@@ -1,0 +1,40 @@
+function wall=completeWallEnergyBalance(wall)
+%COMPLETEWALLENERGYBALANCE 统一内外侧热量符号，形成材料实际净输入。
+% 模块一：把一维解的背温映射回完整面元数组；绝热集中热容背温等于壁温。
+% 模块二：q净入壁=q外对流-q外辐射-q内散热；内侧散热允许为负。
+% 模块三：记录边界算法与适用性；失效面元全部保持 NaN。
+boundary=wallBackBoundary(wall.material);
+back=nan(size(wall.temperature));
+if any(wall.oneDimensionalFace)
+    if ~isfield(wall.oneDimensional,'backTemperature')
+        if boundary.active
+            error('RocketAeroHeat:BackBoundary:History','非绝热内侧需要完整背面温度历程。');
+        end
+    else
+        back(wall.oneDimensionalFace,:)=wall.oneDimensional.backTemperature;
+    end
+end
+if boundary.active && any(wall.lumpedFace)
+    error('RocketAeroHeat:BackBoundary:Model','内侧换热启用时必须使用完整一维导热。');
+end
+back(wall.lumpedFace,:)=wall.temperature(wall.lumpedFace,:);
+[q,~,conv,rad]=evaluateBackWallHeatFlux(back,boundary);
+if ~boundary.active
+    % 兼容无背温历史的旧绝热结果；边界无能量交换是明确条件。
+    q(wall.validFace,:)=0; conv(wall.validFace,:)=0; rad(wall.validFace,:)=0;
+end
+wall.backTemperature=back;
+wall.backConvectiveHeatFlux=conv; wall.backRadiativeHeatFlux=rad;
+wall.backHeatFlux=q;
+wall.outerNetHeatFlux=wall.convectiveHeatFlux-wall.radiativeHeatFlux;
+wall.netHeatFlux=wall.outerNetHeatFlux-q;
+wall.backBoundary=boundary;
+wall.energyConvention='净入壁=外侧对流输入-外侧辐射散热-内侧散热；内侧散热负值表示内环境加热';
+if boundary.active
+    wall.method=strrep(wall.method,'Bi<=0.1：集中热容；Bi>0.1：一维有限体积导热；','全部有效面元一维导热；');
+    wall.method=strrep(wall.method,'Biot 分流','全部有效面元一维导热');
+    if ~contains(wall.method,boundary.method), wall.method=[wall.method '；' boundary.method]; end
+    wall.scope=strrep(strrep(wall.scope,'绝热背面','指定内侧对流/辐射'),'背面绝热','指定内侧对流/辐射');
+    if ~contains(wall.scope,boundary.scope), wall.scope=[wall.scope '；' boundary.scope]; end
+end
+end

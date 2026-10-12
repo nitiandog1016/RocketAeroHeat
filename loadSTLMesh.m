@@ -1,0 +1,182 @@
+function mesh = loadSTLMesh(cfg)
+%% =========================================================
+%  loadSTLMesh.m
+%
+%  功能：
+%  读取 STL 三角面片模型，并转换为程序统一使用的 mesh
+%  数据结构。
+%
+%  输入：
+%
+%  cfg.geometry.stlFile
+%      STL 文件路径
+%
+%  cfg.geometry.scale
+%      STL 原始坐标到 SI 单位 m 的转换系数
+%
+%
+%  输出：
+%
+%  mesh.V
+%      Nvertex × 3 节点坐标矩阵
+%
+%      每一行：
+%
+%      [x  y  z]
+%
+%
+%  mesh.F
+%      Nface × 3 三角面元连接矩阵
+%
+%      每一行：
+%
+%      [node1  node2  node3]
+%
+%      表示一个三角面由哪三个节点组成。
+%
+%
+%  注意：
+%
+%  STL 的三角面节点排列顺序决定原始法向方向。
+%  后续我们会单独建立 fixNormalDirection.m，
+%  对法向方向进行统一处理。
+%% =========================================================
+
+
+%% ===================== 1. 获取 STL 文件路径 =====================
+
+filename = cfg.geometry.stlFile;
+
+
+%% ===================== 2. 检查文件是否存在 =====================
+% 如果 STL 文件不存在，立即终止程序。
+%
+% 避免后面的错误提示难以理解。
+
+if ~isfile(filename)
+
+    error(['STL file not found: ', filename, newline, ...
+           'Please check cfg.geometry.stlFile in createCaseConfig.m']);
+
+end
+
+
+%% ===================== 3. 调用 MATLAB stlread =====================
+% 新版本 MATLAB 的 stlread 通常返回 triangulation 对象：
+%
+% TR.Points
+% TR.ConnectivityList
+%
+% Points：
+% 节点坐标
+%
+% ConnectivityList：
+% 三角面元节点编号
+
+TR = stlread(filename);
+
+
+%% ===================== 4. 提取节点和面元 =====================
+
+if isa(TR, 'triangulation')
+
+    % MATLAB 新版本标准输出形式
+    V = TR.Points;
+    F = TR.ConnectivityList;
+
+elseif isstruct(TR)
+
+    % 为部分旧版本/第三方 stlread 保留兼容接口
+
+    if isfield(TR, 'Points') && isfield(TR, 'ConnectivityList')
+
+        V = TR.Points;
+        F = TR.ConnectivityList;
+
+    elseif isfield(TR, 'vertices') && isfield(TR, 'faces')
+
+        V = TR.vertices;
+        F = TR.faces;
+
+    else
+
+        error('Unknown STL data structure returned by stlread.');
+
+    end
+
+else
+
+    error('Unsupported output format from stlread.');
+
+end
+
+
+%% ===================== 5. 转换为 double =====================
+% 后面的矩阵计算全部使用 double。
+
+V = double(V);
+F = double(F);
+
+
+%% ===================== 6. STL 单位转换 =====================
+% STL 通常没有单位信息。
+%
+% 因此根据用户设置：
+%
+% cfg.geometry.scale
+%
+% 将原始坐标统一换算成 m。
+%
+% 例如原 STL 单位为 mm：
+%
+% 1000 mm × 1e-3 = 1 m
+
+V = V * cfg.geometry.scale;
+
+
+%% ===================== 7. 基本有效性检查 =====================
+
+if size(V,2) ~= 3
+
+    error('Vertex matrix must contain three columns: [x y z].');
+
+end
+
+if size(F,2) ~= 3
+
+    error('Only triangular STL meshes are supported.');
+
+end
+
+if isempty(V) || isempty(F)
+
+    error('The STL file contains no valid geometry.');
+
+end
+
+
+%% ===================== 8. 保存到 mesh 结构体 =====================
+
+mesh.V = V;
+
+mesh.F = F;
+
+
+%% ===================== 9. 保存文件信息 =====================
+
+mesh.fileName = filename;
+
+mesh.scale = cfg.geometry.scale;
+
+
+%% ===================== 10. 输出读取信息 =====================
+
+fprintf('STL file            : %s\n', filename);
+
+fprintf('Vertices            : %d\n', size(V,1));
+
+fprintf('Triangular faces    : %d\n', size(F,1));
+
+fprintf('Coordinate scale    : %.6e\n', cfg.geometry.scale);
+
+end

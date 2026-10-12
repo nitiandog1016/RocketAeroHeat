@@ -1,0 +1,208 @@
+function mesh = calcAerothermalExposure(mesh)
+%CALCAEROTHERMAL EXPOSURE 由壁温和热流历程计算面元累计热量与峰值。
+% 模块作用：按隐式 Euler 使用的右端时间站热流积分，得到每个面元的
+% 对流、辐射及净热量 [J/m^2]，并给出峰值热流/壁温与出现时间。
+% 结合真实面元面积，汇总已求解区域的瞬时总功率和累计能量 [J]。
+% 未计算面元保持 NaN；总能量只代表已求解面积，不伪称整箭体总量。
+% 同时以薄壁热容或厚壁最终温度剖面核对离散能量守恒。
+
+%% 1. 检查热历程和实际面元面积
+if ~isfield(mesh,'wallThermal') || ~isfield(mesh,'localGeometry') || ...
+        ~isfield(mesh.localGeometry,'area')
+    error('RocketAeroHeat:Exposure:Input', ...
+        '需要壁温历程与每个面元的真实面积。');
+end
+w=mesh.wallThermal;
+t=double(w.time(:)'); nt=numel(t);
+nf=size(mesh.F,1);
+area=double(mesh.localGeometry.area(:));
+if nt<2 || t(1)~=0 || any(diff(t)<=0) || ...
+        numel(area)~=nf || any(~isfinite(area) | area<=0)
+    error('RocketAeroHeat:Exposure:Geometry', ...
+        '时间或面元面积无效。');
+end
+fields={'convectiveHeatFlux','radiativeHeatFlux', ...
+    'netHeatFlux','temperature'};
+for j=1:numel(fields)
+    if ~isfield(w,fields{j}) || ...
+            ~isequal(size(w.(fields{j})),[nf nt])
+        error('RocketAeroHeat:Exposure:Size', ...
+            '%s 与网格/时间尺寸不匹配。',fields{j});
+    end
+end
+valid=logical(w.validFace(:));
+if numel(valid)~=nf
+    error('RocketAeroHeat:Exposure:Size','有效面元数量不匹配。');
+end
+for j=1:numel(fields)
+    values=w.(fields{j});
+    if any(~isfinite(values(valid,:)),'all')
+        error('RocketAeroHeat:Exposure:Missing', ...
+            '有效面元的 %s 历程包含缺失值。',fields{j});
+    end
+end
+
+% 新结果必须明确保存内侧热流；仅旧绝热结果可以按零内侧交换处理。
+backBoundary=wallBackBoundary(w.material);
+backFlux=nan(nf,nt); backFlux(valid,:)=0; backConv=backFlux; backRad=backFlux;
+if isfield(w,'backHeatFlux')
+    for key={'backHeatFlux','backConvectiveHeatFlux','backRadiativeHeatFlux'}
+        if ~isfield(w,key{1}) || ~isequal(size(w.(key{1})),[nf nt]) || ...
+                any(~isfinite(w.(key{1})(valid,:)),'all')
+            error('RocketAeroHeat:Exposure:BackHistory','内侧热流历程缺失或无效。');
+        end
+    end
+    backFlux=w.backHeatFlux; backConv=w.backConvectiveHeatFlux; backRad=w.backRadiativeHeatFlux;
+elseif backBoundary.active
+    error('RocketAeroHeat:Exposure:BackHistory','非绝热内侧缺少热流历史，请重新求壁温。');
+end
+balanceFlux=w.convectiveHeatFlux-w.radiativeHeatFlux-backFlux;
+balanceScale=max(1,abs(w.convectiveHeatFlux)+abs(w.radiativeHeatFlux)+abs(backFlux));
+if any(abs(balanceFlux(valid,:)-w.netHeatFlux(valid,:))>1e-10*balanceScale(valid,:),'all') || ...
+        any(abs(backFlux(valid,:)-backConv(valid,:)-backRad(valid,:))>1e-10*balanceScale(valid,:),'all')
+    error('RocketAeroHeat:Exposure:FluxBalance','内外侧热流与材料净输入的符号/分量不一致。');
+end
+
+%% 2. 与壁温推进一致的右端矩形积分；区分有符号和正向吸收热量
+dt=diff(t);
+conv=nan(nf,nt); rad=conv; net=conv; positive=conv;
+conv(valid,:)=[zeros(nnz(valid),1), ...
+    cumsum(w.convectiveHeatFlux(valid,2:end).*dt,2)];
+rad(valid,:)=[zeros(nnz(valid),1), ...
+    cumsum(w.radiativeHeatFlux(valid,2:end).*dt,2)];
+net(valid,:)=[zeros(nnz(valid),1), ...
+    cumsum(w.netHeatFlux(valid,2:end).*dt,2)];
+positive(valid,:)=[zeros(nnz(valid),1), ...
+    cumsum(max(w.convectiveHeatFlux(valid,2:end),0).*dt,2)];
+backDose=nan(nf,nt); backConvDose=backDose; backRadDose=backDose;
+backDose(valid,:)=[zeros(nnz(valid),1) cumsum(backFlux(valid,2:end).*dt,2)];
+backConvDose(valid,:)=[zeros(nnz(valid),1) cumsum(backConv(valid,2:end).*dt,2)];
+backRadDose(valid,:)=[zeros(nnz(valid),1) cumsum(backRad(valid,2:end).*dt,2)];
+peakFlux=nan(nf,1); peakFluxTime=peakFlux;
+peakTemperature=peakFlux; peakTemperatureTime=peakFlux;
+if any(valid)
+    [peakFlux(valid),fluxIndex]=max(w.convectiveHeatFlux(valid,:),[],2);
+    peakFluxTime(valid)=t(fluxIndex);
+    [peakTemperature(valid),temperatureIndex]=max(w.temperature(valid,:),[],2);
+    peakTemperatureTime(valid)=t(temperatureIndex);
+end
+
+%% 3. 面积加权功率与最终材料储热；检查净热量守恒
+powerConv=nan(1,nt); powerRad=powerConv; powerNet=powerConv;
+if any(valid)
+    powerConv=sum(area(valid).*w.convectiveHeatFlux(valid,:),1);
+    powerRad=sum(area(valid).*w.radiativeHeatFlux(valid,:),1);
+    powerNet=sum(area(valid).*w.netHeatFlux(valid,:),1);
+end
+stored=nan(nf,1);
+lumped=valid & logical(w.lumpedFace(:));
+thick=valid & logical(w.oneDimensionalFace(:));
+if any(lumped & thick) || any(valid & ~(lumped | thick))
+    error('RocketAeroHeat:Exposure:WallModel', ...
+        '已求解面元必须且只能对应一种壁温求解模型。');
+end
+stored(lumped)=w.material.density*w.material.thickness* ...
+    integrateWallMaterialProperty(w.material,'specificHeat', ...
+        w.initialTemperature,w.temperature(lumped,end));
+if any(thick)
+    if ~isfield(w.oneDimensional,'finalDepthTemperature') || ...
+            ~isfield(w.oneDimensional,'depth')
+        error('RocketAeroHeat:Exposure:Depth', ...
+            '厚壁求解缺少最终厚度温度剖面。');
+    end
+    profile=w.oneDimensional.finalDepthTemperature;
+    depth=w.oneDimensional.depth(:)';
+    if ~isequal(size(profile),[nnz(thick) numel(depth)])
+        error('RocketAeroHeat:Exposure:Depth', ...
+            '厚壁温度剖面与有效面元不匹配。');
+    end
+    if isfield(w.material,'layers') && ~isempty(w.material.layers)
+        % 逐层半控制体独立储热；热阻的双节点没有额外厚度，不能全局 trapz。
+        grid=buildLayeredWallGrid(w.material);
+        stored(thick)=sum(layeredWallEnergyIncrement(grid,w.initialTemperature,profile),2);
+    else
+        specificEnergy=integrateWallMaterialProperty(w.material,'specificHeat', ...
+            w.initialTemperature,profile);
+        stored(thick)=w.material.density*trapz(depth,specificEnergy,2);
+    end
+end
+residual=nan(nf,1);
+residual(valid)=stored(valid)-net(valid,end);
+resolvedArea=sum(area(valid));
+
+%% 4. 输出算法、适用范围与驻点单点热剂量
+e=struct;
+e.method='隐式 Euler 右端热流积分 + 面元面积加权 + 材料储热核对';
+e.scope=['已求解面元的有符号热量与离散时间点峰值；' ...
+    '未解面元保持 NaN；面积总量仅覆盖已求解表面，不代表完整箭体'];
+e.time=t; e.validFace=valid;
+e.cumulativeConvectiveHeat=conv;
+e.cumulativeRadiativeHeat=rad;
+e.cumulativeNetHeat=net;
+e.cumulativeOuterNetHeat=conv-rad;
+e.cumulativeBackHeat=backDose;
+e.cumulativeBackConvectiveHeat=backConvDose;
+e.cumulativeBackRadiativeHeat=backRadDose;
+e.backBoundary=backBoundary;
+e.energyConvention='材料净热量=外对流-外辐射-内侧散热；内侧散热可为负';
+e.cumulativePositiveConvectiveHeat=positive;
+e.peakConvectiveHeatFlux=peakFlux;
+e.peakConvectiveHeatFluxTime=peakFluxTime;
+e.peakWallTemperature=peakTemperature;
+e.peakWallTemperatureTime=peakTemperatureTime;
+e.convectivePower=powerConv;
+e.radiativePower=powerRad;
+e.netPower=powerNet;
+e.backPower=nan(1,nt);
+if any(valid), e.backPower=sum(area(valid).*backFlux(valid,:),1); end
+e.storedEnergyPerArea=stored;
+e.energyBalanceResidualPerArea=residual;
+e.summary=struct('calculatedFaces',nnz(valid), ...
+    'resolvedArea',resolvedArea,'totalArea',sum(area), ...
+    'resolvedAreaFraction',resolvedArea/sum(area), ...
+    'totalConvectiveEnergyResolved',NaN, ...
+    'totalRadiativeEnergyResolved',NaN, ...
+    'totalNetEnergyResolved',NaN, ...
+    'totalBackEnergyResolved',NaN,'totalBackConvectiveEnergyResolved',NaN, ...
+    'totalBackRadiativeEnergyResolved',NaN, ...
+    'maximumEnergyBalanceResidual',NaN);
+if any(valid)
+    e.summary.totalConvectiveEnergyResolved= ...
+        sum(area(valid).*conv(valid,end));
+    e.summary.totalRadiativeEnergyResolved= ...
+        sum(area(valid).*rad(valid,end));
+    e.summary.totalNetEnergyResolved=sum(area(valid).*net(valid,end));
+    e.summary.totalBackEnergyResolved=sum(area(valid).*backDose(valid,end));
+    e.summary.totalBackConvectiveEnergyResolved=sum(area(valid).*backConvDose(valid,end));
+    e.summary.totalBackRadiativeEnergyResolved=sum(area(valid).*backRadDose(valid,end));
+    e.summary.maximumEnergyBalanceResidual=max(abs(residual(valid)));
+end
+point=struct('available',false, ...
+    'status','驻点单点历程不可用');
+if isfield(w,'stagnationPoint') && w.stagnationPoint.available
+    p=w.stagnationPoint;
+    if numel(p.convectiveHeatFlux)==nt && ...
+            numel(p.radiativeHeatFlux)==nt && ...
+            numel(p.netHeatFlux)==nt && ...
+            all(isfinite([p.convectiveHeatFlux(:); ...
+            p.radiativeHeatFlux(:);p.netHeatFlux(:)]))
+        point=struct('available',true, ...
+            'status','驻点单点累计热量；不是鼻部总能量', ...
+            'method',e.method, ...
+            'cumulativeConvectiveHeat', ...
+            [0 cumsum(p.convectiveHeatFlux(2:end).*dt)], ...
+            'cumulativeRadiativeHeat', ...
+            [0 cumsum(p.radiativeHeatFlux(2:end).*dt)], ...
+            'cumulativeNetHeat', ...
+            [0 cumsum(p.netHeatFlux(2:end).*dt)]);
+        point.cumulativeBackHeat=zeros(1,nt);
+        if isfield(p,'backHeatFlux')
+            point.cumulativeBackHeat=[0 cumsum(p.backHeatFlux(2:end).*dt)];
+        elseif backBoundary.active
+            error('RocketAeroHeat:Exposure:BackPoint','非绝热驻点单点缺少内侧热流历史。');
+        end
+    end
+end
+e.stagnationPoint=point;
+mesh.aerothermalExposure=e;
+end

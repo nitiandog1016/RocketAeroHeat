@@ -1,0 +1,384 @@
+function mesh = calcWallThermalHistory(mesh,history,material,cfg)
+%CALCWALLTHERMALHISTORY 由逐站内置气动热边界条件求变工况壁温历程。
+% 内置历程默认重建各时刻外流，沿程边界层与厚度导热隐式耦合；
+% 自动子步也按飞行条件插值。以下 Biot 分流及局部黏度反馈只用于
+% 给定 h/Taw 的旧接口或 cfg.heating.wallCoupling='local' 对照。
+% 面元任一站无可信热流时，整条该面元温度历程为 NaN，不以零热流冒充。
+% 材料可为常物性或 cp(T)/k(T) 表，密度保持常数；背面默认绝热，
+% 可按 material.backBoundary 指定内侧恒定对流/辐射边界；
+% 不含横向导热、烧蚀和非定常外流。
+
+%% 1. 时间、材料、尺寸与有效面元检查
+if nargin<4, cfg=struct; end
+backBoundary=wallBackBoundary(material);
+layeredMaterial=isfield(material,'layers') && ~isempty(material.layers);
+if layeredMaterial
+    if ~isfield(cfg,'flight') || ~isfield(cfg.flight,'Twall')
+        error('RocketAeroHeat:LayeredWall:Initial','多层材料需要 cfg.flight.Twall 初温。');
+    end
+    material=normalizeLayeredWallMaterial(material,cfg.flight.Twall);
+end
+required={'density','specificHeat','thickness','thermalConductivity', ...
+    'emissivity','radiationTemperature'};
+for k=1:numel(required)
+    key=required{k};
+    if ~isfield(material,key)
+        error('RocketAeroHeat:WallHistory:Material','缺少 %s。',key);
+    end
+    validateattributes(material.(key),{'numeric'}, ...
+        {'real','finite','scalar'},mfilename,key);
+end
+if any([material.density,material.specificHeat,material.thickness, ...
+        material.thermalConductivity,material.radiationTemperature]<=0) || ...
+        material.emissivity<0 || material.emissivity>1
+    error('RocketAeroHeat:WallHistory:Material','材料参数不在物理范围内。');
+end
+if ~isfield(cfg,'flight') || ~isfield(cfg.flight,'Twall')
+    error('RocketAeroHeat:WallHistory:Initial','缺少初始壁温。');
+end
+initial=cfg.flight.Twall;
+validateattributes(initial,{'numeric'},{'real','finite','scalar','positive'});
+materialProperties=wallMaterialProperties(material,initial);
+material.specificHeat=materialProperties.specificHeat;
+material.thermalConductivity=materialProperties.thermalConductivity;
+variableMaterial=isfield(material,'propertyTable') && ~isempty(material.propertyTable);
+if abs(initial-history.initialWallTemperature)>1e-9*initial
+    error('RocketAeroHeat:WallHistory:Stale', ...
+        '逐站热流计算使用的初始壁温与当前配置不同。');
+end
+t=double(history.time(:)'); nt=numel(t);
+if nt<2 || t(1)~=0 || any(diff(t)<=0)
+    error('RocketAeroHeat:WallHistory:Time','时间须从 0 开始并严格递增。');
+end
+nf=size(mesh.F,1);
+h=double(history.heatTransferCoefficient);
+Taw=double(history.recoveryTemperature);
+eligible=logical(history.eligibleFace);
+if ~isequal(size(h),[nf nt]) || ~isequal(size(Taw),[nf nt]) || ...
+        ~isequal(size(eligible),[nf nt])
+    error('RocketAeroHeat:WallHistory:Size','逐站热流数组与网格/时间不匹配。');
+end
+if nf*nt>1e6
+    error('RocketAeroHeat:WallHistory:Memory','输出过大，请减少时间站点。');
+end
+valid=all(eligible & isfinite(h) & h>=0 & ...
+    isfinite(Taw) & Taw>0,2);
+% 完整内置历程默认逐步重算沿程壁温热边界；给定 h/Taw 的旧接口
+% 和显式 local 对照仍走下方低阶求解。冷壁覆盖掩码不代替热壁重算。
+couplingMode='streamline';
+if isfield(cfg,'heating') && isfield(cfg.heating,'wallCoupling')
+    couplingMode=char(cfg.heating.wallCoupling);
+end
+if ~ismember(couplingMode,{'streamline','local'})
+    error('RocketAeroHeat:WallHistory:Coupling','wallCoupling 须为 streamline 或 local。');
+end
+if strcmp(couplingMode,'streamline') && isfield(history,'couplingInput')
+    mesh=calcCoupledFlightWallHistory(mesh,history,material,cfg);
+    return;
+end
+law=[];
+if isfield(history,'referenceLaw') && ~isempty(history.referenceLaw)
+    law=history.referenceLaw;
+    for key={'edgeTemperature','edgePressure','exponent','referenceViscosity0'}
+        if ~isequal(size(law.(key{1})),[nf nt])
+            error('RocketAeroHeat:WallHistory:Law', ...
+                '参考性质 %s 尺寸不匹配。',key{1});
+        end
+    end
+    if isfield(law,'referenceCp0') && ...
+            ~isequal(size(law.referenceCp0),[nf nt])
+        error('RocketAeroHeat:WallHistory:Law', ...
+            '空气焓等效比热尺寸不匹配。');
+    end
+end
+
+%% 2. 跨历程取最大可能 Bi，固定每个面元的厚度求解路径
+Bi=h*(material.thickness/2)/material.thermalConductivity;
+maximumBi=nan(nf,1);
+for j=1:nt
+    estimate=h(valid,j);
+    if ~isempty(law)
+        upper=max(initial,Taw(valid,j));
+        estimate=max(estimate,evaluateWallConvection( ...
+            h(valid,j),Taw(valid,j),upper, ...
+            selectLaw(law,valid,j)));
+    end
+    candidate=estimate*(material.thickness/2)/material.thermalConductivity;
+    if j==1, maximumBi(valid)=candidate;
+    else, maximumBi(valid)=max(maximumBi(valid),candidate); end
+end
+lumped=valid & maximumBi<=0.1;
+oneDimensional=valid & maximumBi>0.1;
+if variableMaterial
+    lumped(:)=false; oneDimensional=valid;
+    maximumBi=maximumBi*material.thermalConductivity/min(material.propertyTable.thermalConductivity);
+end
+
+if layeredMaterial || backBoundary.active
+    lumped(:)=false; oneDimensional=valid; Bi(:)=NaN; maximumBi(:)=NaN;
+end
+
+%% 3. 集中热容：分段变工况隐式 Euler 和非线性辐射
+temperature=nan(nf,nt); qConv=temperature; qRad=temperature;
+qNet=temperature; hHistory=temperature;
+C=material.density*material.specificHeat*material.thickness;
+rad=material.emissivity*5.670374419e-8;
+Tr=material.radiationTemperature;
+ids=find(lumped);
+temperature(ids,1)=initial;
+for j=1:nt
+    localLaw=selectLaw(law,ids,j);
+    if j==1
+        value=initial*ones(numel(ids),1);
+    else
+        dt=t(j)-t(j-1);
+        old=temperature(ids,j-1);
+        value=old;
+        for iteration=1:30
+            [currentH,derivativeH]=evaluateWallConvection( ...
+                h(ids,j),Taw(ids,j),value,localLaw);
+            residual=C/dt*(value-old)-currentH.*(Taw(ids,j)-value)+ ...
+                rad*(value.^4-Tr^4);
+            derivative=C/dt+currentH-derivativeH.* ...
+                (Taw(ids,j)-value)+4*rad*value.^3;
+            correction=residual./derivative;
+            value=max(1,value-correction);
+            if all(abs(correction)<=1e-9*max(1,value)), break; end
+        end
+        if any(~isfinite(value)) || any(abs(correction)>1e-6*max(1,value))
+            error('RocketAeroHeat:WallHistory:Convergence', ...
+                '第 %d 时间步的集中热容迭代未收敛。',j);
+        end
+        temperature(ids,j)=value;
+    end
+    currentH=evaluateWallConvection( ...
+        h(ids,j),Taw(ids,j),value,localLaw);
+    hHistory(ids,j)=currentH;
+    qConv(ids,j)=currentH.*(Taw(ids,j)-value);
+    qRad(ids,j)=rad*(value.^4-Tr^4);
+    qNet(ids,j)=qConv(ids,j)-qRad(ids,j);
+end
+
+%% 4. 厚壁：逐站更新表面对流的一维有限体积导热
+depthResult=struct;
+if any(oneDimensional)
+    ids=find(oneDimensional);
+    depthResult=conductionHistory(h(ids,:),Taw(ids,:),t, ...
+        material,initial,selectLaw(law,ids,':'));
+    temperature(ids,:)=depthResult.surfaceTemperature;
+    for j=1:nt
+        currentH=evaluateWallConvection(h(ids,j),Taw(ids,j), ...
+            temperature(ids,j),selectLaw(law,ids,j));
+        hHistory(ids,j)=currentH;
+        qConv(ids,j)=currentH.*(Taw(ids,j)-temperature(ids,j));
+        qRad(ids,j)=rad*(temperature(ids,j).^4-Tr^4);
+        qNet(ids,j)=qConv(ids,j)-qRad(ids,j);
+    end
+end
+
+%% 5. 输出可审查的算法、适用性及驻点单点历程
+wall=struct;
+wall.method=['逐站内置气动热 + 右端工况分段常值 + Biot 分流 + ' ...
+    '隐式 Euler/一维有限体积导热 + 辐射 Newton 迭代'];
+wall.scope=['均匀常物性材料、绝热背面；各时间站外流独立重算，' ...
+    '站间不求非定常流；壁温反馈使用局部 1/2、1/5 黏度指数，' ...
+    '不随壁温重积分 Head 状态或重判分离；面元任一站无解则整条历程未计算'];
+wall.time=t; wall.material=material; wall.initialTemperature=initial;
+wall.temperature=temperature;
+wall.convectiveHeatFlux=qConv;
+wall.radiativeHeatFlux=qRad;
+wall.netHeatFlux=qNet;
+wall.heatTransferCoefficientHistory=hHistory;
+wall.maximumEstimatedBiot=maximumBi;
+wall.Biot=Bi;
+wall.validFace=valid; wall.lumpedFace=lumped;
+wall.oneDimensionalFace=oneDimensional;
+wall.oneDimensional=depthResult;
+wall.wallTemperatureFeedback=~isempty(law);
+wall.materialMethod=materialProperties.method;
+if variableMaterial
+    wall.method=[wall.method '；变物性材料全部采用 cp(T) 积分储热/Kirchhoff 一维导热'];
+    wall.scope=strrep(wall.scope,'均匀常物性材料','单层常密度、用户温度相关 cp/k 材料');
+end
+if layeredMaterial
+    wall.method='逐站边界 + 逐层有限体积/cp(T) 储热/Kirchhoff 通量 + 接触热阻 + 隐式 Euler/辐射';
+    wall.materialMethod='逐层独立材料物性与界面热阻；不使用平均物性求解';
+    wall.scope=strrep(wall.scope,'均匀常物性材料','多层常密度材料、各层可给 cp(T)/k(T)');
+end
+wall.summary=struct('calculatedFaces',nnz(valid), ...
+    'lumpedFaces',nnz(lumped),'oneDimensionalFaces',nnz(oneDimensional), ...
+    'maximumFinalTemperature',NaN);
+if any(valid)
+    wall.summary.maximumFinalTemperature=max(temperature(valid,end));
+end
+wall=completeWallEnergyBalance(wall);
+point=struct('available',false,'status','各站驻点边界条件未全部可用');
+fixedPoint=true;
+if isfield(history,'stagnation') && isfield(history.stagnation,'position')
+    positions=history.stagnation.position;
+    scale=1;
+    if isfield(mesh,'V'), scale=max(1,max(max(mesh.V)-min(mesh.V))); end
+    fixedPoint=all(isfinite(positions),'all') && ...
+        all(vecnorm(positions-positions(1,:),2,2)<=1e-8*scale);
+    if all(history.stagnation.available) && ~fixedPoint
+        point.status='驻点位置随工况移动，请查看固定面元温度曲线';
+    end
+end
+if isfield(history,'stagnation') && ...
+        all(history.stagnation.available) && fixedPoint
+    single=struct('F',[1 2 3]);
+    pointHistory=struct('time',t, ...
+        'initialWallTemperature',initial, ...
+        'heatTransferCoefficient', ...
+        history.stagnation.heatTransferCoefficient, ...
+        'recoveryTemperature',history.stagnation.recoveryTemperature, ...
+        'eligibleFace',true(1,nt));
+    if ~isempty(law) && isfield(law,'thermalPropertyMode') && ...
+            strcmp(law.thermalPropertyMode,'thermallyPerfect')
+        pointTaw=pointHistory.recoveryTemperature;
+        pointReference=pointTaw+0.5*(initial-pointTaw);
+        pointMu=1.458e-6*pointReference.^(3/2)./ ...
+            (pointReference+110.4);
+        pointHistory.referenceLaw=struct( ...
+            'edgeTemperature',pointTaw,'edgePressure',ones(1,nt), ...
+            'exponent',zeros(1,nt), ...
+            'referenceViscosity0',pointMu.*287.05.*pointReference, ...
+            'gasConstant',287.05, ...
+            'thermalPropertyMode','thermallyPerfect', ...
+            'referenceCp0',airEnthalpySecantCp(pointTaw,initial));
+    end
+    single=calcWallThermalHistory(single,pointHistory,material,cfg);
+    computed=single.wallThermal;
+    point=struct('available',true, ...
+        'status','逐站驻点单点壁温；不是鼻部温度分布', ...
+        'method',[history.method ' + ' computed.method], ...
+        'scope',computed.scope, ...
+        'time',t,'temperature',computed.temperature(1,:), ...
+        'convectiveHeatFlux',computed.convectiveHeatFlux(1,:), ...
+        'radiativeHeatFlux',computed.radiativeHeatFlux(1,:), ...
+        'netHeatFlux',computed.netHeatFlux(1,:), ...
+        'oneDimensional',logical(computed.oneDimensionalFace), ...
+        'backTemperature',computed.backTemperature(1,:), ...
+        'backHeatFlux',computed.backHeatFlux(1,:), ...
+        'backConvectiveHeatFlux',computed.backConvectiveHeatFlux(1,:), ...
+        'backRadiativeHeatFlux',computed.backRadiativeHeatFlux(1,:));
+end
+wall.stagnationPoint=point;
+if isfield(history,'flight'), wall.flightHistory=history.flight; end
+if isfield(history,'method')
+    wall.heatingHistoryMethod=history.method;
+else
+    wall.heatingHistoryMethod='调用方给定的逐站 h 与 Taw';
+end
+if isfield(mesh,'aerothermalExposure'), mesh=rmfield(mesh,'aerothermalExposure'); end
+mesh.wallThermal=wall;
+mesh.flightHeatingHistory=history;
+end
+
+function part=selectLaw(law,rows,column)
+% 提取当前时间站的参考性质；':' 用于一维导热的完整时间矩阵。
+if isempty(law), part=[]; return; end
+part=law;
+for key={'edgeTemperature','edgePressure','exponent','referenceViscosity0'}
+    values=law.(key{1});
+    if isequal(column,':'), part.(key{1})=values(rows,:);
+    else, part.(key{1})=values(rows,column); end
+end
+if isfield(law,'referenceCp0')
+    values=law.referenceCp0;
+    if isequal(column,':'), part.referenceCp0=values(rows,:);
+    else, part.referenceCp0=values(rows,column); end
+end
+end
+
+function result=conductionHistory(h,Taw,time,material,initial,law)
+% 时间变化边界条件下的厚度方向一维有限体积求解。
+nodes=12;
+if isfield(material,'thermalNodes'), nodes=material.thermalNodes; end
+validateattributes(nodes,{'numeric'}, ...
+    {'real','finite','scalar','integer','>=',3,'<=',100});
+[count,nt]=size(h);
+layered=isfield(material,'layers') && ~isempty(material.layers);
+historyBackBoundary=wallBackBoundary(material);
+if layered || historyBackBoundary.active || (isfield(material,'propertyTable') && ~isempty(material.propertyTable))
+    % 每一站接续完整厚度温度；变物性和局部气体反馈由同一守恒核求解。
+    profile=initial*ones(count,nodes); surface=nan(count,nt); surface(:,1)=initial;
+    back=surface;
+    for step=2:nt
+        state=calcWallConduction1D(h(:,step),Taw(:,step), ...
+            [0 time(step)-time(step-1)],material,profile,selectLaw(law,1:count,step));
+        profile=state.finalDepthTemperature; surface(:,step)=state.surfaceTemperature(:,end);
+        back(:,step)=profile(:,end);
+    end
+    result=struct('surfaceTemperature',surface,'finalDepthTemperature',profile, ...
+        'depth',linspace(0,material.thickness,nodes),'thermalNodes',nodes);
+    result.backTemperature=back;
+    if layered || historyBackBoundary.active
+        result.depth=state.depth; result.materialGrid=state.materialGrid;
+        result.backTemperature=back; result.interfaceFinal=state.interfaceFinal;
+        result.method=state.method; result.scope=state.scope;
+    end
+    return;
+end
+dx=material.thickness/(nodes-1);
+g=material.thermalConductivity/dx;
+capacity=material.density*material.specificHeat*dx*ones(1,nodes);
+capacity([1 end])=capacity([1 end])/2;
+rad=material.emissivity*5.670374419e-8;
+Tr=material.radiationTemperature;
+old=initial*ones(count,nodes);
+surface=nan(count,nt); surface(:,1)=initial;
+back=surface;
+for step=2:nt
+    dt=time(step)-time(step-1);
+    guess=old(:,1);
+    localLaw=selectLaw(law,1:count,step);
+    for iteration=1:25
+        [currentH,derivativeH]=evaluateWallConvection( ...
+            h(:,step),Taw(:,step),guess,localLaw);
+        flux=currentH.*(Taw(:,step)-guess)-rad*(guess.^4-Tr^4);
+        slope=derivativeH.*(Taw(:,step)-guess)-currentH-4*rad*guess.^3;
+        diagonal=repmat(capacity/dt,count,1);
+        diagonal(:,1)=diagonal(:,1)+g-slope;
+        diagonal(:,2:end-1)=diagonal(:,2:end-1)+2*g;
+        diagonal(:,end)=diagonal(:,end)+g;
+        rhs=old.*repmat(capacity/dt,count,1);
+        rhs(:,1)=rhs(:,1)+flux-slope.*guess;
+        updated=solveTridiagonal(diagonal,rhs,g);
+        if any(~isfinite(updated),'all') || any(updated(:)<=0)
+            error('RocketAeroHeat:WallHistory:Numerical', ...
+                '一维导热得到非物理温度。');
+        end
+        difference=updated(:,1)-guess;
+        guess=updated(:,1);
+        if all(abs(difference)<=1e-8*max(1,guess)), break; end
+    end
+    if any(abs(difference)>1e-6*max(1,guess))
+        error('RocketAeroHeat:WallHistory:Convergence', ...
+            '第 %d 时间步的一维导热未收敛。',step);
+    end
+    old=updated;
+    surface(:,step)=updated(:,1); back(:,step)=updated(:,end);
+end
+result=struct('method','变工况一维有限体积 + 隐式 Euler', ...
+    'scope','常物性材料、绝热背面；站间右端边界条件', ...
+    'surfaceTemperature',surface,'backTemperature',back,'finalDepthTemperature',old, ...
+    'depth',linspace(0,material.thickness,nodes),'thermalNodes',nodes);
+end
+
+function answer=solveTridiagonal(diagonal,rhs,g)
+% Thomas 法批量解厚度方向三对角系统。
+[count,n]=size(diagonal);
+upper=zeros(count,n); forward=zeros(count,n);
+upper(:,1)=-g./diagonal(:,1);
+forward(:,1)=rhs(:,1)./diagonal(:,1);
+for j=2:n
+    denominator=diagonal(:,j)+g*upper(:,j-1);
+    forward(:,j)=(rhs(:,j)+g*forward(:,j-1))./denominator;
+    if j<n, upper(:,j)=-g./denominator; end
+end
+answer=zeros(count,n); answer(:,end)=forward(:,end);
+for j=n-1:-1:1
+    answer(:,j)=forward(:,j)-upper(:,j).*answer(:,j+1);
+end
+end

@@ -1,0 +1,3970 @@
+function [cfgOut, rawMeshOut, meshOut, qualityOut, action] = ...
+    meshGUI(cfgIn, rawMeshOriginalIn, host)
+%% ========================================================================
+% meshGUI.m
+%
+% Rocket AeroHeat
+%
+% Geometry Orientation + Surface Mesh GUI
+%
+% ========================================================================
+%
+% 主要流程：
+%
+%       原始 STL
+%           ↓
+%       Geometry Orientation
+%           ↓
+%       PCA 自动主轴 / 手动旋转
+%           ↓
+%       用户确认：
+%           主轴 = X
+%           鼻尖 = +X
+%           ↓
+%       Surface Mesh
+%           ↓
+%       autoRemeshSurface
+%           ↓
+%       calcFaceGeometry
+%           ↓
+%       checkMeshQuality
+%           ↓
+%       确认返回 main
+%
+%
+% ========================================================================
+% 输出
+%
+% cfgOut
+% rawMeshOut
+% meshOut
+% qualityOut
+% action
+%
+% action =
+%
+%       'continue'
+%       'cancel'
+%
+%% ========================================================================
+
+
+%% ========================================================================
+% 1. 配置
+% ========================================================================
+
+if nargin < 1 || isempty(cfgIn)
+
+    cfg = createCaseConfig();
+
+else
+
+    cfg = cfgIn;
+end
+
+
+
+%% ========================================================================
+% 2. 原始 STL
+% ========================================================================
+
+if nargin < 2 || isempty(rawMeshOriginalIn)
+
+    rawMeshOriginal = [];
+
+else
+
+    rawMeshOriginal = rawMeshOriginalIn;
+end
+
+
+
+%% ========================================================================
+% 3. 当前状态
+% ========================================================================
+
+rawMesh = rawMeshOriginal;
+
+mesh = [];
+
+quality = [];
+
+
+cfgOut = cfg;
+
+rawMeshOut = rawMesh;
+
+meshOut = [];
+
+qualityOut = [];
+
+action = 'cancel';
+
+
+
+%% ========================================================================
+% 4. 旋转状态
+% ========================================================================
+
+Rtotal = eye(3);
+
+
+if isempty(rawMeshOriginal)
+
+    rotationCenter = [0 0 0];
+
+else
+
+    validateDisplayMesh(rawMeshOriginal,'rawMeshOriginal');
+
+    rotationCenter = ...
+        mean(rawMeshOriginal.V,1);
+end
+
+
+orientationConfirmed = false;
+
+pcaInfo = [];
+
+
+
+%% ========================================================================
+% 5. PCA 初始分析
+% ========================================================================
+
+if ~isempty(rawMeshOriginal)
+
+    try
+
+        [~,pcaInfo] = ...
+            alignGeometryAxis( ...
+                rawMeshOriginal, ...
+                'pca');
+
+    catch ME
+
+        fprintf(2, ...
+            '\nPCA preview calculation failed:\n%s\n', ...
+            getReport(ME,'extended','hyperlinks','on'));
+
+
+        pcaInfo = [];
+    end
+end
+
+
+
+%% ========================================================================
+% 6. GUI 范围
+% ========================================================================
+
+hMinRange = ...
+    getCfgValue( ...
+        cfg, ...
+        {'gui','hMinSliderRange_mm'}, ...
+        [0.5 20]);
+
+
+hMaxRange = ...
+    getCfgValue( ...
+        cfg, ...
+        {'gui','hMaxSliderRange_mm'}, ...
+        [5 100]);
+
+
+axialRange = ...
+    getCfgValue( ...
+        cfg, ...
+        {'gui','axialSpacingSliderRange_mm'}, ...
+        [2 100]);
+
+
+curvatureRange = ...
+    getCfgValue( ...
+        cfg, ...
+        {'gui','curvatureAngleSliderRange_deg'}, ...
+        [2 20]);
+
+
+
+%% ========================================================================
+% 7. 主窗口
+% ========================================================================
+
+% 可选宿主面板：嵌入统一窗口，单独调用仍保留原有窗口模式。
+embedded = nargin >= 3 && ~isempty(host) && isgraphics(host);
+if embedded
+    fig = ancestor(host,'figure');
+    hideAeroHeatPages(host);
+    parent = host;
+else
+fig = ...
+    uifigure( ...
+        'Name', ...
+        'Rocket AeroHeat - Geometry & Surface Mesh', ...
+        'Position', ...
+        [30 30 1580 900], ...
+        'Color', ...
+        [0.97 0.97 0.97]);
+
+
+    parent = fig;
+end
+
+if embedded
+    fig.CloseRequestFcn = @(src,event)delete(src);
+else
+    fig.CloseRequestFcn = @cancelMainProgram;
+end
+
+
+
+%% ========================================================================
+% 8. 主布局
+% ========================================================================
+
+mainGrid = ...
+    uigridlayout( ...
+        parent, ...
+        [1 2]);
+
+
+mainGrid.ColumnWidth = ...
+    {440,'1x'};
+
+
+mainGrid.RowHeight = ...
+    {'1x'};
+
+
+mainGrid.Padding = ...
+    [8 8 8 8];
+
+
+mainGrid.ColumnSpacing = ...
+    8;
+
+
+
+%% ========================================================================
+% 9. 左侧 Tab
+% ========================================================================
+
+tabGroup = ...
+    uitabgroup(mainGrid);
+
+
+tabGroup.Layout.Row = 1;
+
+tabGroup.Layout.Column = 1;
+
+
+orientationTab = ...
+    uitab( ...
+        tabGroup, ...
+        'Title', ...
+        '1. Geometry Orientation');
+
+
+meshTab = ...
+    uitab( ...
+        tabGroup, ...
+        'Title', ...
+        '2. Surface Mesh');
+
+
+tabGroup.SelectedTab = ...
+    orientationTab;
+
+
+
+%% ========================================================================
+% 10. Orientation Tab
+% ========================================================================
+
+orientationGrid = ...
+    uigridlayout( ...
+        orientationTab, ...
+        [14 1]);
+
+
+orientationGrid.RowHeight = { ...
+    38, ...
+    24, ...
+    30, ...
+    34, ...
+    40, ...
+    24, ...
+    24, ...
+    24, ...
+    24, ...
+    78, ...
+    82, ...
+    34, ...
+    42, ...
+    '1x'};
+
+
+orientationGrid.Padding = ...
+    [10 10 10 10];
+
+
+orientationGrid.RowSpacing = ...
+    6;
+
+
+
+%% ========================================================================
+% 11. Orientation 标题
+% ========================================================================
+
+orientationTitle = ...
+    uilabel( ...
+        orientationGrid, ...
+        'Text', ...
+        'STL Geometry Orientation', ...
+        'FontSize', ...
+        17, ...
+        'FontWeight', ...
+        'bold', ...
+        'HorizontalAlignment', ...
+        'center');
+
+
+orientationTitle.Layout.Row = 1;
+
+
+
+%% ========================================================================
+% 12. STL 文件
+% ========================================================================
+
+pathLabel = ...
+    uilabel( ...
+        orientationGrid, ...
+        'Text', ...
+        'Original STL file');
+
+
+pathLabel.Layout.Row = 2;
+
+
+pathField = ...
+    uieditfield( ...
+        orientationGrid, ...
+        'text', ...
+        'Editable', ...
+        'off', ...
+        'Value', ...
+        getCurrentSTLPath());
+
+
+pathField.Layout.Row = 3;
+
+
+selectFileButton = ...
+    uibutton( ...
+        orientationGrid, ...
+        'push', ...
+        'Text', ...
+        '选择新的 STL 文件');
+
+
+selectFileButton.Layout.Row = 4;
+
+
+
+%% ========================================================================
+% 13. PCA / 翻转
+% ========================================================================
+
+autoGrid = ...
+    uigridlayout( ...
+        orientationGrid, ...
+        [1 2]);
+
+
+autoGrid.Layout.Row = 5;
+
+
+autoGrid.ColumnWidth = ...
+    {'1.4x','1x'};
+
+
+autoGrid.Padding = ...
+    [0 0 0 0];
+
+
+pcaButton = ...
+    uibutton( ...
+        autoGrid, ...
+        'push', ...
+        'Text', ...
+        '自动识别主轴 → X', ...
+        'FontWeight', ...
+        'bold');
+
+
+flipAxisButton = ...
+    uibutton( ...
+        autoGrid, ...
+        'push', ...
+        'Text', ...
+        '轴向翻转 180°');
+
+
+
+%% ========================================================================
+% 14. PCA 信息
+% ========================================================================
+
+axisVectorValue = ...
+    uilabel( ...
+        orientationGrid, ...
+        'Text', ...
+        'PCA main axis: --');
+
+
+axisVectorValue.Layout.Row = 6;
+
+
+axisRatioValue = ...
+    uilabel( ...
+        orientationGrid, ...
+        'Text', ...
+        'PCA axis ratio lambda1/lambda2: --');
+
+
+axisRatioValue.Layout.Row = 7;
+
+
+dimensionValue = ...
+    uilabel( ...
+        orientationGrid, ...
+        'Text', ...
+        'Dimensions: --');
+
+
+dimensionValue.Layout.Row = 8;
+
+
+alignmentValue = ...
+    uilabel( ...
+        orientationGrid, ...
+        'Text', ...
+        'Main-axis alignment: --', ...
+        'FontWeight', ...
+        'bold');
+
+
+alignmentValue.Layout.Row = 9;
+
+
+
+%% ========================================================================
+% 15. 手动旋转
+% ========================================================================
+
+manualPanel = ...
+    uipanel( ...
+        orientationGrid, ...
+        'Title', ...
+        'Manual incremental rotation / deg');
+
+
+manualPanel.Layout.Row = 10;
+
+
+manualGrid = ...
+    uigridlayout( ...
+        manualPanel, ...
+        [2 3]);
+
+
+manualGrid.ColumnWidth = ...
+    {'1x','1x','1x'};
+
+
+manualGrid.RowHeight = ...
+    {22,30};
+
+
+manualGrid.Padding = ...
+    [5 5 5 5];
+
+
+uilabel( ...
+    manualGrid, ...
+    'Text','Rx', ...
+    'HorizontalAlignment','center');
+
+
+uilabel( ...
+    manualGrid, ...
+    'Text','Ry', ...
+    'HorizontalAlignment','center');
+
+
+uilabel( ...
+    manualGrid, ...
+    'Text','Rz', ...
+    'HorizontalAlignment','center');
+
+
+rxField = ...
+    uieditfield( ...
+        manualGrid, ...
+        'numeric', ...
+        'Value',0);
+
+
+ryField = ...
+    uieditfield( ...
+        manualGrid, ...
+        'numeric', ...
+        'Value',0);
+
+
+rzField = ...
+    uieditfield( ...
+        manualGrid, ...
+        'numeric', ...
+        'Value',0);
+
+
+
+%% ========================================================================
+% 16. 快捷旋转
+% ========================================================================
+
+quickPanel = ...
+    uipanel( ...
+        orientationGrid, ...
+        'Title', ...
+        'Quick rotation');
+
+
+quickPanel.Layout.Row = 11;
+
+
+quickGrid = ...
+    uigridlayout( ...
+        quickPanel, ...
+        [2 3]);
+
+
+quickGrid.ColumnWidth = ...
+    {'1x','1x','1x'};
+
+
+quickGrid.RowHeight = ...
+    {30,30};
+
+
+quickGrid.Padding = ...
+    [4 4 4 4];
+
+
+rxMinusButton = ...
+    uibutton( ...
+        quickGrid, ...
+        'push', ...
+        'Text','Rx -90°');
+
+
+ryMinusButton = ...
+    uibutton( ...
+        quickGrid, ...
+        'push', ...
+        'Text','Ry -90°');
+
+
+rzMinusButton = ...
+    uibutton( ...
+        quickGrid, ...
+        'push', ...
+        'Text','Rz -90°');
+
+
+rxPlusButton = ...
+    uibutton( ...
+        quickGrid, ...
+        'push', ...
+        'Text','Rx +90°');
+
+
+ryPlusButton = ...
+    uibutton( ...
+        quickGrid, ...
+        'push', ...
+        'Text','Ry +90°');
+
+
+rzPlusButton = ...
+    uibutton( ...
+        quickGrid, ...
+        'push', ...
+        'Text','Rz +90°');
+
+
+
+%% ========================================================================
+% 17. 手动应用 / Reset
+% ========================================================================
+
+orientationActionGrid = ...
+    uigridlayout( ...
+        orientationGrid, ...
+        [1 2]);
+
+
+orientationActionGrid.Layout.Row = 12;
+
+
+orientationActionGrid.ColumnWidth = ...
+    {'1x','1x'};
+
+
+orientationActionGrid.Padding = ...
+    [0 0 0 0];
+
+
+applyManualButton = ...
+    uibutton( ...
+        orientationActionGrid, ...
+        'push', ...
+        'Text', ...
+        '应用手动旋转');
+
+
+resetOrientationButton = ...
+    uibutton( ...
+        orientationActionGrid, ...
+        'push', ...
+        'Text', ...
+        '恢复原始方向');
+
+
+
+%% ========================================================================
+% 18. 确认朝向
+% ========================================================================
+
+confirmOrientationButton = ...
+    uibutton( ...
+        orientationGrid, ...
+        'push', ...
+        'Text', ...
+        '确认：主轴沿 X 且鼻尖朝 +X', ...
+        'FontWeight', ...
+        'bold', ...
+        'FontSize', ...
+        14);
+
+
+confirmOrientationButton.Layout.Row = 13;
+
+
+
+%% ========================================================================
+% 19. Orientation 说明
+% ========================================================================
+
+orientationHint = ...
+    uitextarea( ...
+        orientationGrid, ...
+        'Editable', ...
+        'off', ...
+        'Value', ...
+        { ...
+        '使用方法：'; ...
+        '1. 观察 STL 与 X/Y/Z 坐标方向。'; ...
+        '2. 长细体可以点击“自动识别主轴 → X”。'; ...
+        '3. PCA 不能判断哪一端是鼻尖。'; ...
+        '4. 若鼻尖朝 -X，点击“轴向翻转 180°”。'; ...
+        '5. 任意姿态可继续使用 Rx/Ry/Rz 调整。'; ...
+        '6. 确认鼻尖朝 +X 后再进行网格重构。'});
+
+
+orientationHint.Layout.Row = 14;
+
+
+
+%% ========================================================================
+% 20. Surface Mesh Tab
+% ========================================================================
+
+meshGrid = ...
+    uigridlayout( ...
+        meshTab, ...
+        [19 2]);
+
+
+meshGrid.ColumnWidth = ...
+    {'1x',115};
+
+
+meshGrid.RowHeight = { ...
+    38, ...
+    30, ...
+    40, ...
+    30, ...
+    40, ...
+    30, ...
+    40, ...
+    30, ...
+    40, ...
+    30, ...
+    30, ...
+    30, ...
+    34, ...
+    38, ...
+    34, ...
+    25, ...
+    '1x', ...
+    30, ...
+    44};
+
+
+meshGrid.Padding = ...
+    [10 10 10 10];
+
+
+meshGrid.RowSpacing = ...
+    5;
+
+
+
+%% ========================================================================
+% 21. Mesh 标题
+% ========================================================================
+
+meshTitle = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        'Surface Mesh Reconstruction', ...
+        'FontSize', ...
+        17, ...
+        'FontWeight', ...
+        'bold', ...
+        'HorizontalAlignment', ...
+        'center');
+
+
+meshTitle.Layout.Row = 1;
+
+meshTitle.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 22. hMin
+% ========================================================================
+
+uilabel( ...
+    meshGrid, ...
+    'Text', ...
+    'hMin / mm');
+
+
+hMinField = ...
+    uieditfield( ...
+        meshGrid, ...
+        'numeric', ...
+        'Value', ...
+        cfg.remesh.hMin*1000);
+
+
+hMinField.Layout.Row = 2;
+
+hMinField.Layout.Column = 2;
+
+
+hMinSlider = ...
+    uislider( ...
+        meshGrid, ...
+        'Limits', ...
+        hMinRange, ...
+        'Value', ...
+        clampValue( ...
+            cfg.remesh.hMin*1000, ...
+            hMinRange));
+
+
+hMinSlider.Layout.Row = 3;
+
+hMinSlider.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 23. hMax
+% ========================================================================
+
+hMaxLabel = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        'hMax / mm');
+
+
+hMaxLabel.Layout.Row = 4;
+
+hMaxLabel.Layout.Column = 1;
+
+
+hMaxField = ...
+    uieditfield( ...
+        meshGrid, ...
+        'numeric', ...
+        'Value', ...
+        cfg.remesh.hMax*1000);
+
+
+hMaxField.Layout.Row = 4;
+
+hMaxField.Layout.Column = 2;
+
+
+hMaxSlider = ...
+    uislider( ...
+        meshGrid, ...
+        'Limits', ...
+        hMaxRange, ...
+        'Value', ...
+        clampValue( ...
+            cfg.remesh.hMax*1000, ...
+            hMaxRange));
+
+
+hMaxSlider.Layout.Row = 5;
+
+hMaxSlider.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 24. Axial spacing
+% ========================================================================
+
+axialLabel = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        'Initial axial spacing / mm');
+
+
+axialLabel.Layout.Row = 6;
+
+axialLabel.Layout.Column = 1;
+
+
+axialField = ...
+    uieditfield( ...
+        meshGrid, ...
+        'numeric', ...
+        'Value', ...
+        cfg.remesh.initialAxialSpacing*1000);
+
+
+axialField.Layout.Row = 6;
+
+axialField.Layout.Column = 2;
+
+
+axialSlider = ...
+    uislider( ...
+        meshGrid, ...
+        'Limits', ...
+        axialRange, ...
+        'Value', ...
+        clampValue( ...
+            cfg.remesh.initialAxialSpacing*1000, ...
+            axialRange));
+
+
+axialSlider.Layout.Row = 7;
+
+axialSlider.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 25. Curvature
+% ========================================================================
+
+curvatureLabel = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        'Curvature target / deg');
+
+
+curvatureLabel.Layout.Row = 8;
+
+curvatureLabel.Layout.Column = 1;
+
+
+curvatureField = ...
+    uieditfield( ...
+        meshGrid, ...
+        'numeric', ...
+        'Value', ...
+        cfg.remesh.curvatureAngleTarget);
+
+
+curvatureField.Layout.Row = 8;
+
+curvatureField.Layout.Column = 2;
+
+
+curvatureSlider = ...
+    uislider( ...
+        meshGrid, ...
+        'Limits', ...
+        curvatureRange, ...
+        'Value', ...
+        clampValue( ...
+            cfg.remesh.curvatureAngleTarget, ...
+            curvatureRange));
+
+
+curvatureSlider.Layout.Row = 9;
+
+curvatureSlider.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 26. 周向节点数
+% ========================================================================
+
+minCircumLabel = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        'Minimum circumferential points');
+
+
+minCircumLabel.Layout.Row = 10;
+
+minCircumLabel.Layout.Column = 1;
+
+
+minCircumField = ...
+    uieditfield( ...
+        meshGrid, ...
+        'numeric', ...
+        'Value', ...
+        cfg.remesh.minCircumPoints);
+
+
+minCircumField.Layout.Row = 10;
+
+minCircumField.Layout.Column = 2;
+
+
+maxCircumLabel = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        'Maximum circumferential points');
+
+
+maxCircumLabel.Layout.Row = 11;
+
+maxCircumLabel.Layout.Column = 1;
+
+
+maxCircumField = ...
+    uieditfield( ...
+        meshGrid, ...
+        'numeric', ...
+        'Value', ...
+        cfg.remesh.maxCircumPoints);
+
+
+maxCircumField.Layout.Row = 11;
+
+maxCircumField.Layout.Column = 2;
+
+
+
+%% ========================================================================
+% 27. Display
+% ========================================================================
+
+displayModeLabel = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        'Display mode');
+
+
+displayModeLabel.Layout.Row = 12;
+
+displayModeLabel.Layout.Column = 1;
+
+
+displayMode = ...
+    uidropdown( ...
+        meshGrid, ...
+        'Items', ...
+        { ...
+        'Geometry Mesh', ...
+        'Aspect Ratio', ...
+        'Minimum Angle'}, ...
+        'Value', ...
+        'Geometry Mesh');
+
+
+displayMode.Layout.Row = 12;
+
+displayMode.Layout.Column = 2;
+
+
+displayOptionGrid = ...
+    uigridlayout( ...
+        meshGrid, ...
+        [1 2]);
+
+
+displayOptionGrid.Layout.Row = 13;
+
+displayOptionGrid.Layout.Column = [1 2];
+
+
+displayOptionGrid.ColumnWidth = ...
+    {'1x','1x'};
+
+
+displayOptionGrid.Padding = ...
+    [0 0 0 0];
+
+
+showEdgesCheck = ...
+    uicheckbox( ...
+        displayOptionGrid, ...
+        'Text', ...
+        '显示三角边', ...
+        'Value', ...
+        cfg.plot.showEdges);
+
+
+showNormalsCheck = ...
+    uicheckbox( ...
+        displayOptionGrid, ...
+        'Text', ...
+        '显示法向', ...
+        'Value', ...
+        cfg.plot.showNormals);
+
+
+
+%% ========================================================================
+% 28. Generate
+% ========================================================================
+
+generateButton = ...
+    uibutton( ...
+        meshGrid, ...
+        'push', ...
+        'Text', ...
+        '重新生成表面网格', ...
+        'FontWeight', ...
+        'bold', ...
+        'FontSize', ...
+        14, ...
+        'Enable', ...
+        'off');
+
+
+generateButton.Layout.Row = 14;
+
+generateButton.Layout.Column = [1 2];
+
+
+resetMeshButton = ...
+    uibutton( ...
+        meshGrid, ...
+        'push', ...
+        'Text', ...
+        '恢复默认网格参数');
+
+
+resetMeshButton.Layout.Row = 15;
+
+resetMeshButton.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 29. Status
+% ========================================================================
+
+meshStatusLabel = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        'Mesh not generated.', ...
+        'FontWeight', ...
+        'bold');
+
+
+meshStatusLabel.Layout.Row = 16;
+
+meshStatusLabel.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 30. Statistics
+% ========================================================================
+
+statisticsPanel = ...
+    uipanel( ...
+        meshGrid, ...
+        'Title', ...
+        'Mesh Quality / Statistics');
+
+
+statisticsPanel.Layout.Row = 17;
+
+statisticsPanel.Layout.Column = [1 2];
+
+
+statisticsGrid = ...
+    uigridlayout( ...
+        statisticsPanel, ...
+        [9 2]);
+
+
+statisticsGrid.ColumnWidth = ...
+    {'1x','1x'};
+
+
+statisticsGrid.RowHeight = ...
+    repmat({22},1,9);
+
+
+statisticsGrid.Padding = ...
+    [5 5 5 5];
+
+
+uilabel(statisticsGrid,'Text','Faces');
+
+facesValue = uilabel(statisticsGrid,'Text','--');
+
+
+uilabel(statisticsGrid,'Text','Vertices');
+
+verticesValue = uilabel(statisticsGrid,'Text','--');
+
+
+uilabel(statisticsGrid,'Text','Mean AR');
+
+meanARValue = uilabel(statisticsGrid,'Text','--');
+
+
+uilabel(statisticsGrid,'Text','Max AR');
+
+maxARValue = uilabel(statisticsGrid,'Text','--');
+
+
+uilabel(statisticsGrid,'Text','Mean Min Angle');
+
+meanAngleValue = uilabel(statisticsGrid,'Text','--');
+
+
+uilabel(statisticsGrid,'Text','Minimum Angle');
+
+minAngleValue = uilabel(statisticsGrid,'Text','--');
+
+
+uilabel(statisticsGrid,'Text','Poor Faces');
+
+poorValue = uilabel(statisticsGrid,'Text','--');
+
+
+uilabel(statisticsGrid,'Text','Boundary Edges');
+
+boundaryValue = uilabel(statisticsGrid,'Text','--');
+
+
+uilabel(statisticsGrid,'Text','Non-manifold');
+
+nonManifoldValue = uilabel(statisticsGrid,'Text','--');
+
+
+
+%% ========================================================================
+% 31. Diagnostics hint
+% ========================================================================
+
+diagnosticLabel = ...
+    uilabel( ...
+        meshGrid, ...
+        'Text', ...
+        '错误时详细 stack 会自动打印到 MATLAB Command Window.');
+
+
+diagnosticLabel.Layout.Row = 18;
+
+diagnosticLabel.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 32. Continue
+% ========================================================================
+
+continueButton = ...
+    uibutton( ...
+        meshGrid, ...
+        'push', ...
+        'Text', ...
+        '确认网格并继续主程序', ...
+        'FontWeight', ...
+        'bold', ...
+        'FontSize', ...
+        14, ...
+        'Enable', ...
+        'off');
+
+
+continueButton.Layout.Row = 19;
+
+continueButton.Layout.Column = [1 2];
+
+
+
+%% ========================================================================
+% 33. 右侧预览
+% ========================================================================
+
+viewPanel = ...
+    uipanel( ...
+        mainGrid, ...
+        'Title', ...
+        '3-D Geometry / Mesh Preview', ...
+        'FontWeight', ...
+        'bold');
+
+
+viewPanel.Layout.Row = 1;
+
+viewPanel.Layout.Column = 2;
+
+
+viewGrid = ...
+    uigridlayout( ...
+        viewPanel, ...
+        [2 1]);
+
+
+viewGrid.RowHeight = ...
+    {'1x',40};
+
+
+viewGrid.Padding = ...
+    [3 3 3 3];
+
+
+ax = ...
+    uiaxes(viewGrid);
+
+
+ax.Layout.Row = 1;
+
+
+xlabel(ax,'X / m');
+
+ylabel(ax,'Y / m');
+
+zlabel(ax,'Z / m');
+
+
+grid(ax,'on');
+
+box(ax,'on');
+
+axis(ax,'equal');
+
+axis(ax,'vis3d');
+
+
+if isprop(ax,'Clipping')
+    ax.Clipping = 'off';
+end
+
+
+camproj(ax,'orthographic');
+
+
+
+%% ========================================================================
+% 这里故意不再设置：
+%
+% ax.Interactions = [...]
+%
+% 避免当前 MATLAB 版本出现：
+%
+% BaseAxesInteractionContainer/findConflicts
+%% ========================================================================
+
+
+
+%% ========================================================================
+% 34. 快捷视图
+% ========================================================================
+
+viewButtonGrid = ...
+    uigridlayout( ...
+        viewGrid, ...
+        [1 3]);
+
+
+viewButtonGrid.Layout.Row = 2;
+
+
+viewButtonGrid.ColumnWidth = ...
+    {'1x','1x','1x'};
+
+
+viewButtonGrid.Padding = ...
+    [0 0 0 0];
+
+
+view3DButton = ...
+    uibutton( ...
+        viewButtonGrid, ...
+        'push', ...
+        'Text', ...
+        '3D');
+
+
+viewXZButton = ...
+    uibutton( ...
+        viewButtonGrid, ...
+        'push', ...
+        'Text', ...
+        'X-Z Side');
+
+
+viewXYButton = ...
+    uibutton( ...
+        viewButtonGrid, ...
+        'push', ...
+        'Text', ...
+        'X-Y Top');
+
+
+
+%% ========================================================================
+% 35. Callbacks
+% ========================================================================
+
+selectFileButton.ButtonPushedFcn = ...
+    @selectSTL;
+
+
+pcaButton.ButtonPushedFcn = ...
+    @autoPCAAlignment;
+
+
+flipAxisButton.ButtonPushedFcn = ...
+    @(~,~)applyIncrementRotation(0,180,0);
+
+
+applyManualButton.ButtonPushedFcn = ...
+    @applyManualRotation;
+
+
+resetOrientationButton.ButtonPushedFcn = ...
+    @resetOrientation;
+
+
+confirmOrientationButton.ButtonPushedFcn = ...
+    @confirmOrientation;
+
+
+rxMinusButton.ButtonPushedFcn = ...
+    @(~,~)applyIncrementRotation(-90,0,0);
+
+
+rxPlusButton.ButtonPushedFcn = ...
+    @(~,~)applyIncrementRotation(90,0,0);
+
+
+ryMinusButton.ButtonPushedFcn = ...
+    @(~,~)applyIncrementRotation(0,-90,0);
+
+
+ryPlusButton.ButtonPushedFcn = ...
+    @(~,~)applyIncrementRotation(0,90,0);
+
+
+rzMinusButton.ButtonPushedFcn = ...
+    @(~,~)applyIncrementRotation(0,0,-90);
+
+
+rzPlusButton.ButtonPushedFcn = ...
+    @(~,~)applyIncrementRotation(0,0,90);
+
+
+generateButton.ButtonPushedFcn = ...
+    @generateMesh;
+
+
+resetMeshButton.ButtonPushedFcn = ...
+    @resetMeshParameters;
+
+
+continueButton.ButtonPushedFcn = ...
+    @continueMainProgram;
+
+
+displayMode.ValueChangedFcn = ...
+    @(~,~)safeRender(false);
+
+
+showEdgesCheck.ValueChangedFcn = ...
+    @(~,~)safeRender(false);
+
+
+showNormalsCheck.ValueChangedFcn = ...
+    @(~,~)safeRender(false);
+
+
+tabGroup.SelectionChangedFcn = ...
+    @(~,~)safeRender(false);
+
+
+view3DButton.ButtonPushedFcn = ...
+    @(~,~)view(ax,35,25);
+
+
+viewXZButton.ButtonPushedFcn = ...
+    @(~,~)view(ax,[0 -1 0]);
+
+
+viewXYButton.ButtonPushedFcn = ...
+    @(~,~)view(ax,[0 0 1]);
+
+
+
+%% ========================================================================
+% 36. 参数变化 → 网格失效
+% ========================================================================
+
+hMinSlider.ValueChangedFcn = ...
+    @(src,~)meshSliderChanged( ...
+        hMinField, ...
+        src.Value);
+
+
+hMaxSlider.ValueChangedFcn = ...
+    @(src,~)meshSliderChanged( ...
+        hMaxField, ...
+        src.Value);
+
+
+axialSlider.ValueChangedFcn = ...
+    @(src,~)meshSliderChanged( ...
+        axialField, ...
+        src.Value);
+
+
+curvatureSlider.ValueChangedFcn = ...
+    @(src,~)meshSliderChanged( ...
+        curvatureField, ...
+        src.Value);
+
+
+hMinField.ValueChangedFcn = ...
+    @(src,~)meshFieldChanged( ...
+        hMinSlider, ...
+        src.Value);
+
+
+hMaxField.ValueChangedFcn = ...
+    @(src,~)meshFieldChanged( ...
+        hMaxSlider, ...
+        src.Value);
+
+
+axialField.ValueChangedFcn = ...
+    @(src,~)meshFieldChanged( ...
+        axialSlider, ...
+        src.Value);
+
+
+curvatureField.ValueChangedFcn = ...
+    @(src,~)meshFieldChanged( ...
+        curvatureSlider, ...
+        src.Value);
+
+
+minCircumField.ValueChangedFcn = ...
+    @(~,~)invalidateMesh(true);
+
+
+maxCircumField.ValueChangedFcn = ...
+    @(~,~)invalidateMesh(true);
+
+
+
+%% ========================================================================
+% 37. 初始显示
+% ========================================================================
+
+updateOrientationInformation();
+
+safeRender(true);
+
+
+
+%% ========================================================================
+% 38. 阻塞 main
+% ========================================================================
+
+uiwait(fig);
+
+
+
+%% ========================================================================
+% 39. 关闭
+% ========================================================================
+
+if isvalid(fig) && ~embedded
+    delete(fig);
+end
+
+
+
+%% ========================================================================
+% NESTED
+% 当前 STL 路径
+%% ========================================================================
+
+    function path = getCurrentSTLPath()
+
+        if isfield(cfg,'geometry') ...
+                && isfield(cfg.geometry,'stlFile')
+
+            path = cfg.geometry.stlFile;
+
+        else
+
+            path = '';
+        end
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 选择 STL
+%% ========================================================================
+
+    function selectSTL(~,~)
+
+        [file,path] = ...
+            uigetfile( ...
+                {'*.stl','STL Files (*.stl)'}, ...
+                '选择 STL 文件');
+
+
+        if isequal(file,0)
+            return;
+        end
+
+
+        candidateCfg = cfg;
+        candidateCfg.geometry.stlFile = fullfile(path,file);
+
+
+        candidateCfg.geometry.stlName = file;
+
+
+        try
+
+            newRaw = ...
+                loadSTLMesh(candidateCfg);
+
+
+            newRaw = ...
+                calcFaceGeometry(newRaw);
+
+
+            validateDisplayMesh( ...
+                newRaw, ...
+                'new STL');
+
+
+        catch ME
+
+            showDiagnosticError( ...
+                'STL loading', ...
+                ME);
+
+            return;
+        end
+
+
+        % Commit the path and geometry together only after a successful read.
+        cfg = candidateCfg;
+        pathField.Value = cfg.geometry.stlFile;
+        rawMeshOriginal = newRaw;
+
+        rawMesh = newRaw;
+
+
+        rotationCenter = ...
+            mean(rawMeshOriginal.V,1);
+
+
+        Rtotal = eye(3);
+
+
+        mesh = [];
+
+        quality = [];
+
+
+        orientationConfirmed = false;
+
+
+        cfg.geometry.isAligned = false;
+
+        cfg.geometry.alignmentMethod = 'none';
+
+
+        generateButton.Enable = 'off';
+
+        continueButton.Enable = 'off';
+
+
+        meshStatusLabel.Text = ...
+            'Mesh not generated.';
+
+
+        try
+
+            [~,pcaInfo] = ...
+                alignGeometryAxis( ...
+                    rawMeshOriginal, ...
+                    'pca');
+
+        catch ME
+
+            fprintf(2, ...
+                '\nPCA preview failed:\n%s\n', ...
+                getReport(ME,'extended','hyperlinks','on'));
+
+
+            pcaInfo = [];
+        end
+
+
+        clearStatistics();
+
+        updateOrientationInformation();
+
+
+        tabGroup.SelectedTab = ...
+            orientationTab;
+
+
+        safeRender(true);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% PCA
+%% ========================================================================
+
+    function autoPCAAlignment(~,~)
+
+        if isempty(rawMeshOriginal)
+            return;
+        end
+
+
+        try
+
+            [newRaw,pcaResult] = ...
+                alignGeometryAxis( ...
+                    rawMeshOriginal, ...
+                    'pca');
+
+
+            validateDisplayMesh( ...
+                newRaw, ...
+                'PCA aligned mesh');
+
+
+            rawMesh = newRaw;
+
+
+            Rtotal = ...
+                pcaResult.rotationMatrix;
+
+
+            rotationCenter = ...
+                reshape( ...
+                    pcaResult.rotationCenter, ...
+                    1,3);
+
+
+            pcaInfo = pcaResult;
+
+
+            cfg.geometry.alignmentMethod = ...
+                'PCA';
+
+
+            geometryChanged();
+
+
+        catch ME
+
+            showDiagnosticError( ...
+                'PCA alignment', ...
+                ME);
+        end
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 手动旋转
+%% ========================================================================
+
+    function applyManualRotation(~,~)
+
+        rx = rxField.Value;
+
+        ry = ryField.Value;
+
+        rz = rzField.Value;
+
+
+        applyIncrementRotation(rx,ry,rz);
+
+
+        rxField.Value = 0;
+
+        ryField.Value = 0;
+
+        rzField.Value = 0;
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 增量旋转
+%% ========================================================================
+
+    function applyIncrementRotation(rx,ry,rz)
+
+        if isempty(rawMeshOriginal)
+            return;
+        end
+
+
+        Rx = rotationMatrixX(rx);
+
+        Ry = rotationMatrixY(ry);
+
+        Rz = rotationMatrixZ(rz);
+
+
+        Rdelta = ...
+            Rz ...
+            * ...
+            Ry ...
+            * ...
+            Rx;
+
+
+        Rcandidate = ...
+            Rdelta ...
+            * ...
+            Rtotal;
+
+
+        try
+
+            [newRaw,~] = ...
+                alignGeometryAxis( ...
+                    rawMeshOriginal, ...
+                    'matrix', ...
+                    Rcandidate, ...
+                    rotationCenter);
+
+
+            validateDisplayMesh( ...
+                newRaw, ...
+                'manually aligned mesh');
+
+
+            Rtotal = Rcandidate;
+
+            rawMesh = newRaw;
+
+
+            cfg.geometry.alignmentMethod = ...
+                'manual';
+
+
+            geometryChanged();
+
+
+        catch ME
+
+            showDiagnosticError( ...
+                'manual geometry rotation', ...
+                ME);
+        end
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 几何改变
+%% ========================================================================
+
+    function geometryChanged()
+
+        orientationConfirmed = false;
+
+        cfg.geometry.isAligned = false;
+
+
+        mesh = [];
+
+        quality = [];
+
+
+        generateButton.Enable = 'off';
+
+        continueButton.Enable = 'off';
+
+
+        meshStatusLabel.Text = ...
+            'Geometry changed. Confirm orientation first.';
+
+
+        clearStatistics();
+
+        updateOrientationInformation();
+
+        safeRender(true);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Reset orientation
+%% ========================================================================
+
+    function resetOrientation(~,~)
+
+        if isempty(rawMeshOriginal)
+            return;
+        end
+
+
+        Rtotal = eye(3);
+
+
+        rawMesh = rawMeshOriginal;
+
+
+        rotationCenter = ...
+            mean(rawMeshOriginal.V,1);
+
+
+        cfg.geometry.alignmentMethod = ...
+            'none';
+
+
+        geometryChanged();
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 确认朝向
+%% ========================================================================
+
+    function confirmOrientation(~,~)
+
+        if isempty(rawMesh)
+
+            uialert( ...
+                fig, ...
+                '当前没有有效 STL。', ...
+                'Geometry');
+
+            return;
+        end
+
+
+        validateDisplayMesh( ...
+            rawMesh, ...
+            'aligned rawMesh');
+
+
+        dimensions = ...
+            getMeshDimensions(rawMesh);
+
+
+        transverseSize = ...
+            max(dimensions(2:3));
+
+
+        slenderRatio = ...
+            dimensions(1) ...
+            / ...
+            max(transverseSize,eps);
+
+
+        if slenderRatio < 1.2
+
+            choice = ...
+                uiconfirm( ...
+                    fig, ...
+                    ['当前 X 方向并没有明显比 Y/Z 更长。' newline ...
+                     '请确认箭体主轴确实已经沿 X。' newline newline ...
+                     '仍然继续吗？'], ...
+                    'Geometry Orientation Warning', ...
+                    'Options', ...
+                    {'继续','返回检查'}, ...
+                    'DefaultOption', ...
+                    2, ...
+                    'CancelOption', ...
+                    2);
+
+
+            if ~strcmp(choice,'继续')
+                return;
+            end
+        end
+
+
+        cfg.geometry.rotationMatrix = ...
+            Rtotal;
+
+
+        cfg.geometry.rotationCenter = ...
+            rotationCenter;
+
+
+        cfg.geometry.bodyAxis = ...
+            [1 0 0];
+
+
+        cfg.geometry.noseDirection = ...
+            [1 0 0];
+
+
+        cfg.geometry.isAligned = ...
+            true;
+
+
+        orientationConfirmed = true;
+
+
+        generateButton.Enable = 'on';
+
+
+        meshStatusLabel.Text = ...
+            'Orientation confirmed. Ready to remesh.';
+
+
+        tabGroup.SelectedTab = ...
+            meshTab;
+
+
+        safeRender(true);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Orientation 信息
+%% ========================================================================
+
+    function updateOrientationInformation()
+
+        if isempty(rawMesh)
+
+            axisVectorValue.Text = ...
+                'PCA main axis: --';
+
+
+            axisRatioValue.Text = ...
+                'PCA axis ratio lambda1/lambda2: --';
+
+
+            dimensionValue.Text = ...
+                'Dimensions: --';
+
+
+            alignmentValue.Text = ...
+                'Main-axis alignment: --';
+
+            return;
+        end
+
+
+        dimensions = ...
+            getMeshDimensions(rawMesh);
+
+
+        dimensionValue.Text = ...
+            sprintf( ...
+                'Dimensions: X %.4f m   Y %.4f m   Z %.4f m', ...
+                dimensions(1), ...
+                dimensions(2), ...
+                dimensions(3));
+
+
+        if isempty(pcaInfo) ...
+                || ...
+                ~isfield(pcaInfo,'principalAxisOriginal')
+
+            axisVectorValue.Text = ...
+                'PCA main axis: unavailable';
+
+
+            axisRatioValue.Text = ...
+                'PCA axis ratio lambda1/lambda2: unavailable';
+
+
+            return;
+        end
+
+
+        principalAxisOriginal = ...
+            pcaInfo.principalAxisOriginal(:);
+
+
+        if numel(principalAxisOriginal) ~= 3
+
+            axisVectorValue.Text = ...
+                'PCA main axis: invalid';
+
+            return;
+        end
+
+
+        currentPcaAxis = ...
+            Rtotal ...
+            * ...
+            principalAxisOriginal;
+
+
+        currentPcaAxis = ...
+            currentPcaAxis ...
+            / ...
+            max(norm(currentPcaAxis),eps);
+
+
+        axisVectorValue.Text = ...
+            sprintf( ...
+                'PCA main axis: [%.4f  %.4f  %.4f]', ...
+                currentPcaAxis(1), ...
+                currentPcaAxis(2), ...
+                currentPcaAxis(3));
+
+
+        if isfield(pcaInfo,'axisRatio12')
+
+            axisRatioValue.Text = ...
+                sprintf( ...
+                    'PCA axis ratio lambda1/lambda2: %.3f', ...
+                    pcaInfo.axisRatio12);
+
+        else
+
+            axisRatioValue.Text = ...
+                'PCA axis ratio lambda1/lambda2: --';
+        end
+
+
+        directedAngle = ...
+            acosd( ...
+                max( ...
+                    -1, ...
+                    min( ...
+                        1, ...
+                        dot( ...
+                            currentPcaAxis, ...
+                            [1;0;0]))));
+
+
+        axisAngle = ...
+            min( ...
+                directedAngle, ...
+                180-directedAngle);
+
+
+        transverseSize = ...
+            max(dimensions(2:3));
+
+
+        slenderRatio = ...
+            dimensions(1) ...
+            / ...
+            max(transverseSize,eps);
+
+
+        alignmentValue.Text = ...
+            sprintf( ...
+                'Axis-to-X angle: %.3f deg    Lx/Ltrans = %.3f', ...
+                axisAngle, ...
+                slenderRatio);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 读取网格参数
+%% ========================================================================
+
+    function cfgNow = readMeshControls()
+
+        cfgNow = cfg;
+
+
+        cfgNow.remesh.hMin = ...
+            hMinField.Value*1e-3;
+
+
+        cfgNow.remesh.hMax = ...
+            hMaxField.Value*1e-3;
+
+
+        cfgNow.remesh.initialAxialSpacing = ...
+            axialField.Value*1e-3;
+
+
+        cfgNow.remesh.curvatureAngleTarget = ...
+            curvatureField.Value;
+
+
+        cfgNow.remesh.minCircumPoints = ...
+            round(minCircumField.Value);
+
+
+        cfgNow.remesh.maxCircumPoints = ...
+            round(maxCircumField.Value);
+
+
+        cfgNow.plot.showEdges = ...
+            showEdgesCheck.Value;
+
+
+        cfgNow.plot.showNormals = ...
+            showNormalsCheck.Value;
+
+
+        cfg = cfgNow;
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Generate mesh
+%% ========================================================================
+
+    function generateMesh(~,~)
+
+        if ~orientationConfirmed
+
+            uialert( ...
+                fig, ...
+                ['请先在 Geometry Orientation 中确认：' newline ...
+                 '主轴沿 X 且鼻尖朝 +X。'], ...
+                'Geometry not confirmed');
+
+            return;
+        end
+
+
+        cfg = readMeshControls();
+
+
+        if cfg.remesh.hMin <= 0 ...
+                || cfg.remesh.hMax <= 0 ...
+                || cfg.remesh.hMin >= cfg.remesh.hMax
+
+            uialert( ...
+                fig, ...
+                '必须满足 0 < hMin < hMax。', ...
+                '参数错误');
+
+            return;
+        end
+
+
+        if cfg.remesh.initialAxialSpacing <= 0
+
+            uialert( ...
+                fig, ...
+                'Initial axial spacing 必须大于 0。', ...
+                '参数错误');
+
+            return;
+        end
+
+
+        if cfg.remesh.minCircumPoints < 3 ...
+                || ...
+                cfg.remesh.minCircumPoints ...
+                > ...
+                cfg.remesh.maxCircumPoints
+
+            uialert( ...
+                fig, ...
+                '周向节点数设置不合法。', ...
+                '参数错误');
+
+            return;
+        end
+
+
+
+        %% ----------------------------------------------------------------
+        % 旧 mesh 失效，但此处不立即重绘
+        %% ----------------------------------------------------------------
+
+        invalidateMesh(false);
+
+
+        meshStatusLabel.Text = ...
+            'Generating surface mesh...';
+
+
+        drawnow;
+
+
+
+        %% ----------------------------------------------------------------
+        % Progress
+        %% ----------------------------------------------------------------
+
+        progress = ...
+            uiprogressdlg( ...
+                fig, ...
+                'Title', ...
+                'Surface Remeshing', ...
+                'Message', ...
+                '正在沿 X 方向重构表面三角面元...', ...
+                'Indeterminate', ...
+                'on');
+
+
+        stage = ...
+            'autoRemeshSurface';
+
+
+        try
+
+            %% ============================================================
+            % Stage 1
+            %% ============================================================
+
+            meshCandidate = ...
+                autoRemeshSurface( ...
+                    rawMesh, ...
+                    cfg);
+
+
+            validateGeneratedMesh( ...
+                meshCandidate, ...
+                'autoRemeshSurface output');
+
+
+
+            %% ============================================================
+            % Stage 2
+            %% ============================================================
+
+            stage = ...
+                'calcFaceGeometry';
+
+
+            meshCandidate = ...
+                calcFaceGeometry( ...
+                    meshCandidate);
+
+
+            validateGeneratedMesh( ...
+                meshCandidate, ...
+                'calcFaceGeometry output');
+
+
+
+            %% ============================================================
+            % Stage 3
+            %% ============================================================
+
+            stage = ...
+                'checkMeshQuality';
+
+
+            qualityCandidate = ...
+                checkMeshQuality( ...
+                    meshCandidate, ...
+                    cfg);
+
+
+            validateQualityStruct( ...
+                qualityCandidate, ...
+                size(meshCandidate.F,1));
+
+
+
+            %% ============================================================
+            % 成功
+            %% ============================================================
+
+            mesh = meshCandidate;
+
+            quality = qualityCandidate;
+
+
+            if isvalid(progress)
+                close(progress);
+            end
+
+
+            updateStatistics();
+
+
+            continueButton.Enable = ...
+                'on';
+
+
+            meshStatusLabel.Text = ...
+                sprintf( ...
+                    'Mesh generated successfully: %d faces.', ...
+                    size(mesh.F,1));
+
+
+            %% ------------------------------------------------------------
+            % GUI 绘图单独处理。
+            %
+            % 即使绘图失败，也不把有效网格说成生成失败。
+            %% ------------------------------------------------------------
+
+            try
+
+                renderCurrentScene(true);
+
+            catch renderError
+
+                fprintf(2, ...
+                    '\nMesh generated, but GUI rendering failed:\n%s\n', ...
+                    getReport( ...
+                        renderError, ...
+                        'extended', ...
+                        'hyperlinks', ...
+                        'on'));
+
+
+                uialert( ...
+                    fig, ...
+                    ['网格已经成功生成，但 GUI 绘图失败。' newline ...
+                     '详细错误已经输出到 Command Window。'], ...
+                    'Rendering Warning', ...
+                    'Icon', ...
+                    'warning');
+            end
+
+
+        catch ME
+
+            if isvalid(progress)
+                close(progress);
+            end
+
+
+            mesh = [];
+
+            quality = [];
+
+
+            continueButton.Enable = ...
+                'off';
+
+
+            meshStatusLabel.Text = ...
+                ['FAILED at stage: ',stage];
+
+
+            clearStatistics();
+
+
+            showDiagnosticError( ...
+                stage, ...
+                ME);
+
+
+            safeRender(false);
+        end
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Reset mesh parameters
+%% ========================================================================
+
+    function resetMeshParameters(~,~)
+
+        defaultCfg = ...
+            createCaseConfig();
+
+
+        hMinField.Value = ...
+            defaultCfg.remesh.hMin*1000;
+
+
+        hMaxField.Value = ...
+            defaultCfg.remesh.hMax*1000;
+
+
+        axialField.Value = ...
+            defaultCfg.remesh.initialAxialSpacing*1000;
+
+
+        curvatureField.Value = ...
+            defaultCfg.remesh.curvatureAngleTarget;
+
+
+        minCircumField.Value = ...
+            defaultCfg.remesh.minCircumPoints;
+
+
+        maxCircumField.Value = ...
+            defaultCfg.remesh.maxCircumPoints;
+
+
+        setSliderValue( ...
+            hMinSlider, ...
+            hMinField.Value);
+
+
+        setSliderValue( ...
+            hMaxSlider, ...
+            hMaxField.Value);
+
+
+        setSliderValue( ...
+            axialSlider, ...
+            axialField.Value);
+
+
+        setSliderValue( ...
+            curvatureSlider, ...
+            curvatureField.Value);
+
+
+        invalidateMesh(true);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 参数变化
+%% ========================================================================
+
+    function meshSliderChanged(field,value)
+
+        setNumericValue(field,value);
+
+        invalidateMesh(true);
+    end
+
+
+    function meshFieldChanged(slider,value)
+
+        setSliderValue(slider,value);
+
+        invalidateMesh(true);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 旧网格失效
+%% ========================================================================
+
+    function invalidateMesh(redraw)
+
+        if nargin < 1
+            redraw = true;
+        end
+
+
+        mesh = [];
+
+        quality = [];
+
+
+        continueButton.Enable = ...
+            'off';
+
+
+        meshStatusLabel.Text = ...
+            'Mesh parameters changed. Regeneration required.';
+
+
+        clearStatistics();
+
+
+        if redraw
+            safeRender(false);
+        end
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Statistics
+%% ========================================================================
+
+    function updateStatistics()
+
+        if isempty(mesh) ...
+                || isempty(quality)
+
+            clearStatistics();
+
+            return;
+        end
+
+
+        facesValue.Text = ...
+            sprintf('%d',size(mesh.F,1));
+
+
+        verticesValue.Text = ...
+            sprintf('%d',size(mesh.V,1));
+
+
+        meanARValue.Text = ...
+            sprintf( ...
+                '%.4f', ...
+                getQualityScalar( ...
+                    quality, ...
+                    'meanAspectRatio', ...
+                    NaN));
+
+
+        maxARValue.Text = ...
+            sprintf( ...
+                '%.4f', ...
+                getQualityScalar( ...
+                    quality, ...
+                    'maxAspectRatio', ...
+                    NaN));
+
+
+        meanAngleValue.Text = ...
+            sprintf( ...
+                '%.3f deg', ...
+                getQualityScalar( ...
+                    quality, ...
+                    'meanMinimumAngle', ...
+                    NaN));
+
+
+        minAngleValue.Text = ...
+            sprintf( ...
+                '%.3f deg', ...
+                getQualityScalar( ...
+                    quality, ...
+                    'minimumAngle', ...
+                    NaN));
+
+
+        poorValue.Text = ...
+            sprintf( ...
+                '%.3f %%', ...
+                getQualityScalar( ...
+                    quality, ...
+                    'badFacePercent', ...
+                    NaN));
+
+
+        if isfield(mesh,'remeshInfo') ...
+                && ...
+                isfield(mesh.remeshInfo,'boundaryEdges') ...
+                && ...
+                isfield(mesh.remeshInfo,'nonManifoldEdges')
+
+            boundaryEdges = ...
+                mesh.remeshInfo.boundaryEdges;
+
+
+            nonManifoldEdges = ...
+                mesh.remeshInfo.nonManifoldEdges;
+
+        else
+
+            [boundaryEdges,nonManifoldEdges] = ...
+                checkTopology(mesh.F);
+        end
+
+
+        boundaryValue.Text = ...
+            sprintf('%d',boundaryEdges);
+
+
+        nonManifoldValue.Text = ...
+            sprintf('%d',nonManifoldEdges);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Clear statistics
+%% ========================================================================
+
+    function clearStatistics()
+
+        facesValue.Text = '--';
+
+        verticesValue.Text = '--';
+
+        meanARValue.Text = '--';
+
+        maxARValue.Text = '--';
+
+        meanAngleValue.Text = '--';
+
+        minAngleValue.Text = '--';
+
+        poorValue.Text = '--';
+
+        boundaryValue.Text = '--';
+
+        nonManifoldValue.Text = '--';
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Safe render
+%% ========================================================================
+
+    function safeRender(resetView)
+
+        try
+
+            renderCurrentScene(resetView);
+
+        catch ME
+
+            fprintf(2, ...
+                '\nGUI rendering error:\n%s\n', ...
+                getReport( ...
+                    ME, ...
+                    'extended', ...
+                    'hyperlinks', ...
+                    'on'));
+        end
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% 3-D rendering
+%% ========================================================================
+
+    function renderCurrentScene(resetView)
+
+        if tabGroup.SelectedTab == orientationTab
+
+            displayMesh = rawMesh;
+
+            orientationMode = true;
+
+        else
+
+            orientationMode = false;
+
+
+            if ~isempty(mesh)
+
+                displayMesh = mesh;
+
+            else
+
+                displayMesh = rawMesh;
+            end
+        end
+
+
+        if isempty(displayMesh)
+
+            cla(ax);
+
+            return;
+        end
+
+
+        validateDisplayMesh( ...
+            displayMesh, ...
+            'displayMesh');
+
+
+        oldCameraPosition = ...
+            ax.CameraPosition;
+
+
+        oldCameraTarget = ...
+            ax.CameraTarget;
+
+
+        oldCameraUp = ...
+            ax.CameraUpVector;
+
+
+        oldCameraAngle = ...
+            ax.CameraViewAngle;
+
+
+        cla(ax);
+
+
+        colorbar(ax,'off');
+
+
+        hold(ax,'on');
+
+
+
+        %% =================================================================
+        % Orientation
+        %% =================================================================
+
+        if orientationMode
+
+            patch( ...
+                ax, ...
+                'Faces', ...
+                displayMesh.F, ...
+                'Vertices', ...
+                displayMesh.V, ...
+                'FaceColor', ...
+                [0.72 0.75 0.78], ...
+                'EdgeColor', ...
+                [0.35 0.35 0.35], ...
+                'EdgeAlpha', ...
+                0.30);
+
+
+            title( ...
+                ax, ...
+                ['Geometry Orientation - ', ...
+                 'body axis X, nose +X']);
+
+
+
+        %% =================================================================
+        % Mesh
+        %% =================================================================
+
+        else
+
+            if showEdgesCheck.Value
+                edgeColor = [0.30 0.30 0.30];
+            else
+                edgeColor = 'none';
+            end
+
+
+            switch displayMode.Value
+
+                case 'Geometry Mesh'
+
+                    patch( ...
+                        ax, ...
+                        'Faces', ...
+                        displayMesh.F, ...
+                        'Vertices', ...
+                        displayMesh.V, ...
+                        'FaceColor', ...
+                        [0.72 0.75 0.78], ...
+                        'EdgeColor', ...
+                        edgeColor);
+
+
+                    title( ...
+                        ax, ...
+                        sprintf( ...
+                            'Surface Mesh - %d Faces', ...
+                            size(displayMesh.F,1)));
+
+
+
+                case 'Aspect Ratio'
+
+                    if isempty(quality) ...
+                            || ...
+                            ~isfield(quality,'aspectRatio') ...
+                            || ...
+                            numel(quality.aspectRatio) ...
+                            ~= ...
+                            size(displayMesh.F,1)
+
+                        patch( ...
+                            ax, ...
+                            'Faces', ...
+                            displayMesh.F, ...
+                            'Vertices', ...
+                            displayMesh.V, ...
+                            'FaceColor', ...
+                            [0.72 0.75 0.78], ...
+                            'EdgeColor', ...
+                            edgeColor);
+
+                    else
+
+                        patch( ...
+                            ax, ...
+                            'Faces', ...
+                            displayMesh.F, ...
+                            'Vertices', ...
+                            displayMesh.V, ...
+                            'FaceVertexCData', ...
+                            quality.aspectRatio(:), ...
+                            'FaceColor', ...
+                            'flat', ...
+                            'EdgeColor', ...
+                            edgeColor);
+
+
+                        cb = colorbar(ax);
+
+                        cb.Label.String = ...
+                            'Aspect Ratio';
+
+
+                        upperLimit = ...
+                            max( ...
+                                2, ...
+                                min( ...
+                                    10, ...
+                                    max(quality.aspectRatio)));
+
+
+                        caxis(ax,[1 upperLimit]);
+                    end
+
+
+
+                case 'Minimum Angle'
+
+                    if isempty(quality) ...
+                            || ...
+                            ~isfield(quality,'minAngle') ...
+                            || ...
+                            numel(quality.minAngle) ...
+                            ~= ...
+                            size(displayMesh.F,1)
+
+                        patch( ...
+                            ax, ...
+                            'Faces', ...
+                            displayMesh.F, ...
+                            'Vertices', ...
+                            displayMesh.V, ...
+                            'FaceColor', ...
+                            [0.72 0.75 0.78], ...
+                            'EdgeColor', ...
+                            edgeColor);
+
+                    else
+
+                        patch( ...
+                            ax, ...
+                            'Faces', ...
+                            displayMesh.F, ...
+                            'Vertices', ...
+                            displayMesh.V, ...
+                            'FaceVertexCData', ...
+                            quality.minAngle(:), ...
+                            'FaceColor', ...
+                            'flat', ...
+                            'EdgeColor', ...
+                            edgeColor);
+
+
+                        cb = colorbar(ax);
+
+                        cb.Label.String = ...
+                            'Minimum Angle / deg';
+
+
+                        caxis(ax,[0 60]);
+                    end
+            end
+        end
+
+
+
+        %% =================================================================
+        % 几何范围
+        %% =================================================================
+
+        Vplot = double(displayMesh.V);
+
+
+        xmin = min(Vplot(:,1));
+
+        xmax = max(Vplot(:,1));
+
+        ymin = min(Vplot(:,2));
+
+        ymax = max(Vplot(:,2));
+
+        zmin = min(Vplot(:,3));
+
+        zmax = max(Vplot(:,3));
+
+
+        modelCenter = [
+            0.5*(xmin+xmax), ...
+            0.5*(ymin+ymax), ...
+            0.5*(zmin+zmax)
+        ];
+
+
+        modelLength = ...
+            max( ...
+                [ ...
+                xmax-xmin, ...
+                ymax-ymin, ...
+                zmax-zmin ...
+                ]);
+
+
+        if ~(isfinite(modelLength) ...
+                && modelLength > 0)
+
+            modelLength = 1;
+        end
+
+
+
+        %% =================================================================
+        % Orientation axes
+        %% =================================================================
+
+        if orientationMode
+
+            axisLength = ...
+                0.35*modelLength;
+
+
+
+            %% +X
+            quiver3( ...
+                ax, ...
+                modelCenter(1), ...
+                modelCenter(2), ...
+                modelCenter(3), ...
+                axisLength, ...
+                0, ...
+                0, ...
+                0, ...
+                'Color',[0.90 0.10 0.10], ...
+                'LineWidth',2.5, ...
+                'MaxHeadSize',0.5);
+
+
+            text( ...
+                ax, ...
+                modelCenter(1)+axisLength, ...
+                modelCenter(2), ...
+                modelCenter(3), ...
+                '  +X', ...
+                'FontWeight','bold');
+
+
+
+            %% +Y
+            quiver3( ...
+                ax, ...
+                modelCenter(1), ...
+                modelCenter(2), ...
+                modelCenter(3), ...
+                0, ...
+                axisLength, ...
+                0, ...
+                0, ...
+                'Color',[0.10 0.65 0.20], ...
+                'LineWidth',2.5, ...
+                'MaxHeadSize',0.5);
+
+
+            text( ...
+                ax, ...
+                modelCenter(1), ...
+                modelCenter(2)+axisLength, ...
+                modelCenter(3), ...
+                '  +Y', ...
+                'FontWeight','bold');
+
+
+
+            %% +Z
+            quiver3( ...
+                ax, ...
+                modelCenter(1), ...
+                modelCenter(2), ...
+                modelCenter(3), ...
+                0, ...
+                0, ...
+                axisLength, ...
+                0, ...
+                'Color',[0.10 0.30 0.90], ...
+                'LineWidth',2.5, ...
+                'MaxHeadSize',0.5);
+
+
+            text( ...
+                ax, ...
+                modelCenter(1), ...
+                modelCenter(2), ...
+                modelCenter(3)+axisLength, ...
+                '  +Z', ...
+                'FontWeight','bold');
+
+
+
+            %% PCA 主轴
+            if ~isempty(pcaInfo) ...
+                    && ...
+                    isfield(pcaInfo,'principalAxisOriginal')
+
+
+                pcaOriginal = ...
+                    pcaInfo.principalAxisOriginal(:);
+
+
+                if numel(pcaOriginal) == 3
+
+                    currentPcaAxis = ...
+                        Rtotal ...
+                        * ...
+                        pcaOriginal;
+
+
+                    currentPcaAxis = ...
+                        currentPcaAxis ...
+                        / ...
+                        max(norm(currentPcaAxis),eps);
+
+
+                    %% -----------------------------------------------------
+                    % 关键修复：
+                    %
+                    % 强制转为 1×3 行向量。
+                    %% -----------------------------------------------------
+
+                    pcaVector = ...
+                        ( ...
+                        0.45 ...
+                        * ...
+                        modelLength ...
+                        * ...
+                        currentPcaAxis ...
+                        ).';
+
+
+                    quiver3( ...
+                        ax, ...
+                        modelCenter(1), ...
+                        modelCenter(2), ...
+                        modelCenter(3), ...
+                        pcaVector(1), ...
+                        pcaVector(2), ...
+                        pcaVector(3), ...
+                        0, ...
+                        'Color', ...
+                        [0.75 0.15 0.75], ...
+                        'LineWidth', ...
+                        2.0, ...
+                        'MaxHeadSize', ...
+                        0.5);
+
+
+                    pcaEnd = ...
+                        modelCenter ...
+                        + ...
+                        pcaVector;
+
+
+                    text( ...
+                        ax, ...
+                        pcaEnd(1), ...
+                        pcaEnd(2), ...
+                        pcaEnd(3), ...
+                        '  PCA axis', ...
+                        'FontWeight', ...
+                        'bold');
+                end
+            end
+        end
+
+
+
+        %% =================================================================
+        % Face normals
+        %% =================================================================
+
+        if ~orientationMode ...
+                && ...
+                showNormalsCheck.Value ...
+                && ...
+                isfield(displayMesh,'normal') ...
+                && ...
+                isfield(displayMesh,'center') ...
+                && ...
+                size(displayMesh.normal,2) == 3 ...
+                && ...
+                size(displayMesh.center,2) == 3
+
+
+            numberFaces = ...
+                size(displayMesh.F,1);
+
+
+            numberNormals = ...
+                min( ...
+                    cfg.plot.maxNormalNumber, ...
+                    numberFaces);
+
+
+            if numberNormals > 0
+
+                sampleIndex = ...
+                    round( ...
+                        linspace( ...
+                            1, ...
+                            numberFaces, ...
+                            numberNormals));
+
+
+                sampleIndex = ...
+                    unique(sampleIndex);
+
+
+                C = ...
+                    displayMesh.center(sampleIndex,:);
+
+
+                N = ...
+                    displayMesh.normal(sampleIndex,:);
+
+
+                normalLength = ...
+                    modelLength ...
+                    * ...
+                    cfg.plot.normalScale;
+
+
+                quiver3( ...
+                    ax, ...
+                    C(:,1), ...
+                    C(:,2), ...
+                    C(:,3), ...
+                    normalLength*N(:,1), ...
+                    normalLength*N(:,2), ...
+                    normalLength*N(:,3), ...
+                    0, ...
+                    'Color', ...
+                    [1 0 0], ...
+                    'LineWidth', ...
+                    1);
+            end
+        end
+
+
+
+        %% =================================================================
+        % Limits
+        %% =================================================================
+
+        margin = ...
+            0.18*modelLength;
+
+
+        xlim( ...
+            ax, ...
+            [xmin-margin xmax+margin]);
+
+
+        ylim( ...
+            ax, ...
+            [ymin-margin ymax+margin]);
+
+
+        zlim( ...
+            ax, ...
+            [zmin-margin zmax+margin]);
+
+
+        axis(ax,'equal');
+
+        axis(ax,'vis3d');
+
+
+        xlabel(ax,'X / m');
+
+        ylabel(ax,'Y / m');
+
+        zlabel(ax,'Z / m');
+
+
+        grid(ax,'on');
+
+        box(ax,'on');
+
+
+        if isprop(ax,'Clipping')
+            ax.Clipping = 'off';
+        end
+
+
+        camproj(ax,'orthographic');
+
+
+
+        %% =================================================================
+        % Camera
+        %% =================================================================
+
+        if resetView
+
+            view(ax,35,25);
+
+            camtarget(ax,modelCenter);
+
+        else
+
+            if all(isfinite(oldCameraPosition)) ...
+                    && ...
+                    all(isfinite(oldCameraTarget)) ...
+                    && ...
+                    all(isfinite(oldCameraUp)) ...
+                    && ...
+                    isfinite(oldCameraAngle)
+
+
+                ax.CameraPosition = ...
+                    oldCameraPosition;
+
+
+                ax.CameraTarget = ...
+                    oldCameraTarget;
+
+
+                ax.CameraUpVector = ...
+                    oldCameraUp;
+
+
+                ax.CameraViewAngle = ...
+                    oldCameraAngle;
+            end
+        end
+
+
+        hold(ax,'off');
+
+
+        drawnow limitrate;
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Continue main
+%% ========================================================================
+
+    function continueMainProgram(~,~)
+
+        if ~orientationConfirmed
+
+            uialert( ...
+                fig, ...
+                '几何朝向尚未确认。', ...
+                'Geometry Orientation');
+
+            return;
+        end
+
+
+        if isempty(mesh)
+
+            uialert( ...
+                fig, ...
+                '请先生成最终表面网格。', ...
+                'Surface Mesh');
+
+            return;
+        end
+
+
+        validateGeneratedMesh( ...
+            mesh, ...
+            'final GUI mesh');
+
+
+        cfg = ...
+            readMeshControls();
+
+
+        cfg.geometry.rotationMatrix = ...
+            Rtotal;
+
+
+        cfg.geometry.rotationCenter = ...
+            rotationCenter;
+
+
+        cfg.geometry.isAligned = ...
+            true;
+
+
+        cfg.geometry.bodyAxis = ...
+            [1 0 0];
+
+
+        cfg.geometry.noseDirection = ...
+            [1 0 0];
+
+
+        cfgOut = cfg;
+
+        rawMeshOut = rawMesh;
+
+        meshOut = mesh;
+
+        qualityOut = quality;
+
+        action = 'continue';
+
+
+        assignin( ...
+            'base', ...
+            'rawMeshOriginal', ...
+            rawMeshOriginal);
+
+
+        assignin( ...
+            'base', ...
+            'rawMesh', ...
+            rawMeshOut);
+
+
+        assignin( ...
+            'base', ...
+            'mesh', ...
+            meshOut);
+
+
+        assignin( ...
+            'base', ...
+            'quality', ...
+            qualityOut);
+
+
+        assignin( ...
+            'base', ...
+            'cfg', ...
+            cfgOut);
+
+
+        uiresume(fig);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Cancel
+%% ========================================================================
+
+    function cancelMainProgram(~,~)
+
+        action = 'cancel';
+
+
+        cfgOut = cfg;
+
+        rawMeshOut = rawMesh;
+
+        meshOut = mesh;
+
+        qualityOut = quality;
+
+
+        uiresume(fig);
+    end
+
+
+
+%% ========================================================================
+% NESTED
+% Error diagnostics
+%% ========================================================================
+
+    function showDiagnosticError(stage,ME)
+
+        fprintf(2, ...
+            '\n============================================================\n');
+
+
+        fprintf(2, ...
+            'Rocket AeroHeat Error\n');
+
+
+        fprintf(2, ...
+            'Stage : %s\n', ...
+            stage);
+
+
+        fprintf(2, ...
+            '============================================================\n');
+
+
+        fprintf(2, ...
+            '%s\n', ...
+            getReport( ...
+                ME, ...
+                'extended', ...
+                'hyperlinks', ...
+                'on'));
+
+
+        fprintf(2, ...
+            '============================================================\n\n');
+
+
+        if isempty(ME.stack)
+
+            locationText = ...
+                'Location: unavailable';
+
+        else
+
+            top = ME.stack(1);
+
+
+            locationText = ...
+                sprintf( ...
+                    ['File:\n%s\n\n' ...
+                     'Function:\n%s\n\n' ...
+                     'Line:\n%d'], ...
+                    top.file, ...
+                    top.name, ...
+                    top.line);
+        end
+
+
+        message = ...
+            sprintf( ...
+                ['Failed stage:\n%s\n\n' ...
+                 'Error:\n%s\n\n%s\n\n' ...
+                 '完整错误堆栈已打印到 MATLAB Command Window。'], ...
+                stage, ...
+                ME.message, ...
+                locationText);
+
+
+        uialert( ...
+            fig, ...
+            message, ...
+            'Rocket AeroHeat Error', ...
+            'Icon', ...
+            'error');
+    end
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Rx
+%% ========================================================================
+function R = rotationMatrixX(angleDeg)
+
+a = deg2rad(angleDeg);
+
+c = cos(a);
+
+s = sin(a);
+
+
+R = [
+    1, 0,  0;
+    0, c, -s;
+    0, s,  c
+];
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Ry
+%% ========================================================================
+function R = rotationMatrixY(angleDeg)
+
+a = deg2rad(angleDeg);
+
+c = cos(a);
+
+s = sin(a);
+
+
+R = [
+     c, 0, s;
+     0, 1, 0;
+    -s, 0, c
+];
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Rz
+%% ========================================================================
+function R = rotationMatrixZ(angleDeg)
+
+a = deg2rad(angleDeg);
+
+c = cos(a);
+
+s = sin(a);
+
+
+R = [
+    c, -s, 0;
+    s,  c, 0;
+    0,  0, 1
+];
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Numeric field
+%% ========================================================================
+function setNumericValue(field,value)
+
+field.Value = value;
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Slider
+%% ========================================================================
+function setSliderValue(slider,value)
+
+slider.Value = ...
+    clampValue( ...
+        value, ...
+        slider.Limits);
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Clamp
+%% ========================================================================
+function value = clampValue(value,limits)
+
+value = ...
+    max( ...
+        limits(1), ...
+        min( ...
+            limits(2), ...
+            value));
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% cfg
+%% ========================================================================
+function value = ...
+    getCfgValue(cfg,path,defaultValue)
+
+value = defaultValue;
+
+current = cfg;
+
+
+for i = 1:numel(path)
+
+    fieldName = path{i};
+
+
+    if ~isstruct(current) ...
+            || ...
+            ~isfield(current,fieldName)
+
+        return;
+    end
+
+
+    current = current.(fieldName);
+end
+
+
+value = current;
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Mesh dimensions
+%% ========================================================================
+function dimensions = ...
+    getMeshDimensions(mesh)
+
+validateDisplayMesh(mesh,'mesh');
+
+
+V = double(mesh.V);
+
+
+dimensions = ...
+    max(V,[],1) ...
+    - ...
+    min(V,[],1);
+
+
+dimensions = ...
+    reshape(dimensions,1,3);
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Display mesh validation
+%% ========================================================================
+function validateDisplayMesh(mesh,label)
+
+if nargin < 2
+    label = 'mesh';
+end
+
+
+if ~isstruct(mesh) ...
+        || ...
+        ~isfield(mesh,'V') ...
+        || ...
+        ~isfield(mesh,'F')
+
+    error( ...
+        'RocketAeroHeat:GUI:InvalidMesh', ...
+        '%s 必须包含 V 和 F。', ...
+        label);
+end
+
+
+V = mesh.V;
+
+F = mesh.F;
+
+
+if ~isnumeric(V) ...
+        || ...
+        size(V,2) ~= 3
+
+    error( ...
+        'RocketAeroHeat:GUI:VertexDimension', ...
+        ['%s.V 必须为 N×3。' newline ...
+         '当前尺寸 = %d×%d。'], ...
+        label, ...
+        size(V,1), ...
+        size(V,2));
+end
+
+
+if ~isnumeric(F) ...
+        || ...
+        size(F,2) ~= 3
+
+    error( ...
+        'RocketAeroHeat:GUI:FaceDimension', ...
+        ['%s.F 必须为 M×3。' newline ...
+         '当前尺寸 = %d×%d。'], ...
+        label, ...
+        size(F,1), ...
+        size(F,2));
+end
+
+
+if isempty(V) || isempty(F)
+
+    error( ...
+        'RocketAeroHeat:GUI:EmptyMesh', ...
+        '%s 的 V 或 F 为空。', ...
+        label);
+end
+
+
+if any(~isfinite(V(:)))
+
+    error( ...
+        'RocketAeroHeat:GUI:NonFiniteVertex', ...
+        '%s.V 含 NaN 或 Inf。', ...
+        label);
+end
+
+
+if any(F(:) < 1) ...
+        || any(F(:) > size(V,1)) ...
+        || any(F(:) ~= round(F(:)))
+
+    error( ...
+        'RocketAeroHeat:GUI:InvalidFaceIndex', ...
+        '%s.F 含非法节点索引。', ...
+        label);
+end
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Generated mesh validation
+%% ========================================================================
+function validateGeneratedMesh(mesh,label)
+
+validateDisplayMesh(mesh,label);
+
+
+if isfield(mesh,'center') ...
+        && ...
+        ( ...
+        size(mesh.center,1) ~= size(mesh.F,1) ...
+        || ...
+        size(mesh.center,2) ~= 3 ...
+        )
+
+    error( ...
+        'RocketAeroHeat:GUI:CenterDimension', ...
+        '%s.center 必须为 numberFaces×3。', ...
+        label);
+end
+
+
+if isfield(mesh,'normal') ...
+        && ...
+        ( ...
+        size(mesh.normal,1) ~= size(mesh.F,1) ...
+        || ...
+        size(mesh.normal,2) ~= 3 ...
+        )
+
+    error( ...
+        'RocketAeroHeat:GUI:NormalDimension', ...
+        '%s.normal 必须为 numberFaces×3。', ...
+        label);
+end
+
+
+if isfield(mesh,'area') ...
+        && ...
+        numel(mesh.area) ~= size(mesh.F,1)
+
+    error( ...
+        'RocketAeroHeat:GUI:AreaDimension', ...
+        '%s.area 数量必须等于三角面数量。', ...
+        label);
+end
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Quality validation
+%% ========================================================================
+function validateQualityStruct(quality,numberFaces)
+
+if ~isstruct(quality)
+
+    error( ...
+        'RocketAeroHeat:GUI:InvalidQuality', ...
+        'checkMeshQuality 必须返回结构体。');
+end
+
+
+requiredScalar = { ...
+    'meanAspectRatio', ...
+    'maxAspectRatio', ...
+    'meanMinimumAngle', ...
+    'minimumAngle', ...
+    'badFacePercent'};
+
+
+for i = 1:numel(requiredScalar)
+
+    fieldName = ...
+        requiredScalar{i};
+
+
+    if ~isfield(quality,fieldName)
+
+        error( ...
+            'RocketAeroHeat:GUI:MissingQualityField', ...
+            'quality.%s 不存在。', ...
+            fieldName);
+    end
+end
+
+
+if isfield(quality,'aspectRatio') ...
+        && ...
+        numel(quality.aspectRatio) ~= numberFaces
+
+    error( ...
+        'RocketAeroHeat:GUI:AspectRatioDimension', ...
+        'quality.aspectRatio 数量与面元数量不一致。');
+end
+
+
+if isfield(quality,'minAngle') ...
+        && ...
+        numel(quality.minAngle) ~= numberFaces
+
+    error( ...
+        'RocketAeroHeat:GUI:MinAngleDimension', ...
+        'quality.minAngle 数量与面元数量不一致。');
+end
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Quality scalar
+%% ========================================================================
+function value = ...
+    getQualityScalar(quality,fieldName,defaultValue)
+
+if isfield(quality,fieldName) ...
+        && ...
+        isscalar(quality.(fieldName))
+
+    value = ...
+        quality.(fieldName);
+
+else
+
+    value = ...
+        defaultValue;
+end
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% Topology
+%% ========================================================================
+function [boundary,nonManifold] = ...
+    checkTopology(F)
+
+if size(F,2) ~= 3
+    error( ...
+        'RocketAeroHeat:GUI:TopologyFaceDimension', ...
+        'F 必须为 M×3。');
+end
+
+
+E = [
+    F(:,[1 2]);
+    F(:,[2 3]);
+    F(:,[3 1])
+];
+
+
+E = sort(E,2);
+
+
+[~,~,group] = ...
+    unique( ...
+        E, ...
+        'rows');
+
+
+count = ...
+    accumarray( ...
+        group, ...
+        1);
+
+
+boundary = ...
+    sum(count == 1);
+
+
+nonManifold = ...
+    sum(count > 2);
+
+end

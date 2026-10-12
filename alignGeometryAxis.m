@@ -1,0 +1,839 @@
+function [meshOut, info] = ...
+    alignGeometryAxis(meshIn, mode, varargin)
+%% ========================================================================
+% alignGeometryAxis.m
+%
+% Rocket AeroHeat
+%
+% STL / Surface Mesh 几何朝向标准化模块
+%
+% ========================================================================
+%
+% 目标：
+%
+%       将火箭 / 弹体 / 整流罩等长细体的主轴
+%
+%       自动或手动旋转到全局 X 方向。
+%
+%
+% 软件内部统一约定：
+%
+%       +X = 鼻尖 / 飞行前向
+%       +Y = 横向
+%       +Z = 竖向
+%
+%
+% ========================================================================
+%
+% 支持两种调用模式：
+%
+%
+% ------------------------------------------------------------------------
+% 1. PCA 自动主轴识别
+% ------------------------------------------------------------------------
+%
+% [meshOut,info] = ...
+%       alignGeometryAxis(meshIn,'pca');
+%
+%
+% 程序：
+%
+%       计算顶点协方差矩阵
+%           ↓
+%       求特征向量
+%           ↓
+%       最大特征值对应方向 = 几何长轴
+%           ↓
+%       自动旋转到 +X
+%
+%
+% 注意：
+%
+% PCA 只能识别“轴”，无法判断：
+%
+%       哪一端是鼻尖
+%
+% 所以 PCA 对齐后仍然需要用户在 GUI 中确认：
+%
+%       鼻尖是否朝 +X
+%
+% 如果相反：
+%
+%       点击“轴向翻转”
+%
+%
+% ------------------------------------------------------------------------
+% 2. 指定旋转矩阵
+% ------------------------------------------------------------------------
+%
+% [meshOut,info] = ...
+%       alignGeometryAxis( ...
+%           meshIn, ...
+%           'matrix', ...
+%           R, ...
+%           rotationCenter);
+%
+%
+% R：
+%
+%       3×3 正交旋转矩阵
+%
+%
+% rotationCenter：
+%
+%       1×3
+%
+%       绕该点旋转。
+%
+%
+% ========================================================================
+%
+% 旋转定义：
+%
+%       xNew = R * (xOld - center) + center
+%
+%
+% 对 MATLAB 行向量节点：
+%
+%       Vnew = (R*(V-center)')' + center
+%
+%
+% ========================================================================
+%
+% 输出：
+%
+% meshOut
+%
+%       旋转后的网格
+%
+%
+% info.rotationMatrix
+%
+%       原始坐标 → 当前坐标的旋转矩阵
+%
+%
+% info.rotationCenter
+%
+%       旋转中心
+%
+%
+% info.principalAxisOriginal
+%
+%       PCA 检测到的原始长轴
+%
+%
+% info.eigenvalues
+%
+%       PCA 三个特征值
+%
+%
+% info.axisRatio12
+%
+%       lambda1 / lambda2
+%
+%       越大说明长轴越明显。
+%
+%
+% info.dimensionsBefore
+%
+% info.dimensionsAfter
+%
+%
+%% ========================================================================
+
+
+%% ========================================================================
+% 1. 输入检查
+% ========================================================================
+
+if nargin < 2
+
+    error( ...
+        'alignGeometryAxis: 必须指定 mode。');
+
+end
+
+
+if ~isstruct(meshIn) ...
+        || ...
+        ~isfield(meshIn,'V') ...
+        || ...
+        ~isfield(meshIn,'F')
+
+    error( ...
+        'alignGeometryAxis: meshIn 必须包含 V 和 F。');
+
+end
+
+
+V = ...
+    double(meshIn.V);
+
+
+F = ...
+    double(meshIn.F);
+
+validateattributes(V, {'numeric'}, {'2d','real','finite','nonempty','ncols',3});
+validateattributes(F, {'numeric'}, ...
+    {'2d','real','finite','nonempty','ncols',3,'integer','>=',1,'<=',size(V,1)});
+
+
+if isempty(V) || ...
+        size(V,2) ~= 3
+
+    error( ...
+        'alignGeometryAxis: meshIn.V 必须是 N×3。');
+
+end
+
+
+if isempty(F) || ...
+        size(F,2) ~= 3
+
+    error( ...
+        'alignGeometryAxis: meshIn.F 必须是 M×3。');
+
+end
+
+
+
+%% ========================================================================
+% 2. 原始几何信息
+% ========================================================================
+
+centroid = ...
+    mean(V,1);
+
+
+dimensionsBefore = ...
+    max(V,[],1) ...
+    - ...
+    min(V,[],1);
+
+
+
+%% ========================================================================
+% 3. PCA
+%
+% 无论是哪一种调用模式，都计算一次 PCA 信息，
+% 这样 GUI 可以随时显示主轴诊断信息。
+%% ========================================================================
+
+X = ...
+    V ...
+    - ...
+    centroid;
+
+
+covarianceMatrix = ...
+    (X' * X) ...
+    / ...
+    max(size(X,1),1);
+
+
+[eigenVectors,eigenValueMatrix] = ...
+    eig(covarianceMatrix);
+
+
+eigenValues = ...
+    diag(eigenValueMatrix);
+
+
+[eigenValuesSorted,sortIndex] = ...
+    sort( ...
+        eigenValues, ...
+        'descend');
+
+
+eigenVectorsSorted = ...
+    eigenVectors(:,sortIndex);
+
+
+principalAxis = ...
+    eigenVectorsSorted(:,1);
+
+
+principalAxis = ...
+    principalAxis ...
+    / ...
+    max(norm(principalAxis),eps);
+
+
+
+%% ========================================================================
+% 4. 固定 PCA 轴符号
+%
+% PCA 的 v 和 -v 数学上完全等价。
+%
+% 为保证每次运行结果可重复，
+% 这里让绝对值最大的那个分量为正。
+%
+% 注意：
+%
+% 这仍然不代表它一定指向鼻尖。
+%% ========================================================================
+
+[~,largestComponent] = ...
+    max(abs(principalAxis));
+
+
+if principalAxis(largestComponent) < 0
+
+    principalAxis = ...
+        -principalAxis;
+
+end
+
+
+
+%% ========================================================================
+% 5. PCA 轴可信度指标
+%% ========================================================================
+
+lambda1 = ...
+    eigenValuesSorted(1);
+
+
+if numel(eigenValuesSorted) >= 2
+
+    lambda2 = ...
+        eigenValuesSorted(2);
+
+else
+
+    lambda2 = ...
+        0;
+
+end
+
+
+if numel(eigenValuesSorted) >= 3
+
+    lambda3 = ...
+        eigenValuesSorted(3);
+
+else
+
+    lambda3 = ...
+        0;
+
+end
+
+
+axisRatio12 = ...
+    lambda1 ...
+    / ...
+    max(lambda2,eps);
+
+
+axisRatio23 = ...
+    lambda2 ...
+    / ...
+    max(lambda3,eps);
+
+
+
+%% ========================================================================
+% 6. 根据 mode 确定旋转矩阵
+%% ========================================================================
+
+mode = ...
+    lower(string(mode));
+
+
+switch mode
+
+
+    %% ====================================================================
+    % PCA 自动对齐
+    %% ====================================================================
+
+    case "pca"
+
+        targetAxis = ...
+            [1;0;0];
+
+
+        R = ...
+            rotationVectorToVector( ...
+                principalAxis, ...
+                targetAxis);
+
+
+        rotationCenter = ...
+            centroid;
+
+
+
+    %% ====================================================================
+    % 外部指定旋转矩阵
+    %% ====================================================================
+
+    case "matrix"
+
+        if isempty(varargin)
+
+            error( ...
+                ['alignGeometryAxis(matrix): ' ...
+                 '必须提供 3×3 旋转矩阵 R。']);
+
+        end
+
+
+        validateattributes(varargin{1}, {'numeric'}, ...
+            {'real','finite','size',[3 3]}, mfilename, 'R');
+        R = ...
+            double(varargin{1});
+
+
+        if ~isequal(size(R),[3 3])
+
+            error( ...
+                'alignGeometryAxis: R 必须是 3×3。');
+
+        end
+
+
+        if numel(varargin) >= 2 ...
+                && ...
+                ~isempty(varargin{2})
+
+            rotationCenter = ...
+                double(varargin{2});
+
+
+        else
+
+            rotationCenter = ...
+                centroid;
+
+        end
+
+
+        validateattributes(rotationCenter, {'numeric'}, ...
+            {'real','finite','numel',3}, mfilename, 'rotationCenter');
+        rotationCenter = ...
+            reshape(rotationCenter,1,3);
+
+
+
+    otherwise
+
+        error( ...
+            'alignGeometryAxis: 未知 mode = %s。', ...
+            mode);
+
+end
+
+
+
+%% ========================================================================
+% 7. 检查旋转矩阵
+%% ========================================================================
+
+orthogonalityError = ...
+    norm( ...
+        R'*R ...
+        - ...
+        eye(3), ...
+        'fro');
+
+
+determinantR = ...
+    det(R);
+
+
+if orthogonalityError > 1e-8 ...
+        || ...
+        abs(determinantR-1) > 1e-8
+
+    error( ...
+        ['alignGeometryAxis: 输入 R 不是合法的刚体旋转矩阵。' newline ...
+         '||R''R-I|| = %.3e' newline ...
+         'det(R) = %.12f'], ...
+         orthogonalityError, ...
+         determinantR);
+
+end
+
+
+
+%% ========================================================================
+% 8. 应用旋转
+%% ========================================================================
+
+Vrelative = ...
+    V ...
+    - ...
+    rotationCenter;
+
+
+Vrotated = ...
+    ( ...
+    R ...
+    * ...
+    Vrelative' ...
+    )';
+
+
+Vrotated = ...
+    Vrotated ...
+    + ...
+    rotationCenter;
+
+
+
+%% ========================================================================
+% 9. 写回 mesh
+%% ========================================================================
+
+meshOut = ...
+    meshIn;
+
+
+meshOut.V = ...
+    Vrotated;
+
+
+meshOut.F = ...
+    F;
+
+
+
+%% ========================================================================
+% 10. 重新计算基本面元几何
+%% ========================================================================
+
+meshOut = ...
+    recalculateGeometry(meshOut);
+
+
+
+%% ========================================================================
+% 11. 旋转后的几何尺寸
+%% ========================================================================
+
+dimensionsAfter = ...
+    max(Vrotated,[],1) ...
+    - ...
+    min(Vrotated,[],1);
+
+
+
+%% ========================================================================
+% 12. PCA 主轴旋转后的方向
+%% ========================================================================
+
+principalAxisCurrent = ...
+    R ...
+    * ...
+    principalAxis;
+
+
+principalAxisCurrent = ...
+    principalAxisCurrent ...
+    / ...
+    max(norm(principalAxisCurrent),eps);
+
+
+
+%% ========================================================================
+% 13. 输出 info
+%% ========================================================================
+
+info = struct;
+
+
+info.mode = ...
+    char(mode);
+
+
+info.rotationMatrix = ...
+    R;
+
+
+info.rotationCenter = ...
+    rotationCenter;
+
+
+info.centroidOriginal = ...
+    centroid;
+
+
+info.principalAxisOriginal = ...
+    principalAxis(:)';
+
+
+info.principalAxisCurrent = ...
+    principalAxisCurrent(:)';
+
+
+info.eigenvalues = ...
+    eigenValuesSorted(:)';
+
+
+info.axisRatio12 = ...
+    axisRatio12;
+
+
+info.axisRatio23 = ...
+    axisRatio23;
+
+
+info.dimensionsBefore = ...
+    dimensionsBefore;
+
+
+info.dimensionsAfter = ...
+    dimensionsAfter;
+
+
+info.orthogonalityError = ...
+    orthogonalityError;
+
+
+info.determinant = ...
+    determinantR;
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+%
+% 根据两个单位向量建立最小旋转矩阵：
+%
+%       R*a = b
+%% ========================================================================
+function R = ...
+    rotationVectorToVector(a,b)
+
+
+a = ...
+    a(:);
+
+
+b = ...
+    b(:);
+
+
+a = ...
+    a ...
+    / ...
+    max(norm(a),eps);
+
+
+b = ...
+    b ...
+    / ...
+    max(norm(b),eps);
+
+
+c = ...
+    dot(a,b);
+
+
+c = ...
+    max(-1,min(1,c));
+
+
+tolerance = ...
+    1e-12;
+
+
+
+%% ========================================================================
+% 完全同向
+%% ========================================================================
+
+if c > 1-tolerance
+
+    R = ...
+        eye(3);
+
+    return;
+
+end
+
+
+
+%% ========================================================================
+% 完全反向
+%
+% 需要寻找一个与 a 垂直的旋转轴，
+% 做 180° 旋转。
+%% ========================================================================
+
+if c < -1+tolerance
+
+    candidate = ...
+        [0;0;1];
+
+
+    if abs(dot(candidate,a)) > 0.9
+
+        candidate = ...
+            [0;1;0];
+
+    end
+
+
+    rotationAxis = ...
+        cross(a,candidate);
+
+
+    rotationAxis = ...
+        rotationAxis ...
+        / ...
+        max(norm(rotationAxis),eps);
+
+
+    R = ...
+        -eye(3) ...
+        + ...
+        2 ...
+        * ...
+        (rotationAxis*rotationAxis');
+
+
+    return;
+
+end
+
+
+
+%% ========================================================================
+% 一般情况：Rodrigues
+%% ========================================================================
+
+v = ...
+    cross(a,b);
+
+
+s = ...
+    norm(v);
+
+
+K = [
+     0,    -v(3),  v(2);
+     v(3),  0,    -v(1);
+    -v(2),  v(1),  0
+];
+
+
+R = ...
+    eye(3) ...
+    + ...
+    K ...
+    + ...
+    K*K ...
+    * ...
+    ( ...
+    (1-c) ...
+    / ...
+    max(s^2,eps) ...
+    );
+
+end
+
+
+
+%% ========================================================================
+% LOCAL FUNCTION
+% 重新计算基本几何
+%% ========================================================================
+function mesh = ...
+    recalculateGeometry(mesh)
+
+
+V = ...
+    mesh.V;
+
+
+F = ...
+    mesh.F;
+
+
+P1 = ...
+    V(F(:,1),:);
+
+
+P2 = ...
+    V(F(:,2),:);
+
+
+P3 = ...
+    V(F(:,3),:);
+
+
+rawNormal = ...
+    cross( ...
+        P2-P1, ...
+        P3-P1, ...
+        2);
+
+
+normalMagnitude = ...
+    sqrt( ...
+        sum(rawNormal.^2,2));
+
+
+mesh.area = ...
+    0.5 ...
+    * ...
+    normalMagnitude;
+
+
+mesh.normal = ...
+    rawNormal ...
+    ./ ...
+    max(normalMagnitude,eps);
+
+
+mesh.center = ...
+    (P1+P2+P3)/3;
+
+
+mesh.totalArea = ...
+    sum(mesh.area);
+
+
+mesh.boundingBox = [
+    min(V(:,1)), max(V(:,1));
+    min(V(:,2)), max(V(:,2));
+    min(V(:,3)), max(V(:,3))
+];
+
+
+mesh.size = ...
+    mesh.boundingBox(:,2)' ...
+    - ...
+    mesh.boundingBox(:,1)';
+
+
+characteristicLength = ...
+    max(mesh.size);
+
+
+if characteristicLength <= 0
+
+    characteristicLength = 1;
+
+end
+
+
+areaTolerance = ...
+    1e-14 ...
+    * ...
+    characteristicLength^2;
+
+
+mesh.badFace = ...
+    mesh.area <= areaTolerance;
+
+
+mesh.numberBadFaces = ...
+    sum(mesh.badFace);
+
+end

@@ -1,0 +1,756 @@
+function atm = standardAtmosphere(altitude)
+%% ========================================================================
+% standardAtmosphere.m
+%
+% Rocket AeroHeat
+%
+% 标准大气模型
+%
+% ========================================================================
+%
+% 输入：
+%
+% altitude
+%
+%       几何海拔高度
+%
+%       单位：
+%
+%           m
+%
+%
+%       可以输入：
+%
+%           标量
+%
+%       或：
+%
+%           数组
+%
+%
+% 当前适用范围：
+%
+%       0 ~ 86 km
+%
+%
+% ------------------------------------------------------------------------
+% 输出：
+%
+% atm.temperature
+%
+%       静温 [K]
+%
+%
+% atm.pressure
+%
+%       静压 [Pa]
+%
+%
+% atm.density
+%
+%       密度 [kg/m^3]
+%
+%
+% atm.speedOfSound
+%
+%       声速 [m/s]
+%
+%
+% atm.dynamicViscosity
+%
+%       动力黏度 [Pa*s]
+%
+%
+% atm.kinematicViscosity
+%
+%       运动黏度 [m^2/s]
+%
+%
+% atm.gamma
+%
+%       比热比
+%
+%
+% atm.R
+%
+%       空气气体常数 [J/(kg*K)]
+%
+%
+% atm.gravity
+%
+%       标准重力加速度 [m/s^2]
+%
+%
+% atm.geometricAltitude
+%
+%       几何高度 [m]
+%
+%
+% atm.geopotentialAltitude
+%
+%       位势高度 [m]
+%
+%
+% ------------------------------------------------------------------------
+% 模型：
+%
+% 标准分层大气：
+%
+% 0      - 11 km
+% 11     - 20 km
+% 20     - 32 km
+% 32     - 47 km
+% 47     - 51 km
+% 51     - 71 km
+% 71     - 84.852 km 位势高度
+%
+%
+% 每层满足：
+%
+% 非等温层：
+%
+%                T_b
+% p = p_b (-------------)^(g0/(R*L))
+%                 T
+%
+%
+% 等温层：
+%
+% p = p_b exp[-g0(h-h_b)/(R*T_b)]
+%
+%
+%% ========================================================================
+
+
+%% ========================================================================
+% 1. 输入检查
+% ========================================================================
+
+if nargin < 1
+
+    error( ...
+        'standardAtmosphere: 必须输入飞行高度 altitude。');
+
+end
+
+
+if ~isnumeric(altitude) ...
+        || ...
+        ~isreal(altitude)
+
+    error( ...
+        'standardAtmosphere: altitude 必须为实数。');
+
+end
+
+
+if any(~isfinite(altitude(:)))
+
+    error( ...
+        'standardAtmosphere: altitude 中存在 NaN 或 Inf。');
+
+end
+
+
+%% ========================================================================
+% 2. 当前模型高度范围
+% ========================================================================
+
+minimumAltitude = ...
+    0;
+
+
+maximumAltitude = ...
+    86000;
+
+
+if any(altitude(:) < minimumAltitude) ...
+        || ...
+        any(altitude(:) > maximumAltitude)
+
+    error( ...
+        ['standardAtmosphere 当前支持的几何高度范围为：' newline ...
+         '0 ~ 86000 m。' newline ...
+         '更高高度将在后续 upper-atmosphere / rarefied 模块中处理。']);
+
+end
+
+
+%% ========================================================================
+% 3. 保存原输入形状
+% ========================================================================
+
+originalSize = ...
+    size(altitude);
+
+
+z = ...
+    double(altitude(:));
+
+
+%% ========================================================================
+% 4. 物理常数
+% ========================================================================
+
+g0 = ...
+    9.80665;
+
+
+R = ...
+    287.05287;
+
+
+gamma = ...
+    1.4;
+
+
+earthRadius = ...
+    6356766.0;
+
+
+%% ========================================================================
+% 5. 几何高度 → 位势高度
+% ========================================================================
+%
+%                  Re * z
+%       h = --------------------
+%                Re + z
+%
+
+h = ...
+    earthRadius ...
+    .* ...
+    z ...
+    ./ ...
+    (earthRadius + z);
+
+
+%% ========================================================================
+% 6. 标准大气层基准高度
+% ========================================================================
+%
+% 单位：
+%
+% m
+%
+
+baseHeight = [
+    0;
+    11000;
+    20000;
+    32000;
+    47000;
+    51000;
+    71000;
+    84852
+];
+
+
+%% ========================================================================
+% 7. 各层温度梯度
+% ========================================================================
+%
+% 单位：
+%
+% K/m
+%
+
+lapseRate = [
+    -0.0065;
+     0.0;
+     0.0010;
+     0.0028;
+     0.0;
+    -0.0028;
+    -0.0020
+];
+
+
+%% ========================================================================
+% 8. 计算每一层底部基准温度和压力
+% ========================================================================
+
+numberBase = ...
+    numel(baseHeight);
+
+
+baseTemperature = ...
+    zeros(numberBase,1);
+
+
+basePressure = ...
+    zeros(numberBase,1);
+
+
+baseTemperature(1) = ...
+    288.15;
+
+
+basePressure(1) = ...
+    101325.0;
+
+
+for layer = 1:numberBase-1
+
+    deltaH = ...
+        baseHeight(layer+1) ...
+        - ...
+        baseHeight(layer);
+
+
+    L = ...
+        lapseRate(layer);
+
+
+    Tbase = ...
+        baseTemperature(layer);
+
+
+    Pbase = ...
+        basePressure(layer);
+
+
+    %% --------------------------------------------------------------------
+    % 等温层
+    %% --------------------------------------------------------------------
+
+    if abs(L) < eps
+
+        baseTemperature(layer+1) = ...
+            Tbase;
+
+
+        basePressure(layer+1) = ...
+            Pbase ...
+            * ...
+            exp( ...
+            -g0 ...
+            * ...
+            deltaH ...
+            / ...
+            (R*Tbase));
+
+
+    %% --------------------------------------------------------------------
+    % 非等温层
+    %% --------------------------------------------------------------------
+
+    else
+
+        Tnext = ...
+            Tbase ...
+            + ...
+            L ...
+            * ...
+            deltaH;
+
+
+        baseTemperature(layer+1) = ...
+            Tnext;
+
+
+        basePressure(layer+1) = ...
+            Pbase ...
+            * ...
+            ( ...
+            Tbase ...
+            / ...
+            Tnext ...
+            ) ...
+            ^ ...
+            ( ...
+            g0 ...
+            / ...
+            (R*L));
+
+    end
+
+end
+
+
+%% ========================================================================
+% 9. 为所有高度计算 T 和 p
+% ========================================================================
+
+numberPoint = ...
+    numel(h);
+
+
+temperature = ...
+    zeros(numberPoint,1);
+
+
+pressure = ...
+    zeros(numberPoint,1);
+
+
+layerIndex = ...
+    zeros(numberPoint,1);
+
+
+for i = 1:numberPoint
+
+    hi = ...
+        h(i);
+
+
+    %% --------------------------------------------------------------------
+    % 找当前高度属于哪一层
+    %% --------------------------------------------------------------------
+
+    currentLayer = ...
+        find( ...
+        hi >= ...
+        baseHeight(1:end-1), ...
+        1, ...
+        'last');
+
+
+    if isempty(currentLayer)
+
+        currentLayer = 1;
+
+    end
+
+
+    if currentLayer > ...
+            numel(lapseRate)
+
+        currentLayer = ...
+            numel(lapseRate);
+
+    end
+
+
+    layerIndex(i) = ...
+        currentLayer;
+
+
+    hb = ...
+        baseHeight(currentLayer);
+
+
+    Tb = ...
+        baseTemperature(currentLayer);
+
+
+    pb = ...
+        basePressure(currentLayer);
+
+
+    L = ...
+        lapseRate(currentLayer);
+
+
+    deltaH = ...
+        hi-hb;
+
+
+    %% --------------------------------------------------------------------
+    % 等温层
+    %% --------------------------------------------------------------------
+
+    if abs(L) < eps
+
+        Ti = ...
+            Tb;
+
+
+        pi = ...
+            pb ...
+            * ...
+            exp( ...
+            -g0 ...
+            * ...
+            deltaH ...
+            / ...
+            (R*Tb));
+
+
+    %% --------------------------------------------------------------------
+    % 非等温层
+    %% --------------------------------------------------------------------
+
+    else
+
+        Ti = ...
+            Tb ...
+            + ...
+            L ...
+            * ...
+            deltaH;
+
+
+        pi = ...
+            pb ...
+            * ...
+            ( ...
+            Tb ...
+            / ...
+            Ti ...
+            ) ...
+            ^ ...
+            ( ...
+            g0 ...
+            / ...
+            (R*L));
+
+    end
+
+
+    temperature(i) = ...
+        Ti;
+
+
+    pressure(i) = ...
+        pi;
+
+end
+
+
+%% ========================================================================
+% 10. 密度
+% ========================================================================
+%
+%           p
+% rho = ---------
+%          R T
+%
+
+density = ...
+    pressure ...
+    ./ ...
+    (R .* temperature);
+
+
+%% ========================================================================
+% 11. 声速
+% ========================================================================
+%
+% a = sqrt(gamma R T)
+%
+
+speedOfSound = ...
+    sqrt( ...
+    gamma ...
+    * ...
+    R ...
+    .* ...
+    temperature);
+
+
+%% ========================================================================
+% 12. 动力黏度
+%
+% Sutherland 公式
+% ========================================================================
+
+referenceTemperature = ...
+    273.15;
+
+
+referenceViscosity = ...
+    1.716e-5;
+
+
+sutherlandConstant = ...
+    110.4;
+
+
+dynamicViscosity = ...
+    referenceViscosity ...
+    .* ...
+    ( ...
+    temperature ...
+    ./ ...
+    referenceTemperature ...
+    ) ...
+    .^ ...
+    1.5 ...
+    .* ...
+    ( ...
+    referenceTemperature ...
+    + ...
+    sutherlandConstant ...
+    ) ...
+    ./ ...
+    ( ...
+    temperature ...
+    + ...
+    sutherlandConstant ...
+    );
+
+
+%% ========================================================================
+% 13. 运动黏度
+% ========================================================================
+
+kinematicViscosity = ...
+    dynamicViscosity ...
+    ./ ...
+    density;
+
+
+%% ========================================================================
+% 14. 无量纲比值
+% ========================================================================
+
+temperatureRatio = ...
+    temperature ...
+    / ...
+    288.15;
+
+
+pressureRatio = ...
+    pressure ...
+    / ...
+    101325;
+
+
+densityRatio = ...
+    density ...
+    / ...
+    1.225;
+
+
+%% ========================================================================
+% 15. 恢复原始数组形状
+% ========================================================================
+
+temperature = ...
+    reshape( ...
+    temperature, ...
+    originalSize);
+
+
+pressure = ...
+    reshape( ...
+    pressure, ...
+    originalSize);
+
+
+density = ...
+    reshape( ...
+    density, ...
+    originalSize);
+
+
+speedOfSound = ...
+    reshape( ...
+    speedOfSound, ...
+    originalSize);
+
+
+dynamicViscosity = ...
+    reshape( ...
+    dynamicViscosity, ...
+    originalSize);
+
+
+kinematicViscosity = ...
+    reshape( ...
+    kinematicViscosity, ...
+    originalSize);
+
+
+temperatureRatio = ...
+    reshape( ...
+    temperatureRatio, ...
+    originalSize);
+
+
+pressureRatio = ...
+    reshape( ...
+    pressureRatio, ...
+    originalSize);
+
+
+densityRatio = ...
+    reshape( ...
+    densityRatio, ...
+    originalSize);
+
+
+h = ...
+    reshape( ...
+    h, ...
+    originalSize);
+
+
+layerIndex = ...
+    reshape( ...
+    layerIndex, ...
+    originalSize);
+
+
+%% ========================================================================
+% 16. 输出结构体
+% ========================================================================
+
+atm = struct;
+
+
+atm.geometricAltitude = ...
+    altitude;
+
+
+atm.geopotentialAltitude = ...
+    h;
+
+
+atm.temperature = ...
+    temperature;
+
+
+atm.pressure = ...
+    pressure;
+
+
+atm.density = ...
+    density;
+
+
+atm.speedOfSound = ...
+    speedOfSound;
+
+
+atm.dynamicViscosity = ...
+    dynamicViscosity;
+
+
+atm.kinematicViscosity = ...
+    kinematicViscosity;
+
+
+atm.temperatureRatio = ...
+    temperatureRatio;
+
+
+atm.pressureRatio = ...
+    pressureRatio;
+
+
+atm.densityRatio = ...
+    densityRatio;
+
+
+atm.layerIndex = ...
+    layerIndex;
+
+
+atm.gamma = ...
+    gamma;
+
+
+atm.R = ...
+    R;
+
+
+atm.gravity = ...
+    g0;
+
+
+atm.maximumSupportedAltitude = ...
+    maximumAltitude;
+
+end
