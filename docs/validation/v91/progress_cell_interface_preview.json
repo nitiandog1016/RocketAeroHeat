@@ -1,7 +1,9 @@
 {
   "version": 91,
-  "status": "unit-and-legacy-compatibility-tested-prototype-no-new-real-Q38-run",
-  "processes": {
+  "status": "tested-public-unit-Q38-cell-interface-preview-Q39-bounded-NS-and-original-facet-UI",
+  "recordedUTC": "2026-10-28T12:23:49.218507+00:00",
+  "previousGoalTurnClassification": "progress",
+  "legacyUnitProcesses": {
     "interfaceunit91": {
       "file": "outputs/v83_validation/interfaceunit91_process.json",
       "sha256": "65553a748ae8916b424fb7d63130985fe1195516f00b2946a4717896153baeb8",
@@ -21,34 +23,224 @@
       ]
     }
   },
-  "sourceSHA256": {
-    "internalFlow/cutCell/findRocketCandidateTemperatureFaces.m": "8c0ddb4d4814ee669c788afb665b660608b86a10b08a63b621954913bc2fc97e",
-    "internalFlow/cutCell/selectRocketTemperatureCellInterfaceRows.m": "e26103bac8323de32cba177eb2fa47cd809c0b56b187438b7178b06fba95f77c",
-    "internalFlow/cutCell/selectRocketTemperatureLookaheadRows.m": "601497fcd0bbec3e4f15784927c1d603f73f17880b41471d57ff3c1f51278ece",
-    "tests/studyRocketTemperatureLookahead.m": "cd4bbcb1cf9cc2cd4335e5ce6ecd0d889ad1b100a4a7dc3ed50b4db0f0e777dd",
-    "tests/testRocketCellInterfaceLookahead.m": "9f0c6056e72c8b2d3413a924e88497b17840a03a2ea6145e54e33154a6628b7c",
-    "tests/rocketTemperatureResearchFixture.m": "8aece84c39b23e0aadb628f093d9796f0e04df92300a0124b998a26edfe63d50",
-    "tests/testRocketTemperatureTargetedSmall.m": "566d55f4ddb677e14925cb9d896773589622a684992bbe32ab055dca2e10a0f5",
-    "tests/testRocketTemperatureActiveSet.m": "231e5668c994f61ddce79ad436e1ae0dd2fa0783fc96b68f3c136b5341458c86",
-    "tests/testRocketTemperatureLookaheadIntegration.m": "c66d0c69f9eca8a25198e5ce6d2b249270a6804a51be15eba0280f3aa1b91fae",
-    "tests/data/temperature_research/manifest.json": "72d935612e0b434e899264e31ad463ff3213699bb594f9ca102efd33f8ad3018"
+  "processes": {
+    "interfacepublic91": {
+      "file": "outputs/v91_validation/interfacepublic91_process.json",
+      "sha256": "d45c44935dd166bc06b60ac76898174e9da4017fed456f3b7fdcde671096cb2f",
+      "exitCode": 0,
+      "sourceStableDuringRun": true,
+      "engineProcessIDs": [
+        36380
+      ]
+    },
+    "interfacefull91": {
+      "file": "outputs/v91_validation/interfacefull91_process.json",
+      "sha256": "75c067db43f5dbdb7eb7da2dfa9493a874f9322b883935ef5e06ea7dafa24373",
+      "exitCode": 0,
+      "sourceStableDuringRun": true,
+      "engineProcessIDs": [
+        27360
+      ]
+    },
+    "interfaceview91": {
+      "file": "outputs/v91_validation/interfaceview91_process.json",
+      "sha256": "bb2fea87b9cb089438838d3c21c3d244dcc46403d3774dde9552bcef878aff23",
+      "exitCode": 0,
+      "sourceStableDuringRun": true,
+      "engineProcessIDs": [
+        33052
+      ]
+    }
   },
-  "smallFixturesBytes": 1341785,
-  "fixturePurpose": "repository-contained-manufactured-and-two-state-research-reproduction-not-external-CFD",
-  "originalTemperatureRangeK": [
-    80,
-    2000
+  "selectedState": {
+    "case": "krylov39",
+    "file": "outputs/v83_validation/krylov39/wall_velocity_krylov_evidence.mat",
+    "sha256": "a65065f5f42a6ce5bfd5b4bc42bf572c6e7f0b72863dd63aa55bcf613b254753",
+    "acceptedAlpha": 0.0625,
+    "rmsResidualPerSecond": 190396.97733345832,
+    "maximumResidualPerSecond": 2489785.2826045956,
+    "steadyBoundaryFluxBalance": 0.0033487619482869785,
+    "steadyConverged": false
+  },
+  "sameEquationTotals": {
+    "acceptedIterations": 17,
+    "mainNS": 74
+  },
+  "currentStudyWork": {
+    "preparationNS": 1,
+    "independentProbeNS": 2,
+    "mainNS": 4,
+    "freeIterations": 128,
+    "projectedIterations": 128
+  },
+  "selection": {
+    "originalRows": 135,
+    "predictedViolatingCVs": 34,
+    "selectedAndActiveRows": 149,
+    "distinctConditions": 59,
+    "assessedInterfaces": 849070,
+    "blockedInterfaces": 266,
+    "predictedViolatingAssessableInterfaces": 0,
+    "arrayBoundBytes": 107372160,
+    "kernelCalls": 208,
+    "allOriginalHAndSignsRetained": true,
+    "rankTruncationUsed": false
+  },
+  "independentScope": {
+    "unitPairs": 4,
+    "manufacturedDomains": 3,
+    "batchSizes": [
+      1,
+      3,
+      4096
+    ],
+    "unitPublicFDColumnChecks": 300,
+    "unitMaximumRelativeFDDifference": 2.7403370023942598e-09,
+    "zeroContactSpeedSwitchingColumns": 6,
+    "realPublicDerivativeColumns": 1490,
+    "realMaximumRelativeFDDifference": 2.256754343804223e-11,
+    "allRealCVTemperaturesAndAssessedBlockedPartitionRecomputed": true,
+    "realPublicInterfaceSamples": 247,
+    "allRealRiemannStatesIndependentlyRecomputed": false
+  },
+  "limitation": {
+    "step": 1,
+    "rejectedAlpha": 0.125,
+    "rejectedCellCount": 1,
+    "rejectedCellsInCurrentHSupport": 0,
+    "allRejectedCellsOutsideCurrentHSupport": true,
+    "cells": [
+      {
+        "cellID": 105088,
+        "sourceFacet": 6328,
+        "layer": 6,
+        "centroidM": [
+          -1.8028781442786983,
+          0.013840348714627842,
+          -0.09939435443429137
+        ],
+        "baseTemperatureK": 100.45996742475499,
+        "tangentTemperatureChangeK": -138.12566075335437,
+        "linearPredictedTemperatureK": 83.1942598305857,
+        "rejectedConservativeTemperatureK": 79.09602602663306,
+        "inCurrentHSupport": false,
+        "baseCellWithinOriginal10KBand": false
+      }
+    ],
+    "cellOnlyDiagnostic": true,
+    "allInterfaceDerivativesRecomputed": false,
+    "alternateDirectionOrNSAcceptanceClaimed": false
+  },
+  "finalInteriorTemperatureRangeK": [
+    84.12804863635684,
+    1990.3251112842727
   ],
-  "newCompleteNS": 0,
-  "newFlowAcceptances": 0,
-  "physicalSolution": false,
-  "newProductionSolvedAreaM2": 0,
-  "actualAcceptedState": "Q38",
-  "sameEquationActualNS": 70,
-  "sameEquationAcceptances": 16,
+  "UI": {
+    "CSVValueRows": 592560,
+    "sectionSamples": 6624,
+    "sameHostEvents": 15,
+    "actualBrowserReview": "docs/validation/v91/browser_review.json",
+    "observerErrorAlsoOnScriptFreeControl": true
+  },
+  "evidence": {
+    "publicUnit": {
+      "file": "outputs/v91_validation/unit03/independent_cell_interface_lookahead.json",
+      "sha256": "580dea1cf0bd6d5503f32563ab12e84ff57bba6bfe0012d637d967932334bf63",
+      "status": "passed-independent-public-cell-interface-preview-union-blockage-H-and-same-branch-derivatives"
+    },
+    "portablePublicUnit": {
+      "file": "outputs/v91_validation/unit_portable01/independent_cell_interface_lookahead.json",
+      "sha256": "4082df718121b44fc132cee5e1c21191d56a2a76ef4c26ddb3fa5d033c36cd83",
+      "status": "passed-independent-public-cell-interface-preview-union-blockage-H-and-same-branch-derivatives"
+    },
+    "realSelection": {
+      "file": "outputs/v91_validation/independent_cell_interface_continuation.json",
+      "sha256": "6d17b7e7090742247eb80b22cbec801cc53e0a2164c967261d5d720274eef57c",
+      "status": "passed-real-all-CV-partition-selected-union-original-H-and-public-interface-samples"
+    },
+    "realDirection": {
+      "file": "outputs/v91_validation/continuous01/independent_temperature_active.json",
+      "sha256": "cdf0e9473dddd4de686ceecf31642e5b2213eb1cc6d8bacb7500dad78081a879",
+      "status": "passed-independent-temperature-band-active-cycles-and-complete-objective"
+    },
+    "allWallsAndConservation": {
+      "file": "outputs/v83_validation/krylov39_independent_audit.json",
+      "sha256": "7a631c20b5400aa287ef934465dedc4420369334c5a51a489c364a3d397a51cb",
+      "status": "passed-independent-actual-static-wall-flux-constitutive-Jacobian-conservation-and-update-audit"
+    },
+    "freshNSDirection": {
+      "file": "outputs/v83_validation/krylov39_independent_direct_ns_probe.json",
+      "sha256": "1461b5bfdbfa39747e17b027512e4be76f74e9e5f6828a38e233dac17863e5c5",
+      "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks"
+    },
+    "allOpenReservoirFaces": {
+      "file": "outputs/v83_validation/krylov39_independent_riemann_reservoir.json",
+      "sha256": "6e62149a93c6078fb9d0a38837019e70e31e6236e5b5335bc300e44f1fa26265",
+      "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence"
+    },
+    "currentTemperatureMargins": {
+      "file": "outputs/v91_validation/current_temperature_margins.json",
+      "sha256": "55b1ea122789984515463e6fee630c01c7895526b192c6c27456a4ceea898f55",
+      "status": "passed-all-saved-current-temperature-margins-and-public-extreme-face-samples"
+    },
+    "rejectedCellLocations": {
+      "file": "outputs/v91_validation/step_limits.json",
+      "sha256": "c41fb093c291df5689d5e24482a143043902ece2d3b81e6b8e6b8816b48287d0",
+      "status": "passed-saved-last-cell-temperature-rejection-locations-and-current-H-support-comparison"
+    },
+    "nodeViewCSVSectionsWorkflow": {
+      "file": "outputs/v91_validation/workbench01/node_wall_velocity_summary.json",
+      "sha256": "aeee71894004a35896b745fdcbbdbf6f0e0b8adb7f7d81a322cbac479c54668e",
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events"
+    },
+    "independentOriginalFacetView": {
+      "file": "outputs/v91_validation/workbench01/independent_wall_velocity_view.json",
+      "sha256": "590293383c251923d9a2c960a1c72de5a462d789d61eafaef02228bbc14f3ee8",
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity"
+    },
+    "sourceBindingRejections": {
+      "file": "outputs/v91_validation/view_binding_rejections.json",
+      "sha256": "98425aa2773da36b4a80d16d7304047d0179905acfb9a16c70f82cbd12ccfb69",
+      "status": "passed-old-base-other-step-and-current-source-SHA-rejections"
+    },
+    "browserReview": {
+      "file": "docs/validation/v91/browser_review.json",
+      "sha256": "7d946140f574604d1b914bb27b659d774cf0fdaf1b81ff7f613c925a955baa36",
+      "status": "actual-browser-Q39-pressure-heat-section-probe-methods-diagnostics-and-same-tab-return-reviewed"
+    },
+    "oldCacheCleanup": {
+      "file": "docs/validation/v91/obsolete_v90_cache_cleanup.json",
+      "sha256": "a4ad0871ce5ec40233e26d444e99306426636f165218545c2ced35473bef22a6",
+      "status": "completed-obsolete-v90-cache-cleanup-current-v91-and-states-preserved"
+    },
+    "initialAuditReportingFailure": {
+      "file": "docs/validation/v91/independent_audit_initial_failure.json",
+      "sha256": "9f3e8d0b80d8dd66b1305d0a806161b53b6bb55086639e773a496a07dd1115f4",
+      "status": "failed-report-serialization-after-numerical-assertions"
+    }
+  },
+  "sourceSHA256": {
+    "tests/testRocketCellInterfaceLookahead.m": "5f4e9718903893625f343dab1bae08855438945dbf9bdf3b1a14d9eaec99c35b",
+    "tests/auditRocketCellInterfaceLookahead.py": "29f258804a4788e645fb9d156de81e6e9cf34da3f1c054165b7ce0388e2997c3",
+    "tests/auditRocketCellInterfaceContinuation.py": "7f6a8a6b46b875319dffee7a75b602447fbb27f978ff87b39e31cafd80c8f3eb",
+    "tests/riemannReservoirReference.py": "8472dd5ca67879b40d152f0fee2dc7645578ac1294d7eec33aaa098c965791b3",
+    "tests/diagnoseRocketTemperatureActiveContinuation.py": "efe9b504ea8b876252962bfd36e87cee887ecdf6a0991b5cbcc37e3681af3f47",
+    "tests/plotRocketTemperatureActive.py": "0d4698977fd04b16833b0cb9b036a3ecc4db913054ebdebbc74189ddd5a6fa19",
+    "tests/buildRocketTemperatureActiveWorkbench.py": "ca2480ebeab1707ff7dc48b36a4260a93b6584d8586911754350dffec0f12f4f",
+    "tests/testRocketWallVelocityWorkbench.js": "90a087b8acfb1bac1a06d628cb281fcba380ba24b63f8c603b22843937468760",
+    "web/rocket-wall-velocity.js": "4f16de4813f1c1b8880ad40023af2addc5258142803d223610d89d80c9a01789",
+    "scripts/runMatlabResearch.py": "3199f97bdca1ce8500f4f2d63c6d8c25a261189c793365cd0d7eb3c87a612005",
+    "tests/data/riemann_reference/raw/clawpack_exact_euler.py": "2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef",
+    "tests/data/riemann_reference/raw/probe_exact_riemann.py": "402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a",
+    "tests/data/riemann_reference/raw/LICENSE-CODE": "82e755a0379339dd6d1d9464ebe7cf5f4bdbf1c45af77d45d58b4c0cc7a2a07e"
+  },
+  "smallReferenceFilesBundledWithBSD": true,
+  "fullDomainPrototypeNumericallyTested": true,
+  "productionPhysicalQualificationCompleted": false,
   "formalHeatAreaFraction": 0.665626327424,
-  "fullDomainPrototypeValidated": false,
-  "publicReferenceForNewPolicyCompleted": false,
+  "newProductionSolvedAreaM2": 0,
+  "physicalSolution": false,
   "localEngineeringPackageCreated": false,
-  "githubSyncRequested": true
+  "objectiveComplete": false,
+  "deliveryMode": "GitHub-source-tests-small-reproduction-inputs-and-validation-documents"
 }

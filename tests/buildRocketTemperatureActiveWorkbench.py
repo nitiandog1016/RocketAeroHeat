@@ -127,6 +127,8 @@ def bind(study_file, candidate_file, state_file, step_number):
         # 前瞻集合可能包含原10K之外的面，不能再将全部选择数写成10K带内面数。
         preparation['lookaheadSelection'] = selection
         preparation['methodLabel'] = f"当前自由候选前瞻；保留原温域带并补全部预测越温单元；{report['activeSolveCount']}次受限重算"
+        if selection.get('selectionPolicy') == 'original-and-predicted-cell-and-interface-faces':
+            preparation['methodLabel'] = f"当前单元与Riemann界面共同前瞻；保留原温域带、单元所需面与可检查的越温界面；{report['activeSolveCount']}次受限重算"
     if 'freeCheckpointReplay' in report:
         preparation['freeCheckpointReplay'] = step['directionReport']['freeCheckpointReplay']
         preparation['newFreeNativeIterations'] = report['freeCheckpointReplay']['newFreeNativeIterations']
@@ -186,20 +188,29 @@ def build():
         '<th>步骤</th><th>所选原面</th><th>激活原行</th><th>不同条件</th><th>表示</th>'
         '<th>基存储 KiB</th><th>等价完整基 KiB</th></tr></thead><tbody>' + ''.join(representation_rows)+'</tbody></table>')
     lookahead_rows = []
+    interface_policy = False
     for item in steps:
         selection = item['directionReport'].get('lookaheadSelection')
         if not selection:
             continue
         size = lambda x: int(np.size(x))
+        preview = selection.get('interfacePreview')
+        preview = preview if isinstance(preview, dict) else None
+        interface_policy = interface_policy or preview is not None
         cells = [str(item['step']), str(size(selection['originalBandFaceIDs'])),
                  str(size(selection['predictedViolatingCellIDs'])), str(size(selection['requiredOriginalStateFaceIDs'])),
+                 str(size(preview['predictedViolatingInterfaceFaceIDs'])) if preview is not None else '未启用',
+                 str(size(preview['blockedFaceIDs'])) if preview is not None else '未启用',
                  str(size(selection['selectedBandFaceIDs'])), str(size(selection.get('candidateExtendedBandFaceIDs', selection['selectedBandFaceIDs'])))]
         lookahead_rows.append('<tr>'+''.join('<td>'+x+'</td>' for x in cells)+'</tr>')
     if lookahead_rows:
-        representation_table += ('<h2>当前候选前瞻核对</h2><p>选择集合为原10 K温域带加全部预测越温单元所需原态面。'
+        policy_text = ('选择集合为原10 K温域带、全部预测越温单元所需原态面及可检查的预测越温Riemann界面。'
+                       '候选单元温度超域导致无法检查的相邻面单列为阻挡，不计为已检查。' if interface_policy else
+                       '选择集合为原10 K温域带加全部预测越温单元所需原态面。')
+        representation_table += ('<h2>当前候选前瞻核对</h2><p>'+policy_text+
             '候选扩展带仅用于来源和距离诊断；选面不按秩删行，也不保证非线性候选合法。'
             '所有候选仍须原完整NS、80–2000 K温域和下降检查。</p><table><thead><tr>'
-            '<th>步骤</th><th>原10 K面</th><th>预测越温单元</th><th>所需原态面</th><th>实际选择面</th><th>候选扩展带面</th>'
+            '<th>步骤</th><th>原10 K面</th><th>预测越温单元</th><th>所需原态面</th><th>预测越温界面</th><th>阻挡面</th><th>实际选择面</th><th>候选扩展带面</th>'
             '</tr></thead><tbody>'+''.join(lookahead_rows)+'</tbody></table>')
     page = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>当前温域与连续推进</title>
 <style>body{font:16px/1.7 system-ui,sans-serif;max-width:1350px;margin:28px auto;padding:0 24px;color:#213747;background:#f7f9fb}img{width:100%;background:white}a{color:#146da2}.note{padding:16px;border-left:4px solid #ae7c24;background:#fff3d9}table{border-collapse:collapse;width:100%;background:#fff;font-size:14px}th,td{border-bottom:1px solid #d8e0e7;padding:8px;text-align:right}th{color:#324b60}</style>
@@ -223,7 +234,10 @@ def build():
                    originalFacetDatasetsByteIdentical=same, physicalSolution=False,
                    newProductionSolvedAreaM2=0, browserVisualOrWebGLRuntimeVerified=False)
     (folder / 'temperature_active_view_binding.json').write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
-    print(json.dumps(receipt, ensure_ascii=False))
+    # 全部面号已写入回执；控制台只输出摘要，避免849336面前瞻生成数MB重复日志。
+    print(json.dumps(dict(status=receipt['status'], selected=selected,
+                         originalFacetDatasetsByteIdentical=same, physicalSolution=False,
+                         newProductionSolvedAreaM2=0)))
 
 
 if __name__ == '__main__':

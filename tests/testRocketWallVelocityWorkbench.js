@@ -82,6 +82,23 @@ for(let j=0;j<3;j++){
      assert.deepEqual(asArray(preparation.bandFaceIDs),[...new Set([...originals,...required])].sort((a,b)=>a-b));
      assert.equal(q.constraintRankUsedToSelectFaces,false);assert.equal(q.allPredictedViolatingCellsRepresented,true);
     }
+    if(q.selectionPolicy==='original-and-predicted-cell-and-interface-faces'){
+     const preview=q.interfacePreview,interfaces=asArray(q.predictedViolatingInterfaceFaceIDs);
+     assert.deepEqual(asArray(preparation.bandFaceIDs),[...new Set([...originals,...required,...interfaces])].sort((a,b)=>a-b));
+     const assessed=asArray(preview.assessedFaceIDs),blocked=asArray(preview.blockedFaceIDs);
+     assert.equal(new Set([...assessed,...blocked]).size,preview.completeInteriorFaceCount);
+     assert.equal(assessed.length+blocked.length,preview.completeInteriorFaceCount);
+     assert.equal(preview.allInteriorFacesAssessed,blocked.length===0);
+     assert.equal(preview.temperatureDomainRelaxed,false);
+     assert.ok(ids.details.children.some(e=>e.textContent.includes('因单元超域阻挡 '+blocked.length+' 面')));
+     assert.ok(ids.details.children.some(e=>e.textContent.includes('已检查 '+assessed.length+' 面')));
+     const diagnostic=fs.readFileSync(path.join(folder,d.temperatureActiveResearch.reportURL),'utf8');
+     assert.ok(diagnostic.includes('预测越温界面')&&diagnostic.includes('阻挡面'));
+     // 尚未执行的预览不能显示为“已检查零面”，保留缺失与零的区别。
+     q.interfacePreview=[];buttons[3].events.click();
+     assert.ok(ids.details.children.some(e=>e.textContent.includes('未执行：目标候选')));
+     q.interfacePreview=preview;buttons[3].events.click();
+    }
     assert.ok(ids.details.children.some(e=>e.textContent.includes('原10 K带内 '+originals.length+' 面')));
     assert.ok(ids.details.children.some(e=>e.textContent.includes('实际选择 '+asArray(preparation.bandFaceIDs).length+' 面')));
     if(preparation.freeCheckpointReplay){

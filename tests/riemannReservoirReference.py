@@ -13,7 +13,10 @@ def sha(path):
         for b in iter(lambda:f.read(8*1024**2),b''):h.update(b)
     return h.hexdigest()
 
-source=REF/'clawpack_exact_euler.py';probe=REF/'probe_exact_riemann.py'
+# 优先采用随库的小型原文，便于清理outputs或重新下载源码后离线复现独立核对。
+bundled=ROOT/'tests/data/riemann_reference/raw'
+source=(bundled if (bundled/'clawpack_exact_euler.py').is_file() else REF)/'clawpack_exact_euler.py'
+probe=(bundled if (bundled/'probe_exact_riemann.py').is_file() else REF)/'probe_exact_riemann.py'
 assert sha(source)=='2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef'
 assert sha(probe)=='402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a'
 allowed={'pospart','sound_speed','beta','integral_curve_1','integral_curve_3','hugoniot_locus_1','hugoniot_locus_3'}

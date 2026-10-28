@@ -23,9 +23,13 @@ def main():
     study = json.loads(study_file.read_text('utf8'))
     steps = study['steps'] if isinstance(study['steps'], list) else [study['steps']]
     actual = [x for x in steps if x['main'] and x['main']['acceptedNonlinearIterations']]
-    initial = actual[0]['main']
-    rms = [initial['initialRmsMerit']] + [x['main']['rmsMerit'] for x in actual]
-    peak = [initial['initialMaximumResidual']] + [x['main']['maximumResidual'] for x in actual]
+    if actual:
+        initial = actual[0]['main']; initial_rms = initial['initialRmsMerit']; initial_peak = initial['initialMaximumResidual']
+    else:
+        initial = loadmat(study['initialStateFile'], simplify_cells=True, variable_names=['report'])['report']
+        initial_rms = initial['rmsMerit']; initial_peak = initial['maximumResidual']
+    rms = [initial_rms] + [x['main']['rmsMerit'] for x in actual]
+    peak = [initial_peak] + [x['main']['maximumResidual'] for x in actual]
     x = np.arange(len(rms))
     fig, axes = plt.subplots(2, 2, figsize=(12, 8), layout='constrained')
     a = axes[0, 0]
@@ -53,19 +57,26 @@ def main():
             trace = trace[-1]
         alphas.append(float(trace['alpha']))
     a.bar(np.arange(1, len(alphas) + 1), alphas, color='#236e9c')
-    a.set_yscale('log'); a.set_ylabel('Actually accepted step alpha')
+    if alphas:
+        a.set_yscale('log')
+    else:
+        a.text(.5, .5, 'No accepted flow update', transform=a.transAxes, ha='center')
+    a.set_ylabel('Actually accepted step alpha')
     a.set_xticks(np.arange(1, len(alphas)+1))
     for j, alpha in enumerate(alphas, 1):
         a.annotate(f'{alpha:g}', (j, alpha), xytext=(0, 5), textcoords='offset points', ha='center')
     a = axes[1, 1]
     counts = [len(np.atleast_1d(s['directionReport']['bandFaceIDs'])) if np.size(s['directionReport']['bandFaceIDs']) else 0 for s in steps]
     active = [len(np.atleast_1d(s['directionReport']['activeFaceIDs'])) if np.size(s['directionReport']['activeFaceIDs']) else 0 for s in steps]
-    targeted = any(s['directionReport'].get('lookaheadSelection', {}).get('selectionPolicy') ==
-                   'original-and-predicted-required-faces' for s in steps)
+    interface = any(s['directionReport'].get('lookaheadSelection', {}).get('selectionPolicy') ==
+                    'original-and-predicted-cell-and-interface-faces' for s in steps)
+    targeted = interface or any(s['directionReport'].get('lookaheadSelection', {}).get('selectionPolicy') ==
+                               'original-and-predicted-required-faces' for s in steps)
     if targeted:
         original = [np.size(s['directionReport']['lookaheadSelection']['originalBandFaceIDs']) for s in steps]
         a.bar(number - .24, original, .22, label='Original interfaces within 10 K')
-        a.bar(number, counts, .22, label='Original + all predicted required faces')
+        a.bar(number, counts, .22, label=('Original + predicted CV/interface required faces' if interface
+                                        else 'Original + all predicted required faces'))
         a.bar(number + .24, active, .22, label='Outward rows actually activated')
         a.set_ylim(0, max(original+counts+active)*1.4)
     else:

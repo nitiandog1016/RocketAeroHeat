@@ -38,6 +38,13 @@
     const selectionLabel=lookahead?'原10 K带内 '+count(lookahead.originalBandFaceIDs)+' 面；预测越温 '+count(lookahead.predictedViolatingCellIDs)+' 单元；实际选择 '+count(preparation.bandFaceIDs)+' 面，激活 '+count(preparation.activeFaceIDs)+' 行':'当前两端10 K带内 '+count(preparation.bandFaceIDs)+' 面；实际激活 '+count(preparation.activeFaceIDs)+' 行';
     panels[3][2].push(['当前温域方向选择',selectionLabel],
      ['方向与边界身份','每步重建当前导数；朝域内方向保持自由。未增加物理温度边界，实际候选仍须原NS和温域检查']);
+    if(lookahead&&lookahead.interfacePreview&&!Array.isArray(lookahead.interfacePreview)){
+     const preview=lookahead.interfacePreview;
+     panels[3][2].push(['Riemann界面前瞻','预测越温 '+count(preview.predictedViolatingInterfaceFaceIDs)+' 面；已检查 '+count(preview.assessedFaceIDs)+' 面；因单元超域阻挡 '+count(preview.blockedFaceIDs)+' 面'],
+      ['前瞻适用范围',preview.allInteriorFacesAssessed?'本次自由候选的全部内部面已检查；投影后候选仍须完整NS验收':'仅检查候选输入单元合法的内部面；阻挡面尚未检查，不能宣称候选合法']);
+    }else if(lookahead&&lookahead.selectionPolicy==='original-and-predicted-cell-and-interface-faces'){
+     panels[3][2].push(['Riemann界面前瞻','未执行：目标候选的单元状态无法评估；没有界面已检查结论']);
+    }
     if(preparation.freeCheckpointReplay)panels[3][2].push(['检查点接续','同一当前状态和方程已核对；复用自由方向 '+preparation.reusedFreeNativeIterations+' 步，新算受限方向 '+preparation.newProjectedNativeIterations+' 步']);
    }
   }

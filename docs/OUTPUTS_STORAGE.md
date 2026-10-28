@@ -11,10 +11,10 @@
 
 ## 当前续算需要的数据
 
-- 最新接受状态：`outputs/v83_validation/krylov38/wall_velocity_krylov_evidence.mat`。
+- 最新接受状态：`outputs/v83_validation/krylov39/wall_velocity_krylov_evidence.mat`（v91有界试算，尚未稳态）。
 - 原几何：`outputs/v80_validation/domain02/shell_domain_evidence.mat`。
-- 最近方向：`outputs/v90_validation/recovery01/active_direction.mat`。
-- 最近准备系统：`outputs/v90_validation/continuous01/step01/current/`。该系统属于当时的输入状态，不得当作 Q38 的导数直接复用；下一步应从 Q38 重建。
+- 最近方向：`outputs/v91_validation/continuous01/step01/active_direction.mat`。
+- 最近准备系统：`outputs/v91_validation/continuous01/step01/current/`。该系统属于Q38输入状态，不得当作Q39的导数直接复用；下一次实际推进应从Q39重建。
 - 保留历史输入、实际数值结果、自由/受限检查点、公开参考审计及当前工作台。
 
 ## 旧缓存清理后的复算
@@ -29,6 +29,8 @@ prepareRocketCurrentPeakSystem(newFolder, sourceFile, geometryFile, 'domain');
 `sourceFile` 和 `geometryFile` 来自清理计划对应条目。后续使用新生成的准备清单，不能绕过来源检查，也不能冒称重建 MAT 文件的历史 SHA 会完全相同。重建需要额外计算；本轮没有为了清理重新执行数值求解。
 
 v84 三组旧缓存的一项构造模块已经变化，本轮没有清理。原始数值结果、检查点和失败记录没有因为“看起来旧”就删除。
+
+v91完成实际试算与独立审计后，已另行核对并删除被替代的v90六项派生缓存，实际回收2094682112字节；Q37输入、Q38/Q39结果、几何、方向与v91最近系统保留。回执见`docs/validation/v91/obsolete_v90_cache_cleanup.json`，旧v90目录同样带`CACHE_PRUNED.json`。这不会恢复或改写被清理缓存的原SHA，也没有把GitHub源码当作MAT结果备份。
 
 ## 后续约定
 

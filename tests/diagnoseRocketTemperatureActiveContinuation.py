@@ -64,7 +64,18 @@ def main():
                 np.testing.assert_array_equal(np.atleast_1d(selection['originalBandFaceIDs']), original_ids)
                 if selection.get('selectionPolicy') == 'original-and-predicted-required-faces':
                     expected = np.union1d(original_ids, np.atleast_1d(selection['requiredOriginalStateFaceIDs']))
+                elif selection.get('selectionPolicy') == 'original-and-predicted-cell-and-interface-faces':
+                    expected = np.union1d(np.union1d(original_ids, np.atleast_1d(selection['requiredOriginalStateFaceIDs'])),
+                                          np.atleast_1d(selection['predictedViolatingInterfaceFaceIDs']))
+                    preview = selection['interfacePreview']
+                    assessed = np.atleast_1d(preview['assessedFaceIDs']).astype(int)
+                    blocked = np.atleast_1d(preview['blockedFaceIDs']).astype(int)
+                    assert not np.intersect1d(assessed, blocked).size
+                    np.testing.assert_array_equal(np.sort(np.r_[assessed, blocked]), ids+1)
+                    assert preview['allInputFacesAccountedFor'] and not preview['temperatureDomainRelaxed']
+                    assert bool(preview['allInteriorFacesAssessed']) == (not len(blocked))
                 else:
+                    assert selection.get('selectionPolicy', 'all-extended-band') == 'all-extended-band'
                     width = selection['selectedTemperatureBandK']
                     expected = ids[(upper <= width) | (lower <= width)]+1
                 np.testing.assert_array_equal(band_ids, expected)
