@@ -192,18 +192,43 @@ selectedCoefficient(turbulent)=heatCoefficientTurb(turbulent);
 selectedRecovery(laminar)=TawLam(laminar);
 selectedRecovery(turbulent)=TawTurb(turbulent);
 
-%% 4. 用已验证球鼻的驻点锚定值填补侧壁模型未覆盖的鼻端
-% 保留已有侧壁解；鼻端余弦延拓单独编号，不能误标成 Thwaites 层流。
-nose=calcBluntNoseHeating(mesh,freestream,Tw);
-noseFill=nose.faceMask & ~allowed & ~separationBlocked & ...
-    ~continuum.unresolvedFace;
+%% 4. 按所选鼻区模型求热边界，保存区域独立来源与拒绝状态
+% 默认余弦延拓只补旧侧壁未解处；显式选择局部相似时球鼻只接受其自身解。
+noseModel='cosineExtension';
+if isfield(cfg,'heating') && isfield(cfg.heating,'noseModel')
+    noseModel=char(cfg.heating.noseModel);
+end
+switch noseModel
+    case 'cosineExtension'
+        nose=calcBluntNoseHeating(mesh,freestream,Tw);
+        noseMethodID=3;
+    case 'sphericalLocalSimilarity'
+        % 球鼻局部相似模型直接从壁面总焓导数求热流；拒绝的区域
+        % 保持未解，不退回驻点余弦延拓，也不向后体外推该剖面。
+        nose=solveSphericalNoseLaminarHeating(mesh,freestream,Tw,cfg);
+        noseMethodID=6;
+    otherwise
+        error('RocketAeroHeat:Heating:NoseModel','未知鼻区模型：%s。',noseModel);
+end
+if strcmp(noseModel,'sphericalLocalSimilarity')
+    % 用户明确选择局部相似球鼻时，该已核验区域只接受它自己的解。
+    % 非球面侧壁保留原算法；球鼻拒绝不能偷偷由侧壁或余弦公式填补。
+    sphereRegion=nose.edgeState.geometryFace;
+    allowed(sphereRegion)=false;laminar(sphereRegion)=false;turbulent(sphereRegion)=false;
+    lam(sphereRegion)=NaN;turb(sphereRegion)=NaN;
+    selected(sphereRegion)=NaN;selectedCoefficient(sphereRegion)=NaN;
+    selectedRecovery(sphereRegion)=NaN;
+    noseFill=nose.faceMask & ~separationBlocked & ~continuum.unresolvedFace;
+else
+    noseFill=nose.faceMask & ~allowed & ~separationBlocked & ~continuum.unresolvedFace;
+end
 selected(noseFill)=nose.heatFlux(noseFill);
 selectedCoefficient(noseFill)=nose.heatTransferCoefficient(noseFill);
 selectedRecovery(noseFill)=nose.recoveryTemperature(noseFill);
 faceMethodID=zeros(nf,1,'uint8');
 faceMethodID(laminar)=1;
 faceMethodID(turbulent)=2;
-faceMethodID(noseFill)=3;
+faceMethodID(noseFill)=noseMethodID;
 detachedHeat=false(nf,1);
 if isfield(e,'faceMethodID')
     detachedHeat=(e.faceMethodID(:)==5) & (laminar|turbulent);
@@ -249,13 +274,15 @@ h.continuumUnresolvedFace=continuum.unresolvedFace;
 h.transitionMethod=transition.method;
 h.stagnationMethod=mesh.stagnationHeating.method;
 h.stagnationStatus=mesh.stagnationHeating.status;
-h.noseMethod=nose.method; h.noseScope=nose.scope;
+h.noseMethod=nose.method; h.noseScope=nose.scope; h.noseModel=noseModel;
+h.historyCompatible=~isfield(nose,'historyCompatible') || nose.historyCompatible;
 h.noseDistribution=nose; h.noseFace=noseFill;
 h.faceMethodID=faceMethodID;
 h.faceMethodNames={'未计算','沿流线层流','沿流线湍流/显式平板回退', ...
     '球形鼻端偏置驻点余弦延拓', ...
     '脱体闭合外流 + 沿流线层流', ...
-    '脱体闭合外流 + 沿流线湍流/平板回退'};
+    '脱体闭合外流 + 沿流线湍流/平板回退', ...
+    '球鼻驻点熵外缘 + Levy-Lees 局部相似壁面导数'};
 h.detachedClosureHeatFace=detachedHeat;
 h.separationUnresolvedFace=false(nf,1);
 if ~isempty(separationTrace)
@@ -286,8 +313,8 @@ h.eligibleFace=calculated; h.laminarFace=laminar; h.turbulentFace=turbulent;
 h.unresolvedFace=~calculated; h.nearTipFace=nearTip;
 h.transition=transition;
 h.streamlineDistanceAssumption=distanceMethod;
-h.validity=['附着侧壁工程估算；已验证球形鼻端 <=30° 偏置驻点' ...
-    '余弦延拓仅为低阶空间估算；前体脱体闭合属于更低阶外流估算；' ...
+h.validity=['附着侧壁工程估算；鼻区采用 ' nose.method '；' nose.scope '；' ...
+    '前体脱体闭合属于更低阶外流估算；' ...
     '疑似层流/Head 湍流分离及其下游保持无解，因无再附模型；' ...
     '滑移/过渡流及其准流线下游不套用连续介质公式；' ...
     '湍流模型与回退范围见 turbulentScope，不预测真实三维分离线；' ...

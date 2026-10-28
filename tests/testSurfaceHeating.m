@@ -58,8 +58,8 @@ assert(isstruct(imported.heating.turbulentBoundaryLayer));
 assert(contains(imported.heating.turbulentMethod,'Ludwieg-Tillmann'));
 assert(all(isfinite(imported.heating.turbulentBoundaryLayer.skinFrictionCoefficient( ...
     imported.heating.turbulentFace))));
-% 受控端到端回归：同一有效外流路径中，热物性占位面元仍传递
-% 已转捩标签；下游 Re 降到阈值以下也不能凭热流空白自动变回层流。
+% 受控端到端回归：上游外缘热力占位不是有效流场；即使下游
+% Reynolds较小且当地状态有效，也不能越过该未知状态求热流。
 parent=imported.surfaceStreamlines.predecessorFace;
 candidate=find(imported.heating.turbulentFace & parent>0 & ...
     imported.localGeometry.center(:,1)<-1);
@@ -75,17 +75,11 @@ edge.thermalExpansionOutOfRangeFace(bridge)=true;
 gap.externalFlow.edge=edge;
 gap=calcSurfaceHeating(gap,fs,cfg);
 assert(isnan(gap.heating.heatFlux(bridge)));
-assert(gap.heating.transition.turbulentCarrierFace(bridge));
 assert(gap.heating.edgeReynolds(child)<cfg.heating.transitionRe);
-assert(gap.heating.turbulentFace(child) && ~gap.heating.laminarFace(child));
-assert(~gap.heating.transition.onsetFace(child));
-assert(gap.heating.transition.inheritedThroughUnavailableFace(child));
-assert(isfinite(gap.heating.heatFlux(child)));
-assert(gap.heating.turbulentBoundaryLayer.sourceID(child)>=3);
-% 对照旧的双重筛选调用，确认该算例确实能暴露下游假复位。
-resetByGap=calcTransition(gap.heating.edgeReynolds, ...
-    gap.heating.transition.resultEligibleFace,cfg,gap.surfaceStreamlines);
-assert(~resetByGap.turbulentFace(child));
+assert(gap.continuumRegime.directStateUnresolvedFace(bridge));
+assert(gap.continuumRegime.downstreamStateUnresolvedFace(child));
+assert(isnan(gap.continuumRegime.knudsen(bridge)));
+assert(isnan(gap.heating.heatFlux(child)) && ~gap.heating.eligibleFace(child));
 % 人工受控减速外缘仅用于筛选回归，不声称它是实际箭体外流解。
 % 强减速后恢复速度，已分离路径不能再由平板回退或鼻端延拓补热流。
 decelerated=imported;
@@ -439,8 +433,21 @@ assert(~fig.UserData.wallThermal.stagnationPoint.available);
 assert(isequal(ui.tabs.SelectedTab,ui.wallTab));
 assert(any(contains(string(ui.wallDescription.Value),'逐时刻外流热边界')));
 flightExposure=fig.UserData.aerothermalExposure;
-assert(flightExposure.summary.resolvedAreaFraction>0.8);
-assert(fig.UserData.flightHeatingHistory.summary.reasonAreaByStation(9,2)>0);
+% 历程也不能为了旧80%比例跨越未知上游；核对真实面积及逐站原因。
+assert(flightExposure.summary.resolvedAreaFraction>0 && ...
+    flightExposure.summary.resolvedAreaFraction<1);
+assert(abs(flightExposure.summary.resolvedArea- ...
+    sum(mesh.localGeometry.area(fig.UserData.wallThermal.validFace)))<1e-12);
+reasonIndex=find(strcmp(fig.UserData.flightHeatingHistory.reasonNames, ...
+    '上游外缘热力状态未解/域外占位影响'),1);
+assert(~isempty(reasonIndex) && ...
+    fig.UserData.flightHeatingHistory.summary.reasonAreaByStation(reasonIndex,2)>0);
+assert(fig.UserData.flightHeatingHistory.unknownThermalFacesByStation(2)>0);
+assert(fig.UserData.flightHeatingHistory.upstreamUnknownThermalFacesByStation(2)>0);
+assert(fig.UserData.flightHeatingHistory.rarefiedFacesByStation(2)==0, ...
+    '该工况域外占位不能计入真实稀薄流面数。');
+fprintf('Current flight-history heat area %.9f%%; upstream thermal unknown remains missing.\n', ...
+    100*flightExposure.summary.resolvedAreaFraction);
 assert(flightExposure.summary.maximumEnergyBalanceResidual<1e-3);
 ui.wallMetric.Value=2;
 ui.wallMetric.ValueChangedFcn(ui.wallMetric,[]);

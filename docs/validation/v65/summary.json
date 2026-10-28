@@ -1,0 +1,949 @@
+{
+  "version": "v65",
+  "date": "2026-10-20",
+  "status": "tested-release-inputs",
+  "deliveryAuthority": "Only matching v65_release_verification.json local-archives-verified and actual ZIP hashes confirm delivery; isolated runtime separately recorded.",
+  "scope": {
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "fullSurfaceSolved": false,
+    "newRegionalHeatSolvedAreaM2": 0,
+    "currentProductionHeatAreaFraction": 0.6656263274240188,
+    "productionPhysicsChanged": false,
+    "wholeGoalComplete": false,
+    "githubPushed": false,
+    "coupledFiveQuantitySANumericalSteadyVerified": true,
+    "turbulenceTransportImplemented": true,
+    "turbulenceValidated": false,
+    "benchmarkDiagnosticOnly": true,
+    "browserVisualValidation": false,
+    "webGLRuntimeTested": false
+  },
+  "sourceFiles": [
+    {
+      "path": "regionalFlow/axisymmetric/advanceAxisymmetricSteady.m",
+      "sha256": "f3f9a512a60610ac55dcdf52665066b0707eff62d8750acfed1617807602c532",
+      "bytes": 13146
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricFVJacobian.m",
+      "sha256": "0d2cd6a8eb39aed168046dcdb2459b676d70935ef48b23adf16fb35430e9c8c6",
+      "bytes": 15484
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+      "sha256": "d2f5a45d951bcb47962674a2955213725139a94e8d8c7c9e386bb63faf8e7759",
+      "bytes": 22428
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricRANSResidual.m",
+      "sha256": "8cdd574d3e49579ec2a9c5a757e447d888cd007c9bf1995099ef497573b1534d",
+      "bytes": 1973
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricSADiscretization.m",
+      "sha256": "38fdb4489bacc9fcd31b624e459a7704d0e5fc945a32c4f94a2468847b2eb42e",
+      "bytes": 5600
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricSAModel.m",
+      "sha256": "2778c1082333ab10942c70b431a1fe517820814267d814e6e8eca2f6d0a09bf7",
+      "bytes": 4587
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricSAWallDistance.m",
+      "sha256": "8860a6d7a2ed8b1d96a6ae7f449b101d1a4c9256f7f02d3534084785687e2dc7",
+      "bytes": 6504
+    },
+    {
+      "path": "regionalFlow/axisymmetric/exportTmrAxisymmetricSAStudy.m",
+      "sha256": "17d864b5a6574fb71a57447379a1e386574b30abe46bf5c2575ead1a34af2078",
+      "bytes": 32574
+    },
+    {
+      "path": "tests/studyTmrAxisymmetricSA.m",
+      "sha256": "3f07bd5e65e41dbf00f0ee060ca19c9fc8b803325037ab9ee2ae55ab5afbf9b2",
+      "bytes": 4691
+    },
+    {
+      "path": "tests/studyTmrAxisymmetricSAContinuation.m",
+      "sha256": "e944aa25bf504d2b857d44d3dedfc2fdbf16b8896a2d7083d15d947850801148",
+      "bytes": 5780
+    },
+    {
+      "path": "tests/testAxisymmetricSAAdvance.m",
+      "sha256": "536008e51d8eb7333b6b429faf441753989981959aab957efa853505982f6fec",
+      "bytes": 4294
+    },
+    {
+      "path": "tests/testAxisymmetricSAJacobian.m",
+      "sha256": "13eaff7fedc9371cbab46723f2f1ba69ddf0f43403d5be4fbe8d8bcdcf2e3284",
+      "bytes": 6601
+    },
+    {
+      "path": "tests/testAxisymmetricSAModel.m",
+      "sha256": "9c964736402945564a3fedfa511b525923028dbd82ce27c8eb7fc579aec8401e",
+      "bytes": 14760
+    },
+    {
+      "path": "tests/testAxisymmetricSAResidual.m",
+      "sha256": "0dd77c99c2c88248e6dd119f2909e7ef4d89bd9c3feb2464090e528090223cea",
+      "bytes": 14664
+    },
+    {
+      "path": "tests/testTmrAxisymmetricSAView.m",
+      "sha256": "843a765c7c6bcb6d09f8cf40ebfc261b01f2f0de74b354fd548c44c5081421f2",
+      "bytes": 16831
+    }
+  ],
+  "changedMatlabFiles": [
+    "regionalFlow/axisymmetric/advanceAxisymmetricSteady.m",
+    "regionalFlow/axisymmetric/axisymmetricFVJacobian.m",
+    "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+    "regionalFlow/axisymmetric/axisymmetricRANSResidual.m",
+    "regionalFlow/axisymmetric/axisymmetricSADiscretization.m",
+    "regionalFlow/axisymmetric/axisymmetricSAModel.m",
+    "regionalFlow/axisymmetric/axisymmetricSAWallDistance.m",
+    "regionalFlow/axisymmetric/exportTmrAxisymmetricSAStudy.m",
+    "tests/studyTmrAxisymmetricSA.m",
+    "tests/studyTmrAxisymmetricSAContinuation.m",
+    "tests/testAxisymmetricSAAdvance.m",
+    "tests/testAxisymmetricSAJacobian.m",
+    "tests/testAxisymmetricSAModel.m",
+    "tests/testAxisymmetricSAResidual.m",
+    "tests/testTmrAxisymmetricSAView.m"
+  ],
+  "runs": [
+    {
+      "name": "sa_verified_core",
+      "processID": 28316,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/sa_verified_core_process.json",
+        "sha256": "5cbbbb11bd02c7e5434cf355ee384eb7b150fa50b3476a8a4884d95cacc2ee52",
+        "bytes": 11095
+      }
+    },
+    {
+      "name": "tmr_sa_final",
+      "processID": 33824,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/tmr_sa_final_process.json",
+        "sha256": "822fb4343f57e97fa81ec68568c3446d71be94684cbad9b998a79086d257e674",
+        "bytes": 10370
+      }
+    },
+    {
+      "name": "tmr_sa_continue1",
+      "processID": 24376,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/tmr_sa_continue1_process.json",
+        "sha256": "b194ce51f2e2684639e9d69eef7224418f2bb0b472b419fcab246680e6b460f9",
+        "bytes": 10497
+      }
+    },
+    {
+      "name": "tmr_sa_view",
+      "processID": 4148,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/tmr_sa_view_process.json",
+        "sha256": "e042e89977bfb53e139b9afc0ab62dff7dcfab03f0b1b4b70854600a1cbcf4a8",
+        "bytes": 10837
+      }
+    },
+    {
+      "name": "node_sa_view",
+      "processID": 32944,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/node_sa_view_process.json",
+        "sha256": "75ef9f8e8adf4fb1bb9cc39689b392dfc40da7dae2921b1244dd3fd70783f458",
+        "bytes": 475
+      }
+    },
+    {
+      "name": "independent_sa_final3",
+      "processID": 31208,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/independent_sa_final3_process.json",
+        "sha256": "a4ad4c3f0bf20594d98b76c2de2db22f0a957fd5a2c487dab6050bdd3db48e6c",
+        "bytes": 811
+      }
+    },
+    {
+      "name": "independent_sa_startup_final_scripts",
+      "processID": 15004,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/independent_sa_startup_final_scripts_process.json",
+        "sha256": "5ca889a27ccdc3df3946297aad5ec3fa33afe0d7a7a83a3c85e1fec71aaf9062",
+        "bytes": 739
+      }
+    },
+    {
+      "name": "public_sa_wall",
+      "processID": 30004,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/public_sa_wall_process.json",
+        "sha256": "e543f0f98427f7f6ed55a96ac6385ca282ac344c34dff26f1902907e07c1d944",
+        "bytes": 456
+      }
+    },
+    {
+      "name": "cooling_inspection",
+      "processID": 16804,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v65_validation/cooling_inspection_process.json",
+        "sha256": "501837eb9daee9444ec4fb948f892947cbb621c2e158d7033bbf735803b2784e",
+        "bytes": 448
+      }
+    }
+  ],
+  "historicalSourceMap": [
+    {
+      "processRecord": "outputs/v65_validation/tmr_sa_final_process.json",
+      "sourcePath": "tests/testAxisymmetricSAAdvance.m",
+      "historicalPath": "outputs/v65_validation/historical_sources/testAxisymmetricSAAdvance_bytewise_restart_fixture.m",
+      "historicalSHA256": "76ae6108898042fd9503b8661060f5a5e3286b44b56612cf1451ef507d8de52c",
+      "currentSHA256": "536008e51d8eb7333b6b429faf441753989981959aab957efa853505982f6fec",
+      "currentEvidenceProcessRecord": "outputs/v65_validation/sa_verified_core_process.json",
+      "reason": "Test-only bytewise restart assertion was replaced by saved quantity-scaled 64eps comparison; startup study did not execute this test.",
+      "nonRuntimeTestFixture": true
+    },
+    {
+      "processRecord": "outputs/v65_validation/tmr_sa_final_process.json",
+      "sourcePath": "tests/testAxisymmetricSAResidual.m",
+      "historicalPath": "outputs/v65_validation/historical_sources/testAxisymmetricSAResidual_uniform_fixture.m",
+      "historicalSHA256": "0c89d7cf8d1603ac7c5ea8c362581b595de1433d2364317a62e42bf16acd2966",
+      "currentSHA256": "0dd77c99c2c88248e6dd119f2909e7ef4d89bd9c3feb2464090e528090223cea",
+      "currentEvidenceProcessRecord": "outputs/v65_validation/sa_verified_core_process.json",
+      "reason": "Uniform constant-N fixture was later enhanced; it was not an execution dependency of the three-step TMR study.",
+      "nonRuntimeTestFixture": true
+    },
+    {
+      "processRecord": "outputs/v65_validation/tmr_sa_continue1_process.json",
+      "sourcePath": "tests/testAxisymmetricSAResidual.m",
+      "historicalPath": "outputs/v65_validation/historical_sources/testAxisymmetricSAResidual_constantW_fixture.m",
+      "historicalSHA256": "c15dbd89f004828df10091333372d452b430b5cdd0818295ab95686fbeb88a2f",
+      "currentSHA256": "0dd77c99c2c88248e6dd119f2909e7ef4d89bd9c3feb2464090e528090223cea",
+      "currentEvidenceProcessRecord": "outputs/v65_validation/sa_verified_core_process.json",
+      "reason": "Enhanced nonuniform-density test mistakenly initialized constant W, later corrected at three calls to rho*N; continuation did not execute this test.",
+      "nonRuntimeTestFixture": true
+    }
+  ],
+  "realTmr": {
+    "startup": {
+      "status": "actual-coupled-SA-budgeted-research-not-experimental-validation",
+      "modelID": "SA-noft2-nonnegative-AJS2012-v1",
+      "sourceCheckpoint": "E:\\RocketAeroHeat\\outputs\\v64_validation\\tmr_sutherland\\tmr_sutherland_evidence.mat",
+      "sourceCheckpointSHA256": "82ed2d0ee92c2108de9d9ff5f94c1fb6431145e68fd30475d4c5eeaf18928ddb",
+      "initialNuTildeValueKind": "uniform positive prescribed initialization, not a measured turbulence profile",
+      "prescribedInflowNuTilde": 0.001143898222274945,
+      "prescribedNuTildeToLaminarKinematicViscosity": 5,
+      "initialOriginalResidual": 49580996.628720045,
+      "finalOriginalResidual": 14087961.268573359,
+      "steadyConverged": false,
+      "stopReason": "maximum-steps-reached",
+      "acceptedSteps": 3,
+      "rejectedAttempts": 0,
+      "solverResidualEvaluations": 1921,
+      "diagnosticResidualEvaluations": 2,
+      "elapsedSeconds": 14.6072541,
+      "globalBEFiveQuantityBalanceRelative": 2.028644072207005e-16,
+      "finalNuTildeRange": [
+        0.0005910627555356083,
+        0.0011663743396110662
+      ],
+      "wallSignedHeatRangeWm2": [
+        2689.0553856149195,
+        112919.98232997496
+      ],
+      "pseudoTimeIsPhysical": false,
+      "physicalTimeAdvanced": 0,
+      "turbulenceTransportImplemented": true,
+      "turbulenceValidated": false,
+      "physicalSolution": false,
+      "eligibleForSurfaceCoverage": false,
+      "experimentalValidation": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "summary": {
+      "status": "actual-coupled-SA-continuation-not-experimental-validation",
+      "modelID": "SA-noft2-nonnegative-AJS2012-v1",
+      "parentCheckpoint": "E:\\RocketAeroHeat\\outputs\\v65_validation\\tmr_sa_final\\tmr_sa_evidence.mat",
+      "parentCheckpointSHA256": "7577b63423f48cc9f4751c7bbd0f9395ec617ebea5455a320ce00580c5854684",
+      "cumulative": {
+        "initialConservedIntegral": [
+          0.00284924774370425,
+          -3.6217111310006826,
+          0.019870566015582486,
+          2475.841838390896,
+          3.2592494288441893e-06
+        ],
+        "boundaryIntegral": [
+          -2.231793792348083e-07,
+          -0.00010460753260238045,
+          2.4707107059897075,
+          0.10765829995761118,
+          1.2000835547602714e-05
+        ],
+        "sourceIntegral": [
+          0,
+          0,
+          2.471120744861007,
+          0,
+          1.2420779520529409e-05
+        ],
+        "acceptedSteps": 35,
+        "rejectedAttempts": 10,
+        "solverResidualEvaluations": 47673,
+        "pseudoTime": 0.01064598479451151,
+        "rawFiveQuantityDefect": [
+          -6.173255528928146e-18,
+          7.054889983836021e-15,
+          4.440892098500626e-16,
+          4.9930753975857556e-12,
+          2.879912020664621e-20
+        ],
+        "fiveQuantityRelativeDefect": [
+          2.1959054414953504e-15,
+          1.9684243639737126e-15,
+          1.2390781747830815e-16,
+          2.0413092815407066e-15,
+          8.955528418367856e-15
+        ]
+      },
+      "initialOriginalResidual": 14087961.268573359,
+      "finalOriginalResidual": 1.0612011293015512e-07,
+      "steadyConverged": true,
+      "stopReason": "steady-residual-converged",
+      "acceptedSteps": 32,
+      "rejectedAttempts": 10,
+      "solverResidualEvaluations": 45752,
+      "diagnosticResidualEvaluations": 2,
+      "elapsedSeconds": 302.6595847,
+      "globalBEFiveQuantityBalanceRelative": 8.955528418367856e-15,
+      "finalNuTildeRange": [
+        0.00032474382471831014,
+        0.04698895251767886
+      ],
+      "wallSignedHeatRangeWm2": [
+        -10083.717275252826,
+        112946.36603129798
+      ],
+      "pseudoTimeIsPhysical": false,
+      "physicalTimeAdvanced": 0,
+      "turbulenceTransportImplemented": true,
+      "turbulenceValidated": false,
+      "physicalSolution": false,
+      "eligibleForSurfaceCoverage": false,
+      "experimentalValidation": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "evidence": {
+      "path": "outputs/v65_validation/tmr_sa_continue1/tmr_sa_evidence.mat",
+      "sha256": "68b9922e83bd27a7c091d341b1b626d06e84e05c081c14875accb51e6b75c64f",
+      "bytes": 2469535
+    },
+    "independentAudit": {
+      "path": "outputs/v65_validation/review/independent_sa_final_audit.json",
+      "sha256": "253e5fbfd21ed61ba02bcce70ed6177cf2bef4b1f38c13ca8a9abf5e942c096c",
+      "bytes": 377269
+    },
+    "independentStartupAudit": {
+      "path": "outputs/v65_validation/review/independent_sa_tmr_startup_final_scripts_audit.json",
+      "sha256": "0326d2112224a55b90bafe6d9a72655ceaed64fedf550cdad4aa538a078aad6d",
+      "bytes": 182904
+    },
+    "independentInteriorBEStatesReplayed": false
+  },
+  "core": {
+    "model": {
+      "status": "passed-SA-local-formula-and-actual-shortest-wall-distance-only",
+      "modelID": "SA-noft2-nonnegative-AJS2012-v1",
+      "maximumIndependentFormulaScaledDifference": 1.1117307508110991e-13,
+      "chi5MuTRatio": 1.2942343413175517,
+      "strainSwitchChecked": true,
+      "largeFiniteChiChecked": true,
+      "straightMaximumDistanceErrorM": 5.312590645178972e-18,
+      "cornerEndpointCellCount": 2,
+      "cornerAudit": {
+        "cellCount": 6,
+        "allLogicalWallSegmentCount": 2,
+        "maximumDistanceErrorM": 4.336808689942018e-19,
+        "maximumNearestPointErrorM": 0,
+        "sourceFaceProjectionIndependentlyChecked": true,
+        "nearestFaceTieDifferences": 0,
+        "nearestNodeOrSameGridLineSubstitution": false,
+        "allEndpointsChecked": true
+      },
+      "actualAudit": {
+        "cellCount": 1000,
+        "allLogicalWallSegmentCount": 40,
+        "maximumDistanceErrorM": 5.551115123125783e-17,
+        "maximumNearestPointErrorM": 3.925231146709438e-17,
+        "sourceFaceProjectionIndependentlyChecked": true,
+        "nearestFaceTieDifferences": 0,
+        "nearestNodeOrSameGridLineSubstitution": false,
+        "allEndpointsChecked": true
+      },
+      "periodicStraightWallChecked": true,
+      "periodicVaryingWallRejected": true,
+      "actualCellCount": 1000,
+      "actualWallSegmentCount": 40,
+      "actualNearestNodeWrongCellCount": 1000,
+      "actualDistanceRangeM": [
+        1.6392012218250583e-05,
+        0.32488715710232186
+      ],
+      "refusals": 14,
+      "sourceEvidenceSHA256": "82ed2d0ee92c2108de9d9ff5f94c1fb6431145e68fd30475d4c5eeaf18928ddb",
+      "sourceBindings": [
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricSAModel.m",
+          "sha256": "2778c1082333ab10942c70b431a1fe517820814267d814e6e8eca2f6d0a09bf7"
+        },
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricSAWallDistance.m",
+          "sha256": "8860a6d7a2ed8b1d96a6ae7f449b101d1a4c9256f7f02d3534084785687e2dc7"
+        },
+        {
+          "path": "tests/testAxisymmetricSAModel.m",
+          "sha256": "9c964736402945564a3fedfa511b525923028dbd82ce27c8eb7fc579aec8401e"
+        }
+      ],
+      "SAEquationSolved": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "residual": {
+      "status": "passed-SA-five-variable-spatial-flux-source-wall-boundary-ledger",
+      "cellCount": 16,
+      "zeroReductionExact": true,
+      "constantNInternalOpenMassFluxDefect": 2.710505431213761e-20,
+      "constantNMassConsistencyBudget": 9.296628276273676e-19,
+      "RiemannVsOwnerMassDifference": 0.0005100307377474056,
+      "RiemannVsOwnerMassRelative": 0.5262533293620696,
+      "wrongOwnerMassTimesNDefect": 0.0001377082991917995,
+      "wrongOwnerPhysicalMassNegativeControlRejected": true,
+      "independentSourceRelative": [
+        9.414352266319777e-16,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analyticDensityCorrection": [
+        -0.09149911695941981,
+        -0.09170695680770909,
+        -0.09373521410642559,
+        -0.09394321429158876
+      ],
+      "zeroLedger": {
+        "defect": [
+          -1.0842021724855044e-19,
+          -1.5178830414797062e-17,
+          0,
+          1.3322676295501878e-15,
+          0
+        ],
+        "budget": [
+          8.288864270338357e-16,
+          1.121172449472504e-13,
+          9.04378362920922e-12,
+          1.6450717297702925e-11,
+          0
+        ],
+        "passed": true,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "constantLedger": {
+        "defect": [
+          1.0842021724855044e-19,
+          -1.9081958235744878e-17,
+          4.440892098500626e-16,
+          -1.1102230246251565e-15,
+          -2.220446049250313e-16
+        ],
+        "budget": [
+          1.4272332608796467e-14,
+          2.6424120047256657e-12,
+          9.217756708895058e-12,
+          2.3688658396405027e-11,
+          1.6620387141258816e-12
+        ],
+        "passed": true,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "nonuniformLedger": {
+        "defect": [
+          5.421010862427522e-20,
+          1.9949319973733282e-17,
+          4.440892098500626e-16,
+          -2.498001805406602e-16,
+          0
+        ],
+        "budget": [
+          1.7281561254755854e-14,
+          2.4715223538532986e-12,
+          8.52785356303927e-12,
+          2.573122045223665e-11,
+          2.1826966486355055e-12
+        ],
+        "passed": true,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "omittedDensityCorrectionNegativeControl": {
+        "defect": [
+          5.421010862427522e-20,
+          1.9949319973733282e-17,
+          4.440892098500626e-16,
+          -2.498001805406602e-16,
+          2.2037807973607215e-05
+        ],
+        "budget": [
+          1.7281561254755854e-14,
+          2.4715223538532986e-12,
+          8.52785356303927e-12,
+          2.573122045223665e-11,
+          2.182695395931156e-12
+        ],
+        "passed": false,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "duplicateAxisSourceNegativeControl": {
+        "defect": [
+          5.421010862427522e-20,
+          1.9949319973733282e-17,
+          4.440892098500626e-16,
+          -2.498001805406602e-16,
+          -0.0007397962542829983
+        ],
+        "budget": [
+          1.7281561254755854e-14,
+          2.4715223538532986e-12,
+          8.52785356303927e-12,
+          2.573122045223665e-11,
+          2.182738701183859e-12
+        ],
+        "passed": false,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "zeroMassOpenFaceCount": 4,
+      "outflowFaceCount": 4,
+      "refusals": [
+        {
+          "label": "negative-W",
+          "identifier": "AxisSA:State"
+        },
+        {
+          "label": "nonfinite-W",
+          "identifier": "AxisSA:State"
+        },
+        {
+          "label": "missing-actual-inflow-N",
+          "identifier": "AxisSA:Boundary"
+        },
+        {
+          "label": "negative-inflow-N",
+          "identifier": "AxisSA:Boundary"
+        }
+      ],
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "jacobian": {
+      "status": "passed-SA-complete-five-variable-Jacobian-and-zero-right-derivative",
+      "cellCount": 12,
+      "coloredVsSerialRelative": 2.675552930685867e-11,
+      "blockRelative": [
+        [
+          3.33730382915375e-11,
+          1.2274675467750855e-10,
+          4.9347827428179915e-12,
+          4.832189812170239e-11,
+          0
+        ],
+        [
+          8.374194418044834e-11,
+          7.866598857463194e-12,
+          1.8052061844733418e-10,
+          5.4701231096021254e-11,
+          3.728700693880177e-10
+        ],
+        [
+          3.075132533412018e-11,
+          2.8186760463380136e-10,
+          4.1125479495317985e-14,
+          4.865513556168201e-11,
+          2.6755559598503943e-11
+        ],
+        [
+          3.2147795831405205e-11,
+          5.161308854807728e-11,
+          4.0550986309893044e-11,
+          4.7291128134170974e-11,
+          3.3194030980990696e-11
+        ],
+        [
+          3.4838014371755605e-11,
+          6.413769073932433e-12,
+          4.588846423999779e-14,
+          2.364683452353626e-11,
+          2.675552930685867e-11
+        ]
+      ],
+      "blockAmplitude": [
+        [
+          315.52804887402533,
+          530.3494586570423,
+          1440.6495849144108,
+          5422.084497539004,
+          0
+        ],
+        [
+          759.1793838201966,
+          7340.379198410574,
+          373.9271473685024,
+          1166.1887146630079,
+          111.40245458562958
+        ],
+        [
+          200.2918626118344,
+          302.654654348089,
+          10526.794662496286,
+          3087.1328843957713,
+          106.97195664377546
+        ],
+        [
+          6847.309635759302,
+          514.0513808896685,
+          1401.7785829310014,
+          13790.949411145448,
+          429.9100892808383
+        ],
+        [
+          105292.69963444676,
+          338.04174381657504,
+          914.1827649727929,
+          12743.707247864222,
+          319362.3979968834
+        ]
+      ],
+      "outsideSupportMaximum": 0,
+      "directionRelative": 7.986201477809209e-11,
+      "integratedDerivativeDefect": [
+        -2.2502832930371142e-14,
+        2.8423929876453258e-12,
+        -1.8536749912811956e-10,
+        -1.370267455058638e-08,
+        -1.8980639282517586e-10
+      ],
+      "integratedDerivativeScale": [
+        0.4578284419124614,
+        11.374267768852036,
+        19.94928992959591,
+        2508.751989407511,
+        15.734073143859987
+      ],
+      "zeroNuTildeRightDerivativeRelative": 1.9022246281969943e-12,
+      "colorCount": 12,
+      "zeroFailedResidualEvaluations": 24,
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "advance": {
+      "status": "passed-actual-five-variable-BE-step-ledger-and-restart",
+      "stateBEInfinityNorm": 2.185374441206144e-16,
+      "rateBEInfinityNorm": 2.1853744400050779e-10,
+      "ledgerRaw": [
+        -8.3266726636658465e-22,
+        -6.7702342068507154e-21,
+        -7.385144441468724e-21,
+        1.9828776597427154e-18,
+        4.073677714561305e-26
+      ],
+      "ledgerRelative": [
+        1.892425605378602e-16,
+        1.2822413270550602e-17,
+        1.3987015987630164e-17,
+        2.092566214064807e-18,
+        4.304762348455191e-17
+      ],
+      "actualResidualEvaluations": 85,
+      "jacobianBuilds": 2,
+      "stateWasClipped": false,
+      "restartDifference": [
+        [
+          -2.7755575615628914e-17,
+          -2.220446049250313e-16,
+          2.733057683434407e-18,
+          0,
+          0
+        ],
+        [
+          -2.7755575615628914e-17,
+          -2.220446049250313e-16,
+          2.733057683434407e-18,
+          0,
+          0
+        ],
+        [
+          -1.3877787807814457e-17,
+          0,
+          -1.3765259480771723e-16,
+          0,
+          0
+        ],
+        [
+          -1.3877787807814457e-17,
+          0,
+          -1.3765259480771723e-16,
+          0,
+          0
+        ]
+      ],
+      "restartRelativeByQuantity": [
+        2.7755575615628914e-16,
+        1.850371707708594e-17,
+        1.1471049567309769e-17,
+        0,
+        0
+      ],
+      "fifthVariableChanged": true,
+      "allFiveQuantitiesCoupled": true,
+      "pseudoTimeIsPhysical": false,
+      "steadyConverged": false,
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "newProductionSolvedAreaM2": 0
+    }
+  },
+  "viewer": {
+    "summary": {
+      "path": "outputs/v65_validation/tmr_sa_view/tmr_sa_view_summary.json",
+      "sha256": "1243782287ced105f99cdd93bcfffdc690d0659190bf6151d2ff5144c260a2a7",
+      "bytes": 7651
+    },
+    "nodeAudit": {
+      "path": "outputs/v65_validation/tmr_sa_view/independent_export_check.json",
+      "sha256": "c5ccd6876b973a7e5e0c0bc4ea041a7b720997979da6a2bc6c0fc84ec90731ae",
+      "bytes": 736
+    }
+  },
+  "publicDiagnostic": {
+    "summary": {
+      "pressure": {
+        "comparedPoints": 24,
+        "meanRelativeDifference": 0.11362929183480053,
+        "meanAbsoluteRelativeDifference": 0.1660893588858572,
+        "rootMeanSquareRelativeDifference": 0.34171698202897205,
+        "maximumAbsoluteRelativeDifference": 1.358599373454033
+      },
+      "heating": {
+        "comparedPoints": 27,
+        "meanRelativeDifference": -0.20534104462120462,
+        "meanAbsoluteRelativeDifference": 0.2937624454635683,
+        "rootMeanSquareRelativeDifference": 0.4793513199235784,
+        "maximumAbsoluteRelativeDifference": 1.1795150135066124
+      },
+      "positiveHeatingMagnitudeOnly": {
+        "comparedPoints": 23,
+        "meanRelativeDifference": -0.04293014847141409,
+        "meanAbsoluteRelativeDifference": 0.14672918424288445,
+        "rootMeanSquareRelativeDifference": 0.20961044073995158,
+        "maximumAbsoluteRelativeDifference": 0.7652738101750284
+      }
+    },
+    "signedCoolingFaceIDs": [
+      61,
+      63
+    ],
+    "evidence": {
+      "path": "outputs/v65_validation/tmr_sa_comparison/tmr_sa_wall_comparison.json",
+      "sha256": "963bd1915a171511512eb0d2fc37c4091722c7328e68263b471b90b7029e5f8c",
+      "bytes": 38301
+    },
+    "experimentalValidation": false,
+    "accuracyPassClaimed": false,
+    "signedCoolingWasNotReplacedByAbsoluteValue": true
+  },
+  "coolingInvestigation": {
+    "evidence": {
+      "path": "outputs/v65_validation/sa_cooling_inspection.json",
+      "sha256": "51878e797ee8ab82182da2b58d6f952aa3c0ed0f5c5ed9d6ef9e32594543c6f9",
+      "bytes": 2190
+    },
+    "replacementGradientImplemented": false,
+    "negativeSignedHeatPreserved": true
+  },
+  "diagnosticAttempts": [
+    {
+      "name": "sa_coupled_core",
+      "processID": 30064,
+      "actualExitCode": 1,
+      "classification": "Failed aggregate: restart test incorrectly demanded byte equality; replaced by explicit saved quantity differences and 64eps bounds. Not a successful batch.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/sa_coupled_core_process.json",
+        "sha256": "e0a19da36583853526206decc99221e996e9f3916dabc8d5940050a26e317731",
+        "bytes": 10449
+      }
+    },
+    {
+      "name": "sa_core_final",
+      "processID": 42124,
+      "actualExitCode": 1,
+      "classification": "Failed aggregate: enhanced constant-N test incorrectly supplied constant W in nonuniform rho. Three fixture calls corrected to rho*N and rerun in final core.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/sa_core_final_process.json",
+        "sha256": "6dcee9f29025275c80d292c6c71a08ea0b4730c13c553e3c2c3b699fc4f28419",
+        "bytes": 10625
+      }
+    },
+    {
+      "name": "tmr_sa_startup",
+      "processID": 11352,
+      "actualExitCode": 0,
+      "classification": "Historical three-step startup; source files changed during observation, superseded by final current-source startup and not used as final-source evidence.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/tmr_sa_startup_process.json",
+        "sha256": "bf8a251827c5c7cbe71cf5f230316aa831ff23843ce2ab9e9bc0f3d960da1078",
+        "bytes": 9832
+      }
+    },
+    {
+      "name": "independent_sa_tmr_startup",
+      "processID": 45892,
+      "actualExitCode": 1,
+      "classification": "Independent script failed resolving relative script path against absolute workspace; no numerical acceptance.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/independent_sa_tmr_startup_process.json",
+        "sha256": "db599c8c04ff5bd41e2eb20db1a6f5ebe84c32d515a32204b73f08eece1b7711",
+        "bytes": 725
+      }
+    },
+    {
+      "name": "independent_sa_tmr_startup2",
+      "processID": 15076,
+      "actualExitCode": 1,
+      "classification": "Independent wall-distance bindings used opposite segment endpoint order; corrected using original owner outward edge orientation.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/independent_sa_tmr_startup2_process.json",
+        "sha256": "f2cce88eee4a01ccd82b22e61ffeb733d5af26e4044f34ac1252450fb3f4b90d",
+        "bytes": 725
+      }
+    },
+    {
+      "name": "independent_sa_tmr_startup3",
+      "processID": 44584,
+      "actualExitCode": 0,
+      "classification": "Historical successful independent startup before final audit-script fixes; superseded by independent_sa_startup_final_scripts.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/independent_sa_tmr_startup3_process.json",
+        "sha256": "ea76a78340170fc0b3cce2b4eccc246aa50d788ae54055685cdb96df51be4ee5",
+        "bytes": 725
+      }
+    },
+    {
+      "name": "independent_sa_final",
+      "processID": 2668,
+      "actualExitCode": 1,
+      "classification": "Independent comparison failed near-linear constitutive alpha count due temperature subtraction conditioning; final audit checks actual raw/limited temperatures and physical local bounds.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/independent_sa_final_process.json",
+        "sha256": "6550a26b385f722d07722024e1578151636b8298661d75a4d9d8d83dca3bbd9e",
+        "bytes": 810
+      }
+    },
+    {
+      "name": "independent_sa_final2",
+      "processID": 26776,
+      "actualExitCode": 1,
+      "classification": "Independent real final residual mismatch traced to independent segment endpoint orientation/reconstruction arithmetic; final source audit passes original 2e-6 threshold.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/independent_sa_final2_process.json",
+        "sha256": "532dbd3eb733a8f3d67cd5ad70d6c8039980fbbe40ff368201c56eebad682351",
+        "bytes": 811
+      }
+    },
+    {
+      "name": "core_legacy_model",
+      "processID": 16684,
+      "actualExitCode": 0,
+      "classification": "Historical successful old-four-quantity targeted regression and earlier local model; final model and legacy transport acceptance use sa_verified_core.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/core_legacy_model_process.json",
+        "sha256": "8b73f5aa9e08616b974a15fc6d3983aefdf1f15bcbbc3ce1e861cdf3d29843eb",
+        "bytes": 10335
+      }
+    },
+    {
+      "name": "sa_advance_final",
+      "processID": 7464,
+      "actualExitCode": 0,
+      "classification": "Historical successful advance-only check before final source lock; final current source rerun in sa_verified_core.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/sa_advance_final_process.json",
+        "sha256": "cad17aca003c83376cf3776c0f4312450589c89edbd2e6ced512f035886ab322",
+        "bytes": 10297
+      }
+    },
+    {
+      "name": "sa_model_core",
+      "processID": 43024,
+      "actualExitCode": 0,
+      "classification": "Historical successful model before final periodic and finite-denominator guards; superseded by sa_verified_core.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v65_validation/sa_model_core_process.json",
+        "sha256": "4a6a6a70b464354f36d6c98a39b4231e30f968bcb7ebffb3ce289f9578e9ef09",
+        "bytes": 9656
+      }
+    }
+  ],
+  "limitations": [
+    "Single-condition full-surface and full-flight goal remain incomplete; no new qualified production solved area.",
+    "Current actual TMR is non-swirling axisymmetric SA-noft2 numerical steady on 1000 cells, not validated whole-rocket or three-dimensional crossflow physics.",
+    "Coarse-wall negative signed heat on faces61/63 and large tangential Dirichlet gradients remain visible in clouds/CSV; no abs(q), unvalidated heat multiplier or normal-gradient substitution.",
+    "Pressure/27-point signed heat relative RMS differences are diagnostic only; inlet profile, near-wall y+, mesh/domain/outlet sensitivity and experimental acceptance are incomplete.",
+    "Constant gamma/R/cp, no SA-neg, transition prediction, wall functions or extra high-Mach turbulence correction; not exact WIND defaults.",
+    "Periodic shortest distance supports straight axial walls only; varying periodic walls rejected until proper image search.",
+    "Automatic approval previously rejected preview-server startup and file URL browser action; no bypass, browser visual or WebGL runtime acceptance."
+  ],
+  "nextStep": "First verify/fix actual skew-wall Dirichlet gradients and near-wall mesh evidence for signed cooling; validate upstream u/Tt profile, y+, p/q and mesh/domain/outlet before production qualification, real contraction/afterbody and 3D crossflow."
+}

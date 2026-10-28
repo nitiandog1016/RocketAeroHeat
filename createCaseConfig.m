@@ -380,11 +380,22 @@ cfg.heating.wallCoupling = 'streamline';
 cfg.heating.gradientPathSteps = 4;
 cfg.heating.stagnationCoefficient = 1.83e-4;
 cfg.heating.stagnationReferenceWallTemperature = 300;
+% 鼻区默认保留已有低阶延拓对照。零合成攻角的 sphericalLocalSimilarity 可选择
+% 已核验球面前缀的局部相似 BVP 单工况方法；超域面元不作余弦补值。
+% 新模型不解鼻部/后体熵层接口，也未验证壁体热历史耦合。
+cfg.heating.noseModel = 'cosineExtension';
   % 鼻端法向激波、局部切锥/切楔/膨胀及热流优先使用 NASA7 干空气。
   % 80~150 K 用振动冻结低温近似；零攻角轴向波系若低于 80 K，
   % 侧壁整条退回定比热并标记。
   % 设为 'caloricallyPerfect' 可复现旧版定比热工程外流与热流。
 cfg.heating.airThermalModel = 'thermallyPerfect';
+
+% 底压模块：默认明确给定Cp；sand93Laminar只接入经核验的孤立尖直锥。
+% 无尾撑/无喷流工况不能从STL推断，使用关联前须在工作台显式声明
+% cfg.basePressure.hasRearSupport/hasGasInjection及operationSource。
+% 当前关联限零攻角9~10度层流、定比热gamma=1.4空气；不映射代表底热。
+cfg.basePressure.model = 'prescribed';
+cfg.basePressure.operationSource = '';
 
 % 飞行历程内部计算站的最大时间间隔 [s]；用户表格站点会完整保留。
 % 站间飞行条件线性插值，每个新增站独立计算定常外流/热流。

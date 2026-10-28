@@ -1,0 +1,344 @@
+{
+  "version": "v62",
+  "date": "2026-10-18",
+  "status": "tested-release-inputs",
+  "deliveryAuthority": "Only v62_release_verification.json status local-archives-verified plus matching archive hashes confirms delivered archives.",
+  "scope": {
+    "newRegionalHeatSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "fullSurfaceSolved": false,
+    "productionPhysicsChanged": false,
+    "wholeGoalComplete": false,
+    "currentProductionHeatAreaFraction": 0.6656263274240188,
+    "annularRealTimeAdvanceTested": true,
+    "tmrGeometryAndStaticOnlyAtAllFiveLevels": true,
+    "tmrStartupOnlySteps": 20,
+    "tmrSteadyConverged": false,
+    "gasIsActualAirInAnnularTest": false,
+    "githubPushed": false
+  },
+  "sourceFiles": [
+    {
+      "path": "regionalFlow/axisymmetric/advanceAxisymmetricNavierStokes.m",
+      "sha256": "159eb7590618cf1da2b8d11e539f50f3e1b77af35819b71c133e3b2b11b20ad4",
+      "bytes": 5866
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricFVConservative.m",
+      "sha256": "84efadab51e49ef44f0b48cfeaed5b74d543a72bc05567c81ba5ea892a788492",
+      "bytes": 434
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricFVGas.m",
+      "sha256": "da586507bdae8686e5d67deab5ced311b97d0e7b558da40cf1e616b7ce1ec383",
+      "bytes": 944
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricFVState.m",
+      "sha256": "2e01c39fe267afaf477e9147e814e77ad614114beb6d0c9a49b78882648842b7",
+      "bytes": 734
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+      "sha256": "00a541dcc8cde481e4bc16f9edf8e043c9ccedef64a2bc86889524bef7ce071b",
+      "bytes": 12347
+    },
+    {
+      "path": "regionalFlow/axisymmetric/buildAxisymmetricFVGeometry.m",
+      "sha256": "9160c2f3907a8b219e273c5ec71f25ae180dfd5bce27623ed6644856ce18b2a5",
+      "bytes": 7004
+    },
+    {
+      "path": "regionalFlow/axisymmetric/exportAxisymmetricAnnularStudy.m",
+      "sha256": "69a57040ea40a0c923b27d21647a744121eb9adc0e0f3c554b870d4bd81aeda8",
+      "bytes": 23900
+    },
+    {
+      "path": "regionalFlow/axisymmetric/loadTmrMach7Grid.m",
+      "sha256": "9644bc29103ae29daaa921f61a95cd2da1a070071f509bd461d5c7d686debf19",
+      "bytes": 10275
+    },
+    {
+      "path": "tests/testAxisymmetricAnnularView.m",
+      "sha256": "e03a0ecdd2e8c1f5c5f74581cf9db1932116ba57fa15d58981842d7aa94af09d",
+      "bytes": 13706
+    },
+    {
+      "path": "tests/testAxisymmetricFVGeometry.m",
+      "sha256": "1a820de6886214cc449982195a815501c95479a15d3166804a5cedfc52a5a080",
+      "bytes": 3485
+    },
+    {
+      "path": "tests/testAxisymmetricNSAdvance.m",
+      "sha256": "1c903767b756b005b747f51e7574fc805220527062b78ad3a664e5782e5aa8dd",
+      "bytes": 15505
+    },
+    {
+      "path": "tests/testAxisymmetricNSResidual.m",
+      "sha256": "39e2ed5506bd62ee9eadedc9ef1c729cd8ee67e8de81b8b78ba14442ee2c3a8b",
+      "bytes": 5353
+    },
+    {
+      "path": "tests/testAxisymmetricOpenBoundary.m",
+      "sha256": "925c74e28f5e2fc2017738f9706a32b73b71feb7c955319a1445c8be31129c32",
+      "bytes": 3417
+    },
+    {
+      "path": "tests/testTmrAxisymmetricGeometry.m",
+      "sha256": "43db0b0c44c9f70062833036927b860b195c008cb5220373b47215d4ca32bfdd",
+      "bytes": 15362
+    },
+    {
+      "path": "tests/testTmrAxisymmetricStartup.m",
+      "sha256": "aeaf30d2c7bd5db04b0084277339e08efd17a4e1c8cf650454806abcc7b4cec0",
+      "bytes": 4275
+    },
+    {
+      "path": "tests/testTmrMach7Grid.m",
+      "sha256": "99106b0f0e50dfaf058f160e7b2617327dc1f2e73b45686609199327aaccad17",
+      "bytes": 7717
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "9c51bef5e1c16168b729c7ec45da848d5e4f0a4d0ca26206246b509d47e0eed4",
+      "bytes": 3987
+    },
+    {
+      "path": "README.md",
+      "sha256": "f4acbf0847c826d5e7e8b88b0756ae79fa238bad27c5e91e57ab700ca8790935",
+      "bytes": 12359
+    },
+    {
+      "path": "docs/PROJECT_GOALS.md",
+      "sha256": "90c4321d20b023d758750b64aee4199843db2ac4cc8ec1524dc122634c3b58bb",
+      "bytes": 93315
+    },
+    {
+      "path": "docs/AXISYMMETRIC_REGIONAL_NS.md",
+      "sha256": "00ea8c4b3b10c535616f8cbbfd09eac2b555342de8aa717f4161574aa118822b",
+      "bytes": 8260
+    },
+    {
+      "path": "regionalFlow/axisymmetric/README.md",
+      "sha256": "e8be704e87a77f4143b484fe3837bb9ac19756c5dae556b526e5b6357f22fa50",
+      "bytes": 5810
+    },
+    {
+      "path": "internalFlow/resolveNSCharacteristicBoundary3D.m",
+      "sha256": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9",
+      "bytes": 7541
+    },
+    {
+      "path": "buildAerothermalViewerData.m",
+      "sha256": "cf9444a318b8bff638a6f4087810d8021736f51d51143936131b9aa3e07087e9",
+      "bytes": 24647
+    },
+    {
+      "path": "web/index.html",
+      "sha256": "457ebec03f2b29b88a9792674697d6b170bb7f3c46354f13a9d61e804ec22d15",
+      "bytes": 5664
+    },
+    {
+      "path": "web/viewer.js",
+      "sha256": "bf8cb9d56aaef83a09e620a44d3a2d9f0c340b47dabe09f550ccc20bbaddf09f",
+      "bytes": 41219
+    },
+    {
+      "path": "web/viewer.css",
+      "sha256": "64f10f6fea277195b55e615d3eca51df76c710ae7935f1b9bb1bd89790706690",
+      "bytes": 9815
+    },
+    {
+      "path": "web/section.js",
+      "sha256": "6f1567017cd3cdc43de749f77ccee4d8f1034236180b55e36b94050c307ee4fb",
+      "bytes": 6856
+    },
+    {
+      "path": "web/export.js",
+      "sha256": "99aa0344ecae2a958df74560df0bdfdb11b0888baecb2401d06c888dc3777a6a",
+      "bytes": 10292
+    }
+  ],
+  "changedMatlabFiles": [
+    "regionalFlow/axisymmetric/advanceAxisymmetricNavierStokes.m",
+    "regionalFlow/axisymmetric/axisymmetricFVConservative.m",
+    "regionalFlow/axisymmetric/axisymmetricFVGas.m",
+    "regionalFlow/axisymmetric/axisymmetricFVState.m",
+    "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+    "regionalFlow/axisymmetric/buildAxisymmetricFVGeometry.m",
+    "regionalFlow/axisymmetric/exportAxisymmetricAnnularStudy.m",
+    "regionalFlow/axisymmetric/loadTmrMach7Grid.m",
+    "tests/testAxisymmetricAnnularView.m",
+    "tests/testAxisymmetricFVGeometry.m",
+    "tests/testAxisymmetricNSAdvance.m",
+    "tests/testAxisymmetricNSResidual.m",
+    "tests/testAxisymmetricOpenBoundary.m",
+    "tests/testTmrAxisymmetricGeometry.m",
+    "tests/testTmrAxisymmetricStartup.m",
+    "tests/testTmrMach7Grid.m"
+  ],
+  "runs": [
+    {
+      "name": "NS geometry/residual/actual-steady and radial-startup",
+      "processID": 43844,
+      "exitCode": 0,
+      "toolSessionID": 87250
+    },
+    {
+      "name": "current-source five-grid/open/startup/final-view suite",
+      "processID": 11476,
+      "exitCode": 0,
+      "toolSessionID": 85303
+    },
+    {
+      "name": "independent annular actual-MAT and short-RK2 replay",
+      "processID": 48620,
+      "exitCode": 0
+    },
+    {
+      "name": "independent final geometry/hoop/stress actual MAT",
+      "processID": 42192,
+      "exitCode": 0,
+      "toolChunkID": "92eee6"
+    },
+    {
+      "name": "independent five-grid all-node comparison",
+      "exitCode": 0,
+      "toolChunkID": "1396c3"
+    },
+    {
+      "name": "independent final public-grid geometry/static operator",
+      "exitCode": 0,
+      "toolChunkID": "d1eb3b"
+    },
+    {
+      "name": "Node final JSON/section/CSV and two area integrals",
+      "exitCode": 0,
+      "toolChunkID": "c55828"
+    }
+  ],
+  "annularCases": [
+    {
+      "radialCells": 8,
+      "axialCells": 1,
+      "acceptedSteps": 16758,
+      "seconds": 9.6366882,
+      "time": 0.013464916230874783,
+      "residualNorm": 1.9887123762508333e-06,
+      "initialResidualNorm": 9608.862256723995,
+      "rejectedAttempts": 0,
+      "QMeanRelativeRMS": 0.002095347887000474,
+      "velocityRelativeRMS": 0.001622441897826187,
+      "temperatureRiseRelativeRMS": 0.020025543320330352,
+      "maximumRadialSpeedMps": 9.91254786442916e-09,
+      "pressureNonuniformRelative": 4.457565911041686e-09,
+      "pressureReferenceErrorPa": 0.005043255684313408,
+      "expectedFinalPressurePa": 300.14954318196317,
+      "wallHeatRelativeRMS": 0.003725083125453685,
+      "wallShearRelativeRMS": 0.00210444816830527,
+      "totalWallHeatPerRadianW": 0.38870792005558064,
+      "movingWallPowerPerRadianW": 0.3887079201277669,
+      "expectedHeatPowerPerRadianW": 0.3895276610400202,
+      "steadyPowerRelativeClosure": 1.8570822263716794e-10,
+      "globalBalanceRelative": 4.389043469355221e-14
+    },
+    {
+      "radialCells": 16,
+      "axialCells": 1,
+      "acceptedSteps": 80158,
+      "seconds": 45.6582817,
+      "time": 0.016525947802421503,
+      "residualNorm": 1.9972017408968555e-06,
+      "initialResidualNorm": 39972.866987971924,
+      "rejectedAttempts": 0,
+      "QMeanRelativeRMS": 0.000525871127900745,
+      "velocityRelativeRMS": 0.00040736843803236404,
+      "temperatureRiseRelativeRMS": 0.004861399571181107,
+      "maximumRadialSpeedMps": 1.2194859607004252e-08,
+      "pressureNonuniformRelative": 5.503172922123575e-09,
+      "pressureReferenceErrorPa": 0.0012376159260156783,
+      "expectedFinalPressurePa": 300.1495431819633,
+      "wallHeatRelativeRMS": 0.0008331121737209886,
+      "wallShearRelativeRMS": 0.0005277730336294451,
+      "totalWallHeatPerRadianW": 0.3893220786701129,
+      "movingWallPowerPerRadianW": 0.3893220787093239,
+      "expectedHeatPowerPerRadianW": 0.3895276610400202,
+      "steadyPowerRelativeClosure": 1.0071601368205341e-10,
+      "globalBalanceRelative": 6.165561064094236e-14
+    }
+  ],
+  "annularPhysicalInput": {
+    "gamma": 1.4,
+    "R": 1,
+    "mu": 0.5,
+    "Pr": 0.72,
+    "temperatureRange": [
+      200,
+      500
+    ]
+  },
+  "publicGridCells": [
+    1000,
+    4000,
+    16000,
+    64000,
+    256000
+  ],
+  "tmrStartup": {
+    "Mach": 7.11,
+    "acceptedSteps": 20,
+    "time": 1.1793642142313033e-07,
+    "timeOverCrossing": 0.00014757763679895653,
+    "globalBalanceRelative": 1.2767367196470854e-16,
+    "signedWallHeatRange": [
+      -54556.486783061795,
+      -6160.497178202045
+    ]
+  },
+  "view": {
+    "kind": "curved-cylinder-versus-chordal-display-area-audit",
+    "azimuthSegments": 48,
+    "sourceWallFaces": 2,
+    "displayTriangleCount": 192,
+    "physicalCurvedWallAreaM2": 0.03392920065876977,
+    "displayFacetedAreaM2": 0.03390498219290616,
+    "displayToCurvedAreaRatio": 0.9992862058229084,
+    "exactChordToArcRatio": 0.9992862058229085,
+    "relativeAreaDeficit": 0.000713794177091609,
+    "sourceWallHeatPerRadianW": 0.3893220786701129,
+    "physicalCurvedWallHeatW": 2.4461827644606684,
+    "displayFacetedHeatIntegralW": 2.4444366934472956,
+    "physicalMinusFacetedHeatW": 0.001746071013372763,
+    "physicalMovingWallPowerW": 2.4461827647070384,
+    "physicalWallEnergyFluxOutW": -2.463697767990373e-10,
+    "renderedHeatFluxWasRenormalized": false,
+    "newSolvedSurfaceAreaM2": 0,
+    "physicalSolution": false,
+    "eligibleForSurfaceCoverage": false,
+    "endcapFaces": 0,
+    "areaNote": "数据faceArea/CSV及覆盖率使用真实平三角弦面面积；物理曲面热积分单列2*pi*r*dx，原q密度不缩放",
+    "scope": "本页只有周期环隙的两片物理圆柱墙；周期端面保持开口，不是完整箭体或生产覆盖"
+  },
+  "executionTerminal": {
+    "path": "outputs/v62_validation/execution_terminal.json",
+    "sha256": "532abd2b024c8dc83233d1e6813343ea14f10f4f80a362dcdc796b65b97c17a7",
+    "bytes": 9288
+  },
+  "knownLimits": [
+    "Constant caloric laminar model; artificial gas annular steady is not air/experiment verification",
+    "Only orthogonal first-layer axis BC; no skew-axis accuracy claim",
+    "Uniform open traces verified; complete real boundary-layer/turbulence inlet remains unresolved",
+    "Public Mach7 short startup is far from one crossing or steady state; signed negative q is an initial transient",
+    "First-order convection; no complete multidimensional second-order NS, shock/separation or turbulence validation",
+    "Explicit near-wall time step is stiff; next same-discretization acceleration and real property/turbulence closure"
+  ],
+  "nextStep": "Verify conservative stable steady acceleration/line-implicit or semi-implicit update on this grid/operator; then freeze air transport and one sourced turbulence closure before source-matched TMR and real zero-incidence contraction/afterbody validation. True20deg crossflow requires separate3D/interface proof.",
+  "baselineReplacement": "RocketAeroHeat_internal_aerothermal_v61",
+  "evidenceRootWorking": "outputs/v62_validation",
+  "evidenceRootArchive": "validation/v62",
+  "archiveNames": [
+    "RocketAeroHeat_internal_aerothermal_v62.zip",
+    "RocketAeroHeat_v62_complete_replacement.zip"
+  ]
+}

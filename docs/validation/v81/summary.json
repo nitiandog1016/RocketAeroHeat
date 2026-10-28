@@ -1,0 +1,452 @@
+{
+  "version": 81,
+  "status": "tested-real-20deg-viscous-work-full-residual-line-preconditioned-Krylov-and-five-case-workbench",
+  "lineOperatorTest": {
+    "status": "passed-independent-face-flux-derivative-full-small-domain-fd-assembly-and-sparse-reference-solve",
+    "faceDerivativeRelativeDifference": 9.981240379381668e-10,
+    "fullSmallDomainAssemblyRelativeDifference": 1.5747554584100628e-10,
+    "blockThomasReferenceRelativeDifference": 2.846030702774449e-19,
+    "linearDefectRelative": 2.55351295663786e-15,
+    "smallCellCount": 32,
+    "smallUnknowns": 160,
+    "fullOriginalNSJacobian": false,
+    "physicalDiscretizationReplaced": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 5216
+  },
+  "controlledWorkTest": {
+    "status": "passed-actual-20deg-complete-legacy-replay-internal-work-only-and-pair-identity",
+    "cellCount": 217272,
+    "sourceFaces": 19752,
+    "internalFaces": 849336,
+    "legacyCompleteInfoExactlyReplayed": true,
+    "unchangedMassMomentumStressHeatWallAndBoundary": true,
+    "illegalPolicyRejections": 5,
+    "workFluxRelativeDifference": 4.156001695411756e-16,
+    "energyResidualChangeRelativeDifference": 1.558043027089327e-15,
+    "halfPairRelativeDifference": 1.3516224556055044e-14,
+    "maximumOldWorkSpeed": 3053373.0024762503,
+    "maximumNewWorkSpeed": 1509.6459976930512,
+    "limitingCV": 16340,
+    "oldLimitingTemperatureRateKs": -39298102067.448746,
+    "newLimitingTemperatureRateKs": 14639710949.375929,
+    "negativePairCount": 351671,
+    "generalSkewGridPositivityProved": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 36012
+  },
+  "firstArithmeticSegment": {
+    "status": "bounded-actual-20deg-original-five-quantity-line-preconditioned-Krylov-study",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 3,
+    "candidateTrials": 4,
+    "residualEvaluations": 22,
+    "operatorBuilds": 4,
+    "initialMaximumResidual": 79225137.22355025,
+    "maximumResidual": 72956938.24333768,
+    "initialRmsMerit": 6478339.491695185,
+    "rmsMerit": 4595174.442945678,
+    "elapsedSeconds": 343.5515558,
+    "matrixVectorProducts": 17,
+    "jacobianResidualEvaluations": 17,
+    "preconditionerApplications": 21,
+    "viscousWorkVelocity": "arithmetic",
+    "steadyConverged": false,
+    "stopReason": "maximum-nonlinear-iterations",
+    "spatialConservationRelative": 2.614159626942975e-16,
+    "steadyBoundaryFluxBalance": 0.012794254695760916,
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "wallHeatRangeWm2": [
+      -345321.25821194914,
+      2435842.2876832704
+    ],
+    "signedHeatPowerW": 1349733.4261543863,
+    "engineProcessID": 50812
+  },
+  "continuation": {
+    "status": "bounded-real-20deg-full-Krylov-continuation-from-exact-previous-state",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 3,
+    "priorAcceptedNonlinearIterations": 3,
+    "totalAcceptedNonlinearIterations": 6,
+    "candidateTrials": 15,
+    "residualEvaluations": 28,
+    "operatorBuilds": 3,
+    "initialMaximumResidual": 72956938.24333768,
+    "maximumResidual": 63680895.10926275,
+    "initialRmsMerit": 4595174.442945678,
+    "rmsMerit": 3922376.751765168,
+    "elapsedSeconds": 332.0333172,
+    "matrixVectorProducts": 12,
+    "jacobianResidualEvaluations": 12,
+    "preconditionerApplications": 15,
+    "viscousWorkVelocity": "arithmetic",
+    "steadyConverged": false,
+    "stopReason": "maximum-nonlinear-iterations",
+    "spatialConservationRelative": 2.556171962945711e-16,
+    "steadyBoundaryFluxBalance": 0.013985138402599675,
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "signedHeatPowerW": 1484398.7165628062,
+    "wallHeatRangeWm2": [
+      -354463.49866724166,
+      2744636.7526072403
+    ],
+    "engineProcessID": 1288
+  },
+  "independentStepAndFluxAudit": {
+    "status": "passed-independent-real-five-quantity-accepted-updates-Jvp-arithmetic-and-saved-flux-conservation",
+    "phase": "final",
+    "processID": 5680,
+    "sourceSHA256": {
+      "outputs/v80_validation/domain02/shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "outputs/v81_validation/actual01/steady_line_evidence.mat": "5bf2a85d64b974c3eb7aab5df7ca314bccb16e2d6d173db1455929b023d01c37",
+      "outputs/v81_validation/krylov01/steady_krylov_evidence.mat": "a773afff0359569fa5673fe090e9f3cfa5d1b93f3f2b366a61a2a02424e3c5b5",
+      "outputs/v81_validation/arithmetic01/steady_krylov_evidence.mat": "daba5e6422c8f605d3911e6e4b62f51632feb54e9dc0d6234f7f53d77177093f",
+      "outputs/v81_validation/arithmetic02/steady_krylov_evidence.mat": "a6a356cf5c6c607381ea6edbaf7b3f4a9637adc9a1840f68ccea345db6cade4f"
+    },
+    "scriptSHA256": "d24baffd4d2eaffebb88376d69c33fb4ebeaeacdff37738bb55b953d73b03b8b",
+    "cases": [
+      {
+        "case": "actual01",
+        "acceptedIterations": 3,
+        "maximumResidual": 79185439.81404157,
+        "rmsMerit": 6468172.644016166,
+        "updateArithmeticRelativeDifference": 0.0,
+        "savedFluxDivergenceRelativeDifference": 2.5756713404295916e-16,
+        "independentSpatialConservationRelative": 5.822192935749897e-16,
+        "acceptedTemperatureRangeK": [
+          81.21421837050099,
+          422.3338963504963
+        ],
+        "physicalTimeAdvanced": 0,
+        "steadyConverged": false,
+        "firstActualFullLineSolveRelativeDefect": 5.642072548095265e-16
+      },
+      {
+        "case": "krylov01",
+        "acceptedIterations": 2,
+        "maximumResidual": 79184257.53732689,
+        "rmsMerit": 6467277.841999351,
+        "updateArithmeticRelativeDifference": 0.0,
+        "savedFluxDivergenceRelativeDifference": 2.5757097970161054e-16,
+        "independentSpatialConservationRelative": 6.294617768213836e-16,
+        "acceptedTemperatureRangeK": [
+          80.47231413879453,
+          423.23425700606987
+        ],
+        "physicalTimeAdvanced": 0,
+        "steadyConverged": false,
+        "firstActualFullResidualJvpArithmeticDifference": 0.0,
+        "actualFullResidualJvpCalls": 6,
+        "failedLinearTargetsRetained": 0
+      },
+      {
+        "case": "arithmetic01",
+        "acceptedIterations": 3,
+        "maximumResidual": 72956938.24333768,
+        "rmsMerit": 4595174.442945676,
+        "updateArithmeticRelativeDifference": 0.0,
+        "savedFluxDivergenceRelativeDifference": 4.193343487662687e-16,
+        "independentSpatialConservationRelative": 2.1146557847447743e-16,
+        "acceptedTemperatureRangeK": [
+          136.21971707338116,
+          1482.6060265984513
+        ],
+        "physicalTimeAdvanced": 0,
+        "steadyConverged": false,
+        "firstActualFullResidualJvpArithmeticDifference": 0.0,
+        "actualFullResidualJvpCalls": 17,
+        "failedLinearTargetsRetained": 1
+      },
+      {
+        "case": "arithmetic02",
+        "acceptedIterations": 3,
+        "maximumResidual": 63680895.10926275,
+        "rmsMerit": 3922376.7517651683,
+        "updateArithmeticRelativeDifference": 0.0,
+        "savedFluxDivergenceRelativeDifference": 3.2080861796517637e-16,
+        "independentSpatialConservationRelative": 2.8376550660013206e-16,
+        "acceptedTemperatureRangeK": [
+          131.8837004142736,
+          1632.5263219500257
+        ],
+        "physicalTimeAdvanced": 0,
+        "steadyConverged": false,
+        "firstActualFullResidualJvpArithmeticDifference": 0.0,
+        "actualFullResidualJvpCalls": 12,
+        "failedLinearTargetsRetained": 0,
+        "exactPreviousEndpointContinued": true,
+        "totalAcceptedIterations": 6
+      }
+    ],
+    "fullIndependentNavierStokesSolver": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "workbench": {
+    "status": "passed-five-actual-facet-cases-work-identity-all-field-CSV-sections-and-same-host-events",
+    "processID": 15260,
+    "cases": 5,
+    "sourceFaces": 19752,
+    "CSVrows": 888840,
+    "sectionSegments": 9200,
+    "sameHostEvents": 25,
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "newProductionSolvedAreaM2": 0,
+    "dataSHA256": "a3429bcf30c927dba9981f7ba432d5f38ce2aaac5e0403adc133f2804dd0d43c"
+  },
+  "workbenchSourceAudit": {
+    "status": "passed-independent-five-actual-source-MAT-to-original-facet-fields-and-iteration-identity",
+    "processID": 48704,
+    "sourceSHA256": {
+      "outputs/v80_validation/domain02/shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "outputs/v81_validation/workbench02/krylov-study-data.json": "a3429bcf30c927dba9981f7ba432d5f38ce2aaac5e0403adc133f2804dd0d43c",
+      "outputs/v80_validation/advance01/advance_evidence.mat": "2cd6de36ab349abbcbd05c6a28dcb5027245c83669b7724c4e84aa64c7576941",
+      "outputs/v81_validation/workbench02/cases/initial-legacy/results.json": "ea27e01f7ba6be636d3b4ab5875f28ca4e64955cd66846a10242106781dbe815",
+      "outputs/v81_validation/work01/work_velocity_evidence.mat": "89cb97f37879d3832807d31a0cac7da2db78a6483755b818504c91cdabfd6f68",
+      "outputs/v81_validation/workbench02/cases/initial-arithmetic/results.json": "16895d61bc8fc6b8f5dae4374a4b948811e64be4ffa1085fa4a76256b8f993dc",
+      "outputs/v81_validation/actual01/steady_line_evidence.mat": "5bf2a85d64b974c3eb7aab5df7ca314bccb16e2d6d173db1455929b023d01c37",
+      "outputs/v81_validation/workbench02/cases/legacy-line/results.json": "c5de0beb4cc840f7ae63780448719f337fdc6977e26725cc0c49a3cc4e819e30",
+      "outputs/v81_validation/krylov01/steady_krylov_evidence.mat": "a773afff0359569fa5673fe090e9f3cfa5d1b93f3f2b366a61a2a02424e3c5b5",
+      "outputs/v81_validation/workbench02/cases/legacy-krylov/results.json": "339bff35d6a8968f9edbee779a781a16e2bc8bb05cf75e59cda14f7e4856797e",
+      "outputs/v81_validation/arithmetic02/steady_krylov_evidence.mat": "a6a356cf5c6c607381ea6edbaf7b3f4a9637adc9a1840f68ccea345db6cade4f",
+      "outputs/v81_validation/workbench02/cases/arithmetic-krylov/results.json": "455a78904b64a5c13dce899c55d1b9b2bc4ae4ab4b3d17a14f3d99c3ee2c5047"
+    },
+    "maximumFieldRelativeDifferences": {
+      "pressure": 2.0957248259769346e-16,
+      "heatFlux": 1.6568580540010673e-16,
+      "wallAdjacentTemperature": 0,
+      "temperatureRate": 0,
+      "wallInput": 3.7895612573872e-16,
+      "freestreamNormalProjection": 0
+    },
+    "cases": 5,
+    "sourceFaces": 19752,
+    "scientificPNG": "outputs\\v81_validation\\real_20deg_line_krylov_comparison.png",
+    "scientificPNGSHA256": "893329bdc78a1e1daa16c5bdb480a51ef91e89f3b0b323848cfe6655b033ded5",
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "hllcMarginDiagnostic": {
+    "status": "observed-accepted-real-20deg-HLLC-star-pressure-margin-not-a-guard-change",
+    "cases": [
+      {
+        "case": "arithmetic01",
+        "activeHllcFaces": 307620,
+        "minimumStarPressurePa": 97.39528310026004,
+        "faceID": 49409,
+        "ownerCV": 19705,
+        "neighbourCV": 19704,
+        "faceCentroidM": [
+          -2.8283120479991566,
+          0.02084952661988192,
+          0.03691835459614464
+        ],
+        "ownerPressurePa": 97.58800625429193,
+        "neighbourPressurePa": 97.6275854273791,
+        "ownerTemperatureK": 221.8191173775669,
+        "neighbourTemperatureK": 221.8202774949005,
+        "normalVelocityLeftMs": -148.88011559795288,
+        "normalVelocityRightMs": -147.9514928543443,
+        "starPressureRelativeToMinimumCellPressure": 0.9980251348354254,
+        "sourceSHA256": "daba5e6422c8f605d3911e6e4b62f51632feb54e9dc0d6234f7f53d77177093f"
+      },
+      {
+        "case": "arithmetic02",
+        "activeHllcFaces": 310936,
+        "minimumStarPressurePa": 0.003960151116530142,
+        "faceID": 70995,
+        "ownerCV": 14379,
+        "neighbourCV": 14288,
+        "faceCentroidM": [
+          -0.48970985797372313,
+          -0.027003798076025088,
+          0.1056373729587003
+        ],
+        "ownerPressurePa": 635.9708600145044,
+        "neighbourPressurePa": 93.6536191417026,
+        "ownerTemperatureK": 742.2733284378404,
+        "neighbourTemperatureK": 164.07504822979453,
+        "normalVelocityLeftMs": 484.1963245779293,
+        "normalVelocityRightMs": 1057.7231298375564,
+        "starPressureRelativeToMinimumCellPressure": 4.228508361794578e-05,
+        "sourceSHA256": "a6a356cf5c6c607381ea6edbaf7b3f4a9637adc9a1840f68ccea345db6cade4f"
+      }
+    ],
+    "hllcGuardChanged": false,
+    "automaticFluxFallbackAdded": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "sourceEpochs": [
+    {
+      "run": "line_unit01",
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "c1a08ab4d9544f2658e1d72bd9411e0f702a7dec66d9a469c41c9bd20d9591ef",
+      "frozenActualSource": "source_epochs/pre_work_cutCellNavierStokesResidual.m",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "actual01",
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "c1a08ab4d9544f2658e1d72bd9411e0f702a7dec66d9a469c41c9bd20d9591ef",
+      "frozenActualSource": "source_epochs/pre_work_cutCellNavierStokesResidual.m",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "krylov01",
+      "path": "tests/studyRocketShellSteadyKrylov.m",
+      "sha256": "e752033801475cdb53bae848db758b71bbd386b98b80b111cf617f64e4482996",
+      "frozenActualSource": "source_epochs/krylov01_studyRocketShellSteadyKrylov.m",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "krylov01",
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "c1a08ab4d9544f2658e1d72bd9411e0f702a7dec66d9a469c41c9bd20d9591ef",
+      "frozenActualSource": "source_epochs/pre_work_cutCellNavierStokesResidual.m",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "work01",
+      "path": "tests/studyRocketShellSteadyKrylov.m",
+      "sha256": "e752033801475cdb53bae848db758b71bbd386b98b80b111cf617f64e4482996",
+      "frozenActualSource": "source_epochs/krylov01_studyRocketShellSteadyKrylov.m",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "work01",
+      "path": "tests/testRocketShellViscousWork.m",
+      "sha256": "bc46dc28b72f71ebec29d7a173712024b9d5cad0380deff8a4376b7fb6bee360",
+      "frozenActualSource": "source_epochs/work01_testRocketShellViscousWork.m",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "arithmetic02",
+      "path": "exportRocketShellKrylovStudy.m",
+      "sha256": "f4e6bd3204d2f5f3ed5ea24aae17816d92cc8f6775db03e10f1014cbd79da07d",
+      "frozenActualSource": "source_epochs/arithmetic02_exportRocketShellKrylovStudy.m",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "arithmetic02",
+      "path": "web/rocket-krylov.js",
+      "sha256": "e6ad4b6866a05a064f4bfaa1ce78bbc50093dbb2b1d257f8f11e15bd0bea2cf5",
+      "frozenActualSource": "source_epochs/arithmetic02_rocket-krylov.js",
+      "oldEvidenceRebound": false
+    }
+  ],
+  "processes": {
+    "line_unit01": {
+      "processID": 16008,
+      "engineProcessIDs": [
+        5216
+      ],
+      "exitCode": 0
+    },
+    "actual01": {
+      "processID": 1972,
+      "engineProcessIDs": [
+        17932
+      ],
+      "exitCode": 0
+    },
+    "krylov01": {
+      "processID": 44672,
+      "engineProcessIDs": [
+        18772
+      ],
+      "exitCode": 0
+    },
+    "temperature_path01": {
+      "processID": 44636,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "internal_energy01": {
+      "processID": 45016,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "work01": {
+      "processID": 7820,
+      "engineProcessIDs": [
+        49524
+      ],
+      "exitCode": 0
+    },
+    "work_independent01": {
+      "processID": 13780,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "arithmetic01": {
+      "processID": 29180,
+      "engineProcessIDs": [
+        50812
+      ],
+      "exitCode": 0
+    },
+    "arithmetic02": {
+      "processID": 47932,
+      "engineProcessIDs": [
+        1288
+      ],
+      "exitCode": 0
+    },
+    "solver_independent01": {
+      "processID": 43720,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "solver_final01": {
+      "processID": 5680,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "hllc_margin01": {
+      "processID": 48720,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "finalcheck01": {
+      "processID": 19724,
+      "engineProcessIDs": [
+        36012
+      ],
+      "exitCode": 0
+    },
+    "node02": {
+      "processID": 15260,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "workbench_independent01": {
+      "processID": 48704,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    }
+  },
+  "scientificPNGVisuallyChecked": true,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "archiveIsolatedRecomputeStatus": "pending",
+  "defaultCompleteLegacyNumericalPathPreserved": true,
+  "physicalTimeAdvanced": 0,
+  "BETimeStepsClaimed": 0,
+  "steadyConverged": false,
+  "physicalSolution": false,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "wholeGoalComplete": false,
+  "nextWork": "actual contraction face 70995 positive states: independently verify Riemann/wave-bound and explicit flux-method alternatives, keep HLLC and thermal guards, then same real 20-degree region; no blind extension or axisymmetric/Euler substitution"
+}

@@ -1,0 +1,89 @@
+function report=studyRocketBlockILU0(folder,sourceCase)
+%STUDYROCKETBLOCKILU0 审计真实全五量块结构并有界比较全局块ILU候选。
+% 模块一：保存原C块图/因子及当前源身份，后续不能无绑定地跨Q复用。
+% 模块二：先对照完整矩阵作用，再分解；失败候选不补对角或改原NS。
+% 模块三：只在当前模型预测已过原0.1时重算原NS总方向，不自动接受新状态。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'BlockILUStudy:Overwrite','不得覆盖真实全局块研究。');mkdir(folder);
+sourceFile=fullfile(root,'outputs','v83_validation',sourceCase,'wall_velocity_krylov_evidence.mat');
+s=load(sourceFile,'result','gas','boundary');r=s.result;Q=r.Q;scale=r.residualScale;rate=r.initialRate;rhs=rate./scale;gas=s.gas;boundary=s.boundary;graph=r.firstOperator;
+assert(r.acceptedNonlinearIterations==0&&isequaln(Q,r.initialQ));sourceOptions=r.options;
+direction=r.linearLog{end}.steadyDirectionEvidence.directionU;coarseFile=sourceOptions.coarseOperatorFile;
+baseInfo=struct;for key={'primitive','gradient','viscousFaceFlux'},baseInfo.(key{1})=r.initialInfo.(key{1});end;clear r s;
+sourceBinding=struct('sourceFile',sourceFile,'sourceFileSHA256',rocketStreamingFileSHA256(sourceFile), ...
+    'allFiveConservativeFields',true,'sameQOnly',true,'physicalStateChanged',false);
+sourceIdentity=struct;for key={'packRocketSteadyGraph','factorRocketBlockILU0','solveRocketBlockILU0','solveRocketBlockGraphKrylov'}
+    sourceIdentity.(key{1})=rocketStreamingFileSHA256(which(key{1}));
+end
+packingOptions=struct('ordering','symrcm','maximumPersistentBytes',768*1024^2,'maximumConstructionBytes',2048*1024^2);
+try,packed=packRocketSteadyGraph(graph,packingOptions);
+catch ex
+    if ~startsWith(ex.identifier,'BlockGraph:'),rethrow(ex);end
+    report=reject('packing',ex);writeReport;return;
+end
+packingReport=packed.packingReport;n=size(Q,1);probes=cell(2,1);probeErrors=zeros(2,1);
+for j=1:2
+    if j==1,probe=reshape(sin((1:numel(Q))'*.37),size(Q));else,probe=reshape(cos((1:numel(Q))'*.23),size(Q));end
+    packedValue=applyRocketPackedGraph(packed,probe);expected=applyRocketWlsNormalOperator(graph,probe)-probe/graph.pseudoTimeStepSeconds;
+    probeErrors(j)=norm(packedValue-expected,'fro')/max(1,norm(expected,'fro'));assert(probeErrors(j)<2e-10,'BlockILUStudy:Matrix','真实完整C块图作用未通过。');
+    probes{j}=struct('probe',probe,'packedValue',packedValue,'expected',expected);
+end
+save(fullfile(folder,'steady_graph_packed_evidence.mat'),'packed','sourceFile','sourceBinding','sourceIdentity','probes','probeErrors','-v7');
+try,packed=factorRocketBlockILU0(packed);
+catch ex
+    if ~startsWith(ex.identifier,'BlockILU:'),rethrow(ex);end
+    report=reject('factorization',ex);report.packingReport=packingReport;report.probeErrors=probeErrors;writeReport;return;
+end
+factor=packed;clear packed;factorReport=factor.factorizationReport;
+save(fullfile(folder,'block_ilu_factor_evidence.mat'),'factor','sourceFile','sourceBinding','sourceIdentity','Q','gas','boundary','scale','-v7');
+t=load(coarseFile,'coarse');space=t.coarse.space;primitiveSpace=t.coarse.mixedLift.primitiveSpace;primitiveSpace.geometry=space.geometry;cut=space.geometry;clear t;
+cache=buildCutCellSelectedDirectionCache(Q,baseInfo,cut,gas,boundary,scale);clear baseInfo;
+initialModel=applyCutCellSelectedDirection(cache,direction);remaining=rhs+initialModel;
+[coarse,reuseReport]=loadRocketLocalCoarseOperator(coarseFile,cache,space,primitiveSpace,sourceOptions.coarseMixedColumns,sourceOptions.coarseLocalColumns,256*1024^2);clear space primitiveSpace;
+options=struct('maximumIterations',32,'relativeTolerance',1e-3,'maximumBasisBytes',1024*1024^2,'saveBasisEvidence',false);
+timer=tic;[single,singleReport]=solveRocketBlockILU0(factor,remaining);singleSeconds=toc(timer);
+% 内部Krylov拒绝也必须保留已完成的实际右端/单次扫描，避免重新构造因子或粗像。
+save(fullfile(folder,'current_rhs_before_inner.mat'),'sourceFile','sourceBinding','Q','scale','rhs','direction','initialModel','remaining','single','singleReport','-v7');
+[inner,innerReport]=solveRocketBlockGraphKrylov(graph,factor,remaining,options);candidates={single,inner};names={'blockILU0Single','blockILU0Inner32'};
+summaries=cell(2,1);evidence=cell(2,1);
+for j=1:2
+    value=candidates{j};Cvalue=applyRocketWlsNormalOperator(graph,value)-value/graph.pseudoTimeStepSeconds;Avalue=-applyCutCellSelectedDirection(cache,value);
+    coarseRight=remaining-Avalue;weights=coarse.upper\(coarse.upper'\(coarse.image'*coarseRight(:)));
+    [correction,coarseReport]=solveRocketLocalCoarseSystem(coarse,coarseRight);total=value+correction;totalAction=-applyCutCellSelectedDirection(cache,total);
+    model=Avalue+reshape(coarse.image*weights,size(Q));assert(norm(model-totalAction,'fro')/max(1,norm(totalAction,'fro'))<1e-9);
+    alpha=dot(remaining(:),totalAction(:))/dot(totalAction(:),totalAction(:));prediction=remaining-alpha*totalAction;
+    summary=struct('name',names{j},'relativeCResidual',norm(remaining-Cvalue,'fro')/norm(remaining,'fro'), ...
+        'fullADirectionRelativeResidual',norm(remaining-Avalue,'fro')/norm(remaining,'fro'), ...
+        'afterCoarseRelativeResidual',norm(remaining-totalAction,'fro')/norm(remaining,'fro'), ...
+        'bestScalarAfterCoarse',alpha,'predictedTotalDefectAfterBestScalar',norm(prediction,'fro')/norm(rhs,'fro'), ...
+        'remainingSquaredNormRemovedByBestScalar',1-norm(prediction,'fro')^2/norm(remaining,'fro')^2, ...
+        'steadyGraphToFullAActionRelativeDifference',norm(Cvalue-Avalue,'fro')/max(1,norm(Avalue,'fro')),'originalNSAcceptanceClaimed',false);
+    evidence{j}=struct('value',value,'Cvalue',Cvalue,'Avalue',Avalue,'coarseWeights',weights,'correction',correction,'total',total,'totalAction',totalAction,'coarseReport',coarseReport,'summary',summary);
+    summaries{j}=summary;fprintf('BLOCK_ILU_DIRECTION %s C=%.8g afterCoarse=%.8g predictedTotal=%.9g\n',names{j},summary.relativeCResidual,summary.afterCoarseRelativeResidual,summary.predictedTotalDefectAfterBestScalar);
+end
+predictions=cellfun(@(a)a.predictedTotalDefectAfterBestScalar,summaries);[best,index]=min(predictions);originalNSCheck=struct('performed',false,'actualNSCalls',0,'actualTotalDefect',NaN,'originalTarget',.1,'targetMet',false);
+if best<=.1
+    combinedDirection=direction+summaries{index}.bestScalarAfterCoarse*evidence{index}.total;
+    config=struct('differenceStep',sourceOptions.differenceStep,'scheme',sourceOptions.jacobianScheme,'saveEvidence',true,'spatialConservationTolerance',sourceOptions.spatialConservationTolerance);
+    [actual,originalEvidence]=rocketShellResidualDirectionalDerivative(Q,combinedDirection,rate,cut,gas,boundary,scale,config);
+    defect=norm(rhs+actual,'fro')/norm(rhs,'fro');originalNSCheck=struct('performed',true,'actualNSCalls',originalEvidence.actualOriginalResidualEvaluations, ...
+        'actualTotalDefect',defect,'originalTarget',.1,'targetMet',defect<=.1);save(fullfile(folder,'original_total_direction_check.mat'),'combinedDirection','actual','originalEvidence','originalNSCheck','sourceBinding','-v7');
+end
+report=struct('status','tested-real-full-five-conservation-block-ILU0-current-model-candidates', ...
+    'sourceCase',sourceCase,'cellCount',n,'sourceFaces',graph.sourceFaces,'packingReport',packingReport,'factorReport',factorReport, ...
+    'probeErrors',probeErrors,'summaries',{summaries},'singleApplySeconds',singleSeconds,'innerCApplications',innerReport.CApplications, ...
+    'innerBlockILUApplications',innerReport.blockILUApplications,'initialCurrentModelDefect',norm(remaining,'fro')/norm(rhs,'fro'), ...
+    'newSelectedJApplications',5,'coarseReuseProbeModelApplications',1,'newCoarseConstructionApplications',0, ...
+    'originalNSCheck',originalNSCheck,'newActualNSEvaluations',originalNSCheck.actualNSCalls,'newFlowAcceptances',0, ...
+    'physicalSolution',false,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'block_ilu_real_evidence.mat'),'report','sourceFile','sourceBinding','sourceIdentity','coarseFile','Q','gas','boundary','scale','rhs','direction','initialModel','remaining', ...
+    'packingOptions','options','singleReport','innerReport','reuseReport','evidence','-v7');writeReport;
+    function out=reject(stage,exception)
+        out=struct('status','rejected-real-block-ILU-candidate-before-model-or-flow-update','stage',stage,'errorIdentifier',exception.identifier, ...
+            'message',exception.message,'newSelectedJApplications',0,'newActualNSEvaluations',0,'newFlowAcceptances',0, ...
+            'physicalSolution',false,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+    end
+    function writeReport
+        fReport=fopen(fullfile(folder,'block_ilu_real_summary.json'),'w','n','UTF-8');assert(fReport>=0);closeReport=onCleanup(@()fclose(fReport));fprintf(fReport,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+    end
+end

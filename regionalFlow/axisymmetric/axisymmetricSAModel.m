@@ -1,0 +1,76 @@
+function model=axisymmetricSAModel(rho,T,N,Omega,d,gas)
+%AXISYMMETRICSAMODEL 固定SA-noft2非负分支与AJS2012修正的局部代数闭合。
+% 模块一：显式接受rho、温度T、工作变量N=nuTilde、涡量模Omega和真实壁距d。
+% 模块二：计算层流/湍流黏性、fv1/fv2、修正应变率及未乘rho的生产/破坏。
+% 模块三：冻结官方常数与Prt=.90；不含ft2、转捩、压缩性专用或SA-neg修正。
+% 本函数不推进第五输运量，不计算速度梯度/壁距或梯度平方与密度修正源。
+% 来源：NASA TMR spalart.html的SA-noft2、Note1(c)；完整合同见v64研究记录。
+% 非有限/负N/负Omega/非正d拒绝，不以裁值或任意epsilon替代物理状态。
+values={rho,T,N,Omega,d};shape=[1 1];
+for j=1:numel(values)
+    a=values{j};
+    assert(isnumeric(a)&&isreal(a)&&~isempty(a)&&all(isfinite(a),'all'), ...
+        'AxisFV:SAModelInput','SA输入须为非空有限实数，不能裁值。');
+    if ~isscalar(a)
+        if isequal(shape,[1 1]),shape=size(a);
+        else,assert(isequal(size(a),shape),'AxisFV:SAModelInput','SA非标量输入尺寸须一致。');end
+    end
+end
+for j=1:numel(values)
+    if isscalar(values{j}),values{j}=repmat(double(values{j}),shape);
+    else,values{j}=double(values{j});end
+end
+[rho,T,N,Omega,d]=values{:};
+assert(all(rho>0,'all')&&all(T>0,'all')&&all(N>=0,'all')&& ...
+    all(Omega>=0,'all')&&all(d>0,'all'), ...
+    'AxisFV:SAModelInput','SA要求rho/T/d正、N/Omega非负，不接受SA-neg状态。');
+gas=axisymmetricFVGas(gas);transport=axisymmetricFVTransport(T,gas);
+
+%% 二、辅助函数；用等价比值形式避免chi立方溢出，不设置湍流黏性上限
+c=struct('cb1',.1355,'cb2',.622,'sigma',2/3,'kappa',.41, ...
+    'cw2',.3,'cw3',2,'cv1',7.1,'c2',.7,'c3',.9,'turbulentPrandtl',.90);
+c.cw1=c.cb1/c.kappa^2+(1+c.cb2)/c.sigma;
+nu=transport.mu./rho;chi=N./nu;fv1=zeros(shape);small=chi<=c.cv1;
+z=(chi(small)/c.cv1).^3;fv1(small)=z./(1+z);
+z=(c.cv1./chi(~small)).^3;fv1(~small)=1./(1+z);
+fv2=1-chi./(1+chi.*fv1);muT=rho.*N.*fv1;
+dScale=c.kappa^2*d.^2;sBar=N.*fv2./dScale;sTilde=Omega+sBar;
+modified=sBar < -c.c2*Omega;
+denominator=(c.c3-2*c.c2)*Omega(modified)-sBar(modified);
+assert(all(denominator>0&isfinite(denominator),'all'), ...
+    'AxisFV:SAModelState','AJS2012修正分母非正或非有限。');
+sTilde(modified)=Omega(modified)+Omega(modified).* ...
+    (c.c2^2*Omega(modified)+c.c3*sBar(modified))./denominator;
+assert(all(isfinite(nu)&nu>0,'all')&&all(isfinite(chi)&chi>=0,'all')&& ...
+    all(isfinite(fv1)&fv1>=0&fv1<=1,'all')&&all(isfinite(fv2),'all')&& ...
+    all(isfinite(muT)&muT>=0,'all')&&all(isfinite(dScale)&dScale>0,'all')&& ...
+    all(isfinite(sBar),'all')&&all(isfinite(sTilde)&sTilde>=0,'all'), ...
+    'AxisFV:SAModelState','SA辅助量超出有限非负分支，未裁值。');
+
+%% 三、官方r上限10是模型定义；S波浪等于0时明确取10，禁止epsilon替换
+rSA=10*ones(shape);nonzero=sTilde>0;
+ratioDenominator=sTilde(nonzero).*dScale(nonzero);
+assert(all(isfinite(ratioDenominator)&ratioDenominator>0,'all'),'AxisFV:SAModelState', ...
+    'SA的r分母非有限或非正，未以无穷分母生成零比值。');
+ratio=N(nonzero)./ratioDenominator;
+assert(all(isfinite(ratio)&ratio>=0,'all'),'AxisFV:SAModelState', ...
+    'SA的r原始比值非有限或为负，未用上限10掩盖溢出。');
+rSA(nonzero)=min(ratio,10);
+g=rSA+c.cw2*(rSA.^6-rSA);
+fw=g.*((1+c.cw3^6)./(g.^6+c.cw3^6)).^(1/6);
+production=c.cb1*sTilde.*N;destruction=c.cw1*fw.*(N./d).^2;
+turbulentK=(gas.cp/c.turbulentPrandtl)*muT;
+assert(all(isfinite(g)&g>=0,'all')&&all(isfinite(fw)&fw>=0,'all')&& ...
+    all(isfinite(production)&production>=0,'all')&& ...
+    all(isfinite(destruction)&destruction>=0,'all')&&all(isfinite(turbulentK)&turbulentK>=0,'all'), ...
+    'AxisFV:SAModelState','SA源项或湍流输运系数非有限，未裁值。');
+model=struct('modelID','SA-noft2-nonnegative-AJS2012-v1', ...
+    'muT',muT,'production',production,'destruction',destruction, ...
+    'sourceWithoutGradient',production-destruction,'nu',nu,'chi',chi, ...
+    'fv1',fv1,'fv2',fv2,'sBar',sBar,'sTilde',sTilde,'rSA',rSA,'g',g,'fw',fw, ...
+    'laminarMu',transport.mu,'laminarK',transport.k,'turbulentK',turbulentK,'constants',c, ...
+    'modifiedStrainBranch',modified,'sourceDensityFactorIncluded',false, ...
+    'gradientAndDensityCorrectionIncluded',false,'transportEquationSolved',false, ...
+    'source','NASA TMR SA-noft2; Note1(c), Allmaras-Johnson-Spalart2012', ...
+    'physicalSolution',false,'eligibleForSurfaceCoverage',false);
+end

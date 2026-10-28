@@ -1,0 +1,287 @@
+{
+  "version": 83,
+  "status": "tested-offline-original-CV-local-enrichment-model-and-real-NS-direction-checks-not-integrated-not-delivered",
+  "generatedUTC": "2026-10-24T19:41:43.310748+00:00",
+  "recorderProcessID": 48948,
+  "previousGoalTurnClassification": "progress",
+  "previousGoalTurnEvidence": "The prior numerical goal turn produced the tested bounded mixed coarse space and a genuinely improved original-NS direction, still rejected. The intervening status-only answer changed no code or numerical state; this turn revalidated current files and took the next original-CV diagnostic/construction action.",
+  "priorProgressPath": "docs/validation/v83/progress_mixed_coarse.json",
+  "priorProgressSHA256": "cfa97e4f4ce62de234335b524f801a92cf655b157b760d25990125db17b33fc4",
+  "oldNumericalEvidenceOverwritten": false,
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/buildRocketLocalCoarseOperator.m": "20fd8a18bc7e063669e7c8ff1a30e826dc4eb4f3d3e5fdfe56dd51303c46c21d",
+    "internalFlow/cutCell/liftRocketLocalCoarse.m": "8db7f518929d7153884e836f5bd8087fb5f71c1a3ceb0ba506f6187d3ef9827f",
+    "internalFlow/cutCell/solveRocketLocalCoarseSystem.m": "cd24ecde92729772a9c5cc10799389c471724eafed2bfdcd6ab19109e9b989d6",
+    "internalFlow/cutCell/rocketLocalCoarseLiftIdentity.m": "99955c77acca28f24869b886deb36f2de9ead315d73bfe954245859a1d3538ae",
+    "internalFlow/cutCell/liftRocketMixedCoarse.m": "da4d2cbf01dddd7d4e6fe0f028d73da5a542428b2ca3e0a536591310c2849e62",
+    "internalFlow/cutCell/liftRocketPrimitiveCoarse.m": "5c976ed6d477480222bdf4b2d5f29d9764c44a7a4cafc59f0c716e1486c6780c",
+    "internalFlow/cutCell/cutCellNavierStokesResidual.m": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+    "internalFlow/cutCell/solveRocketShellSteadyKrylov.m": "1643b51897a826c43f20c499c75ca1bc5c98872ad734068009b9c056be8954ba",
+    "tests/studyRocketLocalCoarse.m": "7c8e0b53e18fae35b327fac4ca60a108c7fd7b0345d54b952ff439809498de47",
+    "tests/diagnoseRocketLocalCoarseCells.py": "cf3d4c5782d3fece7fa50d7f02cb4dad10f57c19a46f30c6646d0f8fdab9e98a",
+    "tests/auditRocketLocalCoarse.py": "033eb1ee5535240c37fd5f27f36099006934e757683af8aec75f530ea7bbde78",
+    "tests/auditRocketLocalSupport.py": "b67f229a5b1d6fc51555a9842aef41071d745f9c3adcc6f540ee8b661039e1c8",
+    "tests/plotRocketLocalCoarse.py": "55d76c5eb5b7b5bf5236962e8fb0cff709b214e6881292806f6c4e4d8e2909c6",
+    "docs/LOCAL_CONSERVATIVE_COARSE_V83.md": "49d97f1ce13f2707b71c2778dadd1168a4278284683b10b9fe43921c9cd9cfe7",
+    "docs/PROJECT_GOALS.md": "e4a55c6f974edf42742a2b606b399017ca8c0d102797e34f29f241af08b0bb26",
+    "docs/GITHUB_STAGE_READINESS.md": "213e984bc8db59b674a5f556ab989c47f6ec0902168d031176d4621a65878d40",
+    "web/rocket-wall-velocity.js": "a70ec316d4a568fe6044448569bb46385146d294a2ee2556632cc6ad965e6ca8",
+    "exportRocketWallVelocityStudy.m": "6c0b4b74aa71ccc75db3726337126bc5265acc6f3d26cc84d9b59502c9e5812c",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1"
+  },
+  "matlabProcesses": [
+    {
+      "name": "localstudy01",
+      "path": "outputs/v83_validation/localstudy01_process.json",
+      "sha256": "c144369111032819753204a24831b110156fd95a960394f1d14667166b4cd451",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        7032
+      ]
+    },
+    {
+      "name": "localstudy02",
+      "path": "outputs/v83_validation/localstudy02_process.json",
+      "sha256": "9d94aa4f817cd68f0dcfec7c0fc1aa33e4fd3877e1e9ad34dffa993d6bd801b3",
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        25964
+      ]
+    },
+    {
+      "name": "localstudy03",
+      "path": "outputs/v83_validation/localstudy03_process.json",
+      "sha256": "0610612eeed2b5f88e23256bf5ecdcf2d07e92085dcbf872c180e745528359c4",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        49352
+      ]
+    }
+  ],
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/localunit02_independent_local_coarse.json",
+      "sha256": "8833c8735d177f2e50b93d427440569af5f72f06a00a580219c1c4d9677f7e1d",
+      "status": "passed-independent-original-CV-local-enrichment-lift-budget-projection-and-model-evidence",
+      "processID": 39036
+    },
+    {
+      "path": "outputs/v83_validation/localunit02_local_support.json",
+      "sha256": "78cf568ff548eaa173dd614291c2da133cda5794ec6d69f7473edae7df6535f6",
+      "status": "passed-independent-positive-area-two-ring-support-and-interior-five-equation-cancellation",
+      "processID": 2344
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02_independent_local_coarse.json",
+      "sha256": "7802e06308b3a1581f15befc453071e69b389bb0c47cd35a184583cf91b064dc",
+      "status": "passed-independent-original-CV-local-enrichment-lift-budget-projection-and-model-evidence",
+      "processID": 33332
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02_local_support.json",
+      "sha256": "2823d7d20043688bccdfb4fd4f915e2b112282c4be77a4f14b41f52b27f1526f",
+      "status": "passed-independent-positive-area-two-ring-support-and-interior-five-equation-cancellation",
+      "processID": 54844
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/localcells01/local_cells_diagnostic.json",
+      "sha256": "0466ab30066a33c407501b4d50969a696d50c30987397d94866e256174e53520",
+      "bytes": 40653
+    },
+    {
+      "path": "outputs/v83_validation/localcells01/local_cells_selection.mat",
+      "sha256": "f5f4d82591ed281af26476e781a6f8cceb30510e9a84de93c3ae387e9eda4003",
+      "bytes": 8699896
+    },
+    {
+      "path": "outputs/v83_validation/localunit01/local_coarse_evidence.mat",
+      "sha256": "837e62c036917f374e61db39ed22bccc3c967fa603c6aff11ba3d8d781d9d777",
+      "bytes": 373919
+    },
+    {
+      "path": "outputs/v83_validation/localunit02/local_coarse_evidence.mat",
+      "sha256": "deaf6934ff962a06a3d4c088605899b80ec2ae9f3ab6142862eccb35a704cf0e",
+      "bytes": 373930
+    },
+    {
+      "path": "outputs/v83_validation/localunit02/local_coarse_construction_evidence.mat",
+      "sha256": "58b9c6f0080c56512fd915ef0d1e5a4d3a1f48b179c574e523eac6f6cb9ed8fe",
+      "bytes": 352379
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02/local_coarse_evidence.mat",
+      "sha256": "d38cc000fe7dafa3b907ed9827ac4ce4a57cc381e7effb57e74d1d71c25c160c",
+      "bytes": 365763813
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02/local_coarse_construction_evidence.mat",
+      "sha256": "59c3cae51a2d4b21ba1c357e0fd0dd5dee487f21be375e4883c0b43276f75f96",
+      "bytes": 287883394
+    },
+    {
+      "path": "outputs/v83_validation/localunit02/local_coarse_summary.json",
+      "sha256": "3caeed34d1ddcf1b89a4952e2ac3c8674a39b932d1a9b3f7d8cf6422f376c67b",
+      "bytes": 1141
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02/local_coarse_summary.json",
+      "sha256": "7600d13dfc9b7dd5aaeb749766ba4ed1cdbde3f1a85349c94b8aa979b06aa03e",
+      "bytes": 1134
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02/local_coarse_selection.png",
+      "sha256": "e16643347cab7d1c643a4cc285dd9f4aceeae3315ff63cba32fc47b706a59a34",
+      "bytes": 278813
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02/local_coarse_figure.json",
+      "sha256": "1787203ff288453a26e493e9a51b0dae4666d796a0ea1e66f357281fe6ab529d",
+      "bytes": 412
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02/local_coarse_selection2.png",
+      "sha256": "afb5dbdc08b17fcc022fe22753c8a12245a031f4bd78f18847da312a9d9c68d5",
+      "bytes": 251983
+    },
+    {
+      "path": "outputs/v83_validation/localrocket02/local_coarse_figure2.json",
+      "sha256": "afda32e5dac0d9689d56eebc8c72b3fcb4d904168951d351548b69b9a90bb5c0",
+      "bytes": 430
+    }
+  ],
+  "failedAttempt": {
+    "name": "localstudy02",
+    "exitCode": 1,
+    "cause": "int64 input CV IDs combined with double vector indices in MATLAB",
+    "reportedConstructionModelActions": 320,
+    "finalProjectionEvidenceAvailable": false,
+    "correctedBy": "Validate and canonicalize CV identities to double; regression uses int64 input; save full construction before projection/FD.",
+    "oldSourcesPreserved": true
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_local_integer_fix_buildRocketLocalCoarseOperator.m",
+      "sha256": "bba8e4797d2b2ecdfc91c12b9d70cb059a20edbda9cabfef393af611d49597f6"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_local_integer_fix_studyRocketLocalCoarse.m",
+      "sha256": "68ba049ca5c9b227584cd104ac815527a0a4cd9b6c7a719835d64a3fc0fb943b"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_local_plot_revision2_plotRocketLocalCoarse.py",
+      "sha256": "4f725c882ff0444e95fc6af3a60c9a706786e151678768a72836f917585c9a7a"
+    }
+  ],
+  "researchResults": {
+    "status": "tested-original-CV-local-conservative-enrichment-with-fixed-lift-and-original-model-replay",
+    "kind": "real",
+    "candidateCells": 64,
+    "candidateColumns": 320,
+    "selectedLocalColumns": 320,
+    "retainedMixedColumns": 472,
+    "removedMixedColumns": 438,
+    "coarseUnknowns": 792,
+    "imageBytes": 266582936.0,
+    "maximumImageBytes": 268435456.0,
+    "imageNonzeros": 16661037.0,
+    "reciprocalConditionEstimate": 2.35326761536418e-07,
+    "selectionStopReason": "maximum-additional-columns",
+    "originalRemainingRelativeDefect": 0.3077544380719551,
+    "oldMixedProjectedRelativeDefect": 0.30737682696087526,
+    "localProjectedRelativeDefect": 0.2546925954752104,
+    "extraSquaredNormFractionRemoved": 0.31342119540328917,
+    "fullModelProjectionRelativeDifference": 2.533099996418463e-15,
+    "probeImageRelativeDifference": 4.237784448342915e-16,
+    "fixedLinearityRelativeDifference": 4.745513159343085e-13,
+    "originalNSDirectionFDRelativeDifferences": 3.2033855137616273e-07,
+    "actualOriginalNSEvaluations": 2,
+    "constructionModelApplications": 320,
+    "otherModelApplications": 4,
+    "buildSeconds": 316.6624071,
+    "physicalMeshChanged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 49352
+  },
+  "unitResults": {
+    "status": "tested-original-CV-local-conservative-enrichment-with-fixed-lift-and-original-model-replay",
+    "kind": "unit",
+    "candidateCells": 4,
+    "candidateColumns": 20,
+    "selectedLocalColumns": 2,
+    "retainedMixedColumns": 147,
+    "removedMixedColumns": [],
+    "coarseUnknowns": 149,
+    "imageBytes": 144144,
+    "maximumImageBytes": 268435456.0,
+    "imageNonzeros": 8934,
+    "reciprocalConditionEstimate": 3.456335824415982e-12,
+    "selectionStopReason": "no-independent-candidate",
+    "originalRemainingRelativeDefect": 0.0001975526812068218,
+    "oldMixedProjectedRelativeDefect": 7.492559849323254e-05,
+    "localProjectedRelativeDefect": 6.750310013085231e-05,
+    "extraSquaredNormFractionRemoved": 0.1883159802232539,
+    "fullModelProjectionRelativeDifference": 1.2372537387428212e-12,
+    "probeImageRelativeDifference": 3.506420934116625e-16,
+    "fixedLinearityRelativeDifference": 1.5901779324021058e-11,
+    "originalNSDirectionFDRelativeDifferences": [
+      2.2479443715920805e-09,
+      7.127005130962199e-09
+    ],
+    "actualOriginalNSEvaluations": 5,
+    "constructionModelApplications": 20,
+    "otherModelApplications": 5,
+    "buildSeconds": 0.1152129,
+    "physicalMeshChanged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 49352
+  },
+  "workAccounting": {
+    "mainSolverActualNSEvaluationsUnchanged": 238,
+    "mainAcceptedIterationsUnchanged": 12,
+    "mainLastAcceptanceCallsUnchanged": 125,
+    "mainUnacceptedTailCallsUnchanged": 113,
+    "successfulRealLocalConstructionModelApplications": 320,
+    "successfulRealValidationModelApplications": 4,
+    "separateRealNSCentralDirectionChecks": 2,
+    "separateFinalUnitNSCalls": 5,
+    "separatePreFixUnitNSCalls": 5,
+    "finalStudyHostNSEvaluations": 7,
+    "newMainNonlinearCandidates": 0,
+    "newMainNonlinearAcceptances": 0,
+    "validationNotAppendedToMainSolverHistory": true
+  },
+  "userInterface": {
+    "existingWorkbench": "outputs/v83_validation/workbench11/index.html",
+    "mainAndWorkbenchSourcesUnchanged": true,
+    "newScientificFigure": "outputs/v83_validation/localrocket02/local_coarse_selection2.png",
+    "finalScientificFigureActuallyInspected": true,
+    "newBrowserVisualOrWebGLRuntimeAcceptance": false,
+    "localEnrichmentIntegratedIntoMainSolverOrWorkbench": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "steadyBoundaryImbalance": 0.011954482698849347
+  },
+  "nextAction": "Use the measured local projection benefit to decide whether to integrate explicit frozen local-column cache loading/current-Q rebuild into the actual solver. Verify old full-output compatibility and original-NS acceptance/rejection before a new real Krylov trial. Do not reconstruct the saved local images or rerun unchanged old configurations; keep all physical CVs and all original gates.",
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "b25eca144c507c19921dbf86624154d19bf3ed8cb2a312a16768e88c880ff3c6"
+}

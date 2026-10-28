@@ -48,7 +48,7 @@ if savedThermal.available && ...
     end
 end
 profiles = computePressureProfiles(mesh);
-validateattributes(p.Cp,{'numeric'},{'finite','size',[size(mesh.F,1),1]});
+validateattributes(p.Cp,{'numeric'},{'real','size',[size(mesh.F,1),1]});
 if nargin < 3 || isempty(host)
     [fig,host] = createAeroHeatWindow();
     if isfield(cfg,'pressureGUI') && isfield(cfg.pressureGUI,'visible')
@@ -63,10 +63,21 @@ fig.CloseRequestFcn = @(src,event)delete(src);
 %% 1. 自适应布局：工具栏、压力云图、状态与模型说明
 layout = uigridlayout(host,[4 1]);
 layout.RowHeight = {44,'1x',32,36};
-bar = uigridlayout(layout,[1 9]); bar.Padding = [0 0 0 0];
-bar.ColumnWidth = {185,110,100,95,170,160,155,145,'1x'};
-selector = uidropdown(bar,'Items',{'修正牛顿 Cp','修正牛顿压力 p / kPa', ...
-    '修正牛顿压力增量 Δp / kPa','驻点候选区域','内置外流压力 p / kPa'}, ...
+bar = uigridlayout(layout,[1 11]); bar.Padding = [0 0 0 0];
+legacyToolbarWidths = {0,0,185,110,100,95,170,160,155,145,'1x'};
+bar.ColumnWidth = legacyToolbarWidths;
+% 科研工作台使用自己的显示工具；顶部只保留工况和气动力入口，
+% 收起旧版禁用控件，避免小窗口中重复工具栏挤压云图与重算按钮。
+workbenchLabel=uilabel(bar,'Text','当前工况 · 三维结果与逐面元来源', ...
+    'FontWeight','bold','Visible','off');
+noseSelector=uidropdown(bar, ...
+    'Items',{'鼻区：驻点余弦延拓（对照）','鼻区：球面局部相似（0°层流）'}, ...
+    'ItemsData',{'cosineExtension','sphericalLocalSimilarity'}, ...
+    'Value',mesh.heating.noseModel,'Visible','off', ...
+    'Tooltip','仅重算当前工况；球面局部相似限定零合成攻角、已核验球鼻的连续流层流，不解后体接口，超域保持未解。', ...
+    'ValueChangedFcn',@changeNoseModel);
+selector = uidropdown(bar,'Items',{'表面压力系数 Cp','表面压力 p / kPa', ...
+    '表面压力增量 Δp / kPa','驻点候选区域','内置外流压力 p / kPa'}, ...
     'ItemsData',[1 2 3 4 5],'Value',1,'ValueChangedFcn',@updatePlot);
 wire = uicheckbox(bar,'Text','显示网格线','ValueChangedFcn',@toggleWire);
 resetButton=uibutton(bar,'Text','重置视角','ButtonPushedFcn',@resetView);
@@ -86,6 +97,10 @@ displayScale=uidropdown(bar, ...
 loadToggle=uibutton(bar,'Text','显示气动力/参考量', ...
     'ButtonPushedFcn',@toggleLoadsPanel);
 back = uibutton(bar,'Text','修改飞行条件并重新计算','ButtonPushedFcn',@changeFlight);
+baseButton=uibutton(bar,'Text','底压方法 / 条件','Visible','off', ...
+    'Tooltip','在本窗口配置底压关联与无尾撑/无喷流声明；拒绝区域保持未解，代表底热不作为全面积热流。', ...
+    'ButtonPushedFcn',@editBasePressure);
+baseButton.Layout.Row=1;baseButton.Layout.Column=3;
 % 用独立面板容纳坐标轴和色标，防止色标占用外层布局行。
 plotPanel = uipanel(layout,'BorderType','none'); plotPanel.Layout.Row = 2;
 content = uigridlayout(plotPanel,[1 2]); content.ColumnWidth={'1x',355};
@@ -485,7 +500,7 @@ refSource=uilabel(loadGrid,'WordWrap','on'); refSource.Layout.Row=7; refSource.L
 loadsTable=uitable(loadGrid,'ColumnName',{'量','数值','单位'},'ColumnWidth',{105,105,65});
 loadsTable.Layout.Row=8; loadsTable.Layout.Column=[1 2];
 scope=uilabel(loadGrid,'Text', ...
-    '载荷由修正牛顿面压积分，不随外流云图切换；仅压力贡献，不含摩擦阻力。', ...
+    '载荷由当前逐面元表压积分；各面元保留独立方法；仅压力贡献，不含摩擦阻力。', ...
     'WordWrap','on');
 scope.Layout.Row=9; scope.Layout.Column=[1 2];
 surface = patch(ax,'Vertices',mesh.V,'Faces',mesh.F,'FaceVertexCData',p.Cp, ...
@@ -497,6 +512,9 @@ note = uilabel(layout,'Text',sprintf( ...
     '压力算法：%s。背风 Cp=%g，非迎风尾盖 Cp=%g；不含尾迹、遮挡和真实气体效应。', ...
     p.model,p.leewardCp,p.aftBaseCp));
 note.Layout.Row = 4; note.WordWrap = 'on';
+if isfield(p,'baseRegion') && ~isempty(p.baseRegion)
+    note.Text=['迎风修正牛顿；底压审核：' p.baseRegion.status '；各面元压力来源可在三维探针中核对。'];
+end
 pressureNoteText=note.Text;
 % 保留框架句柄，同时公开显示控件用于自动测试。
 data = fig.UserData;
@@ -514,6 +532,9 @@ data.autoReference=autoReference;
 data.loadsTable=loadsTable;
 data.loadsPanel=loadPanel; data.loadToggle=loadToggle;
 data.contentGrid=content;
+data.resultToolbar=bar; data.workbenchLabel=workbenchLabel;
+data.noseSelector=noseSelector; data.currentMesh=mesh; data.currentCfg=cfg;
+data.basePressureButton=baseButton;
 data.colorScale=colorScale; data.tabs=tabs; data.mapTab=mapTab;
 data.displayScale=displayScale;
 data.curveTab=curveTab; data.angularAxes=angularAxes;
@@ -734,11 +755,11 @@ end
         elseif heatChoice.Value==10
             colormap(heatAxis,[0.72 0.72 0.72;0.18 0.52 0.80; ...
                 0.90 0.27 0.17;0.18 0.76 0.76; ...
-                0.64 0.33 0.80;0.90 0.42 0.66]);
-            clim(heatAxis,[-0.5 5.5]);
-            heatColorbar.Ticks=0:5;
+                0.64 0.33 0.80;0.90 0.42 0.66;0.65 0.73 0.30]);
+            clim(heatAxis,[-0.5 6.5]);
+            heatColorbar.Ticks=0:6;
             heatColorbar.TickLabels={'未算','层流','湍流', ...
-                '球鼻延拓','脱体层流','脱体湍流'};
+                '球鼻延拓','脱体层流','脱体湍流','球鼻局部相似'};
         elseif heatChoice.Value==11
             colormap(heatAxis,[0.18 0.65 0.40;0.50 0.50 0.50; ...
                 0.55 0.32 0.65;0.95 0.61 0.15;0.80 0.16 0.16; ...
@@ -1764,6 +1785,7 @@ end
         loadsTable.Data=[labels,num2cell(numbers),units];
         refSource.Text=sprintf('面积：%s；长度：%s；参考点：%s', ...
             loads.reference.areaSource,loads.reference.lengthSource,loads.reference.pointSource);
+        scope.Text=loads.description;
     end
     function restoreAutomatic(~,~)
         candidate=cfg;
@@ -2036,14 +2058,28 @@ end
         % UI Grid 在页面切换后才给坐标轴分配真实宽高。
         drawnow limitrate;
         % Euler 页有自己的数值场和工具，不让顶部工程压力控件混淆来源。
-        pressureControls=[selector,wire,resetButton,exportButton,viewSelector,colorScale,displayScale,loadToggle];
+        pressureControls=[selector,wire,resetButton,exportButton,viewSelector,colorScale,displayScale];
+        % 切换页面时恢复原布局；WebGL 和 Euler 页只展示有实际用途的入口。
+        bar.ColumnWidth=legacyToolbarWidths;
+        set(pressureControls,'Visible','on');
+        workbenchLabel.Visible='off';noseSelector.Visible='off';baseButton.Visible='off';
+        loadToggle.Visible='on';loadToggle.Enable='on';
         if tabs.SelectedTab==webUI.tab
-            set(pressureControls,'Enable','off');
+            set(pressureControls,'Enable','off','Visible','off');
+            bar.ColumnWidth={'1x',230,145,0,0,0,0,0,0,155,245};
+            workbenchLabel.Visible='on';
+            noseSelector.Visible='on';
+            baseButton.Visible='on';
             if strcmp(loadPanel.Visible,'on'),toggleLoadsPanel();end
             note.Text='自定义 WebGL：面元常值、真实比例；灰色区域未解，给定边界与工程计算分开统计。';
+            if isfield(p,'baseRegion') && ~isempty(p.baseRegion)
+                note.Text=['底压审核：' p.baseRegion.status '。代表底热不作为底面热流。'];
+            end
             status.Text='请使用工作台内的旋转/缩放、色标和探针；热响应末时刻与单点工况分开标注。';
         elseif tabs.SelectedTab==eulerUI.tab
-            set(pressureControls,'Enable','off');
+            set(pressureControls,'Enable','off','Visible','off');
+            bar.ColumnWidth={'1x',0,0,0,0,0,0,0,0,0,245};
+            workbenchLabel.Visible='on';loadToggle.Visible='off';
             if strcmp(loadPanel.Visible,'on'),toggleLoadsPanel();end
             note.Text='本页：内部轴对称 Euler PDE、定比热完全气体；每次计算独立检查残差与边界，尚不驱动气动热。';
             status.Text='Euler 图使用真实比例；请使用页内显示/导出控件。既有工程压力与热流保留各自方法。';
@@ -2138,6 +2174,106 @@ end
     end
 
 %% 3. 同一窗口内重设飞行条件，确认后重算，取消则恢复旧结果
+    function editBasePressure(~,~)
+        % 模块作用：在统一宿主内配置区域方法与不可从STL推断的工况输入。
+        % 新页不启动另一窗口；确认后独立重建当前压力及热边界，取消恢复。
+        hideAeroHeatPages(host);
+        page=uipanel(host,'Units','normalized','Position',[0 0 1 1], ...
+            'Title','底压方法与适用工况','BackgroundColor',[.96 .97 .98]);
+        grid=uigridlayout(page,[8 2]);grid.ColumnWidth={220,'1x'};
+        grid.RowHeight={34,34,34,34,34,'1x',42,36};grid.Padding=[24 18 24 18];
+        keys={'底压方法','外流/热流空气物性','是否有尾撑','是否有底部喷流','操作声明来源'};
+        for j=1:5
+            lab=uilabel(grid,'Text',keys{j});lab.Layout.Row=j;lab.Layout.Column=1;
+        end
+        currentModel='prescribed';bp=struct;
+        if isfield(cfg,'basePressure'),bp=cfg.basePressure;end
+        if isfield(bp,'model'),currentModel=bp.model;end
+        model=uidropdown(grid,'Items',{'给定尾底Cp（明确边界输入）','SAND93-0280层流尖锥底压'}, ...
+            'ItemsData',{'prescribed','sand93Laminar'},'Value',currentModel);
+        model.Layout.Row=1;model.Layout.Column=2;
+        [airMode,~]=selectAirThermalModel(p.freestream,cfg);
+        thermal=uidropdown(grid,'Items',{'NASA7变比热空气','定比热空气'}, ...
+            'ItemsData',{'thermallyPerfect','caloricallyPerfect'},'Value',airMode);
+        thermal.Layout.Row=2;thermal.Layout.Column=2;
+        support=uidropdown(grid,'Items',{'未声明','无尾撑','有尾撑'}, ...
+            'ItemsData',{'unknown','no','yes'},'Value',operationValue(bp,'hasRearSupport'));
+        support.Layout.Row=3;support.Layout.Column=2;
+        injection=uidropdown(grid,'Items',{'未声明','无底部喷流','有底部喷流'}, ...
+            'ItemsData',{'unknown','no','yes'},'Value',operationValue(bp,'hasGasInjection'));
+        injection.Layout.Row=4;injection.Layout.Column=2;
+        source='';if isfield(bp,'operationSource'),source=char(bp.operationSource);end
+        sourceField=uieditfield(grid,'text','Value',source, ...
+            'Placeholder','填写工况依据；STL不能证明发动机状态或试验尾撑');
+        sourceField.Layout.Row=5;sourceField.Layout.Column=2;
+        help=uitextarea(grid,'Editable','off','Value',{ ...
+            '本模块计算底面压力，不把代表底热当作底面径向热流分布。', ...
+            '当前接入范围：零攻角/侧滑、真实孤立尖头直圆锥、9~10°半锥角、平圆底、定比热gamma=1.4空气。', ...
+            '内部求肩部Taylor–Maccoll流动、按当前Re经验阈值审核层流，并解物理剖面审核delta/rb≤0.05。该厚度门限是本实现工程接受准则。', ...
+            '操作声明是用户输入，不标为程序求解；选择定比热会同步重算全工况外流和热流。', ...
+            '未通过审核的尾底压力保持NaN；没有给定Cp回退。缺失压力时总气动力/力矩保持未解。', ...
+            ['当前底压模型：' currentModel]});
+        help.Layout.Row=6;help.Layout.Column=[1 2];
+        apply=uibutton(grid,'Text','应用并重算当前工况','ButtonPushedFcn',@applyBase);
+        apply.Layout.Row=7;apply.Layout.Column=2;
+        cancel=uibutton(grid,'Text','取消，返回原结果','ButtonPushedFcn',@cancelBase);
+        cancel.Layout.Row=7;cancel.Layout.Column=1;
+        progress=uilabel(grid,'Text','所有长度采用m；重新计算保留真实网格和当前飞行条件。','WordWrap','on');
+        progress.Layout.Row=8;progress.Layout.Column=[1 2];
+        fig.UserData.basePressureEditor=struct('page',page,'model',model, ...
+            'thermalModel',thermal,'support',support,'injection',injection, ...
+            'source',sourceField,'apply',apply,'cancel',cancel);
+        function applyBase(~,~)
+            nextCfg=cfg;nextCfg.basePressure=bp;nextCfg.basePressure.model=model.Value;
+            nextCfg.basePressure.operationSource=sourceField.Value;
+            for entry={'hasRearSupport','hasGasInjection'}
+                key=entry{1};control=support;if strcmp(key,'hasGasInjection'),control=injection;end
+                if strcmp(control.Value,'unknown')
+                    if isfield(nextCfg.basePressure,key),nextCfg.basePressure=rmfield(nextCfg.basePressure,key);end
+                else
+                    nextCfg.basePressure.(key)=strcmp(control.Value,'yes');
+                end
+            end
+            nextCfg.heating.airThermalModel=thermal.Value;
+            apply.Enable='off';cancel.Enable='off';progress.Text='正在审核底区并重算当前工况…';drawnow;
+            try
+                updated=calcFlightStationState(mesh,nextCfg.flight,nextCfg);
+                pressureGUI(updated,nextCfg,host);
+                assignin('base','mesh',fig.UserData.currentMesh);assignin('base','cfg',nextCfg);
+            catch errorInfo
+                if isgraphics(apply)
+                    apply.Enable='on';cancel.Enable='on';progress.Text=errorInfo.message;
+                end
+            end
+        end
+        function cancelBase(~,~)
+            pressureGUI(mesh,cfg,host);
+        end
+    end
+    function value=operationValue(bp,key)
+        value='unknown';
+        if isfield(bp,key) && isscalar(bp.(key)) && ismember(bp.(key),[0 1])
+            value='no';if logical(bp.(key)),value='yes';end
+        end
+    end
+    function changeNoseModel(src,~)
+        % 模块作用：同一工况/网格切换鼻区工程方法；不复用旧热历史。
+        % pressureGUI 自身更新热边界和网页，所有区域拒绝状态随结果保存。
+        nextCfg=cfg; nextCfg.heating.noseModel=src.Value;
+        workbenchLabel.Text='正在重算当前工况热边界…（局部相似剖面可能需数分钟）';
+        src.Enable='off';back.Enable='off';drawnow;
+        try
+            pressureGUI(mesh,nextCfg,host);
+            assignin('base','mesh',fig.UserData.currentMesh);
+            assignin('base','cfg',fig.UserData.currentCfg);
+        catch errorInfo
+            if isgraphics(src)
+                src.Value=mesh.heating.noseModel;src.Enable='on';back.Enable='on';
+                workbenchLabel.Text='当前工况 · 三维结果与逐面元来源';
+            end
+            uialert(fig,errorInfo.message,'鼻区模型计算失败');
+        end
+    end
     function changeFlight(~,~)
         nextCfg = cfg; nextCfg.flight = p.freestream;
         if ~isfield(nextCfg,'pressureGUI'), nextCfg.pressureGUI=struct; end

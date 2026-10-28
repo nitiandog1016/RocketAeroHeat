@@ -1,0 +1,124 @@
+# -*- coding: utf-8 -*-
+"""独立公开压力曲线/Brent、全部开放面、原墙本构及五量账核对；不是另一套NS。"""
+import json,os,sys
+for key in ('OPENBLAS_NUM_THREADS','MKL_NUM_THREADS','OMP_NUM_THREADS'):os.environ[key]='1'
+import numpy as np
+from scipy.io import loadmat
+from riemannReservoirReference import ROOT,VAL,sha,exact,PUBLIC_BINDINGS
+
+case,kind=sys.argv[1:3];assert case.replace('_','').isalnum() and kind in ('unit','real','newton')
+target=VAL/(case+'_independent_riemann_reservoir.json');assert not target.exists()
+file=VAL/case/('riemann_reservoir_unit_evidence.mat' if kind=='unit' else 'wall_velocity_krylov_evidence.mat' if kind=='newton' else 'riemann_reservoir_real_evidence.mat')
+s=loadmat(file,simplify_cells=True);gas=s['gas'];cv=gas['R']/(gas['gamma']-1);bindings={str(file.relative_to(ROOT)):sha(file),**PUBLIC_BINDINGS}
+if kind=='unit':cut=s['cut']
+else:
+    path=ROOT/'outputs/v80_validation/domain02/shell_domain_evidence.mat';bindings[str(path.relative_to(ROOT))]=sha(path)
+    cut=loadmat(path,simplify_cells=True,variable_names=['domain'])['domain']
+f=cut['openFaces'];w=cut['walls'];volume=cut['cells']['volume'];N=len(volume)
+relative=lambda a,b:float(np.max(abs(np.asarray(a)-b))/max(1,np.max(abs(b))))
+
+def equal(a,b):
+    if isinstance(a,dict) or isinstance(b,dict):return isinstance(a,dict) and isinstance(b,dict) and a.keys()==b.keys() and all(equal(a[k],b[k]) for k in a)
+    return np.array_equal(np.asarray(a),np.asarray(b))
+
+def check_ns(q,rate,info):
+    rho=q[:,0];u=q[:,1:4]/rho[:,None];T=(q[:,4]-.5*rho*np.sum(u*u,axis=1))/(rho*cv)
+    assert np.all(rho>0) and np.all(T>=80) and np.all(T<=2000)
+    assert relative(np.column_stack((rho,u,T)),info['primitive'])<3e-15
+    m=np.asarray(f['cellMinus'],int)-1;p=np.asarray(f['cellPlus'],int)-1;inside=p>=0
+    summed=np.zeros_like(q);integral=f['area'][:,None]*info['faceFlux']
+    np.add.at(summed,m,-integral);np.add.at(summed,p[inside],integral[inside])
+    owner=np.asarray(w['ownerCell'],int)-1;np.add.at(summed,owner,-w['area'][:,None]*info['wallFlux'])
+    divergence=relative(summed/volume[:,None],rate);assert divergence<3e-12
+    dn=np.sum((w['centroid']-cut['cells']['centroid'][owner])*w['normal'],axis=1);assert np.all(dn>0)
+    pressure=rho[owner]*gas['R']*T[owner];k=gas['mu']*gas['gamma']*cv/gas['Pr']
+    heat=k*(T[owner]-info['wallTemperatureInput'])/dn
+    velocity=u[owner];traction=-gas['mu']/dn[:,None]*(velocity+np.sum(velocity*w['normal'],axis=1)[:,None]*w['normal']/3)
+    wall=np.column_stack((np.zeros(len(owner)),pressure[:,None]*w['normal']-traction,heat))
+    wall_error=relative(wall,info['wallFlux']);assert wall_error<3e-12
+    assert np.all(info['wallMechanicalPowerIntoFluid']==0)
+    audit=info['riemannReservoirBoundaryAudit'];ids=np.asarray(audit['faceID'],int)-1
+    np.testing.assert_array_equal(ids,np.flatnonzero(~inside))
+    flux_error=0.;state_error=0.;ambiguous_regions=0
+    for row,face_id in enumerate(ids):
+        cell=m[face_id];primitive=np.r_[rho[cell],u[cell],T[cell]];normal=f['normal'][face_id]
+        state,flux,region=exact(primitive,audit['reservoirPrimitive'][row],normal,gas)
+        flux_error=max(flux_error,relative(flux,info['convectiveFaceFlux'][face_id]))
+        state_error=max(state_error,relative(state,audit['primitive'][row]))
+        if region!=audit['sampleRegion'][row]:ambiguous_regions+=1
+        assert bool(audit['incoming'][row])==(flux[0]<0)
+    assert flux_error<3e-12 and state_error<3e-12 and ambiguous_regions==0
+    assert relative(audit['outwardConvectiveFlux'],info['convectiveFaceFlux'][ids])==0
+    denominator=np.maximum(1,np.sum(abs(integral[~inside]),axis=0)+np.sum(w['area'][:,None]*abs(info['wallFlux']),axis=0))
+    boundary=integral[~inside].sum(axis=0)+(w['area'][:,None]*info['wallFlux']).sum(axis=0)
+    balance=float(np.max(abs(summed.sum(axis=0)+boundary)/denominator));assert balance<1e-9
+    return dict(cells=N,openReservoirFaces=len(ids),publicFluxRelativeDifference=flux_error,
+                publicPrimitiveRelativeDifference=state_error,ambiguousReferenceRegions=ambiguous_regions,
+                wallFiveQuantityRelativeDifference=wall_error,fiveQuantityDivergenceRelativeDifference=divergence,
+                independentSpatialConservationRelative=balance)
+
+if kind=='newton':
+    r=s['result'];base=check_ns(r['Q'],r['rate'],r['info'])
+else:base=check_ns(s['Q'],s['rate'],s['info'])
+checks={'acceptedEndpoint' if kind=='newton' else 'base':base}
+rows=lambda x:[x] if isinstance(x,dict) else list(x)
+if kind=='unit':
+    worst_flux=0.;worst_state=0.;degenerate_region_differences=0
+    for i,(p,r,n) in enumerate(zip(s['PL'],s['PR'],s['normal'])):
+        state,flux,region=exact(p,r,n,gas)
+        worst_flux=max(worst_flux,relative(flux,s['fluxes'][i]));worst_state=max(worst_state,relative(state,s['faces'][i]))
+        if region!=s['regions'][i]:
+            assert relative(p,r)<1e-14
+            degenerate_region_differences+=1
+    assert worst_flux<3e-12 and worst_state<3e-12
+    r=s['result'];a=rows(r['linearLog'])[0];e=a['steadyDirectionEvidence'];rhs=r['initialRate']/r['residualScale']
+    factor=2 if e['scheme']=='central' else 1
+    jv=(e['ratePlus']-e['rateMinusOrBase'])/r['residualScale']/(factor*e['actualScalarStep'])
+    assert relative(jv,e['value'])<3e-15
+    defect=float(np.linalg.norm(rhs+jv)/np.linalg.norm(rhs));slope=float(np.sum(rhs*jv)/np.sum(rhs*rhs))
+    assert defect<=a['target']==.1 and abs(defect-a['fullSystemRelativeDefect'])<1e-12 and slope<0
+    tr=rows(r['trace']);assert len(tr)==r['acceptedNonlinearIterations']==1
+    t=tr[0];np.testing.assert_array_equal(t['initialQ'],s['Q'])
+    np.testing.assert_array_equal(t['Q'],t['initialQ']+t['alpha']*t['linearUpdateU']*r['residualScale'])
+    np.testing.assert_array_equal(r['Q'],t['Q'])
+    checks['accepted']=check_ns(r['Q'],r['rate'],r['info'])
+    assert r['rmsMerit']<=(1-r['options']['sufficientDecrease']*t['alpha'])*r['initialRmsMerit']
+    assert s['report']['oldCompleteNSReplayed'] and np.all(s['report']['invalidInputRejections'])
+    checks['standalone']=dict(publicReferenceCases=len(s['PL']),maximumFluxRelativeDifference=worst_flux,
+                             maximumPrimitiveRelativeDifference=worst_state,degenerateUniformRegionDifferences=degenerate_region_differences,
+                             actualNSDirectionDefect=defect,normalizedMeritSlope=slope)
+elif kind=='real':
+    assert s['report']['oldCompleteNSReplayed'] and not s['report']['sourceHistoryAppended']
+    if s['report']['candidateNewFullNSPassed']:
+        checks['formerlyRejectedCandidate']=check_ns(s['candidateQ'],s['candidateRate'],s['candidateInfo'])
+    assert s['report']['newFlowAcceptances']==0
+else:
+    assert not s['report']['sourceHistoryAppended']
+    if not s['report']['sameEquationHistoryContinued']:
+        assert s['report']['totalNewEquationAcceptedIterations']==s['result']['acceptedNonlinearIterations']
+        assert s['report']['totalNewEquationResidualEvaluations']==s['result']['residualEvaluations']
+    else:
+        assert len(sys.argv)>3,'A same-equation continuation requires its explicit predecessor.'
+        previous=sys.argv[3];assert previous.replace('_','').isalnum() and previous!=case
+        path=VAL/previous/'wall_velocity_krylov_evidence.mat';bindings[str(path.relative_to(ROOT))]=sha(path)
+        old=loadmat(path,simplify_cells=True);prior=old['report'];r=s['result']
+        np.testing.assert_array_equal(r['initialQ'],old['result']['Q']);np.testing.assert_array_equal(r['initialRate'],old['result']['rate'])
+        assert equal(s['boundary'],old['boundary']) and equal(s['gas'],old['gas'])
+        assert s['report']['totalNewEquationAcceptedIterations']==prior['totalNewEquationAcceptedIterations']+r['acceptedNonlinearIterations']
+        assert s['report']['totalNewEquationResidualEvaluations']==prior['totalNewEquationResidualEvaluations']+r['residualEvaluations']
+        for key,values in old['displayHistory'].items():
+            prefix=np.atleast_1d(values);tail=np.atleast_1d(r['history'][key])[1:]
+            if key=='iteration':tail=tail.astype(np.int64)+int(prefix[-1])
+            elif key=='residualEvaluations':tail=tail.astype(np.int64)+int(prior['totalNewEquationResidualEvaluations'])
+            np.testing.assert_array_equal(s['displayHistory'][key],np.r_[prefix,tail])
+        assert s['lineage']['previousProblemAcceptancesNotAppended']==13 and s['lineage']['previousProblemNSNotAppended']==258
+        checks['continuation']=dict(predecessorCase=previous,priorAccepted=int(prior['totalNewEquationAcceptedIterations']),
+            priorActualNS=int(prior['totalNewEquationResidualEvaluations']),totalAccepted=int(s['report']['totalNewEquationAcceptedIterations']),
+            totalActualNS=int(s['report']['totalNewEquationResidualEvaluations']),allMergedHistoryFieldsExactlyVerified=True)
+assert not s['report']['physicalSolution'] and s['report']['newProductionSolvedAreaM2']==0
+assert all(sha(ROOT/p)==digest for p,digest in bindings.items())
+out=dict(status='passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence',
+         case=case,kind=kind,processID=os.getpid(),checks=checks,completeIndependentNSSolver=False,
+         oldCharacteristicGuardRelaxed=False,productionQualified=False,newProductionSolvedAreaM2=0,
+         inputSHA256=bindings,scriptSHA256=sha(__file__),referenceHelperSHA256=sha(__import__('riemannReservoirReference').__file__))
+target.write_text(json.dumps(out,indent=2)+'\n',encoding='utf8');print(json.dumps({k:v for k,v in out.items() if k!='inputSHA256'}))

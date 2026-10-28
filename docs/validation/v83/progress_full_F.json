@@ -1,0 +1,998 @@
+{
+  "status": "tested-exact-full-FF-and-F-only-repartition-with-unresolved-residuals-and-bounded-overlap-preflight",
+  "version": 83,
+  "recordedUTC": "2026-10-25T19:18:44.626970+00:00",
+  "processID": 700,
+  "previousGoalTurnClassification": "progress-spatial-reduction-real-run-and-independent-cross-F-error-attribution",
+  "currentGoalTurnClassification": "progress-exact-full-F-real-test-strength-repartition-comparison-shape-repair-and-overlap-preflight",
+  "processes": {
+    "fullFunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        48512
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\fullFunit01_process.json",
+        "sha256": "ca79b886723db701fab6b77338322361fe461d496b18e25ac8ac75ded657045b",
+        "bytes": 179667
+      }
+    },
+    "fullFreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        36848
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\fullFreal01_process.json",
+        "sha256": "cea911ddefd1795f746c6388d14b12262ca0848abd3af7fa330f027cc4933aac",
+        "bytes": 180031
+      }
+    },
+    "fullFstrengthunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        57508
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\fullFstrengthunit01_process.json",
+        "sha256": "cccd409eb511b8198cdd6c2b3e9d4010c2a1acc998a634627f1595720f48a405",
+        "bytes": 181031
+      }
+    },
+    "fullFstrengthreal01": {
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        60028
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\fullFstrengthreal01_process.json",
+        "sha256": "d96acd98e3e12fd7b21ee2478e16d5958fa1b4dc11c013faaadc48fac4ddd56b",
+        "bytes": 181435
+      }
+    },
+    "fullFstrengthunit02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        25988
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\fullFstrengthunit02_process.json",
+        "sha256": "8682b5c1911a08dc7f051840190e948a61b10a6d0f99555cfb097e092140393d",
+        "bytes": 182178
+      }
+    },
+    "fullFstrengthreal02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        36432
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\fullFstrengthreal02_process.json",
+        "sha256": "17f485b64ea18b0187cb96613b2518dce8b74124a1942f4d8a9b17e3074eff88",
+        "bytes": 182427
+      }
+    },
+    "fullFui01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        19948
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\fullFui01_process.json",
+        "sha256": "842d46ed89f15bebfc08b12b2fe3c9287a2e0eccf78b3f0759ea6f62d0a14973",
+        "bytes": 183415
+      }
+    }
+  },
+  "smallFullFAudit": {
+    "status": "passed-independent-all-small-FF-coefficients-full-F-Arnoldi-and-fixed-C-parent-reference",
+    "processID": 53396,
+    "cases": [
+      {
+        "originalCVs": 32,
+        "FCVs": 24,
+        "allFFCoefficientsExactlyPreserved": true,
+        "fullFResidual": 2.7802981268145316e-11,
+        "fixedCParentCResidual": 2.83738483950457e-10,
+        "allPhysicalArnoldiRelation": 1.0842821614191384e-15,
+        "allPhysicalLocalFMapDifference": 3.4547790671375598e-18,
+        "arnoldiSteps": 14
+      },
+      {
+        "originalCVs": 32,
+        "FCVs": 24,
+        "allFFCoefficientsExactlyPreserved": true,
+        "fullFResidual": 2.7802986904359855e-11,
+        "fixedCParentCResidual": 2.837381902899611e-10,
+        "allPhysicalArnoldiRelation": 1.1538638691558595e-15,
+        "allPhysicalLocalFMapDifference": 3.4123794527684448e-18,
+        "arnoldiSteps": 14
+      }
+    ],
+    "newActualNSEvaluations": 0,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\fullFunit01\\full_F_unit_evidence.mat": "90e6238fb290757c2cd3886e598b3cfe116980eb86c4313ff9d1bb3fdb7f9333"
+    },
+    "scriptSHA256": "bc7add9dde08b3073fd731fc96db139cf022ed0cee9be4b3f3106efbed7d492f"
+  },
+  "smallStrengthAudits": [
+    {
+      "status": "passed-independent-F-only-strength-inverses-all-small-F-directions-and-parent-reference",
+      "processID": 11560,
+      "cases": [
+        {
+          "FCVs": 24,
+          "maximumLocalInverseReferenceDifference": 6.512212458698795e-18,
+          "fullFResidual": 6.447857960772834e-11,
+          "allPhysicalFArnoldiRelation": 7.944762487829021e-16,
+          "allPhysicalStrengthMapDifference": 2.6939328590344825e-18,
+          "fixedCParentCResidual": 3.183292833618866e-10,
+          "arnoldiSteps": 14
+        },
+        {
+          "FCVs": 24,
+          "maximumLocalInverseReferenceDifference": 6.512212458698795e-18,
+          "fullFResidual": 6.447856063903532e-11,
+          "allPhysicalFArnoldiRelation": 7.100910063749468e-16,
+          "allPhysicalStrengthMapDifference": 2.770555778164222e-18,
+          "fixedCParentCResidual": 3.183296657526231e-10,
+          "arnoldiSteps": 14
+        }
+      ],
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "inputSHA256": {
+        "outputs\\v83_validation\\fullFstrengthunit01\\full_F_strength_unit_evidence.mat": "097e485adf25e50a42486c057de6697c229afbe43271815f34d998ca427c034b"
+      },
+      "scriptSHA256": "3e156bcdb0566aa6ae12ae2c5f2494be85f7b2a87fae6fa093b3d04ceea923b7"
+    },
+    {
+      "status": "passed-independent-F-only-strength-inverses-all-small-F-directions-and-parent-reference",
+      "processID": 772,
+      "cases": [
+        {
+          "FCVs": 24,
+          "maximumLocalInverseReferenceDifference": 6.512212458698795e-18,
+          "fullFResidual": 6.447857960772834e-11,
+          "allPhysicalFArnoldiRelation": 7.944762487829021e-16,
+          "allPhysicalStrengthMapDifference": 2.6939328590344825e-18,
+          "fixedCParentCResidual": 3.183292833618866e-10,
+          "arnoldiSteps": 14
+        },
+        {
+          "FCVs": 24,
+          "maximumLocalInverseReferenceDifference": 6.512212458698795e-18,
+          "fullFResidual": 6.447856063903532e-11,
+          "allPhysicalFArnoldiRelation": 7.100910063749468e-16,
+          "allPhysicalStrengthMapDifference": 2.770555778164222e-18,
+          "fixedCParentCResidual": 3.183296657526231e-10,
+          "arnoldiSteps": 14
+        }
+      ],
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "inputSHA256": {
+        "outputs\\v83_validation\\fullFstrengthunit02\\full_F_strength_unit_evidence.mat": "501f7ceaafc69ae26bc41996d0faa3dbef12933665ebf98a77b1acc17d51d960"
+      },
+      "scriptSHA256": "b528e6dce40827cea566940ff613b05976cd44de9bbdbcbede656aa2c6f8556b"
+    }
+  ],
+  "realFullFAudit": {
+    "status": "passed-independent-all-real-FF-coefficients-frozen-local-map-final-F-and-fixed-C-parent-diagnostic",
+    "processID": 43400,
+    "originalCVs": 217272,
+    "FCVs": 187749,
+    "originalFFBlocks": 1285801,
+    "crossPatchFFBlocks": 682056,
+    "allFFCoefficientsExactlyMatchOriginalC": true,
+    "sourceOriginalPhysicalCVMapExactlyVerified": true,
+    "existingLocalFInverseAuditReusedByAssemblyByteIdentity": true,
+    "newLocalFInverseConstructions": 0,
+    "sameFixedCAndSameFRhsAsPreviousCandidate": true,
+    "previousFullFResidual": 0.39703768882785284,
+    "finalFullFResidual": 0.2786208112568755,
+    "fullFInternalTargetMet": false,
+    "parentOriginalCResidual": 9.658475602935413,
+    "FRowsRelativeToOriginalRHS": 7.6284105663676245,
+    "CRowsRelativeToOriginalRHS": 5.923976975261611,
+    "FRowsSubmatrixConsistency": 3.976269299284336e-15,
+    "oldApproximateSchurIdentityNotClaimedForNewFValue": true,
+    "parentOriginalCTargetMet": false,
+    "originalCImageDifference": 0.0,
+    "nativeFullFArnoldiGatesPassed": true,
+    "fullFArnoldiBasisSaved": false,
+    "independentAllRealFullFArnoldiColumnsClaimed": false,
+    "fullFSolverApplications": 33,
+    "fullFDiagnosticApplications": 2,
+    "fixedLocalFApplications": 32,
+    "originalCDiagnosticApplications": 1,
+    "newApproximateSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "inputSHA256": {
+      "outputs\\v83_validation\\fullFreal01\\full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+      "outputs\\v83_validation\\fullFreal01\\full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04",
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_reduction_assembly_evidence.mat": "b04c5c8d604c52c9289ce5d08127270a41c31322eef5ac44cd0fda4ebc0c76ca",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "outputs\\v83_validation\\spatialschurreal01\\spatial_schur_krylov_evidence.mat": "6a9f2798bc996cbe9e1cfdeab594bb7d6e7f79e53be7d05d188ca2ab90b52b3c",
+      "outputs\\v83_validation\\fullFreal01\\full_F_inputs.mat": "8d90e8f6a9416b189ecae56e029a500c889f47d413534d7bb31a73f53d06bbf6"
+    },
+    "scriptSHA256": "c8a15c0b7cd77bf3e368010d52a21a8d5db6eb64b47228d62b47b719f45380e0"
+  },
+  "realStrengthAudit": {
+    "status": "passed-independent-real-F-strength-all-local-inverses-coverage-full-F-and-fixed-C-parent-diagnostic",
+    "processID": 58212,
+    "FCVs": 187749,
+    "strengthPatches": 27461,
+    "allOriginalFUnknownsExactlyOnce": true,
+    "allStrengthPatchesConnected": true,
+    "originalFFCoefficientAuditReusedByExactGraphFileIdentity": true,
+    "fallbackStrengthPatches": 1,
+    "maximumOrdinaryBLASLocalInverseDefect": 4.0708675675626156e-10,
+    "maximumSourceOriginalInputInverseBound": 9.4254154810208e-09,
+    "decimal80CheckedBlocks": 5,
+    "maximumDecimal80LocalInverseDefect": 4.104402143276553e-10,
+    "strengthCoverage": {
+      "allOriginalFFBlocks": 1285801,
+      "oldWithinOriginalPatchFFBlocks": 603745,
+      "newWithinStrengthPatchBlocks": 635985,
+      "newEffectiveLocalBlocksAfterFallback": 635961,
+      "oldCrossPatchBlocks": 682056,
+      "newlyIncludedOldCrossPatchBlocks": 145730,
+      "countsAreAlgebraicBlocksNotPhysicalArea": 1,
+      "oldApproximateSchurIdentityClaimed": 0
+    },
+    "fixedStrengthMapDifference": 0.0,
+    "singleFullFResidual": 1.3318841820036902,
+    "finalFullFResidual": 0.2830525658217825,
+    "previousThirtyTwoStepFullFResidual": 0.27862081125690186,
+    "fullFResidualImproved": false,
+    "fullFInternalTargetMet": false,
+    "fixedCParentOriginalCResidual": 13.82113987537765,
+    "fixedCUnchangedAndSameRHSVerified": true,
+    "FRowsSubmatrixConsistency": 7.341453684515732e-15,
+    "originalCImageDifference": 0.0,
+    "oldApproximateSchurIdentityNotClaimed": true,
+    "nativeFullFArnoldiGatesPassed": true,
+    "fullFArnoldiBasisSaved": false,
+    "independentAllRealFullFArnoldiColumnsClaimed": false,
+    "numericalStudyFullFApplications": 35,
+    "numericalStudyNewLocalFApplications": 33,
+    "numericalStudyOriginalCDiagnosticApplications": 1,
+    "newApproximateSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "inputSHA256": {
+      "outputs\\v83_validation\\fullFstrengthreal02\\full_F_strength_real_evidence.mat": "5787704207516892324a447be539e8912c116305acc43651a0cbfd8ac706a478",
+      "outputs\\v83_validation\\fullFstrengthreal02\\full_F_strength_factor_evidence.mat": "47d94af8a79693c706de54a0c758c5df1f044a8b5cc35a77879afd09a9311404",
+      "outputs\\v83_validation\\fullFreal01\\full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04",
+      "outputs\\v83_validation\\spatialreductionpreflight01\\spatial_reduction_input.mat": "f7a581f6467423799b0d771923718d56a678040b01b65e4afb9ce4aa83e5df20",
+      "outputs\\v83_validation\\fullFreal01\\full_F_inputs.mat": "8d90e8f6a9416b189ecae56e029a500c889f47d413534d7bb31a73f53d06bbf6",
+      "outputs\\v83_validation\\fullFreal01\\full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf"
+    },
+    "scriptSHA256": "da911d323e7331181358322e7aa6d01aa2d81b1cac1a66a4c7f9421de294d278"
+  },
+  "compactNumericalSummary": {
+    "status": "tested-first-bounded-all-original-five-field-FF-subsystem-study",
+    "stage": "bounded-full-FF-and-fixed-C-parent-study-complete",
+    "candidateRejected": false,
+    "errorIdentifier": "",
+    "message": "",
+    "graphAvailable": true,
+    "inputsAvailable": true,
+    "innerRunComplete": true,
+    "parentDiagnosticComplete": true,
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "allFiveConservativeFields": true,
+      "sameQOnly": true,
+      "physicalStateChanged": false
+    },
+    "sourceIdentity": {
+      "extractRocketFullFGraph": "ebd9bc4e8c67982473e0869072b608755ab74b58484d11e8821816754edaf577",
+      "solveRocketFullFKrylov": "a07876efe593ce6bca30cc1592ae03ff51cce0b0e4d30facffd0658d8fa77164",
+      "compactRocketFullFReport": "fc365cb7bbceb0c873b0ecde85775adba85f6a1f4cdaa7fa1c7e4c72c2e2bb87",
+      "applyRocketPackedGraph": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+      "solveRocketRecycledGMRES": "c2780eb5cf926098640111ab5284d776dc493e1588458f8c95d45025e9a39811",
+      "solveRocketSpatialFBlocks": "69310841a85f0ca8386c4f5867a380d1300e798cd5fffe6b249cbd693a440e3f",
+      "applyRocketRectangularCoupling": "16e4abd1c8cc860cf80b43bbfa34c045d3add4cfb44a348383d3365d107a6c1a"
+    },
+    "systemScope": "exact-all-five-field-A_FF-with-fixed-C-values-not-original-full-C-solve",
+    "newLocalFInverseConstructions": 0,
+    "newApproximateSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 36848,
+    "extractionReport": {
+      "method": "exact-all-original-five-field-spatial-F-submatrix-extraction",
+      "originalCells": 217272,
+      "FCells": 187749,
+      "originalBlocks": 1619664.0,
+      "allOriginalFFBlocks": 1285801.0,
+      "withinOriginalPatchFFBlocks": 603745,
+      "crossPatchFFBlocks": 682056,
+      "graphStorageUpperBoundBytes": 273520112.0,
+      "constructionArrayEstimateBytes": 1302684016.0,
+      "processPeakMemoryClaimed": false,
+      "allFFCoefficientsKept": true,
+      "originalPhysicalGridChanged": false,
+      "originalFullCReplaced": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "previousFullFResidual": 0.3970376888278549,
+    "previousParentDiagnostic": {
+      "relativeApproximateSResidual": 0.02392023073932026,
+      "relativeFullCResidual": 10.874683842003664,
+      "fineRowsRelativeToOriginalRHS": 10.870568092302483,
+      "coarseRowsRelativeToOriginalRHS": 0.2991621870515586,
+      "coarseRowsCondensationConsistency": 7.269358951823233e-13,
+      "fineRowsRemainingSquaredNormFraction": 0.9992432017490278,
+      "originalCInternalTargetMet": false,
+      "approximateSTargetMet": false
+    },
+    "innerFullFReport": {
+      "method": "complete-spatial-A_FF-GMRES-with-existing-fixed-within-patch-F-map",
+      "options": {
+        "maximumIterations": 32,
+        "relativeTolerance": 0.001,
+        "maximumBasisBytes": 1073741824.0,
+        "saveBasisEvidence": false,
+        "failureEvidenceFile": "outputs\\v83_validation\\fullFreal01\\full_F_arnoldi_failure.mat"
+      },
+      "relativeFullFResidual": 0.27862081125690186,
+      "FApplications": 33,
+      "localFApplications": 32,
+      "elapsedSeconds": 34.0690082,
+      "fullFOperatorIncludesCrossPatchBlocks": true,
+      "baseLocalFMapFixedLinear": true,
+      "innerSolveFixedLinearMapClaimed": false,
+      "oldApproximateSchurIdentityReplaced": false,
+      "originalCOrNSConvergenceClaimed": false,
+      "physicalSolution": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "krylov": {
+        "method": "SVD-selected-augmented-restarted-right-GMRES",
+        "flag": 1,
+        "stopReason": "bounded-cycles-or-Arnoldi-budget-exhausted",
+        "options": {
+          "restartLength": 32,
+          "maximumCycles": 1,
+          "retainedDirections": 0,
+          "maximumArnoldiSteps": 32,
+          "absoluteTolerance": 2958780.952089125,
+          "maximumBasisBytes": 1073741824.0,
+          "saveBasisEvidence": false,
+          "breakdownRelativeTolerance": 1e-13,
+          "retentionRelativeThreshold": 1e-12
+        },
+        "arnoldiSteps": 32,
+        "modelApplications": 33,
+        "preconditionerApplications": 32,
+        "basisStorageUpperBoundBytes": 600870784.0,
+        "maximumBasisBytes": 1073741824.0,
+        "maximumBasisOrthogonalityError": 2.7397854616424344e-12,
+        "absoluteResidual": 824377949.2025404,
+        "relativeResidual": 0.27862081125690186,
+        "residualHistory": [
+          2958780952.0891247,
+          1061731497.2789183,
+          927476453.5000862,
+          914258721.2781239,
+          910704855.1600282,
+          908619840.2443885,
+          908610189.8637516,
+          899276878.9955468,
+          899136825.7518954,
+          898899473.4537997,
+          898689955.1354939,
+          896382196.1254392,
+          896196379.6287746,
+          890968926.2534564,
+          890968483.1223791,
+          862833708.3236763,
+          862348943.9424405,
+          862281641.4685917,
+          861708777.3481964,
+          857925068.1936812,
+          855106226.7194934,
+          847728221.7582946,
+          847726623.8213665,
+          842052264.8678483,
+          841372087.223898,
+          837997321.3414488,
+          836923138.5634012,
+          830416122.127289,
+          829005677.4896519,
+          828970913.5721823,
+          828803354.5462195,
+          825489717.2807802,
+          824377949.2025404
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "arnoldiSteps": 32,
+            "startResidualNorm": 2958780952.0891247,
+            "actualResidualNorm": 824377949.2025404,
+            "arnoldiRelationRelativeDifference": 5.078476493977985e-14,
+            "basisOrthogonalityError": 2.7397854616424344e-12,
+            "modelApplications": 33,
+            "preconditionerApplications": 32
+          }
+        ],
+        "basisArraysOmittedFromJSON": true
+      }
+    },
+    "fullFInternalTargetMet": false,
+    "fullFArnoldiBasisSaved": false,
+    "extraFullFDiagnosticApplications": 2,
+    "parentDiagnostic": {
+      "relativeFullFResidual": 0.27862081125690186,
+      "relativeParentOriginalCResidual": 9.6584756029352,
+      "FRowsRelativeToOriginalRHS": 7.628410566367929,
+      "CRowsRelativeToOriginalRHS": 5.923976975262202,
+      "FRowsSubmatrixConsistency": 3.976269299283981e-15,
+      "oldApproximateSchurIdentityClaimedForNewFValue": false,
+      "parentOriginalCTargetMet": false
+    },
+    "newOriginalCDiagnosticApplications": 1
+  },
+  "compactStrengthSummary": {
+    "status": "tested-real-F-only-strength-repartition-with-fixed-C-parent-diagnostic",
+    "stage": "bounded-F-strength-study-complete",
+    "candidateRejected": false,
+    "errorIdentifier": "",
+    "message": "",
+    "factorAvailable": true,
+    "singleComplete": true,
+    "innerRunComplete": true,
+    "parentDiagnosticComplete": true,
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "allFiveConservativeFields": true,
+      "sameQOnly": true,
+      "physicalStateChanged": false
+    },
+    "sourceIdentity": {
+      "buildRocketStrongPatches": "52d98ebce00e6974e2f9e575eb2e61a807d9242d6faf242c12df7415962fc819",
+      "factorRocketCoupledPatches": "a1b7bd8390e07b5768d2a17b6bce0f5ef118b5a3dc0ac64475988f526a4693f5",
+      "certifyRocketLocalInverse": "976f23217cc52ac335d586b414ee02fcd3c1b28b6cac572876117fafbce684b6",
+      "rocketCompensatedInverseResidual": "a9d18920c8cde0850370bf9cbf6d08fd8765c42127265968c84d3ff6d7d33fd7",
+      "rocketFullFStrengthCoverage": "457d8a67faf8438d43e11977d7cdd06d7ad5b2f4f69be49c879aa8d3b75d0922",
+      "solveRocketCoupledPatches": "408086185e6d91fddb1c2467d588d6071d4b10f4734bcf90a0c223b2ac62f083",
+      "solveRocketCoupledPatchKrylov": "19e8490b817d55449c42076c227a0d695c87530a71a23142652eeda13cf73539",
+      "compactRocketCoupledKrylovReport": "4817355b5c0b5d0605da55b548bbee30cee2ba74ba0e0f4deb3eaa84a5c10701",
+      "applyRocketPackedGraph": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+      "solveRocketRecycledGMRES": "c2780eb5cf926098640111ab5284d776dc493e1588458f8c95d45025e9a39811"
+    },
+    "systemScope": "same-complete-spatial-A_FF-only-not-original-full-C-solve",
+    "oldThirtyTwoStepFullFResidual": 0.27862081125690186,
+    "newFullFGraphExtractions": 0,
+    "newApproximateSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 36432,
+    "factorizationReport": {
+      "patchCount": 27461,
+      "maximumPatchCells": 8,
+      "includedOriginalBlocksBeforeFallback": 635985,
+      "originalBlocks": 1285801.0,
+      "maximumCertifiedLocalInverseDefect": 9.4254154810208e-09,
+      "inverseDefectThreshold": 1e-08,
+      "fallbackPatchCount": 1,
+      "accurateCheckedPatches": 6,
+      "refinedPatches": 1,
+      "factorStorageUpperBoundBytes": 303812280.0,
+      "algorithmArrayConstructionEstimateBytes": 976251100.0,
+      "factorSeconds": 1.3581866,
+      "processPeakMemoryClaimed": false,
+      "fallbackPolicy": "certified-original-CV-five-field-diagonal-only-in-preconditioner",
+      "allOriginalCellsAndFiveFieldsKept": true,
+      "physicalEquationChanged": false,
+      "rejectedPatchInverseClaimedValid": false,
+      "diagonalCompensationApplied": false,
+      "fixedLinearMap": true,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "strengthCoverage": {
+      "allOriginalFFBlocks": 1285801.0,
+      "oldWithinOriginalPatchFFBlocks": 603745,
+      "newWithinStrengthPatchBlocks": 635985,
+      "newEffectiveLocalBlocksAfterFallback": 635961,
+      "oldCrossPatchBlocks": 682056,
+      "newlyIncludedOldCrossPatchBlocks": 145730,
+      "countsAreAlgebraicBlocksNotPhysicalArea": true,
+      "oldApproximateSchurIdentityClaimed": false
+    },
+    "singleFullFResidual": 1.3318841820035456,
+    "innerFullFReport": {
+      "method": "full-five-conservation-C-GMRES-with-bounded-strong-connection-local-inverses",
+      "options": {
+        "maximumIterations": 32,
+        "relativeTolerance": 0.001,
+        "maximumBasisBytes": 1073741824.0,
+        "saveBasisEvidence": false,
+        "failureEvidenceFile": "outputs\\v83_validation\\fullFstrengthreal02\\F_strength_arnoldi_failure.mat"
+      },
+      "relativeCResidual": 0.2830525658218158,
+      "CApplications": 33,
+      "localBlockApplications": 32,
+      "elapsedSeconds": 29.3150095,
+      "baseLocalMapFixedLinear": true,
+      "innerSolveFixedLinearMapClaimed": false,
+      "requiresFlexibleOuterMethod": true,
+      "originalNSAcceptanceClaimed": false,
+      "physicalSolution": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "krylov": {
+        "method": "SVD-selected-augmented-restarted-right-GMRES",
+        "flag": 1,
+        "stopReason": "bounded-cycles-or-Arnoldi-budget-exhausted",
+        "options": {
+          "restartLength": 32,
+          "maximumCycles": 1,
+          "retainedDirections": 0,
+          "maximumArnoldiSteps": 32,
+          "absoluteTolerance": 2958780.952089125,
+          "maximumBasisBytes": 1073741824.0,
+          "saveBasisEvidence": false,
+          "breakdownRelativeTolerance": 1e-13,
+          "retentionRelativeThreshold": 1e-12
+        },
+        "arnoldiSteps": 32,
+        "modelApplications": 33,
+        "preconditionerApplications": 32,
+        "basisStorageUpperBoundBytes": 600870784.0,
+        "maximumBasisBytes": 1073741824.0,
+        "maximumBasisOrthogonalityError": 2.7358146687298507e-12,
+        "absoluteResidual": 837490540.1935418,
+        "relativeResidual": 0.2830525658218158,
+        "residualHistory": [
+          2958780952.0891247,
+          2372990797.253949,
+          2113287432.585297,
+          1853554309.1257741,
+          1758172576.0199387,
+          1639414959.6330762,
+          1588582399.6409934,
+          1560529882.1797807,
+          1558810183.259946,
+          1537664942.028876,
+          1267594987.8300245,
+          1155910549.3184595,
+          1144469571.4193864,
+          1117190139.4306517,
+          1107693761.0075264,
+          1038557716.4240497,
+          1004107258.803362,
+          934944188.8054261,
+          914741366.0782902,
+          913159527.183446,
+          903898294.8725456,
+          867601852.6881162,
+          864482215.0155973,
+          862098471.3009338,
+          854485431.2424365,
+          854484070.6671728,
+          853578263.9077141,
+          853111291.1778263,
+          849130949.6711681,
+          848521594.744221,
+          846860353.350349,
+          845415791.6328634,
+          837490540.1935418
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "arnoldiSteps": 32,
+            "startResidualNorm": 2958780952.0891247,
+            "actualResidualNorm": 837490540.1935418,
+            "arnoldiRelationRelativeDifference": 6.778393580480099e-14,
+            "basisOrthogonalityError": 2.7358146687298507e-12,
+            "modelApplications": 33,
+            "preconditionerApplications": 32
+          }
+        ],
+        "basisArraysOmittedFromJSON": true
+      }
+    },
+    "fullFInternalTargetMet": false,
+    "fullFArnoldiBasisSaved": false,
+    "extraFullFDiagnosticApplications": 2,
+    "parentDiagnostic": {
+      "relativeFullFResidual": 0.2830525658218158,
+      "relativeParentOriginalCResidual": 13.821139875377083,
+      "FRowsRelativeToOriginalRHS": 7.749748391773031,
+      "CRowsRelativeToOriginalRHS": 11.44400748509877,
+      "FRowsSubmatrixConsistency": 7.34145368451327e-15,
+      "parentOriginalCTargetMet": false,
+      "oldApproximateSchurIdentityClaimedForNewMap": false
+    },
+    "newOriginalCDiagnosticApplications": 1
+  },
+  "compactSummaryReceipts": [
+    {
+      "path": "outputs\\v83_validation\\fullFreal01\\full_F_real_summary.json",
+      "sha256": "775eb8d9732c69b8a29fa298193b7afca7b6e6f0e768eff4e48105e9683021ac",
+      "bytes": 5517
+    },
+    {
+      "path": "outputs\\v83_validation\\fullFstrengthreal02\\full_F_strength_summary.json",
+      "sha256": "9b1299dfe9decd6b28647cb00809c92194573904a99d7082f17c9117e363f8bd",
+      "bytes": 5962
+    }
+  ],
+  "retainedShapeFailure": {
+    "status": "actual-MATLAB-diagnostic-shape-error-before-F-iteration",
+    "case": "fullFstrengthreal01",
+    "exitCode": 1,
+    "sourceStable": true,
+    "rootCause": "Old MATLAB group IDs retained row-vector shape; combining the old-cross mask with a column mask requested implicit square expansion.",
+    "requestedShape": [
+      1285801,
+      1285801
+    ],
+    "reportedRequestedArrayGB": 1539.7,
+    "reportedMaximumArrayPreferenceGB": 15.7,
+    "requestRejectedByRuntime": true,
+    "actualTerabyteAllocationOrProcessPeakClaimed": false,
+    "localFactorConstructionReached": true,
+    "localFactorPersistedBeforeFailure": false,
+    "newFullFMatrixApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "errorIdentifierWasRecorded": false,
+    "failedSourceEpoch": "outputs/v83_validation/source_epochs/pre_F_strength_coverage_shape_studyRocketFullFStrength.m",
+    "repair": "Normalize old groups and all masks to columns in a separate checked coverage function; add row/column input regression."
+  },
+  "retainedShapeFailureReceipt": {
+    "path": "outputs\\v83_validation\\fullFstrengthreal01_shape_failure.json",
+    "sha256": "3b18bd0b477198fb9e8a68d6f5828462331638d192a8d94de2b2c7a769dec970",
+    "bytes": 989
+  },
+  "shapeRepair": {
+    "rowAndColumnInputTestPassed": true,
+    "smallNumericCachesAndSolutionsExactlyUnchanged": true,
+    "failedRequestNotClaimedAsActualAllocation": true,
+    "failedRunFIterationNotStarted": true,
+    "failedFactorNotPersisted": true
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_F_strength_coverage_shape_studyRocketFullFStrength.m",
+      "sha256": "6882e7bfc83519d6f475aa2571e66c4f801b75572158b3b13a5027ca454b4a2b",
+      "bytes": 8238
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_F_strength_coverage_testRocketFullFStrength.m",
+      "sha256": "bcfcf56fe1a6b8f7d9e5aa91e8097cafb1f11457670d5b7a04c1aea356e1b0cb",
+      "bytes": 3117
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\passed_fullFstrengthunit01_audit_before_coverage.py",
+      "sha256": "3e156bcdb0566aa6ae12ae2c5f2494be85f7b2a87fae6fa093b3d04ceea923b7",
+      "bytes": 4164
+    }
+  ],
+  "codeSourceIdentity": [
+    {
+      "path": "internalFlow\\cutCell\\extractRocketFullFGraph.m",
+      "sha256": "ebd9bc4e8c67982473e0869072b608755ab74b58484d11e8821816754edaf577",
+      "bytes": 3311
+    },
+    {
+      "path": "internalFlow\\cutCell\\solveRocketFullFKrylov.m",
+      "sha256": "a07876efe593ce6bca30cc1592ae03ff51cce0b0e4d30facffd0658d8fa77164",
+      "bytes": 2759
+    },
+    {
+      "path": "internalFlow\\cutCell\\compactRocketFullFReport.m",
+      "sha256": "fc365cb7bbceb0c873b0ecde85775adba85f6a1f4cdaa7fa1c7e4c72c2e2bb87",
+      "bytes": 1418
+    },
+    {
+      "path": "internalFlow\\cutCell\\rocketFullFStrengthCoverage.m",
+      "sha256": "457d8a67faf8438d43e11977d7cdd06d7ad5b2f4f69be49c879aa8d3b75d0922",
+      "bytes": 1812
+    },
+    {
+      "path": "tests\\testRocketFullFGraph.m",
+      "sha256": "4500ad6d666ed4e19c66a683bf18655580937b0e56deb80108a5e373e7e12d4f",
+      "bytes": 3608
+    },
+    {
+      "path": "tests\\studyRocketFullFGraph.m",
+      "sha256": "dfe2d80ef86f9c1e1eb06201fe53622725eb3bcd7312532f7f14ffcae8ad2424",
+      "bytes": 7011
+    },
+    {
+      "path": "tests\\testRocketFullFStrength.m",
+      "sha256": "4cd1ed2c648a3f19dbce0bde6f5ad16e8d4e88ab981a48aca926a07daabf9201",
+      "bytes": 3463
+    },
+    {
+      "path": "tests\\studyRocketFullFStrength.m",
+      "sha256": "adaacc747a85ea7992bd222f86eb51d90300bc3fe52789ed4bf3116a41945814",
+      "bytes": 7438
+    },
+    {
+      "path": "tests\\auditRocketFullFUnit.py",
+      "sha256": "bc7add9dde08b3073fd731fc96db139cf022ed0cee9be4b3f3106efbed7d492f",
+      "bytes": 3623
+    },
+    {
+      "path": "tests\\auditRocketFullFReal.py",
+      "sha256": "c8a15c0b7cd77bf3e368010d52a21a8d5db6eb64b47228d62b47b719f45380e0",
+      "bytes": 9559
+    },
+    {
+      "path": "tests\\auditRocketFullFStrengthUnit.py",
+      "sha256": "b528e6dce40827cea566940ff613b05976cd44de9bbdbcbede656aa2c6f8556b",
+      "bytes": 5578
+    },
+    {
+      "path": "tests\\auditRocketFullFStrengthReal.py",
+      "sha256": "da911d323e7331181358322e7aa6d01aa2d81b1cac1a66a4c7f9421de294d278",
+      "bytes": 12411
+    },
+    {
+      "path": "tests\\preflightRocketFullFOverlap.py",
+      "sha256": "dbb10b0e889d82063bec82ab9d7f5aaa99bdb8c41795d108c5e2c513d8be9333",
+      "bytes": 7528
+    },
+    {
+      "path": "tests\\exportRocketFullFDiagnostics.py",
+      "sha256": "d3c1c808a817ca7e7035d5a4ed0eab62989e6d2db68c8f5f69504b5dd677cbe9",
+      "bytes": 5000
+    },
+    {
+      "path": "tests\\auditRocketFullFWorkbench.py",
+      "sha256": "b44959faee0bca7394818053ad47aaaa475d101e5083f4e3574c7dce0cb2e1d8",
+      "bytes": 4750
+    }
+  ],
+  "restrictedOverlapStructuralAndStoragePreflight": {
+    "status": "read-only-fixed-core-two-neighbor-restricted-overlap-topology-and-partial-storage-preflight",
+    "processID": 16176,
+    "FCVs": 187749,
+    "corePatches": 27461,
+    "originalFGraphBlocks": 1285801,
+    "maximumAddedFNeighbors": 2,
+    "coreAndFCRolesExactlyUnchanged": true,
+    "coreUnknownsReturnedExactlyOnce": true,
+    "overlapPhysicalCellsMerged": false,
+    "overlapMembers": 242670,
+    "addedMembers": 54921,
+    "maximumCVOverlapMembership": 5,
+    "minimumOverlapCells": 2,
+    "maximumOverlapCells": 10,
+    "originalFFBlockOccurrencesInsideOverlapSets": 863948,
+    "coreRowsToOverlapOriginalFFBlocks": 719891,
+    "inverseNumericArrayBytes": 460382800,
+    "conservativeFactorArrayBoundBytes": 484807360,
+    "proposedFactorBudgetBytes": 536870912,
+    "factorBoundFitsProposedBudget": true,
+    "constructionAndWholeRuntimeBudgetProven": false,
+    "numericalOverlapInversesConstructed": false,
+    "convergenceOrRegionalQualificationProven": false,
+    "boundarySelection": "two-highest-symmetric-row-diagonal-normalized-five-field-block-neighbors-original-global-CV-ID-tie",
+    "outputPolicy": "solve-extended-local-system-return-only-original-core-rows-fixed-map-prototype-not-yet-implemented",
+    "savedTwoResidualCorrelation": 0.6115111238726734,
+    "savedTwoCandidateImageSpanPredictedFResidual": 0.25152857059200656,
+    "savedTwoCandidateWeights": [
+      0.5284069781451295,
+      0.4884830534689369
+    ],
+    "imageSpanResultIsDiagnosticOnly": true,
+    "betterSavedFullFRemainingLayerSquaredNormFractions": [
+      0.042951706889965656,
+      0.10419415872276276,
+      0.010088233093093148,
+      0.7770584123400537,
+      0.06528534322856984,
+      0.0004033268809066039,
+      1.3681141072324317e-05,
+      2.7779136795282376e-06,
+      1.357896328977282e-06,
+      7.07716971853038e-07,
+      2.9417659379536895e-07
+    ],
+    "betterSavedFullFRemainingEquationSquaredNormFractions": [
+      0.31404558241847086,
+      0.24138100094054973,
+      0.03023613789503732,
+      0.04000767931956585,
+      0.3743295994263763
+    ],
+    "top64FUnknownRemainingSquaredNormFraction": 0.4761448664395931,
+    "topologyMATFile": "outputs\\v83_validation\\fullFoverlappreflight01\\full_F_overlap_input.mat",
+    "topologyMATFileSHA256": "af0061652a19dddb4f80980ebd7e3e33f07e033d5901239ddb0efdcd93403910",
+    "newFullFApplications": 0,
+    "newOriginalCApplications": 0,
+    "newLocalInverseConstructions": 0,
+    "newActualNSEvaluations": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "inputSHA256": {
+      "outputs\\v83_validation\\fullFreal01\\full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+      "outputs\\v83_validation\\fullFstrengthreal02\\full_F_strength_real_evidence.mat": "5787704207516892324a447be539e8912c116305acc43651a0cbfd8ac706a478",
+      "outputs\\v83_validation\\fullFstrengthreal02\\full_F_strength_factor_evidence.mat": "47d94af8a79693c706de54a0c758c5df1f044a8b5cc35a77879afd09a9311404",
+      "outputs\\v83_validation\\fullFreal01\\full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04"
+    },
+    "scriptSHA256": "dbb10b0e889d82063bec82ab9d7f5aaa99bdb8c41795d108c5e2c513d8be9333"
+  },
+  "methodDocumentation": {
+    "path": "docs\\FULL_F_SUBSYSTEM_V83.md",
+    "sha256": "32a4aa97f11122810a4aa20d1277ad37b401ae0cf6f482a23e7b6ca0a4ec5936",
+    "bytes": 8785
+  },
+  "userInterface": {
+    "status": "passed-independent-sixteen-source-bound-rows-separated-full-F-and-unchanged-facet-data",
+    "processID": 45104,
+    "workbench": "outputs/v83_validation/workbench26/index.html",
+    "researchRows": 16,
+    "originalNSAndAcceptanceHistoryExactlyUnchanged": true,
+    "originalCAndFResidualDenominatorsAndSystemScopesKeptDistinct": true,
+    "diagnosticShapeFailureAndRepairKeptExplicit": true,
+    "structuralOverlapNotClaimedAsNumericalSolver": true,
+    "allThreeFalseSourceOrQualificationExportsRejected": true,
+    "productionQualificationNotClaimed": true,
+    "sourceFacetPayload": [
+      {
+        "path": "outputs\\v83_validation\\workbench26\\cases\\legacy-wall-source\\results.json",
+        "sha256": "5c048e7c893dc4c67064656bde19b17419e0ed6b742f893f0e63bf24db25d04f",
+        "bytes": 9047228
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench26\\cases\\legacy-wall-source\\case-data.js",
+        "sha256": "60cfa644b4ad13d70e9591bd40b6417281801a46698df5688100d62d06bf381c",
+        "bytes": 9047249
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench26\\cases\\constrained-wall-baseline\\results.json",
+        "sha256": "7bd40b17d235011f19be08c8b856f1854eb078bbf9592fa9969557d283a89f5f",
+        "bytes": 9047209
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench26\\cases\\constrained-wall-baseline\\case-data.js",
+        "sha256": "780da22265a80f0e26a55e79f66138a48a1722d38a730dd3de111eb6402f9197",
+        "bytes": 9047230
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench26\\cases\\constrained-wall-krylov\\results.json",
+        "sha256": "b946336d02ea4a81384ba9ff4bf13828e0910bb2ba399b27c48feccd2bcd37b2",
+        "bytes": 9060905
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench26\\cases\\constrained-wall-krylov\\case-data.js",
+        "sha256": "8140318bfa34e28df8dd8320ee5c4541c216addfa533b4925087d3b8ae0c2d57",
+        "bytes": 9060926
+      }
+    ],
+    "previousFullMATFieldAuditReusedByByteIdentity": true,
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "newActualNSEvaluations": 0,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockilufailurediag01\\arnoldi_failure_evidence.mat": "b4c42808fd960db0b827daba4450054724f25b2ea6b7d9306965d7a42a282319",
+      "outputs\\v83_validation\\scaledilureal01\\scaled_arnoldi_failure_evidence.mat": "ecc4dc36726284411c601f2f12058caecce4bc5edcaa76cd0684350d25626fd1",
+      "outputs\\v83_validation\\blockfillreal01\\scaled_arnoldi_failure_evidence.mat": "46f4a5065956e9977037ac39a2b8419c6a1687d44a5edf712eeb7cd196656938",
+      "outputs\\v83_validation\\floworderfactor01\\flow_ordering_actions_evidence.mat": "ae8819df3a2ad68544ac54b23285ca10347c333b74a3a05704e074afb2747856",
+      "outputs\\v83_validation\\schurcheckpointreal01\\schur_failure_checkpoint_summary.json": "5c353f08b38934a3b410b1d25f7bda555f3be47c86faa37f61fa484db2913d0d",
+      "outputs\\v83_validation\\pivotedschurreal02\\pivoted_schur_real_summary.json": "4efe6d754c844452f9b55adb98602be37fd6eaa25a54abd403dba474c1e306f5",
+      "outputs\\v83_validation\\schurscalereal01\\agent_stop_record.json": "f4b4a0e160bca5a8e15233be3e0cb963fe3f1956665ad4c26e863b373c87a67a",
+      "outputs\\v83_validation\\consistentdiagrefine01\\consistent_schur_real_summary.json": "e08f3e895c392f08e14e4c6bee449c4fca9f60e2e2f6c0a716c109f316307865",
+      "outputs\\v83_validation\\momentumlinereport02\\momentum_lines_real_summary.json": "98bb9ebbac1488f46bfcfaf3df613f79ae65f8622e6434b9dbc752ea44c4d199",
+      "outputs\\v83_validation\\rowmomentumreal01\\row_momentum_real_summary.json": "a9c9164c35274e6b1da9ddb28df21fb45186263890ca7981d17dd9d6c73e2024",
+      "outputs\\v83_validation\\coupledpatchreal01\\coupled_patch_real_summary.json": "cd98962666455ef04579c660f08f48634179061d2730c25e9255fea35046145a",
+      "outputs\\v83_validation\\patchhierarchyreal01\\patch_hierarchy_real_summary.json": "8fc26436d44cbb2773678da4577acd71fd79a8c23b715bc0bc5859180c23a978",
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_reduction_real_summary.json": "ff69d3ac21c47cdd5fa4897b8bd88d517f578900c1b8a608401b57d227454173",
+      "outputs\\v83_validation\\spatialschurreal01\\spatial_schur_krylov_summary.json": "b41f5f37a906b220e51dedce58479c86d8020c4105dcc05e4921702bccbb17e8",
+      "outputs\\v83_validation\\fullFreal01\\full_F_real_summary.json": "775eb8d9732c69b8a29fa298193b7afca7b6e6f0e768eff4e48105e9683021ac",
+      "outputs\\v83_validation\\fullFstrengthreal02\\full_F_strength_summary.json": "9b1299dfe9decd6b28647cb00809c92194573904a99d7082f17c9117e363f8bd"
+    },
+    "scriptSHA256": "b44959faee0bca7394818053ad47aaaa475d101e5083f4e3574c7dce0cb2e1d8"
+  },
+  "nodeDataVerification": {
+    "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+    "processID": 37444,
+    "cases": 3,
+    "sourceFaces": 19752,
+    "CSVrows": 592560,
+    "sectionSamples": 6624,
+    "sameHostEvents": 15,
+    "linearDiagnosticRows": 1,
+    "candidateDiagnosticRows": 0,
+    "sourceSHA256": {
+      "tests\\testRocketWallVelocityWorkbench.js": "068069564728d28e7e2d31e201e710bf5a23f61e06620dc022aa94d38a49893e",
+      "outputs\\v83_validation\\workbench26\\rocket-wall-velocity.js": "c1d2f48ad5fc429d1f5d6a0e225a49935945c72d730e70212e82f6365d733e85",
+      "outputs\\v83_validation\\workbench26\\index.html": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+      "web\\viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+      "web\\export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+      "web\\section.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c"
+    },
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "newProductionSolvedAreaM2": 0,
+    "dataSHA256": "ff3b31a61a32a03180fab49624ff73c0aceaa917dae12b7ee14e6ae81a61f0df"
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "mainAcceptedIterations": 12,
+    "mainActualNSEvaluations": 246,
+    "actualNSDirectionDefect": 0.19876430371570342,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "actualNSEvaluationsAfterLastAcceptedHistory": 121,
+    "latestEndpoint": {
+      "path": "outputs/v83_validation/krylov17/wall_velocity_krylov_evidence.mat",
+      "sha256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "bytes": 1214364034
+    },
+    "originalNSSource": {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    },
+    "physicalPressureHeatFluxAndHeatPowerUnchanged": true
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "workAccounting": {
+    "exactFullFGraphExtractions": 1,
+    "fullFNumericalStudyApplications": 35,
+    "FStrengthNumericalStudyApplications": 35,
+    "combinedCompleteFApplications": 70,
+    "originalCDiagnosticApplications": 2,
+    "existingLocalFApplications": 32,
+    "newStrengthLocalApplications": 33,
+    "newStrengthFactorConstructionsPersisted": 1,
+    "failedStrengthFactorConstructionNotPersisted": 1,
+    "failedShapeRunFApplications": 0,
+    "overlapPreflightNewMatrixApplications": 0,
+    "overlapNumericalInverseConstructions": 0,
+    "newApproximateSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0
+  },
+  "nextAction": "Do not repeat either tested 32-step nonoverlapping F grouping or blindly add directions, merely tune the two saved candidate weights, old group-constant hierarchies, global momentum ILU or stopped scalar ILUTP. Exact full A_FF is now persisted and audited. Reuse its file and the frozen core/at-most-two-neighbor overlap members from fullFoverlappreflight01. First implement a fixed extended-local-inverse map returning only original core rows; prove core ownership/extension restriction, all-five-field dense references, linearity, original-F action and explicit rejection/fallback policies on small tests. Establish complete construction/storage budgets before a real factor: inverse numeric bytes 460382800 and factor upper bound 484807360 fit a proposed 512MiB factor cap but do not include full graph, basis, temporaries or process runtime. No overlap inverse exists yet. Preserve all physical CVs/F-C roles, original full C and frozen same-Q best NS direction. Changing F maps requires an explicit consistent Schur/block-preconditioner treatment or a properly variable outer method; never claim the old S identity. Complete selected-J and original-NS total-direction 0.1/original norm(R), temperature/state/descent/spatial/steady/flux and regional-physics/experimental gates remain required; scientific UI stays parallel.",
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "dcf87c2640aa0fd2199e85bc115080ae6e959e745ae2bb83e6f34751a08bd7b4"
+}

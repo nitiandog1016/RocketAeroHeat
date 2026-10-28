@@ -26,7 +26,17 @@ V=double(mesh.V); F=double(mesh.F); g=mesh.localGeometry; p=mesh.pressure;
 validateattributes(V,{'numeric'},{'real','finite','2d','ncols',3,'nonempty'});
 validateattributes(F,{'numeric'},{'real','finite','integer','positive','2d','ncols',3,'nonempty','<=',size(V,1)});
 nf=size(F,1);
-validateattributes(p.pressureIncrement,{'numeric'},{'real','finite','size',[nf 1]});
+validateattributes(p.pressureIncrement,{'numeric'},{'real','size',[nf 1]});
+% 模块作用：明确未解压力时保留未解总载荷，不能忽略该面或补零积分。
+% 非有限输入只有与求压模块的逐面元未解声明完全一致时才接受。
+missing=~isfinite(p.pressureIncrement);
+if isfield(p,'fieldStatus') && (numel(p.fieldStatus)~=nf || ...
+        any(~ismember(p.fieldStatus(:),[0 1 2])) || ~isequal(missing,p.fieldStatus(:)==0))
+    error('RocketAeroHeat:Loads:MissingPressure','压力值与逐面元计算/给定/未解状态不一致。');
+end
+if any(missing) && (~isfield(p,'fieldStatus') || any(isinf(p.pressureIncrement)))
+    error('RocketAeroHeat:Loads:MissingPressure','非有限压力缺少一致的未解区域声明。');
+end
 validateattributes(p.dynamicPressure,{'numeric'},{'real','finite','scalar','positive'});
 edges=[F(:,[1 2]);F(:,[2 3]);F(:,[3 1])];
 [~,~,group]=unique(sort(edges,2),'rows'); count=accumarray(group,1);
@@ -112,6 +122,14 @@ r.windDirections=struct('drag',drag,'side',side,'lift',lift);
 r.reference=struct('area',S,'length',L,'momentPoint',origin, ...
     'areaSource',areaSource,'lengthSource',lengthSource,'pointSource',pointSource);
 r.dynamicPressure=p.dynamicPressure;
+r.available=~any(missing); r.missingPressureFace=missing;
+r.missingPressureArea=sum(area(missing));
+r.missingPressureAreaFraction=r.missingPressureArea/sum(area);
 r.description='闭合表面表压积分；仅压力贡献，不含摩擦阻力';
+if any(missing)
+    r.description=sprintf('总载荷未解：%.4g%%表面积缺少压力；不以已解区域的部分积分代替整体载荷',100*r.missingPressureAreaFraction);
+end
+if isfield(p,'faceMethod'),r.pressureFaceMethod=p.faceMethod;end
+if isfield(p,'faceScope'),r.pressureFaceScope=p.faceScope;end
 mesh.aerodynamicLoads=r;
 end

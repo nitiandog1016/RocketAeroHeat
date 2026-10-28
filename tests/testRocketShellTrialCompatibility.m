@@ -1,0 +1,52 @@
+function report=testRocketShellTrialCompatibility(folder)
+%TESTROCKETSHELLTRIALCOMPATIBILITY 与新增选项前完整求解器比较缺省/显式保守路径。
+% 模块一：由原源快照仅重命名函数，不重写参考方程或删除验收门槛。
+% 模块二：完整小三维域实际Krylov结果逐字段比较，仅排除机器运行耗时。
+% 模块三：未知候选坐标明确拒绝；该回归不证明真实几何稳态/物理精度。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'ShellTrialCompatibility:Overwrite','不得覆盖兼容性证据。');mkdir(folder);
+source=fullfile(root,'outputs','v82_validation','source_epochs','pre_primitive_solveRocketShellSteadyKrylov.m');
+text=fileread(source);prefix='function result=solveRocketShellSteadyKrylov(Q,cut,gas,boundary,options)';
+assert(startsWith(text,prefix),'ShellTrialCompatibility:Reference','原完整求解器快照身份不符。');
+text=strrep(text,prefix,'function result=solveRocketShellSteadyKrylovReference(Q,cut,gas,boundary,options)');
+write(fullfile(folder,'solveRocketShellSteadyKrylovReference.m'),text);addpath(folder);pathGuard=onCleanup(@()rmpath(folder));
+V=[1 0 0;-1 0 0;0 1 0;0 -1 0;0 0 1;0 0 -1];F=convhull(V);
+normal=cross(V(F(:,2),:)-V(F(:,1),:),V(F(:,3),:)-V(F(:,1),:),2);flip=sum(normal.*V(F(:,1),:),2)<0;F(flip,:)=F(flip,[1 3 2]);
+cut=buildRocketTriangularShellDomain(V,F,struct('normalLayerHeightsM',[0 .01 .03],'outerScaleFactors',[1.2 1.5]));
+gas=struct('gamma',1.4,'R',287,'mu',1.8e-5,'Pr',.72,'temperatureRange',[80 2000]);
+c=cut.cells.centroid;P=[1+.02*c(:,1),100+5*c(:,2),-20+3*c(:,3),30+2*c(:,1),300+3*c(:,2)];
+Q=[P(:,1),P(:,1).*P(:,2:4),P(:,1).*(gas.R/(gas.gamma-1)*P(:,5)+.5*sum(P(:,2:4).^2,2))];
+given=struct('type','characteristic','mode','riemannFarfield','reservoirPrimitive',[1 100 -20 30 300]);
+boundary=struct('xmin',given,'xmax',given,'ymin',given,'ymax',given,'zmin',given,'zmax',given, ...
+    'solidWall',struct('type','wall','velocity',[0 0 0],'temperature',320,'thermalGradient','dirichlet-tangent'));
+options=struct('residualScale',[1 200 200 200 300000],'maximumIterations',2, ...
+    'initialPseudoDt',1e-7,'maximumKrylovIterations',6);
+reference=solveRocketShellSteadyKrylovReference(Q,cut,gas,boundary,options);
+actual=solveRocketShellSteadyKrylov(Q,cut,gas,boundary,options);
+explicit=options;explicit.trialStateCoordinates='conservative';
+selected=solveRocketShellSteadyKrylov(Q,cut,gas,boundary,explicit);
+explicitPseudo=options;explicitPseudo.linearEquation='pseudo-transient';
+selectedPseudo=solveRocketShellSteadyKrylov(Q,cut,gas,boundary,explicitPseudo);
+assert(isequaln(untimed(reference),untimed(actual))&&isequaln(untimed(actual),untimed(selected)), ...
+    'ShellTrialCompatibility:Identity','完整缺省/显式保守结果没有复现原源快照。');
+assert(isequaln(untimed(actual),untimed(selectedPseudo)),'ShellTrialCompatibility:Identity','显式旧线性方程未复现缺省完整结果。');
+rejections=0;
+for value={'unknown',17}
+    bad=options;bad.trialStateCoordinates=value{1};rejected=false;
+    try,solveRocketShellSteadyKrylov(Q,cut,gas,boundary,bad);catch ex,rejected=strcmp(ex.identifier,'ShellKrylov:TrialCoordinates');end
+    assert(rejected);rejections=rejections+1;
+end
+report=struct('status','passed-complete-small-3D-default-and-explicit-conservative-prior-source-replay', ...
+    'cellCount',size(Q,1),'acceptedIterations',actual.acceptedNonlinearIterations, ...
+    'completeDefaultResultExactlyReplayed',true,'onlyRuntimeTimingsExcluded',true,'invalidPolicyRejections',rejections, ...
+    'physicalSolution',false,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+report.completeExplicitPseudoResultExactlyReplayed=true;
+save(fullfile(folder,'trial_compatibility_evidence.mat'),'report','reference','actual','selected','selectedPseudo','-v7');
+write(fullfile(folder,'trial_compatibility_summary.json'),jsonencode(report));fprintf('%s\n',jsonencode(report));
+end
+function out=untimed(out)
+out.history=rmfield(out.history,{'operatorBuildSeconds','linearSolveSeconds'});
+end
+function write(path,value)
+fid=fopen(path,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',value);
+end

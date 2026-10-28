@@ -1,0 +1,1002 @@
+{
+  "version": 83,
+  "status": "tested-explicit-colored-graph-unit-cost-real-rejection-and-near-wall-direction-diagnosis-not-delivered",
+  "generatedUTC": "2026-10-24T12:58:40.070662+00:00",
+  "recorderProcessID": 45780,
+  "priorProgressPath": "docs\\validation\\v83\\progress_steady_newton.json",
+  "priorProgressSHA256": "efd52789cce88ec28c5f9f1780d90e4ae9fd9e9719e176d245c84ab7de5d5182",
+  "oldEvidenceRebound": false,
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/buildRocketShellGraphPreconditioner.m": "d51d82c393bdaa7f63b09e02264b2d5e1e834f41f7e545edb16d74aa380eef54",
+    "internalFlow/cutCell/applyRocketShellGraphOperator.m": "3bbfabe3751c4e8fc2ad4e602a68052011970be69882d1bb6eec70c1d3f80abd",
+    "internalFlow/cutCell/solveRocketShellGraphPreconditioner.m": "cf5c3c3eca4cc433f33979d35a7096c541f427872eb1525135614849d0f72f64",
+    "internalFlow/cutCell/solveRocketShellSteadyKrylov.m": "84bdeedab786df13392edea4cb51beb01da88cbe4e8355291512fa04e84940bc",
+    "internalFlow/cutCell/cutCellNavierStokesResidual.m": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+    "tests/continueRocketWallVelocityKrylov.m": "bc2d2510c984714738eabe9371b5f1bb547667445df2e0655b7461302111d5e6",
+    "tests/testRocketShellGraphPreconditioner.m": "cf4984f4ee11bfca87ff91f295f1c17f697c7c5863288552a650d7d981a0558e",
+    "tests/probeRocketShellGraphPreconditioner.m": "837f970772734d4f7fb401852419b77df314f1643eb564584b639c4ebe4042ef",
+    "tests/diagnoseRocketGraphKrylovDirection.m": "35c5eee9c76420bfebff969a42c5b8289b10d23f8cc69ee07917ee10accf8f8f",
+    "tests/auditRocketShellGraphPreconditioner.py": "03d2d074d0bead7ed0c6ba4e56c77367f4ea9ccc77e8f3ea7dcc8c9ee63f391a",
+    "tests/auditRocketGraphDirection.py": "33ff2484941559acfdcde643120e3af22849e5ce3589cdda49a8cddd54c07020",
+    "tests/auditRocketWallVelocity.py": "4065aae9ae143c53e9c77e7e19f1131a7632608535223fe938e8446306637a00",
+    "tests/auditRocketSteadyNewtonDirections.py": "56ea2b1e60e4b434c7036d14dc884e5c6685816ca5b0d28d3b258fa536573edb",
+    "exportRocketWallVelocityStudy.m": "fe78d096a0d4d6a4f22eb44e102340211e5cedcd5b9d6e7f60c05dcb05ccdfa1",
+    "web/rocket-wall-velocity.js": "a469056f0731bc950fbb013589a6e7afc60db39b60d5cb230f744fa83af04c9a",
+    "web/rocket-wall-velocity.html": "12d56029dae023dc646c161704019e420e8f9fad321b8d7a5d4d4aad69126192",
+    "tests/testRocketWallVelocityWorkbench.js": "6b1b422381cb1d875343aea123808628fbcd70e91ed785fa3be1481c530b047c",
+    "tests/auditRocketWallVelocityWorkbench.py": "a0493ac4131b29a3b97150e00dc8bc3685470f9cfa725a32260fb9ca116cf865",
+    "docs/COLORED_LATERAL_PRECONDITIONER.md": "7bf7a5e3da4c64cf8bcff380f863adea0f582710db9861c0535e317865a1fef8",
+    "docs/DIRECT_STEADY_NEWTON_3D.md": "8947e3f7e0dba64f171a76fc33e7db94672e861ea7f0766ba6924807457a8e96",
+    "docs/GITHUB_STAGE_READINESS.md": "c620a71b326256dc5ec4e17dda9be6aa8c93044a66cc0e5fe6e456f72562bf95",
+    "docs/PROJECT_GOALS.md": "7d0407f36cf4b3bc2f862250fbbabd4cd8709e9d552fb7a8b91d4415501f8f23"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\graphprobe01_probeRocketShellGraphPreconditioner.m",
+      "sha256": "3008c3c87e492def532a751a1358d1553a882604d9d95ac312405b7280d22219"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_auditRocketWallVelocityWorkbench.py",
+      "sha256": "dfd8ca1bb068edb1ffc1a40ed66857b2775a25c519d3bcef809601e8d2d9a350"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_continueRocketWallVelocityKrylov.m",
+      "sha256": "ec075d3a8a0554c6702b6ccdbd4aad3766b30fd9af7e0e8af7e7e6aa0cebbfd3"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_DIRECT_STEADY_NEWTON_3D.md",
+      "sha256": "74efc863b0d72738d05e613cf805aae48dc02f8c10a964ad3a11fb198fe103a7"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_exportRocketWallVelocityStudy.m",
+      "sha256": "6bf617d12398e465bef52dfa8f9726e7db2a78b66f71e5d896a6a72cab03cc78"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_GITHUB_STAGE_READINESS.md",
+      "sha256": "acd0cc4512a8280ed7af4cc74996a5b4b42d040f2cf6b4486625e8da6666b4b5"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_PROJECT_GOALS.md",
+      "sha256": "8654bc04fd4814d84f5826beddebd89ac5ef07541f5510b49f04ee26389b74b2"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_rocket-wall-velocity.html",
+      "sha256": "82b7f301cf0db8ab44029abdc5b9b1c49129c536e4e4aa60d63dc7bbf672620d"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_rocket-wall-velocity.js",
+      "sha256": "b998c45727c274a75fd4eb43b55f779b5c7258524ad5f16418bf40f4230f812c"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_solveRocketShellSteadyKrylov.m",
+      "sha256": "5f63155ddec424a7b33042467c469b221d33b3433f03ca150f8c04608d30808a"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_colored_graph_testRocketWallVelocityWorkbench.js",
+      "sha256": "5e52300244f644000dba43af108ae233d6f1c9aa75ba059fc6e2cfbbc06d2cd0"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_graph_direction_figure_auditRocketGraphDirection.py",
+      "sha256": "7950e326a60bbd7b0ad67ee20015c3bc66c5df33b3b5f886594653a25f3fb3fe"
+    }
+  ],
+  "actualMatlabTerminals": [
+    {
+      "name": "graphunit01",
+      "path": "outputs\\v83_validation\\graphunit01_process.json",
+      "sha256": "0eb2a35cebdced853e1aa860b9a40620bd3f64edb2525d32c150ab3c0becff9c",
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T10:32:09.436670+00:00",
+      "endedUTC": "2026-10-24T10:32:30.412378+00:00",
+      "engineProcessIDs": [
+        56296
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "graphprobe01",
+      "path": "outputs\\v83_validation\\graphprobe01_process.json",
+      "sha256": "6ae29854ac1b2a5cfd3bd5324edbcd33a0081f42fcde17f9249f09eaff2564b2",
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T10:35:03.263056+00:00",
+      "endedUTC": "2026-10-24T10:35:40.134413+00:00",
+      "engineProcessIDs": [
+        50316
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "graphstiff01",
+      "path": "outputs\\v83_validation\\graphstiff01_process.json",
+      "sha256": "31c8e5718beaae90bd7b0ab762956ad7def21008bc7f1b4ea8dc2328f54cbb73",
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T10:39:50.359247+00:00",
+      "endedUTC": "2026-10-24T10:41:10.281272+00:00",
+      "engineProcessIDs": [
+        51832
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "krylov07",
+      "path": "outputs\\v83_validation\\krylov07_process.json",
+      "sha256": "2f4ed89ea068a9606c55fac6961427e293aa2d2c7454dbfdc3983a841adb309a",
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T10:42:07.599274+00:00",
+      "endedUTC": "2026-10-24T10:50:11.576244+00:00",
+      "engineProcessIDs": [
+        50152
+      ],
+      "sourceLockScope": "numerics",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "graphdiagnostic01",
+      "path": "outputs\\v83_validation\\graphdiagnostic01_process.json",
+      "sha256": "b15e5a511721ee12e80de250d48a413ce2c25043cb058c57bba1d92d5f112849",
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T12:47:32.632337+00:00",
+      "endedUTC": "2026-10-24T12:48:15.630036+00:00",
+      "engineProcessIDs": [
+        46944
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    }
+  ],
+  "checkedReports": {
+    "unit": {
+      "path": "outputs\\v83_validation\\graphunit01\\graph_preconditioner_summary.json",
+      "sha256": "58252597c06eba2a222491df9a47ceb403eaa9087e108e3c6838aa1875afcfc8",
+      "report": {
+        "status": "passed-full-small-domain-FD-graph-assembly-dense-color-solve-linearity-and-actual-NS",
+        "cellCount": 32,
+        "colorCount": 2,
+        "fullGraphFDRelativeDifference": 3.0703000334664715e-09,
+        "denseColoredScanRelativeDifference": 9.486769009248164e-20,
+        "matrixActionRelativeDifference": 8.881784197001252e-16,
+        "linearSuperpositionRelativeDifference": 5.421010862427522e-20,
+        "priorIndependentDirectionRelativeDifference": 2.2096843769375815e-16,
+        "completePriorNormalResultExactlyReplayed": true,
+        "fixedSymmetricSweeps": 2,
+        "invalidPolicyRejections": 3,
+        "actualAcceptedIterations": 1,
+        "actualNSCalls": 6,
+        "actualSteadyLinearDefect": 0.059511584246860594,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 56296
+      }
+    },
+    "compatibility": {
+      "path": "outputs\\v83_validation\\solvercompat06\\trial_compatibility_summary.json",
+      "sha256": "6404914b655441253faed033559729e40f79b605aee55924061f17404753f013",
+      "report": {
+        "status": "passed-complete-small-3D-default-and-explicit-conservative-prior-source-replay",
+        "cellCount": 32,
+        "acceptedIterations": 2,
+        "completeDefaultResultExactlyReplayed": true,
+        "onlyRuntimeTimingsExcluded": true,
+        "invalidPolicyRejections": 2,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 56296,
+        "completeExplicitPseudoResultExactlyReplayed": true
+      }
+    },
+    "unitIndependent": {
+      "path": "outputs\\v83_validation\\graphunit01_independent_graph_preconditioner.json",
+      "sha256": "e712bb5d4c3dacaa70a9446d21973565caddd07024d42de298f9afe1b01bc76b",
+      "report": {
+        "status": "passed-independent-graph-preconditioner-unit",
+        "case": "graphunit01",
+        "processID": 51492,
+        "details": {
+          "cellCount": 32,
+          "sideFaceCount": 96,
+          "fullMatrixRelativeDifference": 0.0,
+          "independentMATLABFDRelativeDifference": 3.0703000334664715e-09,
+          "denseColoredScanRelativeDifference": 6.776263578034403e-20,
+          "cachedInverseRelativeDifference": 4.440892098500626e-16,
+          "cachedUpperFactorRelativeDifference": 1.2537563267630526e-15,
+          "linearSuperpositionRelativeDifference": 5.421010862427522e-20
+        },
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\graphunit01\\graph_preconditioner_evidence.mat": "93e79a49cf505250b424d9006df9f39627aba924497acc0a4355e38348472692",
+          "outputs\\v83_validation\\lateralunit01\\lateral_coupling_evidence.mat": "cf40b4aeef6a37ed0a9dc4f7ef6748ab300696a0f2696202865730a4e1244ba8"
+        },
+        "scriptSHA256": "03d2d074d0bead7ed0c6ba4e56c77367f4ea9ccc77e8f3ea7dcc8c9ee63f391a"
+      }
+    },
+    "unitDirections": {
+      "path": "outputs\\v83_validation\\graphunit01_independent_newton_directions.json",
+      "sha256": "12839e39194163bcdd56fa95aad090d3fd7dcaae9ee9145c42ba70580eb1ff2a",
+      "report": {
+        "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+        "case": "graphunit01",
+        "kind": "unit",
+        "variant": "result",
+        "processID": 37808,
+        "linearDirections": [
+          {
+            "iteration": 1,
+            "retry": 0,
+            "actualSteadyLinearDefect": 0.059511584246860566,
+            "normalizedMeritDerivative": -0.9964583961415229,
+            "inexactNewtonUpperBound": -0.9404884157531395,
+            "targetMet": true,
+            "originalJvpArithmeticRelativeDifference": 0.0
+          }
+        ],
+        "allDirectionsIncludingFailuresSaved": true,
+        "candidateTrials": 1,
+        "candidateNSEvaluations": 1,
+        "jacobianNSEvaluations": 4,
+        "totalSolverNSEvaluations": 6,
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\graphunit01\\steady_newton_unit_evidence.mat": "839cb96a3b7a17af8d2def26de37ccdf2b31dfdfe7f70b1a39bdd1f73145819a"
+        },
+        "scriptSHA256": "56ea2b1e60e4b434c7036d14dc884e5c6685816ca5b0d28d3b258fa536573edb"
+      }
+    },
+    "rocket": {
+      "path": "outputs\\v83_validation\\krylov07\\wall_velocity_krylov_summary.json",
+      "sha256": "369ab7fbc1fcd839c0f47dcdd0c2b67f83abf38f173b4821b1afb862b735faee",
+      "report": {
+        "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+        "sourceFaces": 19752,
+        "cellCount": 217272,
+        "acceptedNonlinearIterations": 0,
+        "priorAcceptedNonlinearIterations": 12,
+        "totalNewEquationAcceptedIterations": 12,
+        "candidateTrials": 0,
+        "residualEvaluations": 27,
+        "totalNewEquationResidualEvaluations": 228,
+        "operatorBuilds": 1,
+        "initialMaximumResidual": 4758049.601364592,
+        "maximumResidual": 4758049.601364592,
+        "initialRmsMerit": 521635.2792153294,
+        "rmsMerit": 521635.2792153294,
+        "elapsedSeconds": 445.2551592,
+        "matrixVectorProducts": 26,
+        "jacobianResidualEvaluations": 26,
+        "preconditionerApplications": 27,
+        "lineage": {
+          "sourceState": "v82-exact-conservative-three-corrections-internal-initial-guess",
+          "sourceHistoryAppended": false,
+          "newEquationInitialCounter": 0,
+          "wallVelocityGradientChanged": true,
+          "interiorEulerFlux": "exact-godunov",
+          "viscousWorkVelocity": "arithmetic",
+          "wallVelocityGradient": "dirichlet-tangent",
+          "physicalWallVelocityAndTemperatureKept": true,
+          "externalCFDImported": false
+        },
+        "wallVelocityGradient": "dirichlet-tangent",
+        "sameEquationHistoryContinued": true,
+        "steadyConverged": false,
+        "stopReason": "steady-newton-linear-target-not-met",
+        "spatialConservationRelative": 4.762501927036358e-16,
+        "steadyBoundaryFluxBalance": 0.011954482698849347,
+        "signedHeatPowerW": 925861.9660217352,
+        "wallHeatRangeWm2": [
+          -358287.2316281634,
+          2267395.715238431
+        ],
+        "physicalTimeAdvanced": 0,
+        "BETimeStepsClaimed": 0,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 50152,
+        "priorActualResidualEvaluations": 201,
+        "residualEvaluationsAfterLastAcceptedHistory": 103,
+        "normalEulerLinearization": "exact-branch",
+        "physicalSpatialEquationChanged": false,
+        "linearEquation": "steady-newton",
+        "preconditionerTimeStepOnly": true,
+        "rightPreconditioner": "lateral-colored-line",
+        "graphSweeps": 1,
+        "fixedLinearPreconditioner": true
+      }
+    },
+    "rocketIndependent": {
+      "path": "outputs\\v83_validation\\krylov07_independent_audit.json",
+      "sha256": "ecb9fcbe30f950fa377480573f59a7ea0368f74fccffa5e536ab8ec057dd1aed",
+      "report": {
+        "status": "passed-independent-actual-static-wall-flux-constitutive-Jacobian-conservation-and-update-audit",
+        "case": "krylov07",
+        "processID": 49404,
+        "predecessorCase": "krylov06",
+        "wallCount": 19752,
+        "wallFiveQuantityFluxRelativeDifference": 8.214909892934539e-16,
+        "wallHeatRelativeDifference": 8.214909892934539e-16,
+        "wallConstitutiveJacobianFDRelativeDifference": 7.139504669576014e-11,
+        "constitutiveJacobianSampleWalls": 6,
+        "mechanicalCoolingWalls": 0,
+        "negativeWallEntropyFaces": 0,
+        "fiveQuantityDivergenceRelativeDifference": 1.6086095796155252e-15,
+        "independentSpatialConservationRelative": 4.521171563967075e-16,
+        "iterationAudit": {
+          "acceptedIterations": 0,
+          "maximumResidual": 4758049.601364592,
+          "rmsMerit": 521635.2792153296,
+          "updateArithmeticRelativeDifference": 0.0,
+          "firstFullResidualJvpArithmeticDifference": 0.0,
+          "acceptedTemperatureRangeK": null,
+          "maximumKrylovIterations": 24,
+          "linearRelativeTolerance": 0.1,
+          "originalLinearToleranceUpperBoundNotWeakened": true,
+          "residualEvaluationsAfterLastLocalHistory": 26,
+          "residualEvaluationsAfterLastAcceptedHistory": 103,
+          "originalSteadyAndTemperatureGuardrailsPreserved": true,
+          "steadyConverged": false,
+          "sourceHistoryAppended": false
+        },
+        "fullIndependentNSSolver": false,
+        "wholeOpenBoundaryEntropyBalanceProved": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\krylov07\\wall_velocity_krylov_evidence.mat": "55d331d0d40b45e149dff5873a358d9a9566b4b6b6342c9cd66c5cf4e4eff906",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "outputs\\v83_validation\\krylov06\\wall_velocity_krylov_evidence.mat": "c2623c667b32d3e8c0a4c8f2db611f08d7a29ed14379fa1c922a3469cf044863"
+        },
+        "scriptSHA256": "4065aae9ae143c53e9c77e7e19f1131a7632608535223fe938e8446306637a00"
+      }
+    },
+    "rocketDirections": {
+      "path": "outputs\\v83_validation\\krylov07_independent_newton_directions.json",
+      "sha256": "9dc153d6840092b4aea44fa0e4541b49ad92bed44f3bc5472fb716576d69d960",
+      "report": {
+        "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+        "case": "krylov07",
+        "kind": "rocket",
+        "variant": "result",
+        "processID": 44724,
+        "linearDirections": [
+          {
+            "iteration": 1,
+            "retry": 0,
+            "actualSteadyLinearDefect": 0.9929044332098461,
+            "normalizedMeritDerivative": -0.014140797125680931,
+            "inexactNewtonUpperBound": -0.007095566790153884,
+            "targetMet": false,
+            "originalJvpArithmeticRelativeDifference": 0.0
+          }
+        ],
+        "allDirectionsIncludingFailuresSaved": true,
+        "candidateTrials": 0,
+        "candidateNSEvaluations": 0,
+        "jacobianNSEvaluations": 26,
+        "totalSolverNSEvaluations": 27,
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\krylov07\\wall_velocity_krylov_evidence.mat": "55d331d0d40b45e149dff5873a358d9a9566b4b6b6342c9cd66c5cf4e4eff906"
+        },
+        "scriptSHA256": "56ea2b1e60e4b434c7036d14dc884e5c6685816ca5b0d28d3b258fa536573edb"
+      }
+    },
+    "direction": {
+      "path": "outputs\\v83_validation\\graphdirection01\\graph_direction_summary.json",
+      "sha256": "760b2f7dd5a76b0838c8000e07b541464484c03e9db8f1d2a99a0401503dd4ab",
+      "report": {
+        "status": "measured-actual-failed-graph-direction-approximation-and-linear-defect",
+        "sourceCase": "krylov07",
+        "graphActionRelativeToFullNS": 0.2768616925830556,
+        "equationActionRelativeErrors": [
+          1.2385492797677333e-06,
+          0.30296688650944875,
+          0.5370500265326446,
+          0.5602912282781725,
+          0.14970875671959546
+        ],
+        "graphSteadyLinearDefect": 0.9923050031130455,
+        "fullNSSteadyLinearDefect": 0.9929044332098234,
+        "massActionNormRelativeToFullNS": 1.9635634471285421,
+        "preconditionerActionNormRelativeToFullNS": 1.7946237309421065,
+        "graphPreconditionerRelativeResidual": 0.021067059306250798,
+        "preconditionerPseudoDt": 1e-07,
+        "layerErrorFraction": [
+          0.9012318562444365,
+          0.097866465079667,
+          6.0888197245311715e-05,
+          0.0008155460575142272,
+          2.522523234017694e-05,
+          1.91718758135346e-08,
+          1.6915865564428493e-11,
+          4.861022644065247e-15,
+          5.873531122417385e-18,
+          5.127313801802705e-19,
+          1.7283863084944136e-22
+        ],
+        "layerFullActionFraction": [
+          0.2964895154590407,
+          0.14568084610482948,
+          0.02623911700519454,
+          0.5224987628955041,
+          0.00892856140865455,
+          0.00015397141122296007,
+          9.1715764820506e-06,
+          5.411977710741598e-08,
+          1.9294264846664798e-11,
+          1.952660379069412e-16,
+          4.4678898529612745e-23
+        ],
+        "layerRhsFraction": [
+          0.0657889369719019,
+          0.17908494736124286,
+          0.45193482292500564,
+          0.2527220319661668,
+          0.043249986969435376,
+          0.006922483479253182,
+          0.0002955447859633988,
+          1.2452464359125238e-06,
+          2.9459350798104334e-10,
+          1.897481244148073e-15,
+          2.0536219225533318e-22
+        ],
+        "largestErrorCellIDs": [
+          16403,
+          16399,
+          16401,
+          36155,
+          16397,
+          36151,
+          16405,
+          16412,
+          36153,
+          16411,
+          14361,
+          36149,
+          16410,
+          668,
+          3796,
+          760,
+          3888,
+          576,
+          16414,
+          3704
+        ],
+        "largestErrorOriginalFaceIDs": [
+          16403,
+          16399,
+          16401,
+          16403,
+          16397,
+          16399,
+          16405,
+          16412,
+          16401,
+          16411,
+          14361,
+          16397,
+          16410,
+          668,
+          3796,
+          760,
+          3888,
+          576,
+          16414,
+          3704
+        ],
+        "largestErrorLayerIDs": [
+          1,
+          1,
+          1,
+          2,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "normalizedGMRESHistory": [
+          1,
+          0.9998793767881896,
+          0.9984366338786785,
+          0.9982689739394223,
+          0.9982194660461351,
+          0.9975064851401562,
+          0.9965450411287259,
+          0.9958230646147445,
+          0.9957076152265248,
+          0.9956977641448498,
+          0.9956689982915825,
+          0.9956378479169917,
+          0.9956376218324814,
+          0.9955242508683352,
+          0.9954854399176145,
+          0.9954828968298893,
+          0.9953771157927902,
+          0.9952450103355133,
+          0.9952071630547469,
+          0.9951194976752202,
+          0.9947699250326207,
+          0.9946839437298446,
+          0.9945282473520328,
+          0.9933296261504243,
+          0.9929044297528486
+        ],
+        "fullNSSolverCalledAgain": false,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 46944
+      }
+    },
+    "directionIndependent": {
+      "path": "outputs\\v83_validation\\graphdirection01_independent_graph_direction2.json",
+      "sha256": "72c2cd67140522ad11087830f64e5d546eb9d4531e846c2353e9d0d96fb45360",
+      "report": {
+        "status": "passed-independent-failed-graph-direction-arithmetic-and-layer-diagnosis",
+        "case": "graphdirection01",
+        "processID": 21312,
+        "graphActionRelativeToFullNS": 0.2768616925830486,
+        "graphSteadyLinearDefect": 0.9923050031130566,
+        "fullNSSteadyLinearDefect": 0.9929044332098473,
+        "firstTwoLayersSquaredErrorFraction": 0.9990983213241036,
+        "newOriginalNSEvaluations": 0,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\graphdirection01\\graph_direction_evidence.mat": "abd289b22fac3fa19a108091ce88083cb66825a85f043203ac88578aedda92fc",
+          "outputs\\v83_validation\\krylov07\\wall_velocity_krylov_evidence.mat": "55d331d0d40b45e149dff5873a358d9a9566b4b6b6342c9cd66c5cf4e4eff906"
+        },
+        "scriptSHA256": "33ff2484941559acfdcde643120e3af22849e5ce3589cdda49a8cddd54c07020",
+        "figure": {
+          "path": "outputs\\v83_validation\\graphdirection01\\graph_direction_diagnostic2.png",
+          "sha256": "ce82db2ab70f1948153bc6bbf9257ad385442942d3b3e057db7e1c0a6bc708fd"
+        }
+      }
+    },
+    "node": {
+      "path": "outputs\\v83_validation\\workbench06\\node_wall_velocity_summary.json",
+      "sha256": "22325050ccff992996cb7f2bb4a849a84eef906f022d13bda09c2f82eddf5f9f",
+      "report": {
+        "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+        "processID": 52232,
+        "cases": 3,
+        "sourceFaces": 19752,
+        "CSVrows": 592560,
+        "sectionSamples": 6624,
+        "sameHostEvents": 15,
+        "linearDiagnosticRows": 1,
+        "candidateDiagnosticRows": 0,
+        "sourceSHA256": {
+          "tests\\testRocketWallVelocityWorkbench.js": "6b1b422381cb1d875343aea123808628fbcd70e91ed785fa3be1481c530b047c",
+          "outputs\\v83_validation\\workbench06\\rocket-wall-velocity.js": "a469056f0731bc950fbb013589a6e7afc60db39b60d5cb230f744fa83af04c9a",
+          "outputs\\v83_validation\\workbench06\\index.html": "12d56029dae023dc646c161704019e420e8f9fad321b8d7a5d4d4aad69126192",
+          "web\\viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+          "web\\export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+          "web\\section.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c"
+        },
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "newProductionSolvedAreaM2": 0,
+        "dataSHA256": "1d4903a8b0af55d0999e7450b2702df9e3678423e42ccd76835f5b75028e4a1f"
+      }
+    },
+    "viewerIndependent": {
+      "path": "outputs\\v83_validation\\workbench06\\independent_wall_velocity_view.json",
+      "sha256": "d681898a9c331b46a03d34182f29724081548315d9b350f007576a9c45a402e4",
+      "report": {
+        "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+        "processID": 55476,
+        "cases": [
+          {
+            "case": "legacy-wall-source",
+            "sourceRelativeDifferences": {
+              "pressure": 2.4865056369363964e-16,
+              "heatFlux": 2.9471930864008487e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 2.8653818713341003e-16,
+              "steadyBoundaryFluxBalance": 0.015713480397044875
+            }
+          },
+          {
+            "case": "constrained-wall-baseline",
+            "sourceRelativeDifferences": {
+              "pressure": 2.4865056369363964e-16,
+              "heatFlux": 2.9471930864008487e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 2.8653818713341003e-16,
+              "steadyBoundaryFluxBalance": 0.015119531285283542
+            }
+          },
+          {
+            "case": "constrained-wall-krylov",
+            "sourceRelativeDifferences": {
+              "pressure": 2.8413742184432045e-16,
+              "heatFlux": 2.0055932355797212e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 4.762501927036352e-16,
+              "steadyBoundaryFluxBalance": 0.01195448269884938
+            }
+          }
+        ],
+        "sourceFaces": 19752,
+        "solverDiagnosticAudit": {
+          "linearAttempts": 1,
+          "rejectedLinearAttempts": 1,
+          "nonlinearTrials": 0,
+          "rejectedNonlinearTrials": 0
+        },
+        "scientificPNGs": [
+          "static_wall_velocity_comparison.png",
+          "static_wall_velocity_residuals.png",
+          "static_wall_velocity_balance.png"
+        ],
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "outputs\\v83_validation\\workbench06\\wall-velocity-study-data.json": "1d4903a8b0af55d0999e7450b2702df9e3678423e42ccd76835f5b75028e4a1f",
+          "outputs\\v83_validation\\workbench06\\cases\\legacy-wall-source\\results.json": "5c048e7c893dc4c67064656bde19b17419e0ed6b742f893f0e63bf24db25d04f",
+          "outputs\\v82_validation\\exact_krylov01\\steady_krylov_evidence.mat": "4412d1d91f7911d4fc84269f82e70ebcafc8943491041b357da9317dd32a570e",
+          "outputs\\v83_validation\\workbench06\\cases\\constrained-wall-baseline\\results.json": "7bd40b17d235011f19be08c8b856f1854eb078bbf9592fa9969557d283a89f5f",
+          "outputs\\v83_validation\\integration01\\wall_velocity_integration_evidence.mat": "9d14bc8626323d57745540613baff91063749748ed4d4ce89b3110c22e097f5b",
+          "outputs\\v83_validation\\workbench06\\cases\\constrained-wall-krylov\\results.json": "b946336d02ea4a81384ba9ff4bf13828e0910bb2ba399b27c48feccd2bcd37b2",
+          "outputs\\v83_validation\\krylov07\\wall_velocity_krylov_evidence.mat": "55d331d0d40b45e149dff5873a358d9a9566b4b6b6342c9cd66c5cf4e4eff906"
+        },
+        "scriptSHA256": "a0493ac4131b29a3b97150e00dc8bc3685470f9cfa725a32260fb9ca116cf865"
+      }
+    },
+    "graphprobe01": {
+      "path": "outputs\\v83_validation\\graphprobe01\\graph_probe_summary.json",
+      "sha256": "d40d5ca4931839b0e805a72ae97dcc94c35e8e28df9a8ed62fd3981d28501cc6",
+      "report": {
+        "status": "measured-real-graph-cache-fixed-scan-cost-and-prior-independent-action",
+        "sourceCase": "krylov06",
+        "cellCount": 217272,
+        "sideFaceCount": 651816,
+        "colorCount": 3,
+        "fixedSymmetricSweeps": 1,
+        "operatorCacheBytes": 516563895.0,
+        "buildSeconds": 15.283376,
+        "applySeconds": 0.9865041,
+        "matlabBytesBeforeBuild": 1619406848.0,
+        "matlabBytesAfterBuild": 2249089024.0,
+        "matlabBytesAfterApply": 2259333120.0,
+        "peakMemoryMeasured": false,
+        "fullSparseGraphAllocated": false,
+        "graphPreconditionerRelativeResidual": 8404.191127207396,
+        "maximumCachedLineFactorDefect": 1.8189894035458565e-12,
+        "priorIndependentActionRelativeDifference": 7.70416138419266e-15,
+        "linearSuperpositionRelativeDifference": 1.1830807935791288e-14,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "fullOriginalNSJacobian": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 50316
+      }
+    },
+    "graphprobe01Independent": {
+      "path": "outputs\\v83_validation\\graphprobe01_independent_graph_preconditioner.json",
+      "sha256": "d6c4ef196e5d5906c6b720e9675ff02e431cbcac0cf82dcb102a904211723000",
+      "report": {
+        "status": "passed-independent-graph-preconditioner-probe",
+        "case": "graphprobe01",
+        "processID": 18396,
+        "details": {
+          "cellCount": 217272,
+          "sideFaceCount": 651816,
+          "colorCount": 3,
+          "allSideColorConflictCount": 0,
+          "priorIndependentActionRelativeDifference": 1.7043896422671353e-14,
+          "linearSuperpositionRelativeDifference": 7.792932708635384e-15,
+          "operatorCacheBytes": 516563895.0,
+          "fullSparseGraphAllocated": false,
+          "peakMemoryMeasured": false
+        },
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\graphprobe01\\graph_probe_evidence.mat": "2d84df832e96dd74a22bdd7ecee5699c40c7dbf6c1fa26aace6b928072dcb859",
+          "outputs\\v83_validation\\lateralrocket01\\lateral_coupling_evidence.mat": "32d8293d04ff402d22a46cb258b2e420f899cf48745c5a1340fde001e78ee377",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa"
+        },
+        "scriptSHA256": "03d2d074d0bead7ed0c6ba4e56c77367f4ea9ccc77e8f3ea7dcc8c9ee63f391a"
+      }
+    },
+    "graphprobe02": {
+      "path": "outputs\\v83_validation\\graphprobe02\\graph_probe_summary.json",
+      "sha256": "e486b6e447ef0419c20445de091112f9aa45bae998dd1dd16ec06133ee41edad",
+      "report": {
+        "status": "measured-real-graph-cache-fixed-scan-cost-and-prior-independent-action",
+        "sourceCase": "krylov06",
+        "cellCount": 217272,
+        "sideFaceCount": 651816,
+        "colorCount": 3,
+        "fixedSymmetricSweeps": 1,
+        "preconditionerPseudoDt": 1e-06,
+        "operatorCacheBytes": 516563895.0,
+        "buildSeconds": 15.3754869,
+        "applySeconds": 1.0635716,
+        "matlabBytesBeforeBuild": 1603342336.0,
+        "matlabBytesAfterBuild": 2234515456.0,
+        "matlabBytesAfterApply": 2244890624.0,
+        "peakMemoryMeasured": false,
+        "fullSparseGraphAllocated": false,
+        "graphPreconditionerRelativeResidual": 2959.1787244123125,
+        "maximumCachedLineFactorDefect": 9.094947017729282e-13,
+        "priorIndependentActionRelativeDifference": 8.19600174835189e-15,
+        "linearSuperpositionRelativeDifference": 5.3616317340129615e-15,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "fullOriginalNSJacobian": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 51832
+      }
+    },
+    "graphprobe02Independent": {
+      "path": "outputs\\v83_validation\\graphprobe02_independent_graph_preconditioner.json",
+      "sha256": "90e6abf9b7d6ffdfef25cefd31bdd133feaf59f9217990306f3bc8b750297ba8",
+      "report": {
+        "status": "passed-independent-graph-preconditioner-probe",
+        "case": "graphprobe02",
+        "processID": 53116,
+        "details": {
+          "cellCount": 217272,
+          "sideFaceCount": 651816,
+          "colorCount": 3,
+          "allSideColorConflictCount": 0,
+          "priorIndependentActionRelativeDifference": 1.8347183195215007e-14,
+          "linearSuperpositionRelativeDifference": 5.321838386195161e-15,
+          "operatorCacheBytes": 516563895.0,
+          "fullSparseGraphAllocated": false,
+          "peakMemoryMeasured": false
+        },
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\graphprobe02\\graph_probe_evidence.mat": "ee31758968a834b4d0333951ed4d5b2e71ed98fb92302a873cc917fabfa015e7",
+          "outputs\\v83_validation\\lateralrocket01\\lateral_coupling_evidence.mat": "32d8293d04ff402d22a46cb258b2e420f899cf48745c5a1340fde001e78ee377",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa"
+        },
+        "scriptSHA256": "03d2d074d0bead7ed0c6ba4e56c77367f4ea9ccc77e8f3ea7dcc8c9ee63f391a"
+      }
+    },
+    "graphprobe03": {
+      "path": "outputs\\v83_validation\\graphprobe03\\graph_probe_summary.json",
+      "sha256": "183a3da6f9f31ca2668be4f5b5153b106901747b9e83304ad8ed4f6a91c24614",
+      "report": {
+        "status": "measured-real-graph-cache-fixed-scan-cost-and-prior-independent-action",
+        "sourceCase": "krylov06",
+        "cellCount": 217272,
+        "sideFaceCount": 651816,
+        "colorCount": 3,
+        "fixedSymmetricSweeps": 1,
+        "preconditionerPseudoDt": 1e-07,
+        "operatorCacheBytes": 516563895.0,
+        "buildSeconds": 14.5783122,
+        "applySeconds": 0.9431199,
+        "matlabBytesBeforeBuild": 1703800832.0,
+        "matlabBytesAfterBuild": 2243661824.0,
+        "matlabBytesAfterApply": 2252353536.0,
+        "peakMemoryMeasured": false,
+        "fullSparseGraphAllocated": false,
+        "graphPreconditionerRelativeResidual": 0.014783070198249012,
+        "maximumCachedLineFactorDefect": 2.842170943040401e-14,
+        "priorIndependentActionRelativeDifference": 8.81183652047373e-15,
+        "linearSuperpositionRelativeDifference": 4.182890401486293e-16,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "fullOriginalNSJacobian": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 51832
+      }
+    },
+    "graphprobe03Independent": {
+      "path": "outputs\\v83_validation\\graphprobe03_independent_graph_preconditioner.json",
+      "sha256": "7d38e960afa2c4b353a9009e0f0c62ed2c7c2eeeb8b366d2cf8781a58dbdb227",
+      "report": {
+        "status": "passed-independent-graph-preconditioner-probe",
+        "case": "graphprobe03",
+        "processID": 27108,
+        "details": {
+          "cellCount": 217272,
+          "sideFaceCount": 651816,
+          "colorCount": 3,
+          "allSideColorConflictCount": 0,
+          "priorIndependentActionRelativeDifference": 1.6972483448833346e-14,
+          "linearSuperpositionRelativeDifference": 7.202226770425408e-16,
+          "operatorCacheBytes": 516563895.0,
+          "fullSparseGraphAllocated": false,
+          "peakMemoryMeasured": false
+        },
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\graphprobe03\\graph_probe_evidence.mat": "046fac169b703c534932d228fb2c8bb46c2d65cd6df9254b7a567db91cf24967",
+          "outputs\\v83_validation\\lateralrocket01\\lateral_coupling_evidence.mat": "32d8293d04ff402d22a46cb258b2e420f899cf48745c5a1340fde001e78ee377",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa"
+        },
+        "scriptSHA256": "03d2d074d0bead7ed0c6ba4e56c77367f4ea9ccc77e8f3ea7dcc8c9ee63f391a"
+      }
+    },
+    "graphprobe04": {
+      "path": "outputs\\v83_validation\\graphprobe04\\graph_probe_summary.json",
+      "sha256": "a55b20d02b5e8172b75be73aa9b459fc94c7bfd4d9957ccf6d3dd21c989fff81",
+      "report": {
+        "status": "measured-real-graph-cache-fixed-scan-cost-and-prior-independent-action",
+        "sourceCase": "krylov06",
+        "cellCount": 217272,
+        "sideFaceCount": 651816,
+        "colorCount": 3,
+        "fixedSymmetricSweeps": 1,
+        "preconditionerPseudoDt": 1e-08,
+        "operatorCacheBytes": 516563895.0,
+        "buildSeconds": 14.4573394,
+        "applySeconds": 0.9297712,
+        "matlabBytesBeforeBuild": 1708212224.0,
+        "matlabBytesAfterBuild": 2245361664.0,
+        "matlabBytesAfterApply": 2254442496.0,
+        "peakMemoryMeasured": false,
+        "fullSparseGraphAllocated": false,
+        "graphPreconditionerRelativeResidual": 0.00016742482420694556,
+        "maximumCachedLineFactorDefect": 1.7763568394002505e-15,
+        "priorIndependentActionRelativeDifference": 3.3866560883137204e-14,
+        "linearSuperpositionRelativeDifference": 2.3729169903341006e-16,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "fullOriginalNSJacobian": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 51832
+      }
+    },
+    "graphprobe04Independent": {
+      "path": "outputs\\v83_validation\\graphprobe04_independent_graph_preconditioner.json",
+      "sha256": "b6936c903a99697fcea85ed8d77cff93ed2b0f4b801d97c8c964ab19894d4a65",
+      "report": {
+        "status": "passed-independent-graph-preconditioner-probe",
+        "case": "graphprobe04",
+        "processID": 39680,
+        "details": {
+          "cellCount": 217272,
+          "sideFaceCount": 651816,
+          "colorCount": 3,
+          "allSideColorConflictCount": 0,
+          "priorIndependentActionRelativeDifference": 5.6404347169720355e-14,
+          "linearSuperpositionRelativeDifference": 5.551115123125783e-17,
+          "operatorCacheBytes": 516563895.0,
+          "fullSparseGraphAllocated": false,
+          "peakMemoryMeasured": false
+        },
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\graphprobe04\\graph_probe_evidence.mat": "18b9b476112929b4f59517e45845f9b84eaecf4c1f9e1c5b8d30a158072bc314",
+          "outputs\\v83_validation\\lateralrocket01\\lateral_coupling_evidence.mat": "32d8293d04ff402d22a46cb258b2e420f899cf48745c5a1340fde001e78ee377",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa"
+        },
+        "scriptSHA256": "03d2d074d0bead7ed0c6ba4e56c77367f4ea9ccc77e8f3ea7dcc8c9ee63f391a"
+      }
+    }
+  },
+  "evidence": [
+    {
+      "path": "outputs\\v83_validation\\graphunit01\\graph_preconditioner_evidence.mat",
+      "sha256": "93e79a49cf505250b424d9006df9f39627aba924497acc0a4355e38348472692",
+      "bytes": 149342
+    },
+    {
+      "path": "outputs\\v83_validation\\graphunit01\\steady_newton_unit_evidence.mat",
+      "sha256": "839cb96a3b7a17af8d2def26de37ccdf2b31dfdfe7f70b1a39bdd1f73145819a",
+      "bytes": 146888
+    },
+    {
+      "path": "outputs\\v83_validation\\solvercompat06\\trial_compatibility_evidence.mat",
+      "sha256": "1eacd287e589431d0f4a2d821bb38f11ae137e604acb35cb814d3e816e4c98b1",
+      "bytes": 249613
+    },
+    {
+      "path": "outputs\\v83_validation\\krylov07\\wall_velocity_krylov_evidence.mat",
+      "sha256": "55d331d0d40b45e149dff5873a358d9a9566b4b6b6342c9cd66c5cf4e4eff906",
+      "bytes": 1061303041
+    },
+    {
+      "path": "outputs\\v83_validation\\graphdirection01\\graph_direction_evidence.mat",
+      "sha256": "abd289b22fac3fa19a108091ce88083cb66825a85f043203ac88578aedda92fc",
+      "bytes": 48651391
+    },
+    {
+      "path": "outputs\\v83_validation\\graphdirection01\\graph_direction_diagnostic2.png",
+      "sha256": "ce82db2ab70f1948153bc6bbf9257ad385442942d3b3e057db7e1c0a6bc708fd",
+      "bytes": 99602
+    },
+    {
+      "path": "outputs\\v83_validation\\workbench06\\wall-velocity-study-data.json",
+      "sha256": "1d4903a8b0af55d0999e7450b2702df9e3678423e42ccd76835f5b75028e4a1f",
+      "bytes": 10070
+    },
+    {
+      "path": "outputs\\v83_validation\\workbench06\\static_wall_velocity_comparison.png",
+      "sha256": "79ec8ff917c241b93bc17544f0fcc405ba0ecc121eace6e4d36fdad078a14169",
+      "bytes": 476061
+    },
+    {
+      "path": "outputs\\v83_validation\\workbench06\\static_wall_velocity_residuals.png",
+      "sha256": "46577cee0c0bc8596218022c0c7504c5f28ddbc1c7a3ab69ded97be55cb48c6a",
+      "bytes": 62434
+    },
+    {
+      "path": "outputs\\v83_validation\\workbench06\\static_wall_velocity_balance.png",
+      "sha256": "edad2433c601fd6645c38491226dbb563c64b37240c20454121bb5b8e7bc2c9a",
+      "bytes": 72084
+    }
+  ],
+  "figureRevision": {
+    "reason": "First legend overlapped target line; moved to clear center area.",
+    "originalFigureAndSourcePreserved": true,
+    "independentNumericsUnchanged": true
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench06/index.html",
+    "finalScientificPNGsActuallyInspected": 4,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false
+  },
+  "nextAction": "Separate full WLS viscous/static-wall/arithmetic-work chain derivatives on actual krylov07 saved direction; test small domain and half-step sensitivity before a justified stronger graph inverse or matching flexible outer iteration. Do not repeat unchanged 24-vector solves or loosen gates.",
+  "recorderSHA256": "9c0577b09584968ea8043f44b620b28f4cd281e17ea04564303573485c3f3681"
+}

@@ -1,0 +1,533 @@
+{
+  "version": 77,
+  "status": "tested-two-wall-normal-grid-roots-original-BE-and-all-wall-profile-workbench",
+  "cases": [
+    {
+      "kind": "baseline",
+      "cellCount": 2760,
+      "radialLayers": 24,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 2e-05,
+      "NewtonIterations": 3,
+      "residualEvaluations": 577,
+      "BEAcceptedSteps": 3,
+      "independentOriginalBEDefects": [
+        4.670373174286815e-17,
+        9.34074634857363e-17,
+        1.868149269714726e-16
+      ],
+      "mappingNormalizedMaximumError": null,
+      "independentGaussVolumeMaximumRelativeError": 4.431372034806589e-16,
+      "independentGaussCentroidMaximumErrorM": 1.7763568394002505e-15,
+      "originalResidual": 1.8271973805100923e-08,
+      "boundaryBalanceRelative": 1.7010744190490343e-16,
+      "minDensity": 0.0002624874400855957,
+      "TminK": 223.02124392684303,
+      "TmaxK": 1222.422224049788,
+      "totalSignedHeatW": 191247.09627469143,
+      "yPlusProxyRange": [
+        0.0170972235810373,
+        8.471736276483066
+      ]
+    },
+    {
+      "kind": "radial48",
+      "cellCount": 5520,
+      "radialLayers": 48,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 2e-05,
+      "NewtonIterations": 8,
+      "residualEvaluations": 1541,
+      "BEAcceptedSteps": 3,
+      "independentOriginalBEDefects": [
+        7.791494391215695e-15,
+        1.558298878243139e-14,
+        3.116597756486278e-14
+      ],
+      "mappingNormalizedMaximumError": null,
+      "independentGaussVolumeMaximumRelativeError": 5.397893100069373e-16,
+      "independentGaussCentroidMaximumErrorM": 1.3322676295501878e-15,
+      "originalResidual": 1.0415275689119186e-06,
+      "boundaryBalanceRelative": 2.3985383218342134e-16,
+      "minDensity": 0.0007223267077056965,
+      "TminK": 219.63401177736705,
+      "TmaxK": 1221.5046722921973,
+      "totalSignedHeatW": 137173.59167115064,
+      "yPlusProxyRange": [
+        0.030267066995255727,
+        8.505038532147315
+      ]
+    },
+    {
+      "kind": "collar72",
+      "cellCount": 8280,
+      "radialLayers": 72,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 2e-06,
+      "NewtonIterations": 9,
+      "residualEvaluations": 1730,
+      "BEAcceptedSteps": 3,
+      "independentOriginalBEDefects": [
+        4.7196759877445836e-17,
+        9.439351975489167e-17,
+        1.8878703950978334e-16
+      ],
+      "mappingNormalizedMaximumError": 4.409692907167101e-15,
+      "independentGaussVolumeMaximumRelativeError": 4.903155117103242e-16,
+      "independentGaussCentroidMaximumErrorM": 1.7763568394002505e-15,
+      "originalResidual": 8.938887514599088e-07,
+      "boundaryBalanceRelative": 2.154306208153619e-16,
+      "minDensity": 0.00048098888805349566,
+      "TminK": 218.70357997365358,
+      "TmaxK": 1233.2018176396632,
+      "totalSignedHeatW": 99584.21840227282,
+      "yPlusProxyRange": [
+        0.0025588639135344,
+        1.0991991172325368
+      ]
+    },
+    {
+      "kind": "nested144",
+      "cellCount": 16560,
+      "radialLayers": 144,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 1e-06,
+      "NewtonIterations": 9,
+      "residualEvaluations": 1732,
+      "BEAcceptedSteps": 3,
+      "independentOriginalBEDefects": [
+        1.4773059923496533e-17,
+        2.9546119846993066e-17,
+        5.909223969398613e-17
+      ],
+      "mappingNormalizedMaximumError": 4.409692907167101e-15,
+      "independentGaussVolumeMaximumRelativeError": 5.459752131292559e-16,
+      "independentGaussCentroidMaximumErrorM": 2.220446049250313e-15,
+      "originalResidual": 1.0341911986404406e-06,
+      "boundaryBalanceRelative": 7.334038931668545e-17,
+      "minDensity": 0.0005869406117767062,
+      "TminK": 217.30552087351606,
+      "TmaxK": 1254.7539601562244,
+      "totalSignedHeatW": 66516.98242009697,
+      "yPlusProxyRange": [
+        0.0010502823479856946,
+        0.4738128846008502
+      ]
+    }
+  ],
+  "nested144VsCollar72SignedHeatChangeFraction": -0.3320529749864578,
+  "nestedComparison": {
+    "pressurePa": {
+      "areaWeightedAbsoluteChangeFraction": 0.010532451643742703,
+      "maximumAbsoluteChange": 391.81047616052456
+    },
+    "signedHeatWm2": {
+      "areaWeightedAbsoluteChangeFraction": 0.3320529749864578,
+      "maximumAbsoluteChange": 816714.5913707206
+    },
+    "wallAdjacentGasProxyK": {
+      "areaWeightedAbsoluteChangeFraction": 0.009042901708869875,
+      "maximumAbsoluteChange": 66.21786911899835
+    }
+  },
+  "regionalComparisons": [
+    {
+      "region": "sphericalNose",
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 3196.8215938765816,
+          "wallHeatMinimumWm2": 786669.3172603655,
+          "wallHeatMaximumWm2": 1883244.351085707
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 3045.1904115241327,
+          "wallHeatMinimumWm2": 729553.8378324735,
+          "wallHeatMaximumWm2": 1814809.6391044597
+        },
+        {
+          "kind": "collar72",
+          "signedHeatW": 3171.6552378702386,
+          "wallHeatMinimumWm2": 490884.32164187444,
+          "wallHeatMaximumWm2": 2594427.8214164437
+        },
+        {
+          "kind": "nested144",
+          "signedHeatW": 2112.664032379892,
+          "wallHeatMinimumWm2": 321968.9915328927,
+          "wallHeatMaximumWm2": 1777713.230045723
+        }
+      ]
+    },
+    {
+      "region": "cone",
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 81743.24222712676,
+          "wallHeatMinimumWm2": 505674.5328817749,
+          "wallHeatMaximumWm2": 609026.2606993475
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 65240.59795241978,
+          "wallHeatMinimumWm2": 392980.1728338228,
+          "wallHeatMaximumWm2": 498956.0421489694
+        },
+        {
+          "kind": "collar72",
+          "signedHeatW": 48826.99611451654,
+          "wallHeatMinimumWm2": 270587.26934934506,
+          "wallHeatMaximumWm2": 382062.6557966072
+        },
+        {
+          "kind": "nested144",
+          "signedHeatW": 32110.01730550074,
+          "wallHeatMinimumWm2": 173676.83645178136,
+          "wallHeatMaximumWm2": 259175.16431039694
+        }
+      ]
+    },
+    {
+      "region": "cylinder",
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 92850.40368602329,
+          "wallHeatMinimumWm2": 125036.43315356008,
+          "wallHeatMaximumWm2": 258259.53229884198
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 61089.349957157334,
+          "wallHeatMinimumWm2": 79371.40897448864,
+          "wallHeatMaximumWm2": 194724.09820228405
+        },
+        {
+          "kind": "collar72",
+          "signedHeatW": 41470.310697193265,
+          "wallHeatMinimumWm2": 60472.4042077592,
+          "wallHeatMaximumWm2": 116676.3214330711
+        },
+        {
+          "kind": "nested144",
+          "signedHeatW": 27995.69754880212,
+          "wallHeatMinimumWm2": 41182.717183795874,
+          "wallHeatMaximumWm2": 83273.46893963197
+        }
+      ]
+    },
+    {
+      "region": "contraction",
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 1175.9708945098512,
+          "wallHeatMinimumWm2": 18220.1123358793,
+          "wallHeatMaximumWm2": 33476.21637750886
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 698.7335393891345,
+          "wallHeatMinimumWm2": 10460.604266533524,
+          "wallHeatMaximumWm2": 21118.15650770399
+        },
+        {
+          "kind": "collar72",
+          "signedHeatW": 569.9785953344889,
+          "wallHeatMinimumWm2": 8452.882229265011,
+          "wallHeatMaximumWm2": 17429.036083472427
+        },
+        {
+          "kind": "nested144",
+          "signedHeatW": 405.0482397709776,
+          "wallHeatMinimumWm2": 5678.430162450057,
+          "wallHeatMaximumWm2": 13147.015945476203
+        }
+      ]
+    },
+    {
+      "region": "afterbody",
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 12125.272436943294,
+          "wallHeatMinimumWm2": 56964.186488535684,
+          "wallHeatMaximumWm2": 131512.23686732462
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 6961.904363485128,
+          "wallHeatMinimumWm2": 29905.55872961956,
+          "wallHeatMaximumWm2": 85614.33779192387
+        },
+        {
+          "kind": "collar72",
+          "signedHeatW": 5397.833621852205,
+          "wallHeatMinimumWm2": 24184.021948066453,
+          "wallHeatMaximumWm2": 63996.994133099666
+        },
+        {
+          "kind": "nested144",
+          "signedHeatW": 3756.9864985989143,
+          "wallHeatMinimumWm2": 16097.198794452965,
+          "wallHeatMaximumWm2": 46208.98318515101
+        }
+      ]
+    },
+    {
+      "region": "base",
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 155.3854362116523,
+          "wallHeatMinimumWm2": 3631.356335774075,
+          "wallHeatMaximumWm2": 17168.753786894096
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 137.81544717510994,
+          "wallHeatMinimumWm2": 2924.591624883511,
+          "wallHeatMaximumWm2": 15812.486769905907
+        },
+        {
+          "kind": "collar72",
+          "signedHeatW": 147.4441355060867,
+          "wallHeatMinimumWm2": 3847.4516605830313,
+          "wallHeatMaximumWm2": 14098.388277389306
+        },
+        {
+          "kind": "nested144",
+          "signedHeatW": 136.56879504432982,
+          "wallHeatMinimumWm2": 3843.5968688479797,
+          "wallHeatMaximumWm2": 13185.47821675917
+        }
+      ]
+    }
+  ],
+  "numericallySteady": true,
+  "independentAcceptedBEEndpoints": 12,
+  "preparationNewtonCountedAsBE": false,
+  "oldChainRebound": false,
+  "originalSteadyResidualTolerance": 2e-06,
+  "originalConservationTolerance": 5e-10,
+  "originalBEAbsoluteTolerance": 1e-11,
+  "originalBERelativeTolerance": 1e-09,
+  "wallNormalProfileIndependentComparison": {
+    "status": "passed-four-real-states-all-wall-normal-cell-and-energy-flux-profiles",
+    "cases": [
+      {
+        "kind": "baseline",
+        "wallProfiles": 115,
+        "radialLayers": 24,
+        "maximumScaledDifference": 4.263116974920284e-16,
+        "independentEOSCellAndFaceComparisonPassed": true
+      },
+      {
+        "kind": "radial48",
+        "wallProfiles": 115,
+        "radialLayers": 48,
+        "maximumScaledDifference": 4.2698317467349166e-16,
+        "independentEOSCellAndFaceComparisonPassed": true
+      },
+      {
+        "kind": "collar72",
+        "wallProfiles": 115,
+        "radialLayers": 72,
+        "maximumScaledDifference": 4.2631184069229943e-16,
+        "independentEOSCellAndFaceComparisonPassed": true
+      },
+      {
+        "kind": "nested144",
+        "wallProfiles": 115,
+        "radialLayers": 144,
+        "maximumScaledDifference": 4.263118406924031e-16,
+        "independentEOSCellAndFaceComparisonPassed": true
+      }
+    ],
+    "engineProcessID": 22148,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "originalThreeBEActuallyCalledAgain": true,
+  "rootReplayTestIncludedForIsolatedActualRecompute": true,
+  "sourceMetricsAnd3DNativeProjectionChecked": true,
+  "commonVariableColorRanges": true,
+  "sameHostEvents": 20,
+  "normalProfileSelections": 72,
+  "snapshotHTMLResyncedForOriginalJSONDownloadLink": true,
+  "scientificPlotVisuallyChecked": true,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "noFurtherBlindRadialRefinementPlanned": true,
+  "gridIndependentClaimed": false,
+  "physicalSolution": false,
+  "experimentalValidation": false,
+  "fullSurfaceSolved": false,
+  "wholeGoalComplete": false,
+  "fluxDifferenceIsIndependentErrorEstimate": false,
+  "normalProfilesAreCellProxiesNotEdgeStates": true,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "historicActualSourceEpochs": [
+    {
+      "run": "factory01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "51809cb6bebaa170fec18f2f3feb8c1fb376b3333e9bf900266abb3aae17172d",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory01",
+      "path": "regionalFlow/axisymmetric/mapRocketAxisymmetricWall.m",
+      "sha256": "0bcea746631475843e6a0435d4303899f04992e2cefb41b477031a2e91e1d535",
+      "frozenActualSource": "source_epochs/before_mapRocketAxisymmetricWall.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "b68ff8435cfd931a29f92a260970e21e272056aac26285c6ace09af3e45ec601",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "7839216a516e65c7fcd4333476f2b794d1ec99df3a69aa1656208e13cb076a5a",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "51809cb6bebaa170fec18f2f3feb8c1fb376b3333e9bf900266abb3aae17172d",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "regionalFlow/axisymmetric/mapRocketAxisymmetricWall.m",
+      "sha256": "0bcea746631475843e6a0435d4303899f04992e2cefb41b477031a2e91e1d535",
+      "frozenActualSource": "source_epochs/before_mapRocketAxisymmetricWall.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "b68ff8435cfd931a29f92a260970e21e272056aac26285c6ace09af3e45ec601",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "7839216a516e65c7fcd4333476f2b794d1ec99df3a69aa1656208e13cb076a5a",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "51809cb6bebaa170fec18f2f3feb8c1fb376b3333e9bf900266abb3aae17172d",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm01",
+      "path": "regionalFlow/axisymmetric/mapRocketAxisymmetricWall.m",
+      "sha256": "0bcea746631475843e6a0435d4303899f04992e2cefb41b477031a2e91e1d535",
+      "frozenActualSource": "source_epochs/before_mapRocketAxisymmetricWall.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "b68ff8435cfd931a29f92a260970e21e272056aac26285c6ace09af3e45ec601",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "7839216a516e65c7fcd4333476f2b794d1ec99df3a69aa1656208e13cb076a5a",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "profile01",
+      "path": "regionalFlow/axisymmetric/mapRocketAxisymmetricWall.m",
+      "sha256": "0bcea746631475843e6a0435d4303899f04992e2cefb41b477031a2e91e1d535",
+      "frozenActualSource": "source_epochs/before_mapRocketAxisymmetricWall.source.txt",
+      "oldChainRebound": false
+    }
+  ],
+  "processes": {
+    "factory01": {
+      "processID": 19820,
+      "engineProcessIDs": [
+        9100
+      ],
+      "exitCode": 0
+    },
+    "roots01": {
+      "processID": 22140,
+      "engineProcessIDs": [
+        20148
+      ],
+      "exitCode": 0
+    },
+    "confirm01": {
+      "processID": 33900,
+      "engineProcessIDs": [
+        20224
+      ],
+      "exitCode": 0
+    },
+    "independent01": {
+      "processID": 23676,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "profile01": {
+      "processID": 19964,
+      "engineProcessIDs": [
+        22148
+      ],
+      "exitCode": 0
+    },
+    "scientific01": {
+      "processID": 3964,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "export02": {
+      "processID": 42880,
+      "engineProcessIDs": [
+        21980
+      ],
+      "exitCode": 0
+    },
+    "export03": {
+      "processID": 13580,
+      "engineProcessIDs": [
+        14704
+      ],
+      "exitCode": 0
+    },
+    "node02": {
+      "processID": 37792,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "becheck01": {
+      "processID": 12212,
+      "engineProcessIDs": [
+        13532
+      ],
+      "exitCode": 0
+    }
+  },
+  "v76DocumentationErratum": "original four wall-heat arrays are positive; base changes have mixed signs, not the heat itself",
+  "nextWork": "bounded existing viscous discretization/regional-boundary-layer method comparison on real rocket and public benchmark; no Euler-only prerequisite or blind refinement; then actual 20-degree large regions"
+}

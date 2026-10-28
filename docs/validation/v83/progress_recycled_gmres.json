@@ -1,0 +1,583 @@
+{
+  "version": 83,
+  "status": "tested-SVD-recycled-kernel-main-and-real-NS-stagnation-result-export-repaired-not-delivered",
+  "generatedUTC": "2026-10-25T04:29:06.428985+00:00",
+  "recorderProcessID": 25292,
+  "previousGoalTurnClassification": "progress",
+  "previousGoalTurnEvidence": "Previous completed goal turn implemented and tested the same-Q single-direction guess and bounded scale probes; the continuing in-flight work implemented and validated the multi-direction prototype, without restarting completed or live jobs on the additional goal message.",
+  "priorProgressPath": "docs/validation/v83/progress_steady_guess.json",
+  "priorProgressSHA256": "ee5b630bf86a67629828dff656c01ee624180813daae02b74c8fa707940374d1",
+  "oldNumericalEvidenceOverwritten": false,
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/solveRocketRecycledGMRES.m": "a01a1e9bb31dd7682050ff34bd2ef794d92c464071132e701565dba112a72051",
+    "internalFlow/cutCell/solveRocketShellSteadyKrylov.m": "ca56f0f8e9469af53d7f5893458b48b4a937e664b2b7f5f402ccb8af27d5c859",
+    "internalFlow/cutCell/loadRocketSteadyDirectionGuess.m": "969a4b6c0662f7b7522ac1d133fa0a6cc2b24e598efa8053d3a4756be2801c56",
+    "internalFlow/cutCell/loadRocketLocalCoarseOperator.m": "403e946ad87bf0e0b5590ea686eec4a5fb16e6fc8c0848a55de0a98e376b5b69",
+    "internalFlow/cutCell/solveRocketMinResidualCoarsePreconditioner.m": "23bacdc58b96ba834fef8bdc81ebc9f64db636920f21e6eb65413a59628edb44",
+    "internalFlow/cutCell/liftRocketLocalCoarse.m": "8db7f518929d7153884e836f5bd8087fb5f71c1a3ceb0ba506f6187d3ef9827f",
+    "internalFlow/cutCell/cutCellNavierStokesResidual.m": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+    "tests/testRocketRecycledGMRESKernel.m": "9e9583b718590824819e4ebc52fec65967746bccb1cde78ffe70a3bfdd23ed14",
+    "tests/testRocketRecycledIntegration.m": "0738271c6e556743fb476b6cc8a4252beb62de3db99f8dc2cda032921e907c33",
+    "tests/continueRocketWallVelocityKrylov.m": "7d6eb5bacd341cc7dc1220901468b1793f59302ffab7dc7ae3f7161f13666735",
+    "tests/auditRocketRecycledKernel.py": "aa08a2a50e1fd20fa4f119c1b728a376b4cc608dfb170cd28f4a858b6edeac23",
+    "tests/auditRocketRecycledIntegration.py": "95578848beda6fa5c6aeefcff2c89b26b4b2406c9d20aac807a239a841d650de",
+    "tests/auditRocketSteadyNewtonDirections.py": "01f2dc1700fa9c021a8abc0fc749e646c688ce1808ce10c6377c0025b347874b",
+    "tests/auditRocketSteadyGuess.py": "4549ee1d63e838e80c7ede490d4f89c48a2cb255ab7a2bad1b2fea8020a95548",
+    "tests/auditRocketCoarseSolver.py": "c9ec507eefc39d9ba93538d8c21b0628635bd9d00b7c9a938d447657af53f7e4",
+    "tests/auditRocketWallVelocity.py": "4065aae9ae143c53e9c77e7e19f1131a7632608535223fe938e8446306637a00",
+    "tests/auditRocketWallVelocityWorkbench.py": "673db3351e14431ad5a3470f937d399e83bd45eb8fb06f3bdff9d245f56e92d1",
+    "tests/testRocketWallVelocityWorkbench.js": "c1461d8ea95821d7d55e741e36c8d5285a22319a6b09c0d28a38c6f86ea55c72",
+    "tests/plotRocketRecycledKernel.py": "8505557d7accaa1a32ac689edf993e3803c56387dd95560ec076b5d3618f94de",
+    "tests/plotRocketCoarseEnrichmentDirections.py": "fdfd12111fe585284f99d1909f153fe2e4e2b1f807abd9b1b933018aa1ef01ac",
+    "tests/diagnoseRocketRecycledStagnation.py": "3b3413d1f3c86caec3d21ceb1b616703aa68689ccde1b05e330037e4a35c2b1d",
+    "exportRocketWallVelocityStudy.m": "86332be375eebe76e5d01cebc62e2a7e1f23b83f3bf9dbf10e9864af64340a21",
+    "web/rocket-wall-velocity.js": "327d75b2f26a0ddb089bde1e9d3aa4dad71052de748a561d002310aff68943a2",
+    "docs/PROJECT_GOALS.md": "3674715b68c99148d1c4aec15081bcf7361cfdb88ff1f6c61c16f694eca525b9",
+    "docs/GITHUB_STAGE_READINESS.md": "0fd472ec18eddc060c82341d5fcbcb719c5a102d801041122fbc57243ad811c2",
+    "docs/RECYCLED_GMRES_V83.md": "3e1ca550a6c82e30add5e30223fb4829c9e791108bbe25f1e8ab958eec5e8abf",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_recycled_continueRocketWallVelocityKrylov.m",
+      "sha256": "8eddc966422c809f7e5aa6af6960ff69b8b80b44db82411e0b3009e4367005e5"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_recycled_export_fix_exportRocketWallVelocityStudy.m",
+      "sha256": "8554bd0d414866225104f50da681b71a28d5f50bbc8cf50f85e8043b7d92f775"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_recycled_exportRocketWallVelocityStudy.m",
+      "sha256": "baf2fa9d3dc075bfb9832b6c91869beb878952a5d21b390fda0420b3aa1679d8"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_recycled_plot_kernel_revision2.py",
+      "sha256": "6a05ff0153d77d8cf40f7b0c0abdde802e518dbc6da8ef04cb114d08ec5fb721"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_recycled_plotRocketCoarseEnrichmentDirections.py",
+      "sha256": "7e8b5ac1ba34c95d167510fe1a6f4631a2087847bad51516f600c16646ac9053"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_recycled_rocket-wall-velocity.js",
+      "sha256": "8a8a8c382e9feb1c65ed1068a8e7e0e58fbc39f589de00d1bdc3d72c48de1490"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_recycled_solveRocketShellSteadyKrylov.m",
+      "sha256": "1a18d9c1b032dbe408044c08a2f91fc3ed93f30e8417cbf690b55bd8c1820bef"
+    }
+  ],
+  "matlabProcesses": [
+    {
+      "name": "recycledkernel01",
+      "path": "outputs/v83_validation/recycledkernel01_process.json",
+      "sha256": "e1fa9f6c965b87b0e13a11028fc76e59db7cb29776c66a949890fe660691146a",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        55300
+      ]
+    },
+    {
+      "name": "recycledintegration01",
+      "path": "outputs/v83_validation/recycledintegration01_process.json",
+      "sha256": "542218932f115d42653b05e1077af67221837696e5efa44955dc28b738a43b33",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        37148
+      ]
+    },
+    {
+      "name": "recycledtrial01",
+      "path": "outputs/v83_validation/recycledtrial01_process.json",
+      "sha256": "63cfee31b9f3330c23c99930b18d95f09140ad1d37f04fea68ef854ec0cb1876",
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        59660
+      ]
+    },
+    {
+      "name": "recycledexport01",
+      "path": "outputs/v83_validation/recycledexport01_process.json",
+      "sha256": "f0177642ca88a91e4fe24972513f83c73b49cd176badb52904845eb05b926e39",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        43364
+      ]
+    }
+  ],
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/recycledkernel01_independent_recycled_kernel.json",
+      "sha256": "098e97727b13289cf802523930460c6b365e273bda61259f5fdf5b472b22d882",
+      "status": "passed-independent-recycled-Arnoldi-SVD-retained-images-budget-and-unit-original-NS-directions",
+      "processID": 59204
+    },
+    {
+      "path": "outputs/v83_validation/recycledintegration01_independent_recycled_integration.json",
+      "sha256": "d496d16f8fb3df2e7bb1b8871db04c9b23c98964ceb90294a5f9c657f19eb2b2",
+      "status": "passed-independent-recycled-main-current-images-work-budgets-and-total-direction-identity",
+      "processID": 31632
+    },
+    {
+      "path": "outputs/v83_validation/recycledintegration01_independent_newton_directions.json",
+      "sha256": "d4dd8994d35d8a86293f1bd68bcfc8b52819cd900d2ac14f5bb043e9558d1826",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 43388
+    },
+    {
+      "path": "outputs/v83_validation/recycledintegration01_limited_independent_newton_directions.json",
+      "sha256": "c34e15abcf09d887214023e7010735276f2ad85051f91e24fbd5d838376c6c8e",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 50140
+    },
+    {
+      "path": "outputs/v83_validation/krylov15_independent_recycled_integration.json",
+      "sha256": "25a46796134764c0b95439d039f5e5c01df95464405e3566dc2a9322f702dc5e",
+      "status": "passed-independent-recycled-main-current-images-work-budgets-and-total-direction-identity",
+      "processID": 42356
+    },
+    {
+      "path": "outputs/v83_validation/krylov15_independent_steady_guess.json",
+      "sha256": "a7fbe484c00677fa706792418bfb8c14abfc1973880ac7ef83be037d5089b285",
+      "status": "passed-independent-same-Q-guess-current-remainder-total-direction-and-original-normalization",
+      "processID": 55620
+    },
+    {
+      "path": "outputs/v83_validation/krylov15_independent_newton_directions.json",
+      "sha256": "847059e5c3cd5dfb5fd470f961538b4cd22779befec8270a450b39d41200ee41",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 58188
+    },
+    {
+      "path": "outputs/v83_validation/krylov15_independent_coarse_solver.json",
+      "sha256": "f448feca1d1b5007189d63e7bd2ce7bfa1e29d2d55487aa05563c76340c79456",
+      "status": "passed-independent-two-level-cache-identity-and-model-NS-work-accounting",
+      "processID": 60148
+    },
+    {
+      "path": "outputs/v83_validation/krylov15_independent_audit.json",
+      "sha256": "ce52f91cf8365970905e10ece57e33845f6836403ec28520038a91a522ef577b",
+      "status": "passed-independent-actual-static-wall-flux-constitutive-Jacobian-conservation-and-update-audit",
+      "processID": 45736
+    },
+    {
+      "path": "outputs/v83_validation/workbench14/node_wall_velocity_summary.json",
+      "sha256": "befe53c423e3c921d9a7c6f37e9a7224cf99fadc98a2805c0405e6cc55225cde",
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "processID": 47696
+    },
+    {
+      "path": "outputs/v83_validation/workbench14/independent_wall_velocity_view.json",
+      "sha256": "e2a92ff58e8736b16857c11576ce0b19aada576826b118990154f218be8f5e8e",
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+      "processID": 59976
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/recycledkernel01/recycled_kernel_evidence.mat",
+      "sha256": "cf181e6827c69d6107af5fdb1a1ea442d72d622da84ae4c0a0f1ea7e6d185c47",
+      "bytes": 354049
+    },
+    {
+      "path": "outputs/v83_validation/recycledkernel01/recycled_kernel_summary.json",
+      "sha256": "1303a2a7e11b1fc201fbb30149e1b28d90eaf48af56c47a19f4789f3030394d9",
+      "bytes": 515
+    },
+    {
+      "path": "outputs/v83_validation/recycledkernel01/recycled_kernel_cost_comparison.png",
+      "sha256": "3b47a55309b92da6091defc58a96f6420a9d52461c42dfcdc2289d22b868fd8b",
+      "bytes": 160275
+    },
+    {
+      "path": "outputs/v83_validation/recycledkernel01/recycled_kernel_plot.json",
+      "sha256": "3228c5463effe0179d0fe4b1655fc17bff19f54249b68f250fd8f43eda1306f8",
+      "bytes": 470
+    },
+    {
+      "path": "outputs/v83_validation/recycledkernel01/recycled_kernel_cost_comparison2.png",
+      "sha256": "7a1cf86ed9d12aceee00e045e067a9887b733b1e8c7a11617c29939c6ea3fa49",
+      "bytes": 159899
+    },
+    {
+      "path": "outputs/v83_validation/recycledkernel01/recycled_kernel_plot2.json",
+      "sha256": "08d40b382e91c590a37d56715bb8d4df6da378b0ff54b7a76213f6ec0c24cb6e",
+      "bytes": 471
+    },
+    {
+      "path": "outputs/v83_validation/recycledintegration01/steady_newton_unit_evidence.mat",
+      "sha256": "0305e294e8f9cc4eb362b63b3871fab7019a70696881d63f3a232ecb5b8ddd95",
+      "bytes": 322982
+    },
+    {
+      "path": "outputs/v83_validation/recycledintegration01/recycled_integration_summary.json",
+      "sha256": "26f8c13f047d16036836700cf276e3388aaef0875cbf14417f37ed890a9e12b4",
+      "bytes": 437
+    },
+    {
+      "path": "outputs/v83_validation/krylov15/wall_velocity_krylov_evidence.mat",
+      "sha256": "9cf3d86f4f1971b3d332d17844ded48c678a59dcaede3356a413d101efb9f3fa",
+      "bytes": 1093585474
+    },
+    {
+      "path": "outputs/v83_validation/krylov15/wall_velocity_krylov_summary.json",
+      "sha256": "de142191f3793acec2dca62b7677b4b8927e3fe3e0fa0de247a08ecac8f939ae",
+      "bytes": 3792
+    },
+    {
+      "path": "outputs/v83_validation/krylov15/recycled_stagnation_diagnostic.json",
+      "sha256": "35ae02aef614bb2776af24b25a203e76bfe6eec33f7802ec460368a9d481281b",
+      "bytes": 4317
+    },
+    {
+      "path": "outputs/v83_validation/krylov15/coarse_enrichment_direction_plot.json",
+      "sha256": "d3c2eb297c7ace2cd668ea7afb89119bbef28a9161cdb05b2f7698183945cd1e",
+      "bytes": 1126
+    },
+    {
+      "path": "outputs/v83_validation/krylov15/coarse_enrichment_directions.png",
+      "sha256": "482b0ff46df105c8e8b218536cbe80cd5ef272005ae45033d89f8f4ce255cc95",
+      "bytes": 82387
+    },
+    {
+      "path": "outputs/v83_validation/workbench14/wall-velocity-study-data.json",
+      "sha256": "9ed48fc4caeb85071630deac3c629a2c4c90c2eb2ee5f0dde7daa386665581c4",
+      "bytes": 18314
+    },
+    {
+      "path": "outputs/v83_validation/workbench14/static_wall_velocity_comparison.png",
+      "sha256": "79ec8ff917c241b93bc17544f0fcc405ba0ecc121eace6e4d36fdad078a14169",
+      "bytes": 476061
+    },
+    {
+      "path": "outputs/v83_validation/workbench14/static_wall_velocity_residuals.png",
+      "sha256": "46577cee0c0bc8596218022c0c7504c5f28ddbc1c7a3ab69ded97be55cb48c6a",
+      "bytes": 62434
+    },
+    {
+      "path": "outputs/v83_validation/workbench14/static_wall_velocity_balance.png",
+      "sha256": "edad2433c601fd6645c38491226dbb563c64b37240c20454121bb5b8e7bc2c9a",
+      "bytes": 72084
+    }
+  ],
+  "hostFailure": {
+    "name": "recycledtrial01",
+    "exitCode": 1,
+    "numericalResultCompletedAndSavedBeforeFailure": true,
+    "stage": "workbench export after numerical continuation returned",
+    "cause": "new pick local variable shadowed original pick helper before first use",
+    "correction": "rename new cycle-summary variable only; export existing krylov15 evidence with recycledexport01",
+    "numericalSolveRerun": false,
+    "additionalNSForRepair": 0,
+    "oldSourcesAndLogPreserved": true
+  },
+  "kernelResults": {
+    "status": "passed-bounded-SVD-recycled-kernel-matrix-orthogonality-degeneracy-budget-and-unit-NS-directions",
+    "matrixPlainRelativeResidual": 8.578857494696815e-10,
+    "matrixRecycledRelativeResidual": 7.725719450278885e-10,
+    "unitCurrentJacobianRelativeResidual": 0.5603319720743334,
+    "unitOriginalNSDirectionFDErrors": [
+      2.1687859181179524e-08,
+      2.1370039786475505e-09
+    ],
+    "actualOriginalNSEvaluations": 5,
+    "unitJacobianConstructionModelApplications": 160,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 55300
+  },
+  "unitResults": {
+    "status": "passed-explicit-SVD-recycled-main-integration-original-NS-gates-and-old-guess-full-replay",
+    "oldSingleGuessCompleteResultReplayed": true,
+    "actualNSDefect": 0.0007551508225649404,
+    "actualNSCalls": 3,
+    "acceptedIterations": 1,
+    "arnoldiSteps": 1,
+    "recycledModelApplications": 2,
+    "limitedActualNSCalls": 2,
+    "basisBudgetRejected": true,
+    "failedBudgetBaselineNSCalls": 1,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 37148
+  },
+  "realResults": {
+    "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 0,
+    "priorAcceptedNonlinearIterations": 12,
+    "totalNewEquationAcceptedIterations": 12,
+    "candidateTrials": 0,
+    "residualEvaluations": 2,
+    "totalNewEquationResidualEvaluations": 244,
+    "operatorBuilds": 1,
+    "initialMaximumResidual": 4758049.601364592,
+    "maximumResidual": 4758049.601364592,
+    "initialRmsMerit": 521635.2792153294,
+    "rmsMerit": 521635.2792153294,
+    "elapsedSeconds": 483.8770879,
+    "matrixVectorProducts": 119,
+    "jacobianResidualEvaluations": 1,
+    "preconditionerApplications": 96,
+    "lineage": {
+      "sourceState": "v82-exact-conservative-three-corrections-internal-initial-guess",
+      "sourceHistoryAppended": false,
+      "newEquationInitialCounter": 0,
+      "wallVelocityGradientChanged": true,
+      "interiorEulerFlux": "exact-godunov",
+      "viscousWorkVelocity": "arithmetic",
+      "wallVelocityGradient": "dirichlet-tangent",
+      "physicalWallVelocityAndTemperatureKept": true,
+      "externalCFDImported": false
+    },
+    "wallVelocityGradient": "dirichlet-tangent",
+    "sameEquationHistoryContinued": true,
+    "steadyConverged": false,
+    "stopReason": "steady-newton-linear-target-not-met",
+    "spatialConservationRelative": 4.762501927036358e-16,
+    "steadyBoundaryFluxBalance": 0.011954482698849347,
+    "signedHeatPowerW": 925861.9660217352,
+    "wallHeatRangeWm2": [
+      -358287.2316281634,
+      2267395.715238431
+    ],
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 59660,
+    "priorActualResidualEvaluations": 242,
+    "residualEvaluationsAfterLastAcceptedHistory": 119,
+    "normalEulerLinearization": "exact-branch",
+    "physicalSpatialEquationChanged": false,
+    "linearEquation": "steady-newton",
+    "preconditionerTimeStepOnly": true,
+    "rightPreconditioner": "two-level-minres",
+    "graphSweeps": 1,
+    "fixedLinearPreconditioner": true,
+    "jacobianAction": "selected-analytic",
+    "selectedAnalyticApplications": 118,
+    "analyticCacheBuildSeconds": 16.0530868,
+    "originalNSCombinedDirectionCheckPreserved": true,
+    "steadyInitialGuessReport": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov14\\wall_velocity_krylov_evidence.mat",
+      "sourceVariant": "result",
+      "directionScale": 1,
+      "sourceFileSHA256": "206635e2dde614190a9d3a7bbd791a4c81aae5fd68473d850f6753363f2f7517",
+      "sourceCoarseFile": "outputs/v83_validation/localrocket02/local_coarse_evidence.mat",
+      "sourceCoarseFileSHA256": "d38cc000fe7dafa3b907ed9827ac4ce4a57cc381e7effb57e74d1d71c25c160c",
+      "sourceStateAndGeometryVerified": true,
+      "sourceSavedActualNSRelativeDefect": 0.20043131674325604,
+      "oldDerivativeReused": false,
+      "newModelApplications": 0,
+      "newActualNSEvaluations": 0,
+      "originalNSAcceptanceClaimed": false
+    },
+    "steadyInitialGuessModelApplications": 1,
+    "krylovMethod": "SVD-selected-augmented-restarted-right-GMRES",
+    "recycledKrylovModelApplications": 117,
+    "recycledKrylovPreconditionerApplications": 96,
+    "recycledKrylovArnoldiSteps": 96,
+    "coarseUnknowns": 792,
+    "coarseImageBytes": 266582936.0,
+    "coarseOperatorBuilds": 0,
+    "coarseOperatorReuses": 1,
+    "coarseConstructionModelApplications": 0,
+    "coarsePreconditionerModelApplications": 96,
+    "coarseReuseVerificationModelApplications": 1,
+    "coarseReuseReport": {
+      "sourceFile": "outputs/v83_validation/localrocket02/local_coarse_evidence.mat",
+      "sourceAndStateVerified": true,
+      "freshFineModelProbeRelativeDifference": 9.738034046966952e-16,
+      "reuseVerificationModelApplications": 1,
+      "constructionModelApplications": 0,
+      "actualOriginalNSEvaluations": 0,
+      "imageBytes": 266582936.0,
+      "maximumImageBytes": 268435456.0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "coarseSetupSeconds": 4.3772433,
+    "coarseCorrectionChangesPhysicalMesh": false,
+    "coarseBasis": "local-conservative-enriched-mixed",
+    "coarseTargetCellCount": 15160,
+    "parentCoarseUnknowns": 210,
+    "coarseBaseConservativeColumns": 410,
+    "coarseAdditionalPrimitiveColumns": 62,
+    "coarseRetainedMixedColumns": 472,
+    "coarseLocalConservativeColumns": 320,
+    "coarseLocalDistinctCells": 64
+  },
+  "researchResults": {
+    "oldActualNSDirectionDefect": 0.20043131674325604,
+    "newActualNSDirectionDefect": 0.20018066381729055,
+    "newModelDefect": 0.20018070126351376,
+    "originalActualTarget": 0.1,
+    "remainingSquaredNormFractionRemoved": 0.002499948791371054,
+    "oldArnoldiBudget": 48,
+    "newArnoldiBudget": 96,
+    "controlledSpeedupClaimed": false,
+    "newFlowAcceptances": 0,
+    "newCandidates": 0
+  },
+  "workAccounting": {
+    "mainActualNS": 244,
+    "mainAcceptedCorrections": 12,
+    "lastAcceptedNS": 125,
+    "unacceptedTailNS": 119,
+    "latestMainNS": 2,
+    "latestSelectedModelActions": 118,
+    "enhancedModelActions": 117,
+    "arnoldiModelActions": 96,
+    "cycleResidualRechecks": 3,
+    "retainedColumnModelActions": 16,
+    "retainedCombinationProbeActions": 2,
+    "initialGuessModelActions": 1,
+    "preconditionerModelActions": 96,
+    "reuseProbeModelActions": 1,
+    "currentCoarseConstructionModelActions": 0,
+    "totalLatestCurrentModelActions": 215,
+    "separateKernelNS": 5,
+    "separateKernelCurrentJacobianColumnActions": 160,
+    "separateKernelDenseUnitMatrixProducts": 25,
+    "separateIntegrationOldReplayNS": 3,
+    "separateIntegrationAcceptedNS": 3,
+    "separateIntegrationStrictLimitedNS": 2,
+    "separateIntegrationBadBudgetBaselineNS": 1,
+    "totalIntegrationNS": 9,
+    "exportOnlyRepairNS": 0,
+    "validationNotAppendedToMainSolverHistory": true
+  },
+  "stagnationDiagnostic": {
+    "status": "source-bound-recycled-stagnation-and-approximate-graph-diagonal-diagnostic",
+    "processID": 57188,
+    "initialCurrentModelDefect": 0.2004313546553322,
+    "actualFinalTotalNSDefect": 0.20018066381729055,
+    "remainingSquaredNormFractionRemoved": 0.002499948791371054,
+    "cycles": [
+      {
+        "cycle": 1,
+        "arnoldiSteps": 32,
+        "retainedBefore": 0,
+        "retainedAfter": 8,
+        "startResidualNorm": 108973148.99095249,
+        "actualResidualNorm": 108961475.8213976,
+        "projectedHSingularRange": [
+          0.17914454913448405,
+          4.373042131414957
+        ],
+        "projectedHSingularCondition": 24.41069043151354,
+        "arnoldiRelationRelativeDifference": 1.1832414429364104e-16,
+        "basisOrthogonalityError": 2.104932671411169e-12
+      },
+      {
+        "cycle": 2,
+        "arnoldiSteps": 32,
+        "retainedBefore": 8,
+        "retainedAfter": 8,
+        "startResidualNorm": 108961475.8213976,
+        "actualResidualNorm": 108895649.79768126,
+        "projectedHSingularRange": [
+          0.008906821869312838,
+          4.37298351127049
+        ],
+        "projectedHSingularCondition": 490.9701322687242,
+        "arnoldiRelationRelativeDifference": 3.7978585381627856e-15,
+        "basisOrthogonalityError": 1.8898403636477403e-12
+      },
+      {
+        "cycle": 3,
+        "arnoldiSteps": 32,
+        "retainedBefore": 8,
+        "retainedAfter": 0,
+        "startResidualNorm": 108895649.79768126,
+        "actualResidualNorm": 108836870.46578601,
+        "projectedHSingularRange": [
+          0.0729103939851875,
+          4.3735557984461035
+        ],
+        "projectedHSingularCondition": 59.98535406809948,
+        "arnoldiRelationRelativeDifference": 5.872758119967587e-16,
+        "basisOrthogonalityError": 2.1215115010467744e-12
+      }
+    ],
+    "diagonalSplit": [
+      {
+        "equation": "density",
+        "scaledRemainingSquaredNormFraction": 0.39715847263466225,
+        "remainingWeightedMedianPhysicsToTemporalDiagonalRatio": 0.45117489798971305,
+        "remainingWeightedMeanTemporalShareOfAbsoluteDiagonalSplit": 0.6434870391373961,
+        "equationRemainingFractionAtPhysicsToTemporalDiagonalRatioBelowPointOne": 0.1437428677547108
+      },
+      {
+        "equation": "xMomentum",
+        "scaledRemainingSquaredNormFraction": 0.16589976567843753,
+        "remainingWeightedMedianPhysicsToTemporalDiagonalRatio": 1.0409633799800684,
+        "remainingWeightedMeanTemporalShareOfAbsoluteDiagonalSplit": 0.5190476972128225,
+        "equationRemainingFractionAtPhysicsToTemporalDiagonalRatioBelowPointOne": 0.05540489572271232
+      },
+      {
+        "equation": "yMomentum",
+        "scaledRemainingSquaredNormFraction": 0.07291844563124297,
+        "remainingWeightedMedianPhysicsToTemporalDiagonalRatio": 0.23478915131215156,
+        "remainingWeightedMeanTemporalShareOfAbsoluteDiagonalSplit": 0.7272754264991761,
+        "equationRemainingFractionAtPhysicsToTemporalDiagonalRatioBelowPointOne": 0.26374388972721036
+      },
+      {
+        "equation": "zMomentum",
+        "scaledRemainingSquaredNormFraction": 0.10542607612998597,
+        "remainingWeightedMedianPhysicsToTemporalDiagonalRatio": 0.17869528937143908,
+        "remainingWeightedMeanTemporalShareOfAbsoluteDiagonalSplit": 0.7324483468881684,
+        "equationRemainingFractionAtPhysicsToTemporalDiagonalRatioBelowPointOne": 0.2898193559751086
+      },
+      {
+        "equation": "totalEnergy",
+        "scaledRemainingSquaredNormFraction": 0.25859723992567135,
+        "remainingWeightedMedianPhysicsToTemporalDiagonalRatio": 1.5873646403802801,
+        "remainingWeightedMeanTemporalShareOfAbsoluteDiagonalSplit": 0.42771479840437754,
+        "equationRemainingFractionAtPhysicsToTemporalDiagonalRatioBelowPointOne": 0.0007509722744966177
+      }
+    ],
+    "diagonalInterpretation": "Approximate preconditioner B diagonal minus I/tau only; not full-J diagonal, global conditioning, physics time or proof of a better parameter.",
+    "newModelApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\krylov15\\wall_velocity_krylov_evidence.mat": "9cf3d86f4f1971b3d332d17844ded48c678a59dcaede3356a413d101efb9f3fa"
+    },
+    "scriptSHA256": "3b3413d1f3c86caec3d21ceb1b616703aa68689ccde1b05e330037e4a35c2b1d"
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench14/index.html",
+    "allTenFieldsAndOriginalFacetsPreserved": true,
+    "sameHostFiveStepWorkflowCurvesAndColorScalesPreserved": true,
+    "cycleRetentionAndModelCostAndBasisBudgetExplicit": true,
+    "scientificPNGsActuallyInspected": 5,
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "kernelFigureRevision": "First title overran right panel; original source/PNG preserved, second title wrapped without new NS."
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "steadyBoundaryImbalance": 0.011954482698849347
+  },
+  "nextAction": "Quantify full selected J versus approximate graph Jgraph actions on saved current directions, splitting internal Euler/characteristic boundary and WLS stress/heat/viscous-work contributions by equation; use this evidence to select a coupled-block preconditioner improvement. No such correction is implemented yet. Reuse saved directions and image; do not rebuild 792 columns or repeat 96-step SVD tuning/large tau/retention counts. Diagonal magnitude splits are not full-J conditioning or a proof that density regularization alone is the cause. Preserve original NS total-RHS target, all physical cells, temperature/descent/spatial/steady gates and parallel scientific UI work.",
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "fc939e93df6591a4682ec29b0eaac76a94165d54d2d19df5f20c4bb6fa11dfd8"
+}

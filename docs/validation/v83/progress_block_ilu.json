@@ -1,0 +1,803 @@
+{
+  "version": 83,
+  "status": "tested-global-block-ILU0-and-symbolic-level1-studies-real-directions-rejected-no-new-physical-solution-not-delivered",
+  "generatedUTC": "2026-10-25T07:23:36.472511+00:00",
+  "recorderProcessID": 41268,
+  "previousGoalTurnClassification": "no progress",
+  "previousGoalTurnEvidence": "The preceding response inspected records and answered the GitHub timing question without changing authoritative project state. This continuation revalidated terminal jobs and executed the next safe numerical and UI work.",
+  "priorProgressPath": "docs/validation/v83/progress_inner_steady_graph.json",
+  "priorProgressSHA256": "b39d979da72942a0136c9e71b9eddf2e813ab910646af08fc4e79314f224cd36",
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/packRocketSteadyGraph.m": "b97c307906ae6097c6bae92ec791ac7234c563692a1d40539136015bbb27fafc",
+    "internalFlow/cutCell/applyRocketPackedGraph.m": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+    "internalFlow/cutCell/factorRocketBlockILU0.m": "0f3e6b1878175b8fe1169108fbb1364347d8aae98faf92b75020d24acc01080d",
+    "internalFlow/cutCell/solveRocketBlockILU0.m": "542885006bfab8810691dde4153a50cff0d8aa6795cb7f7bed7e3cfdf3fffa3b",
+    "internalFlow/cutCell/solveRocketBlockGraphKrylov.m": "a84ff27d4a7d9e6a7fc012a4e1946785857fd15c2a277adf1c802ce529a6cacb",
+    "internalFlow/cutCell/solveRocketRecycledGMRES.m": "c2780eb5cf926098640111ab5284d776dc493e1588458f8c95d45025e9a39811",
+    "internalFlow/cutCell/enrichRocketBlockGraphLevel1.m": "09a2bf05264afcef989fc0efc46ea035b98a8af19b7d90dcdb8a88ff878bddf6",
+    "tests/testRocketBlockILU0.m": "f50311708a20e7c800ba51b2a8ae206d8e1b63ef456f977adf6800dc70d5713c",
+    "tests/testRocketBlockGraphKrylov.m": "d7cb025f8a41012e99e32138c1d47936783fabf92b239fa327a091c1ee43daf5",
+    "tests/testRocketKrylovFailureEvidence.m": "f25a03d0b5c229c0db989d057f597633d186cec88fc87c5e76a8a9a11c01e016",
+    "tests/diagnoseRocketBlockILUFailure.m": "0fbcafca70d08fd0dc6f262cdc5458a634caa455cc1dd477c9f6c810e5e1ce3c",
+    "tests/studyRocketBlockILU0.m": "7b38758b4049a6afe7b4b7db08641f1dce20d8c85a9ef47e857320eda0cc34d5",
+    "tests/testRocketScaledArnoldi.m": "7fbd5e0f13eea310a58a85155e6e5269b9afda6444a870261d43542648aade1c",
+    "tests/studyRocketScaledILUReplay.m": "593f26d412c7c0dd864f6b5c31a7e3a5a32bc447917b95fa179e5968efd350a7",
+    "tests/testRocketBlockFillLevel1.m": "b9d0cd388ad4932f13c3c90a2787baff28273464dc5415959858e6a8dfcbddb3",
+    "tests/studyRocketBlockFillLevel1.m": "83aab16769287681e631d22fcaa44a09502480a803129979f1a8cc1ff71d49cc",
+    "tests/summarizeRocketBlockStudies.m": "ac06bd43cda80587daffe3369845a67386de113be54a199552db1640ecdba262",
+    "tests/testRocketLinearStudyBinding.m": "cd601c5b9202bfeecc5fd39ffd7a3badbff18fa6c77a38903137d62fabd33ca7",
+    "tests/auditRocketBlockILU0.py": "d057920c96f30e639c7e9bea194f9d6943e32e852d52351225fd243f2e91c177",
+    "tests/auditRocketBlockGraphKrylov.py": "b71b12eaf395e3641ae6723dc028a3ef0383f2f76d9bb39c4738f53e6c23dbe9",
+    "tests/auditRocketBlockILUReal.py": "1376c2fbad06ee9e91cd5d48bf8610b674bb0780f4e599248b8a03e691b85e94",
+    "tests/diagnoseRocketBlockILUNumerics.py": "7703c585a6cb26fc26fa34ff798a7d5adf2a898711776e993e68ddcd50368466",
+    "tests/auditRocketScaledArnoldi.py": "79ebd6812d597b323f1db3044d44c0bf6249a5902927c6d326f1d913a6f38f0a",
+    "tests/auditRocketScaledILUReplay.py": "6bd310b2b4fe9ae32d673fb19ec625bcdd5596e2b944a1c2907131a73985ffc7",
+    "tests/auditRocketBlockFillLevel1.py": "cea0e7873c29379602ef2790a554f49c6be79d00ca7d4db17c67d00a1facbb02",
+    "tests/auditRocketRealBlockFillLevel1.py": "ab897aec71e71d9cd95c99c7fde9b040cfa14772432df0eb96e4e97d5510a3cd",
+    "tests/auditRocketBlockStudyWorkbench.py": "2a8ef3065580a0e87c0bded246f66199bde70e50a59c80e3abfe0f2c163bfab3",
+    "tests/plotRocketBlockILUStudies.py": "21a79a5ba806220c096586efbdc1d6b175738fd3e27a08736b0954a19617d716",
+    "tests/testRocketWallVelocityWorkbench.js": "bb5391f3afaabb8d904bc5a158d8361430cd2c4d60e225dfc75ef0c02c41aa48",
+    "exportRocketWallVelocityStudy.m": "f6223e463a02e51ef6f916f5cb7dc4374afd22e17626e46b948709bfaf36dc9a",
+    "web/rocket-wall-velocity.js": "8e56a16d58bb2edf7c18a003691eac6eb1a302a627f9ec349834d243eacf7571",
+    "web/rocket-wall-velocity.html": "a3e8cd75f551987abb725845e7c6128a0bb9f93f10a4d4ca5761d02d693a9f5f",
+    "docs/BLOCK_ILU_STEADY_V83.md": "db87ebe171939fedc26a9297f1f089794a6da2acee53be9d539e1b23c2da03be",
+    "docs/GITHUB_STAGE_READINESS.md": "45506d149e66f098c85d1852c9db4b7902fe0dcbf30f82a0e6cc40942be5614d",
+    "docs/PROJECT_GOALS.md": "0b19321545584ce8f8b50aebcbf355f3fe36279e75db3398958f37347e6a0c42",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1",
+    "outputs/v83_validation/record_block_ilu_progress.py": "68f183e5bc81d172a61e438fa4e94b107eb3816dc7cfc8f9bcb6e2d459f02ebf"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_block_plot_legend_plotRocketBlockILUStudies.py",
+      "sha256": "432049df6dc99be8f8445f842d05043e4a3eefe6d64d65a558253e6512c72e2d",
+      "bytes": 3845
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_block_research_ui_exportRocketWallVelocityStudy.m",
+      "sha256": "771d0565463e6aca21d4e674cc06728b6ba9beb20fb2597669e8b0affdf2eb4c",
+      "bytes": 18843
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_block_research_ui_rocket-wall-velocity.js",
+      "sha256": "3fc28bc556ec4b5e9ba119d79ed81a2e1014100863a2ff7b2d7a1ecc9ce91799",
+      "bytes": 12438
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_blockilu_cancellation_diagnoseRocketBlockILUNumerics.py",
+      "sha256": "5e6226db8d9de2752e2e5e412033d1d66b4ce6fb6970ac21600439ecc141fbda",
+      "bytes": 2961
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_blockilu_failure_solveRocketBlockGraphKrylov.m",
+      "sha256": "81e7bbc63d51b567e7b8b341a15a3fa50dd969c496ffa9d9ef2faaf82e153a38",
+      "bytes": 2934
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_blockilu_failure_solveRocketRecycledGMRES.m",
+      "sha256": "a01a1e9bb31dd7682050ff34bd2ef794d92c464071132e701565dba112a72051",
+      "bytes": 9704
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_blockilu_failure_studyRocketBlockILU0.m",
+      "sha256": "4509b36d32fb7e540737e35c0deecee7f6752e58b4c6244c6ed33ce95b4c7c12",
+      "bytes": 8792
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_blockilu_recorder_path_record_block_ilu_progress.py",
+      "sha256": "c7339e576af2120c3405ccb40647ba1facba7af52fa251f79eb0cf3c38f789bb",
+      "bytes": 10913
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_fill1_reader_auditRocketScaledILUReplay.py",
+      "sha256": "62164fe5500811841b439d87b494e7f821af1cb7c9b2d50f2d97b3cf9e98d22c",
+      "bytes": 5401
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_scaled_arnoldi_solveRocketBlockGraphKrylov.m",
+      "sha256": "31f9692c7e70a97054c0ed13f45e7e15c9f2d45b7396f63fb53974f30279fdab",
+      "bytes": 3233
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_scaled_arnoldi_solveRocketRecycledGMRES.m",
+      "sha256": "77c39cdc22f18f1e491f0a2675919d9283479b6c52f9b9f13eee6c73a4ee809f",
+      "bytes": 11203
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_scaled_zeroimage_solveRocketRecycledGMRES.m",
+      "sha256": "bfd56aa0771233e23b3bc1ff166c5823f0cb0710d1400bc257d5a4d7bebf387c",
+      "bytes": 13386
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_scaled_zeroimage_testRocketScaledArnoldi.m",
+      "sha256": "5659795b7e75ef565aba4bea2e21412a49be22dae3ec89a30b1395a04fb92ed1",
+      "bytes": 3104
+    }
+  ],
+  "oldScaledAuditReaderRecoveredWithExactRecordedSHA256": true,
+  "matlabProcesses": [
+    {
+      "path": "outputs/v83_validation/blockiluunit01_process.json",
+      "sha256": "8f66e0b53b3536e37da29516e9fff34418c53bd3363093a2e3c16b0bd8717b48",
+      "bytes": 132597,
+      "case": "blockiluunit01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        15920
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/blockilukrylovunit01_process.json",
+      "sha256": "d9a1fa0023fa80fbc2756864256089f0facc685db2d85f84823d2fdcd32a009d",
+      "bytes": 133324,
+      "case": "blockilukrylovunit01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        57764
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/blockilureal01_process.json",
+      "sha256": "439610cb37e6a8b347431fc139a8866e5764ea8805ed77a0958e465c38d5fd07",
+      "bytes": 133569,
+      "case": "blockilureal01",
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        31496
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/blockilufailureunit01_process.json",
+      "sha256": "db56dd6b207c14e8599d4ce968513582e7d4bb8ce99f2b40552eae0600778d15",
+      "bytes": 135161,
+      "case": "blockilufailureunit01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        21828
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/blockilufailurediag01_process.json",
+      "sha256": "e54444d9e8bd5c57c4892609f33f2b5b7571d730ab1a5a1e8552a3cd3569fc6d",
+      "bytes": 135911,
+      "case": "blockilufailurediag01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        14092
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/scaledarnoldiunit01_process.json",
+      "sha256": "044d302978e163d1426a1c46646ee5f2309757c859a6b50d65beafef40d688fd",
+      "bytes": 137239,
+      "case": "scaledarnoldiunit01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        49648
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/scaledilureal01_process.json",
+      "sha256": "2970dad0d05246d85d983af293a85ba134aa81158a62d4e25d6b1ea4c53ffa75",
+      "bytes": 137729,
+      "case": "scaledilureal01",
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        43516
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/blockfillunit01_process.json",
+      "sha256": "19094eac4207de1660bdfeb36ab51c29e0efafbf28393cfdf9d11f4aa7ab616a",
+      "bytes": 138695,
+      "case": "blockfillunit01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        51816
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/blockfillreal01_process.json",
+      "sha256": "30d1ca5b5c3e0eb47e5d3cf49bdf158103e9beedd52b07565feba49bc62ac576",
+      "bytes": 138927,
+      "case": "blockfillreal01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        50864
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/blockresearchui01_process.json",
+      "sha256": "e37e5043f2a5453fe4c080d22b35358fce5398c62a2edeee565eb66c5b788448",
+      "bytes": 140975,
+      "case": "blockresearchui01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        46512
+      ]
+    }
+  ],
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/blockiluunit01_independent_block_ilu.json",
+      "sha256": "aa9a1a932d0eeaed9cfceead7210ed98e9986e8cf8c725cfd6042b619508087d",
+      "bytes": 1506,
+      "status": "passed-independent-full-C-CSR-block-ILU0-elimination-and-triangular-reference",
+      "processID": 18948
+    },
+    {
+      "path": "outputs/v83_validation/blockilukrylovunit01_independent_block_krylov.json",
+      "sha256": "312b873485d57a092d1dfcd7bcb24bac0c4f30626f452abb53f8f5f2d601d5e2",
+      "bytes": 913,
+      "status": "passed-independent-complete-C-block-ILU-Krylov-Arnoldi-and-dense-reference",
+      "processID": 17064
+    },
+    {
+      "path": "outputs/v83_validation/blockilukrylovunit02_independent_block_krylov.json",
+      "sha256": "13c02bf25c5a3f479464105898e9343d65b5a6d9a6b54ea1cb2ffb120003baff",
+      "bytes": 913,
+      "status": "passed-independent-complete-C-block-ILU-Krylov-Arnoldi-and-dense-reference",
+      "processID": 47384
+    },
+    {
+      "path": "outputs/v83_validation/blockilukrylovunit03_independent_block_krylov.json",
+      "sha256": "31daa072c7cf8f36eda8a176c58f1ba220b8b51b68113a878337974f058bcaac",
+      "bytes": 913,
+      "status": "passed-independent-complete-C-block-ILU-Krylov-Arnoldi-and-dense-reference",
+      "processID": 48156
+    },
+    {
+      "path": "outputs/v83_validation/blockilureal01_independent_real_C_and_factors.json",
+      "sha256": "c8ffca6fce99bdcb1405e3cd05fbbeeed6dbe5e52b228d0beb641d6ce241bf57",
+      "bytes": 1801,
+      "status": "passed-independent-real-complete-C-all-blocks-and-all-retained-ILU0-product-audit",
+      "processID": 46840
+    },
+    {
+      "path": "outputs/v83_validation/scaledarnoldiunit01_independent_scaled_arnoldi.json",
+      "sha256": "9f6c9e58c83ede0d82a18c53d84cb662d847a6422f0a821ceb5a600b032b87cf",
+      "bytes": 1371,
+      "status": "passed-independent-scaled-Arnoldi-physical-Z-full-small-C-and-default-contract",
+      "processID": 49856
+    },
+    {
+      "path": "outputs/v83_validation/scaledarnoldiunit02_independent_scaled_arnoldi.json",
+      "sha256": "1b25cb9ea2ada48d9f7043c503fcfaa48e1af5f96aef505d660fcf5ed077e6bc",
+      "bytes": 1371,
+      "status": "passed-independent-scaled-Arnoldi-physical-Z-full-small-C-and-default-contract",
+      "processID": 23140
+    },
+    {
+      "path": "outputs/v83_validation/scaledilureal01_independent_scaled_ilu_replay.json",
+      "sha256": "ee58181613013c66a4399710b19bf40d3bcfa9428ea6127e791dfe3f10b325d5",
+      "bytes": 1794,
+      "status": "passed-independent-frozen-real-C-all-Arnoldi-columns-actual-residual-and-two-ILU-direction-probes",
+      "processID": 59936
+    },
+    {
+      "path": "outputs/v83_validation/blockfillunit01_independent_fill1_unit.json",
+      "sha256": "b26abea206b5da12bcda98708cbe6816fa0252a3b360f0018ee5babef7303b10",
+      "bytes": 1230,
+      "status": "passed-independent-small-symbolic-level1-all-C-values-factors-and-triangular-solves",
+      "processID": 24712
+    },
+    {
+      "path": "outputs/v83_validation/blockfillreal01_independent_scaled_ilu_replay.json",
+      "sha256": "da245cb8001ba69f08ff266a43d9831b8090f2552d4fd65a0a966bb366c2496c",
+      "bytes": 1792,
+      "status": "passed-independent-frozen-real-C-all-Arnoldi-columns-actual-residual-and-two-ILU-direction-probes",
+      "processID": 53992
+    },
+    {
+      "path": "outputs/v83_validation/blockfillreal01_independent_real_fill1_factors.json",
+      "sha256": "c39a21ba05b864719d75e17cc2654d9158fc0f5e6e71b730287b2fbe45cad6ee",
+      "bytes": 1417,
+      "status": "passed-independent-real-level1-symbolic-pattern-all-retained-LU-products-and-all-pivot-inverses",
+      "processID": 36524
+    },
+    {
+      "path": "outputs/v83_validation/workbench17/node_wall_velocity_summary.json",
+      "sha256": "1b5d905a0ced8ba1f089d0b3f2f0017a7dd4ba4cb2248573fcaca190014f652c",
+      "bytes": 1120,
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "processID": 9484
+    },
+    {
+      "path": "outputs/v83_validation/workbench17/independent_block_study_view.json",
+      "sha256": "3c690f64e91a482e1852d6d6fe6a998c5f9cc61d17452af3dbf1f057fd3c27d4",
+      "bytes": 3266,
+      "status": "passed-independent-research-source-binding-and-unchanged-wall-fields-history-identity",
+      "processID": 56992
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/blockiluunit01/block_ilu_unit_evidence.mat",
+      "sha256": "a5ff90f83343db19f59dee25ff3a135097ed322b84646cb0782a555299df5869",
+      "bytes": 475525
+    },
+    {
+      "path": "outputs/v83_validation/blockilureal01/steady_graph_packed_evidence.mat",
+      "sha256": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "bytes": 332761888
+    },
+    {
+      "path": "outputs/v83_validation/blockilureal01/block_ilu_factor_evidence.mat",
+      "sha256": "b89a5cc6630b7b922b9a580a8557d24703156e901c29a6d4e824c87e9c97be5d",
+      "bytes": 343620713
+    },
+    {
+      "path": "outputs/v83_validation/blockilufailurediag01/arnoldi_failure_evidence.mat",
+      "sha256": "b4c42808fd960db0b827daba4450054724f25b2ea6b7d9306965d7a42a282319",
+      "bytes": 583581433
+    },
+    {
+      "path": "outputs/v83_validation/blockilufailurediag01/single_ilu_failure_context.mat",
+      "sha256": "d4978a357c3bac4cabfb5b86b4eda06fdf95fca6d8a9f9a94938a846c12c92a5",
+      "bytes": 25006529
+    },
+    {
+      "path": "outputs/v83_validation/blockilufailurediag01/rejected_basis_numerics.json",
+      "sha256": "f25648c0e079cb19093aa3ae688e0303cc3bb4b98bf6bd0e53c4b716190aac88",
+      "bytes": 2950
+    },
+    {
+      "path": "outputs/v83_validation/scaledarnoldiunit02/scaled_arnoldi_unit_evidence.mat",
+      "sha256": "67bc1662bd812081ed359545a8015596e6dc7ccbea22110aa0bb869a01bda7a3",
+      "bytes": 164744
+    },
+    {
+      "path": "outputs/v83_validation/scaledilureal01/scaled_arnoldi_failure_evidence.mat",
+      "sha256": "ecc4dc36726284411c601f2f12058caecce4bc5edcaa76cd0684350d25626fd1",
+      "bytes": 425809333
+    },
+    {
+      "path": "outputs/v83_validation/scaledilureal01/input_binding.mat",
+      "sha256": "89c99a4be45b489419d10217df2cfbbd6cd07b4b567b2beba396f9305d411428",
+      "bytes": 8311153
+    },
+    {
+      "path": "outputs/v83_validation/blockfillunit01/block_fill1_unit_evidence.mat",
+      "sha256": "c01da6fe7bfa053601c55094e6ab1482a07af3f12e811c7833c04ccee4005bae",
+      "bytes": 529629
+    },
+    {
+      "path": "outputs/v83_validation/blockfillreal01/expanded_pattern_evidence.mat",
+      "sha256": "937fbc286cd709b5ea3102ce65658596d99e0584b50ed6e4098ccd3f587c2f05",
+      "bytes": 7124026
+    },
+    {
+      "path": "outputs/v83_validation/blockfillreal01/block_fill1_factor_evidence.mat",
+      "sha256": "58eef1b299b377c684f3c9cb71a1b118574b9d007b3f22424de0285ee3a8c089",
+      "bytes": 603990133
+    },
+    {
+      "path": "outputs/v83_validation/blockfillreal01/scaled_arnoldi_failure_evidence.mat",
+      "sha256": "46f4a5065956e9977037ac39a2b8419c6a1687d44a5edf712eeb7cd196656938",
+      "bytes": 584896914
+    },
+    {
+      "path": "outputs/v83_validation/blockfillreal01/block_fill1_real_summary.json",
+      "sha256": "19c37b70af9b2993525f4459e76f0314562e2d28bbaaa0f5023aa0e8a06e0ecf",
+      "bytes": 1968
+    },
+    {
+      "path": "outputs/v83_validation/linearstudybinding01/linear_study_binding_evidence.mat",
+      "sha256": "7e80008b76e8275bb3eb5ab41d20004a6eb915f06709ce42847123bc1c2389b3",
+      "bytes": 470
+    },
+    {
+      "path": "outputs/v83_validation/block_linear_research_summary.json",
+      "sha256": "d381e4543c31035a840e0704b9bf5b48a0ea63dd2ee6e257d8cab47bab6afb8f",
+      "bytes": 2313
+    },
+    {
+      "path": "outputs/v83_validation/workbench17/wall-velocity-study-data.json",
+      "sha256": "c8737053c557e947aba5d288ecf36f12670f722ba42dd498c195fe48f0d3db38",
+      "bytes": 17662
+    },
+    {
+      "path": "outputs/v83_validation/block_ilu_figures01/figure_manifest.json",
+      "sha256": "92a991713263dc89e5eac12d09ea1d939cd07b65eee06bfaf03d407b243ba885",
+      "bytes": 1411
+    },
+    {
+      "path": "outputs/v83_validation/block_ilu_figures02/figure_manifest.json",
+      "sha256": "52620c264854e75727ffdad8113f804af2d87c2a88e1260f0c418abff61315cf",
+      "bytes": 1411
+    },
+    {
+      "path": "outputs/v83_validation/block_ilu_figures02/actual_visual_review.json",
+      "sha256": "5b6a16bd7e405c3d48a34fdee7e615fcbc47c62bb85e4ec4d4c3382d96f4d49a",
+      "bytes": 479
+    },
+    {
+      "path": "outputs/v83_validation/block_progress_recorder_attempt1_failure.json",
+      "sha256": "6523fea34b4e25e5daa411a80e9d82d32dee222c96e5c726041978c072324bab",
+      "bytes": 527
+    }
+  ],
+  "originalILU0": {
+    "status": "passed-independent-real-complete-C-all-blocks-and-all-retained-ILU0-product-audit",
+    "case": "blockilureal01",
+    "processID": 46840,
+    "cellCount": 217272,
+    "unknowns": 1086360,
+    "rawBlockContributions": 2271480,
+    "uniqueStoredBlocks": 1619664,
+    "allCBlockAssemblyRelativeDifference": 0.0,
+    "fullVectorProbeRelativeDifferences": [
+      1.8422897993687624e-16,
+      1.6348721933095146e-16
+    ],
+    "allPivotInverseDefect": 6.512357904091272e-10,
+    "allRetainedBlockLUProductRelativeDifference": 2.2333460048304796e-12,
+    "maximumCancellationAwareRetainedBlockBackwardError": 5.0848727512275885e-14,
+    "outsidePatternLUBlocks": 1343202,
+    "fullLUApproximationRelativeDifference": 1.1338197719373786,
+    "LUApproximationDifferenceByConservationRow": [
+      1.7947432774078276,
+      1.3084044730280724,
+      0.30426278403649365,
+      0.5262705425098607,
+      0.9561472871234351
+    ],
+    "retainedBlockProducts": 1056732,
+    "discardedFillProducts": 1343202,
+    "auditProductSeconds": 37.46799999999348,
+    "numericFactorStorageUpperBoundBytes": 379080388,
+    "matrixAndFactorIdentityDoesNotProveStableInverse": true,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "outputs\\v83_validation\\blockilureal01\\block_ilu_factor_evidence.mat": "b89a5cc6630b7b922b9a580a8557d24703156e901c29a6d4e824c87e9c97be5d",
+      "outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746"
+    },
+    "scriptSHA256": "1376c2fbad06ee9e91cd5d48bf8610b674bb0780f4e599248b8a03e691b85e94"
+  },
+  "originalFailureReplay": {
+    "status": "reproduced-original-real-block-ILU-Arnoldi-rejection-with-explicit-evidence",
+    "errorIdentifier": "RecycledGMRES:Arnoldi",
+    "orthogonalityError": 16.46157108161325,
+    "modelRelationRelativeDifference": 3.6517976461641324e-05,
+    "arnoldiSteps": 32,
+    "CApplications": 33,
+    "ILUApplications": 32,
+    "singleScanRelativeCResidual": 1.1439331119392982e+16,
+    "singleDirectionNormRelativeToRhs": 26868085166.430447,
+    "newFactorConstructions": 0,
+    "newCoarseConstructions": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "rejectedDirectionUsable": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 14092
+  },
+  "savedBasisDiagnostic": {
+    "status": "source-bound-rejected-real-ILU-basis-orthogonality-and-H-scaling-diagnostic",
+    "processID": 58856,
+    "orthogonalityError": 16.46157108161553,
+    "originalOrthogonalityThreshold": 1e-08,
+    "prefixBasisOrthogonalityErrors": [
+      2.2470914018413168e-13,
+      1.003154059924909e-12,
+      1.0992267205770956e-12,
+      1.9586833993331565e-12,
+      2.3329153733684503e-12,
+      2.39651352024579e-12,
+      2.4469240332306787e-12,
+      2.4998106506500173e-12,
+      2.5803157559133902e-12,
+      2.726434074835419e-12,
+      2.8404243420148404e-12,
+      3.699453528630232e-12,
+      5.300152220284852e-12,
+      8.264475209022708e-12,
+      7.526774376975208e-11,
+      2.8555278668473316e-09,
+      3.049491305678038e-06,
+      1.382697090743367,
+      2.4132348600010416,
+      3.429671696988214,
+      4.43874698058097,
+      5.444489449423243,
+      6.4484499959428785,
+      7.45134688545012,
+      8.453558047481879,
+      9.455301287760513,
+      10.456710977779485,
+      11.457874520994888,
+      12.458851228911872,
+      13.459682769902718,
+      14.460399276558764,
+      15.461023080008328,
+      16.46157108161553
+    ],
+    "firstBasisColumnCountOverOriginalGate": 17,
+    "basisColumnNormRange": [
+      1.0000000000001124,
+      1.0000000000008105
+    ],
+    "HColumnNormRange": [
+      1336170785621.3215,
+      9.480767808189966e+16
+    ],
+    "HPositiveColumnNormRatio": 70954.7605007798,
+    "HSingularValueRange": [
+      0.9342680306497225,
+      9.681655207839592e+16
+    ],
+    "HNumericalRankAtExistingSmallSVDThreshold": 24,
+    "savedActualResidualRelativeToRhs": 0.9994393034120967,
+    "savedProjectedResidualRelativeToRhs": 0.9994394947912797,
+    "modelRelationRelativeDifference": 3.6517976461641324e-05,
+    "projectedRecomputationDifference": 8.612520250482923,
+    "projectedRecomputationRelativeToRhs": 7.969626133909763e-08,
+    "originalRecomputationRhsThreshold": 1e-10,
+    "originalRecomputationRhsCheckPassed": false,
+    "formationNormBound": 8.958938116678883e+17,
+    "projectedRecomputationRoundoffBound": 52517.09429117661,
+    "projectedRecomputationWithinFormationBound": true,
+    "physicalOrArnoldiAcceptanceFromFormationBound": false,
+    "proposedNumericalChecks": "Whole-direction image normalization and adaptive extra reorthogonalization, with the original final gates unchanged; default old output must replay. This does not prove the ILU0 inverse will become useful.",
+    "newModelApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockilufailurediag01\\arnoldi_failure_evidence.mat": "b4c42808fd960db0b827daba4450054724f25b2ea6b7d9306965d7a42a282319",
+      "outputs\\v83_validation\\blockilufailurediag01\\block_ilu_failure_diagnostic_summary.json": "07423dbc7277a7e26a90086d5c9bbe18556eda59948b93d82f9b9fe51bcd6e13"
+    },
+    "scriptSHA256": "7703c585a6cb26fc26fa34ff798a7d5adf2a898711776e993e68ddcd50368466"
+  },
+  "scaledILU0": {
+    "status": "passed-independent-frozen-real-C-all-Arnoldi-columns-actual-residual-and-two-ILU-direction-probes",
+    "processID": 59936,
+    "originalArnoldiGateRejected": true,
+    "cellCount": 217272,
+    "unknowns": 1086360,
+    "arnoldiSteps": 23,
+    "relativeCResidual": 0.9993342644424403,
+    "basisOrthogonalityError": 3.744383858725933e-12,
+    "maximumCompleteCColumnRelationDifference": 1.0092139812682007e-13,
+    "actualResidualRecomputationRelativeToRhs": 0.0,
+    "physicalILUDirectionProbeErrors": [
+      {
+        "column": 1,
+        "relativePhysicalDirectionDifference": 3.2918414790964497e-11
+      },
+      {
+        "column": 23,
+        "relativePhysicalDirectionDifference": 1.8255993471547363e-11
+      }
+    ],
+    "imageScaleRange": [
+      38706953768700.21,
+      9.482305505153616e+16
+    ],
+    "maximumReorthogonalizationPasses": 3,
+    "CApplications": 24,
+    "ILUApplications": 23,
+    "newFactorConstructions": 0,
+    "newCoarseConstructions": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\scaledilureal01\\scaled_arnoldi_failure_evidence.mat": "ecc4dc36726284411c601f2f12058caecce4bc5edcaa76cd0684350d25626fd1",
+      "outputs\\v83_validation\\scaledilureal01\\input_binding.mat": "89c99a4be45b489419d10217df2cfbbd6cd07b4b567b2beba396f9305d411428",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "outputs\\v83_validation\\blockilureal01\\block_ilu_factor_evidence.mat": "b89a5cc6630b7b922b9a580a8557d24703156e901c29a6d4e824c87e9c97be5d"
+    },
+    "scriptSHA256": "62164fe5500811841b439d87b494e7f821af1cb7c9b2d50f2d97b3cf9e98d22c"
+  },
+  "level1": {
+    "status": "tested-real-level1-block-pattern-research-with-explicit-rejection-status",
+    "stage": "inner-Arnoldi",
+    "factorAvailable": true,
+    "candidateRejected": true,
+    "errorIdentifier": "RecycledGMRES:Arnoldi",
+    "singleRelativeCResidual": 143938624146.69174,
+    "singleDirectionNormRelativeToRhs": 219975.77125785156,
+    "newFactorConstructionAttempts": 1,
+    "newCoarseConstructions": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 50864,
+    "enrichmentReport": {
+      "method": "symbolic-level-one-fill-P-plus-strictLowerP-times-strictUpperP",
+      "originalStoredBlocks": 1619664.0,
+      "enrichedStoredBlocks": 2962866.0,
+      "addedInitiallyZeroBlocks": 1343202.0,
+      "originalOrderingKept": true,
+      "allOriginalBlockValuesKept": true,
+      "minimumBlocksPerRow": 6,
+      "maximumBlocksPerRow": 17,
+      "meanBlocksPerRow": 13.636667403070804,
+      "symbolicProductCountUpperBound": 2399934.0,
+      "symbolicArrayConstructionEstimateBytes": 492382080.0,
+      "persistentFactorStorageUpperBoundBytes": 653093596.0,
+      "algorithmArrayConstructionEstimateBytes": 1774952640.0,
+      "sourceOperatorAndLibraryWorkspaceExcluded": true,
+      "processPeakMemoryClaimed": false,
+      "enrichmentSeconds": 0.9216362,
+      "allOriginalCellsAndFiveEquationsKept": true,
+      "physicalEquationChanged": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "factorizationReport": {
+      "method": "five-by-five-cell-block-ILU-zero-fill",
+      "retainedBlockProducts": 5639453.0,
+      "discardedOutOfPatternFillProducts": 3896332.0,
+      "minimumLocalPivotRcond": 4.6390359117693566e-08,
+      "maximumLocalInverseDefect": 2.3283064365386963e-10,
+      "factorSeconds": 13.9827733,
+      "diagonalCompensationApplied": false,
+      "allOriginalCellsAndFiveEquationsKept": true,
+      "originalGraphConnectionsDropped": false,
+      "fixedLinearMap": true,
+      "physicalEquationChanged": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "failureOrthogonality": 1.6536580114859886e-12,
+    "failureModelRelation": 6.681583045223887e-08,
+    "arnoldiSteps": 32,
+    "CApplications": 33,
+    "ILUApplications": 32
+  },
+  "level1FactorAudit": {
+    "status": "passed-independent-real-level1-symbolic-pattern-all-retained-LU-products-and-all-pivot-inverses",
+    "processID": 36524,
+    "cellCount": 217272,
+    "originalBlocks": 1619664,
+    "expandedBlocks": 2962866,
+    "addedInitiallyZeroBlocks": 1343202,
+    "retainedPatternLUProductRelativeDifference": 1.2079959689426784e-10,
+    "maximumCancellationAwareRetainedBlockBackwardError": 1.469609097039217e-12,
+    "allPivotInverseDefect": 2.425279833600443e-10,
+    "fullLUApproximationRelativeDifference": 6.1844163246671,
+    "LUApproximationDifferenceByConservationRow": [
+      9.857446481039526,
+      5.381359892392176,
+      2.6031401991690992,
+      3.615753174656232,
+      6.013451014445574
+    ],
+    "retainedBlockProducts": 5639453,
+    "discardedFillProducts": 3896332,
+    "outsidePatternLUBlocks": 3302030,
+    "auditSeconds": 109.25,
+    "correctFactorArithmeticDoesNotCertifyStableInverse": true,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockfillreal01\\block_fill1_factor_evidence.mat": "58eef1b299b377c684f3c9cb71a1b118574b9d007b3f22424de0285ee3a8c089",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf"
+    },
+    "scriptSHA256": "ab897aec71e71d9cd95c99c7fde9b040cfa14772432df0eb96e4e97d5510a3cd"
+  },
+  "level1DirectionAudit": {
+    "status": "passed-independent-frozen-real-C-all-Arnoldi-columns-actual-residual-and-two-ILU-direction-probes",
+    "processID": 53992,
+    "originalArnoldiGateRejected": true,
+    "cellCount": 217272,
+    "unknowns": 1086360,
+    "arnoldiSteps": 32,
+    "relativeCResidual": 0.9988498463184203,
+    "basisOrthogonalityError": 3.3904338247876273e-12,
+    "maximumCompleteCColumnRelationDifference": 8.190360434953176e-15,
+    "actualResidualRecomputationRelativeToRhs": 0.0,
+    "physicalILUDirectionProbeErrors": [
+      {
+        "column": 1,
+        "relativePhysicalDirectionDifference": 1.2975137659575705e-12
+      },
+      {
+        "column": 32,
+        "relativePhysicalDirectionDifference": 4.048365655555704e-12
+      }
+    ],
+    "imageScaleRange": [
+      203793275.5502475,
+      143938624146.8986
+    ],
+    "maximumReorthogonalizationPasses": 2,
+    "CApplications": 33,
+    "ILUApplications": 32,
+    "newFactorConstructions": 0,
+    "newCoarseConstructions": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockfillreal01\\scaled_arnoldi_failure_evidence.mat": "46f4a5065956e9977037ac39a2b8419c6a1687d44a5edf712eeb7cd196656938",
+      "outputs\\v83_validation\\blockfillreal01\\input_binding.mat": "45b6ae38c445699ce076bc695b560093efca6bd6ca51d7acdd46b2ce9a9306a9",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "outputs\\v83_validation\\blockfillreal01\\block_fill1_factor_evidence.mat": "58eef1b299b377c684f3c9cb71a1b118574b9d007b3f22424de0285ee3a8c089"
+    },
+    "scriptSHA256": "6bd310b2b4fe9ae32d673fb19ec625bcdd5596e2b944a1c2907131a73985ffc7"
+  },
+  "workAccounting": {
+    "originalFailedILU0SelectedModelApplicationsInferredFromExecutedPath": 2,
+    "originalFailedILU0InnerCountsNotRecorded": true,
+    "failureObservationReplay": {
+      "C": 33,
+      "ILU": 32
+    },
+    "scaledILU0": {
+      "C": 24,
+      "ILU": 23
+    },
+    "level1": {
+      "C": 33,
+      "ILU": 32
+    },
+    "newActualNSEvaluationsAcrossTheseStudies": 0,
+    "newAcceptedPhysicalStates": 0,
+    "newCoarseImageConstructions": 0,
+    "note": "No saved-model direction or C residual is promoted to an original-NS physical acceptance."
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench17/index.html",
+    "newSeparateRejectedStudyRows": 3,
+    "sourceFacetPayloadExactlyUnchanged": true,
+    "priorFullMATFieldAuditReusedByPayloadIdentity": true,
+    "CSVRows": 592560,
+    "sectionSamples": 6624,
+    "sameHostEvents": 15,
+    "threeFalseSourceOrQualificationExportsRejected": true,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "steadyBoundaryImbalance": 0.011954482698849347,
+    "latestEndpoint": {
+      "path": "outputs/v83_validation/krylov17/wall_velocity_krylov_evidence.mat",
+      "sha256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "bytes": 1214364034
+    },
+    "mainAcceptedIterations": 12,
+    "mainActualNSEvaluations": 246,
+    "actualNSDirectionDefect": 0.19876430371570342,
+    "actualNSEvaluationsAfterLastAcceptedHistory": 121,
+    "originalNSSource": {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    }
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "nextAction": "Do not rebuild the same C/factors or blindly add fill/iterations. Quantify saved-Z combination cancellation and upstream/downstream coupling, then test physically directed algebraic ordering and its inverse/fill/memory behavior in a small domain before any new bounded real comparison; this ordering is not implemented. Keep all physical CVs and original NS, temperature, descent and convergence gates. Real-region validation and scientific UI remain co-priorities.",
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "68f183e5bc81d172a61e438fa4e94b107eb3816dc7cfc8f9bcb6e2d459f02ebf"
+}

@@ -1,0 +1,56 @@
+function report=studyTmrAxisymmetricSA(folder,maxSteps)
+%STUDYTMRAXISYMMETRICSA 从真实Sutherland层流Q启动完整第五量RANS，不导入CFD。
+% 模块一：原公开节点/储库/Tw/Sutherland不改，明确SA初场及给定Ninf=5*nuinf。
+% 模块二：同一五量BE/Newton实际推进；工作预算与稳态停止分开，负N不得裁值。
+% 模块三：保存完整初末状态/五量账/实际成本/模型与边界身份；尚不算实验或生产区域。
+root=fileparts(fileparts(mfilename('fullpath')));
+addpath(root,fullfile(root,'regionalFlow','axisymmetric'),fullfile(root,'internalFlow'));
+if nargin<1,folder=fullfile(root,'outputs','v65_validation','tmr_sa_startup');end
+if nargin<2,maxSteps=3;end
+validateattributes(maxSteps,{'numeric'},{'real','finite','scalar','integer','positive'});
+source=fullfile(root,'outputs','v64_validation','tmr_sutherland','tmr_sutherland_evidence.mat');
+if ~exist(source,'file'),source=fullfile(root,'validation','v64','tmr_sutherland','tmr_sutherland_evidence.mat');end
+parent=load(source,'mesh','gas','boundary','implicit');parentSHA=fileSHA(source);
+assert(parent.implicit.steadyConverged&&parent.mesh.cellCount==1000&&~parent.implicit.physicalSolution);
+mesh=parent.mesh;gas=parent.gas;boundary=parent.boundary;Q4=parent.implicit.Q;
+inlet=boundary.iMin.primitive;lam=axisymmetricFVTransport(inlet(4),gas);Ninf=5*lam.mu/inlet(1);
+for key={'iMin','iMax','jMax'},boundary.(key{1}).nuTilde=Ninf;end
+% 明确均匀正初场；它不是测得湍流剖面，也不把旧层流状态说成湍流稳态。
+Q=[Q4 Q4(:,1)*Ninf];
+[rate,initialInfo]=axisymmetricRANSResidual(Q,mesh,gas,boundary);
+scale=[parent.implicit.residualScale inlet(1)*Ninf];
+opts=struct('maxSteps',maxSteps,'initialPseudoCFL',.5,'maximumPseudoCFL',500,'pseudoCFLGrowth',2, ...
+    'residualScale',scale,'differenceScheme','central','jacobianRefreshEvery',1,'maxNewtonIterations',24, ...
+    'steadyResidualTolerance',2e-6,'steadyRequiredSteps',3,'minimumSteadySteps',3);
+assert(~exist(fullfile(folder,'tmr_sa_evidence.mat'),'file'),'AxisSA:Overwrite','不得覆盖已保存研究证据。');
+if ~exist(folder,'dir'),mkdir(folder);end
+clock=tic;implicit=advanceAxisymmetricSteady(Q,mesh,gas,boundary,opts);elapsed=toc(clock);
+[replay,info]=axisymmetricRANSResidual(implicit.Q,mesh,gas,boundary);
+assert(isequaln(info,implicit.finalInfo)&&max(abs(replay)./scale,[],'all')==implicit.residualNorm&& ...
+    strcmp(parentSHA,fileSHA(source)));
+report=struct('status','actual-coupled-SA-budgeted-research-not-experimental-validation', ...
+    'modelID',info.sa.modelID,'sourceCheckpoint',source,'sourceCheckpointSHA256',parentSHA, ...
+    'initialNuTildeValueKind','uniform positive prescribed initialization, not a measured turbulence profile', ...
+    'prescribedInflowNuTilde',Ninf,'prescribedNuTildeToLaminarKinematicViscosity',5, ...
+    'initialOriginalResidual',max(abs(rate)./scale,[],'all'),'finalOriginalResidual',implicit.residualNorm, ...
+    'steadyConverged',implicit.steadyConverged,'stopReason',implicit.stopReason,'acceptedSteps',implicit.acceptedSteps, ...
+    'rejectedAttempts',implicit.rejectedAttempts,'solverResidualEvaluations',implicit.residualEvaluations, ...
+    'diagnosticResidualEvaluations',2,'elapsedSeconds',elapsed, ...
+    'globalBEFiveQuantityBalanceRelative',implicit.globalBalanceRelative, ...
+    'finalNuTildeRange',[min(info.sa.nuTilde),max(info.sa.nuTilde)], ...
+    'wallSignedHeatRangeWm2',[min(info.wall.heatFluxIntoWall),max(info.wall.heatFluxIntoWall)], ...
+    'pseudoTimeIsPhysical',false,'physicalTimeAdvanced',0,'turbulenceTransportImplemented',true, ...
+    'turbulenceValidated',false,'physicalSolution',false,'eligibleForSurfaceCoverage',false, ...
+    'experimentalValidation',false,'newProductionSolvedAreaM2',0);
+save(fullfile(folder,'tmr_sa_evidence.mat'),'report','implicit','mesh','gas','boundary','Q','initialInfo','parentSHA');
+fid=fopen(fullfile(folder,'tmr_sa_summary.json'),'w','n','UTF-8');assert(fid>=0);cleanup=onCleanup(@()fclose(fid));
+fprintf(fid,'%s',jsonencode(report));clear cleanup;
+fprintf('TMR coupled SA: %d accepted, original residual %.9g -> %.9g, steady=%d; no experimental/production claim.\n', ...
+    implicit.acceptedSteps,report.initialOriginalResidual,report.finalOriginalResidual,implicit.steadyConverged);
+end
+function digest=fileSHA(path)
+% 模块用途：锁定真实初场身份，禁止研究调用改写原v64证据。
+fid=fopen(path,'rb');assert(fid>=0);cleanup=onCleanup(@()fclose(fid));bytes=fread(fid,Inf,'*uint8');clear cleanup;
+md=java.security.MessageDigest.getInstance('SHA-256');md.update(bytes);
+digest=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
+end

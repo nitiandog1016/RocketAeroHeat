@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+ "http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- HTML input file for Wind-US User's Guide - Keyword Reference, FREESTREAM -->
+
+<html>
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link href="../user.css" rel="stylesheet" type="text/css">
+<title> Wind-US User's Guide - Keyword Reference, FREESTREAM </title>
+</head>
+
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EE" vlink="#551A8B" alink="#FF0000">
+
+<a href="#endnav"><img src="../../blank.gif" border="0" alt="Skip navigation links"></a>
+<center>
+<small>
+(<a href="../../index.html"><b>Wind-US&nbsp;Documentation&nbsp;Home&nbsp;Page</b></a>)
+(<a href="../../user/index.html"><span class="nav"><b>Wind-US&nbsp;User's&nbsp;Guide</b></span></a>)
+(<a href="../../gman/index.html"><b>GMAN&nbsp;User's&nbsp;Guide</b></a>)
+(<a href="../../madcap/index.html"><b>MADCAP&nbsp;User's&nbsp;Guide</b></a>)
+(<a href="../../cfpost/index.html"><b>CFPOST&nbsp;User's&nbsp;Guide</b></a>)
+(<a href="../../utilities/index.html"><b>Wind-US&nbsp;Utilities</b></a>)
+(<a href="../../cff/index.html"><b>Common&nbsp;File&nbsp;User's&nbsp;Guide</b></a>)
+(<a href="../../install/index.html"><b>Wind-US&nbsp;Installation&nbsp;Guide</b></a>)
+(<a href="../../devel/index.html"><b>Wind-US&nbsp;Developer's&nbsp;Reference</b></a>)
+(<a href="../../guidelines/index.html"><b>Guidelines&nbsp;Documents</b></a>)
+<br><br>
+(<a href="../intro.html"><b>Introduction</b></a>)
+(<a href="../tutorial.html"><b>Tutorial</b></a>)
+(<a href="../physical.html"><b>Geometry&nbsp;and&nbsp;Flow&nbsp;Physics&nbsp;Modeling</b></a>)
+(<a href="../numerical.html"><b>Numerical&nbsp;Modeling</b></a>)
+(<a href="../bc.html"><b>Boundary&nbsp;Conditions</b></a>)
+(<a href="../convergence.html"><b>Convergence&nbsp;Monitoring</b></a>)
+(<a href="../files.html"><b>Files</b></a>)
+(<a href="../scripts.html"><b>Scripts</b></a>)
+(<a href="../parallel.html"><b>Parallel&nbsp;Processing</b></a>)
+(<a href="../keywords.html"><span class="nav"><b>Keyword&nbsp;Reference</b></span></a>)
+(<a href="../testopts.html"><b>Test&nbsp;Options</b></a>)
+</small>
+</center>
+<a name="endnav"></a>
+
+<br>
+<hr size="1" align="left" width="25%" noshade>
+<br>
+
+<span class="keyhdr">FREESTREAM - Freestream conditions</span>
+
+<br><br>
+<table class="keysyntax1" cellspacing="0" cellpadding="5" border>
+<tr align="left" valign="baseline"><td>
+<tt>
+FREESTREAM {STATIC | TOTAL} [CONDITIONS] <i>M P T &alpha; &beta;</i>
+</tt>
+</table>
+
+<p>
+This keyword allows input of freestream flow conditions.
+The user-specified parameters are defined as:
+
+<p>
+<table class="dl" cellspacing="0" cellpadding="0" border="0">
+<tr valign="baseline"><td><tt>&nbsp;&nbsp;&nbsp;</tt>
+   <th scope="row"><i>M</i><td><tt>&nbsp;&nbsp;</tt>
+   <td>Mach number
+<tr valign="baseline"><td>
+   <th scope="row"><i>P</i><td>
+   <td>Static or total pressure (psi), depending on the
+       <tt>STATIC | TOTAL</tt> keyword
+<tr valign="baseline"><td>
+   <th scope="row"><i>T</i><td>
+   <td>Static or total temperature (&deg;R), depending on the 
+       <tt>STATIC | TOTAL</tt> keyword
+<tr valign="baseline"><td>
+   <th scope="row"><i>&alpha;</i>,&nbsp;<i>&beta;</i><td>
+   <td>Angles of attack and sideslip (degrees)
+</table>
+
+<p>
+Note that, if <i>U</i> is the freestream velocity magnitude, 
+<i>&alpha;</i> and <i>&beta;</i> are related to the 
+("downstream", "up", and "sidestream") aeroaxis velocity 
+components by:
+
+<center>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr valign="baseline">
+   <td><i>v<sub>ds</sub> = U</i> cos <i>&beta;</i> cos <i>&alpha;</i>
+<tr valign="baseline">
+   <td><i>v<sub>up</sub> = U</i> cos <i>&beta;</i> sin <i>&alpha;</i>
+<tr valign="baseline">
+   <td><i>v<sub>ss</sub> = U</i> sin <i>&beta;</i>
+<!-- ("ss" is in the "downstream" cross "up" direction) -->
+</table>
+</center>
+
+Which Cartesian components these correspond to depends upon how 
+the aerodynamic axes have been assigned.  Using the default set of 
+<a href="../physical.html#physical:aeroaxis">aerodynamic axes</a> 
+(<i>"downstream","up","out"=+x,+y,+z</i>), 
+<i>&alpha;</i> is rotation about the <i>z</i>-axis and 
+<i>&beta;</i> is rotation about the <i>y</i>-axis.
+Note that the "sidestream" velocity component is always in the 
+"downstream" cross "up" direction, but the "out" direction used 
+for force integration may have the opposite sign.
+
+
+<br><br>
+<table class="keysyntax1" cellspacing="0" cellpadding="5" border>
+<tr align="left" valign="baseline"><td>
+<tt>
+FREESTREAM REYNOLDS [CONDITIONS] <i>M Re T &alpha; &beta;</i>
+</tt>
+</table>
+
+<p>
+In this alternate formulation, the freestream static pressure will be 
+computed from the specified static temperature and Reynolds number.
+<i>Re</i> is based on the freestream velocity U and should be 
+per unit grid length.  
+At present, this form may only be used with perfect gases and 
+certain viscosity models.  The code will stop with an error if it 
+is unable to proceed.
+
+<p>
+<i>See Also</i>: <tt><a href="initialize.html">INITIALIZE</a>,
+<a href="reinitialize.html">REINITIALIZE</a></tt>
+
+<p>
+<hr size="4" width="75%">
+
+<p>
+<div class="footer">
+<!-- Only including this info in the small footer, because it is
+easier than adding support to menu items for all pages. -->
+For questions about Wind-US or related tools, please visit the
+<a href="http://www.grc.nasa.gov/www/winddocs/support/index.html">
+support web page</a>.
+<!-- -->
+<p>
+Curator: <a href="mailto:Dennis.A.Yoder@nasa.gov">Dennis Yoder</a><br>
+Responsible NASA Official: <a href="mailto:Dennis.A.Yoder@nasa.gov">Dennis Yoder</a><br>
+<a href="http://www.nasa.gov/about/highlights/HP_Privacy.html">Privacy Policy and Important Notices</a><br>
+
+<!-- The following script is required by NASA IT to record website usage. -->
+<!-- We participate in the US government's analytics program. See the data at analytics.usa.gov. -->
+<script language="javascript" id="_fed_an_ua_tag" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NASA&subagency=GRC"></script>
+<noscript></noscript>
+
+</div>
+
+Last updated 1 Apr 2016
+
+</body>
+</html>

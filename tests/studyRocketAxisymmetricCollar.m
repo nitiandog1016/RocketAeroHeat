@@ -1,0 +1,249 @@
+function report=studyRocketAxisymmetricCollar(folder,stepsThisRun,caseOptions)
+%STUDYROCKETAXISYMMETRICCOLLAR 完整真实箭体五量SA逐BE检查点研究。
+% 模块一：从完整箭体均匀初猜建立法向近壁层/同层数射线对照新链，不导入旧流场。
+% 模块二：每接受一步保存完整端点，恢复时核对源码、不可变step和完整空间方程。
+% 模块三：全链以真实端点重算五量账/历史；原2e-6连续三步判据不变。
+% 模块四：求稳态伪时间不是物理时刻；未稳态及未验证都不计生产求解面积。
+% 约定一个输出目录只由一个进程写入；新工况请使用新目录，禁止覆盖异种证据。
+root=fileparts(fileparts(mfilename('fullpath')));
+addpath(root,fullfile(root,'regionalFlow','axisymmetric'),fullfile(root,'internalFlow'));
+if nargin<1,folder=fullfile(root,'outputs','v70_validation','normal_collar');end
+if nargin<2,stepsThisRun=1;end
+if nargin<3,caseOptions=struct;end
+validateattributes(stepsThisRun,{'numeric'},{'real','finite','scalar','integer','positive'});
+assert((ischar(folder)&&isrow(folder))||(isstring(folder)&&isscalar(folder)), ...
+    'RocketAxisCheckpoint:Folder','输出目录必须为单一路径。');folder=char(folder);
+if ~exist(folder,'dir'),mkdir(folder);end
+stepFolder=fullfile(folder,'steps');if ~exist(stepFolder,'dir'),mkdir(stepFolder);end
+target=fullfile(folder,'rocket_axisymmetric_evidence.mat');bindings=sourceBindings(root);
+pid=feature('getpid');identity=struct('runLabel',getenv('ROCKET_AEROHEAT_RUN_LABEL'), ...
+    'engineProcessID',pid,'processRecordPath',getenv('ROCKET_AEROHEAT_PROCESS_RECORD'));
+if exist(target,'file')
+    saved=load(target,'caseDefinition','implicit','initialInfo','durable');
+    assert(all(isfield(saved,{'caseDefinition','implicit','initialInfo','durable'}))&& ...
+        strcmp(saved.durable.kind,'rocket-complete-C-domain-SA-collar-family-checkpoints-v1')&& ...
+        isequaln(saved.durable.sourceBindings,bindings), ...
+        'RocketAxisCheckpoint:Identity','已有结果不是同一源码的完整箭体检查点，禁止覆盖。');
+    caseDefinition=saved.caseDefinition;implicit=saved.implicit;initialInfo=saved.initialInfo;durable=saved.durable;
+    assert(isempty(fieldnames(caseOptions))||isequaln(caseOptions,caseDefinition.options), ...
+        'RocketAxisCheckpoint:Inputs','续算不能变更几何、飞行或给定边界。');
+    mesh=caseDefinition.mesh;gas=caseDefinition.gas;boundary=caseDefinition.boundary;
+    assert(numel(durable.steps)==implicit.acceptedSteps&&isequal(caseDefinition.Q,implicit.initialQ), ...
+        'RocketAxisCheckpoint:Chain','初态或接受步清单断链。');
+    for k=1:numel(durable.steps)
+        assert(durable.steps(k).number==k&&strcmp(durable.steps(k).relativePath,sprintf('steps/step_%06d.mat',k))&& ...
+            strcmp(fileSHA(fullfile(folder,durable.steps(k).relativePath)),durable.steps(k).sha256), ...
+            'RocketAxisCheckpoint:SHA','不可变真实端点缺失、改字节或断号。');
+    end
+    [rate,info]=axisymmetricRANSResidual(implicit.Q,mesh,gas,boundary);
+    durable.diagnosticResidualEvaluations=durable.diagnosticResidualEvaluations+1;
+    assert(isequaln(info,implicit.finalInfo)&&max(abs(rate)./implicit.residualScale,[],'all')==implicit.residualNorm, ...
+        'RocketAxisCheckpoint:Replay','终态不能重放同一完整五量方程。');
+else
+    caseDefinition=createRocketAxisymmetricCollarCase(caseOptions);
+    mesh=caseDefinition.mesh;gas=caseDefinition.gas;boundary=caseDefinition.boundary;Q=caseDefinition.Q;
+    assert(~caseDefinition.initialization.forebodyProfileImported&& ...
+        ~caseDefinition.initialization.externalCFDSolutionImported&& ...
+        ~caseDefinition.initialization.truncatedAfterbodyInletPrescribed, ...
+        'RocketAxisCheckpoint:Inputs','本研究必须从完整外域内部建立前体/后体历史。');
+    [rate,initialInfo]=axisymmetricRANSResidual(Q,mesh,gas,boundary);
+    options=struct('maxSteps',1,'initialPseudoCFL',.5,'maximumPseudoCFL',1e6,'pseudoCFLGrowth',2, ...
+        'maxNewtonIterations',24,'jacobianRefreshEvery',1,'differenceScheme','central','differenceStep',2e-6, ...
+        'residualScale',caseDefinition.residualScale,'steadyResidualTolerance',2e-6, ...
+        'steadyRequiredSteps',3,'minimumSteadySteps',3,'conservationTolerance',5e-10, ...
+        'nonlinearAbsoluteTolerance',1e-11,'nonlinearRelativeTolerance',1e-9);
+    implicit=initialResult(Q,mesh,gas,initialInfo,rate,options);
+    durable=struct('kind','rocket-complete-C-domain-SA-collar-family-checkpoints-v1','sourceBindings',bindings, ...
+        'steps',struct('number',{},'relativePath',{},'sha256',{},'matlabProcessID',{}), ...
+        'nextPseudoCFL',.5,'solverElapsedSeconds',0,'diagnosticResidualEvaluations',1, ...
+        'recoveredOrphanSteps',0,'allAcceptedEndpointsSaved',true,'runCount',0, ...
+        'runIdentities',struct('runLabel',{},'engineProcessID',{},'processRecordPath',{}));
+end
+durable.runCount=durable.runCount+1;durable.runIdentities(end+1)=identity;
+
+%% 一、恢复已写不可变端点但还没发布latest的真实孤儿步
+while exist(fullfile(stepFolder,sprintf('step_%06d.mat',implicit.acceptedSteps+1)),'file')
+    name=sprintf('steps/step_%06d.mat',implicit.acceptedSteps+1);path=fullfile(folder,name);
+    savedStep=load(path,'segment','stepContext');s=savedStep.segment;c=savedStep.stepContext;
+    assert(isequal(s.initialQ,implicit.Q)&&isequaln(c.sourceBindings,bindings), ...
+        'RocketAxisCheckpoint:Orphan','孤儿初Q或执行源码与当前真实链断接。');
+    validateOrphan(s,c,implicit,durable,mesh,gas,boundary);
+    [implicit,durable]=appendStep(implicit,durable,s,c,mesh,path,name);
+    durable.diagnosticResidualEvaluations=durable.diagnosticResidualEvaluations+2+c.diagnosticResidualEvaluations;
+    durable.recoveredOrphanSteps=durable.recoveredOrphanSteps+1;
+end
+publish();
+
+%% 二、真实单步BE求解；任何失败保留原状态，不能补零或降低原门槛
+for attempt=1:stepsThisRun
+    if implicit.steadyConverged,break;end
+    options=implicit.options;options.maxSteps=1;options.initialPseudoCFL=durable.nextPseudoCFL;
+    [beforeRate,beforeInfo]=axisymmetricRANSResidual(implicit.Q,mesh,gas,boundary);
+    durable.diagnosticResidualEvaluations=durable.diagnosticResidualEvaluations+1;
+    assert(isequaln(beforeInfo,implicit.finalInfo)&& ...
+        max(abs(beforeRate)./implicit.residualScale,[],'all')==implicit.residualNorm);
+    explicit0=1/max(beforeInfo.convectiveFrequency+beforeInfo.diffusiveFrequency);
+    clock=tic;segment=advanceAxisymmetricSteady(implicit.Q,mesh,gas,boundary,options);elapsed=toc(clock);
+    if segment.acceptedSteps~=1
+        failure=struct('segment',segment,'attemptedGlobalStep',implicit.acceptedSteps+1, ...
+            'sourceBindings',bindings,'processIdentity',identity,'elapsedSolverSeconds',elapsed);
+        save(fullfile(folder,sprintf('rejected_%06d_pid%d.mat',implicit.acceptedSteps+1,pid)),'failure');
+        error('RocketAxisCheckpoint:Rejected','原求解器未接受单步；失败已保存，已有真实接受链保持。');
+    end
+    [rate,info]=axisymmetricRANSResidual(segment.Q,mesh,gas,boundary);
+    durable.diagnosticResidualEvaluations=durable.diagnosticResidualEvaluations+1;
+    assert(isequaln(info,segment.finalInfo)&&max(abs(rate)./segment.residualScale,[],'all')==segment.residualNorm);
+    stepContext=struct('number',implicit.acceptedSteps+1,'matlabProcessID',pid,'processIdentity',identity, ...
+        'sourceBindings',bindings,'explicitStepAtInitialState',explicit0,'elapsedSolverSeconds',elapsed, ...
+        'nextPseudoCFL',min(options.maximumPseudoCFL,options.pseudoCFLGrowth*segment.history.dt(end)/explicit0), ...
+        'diagnosticResidualEvaluations',2,'physicalSolution',false,'eligibleForSurfaceCoverage',false);
+    name=sprintf('steps/step_%06d.mat',stepContext.number);path=fullfile(folder,name);
+    assert(~exist(path,'file'),'RocketAxisCheckpoint:Overwrite','禁止覆盖真实接受端点。');
+    temporary=[tempname(stepFolder) '.mat'];save(temporary,'segment','stepContext');movefile(temporary,path);
+    [implicit,durable]=appendStep(implicit,durable,segment,stepContext,mesh,path,name);
+    publish();
+    fprintf('Rocket complete-domain accepted=%d, original residual=%.9g, steady=%d, endpoint=%s.\n', ...
+        implicit.acceptedSteps,implicit.residualNorm,implicit.steadyConverged,name);
+end
+publish();
+
+    function publish()
+        % 模块用途：每个端点保留全表面p/q、给定Tw、原梯度与方法，未知温度不填充。
+        w=implicit.finalInfo.wall;
+        report=struct('status','actual-complete-rocket-SA-collar-family-study-not-production-qualification', ...
+            'cellCount',mesh.cellCount,'acceptedSteps',implicit.acceptedSteps, ...
+            'rejectedAttempts',implicit.rejectedAttempts,'steadyConverged',implicit.steadyConverged, ...
+            'stopReason',implicit.stopReason,'initialOriginalResidual',implicit.history.residual(1), ...
+            'finalOriginalResidual',implicit.residualNorm,'fiveQuantityBalanceRelative',implicit.globalBalanceRelative, ...
+            'solverResidualEvaluations',implicit.residualEvaluations, ...
+            'diagnosticResidualEvaluations',durable.diagnosticResidualEvaluations, ...
+            'elapsedSolverSeconds',durable.solverElapsedSeconds,'allAcceptedEndpointsSaved',true, ...
+            'fullWallFaceCount',numel(w.faceID),'fullRevolvedWallAreaM2',2*pi*sum(w.areaPerRadian), ...
+            'signedWallHeatRangeWm2',[min(w.heatFluxIntoWall),max(w.heatFluxIntoWall)], ...
+            'currentRevolvedWallHeatW',2*pi*sum(w.areaPerRadian.*w.heatFluxIntoWall), ...
+            'wallTemperatureValueKind','prescribed','wallTemperatureSolved',false, ...
+            'edgeTemperatureSolved',false,'recoveryTemperatureSolved',false, ...
+            'physicalTimeAdvancedS',0,'pseudoTimeIsPhysical',false,'inputContract',caseDefinition.inputContract, ...
+            'physicalSolution',false,'experimentalValidation',false,'eligibleForSurfaceCoverage',false, ...
+            'newProductionSolvedAreaM2',0,'processIdentity',identity);
+        payload=struct('caseDefinition',caseDefinition,'initialInfo',initialInfo,'implicit',implicit, ...
+            'durable',durable,'report',report);
+        temporary=[tempname(folder) '.mat'];save(temporary,'-struct','payload');movefile(temporary,target,'f');
+        writeJSON(fullfile(folder,'rocket_axisymmetric_summary.json'),report);
+    end
+end
+
+function validateOrphan(segment,context,previous,durable,mesh,gas,boundary)
+% 模块用途：孤儿步必须重新证明同一方程、原实际BE缺陷和真实边界/源积分，不能只信文件名。
+assert(isequaln(segment.gas,gas)&&isequaln(segment.geometryBinding,previous.geometryBinding)&& ...
+    isequal(segment.options.residualScale,previous.residualScale)&& ...
+    segment.options.initialPseudoCFL==durable.nextPseudoCFL,'RocketAxisCheckpoint:Orphan','孤儿步气体/几何/尺度/CFL不同。');
+for key={'steadyResidualTolerance','steadyRequiredSteps','minimumSteadySteps','conservationTolerance', ...
+        'nonlinearAbsoluteTolerance','nonlinearRelativeTolerance','differenceStep','differenceScheme','jacobianRefreshEvery'}
+    k=key{1};assert(isequal(segment.options.(k),previous.options.(k)),'RocketAxisCheckpoint:Orphan','孤儿步修改原数值门槛或方法。');
+end
+
+[r0,i0]=axisymmetricRANSResidual(previous.Q,mesh,gas,boundary);
+[r1,i1]=axisymmetricRANSResidual(segment.Q,mesh,gas,boundary);
+assert(isequaln(i0,previous.finalInfo)&&isequaln(i1,segment.finalInfo)&& ...
+    max(abs(r1)./previous.residualScale,[],'all')==segment.residualNorm, ...
+    'RocketAxisCheckpoint:Orphan','孤儿步初末完整方程不能重放。');
+dt=segment.history.dt(end);assert(isfinite(dt)&&dt>0);
+assert(isequal(segment.accumulatedBoundaryIntegral,dt*i1.netBoundaryFlux)&& ...
+    isequal(segment.accumulatedSourceIntegral,dt*i1.sourceIntegral)&& ...
+    context.explicitStepAtInitialState==1/max(i0.convectiveFrequency+i0.diffusiveFrequency)&& ...
+    context.nextPseudoCFL==min(segment.options.maximumPseudoCFL,segment.options.pseudoCFLGrowth*dt/context.explicitStepAtInitialState), ...
+    'RocketAxisCheckpoint:Orphan','孤儿步边界/源积分或实际CFL恢复数据不一致。');
+U0=previous.Q./previous.residualScale;U1=segment.Q./previous.residualScale;scaledRate=r1./previous.residualScale;
+defect=U1-U0-dt*scaledRate;
+target=segment.options.nonlinearAbsoluteTolerance+segment.options.nonlinearRelativeTolerance*max(abs(dt*(r0./previous.residualScale)),[],'all');
+roundoff=512*eps*max(abs(U0)+abs(U1)+abs(dt*scaledRate),[],'all');
+assert(target==segment.history.newtonTarget(end)&&max(abs(defect),[],'all')<=target+roundoff, ...
+    'RocketAxisCheckpoint:Orphan','孤儿步真实BE端点缺陷未通过原Newton目标及有单位舍入预算。');
+end
+
+function [result,durable]=appendStep(previous,durable,segment,context,mesh,path,name)
+% 模块用途：保留局部原result，以每步实际Q及累计边界/源重算全链history和账。
+assert(segment.acceptedSteps==1&&~segment.steadyConverged&&numel(segment.history.residual)==2&& ...
+    isequal(segment.initialQ,previous.Q)&&isequal(segment.residualScale,previous.residualScale)&& ...
+    context.number==previous.acceptedSteps+1&&segment.globalBalanceRelative<=5e-10, ...
+    'RocketAxisCheckpoint:StepJoin','只接受原单BE步，重复首残差不能充当新的接受步。');
+result=previous;n=previous.acceptedSteps+1;result.Q=segment.Q;result.finalInfo=segment.finalInfo;
+result.finalConservedIntegral=sum(segment.Q.*mesh.volumePerRadian,1);
+result.accumulatedBoundaryIntegral=previous.accumulatedBoundaryIntegral+segment.accumulatedBoundaryIntegral;
+result.accumulatedSourceIntegral=previous.accumulatedSourceIntegral+segment.accumulatedSourceIntegral;
+scale=sum(mesh.volumePerRadian)*result.residualScale;
+defect=result.finalConservedIntegral-result.initialConservedIntegral+result.accumulatedBoundaryIntegral-result.accumulatedSourceIntegral;
+balance=max(abs(defect)./scale);assert(balance<=result.options.conservationTolerance,'RocketAxisCheckpoint:Ledger','累计五量账未通过原门槛。');
+endpointDefect=result.finalConservedIntegral-previous.finalConservedIntegral+segment.accumulatedBoundaryIntegral-segment.accumulatedSourceIntegral;
+assert(all(abs(endpointDefect)./scale<=result.options.conservationTolerance),'RocketAxisCheckpoint:Ledger','真实端点的一步五量账未通过。');
+for key=fieldnames(previous.history)'
+    k=key{1};row=segment.history.(k);value=row(end,:);
+    if isrow(row)&&size(row,2)==2&&~strcmp(k,'stepDefect'),value=row(end);end
+    switch k
+        case 'pseudoTime',value=previous.pseudoTime+segment.pseudoTime;
+        case 'balance',value=balance;
+        case 'massRelativeDrift',value=(result.finalConservedIntegral(1)-result.initialConservedIntegral(1))/result.initialConservedIntegral(1);
+        case 'residualEvaluations',value=previous.residualEvaluations+segment.residualEvaluations;
+        case 'stepDefect',value=endpointDefect;
+    end
+    if strcmp(k,'stepDefect'),result.history.(k)(end+1,:)=value;else,result.history.(k)(end+1)=value;end
+end
+result.pseudoTime=previous.pseudoTime+segment.pseudoTime;result.acceptedSteps=n;
+for key={'rejectedAttempts','residualEvaluations','linearSolves','factorizations','jacobianBuilds'}
+    k=key{1};result.(k)=previous.(k)+segment.(k);
+end
+for k=1:numel(segment.rejectLog)
+    entry=segment.rejectLog(k);entry.step=entry.step+previous.acceptedSteps;result.rejectLog(end+1)=entry;
+end
+result.residualNorm=segment.residualNorm;result.globalBalanceRelative=balance;result.options.maxSteps=max(3,n);
+result.steadyConverged=n>=result.options.minimumSteadySteps&& ...
+    all(result.history.residual(end-2:end)<=result.options.steadyResidualTolerance);
+if result.steadyConverged,result.stopReason='steady-residual-converged';else,result.stopReason='persisted-accepted-step-budget';end
+durable.nextPseudoCFL=context.nextPseudoCFL;durable.solverElapsedSeconds=durable.solverElapsedSeconds+context.elapsedSolverSeconds;
+durable.steps(end+1)=struct('number',n,'relativePath',name,'sha256',fileSHA(path),'matlabProcessID',context.matlabProcessID);
+end
+
+function result=initialResult(Q,mesh,gas,info,rate,options)
+% 模块用途：尚未接受任何步的真实初态；不以初始化残差伪造推进成本或稳态。
+initial=sum(Q.*mesh.volumePerRadian,1);residual=max(abs(rate)./options.residualScale,[],'all');
+history=struct('pseudoTime',0,'dt',0,'residual',residual,'balance',0,'newtonIterations',0, ...
+    'newtonDefect',0,'newtonTarget',0,'stepDefect',zeros(1,5),'massRelativeDrift',0, ...
+    'lineSearchTrials',0,'residualEvaluations',0,'linearDefect',0,'augmentedLinearDefect',0,'massConstraintDefect',0);
+result=struct('Q',Q,'initialQ',Q,'pseudoTime',0,'acceptedSteps',0,'rejectedAttempts',0,'steadyConverged',false, ...
+    'stopReason','initial-state-not-advanced','residualNorm',residual,'residualScale',options.residualScale, ...
+    'history',history,'rejectLog',struct('step',{},'dt',{},'reason',{},'nonlinearDefect',{}), ...
+    'initialConservedIntegral',initial,'finalConservedIntegral',initial,'accumulatedBoundaryIntegral',zeros(1,5), ...
+    'accumulatedSourceIntegral',zeros(1,5),'globalBalanceRelative',0,'finalInfo',info,'gas',gas,'options',options, ...
+    'residualEvaluations',0,'linearSolves',0,'factorizations',0,'jacobianBuilds',0,'closedMassConstraintActive',false, ...
+    'geometryBinding',struct('X',mesh.X,'R',mesh.R,'cells',mesh.cells,'volumePerRadian',mesh.volumePerRadian), ...
+    'pseudoTimeIsPhysical',false,'physicalTimeAdvanced',0,'wallTemperatureValueKind','prescribed', ...
+    'physicalSolution',false,'eligibleForSurfaceCoverage',false);
+end
+
+
+function out=sourceBindings(root)
+% 模块用途：只锁定实际方程、几何/初猜与本驱动依赖；后续新增显示器不改求解身份。
+names={'advanceAxisymmetricSteady','axisymmetricRANSResidual','axisymmetricNavierStokesResidual', ...
+    'axisymmetricAxisSymmetry','axisymmetricWallThermalGradient','axisymmetricFVJacobian', ...
+    'axisymmetricSADiscretization','axisymmetricSAModel','axisymmetricSAWallDistance', ...
+    'axisymmetricFVState','axisymmetricFVConservative','axisymmetricFVGas','axisymmetricFVTransport', ...
+    'axisymmetricFVTemperatureTrace','buildAxisymmetricFVGeometry','buildRocketAxisymmetricDomain', ...
+    'createRocketAxisymmetricCase','createRocketAxisymmetricWallCase','axisymmetricWallVelocityGradient', ...
+    'axisymmetricViscousWorkVelocity','createRocketAxisymmetricCollarCase','buildRocketAxisymmetricCollarDomain'};
+paths=cellfun(@(x)['regionalFlow/axisymmetric/' x '.m'],names,'UniformOutput',false);
+paths=[{'tests/studyRocketAxisymmetricCollar.m','buildRocketTestBody.m','standardAtmosphere.m', ...
+    'calcFreestream.m','createCaseConfig.m'},paths];
+out=struct('path',{},'sha256',{});
+for k=1:numel(paths),out(k)=struct('path',paths{k},'sha256',fileSHA(fullfile(root,paths{k})));end
+end
+function writeJSON(path,value)
+temporary=[path '.tmp'];fid=fopen(temporary,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));
+fprintf(fid,'%s',jsonencode(value));clear guard;movefile(temporary,path,'f');
+end
+function digest=fileSHA(path)
+fid=fopen(path,'rb');assert(fid>=0,'RocketAxisCheckpoint:Source','缺少实际执行源或不可变端点。');
+guard=onCleanup(@()fclose(fid));bytes=fread(fid,Inf,'*uint8');clear guard;
+md=java.security.MessageDigest.getInstance('SHA-256');md.update(bytes);
+digest=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
+end

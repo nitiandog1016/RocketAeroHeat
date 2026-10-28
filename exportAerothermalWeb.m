@@ -3,7 +3,7 @@ function path=exportAerothermalWeb(mesh,folder)
 % 模块一：复制本地网页；模块二：写入 JSON 数据脚本，NaN 转为 null。
 if ~exist(folder,'dir'),mkdir(folder);end
 root=fileparts(mfilename('fullpath'));
-for name={'index.html','viewer.css','viewer.js'}
+for name={'index.html','viewer.css','section.js','export.js','viewer.js'}
     copyfile(fullfile(root,'web',name{1}),fullfile(folder,name{1}));
 end
 payload=buildAerothermalViewerData(mesh);

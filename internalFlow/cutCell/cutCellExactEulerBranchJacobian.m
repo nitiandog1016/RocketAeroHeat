@@ -1,0 +1,97 @@
+function [left,right,audit,sample]=cutCellExactEulerBranchJacobian(QL,QR,normal,gas)
+%CUTCELLEXACTEULERBRANCHJACOBIAN 对精确Godunov当前波系分支作隐式压力根求导。
+% 模块一：先调用原精确通量检查基态，保留原温域、正根、真空和采样护栏。
+% 模块二：两侧压力曲线隐式求导，再传播到星区/稀疏扇/原态和三个动量通量。
+% 模块三：只供法向线预条件；接触/声速切换处使用当前选中分支，不声称全局光滑Jacobian。
+% 正式三维NS残差不由本函数替代，WLS与横向黏性依赖也未包含于此Euler导数。
+[flux,state]=cutCellExactEulerFlux(QL,QR,normal,gas);
+[~,HL,PL]=cutCellConservativeDerivatives(QL,normal,gas);
+[~,HR,PR]=cutCellConservativeDerivatives(QR,normal,gas);
+N=size(QL,1);g=gas.gamma;gm=g-1;beta=gm/(g+1);exponent=gm/(2*g);
+rL=PL(:,1);rR=PR(:,1);vL=PL(:,2:4);vR=PR(:,2:4);
+pL=gm*(QL(:,5)-.5*rL.*sum(vL.^2,2));pR=gm*(QR(:,5)-.5*rR.*sum(vR.^2,2));
+aL=sqrt(g*pL./rL);aR=sqrt(g*pR./rR);ps=state.pressureStarPa;
+dpL=gm*[.5*sum(vL.^2,2),-vL,ones(N,1)];dpR=gm*[.5*sum(vR.^2,2),-vR,ones(N,1)];
+fpL=pressureSlope(ps,pL,rL,aL);fpR=pressureSlope(ps,pR,rR,aR);denominator=fpL+fpR;
+assert(all(denominator>0&isfinite(denominator)),'ExactBranch:Root','压力匹配导数必须有限且正。');
+region=state.sampleRegion;selectedLeft=region<=3;rs=state.samplePrimitive(:,1);
+vs=state.samplePrimitive(:,2:4);un=sum(vs.*normal,2);pressure=state.samplePressurePa;
+energy=pressure/gm+.5*rs.*sum(vs.^2,2);left=zeros(5,5,N);right=left;
+% 可选第四输出传播真实采样rho/u/v/w/T，供开放储库的WLS边界约束使用。
+wantSample=nargout>3;
+if wantSample,sample=struct('left',zeros(5,5,N),'right',zeros(5,5,N),'basePrimitive',state.samplePrimitive,'sampleRegion',region);end
+for side=1:2
+    for b=1:5
+        drL=zeros(N,1);drR=drL;dvL=zeros(N,3);dvR=dvL;dpl=drL;dpr=drL;
+        if side==1
+            drL(:)=double(b==1);dvL=reshape(HL(1:3,b,:),3,N)';dpl=dpL(:,b);
+        else
+            drR(:)=double(b==1);dvR=reshape(HR(1:3,b,:),3,N)';dpr=dpR(:,b);
+        end
+        dul=sum(dvL.*normal,2);dur=sum(dvR.*normal,2);
+        dal=.5*aL.*(dpl./pL-drL./rL);dar=.5*aR.*(dpr./pR-drR./rR);
+        partialL=fixedPressureCurve(ps,pL,rL,aL,drL,dpl,dal);
+        partialR=fixedPressureCurve(ps,pR,rR,aR,drR,dpr,dar);
+        dps=-(partialL+partialR+dur-dul)./denominator;
+        dus=.5*(dul+dur+partialR+fpR.*dps-partialL-fpL.*dps);
+        drsL=starDensityDerivative(rL,pL,drL,dpl,dps);
+        drsR=starDensityDerivative(rR,pR,drR,dpr,dps);
+        dr=zeros(N,1);du=dr;dp=dr;
+        choose=region==1;dr(choose)=drL(choose);du(choose)=dul(choose);dp(choose)=dpl(choose);
+        choose=region==4;dr(choose)=drR(choose);du(choose)=dur(choose);dp(choose)=dpr(choose);
+        choose=region==2;dr(choose)=drsL(choose);du(choose)=dus(choose);dp(choose)=dps(choose);
+        choose=region==5;dr(choose)=drsR(choose);du(choose)=dus(choose);dp(choose)=dps(choose);
+        for fanSide=1:2
+            choose=region==(3*fanSide);if ~any(choose),continue;end
+            if fanSide==1
+                rr=rL;pk=pL;ak=aL;drr=drL;dpk=dpl;dak=dal;uk=sum(vL.*normal,2);duk=dul;sign=1;
+            else
+                rr=rR;pk=pR;ak=aR;drr=drR;dpk=dpr;dak=dar;uk=sum(vR.*normal,2);duk=dur;sign=-1;
+            end
+            sound=2/(g+1)*(ak+sign*.5*gm*uk);dsound=2/(g+1)*(dak+sign*.5*gm*duk);
+            logChange=dsound(choose)./sound(choose)-dak(choose)./ak(choose);
+            dr(choose)=rs(choose).*(drr(choose)./rr(choose)+2/gm*logChange);
+            dp(choose)=pressure(choose).*(dpk(choose)./pk(choose)+2*g/gm*logChange);
+            du(choose)=sign*dsound(choose);
+        end
+        tangent=dvL-dul.*normal;
+        % 单面且全选左侧时，标量false索引可产生0×0；空右侧不需要做乘法或赋值。
+        if any(~selectedLeft)
+            tangent(~selectedLeft,:)=dvR(~selectedLeft,:)-dur(~selectedLeft).*normal(~selectedLeft,:);
+        end
+        dv=tangent+du.*normal;de=dp/gm+.5*dr.*sum(vs.^2,2)+rs.*sum(vs.*dv,2);
+        if wantSample
+            dT=dp./(rs*gas.R)-state.samplePrimitive(:,5).*dr./rs;
+            primitiveColumn=[dr dv dT];
+            if side==1,sample.left(:,b,:)=reshape(primitiveColumn',5,1,N);else,sample.right(:,b,:)=reshape(primitiveColumn',5,1,N);end
+        end
+        column=[dr.*un+rs.*du,dr.*vs.*un+rs.*dv.*un+rs.*vs.*du+dp.*normal, ...
+            (de+dp).*un+(energy+pressure).*du];
+        if side==1,left(:,b,:)=reshape(column',5,1,N);else,right(:,b,:)=reshape(column',5,1,N);end
+    end
+end
+assert(all(isfinite(left),'all')&&all(isfinite(right),'all'),'ExactBranch:Nonfinite','当前波系导数非有限，不能用于预条件。');
+audit=struct('kind','exact-Godunov-selected-wave-branch-conservative-derivatives-for-preconditioning', ...
+    'sampleRegion',region,'contactNormalVelocityMs',state.normalVelocityStarMs,'zeroContactVelocityCount',nnz(state.normalVelocityStarMs==0), ...
+    'baseFlux',flux,'globalSmoothJacobianClaimed',false,'fullOriginalNSJacobian',false, ...
+    'physicalDiscretizationReplaced',false,'newProductionSolvedAreaM2',0);
+    function slope=pressureSlope(p,pk,rho,a)
+        shock=p>pk;ratio=p./pk;slope=a./(g*pk).*ratio.^(-(g+1)/(2*g));
+        C=sqrt(2./((g+1)*rho)./(p+beta*pk));
+        slope(shock)=C(shock).*(1-.5*(p(shock)-pk(shock))./(p(shock)+beta*pk(shock)));
+    end
+    function value=fixedPressureCurve(p,pk,rho,a,dr,dp,da)
+        shock=p>pk;power=(p./pk).^exponent;
+        value=2/gm*((power-1).*da-a.*exponent.*power.*dp./pk);
+        C=sqrt(2./((g+1)*rho)./(p+beta*pk));F=(p-pk).*C;
+        value(shock)=-C(shock).*dp(shock)-.5*F(shock).* ...
+            (dr(shock)./rho(shock)+beta*dp(shock)./(p(shock)+beta*pk(shock)));
+    end
+    function value=starDensityDerivative(rho,pk,dr,dp,dps)
+        ratio=ps./pk;dratio=dps./pk-ratio.*dp./pk;shock=ps>pk;
+        density=rho.*ratio.^(1/g);value=density.*(dr./rho+(dps./ps-dp./pk)/g);
+        density(shock)=rho(shock).*(ratio(shock)+beta)./(beta*ratio(shock)+1);
+        value(shock)=density(shock).*(dr(shock)./rho(shock)+ ...
+            (1./(ratio(shock)+beta)-beta./(beta*ratio(shock)+1)).*dratio(shock));
+    end
+end

@@ -1,0 +1,45 @@
+function [update,report]=solveRocketBlockGraphKrylov(shifted,factor,rhs,options)
+%SOLVEROCKETBLOCKGRAPHKRYLOV 用固定全局五量块ILU求解有界近似稳态系统C*x=rhs。
+% 模块一：C由全部五量同时去除时间对角；预条件器不是旧的单线扫描。
+% 模块二：当前完整J/原NS不在内部调用；保存物理Z，预算和实际C剩余明确核对。
+% 模块三：内部GMRES结果不能冒充固定线性外预条件或新的原NS接受方向。
+if nargin<4,options=struct;end
+robustArnoldi=false;
+if isstruct(options)&&isscalar(options)&&isfield(options,'robustArnoldi')
+    robustArnoldi=options.robustArnoldi;options=rmfield(options,'robustArnoldi');
+    assert(islogical(robustArnoldi)&&isscalar(robustArnoldi),'BlockGraphKrylov:RobustOption','稳健研究开关非法。');
+end
+failureEvidenceFile='';
+if isstruct(options)&&isscalar(options)&&isfield(options,'failureEvidenceFile')
+    failureEvidenceFile=options.failureEvidenceFile;options=rmfield(options,'failureEvidenceFile');
+end
+defaults=struct('maximumIterations',32,'relativeTolerance',1e-3,'maximumBasisBytes',1024*1024^2,'saveBasisEvidence',false);
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))),'BlockGraphKrylov:Options','内部块图选项无效。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+validateattributes(options.maximumIterations,{'numeric'},{'real','finite','scalar','integer','positive'});
+validateattributes(options.relativeTolerance,{'numeric'},{'real','finite','scalar','positive','<',1});
+assert(~isfield(shifted,'steadyGraphPreconditionerReport')&&factor.cellCount==shifted.sourceFaces*shifted.layers&& ...
+    isequal(factor.residualScale,shifted.residualScale),'BlockGraphKrylov:Source','当前完整B和块因子的维数/尺度不符。');
+assert(isequal(size(rhs),[factor.cellCount 5])&&all(isfinite(rhs),'all'),'BlockGraphKrylov:RHS','五量右端非法。');
+C=shifted;for a=1:5,C.diagonal(a,a,:)=C.diagonal(a,a,:)-1/C.pseudoTimeStepSeconds;end
+C=rmfield(C,'wlsNormalFactor');
+configuration=struct('restartLength',options.maximumIterations,'maximumCycles',1,'retainedDirections',0, ...
+    'maximumArnoldiSteps',options.maximumIterations,'absoluteTolerance',max(realmin,options.relativeTolerance*norm(rhs,'fro')), ...
+    'maximumBasisBytes',options.maximumBasisBytes,'saveBasisEvidence',options.saveBasisEvidence);
+if ~isempty(failureEvidenceFile),configuration.failureEvidenceFile=failureEvidenceFile;end
+if robustArnoldi,configuration.robustArnoldi=true;end
+timer=tic;[value,krylov]=solveRocketRecycledGMRES(@action,@precondition,rhs(:),configuration);update=reshape(value,size(rhs));
+report=struct('method','one-cycle-global-five-conservation-block-ILU0-right-GMRES-for-C', ...
+    'linearSystem','C*x=rhs; C=-Jgraph','options',options,'krylov',krylov, ...
+    'CApplications',krylov.modelApplications,'blockILUApplications',krylov.preconditionerApplications, ...
+    'relativeCResidual',krylov.relativeResidual,'elapsedSeconds',toc(timer),'fullSelectedJApplications',0,'newActualNSEvaluations',0, ...
+    'outerFixedLinearMapClaimed',false,'baseILUFixedLinearMap',true,'requiresFlexibleOuterMethod',true, ...
+    'originalNSAcceptanceClaimed',false,'physicalSolution',false,'newProductionSolvedAreaM2',0);
+if robustArnoldi,report.robustArnoldi=true;end
+    function out=action(v)
+        aValue=applyRocketWlsNormalOperator(C,reshape(v,size(rhs)));out=aValue(:);
+    end
+    function out=precondition(v)
+        pValue=solveRocketBlockILU0(factor,reshape(v,size(rhs)));out=pValue(:);
+    end
+end

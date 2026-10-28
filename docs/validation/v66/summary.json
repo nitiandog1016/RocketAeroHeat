@@ -1,0 +1,2116 @@
+{
+  "version": "v66",
+  "date": "2026-10-20",
+  "status": "tested-release-inputs",
+  "deliveryAuthority": "Only matching v66_release_verification.json local-archives-verified and actual ZIP hashes confirm delivery; isolated runtime separately recorded.",
+  "scope": {
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "fullSurfaceSolved": false,
+    "newRegionalHeatSolvedAreaM2": 0,
+    "currentProductionHeatAreaFraction": 0.6656263274240188,
+    "productionPhysicsChanged": false,
+    "wholeGoalComplete": false,
+    "githubPushed": false,
+    "coupledFiveQuantitySANumericalSteadyVerified": true,
+    "explicitDirichletWallThermalGradientVerified": true,
+    "turbulenceValidated": false,
+    "benchmarkDiagnosticOnly": true,
+    "browserVisualValidation": false,
+    "webGLRuntimeTested": false
+  },
+  "sourceFiles": [
+    {
+      "path": "regionalFlow/axisymmetric/advanceAxisymmetricSteady.m",
+      "sha256": "f31661a7afff327684a21a4eb05dac9bf3eec8f3ac048c22d97fb0f512269851",
+      "bytes": 13172
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricFVJacobian.m",
+      "sha256": "f3946ba7ce26c1ca482ba0b3e69ce9881e16561533b0c81cb3bfb182d104fed6",
+      "bytes": 15596
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+      "sha256": "07614b8837bdb9701ec839d471acf735f833fb1cc498a5f6597028a1864d96fb",
+      "bytes": 23302
+    },
+    {
+      "path": "regionalFlow/axisymmetric/axisymmetricWallThermalGradient.m",
+      "sha256": "5c636dcd44719e79c7d73a4996f4fa7fbe5c962197ffc82956a09a11ed73d0df",
+      "bytes": 4858
+    },
+    {
+      "path": "regionalFlow/axisymmetric/exportTmrAxisymmetricSAStudy.m",
+      "sha256": "04852d6e6ad1304547d2711ba0d271b676ba25ce753dcfdc91db11fc7f5ceebf",
+      "bytes": 38668
+    },
+    {
+      "path": "tests/studyTmrAxisymmetricWallThermal.m",
+      "sha256": "81fcef63a557be65747b44a25e52004bfabc68457be718cbf74ed628c2ef11b4",
+      "bytes": 5147
+    },
+    {
+      "path": "tests/testAxisymmetricWallThermalGradient.m",
+      "sha256": "531242c91a153b627c243569393811827f9736d8c3656815be547a4e41572530",
+      "bytes": 26764
+    },
+    {
+      "path": "tests/testTmrAxisymmetricWallThermalView.m",
+      "sha256": "7ed3c80b5a97ef085f0b275703fdcd2c34a9095f5c09a0bba40bbc7eae41dc7d",
+      "bytes": 12012
+    }
+  ],
+  "changedMatlabFiles": [
+    "regionalFlow/axisymmetric/advanceAxisymmetricSteady.m",
+    "regionalFlow/axisymmetric/axisymmetricFVJacobian.m",
+    "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+    "regionalFlow/axisymmetric/axisymmetricWallThermalGradient.m",
+    "regionalFlow/axisymmetric/exportTmrAxisymmetricSAStudy.m",
+    "tests/studyTmrAxisymmetricWallThermal.m",
+    "tests/testAxisymmetricWallThermalGradient.m",
+    "tests/testTmrAxisymmetricWallThermalView.m"
+  ],
+  "runs": [
+    {
+      "name": "clean_core",
+      "processID": 49900,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v66_validation/clean_core_process.json",
+        "sha256": "2817ca4ada99e4721543a52ac6995f0d7872e3741161e675aaa165e351ce1b65",
+        "bytes": 11884
+      }
+    },
+    {
+      "name": "tmr_wall_thermal",
+      "processID": 20296,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v66_validation/tmr_wall_thermal_process.json",
+        "sha256": "47979374822a8f72f399224950fe23b3cc20d15bda96470a6840243dec6ee3d0",
+        "bytes": 11534
+      }
+    },
+    {
+      "name": "tmr_wall_thermal_view",
+      "processID": 46972,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v66_validation/tmr_wall_thermal_view_process.json",
+        "sha256": "251ff037e4ceb1208cc219109ddf0be202f30c7a473c34f72334716ab7806244",
+        "bytes": 11537
+      }
+    },
+    {
+      "name": "node_wall_thermal_view",
+      "processID": 50204,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v66_validation/node_wall_thermal_view_process.json",
+        "sha256": "0665f1bbc247c974b2528534a8580e4043821e5cd6d6583c1e8a38352a2d3ef6",
+        "bytes": 515
+      }
+    },
+    {
+      "name": "public_wall_thermal",
+      "processID": 46740,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v66_validation/public_wall_thermal_process.json",
+        "sha256": "9fb22991eff4cacd5a791d691a5ca2105ec78cba333df4d96f23c12b6ed8a629",
+        "bytes": 466
+      }
+    },
+    {
+      "name": "upstream_profile",
+      "processID": 50652,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v66_validation/upstream_profile_process.json",
+        "sha256": "2ceec639d1cf850363b93ca28a0062053f1d794db9b6251d5e98f4a42076209c",
+        "bytes": 462
+      }
+    },
+    {
+      "name": "independent_wall_thermal_clean_core",
+      "processID": 43900,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v66_validation/independent_wall_thermal_clean_core_process.json",
+        "sha256": "dbf096d44b22c2455b0798448600e01513ed0a99351cbedabbe2e75fbc7b43a6",
+        "bytes": 750
+      }
+    },
+    {
+      "name": "independent_wall_thermal_tmr",
+      "processID": 6900,
+      "exitCode": 0,
+      "status": "terminal",
+      "processRecord": {
+        "path": "outputs/v66_validation/independent_wall_thermal_tmr_process.json",
+        "sha256": "d0cb9c72ee78ecdcdb5f7ac9f71f44dce2333ef700038e3b21b678453f2c4bd6",
+        "bytes": 736
+      }
+    }
+  ],
+  "historicalSourceMap": [],
+  "core": {
+    "wallThermalGradient": {
+      "status": "passed-explicit-sloping-wall-Dirichlet-gradient-spatial-contract",
+      "cellCount": 9,
+      "minimumWallSkewRatio": 4.535634804320682,
+      "constantWallHeatRelative": 1.1746921663168759e-14,
+      "constantGradientRelative": 1.1059967179942519e-14,
+      "functionWallHeatRelative": 2.0848521361953764e-14,
+      "functionGradientRelative": 1.9628754506377184e-14,
+      "linearConservativeFVQuadrature": {
+        "method": "independent two-triangle Duffy 4x4 Gauss integral of r*Q / integral(r)",
+        "relativeToLinearExactMean": 4.9650022356860325e-16,
+        "volumeRelative": 5.845638007276064e-16,
+        "realConservativeFVMeans": true
+      },
+      "functionConservativeFVQuadrature": {
+        "method": "independent two-triangle Duffy 4x4 Gauss integral of r*Q / integral(r)",
+        "relativeToLinearExactMean": 4.855524955820878e-16,
+        "volumeRelative": 5.845638007276064e-16,
+        "realConservativeFVMeans": true
+      },
+      "constantConstraints": {
+        "maximumTangentialResidualKm": 9.094947017729282e-13,
+        "maximumDisplacementTemperatureResidualK": 7.105427357601002e-15,
+        "maximumTangentBudgetKm": 4.734445280584157e-10,
+        "maximumTemperatureBudgetK": 6.244251510149145e-11,
+        "passed": true
+      },
+      "functionConstraints": {
+        "maximumTangentialResidualKm": 4.547473508864641e-13,
+        "maximumDisplacementTemperatureResidualK": 3.552713678800501e-15,
+        "maximumTangentBudgetKm": 1.3067068974412494e-10,
+        "maximumTemperatureBudgetK": 5.847617591319727e-11,
+        "passed": true
+      },
+      "constantLedger": {
+        "quantityCount": 4,
+        "defect": [
+          -2.168404344971009e-18,
+          0,
+          3.3306690738754696e-16,
+          0
+        ],
+        "physicalScale": [
+          0.017619484978263506,
+          3.2318380839154743,
+          8.730393613051584,
+          104.88638923440027
+        ],
+        "roundoffBudget": [
+          4.770111369659253e-16,
+          1.2168865274689817e-13,
+          3.072996791907904e-13,
+          3.717871989537752e-12
+        ],
+        "combinedBudget": [
+          3.571598109349294e-14,
+          6.585364820577847e-12,
+          1.7768086905293957e-11,
+          2.1349065045833827e-10
+        ],
+        "passed": true,
+        "perRadian": true,
+        "unitSeparated": true
+      },
+      "functionLedger": {
+        "quantityCount": 4,
+        "defect": [
+          4.336808689942018e-19,
+          -1.249000902703301e-16,
+          0,
+          4.440892098500626e-16
+        ],
+        "physicalScale": [
+          0.008321972280285425,
+          3.381197921040367,
+          9.006573326796834,
+          34.960637831958294
+        ],
+        "roundoffBudget": [
+          2.8528984575731867e-16,
+          1.3294430867199008e-13,
+          3.348324274175587e-13,
+          1.093146736630594e-12
+        ],
+        "combinedBudget": [
+          1.692923440632817e-14,
+          6.895340150752724e-12,
+          1.834797908101123e-11,
+          7.101442240054718e-11
+        ],
+        "passed": true,
+        "perRadian": true,
+        "unitSeparated": true
+      },
+      "oldNonlinearTangentialMaximumKm": 2919.1911861075955,
+      "newNonlinearTangentialMaximumKm": 9.094947017729282e-13,
+      "nonlinearConstraints": {
+        "maximumTangentialResidualKm": 9.094947017729282e-13,
+        "maximumDisplacementTemperatureResidualK": 1.4210854715202004e-14,
+        "maximumTangentBudgetKm": 1.3370272850774695e-09,
+        "maximumTemperatureBudgetK": 6.431158197705889e-11,
+        "passed": true
+      },
+      "fourQuantityChange": {
+        "unchangedNonEnergyComponents": [
+          1,
+          2,
+          3
+        ],
+        "nonwallEnergyFluxUnchanged": true,
+        "stateCoefficientsAndSAUnchanged": true,
+        "wallHeatEnergyDifferenceWPerRad": 8.881784197001252e-16,
+        "netWallPowerChangeWPerRad": 16.26214327121594,
+        "rateOnlyEnergyChanged": true
+      },
+      "fiveQuantityChange": {
+        "unchangedNonEnergyComponents": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "nonwallEnergyFluxUnchanged": true,
+        "stateCoefficientsAndSAUnchanged": true,
+        "wallHeatEnergyDifferenceWPerRad": 8.881784197001252e-16,
+        "netWallPowerChangeWPerRad": 16.26214327121594,
+        "rateOnlyEnergyChanged": true
+      },
+      "legacyLedger": {
+        "quantityCount": 4,
+        "defect": [
+          -6.505213034913027e-19,
+          5.551115123125783e-17,
+          1.1102230246251565e-16,
+          -7.105427357601002e-15
+        ],
+        "physicalScale": [
+          0.022295415314710965,
+          3.5481884345148202,
+          9.506664136646808,
+          152.3192124578121
+        ],
+        "roundoffBudget": [
+          6.665982752671657e-16,
+          1.34810346058871e-13,
+          3.406916273369152e-13,
+          4.613660693233998e-12
+        ],
+        "combinedBudget": [
+          4.5257428904689097e-14,
+          7.231187215088511e-12,
+          1.9354019900630532e-11,
+          3.092520856088582e-10
+        ],
+        "passed": true,
+        "perRadian": true,
+        "unitSeparated": true
+      },
+      "newLedger": {
+        "quantityCount": 4,
+        "defect": [
+          -6.505213034913027e-19,
+          5.551115123125783e-17,
+          1.1102230246251565e-16,
+          0
+        ],
+        "physicalScale": [
+          0.022295415314710965,
+          3.5481884345148202,
+          9.506664136646808,
+          170.02620709525513
+        ],
+        "roundoffBudget": [
+          6.665982752671657e-16,
+          1.34810346058871e-13,
+          3.406916273369152e-13,
+          4.768203442914379e-12
+        ],
+        "combinedBudget": [
+          4.5257428904689097e-14,
+          7.231187215088511e-12,
+          1.9354019900630532e-11,
+          3.448206176334246e-10
+        ],
+        "passed": true,
+        "perRadian": true,
+        "unitSeparated": true
+      },
+      "legacyLedger5": {
+        "quantityCount": 5,
+        "defect": [
+          -6.505213034913027e-19,
+          5.551115123125783e-17,
+          1.1102230246251565e-16,
+          0,
+          0
+        ],
+        "physicalScale": [
+          0.022295415314710965,
+          3.5481884345148202,
+          9.506664136646808,
+          156.011977871469,
+          1.6804451453487679
+        ],
+        "roundoffBudget": [
+          6.665982752671657e-16,
+          1.34810346058871e-13,
+          3.406916273369152e-13,
+          4.708732777523843e-12,
+          1.8657394682876195e-14
+        ],
+        "combinedBudget": [
+          4.5257428904689097e-14,
+          7.231187215088511e-12,
+          1.9354019900630532e-11,
+          3.1673268852046184e-10,
+          3.379547685380412e-12
+        ],
+        "passed": true,
+        "perRadian": true,
+        "unitSeparated": true
+      },
+      "newLedger5": {
+        "quantityCount": 5,
+        "defect": [
+          -6.505213034913027e-19,
+          5.551115123125783e-17,
+          1.1102230246251565e-16,
+          0,
+          0
+        ],
+        "physicalScale": [
+          0.022295415314710965,
+          3.5481884345148202,
+          9.506664136646808,
+          173.6730916011325,
+          1.6804451453487679
+        ],
+        "roundoffBudget": [
+          6.665982752671657e-16,
+          1.34810346058871e-13,
+          3.406916273369152e-13,
+          4.862806897234315e-12,
+          1.8657394682876195e-14
+        ],
+        "combinedBudget": [
+          4.5257428904689097e-14,
+          7.231187215088511e-12,
+          1.9354019900630532e-11,
+          3.5220899009949935e-10,
+          3.379547685380412e-12
+        ],
+        "passed": true,
+        "perRadian": true,
+        "unitSeparated": true
+      },
+      "jacobian4": {
+        "quantityCount": 4,
+        "directionRelative": 1.2009553915051267e-10,
+        "integratedDerivativeDefect": [
+          9.979794768355532e-13,
+          -7.045751482248619e-11,
+          1.6958145998557939e-10,
+          1.5848911516513908e-08
+        ],
+        "integratedDerivativeBudget": [
+          3.672948359862724e-06,
+          3.6017286951198294e-05,
+          6.836832762204609e-05,
+          0.01600165802873987
+        ],
+        "columnCount": 36,
+        "residualEvaluations": 73
+      },
+      "jacobian5": {
+        "quantityCount": 5,
+        "directionRelative": 2.119663152599444e-10,
+        "integratedDerivativeDefect": [
+          9.979794768355532e-13,
+          3.5951554233637495e-11,
+          3.58292728819265e-10,
+          1.883739741970203e-08,
+          -2.1775803382695358e-10
+        ],
+        "integratedDerivativeBudget": [
+          3.672948359862724e-06,
+          3.627626335056539e-05,
+          6.839577868635174e-05,
+          0.016058166648630596,
+          2.154600641657622e-05
+        ],
+        "columnCount": 45,
+        "residualEvaluations": 91
+      },
+      "refusals": [
+        {
+          "label": "unknown-policy",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "function-Tw-missing-tangent",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "constant-Tw-nonzero-tangent",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "orphan-tangent",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "nonwall-policy",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "invalid-tangent-value",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "invalid-tangent-value",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "invalid-tangent-value",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "invalid-tangent-value",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "invalid-tangent-value",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "invalid-tangent-value",
+          "identifier": "AxisFV:WallThermalBoundary"
+        },
+        {
+          "label": "wrong-cell-temperature-size",
+          "identifier": "AxisFV:WallThermalGeometry"
+        },
+        {
+          "label": "nonpositive-wall-normal-distance",
+          "identifier": "AxisFV:WallThermalGeometry"
+        },
+        {
+          "label": "nonfinite-input-gradient",
+          "identifier": "AxisFV:WallThermalState"
+        }
+      ],
+      "realDiagnostic": {
+        "sourceSHA256": "68b9922e83bd27a7c091d341b1b626d06e84e05c081c14875accb51e6b75c64f",
+        "completeLegacyInfoReplay": true,
+        "faceID": [
+          61,
+          63
+        ],
+        "ownerCell": [
+          31,
+          32
+        ],
+        "ownerTemperatureK": [
+          597.2755126572409,
+          610.5700308410277
+        ],
+        "prescribedWallTemperatureK": [
+          311,
+          311
+        ],
+        "oldSignedHeatWm2": [
+          -10083.717275252826,
+          -9733.729551794102
+        ],
+        "sameStateNewSignedHeatWm2": [
+          383978.91976798215,
+          364075.90647918126
+        ],
+        "oldTangentialGradientKm": [
+          -2154120.1795595293,
+          -2298245.087120977
+        ],
+        "newTangentialGradientKm": [
+          0,
+          0
+        ],
+        "oldSteadyOriginalResidual": 1.0612011293015512e-07,
+        "newSameStateOriginalResidual": 480426.837538104,
+        "newSteadySolvePerformed": false,
+        "newStateIsSteady": false,
+        "experimentalValidation": false
+      },
+      "realChange": {
+        "unchangedNonEnergyComponents": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "nonwallEnergyFluxUnchanged": true,
+        "stateCoefficientsAndSAUnchanged": true,
+        "wallHeatEnergyDifferenceWPerRad": 5.684341886080802e-14,
+        "netWallPowerChangeWPerRad": 3802.775356021225,
+        "rateOnlyEnergyChanged": true
+      },
+      "realConstraints": {
+        "maximumTangentialResidualKm": 9.313225746154785e-10,
+        "maximumDisplacementTemperatureResidualK": 2.842170943040401e-14,
+        "maximumTangentBudgetKm": 5.298270478150666e-07,
+        "maximumTemperatureBudgetK": 1.363566661862276e-10,
+        "passed": true
+      },
+      "realLedger": {
+        "quantityCount": 5,
+        "defect": [
+          5.032428423795841e-16,
+          1.2580126896034356e-12,
+          0,
+          -1.228727342095226e-09,
+          2.8189256484623115e-18
+        ],
+        "physicalScale": [
+          7.564336153946869,
+          9779.92333425529,
+          947.2496644385933,
+          6762896.811398141,
+          0.012022735785985953
+        ],
+        "roundoffBudget": [
+          1.551159636165836e-10,
+          2.0081884070748866e-07,
+          5.163023336590209e-09,
+          0.00013849287381790875,
+          2.1436787198770983e-13
+        ],
+        "combinedBudget": [
+          1.7024463592447734e-10,
+          2.2037868737599924e-07,
+          7.057522665467396e-09,
+          0.00015201866744070505,
+          2.384133435596817e-13
+        ],
+        "passed": true,
+        "perRadian": true,
+        "unitSeparated": true
+      },
+      "sourceBindings": [
+        {
+          "path": "tests/testAxisymmetricWallThermalGradient.m",
+          "sha256": "531242c91a153b627c243569393811827f9736d8c3656815be547a4e41572530"
+        },
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricWallThermalGradient.m",
+          "sha256": "5c636dcd44719e79c7d73a4996f4fa7fbe5c962197ffc82956a09a11ed73d0df"
+        },
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+          "sha256": "07614b8837bdb9701ec839d471acf735f833fb1cc498a5f6597028a1864d96fb"
+        },
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricRANSResidual.m",
+          "sha256": "8cdd574d3e49579ec2a9c5a757e447d888cd007c9bf1995099ef497573b1534d"
+        },
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricFVJacobian.m",
+          "sha256": "f3946ba7ce26c1ca482ba0b3e69ce9881e16561533b0c81cb3bfb182d104fed6"
+        }
+      ],
+      "timeStepsTaken": 0,
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "residual": {
+      "status": "passed-SA-five-variable-spatial-flux-source-wall-boundary-ledger",
+      "cellCount": 16,
+      "zeroReductionExact": true,
+      "constantNInternalOpenMassFluxDefect": 2.710505431213761e-20,
+      "constantNMassConsistencyBudget": 9.296628276273676e-19,
+      "RiemannVsOwnerMassDifference": 0.0005100307377474056,
+      "RiemannVsOwnerMassRelative": 0.5262533293620696,
+      "wrongOwnerMassTimesNDefect": 0.0001377082991917995,
+      "wrongOwnerPhysicalMassNegativeControlRejected": true,
+      "independentSourceRelative": [
+        9.414352266319777e-16,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analyticDensityCorrection": [
+        -0.09149911695941981,
+        -0.09170695680770909,
+        -0.09373521410642559,
+        -0.09394321429158876
+      ],
+      "zeroLedger": {
+        "defect": [
+          -1.0842021724855044e-19,
+          -1.5178830414797062e-17,
+          0,
+          1.3322676295501878e-15,
+          0
+        ],
+        "budget": [
+          8.288864270338357e-16,
+          1.121172449472504e-13,
+          9.04378362920922e-12,
+          1.6450717297702925e-11,
+          0
+        ],
+        "passed": true,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "constantLedger": {
+        "defect": [
+          1.0842021724855044e-19,
+          -1.9081958235744878e-17,
+          4.440892098500626e-16,
+          -1.1102230246251565e-15,
+          -2.220446049250313e-16
+        ],
+        "budget": [
+          1.4272332608796467e-14,
+          2.6424120047256657e-12,
+          9.217756708895058e-12,
+          2.3688658396405027e-11,
+          1.6620387141258816e-12
+        ],
+        "passed": true,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "nonuniformLedger": {
+        "defect": [
+          5.421010862427522e-20,
+          1.9949319973733282e-17,
+          4.440892098500626e-16,
+          -2.498001805406602e-16,
+          0
+        ],
+        "budget": [
+          1.7281561254755854e-14,
+          2.4715223538532986e-12,
+          8.52785356303927e-12,
+          2.573122045223665e-11,
+          2.1826966486355055e-12
+        ],
+        "passed": true,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "omittedDensityCorrectionNegativeControl": {
+        "defect": [
+          5.421010862427522e-20,
+          1.9949319973733282e-17,
+          4.440892098500626e-16,
+          -2.498001805406602e-16,
+          2.2037807973607215e-05
+        ],
+        "budget": [
+          1.7281561254755854e-14,
+          2.4715223538532986e-12,
+          8.52785356303927e-12,
+          2.573122045223665e-11,
+          2.182695395931156e-12
+        ],
+        "passed": false,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "duplicateAxisSourceNegativeControl": {
+        "defect": [
+          5.421010862427522e-20,
+          1.9949319973733282e-17,
+          4.440892098500626e-16,
+          -2.498001805406602e-16,
+          -0.0007397962542829983
+        ],
+        "budget": [
+          1.7281561254755854e-14,
+          2.4715223538532986e-12,
+          8.52785356303927e-12,
+          2.573122045223665e-11,
+          2.182738701183859e-12
+        ],
+        "passed": false,
+        "unitSeparated": true,
+        "perRadian": true
+      },
+      "zeroMassOpenFaceCount": 4,
+      "outflowFaceCount": 4,
+      "refusals": [
+        {
+          "label": "negative-W",
+          "identifier": "AxisSA:State"
+        },
+        {
+          "label": "nonfinite-W",
+          "identifier": "AxisSA:State"
+        },
+        {
+          "label": "missing-actual-inflow-N",
+          "identifier": "AxisSA:Boundary"
+        },
+        {
+          "label": "negative-inflow-N",
+          "identifier": "AxisSA:Boundary"
+        }
+      ],
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "jacobian": {
+      "status": "passed-SA-complete-five-variable-Jacobian-and-zero-right-derivative",
+      "cellCount": 12,
+      "coloredVsSerialRelative": 2.675552930685867e-11,
+      "blockRelative": [
+        [
+          3.33730382915375e-11,
+          1.2274675467750855e-10,
+          4.9347827428179915e-12,
+          4.832189812170239e-11,
+          0
+        ],
+        [
+          8.374194418044834e-11,
+          7.866598857463194e-12,
+          1.8052061844733418e-10,
+          5.4701231096021254e-11,
+          3.728700693880177e-10
+        ],
+        [
+          3.075132533412018e-11,
+          2.8186760463380136e-10,
+          4.1125479495317985e-14,
+          4.865513556168201e-11,
+          2.6755559598503943e-11
+        ],
+        [
+          3.2147795831405205e-11,
+          5.161308854807728e-11,
+          4.0550986309893044e-11,
+          4.7291128134170974e-11,
+          3.3194030980990696e-11
+        ],
+        [
+          3.4838014371755605e-11,
+          6.413769073932433e-12,
+          4.588846423999779e-14,
+          2.364683452353626e-11,
+          2.675552930685867e-11
+        ]
+      ],
+      "blockAmplitude": [
+        [
+          315.52804887402533,
+          530.3494586570423,
+          1440.6495849144108,
+          5422.084497539004,
+          0
+        ],
+        [
+          759.1793838201966,
+          7340.379198410574,
+          373.9271473685024,
+          1166.1887146630079,
+          111.40245458562958
+        ],
+        [
+          200.2918626118344,
+          302.654654348089,
+          10526.794662496286,
+          3087.1328843957713,
+          106.97195664377546
+        ],
+        [
+          6847.309635759302,
+          514.0513808896685,
+          1401.7785829310014,
+          13790.949411145448,
+          429.9100892808383
+        ],
+        [
+          105292.69963444676,
+          338.04174381657504,
+          914.1827649727929,
+          12743.707247864222,
+          319362.3979968834
+        ]
+      ],
+      "outsideSupportMaximum": 0,
+      "directionRelative": 7.986201477809209e-11,
+      "integratedDerivativeDefect": [
+        -2.2502832930371142e-14,
+        2.8423929876453258e-12,
+        -1.8536749912811956e-10,
+        -1.370267455058638e-08,
+        -1.8980639282517586e-10
+      ],
+      "integratedDerivativeScale": [
+        0.4578284419124614,
+        11.374267768852036,
+        19.94928992959591,
+        2508.751989407511,
+        15.734073143859987
+      ],
+      "zeroNuTildeRightDerivativeRelative": 1.9022246281969943e-12,
+      "colorCount": 12,
+      "zeroFailedResidualEvaluations": 24,
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "advance": {
+      "status": "passed-actual-five-variable-BE-step-ledger-and-restart",
+      "stateBEInfinityNorm": 2.185374441206144e-16,
+      "rateBEInfinityNorm": 2.1853744400050779e-10,
+      "ledgerRaw": [
+        -8.3266726636658465e-22,
+        -6.7702342068507154e-21,
+        -7.385144441468724e-21,
+        1.9828776597427154e-18,
+        4.073677714561305e-26
+      ],
+      "ledgerRelative": [
+        1.892425605378602e-16,
+        1.2822413270550602e-17,
+        1.3987015987630164e-17,
+        2.092566214064807e-18,
+        4.304762348455191e-17
+      ],
+      "actualResidualEvaluations": 85,
+      "jacobianBuilds": 2,
+      "stateWasClipped": false,
+      "restartDifference": [
+        [
+          -2.7755575615628914e-17,
+          -2.220446049250313e-16,
+          2.733057683434407e-18,
+          0,
+          0
+        ],
+        [
+          -2.7755575615628914e-17,
+          -2.220446049250313e-16,
+          2.733057683434407e-18,
+          0,
+          0
+        ],
+        [
+          -1.3877787807814457e-17,
+          0,
+          -1.3765259480771723e-16,
+          0,
+          0
+        ],
+        [
+          -1.3877787807814457e-17,
+          0,
+          -1.3765259480771723e-16,
+          0,
+          0
+        ]
+      ],
+      "restartRelativeByQuantity": [
+        2.7755575615628914e-16,
+        1.850371707708594e-17,
+        1.1471049567309769e-17,
+        0,
+        0
+      ],
+      "fifthVariableChanged": true,
+      "allFiveQuantitiesCoupled": true,
+      "pseudoTimeIsPhysical": false,
+      "steadyConverged": false,
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "legacyTransport": {
+      "status": "passed-Sutherland-local-spatial-couette-and-constant-legacy-replay",
+      "temperatureTable": [
+        80,
+        150,
+        273.15,
+        300,
+        600,
+        1200,
+        1800
+      ],
+      "independentViscosityTable": [
+        5.47905297834979e-06,
+        1.0285688602850156e-05,
+        1.716e-05,
+        1.8459162511975804e-05,
+        3.016208684889843e-05,
+        4.624933024978552e-05,
+        5.828031783105811e-05
+      ],
+      "refusals": [
+        {
+          "label": "invalid-temperature",
+          "identifier": "AxisFV:TransportTemperature"
+        },
+        {
+          "label": "invalid-temperature",
+          "identifier": "AxisFV:TransportTemperature"
+        },
+        {
+          "label": "invalid-temperature",
+          "identifier": "AxisFV:TransportTemperature"
+        },
+        {
+          "label": "invalid-temperature",
+          "identifier": "AxisFV:TransportTemperature"
+        },
+        {
+          "label": "invalid-temperature",
+          "identifier": "AxisFV:TransportTemperature"
+        },
+        {
+          "label": "invalid-temperature",
+          "identifier": "AxisFV:TransportTemperature"
+        },
+        {
+          "label": "invalid-temperature",
+          "identifier": "AxisFV:TransportTemperature"
+        },
+        {
+          "label": "mismatched-reference-mu",
+          "identifier": "AxisFV:GasTransport"
+        },
+        {
+          "label": "unknown-model",
+          "identifier": "AxisFV:GasTransport"
+        },
+        {
+          "label": "missing-referenceViscosity",
+          "identifier": "AxisFV:GasTransport"
+        },
+        {
+          "label": "missing-referenceTemperature",
+          "identifier": "AxisFV:GasTransport"
+        },
+        {
+          "label": "missing-sutherlandTemperature",
+          "identifier": "AxisFV:GasTransport"
+        },
+        {
+          "label": "nonpositive-reference-temperature",
+          "identifier": "AxisFV:GasTransport"
+        },
+        {
+          "label": "nonfinite-reference-viscosity",
+          "identifier": "AxisFV:GasTransport"
+        },
+        {
+          "label": "negative-sutherland-temperature",
+          "identifier": "AxisFV:GasTransport"
+        }
+      ],
+      "wallHeatRelative": 2.827580616587883e-15,
+      "wallTractionRelative": 7.604765121648506e-16,
+      "diffusiveFrequencyRelative": 3.6993856606098795e-16,
+      "hoopStressRelative": 2.0078400691127863e-14,
+      "couetteRecords": [
+        {
+          "radialCells": 12,
+          "wallHeatRelativeRMS": 0.08926223255803883,
+          "wallShearRelativeRMS": 0.08900067620540167,
+          "actualWallHeat": [
+            833.0982608555488,
+            -480.5968010395859
+          ],
+          "continuousWallHeat": [
+            950.5648219282364,
+            -468.51866374446826
+          ],
+          "actualWallShear": [
+            -0.11860602341264045,
+            0.06937306696206416
+          ],
+          "continuousWallShear": [
+            -0.13527494439299914,
+            0.06763747219649957
+          ],
+          "sourceFreeContinuousReference": true,
+          "realConservativeFVMeans": true,
+          "timeStepsTaken": 0,
+          "conservationAudit": {
+            "quantityOrder": [
+              "mass",
+              "axialMomentum",
+              "radialMomentum",
+              "totalEnergy"
+            ],
+            "quantityUnits": [
+              "kg/(s rad)",
+              "N/rad",
+              "N/rad",
+              "W/rad"
+            ],
+            "rawDefect": [
+              0,
+              -2.710505431213761e-20,
+              1.4210854715202004e-14,
+              2.7755575615628914e-17
+            ],
+            "reportedRawDefect": [
+              0,
+              -2.710505431213761e-20,
+              1.4210854715202004e-14,
+              2.7755575615628914e-17
+            ],
+            "reportedMinusRecomputed": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "rateVolumeIntegral": [
+              0,
+              2.4168132613785435e-05,
+              0.006045952446482872,
+              0.16794713227786454
+            ],
+            "boundaryIntegral": [
+              0,
+              -2.416813261378546e-05,
+              119.99516767359403,
+              -0.1679471322778645
+            ],
+            "sourceIntegral": [
+              0,
+              0,
+              120.0012136260405,
+              0
+            ],
+            "absoluteRateVolumeSum": [
+              7.1331361836275566e-06,
+              0.0006835855375662627,
+              0.006045952446482872,
+              2.3264937981605596
+            ],
+            "absoluteBoundaryFluxSum": [
+              0,
+              0.0003088225888041225,
+              360.00565067091924,
+              2.1389175127121476
+            ],
+            "absoluteCellSourceSum": [
+              0,
+              0,
+              120.0012136260405,
+              0
+            ],
+            "physicalSummationScale": [
+              7.1331361836275566e-06,
+              0.0009924081263703853,
+              480.0129102494062,
+              4.465411310872707
+            ],
+            "zeroPhysicalScaleComponents": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "rawRelativeDefect": [
+              0,
+              2.731240665195994e-17,
+              2.960515105274626e-17,
+              6.215681755462846e-18
+            ],
+            "physicalRelativeTolerance": 2e-12,
+            "physicalRelativeBudget": [
+              1.4266272367255113e-17,
+              1.9848162527407707e-15,
+              9.600258204988125e-10,
+              8.930822621745413e-12
+            ],
+            "physicalRelativeOnlyPassed": true,
+            "allFaceMultiplicityAbsolute": [
+              0.06436001639277933,
+              273.8990093904337,
+              4320.035556297836,
+              32367.071173537122
+            ],
+            "allAbsoluteRoundoffContributions": [
+              0.06436714952896296,
+              273.9000017985601,
+              4800.048466547242,
+              32371.536584847996
+            ],
+            "maximumCellFaceMultiplicity": 4,
+            "roundoffOperationBoundK": 42,
+            "machineSpacing": 2.220446049250313e-16,
+            "gammaK": 9.325873406851402e-15,
+            "absoluteRoundoffBound": [
+              6.002798880669833e-16,
+              2.5543567429097424e-12,
+              4.476464434577078e-11,
+              3.018928521755512e-10
+            ],
+            "combinedAbsoluteBudget": [
+              6.145461604342384e-16,
+              2.556341559162483e-12,
+              1.0047904648445832e-09,
+              3.108236747972966e-10
+            ],
+            "roundoffDominatedComponents": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "combinedBudgetPassed": true,
+            "roundoffPassed": true,
+            "reportedDefectAgrees": true
+          }
+        },
+        {
+          "radialCells": 24,
+          "wallHeatRelativeRMS": 0.04970686948602099,
+          "wallShearRelativeRMS": 0.049562860730433894,
+          "actualWallHeat": [
+            884.8339593279775,
+            -474.4436068033976
+          ],
+          "continuousWallHeat": [
+            950.5648219282364,
+            -468.51866374446826
+          ],
+          "actualWallShear": [
+            -0.12594733800837105,
+            0.0684888587481875
+          ],
+          "continuousWallShear": [
+            -0.13527494439299914,
+            0.06763747219649957
+          ],
+          "sourceFreeContinuousReference": true,
+          "realConservativeFVMeans": true,
+          "timeStepsTaken": 0,
+          "conservationAudit": {
+            "quantityOrder": [
+              "mass",
+              "axialMomentum",
+              "radialMomentum",
+              "totalEnergy"
+            ],
+            "quantityUnits": [
+              "kg/(s rad)",
+              "N/rad",
+              "N/rad",
+              "W/rad"
+            ],
+            "rawDefect": [
+              8.271806125530277e-25,
+              0,
+              -1.4210854715202004e-14,
+              0
+            ],
+            "reportedRawDefect": [
+              8.271806125530277e-25,
+              0,
+              -1.4210854715202004e-14,
+              0
+            ],
+            "reportedMinusRecomputed": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "rateVolumeIntegral": [
+              8.271806125530277e-25,
+              1.3236455385604734e-05,
+              0.001778422392081147,
+              0.09197758569558578
+            ],
+            "boundaryIntegral": [
+              0,
+              -1.3236455385604734e-05,
+              119.99852661465327,
+              -0.09197758569558578
+            ],
+            "sourceIntegral": [
+              0,
+              0,
+              120.00030503704536,
+              0
+            ],
+            "absoluteRateVolumeSum": [
+              1.4186635471016476e-06,
+              0.00015084708051918514,
+              0.001778422392081147,
+              0.3877939081685431
+            ],
+            "absoluteBoundaryFluxSum": [
+              0,
+              0.0003155100666056952,
+              360.0016702792067,
+              2.1853517269607226
+            ],
+            "absoluteCellSourceSum": [
+              0,
+              0,
+              120.00030503704536,
+              0
+            ],
+            "physicalSummationScale": [
+              1.4186635471016476e-06,
+              0.00046635714712488035,
+              480.00375373864415,
+              2.573145635129266
+            ],
+            "zeroPhysicalScaleComponents": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "rawRelativeDefect": [
+              5.83070322940891e-19,
+              0,
+              2.960571579808859e-17,
+              0
+            ],
+            "physicalRelativeTolerance": 2e-12,
+            "physicalRelativeBudget": [
+              2.837327094203295e-18,
+              9.327142942497607e-16,
+              9.600075074772883e-10,
+              5.1462912702585315e-12
+            ],
+            "physicalRelativeOnlyPassed": true,
+            "allFaceMultiplicityAbsolute": [
+              0.06434968551510087,
+              273.90882376507585,
+              8640.018109461647,
+              32356.477647778207
+            ],
+            "allAbsoluteRoundoffContributions": [
+              0.06435110417864796,
+              273.90929012222296,
+              9120.02186320029,
+              32359.050793413335
+            ],
+            "maximumCellFaceMultiplicity": 4,
+            "roundoffOperationBoundK": 66,
+            "machineSpacing": 2.220446049250313e-16,
+            "gammaK": 1.465494392505228e-14,
+            "absoluteRoundoffBound": [
+              9.430618232532833e-16,
+              4.014125287292054e-12,
+              1.336534090004511e-10,
+              4.742200748453909e-10
+            ],
+            "combinedAbsoluteBudget": [
+              9.458991503474865e-16,
+              4.015058001586304e-12,
+              1.0936609164777393e-09,
+              4.793663661156494e-10
+            ],
+            "roundoffDominatedComponents": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "combinedBudgetPassed": true,
+            "roundoffPassed": true,
+            "reportedDefectAgrees": true
+          }
+        },
+        {
+          "radialCells": 48,
+          "wallHeatRelativeRMS": 0.026441056458663997,
+          "wallShearRelativeRMS": 0.026364881864166422,
+          "actualWallHeat": [
+            915.522377447664,
+            -471.4535736923707
+          ],
+          "continuousWallHeat": [
+            950.5648219282364,
+            -468.51866374446826
+          ],
+          "actualWallShear": [
+            -0.130302165245583,
+            0.06805920230968446
+          ],
+          "continuousWallShear": [
+            -0.13527494439299914,
+            0.06763747219649957
+          ],
+          "sourceFreeContinuousReference": true,
+          "realConservativeFVMeans": true,
+          "timeStepsTaken": 0,
+          "conservationAudit": {
+            "quantityOrder": [
+              "mass",
+              "axialMomentum",
+              "radialMomentum",
+              "totalEnergy"
+            ],
+            "quantityUnits": [
+              "kg/(s rad)",
+              "N/rad",
+              "N/rad",
+              "W/rad"
+            ],
+            "rawDefect": [
+              -3.970466940254533e-23,
+              0,
+              0,
+              0
+            ],
+            "reportedRawDefect": [
+              -3.970466940254533e-23,
+              0,
+              0,
+              0
+            ],
+            "reportedMinusRecomputed": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "rateVolumeIntegral": [
+              -3.970466940254533e-23,
+              6.97948724854311e-06,
+              0.0004875677661875244,
+              0.04849798375396297
+            ],
+            "boundaryIntegral": [
+              0,
+              -6.97948724854311e-06,
+              119.99958879281454,
+              -0.04849798375396297
+            ],
+            "sourceIntegral": [
+              0,
+              0,
+              120.00007636058072,
+              0
+            ],
+            "absoluteRateVolumeSum": [
+              2.3604883641043838e-07,
+              3.066175666412851e-05,
+              0.0004875677661875244,
+              0.04849798375396297
+            ],
+            "absoluteBoundaryFluxSum": [
+              0,
+              0.00031970468383794225,
+              360.00045951192794,
+              2.214479169969416
+            ],
+            "absoluteCellSourceSum": [
+              0,
+              0,
+              120.00007636058072,
+              0
+            ],
+            "physicalSummationScale": [
+              2.3604883641043838e-07,
+              0.00035036644050207076,
+              480.0010234402748,
+              2.262977153723379
+            ],
+            "zeroPhysicalScaleComponents": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "rawRelativeDefect": [
+              1.6820531719761335e-16,
+              0,
+              0,
+              0
+            ],
+            "physicalRelativeTolerance": 2e-12,
+            "physicalRelativeBudget": [
+              4.720976728208767e-19,
+              7.007328810041415e-16,
+              9.600020468805495e-10,
+              4.525954307446758e-12
+            ],
+            "physicalRelativeOnlyPassed": true,
+            "allFaceMultiplicityAbsolute": [
+              0.06434651276727936,
+              273.91805307869015,
+              17280.009210329732,
+              32401.32191899875
+            ],
+            "allAbsoluteRoundoffContributions": [
+              0.06434674881611577,
+              273.91840344513065,
+              17760.01023377001,
+              32403.584896152475
+            ],
+            "maximumCellFaceMultiplicity": 4,
+            "roundoffOperationBoundK": 114,
+            "machineSpacing": 2.220446049250313e-16,
+            "gammaK": 2.531308496145421e-14,
+            "absoluteRoundoffBound": [
+              1.6288147197756914e-15,
+              6.933719818912484e-12,
+              4.4956064796371645e-10,
+              8.20234697532002e-10
+            ],
+            "combinedAbsoluteBudget": [
+              1.6292868174485123e-15,
+              6.934420551793488e-12,
+              1.409562694844266e-09,
+              8.247606518394487e-10
+            ],
+            "roundoffDominatedComponents": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "combinedBudgetPassed": true,
+            "roundoffPassed": true,
+            "reportedDefectAgrees": true
+          }
+        }
+      ],
+      "linearConservationAudit": {
+        "quantityOrder": [
+          "mass",
+          "axialMomentum",
+          "radialMomentum",
+          "totalEnergy"
+        ],
+        "quantityUnits": [
+          "kg/(s rad)",
+          "N/rad",
+          "N/rad",
+          "W/rad"
+        ],
+        "rawDefect": [
+          -1.8852926655231109e-19,
+          -1.3921223657349657e-15,
+          0,
+          1.5543122344752192e-15
+        ],
+        "reportedRawDefect": [
+          -1.8852926655231109e-19,
+          -1.3921223657349657e-15,
+          0,
+          1.5543122344752192e-15
+        ],
+        "reportedMinusRecomputed": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "rateVolumeIntegral": [
+          -1.8852926655231109e-19,
+          1.0102686781147247e-05,
+          -1.7763568394002505e-15,
+          0.5638413750030018
+        ],
+        "boundaryIntegral": [
+          0,
+          -1.010268678253937e-05,
+          96,
+          -0.5638413750030002
+        ],
+        "sourceIntegral": [
+          0,
+          0,
+          96,
+          0
+        ],
+        "absoluteRateVolumeSum": [
+          3.875362905698654e-16,
+          1.0102686781147247e-05,
+          1.723066134218243e-13,
+          0.5638413750030018
+        ],
+        "absoluteBoundaryFluxSum": [
+          0,
+          2.274516276241942e-05,
+          287.99999999999994,
+          1.2693076889551707
+        ],
+        "absoluteCellSourceSum": [
+          0,
+          0,
+          96,
+          0
+        ],
+        "physicalSummationScale": [
+          3.875362905698654e-16,
+          3.284784954356667e-05,
+          384.0000000000001,
+          1.8331490639581725
+        ],
+        "zeroPhysicalScaleComponents": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "rawRelativeDefect": [
+          0.00048648157898988526,
+          4.238092858677308e-11,
+          0,
+          8.478918954463621e-16
+        ],
+        "physicalRelativeTolerance": 2e-12,
+        "physicalRelativeBudget": [
+          7.750725811397308e-28,
+          6.569569908713334e-17,
+          7.680000000000002e-10,
+          3.666298127916345e-12
+        ],
+        "physicalRelativeOnlyPassed": false,
+        "allFaceMultiplicityAbsolute": [
+          0.026531505079039883,
+          432.29530599558643,
+          2304.0000333259463,
+          16139.601696518728
+        ],
+        "allAbsoluteRoundoffContributions": [
+          0.02653150507904027,
+          432.29533884343596,
+          2688.0000333259463,
+          16141.434845582686
+        ],
+        "maximumCellFaceMultiplicity": 4,
+        "roundoffOperationBoundK": 52,
+        "machineSpacing": 2.220446049250313e-16,
+        "gammaK": 1.1546319456101762e-14,
+        "absoluteRoundoffBound": [
+          3.063412332937854e-16,
+          4.991420081670069e-12,
+          3.103650708279356e-11,
+          1.863741632069503e-10
+        ],
+        "combinedAbsoluteBudget": [
+          3.0634123329456046e-16,
+          4.991485777369156e-12,
+          7.990365070827938e-10,
+          1.9004046133486665e-10
+        ],
+        "roundoffDominatedComponents": [
+          true,
+          true,
+          false,
+          false
+        ],
+        "combinedBudgetPassed": true,
+        "roundoffPassed": true,
+        "reportedDefectAgrees": true
+      },
+      "hoopConservationAudit": {
+        "quantityOrder": [
+          "mass",
+          "axialMomentum",
+          "radialMomentum",
+          "totalEnergy"
+        ],
+        "quantityUnits": [
+          "kg/(s rad)",
+          "N/rad",
+          "N/rad",
+          "W/rad"
+        ],
+        "rawDefect": [
+          1.3552527156068805e-20,
+          1.2378336203267004e-15,
+          0,
+          -2.2737367544323206e-13
+        ],
+        "reportedRawDefect": [
+          1.3552527156068805e-20,
+          1.2378336203267004e-15,
+          0,
+          -2.2737367544323206e-13
+        ],
+        "reportedMinusRecomputed": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "rateVolumeIntegral": [
+          -0.00010350047968019572,
+          0.00046954384048779763,
+          -2.4130511410369593e-05,
+          -90.15541884999905
+        ],
+        "boundaryIntegral": [
+          0.00010350047968019573,
+          -0.0004695438404865598,
+          96.00002405749973,
+          90.15541884999882
+        ],
+        "sourceIntegral": [
+          0,
+          0,
+          95.99999992698832,
+          0
+        ],
+        "absoluteRateVolumeSum": [
+          0.00010350047968019572,
+          0.0006902411559890781,
+          0.0070986254273011085,
+          90.15541884999905
+        ],
+        "absoluteBoundaryFluxSum": [
+          0.01350878289113441,
+          216.14986409987148,
+          316.0818214663526,
+          8228.420103015858
+        ],
+        "absoluteCellSourceSum": [
+          0,
+          0,
+          95.99999992698832,
+          0
+        ],
+        "physicalSummationScale": [
+          0.013612283370814606,
+          216.15055434102746,
+          412.08892001876825,
+          8318.575521865858
+        ],
+        "zeroPhysicalScaleComponents": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "rawRelativeDefect": [
+          9.95610125566889e-19,
+          5.726719619574659e-18,
+          0,
+          2.733324652106207e-17
+        ],
+        "physicalRelativeTolerance": 2e-12,
+        "physicalRelativeBudget": [
+          2.722456674162921e-14,
+          4.323011086820549e-10,
+          8.241778400375365e-10,
+          1.6637151043731716e-08
+        ],
+        "physicalRelativeOnlyPassed": true,
+        "allFaceMultiplicityAbsolute": [
+          0.02794178206637311,
+          432.31050361395586,
+          1784.1329046097155,
+          16997.457279774393
+        ],
+        "allAbsoluteRoundoffContributions": [
+          0.04155406543718772,
+          648.4610579549833,
+          2196.221824628484,
+          25316.03280164025
+        ],
+        "maximumCellFaceMultiplicity": 4,
+        "roundoffOperationBoundK": 56,
+        "machineSpacing": 2.220446049250313e-16,
+        "gammaK": 1.2434497875801908e-14,
+        "absoluteRoundoffBound": [
+          5.167039384096442e-16,
+          8.063287647681497e-12,
+          2.7308915613132673e-11,
+          3.147921560957271e-10
+        ],
+        "combinedAbsoluteBudget": [
+          2.7741270680038855e-14,
+          4.403643963297364e-10,
+          8.514867556506691e-10,
+          1.6951943199827444e-08
+        ],
+        "roundoffDominatedComponents": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "combinedBudgetPassed": true,
+        "roundoffPassed": true,
+        "reportedDefectAgrees": true
+      },
+      "omittedAxisSourceNegativeControl": {
+        "quantityOrder": [
+          "mass",
+          "axialMomentum",
+          "radialMomentum",
+          "totalEnergy"
+        ],
+        "quantityUnits": [
+          "kg/(s rad)",
+          "N/rad",
+          "N/rad",
+          "W/rad"
+        ],
+        "rawDefect": [
+          1.3552527156068805e-20,
+          1.2378336203267004e-15,
+          -95.99999992698832,
+          -2.2737367544323206e-13
+        ],
+        "reportedRawDefect": [
+          1.3552527156068805e-20,
+          1.2378336203267004e-15,
+          0,
+          -2.2737367544323206e-13
+        ],
+        "reportedMinusRecomputed": [
+          0,
+          0,
+          95.99999992698832,
+          0
+        ],
+        "rateVolumeIntegral": [
+          -0.00010350047968019572,
+          0.00046954384048779763,
+          -96.00002405749973,
+          -90.15541884999905
+        ],
+        "boundaryIntegral": [
+          0.00010350047968019573,
+          -0.0004695438404865598,
+          96.00002405749973,
+          90.15541884999882
+        ],
+        "sourceIntegral": [
+          0,
+          0,
+          95.99999992698832,
+          0
+        ],
+        "absoluteRateVolumeSum": [
+          0.00010350047968019572,
+          0.0006902411559890781,
+          96.00002405749973,
+          90.15541884999905
+        ],
+        "absoluteBoundaryFluxSum": [
+          0.01350878289113441,
+          216.14986409987148,
+          316.0818214663526,
+          8228.420103015858
+        ],
+        "absoluteCellSourceSum": [
+          0,
+          0,
+          95.99999992698832,
+          0
+        ],
+        "physicalSummationScale": [
+          0.013612283370814606,
+          216.15055434102746,
+          508.08184545084066,
+          8318.575521865858
+        ],
+        "zeroPhysicalScaleComponents": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "rawRelativeDefect": [
+          9.95610125566889e-19,
+          5.726719619574659e-18,
+          0.18894593614500005,
+          2.733324652106207e-17
+        ],
+        "physicalRelativeTolerance": 2e-12,
+        "physicalRelativeBudget": [
+          2.722456674162921e-14,
+          4.323011086820549e-10,
+          1.0161636909016813e-09,
+          1.6637151043731716e-08
+        ],
+        "physicalRelativeOnlyPassed": false,
+        "allFaceMultiplicityAbsolute": [
+          0.02794178206637311,
+          432.31050361395586,
+          1784.1329046097155,
+          16997.457279774393
+        ],
+        "allAbsoluteRoundoffContributions": [
+          0.04155406543718772,
+          648.4610579549833,
+          2292.214750060556,
+          25316.03280164025
+        ],
+        "maximumCellFaceMultiplicity": 4,
+        "roundoffOperationBoundK": 56,
+        "machineSpacing": 2.220446049250313e-16,
+        "gammaK": 1.2434497875801908e-14,
+        "absoluteRoundoffBound": [
+          5.167039384096442e-16,
+          8.063287647681497e-12,
+          2.8502539440509785e-11,
+          3.147921560957271e-10
+        ],
+        "combinedAbsoluteBudget": [
+          2.7741270680038855e-14,
+          4.403643963297364e-10,
+          1.044666230342191e-09,
+          1.6951943199827444e-08
+        ],
+        "roundoffDominatedComponents": [
+          false,
+          false,
+          false,
+          false
+        ],
+        "combinedBudgetPassed": false,
+        "roundoffPassed": false,
+        "reportedDefectAgrees": false
+      },
+      "legacyEvidenceSHA256": "ec6d3fbb75f101b420c13c5264b13db2db87ae57a72b3ecdb77e3e36db31b360",
+      "legacySteadyResidual": 1.656922629377061e-08,
+      "legacyCompleteInfoReplay": true,
+      "sourceBindings": [
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricFVTransport.m",
+          "sha256": "5c891cc481a2ae89dcaa2c4b1f614968107e7a074a1291db347397824d2b7e37"
+        },
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricFVGas.m",
+          "sha256": "2cd3f38f83a30402738b1db0a917841c4a2b95fb15431d561187f2fe5a705ca0"
+        },
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricFVTemperatureTrace.m",
+          "sha256": "dc7d5134f32149770efa60989675bba563d428aa16e90e3557a237d568500a83"
+        },
+        {
+          "path": "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+          "sha256": "07614b8837bdb9701ec839d471acf735f833fb1cc498a5f6597028a1864d96fb"
+        },
+        {
+          "path": "tests/testAxisymmetricVariableTransport.m",
+          "sha256": "51041cb6dcd35a1f361fabbe3f1122f54760e7faa397baa483eb7e337f92c38c"
+        }
+      ],
+      "timeStepsTaken": 0,
+      "couetteValidationKind": "Source-free continuous integral reference, spatial/FV-mean wall heat and shear refinement; not an advanced NS steady solution",
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0
+    }
+  },
+  "realTmr": {
+    "summary": {
+      "status": "actual-explicit-wall-thermal-policy-SA-restart-not-experimental-validation",
+      "parentCheckpoint": "E:\\RocketAeroHeat\\outputs\\v65_validation\\tmr_sa_continue1\\tmr_sa_evidence.mat",
+      "parentCheckpointSHA256": "68b9922e83bd27a7c091d341b1b626d06e84e05c081c14875accb51e6b75c64f",
+      "singleChange": "jMin Fourier wall gradient: explicit Dirichlet-tangent, constant Tw derivative 0; full SA scalar gradient unchanged",
+      "initialOriginalResidual": 480426.837538104,
+      "finalOriginalResidual": 1.2527467301568707e-07,
+      "steadyConverged": true,
+      "stopReason": "steady-residual-converged",
+      "acceptedSteps": 30,
+      "rejectedAttempts": 8,
+      "solverResidualEvaluations": 29375,
+      "diagnosticResidualEvaluations": 3,
+      "elapsedSeconds": 201.0730317,
+      "fiveQuantityBalanceRelative": 2.1058213346622588e-15,
+      "initialSameQWallSignedHeatRangeWm2": [
+        8221.854369176712,
+        383978.91976798215
+      ],
+      "finalWallSignedHeatRangeWm2": [
+        8185.062959075855,
+        112946.36603129792
+      ],
+      "finalCoolingFaceIDs": [],
+      "wallThermalGradientPolicy": "dirichlet-tangent",
+      "heatFluxWasClippedOrMultiplied": false,
+      "pseudoTimeIsPhysical": false,
+      "physicalTimeAdvanced": 0,
+      "physicalSolution": false,
+      "eligibleForSurfaceCoverage": false,
+      "experimentalValidation": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "evidence": {
+      "path": "outputs/v66_validation/tmr_wall_thermal/tmr_wall_thermal_evidence.mat",
+      "sha256": "d1b8d4479b23358611c653fd131e96759cf9556ed6555fbaea8c8a517694016f",
+      "bytes": 3591023
+    },
+    "independentAudit": {
+      "path": "outputs/v66_validation/review/independent_wall_thermal_tmr_audit.json",
+      "sha256": "cfbbedfbafb2d7f808ba8c75e3ca0a174b05a857ab25b475e9db2d1ae9fb8a7f",
+      "bytes": 283237
+    },
+    "independentInteriorBEStatesReplayed": false
+  },
+  "viewer": {
+    "summary": {
+      "path": "outputs/v66_validation/tmr_wall_thermal_view/tmr_wall_thermal_view_summary.json",
+      "sha256": "f788bbd7d83023ea6a4d25d6498b326b71d581479d698310074783ea39fbc27a",
+      "bytes": 14348
+    },
+    "nodeAudit": {
+      "path": "outputs/v66_validation/tmr_wall_thermal_view/independent_export_check.json",
+      "sha256": "bbeaa07b62987dfb15bbafd9bf418ff721a3a4edbb7483c6881e28cc6baee1a3",
+      "bytes": 826
+    }
+  },
+  "publicDiagnostic": {
+    "summary": {
+      "pressure": {
+        "comparedPoints": 24,
+        "meanRelativeDifference": 0.11100330750558814,
+        "meanAbsoluteRelativeDifference": 0.16413429380906744,
+        "rootMeanSquareRelativeDifference": 0.3378996970000046,
+        "maximumAbsoluteRelativeDifference": 1.3447043453472534
+      },
+      "heating": {
+        "comparedPoints": 27,
+        "meanRelativeDifference": 0.08794671862169896,
+        "meanAbsoluteRelativeDifference": 0.16232871303232563,
+        "rootMeanSquareRelativeDifference": 0.2242903359747662,
+        "maximumAbsoluteRelativeDifference": 0.5925230063228526
+      },
+      "positiveHeatingMagnitudeOnly": {
+        "comparedPoints": 27,
+        "meanRelativeDifference": 0.08794671862169896,
+        "meanAbsoluteRelativeDifference": 0.16232871303232563,
+        "rootMeanSquareRelativeDifference": 0.2242903359747662,
+        "maximumAbsoluteRelativeDifference": 0.5925230063228526
+      }
+    },
+    "sourceWallCoolingFaceIDs": [],
+    "evidence": {
+      "path": "outputs/v66_validation/tmr_wall_thermal_comparison/tmr_wall_thermal_comparison.json",
+      "sha256": "aee675929e150b4a55a52a31680bcac824011cb52e356cb311568b48567ba71f",
+      "bytes": 38357
+    },
+    "experimentalValidation": false,
+    "accuracyPassClaimed": false,
+    "signedCoolingWasNotReplacedByAbsoluteValue": true
+  },
+  "upstreamDiagnostic": {
+    "evidence": {
+      "path": "outputs/v66_validation/upstream_profile/upstream_profile_diagnostic.json",
+      "sha256": "8b87b31fa19842cf2c40011578c97bd2094c97c90c1c29e9c9afe647f92c36d8",
+      "bytes": 38545
+    },
+    "comparedVelocityPoints": 20,
+    "wallYPlusRange": [
+      0.24006172532677053,
+      4.216070089878938
+    ],
+    "velocityRatioAbsoluteRMS": 0.014224904970385885,
+    "totalTemperatureComparisonPerformed": false,
+    "measuredTotalTemperatureReferenceK": null
+  },
+  "frozenV65OutputRestoration": {
+    "path": "outputs/v66_validation/v65_test_output_restore.json",
+    "sha256": "f72133129f3688b54dcf115b84762ac308267f115c8b19b87b0e5ff4ed4325ad",
+    "bytes": 3724
+  },
+  "diagnosticAttempts": [
+    {
+      "name": "wall_thermal_core",
+      "processID": 47304,
+      "actualExitCode": 1,
+      "classification": "Failed aggregate: the direct fixture incorrectly required byte equality for old WLS audit values computed through a separate EOS round trip. Physical constraints and scope were not loosened; repaired fixture rerun in clean_core. Not a successful final batch.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v66_validation/wall_thermal_core_process.json",
+        "sha256": "6314815ad1ec059927e1705d85f26b5152a81beef27365cb1a7417d85abec69e",
+        "bytes": 11362
+      }
+    },
+    {
+      "name": "wall_thermal_core_final",
+      "processID": 50116,
+      "actualExitCode": 0,
+      "classification": "Historical successful wall fixture before the final clean aggregate. Superseded by clean_core; not final-source acceptance.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v66_validation/wall_thermal_core_final_process.json",
+        "sha256": "be5d2ae142a5fa0d0422ba8feef4070174b9179b400cf9f1c2b7f07f6755a693",
+        "bytes": 11362
+      }
+    },
+    {
+      "name": "verified_core",
+      "processID": 19760,
+      "actualExitCode": 0,
+      "classification": "Historical successful numerical aggregate accidentally used three SA tests with default v65 output folders. Exact new bytes preserved separately and frozen v65 outputs restored from verified archive. Final clean_core uses explicit v66 destinations. Not final-source acceptance.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v66_validation/verified_core_process.json",
+        "sha256": "3f2560cd2ffc11313baeca1d3ef626d0b1a4461cd616ae22d00060ac7f4577ae",
+        "bytes": 11717
+      }
+    },
+    {
+      "name": "independent_wall_thermal_core",
+      "processID": 40532,
+      "actualExitCode": 0,
+      "classification": "Historical successful independent wall core audit before clean_core source/output lock. Superseded by independent_wall_thermal_clean_core; not final-source acceptance.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v66_validation/independent_wall_thermal_core_process.json",
+        "sha256": "6a484ec7e759d3cbb668715b491c58e4de263632cdb2eb0c0e6af8dd0ce3f6f0",
+        "bytes": 757
+      }
+    },
+    {
+      "name": "independent_wall_formula",
+      "processID": 3232,
+      "actualExitCode": 0,
+      "classification": "Read-only independent affine formula and same-Q diagnostic from frozen v65. No new MATLAB, new steady solve or physical qualification; not final-source acceptance.",
+      "finalSourceEvidence": false,
+      "processRecord": {
+        "path": "outputs/v66_validation/independent_wall_formula_process.json",
+        "sha256": "d6d906208ee6233306efce380ef942975594e3169e642b04df1c13d82591f31b",
+        "bytes": 484
+      }
+    }
+  ],
+  "limitations": [
+    "Full surface and full flight goal remain incomplete; no new qualified production solved area.",
+    "Axisymmetric non-swirling 1000-cell SA-noft2 numerical steady is not validated whole-rocket or 3D crossflow physics.",
+    "Dirichlet tangent gradient uses EOS of conservative means as point proxy; strong stretching, curvature and nonlinear layers still require mesh/physical checks.",
+    "SA scalar wall-gradient discretization is unchanged to isolate thermal boundary change.",
+    "24 pressure/27 signed heat points and upstream cell-containment velocity diagnostics are not experimental accuracy acceptance.",
+    "Experimental local total-temperature denominator is unknown and was not replaced with prescribed WIND inlet Tt.",
+    "Near-wall mesh, inlet, outer domain, outlet and turbulence-model sensitivity remain unresolved.",
+    "No browser visual/WebGL runtime acceptance: earlier preview startup and file URL actions were rejected; no bypass."
+  ],
+  "nextStep": "Use actual upstream and wall-shear/y+ evidence to choose near-wall/streamwise mesh and inlet sensitivity, then validate pressure/heat before production qualification and real contraction/afterbody/3D crossflow; keep whole-surface UI parallel."
+}

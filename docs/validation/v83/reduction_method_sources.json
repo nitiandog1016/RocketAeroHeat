@@ -1,0 +1,31 @@
+{
+  "status": "official-documentation-and-author-abstract-literature-review-only",
+  "reviewDateLocal": "2026-10-26",
+  "sources": [
+    {
+      "title": "Multigrid Reduction (MGR), hypre documentation",
+      "url": "https://hypre.readthedocs.io/en/latest/solvers-mgr.html",
+      "readScope": "Official introductory solver guide",
+      "finding": "MGR uses a prescribed C/F split, F relaxation and coarse correction for coupled variable systems.",
+      "notEstablished": "No claim that installing or reproducing MGR has solved the current rocket system."
+    },
+    {
+      "title": "PCAIR, PETSc documentation",
+      "url": "https://petsc.org/main/manualpages/PC/PCAIR/",
+      "readScope": "Official manual page, including required PFLARE dependency and available nonsymmetric reduction approaches",
+      "finding": "AIR is a reduction-based family for nonsymmetric systems; concrete interpolation, smoothing and C/F choices matter.",
+      "notEstablished": "No PETSc, PFLARE or hypre installation or integration was performed."
+    },
+    {
+      "title": "Nonsymmetric Algebraic Multigrid Based on Local Approximate Ideal Restriction (lAIR)",
+      "url": "https://arxiv.org/abs/1708.06065",
+      "readScope": "Author metadata and abstract only; full paper not checked",
+      "finding": "Local approximate ideal restriction with F relaxation is motivated by nonsymmetric advection-diffusion-reaction systems.",
+      "notEstablished": "The current group-constant V-cycle and proposed local spatial Schur prototype are not claimed to reproduce lAIR or its reported convergence."
+    }
+  ],
+  "currentImplementationIdentity": "Own unsmoothed block aggregation prototype, tested and unsuccessful for the real same-Q 32-step target",
+  "nextCandidateIdentity": "Own spatial C/F local-elimination candidate, topology/resource preflight only",
+  "experimentalAerothermalValidationClaimed": false,
+  "newProductionSolvedAreaM2": 0
+}

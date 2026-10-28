@@ -1,0 +1,396 @@
+{
+  "version": 82,
+  "status": "frozen-tested-numerics-and-UI-release-candidate-pending-isolated-portable-recompute",
+  "conservativePath": {
+    "status": "bounded-actual-20deg-explicit-exact-Godunov-full-NS-Krylov-study",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 3,
+    "candidateTrials": 5,
+    "residualEvaluations": 15,
+    "operatorBuilds": 3,
+    "initialMaximumResidual": 76558676.45627536,
+    "maximumResidual": 29647012.456388917,
+    "initialRmsMerit": 4683306.33977455,
+    "rmsMerit": 2188947.392069382,
+    "elapsedSeconds": 240.5345304,
+    "matrixVectorProducts": 11,
+    "jacobianResidualEvaluations": 11,
+    "preconditionerApplications": 14,
+    "lineage": {
+      "sourceState": "v81-arithmetic02-six-HLLC-corrections-internal-initial-guess",
+      "sourceAcceptedIterations": 6,
+      "discretizationChangedFromSource": true,
+      "sourceHistoryAppended": false,
+      "interiorEulerFlux": "exact-godunov",
+      "viscousWorkVelocity": "arithmetic",
+      "newEquationInitialCounter": 0,
+      "samePhysicalBoundary": true,
+      "externalCFDImported": false
+    },
+    "interiorEulerFlux": "exact-godunov",
+    "viscousWorkVelocity": "arithmetic",
+    "steadyConverged": false,
+    "stopReason": "maximum-nonlinear-iterations",
+    "spatialConservationRelative": 2.8653818713341037e-16,
+    "steadyBoundaryFluxBalance": 0.01571348039704476,
+    "wallHeatRangeWm2": [
+      -423678.12846445676,
+      3085969.175109647
+    ],
+    "signedHeatPowerW": 1676723.174666211,
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 26220
+  },
+  "primitivePath": {
+    "status": "bounded-actual-20deg-explicit-exact-Godunov-full-NS-Krylov-study",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 3,
+    "candidateTrials": 5,
+    "residualEvaluations": 16,
+    "operatorBuilds": 3,
+    "initialMaximumResidual": 76558676.45627536,
+    "maximumResidual": 36507519.995693386,
+    "initialRmsMerit": 4683306.33977455,
+    "rmsMerit": 2151782.4790493115,
+    "elapsedSeconds": 257.8429997,
+    "matrixVectorProducts": 12,
+    "jacobianResidualEvaluations": 12,
+    "preconditionerApplications": 15,
+    "lineage": {
+      "sourceState": "v81-arithmetic02-six-HLLC-corrections-internal-initial-guess",
+      "sourceAcceptedIterations": 6,
+      "discretizationChangedFromSource": true,
+      "sourceHistoryAppended": false,
+      "interiorEulerFlux": "exact-godunov",
+      "viscousWorkVelocity": "arithmetic",
+      "newEquationInitialCounter": 0,
+      "samePhysicalBoundary": true,
+      "externalCFDImported": false,
+      "nonlinearTrialStateCoordinates": "primitive-tangent"
+    },
+    "interiorEulerFlux": "exact-godunov",
+    "viscousWorkVelocity": "arithmetic",
+    "steadyConverged": false,
+    "stopReason": "maximum-nonlinear-iterations",
+    "spatialConservationRelative": 2.382814007686817e-16,
+    "steadyBoundaryFluxBalance": 0.015815863187096945,
+    "wallHeatRangeWm2": [
+      -366280.75838465255,
+      3179615.307011361
+    ],
+    "signedHeatPowerW": 1742753.2463171596,
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 30488
+  },
+  "integration": {
+    "status": "passed-real-six-correction-state-full-explicit-exact-Euler-integration-and-legacy-info",
+    "cellCount": 217272,
+    "sourceFaces": 19752,
+    "interiorFaces": 849336,
+    "maximumResidual": 76558676.45627536,
+    "rmsMerit": 4683306.33977455,
+    "spatialConservationRelative": 2.731908785398229e-16,
+    "elapsedSeconds": 15.1002481,
+    "actualFacePressureStarPa": 110.46972135130109,
+    "actualFaceSampleTemperatureK": 714.4641263735415,
+    "maxPressureRootIterations": 7,
+    "defaultCompleteInfoExactlyReplayed": true,
+    "viscousWallAndBoundaryExactlyKept": true,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 53828
+  },
+  "defaultCompatibility": {
+    "status": "passed-complete-small-3D-default-and-explicit-conservative-prior-source-replay",
+    "cellCount": 32,
+    "acceptedIterations": 2,
+    "completeDefaultResultExactlyReplayed": true,
+    "onlyRuntimeTimingsExcluded": true,
+    "invalidPolicyRejections": 2,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 51320
+  },
+  "publicPressureCurveAudit": {
+    "status": "passed-independent-public-pressure-curves-all-real-faces-and-scalar-sampling",
+    "case": "integrate01",
+    "processID": 1388,
+    "interiorFaces": 849336,
+    "independentlyRootedSamples": 269,
+    "publicCurveRelativeResidual": 1.4290504221793722e-13,
+    "publicContactVelocityRelativeDifference": 7.721994631747019e-16,
+    "sampledMaximumRelativeDifferences": {
+      "pressureStar": 1.8956862070893273e-13,
+      "normalVelocityStar": 6.836136085414269e-14,
+      "samplePrimitive": 5.975351797949968e-15,
+      "flux": 1.0874663303587528e-13
+    },
+    "sampleRegionsPresent": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "savedFiveQuantityDivergenceRelativeDifference": 4.3244182890092856e-16,
+    "independentSpatialConservationRelative": 2.4028045868108654e-16,
+    "referencePressureFloorActive": false,
+    "fullIndependentNSSolver": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v82_validation\\integrate01\\exact_integration_evidence.mat": "b88b2fc710e86a8d371e9d335b90fa0efa06216c8a3d4bc7179285f786fce784",
+      "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "outputs\\v82_validation\\clawpack_exact_euler.py": "2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef",
+      "outputs\\v82_validation\\probe_exact_riemann.py": "402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a"
+    },
+    "scriptSHA256": "9e720635a45c94a79cb987624112af0df16118a3787de8944224677284d41c09"
+  },
+  "processes": {
+    "flux02": {
+      "processID": 3780,
+      "engineProcessIDs": [
+        34100
+      ],
+      "exitCode": 0
+    },
+    "integrate01": {
+      "processID": 44604,
+      "engineProcessIDs": [
+        53828
+      ],
+      "exitCode": 0
+    },
+    "exact_krylov01": {
+      "processID": 23672,
+      "engineProcessIDs": [
+        26220
+      ],
+      "exitCode": 0
+    },
+    "primitive02": {
+      "processID": 54052,
+      "engineProcessIDs": [
+        49376
+      ],
+      "exitCode": 0
+    },
+    "primitive_krylov01": {
+      "processID": 41696,
+      "engineProcessIDs": [
+        30488
+      ],
+      "exitCode": 0
+    },
+    "trial_compatibility01": {
+      "processID": 36664,
+      "engineProcessIDs": [
+        51320
+      ],
+      "exitCode": 0
+    },
+    "workbench02": {
+      "processID": 21676,
+      "engineProcessIDs": [
+        44636
+      ],
+      "exitCode": 0
+    },
+    "independent01": {
+      "processID": 1388,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "independent02": {
+      "processID": 42708,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "independent03": {
+      "processID": 40912,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "candidates01": {
+      "processID": 2940,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "energy01": {
+      "processID": 23964,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "paths01": {
+      "processID": 42328,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "node02": {
+      "processID": 49468,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "node03": {
+      "processID": 43156,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "originalface04": {
+      "processID": 7868,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "originalface05": {
+      "processID": 27076,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    }
+  },
+  "sourceEpochs": {
+    "status": "all-source-epochs-resolved",
+    "missing": {},
+    "resolvedHistoricalEpochs": [
+      {
+        "run": "flux02",
+        "path": "internalFlow/cutCell/cutCellExactEulerFlux.m",
+        "sha256": "25d0b03d6dfbd7f5925a975e142c9c31c6aeaeae6d76d17d85c3416c678f30f4",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\flux02_cutCellExactEulerFlux.m"
+      },
+      {
+        "run": "flux02",
+        "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+        "sha256": "7c283acee5c03c6b08b7fc2b61d972eb9b4fabe8dd44cafdd25f63923c591eca",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\pre_exact_cutCellNavierStokesResidual.m"
+      },
+      {
+        "run": "flux02",
+        "path": "internalFlow/cutCell/solveRocketShellSteadyKrylov.m",
+        "sha256": "80cb913797f4cc894776d9cab5a137ee9ba7c45bdb9c723ea86b0fe17a1e3842",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\pre_exact_solveRocketShellSteadyKrylov.m"
+      },
+      {
+        "run": "integrate01",
+        "path": "internalFlow/cutCell/solveRocketShellSteadyKrylov.m",
+        "sha256": "582618756b69cf1d9ca3ffbb29d61d16c84b2da7552ef3b58caedbbd30443c1a",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\pre_primitive_solveRocketShellSteadyKrylov.m"
+      },
+      {
+        "run": "exact_krylov01",
+        "path": "tests/studyRocketShellExactKrylov.m",
+        "sha256": "4dca9d0655cabe7a18fd3752a0143c24002b04b17abebb7d570efbc3c9593cef",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\conservative_studyRocketShellExactKrylov.m"
+      },
+      {
+        "run": "exact_krylov01",
+        "path": "internalFlow/cutCell/solveRocketShellSteadyKrylov.m",
+        "sha256": "582618756b69cf1d9ca3ffbb29d61d16c84b2da7552ef3b58caedbbd30443c1a",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\pre_primitive_solveRocketShellSteadyKrylov.m"
+      },
+      {
+        "run": "primitive02",
+        "path": "tests/studyRocketShellExactKrylov.m",
+        "sha256": "4dca9d0655cabe7a18fd3752a0143c24002b04b17abebb7d570efbc3c9593cef",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\conservative_studyRocketShellExactKrylov.m"
+      },
+      {
+        "run": "primitive02",
+        "path": "exportRocketExactFluxStudy.m",
+        "sha256": "61b3dcee68bde771fcb141f6f21a1c16ae91626d3b169f6ac2eb53f8ad70cf75",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\workbench01_exportRocketExactFluxStudy.m"
+      },
+      {
+        "run": "primitive02",
+        "path": "web/rocket-exact.js",
+        "sha256": "9d098cc4fa68ead8ad883aeddfbcd6beff6fe5a19c9083ad16c356ed61245363",
+        "sourceEpoch": "outputs\\v82_validation\\workbench01\\rocket-exact.js"
+      },
+      {
+        "run": "primitive02",
+        "path": "internalFlow/cutCell/solveRocketShellSteadyKrylov.m",
+        "sha256": "582618756b69cf1d9ca3ffbb29d61d16c84b2da7552ef3b58caedbbd30443c1a",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\pre_primitive_solveRocketShellSteadyKrylov.m"
+      },
+      {
+        "run": "primitive_krylov01",
+        "path": "exportRocketExactFluxStudy.m",
+        "sha256": "61b3dcee68bde771fcb141f6f21a1c16ae91626d3b169f6ac2eb53f8ad70cf75",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\workbench01_exportRocketExactFluxStudy.m"
+      },
+      {
+        "run": "primitive_krylov01",
+        "path": "web/rocket-exact.js",
+        "sha256": "9d098cc4fa68ead8ad883aeddfbcd6beff6fe5a19c9083ad16c356ed61245363",
+        "sourceEpoch": "outputs\\v82_validation\\workbench01\\rocket-exact.js"
+      },
+      {
+        "run": "trial_compatibility01",
+        "path": "demoRocketExactFluxStudy.m",
+        "sha256": "f4a6c01e8d4993575408ca853bacc0d60b819032d0a5b276b50141310769102e",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\pre_portable_demoRocketExactFluxStudy.m"
+      },
+      {
+        "run": "trial_compatibility01",
+        "path": "exportRocketExactFluxStudy.m",
+        "sha256": "a2cab86ad00ace80a98195fe2c66cd0ffc57078e5ac00b56219b3a78707c81c9",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\trial_compatibility01_exportRocketExactFluxStudy.m"
+      },
+      {
+        "run": "trial_compatibility01",
+        "path": "web/rocket-exact.js",
+        "sha256": "9d098cc4fa68ead8ad883aeddfbcd6beff6fe5a19c9083ad16c356ed61245363",
+        "sourceEpoch": "outputs\\v82_validation\\workbench01\\rocket-exact.js"
+      },
+      {
+        "run": "workbench02",
+        "path": "demoRocketExactFluxStudy.m",
+        "sha256": "f4a6c01e8d4993575408ca853bacc0d60b819032d0a5b276b50141310769102e",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\pre_portable_demoRocketExactFluxStudy.m"
+      },
+      {
+        "run": "workbench02",
+        "path": "exportRocketExactFluxStudy.m",
+        "sha256": "b968d0b6efc344e00d3f7f864b5b5096f483fff093f66e79bf3527511e3dab09",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\pre_portable_exportRocketExactFluxStudy.m"
+      },
+      {
+        "run": "independent01",
+        "path": "tests\\auditRocketExactFlux.py",
+        "sha256": "9e720635a45c94a79cb987624112af0df16118a3787de8944224677284d41c09",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\independent01_auditRocketExactFlux.py"
+      },
+      {
+        "run": "independent02",
+        "path": "tests\\auditRocketExactFlux.py",
+        "sha256": "5c9212019e805859f73f283cc974b674c65311019bf199da490e7914268a526d",
+        "sourceEpoch": "outputs\\v82_validation\\source_epochs\\independent02_auditRocketExactFlux.py"
+      }
+    ]
+  },
+  "currentExactStudySourcesSHA256": {
+    "exportRocketExactFluxStudy.m": "0cee9ff0e2608a81791b57c882772dd2c4e39108c95014d50ad4ebf7eb75f376",
+    "demoRocketExactFluxStudy.m": "8ea6238745bcf0693734266c949cfae82eb777376ce086ce339e9ffe37641815",
+    "tests\\verifyRocketExactStudyRecomputed.m": "d8638e55f74dccebb5fe1b78c9bbfd7bd9027e383eb179f510e08a0ea1f97157",
+    "internalFlow\\cutCell\\cutCellExactEulerFlux.m": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+    "internalFlow\\cutCell\\solveRocketShellSteadyKrylov.m": "df7bfeae734737b10fb30e50557c19b80903be66fe3960ebcab845b017dbc877"
+  },
+  "portableArchiveInputResolutionActuallyTested": false,
+  "isolatedRuntimeStatus": "pending",
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "realOldHLLCSixCorrectionsRecomputed": false,
+  "physicalTimeAdvanced": 0,
+  "steadyConverged": false,
+  "physicalSolution": false,
+  "wholeGoalComplete": false,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0
+}

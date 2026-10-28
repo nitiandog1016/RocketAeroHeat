@@ -1,0 +1,210 @@
+{
+  "version": 69,
+  "status": "tested-controlled-complete-rocket-discretization-study-not-steady-not-physical",
+  "cellCount": 1380,
+  "realWallSegments": 115,
+  "nativeTriangles": 9216,
+  "displayTriangles": 7296,
+  "cases": {
+    "work_arithmetic": {
+      "acceptedSteps": 13,
+      "rejectedAttempts": 10,
+      "initialOriginalResidual": 200339876.10122073,
+      "finalOriginalResidual": 9673307.331848625,
+      "globalFiveQuantityBalanceRelative": 9.130739912727699e-17,
+      "solverResidualEvaluations": 23951,
+      "elapsedSolverSeconds": 310.1057457,
+      "signedHeatRangeWm2": [
+        -13452.452426935255,
+        2507535.3251574975
+      ],
+      "totalSignedWallHeatW": 282646.9246695773,
+      "strategies": {
+        "caseFactory": "createRocketAxisymmetricWallCase",
+        "source": "actual-case-definition-boundary-and-replayed-finalInfo",
+        "wallVelocityGradientPolicy": "legacy",
+        "viscousWorkVelocityPolicy": "arithmetic",
+        "wallVelocityGradientAuditPresent": false,
+        "viscousWorkVelocityAuditPresent": true,
+        "wallVelocityGradientAuditKind": "",
+        "viscousWorkVelocityAuditKind": "explicit-arithmetic-interior-viscous-work-velocity-v1",
+        "wallScope": "selected wall Newton stress gradient only; cell WLS, SA and Fourier unchanged",
+        "workScope": "interior viscous energy work velocity only; boundary trace and traction unchanged",
+        "physicalAccuracyValidated": false,
+        "generalSkewGridPositivityProved": false,
+        "secondOrderArithmeticReconstructionClaimed": false
+      },
+      "sourceEvidenceSHA256": "15fa1022797accf33a951b20722009e639da9c1ff8f58c02c76b9348569365c8",
+      "acceptedEndpointsReplayed": 13,
+      "exportRefusalsPassed": 14,
+      "cumulativePseudoTimeS": 3.119401255594902e-07,
+      "finalTemperatureRangeK": [
+        195.76941508827113,
+        1430.361727005727
+      ],
+      "finalHot106TemperatureK": 1430.361727005727,
+      "lastStepS": 1.736923619623431e-12,
+      "rejectedInnerStatesPersisted": false,
+      "uniqueLineSearchFailureCauseEstablished": false,
+      "finalNegativeInternalPairs": 540
+    },
+    "work_and_wall": {
+      "acceptedSteps": 3,
+      "rejectedAttempts": 0,
+      "initialOriginalResidual": 200339876.10122073,
+      "finalOriginalResidual": 35476096.848723345,
+      "globalFiveQuantityBalanceRelative": 1.1701405098365047e-16,
+      "solverResidualEvaluations": 1895,
+      "elapsedSolverSeconds": 28.7590547,
+      "signedHeatRangeWm2": [
+        -48350.225689756844,
+        92177.64725088599
+      ],
+      "totalSignedWallHeatW": -23823.98886338363,
+      "strategies": {
+        "caseFactory": "createRocketAxisymmetricWallCase",
+        "source": "actual-case-definition-boundary-and-replayed-finalInfo",
+        "wallVelocityGradientPolicy": "dirichlet-tangent",
+        "viscousWorkVelocityPolicy": "arithmetic",
+        "wallVelocityGradientAuditPresent": true,
+        "viscousWorkVelocityAuditPresent": true,
+        "wallVelocityGradientAuditKind": "explicit-Dirichlet-tangent-static-wall-velocity-gradient-v1",
+        "viscousWorkVelocityAuditKind": "explicit-arithmetic-interior-viscous-work-velocity-v1",
+        "wallScope": "selected wall Newton stress gradient only; cell WLS, SA and Fourier unchanged",
+        "workScope": "interior viscous energy work velocity only; boundary trace and traction unchanged",
+        "physicalAccuracyValidated": false,
+        "generalSkewGridPositivityProved": false,
+        "secondOrderArithmeticReconstructionClaimed": false
+      },
+      "sourceEvidenceSHA256": "c7bfbabbbcaf5298ebaf4a09bc1dd40bf16f49aa657dbb0413dce4ba1aae38a5",
+      "acceptedEndpointsReplayed": 3,
+      "exportRefusalsPassed": 14,
+      "cumulativePseudoTimeS": 9.895786372544078e-09,
+      "finalTemperatureRangeK": [
+        222.28054189460883,
+        340.67263089075186
+      ],
+      "finalHot106TemperatureK": 337.6989386214087,
+      "lastStepS": 6.3243308213476296e-09,
+      "rejectedInnerStatesPersisted": false,
+      "uniqueLineSearchFailureCauseEstablished": false,
+      "finalNegativeInternalPairs": 734
+    }
+  },
+  "defaultLegacyV68AllThirteenEndpointsAndV67CompleteInfoReplayed": true,
+  "staticWallGradientAndArithmeticWorkCoreTestsPassed": true,
+  "defaultProductionNumericalTolerancesUnchanged": true,
+  "sameInitialQAndGeometryForControlledChains": true,
+  "independentSavedFluxBEAndEnergyAuditPassed": true,
+  "independentFullRANSResidualReimplemented": false,
+  "generalSkewGridPositivityProved": false,
+  "nativeCurvedAreaConservativeProjectionPassed": true,
+  "originalSourceFacesPreserved": true,
+  "signedHeatWasRenormalized": false,
+  "fiveStepSameHostDataAndEventsPassed": true,
+  "defaultEditableMainWorkflowPreserved": true,
+  "wallTemperatureValueKind": "prescribed",
+  "edgeTemperatureSolved": false,
+  "recoveryTemperatureSolved": false,
+  "wallTemperatureSolved": false,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "steadyConverged": false,
+  "physicalSolution": false,
+  "experimentalValidation": false,
+  "fullSurfaceSolved": false,
+  "wholeGoalComplete": false,
+  "eligibleForSurfaceCoverage": false,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "nextWork": "complete-meridian near-wall-normal grid and stress/internal-energy pairing; no blind continuation or another TMR prerequisite",
+  "processes": {
+    "wall_case01": {
+      "processID": 2960,
+      "engineProcessIDs": [
+        35740
+      ],
+      "exitCode": 0
+    },
+    "wall_gradient02": {
+      "processID": 27320,
+      "engineProcessIDs": [
+        46088
+      ],
+      "exitCode": 0
+    },
+    "viscous_work02": {
+      "processID": 40488,
+      "engineProcessIDs": [
+        46072
+      ],
+      "exitCode": 0
+    },
+    "work_startup01": {
+      "processID": 50220,
+      "engineProcessIDs": [
+        51168
+      ],
+      "exitCode": 0
+    },
+    "work_continue01": {
+      "processID": 42340,
+      "engineProcessIDs": [
+        20752
+      ],
+      "exitCode": 0
+    },
+    "controlled_replay01": {
+      "processID": 48088,
+      "engineProcessIDs": [
+        48284
+      ],
+      "exitCode": 0
+    },
+    "both_startup01": {
+      "processID": 22704,
+      "engineProcessIDs": [
+        45992
+      ],
+      "exitCode": 0
+    },
+    "both_replay_view01": {
+      "processID": 45988,
+      "engineProcessIDs": [
+        28016
+      ],
+      "exitCode": 0
+    },
+    "work_replay_view01": {
+      "processID": 47888,
+      "engineProcessIDs": [
+        47940
+      ],
+      "exitCode": 0
+    },
+    "node_both_view01": {
+      "processID": 53340,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "node_both_host01": {
+      "processID": 32576,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "node_work_view01": {
+      "processID": 19016,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "node_work_host01": {
+      "processID": 39408,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "independent_final01": {
+      "processID": 46524,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    }
+  }
+}

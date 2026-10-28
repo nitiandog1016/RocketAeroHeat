@@ -1,0 +1,731 @@
+{
+  "version": 83,
+  "status": "tested-complete-Schur-input-and-pivot-checkpoint-studies-pivoted-candidate-zero-pivot-rejected-no-physical-update-not-delivered",
+  "generatedUTC": "2026-10-25T09:31:59.919057+00:00",
+  "recorderProcessID": 55788,
+  "previousGoalTurnClassification": "progress",
+  "previousGoalTurnEvidence": "Previous turn implemented/tested flow ordering and momentum-density-energy Schur, discovered the real local inverse failure and source-mapped it to original CV/face/layer. Current work captured and independently audited that failure, then tested a distinct pivot strategy.",
+  "priorProgressPath": "docs/validation/v83/progress_flow_schur.json",
+  "priorProgressSHA256": "d4b165cac6f90b49a4185be9e58635a6eb4073e53cec89398b0a833083a5566c",
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/buildRocketFieldSchurPreconditioner.m": "344cf6196ed04128271a51674047ea4946efeba98d2dcf0c15629aaefcad8d1f",
+    "internalFlow/cutCell/factorRocketFieldILU0.m": "26ea0f7859c9877aa7698a81000604b789beb4acbc29b7cc6df8c0345c059909",
+    "internalFlow/cutCell/factorRocketPivotedSchur.m": "b2d7a38278aa6f3d42d1ab2a4e2d737b2ebc470dd97d0201709fef84f85e77d5",
+    "internalFlow/cutCell/solveRocketPivotedSchur.m": "19efcdb1ae172523092d1740caf5d0c050b149e9815fb0ec0720a4ce0cd7707e",
+    "internalFlow/cutCell/solveRocketPivotedFieldSchur.m": "c4be70f750d8909ff61bf43ca58fe93a8caaafb8a078318310329b8a9178bc67",
+    "tests/testRocketSchurFailureCheckpoint.m": "4bc5ccfa73cedc93ea1a415979820a73057aa990dd8d48579371fc3ddf04c52e",
+    "tests/studyRocketSchurFailureCheckpoint.m": "3aeedf8066fa343ece247caa6adfdd72cf81f12bcc806be5d9a341527bcef76e",
+    "tests/testRocketPivotedSchur.m": "251523e3bc91b4fcf219ddf875ce02a48935862d6296577a2a4718705d3dab66",
+    "tests/studyRocketPivotedSchurActions.m": "fed66690eee3772c0de47b34823fa2da3369f7e1279900f418867c4f055269b4",
+    "tests/auditRocketSchurFailureCheckpoint.py": "4aeb1786598f208c135c75f2b623ffcf12006be1ab5a2905a20d86e2fc4d519e",
+    "tests/auditRocketRealSchurCheckpoint.py": "a9e5dbde514705822305df94bddc5326e3e1e96bcdebbd57aed586cb9ed95fa2",
+    "tests/auditRocketPivotedSchur.py": "46bc6df5d19c9f1a0411d5188b96d258290a9cfcb5986130ac324543ed31d262",
+    "tests/auditRocketRealPivotedSchur.py": "3540b28567ccf091f16201185f6f5910431859fa7c0b0c239005d63dbf7ca404",
+    "tests/diagnoseRocketSchurScalarScales.py": "8619c664e1410ddbd1a248e9ad87ff3d37ce6c2921249ebd63e97829827b9c95",
+    "tests/diagnoseRocketSchurScalarBandwidth.py": "2fa6d48c55a060e4e5ddd3f1bb69288010a99c47ffa7f3125f8d3163529aa4cf",
+    "tests/exportRocketSchurCheckpointDiagnostics.py": "7d644bab8e8d9eafcf764f589786488e4c6dcf52eff8204cfddfc684157d5c62",
+    "tests/auditRocketBlockStudyWorkbench.py": "c94ffabf2f4e1a622e627e5271c6ee7dd20b9d7a5d6dee49e0d5a200163acbea",
+    "tests/testRocketWallVelocityWorkbench.js": "068069564728d28e7e2d31e201e710bf5a23f61e06620dc022aa94d38a49893e",
+    "docs/SCHUR_PIVOT_CHECKPOINT_V83.md": "361f92fc2b5bd5b5b10893567762e96f555650afe8c51589b2c5d377b014614c",
+    "docs/GITHUB_STAGE_READINESS.md": "5da8dc9f0e2c7b13e870f4a93fc212c5eea1c2b67603005434573494d7cf1df0",
+    "docs/PROJECT_GOALS.md": "a992886a37e2487e273a5f0aa16b795d245f8046fc5b83a5811760a98b3ab234",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1",
+    "outputs/v83_validation/record_schur_pivot_progress.py": "a4123e0ac9a0fdf5d7d915ab95ae23585d617e0495a9825a88259d17d12df7dd"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_interleaved_auditRocketPivotedSchur.py",
+      "sha256": "e23465a9589d2d67cbe925f159c5026c8cd95921feb9b5533a4312c9d853e13f",
+      "bytes": 3927
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_interleaved_factorRocketPivotedSchur.m",
+      "sha256": "ba65c59ba172e9b94cf0d1b043c0dc643f907e58c387ac5781ac3612f02bd1ea",
+      "bytes": 4401
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_interleaved_solveRocketPivotedSchur.m",
+      "sha256": "b8a5549911cc1ed6d1180eaec042f7c2af4735831cff999a61acebecd9084e41",
+      "bytes": 827
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_interleaved_studyRocketPivotedSchurActions.m",
+      "sha256": "3197a81d898ce978ef078ad099b51d4bd3d5a2c7e000ad806447a0704a9ac1a3",
+      "bytes": 5161
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_interleaved_testRocketPivotedSchur.m",
+      "sha256": "bd69c75227a31f2f4543c5fd035b14a4fee850b97478666af74d06e697e22052",
+      "bytes": 4183
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_known_pivot_ui_auditRocketBlockStudyWorkbench.py",
+      "sha256": "c9fdee599bd34a329398f858c6633c32b0329de23fbb53998f7d5ee42985abb1",
+      "bytes": 3628
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_pivoted_unit_budget_testRocketPivotedSchur.m",
+      "sha256": "5572229c5f16aee32934e98dbdedede40592dbf0e562bc0908aba42832a4429e",
+      "bytes": 4184
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_schur_checkpoint_buildRocketFieldSchurPreconditioner.m",
+      "sha256": "48f133971a7780439bafcfd8f8d86c13f3bd031ba4b7e7ab944640f4e96cdde0",
+      "bytes": 4540
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_schur_checkpoint_factorRocketFieldILU0.m",
+      "sha256": "1c8a28fc7e35c214a53d0e8e7898dcf36ce4624996d0732f02d86e77a7013d0b",
+      "bytes": 2311
+    }
+  ],
+  "matlabProcesses": [
+    {
+      "path": "outputs/v83_validation/schurcheckpointunit01_process.json",
+      "sha256": "63248e1e15eef5a5e93c3ea6bd25a98f9aa2d6fc499ede8fdd230a2b874daf15",
+      "bytes": 147393,
+      "case": "schurcheckpointunit01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        47908
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/schurcheckpointreal01_process.json",
+      "sha256": "1c77e90523bf7f07ad0f0873906273aeba06bb09273c288c0ac8001aaaba7e8e",
+      "bytes": 148105,
+      "case": "schurcheckpointreal01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        17240
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurunit01_process.json",
+      "sha256": "81e3e93ad93d42fe1b3c5d58d5f2845d9b2652e38ed24e3be0d896b99316f169",
+      "bytes": 148827,
+      "case": "pivotedschurunit01",
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        17272
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurunit02_process.json",
+      "sha256": "73133f3e9e21c9ca5ab14e25be3bd80bf6498adb077113586cabae3667b68556",
+      "bytes": 149261,
+      "case": "pivotedschurunit02",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        58040
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurreal01_process.json",
+      "sha256": "2b2f37d5efffca0ce345e8e9b0f305f987459721cd210f935007d5594ac70094",
+      "bytes": 149512,
+      "case": "pivotedschurreal01",
+      "exitCode": 4294967295,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        53384
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurunit03_process.json",
+      "sha256": "0059c103af2605ef672ca7c3843786c3c0228395b42a15789efb0e345a7f4428",
+      "bytes": 150525,
+      "case": "pivotedschurunit03",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        17124
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurreal02_process.json",
+      "sha256": "db93ee92c43b90821ac2359714e7e40e1fd7e6400026906cefb27b34f1fde440",
+      "bytes": 150767,
+      "case": "pivotedschurreal02",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        31012
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/schurpivotui01_process.json",
+      "sha256": "2ac825544fb2835dd69003700dbeaf5a737da75d47af76de0a767e8507c4c2f9",
+      "bytes": 150767,
+      "case": "schurpivotui01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        57276
+      ]
+    }
+  ],
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/schurcheckpointunit01_independent_checkpoint.json",
+      "sha256": "bf6b867517908271a7d654cb9ad7cadceefdf6b6fd9403e8360b79e984cc3c2e",
+      "bytes": 1547,
+      "status": "passed-independent-small-assembly-checkpoints-and-original-rejected-pivot-ledger",
+      "processID": 60168
+    },
+    {
+      "path": "outputs/v83_validation/schurcheckpointreal01_independent_real_checkpoint.json",
+      "sha256": "484ebe8a1b57c45529d3b394ed34df0c541b285c83895d50d9b2b9f8f37c21fe",
+      "bytes": 2542,
+      "status": "passed-independent-all-real-Schur-input-coefficients-and-rejected-pivot-ledger-audit",
+      "processID": 52208
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurunit02_independent_pivoted_schur.json",
+      "sha256": "7bbc17d655ed16cf13a24a6825304c31b88eb0235526831c4285c524e78c4904",
+      "bytes": 1277,
+      "status": "passed-independent-pivoted-Schur-permutation-full-S-five-conservation-and-no-diagonal-replacement",
+      "processID": 58240
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurunit03_independent_pivoted_schur.json",
+      "sha256": "c08b6195e95f85d7aa4213d592f41a6c23f68e30dd6bdc409030d46e8271bed1",
+      "bytes": 1276,
+      "status": "passed-independent-pivoted-Schur-permutation-full-S-five-conservation-and-no-diagonal-replacement",
+      "processID": 55968
+    },
+    {
+      "path": "outputs/v83_validation/workbench19/node_wall_velocity_summary.json",
+      "sha256": "9e1c1275cb5fe8363c522c22314ade39da7cb7589a7c7d55af30fe3a513fb402",
+      "bytes": 1121,
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "processID": 58432
+    },
+    {
+      "path": "outputs/v83_validation/workbench19/independent_block_study_view.json",
+      "sha256": "2afba0cea870f7af441eb4e1279f9b294e7f565fff88e1523102ffc53b197477",
+      "bytes": 3739,
+      "status": "passed-independent-research-source-binding-and-unchanged-wall-fields-history-identity",
+      "processID": 52624
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/schurcheckpointunit01/schur_checkpoint_unit_evidence.mat",
+      "sha256": "fb39f51062aea5256a53451476cdf2f7b7ac0f182850f8576051e700bf236201",
+      "bytes": 2947
+    },
+    {
+      "path": "outputs/v83_validation/schurcheckpointunit01/synthetic_failure.mat",
+      "sha256": "05246c9992c4b8c3610ed4da489c0000ae7304a39b33db2d09db019d5087be68",
+      "bytes": 1793
+    },
+    {
+      "path": "outputs/v83_validation/schurcheckpointreal01/checkpoint/schur_assembly_evidence.mat",
+      "sha256": "efffcbd85ba71246dac8aacb735b8efd647f23bc2933332ab143c426d82db1e7",
+      "bytes": 393396866
+    },
+    {
+      "path": "outputs/v83_validation/schurcheckpointreal01/checkpoint/momentum_factor_evidence.mat",
+      "sha256": "0f6e31dcead854511d16d7b663e1f8be78e85c703f6c98ef107e9dbfb870296a",
+      "bytes": 130674792
+    },
+    {
+      "path": "outputs/v83_validation/schurcheckpointreal01/checkpoint/density_energy_failure.mat",
+      "sha256": "10fa11bba7f3e7d9a9ec6ab5c5478b45904e8bb9a7ef82041dfc812fa6f4a680",
+      "bytes": 181584295
+    },
+    {
+      "path": "outputs/v83_validation/schurcheckpointreal01/checkpoint/density_energy_failure.mat.json",
+      "sha256": "0881ac321cb5066563ae8334e591313c8e922d0b71fbb0ea3dbc6d808bdecb90",
+      "bytes": 2099
+    },
+    {
+      "path": "outputs/v83_validation/schurcheckpointreal01/schur_failure_checkpoint_summary.json",
+      "sha256": "5c353f08b38934a3b410b1d25f7bda555f3be47c86faa37f61fa484db2913d0d",
+      "bytes": 2411
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurunit01/budget_rejection_record.json",
+      "sha256": "b982d65893c081b1cbf471284217e8e0b0e3f2cb2c50030d5076dcea204e0389",
+      "bytes": 609
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurunit02/pivoted_schur_unit_evidence.mat",
+      "sha256": "e15aa6113d56e845fb68d2d07c63e85c1fcd573020a274d9a5a3113c3d91a645",
+      "bytes": 267571
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurunit03/pivoted_schur_unit_evidence.mat",
+      "sha256": "1eaf5d8f3c6656739c7dd443705ce2dca9f6eeb56523b086612a430f7bd63246",
+      "bytes": 266185
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurreal01/agent_stop_record.json",
+      "sha256": "34d76c5cb62cf2941f06e6007c8a25b6da697700fd5254aaefc20403d14890ff",
+      "bytes": 934
+    },
+    {
+      "path": "outputs/v83_validation/pivotedschurreal02/pivoted_schur_real_summary.json",
+      "sha256": "4efe6d754c844452f9b55adb98602be37fd6eaa25a54abd403dba474c1e306f5",
+      "bytes": 1072
+    },
+    {
+      "path": "outputs/v83_validation/schur_scalar_bandwidth01.json",
+      "sha256": "3ac4f6708bc679968e1d482799f570400b69855481353a8f2aaf486387d661b8",
+      "bytes": 657
+    },
+    {
+      "path": "outputs/v83_validation/schur_scalar_bandwidth02.json",
+      "sha256": "c7f64f3db6aa4d833d7c29a845a6370a96e2fe81ff187e5373499f3f00dec4ff",
+      "bytes": 1033
+    },
+    {
+      "path": "outputs/v83_validation/schur_scalar_scales01.json",
+      "sha256": "d933d66e43d62743262b1c992188c23681d57ea8c669f7045303d616c43335b0",
+      "bytes": 1815
+    },
+    {
+      "path": "outputs/v83_validation/block_linear_research_summary_v3.json",
+      "sha256": "8799a170e6b86c4367c4751128a19ab721627b0aabb7ddffe3a7e56bf9819163",
+      "bytes": 8195
+    },
+    {
+      "path": "outputs/v83_validation/linearstudybinding03/linear_study_binding_evidence.mat",
+      "sha256": "c883b34f2a846380050e622dbcb9b90f45e60cdfdbfce6f360abe724fbc623bd",
+      "bytes": 473
+    },
+    {
+      "path": "outputs/v83_validation/workbench19/wall-velocity-study-data.json",
+      "sha256": "61a9f63b57d2fd9b3616a7d5ab8a8e7f5a62082c5d13cd6fd5d79d40f1159d5a",
+      "bytes": 22187
+    }
+  ],
+  "originalSchurFailure": {
+    "status": "rejected-by-unchanged-original-local-inverse-gate",
+    "errorIdentifier": "FieldILU:FactorDefect",
+    "dimension": 2,
+    "fieldGroup": "density-total-energy",
+    "algebraicRow": 188887,
+    "lastCommittedInverseRow": 188886,
+    "originalControlVolume": 61925,
+    "originalFace": 2669,
+    "layer": 4,
+    "pivotD": [
+      [
+        1.5421123772583036e+16,
+        1.8643131685344036e+16
+      ],
+      [
+        1.6033979150427602e+16,
+        1.938403382526117e+16
+      ]
+    ],
+    "inverseCandidate": [
+      [
+        2.1584296196017762e-07,
+        -2.0759294992223213e-07
+      ],
+      [
+        -1.7853980152087344e-07,
+        1.717156017077877e-07
+      ]
+    ],
+    "inverseProduct": [
+      [
+        1.0000004768371582,
+        -4.76837158203125e-07
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "maximumInverseDefect": 4.76837158203125e-07,
+    "pivotRcond": 6.667885279856986e-11,
+    "originalInverseDefectThreshold": 1e-08,
+    "rowColumns": [
+      187740,
+      187742,
+      187744,
+      187749,
+      187751,
+      187987,
+      188312,
+      188313,
+      188314,
+      188315,
+      188319,
+      188320,
+      188880,
+      188885,
+      188886,
+      188887,
+      188888,
+      188889,
+      188891,
+      188892,
+      189137,
+      189458,
+      189459,
+      189460,
+      189461,
+      190030,
+      190034,
+      190035,
+      190036
+    ],
+    "ledgerExactlyReproducesPartialRow": true,
+    "ledgerRelativeDifference": 0,
+    "diagonalFormationNormBound": 3.4906946899108076e+16,
+    "diagonalCancellationRatio": 1.000118310213899,
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "allFiveConservativeFields": true,
+      "sameQOnly": true,
+      "physicalStateChanged": false,
+      "packedFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat",
+      "packedFileSHA256": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "sourceFaces": 19752,
+      "layers": 11
+    },
+    "assemblyFile": "outputs\\v83_validation\\schurcheckpointreal01\\checkpoint\\schur_assembly_evidence.mat",
+    "assemblyFileSHA256": "efffcbd85ba71246dac8aacb735b8efd647f23bc2933332ab143c426d82db1e7",
+    "preconditionerUsable": false,
+    "physicalSolution": false,
+    "newActualNSEvaluations": 0,
+    "newProductionSolvedAreaM2": 0,
+    "failureFile": "outputs\\v83_validation\\schurcheckpointreal01\\checkpoint\\density_energy_failure.mat",
+    "failureFileSHA256": "10fa11bba7f3e7d9a9ec6ab5c5478b45904e8bb9a7ef82041dfc812fa6f4a680",
+    "retainedEliminationSteps": 15
+  },
+  "completeInputAndRejectedLedgerAudit": {
+    "status": "passed-independent-all-real-Schur-input-coefficients-and-rejected-pivot-ledger-audit",
+    "processID": 52208,
+    "cellCount": 217272,
+    "baseBlocks": 1619664,
+    "schurBlocks": 5767584,
+    "allMomentumAndCrossCouplingInputValuesExactlyKept": true,
+    "allSchurPatternRowsExactlyTwoHop": true,
+    "allSchurCoefficientRelativeDifference": 1.0411097683010058e-13,
+    "maximumSchurRowRelativeDifference": 1.2283793270593652e-12,
+    "maximumSchurFormationRelativeDifference": 1.2245416300578093e-12,
+    "maximumIndependentLocalMomentumInverseDefect": 2.852386983460409e-12,
+    "maximumRejectedRowProductBackwardDifference": 7.919781911249693e-11,
+    "rejectedRowRecomputeRelativeToFormation": 3.5803783856848556e-16,
+    "rejectedAlgebraicRow": 188887,
+    "originalControlVolume": 61925,
+    "originalFace": 2669,
+    "layer": 4,
+    "actualMatlabInverseDefect": 4.76837158203125e-07,
+    "independentFloatInverseProductDefect": 4.714900318450909e-07,
+    "originalThreshold": 1e-08,
+    "pivotRcond": 6.667885279856986e-11,
+    "decimal80StoredInverseResidual": 3.175277088028831e-07,
+    "decimal80RoundedExactInverseResidual": 1.4812699013283592e-07,
+    "exactDoubleInputDeterminant": "89806207302864785864376",
+    "pivotNormGrowthFromOriginalSchurDiagonal": 4037382586.6356206,
+    "originalSchurDiagonal": [
+      [
+        -2042594.7825703584,
+        -5704025.495334281
+      ],
+      [
+        -5145671.267618877,
+        -3398304.278598589
+      ]
+    ],
+    "rejectedPivot": [
+      [
+        1.5421123772583036e+16,
+        1.8643131685344036e+16
+      ],
+      [
+        1.6033979150427602e+16,
+        1.938403382526117e+16
+      ]
+    ],
+    "diagonalCancellationRatio": 1.000118310213899,
+    "priorPartialFactorAllRowsIndependentlyReplayed": false,
+    "fullUsablePreconditionerProduced": false,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "auditSeconds": 66.125,
+    "inputSHA256": {
+      "outputs\\v83_validation\\schurcheckpointreal01\\checkpoint\\schur_assembly_evidence.mat": "efffcbd85ba71246dac8aacb735b8efd647f23bc2933332ab143c426d82db1e7",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "outputs\\v83_validation\\schurcheckpointreal01\\checkpoint\\density_energy_failure.mat": "10fa11bba7f3e7d9a9ec6ab5c5478b45904e8bb9a7ef82041dfc812fa6f4a680"
+    },
+    "scriptSHA256": "a9e5dbde514705822305df94bddc5326e3e1e96bcdebbd57aed586cb9ed95fa2"
+  },
+  "fieldMajorAttempt": {
+    "status": "agent-stopped-before-completion-not-numerically-judged",
+    "actualStop": {
+      "status": "agent-stopped-field-major-ILUTP-to-test-source-proven-equivalent-cell-interleaving",
+      "processID": 53384,
+      "commandLine": "\"D:\\matlab\\bin\\win64\\MATLAB.exe\" \"-batch\" \"restoredefaultpath; maxNumCompThreads(1); fprintf('RAH_ENGINE_PID=%d\\n',feature('getpid')); addpath('tests'); studyRocketPivotedSchurActions('outputs/v83_validation/pivotedschurreal01');\" \"-logfile\" \"E:\\RocketAeroHeat\\outputs\\v83_validation\\pivotedschurreal01.log\" ",
+      "privateBytes": 3001847808,
+      "workingSetBytes": 1341063168,
+      "userCPUSeconds": 485.296875,
+      "stoppedUTC": "2026-10-25T08:55:38.9940779Z",
+      "reason": "Source-bound structural audit proves field-major bandwidth at least 217272 and cell-interleaved bandwidth at most 2549; preserve all unknowns and reuse raw S checkpoint. Factorization not completed, numerical usability unproven.",
+      "newActualNSEvaluations": 0,
+      "physicalStateChanged": false
+    },
+    "usableFactorProduced": false
+  },
+  "scalarBandwidthProof": {
+    "status": "source-bound-reproduced-structural-bandwidth-bounds-for-equivalent-Schur-scalar-orderings",
+    "processID": 37412,
+    "cellCount": 217272,
+    "originalPatternIsSubsetOfAuditedLevel1": true,
+    "level1BlockBandwidth": 637,
+    "fullTwoHopSchurBlockBandwidthUpperBound": 1274,
+    "fieldMajorScalarBandwidthLowerBound": 217272,
+    "cellInterleavedScalarBandwidthUpperBound": 2549,
+    "lowerBoundOnInitialBandwidthReduction": 85.23813260102001,
+    "numericalAccuracyFillOrRuntimeImprovementClaimed": false,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockfillreal01\\expanded_pattern_evidence.mat": "937fbc286cd709b5ea3102ce65658596d99e0584b50ed6e4098ccd3f587c2f05",
+      "outputs\\v83_validation\\schurcheckpointreal01_independent_real_checkpoint.json": "484ebe8a1b57c45529d3b394ed34df0c541b285c83895d50d9b2b9f8f37c21fe"
+    },
+    "scriptSHA256": "2fa6d48c55a060e4e5ddd3f1bb69288010a99c47ffa7f3125f8d3163529aa4cf"
+  },
+  "pivotedSmallChecks": [
+    {
+      "status": "passed-independent-pivoted-Schur-permutation-full-S-five-conservation-and-no-diagonal-replacement",
+      "processID": 58240,
+      "cases": [
+        {
+          "case": 0,
+          "completePSminusLURelativeDifference": 5.720814000745053e-16,
+          "fullFiveConservationSolveDifference": 2.3028147413552866e-13,
+          "approximatePAminusLUProbeErrors": [
+            0.021077909091202763,
+            0.018791158876256445
+          ]
+        },
+        {
+          "case": 1,
+          "completePSminusLURelativeDifference": 6.059901089343036e-16,
+          "fullFiveConservationSolveDifference": 3.967329132518002e-13,
+          "approximatePAminusLUProbeErrors": [
+            0.013737762763301417,
+            0.016128438240614665
+          ]
+        }
+      ],
+      "newSelectedJApplications": 0,
+      "newActualNSEvaluations": 0,
+      "physicalSolution": false,
+      "newProductionSolvedAreaM2": 0,
+      "inputSHA256": {
+        "outputs\\v83_validation\\pivotedschurunit02\\pivoted_schur_unit_evidence.mat": "e15aa6113d56e845fb68d2d07c63e85c1fcd573020a274d9a5a3113c3d91a645",
+        "outputs\\v83_validation\\fieldschurunit01\\field_schur_unit_evidence.mat": "1d7ac208c419abf75a2e2e16c8fa3f03ad8f45d8ab04d35b90ce514fc2cd95b2"
+      },
+      "scriptSHA256": "e23465a9589d2d67cbe925f159c5026c8cd95921feb9b5533a4312c9d853e13f"
+    },
+    {
+      "status": "passed-independent-pivoted-Schur-permutation-full-S-five-conservation-and-no-diagonal-replacement",
+      "processID": 55968,
+      "cases": [
+        {
+          "case": 0,
+          "completePSminusLURelativeDifference": 5.847476505266281e-16,
+          "fullFiveConservationSolveDifference": 1.965177285237319e-13,
+          "approximatePAminusLUProbeErrors": [
+            0.04187416599443128,
+            0.012611124686676838
+          ]
+        },
+        {
+          "case": 1,
+          "completePSminusLURelativeDifference": 5.771501590047839e-16,
+          "fullFiveConservationSolveDifference": 3.9563160076359773e-13,
+          "approximatePAminusLUProbeErrors": [
+            0.015713688420332484,
+            0.014092799123871557
+          ]
+        }
+      ],
+      "newSelectedJApplications": 0,
+      "newActualNSEvaluations": 0,
+      "physicalSolution": false,
+      "newProductionSolvedAreaM2": 0,
+      "inputSHA256": {
+        "outputs\\v83_validation\\pivotedschurunit03\\pivoted_schur_unit_evidence.mat": "1eaf5d8f3c6656739c7dd443705ce2dca9f6eeb56523b086612a430f7bd63246",
+        "outputs\\v83_validation\\fieldschurunit01\\field_schur_unit_evidence.mat": "1d7ac208c419abf75a2e2e16c8fa3f03ad8f45d8ab04d35b90ce514fc2cd95b2"
+      },
+      "scriptSHA256": "46bc6df5d19c9f1a0411d5188b96d258290a9cfcb5986130ac324543ed31d262"
+    }
+  ],
+  "pivotedRealCandidate": {
+    "status": "tested-real-row-pivoted-scalar-Schur-candidate-with-unchanged-physical-equation",
+    "stage": "pivoted-scalar-Schur-factorization",
+    "factorReady": false,
+    "wholePreconditionerReady": false,
+    "candidateRejected": true,
+    "errorIdentifier": "MATLAB:ilu:ZeroPivot",
+    "message": "\u5b58\u5728\u7b49\u4e8e\u96f6\u7684\u4e3b\u5143\u3002\u8bf7\u8003\u8651\u51cf\u5c0f\u8c03\u964d\u5bb9\u5dee\u6216\u8003\u8651\u4f7f\u7528 'udiag' \u9009\u9879\u3002",
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "allFiveConservativeFields": true,
+      "sameQOnly": true,
+      "physicalStateChanged": false,
+      "packedFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat",
+      "packedFileSHA256": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "sourceFaces": 19752,
+      "layers": 11
+    },
+    "oldRejectedBlockInverseClaimedValid": false,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 31012
+  },
+  "scalarScaleDiagnostic": {
+    "status": "diagnosed-complete-raw-Schur-scalar-zero-rows-columns-and-scale-spread",
+    "processID": 57440,
+    "cellCount": 217272,
+    "scalarUnknowns": 434544,
+    "zeroScalarRows": 0,
+    "zeroScalarColumns": 0,
+    "zeroRowExamples": [],
+    "zeroScalarDiagonalEntries": 0,
+    "fullStructuralRankProvedByDisjointCellPerfectMatchings": true,
+    "provenStructuralRank": 434544,
+    "numericalFullRankClaimed": false,
+    "rowInfinityNormSpan": {
+      "minimumPositive": 10695.217992327667,
+      "medianPositive": 2199863.537506077,
+      "maximum": 576188156078.0741,
+      "maximumToMinimum": 53873437.314826965
+    },
+    "columnInfinityNormSpan": {
+      "minimumPositive": 9770.165925337446,
+      "medianPositive": 4118513.463889328,
+      "maximum": 576188156078.0741,
+      "maximumToMinimum": 58974244.703850664
+    },
+    "rowNonzeroCountRange": [
+      14,
+      58
+    ],
+    "columnNonzeroCountRange": [
+      13,
+      58
+    ],
+    "nonzeroScalarOffDiagonalEntries": 17339451,
+    "potentialInputOffDiagonalEntriesBelowPoint01InitialColumnNormThreshold": 12001254,
+    "potentialFraction": 0.6921357544711191,
+    "actualILUTPDroppedEntriesOrZeroPivotCauseProved": false,
+    "interpretation": "Initial column-norm threshold count is only a diagnostic; updated ILUTP coefficients and mandatory U diagonal handling differ. Structural rank does not prove numerical rank. No threshold or physical equation changed.",
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\schurcheckpointreal01\\checkpoint\\schur_assembly_evidence.mat": "efffcbd85ba71246dac8aacb735b8efd647f23bc2933332ab143c426d82db1e7"
+    },
+    "scriptSHA256": "8619c664e1410ddbd1a248e9ad87ff3d37ce6c2921249ebd63e97829827b9c95"
+  },
+  "limits": {
+    "originalRejectedBlockInverseStillRejected": true,
+    "noDiagonalCompensationOrZeroPivotReplacement": true,
+    "allOriginalSchurInputCoefficientsIndependentlyChecked": true,
+    "previousPartialFactorAllRowsIndependentlyReplayed": false,
+    "pivotedRealUsableFactorProduced": false,
+    "pivotedRealRhsOrGMRESStarted": false,
+    "pivotedRealNativeFailureColumnKnown": false,
+    "structuralFullRankProven": true,
+    "numericalFullRankProven": false,
+    "actualCauseOfNativeZeroPivotProven": false
+  },
+  "draftVerificationEntry": {
+    "path": "tests/auditRocketRealPivotedSchur.py",
+    "syntaxChecked": true,
+    "numericalRun": false,
+    "reason": "No real pivoted factor was generated. This script is not a passed numerical check."
+  },
+  "repairAndStopRecords": {
+    "unitBudgetRequestRepaired": {
+      "status": "unit-requested-factor-cap-and-construction-cap-incompatible-with-conservative-two-factor-storage-estimate",
+      "exitCode": 1,
+      "sourceEpoch": "outputs\\v83_validation\\source_epochs\\pre_pivoted_unit_budget_testRocketPivotedSchur.m",
+      "sourceSHA256": "5572229c5f16aee32934e98dbdedede40592dbf0e562bc0908aba42832a4429e",
+      "requestedFactorMiB": 32,
+      "requestedConstructionMiB": 64,
+      "repair": "Use an 8 MiB unit factor cap; 64-scalar fixtures need far less. Production memory budgets and numerical gates unchanged.",
+      "newSelectedJApplications": 0,
+      "newActualNSEvaluations": 0
+    },
+    "stoppedAttemptNotACompletedOrFailedNumericalJudgement": true
+  },
+  "workAccounting": {
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newAcceptedPhysicalStates": 0,
+    "newCoarseImageConstructions": 0,
+    "note": "Checkpoint replay, scalar matrix diagnostics and LU attempts are algebraic preconditioner studies; no original-NS direction or flow update was accepted."
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench19/index.html",
+    "sourceBoundResearchRows": 6,
+    "knownOriginalBlockPivotErrorShown": true,
+    "nativePivotLocationUnknown": true,
+    "unknownUnexecutedMetricsPreserved": true,
+    "CSVRows": 592560,
+    "sectionSamples": 6624,
+    "sameHostEvents": 15,
+    "sourceFacetPayloadExactlyUnchanged": true,
+    "priorFullMATFieldAuditReusedByPayloadIdentity": true,
+    "threeFalseSourceOrQualificationExportsRejected": true,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "mainAcceptedIterations": 12,
+    "mainActualNSEvaluations": 246,
+    "actualNSDirectionDefect": 0.19876430371570342,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "actualNSEvaluationsAfterLastAcceptedHistory": 121,
+    "latestEndpoint": {
+      "path": "outputs/v83_validation/krylov17/wall_velocity_krylov_evidence.mat",
+      "sha256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "bytes": 1214364034
+    },
+    "originalNSSource": {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    },
+    "physicalPressureHeatFluxAndHeatPowerUnchanged": true
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "nextAction": "Use the saved and fully audited raw S; first test reversible row/column equilibration, original-unit and P/T back-mapping, and memory budgets. Only after small/independent action checks perform one bounded real pivoted comparison. Do not enable udiag, compensate diagonal, blindly scan drop tolerance or rebuild the same S. If zero pivot persists, investigate numerical rank/weak modes and the approximate Schur structure. Preserve all physical CVs and original C/NS, total-direction/temperature/descent/convergence gates and co-priority scientific UI.",
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "a4123e0ac9a0fdf5d7d915ab95ae23585d617e0495a9825a88259d17d12df7dd"
+}

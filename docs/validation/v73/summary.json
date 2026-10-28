@@ -1,0 +1,937 @@
+{
+  "version": 73,
+  "status": "tested-explicit-HLLE-30-step-rocket-and-bounded-Newton-difference-study-not-steady-not-physical",
+  "cellCount": 2760,
+  "wallSegments": 115,
+  "nativeTriangles": 9216,
+  "uniformChain": {
+    "status": "actual-complete-rocket-SA-collar-family-study-not-production-qualification",
+    "cellCount": 2760,
+    "acceptedSteps": 30,
+    "rejectedAttempts": 5,
+    "steadyConverged": false,
+    "stopReason": "persisted-accepted-step-budget",
+    "initialOriginalResidual": 338361517.03826416,
+    "finalOriginalResidual": 164380.67935241287,
+    "fiveQuantityBalanceRelative": 2.565731711739575e-16,
+    "solverResidualEvaluations": 70764,
+    "diagnosticResidualEvaluations": 64,
+    "elapsedSolverSeconds": 1467.3771723,
+    "allAcceptedEndpointsSaved": true,
+    "fullWallFaceCount": 115,
+    "fullRevolvedWallAreaM2": 0.9362872116455068,
+    "signedWallHeatRangeWm2": [
+      3293.2838895724,
+      2251258.2350157006
+    ],
+    "currentRevolvedWallHeatW": 363976.6804961857,
+    "wallTemperatureValueKind": "prescribed",
+    "wallTemperatureSolved": false,
+    "edgeTemperatureSolved": false,
+    "recoveryTemperatureSolved": false,
+    "physicalTimeAdvancedS": 0,
+    "pseudoTimeIsPhysical": false,
+    "inputContract": {
+      "flight": {
+        "altitude": 30000,
+        "Mach": 5,
+        "alpha": 0,
+        "beta": 0,
+        "Twall": 300
+      },
+      "freestreamPrimitiveRhoUxUrT": [
+        0.018410125827734398,
+        -1508.5433002103648,
+        0,
+        226.50908361133003
+      ],
+      "wallTemperatureInputK": 300,
+      "wallTemperatureValueKind": "prescribed",
+      "nuTildeRatioInput": 5,
+      "farfieldNuTildeInputM2s": 0.0040065117894983225,
+      "turbulentPrandtlInput": 0.9,
+      "solverFreestreamViscosityPaS": 1.4752077234993085e-05,
+      "atmosphereReferenceViscosityPaS": 1.4752077234993085e-05,
+      "solverFreestreamReynoldsPerM": 1882614.3282099988,
+      "flowDirection": [
+        -1,
+        0,
+        0
+      ],
+      "units": "SI",
+      "completeExternalDomain": true,
+      "gasModel": "calorically perfect air; gamma/R from standardAtmosphere; explicit Sutherland",
+      "transportSource": "existing standardAtmosphere: muRef=1.716e-5 at 273.15K, S=110.4K; k=cp*mu/.72",
+      "temperatureRangeIsNumericalAcceptanceNotPhysicalCertification": true,
+      "pressureAndHeatNotComputedYet": true,
+      "edgeTemperatureSolved": false,
+      "recoveryTemperatureSolved": false,
+      "wallTemperatureSolved": false,
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0,
+      "wallVelocityGradientPolicy": "legacy",
+      "viscousWorkVelocityPolicy": "arithmetic",
+      "wallVelocityGradientBoundaryMeaning": "static Cartesian wall velocity components have prescribed zero wall-tangential derivative",
+      "changedFromV68": "complete original wall/farfield preserved; grid=normal-collar; uniformly initialized same freestream five-component state on new control volumes; no imported solution",
+      "wallGradientIsPhysicalAccuracyValidation": false,
+      "gridPolicy": "normal-collar",
+      "effectiveDomainOptions": {
+        "radialLayers": 24,
+        "kernelX": 0.707,
+        "outerRadius": 4.261260975070607,
+        "firstRadialSpacing": 0.0002,
+        "maxWallAngleStepDeg": 5,
+        "baseRadialSegments": 8
+      },
+      "effectiveCollarOptions": {
+        "normalLayers": 3,
+        "firstNormalSpacing": 2e-05,
+        "normalGrowth": 1.5
+      },
+      "firstOffsetIsOwnerWallDistance": false,
+      "pressureSourceQuadraturePolicy": "cell-constant",
+      "pressureSourceQuadratureMeaning": "explicit planar-area pressure integral from selected reconstruction; not a solved new boundary",
+      "changedFromV71": "same full collar case and uniform initialization; explicit pressure source=cell-constant",
+      "sourceQuadratureIsPhysicalAccuracyValidation": false,
+      "interiorConvectiveFluxPolicy": "hlle-einfeldt",
+      "interiorFluxIsPrescribedBoundary": false,
+      "interiorFluxIsPhysicalAccuracyValidation": false,
+      "changedFromV72": "same full uniform pressure-source case; explicit interior Euler flux=hlle-einfeldt"
+    },
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "eligibleForSurfaceCoverage": false,
+    "newProductionSolvedAreaM2": 0,
+    "processIdentity": {
+      "runLabel": "hlle_continue03",
+      "engineProcessID": 40560,
+      "processRecordPath": "E:\\RocketAeroHeat\\outputs\\v73_validation\\hlle_continue03_process.json"
+    }
+  },
+  "interruptedRunReceipt": {
+    "observedUTC": "2026-10-22T17:23:21.873397+00:00",
+    "status": "no-live-runner-launcher-or-engine-observed-no-terminal-receipt",
+    "observedAbsentProcessIDs": [
+      19772,
+      3320,
+      40560
+    ],
+    "originalProcessRecordUnchanged": true,
+    "exitCode": null,
+    "plannedEndStep": 33,
+    "lastLoggedAndSavedAcceptedStep": 30,
+    "action": "freeze-saved-chain-at-30-for-replay-and-audit-do-not-restart"
+  },
+  "lastRunExitCodeUnavailable": true,
+  "planned33NotClaimed": true,
+  "warmControlledSingleBE": {
+    "status": "passed-actual-Q11-two-interior-HLLE-single-BE-trials",
+    "cases": [
+      {
+        "policy": "hlle-einfeldt",
+        "matlabEngineProcessID": 19940,
+        "sameInitialQAndSolverOptions": true,
+        "baselineInitialExplicitStepS": 1.7670716349111864e-10,
+        "trialInitialExplicitStepS": 1.7670716349111864e-10,
+        "baselineInitialAttemptedDtS": 1.8094813541490548e-07,
+        "trialInitialAttemptedDtS": 1.8094813541490548e-07,
+        "baselineAcceptedDtS": 2.827314615857898e-09,
+        "trialAcceptedDtS": 1.8094813541490548e-07,
+        "baselineRejectedAttempts": 3,
+        "trialRejectedAttempts": 0,
+        "baselineResidualEvaluations": 6812,
+        "trialResidualEvaluations": 1153,
+        "candidateCount": 6,
+        "completeDiagnostic": true,
+        "candidateStateFailureIdentifiers": [],
+        "BEToOriginalTargetRatio": 0.13812167184547994,
+        "fiveQuantityBalanceRelative": 5.320569447108126e-18,
+        "residual": 5344987.779930396,
+        "temperatureRangeK": [
+          226.47517898371822,
+          1845.3409562774802
+        ],
+        "secondsWithObservation": 29.8730788,
+        "sameFinalPseudoTime": false,
+        "physicalSolution": false,
+        "experimentalValidation": false,
+        "newProductionSolvedAreaM2": 0
+      },
+      {
+        "policy": "hlle-davis",
+        "matlabEngineProcessID": 19940,
+        "sameInitialQAndSolverOptions": true,
+        "baselineInitialExplicitStepS": 1.7670716349111864e-10,
+        "trialInitialExplicitStepS": 1.7670716349111864e-10,
+        "baselineInitialAttemptedDtS": 1.8094813541490548e-07,
+        "trialInitialAttemptedDtS": 1.8094813541490548e-07,
+        "baselineAcceptedDtS": 2.827314615857898e-09,
+        "trialAcceptedDtS": 1.8094813541490548e-07,
+        "baselineRejectedAttempts": 3,
+        "trialRejectedAttempts": 0,
+        "baselineResidualEvaluations": 6812,
+        "trialResidualEvaluations": 1153,
+        "candidateCount": 6,
+        "completeDiagnostic": true,
+        "candidateStateFailureIdentifiers": [],
+        "BEToOriginalTargetRatio": 0.00022497831455768174,
+        "fiveQuantityBalanceRelative": 1.9283060711569667e-18,
+        "residual": 5813359.803250687,
+        "temperatureRangeK": [
+          226.475631559806,
+          1858.882702775187
+        ],
+        "secondsWithObservation": 27.6183804,
+        "sameFinalPseudoTime": false,
+        "physicalSolution": false,
+        "experimentalValidation": false,
+        "newProductionSolvedAreaM2": 0
+      }
+    ],
+    "physicalSolution": false,
+    "wholeGoalComplete": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "HLLEAnalyticEulerTests": {
+    "status": "passed-explicit-HLLE-four-quantity-Riemann-and-Sod-numerical-contract",
+    "matlabEngineProcessID": 46636,
+    "caseLabels": [
+      "uniform",
+      "Sod",
+      "Lax",
+      "strong-shock",
+      "head-on",
+      "double-rarefaction",
+      "near-vacuum",
+      "stationary-contact",
+      "stationary-shear",
+      "all-right",
+      "all-left"
+    ],
+    "wavePolicies": [
+      {
+        "wavePolicy": "davis",
+        "antisymmetryRelative": 0,
+        "rotationRelative": 1.3378295866950385e-14,
+        "tangentialGalileanRelative": 2.220446049250313e-16,
+        "scalarReferenceRelative": 0,
+        "stationaryContactArtificialMassFlux": -0.5916079783099616,
+        "stationaryShearArtificialMomentumFlux": 2.3664319132398464,
+        "minimumUsedIntermediateDensity": 1.1832019216562126e-05,
+        "minimumUsedIntermediateInternalEnergy": 0.0005915909612408261
+      },
+      {
+        "wavePolicy": "einfeldt",
+        "antisymmetryRelative": 0,
+        "rotationRelative": 1.3378295866950385e-14,
+        "tangentialGalileanRelative": 2.220446049250313e-16,
+        "scalarReferenceRelative": 0,
+        "stationaryContactArtificialMassFlux": -0.5404769372944654,
+        "stationaryShearArtificialMomentumFlux": 2.9664793948382644,
+        "minimumUsedIntermediateDensity": 1.1832019216562126e-05,
+        "minimumUsedIntermediateInternalEnergy": 0.0005915909612408261
+      }
+    ],
+    "SodRuns": [
+      {
+        "cells": 80,
+        "steps": 84,
+        "densityL1Error": 0.02187473247594192,
+        "minimumDensity": 0.125,
+        "minimumInternalEnergy": 0.25000000000000006,
+        "conservationLedger": [
+          2.526653272322944e-17,
+          -5.551115123125783e-17,
+          0,
+          -1.1300059350915934e-16
+        ],
+        "starPressure": 0.3031301780506468,
+        "starVelocity": 0.9274526200489499
+      },
+      {
+        "cells": 160,
+        "steps": 171,
+        "densityL1Error": 0.014239192113181105,
+        "minimumDensity": 0.125,
+        "minimumInternalEnergy": 0.25000000000000006,
+        "conservationLedger": [
+          5.712729669401361e-18,
+          1.1102230246251565e-16,
+          0,
+          -4.266643782530988e-17
+        ],
+        "starPressure": 0.3031301780506468,
+        "starVelocity": 0.9274526200489499
+      }
+    ],
+    "SodDensityL1Order": 0.6193980784879557,
+    "refusals": [
+      {
+        "label": "unknown-waves",
+        "identifier": "AxisFV:InteriorFluxPolicy"
+      },
+      {
+        "label": "nonunit-normal",
+        "identifier": "AxisFV:InteriorFluxGeometry"
+      },
+      {
+        "label": "negative-density",
+        "identifier": "AxisFV:State"
+      },
+      {
+        "label": "negative-energy",
+        "identifier": "AxisFV:Temperature"
+      },
+      {
+        "label": "mismatched-states",
+        "identifier": "AxisFV:InteriorFluxGeometry"
+      }
+    ],
+    "EulerBenchmarkOnly": true,
+    "globalNSorSAorImplicitPositivityProved": false,
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "coupledNSandSA": {
+    "status": "passed-explicit-interior-flux-full-NS-SA-Jacobian-BE-and-real-candidate-contract",
+    "matlabEngineProcessID": 46636,
+    "coupledCases": [
+      {
+        "quantities": 4,
+        "policy": "hlle-davis",
+        "jacobianColoredVsSerialRelative": 3.793868028933034e-11,
+        "conservationLedger": [
+          2.168404344971009e-19,
+          0,
+          -2.220446049250313e-16,
+          7.105427357601002e-15
+        ],
+        "residualCalls": 99,
+        "BEBalanceRelative": 1.815385717683045e-16
+      },
+      {
+        "quantities": 4,
+        "policy": "hlle-einfeldt",
+        "jacobianColoredVsSerialRelative": 3.7782854021528265e-11,
+        "conservationLedger": [
+          5.421010862427522e-19,
+          0,
+          0,
+          7.105427357601002e-15
+        ],
+        "residualCalls": 99,
+        "BEBalanceRelative": 2.8448542681254854e-16
+      },
+      {
+        "quantities": 5,
+        "policy": "hlle-davis",
+        "jacobianColoredVsSerialRelative": 2.6755577922414203e-11,
+        "conservationLedger": [
+          2.168404344971009e-19,
+          0,
+          -2.220446049250313e-16,
+          7.105427357601002e-15,
+          0
+        ],
+        "residualCalls": 245,
+        "BEBalanceRelative": 2.5097272511238533e-16
+      },
+      {
+        "quantities": 5,
+        "policy": "hlle-einfeldt",
+        "jacobianColoredVsSerialRelative": 2.6755578385560244e-11,
+        "conservationLedger": [
+          5.421010862427522e-19,
+          2.7755575615628914e-17,
+          -2.220446049250313e-16,
+          0,
+          0
+        ],
+        "residualCalls": 245,
+        "BEBalanceRelative": 1.55632500435903e-16
+      }
+    ],
+    "legacyElevenInfoReplayed": true,
+    "realCandidateRuns": [
+      {
+        "policy": "hlle-davis",
+        "completeRANSCandidatesAccepted": 253,
+        "minimumUsedIntermediateDensity": 5.6859400060095605e-05,
+        "minimumUsedIntermediateInternalEnergy": 14.380798828547274
+      },
+      {
+        "policy": "hlle-einfeldt",
+        "completeRANSCandidatesAccepted": 253,
+        "minimumUsedIntermediateDensity": 5.6859400060095605e-05,
+        "minimumUsedIntermediateInternalEnergy": 14.380798828547274
+      }
+    ],
+    "refusals": [
+      {
+        "label": "unknown-policy",
+        "identifier": "AxisFV:InteriorFluxPolicy"
+      },
+      {
+        "label": "silently-ignored-side-setting",
+        "identifier": "AxisFV:InteriorFluxPolicy"
+      }
+    ],
+    "sharedNSandSAMassFluxPassed": true,
+    "sourceOrBoundaryFluxChangedAtSameQ": false,
+    "oldChainRebound": false,
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "generalPositivityProved": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "pseudoCFLTrials": {
+    "status": "completed-bounded-Q23-pseudo-CFL-work-experiment-not-uniform-chain",
+    "cases": [
+      {
+        "factor": 1,
+        "matlabEngineProcessID": 35456,
+        "initialPseudoCFL": 1000000.0,
+        "maximumPseudoCFL": 1000000.0,
+        "maxStepRetries": 0,
+        "acceptedSteps": 1,
+        "rejectedAttempts": 0,
+        "acceptedDtS": 1.4970288703702052e-06,
+        "residual": 193463.65930108537,
+        "residualEvaluations": 3094,
+        "secondsWithObservation": 51.3839605,
+        "BEToOriginalTargetRatio": 0.03486244676185911,
+        "fiveQuantityBalanceRelative": 3.3856129191444524e-19,
+        "diagnosticComplete": true,
+        "candidateCount": 8,
+        "stopReason": "maximum-steps-reached",
+        "rejectLog": [],
+        "physicalSolution": false,
+        "newAcceptedUniformSteps": 0,
+        "newProductionSolvedAreaM2": 0
+      },
+      {
+        "factor": 10,
+        "matlabEngineProcessID": 35456,
+        "initialPseudoCFL": 10000000.0,
+        "maximumPseudoCFL": 10000000.0,
+        "maxStepRetries": 0,
+        "acceptedSteps": 1,
+        "rejectedAttempts": 0,
+        "acceptedDtS": 1.4970288703702052e-05,
+        "residual": 94824.67564748625,
+        "residualEvaluations": 5388,
+        "secondsWithObservation": 83.4721592,
+        "BEToOriginalTargetRatio": 0.7374339358615968,
+        "fiveQuantityBalanceRelative": 6.902790650117599e-18,
+        "diagnosticComplete": true,
+        "candidateCount": 17,
+        "stopReason": "maximum-steps-reached",
+        "rejectLog": [],
+        "physicalSolution": false,
+        "newAcceptedUniformSteps": 0,
+        "newProductionSolvedAreaM2": 0
+      },
+      {
+        "factor": 100,
+        "matlabEngineProcessID": 35456,
+        "initialPseudoCFL": 100000000.0,
+        "maximumPseudoCFL": 100000000.0,
+        "maxStepRetries": 0,
+        "acceptedSteps": 0,
+        "rejectedAttempts": 1,
+        "acceptedDtS": null,
+        "residual": 219344.99262221632,
+        "residualEvaluations": 5425,
+        "secondsWithObservation": 101.2092694,
+        "BEToOriginalTargetRatio": null,
+        "fiveQuantityBalanceRelative": null,
+        "diagnosticComplete": true,
+        "candidateCount": 54,
+        "stopReason": "nonlinear-step-rejected",
+        "rejectLog": {
+          "step": 1,
+          "dt": 0.0001497028870370205,
+          "reason": "line-search-failed",
+          "nonlinearDefect": 5.374605289659304
+        },
+        "physicalSolution": false,
+        "newAcceptedUniformSteps": 0,
+        "newProductionSolvedAreaM2": 0
+      }
+    ],
+    "originalSteadyAndBEAndConservationTolerancesUnchanged": true,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "failedNewtonLinearization": {
+    "status": "completed-real-failed-Newton-linearization-direction-diagnostic",
+    "matlabEngineProcessID": 39128,
+    "sourceEvidenceSHA256": "5ad7838a10e750625ea5f9c366ff973368e3cdcb79639c655eb38185a4c5605a",
+    "driverSHA256": "f1bc28889816a6c6986c240910b34c9ecc7454811e0919753dda9b97fc8c3e79",
+    "baseDefect": 5.374605289659304,
+    "target": 3.2846578652659745e-08,
+    "worstCell": 115,
+    "worstQuantity": 4,
+    "directionalSecants": [
+      {
+        "step": 0.0001,
+        "trueInfinityNormSlope": 2.6507636288197745,
+        "worstComponentSignedDerivative": 2.6507636288197745
+      },
+      {
+        "step": 1e-06,
+        "trueInfinityNormSlope": 2.650673862625297,
+        "worstComponentSignedDerivative": 2.650673862625297
+      },
+      {
+        "step": 1e-08,
+        "trueInfinityNormSlope": 2.650667063619494,
+        "worstComponentSignedDerivative": 2.650667063619494
+      }
+    ],
+    "JacobianCases": [
+      {
+        "differenceStep": 2e-06,
+        "residualEvaluations": 487,
+        "columnSchemeCounts": [
+          0,
+          2596,
+          0
+        ],
+        "savedDirectionLinearDefect": 1.5027843104474757e-14,
+        "predictedWorstComponentSlope": -5.374605289659307,
+        "relativeToDirectionalSecants": [
+          1.9663439036754844,
+          1.9663133030833064,
+          1.9663134250048513
+        ],
+        "newDirectionLinearDefect": 1.4056972141024156e-14,
+        "newDirectionLineSearchFound": false,
+        "lineSearch": [
+          {
+            "search": 0,
+            "alpha": 1,
+            "norm": null,
+            "acceptedLineSearch": false,
+            "errorIdentifier": "AxisSA:State"
+          },
+          {
+            "search": 1,
+            "alpha": 0.5,
+            "norm": 6.973124260460411,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 2,
+            "alpha": 0.25,
+            "norm": 6.0991875340991415,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 3,
+            "alpha": 0.125,
+            "norm": 5.720727038041965,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 4,
+            "alpha": 0.0625,
+            "norm": 5.543888555476544,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 5,
+            "alpha": 0.03125,
+            "norm": 5.458333111052282,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 6,
+            "alpha": 0.015625,
+            "norm": 5.416244427561059,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 7,
+            "alpha": 0.0078125,
+            "norm": 5.3953691167992375,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 8,
+            "alpha": 0.00390625,
+            "norm": 5.3849733236719945,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 9,
+            "alpha": 0.001953125,
+            "norm": 5.379785843730423,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 10,
+            "alpha": 0.0009765625,
+            "norm": 5.377194701828433,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 11,
+            "alpha": 0.00048828125,
+            "norm": 5.375899779635494,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 12,
+            "alpha": 0.000244140625,
+            "norm": 5.375252480633753,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 13,
+            "alpha": 0.0001220703125,
+            "norm": 5.3749288716448635,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          },
+          {
+            "search": 14,
+            "alpha": 6.103515625e-05,
+            "norm": 5.374767077276809,
+            "acceptedLineSearch": false,
+            "errorIdentifier": ""
+          }
+        ]
+      },
+      {
+        "differenceStep": 7e-08,
+        "residualEvaluations": 425,
+        "columnSchemeCounts": [
+          0,
+          1572,
+          0
+        ],
+        "savedDirectionLinearDefect": 1.4821673195737375,
+        "predictedWorstComponentSlope": 2.5914590262818584,
+        "relativeToDirectionalSecants": [
+          0.07277925336204735,
+          0.07280495823337822,
+          0.0728039515344719
+        ],
+        "newDirectionLinearDefect": 5.773583708179649e-15,
+        "newDirectionLineSearchFound": true,
+        "lineSearch": [
+          {
+            "search": 0,
+            "alpha": 1,
+            "norm": null,
+            "acceptedLineSearch": false,
+            "errorIdentifier": "AxisSA:State"
+          },
+          {
+            "search": 1,
+            "alpha": 0.5,
+            "norm": 2.0847997605976922,
+            "acceptedLineSearch": true,
+            "errorIdentifier": ""
+          }
+        ]
+      },
+      {
+        "differenceStep": 1e-09,
+        "residualEvaluations": 293,
+        "columnSchemeCounts": [
+          0,
+          0,
+          0
+        ],
+        "savedDirectionLinearDefect": 1.4934707538278258,
+        "predictedWorstComponentSlope": 2.652210523815197,
+        "relativeToDirectionalSecants": [
+          0.0009114277796355366,
+          0.0009110733516259391,
+          0.0009110875226314491
+        ],
+        "newDirectionLinearDefect": 8.841122816103363e-15,
+        "newDirectionLineSearchFound": true,
+        "lineSearch": [
+          {
+            "search": 0,
+            "alpha": 1,
+            "norm": null,
+            "acceptedLineSearch": false,
+            "errorIdentifier": "AxisSA:State"
+          },
+          {
+            "search": 1,
+            "alpha": 0.5,
+            "norm": 2.0847981425322604,
+            "acceptedLineSearch": true,
+            "errorIdentifier": ""
+          }
+        ]
+      }
+    ],
+    "smallerDifferenceStepIsNotAutomaticallyAFullBEFix": true,
+    "oldChainModified": false,
+    "fullBEActuallyAdvanced": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "schemeCounts": {
+    "status": "audited-saved-column-schemes",
+    "codeMeaning": {
+      "0": "not-computed",
+      "2": "central",
+      "1": "forward",
+      "-1": "backward"
+    },
+    "cases": [
+      {
+        "differenceStep": 2e-06,
+        "schemeCounts": {
+          "0": 0,
+          "2": 11204,
+          "1": 2596,
+          "-1": 0
+        },
+        "columnsDifferentiated": 13800
+      },
+      {
+        "differenceStep": 7e-08,
+        "schemeCounts": {
+          "0": 0,
+          "2": 12228,
+          "1": 1572,
+          "-1": 0
+        },
+        "columnsDifferentiated": 13800
+      },
+      {
+        "differenceStep": 1e-09,
+        "schemeCounts": {
+          "0": 0,
+          "2": 13800,
+          "1": 0,
+          "-1": 0
+        },
+        "columnsDifferentiated": 13800
+      }
+    ],
+    "originalUnlabelledCountsIncludeUnusedZeroCodeNotCentral": true
+  },
+  "fineDifferenceFullBETrials": {
+    "status": "completed-fixed-Q23-full-BE-difference-step-experiment",
+    "cases": [
+      {
+        "differenceStep": 7e-08,
+        "matlabEngineProcessID": 45808,
+        "initialPseudoCFL": 100000000.0,
+        "acceptedSteps": 1,
+        "rejectedAttempts": 0,
+        "acceptedDtS": 0.0001497028870370205,
+        "residual": 16894.255362752905,
+        "residualEvaluations": 8434,
+        "seconds": 180.8558289,
+        "BEToOriginalTargetRatio": 0.1352991827884493,
+        "fiveQuantityBalanceRelative": 9.973434140734676e-18,
+        "diagnosticComplete": true,
+        "candidateCount": 50,
+        "stopReason": "maximum-steps-reached",
+        "rejectLog": [],
+        "uniformChainModified": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0
+      },
+      {
+        "differenceStep": 1e-09,
+        "matlabEngineProcessID": 45808,
+        "initialPseudoCFL": 100000000.0,
+        "acceptedSteps": 1,
+        "rejectedAttempts": 0,
+        "acceptedDtS": 0.0001497028870370205,
+        "residual": 16894.255362752447,
+        "residualEvaluations": 4831,
+        "seconds": 123.2680381,
+        "BEToOriginalTargetRatio": 0.19441420585790128,
+        "fiveQuantityBalanceRelative": 1.1280508172665772e-17,
+        "diagnosticComplete": true,
+        "candidateCount": 46,
+        "stopReason": "maximum-steps-reached",
+        "rejectLog": [],
+        "uniformChainModified": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0
+      }
+    ],
+    "defaultConfigurationChanged": false,
+    "oldChainModified": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "independentFineDifferenceAudit": {
+    "status": "passed-independent-fixed-input-fine-difference-full-BE-saved-flux-audit",
+    "processID": 18696,
+    "sourceSHA256": {
+      "outputs\\v73_validation\\pseudo_cfl_100\\pseudo_cfl_evidence.mat": "5ad7838a10e750625ea5f9c366ff973368e3cdcb79639c655eb38185a4c5605a",
+      "outputs\\v73_validation\\audit_fine_difference.py": "9854adbdbaba2814786c794b71825c6036d70a859fecb485a8270bad8dbb8a57",
+      "outputs\\v73_validation\\frozen_uniform23_evidence.mat": "915de3818d4f8a06056356f71fd2f6114ad843e511df106c4e7565707f40060b",
+      "outputs\\v73_validation\\fine_difference_1em09\\fine_difference_evidence.mat": "d175c53ca1a5a95757037093486a028018b99fe842a625ecdf951478f9165f22",
+      "outputs\\v73_validation\\fine_difference_7em08\\fine_difference_evidence.mat": "a9dd44598f6560e2884aa9bc41a28eab15b39c4d93ccf5d8ab5183df704bdb3c"
+    },
+    "cases": [
+      {
+        "differenceStep": 1e-09,
+        "acceptedSteps": 1,
+        "rejectedAttempts": 0,
+        "acceptedDtS": 0.0001497028870370205,
+        "BEToOriginalTargetRatio": 0.19441420585790128,
+        "fiveQuantityBalanceRelative": 1.1278750574650526e-17,
+        "TminK": 224.9050920661595,
+        "TmaxK": 1250.889789576777,
+        "originalResidual": 16894.255362752447
+      },
+      {
+        "differenceStep": 7e-08,
+        "acceptedSteps": 1,
+        "rejectedAttempts": 0,
+        "acceptedDtS": 0.0001497028870370205,
+        "BEToOriginalTargetRatio": 0.1352991827884493,
+        "fiveQuantityBalanceRelative": 9.969249383555524e-18,
+        "TminK": 224.9050920661595,
+        "TmaxK": 1250.889789576778,
+        "originalResidual": 16894.255362752905
+      }
+    ],
+    "independentFullRANSResidual": false,
+    "defaultConfigurationChanged": false,
+    "oldChainModified": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "defaultDifferenceStepChanged": false,
+  "defaultLegacyElevenCompleteInfoReplayed": true,
+  "oldChainResumedOrRebound": false,
+  "uniformChainIncludesWarmOrCFLTrials": false,
+  "generalNSorSAorImplicitPositivityProved": false,
+  "scientificPlotVisuallyChecked": true,
+  "sameHostFiveStepsActualFluxLabelsAndDataEventsPassed": true,
+  "wallTemperatureValueKind": "prescribed",
+  "wallSolvedEdgeRecoveryTemperatureKnown": false,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "physicalSolution": false,
+  "experimentalValidation": false,
+  "fullSurfaceSolved": false,
+  "wholeGoalComplete": false,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "nextWork": "use fixed-Q23 BE evidence to design scale-aware Jacobian perturbations/new explicitly configured chain, then qualify zero incidence and return to 20-degree crossflow and regional gaps",
+  "processes": {
+    "hlle_uniform01": {
+      "processID": 19016,
+      "engineProcessIDs": [
+        46636
+      ],
+      "exitCode": 0
+    },
+    "hlle_continue01": {
+      "processID": 48500,
+      "engineProcessIDs": [
+        752
+      ],
+      "exitCode": 0
+    },
+    "hlle_continue02": {
+      "processID": 29928,
+      "engineProcessIDs": [
+        8136
+      ],
+      "exitCode": 0
+    },
+    "independent_hlle01": {
+      "processID": 22004,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "warm_flux01": {
+      "processID": 34944,
+      "engineProcessIDs": [
+        19940
+      ],
+      "exitCode": 0
+    },
+    "pseudo_cfl01": {
+      "processID": 46680,
+      "engineProcessIDs": [
+        35456
+      ],
+      "exitCode": 0
+    },
+    "newton_linearization02": {
+      "processID": 29832,
+      "engineProcessIDs": [
+        39128
+      ],
+      "exitCode": 0
+    },
+    "fine_difference01": {
+      "processID": 756,
+      "engineProcessIDs": [
+        45808
+      ],
+      "exitCode": 0
+    },
+    "independent_fine_difference01": {
+      "processID": 18696,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "independent_rocket_flux01": {
+      "processID": 5392,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "scientific_plot01": {
+      "processID": 14944,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_ui01": {
+      "processID": 48148,
+      "engineProcessIDs": [
+        22560
+      ],
+      "exitCode": 0
+    },
+    "final_host01": {
+      "processID": 31060,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_view01": {
+      "processID": 15164,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_host_view01": {
+      "processID": 14584,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    }
+  }
+}

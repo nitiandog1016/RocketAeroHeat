@@ -1,0 +1,463 @@
+{
+  "version": 80,
+  "status": "tested-real-20deg-domain-Dirichlet-wall-and-three-step-numerical-startup-with-workbench",
+  "domain": {
+    "status": "passed-independent-real-three-dimensional-shell-tetrahedral-geometry-and-retained-failure",
+    "processID": 45528,
+    "cellCount": 217272,
+    "layers": 11,
+    "sourceFaces": 19752,
+    "maximumCVVolumeRelativeDifference": 9.321985565950893e-12,
+    "maximumCentroidAbsoluteDifferenceM": 4.085620730620576e-14,
+    "maximumFaceAreaRelativeDifference": 4.4209288863227644e-16,
+    "maximumFaceCentroidAbsoluteDifferenceM": 3.552713678800501e-15,
+    "wholeShellVolumeRelativeDifference": 1.5044420530697217e-16,
+    "wallNormalDistanceRangeM": [
+      8.012148542344793e-06,
+      9.99979384274357e-06
+    ],
+    "kernelMinimumFaceHeightM": 0.09929697244363314,
+    "originalFailedNegativeCVsReconfirmed": 46,
+    "originalFailureMaximumVolumeRelativeDifference": 7.736235413132789e-14,
+    "sourceSHA256": {
+      "outputs\\v80_validation\\audit_shell_geometry.py": "84b3e31ad66b8c454f695c99c5b2bb8b8fa4c9082bc5085af59097a663b00fa2",
+      "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "outputs\\v80_validation\\probe01\\volume_candidate.mat": "748b373303eda33f6e709734f5c00d0214efbeae6b945e5ee07d6d9f03352469",
+      "buildRocketTriangularShellDomain.m": "38e089dfb0352f1d62131d0de2e2d215b11052069fa4e68262779b3b49013cba"
+    },
+    "flowSolved": false,
+    "gridIndependentClaimed": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "wallThermal": {
+    "status": "passed-actual-20-degree-legacy-info-explicit-wall-temperature-and-actual-diffusion-derivative",
+    "cellCount": 217272,
+    "sourceFaces": 19752,
+    "defaultCompleteInfoExactlyReplayed": true,
+    "legacyInitialHeatWrongDirectionFaces": 184,
+    "newInitialHeatWrongDirectionFaces": 0,
+    "newInitialHeatRangeWm2": [
+      -188814.47667699936,
+      -151284.08223921867
+    ],
+    "fullMassMomentumAndInteriorFluxExactlyKept": true,
+    "fiveQuantityBalanceRelative": 3.2909923001039023e-13,
+    "actualHeatDerivativeRelativeDifference": 2.3234142614444024e-13,
+    "oneNewSpatialEvaluationSeconds": 16.5066183,
+    "diffusionStencilBuildSeconds": 13.6568291,
+    "wallTemperatureValueKind": "prescribed",
+    "boundaryRejections": 6,
+    "steadyConverged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 40516
+  },
+  "advance": {
+    "status": "completed-three-real-shared-RK2-startup-steps-not-steady-or-physical-solution",
+    "cellCount": 217272,
+    "sourceFaces": 19752,
+    "alphaDeg": 20,
+    "acceptedSteps": 3,
+    "rejectedAttempts": 2,
+    "startupIntegrationTimeSeconds": 2.8753146856164565e-09,
+    "referenceLoverUSeconds": 0.0019080128127364785,
+    "fractionOfReferenceConvectiveTime": 1.5069682270595815e-06,
+    "initialResidualPerSecond": 93160079.36859784,
+    "finalResidualPerSecond": 79232379.94632776,
+    "fiveQuantityBalanceRelative": 1.2832210041035151e-16,
+    "elapsedSeconds": 146.1892944,
+    "diffusionStencilBuilds": 1,
+    "minDensityKgM3": 0.01425216820608184,
+    "fluidTemperatureRangeK": [
+      107.45919093783318,
+      392.0061855618602
+    ],
+    "wallPressureRangePa": [
+      587.5541438718151,
+      2119.024426992927
+    ],
+    "wallHeatFluxRangeWm2": [
+      -397262.62521250267,
+      189908.85971861714
+    ],
+    "heatPowerW": -161523.00519936442,
+    "wallTemperatureKind": "prescribed",
+    "startupTimeIsFlightTime": false,
+    "steadyConverged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 11412
+  },
+  "independentArithmetic": {
+    "status": "passed-independent-three-dimensional-Dirichlet-heat-full-saved-flux-and-three-RK2-step-arithmetic",
+    "processID": 26796,
+    "cellCount": 217272,
+    "sourceFaces": 19752,
+    "sourceSHA256": {
+      "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "outputs\\v80_validation\\initial01\\initial_residual_evidence.mat": "ebd3103afb02afcdd5b47dfe29f53d19a98d05444fea10fe1a8883c1315880e5",
+      "outputs\\v80_validation\\thermal02\\wall_thermal_evidence.mat": "6a7eaf031bda5bdd960ffec0472def468ebcb4873e9850a10fbb6bb2b6e842a8",
+      "outputs\\v80_validation\\advance01\\advance_evidence.mat": "2cd6de36ab349abbcbd05c6a28dcb5027245c83669b7724c4e84aa64c7576941"
+    },
+    "independentAuditSourceSHA256": "3a061ae7ac4c6853c163cb026e8bfc0e7d60f50ba814691ca36c2b13afe6fe06",
+    "maximumWallGradientRelativeDifference": 0.0,
+    "maximumWallHeatRelativeDifference": 3.082796506808211e-16,
+    "maximumSavedFluxDivergenceRelativeDifference": 2.5741454194169025e-16,
+    "maximumBoundaryFluxRelativeDifference": 3.821680431339679e-17,
+    "actualThermalDerivativeRelativeDifference": 2.3234142614444024e-13,
+    "legacyWrongHeatDirectionFaces": 184,
+    "newInitialWrongHeatDirectionFaces": 0,
+    "maximumRK2ArithmeticRelativeDifference": 0.0,
+    "maximumStageIntegralBalance": 1.0067137208393533e-14,
+    "independentGlobalBalanceRelative": 1.5118294820724386e-16,
+    "originalFaceHeatPowerMappingRelativeDifference": 0.0,
+    "stageDensityMinimumKgM3": 0.014221181534365792,
+    "allStageTemperatureRangeK": [
+      107.38870168942921,
+      392.4878031391392
+    ],
+    "cost": {
+      "observedAcceptedSteps": 3,
+      "observedElapsedSeconds": 146.1892944,
+      "startupTimeOverLoverU": 1.5069682270595815e-06,
+      "linearExtrapolatedStepsPerLoverU": 1990751.9920666437,
+      "linearExtrapolatedWallSecondsPerLoverU": 97008876.34853901,
+      "interpretation": "cost-warning-only-not-runtime-or-steady-convergence-prediction",
+      "continueMillionsOfExplicitStepsRecommended": false
+    },
+    "fullIndependentNavierStokesSolver": false,
+    "steadyConverged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "workbench": {
+    "status": "passed-three-real-original-facet-numerical-identity-CSV-sections-and-same-host-events",
+    "processID": 15996,
+    "cases": 3,
+    "sourceFaces": 19752,
+    "CSVrows": 474048,
+    "sectionSegments": 5520,
+    "sameHostEvents": 15,
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "newProductionSolvedAreaM2": 0,
+    "dataSHA256": "57503565b3576ad5db4b302d83daff475bdb5ca3869eb95f0e9519188ce3b7c1",
+    "sourceSHA256": {
+      "web/viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+      "web/export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+      "web/index.html": "8dba2b1c2bf6f2e5baf21db254eb34b15daaf42d71e9b5af03b23098009b6bda",
+      "web/rocket-shell.js": "92d5472eb20de332accd96eaccf3402d6f1bcfb2a2e9ca3e2d2e07f10e9758df",
+      "tests/testRocketShellWorkbench.js": "9dfb8b7c73f6e172c8a4c7d558f23378fe61bb77b8352b346fcf78c4153bc217"
+    }
+  },
+  "workbenchActualFieldAudit": {
+    "status": "passed-independent-actual-MAT-to-three-workbench-original-facet-fields-and-identity",
+    "processID": 26872,
+    "sourceSHA256": {
+      "outputs/v80_validation/domain02/shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "outputs/v80_validation/initial01/initial_residual_evidence.mat": "ebd3103afb02afcdd5b47dfe29f53d19a98d05444fea10fe1a8883c1315880e5",
+      "outputs/v80_validation/thermal02/wall_thermal_evidence.mat": "6a7eaf031bda5bdd960ffec0472def468ebcb4873e9850a10fbb6bb2b6e842a8",
+      "outputs/v80_validation/advance01/advance_evidence.mat": "2cd6de36ab349abbcbd05c6a28dcb5027245c83669b7724c4e84aa64c7576941",
+      "outputs/v80_validation/workbench02/shell-study-data.json": "57503565b3576ad5db4b302d83daff475bdb5ca3869eb95f0e9519188ce3b7c1",
+      "outputs/v80_validation/workbench02/cases/legacy-initial/results.json": "7120406811a9ea282e79d001b2f0b6d305edc4697e251381e70199484e87ca8f",
+      "outputs/v80_validation/workbench02/cases/dirichlet-initial/results.json": "ddc100a22b726fbc21862a70746883b2194eace6fc7133acccd51fd013d16a13",
+      "outputs/v80_validation/workbench02/cases/dirichlet-startup/results.json": "da8438ef67043e1e06e1f8040290e577a4d93b1db1eb038750085895e213d5ae"
+    },
+    "maximumFieldRelativeDifferences": {
+      "pressure": 2.0957248259769346e-16,
+      "heatFlux": 3.711749144468941e-16,
+      "wallAdjacentTemperature": 0,
+      "wallInput": 3.7895612573872e-16,
+      "freestreamNormalProjection": 0
+    },
+    "sourceFaces": 19752,
+    "cases": 3,
+    "independentSectionSegments": 276,
+    "scientificPNG": "outputs\\v80_validation\\real_20deg_startup_comparison.png",
+    "scientificPNGSHA256": "b40c4e6323f039be52d26475ce8d59c059b399c8cff4c88b8c48e74d4a781916",
+    "plotIsOrthographicFacetProjection": true,
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "fullIndependentNavierStokesSolver": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "implicitCost": {
+    "status": "measured-real-shell-conservative-Jacobian-graph-coloring-and-storage-cost-not-a-solver",
+    "processID": 9072,
+    "cellCount": 217272,
+    "unknowns": 1086360,
+    "uniqueCVAdjacencyEntries": 1046856,
+    "maximumNeighbors": 5,
+    "conservativeCellDependencyEntries": 4108416,
+    "maximumDependencyCellsPerResidual": 20,
+    "interferenceGraphEntries": 19327050,
+    "safeGreedyCellColors": 37,
+    "safeFullFiveVariableCentralDifferenceResidualCalls": 370,
+    "measuredResidualSeconds": 16.5066183,
+    "linearExtrapolatedCentralDifferenceJacobianSeconds": 6107.448770999999,
+    "conservativeExpandedJacobianEntries": 102710400,
+    "expandedDoubleInt32CSCBytes": 1236870244,
+    "expandedDoubleInt64TripletAssemblyBytes": 2465049600,
+    "sparseFactorizationFillAndWorkspaceIncluded": false,
+    "estimatesAreSafePatternConstructionNotMinimalColorOrRuntimeGuarantee": true,
+    "estimatedNormalLineUnknownsPerOriginalFace": 55,
+    "nextCandidate": "normal-line or block approximate preconditioner with unmodified full-3D five-quantity residual and explicit nonlinear merit/positivity checks; not implemented or qualified",
+    "independentGraphColoringChecked": true,
+    "elapsedSeconds": 3.5141518,
+    "sourceSHA256": {
+      "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "outputs\\v80_validation\\study_shell_implicit_cost.py": "58fa39f33765f015b231c58b8504d453a53a7061131c35954573f0f5a2b84f37"
+    },
+    "steadySolverExecuted": false,
+    "steadyConverged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "sourceEpochs": [
+    {
+      "run": "domain02",
+      "path": "web/export.js",
+      "sha256": "99aa0344ecae2a958df74560df0bdfdb11b0888baecb2401d06c888dc3777a6a",
+      "frozenActualSource": "source_epochs/pre_shell_view_export.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "domain02",
+      "path": "web/index.html",
+      "sha256": "1e55254962804446421e01441a0ea09acb59f88cf9ad71fd32398278f0c58afb",
+      "frozenActualSource": "source_epochs/pre_shell_view_index.html",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "domain02",
+      "path": "web/section.js",
+      "sha256": "6f1567017cd3cdc43de749f77ccee4d8f1034236180b55e36b94050c307ee4fb",
+      "frozenActualSource": "workbench01/cases/legacy-initial/section.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "domain02",
+      "path": "web/viewer.js",
+      "sha256": "b91a90db98a75f63d9c131858d5d2fdacbbec5ed2a3c3a0d9db9277da7a31b65",
+      "frozenActualSource": "source_epochs/pre_shell_view_viewer.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "domain02",
+      "path": "internalFlow/cutCell/buildCutCellDiffusionStencil.m",
+      "sha256": "e2f9a7eaa91af70f9b24ad02c4841509e4a90aef8f41147b67508f2293af9f74",
+      "frozenActualSource": "source_epochs/initial01_buildCutCellDiffusionStencil.source.txt",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "domain02",
+      "path": "internalFlow/cutCell/cutCellBoundaryStencilState.m",
+      "sha256": "728e0edb4f3e7762d7851e7944bd0e147ee6266f99b3f6f0eba15ed47f30cbb6",
+      "frozenActualSource": "source_epochs/initial01_cutCellBoundaryStencilState.source.txt",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "domain02",
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "68f3b2c08de7bcb5f1f11d5504ad7b8b6840c441344b99730ba01f2fe7f14bc2",
+      "frozenActualSource": "source_epochs/initial01_cutCellNavierStokesResidual.source.txt",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "web/export.js",
+      "sha256": "99aa0344ecae2a958df74560df0bdfdb11b0888baecb2401d06c888dc3777a6a",
+      "frozenActualSource": "source_epochs/pre_shell_view_export.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "web/index.html",
+      "sha256": "1e55254962804446421e01441a0ea09acb59f88cf9ad71fd32398278f0c58afb",
+      "frozenActualSource": "source_epochs/pre_shell_view_index.html",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "web/section.js",
+      "sha256": "6f1567017cd3cdc43de749f77ccee4d8f1034236180b55e36b94050c307ee4fb",
+      "frozenActualSource": "workbench01/cases/legacy-initial/section.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "web/viewer.js",
+      "sha256": "b91a90db98a75f63d9c131858d5d2fdacbbec5ed2a3c3a0d9db9277da7a31b65",
+      "frozenActualSource": "source_epochs/pre_shell_view_viewer.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "internalFlow/cutCell/buildCutCellDiffusionStencil.m",
+      "sha256": "e2f9a7eaa91af70f9b24ad02c4841509e4a90aef8f41147b67508f2293af9f74",
+      "frozenActualSource": "source_epochs/initial01_buildCutCellDiffusionStencil.source.txt",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "internalFlow/cutCell/cutCellBoundaryStencilState.m",
+      "sha256": "728e0edb4f3e7762d7851e7944bd0e147ee6266f99b3f6f0eba15ed47f30cbb6",
+      "frozenActualSource": "source_epochs/initial01_cutCellBoundaryStencilState.source.txt",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "68f3b2c08de7bcb5f1f11d5504ad7b8b6840c441344b99730ba01f2fe7f14bc2",
+      "frozenActualSource": "source_epochs/initial01_cutCellNavierStokesResidual.source.txt",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "thermal02",
+      "path": "web/export.js",
+      "sha256": "99aa0344ecae2a958df74560df0bdfdb11b0888baecb2401d06c888dc3777a6a",
+      "frozenActualSource": "source_epochs/pre_shell_view_export.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "thermal02",
+      "path": "web/index.html",
+      "sha256": "1e55254962804446421e01441a0ea09acb59f88cf9ad71fd32398278f0c58afb",
+      "frozenActualSource": "source_epochs/pre_shell_view_index.html",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "thermal02",
+      "path": "web/section.js",
+      "sha256": "6f1567017cd3cdc43de749f77ccee4d8f1034236180b55e36b94050c307ee4fb",
+      "frozenActualSource": "workbench01/cases/legacy-initial/section.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "thermal02",
+      "path": "web/viewer.js",
+      "sha256": "b91a90db98a75f63d9c131858d5d2fdacbbec5ed2a3c3a0d9db9277da7a31b65",
+      "frozenActualSource": "source_epochs/pre_shell_view_viewer.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "advance01",
+      "path": "web/export.js",
+      "sha256": "99aa0344ecae2a958df74560df0bdfdb11b0888baecb2401d06c888dc3777a6a",
+      "frozenActualSource": "source_epochs/pre_shell_view_export.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "advance01",
+      "path": "web/index.html",
+      "sha256": "1e55254962804446421e01441a0ea09acb59f88cf9ad71fd32398278f0c58afb",
+      "frozenActualSource": "source_epochs/pre_shell_view_index.html",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "advance01",
+      "path": "web/section.js",
+      "sha256": "6f1567017cd3cdc43de749f77ccee4d8f1034236180b55e36b94050c307ee4fb",
+      "frozenActualSource": "workbench01/cases/legacy-initial/section.js",
+      "oldEvidenceRebound": false
+    },
+    {
+      "run": "advance01",
+      "path": "web/viewer.js",
+      "sha256": "b91a90db98a75f63d9c131858d5d2fdacbbec5ed2a3c3a0d9db9277da7a31b65",
+      "frozenActualSource": "source_epochs/pre_shell_view_viewer.js",
+      "oldEvidenceRebound": false
+    }
+  ],
+  "processes": {
+    "domain02": {
+      "processID": 21964,
+      "engineProcessIDs": [
+        3300
+      ],
+      "exitCode": 0
+    },
+    "initial01": {
+      "processID": 46328,
+      "engineProcessIDs": [
+        34992
+      ],
+      "exitCode": 0
+    },
+    "thermal02": {
+      "processID": 48432,
+      "engineProcessIDs": [
+        40516
+      ],
+      "exitCode": 0
+    },
+    "advance01": {
+      "processID": 46384,
+      "engineProcessIDs": [
+        11412
+      ],
+      "exitCode": 0
+    },
+    "geometry_independent01": {
+      "processID": 45528,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "thermal_advance_independent01": {
+      "processID": 26796,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "export02": {
+      "processID": 43680,
+      "engineProcessIDs": [
+        43964
+      ],
+      "exitCode": 0
+    },
+    "node_shell02": {
+      "processID": 15996,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "viewer01": {
+      "processID": 47944,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "web_export01": {
+      "processID": 21132,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "web_reasons01": {
+      "processID": 19876,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "section01": {
+      "processID": 50608,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "workbench_independent01": {
+      "processID": 26872,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "implicit_cost02": {
+      "processID": 9072,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    }
+  },
+  "scientificPNGVisuallyChecked": true,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "archiveIsolatedRecomputeStatus": "pending",
+  "newSteadySolverImplemented": false,
+  "fullSurfaceSolved": false,
+  "wholeGoalComplete": false,
+  "physicalSolution": false,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "nextWork": "normal-line/block preconditioner for unchanged full-3D five-quantity residual; bounded positivity/merit study; no million-step explicit extension or axisymmetric/Euler substitution"
+}

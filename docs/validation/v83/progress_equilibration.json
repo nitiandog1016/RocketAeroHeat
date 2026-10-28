@@ -1,0 +1,356 @@
+{
+  "status": "tested-reversible-equilibration-with-independent-all-real-coefficients-audit-native-factorization-resource-stopped",
+  "recordedUTC": "2026-10-25T12:59:52.528268+00:00",
+  "processID": 5988,
+  "version": 83,
+  "processes": {
+    "schurscaleunit01": {
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        37688
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\schurscaleunit01_process.json",
+        "sha256": "27aced07f9052dd4eb2b48f1c4eea87bf91efa78c37b031fb9ddaee472fa0142",
+        "bytes": 152161
+      }
+    },
+    "schurscaleunit02": {
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        59432
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\schurscaleunit02_process.json",
+        "sha256": "e8d7d52ef2ba78ba2756c35cba6c14c56e4ed4117207c12331872b9ab7ae652d",
+        "bytes": 152447
+      }
+    },
+    "schurscaleunit03": {
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        44400
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\schurscaleunit03_process.json",
+        "sha256": "03e75d8c2459f32c3fe6af2e537800717eeb38067e1e79a4738f3151cda1b85d",
+        "bytes": 152733
+      }
+    },
+    "schurscaleunit04": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        45008
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\schurscaleunit04_process.json",
+        "sha256": "8f456ff1701db244912cba58f41a2ccdf169aff238a44d398937548027423292",
+        "bytes": 153013
+      }
+    },
+    "schurscalereal01": {
+      "exitCode": 4294967295,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        15368
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\schurscalereal01_process.json",
+        "sha256": "c29ba9db9d9065b55ac2b84ab5abd9d01def7aaef52eebdc8d9f80a40d8c6309",
+        "bytes": 153259
+      }
+    },
+    "schurscaleui01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        36920
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\schurscaleui01_process.json",
+        "sha256": "de659a855ff45937fa21470503fd11e6597f22e3605515bbda37ace9e0d0af33",
+        "bytes": 153491
+      }
+    }
+  },
+  "smallDomainAudit": {
+    "status": "passed-independent-pivoted-Schur-permutation-full-S-five-conservation-and-no-diagonal-replacement",
+    "processID": 60168,
+    "cases": [
+      {
+        "case": 0,
+        "completePSminusLURelativeDifference": 2.0957569196113642e-16,
+        "fullFiveConservationSolveDifference": 4.015839268291976e-14,
+        "approximatePAminusLUProbeErrors": [
+          0.05794750115119614,
+          0.022486726527912868
+        ]
+      },
+      {
+        "case": 1,
+        "completePSminusLURelativeDifference": 1.94661447695431e-16,
+        "fullFiveConservationSolveDifference": 1.620468901282423e-14,
+        "approximatePAminusLUProbeErrors": [
+          0.01482078039208581,
+          0.02717802043587889
+        ]
+      }
+    ],
+    "equilibrationIndependentlyVerified": true,
+    "stressCases": [
+      {
+        "balancedKnownSolutionRelativeDifference": 1.5060924363462015e-16,
+        "componentwiseOriginalBackwardError": 8.702395263989352e-17
+      },
+      {
+        "balancedKnownSolutionRelativeDifference": 1.7718202975239402e-16,
+        "componentwiseOriginalBackwardError": 8.702395263989355e-17
+      }
+    ],
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\schurscaleunit04\\pivoted_schur_unit_evidence.mat": "ab2aaa776036896fc6e8d42078814cf584a10f928b191e1aeebf3fd837d07293",
+      "outputs\\v83_validation\\fieldschurunit01\\field_schur_unit_evidence.mat": "1d7ac208c419abf75a2e2e16c8fa3f03ad8f45d8ab04d35b90ce514fc2cd95b2"
+    },
+    "scriptSHA256": "a19e5fbe0b1eea857828469c1c5360aa13b6b8c8782e368106fbce57353292e5"
+  },
+  "completeRealScaleAudit": {
+    "status": "passed-independent-complete-real-Schur-row-column-equilibration-and-original-unit-roundtrip",
+    "processID": 55400,
+    "cellCount": 217272,
+    "scalarUnknowns": 434544,
+    "allInputBlocks": 5767584,
+    "originalScalarNonzeros": 17773995,
+    "scaledScalarNonzeros": 17773995,
+    "rowScaleRange": [
+      1.7355441784966141e-12,
+      9.34997305073502e-05
+    ],
+    "columnScaleRange": [
+      1.0,
+      161.26345703275814
+    ],
+    "maximumRelativeCoefficientRoundtripDifference": 3.8766098076805735e-16,
+    "equilibratedRowInfinityNormRange": [
+      0.9999999999999999,
+      1.0
+    ],
+    "equilibratedColumnInfinityNormRange": [
+      0.9999999999999999,
+      1.0
+    ],
+    "coefficientsAddedOrDeleted": false,
+    "numericalFullRankOrStableFactorizationProven": false,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "inputSHA256": {
+      "outputs\\v83_validation\\schurcheckpointreal01\\checkpoint\\schur_assembly_evidence.mat": "efffcbd85ba71246dac8aacb735b8efd647f23bc2933332ab143c426d82db1e7",
+      "outputs\\v83_validation\\schurscalereal01\\schur_equilibration_evidence.mat": "e625bd4d5634ec928ef343fec09a76b2ce9d5820ac2e2cf803d470e307cbbbff",
+      "internalFlow\\cutCell\\equilibrateRocketSchurScales.m": "57c75a7269fcf6ae3fe8598b8a43465db230e286717ed4c8e4b1b2915c735694"
+    },
+    "scriptSHA256": "2e592a101779fe15b7ff9ead1e754c3706b2b4f0e888c21b56649565590b122b"
+  },
+  "realStop": {
+    "status": "agent-resource-stopped-before-native-factorization-return-not-numerically-judged",
+    "processID": 15368,
+    "commandLine": "\"D:\\matlab\\bin\\win64\\MATLAB.exe\" \"-batch\" \"restoredefaultpath; maxNumCompThreads(1); fprintf('RAH_ENGINE_PID=%d\\n',feature('getpid')); addpath('tests'); studyRocketPivotedSchurActions('outputs/v83_validation/schurscalereal01',struct('dropTolerance',1e-2,'maximumFactorBytes',448*1024^2,'maximumConstructionBytes',2048*1024^2,'scalarOrdering','cell-interleaved','equilibration','row-column-max'));\" \"-logfile\" \"E:\\RocketAeroHeat\\outputs\\v83_validation\\schurscalereal01.log\" ",
+    "userCPUSeconds": 530.109375,
+    "totalCPUSeconds": 543.703125,
+    "privateBytes": 4017897472,
+    "workingSetBytes": 2093989888,
+    "freePhysicalMemoryBytes": 716460032,
+    "freeVirtualMemoryBytes": 3632513024,
+    "stoppedUTC": "2026-10-25T12:55:09.2214881Z",
+    "reason": "Adaptive resource stop: native ILUTP has not returned, no complete factor exists, and available physical memory is low. Library workspace is outside the algorithm-array estimate. No numerical validity conclusion or hard factor-budget rejection is inferred.",
+    "usableFactorProduced": false,
+    "numericalFailureOrZeroPivotClaimed": false,
+    "newActualNSEvaluations": 0,
+    "physicalStateChanged": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "realNativeFactorizationCompleted": false,
+  "realNumericalFailureOrZeroPivotConcluded": false,
+  "fullFiveFieldRealPreconditionerAvailable": false,
+  "threeRealRhsOrGMRESStarted": false,
+  "repairHistory": {
+    "failedUnitAttemptsRetained": [
+      "schurscaleunit01",
+      "schurscaleunit02",
+      "schurscaleunit03"
+    ],
+    "changes": [
+      "Use actual raw CSR for bit-exact scales; keep independent S reference comparison.",
+      "Rename local full variable to avoid shadowing full().",
+      "Retain failed tridiagonal stress; use an explicitly well-conditioned balanced known-solution case for the tight accuracy contract. No physical gate changed."
+    ]
+  },
+  "userInterface": {
+    "status": "passed-independent-source-bindings-seven-research-rows-unknown-metrics-and-unchanged-facet-data",
+    "processID": 5988,
+    "workbench": "outputs/v83_validation/workbench20/index.html",
+    "sourceFacetPayload": [
+      {
+        "path": "outputs\\v83_validation\\workbench20\\cases\\legacy-wall-source\\results.json",
+        "sha256": "5c048e7c893dc4c67064656bde19b17419e0ed6b742f893f0e63bf24db25d04f",
+        "bytes": 9047228
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench20\\cases\\legacy-wall-source\\case-data.js",
+        "sha256": "60cfa644b4ad13d70e9591bd40b6417281801a46698df5688100d62d06bf381c",
+        "bytes": 9047249
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench20\\cases\\constrained-wall-baseline\\results.json",
+        "sha256": "7bd40b17d235011f19be08c8b856f1854eb078bbf9592fa9969557d283a89f5f",
+        "bytes": 9047209
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench20\\cases\\constrained-wall-baseline\\case-data.js",
+        "sha256": "780da22265a80f0e26a55e79f66138a48a1722d38a730dd3de111eb6402f9197",
+        "bytes": 9047230
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench20\\cases\\constrained-wall-krylov\\results.json",
+        "sha256": "b946336d02ea4a81384ba9ff4bf13828e0910bb2ba399b27c48feccd2bcd37b2",
+        "bytes": 9060905
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench20\\cases\\constrained-wall-krylov\\case-data.js",
+        "sha256": "8140318bfa34e28df8dd8320ee5c4541c216addfa533b4925087d3b8ae0c2d57",
+        "bytes": 9060926
+      }
+    ],
+    "previousFullMATFieldAuditReusedByByteIdentity": true,
+    "numericalAcceptanceOfStoppedAttemptClaimed": false,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "nodeDataVerification": {
+    "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+    "processID": 29352,
+    "cases": 3,
+    "sourceFaces": 19752,
+    "CSVrows": 592560,
+    "sectionSamples": 6624,
+    "sameHostEvents": 15,
+    "linearDiagnosticRows": 1,
+    "candidateDiagnosticRows": 0,
+    "sourceSHA256": {
+      "tests\\testRocketWallVelocityWorkbench.js": "068069564728d28e7e2d31e201e710bf5a23f61e06620dc022aa94d38a49893e",
+      "outputs\\v83_validation\\workbench20\\rocket-wall-velocity.js": "c1d2f48ad5fc429d1f5d6a0e225a49935945c72d730e70212e82f6365d733e85",
+      "outputs\\v83_validation\\workbench20\\index.html": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+      "web\\viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+      "web\\export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+      "web\\section.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c"
+    },
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "newProductionSolvedAreaM2": 0,
+    "dataSHA256": "9afd3935b06b0be99418c88af36d63b7ff08a7ed6898ff0978a011727eb0e034"
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "mainAcceptedIterations": 12,
+    "mainActualNSEvaluations": 246,
+    "actualNSDirectionDefect": 0.19876430371570342,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "actualNSEvaluationsAfterLastAcceptedHistory": 121,
+    "latestEndpoint": {
+      "path": "outputs/v83_validation/krylov17/wall_velocity_krylov_evidence.mat",
+      "sha256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "bytes": 1214364034
+    },
+    "originalNSSource": {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    },
+    "physicalPressureHeatFluxAndHeatPowerUnchanged": true
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "codeSourceIdentity": [
+    {
+      "path": "internalFlow\\cutCell\\equilibrateRocketSchurScales.m",
+      "sha256": "57c75a7269fcf6ae3fe8598b8a43465db230e286717ed4c8e4b1b2915c735694",
+      "bytes": 2746
+    },
+    {
+      "path": "internalFlow\\cutCell\\factorRocketPivotedSchur.m",
+      "sha256": "16ea2aab2eb425e84397032b0ecc9955b4e88f51149c1415358928a7443aa2b2",
+      "bytes": 6697
+    },
+    {
+      "path": "internalFlow\\cutCell\\solveRocketPivotedSchur.m",
+      "sha256": "397f4b75178707085ca9dc59763afe3e5289fe625d3fe4283f47f89aa9329049",
+      "bytes": 1696
+    },
+    {
+      "path": "tests\\testRocketSchurEquilibration.m",
+      "sha256": "4933a16f04b5cdfd17ad688f6406ffc26bb13baad590308d284acff6c9688d9c",
+      "bytes": 9535
+    },
+    {
+      "path": "tests\\studyRocketPivotedSchurActions.m",
+      "sha256": "61b61c98ecab7f2ec72ae3bc383a866dbd993d05a23653a15254f70070cbae0a",
+      "bytes": 6458
+    },
+    {
+      "path": "tests\\auditRocketPivotedSchur.py",
+      "sha256": "a19e5fbe0b1eea857828469c1c5360aa13b6b8c8782e368106fbce57353292e5",
+      "bytes": 6065
+    },
+    {
+      "path": "tests\\auditRocketRealPivotedSchur.py",
+      "sha256": "cd7cdb7ba7930b497a6698d3bf491a4e38ff488de5c7c15ae5b21fbd127ae259",
+      "bytes": 7755
+    },
+    {
+      "path": "tests\\auditRocketSchurEquilibration.py",
+      "sha256": "2e592a101779fe15b7ff9ead1e754c3706b2b4f0e888c21b56649565590b122b",
+      "bytes": 4283
+    },
+    {
+      "path": "tests\\exportRocketSchurEquilibrationDiagnostics.py",
+      "sha256": "1485624f19605dc8cb54493f21f8ba25202e9d4ed4f776998df06b98b76cda23",
+      "bytes": 4816
+    }
+  ],
+  "draftVerificationEntry": {
+    "path": "tests/auditRocketRealPivotedSchur.py",
+    "syntaxChecked": true,
+    "numericalRun": false,
+    "reason": "No real pivoted factor exists. Source is drafted, not numerical passing evidence."
+  },
+  "workAccounting": {
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newAcceptedPhysicalStates": 0,
+    "newProductionSolvedAreaM2": 0
+  },
+  "nextAction": "Do not restart the stopped native ILUTP or repeat raw S assembly/scale construction/threshold scans. Use the saved equilibrated matrix to inspect weak modes, approximate Schur structure, and sparse fill/resource feasibility before a new controlled solver choice. Keep all physical CVs, original C/NS, direction/temperature/descent/convergence gates and co-priority regional validation/UI.",
+  "githubReadiness": {
+    "conditionalReviewVersion": 90,
+    "versionIsNotACommitment": true,
+    "regionMilestoneMet": false,
+    "commitOrPushPerformed": false
+  },
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "5dda3b69ac5a62e5b428f2dd20e9dd7f83452742af0e5b41f53e898395402af4"
+}

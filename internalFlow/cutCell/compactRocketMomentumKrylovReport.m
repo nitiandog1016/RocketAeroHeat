@@ -1,0 +1,30 @@
+function summary=compactRocketMomentumKrylovReport(detail)
+%COMPACTROCKETMOMENTUMKRYLOVREPORT 仅把计数、剩余及门槛放入JSON，迭代基保留在MAT。
+% 模块一：显式白名单，避免V/Z/保留像等大数组随报告扩展到GB级。
+% 模块二：保留残差历史和来源所需参数，不改变数值证据或求解状态。
+summary=struct;
+keys={'method','options','relativeAResidual','AApplications','lineInverseApplications','elapsedSeconds','baseLineInverseFixedLinear', ...
+    'innerSolveFixedLinearMapClaimed','requiresFlexibleOuterMethod','newSelectedJApplications','newActualNSEvaluations','originalNSAcceptanceClaimed','physicalSolution','newProductionSolvedAreaM2'};
+for k=keys,summary.(k{1})=detail.(k{1});end
+% 等价行变换的双重残差身份为小字段，原报告缺这些字段时完整输出保持。
+for k={'relativeRowScaledResidual','originalUnitTargetMet','rowScaledTargetMet','rowScalingReport','solverAApplications','originalUnitDiagnosticAApplications'}
+    if isfield(detail,k{1}),summary.(k{1})=detail.(k{1});end
+end
+krylov=detail.krylov;small=struct;
+keys={'method','flag','stopReason','options','arnoldiSteps','modelApplications','preconditionerApplications','maximumModelApplications', ...
+    'basisStorageUpperBoundBytes','maximumBasisBytes','maximumBasisOrthogonalityError','maximumRetainedImageProbeRelativeDifference', ...
+    'absoluteResidual','relativeResidual','residualHistory','originalNSAcceptanceClaimed','newProductionSolvedAreaM2'};
+for k=keys,small.(k{1})=krylov.(k{1});end
+small.cycles=cell(size(krylov.cycles));
+for j=1:numel(krylov.cycles)
+    source=krylov.cycles{j};entry=struct;
+    keys={'cycle','arnoldiSteps','totalArnoldiSteps','startResidualNorm','actualResidualNorm','modelResidualNonincreaseVerified', ...
+        'arnoldiRelationRelativeDifference','basisOrthogonalityError','modelApplications','preconditionerApplications'};
+    for k=keys,entry.(k{1})=source.(k{1});end
+    if isfield(source,'V'),entry.savedVSize=size(source.V);end
+    if isfield(source,'Z'),entry.savedZSize=size(source.Z);end
+    small.cycles{j}=entry;
+end
+small.basisArraysOmittedFromJSONSummary=true;summary.krylov=small;
+assert(numel(jsonencode(summary))<128*1024,'MomentumSummary:Size','精简报告仍超限，禁止写入巨大JSON。');
+end

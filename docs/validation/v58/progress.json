@@ -1,0 +1,831 @@
+{
+  "version": "v58",
+  "date": "2026-10-16",
+  "status": "tested-drafts-not-released",
+  "physicalSolution": false,
+  "fullSurfaceSolved": false,
+  "newSolvedSurfaceAreaM2": 0,
+  "actualProductionHeatAreaFraction": 0.6656263274240188,
+  "currentProductionFieldsUnchanged": true,
+  "actualRocketNumericalPilotSteps": 2,
+  "actualRocketPilotSteadyConverged": false,
+  "actualRocketPilotResidualIncreased": true,
+  "localRegionInletProfilesAvailable": false,
+  "staircaseGeometryLevels": 3,
+  "curvedWallClippingStatus": "tested geometry draft; actual 19752 faces to 31205 patches, independently recomputed",
+  "curvedWallFluidOwnerDetermined": true,
+  "fluidCutCellVolumesImplemented": true,
+  "openFaceAperturesImplemented": true,
+  "perFluidCellGeometryClosureVerified": true,
+  "originalFluidControlVolumes": 2242,
+  "originalWallPatches": 31205,
+  "trueCutCellSpatialOperatorTested": true,
+  "conservativeAggregationTested": true,
+  "aggregatedFluidControlVolumes": 1985,
+  "conservativeAggregationIndependentlyRecomputed": true,
+  "actualNonpositiveWallDistancesAfterAggregation": 0,
+  "actualCentroidsInsideSolidAfterAggregation": 0,
+  "cutCellTimeIntegratorStatus": "tested experimental variable-volume global SSP-RK2; independently read back",
+  "variableVolumeGlobalSSPRK2Implemented": true,
+  "actualCurvedCutCellAcceptedSteps": 6,
+  "actualCurvedCutCellRejectedAttempts": 0,
+  "actualCurvedCutCellSteadyConverged": false,
+  "actualCurvedCutCellTime": 9.8664236545609e-06,
+  "actualCurvedCutCellGlobalBalanceRelative": 1.0066723604544735e-14,
+  "batchedDiffusionStencilTested": true,
+  "fullNavierStokesStabilityProven": false,
+  "frozenDiffusionSpectrumTested": true,
+  "frozenThermalScalarMaximumPrinciple": false,
+  "surfaceTrianglePressureHeatMappingImplemented": true,
+  "conservativeWallMappingStatus": "tested numerical mapping only; production fields unchanged",
+  "numericalMappingCountsAsPhysicalSolution": false,
+  "gridDomainBoundaryConvergenceVerified": false,
+  "turbulenceAndVariablePropertiesImplemented": false,
+  "experimentalValidation": false,
+  "runs": [
+    {
+      "log": "draft/control_volume_preparation_final2.log",
+      "observedSession": 49568,
+      "observedBy": "remaining_region_diagnostic_v56 agent terminal report in prior continuation",
+      "purpose": "Actual saved rocket geometry control-volume preparation only; no flow solve",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "7dd698ece0f6417f6c13a2deede17fe11ac2eac67220f1ced11938521ad2b717"
+    },
+    {
+      "log": "draft/actual_rocket_assembly_pilot.log",
+      "observedSession": 55597,
+      "observedBy": "remaining_region_diagnostic_v56 agent terminal report in prior continuation",
+      "purpose": "Actual condition, approximate staircase envelope, two actual global RK2 steps only; not steady or physical validation",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "bf24554601fbe4d157f46ed4a7be8a963b506f1144d459cf8ce94d18d77a2503"
+    },
+    {
+      "log": "draft/pilot_independent_release_final.log",
+      "observedBy": "root direct exec exitCode0",
+      "purpose": "Independent MAT readback of actual initial/final conservative states and derived wall flux, source hashes and unknown regional inlet fields",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "7b2bfd8d5f1ad96a06a5ad099a5754fd56d53d651f44e0d7f4c8c5aa9ebc2eb6"
+    },
+    {
+      "log": "geometry_review/geometry_release_final.log",
+      "observedSession": 43480,
+      "observedBy": "root write_stdin terminal exitCode0",
+      "purpose": "Actual V/F three-level geometry/ray occupancy/normal/area study; no flow or heat solve",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "5c194e96a5b1285cd6e53965014a4f0062a0f7a3f8ff761617ef2af2f10d8e71"
+    },
+    {
+      "log": "curved_wall_draft/curved_wall_matlab_stdout.log",
+      "observedSession": 70900,
+      "observedBy": "curved_wall_clipping_v58 agent observed terminal exitCode0; recorded PID48116 and empty stderr",
+      "purpose": "Eight analytic groups, thirteen rejection cases and actual 19752 triangle partition into 31205 patches; geometry only",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "de117457a5ee1a3f08b1348d4626cc3836d6b81f3416f89b0937ca09934bcfb4"
+    },
+    {
+      "log": "curved_wall_review/independent_python_final.log",
+      "observedSession": 65636,
+      "observedBy": "curved-wall reviewer observed terminal exitCode0; exact terminal stdout transcribed in log and process JSON, not an originally redirected stream",
+      "purpose": "Independent barycentric half-plane pair intersection recomputation of every actual patch; no duplicate, missing or extra fragment",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "c81d970176acff43981dfbcecc52e86acf27c32e8b7e5cf4add443252a49be11"
+    },
+    {
+      "log": "cut_cell_draft/cut_cell_matlab_stdout.log",
+      "observedSession": 95003,
+      "observedBy": "geometry agent observed final PID46340 exitCode0, final reliable-source-normal snapshot",
+      "purpose": "Original-surface fluid cut volumes, centroids, 7938 shared apertures, true owners and per-cell nine-moment closure",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "bb7b24d5c4a808e27a9c621c7722b1b3906f50ef81c08eee6600e79cebd90902"
+    },
+    {
+      "log": "cut_cell_review/independent_cut_cell_final_stdout.log",
+      "observedBy": "independent reviewer final observed process and independent_evidence_manifest.json",
+      "purpose": "Independent all-aperture plane-section loops, V*c second moments, eight analytic fixtures and damaged-geometry rejection",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "67f602dcf9da3ed2eea2cb4ab5eafbf4d7b6e4a495e9a0409ae514f6bc8ef5c0"
+    },
+    {
+      "log": "cut_cell_flow_draft/cut_cell_flow_release_final.log",
+      "observedSession": 2245,
+      "observedBy": "root direct write_stdin terminal exitCode0, finite-output guard included",
+      "purpose": "True-wall flat-cell HLLC/Newton/Fourier spatial consistency and conservation only",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "66f98d0eaca5b92a151b5af9a6608e49e35725b9bbbb7f5c8ff1c4389edde8ac"
+    },
+    {
+      "log": "cut_cell_flow_review/independent_flow_readback.log",
+      "observedBy": "independent reviewer actual Python process exitCode0 and frozen hash checks",
+      "purpose": "Independent every-face HLLC/Newton/Fourier reconstruction, five-field incidence and rotated wall work",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "0c79cc15a386c4f2719ed6bb27249eddf88b0d54692163e36567c570696f189e"
+    },
+    {
+      "log": "cut_cell_transport_draft/aggregation_matlab_stdout.log",
+      "observedSession": 92856,
+      "observedBy": "geometry agent final PID53828 and real terminal exitCode0",
+      "purpose": "Bounded positive-aperture conservative aggregation, actual group quality and explicit isolated refusal",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "e685386a7de5f892c0808c65bcdfc461c56d892e3fcad7473132511686bf9655"
+    },
+    {
+      "log": "cut_cell_transport_review/independent_aggregation_readback.log",
+      "observedBy": "independent aggregation reviewer actual Python PID42332 observed exitCode0",
+      "purpose": "Independent full mapping/merge replay, positive-aperture connectivity, compensated volume moments, nine-moment closure, three-axis ray occupancy and five damaged snapshots",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "49a0e88a137f88dcda63f5cc33d79625adea6fdd57e11712cf7ce2bb9142fafd"
+    },
+    {
+      "log": "cut_cell_advance_review/frozen_diffusion_diagnostic.log",
+      "observedBy": "independent stencil reviewer actual Python process exitCode0, numerical spectra and symmetry diagnostics",
+      "purpose": "Frozen thermal/Newton LS-corrected sparse matrices and numeric dissipation spectra only, not complete Navier-Stokes stability",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "dfe6001756d27ca4959f52590c4a3c0d8258dd85becd413aad14935cf35e67e4"
+    },
+    {
+      "log": "cut_cell_advance_draft/mapping_stdout.log",
+      "observedSession": 71682,
+      "observedBy": "root direct write_stdin terminal exitCode0",
+      "purpose": "Conservative patch-to-original-triangle heat-power and pressure-force mapping; tiny unknown patch remains unknown, genuine zero retained; no production field update",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "fae2cbd35f603b857073d46fafed8fb47158c9d170776fb4879f593180e9be37"
+    },
+    {
+      "log": "cut_cell_advance_draft/advance_stdout.log",
+      "observedSession": 40297,
+      "observedBy": "root direct write_stdin terminal exitCode0; final helper formula and independently validated batching",
+      "purpose": "Actual variable-volume shared SSP-RK2 six accepted steps, artificial ODE temporal order and atomic rejection; not steady",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "6b546d8252b3a4d65a62f3651a00c6e4f19273e67b6fde6f03cec403fae3b280"
+    },
+    {
+      "log": "cut_cell_advance_draft/stencil_stdout.log",
+      "observedSession": 27545,
+      "observedBy": "root direct write_stdin terminal exitCode0",
+      "purpose": "Frozen actual initial C/heat/stress matrices for independent complete sparse comparison; no additional time advance",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "03028a68f1175cee159f6a0a4ab748d502312130fe71ac030b90eed2a0a1d6b5"
+    },
+    {
+      "log": "cut_cell_transport_review/performance/candidate_matlab_stdout.log",
+      "observedSession": 56247,
+      "observedBy": "independent performance reviewer actual PID57660 terminal exitCode0",
+      "purpose": "Equivalent batched assembly, three small boundary fixtures and actual 0.915s construction",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "3fd5d3d0951fa026c45a3cd18473bd42abc39a142d952184645331429fceb326"
+    },
+    {
+      "log": "cut_cell_transport_review/performance/independent_comparison_stdout.log",
+      "observedBy": "independent performance reviewer Python PID58388 observed exitCode0",
+      "purpose": "Batched actual complete matrices compared to independently reconstructed NPZ and exact boundary branches",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "17f0deef7ec6a7b615723e92b6e6833c38cdde45a1f86fec6a32fb28cfafbab9"
+    },
+    {
+      "log": "cut_cell_advance_review/independent_advance_readback.log",
+      "observedBy": "independent six-step reviewer actual Python process terminal exitCode0",
+      "purpose": "Every RK2 stage, variable-volume conservation, actual wall flux and full C/heat/stress matrix readback with frozen hashes",
+      "status": "completed",
+      "exitCode": 0,
+      "logSha256": "9eca55e30139becd5b4297f043abc4701adafc72a5e727c2ea55ebc3f2941877"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "curved_wall_draft/README.md",
+      "sha256": "3625a4bf06f9342745a381dc0de6d3fa39fbd85d476e6af9307faa3c28272788"
+    },
+    {
+      "path": "curved_wall_draft/actual_curved_wall_partition.mat",
+      "sha256": "5b03a7b246cce51f119d54a7f0bee5e75f4dc38a911dadc668d5ffea714967df"
+    },
+    {
+      "path": "curved_wall_draft/actual_curved_wall_patches.csv",
+      "sha256": "9c4a35de529fff6420fcccaa495360b1b50c14c2ba6c81f79426b8c365fd64e6"
+    },
+    {
+      "path": "curved_wall_draft/analytic_geometry_evidence.mat",
+      "sha256": "93059c1a3d9458ae31142f80a9eb949cc9ef9a11c9a26758f2519263b9e3ab00"
+    },
+    {
+      "path": "curved_wall_draft/curved_wall_matlab_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "curved_wall_draft/curved_wall_matlab_stdout.log",
+      "sha256": "de117457a5ee1a3f08b1348d4626cc3836d6b81f3416f89b0937ca09934bcfb4"
+    },
+    {
+      "path": "curved_wall_draft/curved_wall_validation_summary.json",
+      "sha256": "2db9b15b12fee04a3b3bfca91eb7cf62e48a364e72beca29602f05deafbf3fdd"
+    },
+    {
+      "path": "curved_wall_draft/geometry_evidence_manifest.json",
+      "sha256": "17f216bbbf1bddde8fbca86cf526f53633d7be67e42036cc835994f3d7f75a01"
+    },
+    {
+      "path": "curved_wall_draft/matlab_process_final.json",
+      "sha256": "3a955f553406e4f64bdc1bc31f7ba9deedf06254025b860b07a209d124ac25f0"
+    },
+    {
+      "path": "curved_wall_draft/partitionOrientedTriangles.m",
+      "sha256": "ff5c6b19f6a0fd770948a2e956090e9b977811d73afdaab50ce45fc1c6fb9a62"
+    },
+    {
+      "path": "curved_wall_draft/runCurvedWallDraftValidation.m",
+      "sha256": "931da5f2453a00384a3fac6940c3ed620c03b6bd79df6e5d943ada45839b3f12"
+    },
+    {
+      "path": "curved_wall_draft/run_geometry_validation.ps1",
+      "sha256": "cccfa9a84e192fbb9e7e2866689ae059c3a0012713e5a6c1b4b7c4f6e086af70"
+    },
+    {
+      "path": "curved_wall_review/check_curved_wall_geometry.py",
+      "sha256": "d2e75be454c4bfc53ff4b6121985192c6527fc1aa0aab1525dcf56a2ab473948"
+    },
+    {
+      "path": "curved_wall_review/independent_actual_recomputation.json",
+      "sha256": "87a79a8747117cc047cb759f9986c2cec230025917742f7a3af35cc0442692df"
+    },
+    {
+      "path": "curved_wall_review/independent_analytic_recomputation.json",
+      "sha256": "3ceb36b91c5635790874fd06f89ab800929a92bf5dbdf91bf2e20a91796015ad"
+    },
+    {
+      "path": "curved_wall_review/independent_python_final.log",
+      "sha256": "c81d970176acff43981dfbcecc52e86acf27c32e8b7e5cf4add443252a49be11"
+    },
+    {
+      "path": "curved_wall_review/independent_python_process_final.json",
+      "sha256": "a2960b780c1040e493212549f716db57004e7dd82f2ce24d3049e7775dee36f7"
+    },
+    {
+      "path": "curved_wall_review/independent_source_and_selftest.json",
+      "sha256": "4efa24f9031f5af879aee47f1a14cfa53da931fc006a4246224f9bf1abfc7352"
+    },
+    {
+      "path": "cut_cell_advance_draft/README.md",
+      "sha256": "3bdc8085c8a4260d1af107d8ba64a3f395b349f7a87d1eb8924b2641657d1d6b"
+    },
+    {
+      "path": "cut_cell_advance_draft/actual_stencil_evidence.mat",
+      "sha256": "2dbd2c0cc6d9494c58f90bc45af1f94437e985c324c7bc390d91d7bf6a6a1250"
+    },
+    {
+      "path": "cut_cell_advance_draft/advanceCutCellNavierStokes.m",
+      "sha256": "0801d3dfc373b6cbbffb593b3708ae02b7d8ad02e8e29ab744e8797ddcbaad99"
+    },
+    {
+      "path": "cut_cell_advance_draft/advance_evidence_manifest.json",
+      "sha256": "1f8ee8b2d1514471bede8f11a5610c5a51b671099c12d690e6d838a0779647cb"
+    },
+    {
+      "path": "cut_cell_advance_draft/advance_process.json",
+      "sha256": "dcad3e2645537050f0907e29d90d59eb8532ca079175a9781195368dadf35e7a"
+    },
+    {
+      "path": "cut_cell_advance_draft/advance_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_advance_draft/advance_stdout.log",
+      "sha256": "6b546d8252b3a4d65a62f3651a00c6e4f19273e67b6fde6f03cec403fae3b280"
+    },
+    {
+      "path": "cut_cell_advance_draft/buildCutCellDiffusionStencil.m",
+      "sha256": "e2f9a7eaa91af70f9b24ad02c4841509e4a90aef8f41147b67508f2293af9f74"
+    },
+    {
+      "path": "cut_cell_advance_draft/cutCellBoundaryStencilState.m",
+      "sha256": "728e0edb4f3e7762d7851e7944bd0e147ee6266f99b3f6f0eba15ed47f30cbb6"
+    },
+    {
+      "path": "cut_cell_advance_draft/cut_cell_advance_evidence.mat",
+      "sha256": "da7229a850cb5a4d147be7427c674ef762b8c77f92489db432ddff79f1fe3bcb"
+    },
+    {
+      "path": "cut_cell_advance_draft/cut_cell_advance_summary.json",
+      "sha256": "73832b959be45da87a065e5ce3e260d5a819796f6270601ab7225fa53259ff64"
+    },
+    {
+      "path": "cut_cell_advance_draft/mapCutCellWallFields.m",
+      "sha256": "aedc1d827351b2886f8b91689345663e96cf1274cc12f063ef631f124a468d46"
+    },
+    {
+      "path": "cut_cell_advance_draft/mapping_process.json",
+      "sha256": "4a6065fe2549c65b4a4b7526f52a6eb657e9af491899c43f988b3f0e616bb4eb"
+    },
+    {
+      "path": "cut_cell_advance_draft/mapping_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_advance_draft/mapping_stdout.log",
+      "sha256": "fae2cbd35f603b857073d46fafed8fb47158c9d170776fb4879f593180e9be37"
+    },
+    {
+      "path": "cut_cell_advance_draft/run_advance_validation.ps1",
+      "sha256": "db9563c0b001ac3c493ec3fb3b9ab7e54a30e2a10932a57dbeedbadc5bb96f20"
+    },
+    {
+      "path": "cut_cell_advance_draft/run_support_validation.ps1",
+      "sha256": "29fba1a149d6e8a1e34db9b315cdf9973149c345357fe49665b675afa763fadb"
+    },
+    {
+      "path": "cut_cell_advance_draft/stencil_process.json",
+      "sha256": "1772072273c86aa8263afd5f37ca753c0339c2ba5cab59f8683ba503eb734207"
+    },
+    {
+      "path": "cut_cell_advance_draft/stencil_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_advance_draft/stencil_stdout.log",
+      "sha256": "03028a68f1175cee159f6a0a4ab748d502312130fe71ac030b90eed2a0a1d6b5"
+    },
+    {
+      "path": "cut_cell_advance_draft/testCutCellAdvance.m",
+      "sha256": "9b2a3f5d070a24ece7d908f2dc87bb32d6ff5a29de86c9f95007c209f13bd0b6"
+    },
+    {
+      "path": "cut_cell_advance_draft/testCutCellWallMapping.m",
+      "sha256": "cd88e9f2279b47a2b9660c86b2a0d2b17497b1ce7fde7b69d48c7f66798d8623"
+    },
+    {
+      "path": "cut_cell_advance_draft/wall_mapping_evidence.mat",
+      "sha256": "d295ae124c4592bd6b2feaacebb81de5b5faace95b94f78d074a26ed1731d063"
+    },
+    {
+      "path": "cut_cell_advance_draft/wall_mapping_summary.json",
+      "sha256": "d78e8be2c47340d5370250081d5e3625b741dbb94492fd16b1dfe60d30497ec0"
+    },
+    {
+      "path": "cut_cell_advance_draft/writeActualCutCellStencilEvidence.m",
+      "sha256": "5f7b8ebb19132e0326d3d2e3a394bbb39e354b7cd824e16f2031f9acdeaee6fe"
+    },
+    {
+      "path": "cut_cell_advance_draft/write_advance_evidence_manifest.py",
+      "sha256": "f840563a654b6a344ff737c70ce192a4d7b94d434b2c049ed166838e11577417"
+    },
+    {
+      "path": "cut_cell_advance_review/TIME_STEP_REVIEW.md",
+      "sha256": "1435a1e9d7c18ff51e03132482e876cabd85f8bb950b2ff4fe7112b9397e3f5a"
+    },
+    {
+      "path": "cut_cell_advance_review/cell_gradient_coefficients.npz",
+      "sha256": "4cdfa6c0b08905aba522900eed357fbfc0d38f9088fa1b526c3913691fd4d976"
+    },
+    {
+      "path": "cut_cell_advance_review/check_cut_cell_advance.py",
+      "sha256": "42665c0bc11ec293513cf4baf612f0696b817601fd1d8f9599e230d62a16c283"
+    },
+    {
+      "path": "cut_cell_advance_review/diagnose_frozen_diffusion.py",
+      "sha256": "594023c883eccddf30bcb20dbfa96f3563db4753165aa16b5eff7e3892ed07d2"
+    },
+    {
+      "path": "cut_cell_advance_review/frozen_diffusion_diagnostic.json",
+      "sha256": "6218535692be8dd7dc00887c0d1fa84058982572f252525304ed3ea940a945f4"
+    },
+    {
+      "path": "cut_cell_advance_review/frozen_diffusion_diagnostic.log",
+      "sha256": "dfe6001756d27ca4959f52590c4a3c0d8258dd85becd413aad14935cf35e67e4"
+    },
+    {
+      "path": "cut_cell_advance_review/frozen_heat_matrix.npz",
+      "sha256": "4d7d9561693f5688156b62993bc0ea234eb63107dc075a028a0053f0f5956ed6"
+    },
+    {
+      "path": "cut_cell_advance_review/frozen_newton_velocity_matrix.npz",
+      "sha256": "59ccf13dc78a172528eb2f17b7c4bd5c36a8c8cb230bedb4e8ecce9257e0522f"
+    },
+    {
+      "path": "cut_cell_advance_review/independent_advance_readback.json",
+      "sha256": "dc086e82ae2f7c540b051ee6587e28e996ce6f69e67963f0e011bae820c690a8"
+    },
+    {
+      "path": "cut_cell_advance_review/independent_advance_readback.log",
+      "sha256": "9eca55e30139becd5b4297f043abc4701adafc72a5e727c2ea55ebc3f2941877"
+    },
+    {
+      "path": "cut_cell_advance_review/python_advance_process_final.json",
+      "sha256": "5f1041ce0deaa1fea479b3f5fc0a96495afa2c754b4bae1d5434f9576b3886dc"
+    },
+    {
+      "path": "cut_cell_advance_review/python_process_final.json",
+      "sha256": "8491b2fcd2291002e5216d5d2980af1f34fbd0c935cd1b0e1ac3bc60450c6c75"
+    },
+    {
+      "path": "cut_cell_advance_review/review_manifest.json",
+      "sha256": "9e6fde4d83c1cd7d7df55be9a3ebcc14ad7b468587d82fea75df915deee37205"
+    },
+    {
+      "path": "cut_cell_draft/README.md",
+      "sha256": "c18477ad7ff4b49b4dfbb303b734154fb3e978f829908b9c74a2182aab055afb"
+    },
+    {
+      "path": "cut_cell_draft/analytic_cut_cell_results.mat",
+      "sha256": "e08c1eaf51f2a009599f7b522e214ab6c6ce289620fae7a8dfa9a541162540f8"
+    },
+    {
+      "path": "cut_cell_draft/buildOriginalSurfaceCutCells.m",
+      "sha256": "203632630fa83aa9b94d4049da9f0cb5a2ae92a4ccbc530a3cd144be49d241f6"
+    },
+    {
+      "path": "cut_cell_draft/cut_cell_geometry_evidence_manifest.json",
+      "sha256": "a5451bede10cca5a6fd34becb38dfb0cce8c180c2cafdbe7eff2811670f35a01"
+    },
+    {
+      "path": "cut_cell_draft/cut_cell_geometry_results.mat",
+      "sha256": "0ce9d7ae76815af4176f092dd6f2022078eab12c083d3635f18a035c6639b45b"
+    },
+    {
+      "path": "cut_cell_draft/cut_cell_geometry_summary.json",
+      "sha256": "2ece630ede453308f445a821a305c1b9aee0b69744bb01bc2c4de0f9e682faff"
+    },
+    {
+      "path": "cut_cell_draft/cut_cell_matlab_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_draft/cut_cell_matlab_stdout.log",
+      "sha256": "bb7b24d5c4a808e27a9c621c7722b1b3906f50ef81c08eee6600e79cebd90902"
+    },
+    {
+      "path": "cut_cell_draft/matlab_process_final.json",
+      "sha256": "585d5c587526189612855821a7deb1156d4206b02018b70e60983ccc4476e4f2"
+    },
+    {
+      "path": "cut_cell_draft/runCutCellGeometryValidation.m",
+      "sha256": "85df4fcb181047d94eb68ea751be394dea7c060b0d653e7b06d6e320ce8df880"
+    },
+    {
+      "path": "cut_cell_draft/run_cut_cell_validation.ps1",
+      "sha256": "f5f5e0d356d923ce2b6f10656ccb70d41c383234f04edc7227f0d3619da8815c"
+    },
+    {
+      "path": "cut_cell_flow_draft/README.md",
+      "sha256": "ec8d57e2972088e1197fd3cb1be3e2c6134789d19ad369a2a26052288bf9905f"
+    },
+    {
+      "path": "cut_cell_flow_draft/cutCellNavierStokesResidual.m",
+      "sha256": "68f3b2c08de7bcb5f1f11d5504ad7b8b6840c441344b99730ba01f2fe7f14bc2"
+    },
+    {
+      "path": "cut_cell_flow_draft/cut_cell_flow_evidence.mat",
+      "sha256": "91566cdc11e1d7100748f7c1d469b47bfe7e7c8f7888c7909742d43a1e7ca3e5"
+    },
+    {
+      "path": "cut_cell_flow_draft/cut_cell_flow_evidence_manifest.json",
+      "sha256": "7784259615dfa2d1e8b187a0e52c058ec290c6f40456ffd7e8e18a9d76b4ba01"
+    },
+    {
+      "path": "cut_cell_flow_draft/cut_cell_flow_release_final.log",
+      "sha256": "66f98d0eaca5b92a151b5af9a6608e49e35725b9bbbb7f5c8ff1c4389edde8ac"
+    },
+    {
+      "path": "cut_cell_flow_draft/cut_cell_flow_summary.json",
+      "sha256": "f7e01d24149921ea0f6d647b12c7b5bb8e90353d4becb8c3484bcdcfeabe7ee7"
+    },
+    {
+      "path": "cut_cell_flow_draft/testCutCellNavierStokesResidual.m",
+      "sha256": "875fad247572c8c91d0672727c398f05c1efae6b25ef621aa5d334848bbbff48"
+    },
+    {
+      "path": "cut_cell_flow_draft/write_flow_evidence_manifest.py",
+      "sha256": "955ee9c0095cb1736de55435929cd275e2fa6179eede265d362dfeffee09038e"
+    },
+    {
+      "path": "cut_cell_flow_review/STATIC_REVIEW.md",
+      "sha256": "d3e975d6285366c17770e53dd8577940b6f9bf830d366bfa4ee0aa1d905533e5"
+    },
+    {
+      "path": "cut_cell_flow_review/check_cut_cell_flow.py",
+      "sha256": "499dc49aaf85f022b596f1528770e0fec4e94f19a6a08383eb1ced9c477bc3cf"
+    },
+    {
+      "path": "cut_cell_flow_review/independent_flow_readback.json",
+      "sha256": "6ec36dfae6ca87eaa869fc368ae91420ff9445ab6f23ffb2eb094f23b57d5223"
+    },
+    {
+      "path": "cut_cell_flow_review/independent_flow_readback.log",
+      "sha256": "0c79cc15a386c4f2719ed6bb27249eddf88b0d54692163e36567c570696f189e"
+    },
+    {
+      "path": "cut_cell_flow_review/python_process_final.json",
+      "sha256": "3e1a686ad99fca62376ae11c190bdadf3c274047f1cffed5bdadc4872c17e736"
+    },
+    {
+      "path": "cut_cell_review/README.md",
+      "sha256": "a5d96518ec6b1570cce2ef8e0b28764b7e2e875da8073ad955dd658f4a58e8dc"
+    },
+    {
+      "path": "cut_cell_review/analytic_cut_cell_oracles.mat",
+      "sha256": "9ddd2d840eca88ae2186eefa31115c51ba343d6439faa5b0cb8c32773a58bbff"
+    },
+    {
+      "path": "cut_cell_review/analytic_oracle_final_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_review/analytic_oracle_final_stdout.log",
+      "sha256": "f0efa79bea2f317bb9c18d8a4d15314d95cccc58229a288f3773bf19d5d11aae"
+    },
+    {
+      "path": "cut_cell_review/analytic_oracle_process_final.json",
+      "sha256": "04d535c8a5938701bdc5575386b6412d637ad26a55e4670144da8f387e354179"
+    },
+    {
+      "path": "cut_cell_review/analytic_oracle_selftest.json",
+      "sha256": "0e669adb9094087bd35425f3aa6b156baabcf718873ff4a58dc513b3256bc2eb"
+    },
+    {
+      "path": "cut_cell_review/build_analytic_cut_cell_oracles.py",
+      "sha256": "338e21d19a4340c628fe2a9c113701447616a83e265a59a4dfb4dd2b68267db8"
+    },
+    {
+      "path": "cut_cell_review/check_cut_cell_geometry.py",
+      "sha256": "3fc77184db3a61a25c2d853525f115e8175c8350cf00cae7c42231b7bc0451af"
+    },
+    {
+      "path": "cut_cell_review/independent_cut_cell_final.json",
+      "sha256": "a6234066896394256e86d5254099fcc847fa3f105fef400bdaf58a1e8aa1bd7f"
+    },
+    {
+      "path": "cut_cell_review/independent_cut_cell_final_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_review/independent_cut_cell_final_stdout.log",
+      "sha256": "67f602dcf9da3ed2eea2cb4ab5eafbf4d7b6e4a495e9a0409ae514f6bc8ef5c0"
+    },
+    {
+      "path": "cut_cell_review/independent_cut_cell_process_final.json",
+      "sha256": "808a9af00d052f99e173c49a8f4d086864ad0bb6b73043fef67f9b37d089478f"
+    },
+    {
+      "path": "cut_cell_review/independent_evidence_manifest.json",
+      "sha256": "90c24dbf53ba7e2bcebd166d2ba591d2ab5ae7fbbe2bab453972dceb602fcbd3"
+    },
+    {
+      "path": "cut_cell_review/independent_sections.py",
+      "sha256": "1d859b37bfbe3d052268507d2a1e480a5f977f5b47819226041fce5acb6f37d8"
+    },
+    {
+      "path": "cut_cell_transport_draft/README.md",
+      "sha256": "ee6f4cc8552ad535182d7f44119f0afadc739ed8f885fca550504b6a73a0bac7"
+    },
+    {
+      "path": "cut_cell_transport_draft/actual_aggregation_results.mat",
+      "sha256": "c0aea963b761eb9db7c62033ab02cf374b3fc1ecd5bf3389b59abd55d4407e0f"
+    },
+    {
+      "path": "cut_cell_transport_draft/agglomerateFluidControlVolumes.m",
+      "sha256": "af3f6a469e0774883ba5ea8e90d1733ff4016dead02bf417a4951fbfdefedb33"
+    },
+    {
+      "path": "cut_cell_transport_draft/aggregation_evidence_manifest.json",
+      "sha256": "c784a73dc96cdf2656d5f0c003d4b6f9db6a9910d399eb8faa5485a03ee99790"
+    },
+    {
+      "path": "cut_cell_transport_draft/aggregation_matlab_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_transport_draft/aggregation_matlab_stdout.log",
+      "sha256": "e685386a7de5f892c0808c65bcdfc461c56d892e3fcad7473132511686bf9655"
+    },
+    {
+      "path": "cut_cell_transport_draft/aggregation_summary.json",
+      "sha256": "6b7bcfb63d2df11cacd8e3c20bc8375aa08d9bfd1515b406c0b898bd4622911a"
+    },
+    {
+      "path": "cut_cell_transport_draft/analytic_aggregation_results.mat",
+      "sha256": "cef0161d2d3e987a1dbd24f8b4408ec204b70fbe748bebcd8eaabd1ba86c791d"
+    },
+    {
+      "path": "cut_cell_transport_draft/matlab_process_final.json",
+      "sha256": "66b91ad1fd1d62b18ffbfbecfac7231be18e6c18f3087b90db0b5293ee5c1a69"
+    },
+    {
+      "path": "cut_cell_transport_draft/runCutCellAgglomerationValidation.m",
+      "sha256": "7ec97c88ce1595b43f3e2322fb305535039beb51e9a5ad3b48086c658e688ab9"
+    },
+    {
+      "path": "cut_cell_transport_draft/run_aggregation_validation.ps1",
+      "sha256": "a0d90d69a08c02999f7313cf4b35e59da3a9d10c30ae601290fb53778a9d9a74"
+    },
+    {
+      "path": "cut_cell_transport_review/README.md",
+      "sha256": "45f89d6f4c2223489e14dfe1e03e18cd34e27316253afe3897bda11cc04a5285"
+    },
+    {
+      "path": "cut_cell_transport_review/check_aggregation.py",
+      "sha256": "74264d0b04737d7c7aa2036d9c63e9d3d1a341006afdefecf47e5d064671c75e"
+    },
+    {
+      "path": "cut_cell_transport_review/independent_aggregation_readback.json",
+      "sha256": "bf687f141006df92e8e9375211f6575f1bf03b5751de177f3b2d75672f5d9966"
+    },
+    {
+      "path": "cut_cell_transport_review/independent_aggregation_readback.log",
+      "sha256": "49a0e88a137f88dcda63f5cc33d79625adea6fdd57e11712cf7ce2bb9142fafd"
+    },
+    {
+      "path": "cut_cell_transport_review/independent_aggregation_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_transport_review/independent_evidence_manifest.json",
+      "sha256": "fcba7d71a858a27f29034e9151b23848e6bc5e01ef69f3c46f412bcdcd74a1d9"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/README.md",
+      "sha256": "e0c208be3ade2ef4b26887d5551e5c1d21b1a0fd75155ddf0550aea0fb06b6a1"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/batched_stencil_evidence.mat",
+      "sha256": "bb30be2c485cec7ffef13dc8205eda26c54e743b4e6513678137ae775d9981ee"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/buildCutCellDiffusionStencilBatched.m",
+      "sha256": "d76df86f0d1bbd1b6be02ee9499adb7635c80d966bb47e6c3c6cbfec18a92e0f"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/candidate_matlab_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/candidate_matlab_stdout.log",
+      "sha256": "3fd5d3d0951fa026c45a3cd18473bd42abc39a142d952184645331429fceb326"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/check_batched_candidate.py",
+      "sha256": "a06be70ba9303c67f0411f0050f6f3a4179ff87ba8abb39de03d2e57222ec6b7"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/independent_candidate_comparison.json",
+      "sha256": "2ca33450a13af122199be9a88aa1031f674a4d6d35ae1d5bf3e0edcd934cd2fb"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/independent_comparison_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/independent_comparison_stdout.log",
+      "sha256": "17f0deef7ec6a7b615723e92b6e6833c38cdde45a1f86fec6a32fb28cfafbab9"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/matlab_candidate_summary.json",
+      "sha256": "1eec97fec23e387fd8a0782baf3dec1665fa4fddcbe8d258cc8d3d22efcbaa87"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/matlab_process_final.json",
+      "sha256": "58a45be80a80929aaa542a9f414bbf6f5e9691d80eb38c73c619743371364454"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/performance_evidence_manifest.json",
+      "sha256": "234f10bce7b2d0d76f92ed925f482e4209c2bef4d6bd77268029bb1e035109bd"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/python_process_final.json",
+      "sha256": "ea4093de0608923fa43de6f405a7ef6c4dd18813428ed7a7197dd8f59c7a1e5b"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/reference_source/buildCutCellDiffusionStencil.m",
+      "sha256": "0a0f3ccc57202a57bad69658e0ab471271cc2565ec16fc56b41d3beae3c38e75"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/run_candidate.ps1",
+      "sha256": "b64c7c26a71754d5ff046385315a2f0813d4ec26280a806545807c1c8b96c30b"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/run_comparison.ps1",
+      "sha256": "e8af361cf8a40c9bb527c45e2660b8ef8f7594d4ea9b29272e769e4ee89f2d2a"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/testBatchedCutCellStencil.m",
+      "sha256": "fb770e0a9b885ec82b84344242fd62830accb859a262357ddd49e6c9518ac433"
+    },
+    {
+      "path": "cut_cell_transport_review/performance/write_performance_manifest.py",
+      "sha256": "c5c1192afb5e21f860dd997be2d0f30fa6a3a3c8735608100768e8226b6920f9"
+    },
+    {
+      "path": "cut_cell_transport_review/python_process_final.json",
+      "sha256": "f9dbd8795bf7a6ccad5f19e8cb074f83a8f911c6a0a3db36635631024085b252"
+    },
+    {
+      "path": "cut_cell_transport_review/run_review.ps1",
+      "sha256": "4c6ccc60539a9922aa276060b87463f8a469b9fb62e507cebdc0e68cfadeb1c7"
+    },
+    {
+      "path": "cut_cell_transport_review/write_evidence_manifest.py",
+      "sha256": "3eee73f069e7e93995da6a0b61d4bb35068fd41ca9197735322d114421a6309b"
+    },
+    {
+      "path": "draft/actual_control_volume_summary.json",
+      "sha256": "d1e304d594d1eace1db131b0fc26b80f548e1f469d1fc64013a68b6199cabd5e"
+    },
+    {
+      "path": "draft/actual_control_volumes.mat",
+      "sha256": "61b9bbb85cf2731472bb3c429cdcecae6faca2e9da823d6cc693570cddb7e899"
+    },
+    {
+      "path": "draft/actual_rocket_assembly_pilot.json",
+      "sha256": "e82158d17588174fe7eb691ec5b7891b57f2bfb182b664166ef1001b60099e4d"
+    },
+    {
+      "path": "draft/actual_rocket_assembly_pilot.log",
+      "sha256": "bf24554601fbe4d157f46ed4a7be8a963b506f1144d459cf8ce94d18d77a2503"
+    },
+    {
+      "path": "draft/actual_rocket_assembly_pilot.mat",
+      "sha256": "e3ae851cd6e8d85020865353cf49555edc605fff9a970805e75ad94b310e7cce"
+    },
+    {
+      "path": "draft/actual_rocket_pilot_conservation.csv",
+      "sha256": "06529612e75fdbc02d0ff4ed763fb03f93e587924235f9e1eb879e08a94b0b2d"
+    },
+    {
+      "path": "draft/actual_rocket_pilot_independent.json",
+      "sha256": "d216fa5f9527d7518e79fe739e4710b803e4f9f47420a098268f84649f9b4052"
+    },
+    {
+      "path": "draft/actual_rocket_pilot_stair_wall.csv",
+      "sha256": "4a27882cfee961867029a8698be2a8b2272bd9817e952f0f85280eb3c2bf3865"
+    },
+    {
+      "path": "draft/actual_sections.csv",
+      "sha256": "db1af4e2fa945cf53662e90cf70b97d4c7fdbd669e875a8a1561480beb8b0385"
+    },
+    {
+      "path": "draft/base_inlet_surface_samples.csv",
+      "sha256": "90589ca923a74e23618fb0bcb3ab94568324faff970ac0150bb76653154d57aa"
+    },
+    {
+      "path": "draft/contraction_inlet_surface_samples.csv",
+      "sha256": "cda00a5fa8835c21726d9379c6d62208d76c2799a85b6a4f8fa89ef0882bf465"
+    },
+    {
+      "path": "draft/control_volume_preparation_final2.log",
+      "sha256": "7dd698ece0f6417f6c13a2deede17fe11ac2eac67220f1ced11938521ad2b717"
+    },
+    {
+      "path": "draft/pilot_independent_release_final.log",
+      "sha256": "7b2bfd8d5f1ad96a06a5ad099a5754fd56d53d651f44e0d7f4c8c5aa9ebc2eb6"
+    },
+    {
+      "path": "draft/prepareActualRocketControlVolumes.m",
+      "sha256": "708a8ce8d6dd6f6eca824f9300a8ec08ba71f572962a9e1a3a7fb320e7e0dd25"
+    },
+    {
+      "path": "draft/runActualRocketAssemblyPilot.m",
+      "sha256": "7cd58761439cfe135bb9d55e9489176b2bd16288b243fc5e992f57c19f261adf"
+    },
+    {
+      "path": "draft/verify_actual_rocket_pilot.py",
+      "sha256": "8060e03ee9e1626e0879d41d8f2082dc7dc4dca7118bdbc23810da374baab0e4"
+    },
+    {
+      "path": "geometry_review/check_actual_staircase_geometry.py",
+      "sha256": "d9b1fe6a8d5f60e53ec0170f029e79324d284cd64363d3c5d269a6e1ed0e37df"
+    },
+    {
+      "path": "geometry_review/geometry_comparison.csv",
+      "sha256": "eb0b3250d11d83c6853c4229b3a94c6799e9805f57ae3e7cdc136b6df6c5f8f9"
+    },
+    {
+      "path": "geometry_review/geometry_release_final.log",
+      "sha256": "5c194e96a5b1285cd6e53965014a4f0062a0f7a3f8ff761617ef2af2f10d8e71"
+    },
+    {
+      "path": "geometry_review/geometry_report.json",
+      "sha256": "7b4a6937b4b0c446b0005db27b49acc9be465981c73321cb8011953ad4233403"
+    },
+    {
+      "path": "write_progress_evidence.py",
+      "sha256": "06682bee1a9d584b69f3179c80e2d6daa178e66f7134cf8fa37a6b04fa8be201"
+    }
+  ],
+  "githubPushed": false,
+  "note": "drafts under outputs are local preparation, not a released default regional solver; v57 remains the delivered frozen release"
+}

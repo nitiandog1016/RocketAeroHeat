@@ -1,0 +1,840 @@
+{
+  "version": 83,
+  "status": "tested-complete-F-image-column-normalization-bounded-real-LSQR-and-workbench",
+  "recordedUTC": "2026-10-25T20:31:35.599337+00:00",
+  "processID": 56208,
+  "priorProgress": {
+    "path": "docs/validation/v83/progress_full_F_least_squares.json",
+    "sha256": "841b4f41a9644d4da9b02ef7b7311c15b7ca35a7211c0a461a45ed3d6a0e49c8",
+    "bytes": 44962
+  },
+  "previousGoalTurnClassification": "progress-complete-forward-adjoint-LSQR-and-native-stop-repair",
+  "currentGoalTurnClassification": "progress-complete-image-column-conditioning-independent-scaled-solver-and-workbench",
+  "processes": {
+    "fullFimagescaleunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        47056
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/fullFimagescaleunit01_process.json",
+        "sha256": "26112102012286ff5b7dd7b473542366bae50038d149f29d931d4b5f9fe50e09",
+        "bytes": 190983
+      }
+    },
+    "fullFimagescalereal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        57060
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/fullFimagescalereal01_process.json",
+        "sha256": "23cba6ee4a84567a1f272ba2b7d84c1daffbc20040deb62e76a29f0caa1558c7",
+        "bytes": 191241
+      }
+    },
+    "fullFimagescaleui01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        30028
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/fullFimagescaleui01_process.json",
+        "sha256": "96adb9291638182bac3b70736e69c974fe5d6a96831f53b611ac4af49ba286fa",
+        "bytes": 192011
+      }
+    }
+  },
+  "independentChecks": [
+    {
+      "report": {
+        "status": "passed-independent-all-small-complete-image-columns-permutations-scaled-LSQR-and-old-default",
+        "processID": 53408,
+        "cases": [
+          {
+            "allColumnNormRelativeDifference": 2.2191612542038762e-16,
+            "permutedColumnNormRelativeDifference": 5.002585861575701e-16,
+            "fullFRelativeResidual": 5.280626744201859e-13,
+            "oldDefaultValueExactlyReproduced": true
+          },
+          {
+            "allColumnNormRelativeDifference": 2.2191612542038762e-16,
+            "permutedColumnNormRelativeDifference": 5.002585861575701e-16,
+            "fullFRelativeResidual": 5.280372830344569e-13,
+            "oldDefaultValueExactlyReproduced": true
+          }
+        ],
+        "newActualNSEvaluations": 0,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs/v83_validation/fullFimagescaleunit01/full_F_image_scale_unit_evidence.mat": "0476d55ec78a3e88732f910db2843c2c06f6bff17dbf4d36292cace5101f5d8b",
+          "outputs/v83_validation/fullFlsqrunit02/full_F_least_squares_unit_evidence.mat": "c1cfd9e49a338e58c76e237bc21f02fd563d678f408fb433f0164d63db336801"
+        },
+        "scriptSHA256": "6996c1ee6fb58f28001b7bc8c2197c578133923629827964165c1c0753853d17",
+        "helperSourceSHA256": "8629f44182332ef37523fe2a93e38e4a54febb8288f031a487f12d1bbb4dc024"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/fullFimagescaleunit01_independent_full_F_image_scale.json",
+        "sha256": "c6db3791b11453372a827b7380fad8d311fd7b470b33262e73df6cf58d3a8ecb",
+        "bytes": 1248
+      }
+    },
+    {
+      "report": {
+        "status": "passed-independent-all-real-complete-image-column-norms-scaled-F-and-fixed-C-parent-diagnostic",
+        "processID": 24988,
+        "allPreconditionedColumns": 938745,
+        "maximumColumnNormRelativeDifference": 7.499086367325968e-14,
+        "scaledFImageDifference": 4.782132168085841e-15,
+        "parentOriginalCImageDifference": 1.3860521542579723e-14,
+        "finalFullFResidual": 0.006944675536364437,
+        "fullFInternalTargetMet": false,
+        "fixedCParentOriginalCResidual": 9.589992117991597,
+        "FRowsSubmatrixConsistency": 1.334231299475471e-13,
+        "oldApproximateSchurIdentityClaimed": false,
+        "independentAllRealBidiagonalizationColumnsClaimed": false,
+        "originalFResidualNormUnchanged": true,
+        "newActualNSEvaluations": 0,
+        "newFlowAcceptances": 0,
+        "newProductionSolvedAreaM2": 0,
+        "physicalSolution": false,
+        "inputSHA256": {
+          "outputs/v83_validation/fullFimagescalereal01/full_F_image_scaled_real_evidence.mat": "645224f6e82bf2bbf909bd42eafa5c338d075ff008344b2cd38dccf896f9465a",
+          "outputs/v83_validation/fullFimagescalereal01/full_F_image_scale_evidence.mat": "99b4e6d25b1255e29ad0d48e379dca2fcae2f442ac50144d144baf8a73b5128c",
+          "outputs/v83_validation/fullFimagescalescreen01/full_F_image_scale_evidence.mat": "fb4adc2e4e4a92d3ff60be5006bbfc8f0048117e07c93f585232a510dd6eac72",
+          "outputs/v83_validation/fullFreal01/full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04",
+          "outputs/v83_validation/fullFreal01/full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+          "outputs/v83_validation/blockilureal01/steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf"
+        },
+        "scriptSHA256": "6996c1ee6fb58f28001b7bc8c2197c578133923629827964165c1c0753853d17",
+        "helperSourceSHA256": "8629f44182332ef37523fe2a93e38e4a54febb8288f031a487f12d1bbb4dc024"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/fullFimagescalereal01_independent_full_F_image_scale.json",
+        "sha256": "491fb77095488c34ea2d7793880fc31e9511792983cea1204e205810ae1d4ae5",
+        "bytes": 1920
+      }
+    },
+    {
+      "report": {
+        "status": "passed-independent-nineteen-source-bound-rows-image-scale-F-parent-qualification-and-unchanged-facet-data",
+        "processID": 36452,
+        "researchRows": 19,
+        "previousEighteenRowsExactlyPreserved": true,
+        "originalTenFieldsAndNSHistoryUnchanged": true,
+        "fullFAndParentAndNSQualificationKeptSeparate": true,
+        "originalFNormAndRightHandSideUnchanged": true,
+        "LSQRArnoldiMetricsNotApplicable": true,
+        "allThreeFalseSourceOrQualificationExportsRejected": true,
+        "sourceFacetPayload": [
+          {
+            "path": "outputs/v83_validation/workbench29/cases/legacy-wall-source/results.json",
+            "sha256": "5c048e7c893dc4c67064656bde19b17419e0ed6b742f893f0e63bf24db25d04f",
+            "bytes": 9047228
+          },
+          {
+            "path": "outputs/v83_validation/workbench29/cases/legacy-wall-source/case-data.js",
+            "sha256": "60cfa644b4ad13d70e9591bd40b6417281801a46698df5688100d62d06bf381c",
+            "bytes": 9047249
+          },
+          {
+            "path": "outputs/v83_validation/workbench29/cases/constrained-wall-baseline/results.json",
+            "sha256": "7bd40b17d235011f19be08c8b856f1854eb078bbf9592fa9969557d283a89f5f",
+            "bytes": 9047209
+          },
+          {
+            "path": "outputs/v83_validation/workbench29/cases/constrained-wall-baseline/case-data.js",
+            "sha256": "780da22265a80f0e26a55e79f66138a48a1722d38a730dd3de111eb6402f9197",
+            "bytes": 9047230
+          },
+          {
+            "path": "outputs/v83_validation/workbench29/cases/constrained-wall-krylov/results.json",
+            "sha256": "b946336d02ea4a81384ba9ff4bf13828e0910bb2ba399b27c48feccd2bcd37b2",
+            "bytes": 9060905
+          },
+          {
+            "path": "outputs/v83_validation/workbench29/cases/constrained-wall-krylov/case-data.js",
+            "sha256": "8140318bfa34e28df8dd8320ee5c4541c216addfa533b4925087d3b8ae0c2d57",
+            "bytes": 9060926
+          }
+        ],
+        "previousFullMATFieldAuditReusedByByteIdentity": true,
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "newActualNSEvaluations": 0,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs/v83_validation/blockilufailurediag01/arnoldi_failure_evidence.mat": "b4c42808fd960db0b827daba4450054724f25b2ea6b7d9306965d7a42a282319",
+          "outputs/v83_validation/scaledilureal01/scaled_arnoldi_failure_evidence.mat": "ecc4dc36726284411c601f2f12058caecce4bc5edcaa76cd0684350d25626fd1",
+          "outputs/v83_validation/blockfillreal01/scaled_arnoldi_failure_evidence.mat": "46f4a5065956e9977037ac39a2b8419c6a1687d44a5edf712eeb7cd196656938",
+          "outputs/v83_validation/floworderfactor01/flow_ordering_actions_evidence.mat": "ae8819df3a2ad68544ac54b23285ca10347c333b74a3a05704e074afb2747856",
+          "outputs/v83_validation/schurcheckpointreal01/schur_failure_checkpoint_summary.json": "5c353f08b38934a3b410b1d25f7bda555f3be47c86faa37f61fa484db2913d0d",
+          "outputs/v83_validation/pivotedschurreal02/pivoted_schur_real_summary.json": "4efe6d754c844452f9b55adb98602be37fd6eaa25a54abd403dba474c1e306f5",
+          "outputs/v83_validation/schurscalereal01/agent_stop_record.json": "f4b4a0e160bca5a8e15233be3e0cb963fe3f1956665ad4c26e863b373c87a67a",
+          "outputs/v83_validation/consistentdiagrefine01/consistent_schur_real_summary.json": "e08f3e895c392f08e14e4c6bee449c4fca9f60e2e2f6c0a716c109f316307865",
+          "outputs/v83_validation/momentumlinereport02/momentum_lines_real_summary.json": "98bb9ebbac1488f46bfcfaf3df613f79ae65f8622e6434b9dbc752ea44c4d199",
+          "outputs/v83_validation/rowmomentumreal01/row_momentum_real_summary.json": "a9c9164c35274e6b1da9ddb28df21fb45186263890ca7981d17dd9d6c73e2024",
+          "outputs/v83_validation/coupledpatchreal01/coupled_patch_real_summary.json": "cd98962666455ef04579c660f08f48634179061d2730c25e9255fea35046145a",
+          "outputs/v83_validation/patchhierarchyreal01/patch_hierarchy_real_summary.json": "8fc26436d44cbb2773678da4577acd71fd79a8c23b715bc0bc5859180c23a978",
+          "outputs/v83_validation/spatialreductionreal01/spatial_reduction_real_summary.json": "ff69d3ac21c47cdd5fa4897b8bd88d517f578900c1b8a608401b57d227454173",
+          "outputs/v83_validation/spatialschurreal01/spatial_schur_krylov_summary.json": "b41f5f37a906b220e51dedce58479c86d8020c4105dcc05e4921702bccbb17e8",
+          "outputs/v83_validation/fullFreal01/full_F_real_summary.json": "775eb8d9732c69b8a29fa298193b7afca7b6e6f0e768eff4e48105e9683021ac",
+          "outputs/v83_validation/fullFstrengthreal02/full_F_strength_summary.json": "9b1299dfe9decd6b28647cb00809c92194573904a99d7082f17c9117e363f8bd",
+          "outputs/v83_validation/overlapFreal01/restricted_overlap_summary.json": "8906b47033c05a5481e62634bd9f4a8d9d8410f051a26383105bf245b7f9bf0c",
+          "outputs/v83_validation/fullFlsqrreal02/full_F_least_squares_summary.json": "b635ab03955dd35d93cf36fe5321f6d0c01b134e2d2a1983c9bfc416aa2f4d86",
+          "outputs/v83_validation/fullFimagescalereal01/full_F_image_scaled_summary.json": "a8ce3f40001f5f9dcf4d255ebd3c3dceb3d3ef0dd06662a05854ee3fcdd046da"
+        },
+        "scriptSHA256": "affefd819e2f7b23e87259f21ba86c188b8c6c5779281cafcac1d2d7511fa5b7"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/workbench29/independent_full_F_image_scale_study_view.json",
+        "sha256": "8dd888958fd18605895812f7e5aac49d002f959241f74df3f3e3e5652fa7d908",
+        "bytes": 4976
+      }
+    },
+    {
+      "report": {
+        "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+        "processID": 7256,
+        "cases": 3,
+        "sourceFaces": 19752,
+        "CSVrows": 592560,
+        "sectionSamples": 6624,
+        "sameHostEvents": 15,
+        "linearDiagnosticRows": 1,
+        "candidateDiagnosticRows": 0,
+        "sourceSHA256": {
+          "tests\\testRocketWallVelocityWorkbench.js": "b098948aab77941afa23e480c6a0e0478650393055b01e05c1c1d575d5bbcc41",
+          "outputs\\v83_validation\\workbench29\\rocket-wall-velocity.js": "a5918a3bd45c29823e51a4333ff9574ee9bc88ec7f98dd6910bdba2a92eb8ac9",
+          "outputs\\v83_validation\\workbench29\\index.html": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+          "web\\viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+          "web\\export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+          "web\\section.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c"
+        },
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "newProductionSolvedAreaM2": 0,
+        "dataSHA256": "d9f5497d507daad5272740120c7d27aada858fae45cb83c0173036b049eb13f9"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/workbench29/node_wall_velocity_summary.json",
+        "sha256": "547b5dab7c4863c8e5cb5a37273d32e9716a823c6d7c719a000d77147162f3fd",
+        "bytes": 1120
+      }
+    }
+  ],
+  "independentPrototype": {
+    "status": "tested-complete-preconditioned-F-image-column-normalization-and-bounded-LSQR-screen",
+    "processID": 17672,
+    "recordedUTC": "2026-10-25T20:16:20.963309+00:00",
+    "smallReferences": [
+      {
+        "columnNormMaximumRelativeDifference": 4.4389535452030583e-16,
+        "adjointIdentityDifference": 2.5596720100879327e-17,
+        "fullFRelativeResidual": 8.267525575065362e-12,
+        "construction": {
+          "groups": 6,
+          "originalBlocksUsedExactlyOnce": 128,
+          "allOriginalUnknownColumnsCoveredExactlyOnce": true,
+          "maximumSupportedOriginalRows": 14,
+          "maximumDensePanelAndImageArrayBytes": 22400,
+          "fullGlobalPreconditionedMatrixAllocated": false,
+          "processPeakMemoryClaimed": false
+        }
+      },
+      {
+        "columnNormMaximumRelativeDifference": 4.4389535452030583e-16,
+        "adjointIdentityDifference": 2.5596720100879327e-17,
+        "fullFRelativeResidual": 8.2465364493718e-12,
+        "construction": {
+          "groups": 6,
+          "originalBlocksUsedExactlyOnce": 128,
+          "allOriginalUnknownColumnsCoveredExactlyOnce": true,
+          "maximumSupportedOriginalRows": 14,
+          "maximumDensePanelAndImageArrayBytes": 22400,
+          "fullGlobalPreconditionedMatrixAllocated": false,
+          "processPeakMemoryClaimed": false
+        }
+      }
+    ],
+    "construction": {
+      "groups": 28902,
+      "originalBlocksUsedExactlyOnce": 1285801,
+      "allOriginalUnknownColumnsCoveredExactlyOnce": true,
+      "maximumSupportedOriginalRows": 44,
+      "maximumDensePanelAndImageArrayBytes": 123200,
+      "fullGlobalPreconditionedMatrixAllocated": false,
+      "processPeakMemoryClaimed": false
+    },
+    "columnNormRange": [
+      1.0000000000000107,
+      441979.8076096609
+    ],
+    "columnNormSpan": 441979.8076096562,
+    "columnNormQuantiles": [
+      1.0000000000000107,
+      1.1759838737195367,
+      1.9954939507377036,
+      4.5345699590524084,
+      441979.8076096609
+    ],
+    "columnScaleRange": [
+      2.2625468014212098e-06,
+      0.9999999999999893
+    ],
+    "columnScaleFile": "outputs/v83_validation/fullFimagescalescreen01/full_F_image_scale_evidence.mat",
+    "columnScaleSHA256": "fb4adc2e4e4a92d3ff60be5006bbfc8f0048117e07c93f585232a510dd6eac72",
+    "realAdjointIdentityDifference": 5.565367089174443e-17,
+    "completeColumnProbes": 17,
+    "maximumColumnProbeRelativeDifference": 2.216674007541036e-15,
+    "originalSavedFullFResidual": 0.27862081125687577,
+    "maximumBidiagonalizationSteps": 32,
+    "actualIterations": 32,
+    "nativeStopCode": 7,
+    "finalRelativeFullFResidual": 0.021269225205932864,
+    "unscaledSameEndpointSameIterationBudgetResidual": 0.22476791086045772,
+    "fullFInternalTargetMet": false,
+    "nativeEstimatedCondition": 106.82923249428902,
+    "nativeSolverApplications": {
+      "F": 32,
+      "FT": 33,
+      "M": 32,
+      "MT": 33
+    },
+    "totalCompositeApplications": {
+      "F": 51,
+      "FT": 34,
+      "M": 51,
+      "MT": 34
+    },
+    "separateOriginalFImageEvaluations": 2,
+    "separateFinalLocalMapApplications": 1,
+    "fixedPositiveRightScalingOnly": true,
+    "originalFResidualNormAndRightHandSideUnchanged": true,
+    "oldApproximateSchurIdentityClaimed": false,
+    "physicalStateChanged": false,
+    "matlabProductionSolverModified": false,
+    "independentAllRealBidiagonalizationColumnsClaimed": false,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs/v83_validation/overlapFunit01/restricted_overlap_unit_evidence.mat": "96460ed6e5dac593998483b8d3446455a8f7b809970b9ef28fbf3d4b96823d26",
+      "outputs/v83_validation/fullFreal01/full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+      "outputs/v83_validation/spatialreductionreal01/spatial_reduction_assembly_evidence.mat": "b04c5c8d604c52c9289ce5d08127270a41c31322eef5ac44cd0fda4ebc0c76ca",
+      "outputs/v83_validation/fullFreal01/full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04",
+      "outputs/v83_validation/fullFlsqrscreen01/full_F_lsqr_screen_summary.json": "7ec1a0f1b2a15b994017e1dfe6aa355447ab6f4632e402212b2c5341cc0309f6"
+    },
+    "helperSourceSHA256": "8629f44182332ef37523fe2a93e38e4a54febb8288f031a487f12d1bbb4dc024",
+    "scriptSHA256": "349e4b88f73a7ac067b105f45444b9e7891f3456093f6b222795ad2b1a62f3fa"
+  },
+  "independentPrototypeReceipt": {
+    "path": "outputs/v83_validation/fullFimagescalescreen01/full_F_image_scaled_screen_summary.json",
+    "sha256": "3e8ecfce805de8fed88732b8242d4ba22df24009f5709f75e99044e17d932875",
+    "bytes": 4396
+  },
+  "currentRealSummary": {
+    "status": "tested-real-complete-image-column-scaled-F-LSQR-with-separate-fixed-C-parent-diagnostic",
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "allFiveConservativeFields": true,
+      "sameQOnly": true,
+      "physicalStateChanged": false
+    },
+    "sourceIdentity": {
+      "buildRocketFullFImageScale": "2cbd0d6cd9d2b893d79e4d1b958ed7cf991f0599cf0e0ed0979f360af37625e0",
+      "solveRocketFullFLeastSquares": "a4bfd71256bc7a860d4315ae54712c9f4a74db245e5369a00489397f72417d16",
+      "applyRocketPackedGraph": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+      "applyRocketPackedGraphTranspose": "a8c6279b89d20ee504f23d6a5284d12f060d46773bdef53a8bff8ac72f4256a3",
+      "solveRocketSpatialFBlocks": "69310841a85f0ca8386c4f5867a380d1300e798cd5fffe6b249cbd693a440e3f",
+      "solveRocketSpatialFBlocksTranspose": "1499b3e64b1dea246b96087a6bfd8f0c0a30e7e7e5e733a5ff8586794400b545"
+    },
+    "construction": {
+      "method": "inverse-complete-A_FF-M_F-column-two-norm",
+      "groups": 28902,
+      "originalBlocksUsedExactlyOnce": 1285801.0,
+      "allOriginalUnknownColumnsCoveredExactlyOnce": true,
+      "columnNormRange": [
+        1.0000000000000107,
+        441979.8076096609
+      ],
+      "columnNormSpan": 441979.8076096562,
+      "columnScaleRange": [
+        2.2625468014212098e-06,
+        0.9999999999999893
+      ],
+      "maximumSupportedOriginalRows": 44,
+      "maximumDensePanelAndImageArrayBytes": 123200,
+      "additionalWorkspaceArrayBoundBytes": 65399840.0,
+      "fullGlobalPreconditionedMatrixAllocated": false,
+      "processPeakMemoryClaimed": false,
+      "fixedPositiveRightScalingOnly": true,
+      "originalFResidualNormAndRightHandSideUnchanged": true,
+      "elapsedSeconds": 8.3933485,
+      "newLocalInverseConstructions": 0,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "fullFReport": {
+      "method": "bounded-LSQR-on-complete-image-column-scaled-A_FF-M_F",
+      "options": {
+        "maximumIterations": 128,
+        "relativeTolerance": 0.001,
+        "adjointIdentityTolerance": 1e-08
+      },
+      "initialRelativeFullFResidual": 0.27862081125690186,
+      "relativeFullFResidual": 0.006944675536365406,
+      "fullFInternalTargetMet": false,
+      "nativeFlag": 1,
+      "nativeRelativeCorrectionResidual": 0.024925185972402047,
+      "nativeIterations": 128,
+      "nativeToleranceRelativeToCorrectionRHS": 1e-12,
+      "nativeResidualHistory": [
+        824377949.2025404,
+        426111051.8945232,
+        330204664.05236965,
+        276693271.686549,
+        236375962.26811355,
+        203254207.48458263,
+        181214157.86621848,
+        165666549.98303658,
+        151892056.45197675,
+        139442735.66300222,
+        131116320.13524349,
+        125376821.71374662,
+        119713174.67776212,
+        113648978.9866078,
+        108973080.80904703,
+        105286745.07942708,
+        101104038.42377782,
+        97473569.00235718,
+        94166159.71350235,
+        91020512.0130624,
+        88522432.4597608,
+        85783885.79848637,
+        83344113.67346734,
+        80827721.24203202,
+        78461471.44693638,
+        76138452.40041733,
+        74118520.23715265,
+        72291180.20192957,
+        70499502.08912787,
+        68476150.90302409,
+        66644851.25571243,
+        64931638.10871266,
+        62930978.404999085,
+        61144628.60922313,
+        59506234.434570685,
+        57786716.44391037,
+        56376306.03377471,
+        55027812.331805095,
+        53899446.748103514,
+        52823723.66910722,
+        51795537.196392104,
+        50728120.39874594,
+        49806311.283737615,
+        48864347.98518155,
+        48016474.75887774,
+        47096726.28272794,
+        46182594.37424981,
+        45448053.28649748,
+        44758669.79920809,
+        44201907.13439975,
+        43624352.90560645,
+        43080067.97217203,
+        42618613.025570385,
+        42094567.85533624,
+        41588061.931733735,
+        41107279.3204892,
+        40592666.32648687,
+        40097390.57622671,
+        39615759.04336441,
+        39139286.163267165,
+        38613440.68291877,
+        38143767.477009445,
+        37697460.52972343,
+        37271529.436904326,
+        36851617.511081114,
+        36440321.05769059,
+        36032748.545472585,
+        35615261.75736632,
+        35211790.86343988,
+        34840591.33490368,
+        34515073.17852104,
+        34108990.80203288,
+        33711258.49764361,
+        33288884.145802997,
+        32955291.464489907,
+        32596606.787206862,
+        32201616.329101693,
+        31875796.86321427,
+        31510367.983236283,
+        31159799.88607712,
+        30819120.41687667,
+        30491349.797977597,
+        30200880.16697347,
+        29914274.697226353,
+        29643248.95103911,
+        29350735.31990308,
+        29062093.6192018,
+        28784538.50865918,
+        28500347.23394944,
+        28216512.04267168,
+        27924396.717164557,
+        27622505.43152668,
+        27343507.40261831,
+        27080042.741756286,
+        26833327.23950637,
+        26589712.540460594,
+        26340682.014551435,
+        26087720.390326418,
+        25864650.380252756,
+        25634939.38432641,
+        25408417.814217392,
+        25198903.305382032,
+        24991896.28701558,
+        24790817.82143191,
+        24588505.690467894,
+        24378528.48557651,
+        24167310.171021808,
+        23950175.739945993,
+        23749642.44743213,
+        23555607.919974867,
+        23346313.478985317,
+        23148162.1832052,
+        22964843.257601276,
+        22794222.749156408,
+        22614261.831902258,
+        22448201.99795928,
+        22295240.423471767,
+        22150802.92794626,
+        21994231.817657065,
+        21842239.75851839,
+        21703178.158013035,
+        21562251.425684433,
+        21414137.93328464,
+        21273514.632065423,
+        21131202.859857984,
+        20995040.22749189,
+        20836276.277247444,
+        20688236.653090958,
+        20547773.695420727
+      ],
+      "nativeLeastSquaresHistory": [
+        705711254.3985176,
+        163823455.55141824,
+        80453354.41632941,
+        55563449.21920461,
+        42570231.59275141,
+        30098961.741564903,
+        21770928.26709735,
+        18065157.704088133,
+        15321316.095265863,
+        11477861.2211496,
+        9006241.444447607,
+        6956657.188401174,
+        7301184.1264007585,
+        6281649.561003225,
+        5314482.782318611,
+        4824074.64565135,
+        4822847.895809358,
+        4156554.532667913,
+        3829540.6232445636,
+        3538230.6298269243,
+        3186601.981599899,
+        3089986.079581576,
+        3011376.030443821,
+        2792739.784304542,
+        2680681.238507437,
+        2395831.348083725,
+        2328503.6774923196,
+        2035671.3710636168,
+        2131458.0505396537,
+        2072413.1146592617,
+        1830925.3909846845,
+        1935543.1144464936,
+        1812509.4127355665,
+        1706334.476232911,
+        1632317.118841966,
+        1579818.8818223875,
+        1375867.5389886359,
+        1335446.1407782554,
+        1202234.6678844502,
+        1171259.7065558909,
+        1170565.4477189486,
+        1070762.7985689011,
+        1035320.256077724,
+        972307.1664538352,
+        953727.3906002311,
+        950300.2968531188,
+        877813.1404760949,
+        793573.1605168595,
+        734380.6571112457,
+        694774.7867435787,
+        675524.2771143394,
+        636522.7749138982,
+        609965.5647745476,
+        626354.9342071952,
+        611390.7032339692,
+        599920.6421691949,
+        651430.5063192133,
+        634144.9583764635,
+        594015.9964835177,
+        575765.6640759659,
+        551218.49374255,
+        512635.1001824242,
+        491864.79550384585,
+        492300.8490817097,
+        471899.7267166983,
+        472680.9161489527,
+        455942.9227870474,
+        463788.63679972803,
+        433989.99000864336,
+        400484.5125034085,
+        411073.49343841703,
+        428215.6009488611,
+        430285.4959510468,
+        399525.85724269575,
+        374134.07187705685,
+        392820.47728054784,
+        380320.97983252903,
+        360944.39126042835,
+        378781.82092044246,
+        350851.52629208344,
+        351824.12016484526,
+        334387.0388958497,
+        315094.4149387052,
+        313726.79340709205,
+        299621.4936471772,
+        313182.1935744766,
+        295500.30963638955,
+        296107.88832432474,
+        294800.2080635228,
+        289465.1334554569,
+        296799.7767031666,
+        289137.42271483026,
+        273080.6442134493,
+        264964.28264487477,
+        253466.1725279361,
+        254811.6789644496,
+        258895.88149390294,
+        246330.1372114822,
+        238192.65040628822,
+        242537.8771762384,
+        240792.56375767614,
+        248400.35691730867,
+        246097.80158052457,
+        225414.80916906157,
+        219435.1519790488,
+        217423.58377783763,
+        214518.24206730764,
+        213821.80615157893,
+        198295.21359261568,
+        206640.3381546153,
+        200614.68618246182,
+        197732.8978254225,
+        188562.81852796776,
+        188968.21419290488,
+        189930.79665934015,
+        180613.5114159488,
+        168332.53831085097,
+        166772.44005443392,
+        166822.89918059122,
+        157402.38648291733,
+        155565.36007516982,
+        155625.22740152982,
+        156901.70254031647,
+        152611.65451687973,
+        147529.63937378424,
+        154684.1965870166,
+        155825.47520777222,
+        147512.8295473986
+      ],
+      "nativeStoppingPolicy": "strict-internal-tolerance-original-F-total-residual-is-acceptance-gate",
+      "adjointIdentityRelativeDifference": 1.5685977651021739e-18,
+      "totalDirectionReconstructionDifference": 1.4090146496811734e-14,
+      "operatorApplications": {
+        "F": 132,
+        "FT": 130,
+        "M": 130,
+        "MT": 130
+      },
+      "nativeSolverApplications": {
+        "F": 128,
+        "FT": 129,
+        "M": 128,
+        "MT": 129
+      },
+      "compositeApplications": {
+        "forward": 129,
+        "transpose": 130
+      },
+      "elapsedSeconds": 159.1688224,
+      "fullFOperatorIncludesCrossPatchBlocks": true,
+      "baseLocalFMapFixedLinear": true,
+      "innerSolveFixedLinearMapClaimed": false,
+      "originalCOrNSConvergenceClaimed": false,
+      "oldApproximateSchurIdentityReplaced": false,
+      "nativeGMRESArnoldiColumnChecksClaimed": false,
+      "independentAllRealBidiagonalizationColumnsClaimed": false,
+      "physicalSolution": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "columnScalingUsed": true,
+      "columnScaleRange": [
+        2.2625468014212098e-06,
+        0.9999999999999893
+      ]
+    },
+    "parentDiagnostic": {
+      "relativeParentOriginalCResidual": 9.589992117991056,
+      "FRowsRelativeToOriginalRHS": 0.19013955204071112,
+      "CRowsRelativeToOriginalRHS": 9.588106996373678,
+      "FRowsSubmatrixConsistency": 5.470382450712517e-15
+    },
+    "scaleFileSHA256": "99b4e6d25b1255e29ad0d48e379dca2fcae2f442ac50144d144baf8a73b5128c",
+    "separateBaselineReplayFApplications": 1,
+    "separateFinalDiagnosticFApplications": 1,
+    "originalCDiagnosticApplications": 1,
+    "newLocalInverseConstructions": 0,
+    "newApproximateSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 57060
+  },
+  "currentRealSummaryReceipt": {
+    "path": "outputs/v83_validation/fullFimagescalereal01/full_F_image_scaled_summary.json",
+    "sha256": "a8ce3f40001f5f9dcf4d255ebd3c3dceb3d3ef0dd06662a05854ee3fcdd046da",
+    "bytes": 9143
+  },
+  "codeSourceIdentity": [
+    {
+      "path": "internalFlow/cutCell/buildRocketFullFImageScale.m",
+      "sha256": "2cbd0d6cd9d2b893d79e4d1b958ed7cf991f0599cf0e0ed0979f360af37625e0",
+      "bytes": 4226
+    },
+    {
+      "path": "internalFlow/cutCell/solveRocketFullFLeastSquares.m",
+      "sha256": "a4bfd71256bc7a860d4315ae54712c9f4a74db245e5369a00489397f72417d16",
+      "bytes": 6838
+    },
+    {
+      "path": "tests/screenRocketImageScaledFullF.py",
+      "sha256": "349e4b88f73a7ac067b105f45444b9e7891f3456093f6b222795ad2b1a62f3fa",
+      "bytes": 9512
+    },
+    {
+      "path": "tests/testRocketFullFImageScale.m",
+      "sha256": "5948b1d2ac152b85ac6e612b114afd62e851e8722e37405f4f6d0eecbeb2152d",
+      "bytes": 2943
+    },
+    {
+      "path": "tests/studyRocketFullFImageScale.m",
+      "sha256": "87160ec49432f566f29e4e68f5f67dc8706596617839d5eb1580c2df88dd841d",
+      "bytes": 4364
+    },
+    {
+      "path": "tests/auditRocketFullFImageScale.py",
+      "sha256": "6996c1ee6fb58f28001b7bc8c2197c578133923629827964165c1c0753853d17",
+      "bytes": 7216
+    },
+    {
+      "path": "tests/buildRocketFullFImageScaleSummary.py",
+      "sha256": "40272669f16a67d487149e035becc6117fcf9542f16742281a2722f77ddd37d5",
+      "bytes": 3339
+    },
+    {
+      "path": "tests/auditRocketFullFImageScaleWorkbench.py",
+      "sha256": "affefd819e2f7b23e87259f21ba86c188b8c6c5779281cafcac1d2d7511fa5b7",
+      "bytes": 3573
+    },
+    {
+      "path": "tests/recordRocketFullFImageScaleProgress.py",
+      "sha256": "7695217d84ee3bbc7a618fc94da756cdab5bea1b5b3b4456952b3215dd4d52ce",
+      "bytes": 7108
+    },
+    {
+      "path": "tests/testRocketWallVelocityWorkbench.js",
+      "sha256": "b098948aab77941afa23e480c6a0e0478650393055b01e05c1c1d575d5bbcc41",
+      "bytes": 16398
+    },
+    {
+      "path": "web/rocket-wall-velocity.js",
+      "sha256": "a5918a3bd45c29823e51a4333ff9574ee9bc88ec7f98dd6910bdba2a92eb8ac9",
+      "bytes": 13855
+    }
+  ],
+  "savedParentCRowsRemainingSquaredNormFraction": 0.9996068951228845,
+  "preservedOldLeastSquaresSource": {
+    "path": "outputs/v83_validation/source_epochs/pre_image_scale_solveRocketFullFLeastSquares.m",
+    "sha256": "b90a446df82b795adde1ec4f8dc58a6567228f6b1136f37235c168b52a841d8d",
+    "bytes": 5920
+  },
+  "methodDocumentation": {
+    "path": "docs/FULL_F_IMAGE_SCALE_V83.md",
+    "sha256": "f7f31376eba583c2c35e53ea3752f7f75fea8b2a2ffc7a18742897b7ef509fb8",
+    "bytes": 7333
+  },
+  "goalAndReadinessSnapshots": [
+    {
+      "path": "docs/PROJECT_GOALS.md",
+      "sha256": "38ff7bc817421b345672aa49aee3f83c36def72b7dac93dff48ec495ead46cf9",
+      "bytes": 347657
+    },
+    {
+      "path": "docs/GITHUB_STAGE_READINESS.md",
+      "sha256": "f3f704f94c9fc4d4804162464976c6f9d2593842cb4267bef69c40652f483199",
+      "bytes": 12134
+    }
+  ],
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench29/index.html",
+    "researchRows": 19,
+    "oldEighteenRowsAndSixFacetFilesExactlyPreserved": true,
+    "fullFParentAndNSQualificationKeptSeparate": true,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "mainAcceptedIterations": 12,
+    "mainActualNSEvaluations": 246,
+    "actualNSDirectionDefect": 0.19876430371570342,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "actualNSEvaluationsAfterLastAcceptedHistory": 121,
+    "latestEndpoint": {
+      "path": "outputs/v83_validation/krylov17/wall_velocity_krylov_evidence.mat",
+      "sha256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "bytes": 1214364034
+    },
+    "originalNSSource": {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    },
+    "physicalPressureHeatFluxAndHeatPowerUnchanged": true
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "newSelectedJApplications": 0,
+  "newActualNSEvaluations": 0,
+  "newFlowAcceptances": 0,
+  "newProductionSolvedAreaM2": 0,
+  "nextAction": "The original F target remains unmet; keep that identity explicit. For the saved new vector the fixed-C parent remaining is now dominated by C rows, so do not merely add F-only LSQR steps. Reintroduce all original C unknowns through a complete-parent fixed-operator flexible right-preconditioning study. The bounded scaled F inner solves remain explicitly approximate and may be nonlinear in the RHS; prove small dense block/back-substitution identities, variable-inner accounting and actual flexible Arnoldi Z/image combinations before a bounded real run. Old S can only be an explicitly approximate preconditioning object, not an exact identity or an operator formed with a RHS-dependent F inverse. Preserve the full-parent 1e-3 and original selected-J/NS total-direction/physics gates. Scientific UI and actual regional heat solutions remain highest priorities.",
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "7695217d84ee3bbc7a618fc94da756cdab5bea1b5b3b4456952b3215dd4d52ce"
+}

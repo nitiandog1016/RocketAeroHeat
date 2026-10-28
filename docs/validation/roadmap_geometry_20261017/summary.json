@@ -1,0 +1,255 @@
+{
+  "stage": "roadmap_geometry_20261017",
+  "date": "2026-10-17",
+  "status": "tested-local-slice",
+  "scope": {
+    "geometryOnly": true,
+    "physicalValidation": false,
+    "newPhysicalSolvedAreaM2": 0,
+    "fullSurfaceSolved": false,
+    "v61ProductionIntegrated": false,
+    "currentHeatAreaFraction": 0.6656263274240188,
+    "globalRemeshQualityPassed": false,
+    "githubPushed": false
+  },
+  "runs": {
+    "geometry": {
+      "status": "terminal",
+      "exitCode": 0,
+      "session": 83668,
+      "log": "outputs/rocket_fixture_2026_10_17/matlab_final.log",
+      "tests": "29 checks",
+      "physicalValidation": false,
+      "sources": [
+        {
+          "path": "E:\\RocketAeroHeat\\buildRocketTestBody.m",
+          "bytes": 12533,
+          "sha256": "727814bccb053b6a941d759b9191550032b42901fe0ea06a45792ef3c571872d"
+        },
+        {
+          "path": "E:\\RocketAeroHeat\\tests\\testRocketTestBody.m",
+          "bytes": 5980,
+          "sha256": "dbca15cfef4f56ea18fb808e84c00d310633b868d9adf419ac87b3c3801d2b30"
+        },
+        {
+          "path": "E:\\RocketAeroHeat\\demoRocketTestBodies.m",
+          "bytes": 2669,
+          "sha256": "1ba5c0aeacbf4d5278e9de071855a0255f2d5dab4e1fe7215dec9242377f49cc"
+        }
+      ]
+    },
+    "remesh": {
+      "matlabSession": 76066,
+      "exitCode": 0,
+      "independentAuditPassed": true
+    },
+    "export": {
+      "geometryExportTest": {
+        "status": "terminal",
+        "sessionId": 32276,
+        "exitCode": 0,
+        "command": "addpath('tests'); testRocketTestGeometryView;",
+        "output": "Rocket offline geometry export identity and refusal checks passed."
+      },
+      "finalPreviewExport": {
+        "status": "terminal",
+        "sessionId": 48898,
+        "exitCode": 0,
+        "log": "export_preview_final.log"
+      },
+      "browserInspection": {
+        "url": "http://127.0.0.1:8772/web/index.html",
+        "observedFaces": [
+          9216,
+          11172,
+          10800,
+          12600
+        ],
+        "geometryRendered": true,
+        "selectorAndIsometricViewChecked": true,
+        "screenshot": "rocket_two_protrusions_web.png",
+        "scope": "Visual inspection of real geometry, not physical validation."
+      },
+      "newPhysicalSolvedAreaM2": 0,
+      "githubPushed": false
+    }
+  },
+  "sourceFiles": [
+    {
+      "path": "buildRocketTestBody.m",
+      "sha256": "727814bccb053b6a941d759b9191550032b42901fe0ea06a45792ef3c571872d"
+    },
+    {
+      "path": "demoRocketTestBodies.m",
+      "sha256": "1ba5c0aeacbf4d5278e9de071855a0255f2d5dab4e1fe7215dec9242377f49cc"
+    },
+    {
+      "path": "exportRocketTestGeometryView.m",
+      "sha256": "ae2caa0df563fe1371c93ae06e59c1cfe82c8ed934033d61e8424e19b80d8685"
+    },
+    {
+      "path": "tests/testRocketTestBody.m",
+      "sha256": "dbca15cfef4f56ea18fb808e84c00d310633b868d9adf419ac87b3c3801d2b30"
+    },
+    {
+      "path": "tests/testRocketRemeshFeatures.m",
+      "sha256": "ffb1cd2efa59e20fd6bbdffe88b60b683f7ed504c1f8641791233741473f3073"
+    },
+    {
+      "path": "tests/testRocketTestGeometryView.m",
+      "sha256": "963d8ab1ae96d0dd0ff4dd298d65d66c36c38469e03b8993e9667e7cedc50720"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "9c51bef5e1c16168b729c7ec45da848d5e4f0a4d0ca26206246b509d47e0eed4"
+    },
+    {
+      "path": "docs/PROJECT_GOALS.md",
+      "sha256": "43f7d36a3c6468b6cbeff4a3902aa67212e1e4a055981d81c97561c40a96a3ca"
+    },
+    {
+      "path": "docs/REGIONAL_ALGORITHM_ROADMAP_2026-10-17.md",
+      "sha256": "cfcf23ac1c3d5bafc53d3bde5588da8d2484cf839b079cd0181095bf54e70854"
+    },
+    {
+      "path": "docs/ROCKET_PROTRUSION_TESTS.md",
+      "sha256": "730e37252860ec8724341847ec038f25b2b4cd2bab3279449523b0b1a0200cb2"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "geometry_terminal.json",
+      "sha256": "6c2412d683bf24d880800df236e5be404f67d840b55e6100745c0ae19b5a9a0e"
+    },
+    {
+      "path": "matlab_final.log",
+      "sha256": "6a4431eba56fcfcfbac4cfb863f103a858825bee65fdf059dd0bd4aab0ffe599"
+    },
+    {
+      "path": "test_report.json",
+      "sha256": "ab4b5358a6fde94986f17c87eb5d7d192bf4c97f829453995759c7c96b6f3a25"
+    },
+    {
+      "path": "geometry_summary.json",
+      "sha256": "beb0b20782c23505f3f87bd26a52d2cd4a6ef91525f482e824200baa3ef5bdf3"
+    },
+    {
+      "path": "remesh_validation_manifest.json",
+      "sha256": "f4eb4ace13e9f4cbcc22eff6555eba15015f530a778b5290c11d035e57487bca"
+    },
+    {
+      "path": "remesh_test_frozen.log",
+      "sha256": "689fad8111e9a2d8bab1aee71e8407f5c4e4b13588a33875ea726ae06a2d6c47"
+    },
+    {
+      "path": "remesh_features.json",
+      "sha256": "b9035cbec86de3f707abc91dec368a807616a397027e2ce44169cd19ecab5c80"
+    },
+    {
+      "path": "remesh_features.mat",
+      "sha256": "93b12f4222562c321234a918a6f89eb959f12ec74390c3f9884a425f36c35d74"
+    },
+    {
+      "path": "remesh_default_meshes.mat",
+      "sha256": "a1e28da7f3b81304a059a91904998715e59df6124b564cc2b7d008a6e29895dc"
+    },
+    {
+      "path": "remesh_featureResolved_meshes.mat",
+      "sha256": "2d03501513b9dca2239ec3ae88121a9dfc71d5bb74e1fc24e450a34e909cab34"
+    },
+    {
+      "path": "remesh_independent_review.py",
+      "sha256": "bf122d0edd3a417542421a0a7d9e8d6a5de79b7cbf23abdc64010b3b4d55b6e4"
+    },
+    {
+      "path": "root_terminal.json",
+      "sha256": "36c371f7d1d7651bb5ac9731dec65f8ecab3bc88c9276e1bd8bd502f31852f09"
+    },
+    {
+      "path": "export_preview_final.log",
+      "sha256": "1c4921729c68d64489fb9ea4adf2c287e2f36805fb56cd299a0c2671f1a05192"
+    },
+    {
+      "path": "rocket_two_protrusions_web.png",
+      "sha256": "64d27f70b0c1cce250f47b6eec7e46d0842a1c19ebfda720059837ef0c169098"
+    },
+    {
+      "path": "package_roadmap_geometry.py",
+      "sha256": "829c9e637c84a10abe93f559af3ad0911bc4eb1cd5b0bedec0ae31d854c79c46"
+    }
+  ],
+  "geometry": [
+    {
+      "path": "rocket_fairing.json",
+      "sha256": "6b7d2e93bab6bd4c15e5351d63ce5d0bf71b534becad33c767559af772c92a3c"
+    },
+    {
+      "path": "rocket_fairing.mat",
+      "sha256": "885cc3b85b590368b935bdecf4d830d7da3c7c4545f2844aa09f535d59aa5d9d"
+    },
+    {
+      "path": "rocket_fairing.stl",
+      "sha256": "154aacf36ed26097f54daaf54d4f347526ff0670350806cbc63a509679a6a955"
+    },
+    {
+      "path": "rocket_ridge.json",
+      "sha256": "338bac848b0c4275da98c10b140adef43a5f117227a87309223ac0b4325ea327"
+    },
+    {
+      "path": "rocket_ridge.mat",
+      "sha256": "d026c603935d9be97c4780170e852813a4bbc9bad17a2b3026a10384c7c84974"
+    },
+    {
+      "path": "rocket_ridge.stl",
+      "sha256": "b2d2056e5eed8fc61c4a8d7fb8ebb45d890226b84a3c9c925c212de71806dcab"
+    },
+    {
+      "path": "rocket_smooth.json",
+      "sha256": "09461562eb848e6c463d7719825522a707b4b8f8e4832f3e16065736e3222ca2"
+    },
+    {
+      "path": "rocket_smooth.mat",
+      "sha256": "7b14e35b1c0e1344296fe03767e602f4cc416833a11d945d0f1f1b1368f3744b"
+    },
+    {
+      "path": "rocket_smooth.stl",
+      "sha256": "8f0338e7d23926fc2bd718b80fd50d6e862b458509896801b63e9c7ec530e0f2"
+    },
+    {
+      "path": "rocket_two_protrusions.json",
+      "sha256": "c75362666dcd2db867a985023546349c7cbc3886802e388872069216282ab535"
+    },
+    {
+      "path": "rocket_two_protrusions.mat",
+      "sha256": "ea8dd175213cff07cd9dc3d307f8f0c6a06331e19a4b0941ea9e1a487b2e716e"
+    },
+    {
+      "path": "rocket_two_protrusions.stl",
+      "sha256": "e7589307d8b82e8a781f48c35e4e248f8fd4f6604fa5277cb5bdeebd5376e975"
+    },
+    {
+      "path": "web/geometry.css",
+      "sha256": "e78ff56968594846aecf1136666c67c0ebb2d7127c552cb84eccf17e87308b83"
+    },
+    {
+      "path": "web/geometry.html",
+      "sha256": "44dc6a35badf174ba0624f945555c7f23125034ec2007a2e9d5747e76a33369a"
+    },
+    {
+      "path": "web/geometry.js",
+      "sha256": "8514456305a006ce38196b90a01f6231a82bde5df32b419123a21e7db910008a"
+    },
+    {
+      "path": "web/index.html",
+      "sha256": "a0f3838447c6f931c49f53991b781e45543d834bc233ad24c142b97864bcf7c1"
+    },
+    {
+      "path": "web/rocket-geometry-bootstrap.js",
+      "sha256": "93f9671645057945eea7d2769c7cc12bdf8772949aa75d6a5b250473c4b38068"
+    },
+    {
+      "path": "web/rocket-geometry-data.js",
+      "sha256": "2b83aa2ecd3786abf64f46ac559e91822fab45e62994c23f682b0df431ceb3ae"
+    }
+  ]
+}

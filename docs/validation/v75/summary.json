@@ -1,0 +1,948 @@
+{
+  "version": 75,
+  "status": "tested-complete-zero-incidence-rocket-numerical-spatial-steady-root-and-original-BE-confirmation",
+  "numericalSteady": true,
+  "cellCount": 2760,
+  "wallSegments": 115,
+  "nativeTriangles": 9216,
+  "spatialRootCases": [
+    {
+      "arithmetic": "double",
+      "matlabEngineProcessID": 38868,
+      "sourceEvidenceSHA256": "5b7f66224329e057aea76a1071f83511f27605168ac45663a6859d4dd8a213e5",
+      "driverSHA256": "177285e53c88b792389ad96bf5aa299da574ece5fa96a8fce18ed7e80c188bb4",
+      "acceptedNewtonIterations": 3,
+      "spatialRootConverged": true,
+      "originalResidual": 1.8271973805100923e-08,
+      "boundaryFluxBalanceRelative": 1.0588068405698093e-16,
+      "residualEvaluations": 577,
+      "seconds": 15.0443527,
+      "stopReason": "original-spatial-root-and-flux-balance-met",
+      "BEThreeStepConfirmationPassed": true,
+      "oldChainModified": false,
+      "physicalSolution": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    {
+      "arithmetic": "two-double-euler",
+      "matlabEngineProcessID": 38868,
+      "sourceEvidenceSHA256": "5b7f66224329e057aea76a1071f83511f27605168ac45663a6859d4dd8a213e5",
+      "driverSHA256": "177285e53c88b792389ad96bf5aa299da574ece5fa96a8fce18ed7e80c188bb4",
+      "acceptedNewtonIterations": 3,
+      "spatialRootConverged": true,
+      "originalResidual": 1.7007339557675547e-08,
+      "boundaryFluxBalanceRelative": 1.0588068405698101e-16,
+      "residualEvaluations": 577,
+      "seconds": 22.9999085,
+      "stopReason": "original-spatial-root-and-flux-balance-met",
+      "BEThreeStepConfirmationPassed": true,
+      "oldChainModified": false,
+      "physicalSolution": false,
+      "newProductionSolvedAreaM2": 0
+    }
+  ],
+  "originalBEConfirmationChain": {
+    "status": "actual-complete-rocket-SA-collar-family-study-not-production-qualification",
+    "cellCount": 2760,
+    "acceptedSteps": 3,
+    "rejectedAttempts": 0,
+    "steadyConverged": true,
+    "stopReason": "steady-residual-converged",
+    "initialOriginalResidual": 1.8271973805100923e-08,
+    "finalOriginalResidual": 1.8271973805100923e-08,
+    "fiveQuantityBalanceRelative": 6.280126747928323e-22,
+    "solverResidualEvaluations": 3,
+    "diagnosticResidualEvaluations": 7,
+    "elapsedSolverSeconds": 0.18372290000000002,
+    "allAcceptedEndpointsSaved": true,
+    "fullWallFaceCount": 115,
+    "fullRevolvedWallAreaM2": 0.9362872116455068,
+    "signedWallHeatRangeWm2": [
+      3631.356335774075,
+      1883244.351085707
+    ],
+    "currentRevolvedWallHeatW": 191247.09627469143,
+    "wallTemperatureValueKind": "prescribed",
+    "wallTemperatureSolved": false,
+    "edgeTemperatureSolved": false,
+    "recoveryTemperatureSolved": false,
+    "physicalTimeAdvancedS": 0,
+    "pseudoTimeIsPhysical": false,
+    "inputContract": {
+      "flight": {
+        "altitude": 30000,
+        "Mach": 5,
+        "alpha": 0,
+        "beta": 0,
+        "Twall": 300
+      },
+      "freestreamPrimitiveRhoUxUrT": [
+        0.018410125827734398,
+        -1508.5433002103648,
+        0,
+        226.50908361133003
+      ],
+      "wallTemperatureInputK": 300,
+      "wallTemperatureValueKind": "prescribed",
+      "nuTildeRatioInput": 5,
+      "farfieldNuTildeInputM2s": 0.0040065117894983225,
+      "turbulentPrandtlInput": 0.9,
+      "solverFreestreamViscosityPaS": 1.4752077234993085e-05,
+      "atmosphereReferenceViscosityPaS": 1.4752077234993085e-05,
+      "solverFreestreamReynoldsPerM": 1882614.3282099988,
+      "flowDirection": [
+        -1,
+        0,
+        0
+      ],
+      "units": "SI",
+      "completeExternalDomain": true,
+      "gasModel": "calorically perfect air; gamma/R from standardAtmosphere; explicit Sutherland",
+      "transportSource": "existing standardAtmosphere: muRef=1.716e-5 at 273.15K, S=110.4K; k=cp*mu/.72",
+      "temperatureRangeIsNumericalAcceptanceNotPhysicalCertification": true,
+      "pressureAndHeatNotComputedYet": true,
+      "edgeTemperatureSolved": false,
+      "recoveryTemperatureSolved": false,
+      "wallTemperatureSolved": false,
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0,
+      "wallVelocityGradientPolicy": "legacy",
+      "viscousWorkVelocityPolicy": "arithmetic",
+      "wallVelocityGradientBoundaryMeaning": "static Cartesian wall velocity components have prescribed zero wall-tangential derivative",
+      "changedFromV68": "complete original wall/farfield preserved; grid=normal-collar; uniformly initialized same freestream five-component state on new control volumes; no imported solution",
+      "wallGradientIsPhysicalAccuracyValidation": false,
+      "gridPolicy": "normal-collar",
+      "effectiveDomainOptions": {
+        "radialLayers": 24,
+        "kernelX": 0.707,
+        "outerRadius": 4.261260975070607,
+        "firstRadialSpacing": 0.0002,
+        "maxWallAngleStepDeg": 5,
+        "baseRadialSegments": 8
+      },
+      "effectiveCollarOptions": {
+        "normalLayers": 3,
+        "firstNormalSpacing": 2e-05,
+        "normalGrowth": 1.5
+      },
+      "firstOffsetIsOwnerWallDistance": false,
+      "pressureSourceQuadraturePolicy": "cell-constant",
+      "pressureSourceQuadratureMeaning": "explicit planar-area pressure integral from selected reconstruction; not a solved new boundary",
+      "changedFromV71": "same full collar case and uniform initialization; explicit pressure source=cell-constant",
+      "sourceQuadratureIsPhysicalAccuracyValidation": false,
+      "interiorConvectiveFluxPolicy": "hlle-einfeldt",
+      "interiorFluxIsPrescribedBoundary": false,
+      "interiorFluxIsPhysicalAccuracyValidation": false,
+      "changedFromV72": "same full uniform pressure-source case; explicit interior Euler flux=hlle-einfeldt",
+      "jacobianDifferencePolicy": "local-conservative-acoustic-SA-roundoff-floor-v1",
+      "jacobianRelativeStep": 2e-06,
+      "internalInitialGuess": {
+        "kind": "v75-spatial-root",
+        "sourceEvidenceSHA256": "44100288ee800df1c2de3f07cb68bfe62979a8dcc00cf870eaf9adf5c599b2b5",
+        "priorAcceptedSteps": 0,
+        "priorNewtonIterations": 3,
+        "parentSeedKind": "v74-local6",
+        "parentAcceptedSteps": 6,
+        "parentSeedPriorAcceptedSteps": 23,
+        "initialGuessIsBoundaryCondition": false,
+        "externalCFDImported": false,
+        "spatialRootResidualNorm": 1.8271973805100923e-08,
+        "rootSolver": "solveAxisymmetricSteadyNewton",
+        "rootArithmetic": "double",
+        "physicalSolution": false
+      },
+      "newChainIncludesPriorAcceptedSteps": false,
+      "changedFromV73": "same full spatial RANS/SA and physical boundaries; explicit local-conservative numerical Jacobian and internally bound initial guess",
+      "interiorFluxArithmetic": "double",
+      "initializationSolver": "solveAxisymmetricSteadyNewton",
+      "changedFromV74": "same spatial RANS/SA; actual direct spatial Newton root used as internal initial guess; separate original BE confirmation"
+    },
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "eligibleForSurfaceCoverage": false,
+    "newProductionSolvedAreaM2": 0,
+    "processIdentity": {
+      "runLabel": "root_chain01",
+      "engineProcessID": 48152,
+      "processRecordPath": "E:\\RocketAeroHeat\\outputs\\v75_validation\\root_chain01_process.json"
+    }
+  },
+  "preparationNewtonIterations": 3,
+  "independentAcceptedBESteps": 3,
+  "preparationCountedAsBE": false,
+  "rootAndBEReplay": {
+    "status": "passed-actual-Q6-direct-Newton-and-original-three-BE-exact-replay",
+    "matlabEngineProcessID": 15892,
+    "cases": [
+      {
+        "arithmetic": "double",
+        "newtonIterations": 3,
+        "rootResidual": 1.8271973805100923e-08,
+        "boundaryBalanceRelative": 1.0588068405698093e-16,
+        "BEAcceptedSteps": 3,
+        "allNewtonAndBEFieldsExactlyReplayed": true
+      },
+      {
+        "arithmetic": "two_double_euler",
+        "newtonIterations": 3,
+        "rootResidual": 1.7007339557675547e-08,
+        "boundaryBalanceRelative": 1.0588068405698101e-16,
+        "BEAcceptedSteps": 3,
+        "allNewtonAndBEFieldsExactlyReplayed": true
+      }
+    ],
+    "budgetStopNotPromoted": true,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "openUniformAnalyticUnit": {
+    "status": "passed-uniform-open-four-quantity-direct-spatial-Newton-analytic-check",
+    "matlabEngineProcessID": 15892,
+    "newtonIterations": 2,
+    "residual": 3.4793859515867625e-12,
+    "boundaryBalanceRelative": 7.643625316022754e-15,
+    "analyticPrimitiveRelativeError": 1.801396670222667e-14,
+    "refusals": 2,
+    "physicalSolution": false,
+    "experimentalValidation": false
+  },
+  "interiorArithmeticCoupling": {
+    "status": "passed-explicit-Euler-arithmetic-four-five-quantity-coupling-and-default-replay",
+    "matlabEngineProcessID": 29992,
+    "cases": [
+      {
+        "quantities": 4,
+        "policy": "hlle-davis",
+        "coloredVsSerialRelative": 3.573537851093978e-11,
+        "acceptedSteps": 1,
+        "BEConservationRelative": 1.3552527156068803e-16,
+        "residualEvaluations": 69
+      },
+      {
+        "quantities": 4,
+        "policy": "hlle-einfeldt",
+        "coloredVsSerialRelative": 3.5579556943246354e-11,
+        "acceptedSteps": 1,
+        "BEConservationRelative": 1.3552527156068803e-16,
+        "residualEvaluations": 69
+      },
+      {
+        "quantities": 5,
+        "policy": "hlle-davis",
+        "coloredVsSerialRelative": 3.023195557690315e-11,
+        "acceptedSteps": 1,
+        "BEConservationRelative": 8.99972506457694e-17,
+        "residualEvaluations": 85
+      },
+      {
+        "quantities": 5,
+        "policy": "hlle-einfeldt",
+        "coloredVsSerialRelative": 3.023197188673501e-11,
+        "acceptedSteps": 1,
+        "BEConservationRelative": 2.7105054312137606e-16,
+        "residualEvaluations": 85
+      }
+    ],
+    "legacyTenCompleteInfoReplayed": true,
+    "refusals": 3,
+    "fullRANSHighPrecision": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "twoDoubleIndependent80DigitAudit": {
+    "status": "passed-independent-80-digit-two-double-Euler-HLLE-and-arithmetic-audit",
+    "processID": 24880,
+    "sourceSHA256": {
+      "outputs\\v75_validation\\accurate_flux\\accurate_flux_evidence.mat": "093a63a1aa9004e1c0cd0e96076ffc8388557d84012aeb8208f32ad40837bb5d",
+      "outputs\\v75_validation\\audit_accurate_flux.py": "2b5ea8326f792f8175fd318420448d008408660465ac5b9a8dd51d121669a04b",
+      "outputs\\v75_validation\\euler_decimal_reference.py": "039ea349ec70aedf512bf353ebb9941167806efd10704f2b70aa909fb7efc35d"
+    },
+    "cases": [
+      {
+        "category": "benchmarks",
+        "caseIndex": 1,
+        "policy": "davis",
+        "scalarComparisons": 44,
+        "maximumBudgetRatio": 0.10416666666655101,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.41666666666666663,
+        "worst": {
+          "face": 1,
+          "quantity": 3,
+          "absoluteError": 5.551115123125783e-17,
+          "reference": 0.6000000000000001
+        }
+      },
+      {
+        "category": "benchmarks",
+        "caseIndex": 2,
+        "policy": "einfeldt",
+        "scalarComparisons": 44,
+        "maximumBudgetRatio": 0.10416666666655101,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.41666666666666663,
+        "worst": {
+          "face": 1,
+          "quantity": 3,
+          "absoluteError": 5.551115123125783e-17,
+          "reference": 0.6000000000000001
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 1,
+        "policy": "einfeldt",
+        "scalarComparisons": 100,
+        "maximumBudgetRatio": 0.10073229670054329,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.40292918680262046,
+        "worst": {
+          "face": 10,
+          "quantity": 3,
+          "absoluteError": 3.479669458524309e-12,
+          "reference": 38892.78461343932
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 2,
+        "policy": "einfeldt",
+        "scalarComparisons": 92,
+        "maximumBudgetRatio": 0.1164723974807404,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.46588958992347884,
+        "worst": {
+          "face": 12,
+          "quantity": 4,
+          "absoluteError": 5.4357968615427665e-11,
+          "reference": -525460.3933976417
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 3,
+        "policy": "einfeldt",
+        "scalarComparisons": 64,
+        "maximumBudgetRatio": 0.1026085913676033,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.4104343654708688,
+        "worst": {
+          "face": 15,
+          "quantity": 3,
+          "absoluteError": 3.6358491367615176e-12,
+          "reference": 39895.31626745984
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 4,
+        "policy": "einfeldt",
+        "scalarComparisons": 104,
+        "maximumBudgetRatio": 0.10003691472945979,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.4001476589182834,
+        "worst": {
+          "face": 23,
+          "quantity": 4,
+          "absoluteError": 5.010560618671074e-11,
+          "reference": -563930.7998493771
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 5,
+        "policy": "einfeldt",
+        "scalarComparisons": 128,
+        "maximumBudgetRatio": 0.1080508287345281,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.43220331493859226,
+        "worst": {
+          "face": 16,
+          "quantity": 3,
+          "absoluteError": 3.9449783752279306e-13,
+          "reference": 4110.704968374772
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 6,
+        "policy": "einfeldt",
+        "scalarComparisons": 100,
+        "maximumBudgetRatio": 0.11614415551899882,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.46457662208382217,
+        "worst": {
+          "face": 19,
+          "quantity": 1,
+          "absoluteError": 1.0424382417573358e-16,
+          "reference": -1.010538252242929
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 7,
+        "policy": "einfeldt",
+        "scalarComparisons": 116,
+        "maximumBudgetRatio": 0.12061019450497279,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.48244077802042673,
+        "worst": {
+          "face": 17,
+          "quantity": 3,
+          "absoluteError": 4.403525773255885e-13,
+          "reference": 4110.70496837477
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 8,
+        "policy": "einfeldt",
+        "scalarComparisons": 124,
+        "maximumBudgetRatio": 0.10834932362228211,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.43339729448961206,
+        "worst": {
+          "face": 29,
+          "quantity": 4,
+          "absoluteError": 8.938233090786283e-10,
+          "reference": 9288065.183798831
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 9,
+        "policy": "einfeldt",
+        "scalarComparisons": 84,
+        "maximumBudgetRatio": 0.10052055773696296,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.40208223094829826,
+        "worst": {
+          "face": 18,
+          "quantity": 1,
+          "absoluteError": 3.1447709416242096e-15,
+          "reference": 35.22361385496161
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 10,
+        "policy": "einfeldt",
+        "scalarComparisons": 84,
+        "maximumBudgetRatio": 0.10052055773696296,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.40208223094829826,
+        "worst": {
+          "face": 18,
+          "quantity": 1,
+          "absoluteError": 3.1447709416242096e-15,
+          "reference": 35.22361385496161
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 11,
+        "policy": "einfeldt",
+        "scalarComparisons": 84,
+        "maximumBudgetRatio": 0.10052055773696296,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.40208223094829826,
+        "worst": {
+          "face": 18,
+          "quantity": 1,
+          "absoluteError": 3.1447709416242096e-15,
+          "reference": 35.22361385496161
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 12,
+        "policy": "einfeldt",
+        "scalarComparisons": 84,
+        "maximumBudgetRatio": 0.10052055773696296,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.40208223094829826,
+        "worst": {
+          "face": 18,
+          "quantity": 1,
+          "absoluteError": 3.1447709416242096e-15,
+          "reference": 35.22361385496161
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 13,
+        "policy": "einfeldt",
+        "scalarComparisons": 84,
+        "maximumBudgetRatio": 0.10052055773696296,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.40208223094829826,
+        "worst": {
+          "face": 18,
+          "quantity": 1,
+          "absoluteError": 3.1447709416242096e-15,
+          "reference": 35.22361385496161
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 14,
+        "policy": "einfeldt",
+        "scalarComparisons": 84,
+        "maximumBudgetRatio": 0.10052055773696296,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.40208223094829826,
+        "worst": {
+          "face": 18,
+          "quantity": 1,
+          "absoluteError": 3.1447709416242096e-15,
+          "reference": 35.22361385496161
+        }
+      },
+      {
+        "category": "real",
+        "caseIndex": 15,
+        "policy": "einfeldt",
+        "scalarComparisons": 84,
+        "maximumBudgetRatio": 0.10052055773696296,
+        "maximumErrorOverEpsilonTimesMagnitude": 0.40208223094829826,
+        "worst": {
+          "face": 18,
+          "quantity": 1,
+          "absoluteError": 3.1447709416242096e-15,
+          "reference": 35.22361385496161
+        }
+      }
+    ],
+    "scalarComparisons": 1504,
+    "maximumBudgetRatio": 0.12061019450497279,
+    "finalOutputType": "double; low parts used only while forming Euler flux",
+    "fullHighPrecisionRANS": false,
+    "physicalSolution": false,
+    "fullBEActuallyAdvanced": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "failedLargeBETrialRetained": {
+    "status": "completed-actual-fixed-Q6-fixed-dt-two-double-internal-Euler-BE-trial",
+    "matlabEngineProcessID": 19508,
+    "sourceEvidenceSHA256": "5b7f66224329e057aea76a1071f83511f27605168ac45663a6859d4dd8a213e5",
+    "driverSHA256": "26e6dbac76f61b9fb6c824674403cd280f38653b36b6e7c12287878e2717f3eb",
+    "sameInitialQAndAttemptedDt": true,
+    "attemptedDtS": 0.05110640188156627,
+    "initialPseudoCFL": 200000000.0,
+    "maximumPseudoStep": 0.05110640188156627,
+    "arithmeticPolicy": "two-double-euler",
+    "acceptedSteps": 0,
+    "rejectedAttempts": 1,
+    "residual": 6.628009558290492,
+    "residualEvaluations": 975,
+    "candidateCount": 19,
+    "seconds": 38.9861413,
+    "BEToOriginalFormulaTargetRatio": null,
+    "fiveQuantityBalanceRelative": null,
+    "stopReason": "nonlinear-step-rejected",
+    "rejectLog": {
+      "step": 1,
+      "dt": 0.05110640188156627,
+      "reason": "line-search-failed",
+      "nonlinearDefect": 5.669723899050403e-10
+    },
+    "originalTenStepChainModified": false,
+    "fullRANSHighPrecision": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "failedPolishResearchRetained": {
+    "status": "completed-real-failed-Newton-representable-neighborhood-probe",
+    "matlabEngineProcessID": 11132,
+    "sourceEvidenceSHA256": "a5f462c18f920a03004dbcb72b8b515e1943ca7da3885b38ea33f8bb6d7ed5bc",
+    "driverSHA256": "4f1e1862e15aeae901627621c65d809162b4844b111cd3299cc89e31205469c8",
+    "originalBEEquationMet": false,
+    "initialNorm": 5.669723899050403e-10,
+    "finalNorm": 5.669723343938891e-10,
+    "originalTarget": 3.4873372016085646e-10,
+    "residualEvaluations": 512,
+    "commits": 4,
+    "reason": "evaluation-budget",
+    "fiveQuantityBalanceRelative": 3.9460752296875145e-15,
+    "seconds": 19.3972753,
+    "fullStepAcceptedByIntegratedSolver": false,
+    "originalChainModified": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "priorSingleBigBEFailedPointReclassifiedAsPass": false,
+  "ordinaryArithmeticIsDefault": true,
+  "oldDefaultTenCompleteInfoNumericallyReplayed": true,
+  "NSBytesChangedForExplicitNewArithmeticBranch": true,
+  "oldChainRebound": false,
+  "historicSourceEpochs": [
+    {
+      "run": "flux_witness01",
+      "path": "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+      "sha256": "7a578c5f94eb4fc6b7d26e3273b09cb69b882a24cdf47d1540197a40476b7405",
+      "frozenSource": "source_epochs/v74/axisymmetricNavierStokesResidual.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "flux_witness01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144",
+      "frozenSource": "source_epochs/v74_97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144_exportRocketAxisymmetricStudy.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "flux_witness01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd",
+      "frozenSource": "source_epochs/v74_56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd_exportRocketAxisymmetricWorkbench.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "flux_witness01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59",
+      "frozenSource": "source_epochs/v74_35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59_rocketAxisymmetricSolverContract.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "flux_witness01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c",
+      "frozenSource": "source_epochs/v74_16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c_testRocketAxisymmetricControlledCheckpoint.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "euler_witness01",
+      "path": "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+      "sha256": "7a578c5f94eb4fc6b7d26e3273b09cb69b882a24cdf47d1540197a40476b7405",
+      "frozenSource": "source_epochs/v74/axisymmetricNavierStokesResidual.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "euler_witness01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144",
+      "frozenSource": "source_epochs/v74_97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144_exportRocketAxisymmetricStudy.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "euler_witness01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd",
+      "frozenSource": "source_epochs/v74_56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd_exportRocketAxisymmetricWorkbench.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "euler_witness01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59",
+      "frozenSource": "source_epochs/v74_35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59_rocketAxisymmetricSolverContract.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "euler_witness01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c",
+      "frozenSource": "source_epochs/v74_16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c_testRocketAxisymmetricControlledCheckpoint.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_flux01",
+      "path": "regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m",
+      "sha256": "7a578c5f94eb4fc6b7d26e3273b09cb69b882a24cdf47d1540197a40476b7405",
+      "frozenSource": "source_epochs/v74/axisymmetricNavierStokesResidual.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_flux01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144",
+      "frozenSource": "source_epochs/v74_97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144_exportRocketAxisymmetricStudy.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_flux01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd",
+      "frozenSource": "source_epochs/v74_56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd_exportRocketAxisymmetricWorkbench.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_flux01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59",
+      "frozenSource": "source_epochs/v74_35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59_rocketAxisymmetricSolverContract.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_flux01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c",
+      "frozenSource": "source_epochs/v74_16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c_testRocketAxisymmetricControlledCheckpoint.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_late01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144",
+      "frozenSource": "source_epochs/v74_97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144_exportRocketAxisymmetricStudy.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_late01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd",
+      "frozenSource": "source_epochs/v74_56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd_exportRocketAxisymmetricWorkbench.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_late01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59",
+      "frozenSource": "source_epochs/v74_35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59_rocketAxisymmetricSolverContract.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "accurate_late01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c",
+      "frozenSource": "source_epochs/v74_16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c_testRocketAxisymmetricControlledCheckpoint.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "arithmetic_coupled01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144",
+      "frozenSource": "source_epochs/v74_97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144_exportRocketAxisymmetricStudy.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "arithmetic_coupled01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd",
+      "frozenSource": "source_epochs/v74_56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd_exportRocketAxisymmetricWorkbench.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "arithmetic_coupled01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59",
+      "frozenSource": "source_epochs/v74_35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59_rocketAxisymmetricSolverContract.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "arithmetic_coupled01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c",
+      "frozenSource": "source_epochs/v74_16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c_testRocketAxisymmetricControlledCheckpoint.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "late_polish01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144",
+      "frozenSource": "source_epochs/v74_97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144_exportRocketAxisymmetricStudy.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "late_polish01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd",
+      "frozenSource": "source_epochs/v74_56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd_exportRocketAxisymmetricWorkbench.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "late_polish01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59",
+      "frozenSource": "source_epochs/v74_35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59_rocketAxisymmetricSolverContract.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "late_polish01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c",
+      "frozenSource": "source_epochs/v74_16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c_testRocketAxisymmetricControlledCheckpoint.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "spatial_root01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144",
+      "frozenSource": "source_epochs/v74_97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144_exportRocketAxisymmetricStudy.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "spatial_root01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd",
+      "frozenSource": "source_epochs/v74_56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd_exportRocketAxisymmetricWorkbench.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "spatial_root01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59",
+      "frozenSource": "source_epochs/v74_35081dd8ee7e83914d0fe2205010a636988502d225bed8b3fb6b68bae0e4ad59_rocketAxisymmetricSolverContract.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "spatial_root01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c",
+      "frozenSource": "source_epochs/v74_16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c_testRocketAxisymmetricControlledCheckpoint.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "root_chain01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144",
+      "frozenSource": "source_epochs/v74_97b0615b440a26ae018c2893414af019aaa136fa853e89c85e6bacf6a818c144_exportRocketAxisymmetricStudy.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "root_chain01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd",
+      "frozenSource": "source_epochs/v74_56abcf12f4c5cef982458208b9dc996d242fd5fe7675009d1a854f78645296dd_exportRocketAxisymmetricWorkbench.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "root_chain01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c",
+      "frozenSource": "source_epochs/v74_16e2eb07b8ae081ff39c93ba5f03ae45fe10ee405c5ec73d941d73c4d4290a0c_testRocketAxisymmetricControlledCheckpoint.m.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "uniform_diagnosis01",
+      "path": "tests/testAxisymmetricSteadyNewton.m",
+      "sha256": "8fd8036306e64dc131b22cc990c1771789c53aa821f4fdea10f1f60e9b2801f5",
+      "frozenSource": "attempts/testAxisymmetricSteadyNewton01.m.source.txt",
+      "oldChainRebound": false
+    }
+  ],
+  "initializationAndNewtonAndBEPhasesShownSeparately": true,
+  "finalWorkBench3DFieldsAndNativeProjectionReplayed": true,
+  "scientificPlotVisuallyChecked": true,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "physicalSolution": false,
+  "experimentalValidation": false,
+  "fullSurfaceSolved": false,
+  "wholeGoalComplete": false,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "nextWork": "grid/near-wall/outer-domain sensitivity and traceable public benchmarks for numerical steady result, then real 20-degree crossflow/contraction/afterbody/separation/base/protrusion regions; stop repeating late big-BE precision prerequisite",
+  "processes": {
+    "flux_witness01": {
+      "processID": 44336,
+      "engineProcessIDs": [
+        26144
+      ],
+      "exitCode": 0
+    },
+    "euler_witness01": {
+      "processID": 11376,
+      "engineProcessIDs": [
+        19572
+      ],
+      "exitCode": 0
+    },
+    "euler_precision01": {
+      "processID": 28836,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "accurate_flux01": {
+      "processID": 39040,
+      "engineProcessIDs": [
+        12600
+      ],
+      "exitCode": 0
+    },
+    "accurate_independent01": {
+      "processID": 24880,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "accurate_late01": {
+      "processID": 30528,
+      "engineProcessIDs": [
+        19508
+      ],
+      "exitCode": 0
+    },
+    "arithmetic_coupled01": {
+      "processID": 17196,
+      "engineProcessIDs": [
+        29992
+      ],
+      "exitCode": 0
+    },
+    "late_polish01": {
+      "processID": 47228,
+      "engineProcessIDs": [
+        11132
+      ],
+      "exitCode": 0
+    },
+    "spatial_root01": {
+      "processID": 50124,
+      "engineProcessIDs": [
+        38868
+      ],
+      "exitCode": 0
+    },
+    "root_chain01": {
+      "processID": 41016,
+      "engineProcessIDs": [
+        48152
+      ],
+      "exitCode": 0
+    },
+    "uniform_diagnosis01": {
+      "processID": 7836,
+      "engineProcessIDs": [
+        3064
+      ],
+      "exitCode": 0
+    },
+    "root_replay02": {
+      "processID": 40040,
+      "engineProcessIDs": [
+        15892
+      ],
+      "exitCode": 0
+    },
+    "root_case01": {
+      "processID": 16200,
+      "engineProcessIDs": [
+        26544
+      ],
+      "exitCode": 0
+    },
+    "final_ui01": {
+      "processID": 47304,
+      "engineProcessIDs": [
+        38448
+      ],
+      "exitCode": 0
+    },
+    "root_chain_independent01": {
+      "processID": 23964,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "roots_independent01": {
+      "processID": 3068,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_host01": {
+      "processID": 7440,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_view01": {
+      "processID": 13800,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_host_view01": {
+      "processID": 23336,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "scientific_plot01": {
+      "processID": 40040,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    }
+  }
+}

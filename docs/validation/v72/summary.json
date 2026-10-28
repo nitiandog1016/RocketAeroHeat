@@ -1,0 +1,343 @@
+{
+  "version": 72,
+  "status": "tested-explicit-pressure-source-quadrature-and-uniform-rocket-study-not-steady-not-physical",
+  "cellCount": 2760,
+  "wallSegments": 115,
+  "nativeTriangles": 9216,
+  "uniformChain": {
+    "status": "actual-complete-rocket-SA-collar-family-study-not-production-qualification",
+    "cellCount": 2760,
+    "acceptedSteps": 11,
+    "rejectedAttempts": 0,
+    "steadyConverged": false,
+    "stopReason": "persisted-accepted-step-budget",
+    "initialOriginalResidual": 338361517.03826416,
+    "finalOriginalResidual": 5642577.850312759,
+    "fiveQuantityBalanceRelative": 1.8922902435178636e-16,
+    "solverResidualEvaluations": 11156,
+    "diagnosticResidualEvaluations": 24,
+    "elapsedSolverSeconds": 335.8546465,
+    "allAcceptedEndpointsSaved": true,
+    "fullWallFaceCount": 115,
+    "fullRevolvedWallAreaM2": 0.9362872116455068,
+    "signedWallHeatRangeWm2": [
+      130571.01712924642,
+      2903670.030976566
+    ],
+    "currentRevolvedWallHeatW": 577809.2291275839,
+    "wallTemperatureValueKind": "prescribed",
+    "wallTemperatureSolved": false,
+    "edgeTemperatureSolved": false,
+    "recoveryTemperatureSolved": false,
+    "physicalTimeAdvancedS": 0,
+    "pseudoTimeIsPhysical": false,
+    "inputContract": {
+      "flight": {
+        "altitude": 30000,
+        "Mach": 5,
+        "alpha": 0,
+        "beta": 0,
+        "Twall": 300
+      },
+      "freestreamPrimitiveRhoUxUrT": [
+        0.018410125827734398,
+        -1508.5433002103648,
+        0,
+        226.50908361133003
+      ],
+      "wallTemperatureInputK": 300,
+      "wallTemperatureValueKind": "prescribed",
+      "nuTildeRatioInput": 5,
+      "farfieldNuTildeInputM2s": 0.0040065117894983225,
+      "turbulentPrandtlInput": 0.9,
+      "solverFreestreamViscosityPaS": 1.4752077234993085e-05,
+      "atmosphereReferenceViscosityPaS": 1.4752077234993085e-05,
+      "solverFreestreamReynoldsPerM": 1882614.3282099988,
+      "flowDirection": [
+        -1,
+        0,
+        0
+      ],
+      "units": "SI",
+      "completeExternalDomain": true,
+      "gasModel": "calorically perfect air; gamma/R from standardAtmosphere; explicit Sutherland",
+      "transportSource": "existing standardAtmosphere: muRef=1.716e-5 at 273.15K, S=110.4K; k=cp*mu/.72",
+      "temperatureRangeIsNumericalAcceptanceNotPhysicalCertification": true,
+      "pressureAndHeatNotComputedYet": true,
+      "edgeTemperatureSolved": false,
+      "recoveryTemperatureSolved": false,
+      "wallTemperatureSolved": false,
+      "physicalSolution": false,
+      "experimentalValidation": false,
+      "eligibleForSurfaceCoverage": false,
+      "newProductionSolvedAreaM2": 0,
+      "wallVelocityGradientPolicy": "legacy",
+      "viscousWorkVelocityPolicy": "arithmetic",
+      "wallVelocityGradientBoundaryMeaning": "static Cartesian wall velocity components have prescribed zero wall-tangential derivative",
+      "changedFromV68": "complete original wall/farfield preserved; grid=normal-collar; uniformly initialized same freestream five-component state on new control volumes; no imported solution",
+      "wallGradientIsPhysicalAccuracyValidation": false,
+      "gridPolicy": "normal-collar",
+      "effectiveDomainOptions": {
+        "radialLayers": 24,
+        "kernelX": 0.707,
+        "outerRadius": 4.261260975070607,
+        "firstRadialSpacing": 0.0002,
+        "maxWallAngleStepDeg": 5,
+        "baseRadialSegments": 8
+      },
+      "effectiveCollarOptions": {
+        "normalLayers": 3,
+        "firstNormalSpacing": 2e-05,
+        "normalGrowth": 1.5
+      },
+      "firstOffsetIsOwnerWallDistance": false,
+      "pressureSourceQuadraturePolicy": "cell-constant",
+      "pressureSourceQuadratureMeaning": "explicit planar-area pressure integral from selected reconstruction; not a solved new boundary",
+      "changedFromV71": "same full collar case and uniform initialization; explicit pressure source=cell-constant",
+      "sourceQuadratureIsPhysicalAccuracyValidation": false
+    },
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "eligibleForSurfaceCoverage": false,
+    "newProductionSolvedAreaM2": 0,
+    "processIdentity": {
+      "runLabel": "uniform_continue01",
+      "engineProcessID": 3068,
+      "processRecordPath": "E:\\RocketAeroHeat\\outputs\\v72_validation\\uniform_continue01_process.json"
+    }
+  },
+  "warmControlledSingleBE": {
+    "status": "passed-real-single-BE-cell-constant-pressure-source-controlled-trial",
+    "matlabEngineProcessID": 49556,
+    "sameWarmInitialQAndOptions": true,
+    "sameInitialFrequencies": true,
+    "pressureSourcePolicy": "cell-constant",
+    "baselineAcceptedDtS": 5.284620459572102e-09,
+    "trialAcceptedDtS": 2.113848183828841e-08,
+    "baselineRejectedAttempts": 1,
+    "trialRejectedAttempts": 0,
+    "baselineResidualEvaluations": 2111,
+    "trialResidualEvaluations": 961,
+    "diagnosticComplete": true,
+    "candidateCount": 5,
+    "stateFailureCount": 0,
+    "pressureSourceFailureCount": 0,
+    "actualBEToOriginalTargetRatio": 0.007118012825235673,
+    "fiveQuantityBalanceRelative": 8.06455608562513e-18,
+    "trialResidual": 32162085.30213883,
+    "temperatureRangeK": [
+      226.50908360569406,
+      1773.9277300733324
+    ],
+    "negativeRawLinearSourceCount": 1,
+    "sourcePressureRangePa": [
+      130.73265275299238,
+      62101.975653571586
+    ],
+    "elapsedSecondsWithObservation": 30.4299559,
+    "sameFinalPseudoTime": false,
+    "productionDefaultSourceChanged": false,
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "subsequentQ11Trial": {
+    "status": "recorded-and-replayed-real-Q11-next-BE-pressure-source-observation",
+    "matlabEngineProcessID": 13652,
+    "acceptedSteps": 1,
+    "rejectedAttempts": 3,
+    "candidateCount": 253,
+    "storedCandidates": 253,
+    "complete": true,
+    "stateFailureIdentifiers": [
+      "AxisFV:HLLC"
+    ],
+    "residualEvaluations": 6812,
+    "residual": 5646962.3753785435,
+    "seconds": 179.3337321,
+    "temperatureRangeK": [
+      226.49773213552007,
+      1997.4727668923945
+    ],
+    "trialPseudoStepS": 2.827314615857898e-09,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "newAcceptedChainClaimed": false
+  },
+  "newPressureQuadrature": "cell-constant",
+  "defaultPressureQuadrature": "linear-planar",
+  "sourcePressureClipped": false,
+  "defaultLegacyTenCompleteInfoReplayed": true,
+  "defaultSourceBytesChangedWithExplicitNewSourceBinding": true,
+  "oldChainResumedOrRebound": false,
+  "uniformChainDoesNotIncludeWarmOrSubsequentTrials": true,
+  "manufacturedIntegralOrders": {
+    "axis": [
+      1.729545509605952,
+      1.7718918847629692,
+      1.8029860610352977
+    ],
+    "annulus": [
+      1.9643101824668,
+      1.989335154459057,
+      1.9971582002197212
+    ]
+  },
+  "coupledFourFiveQuantityJacobianAndBE": [
+    {
+      "quantities": 4,
+      "jacobianColoredVsSerialRelative": 3.7346596942533183e-11,
+      "ledger": [
+        0,
+        5.551115123125783e-17,
+        -2.220446049250313e-16,
+        -7.105427357601002e-15
+      ],
+      "beResidualEvaluations": 99,
+      "beBalanceRelative": 2.3879417559008607e-16
+    },
+    {
+      "quantities": 5,
+      "jacobianColoredVsSerialRelative": 2.675552930685867e-11,
+      "ledger": [
+        0,
+        -5.551115123125783e-17,
+        -2.220446049250313e-16,
+        7.105427357601002e-15,
+        0
+      ],
+      "beResidualEvaluations": 245,
+      "beBalanceRelative": 1.2548636255619267e-16
+    }
+  ],
+  "inputRefusals": 7,
+  "independentTriangularPressureMomentsPassed": true,
+  "independentSavedFluxFiveQuantityBEPassed": true,
+  "independentHLLCCandidateAudit": {
+    "status": "completed-independent-saved-candidate-interior-Riemann-state-audit",
+    "processID": 33712,
+    "sourceEvidenceSHA256": "2768bc203531bfcce1b5768955a5a28aa7427540abde6a8dc8ea40d3843d6a29",
+    "scriptSHA256": "e7d7483f5f2af3c10127e93cd2686948f6165097d23b0065f2a06381f6973dde",
+    "candidateCount": 253,
+    "recordedHLLCStateFailures": 226,
+    "independentNonpositiveHLLCStateCandidates": 226,
+    "allCandidatesCellDensityTemperatureValid": true,
+    "allHLLEIntermediateStatesPositive": true,
+    "worstStarPressure": {
+      "record": 250,
+      "attempt": 2,
+      "newton": 10,
+      "alpha": 6.103515625e-05,
+      "status": "state-failure",
+      "TminK": 226.49728906074827,
+      "TmaxK": 1998.2926987926794,
+      "negativeHLLCFaceCount": 1,
+      "HLLCWaveOrderFailureCount": 0,
+      "HLLCPressureMismatchCount": 0,
+      "minStarPressurePa": -18.564377912327686,
+      "minimumStarFaceID": 920,
+      "faceX": -9.499999999999999e-05,
+      "faceR": 0.015555555555555555,
+      "ownerCell": 344,
+      "neighbourCell": 459,
+      "allHLLEIntermediateDensityAndInternalEnergyPositive": true
+    },
+    "floatRoundoffBoundaryMayDifferAcrossLanguages": true,
+    "HLLEActuallyAdvanced": false,
+    "independentFullRANSResidual": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "all253SubsequentCandidatesReplayed": true,
+  "generalRiemannOrSkewGridPositivityProved": false,
+  "HLLEActuallyAdvanced": false,
+  "wallTemperatureValueKind": "prescribed",
+  "wallSolvedEdgeRecoveryTemperatureKnown": false,
+  "scientificPlotVisuallyChecked": true,
+  "sameHostFiveStepsPressureStrategyAndDataEventsPassed": true,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "physicalSolution": false,
+  "experimentalValidation": false,
+  "fullSurfaceSolved": false,
+  "wholeGoalComplete": false,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "nextWork": "isolate HLLC star-state failures; compare explicitly configured robust HLL/HLLE/HLLC flux and wave speeds, conservation/contact diffusion and real new-chain advancement",
+  "processes": {
+    "uniform_start01": {
+      "processID": 32724,
+      "engineProcessIDs": [
+        29324
+      ],
+      "exitCode": 0
+    },
+    "warm_source01": {
+      "processID": 2960,
+      "engineProcessIDs": [
+        49556
+      ],
+      "exitCode": 0
+    },
+    "uniform_continue01": {
+      "processID": 11076,
+      "engineProcessIDs": [
+        3068
+      ],
+      "exitCode": 0
+    },
+    "independent_quadrature01": {
+      "processID": 10244,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "continuation_probe02": {
+      "processID": 18116,
+      "engineProcessIDs": [
+        13652
+      ],
+      "exitCode": 0
+    },
+    "independent_rocket02": {
+      "processID": 49148,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "independent_hllc01": {
+      "processID": 33712,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "scientific_plot02": {
+      "processID": 23072,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_replay01": {
+      "processID": 484,
+      "engineProcessIDs": [
+        51068
+      ],
+      "exitCode": 0
+    },
+    "final_host01": {
+      "processID": 7672,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_view01": {
+      "processID": 52636,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "final_host_view01": {
+      "processID": 25648,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "observer_body01": {
+      "processID": 13668,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    }
+  }
+}

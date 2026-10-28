@@ -1,0 +1,12 @@
+<section id="wallProfilePanel" class="comparison" hidden>
+ <div class="controls"><strong>实际控制体法向剖面</strong><label>变量 <select id="profileField">
+  <option value="temperatureK">内部气体温度 / K</option><option value="tangentialVelocityMps">沿墙切向速度 / m·s⁻¹</option>
+  <option value="pressurePa">内部压力 / kPa</option><option value="muTOverMu">湍流/层流黏度比</option>
+  <option value="EulerEnergyFluxMinusArithmeticPhysicalWm2">Euler能量通量减算术物理参考 / kW·m⁻²</option>
+  <option value="viscousTotalEnergyFluxWm2">实际黏性总能通量 / kW·m⁻²</option>
+ </select></label></div>
+ <div class="profileControls"><label>墙段 <input id="profileWall" type="range" min="1" max="115" step="1" value="56"></label><output id="profilePosition"></output>
+ <label>最大法向距离 / mm <input id="profileExtent" type="number" value="20" min="0.001" step="any"></label><label><input id="profileLog" type="checkbox" checked>距离对数坐标</label></div>
+ <svg id="profileCurve" viewBox="0 0 960 275" role="img" aria-label="真实控制体法向剖面比较"></svg><a href="sensitivity-data.json" download>导出四档场量、剖面与算法 JSON</a>
+ <p id="profileBoundaryNote" class="note"></p><details><summary>当前剖面的算法与身份</summary><p id="profileAlgorithmText" class="note"></p></details><p class="note">实线连接实际单元中心代理；不是沿法线重新求解或边界层外缘识别。能量通量差是实际离散量减算术参考，不是独立误差估计或纯物理热流。Tw、墙速为给定，Te、Tr与求解Tw仍未知。</p>
+</section>

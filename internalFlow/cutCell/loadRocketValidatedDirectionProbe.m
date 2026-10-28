@@ -1,0 +1,43 @@
+function [direction,report]=loadRocketValidatedDirectionProbe(config,Q,cut,gas,boundary,scale)
+%LOADROCKETVALIDATEDDIRECTIONPROBE 读取同Q已检查原NS的方向候选，不伪造原求解器历史。
+% 模块一：状态/物性/边界/完整几何/缩放/13项计算源逐项绑定，来源文件按SHA核对。
+% 模块二：从保存原NS差分率重算总方向缺陷与下降界，不只信任成功标志。
+% 模块三：返回值仅为方向初猜；主求解器仍重新调用原NS并进行原状态/温域线搜索。
+required={'Q','scale','totalDirection','nsEvidence','report','sourceBinding','sourceIdentity','gas','boundary','coarseFile','baseRate','rhs'};
+s=load(config.file,required{:});assert(all(isfield(s,required)),'SteadyGuess:ProbeFile','已验原NS探针缺少必要证据。');r=s.report;e=s.nsEvidence;
+assert(isequaln(s.Q,Q)&&isequaln(s.scale,scale)&&isequaln(s.gas,gas)&&isequaln(s.boundary,boundary), ...
+    'SteadyGuess:ProbeState','探针不是当前同Q、缩放、边界或物性。');
+assert(r.originalNSDirectionChecked&&r.originalNSDirectionTargetMet&&r.originalNSDirectionTarget==.1&& ...
+    ~r.physicalStateChanged&&r.newFlowAcceptances==0&&isequaln(s.sourceIdentity,rocketSelectedDirectionSourceIdentity), ...
+    'SteadyGuess:ProbeSource','探针未过原NS0.1、已改变状态或计算来源不一致。');
+assert(isfile(s.sourceBinding.sourceFile)&&strcmp(rocketStreamingFileSHA256(s.sourceBinding.sourceFile),s.sourceBinding.sourceFileSHA256), ...
+    'SteadyGuess:ProbeSource','原探针基态文件SHA不符。');
+assert(isfile(s.coarseFile)&&strcmp(rocketStreamingFileSHA256(s.coarseFile),r.coarseFileSHA256),'SteadyGuess:ProbeGeometry','探针几何来源文件SHA不符。');
+t=load(s.coarseFile,'coarse');c=t.coarse;
+assert(isequaln(c.baseQ,Q)&&isequaln(c.space.geometry,cut)&&isequaln(c.gas,gas)&&isequaln(c.boundary,boundary)&& ...
+    isequaln(c.scale,scale)&&isequaln(c.sourceIdentity,rocketSelectedDirectionSourceIdentity),'SteadyGuess:ProbeGeometry','探针完整几何/物性/计算来源不符。');clear c t;
+assert(isequal(size(s.totalDirection),size(Q))&&isreal(s.totalDirection)&&all(isfinite(s.totalDirection),'all')&& ...
+    isequaln(e.directionU,s.totalDirection)&&e.fullThreeDimensionalResidualCalled&&ismember(e.scheme,{'forward','central'})&& ...
+    isscalar(e.actualScalarStep)&&isfinite(e.actualScalarStep)&&e.actualScalarStep>0,'SteadyGuess:ProbeDirection','原NS探针方向或差分身份非法。');
+assert(isequal(size(e.ratePlus),size(Q))&&isequal(size(e.rateMinusOrBase),size(Q))&&isequal(size(e.value),size(Q))&& ...
+    all(isfinite(e.ratePlus),'all')&&all(isfinite(e.rateMinusOrBase),'all')&&all(isfinite(e.value),'all'),'SteadyGuess:ProbeRates','原NS探针保存率非法。');
+expected=(e.ratePlus-e.rateMinusOrBase)./scale/e.actualScalarStep;
+if strcmp(e.scheme,'central'),expected=expected/2;else,assert(isequaln(e.rateMinusOrBase,s.baseRate),'SteadyGuess:ProbeRates','前向差分基态率不符。');end
+assert(norm(expected-e.value,'fro')/max(1,norm(e.value,'fro'))<1e-12&&isequaln(s.rhs,s.baseRate./scale),'SteadyGuess:ProbeRates','原NS差分或原始分母算术不符。');
+defect=norm(s.rhs+expected,'fro')/norm(s.rhs,'fro');slope=dot(s.rhs(:),expected(:))/dot(s.rhs(:),s.rhs(:));upper=-1+defect;
+assert(defect<=.1&&abs(defect-r.originalNSTotalDirectionDefect)<1e-12&&slope<0&& ...
+    slope<=upper+512*eps*max([1 abs(slope) abs(upper)]),'SteadyGuess:ProbeQualification','保存的总方向未通过原NS缺陷/下降界。');
+plus=Q+e.actualScalarStep*s.totalDirection.*scale;check(plus);
+if strcmp(e.scheme,'central'),check(Q-e.actualScalarStep*s.totalDirection.*scale);end
+direction=double(config.scale)*s.totalDirection;assert(all(isfinite(direction),'all'),'SteadyGuess:ProbeDirection','方向缩放非有限。');
+report=struct('sourceFile',config.file,'sourceVariant',config.variant,'directionScale',config.scale, ...
+    'sourceFileSHA256',rocketStreamingFileSHA256(config.file),'sourceCoarseFile',s.coarseFile,'sourceCoarseFileSHA256',r.coarseFileSHA256, ...
+    'sourceStateAndGeometryVerified',true,'sourceSavedActualNSRelativeDefect',defect,'oldDerivativeReused',false, ...
+    'originalNSProbeArithmeticVerified',true,'newModelApplications',0,'newActualNSEvaluations',0,'originalNSAcceptanceClaimed',false);
+    function check(q)
+        rho=q(:,1);assert(all(isfinite(q),'all')&&all(rho>0),'SteadyGuess:ProbeState','原NS扰动密度非法。');
+        internal=q(:,5)-.5*sum(q(:,2:4).^2,2)./rho;temperature=internal./(rho*gas.R/(gas.gamma-1));
+        assert(all(internal>0)&&all(temperature>=gas.temperatureRange(1)&temperature<=gas.temperatureRange(2)), ...
+            'SteadyGuess:ProbeState','原NS扰动内能/温域不符。');
+    end
+end

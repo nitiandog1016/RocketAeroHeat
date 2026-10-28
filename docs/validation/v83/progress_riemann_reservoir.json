@@ -1,0 +1,736 @@
+{
+  "version": 83,
+  "status": "tested-explicit-3D-Riemann-reservoir-real-NS-accepted-update-and-original-facet-workbench",
+  "recordedUTC": "2026-10-26T02:18:40.564885+00:00",
+  "processID": 14104,
+  "priorProgress": {
+    "path": "docs/validation/v83/progress_parent_lsqr.json",
+    "sha256": "366b4b1a1ec380391f99a1e1caa54cd3119a9bd1e6b4a6dba0011dd6d60d5437",
+    "bytes": 42199
+  },
+  "previousGoalTurnClassification": "progress",
+  "previousGoalTurnEvidence": "New parent-LSQR direction passed original NS and accepted krylov19; the remaining restriction selected this real boundary study.",
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/resolveNSRiemannReservoir3D.m": "70f035c1c76f816e6d00dbc9f0460a2728bbb2631d940f512c0fc85cf10fdaf6",
+    "internalFlow/cutCell/buildCutCellRiemannReservoirBoundaryState.m": "29613f88092acd22c87795775d2d6f16d12e0e0b1ab43a0609378cf52bdf32ac",
+    "internalFlow/cutCell/cutCellNavierStokesResidual.m": "e13e67511a62e1a7faef37b3d27be698faa72c943b73b2a33cce4bd26797a52b",
+    "internalFlow/cutCell/cutCellBoundaryStencilState.m": "cece939ebd097eab666dee2757692289f06e57cc52f64d83264a2e7b83b8d2e3",
+    "internalFlow/cutCell/rocketNSProbeSourceIdentity.m": "2c999afd30d88210f506632c44618e151be10e10e9f0d14824c7a2b21e725b96",
+    "internalFlow/cutCell/loadRocketDirectNSDirectionProbe.m": "d254b73e3342e21f222cb0a668bffde57afcc4ae854d12e38f2d214822303521",
+    "internalFlow/cutCell/loadRocketSteadyDirectionGuess.m": "999eca78757d75832cbcf70b7eccf484401e8acdd05be105794d8c71a7eeae43",
+    "internalFlow/cutCell/solveRocketShellSteadyKrylov.m": "a159ff38d8a706d6ea12e369648dc7636ce500aeebaaa38a1c9af90d54524a9f",
+    "internalFlow/cutCell/cutCellExactEulerFlux.m": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+    "internalFlow/cutCell/rocketShellResidualDirectionalDerivative.m": "3caeef137a1a24921c70f4d34c6e809e56ad7e9a791d45c4c579f56bcf9e4afc",
+    "tests/studyRocketNewtonBoundaryPath.m": "04c7936fd9a91bfbf004a2482ab283a46226d55aa259c1672c3a8c612b8075eb",
+    "tests/testNSRiemannReservoir3D.m": "f3592f64235d3a11c3f11aab92be7d3f04135f4c56468b7ecff6037bf2630dc6",
+    "tests/studyRocketRiemannReservoirIntegration.m": "1560fccca1db7ec3ace3342cc002eb03f2130f197c8e561d50d9e49dd055ff66",
+    "tests/createRocketNSDirectionProbe.m": "893b467e95829afbc54e760216bf0deafc9199ce542dcf36a93b3a5993b173bb",
+    "tests/testRocketDirectNSDirectionProbe.m": "a6403c4ddaa82b242c94272c6ee78080217cb0c933e02d901e75c466bcf0d9c8",
+    "tests/studyRocketRiemannReservoirNewton.m": "882b778140f89c1aa14f749f81817bebc4159ff83ec6e75802e1d33975d2e64c",
+    "tests/riemannReservoirReference.py": "a11904a2017d7bb0b7bf53bf14e04bcc2c3fda0ab3538350df1807438577efca",
+    "tests/auditRocketNewtonBoundaryPath.py": "b6cb14a5f9a3e748cb946b675897761c39f162220f5668c521da89c8d8c64551",
+    "tests/auditNSRiemannReservoir3D.py": "258aa99577b6871a9523a4fa444754a3802d1a28b6d69b92b9ce750adcf47fee",
+    "tests/auditRocketDirectNSDirectionProbe.py": "8b940762d7f894cefc54c7c3e9ef0a4043724c067b61e989b3f9ef3133c6859a",
+    "tests/auditRocketSteadyNewtonDirections.py": "01f2dc1700fa9c021a8abc0fc749e646c688ce1808ce10c6377c0025b347874b",
+    "tests/auditRocketWallVelocityWorkbench.py": "96de5178c17215874cb14d91d94ed004526dee0d8103156e04435b07cd46a42c",
+    "tests/testRocketWallVelocityWorkbench.js": "532573418d04ff0f4cc011aa734068081c953aa0b708845f5b0b35519132a9b5",
+    "exportRocketWallVelocityStudy.m": "e39e6a5fee5ba849193eb08b156bcca94b414a06908af4b2950cd22fe756c515",
+    "web/rocket-wall-velocity.js": "d9020e65d10026faba649afc6b3031c4d44c0b27e24b59164fc716b63e998207",
+    "web/rocket-wall-velocity.html": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+    "docs/PROJECT_GOALS.md": "0b25d0952ba89a3ed70f43a1c87ef146fb9c393d4404a5ed9fdc8ae200b52778",
+    "docs/GITHUB_STAGE_READINESS.md": "18e4e4e095eb8277a48c1199fd742bb9fcdcad7dafd81b823437739750d9aa1a",
+    "docs/RIEMANN_RESERVOIR_3D_V83.md": "94ce4c7c589780daa314ff327d91925ecfedceb3a3349a1108d60fd480c529d0",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1",
+    "outputs/v83_validation/record_riemann_reservoir_progress.py": "58a5bd855a8343d11d0ab8e04681f4772e9b4810b102e7db30dab0bec2348a8a",
+    "outputs/v83_validation/package_riemann_research.py": "e082d23285aeeadb4e241af891f5149ab4fa0c6642c23dff0e699f80cb0078c7"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_riemann_real_gas_testNSRiemannReservoir3D.m",
+      "sha256": "388899e511673cc999f51065f81a8e8b682fb37c43b80f76471524ee76bb6228",
+      "bytes": 7999
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_riemann_reservoir_auditRocketWallVelocityWorkbench.py",
+      "sha256": "690b5d37e1e908f6068194136b078b3c893658d712b2207a0589379e47364da5",
+      "bytes": 15347
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_riemann_reservoir_cutCellBoundaryStencilState.m",
+      "sha256": "8f9e819cbcf7ce0f9bfd0f15197fe721ac763ff0994ed15763bd3b43ef0d12fb",
+      "bytes": 2264
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_riemann_reservoir_cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_riemann_reservoir_exportRocketWallVelocityStudy.m",
+      "sha256": "f287e46011aa2ed6cb87c26459afdb74a24dcd0ec20209e44dbddbfd6334610d",
+      "bytes": 20183
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_riemann_reservoir_rocket-wall-velocity.html",
+      "sha256": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+      "bytes": 3736
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_riemann_reservoir_rocket-wall-velocity.js",
+      "sha256": "e47520eb88b8a3ee82aa4c2a37195a598be4e86335902ee888e6345cc85055a2",
+      "bytes": 13902
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_riemann_reservoir_testRocketWallVelocityWorkbench.js",
+      "sha256": "a63dde6685a6dd53c4318ab1def01e25bcb88ad69c00fe6887df2eedd155d92e",
+      "bytes": 16602
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_direct_probe_loadRocketSteadyDirectionGuess.m",
+      "sha256": "71947e818cbfca038fea7ac168bc8a85d1a0d3cb7ad34a3382ea00a64c544a44",
+      "bytes": 3223
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_direct_probe_solveRocketShellSteadyKrylov.m",
+      "sha256": "572a76191837f7c1f1ce7fb1734ee0470715b6b4a178f75aa39ffa1116ff5247",
+      "bytes": 36659
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_direct_probe_value_createRocketNSDirectionProbe.m",
+      "sha256": "374139aa824add849d7019858917fa69099b0317c5d29f44c6bee4a11b183722",
+      "bytes": 2368
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_newton_kind_auditNSRiemannReservoir3D.py",
+      "sha256": "cba060109bc126c34afec3c69e0fe970d472d49b805d1b8a1322e6dd2dcf433b",
+      "bytes": 7017
+    }
+  ],
+  "matlabProcesses": {
+    "boundarypath01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        22508
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/boundarypath01_process.json",
+        "sha256": "9a64ae0fea05fbbb2b84c0af896fd5e4018fffc35d00cf2fac369b646a4fd185",
+        "bytes": 204533
+      }
+    },
+    "riemannreservoirunit01": {
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        46392
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/riemannreservoirunit01_process.json",
+        "sha256": "a5acd404ad80f25869aa0aa2f9a3f6dc68af56d99de3380a1ffdda7fac946b01",
+        "bytes": 205887
+      }
+    },
+    "riemannreservoirunit02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        40000
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/riemannreservoirunit02_process.json",
+        "sha256": "45319ad170a43929951e8cf65a071e3b171a630df73eb97983acdf867459b9d7",
+        "bytes": 206151
+      }
+    },
+    "riemannreservoirreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        25928
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/riemannreservoirreal01_process.json",
+        "sha256": "daf7a0508b138df5d0639e846b847942995747a2ae78821fe7623b3785715a32",
+        "bytes": 206593
+      }
+    },
+    "directnsprobeunit01": {
+      "exitCode": 1,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        54192
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/directnsprobeunit01_process.json",
+        "sha256": "f48f0e62040819a1a5f4386b82bef8eeebbab833d1e803838dc2510a20f1b9e7",
+        "bytes": 208291
+      }
+    },
+    "directnsprobeunit02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        36684
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/directnsprobeunit02_process.json",
+        "sha256": "1bad660af54f0b0aa301607e274cf2ae05977505c8aff0cf452de1300233a08f",
+        "bytes": 208567
+      }
+    },
+    "riemannreservoirnewton01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        48732
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/riemannreservoirnewton01_process.json",
+        "sha256": "6ec5bc3fb2cb6602cb160f220f096675ee5419abd84fe0b0f0b3866f0bdb0ae5",
+        "bytes": 210802
+      }
+    },
+    "riemannreservoirui01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        9344
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/riemannreservoirui01_process.json",
+        "sha256": "006ac6a7bfafdf386a91b35c3a7b56bf80008b1bd73332414fecb982a0f39f46",
+        "bytes": 211268
+      }
+    }
+  },
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/boundarypath01_independent_boundary_path.json",
+      "sha256": "40141058f9eb9fd42013c0bf7cb24c43f7503ae2aad71bad94bb904aef5f2853",
+      "bytes": 2049,
+      "status": "passed-independent-full-legal-boundary-path-and-18-public-Riemann-reference-faces",
+      "processID": 58808
+    },
+    {
+      "path": "outputs/v83_validation/riemannreservoirunit02_independent_riemann_reservoir.json",
+      "sha256": "097fee40f3b943e0c728a8633fe3e3b8d655dc210f7d0659554a619b3b4e9de4",
+      "bytes": 2256,
+      "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+      "processID": 42180
+    },
+    {
+      "path": "outputs/v83_validation/riemannreservoirreal01_independent_riemann_reservoir.json",
+      "sha256": "d0a0146764ac6f67855b91ca9b3ea74f0b71c0d4e7b6e90cd0e709c2f4e84512",
+      "bytes": 2073,
+      "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+      "processID": 51664
+    },
+    {
+      "path": "outputs/v83_validation/directnsprobeunit02_independent_direct_ns_probe.json",
+      "sha256": "cd7ca61c5ece5dafa75b1a99b5a3f4e5e70abda4c27aaa2f0a9b4b64c7487384",
+      "bytes": 4084,
+      "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks",
+      "processID": 30224
+    },
+    {
+      "path": "outputs/v83_validation/krylov20_independent_riemann_reservoir.json",
+      "sha256": "86791aee4ad673eda55c10584b02c3962e07958e8bd19e1b68fbee68dd263f8f",
+      "bytes": 1571,
+      "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+      "processID": 56328
+    },
+    {
+      "path": "outputs/v83_validation/krylov20_independent_direct_ns_probe.json",
+      "sha256": "4ca586b05f786ce53f8dbd48184824b67e3b903d7eb6e66aafad6adc8fbb1cdb",
+      "bytes": 3037,
+      "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks",
+      "processID": 17328
+    },
+    {
+      "path": "outputs/v83_validation/krylov20_independent_newton_directions.json",
+      "sha256": "6d3fb41d50a90a336c8c537c17213b6052077ca439f8f8f41fed5db9f3215c19",
+      "bytes": 1034,
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 53644
+    },
+    {
+      "path": "outputs/v83_validation/workbench33/node_wall_velocity_summary.json",
+      "sha256": "6448dc02622acaed8bb6b13f47c886aa524d21b096d77d8b2c765d2381162994",
+      "bytes": 1121,
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "processID": 37956
+    },
+    {
+      "path": "outputs/v83_validation/workbench33/independent_wall_velocity_view.json",
+      "sha256": "dd28b9959d13cfb70c7a6d4b9b044b175f50fbdb26f7120787a85f698477ab56",
+      "bytes": 3334,
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+      "processID": 29392
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/boundarypath01/newton_boundary_path_evidence.mat",
+      "sha256": "c299d1bef60b24a4964f0efaa36908f943aa2bcf834bac6a552cf1414d67656f",
+      "bytes": 28637564
+    },
+    {
+      "path": "outputs/v83_validation/riemannreservoirunit01_fixture_failure.json",
+      "sha256": "e047a00fdf70cb7c29086b296509f9f44952a211dff906e86ab1c9d87eadb133",
+      "bytes": 811
+    },
+    {
+      "path": "outputs/v83_validation/riemannreservoirunit02/riemann_reservoir_unit_evidence.mat",
+      "sha256": "031c2cfc3cc9b46c0911c155342cb22e3e78123dbdc67d3da6525e92a8d8cf83",
+      "bytes": 144505
+    },
+    {
+      "path": "outputs/v83_validation/riemannreservoirreal01/riemann_reservoir_real_evidence.mat",
+      "sha256": "3036ce5c521e1a396eb770753711b13297be1cb4803f41465ff38c5b266047c8",
+      "bytes": 871087639
+    },
+    {
+      "path": "outputs/v83_validation/directnsprobeunit01_evidence_failure.json",
+      "sha256": "e744cd919c1e014827d970a8c44e2b8fc098502ef0a7054fd911a2f73fcf7423",
+      "bytes": 773
+    },
+    {
+      "path": "outputs/v83_validation/directnsprobeunit02/direct_ns_probe_unit_evidence.mat",
+      "sha256": "59d59be0e5c96cf87b3fd9a7976cbf11e0cba78435b076fa437f7bd00b400f76",
+      "bytes": 113165
+    },
+    {
+      "path": "outputs/v83_validation/directnsprobereal01/direct_ns_direction_probe.mat",
+      "sha256": "533a52eac6bd96e9d246fd0c456bedbc99181f2c41398d07a68c81f0e91c45e3",
+      "bytes": 57304077
+    },
+    {
+      "path": "outputs/v83_validation/krylov20/wall_velocity_krylov_evidence.mat",
+      "sha256": "bbf2b714dd146c102b7f31e93dc9287c73f7d6c0847e23a78042e654cad51e87",
+      "bytes": 865541251
+    },
+    {
+      "path": "outputs/v83_validation/workbench33/wall-velocity-study-data.json",
+      "sha256": "6e2efc5019587118d3b6c31b064aa415b86add9680d6c00288a0fe72af298cb3",
+      "bytes": 12664
+    },
+    {
+      "path": "outputs/v83_validation/workbench33/static_wall_velocity_comparison.png",
+      "sha256": "dafa6b1ef453ae3ddcec190d4707d956f4228d32779996b09a866b4a79349f95",
+      "bytes": 478576
+    },
+    {
+      "path": "outputs/v83_validation/workbench33/static_wall_velocity_residuals.png",
+      "sha256": "09c90d792afe1f03301a0a7e360b75343228ff25be50f5879ce083ded864b9cf",
+      "bytes": 43744
+    },
+    {
+      "path": "outputs/v83_validation/workbench33/static_wall_velocity_balance.png",
+      "sha256": "e0b2737892de9483673831f406e4bb4d722c35482d67a6fabf4b004a3cf3a840",
+      "bytes": 69363
+    }
+  ],
+  "boundaryRestriction": {
+    "status": "tested-original-characteristic-boundary-path-with-separate-exact-reservoir-diagnostic",
+    "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov19\\wall_velocity_krylov_evidence.mat",
+    "sourceSHA256": "d6972f5e894f5f8ab82a0d92b4139b6db0e371fb5fb7279396ce2fbde22360a8",
+    "boundaryFaces": 19752,
+    "trialDetails": [
+      {
+        "alpha": 0,
+        "sourceTrial": 0,
+        "failedBoundaryFaces": 0,
+        "firstFailure": {},
+        "acceptedByOriginalSolver": false,
+        "exactDiagnosticAttemptedFaces": 0,
+        "exactDiagnosticSucceeded": false,
+        "exactDiagnosticFailure": ""
+      },
+      {
+        "alpha": 0.00390625,
+        "sourceTrial": 9,
+        "failedBoundaryFaces": 7,
+        "firstFailure": {
+          "openFaceID": 800606,
+          "ownerCellID": 208046,
+          "sourceFacetID": 10526,
+          "layer": 11,
+          "boundaryName": "ymax",
+          "centroidM": [
+            -4.340507585628984,
+            -0.5044343371951497,
+            0.3471181337210593
+          ],
+          "cellNormalMach": 0.9996432378360477,
+          "acousticNormalMach": 1.0010498750679981,
+          "acousticSubsonicMarginMs": -0.31670503139594075,
+          "errorIdentifier": "RocketAeroHeat:NSDraft:CharacteristicRegime"
+        },
+        "acceptedByOriginalSolver": false,
+        "exactDiagnosticAttemptedFaces": 7,
+        "exactDiagnosticSucceeded": true,
+        "exactDiagnosticFailure": ""
+      },
+      {
+        "alpha": 0.001953125,
+        "sourceTrial": 10,
+        "failedBoundaryFaces": 4,
+        "firstFailure": {
+          "openFaceID": 800790,
+          "ownerCellID": 208230,
+          "sourceFacetID": 10710,
+          "layer": 11,
+          "boundaryName": "ymax",
+          "centroidM": [
+            -4.157018330412437,
+            -0.5046254121196027,
+            0.3468550820720549
+          ],
+          "cellNormalMach": 0.9997275728610401,
+          "acousticNormalMach": 1.000615581024811,
+          "acousticSubsonicMarginMs": -0.1857170444438907,
+          "errorIdentifier": "RocketAeroHeat:NSDraft:CharacteristicRegime"
+        },
+        "acceptedByOriginalSolver": false,
+        "exactDiagnosticAttemptedFaces": 4,
+        "exactDiagnosticSucceeded": true,
+        "exactDiagnosticFailure": ""
+      },
+      {
+        "alpha": 0.0009765625,
+        "sourceTrial": 11,
+        "failedBoundaryFaces": 2,
+        "firstFailure": {
+          "openFaceID": 800882,
+          "ownerCellID": 208322,
+          "sourceFacetID": 10802,
+          "layer": 11,
+          "boundaryName": "ymax",
+          "centroidM": [
+            -4.06527371792593,
+            -0.5047205620348015,
+            0.3467233121832411
+          ],
+          "cellNormalMach": 0.9999260532723823,
+          "acousticNormalMach": 1.0002813382157427,
+          "acousticSubsonicMarginMs": -0.08487885887950597,
+          "errorIdentifier": "RocketAeroHeat:NSDraft:CharacteristicRegime"
+        },
+        "acceptedByOriginalSolver": false,
+        "exactDiagnosticAttemptedFaces": 2,
+        "exactDiagnosticSucceeded": true,
+        "exactDiagnosticFailure": ""
+      },
+      {
+        "alpha": 0.00048828125,
+        "sourceTrial": 12,
+        "failedBoundaryFaces": 2,
+        "firstFailure": {
+          "openFaceID": 800974,
+          "ownerCellID": 208414,
+          "sourceFacetID": 10894,
+          "layer": 11,
+          "boundaryName": "ymax",
+          "centroidM": [
+            -3.973529105439417,
+            -0.5048157118541482,
+            0.3465915422285027
+          ],
+          "cellNormalMach": 0.9997959659233808,
+          "acousticNormalMach": 1.0000108769942535,
+          "acousticSubsonicMarginMs": -0.003281639714202811,
+          "errorIdentifier": "RocketAeroHeat:NSDraft:CharacteristicRegime"
+        },
+        "acceptedByOriginalSolver": false,
+        "exactDiagnosticAttemptedFaces": 2,
+        "exactDiagnosticSucceeded": true,
+        "exactDiagnosticFailure": ""
+      },
+      {
+        "alpha": 0.000244140625,
+        "sourceTrial": 13,
+        "failedBoundaryFaces": 2,
+        "firstFailure": {
+          "openFaceID": 800974,
+          "ownerCellID": 208414,
+          "sourceFacetID": 10894,
+          "layer": 11,
+          "boundaryName": "ymax",
+          "centroidM": [
+            -3.973529105439417,
+            -0.5048157118541482,
+            0.3465915422285027
+          ],
+          "cellNormalMach": 0.9999300286563053,
+          "acousticNormalMach": 1.0000374896163728,
+          "acousticSubsonicMarginMs": -0.011310866735698255,
+          "errorIdentifier": "RocketAeroHeat:NSDraft:CharacteristicRegime"
+        },
+        "acceptedByOriginalSolver": false,
+        "exactDiagnosticAttemptedFaces": 2,
+        "exactDiagnosticSucceeded": true,
+        "exactDiagnosticFailure": ""
+      },
+      {
+        "alpha": 0.0001220703125,
+        "sourceTrial": 14,
+        "failedBoundaryFaces": 1,
+        "firstFailure": {
+          "openFaceID": 800974,
+          "ownerCellID": 208414,
+          "sourceFacetID": 10894,
+          "layer": 11,
+          "boundaryName": "ymax",
+          "centroidM": [
+            -3.973529105439417,
+            -0.5048157118541482,
+            0.3465915422285027
+          ],
+          "cellNormalMach": 0.9999970550030958,
+          "acousticNormalMach": 1.0000507868391555,
+          "acousticSubsonicMarginMs": -0.015322778274139637,
+          "errorIdentifier": "RocketAeroHeat:NSDraft:CharacteristicRegime"
+        },
+        "acceptedByOriginalSolver": false,
+        "exactDiagnosticAttemptedFaces": 1,
+        "exactDiagnosticSucceeded": true,
+        "exactDiagnosticFailure": ""
+      },
+      {
+        "alpha": 6.103515625e-05,
+        "sourceTrial": 15,
+        "failedBoundaryFaces": 0,
+        "firstFailure": {},
+        "acceptedByOriginalSolver": true,
+        "exactDiagnosticAttemptedFaces": 0,
+        "exactDiagnosticSucceeded": false,
+        "exactDiagnosticFailure": ""
+      }
+    ],
+    "originalBoundaryGuardKept": true,
+    "allOriginalCellLegalCandidatesChecked": true,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 22508
+  },
+  "unit": {
+    "status": "passed-explicit-exact-3D-reservoir-sonic-path-legacy-complete-replay-and-small-NS-Newton",
+    "maximumUniformFluxError": 1.5816309772279843e-16,
+    "realLegacyRejectedFacesTested": 18,
+    "oldGuardRejectionsKept": 18,
+    "sonicContinuity": [
+      {
+        "machOffset": 0.001,
+        "relativeFluxJump": 0.00213528056090037
+      },
+      {
+        "machOffset": 0.0001,
+        "relativeFluxJump": 0.0002133526589817247
+      },
+      {
+        "machOffset": 1e-05,
+        "relativeFluxJump": 2.1333551095868806e-05
+      },
+      {
+        "machOffset": 1e-06,
+        "relativeFluxJump": 2.13333812972699e-06
+      }
+    ],
+    "invalidInputRejections": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "oldCompleteNSReplayed": true,
+    "smallSpatialConservationRelative": 6.555953095068482e-17,
+    "smallAcceptedUpdates": 1,
+    "smallActualNSCalls": 6,
+    "standaloneSmallNSCalls": 3,
+    "mainHistoricalNSCallsAppended": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 40000
+  },
+  "realSameQIntegration": {
+    "status": "tested-real-20deg-explicit-Riemann-reservoir-same-Q-complete-NS-and-formerly-rejected-candidate",
+    "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov19\\wall_velocity_krylov_evidence.mat",
+    "sourceSHA256": "d6972f5e894f5f8ab82a0d92b4139b6db0e371fb5fb7279396ce2fbde22360a8",
+    "oldCompleteNSReplayed": true,
+    "cellCount": 217272,
+    "sourceFaces": 19752,
+    "riemannReservoirFaces": 19752,
+    "sourceMaximumResidual": 4757759.238203716,
+    "newBoundaryMaximumResidual": 4757759.238203716,
+    "sourceRmsMerit": 521603.4791456535,
+    "newBoundaryRmsMerit": 521603.47914565343,
+    "sameQWallPressureAndHeatKept": true,
+    "spatialConservationRelative": 2.7514083673483753e-16,
+    "newBaselineElapsedSeconds": 15.5799066,
+    "candidateAlpha": 0.0001220703125,
+    "candidateOriginalError": "RocketAeroHeat:NSDraft:CharacteristicRegime",
+    "candidateNewFullNSPassed": true,
+    "candidateNewError": "",
+    "sameGoverningNSAndInteriorMethod": true,
+    "openBoundaryDiscretizationChanged": true,
+    "sourceHistoryAppended": false,
+    "separateLegacyReplayNSEvaluations": 1,
+    "newBoundaryActualNSEvaluations": 2,
+    "newFlowAcceptances": 0,
+    "physicalTimeAdvanced": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 25928
+  },
+  "currentDirectionProbe": {
+    "status": "tested-fresh-original-NS-direction-probe-with-explicit-current-boundary-and-complete-geometry",
+    "originalNSDirectionDefect": 0.037206520721944095,
+    "originalNSDirectionTarget": 0.1,
+    "originalNSDirectionTargetMet": true,
+    "normalizedMeritDerivative": -0.9994542599965609,
+    "physicalStateChanged": false,
+    "newFlowAcceptances": 0,
+    "newActualNSEvaluations": 2,
+    "coarseImageRequired": false,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 48732
+  },
+  "newBoundaryProblem": {
+    "status": "bounded-real-20deg-new-explicit-reservoir-boundary-NS-Newton-separate-history",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 1,
+    "priorAcceptedNonlinearIterations": 0,
+    "totalNewEquationAcceptedIterations": 1,
+    "candidateTrials": 9,
+    "residualEvaluations": 4,
+    "totalNewEquationResidualEvaluations": 4,
+    "initialMaximumResidual": 4757759.238203716,
+    "maximumResidual": 4739478.560940738,
+    "initialRmsMerit": 521603.47914565343,
+    "rmsMerit": 519444.27593809797,
+    "elapsedSeconds": 74.0841262,
+    "steadyConverged": false,
+    "stopReason": "maximum-nonlinear-iterations",
+    "spatialConservationRelative": 5.279539254802021e-16,
+    "steadyBoundaryFluxBalance": 0.010120937913419935,
+    "signedHeatPowerW": 923554.2475827932,
+    "wallHeatRangeWm2": [
+      -356491.504338173,
+      2256523.507023292
+    ],
+    "lineage": {
+      "sourceState": "krylov19-state-only-explicit-new-Riemann-reservoir-boundary",
+      "sourceHistoryAppended": false,
+      "newBoundaryProblemInitialCounter": 0,
+      "previousProblemAcceptancesNotAppended": 13,
+      "previousProblemNSNotAppended": 258,
+      "externalCFDImported": false,
+      "interiorEulerFlux": "exact-godunov",
+      "wallVelocityGradient": "dirichlet-tangent"
+    },
+    "wallVelocityGradient": "dirichlet-tangent",
+    "openBoundaryDiscretization": "exact-Riemann-reservoir",
+    "sameEquationHistoryContinued": false,
+    "sourceHistoryAppended": false,
+    "steadyInitialGuessReport": {
+      "sourceFile": "outputs/v83_validation/directnsprobereal01/direct_ns_direction_probe.mat",
+      "sourceVariant": "ns-probe",
+      "directionScale": 1,
+      "sourceFileSHA256": "533a52eac6bd96e9d246fd0c456bedbc99181f2c41398d07a68c81f0e91c45e3",
+      "sourceGeometryFile": "outputs/v80_validation/domain02/shell_domain_evidence.mat",
+      "sourceGeometryFileSHA256": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "sourceStateAndGeometryVerified": true,
+      "sourceSavedActualNSRelativeDefect": 0.037206520721944095,
+      "originalNSProbeArithmeticVerified": true,
+      "oldDerivativeReused": false,
+      "originalNSAcceptanceClaimed": false,
+      "newModelApplications": 0,
+      "newActualNSEvaluations": 0,
+      "coarseImageRequired": false
+    },
+    "steadyInitialGuessModelApplications": 1,
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 48732
+  },
+  "failures": [
+    {
+      "status": "failed-test-fixture-used-different-gas-for-real-near-sonic-boundary",
+      "actualMATLABExitCode": 1,
+      "sourceStable": true,
+      "engineProcessID": 46392,
+      "failureStage": "real legacy guard reproduction before small full NS or Newton",
+      "testGasR": 287,
+      "sourceGasR": 287.05287,
+      "cause": "The test used a canonical gas while replaying a saved real boundary whose normal Mach is within 3e-6 of sonic. The changed sound speed changed the old characteristic branch.",
+      "correction": "Use the saved real gas for all unit inputs and comparisons; retain the original boundary guard and all numerical targets.",
+      "sourceEpoch": "outputs/v83_validation/source_epochs/pre_riemann_real_gas_testNSRiemannReservoir3D.m",
+      "physicalAlgorithmChanged": false,
+      "newPhysicalQualificationClaimed": false
+    },
+    {
+      "status": "failed-direct-probe-generator-omitted-returned-Jv-from-saved-evidence",
+      "actualMATLABExitCode": 1,
+      "sourceStable": true,
+      "engineProcessID": 54192,
+      "oldCompleteDefaultReplayPassed": true,
+      "originalNSProbeDefect": 0.06391641737925151,
+      "probeActuallyPassedOriginalPointOne": true,
+      "failureStage": "strict loader required nsEvidence.value, which the raw derivative helper returns separately",
+      "correction": "Store the actual returned jv as nsEvidence.value; retain saved rates, step, direction, loader arithmetic and all acceptance conditions.",
+      "sourceEpoch": "outputs/v83_validation/source_epochs/pre_direct_probe_value_createRocketNSDirectionProbe.m",
+      "newFlowAcceptedByThisFailedTest": false,
+      "physicalAlgorithmOrGateChanged": false
+    }
+  ],
+  "workAccounting": {
+    "oldProblemAcceptedUpdates": 13,
+    "oldProblemActualNS": 258,
+    "newBoundaryProblemAcceptedUpdates": 1,
+    "newBoundaryProblemMainActualNS": 4,
+    "separateNewBoundaryDirectionProbeNS": 2,
+    "separateNewBoundarySameQAndCandidateNS": 2,
+    "separateOldBoundaryLegacyReplayNS": 1,
+    "oldAndNewHistoriesMerged": false,
+    "physicalTimeAdvanced": 0
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench33/index.html",
+    "allTenOriginalFacetFieldsVerified": true,
+    "newBoundaryMethodInFieldAlgorithmsAndSidebar": true,
+    "newProblemHistoryStartsAtZero": true,
+    "CSVValueRows": 592560,
+    "sectionSamples": 6624,
+    "sameHostEvents": 15,
+    "scientificPNGsActuallyInspected": 3,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "original20degQualifiedHeatAreaPercent": 66.5626327424,
+    "newProductionSolvedAreaM2": 0,
+    "regionalConvergenceOrPhysicalQualificationCompleted": false,
+    "latestFormalDeliveredVersion": 82,
+    "version83IsolatedCompleteEngineeringDelivery": false,
+    "goalStatus": "active"
+  },
+  "sourcePackaging": {
+    "verificationRecord": "outputs/v83_validation/riemann_research_package_verification.json",
+    "sourceSnapshotOnly": true,
+    "isolatedMATLABRecomputationClaimed": false,
+    "largeLocalResearchCheckpointsIncluded": false
+  },
+  "github": {
+    "head": "42601c9",
+    "committed": false,
+    "pushed": false
+  },
+  "nextAction": "Continue from actual krylov20 with its explicit new reservoir boundary and separate history. Recompute direction at Q20; the saved directnsprobereal01 belongs to Q19 and must not be reused as if current. Support a truthful current-state snapshot or explicitly tested result-field source in the direct probe generator/loader before continuation. Preserve original NS 0.1, 80-2000K, positivity, merit, steady and conservation gates. Do not repeat old C/F studies or claim full-area/physical qualification. Continue near-wall/grid/domain/boundary/property/turbulence/public physical validation and the unified workbench."
+}

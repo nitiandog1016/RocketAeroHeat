@@ -1,0 +1,1126 @@
+{
+  "version": 83,
+  "status": "tested-complete-F-global-LSQR-improved-but-unconverged-with-native-stop-repair-and-workbench",
+  "recordedUTC": "2026-10-25T20:12:58.764633+00:00",
+  "processID": 24224,
+  "priorProgress": {
+    "path": "docs/validation/v83/progress_restricted_overlap.json",
+    "sha256": "a466b4b524a25fe6352ea617b74fe6c064ee65fd7b182a650f8a0fb2463689f7",
+    "bytes": 33391
+  },
+  "previousGoalTurnClassification": "progress-restricted-overlap-closure-and-independent-output-weight-screening",
+  "currentGoalTurnClassification": "progress-connected-F-diagnosis-dense-adjoint-validation-real-LSQR-and-workbench",
+  "processes": {
+    "fullFlsqrunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        22232
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrunit01_process.json",
+        "sha256": "20a3c414de8c9104dcb17fcf3a4f7978a1b5415e49811f693af42ca17d721a21",
+        "bytes": 187408
+      }
+    },
+    "fullFlsqrreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        53836
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrreal01_process.json",
+        "sha256": "3bc8dc926984b1b031f3d6faeeba394dadfc725c3cc0e7750b70d24b89664bd1",
+        "bytes": 187659
+      }
+    },
+    "fullFlsqrunit02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        48772
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrunit02_process.json",
+        "sha256": "836e7fc50e9cdf8fa187d8e7d9294e51b4806216fcd56973d3786a9149a3b6d9",
+        "bytes": 188703
+      }
+    },
+    "fullFlsqrreal02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        43492
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrreal02_process.json",
+        "sha256": "0c5619164321cecc258f5786aa12d386a18b35385a95998def7fb4273341582f",
+        "bytes": 188953
+      }
+    },
+    "fullFlsqrui01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        31500
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrui01_process.json",
+        "sha256": "88ee36eefbe78931658ed50ce44fb89a2a5249bfb843b6574dfdf7b8a82ea130",
+        "bytes": 189455
+      }
+    }
+  },
+  "independentChecks": [
+    {
+      "report": {
+        "status": "passed-independent-all-small-F-local-inverse-transpose-columns-permutations-and-dense-LSQR",
+        "processID": 55528,
+        "cases": [
+          {
+            "allDenseMatrixRelativeDifferences": {
+              "F": 0.0,
+              "FT": 0.0,
+              "M": 0.0,
+              "MT": 0.0,
+              "permutedF": 0.0,
+              "permutedFT": 0.0
+            },
+            "fullFRelativeResidual": 5.7281950324525885e-11,
+            "solutionRelativeDifference": 1.9960058123341393e-09,
+            "actualNativeIterations": 40
+          },
+          {
+            "allDenseMatrixRelativeDifferences": {
+              "F": 0.0,
+              "FT": 0.0,
+              "M": 0.0,
+              "MT": 0.0,
+              "permutedF": 0.0,
+              "permutedFT": 0.0
+            },
+            "fullFRelativeResidual": 5.527767900516486e-11,
+            "solutionRelativeDifference": 1.967736051297865e-09,
+            "actualNativeIterations": 40
+          }
+        ],
+        "newActualNSEvaluations": 0,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs/v83_validation/fullFlsqrunit01/full_F_least_squares_unit_evidence.mat": "45d13006c3be98a8478079abc9686b5bf491be95417ac2db3662d69ccad29d76"
+        },
+        "scriptSHA256": "95626347ce31b3dacd0e87c5dcfcd2003f4c45ef4b6baf9aa7475a261ffbfbe2"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrunit01_independent_full_F_least_squares.json",
+        "sha256": "e607f8e7288ceff4d33bf99196dd38339943a8c749d589a4897b6d7efdd40886",
+        "bytes": 1197
+      }
+    },
+    {
+      "report": {
+        "status": "passed-independent-real-complete-F-LSQR-initial-final-image-and-fixed-C-parent-diagnostic",
+        "processID": 33268,
+        "finalFullFImageDifference": 0.0,
+        "parentOriginalCImageDifference": 0.0,
+        "initialRelativeFullFResidual": 0.278620811256874,
+        "finalRelativeFullFResidual": 0.27774898729519865,
+        "independentScipyPrototypeFResidual": 0.22476791086045772,
+        "identicalNativeIterationTrajectoryClaimed": false,
+        "fixedCParentOriginalCResidual": 9.638046228530957,
+        "FRowsSubmatrixConsistency": 3.9348141300542245e-15,
+        "fullFResidualImproved": true,
+        "fullFInternalTargetMet": false,
+        "actualNativeIterations": 1,
+        "nativeAdjointGatePassed": true,
+        "independentAllRealBidiagonalizationColumnsClaimed": false,
+        "originalFFCoefficientsAuditReusedByExactFileIdentity": true,
+        "oldApproximateSchurIdentityClaimed": false,
+        "newActualNSEvaluations": 0,
+        "newFlowAcceptances": 0,
+        "newProductionSolvedAreaM2": 0,
+        "physicalSolution": false,
+        "inputSHA256": {
+          "outputs/v83_validation/fullFlsqrreal01/full_F_least_squares_real_evidence.mat": "c3883265e2fe1f6c79289382ccb91990bb51bc56e9f314fe12374329c08f5d79",
+          "outputs/v83_validation/fullFreal01/full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04",
+          "outputs/v83_validation/fullFreal01/full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+          "outputs/v83_validation/blockilureal01/steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf"
+        },
+        "scriptSHA256": "f095a5b91b3a62762a3840e0836c817332256fa3ca3efb5e34cce522bf5d4874"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrreal01_independent_full_F_least_squares.json",
+        "sha256": "3259c01dbdaedac030b0d525ab5456c4b80cc3b2b2772d0242767bda43288ba6",
+        "bytes": 1674
+      }
+    },
+    {
+      "report": {
+        "status": "passed-independent-all-small-F-local-inverse-transpose-columns-permutations-and-dense-LSQR",
+        "processID": 1684,
+        "cases": [
+          {
+            "allDenseMatrixRelativeDifferences": {
+              "F": 0.0,
+              "FT": 0.0,
+              "M": 0.0,
+              "MT": 0.0,
+              "permutedF": 0.0,
+              "permutedFT": 0.0
+            },
+            "fullFRelativeResidual": 4.786937236996644e-13,
+            "solutionRelativeDifference": 2.177794336564492e-11,
+            "actualNativeIterations": 47
+          },
+          {
+            "allDenseMatrixRelativeDifferences": {
+              "F": 0.0,
+              "FT": 0.0,
+              "M": 0.0,
+              "MT": 0.0,
+              "permutedF": 0.0,
+              "permutedFT": 0.0
+            },
+            "fullFRelativeResidual": 6.903254636745942e-13,
+            "solutionRelativeDifference": 2.7512668896668294e-11,
+            "actualNativeIterations": 46
+          }
+        ],
+        "newActualNSEvaluations": 0,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs/v83_validation/fullFlsqrunit02/full_F_least_squares_unit_evidence.mat": "c1cfd9e49a338e58c76e237bc21f02fd563d678f408fb433f0164d63db336801"
+        },
+        "scriptSHA256": "f095a5b91b3a62762a3840e0836c817332256fa3ca3efb5e34cce522bf5d4874"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrunit02_independent_full_F_least_squares.json",
+        "sha256": "569d05a142f9fd661ff0f2e23ef6c8fd2f6109878214505dfd45a53a6c18b705",
+        "bytes": 1195
+      }
+    },
+    {
+      "report": {
+        "status": "passed-independent-real-complete-F-LSQR-initial-final-image-and-fixed-C-parent-diagnostic",
+        "processID": 49516,
+        "finalFullFImageDifference": 0.0,
+        "parentOriginalCImageDifference": 0.0,
+        "initialRelativeFullFResidual": 0.278620811256874,
+        "finalRelativeFullFResidual": 0.22716975000053172,
+        "independentScipyPrototypeFResidual": 0.22476791086045772,
+        "identicalNativeIterationTrajectoryClaimed": false,
+        "fixedCParentOriginalCResidual": 9.805767465147563,
+        "FRowsSubmatrixConsistency": 5.561511338741384e-15,
+        "fullFResidualImproved": true,
+        "fullFInternalTargetMet": false,
+        "actualNativeIterations": 32,
+        "nativeAdjointGatePassed": true,
+        "independentAllRealBidiagonalizationColumnsClaimed": false,
+        "originalFFCoefficientsAuditReusedByExactFileIdentity": true,
+        "oldApproximateSchurIdentityClaimed": false,
+        "newActualNSEvaluations": 0,
+        "newFlowAcceptances": 0,
+        "newProductionSolvedAreaM2": 0,
+        "physicalSolution": false,
+        "inputSHA256": {
+          "outputs/v83_validation/fullFlsqrreal02/full_F_least_squares_real_evidence.mat": "a314c618691376f6e285adb92a1f151c3f3a031b612ae7c283927da3bf70ca42",
+          "outputs/v83_validation/fullFreal01/full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04",
+          "outputs/v83_validation/fullFreal01/full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+          "outputs/v83_validation/blockilureal01/steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf"
+        },
+        "scriptSHA256": "f095a5b91b3a62762a3840e0836c817332256fa3ca3efb5e34cce522bf5d4874"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrreal02_independent_full_F_least_squares.json",
+        "sha256": "f2f742b01c99286d0b0a5f63d4fbd010403d3a72bbab4b94802f3f0b463d79d3",
+        "bytes": 1674
+      }
+    },
+    {
+      "report": {
+        "status": "passed-independent-eighteen-source-bound-rows-LSQR-applicability-and-unchanged-facet-data",
+        "processID": 58304,
+        "researchRows": 18,
+        "previousSeventeenRowsExactlyPreserved": true,
+        "originalTenFieldsAndNSHistoryUnchanged": true,
+        "originalFAndParentCNormsKeptDistinct": true,
+        "LSQRNotLabeledAsArnoldi": true,
+        "allThreeFalseSourceOrQualificationExportsRejected": true,
+        "sourceFacetPayload": [
+          {
+            "path": "outputs/v83_validation/workbench28/cases/legacy-wall-source/results.json",
+            "sha256": "5c048e7c893dc4c67064656bde19b17419e0ed6b742f893f0e63bf24db25d04f",
+            "bytes": 9047228
+          },
+          {
+            "path": "outputs/v83_validation/workbench28/cases/legacy-wall-source/case-data.js",
+            "sha256": "60cfa644b4ad13d70e9591bd40b6417281801a46698df5688100d62d06bf381c",
+            "bytes": 9047249
+          },
+          {
+            "path": "outputs/v83_validation/workbench28/cases/constrained-wall-baseline/results.json",
+            "sha256": "7bd40b17d235011f19be08c8b856f1854eb078bbf9592fa9969557d283a89f5f",
+            "bytes": 9047209
+          },
+          {
+            "path": "outputs/v83_validation/workbench28/cases/constrained-wall-baseline/case-data.js",
+            "sha256": "780da22265a80f0e26a55e79f66138a48a1722d38a730dd3de111eb6402f9197",
+            "bytes": 9047230
+          },
+          {
+            "path": "outputs/v83_validation/workbench28/cases/constrained-wall-krylov/results.json",
+            "sha256": "b946336d02ea4a81384ba9ff4bf13828e0910bb2ba399b27c48feccd2bcd37b2",
+            "bytes": 9060905
+          },
+          {
+            "path": "outputs/v83_validation/workbench28/cases/constrained-wall-krylov/case-data.js",
+            "sha256": "8140318bfa34e28df8dd8320ee5c4541c216addfa533b4925087d3b8ae0c2d57",
+            "bytes": 9060926
+          }
+        ],
+        "previousFullMATFieldAuditReusedByByteIdentity": true,
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "newActualNSEvaluations": 0,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs/v83_validation/blockilufailurediag01/arnoldi_failure_evidence.mat": "b4c42808fd960db0b827daba4450054724f25b2ea6b7d9306965d7a42a282319",
+          "outputs/v83_validation/scaledilureal01/scaled_arnoldi_failure_evidence.mat": "ecc4dc36726284411c601f2f12058caecce4bc5edcaa76cd0684350d25626fd1",
+          "outputs/v83_validation/blockfillreal01/scaled_arnoldi_failure_evidence.mat": "46f4a5065956e9977037ac39a2b8419c6a1687d44a5edf712eeb7cd196656938",
+          "outputs/v83_validation/floworderfactor01/flow_ordering_actions_evidence.mat": "ae8819df3a2ad68544ac54b23285ca10347c333b74a3a05704e074afb2747856",
+          "outputs/v83_validation/schurcheckpointreal01/schur_failure_checkpoint_summary.json": "5c353f08b38934a3b410b1d25f7bda555f3be47c86faa37f61fa484db2913d0d",
+          "outputs/v83_validation/pivotedschurreal02/pivoted_schur_real_summary.json": "4efe6d754c844452f9b55adb98602be37fd6eaa25a54abd403dba474c1e306f5",
+          "outputs/v83_validation/schurscalereal01/agent_stop_record.json": "f4b4a0e160bca5a8e15233be3e0cb963fe3f1956665ad4c26e863b373c87a67a",
+          "outputs/v83_validation/consistentdiagrefine01/consistent_schur_real_summary.json": "e08f3e895c392f08e14e4c6bee449c4fca9f60e2e2f6c0a716c109f316307865",
+          "outputs/v83_validation/momentumlinereport02/momentum_lines_real_summary.json": "98bb9ebbac1488f46bfcfaf3df613f79ae65f8622e6434b9dbc752ea44c4d199",
+          "outputs/v83_validation/rowmomentumreal01/row_momentum_real_summary.json": "a9c9164c35274e6b1da9ddb28df21fb45186263890ca7981d17dd9d6c73e2024",
+          "outputs/v83_validation/coupledpatchreal01/coupled_patch_real_summary.json": "cd98962666455ef04579c660f08f48634179061d2730c25e9255fea35046145a",
+          "outputs/v83_validation/patchhierarchyreal01/patch_hierarchy_real_summary.json": "8fc26436d44cbb2773678da4577acd71fd79a8c23b715bc0bc5859180c23a978",
+          "outputs/v83_validation/spatialreductionreal01/spatial_reduction_real_summary.json": "ff69d3ac21c47cdd5fa4897b8bd88d517f578900c1b8a608401b57d227454173",
+          "outputs/v83_validation/spatialschurreal01/spatial_schur_krylov_summary.json": "b41f5f37a906b220e51dedce58479c86d8020c4105dcc05e4921702bccbb17e8",
+          "outputs/v83_validation/fullFreal01/full_F_real_summary.json": "775eb8d9732c69b8a29fa298193b7afca7b6e6f0e768eff4e48105e9683021ac",
+          "outputs/v83_validation/fullFstrengthreal02/full_F_strength_summary.json": "9b1299dfe9decd6b28647cb00809c92194573904a99d7082f17c9117e363f8bd",
+          "outputs/v83_validation/overlapFreal01/restricted_overlap_summary.json": "8906b47033c05a5481e62634bd9f4a8d9d8410f051a26383105bf245b7f9bf0c",
+          "outputs/v83_validation/fullFlsqrreal02/full_F_least_squares_summary.json": "b635ab03955dd35d93cf36fe5321f6d0c01b134e2d2a1983c9bfc416aa2f4d86"
+        },
+        "scriptSHA256": "0f0d626db4b66bf8936ee40543fb15876de0a07c2b5f41301e2985bb626bc029"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/workbench28/independent_full_F_least_squares_study_view.json",
+        "sha256": "75ccd61a40e1d50695a3b85b67d517236839d386962b4dc9468feefd7e5db429",
+        "bytes": 4740
+      }
+    },
+    {
+      "report": {
+        "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+        "processID": 58592,
+        "cases": 3,
+        "sourceFaces": 19752,
+        "CSVrows": 592560,
+        "sectionSamples": 6624,
+        "sameHostEvents": 15,
+        "linearDiagnosticRows": 1,
+        "candidateDiagnosticRows": 0,
+        "sourceSHA256": {
+          "tests\\testRocketWallVelocityWorkbench.js": "17def13f0f53531ebabe98dc03c7a6d5fcab4713144fe9fceafcf63044ae2d56",
+          "outputs\\v83_validation\\workbench28\\rocket-wall-velocity.js": "ce1a291ac0fc96321728c37896736c450943643bcc7b1592d484973198b3f9cd",
+          "outputs\\v83_validation\\workbench28\\index.html": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+          "web\\viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+          "web\\export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+          "web\\section.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c"
+        },
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "newProductionSolvedAreaM2": 0,
+        "dataSHA256": "4a3bcfe795ef1068d60f8419c4ce60bb23440e21f377deae101ba1e215c841ac"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/workbench28/node_wall_velocity_summary.json",
+        "sha256": "6cbf0b53b06406925fabdf02827a5aefadcb7f1e7b19a7132b5cf0a93fcf5882",
+        "bytes": 1121
+      }
+    }
+  ],
+  "independentPrototypeAndColorScreening": [
+    {
+      "report": {
+        "status": "tested-independent-dense-multicolor-F-symmetric-block-sweep-and-real-action-screening",
+        "processID": 58220,
+        "recordedUTC": "2026-10-25T19:52:08.715023+00:00",
+        "smallReferences": [
+          {
+            "denseTriangularRelativeDifference": 7.092502928240629e-16,
+            "linearityRelativeDifference": 8.808537777611875e-16,
+            "colors": 3,
+            "fullFRelativeResidual": 0.0017385148185545302,
+            "zeroRHSExactlyZero": true
+          },
+          {
+            "denseTriangularRelativeDifference": 6.770251244987869e-16,
+            "linearityRelativeDifference": 7.505046118395885e-16,
+            "colors": 3,
+            "fullFRelativeResidual": 0.001738514818554545,
+            "zeroRHSExactlyZero": true
+          }
+        ],
+        "groupGraph": {
+          "groups": 28902,
+          "crossGroupOriginalBlocks": 682056,
+          "colorCount": 7,
+          "maximumGroupNeighbourDegree": 23,
+          "strongComponents": 1,
+          "largestStrongComponentGroups": 28902,
+          "allOriginalCrossGroupEdgesConnectDifferentColors": true,
+          "groupOrder": "descending-exact-group-degree-then-frozen-factor-group-index"
+        },
+        "remaining": {
+          "bestSavedFullFResidual": 0.278620811256874,
+          "remainingLayerSquaredNormFractions": [
+            0.04295170688996566,
+            0.10419415872276278,
+            0.01008823309309315,
+            0.7770584123400538,
+            0.06528534322856985,
+            0.000403326880906604,
+            1.368114107232432e-05,
+            2.777913679528238e-06,
+            1.3578963289772822e-06,
+            7.077169718530383e-07,
+            2.94176593795369e-07
+          ],
+          "remainingEquationSquaredNormFractions": [
+            0.3140455824184709,
+            0.2413810009405498,
+            0.030236137895037322,
+            0.04000767931956586,
+            0.37432959942637634
+          ],
+          "top64OriginalCVsOneBased": [
+            78798,
+            78797,
+            39329,
+            78511,
+            78760,
+            19576,
+            78763,
+            78833,
+            78762,
+            78723,
+            78452,
+            78937,
+            19577,
+            78883,
+            78938,
+            78919,
+            75790,
+            78909,
+            39173,
+            78746,
+            78921,
+            78761,
+            39293,
+            39317,
+            39330,
+            78918,
+            78250,
+            78720,
+            78785,
+            78721,
+            78868,
+            78583,
+            78834,
+            78920,
+            78933,
+            78950,
+            78566,
+            78800,
+            78722,
+            78680,
+            78471,
+            78784,
+            19578,
+            39296,
+            77986,
+            78931,
+            78799,
+            78582,
+            39393,
+            78869,
+            39364,
+            39406,
+            78865,
+            78884,
+            39365,
+            78898,
+            19541,
+            39219,
+            78718,
+            39221,
+            19542,
+            78896,
+            39258,
+            78527
+          ],
+          "top64OriginalFacesOneBased": [
+            19542,
+            19541,
+            19577,
+            19255,
+            19504,
+            19576,
+            19507,
+            19577,
+            19506,
+            19467,
+            19196,
+            19681,
+            19577,
+            19627,
+            19682,
+            19663,
+            16534,
+            19653,
+            19421,
+            19490,
+            19665,
+            19505,
+            19541,
+            19565,
+            19578,
+            19662,
+            18994,
+            19464,
+            19529,
+            19465,
+            19612,
+            19327,
+            19578,
+            19664,
+            19677,
+            19694,
+            19310,
+            19544,
+            19466,
+            19424,
+            19215,
+            19528,
+            19578,
+            19544,
+            18730,
+            19675,
+            19543,
+            19326,
+            19641,
+            19613,
+            19612,
+            19654,
+            19609,
+            19628,
+            19613,
+            19642,
+            19541,
+            19467,
+            19462,
+            19469,
+            19542,
+            19640,
+            19506,
+            19271
+          ],
+          "top64LayersOneBased": [
+            4,
+            4,
+            2,
+            4,
+            4,
+            1,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            1,
+            4,
+            4,
+            4,
+            4,
+            4,
+            2,
+            4,
+            4,
+            4,
+            2,
+            2,
+            2,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            1,
+            2,
+            4,
+            4,
+            4,
+            4,
+            2,
+            4,
+            2,
+            2,
+            4,
+            4,
+            2,
+            4,
+            1,
+            2,
+            4,
+            2,
+            1,
+            4,
+            2,
+            4
+          ],
+          "top64SquaredNormFraction": 0.4761448664395931,
+          "top64DistinctOriginalGroups": 50
+        },
+        "actionComparisons": [
+          {
+            "residualRecomputations": 14,
+            "finalImageEvaluations": 1,
+            "maximumPartialDirectionNorm": 106013.56504010365,
+            "relativeResidual": 16.583292739847145,
+            "rhs": "original-F-RHS",
+            "optimalSingleStep": {
+              "coefficient": 0.0038606465487731213,
+              "relativeResidual": 0.997940018104263
+            }
+          },
+          {
+            "residualRecomputations": 14,
+            "finalImageEvaluations": 1,
+            "maximumPartialDirectionNorm": 642938.2107527852,
+            "relativeResidual": 370.60777706395936,
+            "rhs": "best-old-32-step-F-residual",
+            "optimalSingleStep": {
+              "coefficient": 2.6078268302119335e-06,
+              "relativeResidual": 0.9999995329581809
+            }
+          }
+        ],
+        "topologyFile": "outputs/v83_validation/fullFcolorscreen01/full_F_color_topology.mat",
+        "topologySHA256": "97c38766241c25e533da39bf02822ff0ef290ea1891b608511e6fceccc1c0ff3",
+        "fixedMap": true,
+        "allFiveConservativeFieldsRetained": true,
+        "newLocalInverseConstructions": 0,
+        "newKrylovSolves": 0,
+        "originalCOrSchurIdentityClaimed": false,
+        "physicalStateChanged": false,
+        "newSelectedJApplications": 0,
+        "newActualNSEvaluations": 0,
+        "newFlowAcceptances": 0,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs/v83_validation/overlapFunit01/restricted_overlap_unit_evidence.mat": "96460ed6e5dac593998483b8d3446455a8f7b809970b9ef28fbf3d4b96823d26",
+          "outputs/v83_validation/fullFreal01/full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+          "outputs/v83_validation/spatialreductionreal01/spatial_reduction_assembly_evidence.mat": "b04c5c8d604c52c9289ce5d08127270a41c31322eef5ac44cd0fda4ebc0c76ca",
+          "outputs/v83_validation/fullFreal01/full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04"
+        },
+        "processPeakMemoryClaimed": false,
+        "scriptSHA256": "ad3173a79ecde4e009d991d469a6b4a847ebacd64acd4e42ae02e4722b8fc763"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/fullFcolorscreen01/full_F_color_screen_summary.json",
+        "sha256": "4867bd787d265120ad22ac143288b662eeb5b424ab33d988c9277ea7a627418c",
+        "bytes": 6380
+      }
+    },
+    {
+      "report": {
+        "status": "tested-independent-full-F-forward-adjoint-and-bounded-right-preconditioned-LSQR-screen",
+        "processID": 48816,
+        "recordedUTC": "2026-10-25T19:56:19.352462+00:00",
+        "smallReferences": [
+          {
+            "adjointIdentityDifference": 1.308697640342071e-16,
+            "denseSolutionRelativeDifference": 8.081948572992395e-13,
+            "fullFRelativeResidual": 5.929505011497933e-13,
+            "iterations": 47,
+            "zeroRHSExactlyZero": true
+          },
+          {
+            "adjointIdentityDifference": 1.308697640342071e-16,
+            "denseSolutionRelativeDifference": 8.105199537766912e-13,
+            "fullFRelativeResidual": 5.939934185977833e-13,
+            "iterations": 47,
+            "zeroRHSExactlyZero": true
+          }
+        ],
+        "method": "LSQR on exact A_FF times certified original within-patch inverse; adjoint is M_F^T A_FF^T",
+        "realAdjointIdentityDifference": 2.569152637884434e-17,
+        "maximumBidiagonalizationSteps": 32,
+        "originalSavedFullFResidual": 0.27862081125687577,
+        "optimalAdjointGradientStepOnSavedRemaining": 0.996870930216084,
+        "finalRelativeFullFResidual": 0.22476791086045772,
+        "relativeCorrectionEquationResidual": 0.8067161596670248,
+        "fullFInternalTargetMet": false,
+        "nativeStopCode": 7,
+        "actualIterations": 32,
+        "nativeResidualNorm": 665039013.2952822,
+        "nativeNormalResidualNorm": 863442725313.2465,
+        "nativeEstimatedCondition": 5869.363837110286,
+        "solverApplications": {
+          "F": 32,
+          "FT": 33,
+          "M": 32,
+          "MT": 33
+        },
+        "totalCompositeApplications": {
+          "F": 35,
+          "FT": 35,
+          "M": 35,
+          "MT": 35
+        },
+        "separateOriginalFImageEvaluations": 2,
+        "separateFinalLocalMapApplications": 1,
+        "newLocalInverseConstructions": 0,
+        "nativeGMRESArnoldiColumnChecksClaimed": false,
+        "independentAllRealBidiagonalizationColumnsClaimed": false,
+        "originalCOrSchurIdentityClaimed": false,
+        "matlabProductionSolverModified": false,
+        "physicalStateChanged": false,
+        "newSelectedJApplications": 0,
+        "newActualNSEvaluations": 0,
+        "newFlowAcceptances": 0,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs/v83_validation/overlapFunit01/restricted_overlap_unit_evidence.mat": "96460ed6e5dac593998483b8d3446455a8f7b809970b9ef28fbf3d4b96823d26",
+          "outputs/v83_validation/fullFreal01/full_F_real_evidence.mat": "1bf2bfef8fd8f5641f0e2441ab358991b553cd3a5ab77c3a96d15a3bf4b576d5",
+          "outputs/v83_validation/spatialreductionreal01/spatial_reduction_assembly_evidence.mat": "b04c5c8d604c52c9289ce5d08127270a41c31322eef5ac44cd0fda4ebc0c76ca",
+          "outputs/v83_validation/fullFreal01/full_F_graph_evidence.mat": "b8ac74781499c0054ea49af77f3bad41f6ae6600dea9045264bba0230c5e4a04"
+        },
+        "processPeakMemoryClaimed": false,
+        "scriptSHA256": "8629f44182332ef37523fe2a93e38e4a54febb8288f031a487f12d1bbb4dc024"
+      },
+      "receipt": {
+        "path": "outputs/v83_validation/fullFlsqrscreen01/full_F_lsqr_screen_summary.json",
+        "sha256": "7ec1a0f1b2a15b994017e1dfe6aa355447ab6f4632e402212b2c5341cc0309f6",
+        "bytes": 2807
+      }
+    }
+  ],
+  "retainedNormalEquationEarlyStop": {
+    "summary": {
+      "status": "tested-real-bounded-complete-F-LSQR-with-fixed-C-parent-diagnostic",
+      "sourceBinding": {
+        "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+        "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+        "allFiveConservativeFields": true,
+        "sameQOnly": true,
+        "physicalStateChanged": false
+      },
+      "sourceIdentity": {
+        "applyRocketPackedGraphTranspose": "a8c6279b89d20ee504f23d6a5284d12f060d46773bdef53a8bff8ac72f4256a3",
+        "solveRocketSpatialFBlocksTranspose": "1499b3e64b1dea246b96087a6bfd8f0c0a30e7e7e5e733a5ff8586794400b545",
+        "solveRocketFullFLeastSquares": "453ebaf0045c1cc0183b1ea6b252e50527a26848dbf95d1abff7a52367da8181",
+        "applyRocketPackedGraph": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+        "solveRocketSpatialFBlocks": "69310841a85f0ca8386c4f5867a380d1300e798cd5fffe6b249cbd693a440e3f"
+      },
+      "fullFReport": {
+        "method": "bounded-LSQR-on-exact-A_FF-times-certified-fixed-M_F",
+        "options": {
+          "maximumIterations": 32,
+          "relativeTolerance": 0.001,
+          "adjointIdentityTolerance": 1e-08
+        },
+        "initialRelativeFullFResidual": 0.27862081125690186,
+        "relativeFullFResidual": 0.277748987295225,
+        "fullFInternalTargetMet": false,
+        "nativeFlag": 0,
+        "nativeRelativeCorrectionResidual": 0.9968709302160872,
+        "nativeIterations": 1,
+        "nativeToleranceRelativeToCorrectionRHS": 0.0035891073444544374,
+        "nativeResidualHistory": [
+          824377949.2025404,
+          821798413.0711668
+        ],
+        "nativeLeastSquaresHistory": [
+          65164188.05677141,
+          1300474.6021820337
+        ],
+        "adjointIdentityRelativeDifference": 2.924539028944515e-17,
+        "totalDirectionReconstructionDifference": 1.7643748707660516e-14,
+        "operatorApplications": {
+          "F": 6,
+          "FT": 3,
+          "M": 4,
+          "MT": 3
+        },
+        "nativeSolverApplications": {
+          "F": 2,
+          "FT": 2,
+          "M": 2,
+          "MT": 2
+        },
+        "compositeApplications": {
+          "forward": 3,
+          "transpose": 3
+        },
+        "elapsedSeconds": 6.1871244,
+        "fullFOperatorIncludesCrossPatchBlocks": true,
+        "baseLocalFMapFixedLinear": true,
+        "innerSolveFixedLinearMapClaimed": false,
+        "originalCOrNSConvergenceClaimed": false,
+        "oldApproximateSchurIdentityReplaced": false,
+        "nativeGMRESArnoldiColumnChecksClaimed": false,
+        "independentAllRealBidiagonalizationColumnsClaimed": false,
+        "physicalSolution": false,
+        "newActualNSEvaluations": 0,
+        "newProductionSolvedAreaM2": 0
+      },
+      "parentDiagnostic": {
+        "relativeParentOriginalCResidual": 9.638046228530845,
+        "FRowsRelativeToOriginalRHS": 7.604540737365328,
+        "CRowsRelativeToOriginalRHS": 5.921393018290697,
+        "FRowsSubmatrixConsistency": 3.93481413005738e-15
+      },
+      "separateBaselineReplayFApplications": 1,
+      "separateFinalDiagnosticFApplications": 1,
+      "originalCDiagnosticApplications": 1,
+      "newLocalInverseConstructions": 0,
+      "newApproximateSchurAssemblies": 0,
+      "newSelectedJApplications": 0,
+      "newActualNSEvaluations": 0,
+      "newFlowAcceptances": 0,
+      "newProductionSolvedAreaM2": 0,
+      "physicalSolution": false,
+      "engineProcessID": 53836
+    },
+    "receipt": {
+      "path": "outputs/v83_validation/fullFlsqrreal01/full_F_least_squares_summary.json",
+      "sha256": "e18ee049d823f9e1d4b8675800ad364fe85c9ed51c0850ae581e8514b541f7de",
+      "bytes": 2722
+    },
+    "nativeFlagZeroNotUsedAsFullFConvergence": true,
+    "oldEvidenceOverwritten": false
+  },
+  "retainedAuditPathFailure": {
+    "status": "retained-independent-audit-relative-path-error",
+    "driverExitCode": 1,
+    "reason": "Frozen graphFile is project-relative; audit called relative_to absolute ROOT without first resolving it.",
+    "numericMATLABRunExitCode": 0,
+    "numericalEvidenceRecomputed": false,
+    "sources": [
+      {
+        "path": "outputs\\v83_validation\\source_epochs\\pre_lsqraudit_relative_path.py",
+        "sha256": "95626347ce31b3dacd0e87c5dcfcd2003f4c45ef4b6baf9aa7475a261ffbfbe2"
+      },
+      {
+        "path": "outputs\\v83_validation\\source_epochs\\pre_lsqr_normal_stop_solveRocketFullFLeastSquares.m",
+        "sha256": "453ebaf0045c1cc0183b1ea6b252e50527a26848dbf95d1abff7a52367da8181"
+      },
+      {
+        "path": "outputs\\v83_validation\\source_epochs\\pre_lsqr_normal_stop_testRocketFullFLeastSquares.m",
+        "sha256": "576db51507c9afa694b7cea4b6d0719f93d738bd346b593e0bf08b4c96b1e847"
+      }
+    ]
+  },
+  "retainedAuditPathFailureReceipt": {
+    "path": "outputs/v83_validation/fullFlsqrreal01_audit_path_failure.json",
+    "sha256": "cdc9e13f5ecaec2fc076dfb106b64774c15a4a089cd5f316fb009749789d2a49",
+    "bytes": 914
+  },
+  "currentRealSummary": {
+    "status": "tested-real-bounded-complete-F-LSQR-with-fixed-C-parent-diagnostic",
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "allFiveConservativeFields": true,
+      "sameQOnly": true,
+      "physicalStateChanged": false
+    },
+    "sourceIdentity": {
+      "applyRocketPackedGraphTranspose": "a8c6279b89d20ee504f23d6a5284d12f060d46773bdef53a8bff8ac72f4256a3",
+      "solveRocketSpatialFBlocksTranspose": "1499b3e64b1dea246b96087a6bfd8f0c0a30e7e7e5e733a5ff8586794400b545",
+      "solveRocketFullFLeastSquares": "b90a446df82b795adde1ec4f8dc58a6567228f6b1136f37235c168b52a841d8d",
+      "applyRocketPackedGraph": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+      "solveRocketSpatialFBlocks": "69310841a85f0ca8386c4f5867a380d1300e798cd5fffe6b249cbd693a440e3f"
+    },
+    "fullFReport": {
+      "method": "bounded-LSQR-on-exact-A_FF-times-certified-fixed-M_F",
+      "options": {
+        "maximumIterations": 32,
+        "relativeTolerance": 0.001,
+        "adjointIdentityTolerance": 1e-08
+      },
+      "initialRelativeFullFResidual": 0.27862081125690186,
+      "relativeFullFResidual": 0.22716975000054163,
+      "fullFInternalTargetMet": false,
+      "nativeFlag": 1,
+      "nativeRelativeCorrectionResidual": 0.8153366181700639,
+      "nativeIterations": 32,
+      "nativeToleranceRelativeToCorrectionRHS": 1e-12,
+      "nativeResidualHistory": [
+        824377949.2025404,
+        821798413.0711668,
+        817546109.3648151,
+        808154823.2036558,
+        801964452.5742165,
+        801947226.4422865,
+        801812374.702501,
+        800606945.4101783,
+        798486054.4525135,
+        793880742.132883,
+        793827004.7032545,
+        791999777.6961501,
+        779932869.4184035,
+        778587604.5862045,
+        776840508.7828931,
+        776837747.7446629,
+        775202039.9474193,
+        767788851.5007439,
+        759818664.583437,
+        759803156.7494015,
+        754241021.7310371,
+        752037166.8791224,
+        723504934.728307,
+        723460913.8495202,
+        712072405.3744894,
+        708449929.1919622,
+        693630892.5774533,
+        693550128.8596362,
+        693154318.8373345,
+        677900439.7699616,
+        675712786.8094934,
+        672181971.668529,
+        672145529.196772
+      ],
+      "nativeLeastSquaresHistory": [
+        65164188.05677141,
+        1300474.6021820337,
+        3098192.821548044,
+        4182790.0074695796,
+        472800.153241074,
+        3481784.7638452314,
+        314812.4418054558,
+        937683.3044666066,
+        1358063.1406030476,
+        1065431.2589663498,
+        5176700.31315348,
+        904498.0709143521,
+        785451.9728432056,
+        587657.0832937732,
+        525918.3421972219,
+        919442.9515937207,
+        322069.69486488047,
+        390801.9072962567,
+        367836.95775693696,
+        2139563.143885072,
+        1264352.3800874604,
+        279036.10913869546,
+        200922.98263638266,
+        3241778.19158864,
+        1241657.699560985,
+        212386.76348240688,
+        242764.6660554888,
+        3635037.8721747906,
+        341735.21462328784,
+        774423.4293442712,
+        260624.45410376618,
+        2380789.6970923054
+      ],
+      "nativeStoppingPolicy": "strict-internal-tolerance-original-F-total-residual-is-acceptance-gate",
+      "adjointIdentityRelativeDifference": 2.924539028944515e-17,
+      "totalDirectionReconstructionDifference": 1.6773720674100816e-14,
+      "operatorApplications": {
+        "F": 36,
+        "FT": 34,
+        "M": 34,
+        "MT": 34
+      },
+      "nativeSolverApplications": {
+        "F": 32,
+        "FT": 33,
+        "M": 32,
+        "MT": 33
+      },
+      "compositeApplications": {
+        "forward": 33,
+        "transpose": 34
+      },
+      "elapsedSeconds": 43.1551975,
+      "fullFOperatorIncludesCrossPatchBlocks": true,
+      "baseLocalFMapFixedLinear": true,
+      "innerSolveFixedLinearMapClaimed": false,
+      "originalCOrNSConvergenceClaimed": false,
+      "oldApproximateSchurIdentityReplaced": false,
+      "nativeGMRESArnoldiColumnChecksClaimed": false,
+      "independentAllRealBidiagonalizationColumnsClaimed": false,
+      "physicalSolution": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "parentDiagnostic": {
+      "relativeParentOriginalCResidual": 9.805767465147738,
+      "FRowsRelativeToOriginalRHS": 6.2197224731552065,
+      "CRowsRelativeToOriginalRHS": 7.580773571178924,
+      "FRowsSubmatrixConsistency": 5.561511338737916e-15
+    },
+    "separateBaselineReplayFApplications": 1,
+    "separateFinalDiagnosticFApplications": 1,
+    "originalCDiagnosticApplications": 1,
+    "newLocalInverseConstructions": 0,
+    "newApproximateSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 43492
+  },
+  "currentRealSummaryReceipt": {
+    "path": "outputs/v83_validation/fullFlsqrreal02/full_F_least_squares_summary.json",
+    "sha256": "b635ab03955dd35d93cf36fe5321f6d0c01b134e2d2a1983c9bfc416aa2f4d86",
+    "bytes": 4086
+  },
+  "codeSourceIdentity": [
+    {
+      "path": "internalFlow/cutCell/applyRocketPackedGraphTranspose.m",
+      "sha256": "a8c6279b89d20ee504f23d6a5284d12f060d46773bdef53a8bff8ac72f4256a3",
+      "bytes": 1302
+    },
+    {
+      "path": "internalFlow/cutCell/solveRocketSpatialFBlocksTranspose.m",
+      "sha256": "1499b3e64b1dea246b96087a6bfd8f0c0a30e7e7e5e733a5ff8586794400b545",
+      "bytes": 1072
+    },
+    {
+      "path": "internalFlow/cutCell/solveRocketFullFLeastSquares.m",
+      "sha256": "b90a446df82b795adde1ec4f8dc58a6567228f6b1136f37235c168b52a841d8d",
+      "bytes": 5920
+    },
+    {
+      "path": "tests/screenRocketFullFColorSweep.py",
+      "sha256": "ad3173a79ecde4e009d991d469a6b4a847ebacd64acd4e42ae02e4722b8fc763",
+      "bytes": 11545
+    },
+    {
+      "path": "tests/screenRocketFullFLeastSquares.py",
+      "sha256": "8629f44182332ef37523fe2a93e38e4a54febb8288f031a487f12d1bbb4dc024",
+      "bytes": 9014
+    },
+    {
+      "path": "tests/testRocketFullFLeastSquares.m",
+      "sha256": "5ec0bccc956c2dfa6323336ec0ae7e4426a5e93d0d5da46fe430489812652e6e",
+      "bytes": 4023
+    },
+    {
+      "path": "tests/studyRocketFullFLeastSquares.m",
+      "sha256": "7f2485f923e35181d6e7f70eef67d4e14bae1cd7cf1147c99e39fc60c3e400af",
+      "bytes": 3998
+    },
+    {
+      "path": "tests/auditRocketFullFLeastSquares.py",
+      "sha256": "f095a5b91b3a62762a3840e0836c817332256fa3ca3efb5e34cce522bf5d4874",
+      "bytes": 8301
+    },
+    {
+      "path": "tests/buildRocketFullFLeastSquaresSummary.py",
+      "sha256": "23711cb498deaf9fff93dfd776f6d5771c5f71417a69af9fd3d871b8a111dbe4",
+      "bytes": 3292
+    },
+    {
+      "path": "tests/auditRocketFullFLeastSquaresWorkbench.py",
+      "sha256": "0f0d626db4b66bf8936ee40543fb15876de0a07c2b5f41301e2985bb626bc029",
+      "bytes": 3828
+    },
+    {
+      "path": "tests/recordRocketFullFLeastSquaresProgress.py",
+      "sha256": "998704b8f56f44e246f7896fd74a768bc066784b650b8af1651014192c243f6d",
+      "bytes": 6974
+    },
+    {
+      "path": "tests/testRocketWallVelocityWorkbench.js",
+      "sha256": "17def13f0f53531ebabe98dc03c7a6d5fcab4713144fe9fceafcf63044ae2d56",
+      "bytes": 16385
+    },
+    {
+      "path": "web/rocket-wall-velocity.js",
+      "sha256": "ce1a291ac0fc96321728c37896736c450943643bcc7b1592d484973198b3f9cd",
+      "bytes": 13842
+    }
+  ],
+  "methodDocumentation": {
+    "path": "docs/FULL_F_LEAST_SQUARES_V83.md",
+    "sha256": "4783b4a5b0fdfec07ca19aec114b46dd251c945c7903f786087043c587db973b",
+    "bytes": 8773
+  },
+  "goalAndReadinessSnapshots": [
+    {
+      "path": "docs/PROJECT_GOALS.md",
+      "sha256": "69704dd1efd3304724a6345d255f5e98e1afae16ef13f0ea7c939fec892f2c67",
+      "bytes": 343372
+    },
+    {
+      "path": "docs/GITHUB_STAGE_READINESS.md",
+      "sha256": "98ef62a897c941d8f9b10e64c46380e0063760ee98508cc287e9cf601e2a2907",
+      "bytes": 11384
+    }
+  ],
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench28/index.html",
+    "researchRows": 18,
+    "oldSeventeenRowsAndSixFacetFilesExactlyPreserved": true,
+    "LSQRArnoldiMetricsExplicitlyNotApplicable": true,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "mainAcceptedIterations": 12,
+    "mainActualNSEvaluations": 246,
+    "actualNSDirectionDefect": 0.19876430371570342,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "actualNSEvaluationsAfterLastAcceptedHistory": 121,
+    "latestEndpoint": {
+      "path": "outputs/v83_validation/krylov17/wall_velocity_krylov_evidence.mat",
+      "sha256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "bytes": 1214364034
+    },
+    "originalNSSource": {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    },
+    "physicalPressureHeatFluxAndHeatPowerUnchanged": true
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "newSelectedJApplications": 0,
+  "newActualNSEvaluations": 0,
+  "newFlowAcceptances": 0,
+  "newProductionSolvedAreaM2": 0,
+  "nextAction": "Do not repeat the failed symmetric color sweep or merely add LSQR steps. Exact forward/transpose and fixed M_F transpose now exist and are independently checked. Examine the scaled complete A_FF*M_F image/column conditioning or slow global directions using actual operator images and explicit memory budgets, before selecting the next global correction. Preserve all original F/C unknowns, fixed-C diagnostic identity and original NS total-direction gate; no automatic old-Schur replacement. Scientific UI and actual region pressure/heat validation remain highest priorities, not trajectory/history expansion.",
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "998704b8f56f44e246f7896fd74a768bc066784b650b8af1651014192c243f6d"
+}

@@ -1,0 +1,122 @@
+function report=testRocketShellLineOperator(folder,normalEulerLinearization)
+%TESTROCKETSHELLLINEOPERATOR 独立通量差分、完整小域装配及块Thomas求解校核。
+% 模块一：冻结lambda/功速度的手写Euler+Newton+Fourier通量作独立导数参考。
+% 模块二：完整小域逐未知量差分后只截取法向线块，与实际装配比较。
+% 模块三：稀疏直接解作线求解参考；不是完整NS Jacobian或物理精度校核。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+if nargin<2,normalEulerLinearization='rusanov-frozen';end
+assert(~exist(folder,'dir'),'ShellLineTest:Overwrite','不得覆盖已有校核。');mkdir(folder);
+gas=struct('gamma',1.4,'R',287,'mu',1.8e-5,'Pr',.72,'temperatureRange',[80 2000]);
+normal=[1 2 -1;-2 .5 1;1 0 0;0 0 -1];normal=normal./vecnorm(normal,2,2);
+PL=[1 120 -30 40 300;.5 -80 35 110 500;1.2 1000 200 -100 800;.7 50 300 400 200];
+PR=[.8 110 15 20 320;.7 -90 -10 70 450;1.3 900 -100 -80 900;.6 -20 250 410 250];
+QL=cons(PL,gas);QR=cons(PR,gas);distance=[.01;.02;.004;.03];
+if strcmp(normalEulerLinearization,'exact-branch'),[DL,DR,audit]=cutCellExactLineFaceLinearization(QL,QR,normal,distance,gas);
+else,[DL,DR,audit]=cutCellLineFaceLinearization(QL,QR,normal,distance,gas);end
+worst=0;h=2e-6;
+for side=1:2
+    base=QL;if side==2,base=QR;end
+    reference=DL;if side==2,reference=DR;end
+    for b=1:5
+        step=h*max(1,abs(base(:,b)));plus=base;minus=base;plus(:,b)=plus(:,b)+step;minus(:,b)=minus(:,b)-step;
+        if side==1
+            fp=flux(plus,QR,normal,distance,gas,audit.waveSpeedFrozen,audit.viscousWorkVelocityFrozen,normalEulerLinearization);
+            fm=flux(minus,QR,normal,distance,gas,audit.waveSpeedFrozen,audit.viscousWorkVelocityFrozen,normalEulerLinearization);
+        else
+            fp=flux(QL,plus,normal,distance,gas,audit.waveSpeedFrozen,audit.viscousWorkVelocityFrozen,normalEulerLinearization);
+            fm=flux(QL,minus,normal,distance,gas,audit.waveSpeedFrozen,audit.viscousWorkVelocityFrozen,normalEulerLinearization);
+        end
+        actual=(fp-fm)./(2*step);expected=reshape(reference(:,b,:),5,[])';
+        error=max(abs(actual-expected),[],'all')/max(1,max(abs(expected),[],'all'));worst=max(worst,error);
+    end
+end
+assert(worst<3e-8,'ShellLineTest:Derivative','独立两点通量导数校核失败。');
+
+%% 完整小三维层域；几何、所有真实共享面与墙/外边界符号保留
+V=[1 0 0;-1 0 0;0 1 0;0 -1 0;0 0 1;0 0 -1];F=convhull(V);
+normalF=cross(V(F(:,2),:)-V(F(:,1),:),V(F(:,3),:)-V(F(:,1),:),2);flip=sum(normalF.*V(F(:,1),:),2)<0;F(flip,:)=F(flip,[1 3 2]);
+cut=buildRocketTriangularShellDomain(V,F,struct('normalLayerHeightsM',[0 .01 .03],'outerScaleFactors',[1.2 1.5]));
+n=numel(cut.cells.volume);nf=size(F,1);position=cut.cells.centroid;
+P=[1+.02*position(:,1),100+5*position(:,2),-20+3*position(:,3),30+2*position(:,1),300+3*position(:,2)];
+Q=cons(P,gas);scale=[1 200 200 200 300000];tau=.004;
+given=struct('type','characteristic','mode','riemannFarfield','reservoirPrimitive',[1 100 -20 30 300]);
+boundary=struct('xmin',given,'xmax',given,'ymin',given,'ymax',given,'zmin',given,'zmax',given, ...
+    'solidWall',struct('type','wall','velocity',[0 0 0],'temperature',320,'thermalGradient','dirichlet-tangent'));
+operator=buildRocketShellLineOperator(Q,cut,gas,boundary,scale,tau,normalEulerLinearization);M=sparse(5*n,5*n);
+% 逐值核对原完整装配器；参考源只改函数名，默认和显式旧模式都须保持。
+source=fullfile(root,'outputs','v83_validation','source_epochs','pre_exact_line_buildRocketShellLineOperator.m');
+text=fileread(source);text=strrep(text,'function operator=buildRocketShellLineOperator(', ...
+    'function operator=buildRocketShellLineOperatorReference(');
+fid=fopen(fullfile(folder,'buildRocketShellLineOperatorReference.m'),'w','n','UTF-8');assert(fid>=0);fprintf(fid,'%s',text);fclose(fid);
+addpath(folder);pathGuard=onCleanup(@()rmpath(folder));
+referenceOperator=buildRocketShellLineOperatorReference(Q,cut,gas,boundary,scale,tau);
+assert(isequaln(referenceOperator,buildRocketShellLineOperator(Q,cut,gas,boundary,scale,tau))&& ...
+    isequaln(referenceOperator,buildRocketShellLineOperator(Q,cut,gas,boundary,scale,tau,'rusanov-frozen')), ...
+    'ShellLineTest:Compatibility','缺省或显式旧模式没有逐字段复现原装配器。');
+for id=1:n
+    row=(id-1)*5+(1:5);M(row,row)=operator.diagonal(:,:,id);
+    if id>nf,M(row,row-5*nf)=operator.lower(:,:,id);end
+    if id<=n-nf,M(row,row+5*nf)=operator.upper(:,:,id);end
+end
+% 冻结条件来自基态，差分时独立手写整个三维替代通量，不调用被测导数/装配器。
+U=Q./scale;J=zeros(5*n,5*n);
+for id=1:n
+    for b=1:5
+        up=U;um=U;step=h*max(1,abs(U(id,b)));up(id,b)=up(id,b)+step;um(id,b)=um(id,b)-step;
+        rp=surrogate(up.*scale,Q,cut,gas,320,normalEulerLinearization)./scale;rm=surrogate(um.*scale,Q,cut,gas,320,normalEulerLinearization)./scale;
+        col=(id-1)*5+b;J(:,col)=reshape(((rp-rm)/(2*step))',[],1);
+    end
+end
+original=repelem(mod((0:n-1)',nf),5);same=original==original';reference=-J.*same+eye(5*n)/tau;
+assemblyError=max(abs(full(M)-reference),[],'all')/max(1,max(abs(reference),[],'all'));
+assert(assemblyError<3e-8,'ShellLineTest:Assembly','独立完整小域差分与法向线装配不一致。');
+rhs=reshape(sin((1:5*n)*.37),n,5);[update,linear]=solveRocketShellLineSystem(operator,rhs);
+reference=reshape(M\reshape(rhs',[],1),5,n)';solveError=max(abs(update-reference),[],'all')/max(1,max(abs(reference),[],'all'));
+assert(solveError<1e-11,'ShellLineTest:Thomas','批量法向线与独立稀疏直接解不一致。');
+report=struct('status','passed-independent-face-flux-derivative-full-small-domain-fd-assembly-and-sparse-reference-solve', ...
+    'faceDerivativeRelativeDifference',worst,'fullSmallDomainAssemblyRelativeDifference',assemblyError, ...
+    'blockThomasReferenceRelativeDifference',solveError,'linearDefectRelative',linear.relativeLinearDefect, ...
+    'smallCellCount',n,'smallUnknowns',5*n,'fullOriginalNSJacobian',false,'physicalDiscretizationReplaced',false, ...
+    'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+report.normalEulerLinearization=normalEulerLinearization;report.completeLegacyOperatorExactlyReproduced=true;
+save(fullfile(folder,'line_operator_test.mat'),'report','operator','M','reference','update','rhs','-v7');
+fid=fopen(fullfile(folder,'line_operator_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end
+function Q=cons(P,gas)
+Q=[P(:,1),P(:,1).*P(:,2:4),P(:,1).*(gas.R/(gas.gamma-1)*P(:,5)+.5*sum(P(:,2:4).^2,2))];
+end
+function [P,p]=primitive(Q,gas)
+rho=Q(:,1);u=Q(:,2:4)./rho;T=(Q(:,5)./rho-.5*sum(u.^2,2))/(gas.R/(gas.gamma-1));P=[rho,u,T];p=rho*gas.R.*T;
+end
+function value=flux(QL,QR,normal,distance,gas,lambda,workVelocity,eulerPolicy)
+% 独立通量表达，直接由Newton应力张量与Fourier定义形成。
+[PL,pL]=primitive(QL,gas);[PR,pR]=primitive(QR,gas);unL=sum(PL(:,2:4).*normal,2);unR=sum(PR(:,2:4).*normal,2);
+FL=[QL(:,1).*unL,QL(:,2:4).*unL+pL.*normal,(QL(:,5)+pL).*unL];
+FR=[QR(:,1).*unR,QR(:,2:4).*unR+pR.*normal,(QR(:,5)+pR).*unR];
+N=size(QL,1);value=.5*(FL+FR)-.5*lambda.*(QR-QL);k=gas.mu*gas.gamma*gas.R/(gas.gamma-1)/gas.Pr;
+if strcmp(eulerPolicy,'exact-branch'),value=cutCellExactEulerFlux(QL,QR,normal,gas);end
+for j=1:N
+    gradient=(PR(j,2:4)-PL(j,2:4))'*normal(j,:)/distance(j);
+    stress=gas.mu*(gradient+gradient'-(2/3)*trace(gradient)*eye(3));traction=(stress*normal(j,:)')';
+    heat=k*(PR(j,5)-PL(j,5))/distance(j);
+    value(j,:)=value(j,:)-[0,traction,dot(workVelocity(j,:),traction)+heat];
+end
+end
+function rate=surrogate(Q,base,cut,gas,Twall,normalEulerLinearization)
+v=cut.cells.volume;n=numel(v);rate=zeros(n,5);f=cut.openFaces;w=cut.walls;[P,p]=primitive(Q,gas);[P0,~]=primitive(base,gas);
+for j=1:numel(f.area)
+    m=f.cellMinus(j);other=f.cellPlus(j);normal=f.normal(j,:);
+    if other>0,qR=Q(other,:);pR=P0(other,:);distance=dot(cut.cells.centroid(other,:)-cut.cells.centroid(m,:),normal);
+    else,qR=base(m,:);pR=P0(m,:);distance=dot(f.centroid(j,:)-cut.cells.centroid(m,:),normal);end
+    pL=P0(m,:);wave=max(abs(dot(pL(2:4),normal))+sqrt(gas.gamma*gas.R*pL(5)),abs(dot(pR(2:4),normal))+sqrt(gas.gamma*gas.R*pR(5)));
+    policy='rusanov-frozen';if other>0&&f.kind(j)==1,policy=normalEulerLinearization;end
+    F=flux(Q(m,:),qR,normal,distance,gas,wave,.5*(pL(2:4)+pR(2:4)),policy);
+    rate(m,:)=rate(m,:)-f.area(j)/v(m)*F;if other>0,rate(other,:)=rate(other,:)+f.area(j)/v(other)*F;end
+end
+k=gas.mu*gas.gamma*gas.R/(gas.gamma-1)/gas.Pr;
+for j=1:numel(w.area)
+    id=w.ownerCell(j);normal=w.normal(j,:);distance=dot(w.centroid(j,:)-cut.cells.centroid(id,:),normal);
+    gradient=-P(id,2:4)'*normal/distance;stress=gas.mu*(gradient+gradient'-(2/3)*trace(gradient)*eye(3));
+    F=[0,p(id)*normal-(stress*normal')',k*(P(id,5)-Twall)/distance];rate(id,:)=rate(id,:)-w.area(j)/v(id)*F;
+end
+end

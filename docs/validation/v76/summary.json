@@ -1,0 +1,666 @@
+{
+  "version": 76,
+  "status": "tested-three-new-grid-spatial-roots-original-BE-and-four-case-workbench-sensitivity",
+  "cases": [
+    {
+      "kind": "baseline",
+      "cellCount": 2760,
+      "radialLayers": 24,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 2e-05,
+      "NewtonIterations": 3,
+      "residualEvaluations": 577,
+      "BEAcceptedSteps": 3,
+      "originalResidual": 1.8271973805100923e-08,
+      "boundaryBalanceRelative": 1.7010744190490343e-16,
+      "minDensity": 0.0002624874400855957,
+      "TminK": 223.02124392684303,
+      "TmaxK": 1222.422224049788,
+      "totalSignedHeatW": 191247.09627469143,
+      "yPlusProxyRange": [
+        0.0170972235810373,
+        8.471736276483066
+      ]
+    },
+    {
+      "kind": "radial48",
+      "cellCount": 5520,
+      "radialLayers": 48,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 2e-05,
+      "NewtonIterations": 8,
+      "residualEvaluations": 1541,
+      "BEAcceptedSteps": 3,
+      "originalResidual": 1.0415275689119186e-06,
+      "boundaryBalanceRelative": 2.3985383218342134e-16,
+      "minDensity": 0.0007223267077056965,
+      "TminK": 219.63401177736705,
+      "TmaxK": 1221.5046722921973,
+      "totalSignedHeatW": 137173.59167115064,
+      "yPlusProxyRange": [
+        0.030267066995255727,
+        8.505038532147315
+      ]
+    },
+    {
+      "kind": "nearwall_half",
+      "cellCount": 2760,
+      "radialLayers": 24,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 1e-05,
+      "NewtonIterations": 9,
+      "residualEvaluations": 1730,
+      "BEAcceptedSteps": 3,
+      "originalResidual": 2.6043278601549594e-08,
+      "boundaryBalanceRelative": 2.4764800562802006e-16,
+      "minDensity": 0.0003246932619812307,
+      "TminK": 223.21488836435546,
+      "TmaxK": 1190.4304659414786,
+      "totalSignedHeatW": 217644.50593602017,
+      "yPlusProxyRange": [
+        0.009654097941536606,
+        5.325773878239175
+      ]
+    },
+    {
+      "kind": "farfield1p5",
+      "cellCount": 2760,
+      "radialLayers": 24,
+      "outerRadiusM": 6.391891462605911,
+      "firstNormalOffsetM": 2e-05,
+      "NewtonIterations": 6,
+      "residualEvaluations": 1154,
+      "BEAcceptedSteps": 3,
+      "originalResidual": 1.7591758017666006e-08,
+      "boundaryBalanceRelative": 2.4400147135074124e-16,
+      "minDensity": 0.00023889802517932965,
+      "TminK": 223.2045158646445,
+      "TmaxK": 1225.6100680215281,
+      "totalSignedHeatW": 195070.01284062403,
+      "yPlusProxyRange": [
+        0.01768796510309924,
+        8.438225092117282
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "kind": "radial48",
+      "totalSignedHeatChangeFraction": -0.28274157180339143,
+      "pressurePa": {
+        "areaWeightedAbsoluteChangeFraction": 0.024148029870119894,
+        "maximumAbsoluteChange": 874.5910684891896,
+        "maximumChangeScaledByBaselinePeak": 0.02357279837348627
+      },
+      "signedHeatWm2": {
+        "areaWeightedAbsoluteChangeFraction": 0.28281274954902197,
+        "maximumAbsoluteChange": 127447.57314555976,
+        "maximumChangeScaledByBaselinePeak": 0.06767447520662154
+      },
+      "wallAdjacentGasProxyK": {
+        "areaWeightedAbsoluteChangeFraction": 0.05912952421548418,
+        "maximumAbsoluteChange": 49.48198812871681,
+        "maximumChangeScaledByBaselinePeak": 0.04797873032350787
+      }
+    },
+    {
+      "kind": "nearwall_half",
+      "totalSignedHeatChangeFraction": 0.13802776709045395,
+      "pressurePa": {
+        "areaWeightedAbsoluteChangeFraction": 0.006189321367474893,
+        "maximumAbsoluteChange": 79.83708395072563,
+        "maximumChangeScaledByBaselinePeak": 0.0021518439308425364
+      },
+      "signedHeatWm2": {
+        "areaWeightedAbsoluteChangeFraction": 0.1380886883762952,
+        "maximumAbsoluteChange": 1042753.7490320648,
+        "maximumChangeScaledByBaselinePeak": 0.5537007178228932
+      },
+      "wallAdjacentGasProxyK": {
+        "areaWeightedAbsoluteChangeFraction": 0.09011200171462798,
+        "maximumAbsoluteChange": 163.27304692336781,
+        "maximumChangeScaledByBaselinePeak": 0.15831282823673512
+      }
+    },
+    {
+      "kind": "farfield1p5",
+      "totalSignedHeatChangeFraction": 0.01998940972385621,
+      "pressurePa": {
+        "areaWeightedAbsoluteChangeFraction": 0.012016677096218738,
+        "maximumAbsoluteChange": 519.4891529740635,
+        "maximumChangeScaledByBaselinePeak": 0.014001758652103279
+      },
+      "signedHeatWm2": {
+        "areaWeightedAbsoluteChangeFraction": 0.020010470682128183,
+        "maximumAbsoluteChange": 14838.669983611675,
+        "maximumChangeScaledByBaselinePeak": 0.007879312089828944
+      },
+      "wallAdjacentGasProxyK": {
+        "areaWeightedAbsoluteChangeFraction": 0.004183718301018852,
+        "maximumAbsoluteChange": 5.761346333592655,
+        "maximumChangeScaledByBaselinePeak": 0.005586317213461996
+      }
+    }
+  ],
+  "regionalSensitivity": [
+    {
+      "region": "sphericalNose",
+      "areaM2": 0.002680076427987492,
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 3196.8215938765816,
+          "signedHeatChangeW": 0.0,
+          "signedHeatRelativeChange": 0.0,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.0,
+          "maximumYPlusProxy": 8.471736276483066,
+          "wallSegmentCount": 4
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 3045.1904115241327,
+          "signedHeatChangeW": -151.63118235244883,
+          "signedHeatRelativeChange": -0.04743185626714175,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.0474318562671417,
+          "maximumYPlusProxy": 8.505038532147315,
+          "wallSegmentCount": 4
+        },
+        {
+          "kind": "nearwall_half",
+          "signedHeatW": 4520.522126888609,
+          "signedHeatChangeW": 1323.7005330120273,
+          "signedHeatRelativeChange": 0.414067690091789,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.414067690091789,
+          "maximumYPlusProxy": 5.325773878239175,
+          "wallSegmentCount": 4
+        },
+        {
+          "kind": "farfield1p5",
+          "signedHeatW": 3211.728990627761,
+          "signedHeatChangeW": 14.907396751179476,
+          "signedHeatRelativeChange": 0.004663193210323158,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.004663193210323146,
+          "maximumYPlusProxy": 8.438225092117282,
+          "wallSegmentCount": 4
+        }
+      ]
+    },
+    {
+      "region": "cone",
+      "areaM2": 0.14064901517288714,
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 81743.24222712676,
+          "signedHeatChangeW": 0.0,
+          "signedHeatRelativeChange": 0.0,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.0,
+          "maximumYPlusProxy": 3.9190056841453638,
+          "wallSegmentCount": 20
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 65240.59795241978,
+          "signedHeatChangeW": -16502.644274706974,
+          "signedHeatRelativeChange": -0.20188389676119944,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.20188389676119944,
+          "maximumYPlusProxy": 3.4653443425914285,
+          "wallSegmentCount": 20
+        },
+        {
+          "kind": "nearwall_half",
+          "signedHeatW": 99934.38641986145,
+          "signedHeatChangeW": 18191.14419273469,
+          "signedHeatRelativeChange": 0.22254003752615903,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.22254003752615908,
+          "maximumYPlusProxy": 2.1623770540617837,
+          "wallSegmentCount": 20
+        },
+        {
+          "kind": "farfield1p5",
+          "signedHeatW": 82050.88310147851,
+          "signedHeatChangeW": 307.64087435175315,
+          "signedHeatRelativeChange": 0.003763502229297,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.003763502229296927,
+          "maximumYPlusProxy": 3.875766809077785,
+          "wallSegmentCount": 20
+        }
+      ]
+    },
+    {
+      "region": "cylinder",
+      "areaM2": 0.6031857894892403,
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 92850.40368602329,
+          "signedHeatChangeW": 0.0,
+          "signedHeatRelativeChange": 0.0,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.0,
+          "maximumYPlusProxy": 1.4094407584914914,
+          "wallSegmentCount": 62
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 61089.349957157334,
+          "signedHeatChangeW": -31761.053728865954,
+          "signedHeatRelativeChange": -0.3420669428241476,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.3420669428241476,
+          "maximumYPlusProxy": 1.300982939286461,
+          "wallSegmentCount": 62
+        },
+        {
+          "kind": "nearwall_half",
+          "signedHeatW": 99050.98487738229,
+          "signedHeatChangeW": 6200.5811913590005,
+          "signedHeatRelativeChange": 0.06678033638202008,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.06678033638201997,
+          "maximumYPlusProxy": 0.750344580795768,
+          "wallSegmentCount": 62
+        },
+        {
+          "kind": "farfield1p5",
+          "signedHeatW": 95785.2178299254,
+          "signedHeatChangeW": 2934.814143902113,
+          "signedHeatRelativeChange": 0.03160798475175497,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.03160798475175499,
+          "maximumYPlusProxy": 1.3977064629633842,
+          "wallSegmentCount": 62
+        }
+      ]
+    },
+    {
+      "region": "contraction",
+      "areaM2": 0.04902897967456924,
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 1175.9708945098512,
+          "signedHeatChangeW": 0.0,
+          "signedHeatRelativeChange": 0.0,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.0,
+          "maximumYPlusProxy": 0.24297055858320077,
+          "wallSegmentCount": 5
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 698.7335393891345,
+          "signedHeatChangeW": -477.23735512071664,
+          "signedHeatRelativeChange": -0.40582412145466484,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.4058241214546649,
+          "maximumYPlusProxy": 0.22823812891903672,
+          "wallSegmentCount": 5
+        },
+        {
+          "kind": "nearwall_half",
+          "signedHeatW": 1217.8152557010994,
+          "signedHeatChangeW": 41.844361191248254,
+          "signedHeatRelativeChange": 0.035582820447855656,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.03558282044785576,
+          "maximumYPlusProxy": 0.1294051499896274,
+          "wallSegmentCount": 5
+        },
+        {
+          "kind": "farfield1p5",
+          "signedHeatW": 1216.7831488194506,
+          "signedHeatChangeW": 40.81225430959944,
+          "signedHeatRelativeChange": 0.0347051568198975,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.034705156819897304,
+          "maximumYPlusProxy": 0.24377893942258483,
+          "wallSegmentCount": 5
+        }
+      ]
+    },
+    {
+      "region": "afterbody",
+      "areaM2": 0.12063715789784804,
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 12125.272436943294,
+          "signedHeatChangeW": 0.0,
+          "signedHeatRelativeChange": 0.0,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.0,
+          "maximumYPlusProxy": 0.7226651651888166,
+          "wallSegmentCount": 16
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 6961.904363485128,
+          "signedHeatChangeW": -5163.368073458167,
+          "signedHeatRelativeChange": -0.42583522146079045,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.42583522146079034,
+          "maximumYPlusProxy": 0.5449947839960029,
+          "wallSegmentCount": 16
+        },
+        {
+          "kind": "nearwall_half",
+          "signedHeatW": 12764.344098980893,
+          "signedHeatChangeW": 639.0716620375988,
+          "signedHeatRelativeChange": 0.052705756951940685,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.05270575695194083,
+          "maximumYPlusProxy": 0.37107680173216584,
+          "wallSegmentCount": 16
+        },
+        {
+          "kind": "farfield1p5",
+          "signedHeatW": 12649.371110148355,
+          "signedHeatChangeW": 524.0986732050605,
+          "signedHeatRelativeChange": 0.04322366164806635,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.04322366164806631,
+          "maximumYPlusProxy": 0.7399939187211669,
+          "wallSegmentCount": 16
+        }
+      ]
+    },
+    {
+      "region": "base",
+      "areaM2": 0.020106192982974676,
+      "cases": [
+        {
+          "kind": "baseline",
+          "signedHeatW": 155.3854362116523,
+          "signedHeatChangeW": 0.0,
+          "signedHeatRelativeChange": 0.0,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.0,
+          "maximumYPlusProxy": 0.05799805174819714,
+          "wallSegmentCount": 8
+        },
+        {
+          "kind": "radial48",
+          "signedHeatW": 137.81544717510994,
+          "signedHeatChangeW": -17.569989036542353,
+          "signedHeatRelativeChange": -0.1130735895519196,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.20067856401462078,
+          "maximumYPlusProxy": 0.07452484862761796,
+          "wallSegmentCount": 8
+        },
+        {
+          "kind": "nearwall_half",
+          "signedHeatW": 156.4531572058636,
+          "signedHeatChangeW": 1.0677209942112995,
+          "signedHeatRelativeChange": 0.006871435446221152,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.08185284491730652,
+          "maximumYPlusProxy": 0.033326209684613944,
+          "wallSegmentCount": 8
+        },
+        {
+          "kind": "farfield1p5",
+          "signedHeatW": 156.02865962454902,
+          "signedHeatChangeW": 0.6432234128967309,
+          "signedHeatRelativeChange": 0.004139534750351892,
+          "areaWeightedHeatAbsoluteDifferenceFraction": 0.030061186176974317,
+          "maximumYPlusProxy": 0.05686158061898833,
+          "wallSegmentCount": 8
+        }
+      ]
+    }
+  ],
+  "actualNewtonReplay": {
+    "status": "passed-three-actual-interpolated-initial-guesses-new-grid-Newton-exact-replay",
+    "cases": [
+      {
+        "kind": "radial48",
+        "cellCount": 5520,
+        "NewtonIterations": 8,
+        "residualEvaluations": 1541,
+        "originalResidual": 1.0415275689119186e-06,
+        "completeSolutionExactlyReplayed": true
+      },
+      {
+        "kind": "nearwall_half",
+        "cellCount": 2760,
+        "NewtonIterations": 9,
+        "residualEvaluations": 1730,
+        "originalResidual": 2.6043278601549594e-08,
+        "completeSolutionExactlyReplayed": true
+      },
+      {
+        "kind": "farfield1p5",
+        "cellCount": 2760,
+        "NewtonIterations": 6,
+        "residualEvaluations": 1154,
+        "originalResidual": 1.7591758017666006e-08,
+        "completeSolutionExactlyReplayed": true
+      }
+    ],
+    "engineProcessID": 13276,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "originalSteadyResidualTolerance": 2e-06,
+  "originalBEAbsoluteTolerance": 1e-11,
+  "originalBERelativeTolerance": 1e-09,
+  "originalConservationTolerance": 5e-10,
+  "numericallySteady": true,
+  "independentAcceptedBEEndpoints": 12,
+  "preparationNewtonCountedAsBE": false,
+  "interpolationIsConservativeRemapping": false,
+  "externalCFDImported": false,
+  "oldChainRebound": false,
+  "commonVariableColorRanges": true,
+  "sourceMetricsAndActual3DWallBindingChecked": true,
+  "scientificPlotVisuallyChecked": true,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "streamwiseRefinementPerformed": false,
+  "gridIndependentClaimed": false,
+  "farfieldBoundaryDistanceEffectIsolatedFromMeshRedistribution": false,
+  "physicalSolution": false,
+  "experimentalValidation": false,
+  "fullSurfaceSolved": false,
+  "wholeGoalComplete": false,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "historicActualSourceEpochs": [
+    {
+      "run": "factory02",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "5c2404fe6a5007b4608b7f85d2ca2a48b5a506987e10014a8be71faaa5f3c72c",
+      "actualFrozenSource": "source_epochs/exportRocketAxisymmetricStudy_5c2404fe6a5007b4608b7f85d2ca2a48b5a506987e10014a8be71faaa5f3c72c.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory02",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "cf3ec27deb2c39cadf7c4b67c22b415fc965d0e805d0042b2b8b37db29e92e43",
+      "actualFrozenSource": "source_epochs/exportRocketAxisymmetricWorkbench_cf3ec27deb2c39cadf7c4b67c22b415fc965d0e805d0042b2b8b37db29e92e43.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory02",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "e6ff3898c49619d6f0ccadebaafbae1873f1e482c8e93386e4a416488641d315",
+      "actualFrozenSource": "source_epochs/rocketAxisymmetricSolverContract_e6ff3898c49619d6f0ccadebaafbae1873f1e482c8e93386e4a416488641d315.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory02",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "f85019ef96317197a02121ea646070a538cebe7a68936b7406607f2ce2a16644",
+      "actualFrozenSource": "source_epochs/testRocketAxisymmetricControlledCheckpoint_f85019ef96317197a02121ea646070a538cebe7a68936b7406607f2ce2a16644.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factorydiag01",
+      "path": "regionalFlow/axisymmetric/createRocketAxisymmetricSensitivityCase.m",
+      "sha256": "1a2bb97b97852fce5458f18fe8e0e33611589366a2408320b52394de26af2f89",
+      "actualFrozenSource": "attempts/factory01_createRocketAxisymmetricSensitivityCase.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factorydiag01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "5c2404fe6a5007b4608b7f85d2ca2a48b5a506987e10014a8be71faaa5f3c72c",
+      "actualFrozenSource": "source_epochs/exportRocketAxisymmetricStudy_5c2404fe6a5007b4608b7f85d2ca2a48b5a506987e10014a8be71faaa5f3c72c.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factorydiag01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "cf3ec27deb2c39cadf7c4b67c22b415fc965d0e805d0042b2b8b37db29e92e43",
+      "actualFrozenSource": "source_epochs/exportRocketAxisymmetricWorkbench_cf3ec27deb2c39cadf7c4b67c22b415fc965d0e805d0042b2b8b37db29e92e43.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factorydiag01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "e6ff3898c49619d6f0ccadebaafbae1873f1e482c8e93386e4a416488641d315",
+      "actualFrozenSource": "source_epochs/rocketAxisymmetricSolverContract_e6ff3898c49619d6f0ccadebaafbae1873f1e482c8e93386e4a416488641d315.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factorydiag01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "f85019ef96317197a02121ea646070a538cebe7a68936b7406607f2ce2a16644",
+      "actualFrozenSource": "source_epochs/testRocketAxisymmetricControlledCheckpoint_f85019ef96317197a02121ea646070a538cebe7a68936b7406607f2ce2a16644.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factorydiag01",
+      "path": "tests/testRocketAxisymmetricSensitivity.m",
+      "sha256": "900e61f31e303d6916bcc8233d629251a4007483237b6ca58ef25f7b2b3660e6",
+      "actualFrozenSource": "attempts/factory01_testRocketAxisymmetricSensitivity.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "5c2404fe6a5007b4608b7f85d2ca2a48b5a506987e10014a8be71faaa5f3c72c",
+      "actualFrozenSource": "source_epochs/exportRocketAxisymmetricStudy_5c2404fe6a5007b4608b7f85d2ca2a48b5a506987e10014a8be71faaa5f3c72c.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "cf3ec27deb2c39cadf7c4b67c22b415fc965d0e805d0042b2b8b37db29e92e43",
+      "actualFrozenSource": "source_epochs/exportRocketAxisymmetricWorkbench_cf3ec27deb2c39cadf7c4b67c22b415fc965d0e805d0042b2b8b37db29e92e43.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "e6ff3898c49619d6f0ccadebaafbae1873f1e482c8e93386e4a416488641d315",
+      "actualFrozenSource": "source_epochs/rocketAxisymmetricSolverContract_e6ff3898c49619d6f0ccadebaafbae1873f1e482c8e93386e4a416488641d315.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "f85019ef96317197a02121ea646070a538cebe7a68936b7406607f2ce2a16644",
+      "actualFrozenSource": "source_epochs/testRocketAxisymmetricControlledCheckpoint_f85019ef96317197a02121ea646070a538cebe7a68936b7406607f2ce2a16644.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "5c2404fe6a5007b4608b7f85d2ca2a48b5a506987e10014a8be71faaa5f3c72c",
+      "actualFrozenSource": "source_epochs/exportRocketAxisymmetricStudy_5c2404fe6a5007b4608b7f85d2ca2a48b5a506987e10014a8be71faaa5f3c72c.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricWorkbench.m",
+      "sha256": "cf3ec27deb2c39cadf7c4b67c22b415fc965d0e805d0042b2b8b37db29e92e43",
+      "actualFrozenSource": "source_epochs/exportRocketAxisymmetricWorkbench_cf3ec27deb2c39cadf7c4b67c22b415fc965d0e805d0042b2b8b37db29e92e43.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "e6ff3898c49619d6f0ccadebaafbae1873f1e482c8e93386e4a416488641d315",
+      "actualFrozenSource": "source_epochs/rocketAxisymmetricSolverContract_e6ff3898c49619d6f0ccadebaafbae1873f1e482c8e93386e4a416488641d315.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "f85019ef96317197a02121ea646070a538cebe7a68936b7406607f2ce2a16644",
+      "actualFrozenSource": "source_epochs/testRocketAxisymmetricControlledCheckpoint_f85019ef96317197a02121ea646070a538cebe7a68936b7406607f2ce2a16644.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "node01",
+      "path": "tests\\testRocketSensitivityWorkbench.js",
+      "sha256": "9113682eb97573db0cd3437b7a118ef87956402145a4e42cdead37af1997fd1d",
+      "actualFrozenSource": "source_epochs/node01_testRocketSensitivityWorkbench_9113682eb97573db0cd3437b7a118ef87956402145a4e42cdead37af1997fd1d.source.txt",
+      "oldChainRebound": false
+    }
+  ],
+  "processes": {
+    "factory02": {
+      "processID": 26560,
+      "engineProcessIDs": [
+        40052
+      ],
+      "exitCode": 0
+    },
+    "factorydiag01": {
+      "processID": 2112,
+      "engineProcessIDs": [
+        42988
+      ],
+      "exitCode": 0
+    },
+    "roots01": {
+      "processID": 31324,
+      "engineProcessIDs": [
+        41980
+      ],
+      "exitCode": 0
+    },
+    "confirm01": {
+      "processID": 1700,
+      "engineProcessIDs": [
+        25040
+      ],
+      "exitCode": 0
+    },
+    "independent01": {
+      "processID": 9256,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "export01": {
+      "processID": 36788,
+      "engineProcessIDs": [
+        40636
+      ],
+      "exitCode": 0
+    },
+    "node01": {
+      "processID": 32496,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "scientific01": {
+      "processID": 32604,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "replay01": {
+      "processID": 660,
+      "engineProcessIDs": [
+        13276
+      ],
+      "exitCode": 0
+    },
+    "regions01": {
+      "processID": 3644,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "finalexport01": {
+      "processID": 41080,
+      "engineProcessIDs": [
+        10200
+      ],
+      "exitCode": 0
+    },
+    "nodefinal02": {
+      "processID": 20448,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    }
+  },
+  "nextWork": "bounded wall-normal spacing/profile diagnostic and physically resolved thermal boundary-layer grid; traceable public benchmark, then actual 20-degree large-region crossflow/separation/base/protrusions; no residual/CFL detour"
+}

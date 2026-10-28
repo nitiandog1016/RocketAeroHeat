@@ -1,0 +1,65 @@
+function report=studyRocketMixedCoarse(folder,kind,maximumAdditionalColumns)
+%STUDYROCKETMIXEDCOARSE 在同一保存剩余筛选互补列，校核混合提升/模型/线性与小域原NS。
+% 模块一：原父像只作输入，不构造超预算完整联合像，筛选后像和逐列来源完整保存。
+% 模块二：原始变量、保守变量列的提升不同，采用当前完整模型重放混合组合。
+% 模块三：真实研究0新NS/更新；单位原NS中心差分独立于粗像与筛选。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'MixedStudy:Overwrite','不得覆盖混合粗基研究。');mkdir(folder);assert(ismember(kind,{'unit','real'}));
+if strcmp(kind,'unit'),name='basiscandidatesunit02';else,name='basiscandidatesrocket01';end
+spatialFile=fullfile(root,'outputs','v83_validation',name,'spatial','coarse_candidate_evidence.mat');
+primitiveFile=fullfile(root,'outputs','v83_validation',name,'primitive','coarse_candidate_evidence.mat');
+s=load(spatialFile,'coarse');spatial=s.coarse;clear s;s=load(primitiveFile,'coarse');primitive=s.coarse;clear s;
+Q=spatial.baseQ;gas=spatial.gas;boundary=spatial.boundary;scale=spatial.scale;cut=spatial.space.geometry;sourceFile='';calls=0;
+if strcmp(kind,'unit')
+    [rate,info]=cutCellNavierStokesResidual(Q,cut,gas,boundary);calls=calls+1;rhs=rate./scale;
+    remaining=reshape(sin((1:numel(Q))*.37),size(Q));maximum=16;
+else
+    sourceFile=fullfile(root,'outputs','v83_validation','krylov11','wall_velocity_krylov_evidence.mat');s=load(sourceFile,'result');
+    assert(isequaln(Q,s.result.Q)&&isequaln(s.result.Q,s.result.initialQ));rhs=s.result.initialRate./scale;
+    remaining=rhs+s.result.linearLog{end}.steadyDirectionEvidence.value;info=struct;
+    for key={'primitive','gradient','viscousFaceFlux'},info.(key{1})=s.result.initialInfo.(key{1});end;clear s;maximum=48;
+end
+if nargin>=3
+    validateattributes(maximumAdditionalColumns,{'numeric'},{'real','finite','scalar','integer','nonnegative'});maximum=maximumAdditionalColumns;
+end
+oldCorrection=solveRocketLeastSquaresCoarseSystem(spatial,remaining);before=memory;
+coarse=buildRocketMixedCoarseOperator(spatial,primitive,remaining,struct('maximumAdditionalColumns',maximum));after=memory;
+clear spatial primitive;cache=buildCutCellSelectedDirectionCache(Q,info,cut,gas,boundary,scale);clear info;
+oldPredicted=remaining+applyCutCellSelectedDirection(cache,oldCorrection);modelApplications=1;
+[correction,linear]=solveRocketMixedCoarseSystem(coarse,remaining);predicted=remaining+applyCutCellSelectedDirection(cache,correction);modelApplications=modelApplications+1;
+c=coarse.upper\(coarse.upper'\(coarse.image'*remaining(:)));expected=remaining(:)-coarse.image*c;
+projectionDifference=norm(predicted(:)-expected)/max(1,norm(remaining(:)));assert(projectionDifference<1e-8,'MixedStudy:Replay','混合投影与当前完整模型不符。');
+assert(norm(predicted(:))<=norm(oldPredicted(:))+1e-8*max(1,norm(oldPredicted(:))),'MixedStudy:Nonincrease','保留原空间后模型残差不应放大。');
+probeCoefficients=sin((1:size(coarse.image,2))'*.27);probeDirection=liftRocketMixedCoarse(coarse,probeCoefficients);
+probeActual=-applyCutCellSelectedDirection(cache,probeDirection);modelApplications=modelApplications+1;probeProduct=coarse.image*probeCoefficients;
+probeError=norm(probeActual(:)-probeProduct)/max(1,norm(probeProduct));assert(probeError<1e-9,'MixedStudy:Lift','混合逐列提升与保存像不一致。');
+secondRemaining=remaining.*reshape(cos((1:numel(remaining))*.43),size(remaining));other=solveRocketMixedCoarseSystem(coarse,secondRemaining);
+combined=solveRocketMixedCoarseSystem(coarse,.7*remaining-1.3*secondRemaining);linearity=norm(combined-(.7*correction-1.3*other),'fro')/max(1,norm(combined,'fro'));
+assert(linearity<1e-8,'MixedStudy:Linearity','冻结混合基的右端叠加失败。');
+validationDirections={};validationPlus={};validationMinus={};validationModel={};h=1e-6;fdErrors=[];
+if strcmp(kind,'unit')
+    for j=1:2
+        weights=sin((1:size(coarse.image,2))'*(.13+.11*j));direction=liftRocketMixedCoarse(coarse,weights);direction=direction/max(abs(direction),[],'all');
+        plus=cutCellNavierStokesResidual(Q+h*direction.*scale,cut,gas,boundary);minus=cutCellNavierStokesResidual(Q-h*direction.*scale,cut,gas,boundary);calls=calls+2;
+        measured=(plus-minus)./scale/(2*h);model=applyCutCellSelectedDirection(cache,direction);modelApplications=modelApplications+1;
+        error=norm(measured-model,'fro')/max(1,norm(measured,'fro'));assert(error<2e-6,'MixedStudy:NS','混合方向与原NS中心差分不符。');
+        validationDirections{j}=direction;validationPlus{j}=plus;validationMinus{j}=minus;validationModel{j}=model;fdErrors(end+1)=error; %#ok<AGROW>
+    end
+end
+report=struct('status','tested-bounded-mixed-coarse-selection-lift-full-model-replay-and-fixed-linearity','kind',kind, ...
+    'baseConservativeColumns',coarse.baseConservativeColumns,'selectedPrimitiveColumns',coarse.selectedPrimitiveColumns, ...
+    'additionalPrimitiveColumnCount',numel(coarse.selectedPrimitiveColumns),'coarseUnknowns',size(coarse.image,2), ...
+    'imageBytes',coarse.imageBytes,'maximumImageBytes',coarse.maximumImageBytes,'imageNonzeros',coarse.imageNonzeros, ...
+    'reciprocalConditionEstimate',coarse.reciprocalConditionEstimate,'selectionStopReason',coarse.selectionStopReason, ...
+    'originalRemainingRelativeDefect',norm(remaining,'fro')/norm(rhs,'fro'),'baseProjectedRelativeDefect',norm(oldPredicted,'fro')/norm(rhs,'fro'), ...
+    'mixedProjectedRelativeDefect',norm(predicted,'fro')/norm(rhs,'fro'),'extraSquaredNormFractionRemoved',1-norm(predicted,'fro')^2/norm(oldPredicted,'fro')^2, ...
+    'fullModelProjectionRelativeDifference',projectionDifference,'probeImageRelativeDifference',probeError,'fixedLinearityRelativeDifference',linearity, ...
+    'originalNSDirectionFDRelativeDifferences',fdErrors,'actualOriginalNSEvaluations',calls,'constructionModelApplications',0, ...
+    'copiedSourceImageColumns',size(coarse.image,2),'otherModelApplications',modelApplications,'buildSeconds',coarse.buildSeconds, ...
+    'matlabBytesBeforeSelection',before.MemUsedMATLAB,'matlabBytesAfterSelection',after.MemUsedMATLAB,'peakMemoryMeasured',false, ...
+    'physicalSolution',false,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'mixed_coarse_evidence.mat'),'report','coarse','spatialFile','primitiveFile','sourceFile','rhs','remaining','oldCorrection','oldPredicted', ...
+    'correction','predicted','linear','probeCoefficients','probeDirection','probeActual','probeProduct','secondRemaining','other','combined', ...
+    'validationDirections','validationPlus','validationMinus','validationModel','h','-v7');
+fid=fopen(fullfile(folder,'mixed_coarse_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end

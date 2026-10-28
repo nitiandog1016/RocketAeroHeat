@@ -1,0 +1,282 @@
+function report=exportRocketWallVelocityStudy(folder,evidenceRoot,resultFolder,linearStudyFile,directionStudyFile)
+%EXPORTROCKETWALLVELOCITYSTUDY 将真实三维静止壁梯度同Q对照及修正结果接回统一工作台。
+% 模块一：原v82末态、新壁梯度同Q基线、新方程末态分别保存，不拼接旧历史。
+% 模块二：四个主要场量和黏性内能转换诊断共享色标；逐变量标出方法及未收敛身份。
+% 模块三：静止墙外功恒为0，邻壁速度代理的耗散诊断不能冒充壁面对流体做功。
+root=fileparts(mfilename('fullpath'));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+if nargin<2,evidenceRoot=fullfile(root,'outputs','v83_validation');end
+if nargin<3,resultFolder='krylov01';end
+% 模块四：显式选择已保存的接续检查点，避免后续实际端点被固定列表排除。
+assert(ischar(resultFolder)&&~isempty(regexp(resultFolder,'^krylov[0-9]+$','once'))&& ...
+    exist(fullfile(evidenceRoot,resultFolder,'wall_velocity_krylov_evidence.mat'),'file')==2, ...
+    'WallVelocityView:Source','请明确选择已保存的实际修正组。');
+assert(~exist(folder,'dir'),'WallVelocityView:Overwrite','请使用未存在的导出目录。');
+% 模块九：显式绑定实际使用的方向准备过程，不能把别的状态/文件的方法贴到当前结果。
+directionStudy=struct([]);
+if nargin>=5
+    directionStudy=jsondecode(fileread(directionStudyFile));
+    assert(isfield(directionStudy,'candidateCase')&&strcmp(directionStudy.candidateCase,resultFolder)&& ...
+        isfield(directionStudy,'candidateFile')&&isfield(directionStudy,'candidateFileSHA256')&& ...
+        strcmp(rocketStreamingFileSHA256(directionStudy.candidateFile),directionStudy.candidateFileSHA256), ...
+        'WallVelocityView:DirectionSource','方向准备过程的结果组或源文件身份不符。');
+end
+% 模块六：显式接入后续线性研究，绑定同一源端点；不覆盖场量或接受历史。
+linearResearch=struct([]);
+if nargin>=4&&~isempty(linearStudyFile)
+    linearResearch=jsondecode(fileread(linearStudyFile));
+    % JSON中的未执行标量null解码为空数组；恢复NaN，保持导出null及未知身份。
+    for entry=1:numel(linearResearch.studies)
+        for key={'innerRelativeCResidual','basisOrthogonalityError','modelRelationRelativeDifference'}
+            if isempty(linearResearch.studies(entry).(key{1})),linearResearch.studies(entry).(key{1})=NaN;end
+        end
+    end
+    if isfield(linearResearch,'failedCellDetails')&&isempty(linearResearch.failedCellDetails.localInverseDefectValue)
+        linearResearch.failedCellDetails.localInverseDefectValue=NaN;
+    end
+    assert(strcmp(linearResearch.sourceCase,resultFolder)&& ...
+        strcmp(linearResearch.sourceEvidenceSHA256,rocketStreamingFileSHA256(fullfile(evidenceRoot,resultFolder,'wall_velocity_krylov_evidence.mat')))&& ...
+        ~linearResearch.physicalStateChanged&&~linearResearch.productionQualified&&linearResearch.newProductionSolvedAreaM2==0, ...
+        'WallVelocityView:LinearStudy','线性研究来源或未解身份不符，禁止接入当前物理场。');
+end
+d=load(fullfile(root,'outputs','v80_validation','domain02','shell_domain_evidence.mat'),'domain','fs');cut=d.domain;fs=d.fs;mesh=cut.inputGeometry;n=size(mesh.F,1);
+assert(isequal(cut.walls.originalFaceID,(1:n)')&&numel(cut.walls.ownerCell)==n,'WallVelocityView:Geometry','本研究要求每个原面对应一个真实墙面。');
+s=load(fullfile(root,'outputs','v82_validation','exact_krylov01','steady_krylov_evidence.mat'),'result','report','gas');gas=s.gas;
+infos={pick(s.result.info)};rates={s.result.rate};summaries={struct('status','frozen-v82-source-not-recomputed-here', ...
+    'acceptedNonlinearIterations',0,'candidateTrials',0,'residualEvaluations',0,'elapsedSeconds',0, ...
+    'maximumResidual',s.result.maximumResidual,'rmsMerit',s.result.rmsMerit,'sourceAcceptedIterations',3,'frozenSourceReport',s.report)};
+histories={struct([])};diagnostics={struct([])};
+summaries{1}.steadyBoundaryFluxBalance=s.report.steadyBoundaryFluxBalance;
+summaries{1}.spatialConservationRelative=s.report.spatialConservationRelative;clear s;
+s=load(fullfile(evidenceRoot,'integration01','wall_velocity_integration_evidence.mat'),'info','rate','report');
+infos{2}=pick(s.info);rates{2}=s.rate;integrationReport=s.report;
+summaries{2}=struct('status','same-Q-static-wall-velocity-new-equation-baseline','acceptedNonlinearIterations',0, ...
+    'candidateTrials',0,'residualEvaluations',1,'elapsedSeconds',s.report.elapsedSeconds, ...
+    'maximumResidual',s.report.initialNewMaximumResidual,'rmsMerit',s.report.initialNewRmsMerit);
+baselineBalance=balances(s.info,cut);summaries{2}.steadyBoundaryFluxBalance=baselineBalance.steadyBoundaryFluxBalance;
+summaries{2}.spatialConservationRelative=baselineBalance.spatialConservationRelative;
+histories{2}=struct([]);diagnostics{2}=struct([]);clear s;
+s=load(fullfile(evidenceRoot,resultFolder,'wall_velocity_krylov_evidence.mat'),'result','report');
+if isfield(s.report,'totalNewEquationAcceptedIterations'),extra=load(fullfile(evidenceRoot,resultFolder,'wall_velocity_krylov_evidence.mat'),'displayHistory');s.displayHistory=extra.displayHistory;clear extra;end
+infos{3}=pick(s.result.info);rates{3}=s.result.rate;summaries{3}=s.report;histories{3}=s.result.history;
+if isfield(s,'displayHistory'),histories{3}=s.displayHistory;end
+summaries{3}.resultEvidenceFolder=resultFolder;
+% 模块五：本段每次实际线性检查和非线性候选单独保留，包括失败与拒绝。
+% 完整NS线性缺陷与线预条件器求解缺陷是不同指标，不能相互替代。
+attempts=struct([]);
+for j=1:numel(s.result.linearLog)
+    a=s.result.linearLog{j};item=struct('attempt',j,'fullSystemRelativeDefect',a.fullSystemRelativeDefect, ...
+        'target',a.target,'fullSystemTargetMet',a.fullSystemTargetMet,'gmresFlag',a.gmresFlag, ...
+        'gmresReportedResidual',a.gmresReportedResidual,'gmresIterations',a.gmresIterations, ...
+        'preconditionerRelativeDefect',a.relativeLinearDefect, ...
+        'normalizedMeritDerivative',NaN,'inexactNewtonUpperBound',NaN,'coarseAlgebraicRelativeResidual',NaN, ...
+        'initialGuessUsed',false,'initialGuessModelRelativeDefect',NaN,'effectiveCorrectionTolerance',NaN,'gmresSkipped',false,'recycled',struct);
+    if isfield(a,'normalizedMeritDerivative')
+        item.normalizedMeritDerivative=a.normalizedMeritDerivative;item.inexactNewtonUpperBound=a.inexactNewtonUpperBound;
+    end
+    if isfield(a,'coarseAlgebraicRelativeResidual'),item.coarseAlgebraicRelativeResidual=a.coarseAlgebraicRelativeResidual;end
+    if isfield(a,'initialGuessUsed')
+        for key={'initialGuessUsed','initialGuessModelRelativeDefect','effectiveCorrectionTolerance','gmresSkipped'},item.(key{1})=a.(key{1});end
+    end
+    if isfield(a,'recycledKrylovReport')
+        rr=a.recycledKrylovReport;item.recycled=rmfield(rr,'cycles');item.recycled.cycles=struct([]);
+        for z=1:numel(rr.cycles)
+            cc=rr.cycles{z};cycleSummary=struct;
+            for key={'cycle','arnoldiSteps','totalArnoldiSteps','retainedBefore','retainedAfter','startResidualNorm','actualResidualNorm', ...
+                    'basisOrthogonalityError','arnoldiRelationRelativeDifference','retainedImageProbeRelativeDifference','modelApplications','preconditionerApplications'}
+                cycleSummary.(key{1})=cc.(key{1});
+            end
+            if z==1,item.recycled.cycles=cycleSummary;else,item.recycled.cycles(z)=cycleSummary;end
+        end
+    end
+    if isempty(attempts),attempts=item;else,attempts(end+1)=item;end %#ok<AGROW>
+end
+prior=0;if isfield(s.report,'priorAcceptedNonlinearIterations'),prior=s.report.priorAcceptedNonlinearIterations;end
+diagnostics{3}=struct('localSegmentOnly',true,'sourceFolder',resultFolder,'priorAcceptedCorrections',prior, ...
+    'linearAttempts',attempts,'nonlinearTrials',s.result.lineLog, ...
+    'maximumKrylovIterations',s.result.options.maximumKrylovIterations, ...
+    'linearRelativeTolerance',s.result.options.linearRelativeTolerance, ...
+    'steadyResidualTolerance',s.result.options.steadyResidualTolerance,'steadyFluxTolerance',s.result.options.steadyFluxTolerance, ...
+    'spatialConservationTolerance',s.result.options.spatialConservationTolerance, ...
+    'residualEvaluationsAfterLastAcceptedHistory',0);
+% 模块八：整体下降和最大局部残差分别呈现；一次小步接受不代表稳定收敛。
+% 趋势只比较本段真实初末态，不跨边界问题或使用旧方程基线。
+diagnostics{3}.segmentResidualTrend=struct('initialRmsMerit',s.result.initialRmsMerit, ...
+    'finalRmsMerit',s.result.rmsMerit,'initialMaximumResidual',s.result.initialMaximumResidual, ...
+    'finalMaximumResidual',s.result.maximumResidual, ...
+    'rmsRelativeChange',(s.result.rmsMerit-s.result.initialRmsMerit)/max(realmin,s.result.initialRmsMerit), ...
+    'maximumRelativeChange',(s.result.maximumResidual-s.result.initialMaximumResidual)/max(realmin,s.result.initialMaximumResidual), ...
+    'rmsDecreased',s.result.rmsMerit<s.result.initialRmsMerit, ...
+    'maximumIncreased',s.result.maximumResidual>s.result.initialMaximumResidual, ...
+    'steadyNumericalTargetsMet',s.result.steadyConverged);
+% 候选坐标是非线性求解路径，不是新的物理场算法，也不等同于改变守恒方程。
+diagnostics{3}.trialStateCoordinates='conservative';
+if isfield(s.result.options,'trialStateCoordinates'),diagnostics{3}.trialStateCoordinates=s.result.options.trialStateCoordinates;end
+if ~isempty(directionStudy)
+    prepared=load(directionStudy.candidateFile,'value','report');pr=prepared.report;
+    assert(strcmp(pr.status,'tested-current-Q22-fixed-objective-restarted-zero-start-continuation')&& ...
+        ~pr.physicalStateChanged&&pr.newActualNSEvaluations==0&&pr.modelPointOneMet&& ...
+        isequaln(pr.sourceIdentity,rocketSelectedDirectionSourceIdentity)&& ...
+        isequaln(prepared.value,s.result.linearLog{1}.steadyDirectionEvidence.directionU)&& ...
+        directionStudy.main.acceptedNonlinearIterations==s.report.acceptedNonlinearIterations&& ...
+        directionStudy.main.residualEvaluations==s.report.residualEvaluations, ...
+        'WallVelocityView:DirectionSource','准备方向不是主求解器实际验收的完整总方向。');
+    probeBinding=load(s.result.options.steadyInitialGuess.file,'sourceBinding');
+    assert(strcmp(pr.sourceBinding.sourceFileSHA256,probeBinding.sourceBinding.sha256)&& ...
+        strcmp(rocketStreamingFileSHA256(pr.initialEvidenceFile),pr.initialEvidenceFileSHA256), ...
+        'WallVelocityView:DirectionSource','方向准备与原NS探针基态或检查点不一致。');
+    initial=load(pr.initialEvidenceFile,'detail');
+    diagnostics{3}.directionPreparation=struct('methodLabel',sprintf('当前状态峰值软权重；零初猜%d步 + 检查点重启%d步LSQR', ...
+        initial.detail.nativeIterations,pr.linearReport.nativeIterations), ...
+        'studyFile',directionStudyFile,'studyFileSHA256',rocketStreamingFileSHA256(directionStudyFile), ...
+        'candidateFile',directionStudy.candidateFile,'candidateFileSHA256',directionStudy.candidateFileSHA256, ...
+        'baseCase',directionStudy.predecessorCase,'usedTotalDirectionExactlyVerified',true,'hardUpdateLimitClaimed',false, ...
+        'firstSegmentIterations',initial.detail.nativeIterations,'restartedSegmentIterations',pr.linearReport.nativeIterations, ...
+        'internalCRelativeResidual',pr.linearReport.relativeCResidual,'internalCTarget',pr.linearReport.options.relativeTolerance, ...
+        'internalCTargetMet',pr.linearReport.internalCTargetMet,'completeModelRelativeDefect',pr.completeSelectedModelRelativeDefect, ...
+        'originalNSDirectionDefect',s.result.linearLog{1}.fullSystemRelativeDefect, ...
+        'originalNSDirectionTarget',s.result.options.linearRelativeTolerance);
+    clear prepared pr probeBinding initial;
+end
+totalCalls=s.result.residualEvaluations;
+if isfield(s.report,'totalNewEquationResidualEvaluations'),totalCalls=s.report.totalNewEquationResidualEvaluations;end
+diagnostics{3}.residualEvaluationsAfterLastAcceptedHistory=totalCalls-histories{3}.residualEvaluations(end);
+diagnostics{3}.normalEulerLinearization='rusanov-frozen';
+if isfield(s.result.options,'normalEulerLinearization'),diagnostics{3}.normalEulerLinearization=s.result.options.normalEulerLinearization;end
+diagnostics{3}.linearEquation='pseudo-transient';diagnostics{3}.preconditionerTimeStepOnly=false;
+if isfield(s.result,'linearEquation')
+    diagnostics{3}.linearEquation=s.result.linearEquation;diagnostics{3}.preconditionerTimeStepOnly=s.result.preconditionerTimeStepOnly;
+end
+diagnostics{3}.rightPreconditioner='normal-line';diagnostics{3}.graphSweeps=NaN;
+if isfield(s.result,'rightPreconditioner')
+    diagnostics{3}.rightPreconditioner=s.result.rightPreconditioner;diagnostics{3}.graphSweeps=s.result.options.graphSweeps;
+end
+diagnostics{3}.jacobianAction='original-difference';diagnostics{3}.selectedAnalyticApplications=NaN;
+diagnostics{3}.krylovMethod='matlab-gmres';
+if isfield(s.result,'krylovMethod')
+    for key={'krylovMethod','recycledKrylovModelApplications','recycledKrylovPreconditionerApplications','recycledKrylovArnoldiSteps'},diagnostics{3}.(key{1})=s.result.(key{1});end
+end
+diagnostics{3}.steadyInitialGuessModelApplications=0;diagnostics{3}.steadyInitialGuessReport=struct;
+if isfield(s.result,'wlsNormalCorrection'),diagnostics{3}.wlsNormalCorrection=s.result.wlsNormalCorrection;end
+if isfield(s.result,'steadyInitialGuessReport')
+    diagnostics{3}.steadyInitialGuessReport=s.result.steadyInitialGuessReport;
+    diagnostics{3}.steadyInitialGuessModelApplications=s.result.steadyInitialGuessModelApplications;
+end
+if isfield(s.result,'jacobianAction')
+    diagnostics{3}.jacobianAction=s.result.jacobianAction;diagnostics{3}.selectedAnalyticApplications=s.result.selectedAnalyticApplications;
+end
+% 模块六：粗层代数误差、图扫描残差与完整NS缺陷分列；旧路径保持未知粗层诊断。
+for key={'coarseUnknowns','coarseImageBytes','coarseOperatorBuilds','coarseOperatorReuses', ...
+        'coarseConstructionModelApplications','coarsePreconditionerModelApplications','coarseReuseVerificationModelApplications'}
+    name=key{1};diagnostics{3}.(name)=NaN;
+    if isfield(s.result,name),diagnostics{3}.(name)=s.result.(name);end
+end
+diagnostics{3}.coarseBasis='conservative-volume';diagnostics{3}.coarseTargetCellCount=NaN;diagnostics{3}.parentCoarseUnknowns=NaN;
+if isfield(s.result,'coarseBasis')
+    diagnostics{3}.coarseBasis=s.result.coarseBasis;
+    for key={'coarseTargetCellCount','parentCoarseUnknowns','coarseBaseConservativeColumns','coarseAdditionalPrimitiveColumns', ...
+            'coarseRetainedMixedColumns','coarseLocalConservativeColumns','coarseLocalDistinctCells'}
+        diagnostics{3}.(key{1})=NaN;if isfield(s.result,key{1}),diagnostics{3}.(key{1})=s.result.(key{1});end
+    end
+end
+% 模块七：从最后一次原NS方向证据计算法向层/方程剩余分布，不当成表面物理场。
+diagnostics{3}.linearRemainingLayerFractions=[];diagnostics{3}.linearRemainingEquationFractions=[];
+if ~isempty(s.result.linearLog)&&isfield(s.result.linearLog{end},'steadyDirectionEvidence')
+    evidence=s.result.linearLog{end}.steadyDirectionEvidence;index=evidence.baseAcceptedIteration;
+    if index==0,baseRate=s.result.initialRate;else,baseRate=s.result.trace{index}.rate;end
+    remaining=baseRate./s.result.residualScale+evidence.value;denominator=sum(remaining.^2,'all');
+    if denominator>0
+        layerCount=size(remaining,1)/n;layerEnergy=sum(reshape(sum(remaining.^2,2),n,layerCount),1);
+        diagnostics{3}.linearRemainingLayerFractions=layerEnergy/denominator;
+        diagnostics{3}.linearRemainingEquationFractions=sum(remaining.^2,1)/denominator;
+    end
+end
+clear s;
+labels={'原v82末态 · 旧墙速度梯度','相同Q · 静止壁切向约束基线','静止壁切向约束 · 有界修正末态'};
+newReservoir=isfield(summaries{3},'openBoundaryDiscretization')&&strcmp(summaries{3}.openBoundaryDiscretization,'exact-Riemann-reservoir');
+if newReservoir,labels{3}='精确Riemann储库 · 独立NS修正末态';end
+ids={'legacy-wall-source','constrained-wall-baseline','constrained-wall-krylov'};
+mkdir(folder);exportRocketTestGeometryView({mesh},fullfile(folder,'geometry'),{'真实原19752面，X鼻尖正向'});
+exportRocketTestGeometryView({mesh,struct('V',cut.nodeLayers(:,:,2),'F',mesh.F),struct('V',cut.nodeLayers(:,:,end),'F',mesh.F)}, ...
+    fullfile(folder,'domain'),{'原墙','第一近壁节点层','最外计算边界；不是激波'});
+common=struct('pressure',[Inf -Inf],'heatFlux',[Inf -Inf],'wallAdjacentTemperature',[Inf -Inf], ...
+    'temperatureRate',[Inf -Inf],'wallMechanicalExchange',[Inf -Inf]);datasets=cell(3,1);entries=struct([]);cv=gas.R/(gas.gamma-1);owner=cut.walls.ownerCell;
+for j=1:3
+    info=infos{j};r=rates{j};P=info.primitive;u=P(:,2:4);rho=P(:,1);
+    temperatureRate=(r(:,5)-sum(u.*r(:,2:4),2)+(.5*sum(u.^2,2)-cv*P(:,5)).*r(:,1))./(rho*cv);
+    traction=info.wallPressure.*cut.walls.normal-info.wallFlux(:,2:4);mechanical=-sum(u(owner,:).*traction,2);
+    mapped=mapCutCellWallFields(cut,info,false);data=buildAerothermalViewerData(mesh);state=ones(n,1);
+    policy='legacy';wallMethod='旧WLS加斜位移约束墙速度梯度';if j>1,policy='dirichlet-tangent';wallMethod='显式静止墙零切向速度导数与真实正dn约束';end
+    scheme=['精确理想气体Godunov内部对流；Newton应力；算术内面功速度；' wallMethod];
+    if j==3&&newReservoir,scheme=[scheme '；开放储库为精确Riemann xi=0采样，按质量方向闭合黏性边界'];end
+    scope='M5/30km/20°；常gamma/冻结mu层流研究；未稳态/网格外域或实验合格，不计生产覆盖；Tw300K输入';
+    data.fields=field('pressure','研究墙压','kPa',mapped.pressure.value/1000,state,['当前CV内能EOS恢复；' scheme],scope);
+    data.fields(end+1)=field('heatFlux','研究入壁热流（未收敛）','kW/m²',mapped.heatFluxIntoWall.value/1000,state,['真实Dirichlet墙温梯度与Fourier；' scheme],scope);
+    data.fields(end+1)=field('wallAdjacentTemperature','邻壁单元气体温度','K',P(owner,5),state,['当前CV内能恢复，不是Te/Tr/Tw；' scheme],scope);
+    data.fields(end+1)=field('temperatureRate','邻壁气体温度变化率（算子诊断）','K/s',temperatureRate(owner),state,['完整五量空间残差转换，不是轨迹热史；' scheme],scope);
+    data.fields(end+1)=field('wallMechanicalExchange','黏性内能转换（代理诊断）','kW/m²',mechanical/1000,state, ...
+        ['-U邻壁代理·Newton墙牵引；' wallMethod '；静止壁外功仍为0，本量不是壁面对流体做功'],scope);
+    data.fields(end+1)=field('wallInput','给定壁温','K',mapped.wallTemperatureInput.value,2*state,'静止无滑移等温墙输入，非求解壁温',scope);
+    data.fields(end+1)=field('freestreamNormalProjection','给定来流沿实体外法向投影','m/s',-cut.walls.normal*fs.flowVelocityVector(:),state,'给定U∞与原实体外法向点乘，仅几何诊断，非当地速度/压力',scope);
+    data.fields(end).computedStateLabel='几何诊断';
+    for z={{'edgeTemperature','外缘温度','没有合格的当地边界层外缘提取'}, ...
+           {'recoveryTemperature','恢复温度','没有适用的当地外缘/恢复温度解'}, ...
+           {'wallSolved','求解壁温','Tw300K是输入，没有独立壁体能量求解'}}
+        spec=z{1};data.fields(end+1)=field(spec{1},spec{2},'K',nan(n,1),zeros(n,1),['未求解：' spec{3}],spec{3}); %#ok<AGROW>
+    end
+    for key=fieldnames(common)',k=key{1};f=data.fields(strcmp({data.fields.key},k));common.(k)=[min(common.(k)(1),min(f.values)),max(common.(k)(2),max(f.values))];end
+    summary=summaries{j};caption=sprintf('M5 / 30km / α20° / Tw给定300K；%s；本方程最大残差%.7g s^-1；未稳态；不计生产覆盖',labels{j},summary.maximumResidual);
+    data.defaultField='heatFlux';data.caseNote=caption;data.coordinateNote='SI / m · X鼻尖正向 · 零攻角来流-X · 灰色为本场量未知';data.flowDirection=fs.unitFlowDirection;
+    data.region=repmat({'真实原面研究域'},n,1);data.regions=struct([]);data.heatingGaps=struct([]);data.missingReason=repmat({''},n,1);
+    data.resultCondition=struct('caption',caption,'Mach',5,'altitudeM',30000,'angleOfAttackDeg',20,'flowVelocityVector',fs.flowVelocityVector, ...
+        'wallTemperatureInputK',300,'physicalTimeAdvanced',0,'BETimeStepsClaimed',0,'steadyConverged',false);
+    data.researchIdentity=struct('caseID',ids{j},'wallVelocityGradient',policy,'interiorEulerFlux','exact-godunov','viscousWorkVelocity','arithmetic', ...
+        'sourceHistoryAppended',false,'productionQualified',false,'physicalSolution',false,'steadyConverged',false, ...
+        'newProductionSolvedAreaM2',0,'fullThreeDimensionalMomentum',true,'stationaryWallExternalPowerW',0);
+    if j==3&&newReservoir
+        data.researchIdentity.openBoundaryDiscretization='exact-Riemann-reservoir';
+        data.researchIdentity.priorProblemHistoryAppended=false;
+    end
+    datasets{j}=data;
+    entry=struct('id',ids{j},'label',labels{j},'wallVelocityGradient',policy,'resultsURL',['cases/' ids{j} '/index.html'], ...
+        'resultsJSONURL',['cases/' ids{j} '/results.json'],'summary',summary,'history',histories{j},'solverDiagnostics',diagnostics{j}, ...
+        'signedHeatPowerW',mapped.summedKnownHeatPower,'adjacentTemperatureRangeK',[min(P(owner,5)),max(P(owner,5))], ...
+        'mechanicalCoolingWallCount',nnz(mechanical<0),'physicalTimeAdvanced',0,'steadyConverged',false,'newProductionSolvedAreaM2',0);
+    if isempty(entries),entries=entry;else,entries(end+1)=entry;end %#ok<AGROW>
+end
+for j=1:3
+    data=datasets{j};data.comparisonColorRanges=common;out=fullfile(folder,'cases',ids{j});mkdir(out);
+    for name={'index.html','viewer.css','viewer.js','section.js','export.js'},copyfile(fullfile(root,'web',name{1}),fullfile(out,name{1}));end
+    json=jsonencode(data,'ConvertInfAndNaN',true);write(fullfile(out,'results.json'),json);write(fullfile(out,'case-data.js'),['window.ROCKET_CASE=' json ';' newline]);
+end
+payload=struct('kind','actual-20deg-static-wall-velocity-gradient-study-v1','cases',entries,'commonRanges',common, ...
+    'sourceFaces',n,'cellCount',numel(cut.cells.volume),'layerCount',cut.quality.layerCount,'gas',gas,'integrationReport',integrationReport, ...
+    'geometryURL','geometry/index.html','domainURL','domain/index.html','readOnlyFrozenStudy',true, ...
+    'productionQualified',false,'newProductionSolvedAreaM2',0,'browserVisualOrWebGLRuntimeVerified',false);
+payload.convergenceTargets=struct('maximumResidualPerSecond',2e-6,'steadyBoundaryFluxBalance',5e-10,'spatialConservationRelative',1e-9);
+if ~isempty(linearResearch),payload.linearResearch=linearResearch;end
+json=jsonencode(payload,'ConvertInfAndNaN',true);write(fullfile(folder,'wall-velocity-study-data.json'),json);write(fullfile(folder,'wall-velocity-study-data.js'),['window.ROCKET_WALL_VELOCITY_STUDY=' json ';' newline]);
+for name={'rocket-wall-velocity.html','rocket-wall-velocity.js','rocket-sensitivity.css'}
+    dest=name{1};if endsWith(dest,'.html'),dest='index.html';end;copyfile(fullfile(root,'web',name{1}),fullfile(folder,dest));
+end
+report=struct('status','exported-three-actual-static-wall-velocity-gradient-cases','cases',3,'sourceFaces',n,'htmlFile',fullfile(folder,'index.html'), ...
+    'productionQualified',false,'browserVisualOrWebGLRuntimeVerified',false,'newProductionSolvedAreaM2',0);write(fullfile(folder,'study_summary.json'),jsonencode(report));
+end
+function out=pick(info)
+keys={'primitive','wallPressure','wallHeatFluxIntoWall','wallTemperatureInput','wallActiveInFluidDomain','wallFlux'};
+out=struct;for name=keys,key=name{1};out.(key)=info.(key);end
+end
+function value=balances(info,cut)
+% 空间账是离散散度与边界的核对；定常边界净流量非零仍表明没有稳态。
+external=cut.openFaces.cellPlus==0;
+denominator=max(1,sum(abs(info.faceFlux(external,:)).*cut.openFaces.area(external),1)+sum(abs(info.wallFlux).*cut.walls.area,1));
+value=struct('spatialConservationRelative',max(abs(info.balanceResidual)./denominator), ...
+    'steadyBoundaryFluxBalance',max(abs(info.netBoundaryFlux)./denominator));
+end
+function f=field(key,label,unit,values,status,method,scope)
+n=numel(values);reasons=repmat({scope},n,1);reasons(status>0)={''};
+f=struct('key',key,'label',label,'unit',unit,'values',values,'status',status,'methodNames',{{method}},'methodIndex',zeros(n,1), ...
+    'scope',scope,'scopeNames',{{scope}},'scopeIndex',zeros(n,1),'missingReason',{reasons},'stateNote',scope,'computedStateLabel','未收敛研究数值');
+end
+function write(path,value)
+fid=fopen(path,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',value);
+end

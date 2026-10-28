@@ -1,0 +1,232 @@
+# -*- coding: utf-8 -*-
+"""独立核对实际MAT到原面工作台十个场量，并生成科研正投影图；不是浏览器验收。"""
+from pathlib import Path
+import hashlib,json,os,sys
+import numpy as np
+from scipy.io import loadmat
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib.collections import PolyCollection
+from matplotlib.colors import Normalize
+from matplotlib.cm import ScalarMappable
+ROOT=Path(__file__).resolve().parents[1];folder=Path(sys.argv[1]).resolve();suffix=sys.argv[2] if len(sys.argv)>2 else '';assert not suffix or suffix.isdigit()
+target=folder/('independent_wall_velocity_view'+suffix+'.json');assert not target.exists()
+def sha(path):
+    digest=hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for block in iter(lambda:stream.read(8*1024*1024),b''):digest.update(block)
+    return digest.hexdigest()
+domain_file=ROOT/'outputs/v80_validation/domain02/shell_domain_evidence.mat'
+bindings={str(domain_file.relative_to(ROOT)):sha(domain_file)};d=loadmat(domain_file,simplify_cells=True,variable_names=['domain'])['domain'];mesh=d['inputGeometry'];w=d['walls']
+payload_file=folder/'wall-velocity-study-data.json';bindings[str(payload_file.relative_to(ROOT))]=sha(payload_file);payload=json.loads(payload_file.read_text(encoding='utf8'))
+assert payload['convergenceTargets']==dict(maximumResidualPerSecond=2e-6,steadyBoundaryFluxBalance=5e-10,spatialConservationRelative=1e-9)
+views=[];checks=[];diagnostic_audit=None
+for index,entry in enumerate(payload['cases']):
+    file=folder/entry['resultsJSONURL'];bindings[str(file.relative_to(ROOT))]=sha(file);data=json.loads(file.read_text(encoding='utf8'));views.append(data)
+    np.testing.assert_array_equal(data['vertices'],mesh['V']);np.testing.assert_array_equal(data['faces'],mesh['F']-1)
+    if index==0:source=ROOT/'outputs/v82_validation/exact_krylov01/steady_krylov_evidence.mat'
+    elif index==1:source=ROOT/'outputs/v83_validation/integration01/wall_velocity_integration_evidence.mat'
+    else:source=ROOT/'outputs/v83_validation'/entry['summary']['resultEvidenceFolder']/'wall_velocity_krylov_evidence.mat'
+    bindings[str(source.relative_to(ROOT))]=sha(source);s=loadmat(source,simplify_cells=True);r=s.get('result',s);info=r['info'];P=info['primitive'];rate=r['rate'];gas=s['gas'];cv=gas['R']/(gas['gamma']-1)
+    owner=w['ownerCell'].astype(int)-1;u=P[:,1:4];rho=P[:,0]
+    slope=(rate[:,4]-np.sum(u*rate[:,1:4],axis=1)+(.5*np.sum(u*u,axis=1)-cv*P[:,4])*rate[:,0])/(rho*cv)
+    traction=info['wallPressure'][:,None]*w['normal']-info['wallFlux'][:,1:4];mechanical=-np.sum(u[owner]*traction,axis=1)
+    expected=dict(pressure=info['wallPressure']/1000,heatFlux=info['wallHeatFluxIntoWall']/1000,wallAdjacentTemperature=P[owner,4],
+                  temperatureRate=slope[owner],wallMechanicalExchange=mechanical/1000,wallInput=info['wallTemperatureInput'])
+    fields={f['key']:f for f in data['fields']};errors={}
+    for key,value in expected.items():
+        error=float(np.max(abs(np.asarray(fields[key]['values'])-value))/max(1,np.max(abs(value))));assert error<3e-13;errors[key]=error
+    for key in ['edgeTemperature','recoveryTemperature','wallSolved']:assert all(x is None for x in fields[key]['values']) and set(fields[key]['status'])=={0}
+    assert not data['researchIdentity']['productionQualified'] and data['researchIdentity']['stationaryWallExternalPowerW']==0
+    faces=d['openFaces'];external=faces['cellPlus']==0
+    denominator=np.maximum(1,np.sum(abs(info['faceFlux'][external])*faces['area'][external,None],axis=0)+np.sum(abs(info['wallFlux'])*w['area'][:,None],axis=0))
+    balance=dict(spatialConservationRelative=float(np.max(abs(info['balanceResidual'])/denominator)),
+                 steadyBoundaryFluxBalance=float(np.max(abs(info['netBoundaryFlux'])/denominator)))
+    for key,value in balance.items():np.testing.assert_allclose(entry['summary'][key],value,rtol=5e-13,atol=0)
+    if index==2:
+        # 模块三：本段实际检查/拒绝须逐条来自原求解MAT，不从接受历史推测。
+        diag=entry['solverDiagnostics'];assert diag['localSegmentOnly'] and diag['sourceFolder']==entry['summary']['resultEvidenceFolder']
+        if 'trialStateCoordinates' in diag:assert diag['trialStateCoordinates']==r['options'].get('trialStateCoordinates','conservative')
+        if 'directionPreparation' in diag:
+            prep=diag['directionPreparation'];assert prep['usedTotalDirectionExactlyVerified'] and not prep['hardUpdateLimitClaimed']
+            for key in ['studyFile','candidateFile']:
+                path=Path(prep[key]);path=path if path.is_absolute() else ROOT/path
+                bindings[str(path.relative_to(ROOT))]=sha(path);assert sha(path)==prep[key+'SHA256']
+            prepared=loadmat(prep['candidateFile'],simplify_cells=True,variable_names=['value','report','detail','directionReport','sourceBinding','preparationFile','preparationSHA256'])
+            actual_linear=r['linearLog'] if isinstance(r['linearLog'],dict) else r['linearLog'][0]
+            np.testing.assert_array_equal(prepared['value'],actual_linear['steadyDirectionEvidence']['directionU'])
+            if prep.get('kind')=='current-band-active-temperature-v1':
+                study=json.loads(Path(prep['studyFile']).read_text(encoding='utf8'))
+                steps=study['steps'] if isinstance(study['steps'],list) else [study['steps']]
+                pr=next(item for item in steps if item['step']==prep['step'])
+                assert pr['sourceBinding']==prepared['sourceBinding']
+                assert sha(prepared['preparationFile'])==prepared['preparationSHA256']==pr['preparationSHA256']
+                assert sha(prep['candidateFile'])==pr['directionFileSHA256']
+                direction=prepared['directionReport'];pr={**pr,'linearReport':direction['linearReport']}
+                assert direction['bandDirectionFeasible'] and not direction['oldActiveSetInherited']
+                assert not prep['physicalTemperatureBoundaryAdded'] and not prep['constrainedOptimumClaimed']
+                assert not prep['nonlinearTemperatureBoundGuaranteed'] and not prep['oldActiveSetInherited']
+                for label in ('bandFaceIDs','activeFaceIDs','temperatureDerivativeK'):
+                    np.testing.assert_array_equal(np.atleast_1d(prep[label]),np.atleast_1d(pr['directionReport'][label]))
+                assert prep['firstSegmentIterations']==direction['freeLinearReport']['nativeIterations']
+                assert prep['firstSegmentIterations']+prep['restartedSegmentIterations']==direction['totalNativeIterations']
+                probe=loadmat(r['options']['steadyInitialGuess']['file'],simplify_cells=True,variable_names=['sourceBinding'])['sourceBinding']
+                assert probe['sha256']==prepared['sourceBinding']['sourceFileSHA256']
+                assert pr['main']['residualEvaluations']==r['residualEvaluations']
+                assert pr['main']['totalNewEquationResidualEvaluations']==s['report']['totalNewEquationResidualEvaluations']
+            elif prep.get('kind')=='temperature-comparison-QR-LSQR-v1':
+                study=json.loads(Path(prep['studyFile']).read_text(encoding='utf8'))
+                pr=next(b for b in study['branches'] if b['method']==prep['branchMethod'])
+                assert study['sourceBinding']==prepared['sourceBinding'] and not study['parallelHistoriesMerged']
+                assert sha(prepared['preparationFile'])==prepared['preparationSHA256']==study['preparationSHA256']
+                assert prep['firstSegmentIterations']==prepared['detail']['nativeIterations'] and prep['restartedSegmentIterations']==0
+                assert prep['constraintApplied']==(prep['branchMethod']=='projected') and not prep['physicalTemperatureBoundaryAdded']
+                assert not prep['nonlinearTemperatureBoundGuaranteed']
+                probe=loadmat(r['options']['steadyInitialGuess']['file'],simplify_cells=True,variable_names=['sourceBinding'])['sourceBinding']
+                assert probe['sha256']==prepared['sourceBinding']['sourceFileSHA256'] and pr['main']['residualEvaluations']==r['residualEvaluations']
+            elif prep.get('kind')=='augmented-patch-QR-LSQR-v1':
+                pr=json.loads(Path(prep['studyFile']).read_text(encoding='utf8'))
+                assert pr['sourceBinding']==prepared['sourceBinding'] and pr['modelPointOneMet']
+                assert sha(prepared['preparationFile'])==prepared['preparationSHA256']==pr['preparationSHA256']
+                probe=loadmat(r['options']['steadyInitialGuess']['file'],simplify_cells=True,variable_names=['sourceBinding'])['sourceBinding']
+                assert probe['sha256']==prepared['sourceBinding']['sourceFileSHA256']
+                assert prep['firstSegmentIterations']==prepared['detail']['nativeIterations'] and prep['restartedSegmentIterations']==0
+                assert pr['linearReport']['method']=='complete-parent-C-fixed-primitive-penalty-augmented-patch-QR-LSQR'
+                assert pr['main']['residualEvaluations']==r['residualEvaluations']
+            else:
+                pr=prepared['report'];previous=loadmat(pr['initialEvidenceFile'],simplify_cells=True,variable_names=['detail'])['detail']
+                assert sha(pr['initialEvidenceFile'])==pr['initialEvidenceFileSHA256']
+                assert prep['firstSegmentIterations']==previous['nativeIterations'] and prep['restartedSegmentIterations']==pr['linearReport']['nativeIterations']
+            internal_target=pr['linearReport'].get('internalCTarget',pr['linearReport'].get('options',{}).get('relativeTolerance'))
+            for key,value in [('internalCRelativeResidual',pr['linearReport']['relativeCResidual']),('internalCTarget',internal_target),
+                              ('completeModelRelativeDefect',pr['completeSelectedModelRelativeDefect']),('originalNSDirectionDefect',actual_linear['fullSystemRelativeDefect'])]:
+                assert prep[key]==value
+            assert prep['internalCTargetMet']==bool(pr['linearReport']['internalCTargetMet'])
+        if 'segmentResidualTrend' in diag:
+            trend=diag['segmentResidualTrend']
+            for key,actual_value in [('initialRmsMerit',r['initialRmsMerit']),('finalRmsMerit',r['rmsMerit']),
+                                     ('initialMaximumResidual',r['initialMaximumResidual']),('finalMaximumResidual',r['maximumResidual'])]:
+                assert trend[key]==actual_value
+            assert trend['rmsDecreased']==(r['rmsMerit']<r['initialRmsMerit'])
+            assert trend['maximumIncreased']==(r['maximumResidual']>r['initialMaximumResidual'])
+            assert trend['steadyNumericalTargetsMet']==bool(r['steadyConverged'])
+            np.testing.assert_allclose(trend['rmsRelativeChange'],(r['rmsMerit']-r['initialRmsMerit'])/r['initialRmsMerit'],rtol=3e-15)
+            np.testing.assert_allclose(trend['maximumRelativeChange'],(r['maximumResidual']-r['initialMaximumResidual'])/r['initialMaximumResidual'],rtol=3e-15)
+        assert diag['priorAcceptedCorrections']==s['report'].get('priorAcceptedNonlinearIterations',0)
+        rows=lambda x:[x] if isinstance(x,dict) else list(x)
+        actual=rows(r['linearLog']);exported=rows(diag['linearAttempts']);assert len(actual)==len(exported)
+        for ordinal,(a,e) in enumerate(zip(actual,exported),1):
+            assert e['attempt']==ordinal
+            for key in ['fullSystemRelativeDefect','target','fullSystemTargetMet','gmresFlag','gmresReportedResidual']:
+                # 已达方向目标会跳过GMRES；其未执行残差须导出null，不能补成0。
+                if isinstance(a[key],(float,np.floating)) and np.isnan(a[key]):assert e[key] is None
+                else:np.testing.assert_allclose(e[key],a[key],rtol=3e-15,atol=0)
+            np.testing.assert_array_equal(np.atleast_1d(e['gmresIterations']),np.atleast_1d(a['gmresIterations']))
+            np.testing.assert_allclose(e['preconditionerRelativeDefect'],a['relativeLinearDefect'],rtol=3e-15,atol=0)
+            if 'coarseAlgebraicRelativeResidual' in a:np.testing.assert_allclose(e['coarseAlgebraicRelativeResidual'],a['coarseAlgebraicRelativeResidual'],rtol=3e-15,atol=0)
+            else:assert e.get('coarseAlgebraicRelativeResidual') is None
+            for key in ['normalizedMeritDerivative','inexactNewtonUpperBound']:
+                if key in a:np.testing.assert_allclose(e[key],a[key],rtol=3e-15,atol=0)
+                else:assert e[key] is None
+        actual_trials=rows(r['lineLog']);exported_trials=rows(diag['nonlinearTrials']);assert len(actual_trials)==len(exported_trials)
+        for a,e in zip(actual_trials,exported_trials):
+            assert set(a)==set(e)
+            for key,value in a.items():
+                if key=='errorIdentifier':assert e[key]==(value if isinstance(value,str) else '')
+                elif np.isnan(value):assert e[key] is None
+                else:np.testing.assert_allclose(e[key],value,rtol=3e-15,atol=0)
+        for key in ['maximumKrylovIterations','linearRelativeTolerance','steadyResidualTolerance','steadyFluxTolerance','spatialConservationTolerance']:
+            assert diag[key]==r['options'][key]
+        assert diag['normalEulerLinearization']==r['options'].get('normalEulerLinearization','rusanov-frozen')
+        assert diag['rightPreconditioner']==r['options'].get('rightPreconditioner','normal-line')
+        if diag['rightPreconditioner'] in ('lateral-colored-line','two-level-minres'):
+            assert diag['graphSweeps']==r['options']['graphSweeps'] and r['fixedLinearPreconditioner']
+        else:assert diag['graphSweeps'] is None
+        for key in ['coarseUnknowns','coarseImageBytes','coarseOperatorBuilds','coarseOperatorReuses','coarseConstructionModelApplications','coarsePreconditionerModelApplications','coarseReuseVerificationModelApplications']:
+            if key in r:assert diag[key]==r[key]
+            else:assert diag.get(key) is None
+        if 'coarseBasis' in r:
+            assert diag['coarseBasis']==r['coarseBasis']
+            for key in ['parentCoarseUnknowns','coarseTargetCellCount','coarseBaseConservativeColumns','coarseAdditionalPrimitiveColumns','coarseRetainedMixedColumns','coarseLocalConservativeColumns','coarseLocalDistinctCells']:
+                if key in r:assert diag[key]==r[key]
+        assert diag['jacobianAction']==r['options'].get('jacobianAction','original-difference')
+        if 'wlsNormalCorrection' in r:
+            assert diag['wlsNormalCorrection']==r['wlsNormalCorrection']
+            correction=diag['wlsNormalCorrection']
+            assert correction['stressHeatAndBothWorkTermsIncluded'] and not correction['crossOriginalFacetWlsBlocksIncluded']
+            assert correction['additionalPersistentBlockUpperBoundBytes']<=correction['maximumAdditionalBytes'] and not correction['physicalEquationChanged']
+        if 'steadyInitialGuessReport' in r:
+            assert diag['steadyInitialGuessReport']==r['steadyInitialGuessReport']
+            assert diag['steadyInitialGuessModelApplications']==r['steadyInitialGuessModelApplications']
+            for a,e in zip(actual,exported):
+                if a.get('initialGuessUsed',False):
+                    for key in ['initialGuessUsed','initialGuessModelRelativeDefect','effectiveCorrectionTolerance','gmresSkipped']:assert e[key]==a[key]
+        if 'krylovMethod' in r:
+            for key in ['krylovMethod','recycledKrylovModelApplications','recycledKrylovPreconditionerApplications','recycledKrylovArnoldiSteps']:assert diag[key]==r[key]
+            for a,e in zip(actual,exported):
+                if 'recycledKrylovReport' in a:
+                    rr=a['recycledKrylovReport'];er=e['recycled']
+                    for key in ['arnoldiSteps','modelApplications','preconditionerApplications','maximumModelApplications','basisStorageUpperBoundBytes','maximumBasisBytes']:assert rr[key]==er[key]
+                    for c,d in zip(rows(rr['cycles']),rows(er['cycles'])):
+                        for key in d:
+                            if d[key] is None:assert np.isnan(c[key])
+                            else:np.testing.assert_allclose(d[key],c[key],rtol=3e-15,atol=0)
+        if diag['jacobianAction']=='selected-analytic':
+            assert diag['selectedAnalyticApplications']==r['selectedAnalyticApplications'] and r['originalNSCombinedDirectionCheckPreserved']
+        else:assert diag['selectedAnalyticApplications'] is None
+        assert diag['linearEquation']==r.get('linearEquation','pseudo-transient')
+        assert diag['preconditionerTimeStepOnly']==r.get('preconditionerTimeStepOnly',False)
+        actual_history=s.get('displayHistory',r['history'])
+        assert diag['residualEvaluationsAfterLastAcceptedHistory']==s['report'].get('totalNewEquationResidualEvaluations',r['residualEvaluations'])-np.atleast_1d(actual_history['residualEvaluations'])[-1]
+        actual_history=s.get('displayHistory',r['history']);assert set(entry['history'])==set(actual_history)
+        for key,value in actual_history.items():np.testing.assert_allclose(entry['history'][key],value,rtol=3e-15,atol=0)
+        if diag.get('linearRemainingLayerFractions'):
+            evidence=actual[-1]['steadyDirectionEvidence'];index=int(evidence['baseAcceptedIteration'])
+            base_rate=r['initialRate'] if index==0 else rows(r['trace'])[index-1]['rate']
+            remaining=base_rate/r['residualScale']+evidence['value'];squared=float(np.sum(remaining**2));nl=len(remaining)//len(mesh['F'])
+            layer=np.sum(remaining.reshape((nl,len(mesh['F']),5))**2,axis=(1,2))/squared;equation=np.sum(remaining**2,axis=0)/squared
+            np.testing.assert_allclose(diag['linearRemainingLayerFractions'],layer,rtol=5e-13,atol=0)
+            np.testing.assert_allclose(diag['linearRemainingEquationFractions'],equation,rtol=5e-13,atol=0)
+        diagnostic_audit=dict(linearAttempts=len(actual),rejectedLinearAttempts=sum(not x['fullSystemTargetMet'] for x in actual),
+                              nonlinearTrials=len(actual_trials),rejectedNonlinearTrials=sum(not x['accepted'] for x in actual_trials))
+    checks.append(dict(case=entry['id'],sourceRelativeDifferences=errors,balance=balance));del s,r,info,rate
+
+# 模块二：投影真实完整三维面片并按深度排序，保持物理比例及共同全范围色标。
+V=np.asarray(views[0]['vertices']);F=np.asarray(views[0]['faces'],dtype=int);view=np.array([.15,-1.,.4]);view/=np.linalg.norm(view)
+right=np.cross([0.,0.,1.],view);right/=np.linalg.norm(right);up=np.cross(view,right);projected=np.column_stack((V@right,V@up));order=np.argsort((V@view)[F].mean(axis=1));triangles=projected[F][order]
+fig=plt.figure(figsize=(16,6),layout='constrained');labels=['Frozen legacy-wall source','Same Q / constrained wall','Constrained-wall corrections']
+new_reservoir=payload['cases'][2]['summary'].get('openBoundaryDiscretization')=='exact-Riemann-reservoir'
+if new_reservoir:
+    labels[2]='Exact Riemann reservoir / separate NS history'
+    assert views[2]['researchIdentity']['openBoundaryDiscretization']=='exact-Riemann-reservoir'
+    assert not views[2]['researchIdentity']['priorProblemHistoryAppended']
+    summary=payload['cases'][2]['summary'];assert summary['priorAcceptedNonlinearIterations']>=0
+    assert summary['totalNewEquationAcceptedIterations']==summary['priorAcceptedNonlinearIterations']+summary['acceptedNonlinearIterations']
+    assert payload['cases'][2]['history']['iteration'][0]==0
+for row,(key,unit) in enumerate([('heatFlux','kW/m2'),('wallMechanicalExchange','kW/m2')]):
+    norm=Normalize(*payload['commonRanges'][key]);axes=[]
+    for col,data in enumerate(views):
+        ax=fig.add_subplot(2,3,row*3+col+1);axes.append(ax);fields={f['key']:f for f in data['fields']};values=np.asarray(fields[key]['values'])
+        ax.add_collection(PolyCollection(triangles,facecolors=plt.colormaps['viridis'](norm(values[order])),edgecolors='none',rasterized=True))
+        low=projected.min(axis=0);high=projected.max(axis=0);pad=.03*(high-low);ax.set(xlim=(low[0]-pad[0],high[0]+pad[0]),ylim=(low[1]-pad[1],high[1]+pad[1]),xlabel='Orthographic horizontal coordinate (m)',ylabel='View height (m)')
+        ax.set_aspect('equal',adjustable='box');ax.tick_params(labelsize=8);ax.set_title(labels[col]+' / '+key,fontsize=9)
+    colorbar=fig.colorbar(ScalarMappable(norm=norm,cmap='viridis'),ax=axes,shrink=.65)
+    colorbar.set_label(('Heat flux' if key=='heatFlux' else 'Proxy viscous conversion')+' ('+unit+')',fontsize=9)
+fig.suptitle('M5 / 30 km / alpha=20 deg / prescribed Tw=300 K / UNCONVERGED RESEARCH\nCommon full limits per row; mechanical proxy conversion is not stationary-wall external work',fontsize=12)
+comparison_name='static_wall_velocity_comparison'+suffix+'.png';residual_name='static_wall_velocity_residuals'+suffix+'.png'
+fig.savefig(folder/comparison_name,dpi=150);plt.close(fig)
+h=payload['cases'][2]['history'];fig,ax=plt.subplots(figsize=(8,4),layout='constrained');ax.semilogy(h['iteration'],h['maximumResidualPerSecond'],'o-',label='Maximum scaled residual');ax.semilogy(h['iteration'],h['rmsMerit'],'s-',label='RMS merit')
+ax.set(xlabel='Accepted corrections of the same NEW equation; physical time=0',ylabel='Residual (1/s)',title='Exact Riemann reservoir + full 3D NS / not steady' if new_reservoir else 'Static-wall tangent constraint + full 3D NS / not steady');ax.grid(True,alpha=.25);ax.legend();fig.savefig(folder/residual_name,dpi=150);plt.close(fig)
+balance_name='static_wall_velocity_balance'+suffix+'.png';fig,ax=plt.subplots(figsize=(10,4),layout='constrained')
+ax.semilogy(h['iteration'],h['spatialConservationRelative'],'o-',label='Spatial conservation error')
+ax.semilogy(h['iteration'],h['steadyBoundaryFluxBalance'],'s-',label='Steady boundary imbalance')
+ax.axhline(1e-9,color='C0',linestyle='--',label='Spatial target: 1e-9')
+ax.axhline(5e-10,color='C1',linestyle=':',label='Steady boundary target: 5e-10')
+ax.set(xlabel='Accepted corrections; physical time=0',ylabel='Relative balance (dimensionless)',title='Spatial conservation is not steady convergence / UNCONVERGED')
+ax.grid(True,alpha=.25);ax.legend(loc='center left',bbox_to_anchor=(1.02,.5),fontsize=9);fig.savefig(folder/balance_name,dpi=150);plt.close(fig)
+assert all(sha(ROOT/p)==h for p,h in bindings.items())
+report=dict(status='passed-independent-all-original-facet-static-wall-study-source-identity',processID=os.getpid(),cases=checks,sourceFaces=19752,solverDiagnosticAudit=diagnostic_audit,
+            scientificPNGs=[comparison_name,residual_name,balance_name],browserVisualOrWebGLRuntimeVerified=False,
+            physicalSolution=False,newProductionSolvedAreaM2=0,inputSHA256=bindings,scriptSHA256=sha(__file__))
+target.write_bytes((json.dumps(report,indent=2)+'\n').encode('utf8'));print(json.dumps(dict(status=report['status'],cases=len(checks),sourceFaces=19752)))

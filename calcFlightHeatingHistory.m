@@ -8,6 +8,11 @@ function result = calcFlightHeatingHistory(mesh,flightHistory,cfg)
 % 这不等于非定常激波或连续轨迹求解。
 
 %% 1. 校验飞行历程和最终网格
+if isfield(cfg,'heating') && isfield(cfg.heating,'noseModel') && ...
+        strcmp(cfg.heating.noseModel,'sphericalLocalSimilarity')
+    error('RocketAeroHeat:FlightHistory:SingleConditionModel', ...
+        '球鼻局部相似模型仅验证单工况；暂不能用于飞行历程热边界。');
+end
 fields={'time','altitude','Mach','alpha','beta'};
 for k=1:numel(fields)
     name=fields{k};
@@ -76,6 +81,8 @@ reasonArea=[];
 reasonCode=zeros(nf,nt,'uint8');
 knudsenByStation=nan(1,nt);
 rarefiedFacesByStation=zeros(1,nt);
+unknownThermalFacesByStation=zeros(1,nt);
+upstreamUnknownThermalFacesByStation=zeros(1,nt);
 freestreams=cell(1,nt);
 reusedSteadyState=false(1,nt);
 flowStations=cell(1,nt);
@@ -124,7 +131,12 @@ for j=1:nt
     reasonCode(:,j)=coverage.reasonCode;
     knudsenByStation(j)=current.continuumRegime.freestreamKnudsen;
     rarefiedFacesByStation(j)= ...
-        current.continuumRegime.summary.directUnresolvedFaces;
+        current.continuumRegime.summary.directKnudsenUnresolvedFaces;
+    % 兼容已有历程时也按真实身份统计；未知占位不写成稀薄流面数。
+    unknownThermalFacesByStation(j)= ...
+        current.continuumRegime.summary.directStateUnresolvedFaces;
+    upstreamUnknownThermalFacesByStation(j)= ...
+        current.continuumRegime.summary.downstreamStateUnresolvedFaces;
     freestreams{j}=fs;
     if current.stagnationHeating.available
         pointValid(j)=true;
@@ -214,6 +226,8 @@ result.stagnation=struct('available',pointValid, ...
 result.freestream=freestreams;
 result.freestreamKnudsenByStation=knudsenByStation;
 result.rarefiedFacesByStation=rarefiedFacesByStation;
+result.unknownThermalFacesByStation=unknownThermalFacesByStation;
+result.upstreamUnknownThermalFacesByStation=upstreamUnknownThermalFacesByStation;
 result.continuumMethod=current.continuumRegime.method;
 result.continuumScope=current.continuumRegime.scope;
 result.summary=struct('calculatedFacesByStation',validCounts, ...

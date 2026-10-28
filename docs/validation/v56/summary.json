@@ -1,0 +1,633 @@
+{
+  "version": "v56",
+  "date": "2026-10-14",
+  "runs": [
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "state_validity/state_validity_surface_release_final.log",
+      "logSha256": "11b8cd699001dde0bfe43b75e1b0fd6e18623cefdb14f55f6521a86dd27b592a",
+      "purpose": "testContinuumRegime, testAerothermalViewerTemperatures, testSurfaceHeating; targeted state and existing GUI/history compatibility",
+      "observedSession": 79867,
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "state_validity/external_axisymmetric_final.log",
+      "logSha256": "27c655dfe815b71ec17fc01d351fbdcfc06fd6217c32c44b7c0742817dbd8336",
+      "purpose": "testExternalSolver and testAxisymmetricShockExpansion; optional legacy exportapp PNG not executed",
+      "observedSession": 48705,
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "workflow_final/workflow_release_final.log",
+      "logSha256": "3cfbdf3d459968984859e340d2e88160474768a26a15bcdbf2ee7841cb510fa3",
+      "purpose": "Fresh production testWorkflowWorkbench from STL through five-step workflow and actual embedded WebGL",
+      "observedSession": 81021,
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "state_validity/state_validity_actual_rocket.log",
+      "logSha256": "08f9fcd103f8580387956a10cd9cfdff6980b57fd76061f2cc0fdf2929720b7d",
+      "purpose": "testExternalStateValidity: cached v55 snapshot reheat; not a fresh external-flow solve",
+      "observedSession": 20455,
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "state_validity/path_resolution_check.log",
+      "logSha256": "d76b69fad2ca1d9de51abed30bdaa8a46858816ed81aed2c52a2c54ffc8c5fd9",
+      "purpose": "Default/explicit baseline path guards; no numerical recalculation",
+      "observedSession": 77597,
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "web_export_final.log",
+      "logSha256": "b594ec66e95ffe6b84976e047f2dc53845669ac783ac06e70ed5cbc11aee3596",
+      "purpose": "Node independent CSV decoding for seven fields and export contract",
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "web_section_final.log",
+      "logSha256": "14b3197825e8ad6b165204cd32de2eba05ceb5abf036c81d7f156beba4874a68",
+      "purpose": "Node analytical section and provenance contract",
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "region_diagnostic/diagnostic_final3.log",
+      "logSha256": "4c12bd4f17e2df39cdee98a5a9e7874b1203226259ee96a503e9be2bd8d3734b",
+      "purpose": "Saved v54/v55 diagnostics; no new physical solution",
+      "observedSession": 6488,
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "region_diagnostic/kn_origin_final2.log",
+      "logSha256": "32b08ace02dddd3c6dc4891d48c7cad0c3f166b573bbdde4411b8cfc6cd9ffff",
+      "purpose": "Saved v55 ancestry diagnostics; no physical rarefaction claim",
+      "observedSession": 88784,
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "base_research/source_audit.log",
+      "logSha256": "b11700792b38543e134d489327d5d2f9bfb02b65bb3aac46193e43312fb5af8c",
+      "purpose": "Delegated primary-source byte/page audit; no physical validation",
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "crossflow_source/source_audit.log",
+      "logSha256": "7f67b4f86beeec809a8d3af58e1fe0e4b5107f53f4a58fbc44b4c6162e223612",
+      "purpose": "Delegated primary-source byte/page/printed-anchor audit; no model comparison",
+      "statusSource": "root-observed terminal result, retained in conversation history"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "base_research/19810011647.pdf",
+      "sha256": "932b5f51735f0cbf542c00a17d7aec92d134943abd55d6e61e5d3875d535544e"
+    },
+    {
+      "path": "base_research/19810011647_pdfpage_169.png",
+      "sha256": "2167b9e021c08390098470ab57309be04a4d5103dda6ed6ede85a9cbeb7c5e0c"
+    },
+    {
+      "path": "base_research/19810011647_pdfpage_169.txt",
+      "sha256": "b5a54514cc454df250aec2f88585d4c2e08a441fd559d13570299bd84035600a"
+    },
+    {
+      "path": "base_research/19810011647_pdfpage_170.png",
+      "sha256": "387b5f85aa05c004ba8f06ffa49f140931e17944cb7809ca2f64d400a1374dda"
+    },
+    {
+      "path": "base_research/19810011647_pdfpage_170.txt",
+      "sha256": "780f657c64c441eec6ecabc16a68a2f54ce4dad514f49494a7417e13ac1d4acd"
+    },
+    {
+      "path": "base_research/19810011647_pdfpage_173.png",
+      "sha256": "64d36cec7359272c5fcb4495792402f97eca2d405f76552ef4deb30f0f7d7fb0"
+    },
+    {
+      "path": "base_research/19810011647_pdfpage_173.txt",
+      "sha256": "3ff03cb535b02d1a701b131f16888b33c4bc595f14ef247b930cc91191bde513"
+    },
+    {
+      "path": "base_research/19810011647_pdfpage_230.png",
+      "sha256": "08774c27b733be1405c8f97be8740fbe768b9483950d9fa198a8cfd0745e39e8"
+    },
+    {
+      "path": "base_research/19810011647_pdfpage_230.txt",
+      "sha256": "63d0eb5107e77ff951d34c0898fd0cdbca74dbfb83989ed5cb645d49ac482d63"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41.pdf",
+      "sha256": "3b24653097bbd0cbb4a7369dac89ad720b8a75a676607544493df3ed0f159f67"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_10.png",
+      "sha256": "c48bc3cae102f321b264a3def13f284a22801d2810210955dffc5c326f96cae6"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_10.txt",
+      "sha256": "046d55f9b1d1156750ed3bc4b55d649ced20ea7a2c6d46b59f42b72cd54502a2"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_11.png",
+      "sha256": "e1534c145dc1ea59e1a8a28ee9e3d594170e14ca1080e58aa6c5c0ed6853fd63"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_11.txt",
+      "sha256": "795cc5f164dfa2eab9a7d1e9aeb2325022c67e3a56d900e733a5977c63323fe2"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_12.png",
+      "sha256": "145b25b975f3eb5ad1d0edd42e236298d55ea9c018afc427358ddb7e1d2b5d0c"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_12.txt",
+      "sha256": "a47d12cff34deb7c704fd2d791eba5d93a3b2ce661fb5cf36bbe2c05c6b34c63"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_17.png",
+      "sha256": "41e843c8cbeaa840dc5db0b930d0435ffc8e1056a2003fd22f6264fc7e02aa6d"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_17.txt",
+      "sha256": "ede7d22a8e243a3dfffad8b68ed139648a82b8f02d3a857f083ef58eea5af190"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_18.png",
+      "sha256": "2a3531644eae2d48943ceafc2ccbbfa0d58ed2117bf1383c5bb051690c6eebf4"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_18.txt",
+      "sha256": "5e6a3000d9c5a894efb0a48b794a40e50a74bab3ce675ae2f92e44b918e645d4"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_22.png",
+      "sha256": "a66d642024a0e3efd20e4f7ab57e6856858fceabe68747e047a20fa2342d09ff"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_22.txt",
+      "sha256": "5eb7f942902b92dfc579ba9549786611c0b002c03323a50aac29c8ec6b7acccf"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_23.png",
+      "sha256": "827a9b30c344e5a51a93526ebbb5cab9650de164f3188e97b82f2335c046db9d"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_23.txt",
+      "sha256": "677cbfc3baeda21bf6bcef972c908d0ae09b0b55b153fa4230bafac52538c508"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_27.png",
+      "sha256": "ea5759615cd70dee0418f5d3190ca9f4779013468d6eb5b198ed29efa31f9a95"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_27.txt",
+      "sha256": "c20131665e3482139f4168fae6a2cc10f007aa59bccb3b385857aa14af0413d8"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_3.png",
+      "sha256": "db3498497380412847afce085287ac1e82d14d429d28fd5a6d29a96d945eaa59"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_3.txt",
+      "sha256": "d4793210114ddaeff9dc433c91a37370be919538e7bb687db1c88fa4b2a73bbc"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_9.png",
+      "sha256": "e068849bb0f5a9e25f584c58c4f4a653d63a04ad8a21bc0de89e57fb7a8e6759"
+    },
+    {
+      "path": "base_research/Rabinowicz_1957_HRP41_pdfpage_9.txt",
+      "sha256": "313533b51ce79d16c9720088d51ab9ca8fbdc67149df41e7c86f63d82adf0502"
+    },
+    {
+      "path": "base_research/audit_primary_sources.py",
+      "sha256": "f48fd86207636490dad6a6aa463a8c3a86605d5b53e7ab0c420729f809774e88"
+    },
+    {
+      "path": "base_research/osti_radial_page.txt",
+      "sha256": "d5d8ad6686e5cd518434e9d8f44328c1650333268616292e5fcd87aa706920bc"
+    },
+    {
+      "path": "base_research/research_manifest.json",
+      "sha256": "2729a73d0d3f601a34447dd2bdea131e0913419ed863ebd7fe85c5e178bfe094"
+    },
+    {
+      "path": "base_research/source_audit.log",
+      "sha256": "b11700792b38543e134d489327d5d2f9bfb02b65bb3aac46193e43312fb5af8c"
+    },
+    {
+      "path": "crossflow_source/19930084664.pdf",
+      "sha256": "4b3884fdbd75781c8707748aa906af00974f5e1a995d056c550f64f6c41f5957"
+    },
+    {
+      "path": "crossflow_source/19930084664_metadata.json",
+      "sha256": "ccaf8b91da52a0bb8bd20d4c1ba3b77030e127203207d75daf592873a8fe5905"
+    },
+    {
+      "path": "crossflow_source/audit_penland.py",
+      "sha256": "5f09b6041c51d2f7be1ee94f9309d90fb419d1853580d253937eaa3d2bab48d9"
+    },
+    {
+      "path": "crossflow_source/penland_geometry_x.csv",
+      "sha256": "9a2ccbae84d7ba08f477cdc79aea822ab23543d3795fcb50fdeeea249fce8458"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_11.png",
+      "sha256": "6c837b2af79db4b347a6d85b689e7a6a4b85bf258d9475e5633bec9264c842ed"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_11.txt",
+      "sha256": "ff2c331eced79fceb2100c1c09ae45f49b28345780bf7f1b226ea7f6598972c7"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_12.png",
+      "sha256": "9f40abc38c0fd135debabc120526846f08b04cfa867468be306650e4fa8955a0"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_12.txt",
+      "sha256": "1f37cf8fb2f637c42181de7bd64b3e6d0ab9bca2563acfd781e51a6f483da114"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_13.png",
+      "sha256": "3d3f52871c380a72f001bb0dbaf1ed8931d658737c9979e59750d67ee8aff126"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_13.txt",
+      "sha256": "f9ac8d599d80fcf155b020b497042ef3a39d77a41e3cbd5cc0a9cba866110185"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_19.png",
+      "sha256": "2e5b6ae6a128fbe2642fd576b48f113b8d0f26f3a14bb249ea68691cce925bee"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_19.txt",
+      "sha256": "3e38e6323c54f83028e3f1d31d87878c5dca0a72bdb71ee232c9b8abc4463013"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_2.png",
+      "sha256": "d75fb4592cf877e0f2bb1a5d776f41092dd0c6eec4ce90fadc325f583c6902e8"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_2.txt",
+      "sha256": "a2e618a2005f65131cb7b988e7ee3b3060f40604f69626b061d4888777e47dcf"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_20.png",
+      "sha256": "fd51307f30db1f1d222113cd49772f1917c96255874005d7433971d01dccb116"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_20.txt",
+      "sha256": "988ef03cf8851e0b6dac143fd728f3b43249ade5fb487fcc24210b087fd677f5"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_21.png",
+      "sha256": "f7c6ce56cda2fff82618aa49fe0131cf415127d85f0c70e6d7fb77f36c6c233b"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_21.txt",
+      "sha256": "cdf61c06585a33cc6f9ad01181ebcda309bb2d14de8b45324074008377558aeb"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_22.png",
+      "sha256": "211d7c4784e14f37f181c2a3664c815d816f86b67569c2f88101eef7ac45aeb1"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_22.txt",
+      "sha256": "1ef4772490e3adb36d04b7568eea20b06514128bf332fa6bc5817c963afa7dd4"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_23.png",
+      "sha256": "7c22fbc4aa8111b8509ebfa7ef06ac72250645011a84af7b64d8ea0d66496d20"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_23.txt",
+      "sha256": "55d418863476408da4c7ca41088f65cc6f0267a146c8ba68bc1d4ed0aa214817"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_24.png",
+      "sha256": "9275be635c74f75c1af6f3e84c13de16b8185732a97c4d5b292f0c684a2fd052"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_24.txt",
+      "sha256": "d774805cadf28b2700607ff128559aa0e2870ecbbf559b8bb627c2407ccb28a4"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_3.png",
+      "sha256": "ddf3a6cb01fe766f8408d486807608fb506906394d5702120b15a5e3556175ce"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_3.txt",
+      "sha256": "12f542e5383b29751bc9752468b54f3a85502f88bcd250d7317a7b6c1b5fe496"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_31.png",
+      "sha256": "a7556e3f4eaa960b595a47998aa00baf2074b006f3c45373f4e0e6b79cefa203"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_31.txt",
+      "sha256": "b2f2a71ce2270d238feaab8045f25648786510a69a49f45e5df99a53b2358364"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_32.png",
+      "sha256": "2b50a312f84f0252dc1001d227207742c593f955b6e104f741daa8bfaeda7e63"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_32.txt",
+      "sha256": "4d897fa2602ad4b6e9a72ae7d7657eb7d714e215a1c3c91c7c1cf4a98251eb6a"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_33.png",
+      "sha256": "6e08a51016af62c6755976d9565321b74d53e74e460d119e6c6b928c658b179a"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_33.txt",
+      "sha256": "9a74cba01d1834a99877fcc315cbd811ff7232008dd5e7fc27918e350b657adf"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_4.png",
+      "sha256": "4aa62aa0843765823be47a6a03ff471b71c904275fbcefd24f2b0b65d578d172"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_4.txt",
+      "sha256": "30f45b92f9172146b23619b132d605695df5317184056593275865000ff142a9"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_5.png",
+      "sha256": "e469d439a28ba2cd54601fbcef3809bbb8e2beb0d4f44aedcb4c094f9c21f55f"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_5.txt",
+      "sha256": "8e6cb07188704a9b60d236bb5e29833c8b5455a3f91d1ac9b36cd3067c42f0f2"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_6.png",
+      "sha256": "601cfce08e8a49227583addd169487482f5b2381172119803a14d765170c8a48"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_6.txt",
+      "sha256": "284eefda758b298cb4a0f46e23c9938992829100c9ff4b0f1a4308918df78bd3"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_7.png",
+      "sha256": "ff1a6887e714eefed41d69d7c55e4c7f4b1b4437ffc12ac69d1a3c72eb27445c"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_7.txt",
+      "sha256": "ae3fc4589cd577dbb984758473385bdcfb10157895baf86e3be41d5d1a599039"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_8.png",
+      "sha256": "284ccbfa0bd7588b7b847e5b8db24cc035b58bc3fb43d7a92d817c3d5b4868cb"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_8.txt",
+      "sha256": "25be46dc3f05db2d82b123d64fab9d2389bdd99a8a9c4d0f178615dcefb77e14"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_9.png",
+      "sha256": "b6bbded74b6c8d65b265f3bba1195f2c1b912cdae81421f8b83ff07badd7d4ec"
+    },
+    {
+      "path": "crossflow_source/penland_pdfpage_9.txt",
+      "sha256": "766a924d7735273ec096c4f2966556530566409a7aaba5f5f91991eb378ab292"
+    },
+    {
+      "path": "crossflow_source/penland_pressure_anchors.csv",
+      "sha256": "4bf8040ae5eef16a04d4188c90a1c41fc7e2aeeccf047e9d0559b80139188770"
+    },
+    {
+      "path": "crossflow_source/research_manifest.json",
+      "sha256": "15fab4800414ec46d454af5c763bf617542129f6eb685cba2bd74f4b903a7b76"
+    },
+    {
+      "path": "crossflow_source/source_audit.log",
+      "sha256": "7f67b4f86beeec809a8d3af58e1fe0e4b5107f53f4a58fbc44b4c6162e223612"
+    },
+    {
+      "path": "region_diagnostic/contraction_sections.csv",
+      "sha256": "29759286f609015c16bf8c347eb8cbb0dbfc5bb34367bd82e9cb9de122127927"
+    },
+    {
+      "path": "region_diagnostic/diagnoseKnOrigins.m",
+      "sha256": "48c339a9a9ae0bd851594a743ef8bad61b4250c865ba6c65d5a4688332bdb2a6"
+    },
+    {
+      "path": "region_diagnostic/diagnoseRemainingRegions.m",
+      "sha256": "3d26926fbfc5b79d980d6dc7523f0fdc78346eeaa8846f7eae557e775fc6ef0f"
+    },
+    {
+      "path": "region_diagnostic/diagnostic_final3.log",
+      "sha256": "4c12bd4f17e2df39cdee98a5a9e7874b1203226259ee96a503e9be2bd8d3734b"
+    },
+    {
+      "path": "region_diagnostic/evidence_manifest.json",
+      "sha256": "575759fa0f2a67bfbf8977c1892f304ac6f778ddd05186e7e220a4ccadfdb6e6"
+    },
+    {
+      "path": "region_diagnostic/first_kn_crossings.csv",
+      "sha256": "a2530285ef154f8423cf56cdbbcd6370d7b390d5ed549dc041bc1b84df621cb1"
+    },
+    {
+      "path": "region_diagnostic/kn_downstream_ancestry.csv",
+      "sha256": "a849e18b822d899d85bc74ccce456643fc28d9ec20308fede9edb6978d187909"
+    },
+    {
+      "path": "region_diagnostic/kn_origin_diagnostic.json",
+      "sha256": "f26552efe163cd3d13a4e7877741fe76aec288b26cd3718c086b02640c81626e"
+    },
+    {
+      "path": "region_diagnostic/kn_origin_diagnostic.mat",
+      "sha256": "7d8ab873488bb9c31c19dd8e89ac65a0203175780740c49e69b467057fb20e27"
+    },
+    {
+      "path": "region_diagnostic/kn_origin_final2.log",
+      "sha256": "32b08ace02dddd3c6dc4891d48c7cad0c3f166b573bbdde4411b8cfc6cd9ffff"
+    },
+    {
+      "path": "region_diagnostic/remaining_regions.json",
+      "sha256": "11e874e52a69603be8a1882e029c0e46408208158aae30ec46a2c0d811e648c3"
+    },
+    {
+      "path": "region_diagnostic/remaining_regions.mat",
+      "sha256": "78ee3ec136b3751782cdc046d60548a2ba92d4f9d309ca06283bd86329977249"
+    },
+    {
+      "path": "region_diagnostic/rocket_faces.csv",
+      "sha256": "eaeffc57bb459877e3795a620db60a324ba7e81a8196effe024c3598eaaf0644"
+    },
+    {
+      "path": "region_diagnostic/sphere_faces.csv",
+      "sha256": "1b5bc4e4460fdc4de4c3f3a7820ef3cf11ae498bb485c1b5de991582875bfc3c"
+    },
+    {
+      "path": "region_diagnostic/verify_diagnostic.py",
+      "sha256": "e559891c0f3485a57874f491763bd2c321068094b3ab51e661c19c50d21c3399"
+    },
+    {
+      "path": "sidebar_scope/boundary_method_scope.png",
+      "sha256": "3d0c8e08a795a406e33f9172ce3416ff7d9ec3638e8cef28530d5890da5fe93d"
+    },
+    {
+      "path": "sidebar_scope/failure_recovery_visual.png",
+      "sha256": "711495fab94e2433c1093289234a75927bb25530f60b6c334019ecdd41c1f1eb"
+    },
+    {
+      "path": "state_validity/actual_rocket/case-data.js",
+      "sha256": "3ef6e65e99d40c09f3ce11e3ee9bcfc30297430155baaa887e5508e0b3642ffc"
+    },
+    {
+      "path": "state_validity/actual_rocket/results.json",
+      "sha256": "c2ac959ed52b003af3b48b852f1c376d1c502444f17265ecb21bc8e6ff4f1646"
+    },
+    {
+      "path": "state_validity/evidence_manifest.json",
+      "sha256": "e91f6751f678b09961e07c7d9656972670609e34e7152986527cde451f00b9e3"
+    },
+    {
+      "path": "state_validity/external_axisymmetric_final.log",
+      "sha256": "27c655dfe815b71ec17fc01d351fbdcfc06fd6217c32c44b7c0742817dbd8336"
+    },
+    {
+      "path": "state_validity/path_resolution_check.log",
+      "sha256": "d76b69fad2ca1d9de51abed30bdaa8a46858816ed81aed2c52a2c54ffc8c5fd9"
+    },
+    {
+      "path": "state_validity/path_resolution_manifest.json",
+      "sha256": "fbaa81753483c883a3b0958f7ab8e3ae7823d649e86f73930546862ac763c19d"
+    },
+    {
+      "path": "state_validity/state_validity_actual_rocket.json",
+      "sha256": "be1a992010d67b7998ceb6bf724b030f49023f64f1e2e58095e165bbb2815c1e"
+    },
+    {
+      "path": "state_validity/state_validity_actual_rocket.log",
+      "sha256": "08f9fcd103f8580387956a10cd9cfdff6980b57fd76061f2cc0fdf2929720b7d"
+    },
+    {
+      "path": "state_validity/state_validity_actual_rocket.mat",
+      "sha256": "83c9f203d1f83ae1f3825da16809e521eeeb8640c03b0ce11839c2b9bf94a6af"
+    },
+    {
+      "path": "state_validity/state_validity_faces.csv",
+      "sha256": "e7e8fafa66ced3477ac0507a1bbf325d09c2ba03eaf47709c9ddfa634da351e3"
+    },
+    {
+      "path": "state_validity/state_validity_surface_release_final.log",
+      "sha256": "11b8cd699001dde0bfe43b75e1b0fd6e18623cefdb14f55f6521a86dd27b592a"
+    },
+    {
+      "path": "state_validity/temperature_provenance_fixture.json",
+      "sha256": "2cd87d785af3a0472789b89c9b909ba3be30a7501dd5f967c4b5714a94e44b7f"
+    },
+    {
+      "path": "state_validity/verify_state_validity.py",
+      "sha256": "cc0ca498b4a8bbd433c8674d9556670f0d6e74d38cb510dd0594f468b7e57ea4"
+    },
+    {
+      "path": "web_export_final.log",
+      "sha256": "b594ec66e95ffe6b84976e047f2dc53845669ac783ac06e70ed5cbc11aee3596"
+    },
+    {
+      "path": "web_section_final.log",
+      "sha256": "14b3197825e8ad6b165204cd32de2eba05ceb5abf036c81d7f156beba4874a68"
+    },
+    {
+      "path": "workflow_final/evidence.json",
+      "sha256": "cb74775903f048d1c8ef0ab50728c0b30967f601a33d4f1ba918a3b876d5a647"
+    },
+    {
+      "path": "workflow_final/workflow_actual_rocket/results.json",
+      "sha256": "24afc79a3ed03fd05e8e47f24f82dc0c5ddaff53b26d0595b6a815119600c4f6"
+    },
+    {
+      "path": "workflow_final/workflow_release_final.log",
+      "sha256": "3cfbdf3d459968984859e340d2e88160474768a26a15bcdbf2ee7841cb510fa3"
+    },
+    {
+      "path": "workflow_final/workflow_workbench.mat",
+      "sha256": "61c722177a6d6861470de1de3ae3caed0601de589ff56dd42b3922d33619a7e9"
+    }
+  ],
+  "currentExample": {
+    "source": "workflow_final/workflow_actual_rocket",
+    "fullFreshPipeline": true,
+    "observedMatlabSession": 81021
+  },
+  "diagnosticExamples": [
+    {
+      "source": "state_validity/actual_rocket",
+      "destination": "example_web_diagnostic_reheat_from_v55",
+      "fullFreshPipeline": false,
+      "provenance": "v55 workflow_workbench.mat saved mesh/external flow/streamlines; v56 re-evaluates thermal-state validity and heating only, session20455"
+    }
+  ],
+  "scope": {
+    "newRegionalHeatSolvedAreaM2": 0,
+    "fullSurfaceSolved": false,
+    "experimentalValidation": false,
+    "fullLibraryRetested": false,
+    "legacyExportappPngVerified": false,
+    "githubPushed": false,
+    "matlabBackend": true,
+    "inheritedMainLegacyPreserved": true,
+    "freshCase": {
+      "Mach": 5,
+      "altitudeM": 30000,
+      "alphaDeg": 20,
+      "wallInputK": 300,
+      "faces": 19752,
+      "totalAreaM2": 1.9646292565715555,
+      "heatingComputedFaces": 13691,
+      "heatingComputedAreaM2": 1.307708956801505,
+      "heatingComputedAreaPercent": 66.5626327424,
+      "oldOverstatedAreaPercent": 77.4616123124,
+      "removedComputedFaces": 2094,
+      "removedComputedAreaM2": 0.21412454130071493,
+      "directUnknownThermalFaces": 336,
+      "downstreamUnknownThermalFaces": 5147,
+      "totalUnknownThermalFaces": 5483,
+      "physicalValidStateKnExceedanceFaces": 0
+    },
+    "testedBehavior": [
+      "Unknown external thermal state and downstream heating rejection",
+      "Physical Kn separated from formal diagnostic placeholder numbers",
+      "Placeholder edge pressure/temperature exported missing with status and provenance",
+      "Retained13691 cached-reheat heat/Taw/coefficient/method values unchanged",
+      "Fresh unified five-step workflow, input invalidation and failure/retry recovery",
+      "Foldable method/applicability display without solve or revision changes",
+      "Actual embedded geometry and result WebGL drawing, error code0",
+      "Seven-field CSV/section contracts and existing GUI/history compatibility"
+    ],
+    "limitations": [
+      "Large-cylinder/contraction/small-cylinder transverse flow, recompression and separation remain unsolved",
+      "Base recirculation energy and full radial base heating remain unsolved",
+      "Nose/afterbody entropy/vorticity coupling remains unsolved",
+      "No experimental pressure/heating comparison; source acquisition is research only",
+      "sidebar_scope PNGs precede final backend; layout evidence only",
+      "v57 draft is excluded from this release"
+    ],
+    "historicalEvidence": "Cached v55 reheat and saved v54/v55 diagnostics are separate from fresh81021; original manifest source/test hashes record those earlier runs"
+  },
+  "entryPoint": "main.m",
+  "inheritedEvidence": "validation/inherited_v55"
+}

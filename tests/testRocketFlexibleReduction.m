@@ -1,0 +1,43 @@
+function report=testRocketFlexibleReduction(folder)
+%TESTROCKETFLEXIBLEREDUCTION 稠密检查完整块回代、非线性内层和柔性Arnoldi每个实际方向。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'));mkdir(folder);sourceFile=fullfile(root,'outputs','v83_validation','spatialreductionunit01','spatial_reduction_unit_evidence.mat');s=load(sourceFile,'cases');cases=cell(2,1);
+for j=1:2
+    a=s.cases{j};packed=a.packed;reduction=a.reduction;coarseFactor=a.coarseFactor;Fgraph=extractRocketFullFGraph(packed,reduction.split);columnScale=buildRocketFullFImageScale(Fgraph,reduction.Ffactor);
+    rhs=a.rhs;singleFile=fullfile(folder,sprintf('single_%d.mat',j));p=struct('maximumFIterations',2,'FRelativeTolerance',1e-3,'evidenceFile',singleFile);
+    [single,singleWork]=applyRocketFlexibleReduction(reduction,coarseFactor,Fgraph,columnScale,rhs,p);d=load(singleFile);
+    nf=reduction.split.fineCells;nc=reduction.split.coarseCells;n=packed.cellCount;
+    fids=reshape(double(reduction.split.fineOriginalCVs)+(0:4)*n,[],1);cids=reshape(double(reduction.split.coarseOriginalCVs)+(0:4)*n,[],1);
+    expectedCRHS=reshape(rhs(cids),nc,5);expectedCRHS=expectedCRHS-reshape(a.E*d.firstF(:),nc,5);
+    expectedC=a.MS*expectedCRHS(:);expectedFRHS=reshape(rhs(fids),nf,5)-reshape(a.B*expectedC,nf,5);
+    assert(norm(d.coarseRHS-expectedCRHS,'fro')<1e-10&&norm(d.xC(:)-expectedC)/max(1,norm(expectedC))<1e-10);
+    % 独立MS乘法的舍入差经B放大，不能对串联参考固定用1e-10绝对门槛。
+    actualCoarseFRHS=reshape(rhs(fids),nf,5)-reshape(a.B*d.xC(:),nf,5);
+    gamma=(5*nc)*eps/(1-(5*nc)*eps);coarseError=norm(d.xC(:)-expectedC);
+    referenceBound=norm(a.B,'fro')*coarseError+gamma*norm(abs(a.B)*abs(d.xC(:)))+4*eps*norm(rhs(fids));
+    referenceDifference=norm(d.secondRHS-expectedFRHS,'fro');
+    assert(norm(d.secondRHS-actualCoarseFRHS,'fro')/max(1,norm(actualCoarseFRHS,'fro'))<1e-12&& ...
+        referenceDifference<=referenceBound&&referenceDifference/max(1,norm(expectedFRHS,'fro'))<1e-12&& ...
+        isequal(single(reduction.split.fineOriginalCVs,:),d.secondF));
+    referenceRoundoff=struct('coarseVectorDifference',coarseError,'coupledRHSReferenceDifference',referenceDifference,'propagatedReferenceBound',referenceBound);
+    p.evidenceFile='';other=reshape(cos((1:numel(rhs))'*.231),size(rhs));x2=applyRocketFlexibleReduction(reduction,coarseFactor,Fgraph,columnScale,other,p);
+    combined=applyRocketFlexibleReduction(reduction,coarseFactor,Fgraph,columnScale,.7*rhs-.3*other,p);
+    nonlinearity=norm(combined-.7*single+.3*x2,'fro')/max(1,norm(combined,'fro'));assert(nonlinearity>1e-8);
+    opt=struct('maximumIterations',5*n,'relativeTolerance',1e-10,'innerIterationSequence',[1 2 3], ...
+        'innerRelativeTolerance',1e-3,'maximumInnerOperatorApplications',30000,'maximumBasisBytes',64*1024^2,'saveBasisEvidence',true, ...
+        'preconditionerEvidenceFolder',fullfile(folder,sprintf('preconditioner_%d',j)));
+    [value,detail]=solveRocketFlexibleReductionKrylov(packed,reduction,coarseFactor,Fgraph,columnScale,rhs,opt);
+    assert(detail.internalCTargetMet&&norm(value(:)-a.C\rhs(:))/max(1,norm(a.C\rhs(:)))<1e-8);
+    assert(detail.krylov.cycles{1}.arnoldiRelationRelativeDifference<1e-8&&detail.krylov.maximumBasisOrthogonalityError<1e-8);
+    compact=compactRocketFlexibleReductionReport(detail);raw=jsonencode(compact);assert(~contains(raw,'"V":')&&~contains(raw,'"Z":'));
+    zopt=opt;zopt.preconditionerEvidenceFolder='';[zero,zeroWork]=solveRocketFlexibleReductionKrylov(packed,reduction,coarseFactor,Fgraph,columnScale,zeros(size(rhs)),zopt);
+    assert(all(zero==0,'all')&&zeroWork.CApplications==0&&zeroWork.flexiblePreconditionerApplications==0);
+    bad=zopt;bad.maximumInnerOperatorApplications=1;rejected=false;try,solveRocketFlexibleReductionKrylov(packed,reduction,coarseFactor,Fgraph,columnScale,rhs,bad);catch ex,rejected=strcmp(ex.identifier,'FlexibleReduction:WorkBudget');end;assert(rejected);
+    cases{j}=struct('packed',packed,'reduction',reduction,'coarseFactor',coarseFactor,'Fgraph',Fgraph,'columnScale',columnScale,'rhs',rhs, ...
+        'C',a.C,'A',a.A,'B',a.B,'E',a.E,'MS',a.MS,'single',single,'singleWork',singleWork,'singleFile',singleFile, ...
+        'nonlinearityDifference',nonlinearity,'referenceRoundoff',referenceRoundoff,'value',value,'detail',detail);
+end
+report=struct('status','passed-dense-variable-F-block-back-substitution-and-complete-C-flexible-Arnoldi','cases',2, ...
+    'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'flexible_reduction_unit_evidence.mat'),'report','cases','sourceFile','-v7');fprintf('%s\n',jsonencode(report));
+end

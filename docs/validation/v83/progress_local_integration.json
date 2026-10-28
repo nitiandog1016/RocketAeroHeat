@@ -1,0 +1,643 @@
+{
+  "version": 83,
+  "status": "tested-local-coarse-solver-integration-real-NS-direction-improvement-still-rejected-and-workbench-not-delivered",
+  "generatedUTC": "2026-10-24T19:58:06.365037+00:00",
+  "recorderProcessID": 24160,
+  "previousGoalTurnClassification": "progress",
+  "previousGoalTurnEvidence": "Previous goal turn built and tested genuinely new CV-local conservative directions with real-NS central differences; the next required step was explicit runtime integration, completed and tested here.",
+  "priorProgressPath": "docs/validation/v83/progress_local_cv.json",
+  "priorProgressSHA256": "6b7524dd125365684b97d9a3211201813d2c255005581d3fe5761228e887b13d",
+  "oldNumericalEvidenceOverwritten": false,
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/validateRocketLocalCoarseColumns.m": "97c0debf7b652ab486c564fa2b4a81e8a1c741c2d46a6aa184c131013c3ef556",
+    "internalFlow/cutCell/loadRocketLocalCoarseOperator.m": "403e946ad87bf0e0b5590ea686eec4a5fb16e6fc8c0848a55de0a98e376b5b69",
+    "internalFlow/cutCell/rebuildRocketLocalCoarseOperator.m": "3f12b3ef6853fe79770e73c78cbe3e06359b804542db382129ebec0c28508cf6",
+    "internalFlow/cutCell/solveRocketShellSteadyKrylov.m": "e6325985c462cda56b35c955ad464f6749d26f8840fd06af11da67f0f2b2f98b",
+    "internalFlow/cutCell/solveRocketMinResidualCoarsePreconditioner.m": "23bacdc58b96ba834fef8bdc81ebc9f64db636920f21e6eb65413a59628edb44",
+    "internalFlow/cutCell/buildRocketLocalCoarseOperator.m": "20fd8a18bc7e063669e7c8ff1a30e826dc4eb4f3d3e5fdfe56dd51303c46c21d",
+    "internalFlow/cutCell/liftRocketLocalCoarse.m": "8db7f518929d7153884e836f5bd8087fb5f71c1a3ceb0ba506f6187d3ef9827f",
+    "internalFlow/cutCell/solveRocketLocalCoarseSystem.m": "cd24ecde92729772a9c5cc10799389c471724eafed2bfdcd6ab19109e9b989d6",
+    "internalFlow/cutCell/rocketLocalCoarseLiftIdentity.m": "99955c77acca28f24869b886deb36f2de9ead315d73bfe954245859a1d3538ae",
+    "internalFlow/cutCell/liftRocketMixedCoarse.m": "da4d2cbf01dddd7d4e6fe0f028d73da5a542428b2ca3e0a536591310c2849e62",
+    "internalFlow/cutCell/liftRocketPrimitiveCoarse.m": "5c976ed6d477480222bdf4b2d5f29d9764c44a7a4cafc59f0c716e1486c6780c",
+    "internalFlow/cutCell/cutCellNavierStokesResidual.m": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+    "tests/testRocketLocalCoarseIntegration.m": "4e679ec99fc1739bc01f65f792435b3afe3e86989f03bf6b5a3fddb9145bbaa4",
+    "tests/continueRocketWallVelocityKrylov.m": "97ea28e5c943fc17a092203ec063d72d36f66459530952acb02aace2be99b878",
+    "tests/auditRocketLocalIntegration.py": "5111f4e0011688d5d2f9613a07c90d0abc11c933882f57c04bf67d48e6cbcc60",
+    "tests/auditRocketCoarseSolver.py": "c9ec507eefc39d9ba93538d8c21b0628635bd9d00b7c9a938d447657af53f7e4",
+    "tests/auditRocketSteadyNewtonDirections.py": "6d29626c3096feb41689e01d2807bde2cc5b88adedb6fbf51aa767d0d54694b0",
+    "tests/auditRocketWallVelocity.py": "4065aae9ae143c53e9c77e7e19f1131a7632608535223fe938e8446306637a00",
+    "tests/auditRocketWallVelocityWorkbench.py": "fff22a6ac342d0e84785fcdbb6f77b1640f0fef4db91b79ec0d07f13ddae0025",
+    "tests/testRocketWallVelocityWorkbench.js": "ffb62ede70dce65be0cbad8cec5d8028d2984e12465d9c8c2a71f7e2c674c7bc",
+    "tests/diagnoseRocketCoarseDirection.py": "dbc180b667531cefcae1910c9675086a268bf207e0fb4f3295e5a3c82d18e57b",
+    "tests/diagnoseRocketSavedDirections.py": "0df2fc53b7213d3e095c1cff24b9a0774afa28418d1a6c95e7f2b60f5f5d0056",
+    "tests/plotRocketCoarseEnrichmentDirections.py": "7e8b5ac1ba34c95d167510fe1a6f4631a2087847bad51516f600c16646ac9053",
+    "exportRocketWallVelocityStudy.m": "f55f3ccc706d287167c9293ad715954158c37eaf5a0c786cdee2f6e8dc7c15af",
+    "web/rocket-wall-velocity.js": "3d2e23d74dfc90c276828199f1b1f453156eaa6a23543c577104d69bdb1e4aee",
+    "docs/PROJECT_GOALS.md": "83eba63c713a341b4333669f11f9ff1832c181c0d1f5ad6ffd61ecb1130eac15",
+    "docs/GITHUB_STAGE_READINESS.md": "344ab9e2d342a1587ffff7758a78b25d73213e254223250d4a68609479d8109a",
+    "docs/LOCAL_CONSERVATIVE_COARSE_V83.md": "46591c70e00fb529e2138da5fc93caa589cce5bcba59d6a1bd3e7965d3e2e6e4",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1"
+  },
+  "matlabProcesses": [
+    {
+      "name": "localintegration01",
+      "path": "outputs/v83_validation/localintegration01_process.json",
+      "sha256": "1b96ec5c59146552a71b5621ca652ed4ebb279e2dc35904da124cf6e9506256f",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        42164
+      ]
+    },
+    {
+      "name": "localtrial01",
+      "path": "outputs/v83_validation/localtrial01_process.json",
+      "sha256": "8354674373254fadc9d3ce43ad0e560edf9fe8911b23fee71d5efabad8db1be1",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        49908
+      ]
+    }
+  ],
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/localintegration01_independent_local_integration.json",
+      "sha256": "482bc6719801352e56ec56b67aaad0015ca28d5af7895196db1216ce073f5127",
+      "status": "passed-independent-local-cache-fresh-current-Q-rebuild-and-original-NS-gate-accounting",
+      "processID": 22164
+    },
+    {
+      "path": "outputs/v83_validation/localintegration01_independent_newton_directions.json",
+      "sha256": "c27cb48d29926ae1fbcedb55e72e7bdcab7d6c3b4f51c24db0b40a5816dc45a3",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 45868
+    },
+    {
+      "path": "outputs/v83_validation/localintegration01_limited_independent_newton_directions.json",
+      "sha256": "8298260408a8fb20333458470d00a44478412f517c0d5505581d19305f027edf",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 51224
+    },
+    {
+      "path": "outputs/v83_validation/krylov13_independent_newton_directions.json",
+      "sha256": "3a8e1adc4bde0568cb96689c95ff9deb34bb269e76e0803689217e7ec125d02c",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 31196
+    },
+    {
+      "path": "outputs/v83_validation/krylov13_independent_coarse_solver.json",
+      "sha256": "f85613b677c7beae24c86925e37ce19a827b8c5e947b8e3ce3676e6b34eb623f",
+      "status": "passed-independent-two-level-cache-identity-and-model-NS-work-accounting",
+      "processID": 54840
+    },
+    {
+      "path": "outputs/v83_validation/krylov13_independent_audit.json",
+      "sha256": "eb35a104dff670fae2e938e0c513cc6b1af82c5de9e8feb36d2299a13b559a76",
+      "status": "passed-independent-actual-static-wall-flux-constitutive-Jacobian-conservation-and-update-audit",
+      "processID": 24144
+    },
+    {
+      "path": "outputs/v83_validation/workbench12/node_wall_velocity_summary.json",
+      "sha256": "5a178eb47f26035d3892a228dc615d51d34df73f364576453d8c7b71eb55257b",
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "processID": 50472
+    },
+    {
+      "path": "outputs/v83_validation/workbench12/independent_wall_velocity_view.json",
+      "sha256": "b73e5b83183e132533f20d431c67aebe5beccaa0d22d5abcf87c2b27cbfb6ef0",
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+      "processID": 51404
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/localintegration01/steady_newton_unit_evidence.mat",
+      "sha256": "dabc1aab669874b47d3059576dac873bfc6b332e751680795dac2a80d24cba75",
+      "bytes": 1133811
+    },
+    {
+      "path": "outputs/v83_validation/localintegration01/local_integration_summary.json",
+      "sha256": "ce47d646413b53d086a66db86bdc0ac38a72217a040433b67b758679964859a9",
+      "bytes": 661
+    },
+    {
+      "path": "outputs/v83_validation/krylov13/wall_velocity_krylov_evidence.mat",
+      "sha256": "2744766665e57c877f739cdb3d4962acd94c3b9adb4dd9d9fbd31804fcf8c343",
+      "bytes": 1062034487
+    },
+    {
+      "path": "outputs/v83_validation/krylov13/wall_velocity_krylov_summary.json",
+      "sha256": "16d83fe10474f7b8a45b72d3ddb214587c65cb5dadc352782a52f5e28ef747e0",
+      "bytes": 2923
+    },
+    {
+      "path": "outputs/v83_validation/krylov13/coarse_direction_diagnostic.json",
+      "sha256": "43aa63b550469ac68ad93761e5404d1d6e6bb755d7449de44dea7efd69b7ab5b",
+      "bytes": 6308
+    },
+    {
+      "path": "outputs/v83_validation/krylov13/saved_direction_span_diagnostic.json",
+      "sha256": "7b4ed08843a407db6b67872e5cee2518bae9a4317df849e6e10047300dc16d04",
+      "bytes": 1362
+    },
+    {
+      "path": "outputs/v83_validation/krylov13/coarse_enrichment_directions.png",
+      "sha256": "41f38248e7b539163c139601b6a958580c2356b6462a2160ad0328d93c515a79",
+      "bytes": 85559
+    },
+    {
+      "path": "outputs/v83_validation/krylov13/coarse_enrichment_direction_plot.json",
+      "sha256": "faaa294155565fec6402f38c5ee49f25f686a9ae959655b37320592421e8e615",
+      "bytes": 1057
+    },
+    {
+      "path": "outputs/v83_validation/workbench12/wall-velocity-study-data.json",
+      "sha256": "9182da37e9b44105b5d77e30521349423ffffec9ccff33972cb241bfa4b385b9",
+      "bytes": 12240
+    },
+    {
+      "path": "outputs/v83_validation/workbench12/static_wall_velocity_comparison.png",
+      "sha256": "79ec8ff917c241b93bc17544f0fcc405ba0ecc121eace6e4d36fdad078a14169",
+      "bytes": 476061
+    },
+    {
+      "path": "outputs/v83_validation/workbench12/static_wall_velocity_residuals.png",
+      "sha256": "46577cee0c0bc8596218022c0c7504c5f28ddbc1c7a3ab69ded97be55cb48c6a",
+      "bytes": 62434
+    },
+    {
+      "path": "outputs/v83_validation/workbench12/static_wall_velocity_balance.png",
+      "sha256": "edad2433c601fd6645c38491226dbb563c64b37240c20454121bb5b8e7bc2c9a",
+      "bytes": 72084
+    }
+  ],
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_local_integration_continueRocketWallVelocityKrylov.m",
+      "sha256": "2db61945967f5fd21627095b4316652efbc9bc8fe87d818a79f1887aa3b33583"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_local_integration_exportRocketWallVelocityStudy.m",
+      "sha256": "6c0b4b74aa71ccc75db3726337126bc5265acc6f3d26cc84d9b59502c9e5812c"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_local_integration_rocket-wall-velocity.js",
+      "sha256": "a70ec316d4a568fe6044448569bb46385146d294a2ee2556632cc6ad965e6ca8"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_local_integration_solveRocketMinResidualCoarsePreconditioner.m",
+      "sha256": "0f691b4cd33783cdde314c8a1b94f37d7b8a3763c8f5fb8ed1e206ae0d95386a"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_local_integration_solveRocketShellSteadyKrylov.m",
+      "sha256": "1643b51897a826c43f20c499c75ca1bc5c98872ad734068009b9c056be8954ba"
+    }
+  ],
+  "unitResults": {
+    "status": "passed-local-cache-fresh-current-state-rebuild-original-NS-gates-and-old-mixed-complete-replay",
+    "oldMixedCompleteResultReplayed": true,
+    "coarseUnknowns": 149,
+    "actualNSCalls": 3,
+    "actualNSLinearDefect": 0.0007627465266498519,
+    "acceptedIterations": 1,
+    "candidateTrials": 2,
+    "limitedActualNSCalls": 2,
+    "limitedUnitLinearTolerance": 1e-07,
+    "freshConstructionModelApplications": 149,
+    "newQConstructionModelApplications": 149,
+    "newQProbeRelativeDifference": 3.5836928863358363e-16,
+    "invalidCacheOrLiftRejections": 8,
+    "integerConfigurationInputTested": true,
+    "separateNewStateValidationNSEvaluations": 1,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 42164
+  },
+  "realResults": {
+    "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 0,
+    "priorAcceptedNonlinearIterations": 12,
+    "totalNewEquationAcceptedIterations": 12,
+    "candidateTrials": 0,
+    "residualEvaluations": 2,
+    "totalNewEquationResidualEvaluations": 240,
+    "operatorBuilds": 1,
+    "initialMaximumResidual": 4758049.601364592,
+    "maximumResidual": 4758049.601364592,
+    "initialRmsMerit": 521635.2792153294,
+    "rmsMerit": 521635.2792153294,
+    "elapsedSeconds": 213.9270157,
+    "matrixVectorProducts": 50,
+    "jacobianResidualEvaluations": 1,
+    "preconditionerApplications": 51,
+    "lineage": {
+      "sourceState": "v82-exact-conservative-three-corrections-internal-initial-guess",
+      "sourceHistoryAppended": false,
+      "newEquationInitialCounter": 0,
+      "wallVelocityGradientChanged": true,
+      "interiorEulerFlux": "exact-godunov",
+      "viscousWorkVelocity": "arithmetic",
+      "wallVelocityGradient": "dirichlet-tangent",
+      "physicalWallVelocityAndTemperatureKept": true,
+      "externalCFDImported": false
+    },
+    "wallVelocityGradient": "dirichlet-tangent",
+    "sameEquationHistoryContinued": true,
+    "steadyConverged": false,
+    "stopReason": "steady-newton-linear-target-not-met",
+    "spatialConservationRelative": 4.762501927036358e-16,
+    "steadyBoundaryFluxBalance": 0.011954482698849347,
+    "signedHeatPowerW": 925861.9660217352,
+    "wallHeatRangeWm2": [
+      -358287.2316281634,
+      2267395.715238431
+    ],
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 49908,
+    "priorActualResidualEvaluations": 238,
+    "residualEvaluationsAfterLastAcceptedHistory": 115,
+    "normalEulerLinearization": "exact-branch",
+    "physicalSpatialEquationChanged": false,
+    "linearEquation": "steady-newton",
+    "preconditionerTimeStepOnly": true,
+    "rightPreconditioner": "two-level-minres",
+    "graphSweeps": 1,
+    "fixedLinearPreconditioner": true,
+    "jacobianAction": "selected-analytic",
+    "selectedAnalyticApplications": 49,
+    "analyticCacheBuildSeconds": 13.9271955,
+    "originalNSCombinedDirectionCheckPreserved": true,
+    "coarseUnknowns": 792,
+    "coarseImageBytes": 266582936.0,
+    "coarseOperatorBuilds": 0,
+    "coarseOperatorReuses": 1,
+    "coarseConstructionModelApplications": 0,
+    "coarsePreconditionerModelApplications": 51,
+    "coarseReuseVerificationModelApplications": 1,
+    "coarseReuseReport": {
+      "sourceFile": "outputs/v83_validation/localrocket02/local_coarse_evidence.mat",
+      "sourceAndStateVerified": true,
+      "freshFineModelProbeRelativeDifference": 9.738034046966952e-16,
+      "reuseVerificationModelApplications": 1,
+      "constructionModelApplications": 0,
+      "actualOriginalNSEvaluations": 0,
+      "imageBytes": 266582936.0,
+      "maximumImageBytes": 268435456.0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "coarseSetupSeconds": 3.8904653,
+    "coarseCorrectionChangesPhysicalMesh": false,
+    "coarseBasis": "local-conservative-enriched-mixed",
+    "coarseTargetCellCount": 15160,
+    "parentCoarseUnknowns": 210,
+    "coarseBaseConservativeColumns": 410,
+    "coarseAdditionalPrimitiveColumns": 62,
+    "coarseRetainedMixedColumns": 472,
+    "coarseLocalConservativeColumns": 320,
+    "coarseLocalDistinctCells": 64
+  },
+  "researchResults": {
+    "oldActualOriginalNSDirectionDefect": 0.3077544380719551,
+    "newActualOriginalNSDirectionDefect": 0.20251920488174383,
+    "originalActualLinearTarget": 0.1,
+    "newModelDirectionDefect": 0.20251924934135593,
+    "modelActualDifference": 4.445961210297611e-08,
+    "newFlowAcceptances": 0,
+    "newNonlinearCandidates": 0,
+    "currentImageProjectionSquaredNormFractionRemoved": 0.0005825613683982933
+  },
+  "workAccounting": {
+    "mainActualNSEvaluations": 240,
+    "mainAcceptedCorrections": 12,
+    "lastAcceptanceNSEvaluations": 125,
+    "unacceptedTailNSEvaluations": 115,
+    "latestMainNSEvaluations": 2,
+    "latestOuterSelectedModelApplications": 49,
+    "latestPreconditionerModelApplications": 51,
+    "latestReuseProbeApplications": 1,
+    "latestConstructionModelApplications": 0,
+    "separateOldMixedReplayNS": 3,
+    "separateUnitCachedNS": 3,
+    "separateUnitFreshNS": 3,
+    "separateUnitStrictLimitedNS": 2,
+    "separateNewQValidationNS": 1,
+    "totalUnitHostNSEvaluationsIncludingOldReplay": 12,
+    "separateUnitFreshConstructionModels": 149,
+    "separateUnitNewQConstructionModels": 149,
+    "validationNotAppendedToMainSolverHistory": true
+  },
+  "remainingDiagnostic": {
+    "status": "source-bound-original-NS-failed-direction-residual-and-unused-coarse-projection-diagnostic",
+    "processID": 38176,
+    "actualNSRelativeDefect": 0.20251920488174383,
+    "modelFinalRelativeDefect": 0.20251924934135593,
+    "modelActualRelativeDefectDifference": 4.445961210297611e-08,
+    "coarseProjectionRemainingRelativeDefect": 0.20246020635536505,
+    "remainingEnergyRemovableByExistingCoarseFraction": 0.0005825613683982933,
+    "normalizedCoarseImageInnerProducts": 0.033041765187786426,
+    "layerRemainingSquaredNormFractions": [
+      0.1813797916516376,
+      0.17747404591544333,
+      0.2492281153927747,
+      0.3287544598720853,
+      0.05100917914202251,
+      0.008936710872616768,
+      0.0024639618664997207,
+      0.000378674285722829,
+      0.00024185539788651545,
+      0.00010358379632016354,
+      2.962180701534582e-05
+    ],
+    "equationNames": [
+      "density",
+      "xMomentum",
+      "yMomentum",
+      "zMomentum",
+      "totalEnergy"
+    ],
+    "equationRemainingSquaredNormFractions": [
+      0.39379905167582424,
+      0.16621013154977257,
+      0.07475530954671254,
+      0.10783455721908969,
+      0.2574009500086257
+    ],
+    "axialBinEdgesFromAftToNose": [
+      0.0,
+      0.1,
+      0.2,
+      0.30000000000000004,
+      0.4,
+      0.5,
+      0.6000000000000001,
+      0.7000000000000001,
+      0.8,
+      0.9,
+      1.0
+    ],
+    "axialRemainingSquaredNormFractions": [
+      0.039391677508026364,
+      0.02294588300241792,
+      0.022128358578406084,
+      0.022830754220275206,
+      0.02213083708696398,
+      0.043143915665883645,
+      0.032571153478044415,
+      0.03153527989347014,
+      0.086751238398375,
+      0.6765709021681616
+    ],
+    "dominantOriginalFaces": [
+      {
+        "originalFaceID": 19309,
+        "centroidM": [
+          0.04840965080640497,
+          -0.011165931098523893,
+          -0.005215552286851139
+        ],
+        "bodyOutwardNormal": [
+          0.9637582898725899,
+          -0.2379783223571926,
+          -0.12056648286284519
+        ],
+        "remainingSquaredNormFraction": 0.0297622086768131
+      },
+      {
+        "originalFaceID": 19612,
+        "centroidM": [
+          0.049541779834591494,
+          0.0063535359236912324,
+          0.0009303519087929714
+        ],
+        "bodyOutwardNormal": [
+          0.9934890466994991,
+          0.11140870708099467,
+          0.023824652666129247
+        ],
+        "remainingSquaredNormFraction": 0.011323117424081241
+      },
+      {
+        "originalFaceID": 19641,
+        "centroidM": [
+          0.049697935562617236,
+          0.004679115747943463,
+          0.001771626530184372
+        ],
+        "bodyOutwardNormal": [
+          0.9946174121388142,
+          0.0993777136897706,
+          0.029330419227865747
+        ],
+        "remainingSquaredNormFraction": 0.009134240887588378
+      },
+      {
+        "originalFaceID": 19652,
+        "centroidM": [
+          0.049697935562617236,
+          -0.005002412442868131,
+          -0.00047291856278546446
+        ],
+        "bodyOutwardNormal": [
+          0.9940369363164072,
+          -0.10904388336868173,
+          2.7176612287703204e-05
+        ],
+        "remainingSquaredNormFraction": 0.006396195525535977
+      },
+      {
+        "originalFaceID": 18192,
+        "centroidM": [
+          0.03373101237198634,
+          -0.004133306502749008,
+          -0.03647557446026805
+        ],
+        "bodyOutwardNormal": [
+          0.6660706207667811,
+          -0.1027439095797952,
+          -0.7387784628666525
+        ],
+        "remainingSquaredNormFraction": 0.00610160475066893
+      },
+      {
+        "originalFaceID": 19530,
+        "centroidM": [
+          0.0491904294465336,
+          -0.006811199648679878,
+          -0.005423110378833119
+        ],
+        "bodyOutwardNormal": [
+          0.9732866499135119,
+          -0.1811462846739637,
+          -0.14106424298507503
+        ],
+        "remainingSquaredNormFraction": 0.005240289455744763
+      },
+      {
+        "originalFaceID": 18853,
+        "centroidM": [
+          0.04466191333378746,
+          0.020003163184155747,
+          -0.009910433297947734
+        ],
+        "bodyOutwardNormal": [
+          0.8909881983233738,
+          0.4032269075339669,
+          -0.20868179481943824
+        ],
+        "remainingSquaredNormFraction": 0.005189653808477457
+      },
+      {
+        "originalFaceID": 19452,
+        "centroidM": [
+          0.04899523478650145,
+          -0.006194655298144196,
+          -0.007529913056830297
+        ],
+        "bodyOutwardNormal": [
+          0.9870320081910767,
+          -0.10048642411056537,
+          -0.1251810423976476
+        ],
+        "remainingSquaredNormFraction": 0.004905538613966467
+      },
+      {
+        "originalFaceID": 19600,
+        "centroidM": [
+          0.04946370197057862,
+          -0.004587207158436538,
+          -0.005413536781531216
+        ],
+        "bodyOutwardNormal": [
+          0.9923829807933093,
+          -0.08258036294469895,
+          -0.09141391079976868
+        ],
+        "remainingSquaredNormFraction": 0.0047224913493205106
+      },
+      {
+        "originalFaceID": 19682,
+        "centroidM": [
+          0.049815052358636515,
+          0.0037472501098149654,
+          -0.0008991320663315879
+        ],
+        "bodyOutwardNormal": [
+          0.9927126172632927,
+          0.11132183292855359,
+          -0.04614226955504504
+        ],
+        "remainingSquaredNormFraction": 0.004391356547978567
+      },
+      {
+        "originalFaceID": 19683,
+        "centroidM": [
+          0.04989313022264937,
+          0.0023947892933241875,
+          0.0008854205116524704
+        ],
+        "bodyOutwardNormal": [
+          0.9991169183865607,
+          0.03882126857185016,
+          0.016071480958979506
+        ],
+        "remainingSquaredNormFraction": 0.004290784608336012
+      },
+      {
+        "originalFaceID": 18733,
+        "centroidM": [
+          0.04372497896563307,
+          -0.018009019755712855,
+          -0.016092776351177646
+        ],
+        "bodyOutwardNormal": [
+          0.8844242896070665,
+          -0.3402435533570566,
+          -0.3194182216968833
+        ],
+        "remainingSquaredNormFraction": 0.004155872238596606
+      }
+    ],
+    "newActualNSEvaluations": 0,
+    "newModelApplications": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\krylov13\\wall_velocity_krylov_evidence.mat": "2744766665e57c877f739cdb3d4962acd94c3b9adb4dd9d9fbd31804fcf8c343",
+      "outputs\\v83_validation\\localrocket02\\local_coarse_evidence.mat": "d38cc000fe7dafa3b907ed9827ac4ce4a57cc381e7effb57e74d1d71c25c160c"
+    },
+    "scriptSHA256": "dbc180b667531cefcae1910c9675086a268bf207e0fb4f3295e5a3c82d18e57b"
+  },
+  "savedDirectionSpanDiagnostic": {
+    "status": "source-bound-two-saved-finite-difference-direction-span-diagnostic-not-new-original-NS-validation",
+    "processID": 37948,
+    "cases": [
+      "krylov12",
+      "krylov13"
+    ],
+    "savedActualNSRelativeDefects": [
+      0.3077544380719551,
+      0.20251920488172787
+    ],
+    "finiteDifferenceSteps": [
+      1.1330563687797585e-07,
+      4.220314498622697e-08
+    ],
+    "spanWeights": [
+      0.05466658086442812,
+      0.9485706249626533
+    ],
+    "spanRank": 2,
+    "spanCondition": 7.8810754461442745,
+    "predictedSpanRelativeDefect": 0.20210179939756268,
+    "originalActualLinearTarget": 0.1,
+    "predictionReachesTarget": false,
+    "combinedScaledDirectionInfinityNorm": 22.20836077678796,
+    "finiteDifferenceImagesAreApproximate": true,
+    "newCombinedDirectionCheckedWithOriginalNS": false,
+    "newModelApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowUpdates": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\krylov12\\wall_velocity_krylov_evidence.mat": "0b63f93f63f0611f811dccdf1b7fe0d26c6382e0b2c9cecb4fae2ecba76551be",
+      "outputs\\v83_validation\\krylov13\\wall_velocity_krylov_evidence.mat": "2744766665e57c877f739cdb3d4962acd94c3b9adb4dd9d9fbd31804fcf8c343"
+    },
+    "scriptSHA256": "0df2fc53b7213d3e095c1cff24b9a0774afa28418d1a6c95e7f2b60f5f5d0056"
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench12/index.html",
+    "allTenFieldsAndOriginalFacetsPreserved": true,
+    "sameHostFiveStepWorkflowAndCurvesPreserved": true,
+    "localColumnAndOriginalCellCountsShown": true,
+    "numericalAndModelWorkSeparatelyCounted": true,
+    "scientificPNGsActuallyInspected": 4,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "steadyBoundaryImbalance": 0.011954482698849347
+  },
+  "nextAction": "Retain the current best same-Q Newton direction as an explicitly state-bound initial guess and investigate bounded restarted correction of its remaining linear defect. Use fresh current model action to form the correction RHS and original NS recheck on the TOTAL direction with the unchanged original target; bind geometry/scale/Q/source and preserve all state/descent/steady gates. Existing image reprojection and the two saved FD directions alone have little remaining gain. Do not discard the current useful direction or repeat the unchanged zero-initial-guess 48-direction run; do not call finite-difference span prediction a new verified direction.",
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "a2176251ea4995377f1a5b1d28c61475658b2fab9bd43a33bc493f4c2649bdbd"
+}

@@ -1,0 +1,1215 @@
+{
+  "version": 83,
+  "status": "tested-current-J-versus-graph-component-diagnosis-no-new-physical-state-not-delivered",
+  "generatedUTC": "2026-10-25T04:41:22.690580+00:00",
+  "recorderProcessID": 57588,
+  "previousGoalTurnClassification": "progress",
+  "previousGoalTurnEvidence": "Implemented/tested SVD retention and bounded real trial, then repaired export; evidence showed stagnation and changed the next action.",
+  "priorProgressPath": "docs/validation/v83/progress_recycled_gmres.json",
+  "priorProgressSHA256": "8f34a168c7743b51c5e85a59c4abf1bcd6dcc427a43c120101623d203f6bfa6a",
+  "currentSourcesSHA256": {
+    "tests/splitRocketGraphDirection.m": "ada77d84cee12ccc1f11b8a61bb67333d1a9f2f778e2c33151ee7f04bfc102f6",
+    "tests/testRocketGraphActionSplit.m": "defd9aad963b3ca1512b2bd7af3e6e1e40913d3f600b60977e2f18ae4e3d7cdc",
+    "tests/studyRocketGraphActionSplit.m": "8452131de7c4276d34bc9630733e8b65d89a43497d8433d9890e8990aa2f8503",
+    "tests/auditRocketGraphActionSplit.py": "5fd98e7f2a794170d256b82ff21749498ecaa09fe5d732d5cb27f915e160093b",
+    "internalFlow/cutCell/applyCutCellSelectedDirection.m": "f5ec0371d508b8d8cc2972dbe1a6b4f227209374b1751e6a6b55d210518c5cbf",
+    "internalFlow/cutCell/buildCutCellSelectedDirectionCache.m": "aeaf4202a6f980ab6c652ca612888bea5fdbe3c29fd238345f332154df90743a",
+    "internalFlow/cutCell/cutCellSelectedEulerDirection.m": "d82dc62e57edc7046a13bfcdaa506c3f75fb7a352bec0d1039300147c82b43bb",
+    "internalFlow/cutCell/cutCellWlsViscousDirection.m": "a6be816864e8aa6bcf6170c1091435b4a795744f0095b39aba7265f1c44f5f85",
+    "internalFlow/cutCell/buildRocketShellGraphPreconditioner.m": "d51d82c393bdaa7f63b09e02264b2d5e1e834f41f7e545edb16d74aa380eef54",
+    "internalFlow/cutCell/applyRocketShellGraphOperator.m": "3bbfabe3751c4e8fc2ad4e602a68052011970be69882d1bb6eec70c1d3f80abd",
+    "internalFlow/cutCell/buildRocketShellLineOperator.m": "f41ea3c93aecb2350ab2582eebd3be8a6a26951a48322c022a1ee939a4315d04",
+    "internalFlow/cutCell/cutCellLineFaceLinearization.m": "8828034b8d4c84041bb0be3bd9188d48fd0bc40d0298cfbeb78af3eb9c951d45",
+    "internalFlow/cutCell/cutCellExactLineFaceLinearization.m": "b173e4910eaf5f8d1b3f0502ecbd54e08389b834a91ba2d3501566d833935101",
+    "internalFlow/cutCell/cutCellNavierStokesResidual.m": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+    "docs/PROJECT_GOALS.md": "fd4511e35c48139b11cee1b53345590a6b1f0d9893d671c37764a64a31a97875",
+    "docs/GITHUB_STAGE_READINESS.md": "be2fae257ab2aae54a19af6e09d78d66e3bf5c77a69963f97f2acc9733462c80",
+    "docs/GRAPH_WLS_COUPLING_V83.md": "577e91dd8ffe070f01b4dd8e7f70446d2dd9528d7e450ea045f1a48f6806ae82",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1"
+  },
+  "matlabProcesses": [
+    {
+      "path": "outputs/v83_validation/graphsplitunit01_process.json",
+      "sha256": "b3df0c31248509455e2d27d2ca2d8c12ef75f8f0d7bf1ab723290c87c9640a0a",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        60020
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01_process.json",
+      "sha256": "709670e17b140b10f8e08c8f1833e33eb74083ad2da6dd35c00b02197ef0583e",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        46060
+      ]
+    }
+  ],
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/graphsplitunit01_independent_graph_split.json",
+      "sha256": "77b1a3895bee7a2a91749ab8395ba3e6307fc968a1496c08fce735117769ee7a",
+      "status": "passed-independent-current-J-graph-component-WLS-two-point-and-assembled-action-audit",
+      "processID": 37104,
+      "directions": [
+        {
+          "name": "unit1",
+          "independentWlsGradientRelativeDifference": 2.2229265059728395e-14,
+          "independentFullComponentRelativeDifference": 2.3115471844756595e-15,
+          "independentGraphComponentRelativeDifference": 1.448188906664959e-16,
+          "independentAssembledGraphRelativeDifference": 2.270673192969495e-16,
+          "independentOuterEulerRelativeDifference": 4.951751896570662e-16,
+          "graphActionRelativeDifference": 0.057281021522352926,
+          "componentNames": [
+            "interiorNormalEuler",
+            "interiorSideEuler",
+            "outerEuler",
+            "solidWallEuler",
+            "momentumStress",
+            "heatConduction",
+            "workGradient",
+            "workVelocity"
+          ],
+          "componentSignedDifferenceContributions": [
+            0.0,
+            0.0,
+            1.0000002550707667,
+            0.0,
+            -1.012019141695608e-07,
+            -1.5485039189972282e-07,
+            1.0519085825570852e-09,
+            -7.036901689609201e-11
+          ],
+          "componentDifferenceNormRelativeToFull": [
+            0.0,
+            0.0,
+            0.05728103613308497,
+            0.0,
+            4.217125647897481e-08,
+            2.208106345318593e-08,
+            1.8795130224994053e-09,
+            1.1269240539253311e-09
+          ],
+          "layerDifferenceSquaredNormFraction": [
+            3.717514506339322e-14,
+            8.050024293538893e-14,
+            2.9165880057997296e-16,
+            0.9999999999998822
+          ]
+        },
+        {
+          "name": "unit2",
+          "independentWlsGradientRelativeDifference": 2.2054119072611085e-14,
+          "independentFullComponentRelativeDifference": 2.607762224723602e-16,
+          "independentGraphComponentRelativeDifference": 1.234226714132685e-16,
+          "independentAssembledGraphRelativeDifference": 2.558759367394848e-16,
+          "independentOuterEulerRelativeDifference": 1.4051255566854685e-16,
+          "graphActionRelativeDifference": 1.1946476143148098e-05,
+          "componentNames": [
+            "interiorNormalEuler",
+            "interiorSideEuler",
+            "outerEuler",
+            "solidWallEuler",
+            "momentumStress",
+            "heatConduction",
+            "workGradient",
+            "workVelocity"
+          ],
+          "componentSignedDifferenceContributions": [
+            0.0,
+            0.0,
+            0.9999993789768901,
+            0.0,
+            4.946979579732573e-07,
+            1.1770062955627692e-07,
+            8.867796035717095e-09,
+            -2.432732019173905e-10
+          ],
+          "componentDifferenceNormRelativeToFull": [
+            0.0,
+            0.0,
+            1.1946468724311601e-05,
+            0.0,
+            6.885159523467707e-11,
+            1.2138284743183885e-11,
+            2.333186264453118e-12,
+            8.227896927302005e-13
+          ],
+          "layerDifferenceSquaredNormFraction": [
+            2.0583659930520384e-11,
+            8.747695883081612e-13,
+            3.725661783534669e-14,
+            0.9999999999785044
+          ]
+        }
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01_independent_graph_split.json",
+      "sha256": "1973fc66e3064f4925bf6ca352bd6a0b64dcd37fa0ce4aecc7e9e60a848571a9",
+      "status": "passed-independent-current-J-graph-component-WLS-two-point-and-assembled-action-audit",
+      "processID": 48460,
+      "directions": [
+        {
+          "name": "totalNewton",
+          "independentWlsGradientRelativeDifference": 2.398464631533958e-13,
+          "independentFullComponentRelativeDifference": 1.0573772902118895e-13,
+          "independentGraphComponentRelativeDifference": 1.7958042468612228e-16,
+          "independentAssembledGraphRelativeDifference": 8.287005011707858e-15,
+          "independentOuterEulerRelativeDifference": 1.5951973736555917e-16,
+          "graphActionRelativeDifference": 0.06684733112971027,
+          "componentNames": [
+            "interiorNormalEuler",
+            "interiorSideEuler",
+            "outerEuler",
+            "solidWallEuler",
+            "momentumStress",
+            "heatConduction",
+            "workGradient",
+            "workVelocity"
+          ],
+          "componentSignedDifferenceContributions": [
+            0.0,
+            0.0,
+            3.072853987877537e-05,
+            0.0,
+            0.7620558692325635,
+            0.004977022647684813,
+            0.08470760069250564,
+            0.1482287788873631
+          ],
+          "componentDifferenceNormRelativeToFull": [
+            0.0,
+            0.0,
+            0.00037055716842111243,
+            0.0,
+            0.0583549201252486,
+            0.015073856427628879,
+            0.025363243299070994,
+            0.02599573108166804
+          ],
+          "layerDifferenceSquaredNormFraction": [
+            0.6825303084030868,
+            0.07162276006337562,
+            0.0016373819124690517,
+            0.228038311955914,
+            0.01611616129623316,
+            2.4308581666251272e-05,
+            2.62560797696261e-08,
+            6.791575222695185e-09,
+            4.4862658674157576e-09,
+            1.6202699063307236e-09,
+            3.07286330635142e-05
+          ]
+        },
+        {
+          "name": "lastRecycledIncrement",
+          "independentWlsGradientRelativeDifference": 6.036872489533629e-14,
+          "independentFullComponentRelativeDifference": 3.348065846232152e-14,
+          "independentGraphComponentRelativeDifference": 1.56159209940913e-16,
+          "independentAssembledGraphRelativeDifference": 4.040364403809884e-15,
+          "independentOuterEulerRelativeDifference": 2.979778206980824e-16,
+          "graphActionRelativeDifference": 0.40736507932950955,
+          "componentNames": [
+            "interiorNormalEuler",
+            "interiorSideEuler",
+            "outerEuler",
+            "solidWallEuler",
+            "momentumStress",
+            "heatConduction",
+            "workGradient",
+            "workVelocity"
+          ],
+          "componentSignedDifferenceContributions": [
+            0.0,
+            0.0,
+            3.887312609680818e-08,
+            0.0,
+            0.8629632335886107,
+            0.001079804961030656,
+            0.13316522298338984,
+            0.00279169959382763
+          ],
+          "componentDifferenceNormRelativeToFull": [
+            0.0,
+            0.0,
+            8.03174195482139e-05,
+            0.0,
+            0.37842510808674784,
+            0.020720034957888815,
+            0.1500595629172508,
+            0.019963623404315997
+          ],
+          "layerDifferenceSquaredNormFraction": [
+            0.8988758172288831,
+            0.09752736830175442,
+            0.00018084659146187286,
+            0.0031707579727146963,
+            0.0002449197494808245,
+            2.4969955168816385e-07,
+            7.324511012615269e-10,
+            3.085836459460137e-10,
+            3.5561041778187976e-10,
+            1.7980954670007062e-10,
+            3.887969836768833e-08
+          ]
+        },
+        {
+          "name": "normalizedRemaining",
+          "independentWlsGradientRelativeDifference": 1.5085732228556749e-13,
+          "independentFullComponentRelativeDifference": 1.0235441781219417e-13,
+          "independentGraphComponentRelativeDifference": 1.98115210610419e-16,
+          "independentAssembledGraphRelativeDifference": 2.735995654630432e-16,
+          "independentOuterEulerRelativeDifference": 1.9081340953106932e-16,
+          "graphActionRelativeDifference": 0.1055454491662112,
+          "componentNames": [
+            "interiorNormalEuler",
+            "interiorSideEuler",
+            "outerEuler",
+            "solidWallEuler",
+            "momentumStress",
+            "heatConduction",
+            "workGradient",
+            "workVelocity"
+          ],
+          "componentSignedDifferenceContributions": [
+            0.0,
+            0.0,
+            5.638255866395209e-13,
+            0.0,
+            0.44415143102829513,
+            0.5123078906760474,
+            -0.029392939397061404,
+            0.07293361769214468
+          ],
+          "componentDifferenceNormRelativeToFull": [
+            0.0,
+            0.0,
+            7.999493473423542e-08,
+            0.0,
+            0.07034043427880295,
+            0.0761032212197293,
+            0.0183527676528021,
+            0.017825379706594723
+          ],
+          "layerDifferenceSquaredNormFraction": [
+            0.9633722335458897,
+            0.030030745626126752,
+            0.005282997951312376,
+            0.001152075538728057,
+            0.00016174953601401558,
+            1.9762064773549569e-07,
+            1.6192129736643053e-10,
+            8.658654631652715e-12,
+            7.2623910908375966e-12,
+            2.835797925462244e-12,
+            6.040881653908146e-13
+          ]
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/graphsplitunit01/graph_split_unit_evidence.mat",
+      "sha256": "1b47f2443aa7eefcbd1b0d29e2fdef0590933750d224ab475efae68bd787cd42",
+      "bytes": 218506
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitunit01/graph_split_unit_summary.json",
+      "sha256": "1fae8e2a8c4708cda837595773e6d2e37c6280a23197181e16f82ef70c80bfe0",
+      "bytes": 511
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01/graph_split_components.csv",
+      "sha256": "fc6dacfb08f0d94ecc62682a738e822fcc3729026f46df2c6da7bb970d6f6dbf",
+      "bytes": 1610
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01/graph_split_components.png",
+      "sha256": "e2007ae43c8827c451aa48a960f6a12f15f5fd37615f5b660dbae59a09368f5c",
+      "bytes": 148202
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01/graph_split_context.mat",
+      "sha256": "c0f75874cc79b8db19135f92fb71b39971b89ff3a645dec48e7cf9e02a007245",
+      "bytes": 152427876
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01/graph_split_lastRecycledIncrement.mat",
+      "sha256": "1c54e1b6685d1bdf77821e2e0dca90f9ad0bb2dc93f55ea2e3b40d4b8fb9496a",
+      "bytes": 175796804
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01/graph_split_normalizedRemaining.mat",
+      "sha256": "1e588209a5e631fffda5c9a600e261199cbacb47dc555b615d2f87be3533ff05",
+      "bytes": 179711494
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01/graph_split_summary.json",
+      "sha256": "6d9e508716d30e6b833b98ab7a1c785c7d595d935ca8637d9704a3a24e741970",
+      "bytes": 8949
+    },
+    {
+      "path": "outputs/v83_validation/graphsplitreal01/graph_split_totalNewton.mat",
+      "sha256": "51ff6c84b1cb32f006473461b0e201d6fc5187c08fe079854ccc46ece0f20b50",
+      "bytes": 175924776
+    }
+  ],
+  "unitResults": {
+    "status": "passed-small-current-J-and-graph-component-sums-dense-reference-and-original-NS-directions",
+    "cellCount": 32,
+    "directionCount": 2,
+    "directionErrors": [
+      [
+        1.449766662337737e-16,
+        2.4091494666531027e-16,
+        1.9175922230263538e-09
+      ],
+      [
+        1.7333156957622645e-16,
+        3.0553359901037804e-16,
+        2.1844960797784817e-10
+      ]
+    ],
+    "completeSelectedActionApplications": 4,
+    "newCurrentJacobianColumnApplications": 0,
+    "actualOriginalNSEvaluations": 5,
+    "newFlowAcceptances": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 60020
+  },
+  "realResults": {
+    "status": "measured-current-real-J-versus-graph-components-on-three-same-Q-directions",
+    "sourceCase": "krylov15",
+    "parentCase": "krylov14",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "directionCount": 3,
+    "completeSelectedActionApplications": 3,
+    "newGraphBuilds": 0,
+    "newCoarseColumnApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "mainActualNSUnchanged": 244,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "componentInterpretation": "Signed contributions include cancellation; exact replacement is only an action diagnostic, not a solved correction or conditioning result.",
+    "summaries": [
+      {
+        "name": "totalNewton",
+        "graphActionRelativeDifference": 0.06684733112971357,
+        "componentNames": [
+          "interiorNormalEuler",
+          "interiorSideEuler",
+          "outerEuler",
+          "solidWallEuler",
+          "momentumStress",
+          "heatConduction",
+          "workGradient",
+          "workVelocity"
+        ],
+        "componentColumns": [
+          "fullJNorm",
+          "graphJNorm",
+          "differenceNorm",
+          "signedContributionToTotalDifferenceSquaredNorm",
+          "remainingDifferenceRelativeToFullAfterExactReplacement"
+        ],
+        "componentRows": [
+          [
+            2831401586.512566,
+            2831401586.512566,
+            0,
+            0,
+            0.06684733112971357
+          ],
+          [
+            123094994.2242509,
+            123094994.2242509,
+            0,
+            0,
+            0.06684733112971357
+          ],
+          [
+            297380.6282654647,
+            364145.9570448852,
+            197834.0045463835,
+            3.072853987877535e-05,
+            0.0668463040622521
+          ],
+          [
+            2750554385.102423,
+            2750554385.102423,
+            0,
+            0,
+            0.06684733112971357
+          ],
+          [
+            100305993.66083664,
+            98373733.44692877,
+            31154673.332997773,
+            0.7620558692325642,
+            0.032607805450100155
+          ],
+          [
+            262454094.32682887,
+            262855664.3080744,
+            8047668.848888173,
+            0.004977022647685061,
+            0.06820048769320104
+          ],
+          [
+            27040056.910498038,
+            30471704.19458734,
+            13540992.909457712,
+            0.08470760069250718,
+            0.06599103602289921
+          ],
+          [
+            13878667.097198194,
+            0,
+            13878667.097198194,
+            0.14822877888736458,
+            0.06180294204675416
+          ]
+        ],
+        "componentDifferenceGram": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3.0728565926308794e-05,
+            0,
+            7.820026124361261e-12,
+            3.346996712756065e-12,
+            -3.721455641078417e-11,
+            1.3530601964635223e-19
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            7.820026124361261e-12,
+            0,
+            0.7620558692247443,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3.346996712756065e-12,
+            0,
+            0,
+            0.050848787712842555,
+            -0.05106175679015105,
+            0.005189991721646553
+          ],
+          [
+            0,
+            0,
+            -3.721455641078417e-11,
+            0,
+            0,
+            -0.05106175679015105,
+            0.14395986471615083,
+            -0.00819050719627808
+          ],
+          [
+            0,
+            0,
+            1.3530601964635223e-19,
+            0,
+            0,
+            0.005189991721646553,
+            -0.00819050719627808,
+            0.15122929436199609
+          ]
+        ],
+        "equationDifferenceRelativeToFull": [
+          0.0003464408283435874,
+          0.045069850245594276,
+          0.21886307412063977,
+          0.26220832423283674,
+          0.051229827419198626
+        ],
+        "layerDifferenceSquaredNormFraction": [
+          0.6825303084030881,
+          0.07162276006337528,
+          0.0016373819124691,
+          0.2280383119559135,
+          0.01611616129623313,
+          2.4308581666251228e-05,
+          2.6256079769626043e-08,
+          6.791575222695173e-09,
+          4.486265867415738e-09,
+          1.6202699063307201e-09,
+          3.072863306351413e-05
+        ],
+        "largestDifferenceCellIDs": [
+          19699,
+          19744,
+          19721,
+          19743,
+          19742,
+          19722,
+          16448,
+          16450,
+          16446,
+          16444,
+          16449,
+          16447,
+          16452,
+          19741,
+          16445,
+          19731,
+          16442,
+          19732,
+          16443,
+          19730
+        ],
+        "largestDifferenceOriginalFaceIDs": [
+          19699,
+          19744,
+          19721,
+          19743,
+          19742,
+          19722,
+          16448,
+          16450,
+          16446,
+          16444,
+          16449,
+          16447,
+          16452,
+          19741,
+          16445,
+          19731,
+          16442,
+          19732,
+          16443,
+          19730
+        ],
+        "largestDifferenceLayerIDs": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "graphAssemblyRelativeDifference": 8.188721763171507e-15,
+        "fullModelRelativeDefect": 0.2001807012635214,
+        "graphModelRelativeDefect": 0.21118946887132292,
+        "elapsedSeconds": 2.473145,
+        "singleDirectionOnly": true,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "savedOriginalNSDirectionRelativeDifference": 1.5780492344519582e-06
+      },
+      {
+        "name": "lastRecycledIncrement",
+        "graphActionRelativeDifference": 0.40736507932960164,
+        "componentNames": [
+          "interiorNormalEuler",
+          "interiorSideEuler",
+          "outerEuler",
+          "solidWallEuler",
+          "momentumStress",
+          "heatConduction",
+          "workGradient",
+          "workVelocity"
+        ],
+        "componentColumns": [
+          "fullJNorm",
+          "graphJNorm",
+          "differenceNorm",
+          "signedContributionToTotalDifferenceSquaredNorm",
+          "remainingDifferenceRelativeToFullAfterExactReplacement"
+        ],
+        "componentRows": [
+          [
+            12903415.084027264,
+            12903415.084027264,
+            0,
+            0,
+            0.40736507932960164
+          ],
+          [
+            3093937.136340299,
+            3093937.136340299,
+            0,
+            0,
+            0.40736507932960164
+          ],
+          [
+            629.4256599597572,
+            707.9575540124459,
+            447.5855763522065,
+            3.887312609680789e-08,
+            0.40736507141186123
+          ],
+          [
+            11236747.944301812,
+            11236747.944301812,
+            0,
+            0,
+            0.40736507932960164
+          ],
+          [
+            2598846.6210428844,
+            1558937.5823408326,
+            2108852.862329007,
+            0.8629632335886231,
+            0.15080034955742155
+          ],
+          [
+            1113144.8193381126,
+            1137450.0698129046,
+            115466.71744224666,
+            0.0010798049610306018,
+            0.40745214248165884
+          ],
+          [
+            906252.478123072,
+            292299.54827527027,
+            836238.2199686704,
+            0.13316522298339153,
+            0.3798257838825407
+          ],
+          [
+            111251.4562564492,
+            0,
+            111251.4562564492,
+            0.002791699593827614,
+            0.4067164978657196
+          ]
+        ],
+        "componentDifferenceGram": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3.8873343831410146e-08,
+            0,
+            1.4211903669806196e-13,
+            -3.284492520031393e-13,
+            -3.140438692219446e-14,
+            -2.6282145307047916e-23
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1.4211903669806196e-13,
+            0,
+            0.862963233588481,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -3.284492520031393e-13,
+            0,
+            0,
+            0.0025871009376461523,
+            -0.0022129191250282337,
+            0.0007056231487411321
+          ],
+          [
+            0,
+            0,
+            -3.140438692219446e-14,
+            0,
+            0,
+            -0.0022129191250282337,
+            0.13569372355244777,
+            -0.00031558144399680986
+          ],
+          [
+            0,
+            0,
+            -2.6282145307047916e-23,
+            0,
+            0,
+            0.0007056231487411321,
+            -0.00031558144399680986,
+            0.002401657889083294
+          ]
+        ],
+        "equationDifferenceRelativeToFull": [
+          7.562246622655251e-05,
+          0.591506342126394,
+          0.7060617965022331,
+          0.6102534231417621,
+          0.29744800312078745
+        ],
+        "layerDifferenceSquaredNormFraction": [
+          0.8988758172288824,
+          0.09752736830175425,
+          0.0001808465914618677,
+          0.003170757972714669,
+          0.00024491974948082253,
+          2.4969955168816136e-07,
+          7.324511012615204e-10,
+          3.08583645946011e-10,
+          3.5561041778187454e-10,
+          1.7980954670006927e-10,
+          3.8879698367688014e-08
+        ],
+        "largestDifferenceCellIDs": [
+          16467,
+          16468,
+          16377,
+          16423,
+          16378,
+          16424,
+          16413,
+          16425,
+          16379,
+          16395,
+          16380,
+          16422,
+          16411,
+          16382,
+          16421,
+          16415,
+          16399,
+          16398,
+          16420,
+          16410
+        ],
+        "largestDifferenceOriginalFaceIDs": [
+          16467,
+          16468,
+          16377,
+          16423,
+          16378,
+          16424,
+          16413,
+          16425,
+          16379,
+          16395,
+          16380,
+          16422,
+          16411,
+          16382,
+          16421,
+          16415,
+          16399,
+          16398,
+          16420,
+          16410
+        ],
+        "largestDifferenceLayerIDs": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "graphAssemblyRelativeDifference": 3.8380540227806576e-15,
+        "fullModelRelativeDefect": 1.0009213005478355,
+        "graphModelRelativeDefect": 1.0009131217292577,
+        "elapsedSeconds": 2.2809764,
+        "singleDirectionOnly": true,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0
+      },
+      {
+        "name": "normalizedRemaining",
+        "graphActionRelativeDifference": 0.10554544916620956,
+        "componentNames": [
+          "interiorNormalEuler",
+          "interiorSideEuler",
+          "outerEuler",
+          "solidWallEuler",
+          "momentumStress",
+          "heatConduction",
+          "workGradient",
+          "workVelocity"
+        ],
+        "componentColumns": [
+          "fullJNorm",
+          "graphJNorm",
+          "differenceNorm",
+          "signedContributionToTotalDifferenceSquaredNorm",
+          "remainingDifferenceRelativeToFullAfterExactReplacement"
+        ],
+        "componentRows": [
+          [
+            275861962.14189863,
+            275861962.14189863,
+            0,
+            0,
+            0.10554544916620956
+          ],
+          [
+            14064959.376581002,
+            14064959.376581002,
+            0,
+            0,
+            0.10554544916620956
+          ],
+          [
+            74.32998126882208,
+            87.94154612603839,
+            74.45021164984425,
+            5.638255866395184e-13,
+            0.10554544916618301
+          ],
+          [
+            41668486.91730388,
+            41668486.91730388,
+            0,
+            0,
+            0.10554544916620956
+          ],
+          [
+            478271311.083807,
+            458865572.41563284,
+            65464897.70879528,
+            0.44415143102833254,
+            0.07868967622990826
+          ],
+          [
+            758631478.9052403,
+            718737756.2718809,
+            70828246.13667382,
+            0.5123078906760247,
+            0.07427977092718702
+          ],
+          [
+            28604151.584660485,
+            22672701.565644465,
+            17080674.428335797,
+            -0.02939293939705776,
+            0.11014323089681331
+          ],
+          [
+            16589841.548140096,
+            0,
+            16589841.548140096,
+            0.07293361769213705,
+            0.09915970991086596
+          ]
+        ],
+        "componentDifferenceGram": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            5.744416909341159e-13,
+            0,
+            -1.8815650724864423e-15,
+            -3.8712737791088944e-15,
+            -4.863265443010296e-15,
+            8.178560066478354e-27
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -1.8815650724864423e-15,
+            0,
+            0.4441514310283344,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -3.8712737791088944e-15,
+            0,
+            0,
+            0.5199086632791886,
+            -0.05582004679073118,
+            0.048219274187570924
+          ],
+          [
+            0,
+            0,
+            -4.863265443010296e-15,
+            0,
+            0,
+            -0.05582004679073118,
+            0.030235984079902713,
+            -0.0038088766862244753
+          ],
+          [
+            0,
+            0,
+            8.178560066478354e-27,
+            0,
+            0,
+            0.048219274187570924,
+            -0.0038088766862244753,
+            0.02852322019079056
+          ]
+        ],
+        "equationDifferenceRelativeToFull": [
+          2.670711539398874e-07,
+          0.11010636033851168,
+          0.18340128409602038,
+          0.13017876888031818,
+          0.09546060174847176
+        ],
+        "layerDifferenceSquaredNormFraction": [
+          0.9633722335458897,
+          0.030030745626125933,
+          0.005282997951312632,
+          0.0011520755387280535,
+          0.00016174953601401492,
+          1.9762064773549492e-07,
+          1.619212973664299e-10,
+          8.658654631652681e-12,
+          7.2623910908375804e-12,
+          2.8357979254622337e-12,
+          6.040881653908122e-13
+        ],
+        "largestDifferenceCellIDs": [
+          19744,
+          19702,
+          19721,
+          19706,
+          19699,
+          19701,
+          19722,
+          19705,
+          19741,
+          19742,
+          14379,
+          19703,
+          19704,
+          19740,
+          19732,
+          19707,
+          19718,
+          19731,
+          19717,
+          19733
+        ],
+        "largestDifferenceOriginalFaceIDs": [
+          19744,
+          19702,
+          19721,
+          19706,
+          19699,
+          19701,
+          19722,
+          19705,
+          19741,
+          19742,
+          14379,
+          19703,
+          19704,
+          19740,
+          19732,
+          19707,
+          19718,
+          19731,
+          19717,
+          19733
+        ],
+        "largestDifferenceLayerIDs": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "graphAssemblyRelativeDifference": 2.800023951593325e-16,
+        "fullModelRelativeDefect": 1.990194435578198,
+        "graphModelRelativeDefect": 1.9310924878348776,
+        "elapsedSeconds": 2.3141246,
+        "singleDirectionOnly": true,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0
+      }
+    ],
+    "engineProcessID": 46060
+  },
+  "workAccounting": {
+    "mainActualNS": 244,
+    "mainAcceptances": 12,
+    "lastAcceptedNS": 125,
+    "unacceptedTailNS": 119,
+    "newRealCompleteSelectedModelApplications": 3,
+    "newRealActualNS": 0,
+    "newGraphBuilds": 0,
+    "newCoarseColumnApplications": 0,
+    "separateUnitCompleteSelectedModelApplications": 4,
+    "separateUnitActualNS": 5,
+    "newFlowAcceptances": 0
+  },
+  "interpretation": {
+    "threeDirectionalDifferencesAreNotGlobalConditioning": true,
+    "signedContributionsRetainCancellation": true,
+    "hypotheticalExactComponentReplacementIsNotImplementedPreconditioner": true,
+    "pressureOrHeatingErrorClaimed": false,
+    "correctedPreconditionerImplemented": false,
+    "flowStateAndPressureHeatAndPowerUnchanged": true
+  },
+  "userInterface": {
+    "sourceUnchanged": true,
+    "latestWorkbench": "outputs/v83_validation/workbench14/index.html",
+    "newScientificPNGActuallyInspected": true,
+    "newBrowserOrWebGLVisualAcceptance": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "steadyBoundaryImbalance": 0.011954482698849347
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "nextAction": "Prototype measured full-WLS viscous coupled blocks on the small domain, pairing stress/conduction and both work derivatives. Measure neighborhood/storage/model cost before selecting a bounded local or normal-block correction; validate current full action, old path and original NS total direction, then a bounded real trial. No correction is yet implemented or proven to remove stagnation. Keep 792-column image, same-Q direction, original total-RHS 0.1/temperature/descent/spatial/steady gates and parallel UI/physical validation work.",
+  "githubReviewWindow": "Around v90 is a conditional review point only. A verified real-region solver/validation/workbench/reproducible-delivery closure may justify earlier synchronization; unresolved conditions delay it. Full-cycle completion is not required.",
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "1479276bc562f11ea4f6e197076ad9d31d7eaf34aeeb89162110d4ac7a997f5c"
+}

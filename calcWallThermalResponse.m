@@ -15,6 +15,12 @@ function mesh = calcWallThermalResponse(mesh,timeSeconds,material,cfg)
 
 %% 1. 检查时间、材料和已计算的换热边界条件
 if nargin<4, cfg=struct; end
+% 单工况剖面的换热割线不能直接作为旧热历史反馈规律使用。
+if isfield(mesh,'heating') && isfield(mesh.heating,'historyCompatible') && ...
+        ~mesh.heating.historyCompatible
+    error('RocketAeroHeat:WallThermal:SingleConditionModel', ...
+        '当前球鼻局部相似模型仅验证单工况热流；壁体热历史耦合尚未验证。');
+end
 backBoundary=wallBackBoundary(material);
 if ~isfield(mesh,'heating') || ~isfield(mesh.heating,'heatTransferCoefficient') || ...
         ~isfield(mesh.heating,'recoveryTemperature')

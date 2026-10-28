@@ -1,0 +1,44 @@
+function report=testRocketFullFLeastSquares(folder)
+%TESTROCKETFULLFLEASTSQUARES 用稠密原系数核对全部转置列、固定伴随和LSQR实际解。
+% 模块一：沿用已测两排序小域，保存所有原F与局部映射矩阵以供独立复算。
+% 模块二：检查非零初猜、零右端、已达目标早退和非法选项，不改原NS。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'));mkdir(folder);sourceFile=fullfile(root,'outputs','v83_validation','overlapFunit01','restricted_overlap_unit_evidence.mat');s=load(sourceFile,'cases');cases=cell(2,1);
+for j=1:2
+    a=s.cases{j};graph=a.graph;factor=a.plainFactor;
+    % 零重叠因子是另一种缓存格式，显式转换每桶身份后保持同一数值映射。
+    factor=plainSpatialFactor(factor);n=graph.cellCount;N=5*n;A=zeros(N);AT=A;M=A;MT=A;
+    for q=1:N
+        v=zeros(n,5);v(q)=1;z=applyRocketPackedGraph(graph,v);A(:,q)=z(:);z=applyRocketPackedGraphTranspose(graph,v);AT(:,q)=z(:);
+        z=solveRocketSpatialFBlocks(factor,v);M(:,q)=z(:);z=solveRocketSpatialFBlocksTranspose(factor,v);MT(:,q)=z(:);
+    end
+    assert(norm(A-a.A,'fro')<1e-12*max(1,norm(A,'fro'))&&norm(AT-A','fro')<1e-12*max(1,norm(A,'fro')));
+    assert(norm(MT-M','fro')<1e-12*max(1,norm(M,'fro')));
+    permuted=graph;permuted.order=flipud(graph.order(:));permuted.inverseOrder(permuted.order)=(1:n)';
+    map=reshape(permuted.order(:)+(0:4)*n,[],1);permutedA=zeros(N);permutedA(map,map)=A;permutedAT=zeros(N);
+    for q=1:N,v=zeros(n,5);v(q)=1;z=applyRocketPackedGraphTranspose(permuted,v);permutedAT(:,q)=z(:);end
+    assert(norm(permutedAT-permutedA','fro')<1e-12*max(1,norm(permutedA,'fro')));
+    rhs=a.rhs;initial=.2*a.value;options=struct('maximumIterations',300,'relativeTolerance',1e-10);
+    [value,detail]=solveRocketFullFLeastSquares(graph,factor,rhs,initial,options);direct=A\rhs(:);
+    assert(detail.fullFInternalTargetMet&&norm(value(:)-direct)/max(1,norm(direct))<1e-8&&detail.adjointIdentityRelativeDifference<1e-12);
+    assert(detail.nativeIterations>1&&detail.nativeToleranceRelativeToCorrectionRHS<=1e-12);
+    [zero,zeroDetail]=solveRocketFullFLeastSquares(graph,factor,zeros(n,5),zeros(n,5),options);assert(all(zero==0,'all')&&zeroDetail.nativeIterations==0);
+    [early,earlyDetail]=solveRocketFullFLeastSquares(graph,factor,rhs,reshape(direct,n,5),options);assert(earlyDetail.nativeIterations==0&&earlyDetail.fullFInternalTargetMet);
+    rejected=false;try,solveRocketFullFLeastSquares(graph,factor,rhs,initial,struct('adjointIdentityTolerance',1e-7));catch ex,rejected=strcmp(ex.identifier,'FullFLSQR:Options');end;assert(rejected);
+    cases{j}=struct('graph',graph,'factor',factor,'A',A,'AT',AT,'M',M,'MT',MT,'rhs',rhs,'initial',initial,'value',value,'detail',detail, ...
+        'permutedGraph',permuted,'permutedA',permutedA,'permutedAT',permutedAT,'zeroDetail',zeroDetail,'earlyDetail',earlyDetail);
+end
+report=struct('status','passed-two-small-orderings-all-F-and-local-map-transpose-columns-dense-LSQR-and-initial-identity', ...
+    'cases',2,'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'full_F_least_squares_unit_evidence.mat'),'report','cases','sourceFile','-v7');
+fprintf('%s\n',jsonencode(report));
+end
+function factor=plainSpatialFactor(factor)
+% 零重叠扩展缓存中的非空桶转换到按F组大小排列的原SpatialF格式，逆逐值保留。
+buckets=cell(8,1);for k=1:8,buckets{k}=struct('groupIDs',uint32([]),'members',zeros(k,0,'uint32'),'inverse',zeros(5*k,5*k,0));end
+for id=1:numel(factor.buckets)
+    b=factor.buckets{id};if isempty(b.groupIDs),continue;end
+    k=b.coreSize;assert(b.overlapSize==k&&isempty(buckets{k}.groupIDs));buckets{k}=struct('groupIDs',b.groupIDs,'members',b.members,'inverse',b.inverse);
+end
+factor=struct('kind','fixed-within-original-patch-five-field-F-inverse','cellCount',factor.cellCount,'buckets',{buckets});
+end

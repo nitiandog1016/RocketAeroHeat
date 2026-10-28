@@ -1,0 +1,40 @@
+function cache=buildCutCellSelectedDirectionCache(Q,baseInfo,cut,gas,boundary,scale)
+%BUILDCUTCELLSELECTEDDIRECTIONCACHE 缓存完整选中分支方向作用，减少重复压力根和边界解析。
+% 模块一：WLS梯度及全部内部Euler左右5x5块，保持原空间方程与状态护栏。
+% 模块二：局部特征面的5x5 primitive导数只在基态求一次，给定输入不变。
+% 模块三：缓存只属于同一个Q/几何/边界；不能随非线性接受后继续沿用。
+state=cutCellBoundaryStencilState(Q,cut,gas,boundary);gradient=buildCutCellGradientOperator(cut,state);
+f=cut.openFaces;ids=find(f.area>0&f.cellMinus>0&f.cellPlus>0);left=zeros(5,5,numel(ids));right=left;counts=zeros(6,1);
+for first=1:2048:numel(ids)
+    pick=first:min(first+2047,numel(ids));faces=ids(pick);
+    [L,R,audit]=cutCellExactEulerBranchJacobian(Q(f.cellMinus(faces),:),Q(f.cellPlus(faces),:),f.normal(faces,:),gas);
+    left(:,:,pick)=L;right(:,:,pick)=R;counts=counts+accumarray(audit.sampleRegion,1,[6 1]);
+end
+waves=struct('Q',Q,'geometry',cut,'gas',gas,'insideFaceIDs',ids,'left',left,'right',right,'sampleRegionCounts',counts);clear left right;
+outside=find(f.area>0&xor(f.cellMinus>0,f.cellPlus>0));owner=max(f.cellMinus(outside),f.cellPlus(outside));J=zeros(5,5,numel(outside));
+names={'xmin','xmax';'ymin','ymax';'zmin','zmax'};
+riemann=buildCutCellRiemannReservoirJacobian(Q,cut,gas,boundary);
+for j=1:numel(outside)
+    face=outside(j);id=owner(j);point=f.centroid(face,:);
+    if f.cellMinus(face)>0,normal=f.normal(face,:);side=2;else,normal=-f.normal(face,:);side=1;end
+    b=boundary.(names{f.axis(face),side});
+    for key={'reservoirPrimitive','primitive'}
+        if isfield(b,key{1})&&isa(b.(key{1}),'function_handle'),b.(key{1})=b.(key{1})(point,0);end
+    end
+    if strcmp(b.type,'characteristic')
+        for a=1:5
+            basis=zeros(1,5);basis(a)=1;[column,tag]=cutCellCharacteristicBoundaryDirection(state.interiorPrimitive(id,:),basis,b,normal,gas);
+            assert(isequaln(tag.basePrimitive,state.primitive(face,:))&&tag.isInflow==state.incoming(face));J(:,a,j)=column';
+        end
+    elseif strcmp(b.type,'supersonicOutflow'),J(:,:,j)=eye(5);
+    elseif strcmp(b.type,'riemannReservoir')
+        slot=riemann.slot(face);assert(slot>0&&riemann.incoming(slot)==state.incoming(face));
+        J(:,:,j)=riemann.primitiveJacobian(:,:,slot);
+    elseif strcmp(b.type,'supersonicInflow')
+    elseif strcmp(b.type,'wall'),J(1,1,j)=1;
+    else,error('CutDirection:Boundary','缓存不支持未明确的开放边界。');end
+end
+cache=struct('Q',Q,'baseInfo',baseInfo,'geometry',cut,'gas',gas,'boundary',boundary,'scale',reshape(scale,1,5), ...
+    'state',state,'gradient',gradient,'waves',waves,'outsideFaceIDs',outside,'outsideOwner',owner,'boundaryJacobian',J, ...
+    'selectedBranchOnly',true,'nonlinearStateFrozen',true,'newOriginalNSEvaluations',0,'newProductionSolvedAreaM2',0);
+end

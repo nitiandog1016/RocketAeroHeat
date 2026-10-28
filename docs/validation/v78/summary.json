@@ -1,0 +1,647 @@
+{
+  "version": 78,
+  "status": "tested-real-HLLC-HLLE-roots-original-BE-and-contact-workbench",
+  "cases": [
+    {
+      "kind": "hlle_collar72",
+      "gridKind": "collar72",
+      "interiorConvectiveFlux": "hlle-einfeldt",
+      "cellCount": 8280,
+      "radialLayers": 72,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 2e-06,
+      "NewtonIterations": 9,
+      "residualEvaluations": 1730,
+      "BEAcceptedSteps": 3,
+      "independentOriginalBEDefects": [
+        4.7196759877445836e-17,
+        9.439351975489167e-17,
+        1.8878703950978334e-16
+      ],
+      "sourceKind": "collar72",
+      "initialGuessKind": "v77-wall-resolution-interpolated",
+      "independentGaussVolumeMaximumRelativeError": 4.903155117103242e-16,
+      "independentGaussCentroidMaximumErrorM": 1.7763568394002505e-15,
+      "originalResidual": 8.938887514599088e-07,
+      "boundaryBalanceRelative": 2.154306208153619e-16,
+      "minDensity": 0.00048098888805349566,
+      "TminK": 218.70357997365358,
+      "TmaxK": 1233.2018176396632,
+      "totalSignedHeatW": 99584.21840227282,
+      "yPlusProxyRange": [
+        0.0025588639135344,
+        1.0991991172325368
+      ]
+    },
+    {
+      "kind": "hlle_nested144",
+      "gridKind": "nested144",
+      "interiorConvectiveFlux": "hlle-einfeldt",
+      "cellCount": 16560,
+      "radialLayers": 144,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 1e-06,
+      "NewtonIterations": 9,
+      "residualEvaluations": 1732,
+      "BEAcceptedSteps": 3,
+      "independentOriginalBEDefects": [
+        1.4773059923496533e-17,
+        2.9546119846993066e-17,
+        5.909223969398613e-17
+      ],
+      "sourceKind": "nested144",
+      "initialGuessKind": "v77-wall-resolution-interpolated",
+      "independentGaussVolumeMaximumRelativeError": 5.459752131292559e-16,
+      "independentGaussCentroidMaximumErrorM": 2.220446049250313e-15,
+      "originalResidual": 1.0341911986404406e-06,
+      "boundaryBalanceRelative": 7.334038931668545e-17,
+      "minDensity": 0.0005869406117767062,
+      "TminK": 217.30552087351606,
+      "TmaxK": 1254.7539601562244,
+      "totalSignedHeatW": 66516.98242009697,
+      "yPlusProxyRange": [
+        0.0010502823479856946,
+        0.4738128846008502
+      ]
+    },
+    {
+      "kind": "hllc_collar72",
+      "gridKind": "collar72",
+      "interiorConvectiveFlux": "hllc",
+      "cellCount": 8280,
+      "radialLayers": 72,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 2e-06,
+      "NewtonIterations": 11,
+      "residualEvaluations": 2118,
+      "BEAcceptedSteps": 3,
+      "independentOriginalBEDefects": [
+        5.115738104617789e-17,
+        1.0231476209235578e-16,
+        2.0462952418471156e-16
+      ],
+      "sourceKind": "collar72",
+      "initialGuessKind": "v77-HLLE-steady-root-for-HLLC",
+      "independentGaussVolumeMaximumRelativeError": 4.903155117103242e-16,
+      "independentGaussCentroidMaximumErrorM": 1.7763568394002505e-15,
+      "originalResidual": 1.1121834534653427e-06,
+      "boundaryBalanceRelative": 1.6842191560584945e-16,
+      "minDensity": 0.0004779813389920818,
+      "TminK": 217.1738161864169,
+      "TmaxK": 1362.4842141000768,
+      "totalSignedHeatW": 29338.852247487415,
+      "yPlusProxyRange": [
+        0.0013618405023306242,
+        0.557848599454869
+      ]
+    },
+    {
+      "kind": "hllc_nested144",
+      "gridKind": "nested144",
+      "interiorConvectiveFlux": "hllc",
+      "cellCount": 16560,
+      "radialLayers": 144,
+      "outerRadiusM": 4.261260975070607,
+      "firstNormalOffsetM": 1e-06,
+      "NewtonIterations": 8,
+      "residualEvaluations": 1539,
+      "BEAcceptedSteps": 3,
+      "independentOriginalBEDefects": [
+        2.2048481241975505e-17,
+        4.409696248395101e-17,
+        8.819392496790202e-17
+      ],
+      "sourceKind": "nested144_from_hllc72",
+      "initialGuessKind": "v78-HLLC72-root-for-fine-grid",
+      "independentGaussVolumeMaximumRelativeError": 5.459752131292559e-16,
+      "independentGaussCentroidMaximumErrorM": 2.220446049250313e-15,
+      "originalResidual": 1.7063195272592648e-06,
+      "boundaryBalanceRelative": 6.897485578474888e-17,
+      "minDensity": 0.0005443474794969161,
+      "TminK": 216.68883661638674,
+      "TmaxK": 1352.4098797036463,
+      "totalSignedHeatW": 29166.12320264782,
+      "yPlusProxyRange": [
+        0.000369153875826344,
+        0.27936306980156533
+      ]
+    }
+  ],
+  "gridChanges": {
+    "hlle-einfeldt": {
+      "signedHeatChangeFraction": -0.3320529749864578,
+      "areaWeightedHeatAbsoluteChangeFraction": 0.3320529749864578
+    },
+    "hllc": {
+      "signedHeatChangeFraction": -0.005887382484581871,
+      "areaWeightedHeatAbsoluteChangeFraction": 0.011217824092533966
+    }
+  },
+  "comparisons": [
+    {
+      "kind": "hlle_nested144",
+      "totalSignedHeatChangeFraction": -0.3320529749864578,
+      "pressurePa": {
+        "areaWeightedAbsoluteChangeFraction": 0.010532451643742703,
+        "maximumAbsoluteChange": 391.81047616052456,
+        "maximumChangeScaledByBaselinePeak": 0.010535135091118008
+      },
+      "signedHeatWm2": {
+        "areaWeightedAbsoluteChangeFraction": 0.3320529749864578,
+        "maximumAbsoluteChange": 816714.5913707206,
+        "maximumChangeScaledByBaselinePeak": 0.31479564959522766
+      },
+      "wallAdjacentGasProxyK": {
+        "areaWeightedAbsoluteChangeFraction": 0.009042901708869875,
+        "maximumAbsoluteChange": 66.21786911899835,
+        "maximumChangeScaledByBaselinePeak": 0.16524453402733985
+      }
+    },
+    {
+      "kind": "hllc_collar72",
+      "totalSignedHeatChangeFraction": -0.705386528927983,
+      "pressurePa": {
+        "areaWeightedAbsoluteChangeFraction": 0.03276078828326905,
+        "maximumAbsoluteChange": 809.9098990185194,
+        "maximumChangeScaledByBaselinePeak": 0.021777136439552678
+      },
+      "signedHeatWm2": {
+        "areaWeightedAbsoluteChangeFraction": 0.706529346860594,
+        "maximumAbsoluteChange": 1929803.0829324168,
+        "maximumChangeScaledByBaselinePeak": 0.7438260825767853
+      },
+      "wallAdjacentGasProxyK": {
+        "areaWeightedAbsoluteChangeFraction": 0.009592813902596283,
+        "maximumAbsoluteChange": 74.92302200739476,
+        "maximumChangeScaledByBaselinePeak": 0.18696795931749477
+      }
+    },
+    {
+      "kind": "hllc_nested144",
+      "totalSignedHeatChangeFraction": -0.7071210311172944,
+      "pressurePa": {
+        "areaWeightedAbsoluteChangeFraction": 0.03133037898413028,
+        "maximumAbsoluteChange": 1331.4518586273225,
+        "maximumChangeScaledByBaselinePeak": 0.0358005363598602
+      },
+      "signedHeatWm2": {
+        "areaWeightedAbsoluteChangeFraction": 0.7083822849629415,
+        "maximumAbsoluteChange": 1941541.5202346982,
+        "maximumChangeScaledByBaselinePeak": 0.7483505627744548
+      },
+      "wallAdjacentGasProxyK": {
+        "areaWeightedAbsoluteChangeFraction": 0.011589898418590804,
+        "maximumAbsoluteChange": 88.05281588244219,
+        "maximumChangeScaledByBaselinePeak": 0.21973293196948776
+      }
+    }
+  ],
+  "regionalComparisons": [
+    {
+      "region": "sphericalNose",
+      "wallSegments": 4,
+      "areaM2": 0.002680076427987492,
+      "coarseHeatW": 789.7923905533921,
+      "fineHeatW": 786.3097742930007,
+      "signedHeatChangeFraction": -0.004409533824390466,
+      "areaWeightedHeatAbsoluteChangeFraction": 0.011722629372661315,
+      "maximumAbsoluteHeatChangeWm2": 11738.437302281382,
+      "interiorConvectiveFlux": "hllc"
+    },
+    {
+      "region": "cone",
+      "wallSegments": 20,
+      "areaM2": 0.14064901517288714,
+      "coarseHeatW": 12398.950576464746,
+      "fineHeatW": 12448.539515386248,
+      "signedHeatChangeFraction": 0.003999446454414413,
+      "areaWeightedHeatAbsoluteChangeFraction": 0.005396947905723177,
+      "maximumAbsoluteHeatChangeWm2": 1253.0379599736043,
+      "interiorConvectiveFlux": "hllc"
+    },
+    {
+      "region": "cylinder",
+      "wallSegments": 62,
+      "areaM2": 0.6031857894892403,
+      "coarseHeatW": 13584.338551504128,
+      "fineHeatW": 13439.64461468415,
+      "signedHeatChangeFraction": -0.01065152611379494,
+      "areaWeightedHeatAbsoluteChangeFraction": 0.012052825511143122,
+      "maximumAbsoluteHeatChangeWm2": 1216.0990412972897,
+      "interiorConvectiveFlux": "hllc"
+    },
+    {
+      "region": "contraction",
+      "wallSegments": 5,
+      "areaM2": 0.04902897967456924,
+      "coarseHeatW": 293.43055944205247,
+      "fineHeatW": 278.2601292722725,
+      "signedHeatChangeFraction": -0.051700239397784675,
+      "areaWeightedHeatAbsoluteChangeFraction": 0.05170023939778456,
+      "maximumAbsoluteHeatChangeWm2": 464.2755477407136,
+      "interiorConvectiveFlux": "hllc"
+    },
+    {
+      "region": "afterbody",
+      "wallSegments": 16,
+      "areaM2": 0.12063715789784804,
+      "coarseHeatW": 2067.9927187194303,
+      "fineHeatW": 2004.9866445105165,
+      "signedHeatChangeFraction": -0.030467261145836755,
+      "areaWeightedHeatAbsoluteChangeFraction": 0.030467261145836713,
+      "maximumAbsoluteHeatChangeWm2": 1134.197548282411,
+      "interiorConvectiveFlux": "hllc"
+    },
+    {
+      "region": "base",
+      "wallSegments": 8,
+      "areaM2": 0.020106192982974676,
+      "coarseHeatW": 204.34745080366545,
+      "fineHeatW": 208.38252450163458,
+      "signedHeatChangeFraction": 0.019746141594132016,
+      "areaWeightedHeatAbsoluteChangeFraction": 0.05401086775911399,
+      "maximumAbsoluteHeatChangeWm2": 1060.6545810949174,
+      "interiorConvectiveFlux": "hllc"
+    }
+  ],
+  "maximumPointwiseRelativeHeatChange": 0.09765930533579417,
+  "HLLCInteriorAudits": {
+    "collar72": {
+      "actualInteriorFaces": 16373,
+      "mixedWaveFaces": 10413,
+      "maximumToPhysicalScaleRoundoffBudget": 0.0006300571250724947,
+      "originalStarDensityAndEnergyPositive": true,
+      "independentFullRANSResidual": false
+    },
+    "nested144": {
+      "actualInteriorFaces": 32861,
+      "mixedWaveFaces": 20859,
+      "maximumToPhysicalScaleRoundoffBudget": 0.0006547110039535171,
+      "originalStarDensityAndEnergyPositive": true,
+      "independentFullRANSResidual": false
+    }
+  },
+  "failedTrials": [
+    {
+      "kind": "direct-HLLE144-root-initial-guess",
+      "stopReason": "line-search-failed",
+      "spatialRootConverged": false,
+      "originalResidual": 144101786.97285685,
+      "minimumFluidTemperatureK": 40.0510576654442,
+      "guardRejectCounts": {
+        "AxisSA:State": 8,
+        "AxisFV:Temperature": 56
+      }
+    }
+  ],
+  "failedFineDirectInitialGuessRetained": true,
+  "failedDirectTrialRecomputed": false,
+  "fineRootUsesSeparateInternalCoarseHLLCInitialGuess": true,
+  "initializationIsBoundaryCondition": false,
+  "physicalBoundaryChanged": false,
+  "originalHLLCGuardsKept": true,
+  "numericallySteady": true,
+  "acceptedChainEndpoints": 12,
+  "originalThreeBEActuallyCalledAgain": true,
+  "preparationNewtonCountedAsBE": false,
+  "oldChainRebound": false,
+  "originalSteadyResidualTolerance": 2e-06,
+  "originalConservationTolerance": 5e-10,
+  "originalBEAbsoluteTolerance": 1e-11,
+  "originalBERelativeTolerance": 1e-09,
+  "wallNormalProfileIndependentComparison": {
+    "status": "passed-four-real-states-all-wall-normal-cell-and-energy-flux-profiles",
+    "cases": [
+      {
+        "kind": "hlle_collar72",
+        "wallProfiles": 115,
+        "radialLayers": 72,
+        "maximumScaledDifference": 4.2631184069229943e-16,
+        "independentEOSCellAndFaceComparisonPassed": true
+      },
+      {
+        "kind": "hlle_nested144",
+        "wallProfiles": 115,
+        "radialLayers": 144,
+        "maximumScaledDifference": 4.263118406924031e-16,
+        "independentEOSCellAndFaceComparisonPassed": true
+      },
+      {
+        "kind": "hllc_collar72",
+        "wallProfiles": 115,
+        "radialLayers": 72,
+        "maximumScaledDifference": 4.225030102142312e-16,
+        "independentEOSCellAndFaceComparisonPassed": true
+      },
+      {
+        "kind": "hllc_nested144",
+        "wallProfiles": 115,
+        "radialLayers": 144,
+        "maximumScaledDifference": 4.228158788512909e-16,
+        "independentEOSCellAndFaceComparisonPassed": true
+      }
+    ],
+    "engineProcessID": 29080,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "actualRootReplayStatus": "included-for-isolated-runtime-not-yet-executed",
+  "sourceMetricsAnd3DNativeProjectionChecked": true,
+  "commonVariableColorRanges": true,
+  "sameHostEvents": 20,
+  "normalProfileSelections": 72,
+  "snapshotArrayAndLFOnlyRepairsPreserveAllNumericalPayload": true,
+  "currentPublisherArrayCorrectionAwaitingIsolatedRegeneration": true,
+  "scientificPlotVisuallyChecked": true,
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "noFurtherBlindRadialRefinementPlanned": true,
+  "gridIndependentClaimed": false,
+  "physicalSolution": false,
+  "experimentalValidation": false,
+  "fullSurfaceSolved": false,
+  "wholeGoalComplete": false,
+  "independentFullRANSResidual": false,
+  "normalProfilesAreCellProxiesNotEdgeStates": true,
+  "productionHeatCoverageFraction": 0.6656263274240188,
+  "newProductionSolvedAreaM2": 0,
+  "historicActualSourceEpochs": [
+    {
+      "run": "initial01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "e316f3e18f0908dbb3f214440eb4162d1946c28ebba8c8e0477597f5388ea158",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "464b506e76be3bd7855c680d2d18e8c564ffdebd5fbf5965839ee4015b2cb832",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "initial01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "b66ad682fdba12060902d57f1f67add05fea769f9646bd7a13873caf4db2dc59",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "e316f3e18f0908dbb3f214440eb4162d1946c28ebba8c8e0477597f5388ea158",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "464b506e76be3bd7855c680d2d18e8c564ffdebd5fbf5965839ee4015b2cb832",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "factory01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "b66ad682fdba12060902d57f1f67add05fea769f9646bd7a13873caf4db2dc59",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "e316f3e18f0908dbb3f214440eb4162d1946c28ebba8c8e0477597f5388ea158",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "464b506e76be3bd7855c680d2d18e8c564ffdebd5fbf5965839ee4015b2cb832",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "roots01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "b66ad682fdba12060902d57f1f67add05fea769f9646bd7a13873caf4db2dc59",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "refined01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "e316f3e18f0908dbb3f214440eb4162d1946c28ebba8c8e0477597f5388ea158",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "refined01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "464b506e76be3bd7855c680d2d18e8c564ffdebd5fbf5965839ee4015b2cb832",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "refined01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "b66ad682fdba12060902d57f1f67add05fea769f9646bd7a13873caf4db2dc59",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm72_01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "e316f3e18f0908dbb3f214440eb4162d1946c28ebba8c8e0477597f5388ea158",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm72_01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "464b506e76be3bd7855c680d2d18e8c564ffdebd5fbf5965839ee4015b2cb832",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm72_01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "b66ad682fdba12060902d57f1f67add05fea769f9646bd7a13873caf4db2dc59",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm144_01",
+      "path": "regionalFlow/axisymmetric/exportRocketAxisymmetricStudy.m",
+      "sha256": "e316f3e18f0908dbb3f214440eb4162d1946c28ebba8c8e0477597f5388ea158",
+      "frozenActualSource": "source_epochs/before_exportRocketAxisymmetricStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm144_01",
+      "path": "regionalFlow/axisymmetric/rocketAxisymmetricSolverContract.m",
+      "sha256": "464b506e76be3bd7855c680d2d18e8c564ffdebd5fbf5965839ee4015b2cb832",
+      "frozenActualSource": "source_epochs/before_rocketAxisymmetricSolverContract.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "confirm144_01",
+      "path": "tests/testRocketAxisymmetricControlledCheckpoint.m",
+      "sha256": "b66ad682fdba12060902d57f1f67add05fea769f9646bd7a13873caf4db2dc59",
+      "frozenActualSource": "source_epochs/before_testRocketAxisymmetricControlledCheckpoint.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "profile01",
+      "path": "regionalFlow/axisymmetric/exportRocketContactStudy.m",
+      "sha256": "60932cd3a92fb2c0048030a5e7eb7ab2bbc4f9cfa16b4b84ddc37de5a8527492",
+      "frozenActualSource": "attempts/export01_exportRocketContactStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "export01",
+      "path": "regionalFlow/axisymmetric/exportRocketContactStudy.m",
+      "sha256": "60932cd3a92fb2c0048030a5e7eb7ab2bbc4f9cfa16b4b84ddc37de5a8527492",
+      "frozenActualSource": "attempts/export01_exportRocketContactStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "export02",
+      "path": "regionalFlow/axisymmetric/exportRocketContactStudy.m",
+      "sha256": "b9b3b5908c77947c7be343ab26f40f0066b70f9d8fea9d922a43215a8a44a0bb",
+      "frozenActualSource": "attempts/export02_exportRocketContactStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "export03",
+      "path": "regionalFlow/axisymmetric/exportRocketContactStudy.m",
+      "sha256": "5f23f885f3eebbc9b5a15ef2fcbce95cafb533bf4b45296a98f299d49dd8a127",
+      "frozenActualSource": "attempts/export03_exportRocketContactStudy.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "normalize01",
+      "path": "outputs\\v78_validation\\normalize_contact_snapshot.py",
+      "sha256": "802bb02ee99a88f94c107c8322077134234d64d38a47087b77dd85bef565ed0f",
+      "frozenActualSource": "attempts/normalize01_normalize_contact_snapshot.source.txt",
+      "oldChainRebound": false
+    },
+    {
+      "run": "final_workbench03/snapshot_normalization.json",
+      "path": "outputs\\v78_validation\\normalize_contact_snapshot.py",
+      "sha256": "802bb02ee99a88f94c107c8322077134234d64d38a47087b77dd85bef565ed0f",
+      "frozenActualSource": "attempts/normalize01_normalize_contact_snapshot.source.txt",
+      "oldChainRebound": false
+    }
+  ],
+  "processes": {
+    "initial01": {
+      "processID": 29652,
+      "engineProcessIDs": [
+        40876
+      ],
+      "exitCode": 0
+    },
+    "factory01": {
+      "processID": 11004,
+      "engineProcessIDs": [
+        43184
+      ],
+      "exitCode": 0
+    },
+    "roots01": {
+      "processID": 32560,
+      "engineProcessIDs": [
+        17420
+      ],
+      "exitCode": 0
+    },
+    "refined01": {
+      "processID": 32604,
+      "engineProcessIDs": [
+        4488
+      ],
+      "exitCode": 0
+    },
+    "confirm72_01": {
+      "processID": 48092,
+      "engineProcessIDs": [
+        47100
+      ],
+      "exitCode": 0
+    },
+    "confirm144_01": {
+      "processID": 53996,
+      "engineProcessIDs": [
+        35096
+      ],
+      "exitCode": 0
+    },
+    "independent01": {
+      "processID": 16516,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "profile01": {
+      "processID": 45104,
+      "engineProcessIDs": [
+        29080
+      ],
+      "exitCode": 0
+    },
+    "scientific01": {
+      "processID": 51136,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "regions01": {
+      "processID": 40720,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "export01": {
+      "processID": 27340,
+      "engineProcessIDs": [
+        43600
+      ],
+      "exitCode": 0
+    },
+    "export02": {
+      "processID": 48960,
+      "engineProcessIDs": [
+        50576
+      ],
+      "exitCode": 0
+    },
+    "export03": {
+      "processID": 24224,
+      "engineProcessIDs": [
+        11348
+      ],
+      "exitCode": 0
+    },
+    "normalize01": {
+      "processID": 50152,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "wrapper01": {
+      "processID": 36780,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "node03": {
+      "processID": 30368,
+      "engineProcessIDs": [],
+      "exitCode": 0
+    },
+    "becheck01": {
+      "processID": 49316,
+      "engineProcessIDs": [
+        30704
+      ],
+      "exitCode": 0
+    }
+  },
+  "nextWork": "traceable public benchmark geometry/freestream/wall/measurement contract, then actual 20-degree crossflow/contraction/aftbody and separated/base regions; no blind refinement or Euler-only prerequisite"
+}

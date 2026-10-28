@@ -39,6 +39,14 @@ flags.rarefaction=false(nf,1);
 if isfield(h,'continuumUnresolvedFace')
     flags.rarefaction=logical(h.continuumUnresolvedFace(:));
 end
+flags.upstreamExternalState=false(nf,1);
+if isfield(mesh,'continuumRegime') && ...
+        isfield(mesh.continuumRegime,'knudsenUnresolvedFace')
+    c=mesh.continuumRegime;
+    flags.rarefaction=logical(c.knudsenUnresolvedFace(:));
+    flags.externalFlow=flags.externalFlow | logical(c.directStateUnresolvedFace(:));
+    flags.upstreamExternalState=logical(c.downstreamStateUnresolvedFace(:));
+end
 flags.streamline=false(nf,1);
 if isfield(mesh,'surfaceStreamlines')
     flags.streamline=~logical(mesh.surfaceStreamlines.connectedFace(:));
@@ -47,6 +55,14 @@ flags.laminarSeparation=false(nf,1);
 flags.laminarCorrelation=false(nf,1);
 flags.thermalProperty=false(nf,1);
 flags.wallTemperature=false(nf,1);
+% 显式选择的区域模型保留自身拒绝原因；旧准流线无效不能掩盖其物理域限制。
+flags.regionalNoseRejected=false(nf,1);
+regionalNoseCode=zeros(nf,1,'uint8');regionalNoseNames={};
+if isfield(h,'noseModel') && strcmp(h.noseModel,'sphericalLocalSimilarity')
+    nose=h.noseDistribution;
+    flags.regionalNoseRejected=nose.edgeState.geometryFace(:) & nose.statusCode(:)>0;
+    regionalNoseCode=nose.statusCode(:);regionalNoseNames=nose.statusNames(2:end);
+end
 if isfield(h,'wallTemperatureUnavailableFace')
     flags.wallTemperature=logical(h.wallTemperatureUnavailableFace(:));
 end
@@ -86,14 +102,21 @@ names={'已计算','端盖/尾端','特征折角或拓扑问题', ...
     '疑似层流分离及下游','层流相关式范围外', ...
     '空气热物性模型范围外','其他未解限制', ...
     '连续介质假设不适用','疑似湍流分离及下游','Head 积分失败及下游', ...
-    '壁温未知或超出热物性范围'};
+    '壁温未知或超出热物性范围','上游外缘热力状态未解/域外占位影响'};
+regionalOffset=numel(names)-1;
+for j=1:numel(regionalNoseNames)
+    names{end+1}=['所选球鼻模型：' regionalNoseNames{j}]; %#ok<AGROW>
+end
 code=zeros(nf,1,'uint8');
 pending=~computed;
+hit=pending & flags.regionalNoseRejected;
+code(hit)=uint8(regionalOffset+double(regionalNoseCode(hit)));
+pending(hit)=false;
 masks={flags.endCap,flags.geometry,flags.noseModel, ...
-    flags.rarefaction,flags.externalFlow,flags.streamline, ...
+    flags.rarefaction,flags.externalFlow,flags.upstreamExternalState,flags.streamline, ...
     flags.wallTemperature,flags.turbulentSeparation,flags.turbulentNumerical, ...
     flags.laminarSeparation,flags.laminarCorrelation,flags.thermalProperty};
-priorityCode=[1 2 3 10 4 5 13 11 12 6 7 8];
+priorityCode=[1 2 3 10 4 14 5 13 11 12 6 7 8];
 for j=1:numel(masks)
     hit=pending & masks{j};
     code(hit)=uint8(priorityCode(j));

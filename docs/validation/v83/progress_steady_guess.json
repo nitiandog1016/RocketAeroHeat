@@ -1,0 +1,416 @@
+{
+  "version": 83,
+  "status": "tested-same-Q-steady-direction-guess-total-NS-normalization-still-rejected-with-scale-probes-and-workbench-not-delivered",
+  "generatedUTC": "2026-10-24T20:24:54.032253+00:00",
+  "recorderProcessID": 51476,
+  "previousGoalTurnClassification": "progress",
+  "previousGoalTurnEvidence": "Previous goal turn completed local strategy integration and a genuine actual-NS defect reduction to 0.2025; the same-Q guess/restart implementation was the next evidence-based action, tested here with weak real progress and a new bounded scale diagnostic.",
+  "priorProgressPath": "docs/validation/v83/progress_local_integration.json",
+  "priorProgressSHA256": "faed8188d28a4327bbe4c368bc427b052094d4b10e9bde3ff29de3b726b29edc",
+  "oldNumericalEvidenceOverwritten": false,
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/loadRocketSteadyDirectionGuess.m": "969a4b6c0662f7b7522ac1d133fa0a6cc2b24e598efa8053d3a4756be2801c56",
+    "internalFlow/cutCell/rocketStreamingFileSHA256.m": "43cf90274d2b0e77ef874d09ee260a7069d7bdd03980d06ed5db8ca12d00a54e",
+    "internalFlow/cutCell/solveRocketShellSteadyKrylov.m": "1a18d9c1b032dbe408044c08a2f91fc3ed93f30e8417cbf690b55bd8c1820bef",
+    "internalFlow/cutCell/solveRocketMinResidualCoarsePreconditioner.m": "23bacdc58b96ba834fef8bdc81ebc9f64db636920f21e6eb65413a59628edb44",
+    "internalFlow/cutCell/loadRocketLocalCoarseOperator.m": "403e946ad87bf0e0b5590ea686eec4a5fb16e6fc8c0848a55de0a98e376b5b69",
+    "internalFlow/cutCell/liftRocketLocalCoarse.m": "8db7f518929d7153884e836f5bd8087fb5f71c1a3ceb0ba506f6187d3ef9827f",
+    "internalFlow/cutCell/solveRocketLocalCoarseSystem.m": "cd24ecde92729772a9c5cc10799389c471724eafed2bfdcd6ab19109e9b989d6",
+    "internalFlow/cutCell/cutCellNavierStokesResidual.m": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+    "tests/testRocketSteadyDirectionGuess.m": "02eb55adeb4676c17e6453e84b0185cc6787209dd2ad33b4d10e229c10a6c0a3",
+    "tests/studyRocketGuessPreconditionerScales.m": "ea6da1134602d1620a56ed822a0e0f9c68e033872762ae09a714c2e579280ced",
+    "tests/continueRocketWallVelocityKrylov.m": "8eddc966422c809f7e5aa6af6960ff69b8b80b44db82411e0b3009e4367005e5",
+    "tests/auditRocketSteadyGuess.py": "4549ee1d63e838e80c7ede490d4f89c48a2cb255ab7a2bad1b2fea8020a95548",
+    "tests/auditRocketGuessScales.py": "b7cf9a3d33d897732f1aa6339fb104971134a22c2f60683bbec619877df9a659",
+    "tests/auditRocketSteadyNewtonDirections.py": "01f2dc1700fa9c021a8abc0fc749e646c688ce1808ce10c6377c0025b347874b",
+    "tests/auditRocketCoarseSolver.py": "c9ec507eefc39d9ba93538d8c21b0628635bd9d00b7c9a938d447657af53f7e4",
+    "tests/auditRocketWallVelocity.py": "4065aae9ae143c53e9c77e7e19f1131a7632608535223fe938e8446306637a00",
+    "tests/auditRocketWallVelocityWorkbench.py": "0a53eff84dd3e8b2547439918a685878fe2f064a367108fbfdf99801cb7d7538",
+    "tests/testRocketWallVelocityWorkbench.js": "136f91316b8267c2fb09ff94099f98b6c5f389a3366383ee1c24a0b90b33cf05",
+    "tests/plotRocketCoarseEnrichmentDirections.py": "7e8b5ac1ba34c95d167510fe1a6f4631a2087847bad51516f600c16646ac9053",
+    "exportRocketWallVelocityStudy.m": "baf2fa9d3dc075bfb9832b6c91869beb878952a5d21b390fda0420b3aa1679d8",
+    "web/rocket-wall-velocity.js": "8a8a8c382e9feb1c65ed1068a8e7e0e58fbc39f589de00d1bdc3d72c48de1490",
+    "docs/PROJECT_GOALS.md": "1c498eb2fb90c33d1286b627b790ed0f908dd4a84e845861e7902af95f83ba4c",
+    "docs/GITHUB_STAGE_READINESS.md": "13a5332db010a660e889d9b8e64633c63427fe7eb9033f4195f64727c5e40491",
+    "docs/STEADY_DIRECTION_GUESS_V83.md": "cd4070b1f1aee9e70fa836fc0be1c988c46b3aab54982d034536deff98d4a900",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_guess_auditRocketSteadyNewtonDirections.py",
+      "sha256": "6d29626c3096feb41689e01d2807bde2cc5b88adedb6fbf51aa767d0d54694b0"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_guess_continueRocketWallVelocityKrylov.m",
+      "sha256": "97ea28e5c943fc17a092203ec063d72d36f66459530952acb02aace2be99b878"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_guess_exportRocketWallVelocityStudy.m",
+      "sha256": "f55f3ccc706d287167c9293ad715954158c37eaf5a0c786cdee2f6e8dc7c15af"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_guess_rocket-wall-velocity.js",
+      "sha256": "3d2e23d74dfc90c276828199f1b1f453156eaa6a23543c577104d69bdb1e4aee"
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_guess_solveRocketShellSteadyKrylov.m",
+      "sha256": "e6325985c462cda56b35c955ad464f6749d26f8840fd06af11da67f0f2b2f98b"
+    }
+  ],
+  "matlabProcesses": [
+    {
+      "name": "guessintegration01",
+      "path": "outputs/v83_validation/guessintegration01_process.json",
+      "sha256": "2a5f639e49d2b8d0417f8f6c425294ea2b0ad0301c67612551e435ba9eb3116f",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        52664
+      ]
+    },
+    {
+      "name": "guesstrial01",
+      "path": "outputs/v83_validation/guesstrial01_process.json",
+      "sha256": "a466686083ef1f73d80440cfc764f84e6a3e0f3527a329d968c225e18b6071fc",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        48624
+      ]
+    },
+    {
+      "name": "guessscales01",
+      "path": "outputs/v83_validation/guessscales01_process.json",
+      "sha256": "575410f1667c28504273336939346895d125a61a02863d92750e83d73ccb63fa",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        51416
+      ]
+    }
+  ],
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/guessintegration01_independent_steady_guess2.json",
+      "sha256": "eb146ded273c049ac582aff8f50669f9cea7ec4df83d411cedc32325c26351db",
+      "status": "passed-independent-same-Q-guess-current-remainder-total-direction-and-original-normalization",
+      "processID": 30400
+    },
+    {
+      "path": "outputs/v83_validation/guessintegration01_independent_newton_directions.json",
+      "sha256": "0614ffc4c631050f7d863e0df3d167eeeccd4fd95363076b98af934ee123a4a9",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 58076
+    },
+    {
+      "path": "outputs/v83_validation/guessintegration01_limited_independent_newton_directions.json",
+      "sha256": "e0adcbfbc92022812ec5155a634bb8890dbd219e8081a8c4cb01ba2e5e1b512f",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 4644
+    },
+    {
+      "path": "outputs/v83_validation/guessintegration01_ready_independent_newton_directions.json",
+      "sha256": "c4ae6cd572e59072b3c8dffe7d2e4f337e3cc7566d699f28f3e22b2ee79b1f60",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 58336
+    },
+    {
+      "path": "outputs/v83_validation/krylov14_independent_steady_guess.json",
+      "sha256": "aa1e1bda764901103b643eb25a98951843269856b39c9a19a3658f5976d336b3",
+      "status": "passed-independent-same-Q-guess-current-remainder-total-direction-and-original-normalization",
+      "processID": 34724
+    },
+    {
+      "path": "outputs/v83_validation/krylov14_independent_newton_directions.json",
+      "sha256": "8520300c70c57c36dc98270f6d3c79dd1a3e8230c896272ff86c756827dc556f",
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "processID": 1972
+    },
+    {
+      "path": "outputs/v83_validation/krylov14_independent_coarse_solver.json",
+      "sha256": "5cce05897d1d2c76cb78562944e94ca6757439e89ca7c48f408a51c3cefdfdcb",
+      "status": "passed-independent-two-level-cache-identity-and-model-NS-work-accounting",
+      "processID": 57872
+    },
+    {
+      "path": "outputs/v83_validation/krylov14_independent_audit.json",
+      "sha256": "7b5544b2db400f97bcbacd427d623db3fbf93190c03e285f693b4a2331c27f30",
+      "status": "passed-independent-actual-static-wall-flux-constitutive-Jacobian-conservation-and-update-audit",
+      "processID": 51980
+    },
+    {
+      "path": "outputs/v83_validation/guessscales01_independent_guess_scales.json",
+      "sha256": "cec7ba312c67c7f6e256a951f41a1f4235d9a5e9a9b46d87a05e14b3c5843d96",
+      "status": "passed-independent-current-remaining-preconditioner-scale-projection-screen",
+      "processID": 60100
+    },
+    {
+      "path": "outputs/v83_validation/workbench13/node_wall_velocity_summary.json",
+      "sha256": "112db4e2078afbabb55ab95c1c286848faae055eadd490973a9a381e8bcb82f2",
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "processID": 59492
+    },
+    {
+      "path": "outputs/v83_validation/workbench13/independent_wall_velocity_view.json",
+      "sha256": "6277529029cea012dc6c590898b953bcc6289cf5b829b7bb89bec5d1f39bb3ca",
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+      "processID": 30544
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/guessintegration01/steady_newton_unit_evidence.mat",
+      "sha256": "0e42564160d67a92a30792df080d75092a958c9f6057bc224e384ee43ef1eb71",
+      "bytes": 452848
+    },
+    {
+      "path": "outputs/v83_validation/guessintegration01/steady_guess_summary.json",
+      "sha256": "99800e3dcd4dbc5ac2cb811ce78a8abf1ae87f71d6489c7044761c2b1be62496",
+      "bytes": 547
+    },
+    {
+      "path": "outputs/v83_validation/krylov14/wall_velocity_krylov_evidence.mat",
+      "sha256": "206635e2dde614190a9d3a7bbd791a4c81aae5fd68473d850f6753363f2f7517",
+      "bytes": 1093637677
+    },
+    {
+      "path": "outputs/v83_validation/krylov14/wall_velocity_krylov_summary.json",
+      "sha256": "eff4790598e670113c32eddb4fe0b604b26033df6708c4e520ba6e350839f2d7",
+      "bytes": 3612
+    },
+    {
+      "path": "outputs/v83_validation/krylov14/coarse_enrichment_directions.png",
+      "sha256": "6642528ce8eaba1e95cd41e0b4cb5b4e6e31206e00cd44e056ce16172f383022",
+      "bytes": 82210
+    },
+    {
+      "path": "outputs/v83_validation/krylov14/coarse_enrichment_direction_plot.json",
+      "sha256": "52ac790cd2e5ef53fdbcadbef8b7b08220feb82381626c07c40f6e11bd056db2",
+      "bytes": 1058
+    },
+    {
+      "path": "outputs/v83_validation/guessscales01/guess_scale_evidence.mat",
+      "sha256": "e3af04cdf60eaa975c351f095e948d09c7f781cf7fd27bacd03fba4985f351e7",
+      "bytes": 112013146
+    },
+    {
+      "path": "outputs/v83_validation/guessscales01/guess_scale_summary.json",
+      "sha256": "8f3abb893c3cfb2ba4c357aa815b412b8188f28216967863a2aebfe89d0b08e1",
+      "bytes": 482
+    },
+    {
+      "path": "outputs/v83_validation/workbench13/wall-velocity-study-data.json",
+      "sha256": "86c022fabcf31a0dcaf5469fd4e64005583863dad15b5c8a9dd5a913b7b3cf31",
+      "bytes": 13767
+    },
+    {
+      "path": "outputs/v83_validation/workbench13/static_wall_velocity_comparison.png",
+      "sha256": "79ec8ff917c241b93bc17544f0fcc405ba0ecc121eace6e4d36fdad078a14169",
+      "bytes": 476061
+    },
+    {
+      "path": "outputs/v83_validation/workbench13/static_wall_velocity_residuals.png",
+      "sha256": "46577cee0c0bc8596218022c0c7504c5f28ddbc1c7a3ab69ded97be55cb48c6a",
+      "bytes": 62434
+    },
+    {
+      "path": "outputs/v83_validation/workbench13/static_wall_velocity_balance.png",
+      "sha256": "edad2433c601fd6645c38491226dbb563c64b37240c20454121bb5b8e7bc2c9a",
+      "bytes": 72084
+    }
+  ],
+  "unitResults": {
+    "status": "passed-same-Q-guess-correction-skip-total-NS-gates-source-guards-and-old-full-replay",
+    "oldLocalCompleteResultReplayed": true,
+    "correctedActualNSDefect": 0.0007551508197324604,
+    "correctedActualNSCalls": 3,
+    "initialGuessModelDefect": 0.7500001696864561,
+    "effectiveCorrectionTolerance": 0.13333330316685907,
+    "originalTarget": 0.1,
+    "correctedAcceptedIterations": 1,
+    "readySkippedGMRES": true,
+    "readyActualNSCalls": 3,
+    "strictLimitedActualNSCalls": 2,
+    "invalidSourceRejections": 8,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 52664
+  },
+  "realResults": {
+    "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 0,
+    "priorAcceptedNonlinearIterations": 12,
+    "totalNewEquationAcceptedIterations": 12,
+    "candidateTrials": 0,
+    "residualEvaluations": 2,
+    "totalNewEquationResidualEvaluations": 242,
+    "operatorBuilds": 1,
+    "initialMaximumResidual": 4758049.601364592,
+    "maximumResidual": 4758049.601364592,
+    "initialRmsMerit": 521635.2792153294,
+    "rmsMerit": 521635.2792153294,
+    "elapsedSeconds": 233.7319084,
+    "matrixVectorProducts": 51,
+    "jacobianResidualEvaluations": 1,
+    "preconditionerApplications": 50,
+    "lineage": {
+      "sourceState": "v82-exact-conservative-three-corrections-internal-initial-guess",
+      "sourceHistoryAppended": false,
+      "newEquationInitialCounter": 0,
+      "wallVelocityGradientChanged": true,
+      "interiorEulerFlux": "exact-godunov",
+      "viscousWorkVelocity": "arithmetic",
+      "wallVelocityGradient": "dirichlet-tangent",
+      "physicalWallVelocityAndTemperatureKept": true,
+      "externalCFDImported": false
+    },
+    "wallVelocityGradient": "dirichlet-tangent",
+    "sameEquationHistoryContinued": true,
+    "steadyConverged": false,
+    "stopReason": "steady-newton-linear-target-not-met",
+    "spatialConservationRelative": 4.762501927036358e-16,
+    "steadyBoundaryFluxBalance": 0.011954482698849347,
+    "signedHeatPowerW": 925861.9660217352,
+    "wallHeatRangeWm2": [
+      -358287.2316281634,
+      2267395.715238431
+    ],
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 48624,
+    "priorActualResidualEvaluations": 240,
+    "residualEvaluationsAfterLastAcceptedHistory": 117,
+    "normalEulerLinearization": "exact-branch",
+    "physicalSpatialEquationChanged": false,
+    "linearEquation": "steady-newton",
+    "preconditionerTimeStepOnly": true,
+    "rightPreconditioner": "two-level-minres",
+    "graphSweeps": 1,
+    "fixedLinearPreconditioner": true,
+    "jacobianAction": "selected-analytic",
+    "selectedAnalyticApplications": 50,
+    "analyticCacheBuildSeconds": 13.5882983,
+    "originalNSCombinedDirectionCheckPreserved": true,
+    "steadyInitialGuessReport": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov13\\wall_velocity_krylov_evidence.mat",
+      "sourceVariant": "result",
+      "directionScale": 1,
+      "sourceFileSHA256": "2744766665e57c877f739cdb3d4962acd94c3b9adb4dd9d9fbd31804fcf8c343",
+      "sourceCoarseFile": "outputs/v83_validation/localrocket02/local_coarse_evidence.mat",
+      "sourceCoarseFileSHA256": "d38cc000fe7dafa3b907ed9827ac4ce4a57cc381e7effb57e74d1d71c25c160c",
+      "sourceStateAndGeometryVerified": true,
+      "sourceSavedActualNSRelativeDefect": 0.20251920488172787,
+      "oldDerivativeReused": false,
+      "newModelApplications": 0,
+      "newActualNSEvaluations": 0,
+      "originalNSAcceptanceClaimed": false
+    },
+    "steadyInitialGuessModelApplications": 1,
+    "coarseUnknowns": 792,
+    "coarseImageBytes": 266582936.0,
+    "coarseOperatorBuilds": 0,
+    "coarseOperatorReuses": 1,
+    "coarseConstructionModelApplications": 0,
+    "coarsePreconditionerModelApplications": 50,
+    "coarseReuseVerificationModelApplications": 1,
+    "coarseReuseReport": {
+      "sourceFile": "outputs/v83_validation/localrocket02/local_coarse_evidence.mat",
+      "sourceAndStateVerified": true,
+      "freshFineModelProbeRelativeDifference": 9.738034046966952e-16,
+      "reuseVerificationModelApplications": 1,
+      "constructionModelApplications": 0,
+      "actualOriginalNSEvaluations": 0,
+      "imageBytes": 266582936.0,
+      "maximumImageBytes": 268435456.0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "coarseSetupSeconds": 3.8609937,
+    "coarseCorrectionChangesPhysicalMesh": false,
+    "coarseBasis": "local-conservative-enriched-mixed",
+    "coarseTargetCellCount": 15160,
+    "parentCoarseUnknowns": 210,
+    "coarseBaseConservativeColumns": 410,
+    "coarseAdditionalPrimitiveColumns": 62,
+    "coarseRetainedMixedColumns": 472,
+    "coarseLocalConservativeColumns": 320,
+    "coarseLocalDistinctCells": 64
+  },
+  "preconditionerScaleScreen": {
+    "status": "tested-same-remaining-preconditioner-scale-one-direction-model-screen-only",
+    "initialRemainingRelativeDefect": 0.20043131674325604,
+    "bestPseudoDt": 1e-08,
+    "bestOneDirectionPredictedDefect": 0.19955176840157418,
+    "modelApplications": 12,
+    "reuseVerificationModelApplications": 1,
+    "newCoarseConstructionApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "noPhysicalEquationOrStateChange": true,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 51416
+  },
+  "researchResults": {
+    "oldActualTotalNSDefect": 0.20251920488172787,
+    "newActualTotalNSDefect": 0.20043131674325604,
+    "newModelDefect": 0.20043135465530426,
+    "originalActualTotalTarget": 0.1,
+    "effectiveIncrementRelativeTolerance": 0.49378022249722453,
+    "oldDerivativeReused": false,
+    "newCandidates": 0,
+    "newAcceptances": 0
+  },
+  "workAccounting": {
+    "mainActualNSEvaluations": 242,
+    "mainAcceptedCorrections": 12,
+    "lastAcceptanceNS": 125,
+    "unacceptedTailNS": 117,
+    "latestMainNS": 2,
+    "latestSelectedModelActions": 50,
+    "initialGuessModelActionsIncludedInSelected": 1,
+    "incrementalGMRESModelActions": 49,
+    "latestPreconditionerModelActions": 50,
+    "latestReuseProbeModelActions": 1,
+    "latestConstructionModelActions": 0,
+    "separateOldLocalReplayNS": 3,
+    "separateUnitCorrectedNS": 3,
+    "separateUnitReadyNS": 3,
+    "separateUnitStrictLimitedNS": 2,
+    "totalUnitHostNS": 11,
+    "scaleScreenSelectedModelActions": 12,
+    "scaleScreenReuseProbeActions": 1,
+    "scaleScreenNS": 0,
+    "validationNotAppendedToMainSolverHistory": true
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench13/index.html",
+    "allTenFieldsAndOriginalFacetsPreserved": true,
+    "sameHostFiveStepWorkflowCurvesAndColorScalesPreserved": true,
+    "initialGuessModelWorkAndDifferentResidualDenominatorsExplicit": true,
+    "scientificPNGsActuallyInspected": 4,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "steadyBoundaryImbalance": 0.011954482698849347
+  },
+  "nextAction": "Diagnose the stagnating linear modes and prototype controlled-memory restarting that retains multiple directions/subspace, rather than only one final solution direction. Validate on independent matrices and the true small-domain current Jacobian, orthogonality/projection/total-direction NS and source/work budgets before a bounded real comparison. This prototype is not implemented or usable yet. Keep the best krylov14 same-Q direction and fixed 792 image; do not repeat identical single-direction 48-step restart or blindly enlarge tau. Scale probes are only one-direction predictions, not bounds on all GMRES outcomes. Keep the original total-RHS 0.1 NS target and every state/descent/conservation/steady gate.",
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "e7f5e4b4bb0f72a3102029b498a68e142d9789b3faf523658c16cbcee4c3d6b7"
+}

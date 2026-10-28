@@ -1,0 +1,819 @@
+{
+  "schema": "RocketAeroHeat.tmr-mach7-acc.v1",
+  "case_id": "NASA-TMR-ACC-SBLI-M7-20deg",
+  "status": "source_data_and_unit_contract_only",
+  "source_manifest_sha256": "55606c2eb77eaf1e83f051bed47a639aba3d0f18abb171e3bc2705d49970352d",
+  "scope": {
+    "flare_angle_deg": 20,
+    "angle_of_attack_deg": 0,
+    "axisymmetric": true,
+    "planar_2d_equivalent": false,
+    "solver_validation_complete": false,
+    "new_physical_area_m2": 0
+  },
+  "sources": {
+    "case_url": "https://tmbwg.github.io/turbmodels/axiswblim7_val.html",
+    "original_report_url": "https://ntrs.nasa.gov/api/citations/19890010729/downloads/19890010729.pdf",
+    "original_report_local_sha256": null,
+    "original_report_retrieval": "NTRS PDF read via web tool; local HTTP download returned 403; no PDF-byte hash claimed",
+    "experiment_archive_url": "https://www.nasa.gov/wp-content/uploads/2025/10/kussoycompcorner.zip",
+    "experiment_archive_identity": "NASA/TM-2013-216604 database, same Kussoy/Horstman experiment, original NASA-TM-101075",
+    "source_locator_conditions": "raw/KussoyConditions.txt; raw/A5.0.ReadmeKussoyCompCorner.txt; NASA-TM-101075 Table I",
+    "source_locator_uncertainty": "NASA-TM-101075 printed p.5, Experimental Uncertainties",
+    "source_locator_measurements": "raw/*_exp.dat; raw/KussoyCompCorner.dat zones KussoyP20/KussoyQ20; NASA-TM-101075 Table IV(a)"
+  },
+  "geometry": {
+    "cylinder_radius_m": 0.1015,
+    "cylinder_diameter_m": 0.203,
+    "flare_start_distance_from_nose_m": 1.39,
+    "nose_cone_half_angle_deg": 10,
+    "nose_arc_radius_m": null,
+    "flare_end_S_m": null,
+    "source_coordinates": "x increases downstream; x=S=0 at cylinder/flare junction; y is radius from axis",
+    "source_surface_coordinate": "S<0: source x=S,r=R; S>=0: source x=S*cos(20deg),r=R+S*sin(20deg)",
+    "project_coordinates": "X=-source_x, junction X=0; nose is at +X, free-stream velocity -X; radius unchanged",
+    "profile_coordinate": "y_prime is distance from cylinder wall; source radius=y_prime+R",
+    "wall_condition": {
+      "type": "prescribed_no_slip_isothermal",
+      "temperature_K": 311
+    },
+    "geometry_truth_limit": "Boundary grid gives the computational truncation, not full forebody nose-arc dimensions"
+  },
+  "experimental_local_reference": {
+    "location_source_x_m": -0.06,
+    "distance_from_nose_m": 1.33,
+    "definition": "Outside the boundary layer immediately upstream of interaction; inside the forebody/inflow shock layer",
+    "Mach": 7.05,
+    "temperature_K": 81.2,
+    "pressure_Pa": 576,
+    "density_kg_m3": 0.0252,
+    "velocity_m_s": 1274,
+    "wall_temperature_K": 311,
+    "reported_wall_heating_magnitude_W_m2": 9300,
+    "wall_shear_Pa": 25,
+    "unit_Re_m_inv": 5800000.0,
+    "boundary_layer_thickness_m": 0.025,
+    "displacement_thickness_m": 0.0074,
+    "momentum_thickness_m": 0.00065,
+    "Cf": 0.00122,
+    "total_temperature_K": null,
+    "independent_reported_rounded_quantities": true
+  },
+  "computational_truncated_inflow": {
+    "identity": "TMR prescribed calculation boundary, distinct from measured profile station",
+    "source_x_m": -0.7839,
+    "project_X_m": 0.7839,
+    "Mach": 7.11,
+    "temperature_K_figure": 80,
+    "unit_Re_m_inv_figure": 5706000,
+    "total_pressure_psi_WIND_input": 364.8,
+    "total_pressure_Pa_WIND_input": 2515207.4605476866,
+    "total_temperature_rankine_WIND_input": 1600,
+    "total_temperature_K_WIND_input": 888.8888888888889,
+    "wall_temperature_rankine_WIND_input": 559.8,
+    "angle_of_attack_deg": 0,
+    "sideslip_deg": 0,
+    "top_boundary": "supersonic_inflow on both blocks (NMF)",
+    "outflow": "extrapolate from interior, NMF; WIND sample first order extrapolation",
+    "azimuthal_boundary": "rotated periodic planes separated by 1 degree; alternatively consistent axisymmetric equations",
+    "incoming_turbulence_profiles": null,
+    "WIND_unit_source": "raw/wind_freestream.html: total pressure psi and temperature Rankine",
+    "not_a_measured_complete_profile": true
+  },
+  "normalization": {
+    "pressure_ratio": "TMR Pw/Pw-inf; author archive Pw/Pinf, with local Pinf=576 Pa",
+    "pressure_Pa": "pressure_ratio * 576 Pa (same local reference)",
+    "heat_ratio": "Qw/Qw-inf, experimental heating magnitude reference 9300 W/m^2",
+    "heating_magnitude_W_m2": "heat_ratio * 9300 W/m^2",
+    "temperature_profile": "TT/TTinf is total-temperature ratio, not static-temperature ratio",
+    "signed_Fourier_warning": "TMR defines Qw=-k*dT/dy at wall; raw positive ratios do not determine the solver normal/sign. The dimensional field here is reported positive heating magnitude, not a signed Fourier conversion.",
+    "forbidden_reference_substitution": "Do not use truncated M7.11 inlet state as the denominator of the x=-6 cm local experimental ratios"
+  },
+  "measurement_uncertainties": {
+    "surface_pressure_relative_estimate": 0.1,
+    "surface_heat_relative_estimate": 0.1,
+    "velocity_relative_estimate": 0.03,
+    "total_temperature_relative_estimate": 0.015,
+    "profile_y_absolute_m": 0.0002,
+    "confidence_level": null,
+    "per_point_covariance": null,
+    "do_not_infer_ratio_independent_uncertainty": true
+  },
+  "measurements": {
+    "upstream_profile": [
+      {
+        "source_row": 1,
+        "y_from_wall_m": 0.0,
+        "velocity_ratio": 0.0,
+        "total_temperature_ratio": 0.349999994,
+        "measured_M": 0.0,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 2,
+        "y_from_wall_m": 0.0006499999762,
+        "velocity_ratio": 0.4699999988,
+        "total_temperature_ratio": 0.6380000114,
+        "measured_M": 1.547,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 3,
+        "y_from_wall_m": 0.0009300000221,
+        "velocity_ratio": 0.601000011,
+        "total_temperature_ratio": 0.6899999976,
+        "measured_M": 2.177,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 4,
+        "y_from_wall_m": 0.001199999973,
+        "velocity_ratio": 0.699000001,
+        "total_temperature_ratio": 0.7519999743,
+        "measured_M": 2.745,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 5,
+        "y_from_wall_m": 0.001800000072,
+        "velocity_ratio": 0.7590000033,
+        "total_temperature_ratio": 0.8050000072,
+        "measured_M": 3.111,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 6,
+        "y_from_wall_m": 0.0025,
+        "velocity_ratio": 0.7910000086,
+        "total_temperature_ratio": 0.8299999833,
+        "measured_M": 3.356,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 7,
+        "y_from_wall_m": 0.0031999999280000004,
+        "velocity_ratio": 0.8220000267,
+        "total_temperature_ratio": 0.8579999804,
+        "measured_M": 3.61,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 8,
+        "y_from_wall_m": 0.003899999857,
+        "velocity_ratio": 0.8360000253,
+        "total_temperature_ratio": 0.8579999804,
+        "measured_M": 3.835,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 9,
+        "y_from_wall_m": 0.004600000083,
+        "velocity_ratio": 0.8579999804,
+        "total_temperature_ratio": 0.8769999743,
+        "measured_M": 4.07,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 10,
+        "y_from_wall_m": 0.006200000048,
+        "velocity_ratio": 0.8960000277,
+        "total_temperature_ratio": 0.9049999714,
+        "measured_M": 4.626,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 11,
+        "y_from_wall_m": 0.007699999809,
+        "velocity_ratio": 0.92900002,
+        "total_temperature_ratio": 0.9300000072,
+        "measured_M": 5.248,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 12,
+        "y_from_wall_m": 0.009399999976,
+        "velocity_ratio": 0.9539999962,
+        "total_temperature_ratio": 0.9539999962,
+        "measured_M": 5.739,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 13,
+        "y_from_wall_m": 0.01090000033,
+        "velocity_ratio": 0.9670000076,
+        "total_temperature_ratio": 0.9660000205,
+        "measured_M": 6.07,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 14,
+        "y_from_wall_m": 0.0125999999,
+        "velocity_ratio": 0.9819999933,
+        "total_temperature_ratio": 0.9860000014,
+        "measured_M": 6.34,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 15,
+        "y_from_wall_m": 0.014500000479999999,
+        "velocity_ratio": 0.9860000014,
+        "total_temperature_ratio": 0.9860000014,
+        "measured_M": 6.599,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 16,
+        "y_from_wall_m": 0.01639999986,
+        "velocity_ratio": 0.9919999838,
+        "total_temperature_ratio": 0.9909999967,
+        "measured_M": 6.82,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 17,
+        "y_from_wall_m": 0.01899999976,
+        "velocity_ratio": 0.9990000129,
+        "total_temperature_ratio": 1.0,
+        "measured_M": 6.962,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 18,
+        "y_from_wall_m": 0.021500000950000004,
+        "velocity_ratio": 1.0,
+        "total_temperature_ratio": 1.0,
+        "measured_M": 7.022,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 19,
+        "y_from_wall_m": 0.024000000950000003,
+        "velocity_ratio": 1.0,
+        "total_temperature_ratio": 1.0,
+        "measured_M": 7.048,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 20,
+        "y_from_wall_m": 0.02700000048,
+        "velocity_ratio": 1.0,
+        "total_temperature_ratio": 1.0,
+        "measured_M": 7.05,
+        "pressure_ratio": 1.0
+      },
+      {
+        "source_row": 21,
+        "y_from_wall_m": 0.03,
+        "velocity_ratio": 1.0,
+        "total_temperature_ratio": 1.0,
+        "measured_M": 7.05,
+        "pressure_ratio": 1.0
+      }
+    ],
+    "pressure_rows": [
+      {
+        "source_row": 1,
+        "S_m": -0.11300000190000001,
+        "source_x_m": -0.11300000190000001,
+        "project_X_m": 0.11300000190000001,
+        "radius_m": 0.1015,
+        "ratio": 0.9700000286,
+        "pressure_Pa": 558.7200164736,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 2,
+        "S_m": -0.10300000190000001,
+        "source_x_m": -0.10300000190000001,
+        "project_X_m": 0.10300000190000001,
+        "radius_m": 0.1015,
+        "ratio": 0.9800000191,
+        "pressure_Pa": 564.4800110016,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 3,
+        "S_m": -0.09300000191,
+        "source_x_m": -0.09300000191,
+        "project_X_m": 0.09300000191,
+        "radius_m": 0.1015,
+        "ratio": 0.9599999785,
+        "pressure_Pa": 552.959987616,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 4,
+        "S_m": -0.08300000191000001,
+        "source_x_m": -0.08300000191000001,
+        "project_X_m": 0.08300000191000001,
+        "radius_m": 0.1015,
+        "ratio": 0.9800000191,
+        "pressure_Pa": 564.4800110016,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 5,
+        "S_m": -0.07300000191,
+        "source_x_m": -0.07300000191,
+        "project_X_m": 0.07300000191,
+        "radius_m": 0.1015,
+        "ratio": 0.9700000286,
+        "pressure_Pa": 558.7200164736,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 6,
+        "S_m": -0.06300000190999999,
+        "source_x_m": -0.06300000190999999,
+        "project_X_m": 0.06300000190999999,
+        "radius_m": 0.1015,
+        "ratio": 0.9900000095,
+        "pressure_Pa": 570.240005472,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 7,
+        "S_m": -0.05300000191,
+        "source_x_m": -0.05300000191,
+        "project_X_m": 0.05300000191,
+        "radius_m": 0.1015,
+        "ratio": 1.029999971,
+        "pressure_Pa": 593.2799832960001,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 8,
+        "S_m": -0.043000001909999995,
+        "source_x_m": -0.043000001909999995,
+        "project_X_m": 0.043000001909999995,
+        "radius_m": 0.1015,
+        "ratio": 1.0,
+        "pressure_Pa": 576.0,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 9,
+        "S_m": -0.03299999952,
+        "source_x_m": -0.03299999952,
+        "project_X_m": 0.03299999952,
+        "radius_m": 0.1015,
+        "ratio": 1.019999981,
+        "pressure_Pa": 587.519989056,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 10,
+        "S_m": -0.022999999519999998,
+        "source_x_m": -0.022999999519999998,
+        "project_X_m": 0.022999999519999998,
+        "radius_m": 0.1015,
+        "ratio": 1.0,
+        "pressure_Pa": 576.0,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 11,
+        "S_m": -0.012999999520000001,
+        "source_x_m": -0.012999999520000001,
+        "project_X_m": 0.012999999520000001,
+        "radius_m": 0.1015,
+        "ratio": 1.090000033,
+        "pressure_Pa": 627.8400190079999,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 12,
+        "S_m": 0.01100000024,
+        "source_x_m": 0.010336619054171221,
+        "project_X_m": -0.010336619054171221,
+        "radius_m": 0.1052622216586672,
+        "ratio": 2.019999981,
+        "pressure_Pa": 1163.5199890559998,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 13,
+        "S_m": 0.01600000024,
+        "source_x_m": 0.015035082158100763,
+        "project_X_m": -0.015035082158100763,
+        "radius_m": 0.10697232237529554,
+        "ratio": 3.680000067,
+        "pressure_Pa": 2119.680038592,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 14,
+        "S_m": 0.02099999905,
+        "source_x_m": 0.019733544143796085,
+        "project_X_m": -0.019733544143796085,
+        "radius_m": 0.10868242268491991,
+        "ratio": 5.309999943,
+        "pressure_Pa": 3058.559967168,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 15,
+        "S_m": 0.02599999905,
+        "source_x_m": 0.02443200724772563,
+        "project_X_m": -0.02443200724772563,
+        "radius_m": 0.11039252340154826,
+        "ratio": 5.960000038,
+        "pressure_Pa": 3432.9600218880005,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 16,
+        "S_m": 0.03599999905,
+        "source_x_m": 0.033828933455584714,
+        "project_X_m": -0.033828933455584714,
+        "radius_m": 0.11381272483480495,
+        "ratio": 7.420000076,
+        "pressure_Pa": 4273.920043776,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 17,
+        "S_m": 0.04099999905,
+        "source_x_m": 0.03852739655951425,
+        "project_X_m": -0.03852739655951425,
+        "radius_m": 0.11552282555143328,
+        "ratio": 8.270000458,
+        "pressure_Pa": 4763.520263808,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 18,
+        "S_m": 0.04599999905,
+        "source_x_m": 0.0432258596634438,
+        "project_X_m": -0.0432258596634438,
+        "radius_m": 0.11723292626806163,
+        "ratio": 9.100000381,
+        "pressure_Pa": 5241.600219456,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 19,
+        "S_m": 0.05099999905,
+        "source_x_m": 0.047924322767373344,
+        "project_X_m": -0.047924322767373344,
+        "radius_m": 0.11894302698468998,
+        "ratio": 9.949999809,
+        "pressure_Pa": 5731.199889984,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 20,
+        "S_m": 0.060999999049999996,
+        "source_x_m": 0.05732124897523242,
+        "project_X_m": -0.05732124897523242,
+        "radius_m": 0.12236322841794667,
+        "ratio": 10.80000019,
+        "pressure_Pa": 6220.800109440001,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 21,
+        "S_m": 0.07099999905,
+        "source_x_m": 0.0667181751830915,
+        "project_X_m": -0.0667181751830915,
+        "radius_m": 0.12578342985120336,
+        "ratio": 11.30000019,
+        "pressure_Pa": 6508.800109440001,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 22,
+        "S_m": 0.10100000380000002,
+        "source_x_m": 0.09490895827020872,
+        "project_X_m": -0.09490895827020872,
+        "radius_m": 0.1360440357755691,
+        "ratio": 12.14000034,
+        "pressure_Pa": 6992.64019584,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 23,
+        "S_m": 0.1210000038,
+        "source_x_m": 0.11370281068592689,
+        "project_X_m": -0.11370281068592689,
+        "radius_m": 0.14288443864208247,
+        "ratio": 12.26000023,
+        "pressure_Pa": 7061.76013248,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 24,
+        "S_m": 0.14100000380000002,
+        "source_x_m": 0.13249666310164507,
+        "project_X_m": -0.13249666310164507,
+        "radius_m": 0.14972484150859586,
+        "ratio": 12.5,
+        "pressure_Pa": 7200.0,
+        "independent_comparison_point": true
+      },
+      {
+        "source_row": 25,
+        "S_m": 0.14100000380000002,
+        "source_x_m": 0.13249666310164507,
+        "project_X_m": -0.13249666310164507,
+        "radius_m": 0.14972484150859586,
+        "ratio": 12.5,
+        "pressure_Pa": 7200.0,
+        "independent_comparison_point": false
+      },
+      {
+        "source_row": 26,
+        "S_m": 0.14100000380000002,
+        "source_x_m": 0.13249666310164507,
+        "project_X_m": -0.13249666310164507,
+        "radius_m": 0.14972484150859586,
+        "ratio": 12.5,
+        "pressure_Pa": 7200.0,
+        "independent_comparison_point": false
+      },
+      {
+        "source_row": 27,
+        "S_m": 0.14100000380000002,
+        "source_x_m": 0.13249666310164507,
+        "project_X_m": -0.13249666310164507,
+        "radius_m": 0.14972484150859586,
+        "ratio": 12.5,
+        "pressure_Pa": 7200.0,
+        "independent_comparison_point": false
+      }
+    ],
+    "heating_rows": [
+      {
+        "source_row": 1,
+        "S_m": -0.1206000042,
+        "source_x_m": -0.1206000042,
+        "project_X_m": 0.1206000042,
+        "radius_m": 0.1015,
+        "ratio": 0.9800000191,
+        "reported_heating_magnitude_W_m2": 9114.00017763
+      },
+      {
+        "source_row": 2,
+        "S_m": -0.1080000019,
+        "source_x_m": -0.1080000019,
+        "project_X_m": 0.1080000019,
+        "radius_m": 0.1015,
+        "ratio": 1.049999952,
+        "reported_heating_magnitude_W_m2": 9764.9995536
+      },
+      {
+        "source_row": 3,
+        "S_m": -0.09520000458,
+        "source_x_m": -0.09520000458,
+        "project_X_m": 0.09520000458,
+        "radius_m": 0.1015,
+        "ratio": 1.059999943,
+        "reported_heating_magnitude_W_m2": 9857.9994699
+      },
+      {
+        "source_row": 4,
+        "S_m": -0.08260000228999999,
+        "source_x_m": -0.08260000228999999,
+        "project_X_m": 0.08260000228999999,
+        "radius_m": 0.1015,
+        "ratio": 1.019999981,
+        "reported_heating_magnitude_W_m2": 9485.9998233
+      },
+      {
+        "source_row": 5,
+        "S_m": -0.06980000019,
+        "source_x_m": -0.06980000019,
+        "project_X_m": 0.06980000019,
+        "radius_m": 0.1015,
+        "ratio": 1.029999971,
+        "reported_heating_magnitude_W_m2": 9578.9997303
+      },
+      {
+        "source_row": 6,
+        "S_m": -0.057300000190000006,
+        "source_x_m": -0.057300000190000006,
+        "project_X_m": 0.057300000190000006,
+        "radius_m": 0.1015,
+        "ratio": 1.0,
+        "reported_heating_magnitude_W_m2": 9300.0
+      },
+      {
+        "source_row": 7,
+        "S_m": -0.04440000057,
+        "source_x_m": -0.04440000057,
+        "project_X_m": 0.04440000057,
+        "radius_m": 0.1015,
+        "ratio": 1.029999971,
+        "reported_heating_magnitude_W_m2": 9578.9997303
+      },
+      {
+        "source_row": 8,
+        "S_m": -0.03180000067,
+        "source_x_m": -0.03180000067,
+        "project_X_m": 0.03180000067,
+        "radius_m": 0.1015,
+        "ratio": 1.00999999,
+        "reported_heating_magnitude_W_m2": 9392.999907000001
+      },
+      {
+        "source_row": 9,
+        "S_m": -0.01899999976,
+        "source_x_m": -0.01899999976,
+        "project_X_m": 0.01899999976,
+        "radius_m": 0.1015,
+        "ratio": 0.9900000095,
+        "reported_heating_magnitude_W_m2": 9207.00008835
+      },
+      {
+        "source_row": 10,
+        "S_m": -0.0063999998570000004,
+        "source_x_m": -0.0063999998570000004,
+        "project_X_m": 0.0063999998570000004,
+        "radius_m": 0.1015,
+        "ratio": 0.8600000143,
+        "reported_heating_magnitude_W_m2": 7998.00013299
+      },
+      {
+        "source_row": 11,
+        "S_m": 0.01100000024,
+        "source_x_m": 0.010336619054171221,
+        "project_X_m": -0.010336619054171221,
+        "radius_m": 0.1052622216586672,
+        "ratio": 4.789999962,
+        "reported_heating_magnitude_W_m2": 44546.999646599994
+      },
+      {
+        "source_row": 12,
+        "S_m": 0.01600000024,
+        "source_x_m": 0.015035082158100763,
+        "project_X_m": -0.015035082158100763,
+        "radius_m": 0.10697232237529554,
+        "ratio": 4.170000076,
+        "reported_heating_magnitude_W_m2": 38781.0007068
+      },
+      {
+        "source_row": 13,
+        "S_m": 0.02099999905,
+        "source_x_m": 0.019733544143796085,
+        "project_X_m": -0.019733544143796085,
+        "radius_m": 0.10868242268491991,
+        "ratio": 4.989999771,
+        "reported_heating_magnitude_W_m2": 46406.9978703
+      },
+      {
+        "source_row": 14,
+        "S_m": 0.02599999905,
+        "source_x_m": 0.02443200724772563,
+        "project_X_m": -0.02443200724772563,
+        "radius_m": 0.11039252340154826,
+        "ratio": 5.269999981,
+        "reported_heating_magnitude_W_m2": 49010.9998233
+      },
+      {
+        "source_row": 15,
+        "S_m": 0.030999999049999998,
+        "source_x_m": 0.02913047035165517,
+        "project_X_m": -0.02913047035165517,
+        "radius_m": 0.1121026241181766,
+        "ratio": 5.940000057,
+        "reported_heating_magnitude_W_m2": 55242.0005301
+      },
+      {
+        "source_row": 16,
+        "S_m": 0.03599999905,
+        "source_x_m": 0.033828933455584714,
+        "project_X_m": -0.033828933455584714,
+        "radius_m": 0.11381272483480495,
+        "ratio": 5.739999771,
+        "reported_heating_magnitude_W_m2": 53381.9978703
+      },
+      {
+        "source_row": 17,
+        "S_m": 0.04599999905,
+        "source_x_m": 0.0432258596634438,
+        "project_X_m": -0.0432258596634438,
+        "radius_m": 0.11723292626806163,
+        "ratio": 6.039999962,
+        "reported_heating_magnitude_W_m2": 56171.999646599994
+      },
+      {
+        "source_row": 18,
+        "S_m": 0.05099999905,
+        "source_x_m": 0.047924322767373344,
+        "project_X_m": -0.047924322767373344,
+        "radius_m": 0.11894302698468998,
+        "ratio": 7.989999771,
+        "reported_heating_magnitude_W_m2": 74306.9978703
+      },
+      {
+        "source_row": 19,
+        "S_m": 0.060999999049999996,
+        "source_x_m": 0.05732124897523242,
+        "project_X_m": -0.05732124897523242,
+        "radius_m": 0.12236322841794667,
+        "ratio": 8.590000153,
+        "reported_heating_magnitude_W_m2": 79887.00142290001
+      },
+      {
+        "source_row": 20,
+        "S_m": 0.07099999905,
+        "source_x_m": 0.0667181751830915,
+        "project_X_m": -0.0667181751830915,
+        "radius_m": 0.12578342985120336,
+        "ratio": 8.739999771,
+        "reported_heating_magnitude_W_m2": 81281.99787030001
+      },
+      {
+        "source_row": 21,
+        "S_m": 0.08100000381,
+        "source_x_m": 0.07611510586388746,
+        "project_X_m": -0.07611510586388746,
+        "radius_m": 0.1292036329124759,
+        "ratio": 8.640000343,
+        "reported_heating_magnitude_W_m2": 80352.0031899
+      },
+      {
+        "source_row": 22,
+        "S_m": 0.09100000381,
+        "source_x_m": 0.08551203207174654,
+        "project_X_m": -0.08551203207174654,
+        "radius_m": 0.1326238343457326,
+        "ratio": 8.770000458,
+        "reported_heating_magnitude_W_m2": 81561.0042594
+      },
+      {
+        "source_row": 23,
+        "S_m": 0.10100000380000002,
+        "source_x_m": 0.09490895827020872,
+        "project_X_m": -0.09490895827020872,
+        "radius_m": 0.1360440357755691,
+        "ratio": 9.180000305,
+        "reported_heating_magnitude_W_m2": 85374.0028365
+      },
+      {
+        "source_row": 24,
+        "S_m": 0.1210000038,
+        "source_x_m": 0.11370281068592689,
+        "project_X_m": -0.11370281068592689,
+        "radius_m": 0.14288443864208247,
+        "ratio": 9.680000305,
+        "reported_heating_magnitude_W_m2": 90024.0028365
+      },
+      {
+        "source_row": 25,
+        "S_m": 0.13100000380000001,
+        "source_x_m": 0.12309973689378598,
+        "project_X_m": -0.12309973689378598,
+        "radius_m": 0.14630464007533917,
+        "ratio": 9.590000153,
+        "reported_heating_magnitude_W_m2": 89187.00142290001
+      },
+      {
+        "source_row": 26,
+        "S_m": 0.14100000380000002,
+        "source_x_m": 0.13249666310164507,
+        "project_X_m": -0.13249666310164507,
+        "radius_m": 0.14972484150859586,
+        "ratio": 9.359999657,
+        "reported_heating_magnitude_W_m2": 87047.9968101
+      },
+      {
+        "source_row": 27,
+        "S_m": 0.1510000038,
+        "source_x_m": 0.14189358930950413,
+        "project_X_m": -0.14189358930950413,
+        "radius_m": 0.15314504294185252,
+        "ratio": 8.550000191,
+        "reported_heating_magnitude_W_m2": 79515.0017763
+      }
+    ]
+  },
+  "data_quality": {
+    "pressure_raw_rows": 27,
+    "pressure_independent_points": 24,
+    "heating_raw_rows": 27,
+    "upstream_rows": 21,
+    "pressure_duplicate_source_rows_1based": [
+      25,
+      26,
+      27
+    ],
+    "pressure_duplicate_policy": "Keep raw rows and their identity; compare only the first occurrence of an exactly repeated (S,ratio) pair. Do not give repeated tail rows extra statistical weight.",
+    "author_first_heat_position_typo": "raw/KussoyAxiCompCorner.txt prints +12.06 cm; TMR qw_exp.dat, NASA database KussoyQ20 and original Table IV(a) give -12.06 cm. Contract uses the latter and retains both sources unchanged.",
+    "tecplot_placeholder_warning": "Zero columns QQInf/Tau_TauInf in KussoyP20 and PPInf/Tau_TauInf in KussoyQ20 are unavailable-field placeholders, not measurements.",
+    "separation_label_disagreement": "2013 database README calls 20deg attached; original report/Conditions give separation at S=0, reattachment undetermined. Do not treat either as a measured finite separation bubble or reattachment coordinate.",
+    "cross_source_max_abs_native_units": {
+      "pressure": 4.580000005915963e-07,
+      "heat": 4.580000005915963e-07,
+      "upstream": 9.500000031081868e-08
+    }
+  },
+  "unresolved_before_physical_validation": [
+    "Choose and freeze caloric/transport/Prandtl and turbulence-model variants; do not silently substitute current NASA7 for source gas/transport closure",
+    "Generate the boundary layer from TMR M7.11 inflow and demonstrate agreement at x=-6 cm, or separately label measured-profile local-domain validation",
+    "Measured full turbulence profiles, Reynolds stresses and a complete transverse velocity profile are not supplied by these files",
+    "Experimental total-temperature reference is not supplied numerically in the selected source files; retain normalized TT, never substitute calculation inlet TT",
+    "Convergence, near-wall resolution, grid and outer/inlet/outlet sensitivity still require an actual internal viscous solution",
+    "Match wall normal and heat sign explicitly; compare source locations and normalized values without treating duplicate rows as independent observations"
+  ]
+}

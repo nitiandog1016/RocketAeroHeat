@@ -1,0 +1,1860 @@
+{
+  "version": "v60",
+  "date": "2026-10-17",
+  "status": "locally-delivered-tested-experimental-stage",
+  "generatedUTC": "2026-10-17T09:03:01.401114+00:00",
+  "scope": {
+    "fullSurfaceSolved": false,
+    "physicalSolution": false,
+    "newRegionalHeatSolvedAreaM2": 0,
+    "productionHeatAreaFraction": 0.6656263274240188,
+    "trueTemperatureVolumeAverageRequired": true,
+    "EOSPrimitiveAutomaticallyAcceptedAsTemperatureMean": false,
+    "scalarSpatialOperatorOnly": true,
+    "newTimeIntegration": false,
+    "fullNavierStokesClosureImplemented": false,
+    "fullNavierStokesStabilityProven": false,
+    "physicalAirOrExperimentalValidation": false,
+    "defaultProductionFieldsChanged": false,
+    "newUIRuntimeValidation": false,
+    "githubPushed": false
+  },
+  "changedMatlabFiles": [
+    "internalFlow/cutCell/buildCutCellVolumeMoments.m",
+    "internalFlow/cutCell/buildQuadraticTemperatureStencil.m",
+    "internalFlow/cutCell/evaluateQuadraticTemperature.m",
+    "internalFlow/cutCell/quadraticTemperatureFourierFlux.m",
+    "tests/testCutCellVolumeMoments.m",
+    "tests/testQuadraticTemperatureReconstruction.m",
+    "tests/studyCubicTemperatureReconstruction.m"
+  ],
+  "sourceFiles": [
+    {
+      "path": "internalFlow/cutCell/buildCutCellVolumeMoments.m",
+      "bytes": 18270,
+      "sha256": "d842ceca0293009c8db05a20712d8685cd9ff88f2077f8279eb5f7b01ebecdf8"
+    },
+    {
+      "path": "internalFlow/cutCell/buildQuadraticTemperatureStencil.m",
+      "bytes": 7726,
+      "sha256": "e5009aad9fe6aa733a56f19cc55fe44dd350cc1e20dd41cdc11796dc0731417c"
+    },
+    {
+      "path": "internalFlow/cutCell/evaluateQuadraticTemperature.m",
+      "bytes": 3449,
+      "sha256": "3815ed72145a7814c76a4d0a5660ace1945b90a80fb5ecb578b4e17f681f4c97"
+    },
+    {
+      "path": "internalFlow/cutCell/quadraticTemperatureFourierFlux.m",
+      "bytes": 3273,
+      "sha256": "a59d1be5673763cddf1cc770d90a6315ce98cda46872e1fea7ea065214b592eb"
+    },
+    {
+      "path": "tests/testCutCellVolumeMoments.m",
+      "bytes": 8478,
+      "sha256": "2cacf533280fd5eca86216cbf9c0e32ed2b45a09b42c16fc880af0030a88879c"
+    },
+    {
+      "path": "tests/testQuadraticTemperatureReconstruction.m",
+      "bytes": 8150,
+      "sha256": "8c9aca443d05bb161b88e7a1b57cb64d0b847d566e32b93f16d53b1203d27307"
+    },
+    {
+      "path": "tests/studyCubicTemperatureReconstruction.m",
+      "bytes": 7451,
+      "sha256": "ff031022b49522caf6e92effa731e72edbc140f81acf90dc9fc3971602f01e1a"
+    },
+    {
+      "path": "README.md",
+      "bytes": 9604,
+      "sha256": "81aa1098dea4fe13ac241e66a1e271ea4107166130fd51e6647a0c734b7eb550"
+    },
+    {
+      "path": "README_使用说明.txt",
+      "bytes": 92051,
+      "sha256": "cbbf99b1db4c3edac086ffaa2d6515c10d81c832fe76e3c2f61c11ee3a165623"
+    },
+    {
+      "path": "docs/PROJECT_GOALS.md",
+      "bytes": 75091,
+      "sha256": "4845d334c3c927b0a325b72f7028ef0a16421441755c394bc2cdae3e02879f11"
+    },
+    {
+      "path": "docs/QUADRATIC_TEMPERATURE_RECONSTRUCTION.md",
+      "bytes": 6923,
+      "sha256": "a841d4efe3d16aaeb88100451f304af5604ffabd542773910a725a21a44c567a"
+    },
+    {
+      "path": "internalFlow/cutCell/README.md",
+      "bytes": 2903,
+      "sha256": "42e811fac91f195ed381a7a30c7b1fc0d29d9d3e55a29ae53e170c68fb499399"
+    },
+    {
+      "path": "docs/validation/v60/cubic_wall_heat_convergence.png",
+      "bytes": 91028,
+      "sha256": "1ad5f30b297d7d2b02f2d86c160fd75c6564ee478dc42663753ea831fa2048aa"
+    }
+  ],
+  "runs": [
+    {
+      "processRecord": "moments_draft/matlab_process_final.json",
+      "status": "finished",
+      "startedUTC": "2026-10-16T15:32:38.5936195Z",
+      "executable": "D:/matlab/bin/matlab.exe",
+      "command": "maxNumCompThreads(1); addpath('E:/RocketAeroHeat/outputs/v60_validation/moments_draft'); testCutCellVolumeMoments('E:/RocketAeroHeat/outputs/v60_validation/moments_draft');",
+      "stdout": "E:\\RocketAeroHeat\\outputs\\v60_validation\\moments_draft\\matlab_stdout.log",
+      "stderr": "E:\\RocketAeroHeat\\outputs\\v60_validation\\moments_draft\\matlab_stderr.log",
+      "pid": 39312,
+      "finishedUTC": "2026-10-16T15:33:23.0180539Z",
+      "exitCode": 0,
+      "stdoutSha256": "1d0321d7e17b3f578d705283f7d2346663ae5ed7c038e68f656ff77011959308",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "processRecord": "moments_draft/python_process_final.json",
+      "status": "finished",
+      "startedUTC": "2026-10-16T15:35:51.9600906Z",
+      "executable": "D:/anacondapython/python.exe",
+      "script": "E:\\RocketAeroHeat\\outputs\\v60_validation\\moments_draft\\check_matlab_moments.py",
+      "scriptSha256": "36011400ada9f3ce91fe44028588700d470b302173efca64e29edfe84d6b68d1",
+      "stdout": "E:\\RocketAeroHeat\\outputs\\v60_validation\\moments_draft\\independent_stdout.log",
+      "stderr": "E:\\RocketAeroHeat\\outputs\\v60_validation\\moments_draft\\independent_stderr.log",
+      "pid": 46324,
+      "finishedUTC": "2026-10-16T15:36:04.2269702Z",
+      "exitCode": 0,
+      "stdoutSha256": "6ec3504659b66b77384ce0a65ed7b6331814e80f70d89678d1701411cb8d2bcd",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "processRecord": "reconstruction_draft/process.json",
+      "startedUTC": "2026-10-16T15:34:53.0878567Z",
+      "stdoutSha256": "1f875f4fe67dace5151e1bcdcd2da534c2640d7d05ba4aae3cf19d5a3ab20504",
+      "LC_CTYPE": "C",
+      "exitCode": 0,
+      "executable": "D:/matlab/bin/matlab.exe",
+      "finishedUTC": "2026-10-16T15:35:16.1728209Z",
+      "command": "maxNumCompThreads(1); addpath('E:/RocketAeroHeat/outputs/v60_validation/reconstruction_draft'); testQuadraticTemperatureReconstruction('E:/RocketAeroHeat/outputs/v60_validation/reconstruction_draft');",
+      "LC_ALL": "C",
+      "LANG": "C",
+      "status": "finished",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "pid": 30708
+    },
+    {
+      "processRecord": "reconstruction_draft/cubic_process.json",
+      "pid": 30932,
+      "LANG": "C",
+      "LC_CTYPE": "C",
+      "executable": "D:/matlab/bin/matlab.exe",
+      "stdoutSha256": "3f883da061d894df4fe800582d0806cde1a386d4163be7b07f925115f888533a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finishedUTC": "2026-10-16T15:41:16.7965754Z",
+      "status": "finished",
+      "exitCode": 0,
+      "command": "maxNumCompThreads(1); addpath('E:/RocketAeroHeat/outputs/v60_validation/reconstruction_draft'); studyCubicTemperatureReconstruction('E:/RocketAeroHeat/outputs/v60_validation/reconstruction_draft');",
+      "startedUTC": "2026-10-16T15:40:49.7564908Z",
+      "LC_ALL": "C"
+    },
+    {
+      "processRecord": "reconstruction_review/cubic_oracle_process_final.json",
+      "status": "finished",
+      "startedUTC": "2026-10-16T15:35:07.8843072Z",
+      "finishedUTC": "2026-10-16T15:35:30.3788115Z",
+      "executable": "D:/anacondapython/python.exe",
+      "command": "build_cubic_oracles.py --case all",
+      "exitCode": 0,
+      "logSHA256": "d1afe64e94c220144662cb5a9ceb61a47c90e5cb83c36b8cf53d4da5f0444c27",
+      "sourceSHA256": "50a690935593e9962d3a640eb4e36af5343cdff28bbaa443a2030bf60673beb5"
+    },
+    {
+      "processRecord": "reconstruction_review/quadratic_reference_attempt2_process.json",
+      "status": "finished",
+      "startedUTC": "2026-10-16T15:40:55.5031012Z",
+      "finishedUTC": "2026-10-16T15:41:12.2052045Z",
+      "executable": "D:/anacondapython/python.exe",
+      "command": "reference_quadratic_fit.py",
+      "exitCode": 0,
+      "logSHA256": "e33e5bdef1d79ed128680a3685c7d310944c906d60e2466fd65c46484bf36903",
+      "sourceSHA256": "2fbece19dfa8b39e884d6ef6179cd3ea9840aeca113d4291ac7175ce861abadf"
+    },
+    {
+      "processRecord": "reconstruction_review/comparison_process_final.json",
+      "status": "finished",
+      "pid": 35720,
+      "startedUTC": "2026-10-16T15:46:28.1086666Z",
+      "finishedUTC": "2026-10-16T15:46:37.6625481Z",
+      "executable": "D:/anacondapython/python.exe",
+      "command": "compare_frozen_matlab.py",
+      "exitCode": 0,
+      "sourceSHA256": "9d7bc5d3147247f44d5cd2a0741c73508e5168e8d7dd32dd2715fe2cd8278157",
+      "stdoutSHA256": "05fc8a4a5ba5d404a2e3b0febc58ed5ebcf9971b766eba5453d24ffc98c8fbbd",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "processRecord": "reconstruction_review/scalar_matrix_process.json",
+      "status": "finished",
+      "pid": 28552,
+      "startedUTC": "2026-10-17T08:53:03.8169386Z",
+      "finishedUTC": "2026-10-17T08:53:10.6890481Z",
+      "executable": "D:/anacondapython/python.exe",
+      "command": "scalar_linear_matrix_review.py",
+      "exitCode": 0,
+      "sourceSHA256": "cb2d628eaa987a227fbe60031097826b2765d556aaf15ef6aff2241697030271",
+      "stdoutSHA256": "9241b2e9c78a45a30834977698c12ea256bce73fdfdee5c5e1f0536353afa374",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "processRecord": "library_isolation_final/process.json",
+      "LC_ALL": "C",
+      "exitCode": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "startedUTC": "2026-10-17T08:56:07.9422953Z",
+      "status": "finished",
+      "executable": "D:/matlab/bin/matlab.exe",
+      "pid": 47336,
+      "finishedUTC": "2026-10-17T08:57:17.1412680Z",
+      "stdoutSha256": "a8f3cac65b09becefb039d69ca3bec221f37abd396d6cf1097646f286fa2b813",
+      "command": "maxNumCompThreads(1); cd('E:/RocketAeroHeat/outputs/v60_validation/library_isolation_final/project'); addpath('internalFlow'); setupCutCellFlow; addpath('tests'); assert(startsWith(strrep(which('buildCutCellVolumeMoments'),char(92),'/'),'E:/RocketAeroHeat/outputs/v60_validation/library_isolation_final/project')); assert(startsWith(strrep(which('quadraticTemperatureFourierFlux'),char(92),'/'),'E:/RocketAeroHeat/outputs/v60_validation/library_isolation_final/project')); testCutCellVolumeMoments; testQuadraticTemperatureReconstruction; studyCubicTemperatureReconstruction;",
+      "LC_CTYPE": "C",
+      "LANG": "C"
+    },
+    {
+      "processRecord": "formal_review_final_process.json",
+      "stdoutSha256": "2681e8b01dfa0122cd954d90d2e8bb6c3d2b8859a619d954bd6c99486d67afff",
+      "status": "finished",
+      "scriptSha256": "c7cd8cfb4c493dc8886460f1b6de0521ddcbe476a5b56f55008b92d7b58600e8",
+      "script": "E:/RocketAeroHeat/outputs/v60_validation/formal_readonly_review_final.py",
+      "finishedUTC": "2026-10-17T09:00:59.2242458Z",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "startedUTC": "2026-10-17T09:00:43.8030135Z",
+      "executable": "D:/anacondapython/python.exe",
+      "exitCode": 0,
+      "pid": 47696
+    }
+  ],
+  "rootObservedFinalMATLABExecSession": 5879,
+  "rootObservedFinalMATLABExitCode": 0,
+  "quadraticReproduction": {
+    "status": "tested-experimental-library-quadratic-FV-reproduction",
+    "checks": [
+      {
+        "caseName": "actual",
+        "fluidGroups": 1985,
+        "gradientMaximumError": 5.488054455327074e-12,
+        "hessianMaximumError": 7.729119566590725e-10,
+        "wallHeatMaximumError": 5.964650995338161e-11,
+        "wallHeatAreaWeightedRMS": 8.099982119846085e-12,
+        "thermalDivergenceMaximumError": 3.5316034541210684e-09,
+        "wallHeatPowerError": 3.6859404417555197e-13,
+        "thermalBalance": -1.4210854715202004e-14,
+        "maximumNeighborRing": 2,
+        "minimumScaledRelativeSingularValue": 0.005960097927324686,
+        "elapsedSeconds": 2.6218146
+      },
+      {
+        "caseName": "sphere_grid8",
+        "fluidGroups": 468,
+        "gradientMaximumError": 7.780442956573097e-13,
+        "hessianMaximumError": 1.98623339997539e-11,
+        "wallHeatMaximumError": 7.923439682144817e-12,
+        "wallHeatAreaWeightedRMS": 2.1418228883714254e-12,
+        "thermalDivergenceMaximumError": 8.910916449167416e-11,
+        "wallHeatPowerError": -1.5898393712632242e-13,
+        "thermalBalance": -1.5631940186722204e-13,
+        "maximumNeighborRing": 2,
+        "minimumScaledRelativeSingularValue": 0.016363581745209823,
+        "elapsedSeconds": 0.4155856
+      },
+      {
+        "caseName": "sphere_grid12",
+        "fluidGroups": 1608,
+        "gradientMaximumError": 5.615952147763892e-12,
+        "hessianMaximumError": 1.0875065292736963e-09,
+        "wallHeatMaximumError": 3.1242564091371605e-11,
+        "wallHeatAreaWeightedRMS": 4.252683566470059e-12,
+        "thermalDivergenceMaximumError": 6.039044819772243e-10,
+        "wallHeatPowerError": 6.501466032204917e-13,
+        "thermalBalance": 8.526512829121202e-14,
+        "maximumNeighborRing": 2,
+        "minimumScaledRelativeSingularValue": 0.0017273188874722715,
+        "elapsedSeconds": 0.5909213
+      },
+      {
+        "caseName": "sphere_grid16",
+        "fluidGroups": 3823,
+        "gradientMaximumError": 1.3871681581179018e-11,
+        "hessianMaximumError": 5.703459482475637e-09,
+        "wallHeatMaximumError": 6.713207767461427e-11,
+        "wallHeatAreaWeightedRMS": 7.180417025678998e-12,
+        "thermalDivergenceMaximumError": 1.6549606129956373e-09,
+        "wallHeatPowerError": 9.636735853746359e-13,
+        "thermalBalance": 2.2737367544323206e-13,
+        "maximumNeighborRing": 2,
+        "minimumScaledRelativeSingularValue": 0.00047376401246011047,
+        "elapsedSeconds": 1.6141985
+      }
+    ],
+    "refusalGroups": 10,
+    "uniformPhysicalZeroRetained": true,
+    "trueFVTemperatureInputRequired": true,
+    "zeroNormalGradientDoesNotSolveWallTemperature": true,
+    "finiteFluxRequired": true,
+    "momentsBoundToCompleteCVGeometry": true,
+    "physicalSolution": false,
+    "eligibleForSurfaceCoverage": false,
+    "fullNavierStokesStabilityProven": false,
+    "newSolvedSurfaceAreaM2": 0
+  },
+  "cubicSpatialAccuracy": {
+    "status": "tested-cubic-true-FV-scalar-spatial-study",
+    "checks": [
+      {
+        "caseName": "actual",
+        "spacing": 0.0625,
+        "fluidGroups": 1985,
+        "wallPatches": 31205,
+        "quadraticWallHeatAreaWeightedRMS": 0.04197955779876719,
+        "linearWallHeatAreaWeightedRMS": 1.9898463406237463,
+        "wallHeatReferenceRMS": 59.60176671028525,
+        "quadraticWallHeatRelativeRMS": 0.0007043341181952404,
+        "linearWallHeatRelativeRMS": 0.033385693922397874,
+        "quadraticToLinearRMSRatio": 0.021096884187352925,
+        "quadraticWallHeatMaximumError": 0.30302215081028194,
+        "linearWallHeatMaximumError": 13.218824770075997,
+        "quadraticGradientPointVolumeWeightedRMS": 0.03209488058105068,
+        "quadraticGradientMeanVolumeWeightedRMS": 0.02509124612004641,
+        "linearGradientPointVolumeWeightedRMS": 0.3188715930743034,
+        "thermalDivergenceVolumeWeightedRMS": 1.0920742230062024,
+        "thermalBalance": 2.7711166694643907e-13,
+        "wallHeatPowerError": 0.0018628810764712885,
+        "linearWallHeatPowerError": -2.3361250567661003,
+        "areaMeanVersusCentroidReferenceMaximumDifference": 0.007302817552101715,
+        "maximumNeighborRing": 2,
+        "minimumScaledRelativeSingularValue": 0.005960097927324686
+      },
+      {
+        "caseName": "sphere_grid8",
+        "spacing": 0.15,
+        "fluidGroups": 468,
+        "wallPatches": 852,
+        "quadraticWallHeatAreaWeightedRMS": 0.23597995799695648,
+        "linearWallHeatAreaWeightedRMS": 3.7228485877001867,
+        "wallHeatReferenceRMS": 19.635435114380847,
+        "quadraticWallHeatRelativeRMS": 0.012018066145329598,
+        "linearWallHeatRelativeRMS": 0.18959847673421812,
+        "quadraticToLinearRMSRatio": 0.06338693407424732,
+        "quadraticWallHeatMaximumError": 0.9069523729627822,
+        "linearWallHeatMaximumError": 9.902176421360728,
+        "quadraticGradientPointVolumeWeightedRMS": 0.19705693851647435,
+        "quadraticGradientMeanVolumeWeightedRMS": 0.15639799925273398,
+        "linearGradientPointVolumeWeightedRMS": 0.5989016397240504,
+        "thermalDivergenceVolumeWeightedRMS": 2.6962056485808334,
+        "thermalBalance": 1.5631940186722204e-13,
+        "wallHeatPowerError": -0.03783739876692046,
+        "linearWallHeatPowerError": 1.398719406231879,
+        "areaMeanVersusCentroidReferenceMaximumDifference": 0.015516350230802445,
+        "maximumNeighborRing": 2,
+        "minimumScaledRelativeSingularValue": 0.016363581745209823
+      },
+      {
+        "caseName": "sphere_grid12",
+        "spacing": 0.09999999999999999,
+        "fluidGroups": 1608,
+        "wallPatches": 1188,
+        "quadraticWallHeatAreaWeightedRMS": 0.11097813239246072,
+        "linearWallHeatAreaWeightedRMS": 2.266111925255906,
+        "wallHeatReferenceRMS": 19.63753231498608,
+        "quadraticWallHeatRelativeRMS": 0.0056513278049589505,
+        "linearWallHeatRelativeRMS": 0.11539698007404718,
+        "quadraticToLinearRMSRatio": 0.048972926339429707,
+        "quadraticWallHeatMaximumError": 0.4792694246611333,
+        "linearWallHeatMaximumError": 7.144272658787686,
+        "quadraticGradientPointVolumeWeightedRMS": 0.09658984744612376,
+        "quadraticGradientMeanVolumeWeightedRMS": 0.07790230878537528,
+        "linearGradientPointVolumeWeightedRMS": 0.2990948678834652,
+        "thermalDivergenceVolumeWeightedRMS": 1.4153274251841135,
+        "thermalBalance": -4.263256414560601e-14,
+        "wallHeatPowerError": 0.0006056823329652918,
+        "linearWallHeatPowerError": 1.0784891189934582,
+        "areaMeanVersusCentroidReferenceMaximumDifference": 0.012816876962336465,
+        "maximumNeighborRing": 2,
+        "minimumScaledRelativeSingularValue": 0.0017273188874722715
+      },
+      {
+        "caseName": "sphere_grid16",
+        "spacing": 0.075,
+        "fluidGroups": 3823,
+        "wallPatches": 1562,
+        "quadraticWallHeatAreaWeightedRMS": 0.07011285812805898,
+        "linearWallHeatAreaWeightedRMS": 1.567918549006018,
+        "wallHeatReferenceRMS": 19.63956702037242,
+        "quadraticWallHeatRelativeRMS": 0.0035699798297655874,
+        "linearWallHeatRelativeRMS": 0.07983468003034853,
+        "quadraticToLinearRMSRatio": 0.04471715585768599,
+        "quadraticWallHeatMaximumError": 0.6633036551589804,
+        "linearWallHeatMaximumError": 4.757773501272025,
+        "quadraticGradientPointVolumeWeightedRMS": 0.05707631819722428,
+        "quadraticGradientMeanVolumeWeightedRMS": 0.04634158951805513,
+        "linearGradientPointVolumeWeightedRMS": 0.19300216277114438,
+        "thermalDivergenceVolumeWeightedRMS": 0.9087924143919948,
+        "thermalBalance": 4.263256414560601e-14,
+        "wallHeatPowerError": 0.0020041034182593943,
+        "linearWallHeatPowerError": 0.9060341331495745,
+        "areaMeanVersusCentroidReferenceMaximumDifference": 0.009947789079244984,
+        "maximumNeighborRing": 2,
+        "minimumScaledRelativeSingularValue": 0.00047376401246011047
+      }
+    ],
+    "quadraticFixedGeometryObservedOrders": [
+      1.8606131234491894,
+      1.5963002831205224
+    ],
+    "linearFixedGeometryObservedOrders": [
+      1.224331169317541,
+      1.2802903454213237
+    ],
+    "referenceIsWallAreaAverage": true,
+    "inputIsTrueTemperatureVolumeAverage": true,
+    "geometryMomentsComputedByMATLAB": true,
+    "physicalSolution": false,
+    "eligibleForSurfaceCoverage": false,
+    "fullNavierStokesStabilityProven": false,
+    "newSolvedSurfaceAreaM2": 0,
+    "scope": "三次制造场的标量Fourier空间误差；不是完整NS闭合、稳定性、飞行热流或实验精度"
+  },
+  "scalarSpectrumScope": {
+    "status": "verified-metadata-unit-clarification-no-numerical-rerun",
+    "reviewedUTC": "2026-10-17T09:00:04.634511+00:00",
+    "rawAuditSHA256": "928bb2494660bef16819b458d42b2e2f443092ba807f158f7dfad82e36d5ae32",
+    "operatorDefinition": "thermalDiffusionRate = J*Tbar + B*fixed_point_Dirichlet_temperature; this output is heat power per fluid volume, W/m^3.",
+    "rawJacobianUnits": "W/(m^3 K)",
+    "unitCapacityNormalization": "d(Tbar)/dt=(J*Tbar+B*fixed_T)/Cvol only for an independently specified heat equation. The raw audit explicitly used Cvol=1 J/(m^3 K), making the numerical eigenvalues equal to s^-1 values.",
+    "legacyPerSecondFields": "Raw fields whose names contain PerSecond and raw normalized spectral statements apply only to the unit-capacity scalar model; J itself has W/(m^3 K) units.",
+    "rawVolumeWeightedSymmetricPartUnits": "W/K for (V*J+J^T*V)/2; sqrt(V) similarity has W/(m^3 K) units.",
+    "generalConstantCapacityScaling": "For positive constant Cvol in J/(m^3 K), temperature-generator eigenvalues and symmetric parts are divided by Cvol. No such transformation was applied to the reported numerical results.",
+    "notArtificialGasDefault": "The artificial NS gas test has rho*cv=2.5 J/(m^3 K) at rho=1; that value was not silently applied here. This audit supplies no full NS energy time step.",
+    "boundaryScope": "All external and active wall samples are fixed point Dirichlet inputs. These results do not cover zero-gradient or characteristic NS boundary variants.",
+    "cases": [
+      {
+        "caseName": "actual",
+        "fluidGroups": 1985,
+        "powerDensityJacobianSpectralAbscissaComputedWPerM3K": -814.4499897795946,
+        "unitCapacityNormalizedComputedSpectralAbscissaPerSecond": -814.4499897795946,
+        "volumeMetricSymmetricPartLargestComputedEigenvalueWPerM3K": -802.4839311720275,
+        "rawVolumeWeightedSymmetricPartLargestComputedEigenvalueWPerK": -0.19898871330428944,
+        "negativeOffDiagonalCount": 11405,
+        "maximumRightmostEigenpairNormwiseBackwardError": 1.0505961550858313e-15,
+        "maximumRightmostEigenpairRelativeResidual": 8.724168700325607e-14,
+        "matrixActionMaximumScaledError": 6.1612322920745225e-15,
+        "unknownCoefficientLedgerMaximumScaled": 1.0991266414990954e-15,
+        "boundaryCoefficientLedgerMaximumScaled": 4.266060475114681e-16,
+        "denseSpectrum": null
+      },
+      {
+        "caseName": "sphere_grid8",
+        "fluidGroups": 468,
+        "powerDensityJacobianSpectralAbscissaComputedWPerM3K": -136.62711704618866,
+        "unitCapacityNormalizedComputedSpectralAbscissaPerSecond": -136.62711704618866,
+        "volumeMetricSymmetricPartLargestComputedEigenvalueWPerM3K": -134.9810537606788,
+        "rawVolumeWeightedSymmetricPartLargestComputedEigenvalueWPerK": -0.4563872570039897,
+        "negativeOffDiagonalCount": 2910,
+        "maximumRightmostEigenpairNormwiseBackwardError": 6.818535600840375e-16,
+        "maximumRightmostEigenpairRelativeResidual": 1.4862302368247665e-14,
+        "matrixActionMaximumScaledError": 3.2701861708147537e-14,
+        "unknownCoefficientLedgerMaximumScaled": 7.07583529701476e-16,
+        "boundaryCoefficientLedgerMaximumScaled": 2.0942030433849943e-16,
+        "denseSpectrum": {
+          "allEigenvaluesComputed": true,
+          "spectralAbscissa": -136.62711704618914,
+          "rightmostEigenvalue": [
+            -136.62711704618914,
+            0.0
+          ],
+          "arpackAbscissaDifference": 4.831690603168681e-13,
+          "positiveRealEigenvalueCountAbove1eMinus8": 0
+        }
+      },
+      {
+        "caseName": "sphere_grid12",
+        "fluidGroups": 1608,
+        "powerDensityJacobianSpectralAbscissaComputedWPerM3K": -140.77746234504298,
+        "unitCapacityNormalizedComputedSpectralAbscissaPerSecond": -140.77746234504298,
+        "volumeMetricSymmetricPartLargestComputedEigenvalueWPerM3K": -138.39982285085554,
+        "rawVolumeWeightedSymmetricPartLargestComputedEigenvalueWPerK": -0.138657631176657,
+        "negativeOffDiagonalCount": 9605,
+        "maximumRightmostEigenpairNormwiseBackwardError": 2.441205958702185e-16,
+        "maximumRightmostEigenpairRelativeResidual": 4.850138284481791e-14,
+        "matrixActionMaximumScaledError": 6.252789104779162e-14,
+        "unknownCoefficientLedgerMaximumScaled": 7.490247471267475e-16,
+        "boundaryCoefficientLedgerMaximumScaled": 3.150998753494193e-16,
+        "denseSpectrum": null
+      },
+      {
+        "caseName": "sphere_grid16",
+        "fluidGroups": 3823,
+        "powerDensityJacobianSpectralAbscissaComputedWPerM3K": -142.31299424207324,
+        "unitCapacityNormalizedComputedSpectralAbscissaPerSecond": -142.31299424207324,
+        "volumeMetricSymmetricPartLargestComputedEigenvalueWPerM3K": -140.10286475790465,
+        "rawVolumeWeightedSymmetricPartLargestComputedEigenvalueWPerK": -0.05909684040017265,
+        "negativeOffDiagonalCount": 22410,
+        "maximumRightmostEigenpairNormwiseBackwardError": 2.3294943099674515e-16,
+        "maximumRightmostEigenpairRelativeResidual": 9.528682297647588e-14,
+        "matrixActionMaximumScaledError": 3.556337964358173e-14,
+        "unknownCoefficientLedgerMaximumScaled": 5.902736395318332e-16,
+        "boundaryCoefficientLedgerMaximumScaled": 3.1729341317315887e-16,
+        "denseSpectrum": null
+      }
+    ],
+    "interpretation": "Four tested frozen scalar matrices have negative computed rightmost eigenvalues and negative volume-metric symmetric-part maxima. Only sphere_grid8 has a complete dense spectrum; the larger three use two converged ARPACK LR searches plus symmetric-part searches. Negative off-diagonals rule out a general semidiscrete positivity or maximum-principle guarantee.",
+    "fullNavierStokesStabilityProven": false,
+    "positivityGuaranteeEstablished": false,
+    "physicalSolution": false,
+    "eligibleForSurfaceCoverage": false,
+    "newSolvedSurfaceAreaM2": 0
+  },
+  "formalReviewStatus": "completed-read-only-final-three-entry-library-review",
+  "formalReviewSHA256": "4e701bcebdc1b1b800998179b7383e57cd0796e69c2a6953ff3db04d3e81c616",
+  "nextRegionalStep": {
+    "date": "2026-10-17",
+    "status": "只读区域审计已运行；候选工程模块未实现/未测试/未交付",
+    "previousOutputExistedAtStart": false,
+    "scope": "读冻结生产/经典算例及现有原文审查；无重算外流/热流，无搜索或下载新来源",
+    "physicalSolution": false,
+    "newSolvedFaces": 0,
+    "newSolvedHeatAreaM2": 0,
+    "productionFieldsChanged": false,
+    "goalDocumentChanged": false,
+    "actualCase": {
+      "flight": {
+        "Mach": 5,
+        "altitudeM": 30000,
+        "alphaDeg": 20,
+        "betaDeg": 0,
+        "givenWallTemperatureK": 300
+      },
+      "faces": 19752,
+      "totalAreaM2": 1.9646292565715553,
+      "computed": {
+        "faces": 13691,
+        "areaM2": 1.3077089568015043,
+        "fullModelAreaFraction": 0.6656263274240186
+      },
+      "missing": {
+        "faces": 6061,
+        "areaM2": 0.6569202997700511,
+        "fullModelAreaFraction": 0.33437367257598144
+      },
+      "exclusiveReasons": [
+        {
+          "code": 0,
+          "name": "热流已计算",
+          "faces": 13691,
+          "areaM2": 1.3077089568015043,
+          "fullModelAreaFraction": 0.6656263274240186,
+          "xyzBoundsM": [
+            [
+              -2.8182972042899337,
+              -0.15109470784144505,
+              -0.15114121135297934
+            ],
+            [
+              0.04998080248648015,
+              0.1511395027354582,
+              0.15117060658010942
+            ]
+          ]
+        },
+        {
+          "code": 1,
+          "name": "底面/尾端",
+          "faces": 46,
+          "areaM2": 0.031274565614999146,
+          "fullModelAreaFraction": 0.015918812931441283,
+          "xyzBoundsM": [
+            [
+              -2.8283007652833967,
+              -0.09294749665222611,
+              -0.07633210650995909
+            ],
+            [
+              -2.8283007652833967,
+              0.039932530486083063,
+              0.056491934898906304
+            ]
+          ]
+        },
+        {
+          "code": 2,
+          "name": "底唇特征/拓扑保护",
+          "faces": 46,
+          "areaM2": 0.004702613657591935,
+          "fullModelAreaFraction": 0.002393639228298165,
+          "xyzBoundsM": [
+            [
+              -2.823294187586756,
+              -0.09952830557277266,
+              -0.0994572506525287
+            ],
+            [
+              -2.823294187586756,
+              0.09992855193725682,
+              0.09960041972644729
+            ]
+          ]
+        },
+        {
+          "code": 3,
+          "name": "鼻端模型不适用",
+          "faces": 115,
+          "areaM2": 0.0038196063168188282,
+          "fullModelAreaFraction": 0.001944186825093079,
+          "xyzBoundsM": [
+            [
+              -0.004995608178394025,
+              -0.050189115735904705,
+              -0.06391374460799108
+            ],
+            [
+              0.017490816657310487,
+              0.05288403426931648,
+              0.011349055396693437
+            ]
+          ]
+        },
+        {
+          "code": 4,
+          "name": "直接外缘热力未知/域外占位",
+          "faces": 336,
+          "areaM2": 0.05001822561099456,
+          "fullModelAreaFraction": 0.025459371249657865,
+          "xyzBoundsM": [
+            [
+              -0.4996969545639052,
+              -0.14894319462199554,
+              -0.05045730492372812
+            ],
+            [
+              -0.4197452218147315,
+              0.14850161450639435,
+              0.14906278013188526
+            ]
+          ]
+        },
+        {
+          "code": 6,
+          "name": "疑似层流分离及其下游",
+          "faces": 360,
+          "areaM2": 0.03946092604623697,
+          "fullModelAreaFraction": 0.020085685843394003,
+          "xyzBoundsM": [
+            [
+              -2.8182972042899337,
+              -0.13568056813764032,
+              -0.07657368550069672
+            ],
+            [
+              -0.12492320730215427,
+              -0.08750612566384329,
+              -0.04021366308859239
+            ]
+          ]
+        },
+        {
+          "code": 7,
+          "name": "层流相关式范围外",
+          "faces": 11,
+          "areaM2": 0.0013385253529173114,
+          "fullModelAreaFraction": 0.0006813119312155372,
+          "xyzBoundsM": [
+            [
+              -0.11992622400533086,
+              -0.12296600560838383,
+              -0.07264950602773168
+            ],
+            [
+              -0.019986558068864003,
+              0.13699750393068802,
+              -0.021785907470603938
+            ]
+          ]
+        },
+        {
+          "code": 14,
+          "name": "上游外缘热力未知/域外占位的下游",
+          "faces": 5147,
+          "areaM2": 0.5263058371704923,
+          "fullModelAreaFraction": 0.2678906645668815,
+          "xyzBoundsM": [
+            [
+              -2.8182972042899337,
+              -0.0998291108178496,
+              -0.03559296311730764
+            ],
+            [
+              -0.5096909211575513,
+              0.09986955751113295,
+              0.0999213663237195
+            ]
+          ]
+        }
+      ],
+      "immediatelyRecoverableByAlreadySupportedProductionModel": {
+        "provenFaces": 0,
+        "provenAreaM2": 0,
+        "meaning": "本次未找到已闭合输入且可直接恢复的区域；不是证明所有其他工程法不可能"
+      }
+    },
+    "smallestActualGapAudit": {
+      "target": "11个强顺压梯度层流相关式越域面",
+      "statistics": {
+        "faces": 11,
+        "areaM2": 0.0013385253529173114,
+        "fullModelAreaFraction": 0.0006813119312155372
+      },
+      "lambdaRange": [
+        0.10087663517537501,
+        0.2537443888132179
+      ],
+      "secantCompatibility": [
+        {
+          "faceID": 16614,
+          "upstreamFaceID": 16798,
+          "spanM": 0.04410062454633109,
+          "lambda": 0.2537443888132179,
+          "dPdsPaPerM": -42231.23541324379,
+          "rhoU_dUdsPaPerM": 130611.49766236899,
+          "constantEntropyMomentumSecantMismatch": 0.6766652540619997
+        },
+        {
+          "faceID": 16646,
+          "upstreamFaceID": 16826,
+          "spanM": 0.053817672284766735,
+          "lambda": 0.10279452239727535,
+          "dPdsPaPerM": -89430.41783235075,
+          "rhoU_dUdsPaPerM": 269328.54855308385,
+          "constantEntropyMomentumSecantMismatch": 0.6679504704837322
+        },
+        {
+          "faceID": 16648,
+          "upstreamFaceID": 16828,
+          "spanM": 0.05382298135260636,
+          "lambda": 0.11967915808741296,
+          "dPdsPaPerM": -134637.93450849436,
+          "rhoU_dUdsPaPerM": 433587.45439562446,
+          "constantEntropyMomentumSecantMismatch": 0.6894791739392794
+        },
+        {
+          "faceID": 16740,
+          "upstreamFaceID": 16920,
+          "spanM": 0.051769017254902606,
+          "lambda": 0.11240806577928464,
+          "dPdsPaPerM": -148284.69226407193,
+          "rhoU_dUdsPaPerM": 478306.28003481665,
+          "constantEntropyMomentumSecantMismatch": 0.6899796250777261
+        },
+        {
+          "faceID": 16832,
+          "upstreamFaceID": 17012,
+          "spanM": 0.049776763222453904,
+          "lambda": 0.1096287353371034,
+          "dPdsPaPerM": -153957.38497349274,
+          "rhoU_dUdsPaPerM": 496452.84854223335,
+          "constantEntropyMomentumSecantMismatch": 0.6898851815926371
+        },
+        {
+          "faceID": 16924,
+          "upstreamFaceID": 17104,
+          "spanM": 0.04785515740877162,
+          "lambda": 0.10625805428180786,
+          "dPdsPaPerM": -159823.0389021903,
+          "rhoU_dUdsPaPerM": 515170.7101022321,
+          "constantEntropyMomentumSecantMismatch": 0.6897668369568709
+        },
+        {
+          "faceID": 17016,
+          "upstreamFaceID": 17196,
+          "spanM": 0.041916881801411364,
+          "lambda": 0.10894010889019992,
+          "dPdsPaPerM": -181868.82541392313,
+          "rhoU_dUdsPaPerM": 586054.8073290377,
+          "constantEntropyMomentumSecantMismatch": 0.6896726668913514
+        },
+        {
+          "faceID": 17108,
+          "upstreamFaceID": 17288,
+          "spanM": 0.03359665613591213,
+          "lambda": 0.10940548444463666,
+          "dPdsPaPerM": -225983.9705846018,
+          "rhoU_dUdsPaPerM": 727937.1117818952,
+          "constantEntropyMomentumSecantMismatch": 0.6895556402785641
+        },
+        {
+          "faceID": 17200,
+          "upstreamFaceID": 17380,
+          "spanM": 0.029724066720088142,
+          "lambda": 0.10586634808827383,
+          "dPdsPaPerM": -254030.11373021995,
+          "rhoU_dUdsPaPerM": 817873.7743635341,
+          "constantEntropyMomentumSecantMismatch": 0.6894018102880178
+        },
+        {
+          "faceID": 17292,
+          "upstreamFaceID": 17472,
+          "spanM": 0.028636272016854716,
+          "lambda": 0.10311704594206628,
+          "dPdsPaPerM": -263035.45109777857,
+          "rhoU_dUdsPaPerM": 846509.3213490262,
+          "constantEntropyMomentumSecantMismatch": 0.6892704610994759
+        },
+        {
+          "faceID": 17384,
+          "upstreamFaceID": 17564,
+          "spanM": 0.027571469710888932,
+          "lambda": 0.10087663517537501,
+          "dPdsPaPerM": -272445.1742285387,
+          "rhoU_dUdsPaPerM": 876351.6468253152,
+          "constantEntropyMomentumSecantMismatch": 0.6891143238955472
+        }
+      ],
+      "existingProfileDefaultMaximumMomentumMismatch": 1e-06,
+      "reasonNotDirectlyRecoverable": "不能提高Thwaites lambda上限，或把当前20度三维Dijkstra路径直接套进轴对称局部相似BVP。相同四步割线的恒熵动量接口失配0.668~0.690，且连续邻流线度量/横流与法向外流剖面未闭合。",
+      "diagnosticLimit": "这里只检查现有离散外缘到恒熵BVP的接口，不据此判真实外流方程、真实分离或连续导数误差。"
+    },
+    "selectedNextEngineeringImprovement": {
+      "proposedModule": "solveSphericalNoseNonSimilarHeating.m",
+      "decision": "先补固定驻点熵、零攻角、光滑核验球鼻的沿程非相似层流推进；这是已有独立球鼻工程分支的增量，不以完整NS求解作为前置。",
+      "whyClosestClosedRegion": "现有sphere边界的压力/总焓/熵、球面度量、壁温和驻点极限完整且来自同一模型，已有95面局部相似热边界可作连续对照。NASA TP-3271原方程保留沿xi项，当前模块明确未求它；不需要拼底热幅值或重建20度未知横流入口。",
+      "canonicalTarget": {
+        "source": "outputs/v54_validation/sphere_laminar_default2.mat",
+        "Mach": 4,
+        "altitudeM": 20000,
+        "alphaDeg": 0,
+        "betaDeg": 0,
+        "noseRadiusM": 0.09999999999999998,
+        "givenWallTemperatureK": 300,
+        "wholeMeshFaces": 978,
+        "wholeMeshAreaM2": 0.34346392564379336,
+        "verifiedSphereFaces": 186,
+        "currentlySolvedSphereFaces": 95,
+        "remainingSphereFaces": 91,
+        "remainingSphereAreaM2": 0.031061141700502597,
+        "remainingAngleRangeDeg": [
+          64.77189389663161,
+          84.98395663460155
+        ],
+        "firstDomainWithinExisting80DegGeometryGuard": {
+          "candidateFaces": 67,
+          "candidateAreaM2": 0.02290356255564416,
+          "acceptedFaces": 0
+        },
+        "outerBandRequiresSeparateDomainJustification": {
+          "faces": 24,
+          "areaM2": 0.008157579144858432,
+          "angleRangeDeg": [
+            84.97282969825922,
+            84.98395663460155
+          ]
+        }
+      },
+      "relationToCurrentActualCase": "当前真实20度箭体115个鼻区未知面和上述零攻角经典91面是不同集合。该候选模块不能直接用于20度工况，预计/已增加实际20度面积均不得声称大于0。主目标仍须推进实际横流-收缩-后体与底面。",
+      "modelContract": [
+        "只接受沿-X零攻角、核验球面前缀、附着层流/薄层及原物性域；NASA7不裁温、不回退占位。",
+        "同一工程压力pe=pinf+(p02-pinf)*cos(phi)^2，同一H0和驻点熵恢复外缘；这些是明确工程假设，不是实测激波层。",
+        "保留TP-3271式19/25沿xi项，驻点使用解析极限及已有剖面作为数值启动，不凭任意有限距离重置边界层。",
+        "输出局部q、剪应力、速度/温度法向剖面、质量/动量厚度与状态；给定Tw始终输入；Taw需同一完整热边界的绝热求根，未求就NaN。",
+        "不跨未解角度带插值，不将60度上限调大后计覆盖；每个面须通过真实剖面、有限外缘、薄层、Kn/Re和流向数值收敛。"
+      ],
+      "missingTrueBoundaryAndValidation": [
+        "经典工程试验的给定Tw和解析几何已知；同熵外缘是已声明的内部工程模型，尚无实际激波层分布验证。",
+        "需实现沿xi推进的完整耦合方程、轴对称连续方程法向速度及稳定的正向附着支；已有局部BVP不能被改标签当非相似结果。",
+        "需流向步长、法向间距/外缘、启动匹配和能量账收敛；同一固定熵外缘下比较局部相似/非相似差异，尤其60~80度。",
+        "若要进入80度以上或接球鼻-圆柱肩部，需曲率/压力梯度/界面与薄层有效性证据；24面仍NaN直至证明。",
+        "公开Tauber/Kemp圆点是高焓解离激波管工况，传播激波Mach不是模型Mach；壁温/催化/热化学与传感器平均尚未重建，不能当M4/20km实验精度验证。"
+      ],
+      "acceptanceIsNotFullGoalCompletion": true
+    },
+    "currentActualDominantRegionWorkStillRequired": {
+      "unknownThermodynamicBandAndDownstream": {
+        "faces": 5483,
+        "areaM2": 0.5763240627814868,
+        "fullModelAreaFraction": 0.29335003581653935
+      },
+      "contractionGeometry": {
+        "xBase": -2.828319954083032,
+        "xNose": 0.04999999128611596,
+        "maximumEquivalentRadius": 0.15147332729246346,
+        "sectionCount": 224,
+        "bodyCenterYZ": [
+          0.00016279889955291907,
+          5.819191762943348e-05
+        ],
+        "contractionStartX": -0.4297391884083779,
+        "contractionEndX": -0.5046939378607278,
+        "contractionAngleDeg": 31.003781078809737,
+        "contractionRadialDrop": 0.04504518402888143,
+        "contractionLength": 0.07495474945234992,
+        "maxCenterLineDeviationM": 0.002133140268315931,
+        "circularityRange": [
+          1.0000274826744442,
+          1.000317503024039
+        ]
+      },
+      "inletEvidence": {
+        "contraction": {
+          "name": "contraction",
+          "selectedInletX": -0.38476633873696797,
+          "surfaceSampleBand": 163,
+          "actualSurfaceSampleXRange": [
+            -0.39476030533061435,
+            -0.3897633220337909
+          ],
+          "surfaceSamples": 92,
+          "physicalStateSamples": 92,
+          "unknownUpstreamSamples": 0,
+          "possibleSeparationSamples": 2,
+          "usableAttachedUpstreamSamples": 90,
+          "heatComputedSamples": 90,
+          "turbulentHeatSamples": 90,
+          "pressureRangePa": [
+            50.03420186164004,
+            8411.026552171495
+          ],
+          "temperatureRangeK": [
+            91.43647636748764,
+            478.6626637268935
+          ],
+          "densityRange": [
+            0.001906275215604349,
+            0.06121495820322053
+          ],
+          "velocityXRange": [
+            -1595.943580336843,
+            -1328.9107829271488
+          ],
+          "velocityYRange": [
+            -276.81015695155986,
+            277.48741756487135
+          ],
+          "velocityZRange": [
+            -1.778839230732904,
+            516.8280840802032
+          ],
+          "normalMachRange": [
+            3.0425259371839037,
+            8.326742283154287
+          ],
+          "reynoldsRange": [
+            297205.56911998836,
+            1887766.8274640199
+          ],
+          "momentumThicknessRangeM": [
+            0.00023090172151456862,
+            0.003308200882283487
+          ],
+          "nasaTotalEnthalpyConsistencyRelativeRange": [
+            6.998098036824899e-14,
+            7.041699893752157e-14
+          ],
+          "caloricSameFreestreamEnergyMismatchRelativeRange": [
+            -0.0011079821871412374,
+            6.729198140977715e-05
+          ],
+          "nearWallSurfaceEdgeOnly": true,
+          "fullInletNormalProfilesAvailable": false,
+          "fullInletSectionAvailable": false,
+          "physicalSolution": false
+        },
+        "base": {
+          "name": "base",
+          "selectedInletX": -2.6783816719788787,
+          "surfaceSampleBand": 10,
+          "actualSurfaceSampleXRange": [
+            -2.688375638572524,
+            -2.683378655275703
+          ],
+          "surfaceSamples": 92,
+          "physicalStateSamples": 92,
+          "unknownUpstreamSamples": 32,
+          "possibleSeparationSamples": 2,
+          "usableAttachedUpstreamSamples": 58,
+          "heatComputedSamples": 58,
+          "turbulentHeatSamples": 58,
+          "pressureRangePa": [
+            49.982114382143884,
+            8410.495907817523
+          ],
+          "temperatureRangeK": [
+            91.40928896243719,
+            478.64585417649056
+          ],
+          "densityRange": [
+            0.0019048570952630687,
+            0.061213245875498395
+          ],
+          "velocityXRange": [
+            -1595.8448519769581,
+            -1328.784358476378
+          ],
+          "velocityYRange": [
+            -276.94899742007846,
+            277.8741132858892
+          ],
+          "velocityZRange": [
+            0.35995286382499353,
+            517.2868979165074
+          ],
+          "normalMachRange": [
+            3.042288232195084,
+            8.327465295590724
+          ],
+          "reynoldsRange": [
+            1615737.7385192902,
+            10532247.967965886
+          ],
+          "momentumThicknessRangeM": [
+            0.0008576152188360189,
+            0.012309027490789923
+          ],
+          "nasaTotalEnthalpyConsistencyRelativeRange": [
+            0,
+            7.041699893752157e-14
+          ],
+          "caloricSameFreestreamEnergyMismatchRelativeRange": [
+            -0.0011077196217712316,
+            6.834242759774942e-05
+          ],
+          "nearWallSurfaceEdgeOnly": true,
+          "fullInletNormalProfilesAvailable": false,
+          "fullInletSectionAvailable": false,
+          "physicalSolution": false
+        }
+      },
+      "requiredEngineeringWork": [
+        "实际大圆柱-31度收缩-小圆柱需共同物性/H0/熵及三维横流/再压缩连续区域外流；局部2D全局到当地的独立状态不能代表真实连续外流。",
+        "现有收缩入口92外缘样本中90附着可用，底部入口仅58可用；这些不是全截面或法向热边界层，不能填满入口。",
+        "可采用经独立验证的工程条带/三维边界层及内部区域外流路径推进；完整cut-cell NS是并行候选而非所有工程区域/UI的必经前置。",
+        "当前cut-cell常gamma、常mu/k层流短推进与scalar二次温度精度尚不闭合生产NASA7/湍流区域，不能将制造场或有限步p/q接为真实有解区。"
+      ]
+    },
+    "rejectedShortcutsAlreadySupportedByEvidence": [
+      {
+        "shortcut": "SAND代表底热乘径向(1-r/Rb)^1.2涂满底面",
+        "evidence": "docs/BASE_RADIAL_HEATING_RESEARCH.md §3：仅成比例、r/Rb<=0.8，外侧36%面积及振幅未闭合；来源非Bulmer通用函数。"
+      },
+      {
+        "shortcut": "底热均值/峰值作为所有面元q",
+        "evidence": "docs/REGIONAL_HEATING_SOURCE_REVIEW.md §3：Chapman只给总体热率，Tauber63/64只给峰值，均无回流/再附位置及空间函数。"
+      },
+      {
+        "shortcut": "改上游累计PM或重播种跨过未知带",
+        "evidence": "docs/REMAINING_REGIONS_V56.md §§3-4/7：共同二维同熵的20+31度仍等价51度极端膨胀；局部域外到NASA7重置未解。"
+      },
+      {
+        "shortcut": "用Penland圆柱压力资料直接认定20度箭体热流有效",
+        "evidence": "docs/CYLINDER_CROSSFLOW_SOURCE.md §§2/6：源已取得全文，M6.86无20度实测系列、端部及低静温限制；没有热流验证。"
+      },
+      {
+        "shortcut": "仅改球鼻maxPolarAngle即宣称补齐",
+        "evidence": "docs/REMAINING_REGIONS_V56.md §5：60度属已有研究域，但需非相似/薄层/区域接口对照，非单纯配置问题。"
+      }
+    ],
+    "newSourceSearchPerformed": false,
+    "evidenceSha256": {
+      "outputs/v56_validation/workflow_final/workflow_workbench.mat": "61c722177a6d6861470de1de3ae3caed0601de589ff56dd42b3922d33619a7e9",
+      "outputs/v54_validation/sphere_laminar_default2.mat": "0802ea6b3ca8f6b0931dc14bd1ab12b4dbea60a5c2875e5cd62ef7d38c2c4c9b",
+      "docs/REMAINING_REGIONS_V56.md": "ef61881a73f3e253b5d54551f5176871f33a70a96eb4c88fa7be22835be5a92c",
+      "docs/REGIONAL_HEATING_SOURCE_REVIEW.md": "50bdbc2b51b1468a53ca8f4ed6ef534634f461ac0b28023c169c490268d068eb",
+      "docs/BASE_RADIAL_HEATING_RESEARCH.md": "a8d53730dbaa2a16c30df3eb44e393b48d0987107d3b542ada9c02744d7b6043",
+      "docs/CYLINDER_CROSSFLOW_SOURCE.md": "4abc8beaa37925bcc57a17bb62289c0f98ecb92b2ebd34bfd5a09d887b4030dc",
+      "docs/SPHERICAL_NOSE_HEATING.md": "2a57b47fa8107cceff4c88cfe85a6f4b05a116bd91595704ca9e05be2d8c1188",
+      "calcSurfaceHeating.m": "097482089f2fadeaf60f8b75f7b26e0fd4f7cd0575d91a05c54677555d855fd2",
+      "calcBoundaryLayerState.m": "9f57be015880a8da84ca452767e14c8e211d121431d38098e04559a93c2765fe",
+      "solveSphericalNoseLaminarHeating.m": "b34729191df662dac760fba41ae89392d6cf9e28c23139ff669a28caf1150819",
+      "solveSphericalNoseEdge.m": "b8fa94c4ab17d0b6891d8f1b95117049d640854a92bd7c82669a304bfc59bee0",
+      "solveAxisymmetricLaminarMassProfile.m": "a47629a852fc029107bdd7a7d236c5ae5949f9905499aad3772a01af48bb90bc",
+      "outputs/v58_validation/draft/actual_control_volume_summary.json": "d1e304d594d1eace1db131b0fc26b80f548e1f469d1fc64013a68b6199cabd5e"
+    },
+    "allReadInputsUnchangedAfterAudit": true
+  },
+  "evidence": [
+    {
+      "path": "audit_next_regional_step.py",
+      "bytes": 13488,
+      "sha256": "4d67e4837184b70aae676d294770383942d54765185bdf027b1e756e240af5e1"
+    },
+    {
+      "path": "formal_readonly_review.py",
+      "bytes": 14355,
+      "sha256": "406e2bd55515129332f5854e975eb28beeca89d43fd6ea23f0d1a66b53de9b20"
+    },
+    {
+      "path": "formal_readonly_review_final.py",
+      "bytes": 24522,
+      "sha256": "c7cd8cfb4c493dc8886460f1b6de0521ddcbe476a5b56f55008b92d7b58600e8"
+    },
+    {
+      "path": "formal_review_final.json",
+      "bytes": 144170,
+      "sha256": "4e701bcebdc1b1b800998179b7383e57cd0796e69c2a6953ff3db04d3e81c616"
+    },
+    {
+      "path": "formal_review_final_process.json",
+      "bytes": 563,
+      "sha256": "3e12fc1ea579074456ce42b7887444c3f9098b7b9fb0fd2c34f6f65c07898a2d"
+    },
+    {
+      "path": "formal_review_final_stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "formal_review_final_stdout.log",
+      "bytes": 1110,
+      "sha256": "2681e8b01dfa0122cd954d90d2e8bb6c3d2b8859a619d954bd6c99486d67afff"
+    },
+    {
+      "path": "formal_review_initial.json",
+      "bytes": 134861,
+      "sha256": "ecc44224da301e4ed1548337b9cb7b894d2a6406f0ed07b7ed3d5d735a596bad"
+    },
+    {
+      "path": "library_isolation_final/input_manifest.json",
+      "bytes": 7279,
+      "sha256": "fec5405517ddbe3eda27d9b1255e55bb674aaaf679c153bd70d0eb970561b02d"
+    },
+    {
+      "path": "library_isolation_final/process.json",
+      "bytes": 1030,
+      "sha256": "8085117feaf1bec8dbd07673e8b5f23adf64f9429fec4f856ba98dbd77b04264"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/advanceCompressibleNavierStokes3D.m",
+      "bytes": 13520,
+      "sha256": "a7eebb6fe31f0ec095e8f4469523c4797ed46920e59229535ca4102b85e92ffd"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/compressibleNavierStokesResidual3D.m",
+      "bytes": 18021,
+      "sha256": "ffe638f9daa026f58eacaab9e86a8f332b44c19d44f8fea0335973f91a3785f2"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/advanceCutCellNavierStokes.m",
+      "bytes": 13787,
+      "sha256": "0801d3dfc373b6cbbffb593b3708ae02b7d8ad02e8e29ab744e8797ddcbaad99"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/agglomerateFluidControlVolumes.m",
+      "bytes": 19059,
+      "sha256": "af3f6a469e0774883ba5ea8e90d1733ff4016dead02bf417a4951fbfdefedb33"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/buildCutCellDiffusionStencil.m",
+      "bytes": 5570,
+      "sha256": "e2f9a7eaa91af70f9b24ad02c4841509e4a90aef8f41147b67508f2293af9f74"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/buildCutCellVolumeMoments.m",
+      "bytes": 18270,
+      "sha256": "d842ceca0293009c8db05a20712d8685cd9ff88f2077f8279eb5f7b01ebecdf8"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/buildOriginalSurfaceCutCells.m",
+      "bytes": 17645,
+      "sha256": "946550a1af5f8f7df381861bc2393bf97c9542538c942ad5aec19d2e5e820b11"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/buildQuadraticTemperatureStencil.m",
+      "bytes": 7726,
+      "sha256": "e5009aad9fe6aa733a56f19cc55fe44dd350cc1e20dd41cdc11796dc0731417c"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/cutCellBoundaryStencilState.m",
+      "bytes": 1911,
+      "sha256": "728e0edb4f3e7762d7851e7944bd0e147ee6266f99b3f6f0eba15ed47f30cbb6"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "bytes": 16313,
+      "sha256": "68f3b2c08de7bcb5f1f11d5504ad7b8b6840c441344b99730ba01f2fe7f14bc2"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/evaluateQuadraticTemperature.m",
+      "bytes": 3449,
+      "sha256": "3815ed72145a7814c76a4d0a5660ace1945b90a80fb5ecb578b4e17f681f4c97"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/mapCutCellWallFields.m",
+      "bytes": 5249,
+      "sha256": "aedc1d827351b2886f8b91689345663e96cf1274cc12f063ef631f124a468d46"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/partitionOrientedTriangles.m",
+      "bytes": 9228,
+      "sha256": "ff5c6b19f6a0fd770948a2e956090e9b977811d73afdaab50ce45fc1c6fb9a62"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/cutCell/quadraticTemperatureFourierFlux.m",
+      "bytes": 3273,
+      "sha256": "a59d1be5673763cddf1cc770d90a6315ce98cda46872e1fea7ea065214b592eb"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/resolveNSCharacteristicBoundary3D.m",
+      "bytes": 7541,
+      "sha256": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/setupCutCellFlow.m",
+      "bytes": 532,
+      "sha256": "55577b4a399494f622548ec48a6575538fe4f4491fe8e724b35d77e7deeba4de"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/testAdvanceCompressibleNavierStokes3D.m",
+      "bytes": 14137,
+      "sha256": "f99c4f6186dc9959b5d4a65b50acddbac1c6b564878f27ff19dc4816314ef887"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/testCompressibleNavierStokesResidual3D.m",
+      "bytes": 11449,
+      "sha256": "962d1e0be39a585d9867319103e4ae558e4df1f69fa4c3f3f0421f036c876dbc"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/testNSCharacteristicBoundary3D.m",
+      "bytes": 6605,
+      "sha256": "0686007b788624550a20d3674e01d63f9dc56df49d3d4fbb4da6cf9328ed75e7"
+    },
+    {
+      "path": "library_isolation_final/project/internalFlow/testNSOpenRegionAdvance.m",
+      "bytes": 4879,
+      "sha256": "75953dff9c37a18c4cd7c28368d53adffb1e91a11cacf7deb645b9cb6412e9e0"
+    },
+    {
+      "path": "library_isolation_final/project/outputs/v60_validation/library_cubic/cubic_temperature_evidence.mat",
+      "bytes": 41780393,
+      "sha256": "335295153173169e1c74909659ce76aecae7516c0738ea4cc2651b515eded6ac"
+    },
+    {
+      "path": "library_isolation_final/project/outputs/v60_validation/library_cubic/cubic_temperature_summary.json",
+      "bytes": 4616,
+      "sha256": "525ef2aed1a85fb5945e9f25c65aa0a23fae214390ee1d09fb7b826cdb541cc7"
+    },
+    {
+      "path": "library_isolation_final/project/outputs/v60_validation/library_moments/matlab_volume_moment_evidence.mat",
+      "bytes": 16276071,
+      "sha256": "98d0f835db7b6939ad42e10013169c21fc2fc8cc6a444094f10b3c33d9e49432"
+    },
+    {
+      "path": "library_isolation_final/project/outputs/v60_validation/library_moments/matlab_volume_moment_summary.json",
+      "bytes": 3123,
+      "sha256": "d0884e684266f4767aa9c3a85339a4b61c06721750ccfd88598da6d83d04200c"
+    },
+    {
+      "path": "library_isolation_final/project/outputs/v60_validation/library_reproduction/quadratic_temperature_evidence.mat",
+      "bytes": 29337522,
+      "sha256": "c3bb795ee97ad8c1b9dd6cc44f6be4df33ec2669e5e7cc43797f04e4588909fe"
+    },
+    {
+      "path": "library_isolation_final/project/outputs/v60_validation/library_reproduction/quadratic_temperature_summary.json",
+      "bytes": 2334,
+      "sha256": "d02203ef6ba8e39ef9361ae0e31432222bd2e9e7fd1c622b4811d5cd24240a22"
+    },
+    {
+      "path": "library_isolation_final/project/tests/studyCubicTemperatureReconstruction.m",
+      "bytes": 7451,
+      "sha256": "ff031022b49522caf6e92effa731e72edbc140f81acf90dc9fc3971602f01e1a"
+    },
+    {
+      "path": "library_isolation_final/project/tests/testCutCellVolumeMoments.m",
+      "bytes": 8478,
+      "sha256": "2cacf533280fd5eca86216cbf9c0e32ed2b45a09b42c16fc880af0030a88879c"
+    },
+    {
+      "path": "library_isolation_final/project/tests/testQuadraticTemperatureReconstruction.m",
+      "bytes": 8150,
+      "sha256": "8c9aca443d05bb161b88e7a1b57cb64d0b847d566e32b93f16d53b1203d27307"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v58/cut_cell_draft/analytic_cut_cell_results.mat",
+      "bytes": 105953,
+      "sha256": "e08c1eaf51f2a009599f7b522e214ab6c6ce289620fae7a8dfa9a541162540f8"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v58/cut_cell_draft/cut_cell_geometry_results.mat",
+      "bytes": 6322581,
+      "sha256": "0ce9d7ae76815af4176f092dd6f2022078eab12c083d3635f18a035c6639b45b"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v58/cut_cell_transport_draft/actual_aggregation_results.mat",
+      "bytes": 7209454,
+      "sha256": "c0aea963b761eb9db7c62033ab02cf374b3fc1ecd5bf3389b59abd55d4407e0f"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v59/curved_accuracy_oracle/actual_fv_volume_moments.mat",
+      "bytes": 387649,
+      "sha256": "e3fde7821bea6f5d434a3ae392aa435205ba481f90dd74d24962f4cf006e7faf"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v59/curved_accuracy_oracle/sphere_grid12_fv_volume_moments.mat",
+      "bytes": 162357,
+      "sha256": "a1b3cca62f348969fdd8107c0a5edcab9d195f74d2cfa692ac4d50f1f6a71c51"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v59/curved_accuracy_oracle/sphere_grid16_fv_volume_moments.mat",
+      "bytes": 370513,
+      "sha256": "34b4c6163e5000af4a3a4df96ed5d62cc89fe2e7b0026372050682b17af0a1d2"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v59/curved_accuracy_oracle/sphere_grid8_fv_volume_moments.mat",
+      "bytes": 66856,
+      "sha256": "e535ef181a046673f1c3d0d7ae964d6d0eaa58da7a95eab98e4c2dc53eae425d"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v59/geometry/sphere_grid12.mat",
+      "bytes": 825628,
+      "sha256": "6bb4b74a28c13aeb39e0428e50bbafd233f2ae39dbc3229b0e21592b85c7f069"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v59/geometry/sphere_grid16.mat",
+      "bytes": 1304769,
+      "sha256": "3deef1919a5808f877011308bef1c96e222a5fad7aa2fdf388766de05fcc24ec"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v59/geometry/sphere_grid8.mat",
+      "bytes": 479076,
+      "sha256": "22b980e0138d4c3f10bfc712129ca8785820d6166e2d7a85ef44942c95a8b179"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v60/reconstruction_review/actual_cubic_oracle.mat",
+      "bytes": 4458776,
+      "sha256": "63299a8910035d9fa885c0aaf3bcc0d9aca59c9433b5bcc9ff31a796912f464d"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v60/reconstruction_review/sphere_grid12_cubic_oracle.mat",
+      "bytes": 446571,
+      "sha256": "466ed49c7ac29bebad35236baa0ed550328bf5a48921bf3ba919e6791a2cbd3a"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v60/reconstruction_review/sphere_grid16_cubic_oracle.mat",
+      "bytes": 901332,
+      "sha256": "aff6d2990b129d0e4beba83a7451b5f1b96a43b2841a46dc09596c37d735a9cb"
+    },
+    {
+      "path": "library_isolation_final/project/validation/v60/reconstruction_review/sphere_grid8_cubic_oracle.mat",
+      "bytes": 200402,
+      "sha256": "551a1b4dddce4c7d574b5e0fd8abf300e708eb224af3db823dbe42db1004c606"
+    },
+    {
+      "path": "library_isolation_final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "library_isolation_final/stdout.log",
+      "bytes": 1913,
+      "sha256": "a8f3cac65b09becefb039d69ca3bec221f37abd396d6cf1097646f286fa2b813"
+    },
+    {
+      "path": "make_cubic_plot.py",
+      "bytes": 1935,
+      "sha256": "644d80d004612d24c222e87623b89cf06b013ba8c4844b0f6b3c533a89a21a9a"
+    },
+    {
+      "path": "moments_draft/README.md",
+      "bytes": 4928,
+      "sha256": "6b7ddc82d6c2b37cd71f425fd787953da4a989947ddfebeba77b68dc741ae710"
+    },
+    {
+      "path": "moments_draft/buildCutCellVolumeMoments.m",
+      "bytes": 17737,
+      "sha256": "211cc9b36da0ed306c709ca94d62bc877244e9a36668f6aef601fac7ff058b67"
+    },
+    {
+      "path": "moments_draft/check_matlab_moments.py",
+      "bytes": 8251,
+      "sha256": "36011400ada9f3ce91fe44028588700d470b302173efca64e29edfe84d6b68d1"
+    },
+    {
+      "path": "moments_draft/independent_moment_readback.json",
+      "bytes": 6011,
+      "sha256": "8afde76043465d76428d5adb6f1fc1b8bf38273b3417c2aed2e20ab8120ccf6b"
+    },
+    {
+      "path": "moments_draft/independent_stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "moments_draft/independent_stdout.log",
+      "bytes": 6013,
+      "sha256": "6ec3504659b66b77384ce0a65ed7b6331814e80f70d89678d1701411cb8d2bcd"
+    },
+    {
+      "path": "moments_draft/matlab_process_final.json",
+      "bytes": 761,
+      "sha256": "9a3c91bc6a10b07f36bfa7669403b57faa63e775e179e67c3e51e8762d6625f3"
+    },
+    {
+      "path": "moments_draft/matlab_stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "moments_draft/matlab_stdout.log",
+      "bytes": 574,
+      "sha256": "1d0321d7e17b3f578d705283f7d2346663ae5ed7c038e68f656ff77011959308"
+    },
+    {
+      "path": "moments_draft/matlab_volume_moment_evidence.mat",
+      "bytes": 8049484,
+      "sha256": "fc45a5e92e79d12fbf265b91bec6f28d8dd8b5628ec5ac8018dc8daeb8ea2869"
+    },
+    {
+      "path": "moments_draft/matlab_volume_moment_summary.json",
+      "bytes": 3125,
+      "sha256": "6da3e667c5718f1140b0885052a11c47b9faa0c7ae63a7a7eed6f61c483334ac"
+    },
+    {
+      "path": "moments_draft/moment_evidence_manifest.json",
+      "bytes": 12999,
+      "sha256": "3e47b3d4d772ae5a707c2e16c82b1aecb723e03d7fa322cf685c82be8ceb3d10"
+    },
+    {
+      "path": "moments_draft/python_process_final.json",
+      "bytes": 772,
+      "sha256": "e45713d67d53806514a51b14f8f9f75e3e000119c82e8ac30759054cb7914503"
+    },
+    {
+      "path": "moments_draft/run_readback.ps1",
+      "bytes": 1638,
+      "sha256": "dc4b60b57e3f14632523c52f4cb33737f7179fff8c6d2da49f03dc27bdd6fc5f"
+    },
+    {
+      "path": "moments_draft/run_validation.ps1",
+      "bytes": 1565,
+      "sha256": "955d5ba5dc7de939720f88d8b69670f4ceb4fce11f25df79d67a5f162f0a776e"
+    },
+    {
+      "path": "moments_draft/testCutCellVolumeMoments.m",
+      "bytes": 8098,
+      "sha256": "8f4ff340809c68179b26fdf73ac37031bcc135e53a8c9969c43eba22a246c3a3"
+    },
+    {
+      "path": "moments_draft/write_moment_manifest.py",
+      "bytes": 3059,
+      "sha256": "72025825e5f3edf794b2ed1b285b4d744427e325e4b0d92686edcdbabe86d57b"
+    },
+    {
+      "path": "next_regional_step.json",
+      "bytes": 21598,
+      "sha256": "18c1c26511f95b66feaf2cacabb7290e19bf221c2a8472fc0a465a993c4f8c0d"
+    },
+    {
+      "path": "package_v60.py",
+      "bytes": 8340,
+      "sha256": "83647ba71c8fe77797486d7048e53ce0ea82b7b671e640ab4e5e4b927b6275d3"
+    },
+    {
+      "path": "prepare_library_isolation.py",
+      "bytes": 2126,
+      "sha256": "f43da9b15cde918c7190efe727128fac291ae9bf0ce6e3c7513d711bfe5e8781"
+    },
+    {
+      "path": "reconstruction_draft/buildQuadraticTemperatureStencil.m",
+      "bytes": 7183,
+      "sha256": "23fa2b08e085e9f83b4f4cb67f4a83e839b58873aaa10e84bd7691c0db239b87"
+    },
+    {
+      "path": "reconstruction_draft/cubic_process.json",
+      "bytes": 652,
+      "sha256": "91235a4ba66d35793713d7ef7b04168a133ea18eab20465474ac572281910961"
+    },
+    {
+      "path": "reconstruction_draft/cubic_stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reconstruction_draft/cubic_stdout.log",
+      "bytes": 667,
+      "sha256": "3f883da061d894df4fe800582d0806cde1a386d4163be7b07f925115f888533a"
+    },
+    {
+      "path": "reconstruction_draft/cubic_temperature_evidence.mat",
+      "bytes": 33532404,
+      "sha256": "8659613a13b77d78a10753ff13188ea9b7f4c075f1a93fa51f32d53f6467588d"
+    },
+    {
+      "path": "reconstruction_draft/cubic_temperature_summary.json",
+      "bytes": 4616,
+      "sha256": "525ef2aed1a85fb5945e9f25c65aa0a23fae214390ee1d09fb7b826cdb541cc7"
+    },
+    {
+      "path": "reconstruction_draft/evaluateQuadraticTemperature.m",
+      "bytes": 3287,
+      "sha256": "2132b9a38e137cbe77c8eef331de06252045a6ad36939c60dae60928c12879ea"
+    },
+    {
+      "path": "reconstruction_draft/process.json",
+      "bytes": 655,
+      "sha256": "973dc5344f25faf6f785ab4f38214ac45593b974ae72aa8f7f40adf2efbe7694"
+    },
+    {
+      "path": "reconstruction_draft/quadraticTemperatureFourierFlux.m",
+      "bytes": 2739,
+      "sha256": "41cb8cdd90ea77be2ce86c3e4ca640c31f3a85e632d2b808abf8344486b32387"
+    },
+    {
+      "path": "reconstruction_draft/quadratic_temperature_evidence.mat",
+      "bytes": 29574317,
+      "sha256": "96cebc768c0da5e44f1b7724589520d0cecbe1814aabad781938c6fd79d4985a"
+    },
+    {
+      "path": "reconstruction_draft/quadratic_temperature_summary.json",
+      "bytes": 2199,
+      "sha256": "2485f0f7fe709db50743f37483c304994adba8dbeb890c70bbe2f3a411507438"
+    },
+    {
+      "path": "reconstruction_draft/run_cubic.ps1",
+      "bytes": 1702,
+      "sha256": "1b7fad97db1b9f61c92869006287cd870598238acbe35aa561409d05f6ac9fa5"
+    },
+    {
+      "path": "reconstruction_draft/run_reconstruction.ps1",
+      "bytes": 1651,
+      "sha256": "736b11f2404846a64a9bdad90ef47a191c7263319c8ab1016c4712119a587e02"
+    },
+    {
+      "path": "reconstruction_draft/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reconstruction_draft/stdout.log",
+      "bytes": 675,
+      "sha256": "1f875f4fe67dace5151e1bcdcd2da534c2640d7d05ba4aae3cf19d5a3ab20504"
+    },
+    {
+      "path": "reconstruction_draft/studyCubicTemperatureReconstruction.m",
+      "bytes": 7019,
+      "sha256": "08e3d0e3a3522091ff0e66a5894274dbe2b0240083c480d4ed2e7d1f04686a82"
+    },
+    {
+      "path": "reconstruction_draft/testQuadraticTemperatureReconstruction.m",
+      "bytes": 5946,
+      "sha256": "08b72baf5cbe4c912c84e80f9434ee55de7acf6db80e2b0b20031aab20aebb30"
+    },
+    {
+      "path": "reconstruction_review/README.md",
+      "bytes": 3947,
+      "sha256": "296382541879d83a1825c81c972d786cc53a7d11d09e14ff69fc6ca984922086"
+    },
+    {
+      "path": "reconstruction_review/actual_cubic_oracle.mat",
+      "bytes": 4458776,
+      "sha256": "63299a8910035d9fa885c0aaf3bcc0d9aca59c9433b5bcc9ff31a796912f464d"
+    },
+    {
+      "path": "reconstruction_review/actual_cubic_oracle_summary.json",
+      "bytes": 1286,
+      "sha256": "03ab446805a9c8500a84fb9cab4daabcc74d5dab257212cd18479c0a89e9a27e"
+    },
+    {
+      "path": "reconstruction_review/actual_quadratic_reference.mat",
+      "bytes": 9507295,
+      "sha256": "5473b078c5d50cef6295f03de1f1e3d13479a161980d6a9b05a790669f615595"
+    },
+    {
+      "path": "reconstruction_review/actual_quadratic_reference_summary.json",
+      "bytes": 1976,
+      "sha256": "d42d16a87d797963a8063b141100ff61eb732713651f61b27d594d5898d695ea"
+    },
+    {
+      "path": "reconstruction_review/actual_scalar_boundary_map.npz",
+      "bytes": 2029623,
+      "sha256": "61a8fa5a65fe97c3a2f9e23bd6d2349ff825d03066ac3a4bb32f709b9ff5e367"
+    },
+    {
+      "path": "reconstruction_review/actual_scalar_heat_matrix.npz",
+      "bytes": 582276,
+      "sha256": "b2b8b81278f0944f2b8ddd3910a22d91457b57edcecba51d1f26273d459d09bd"
+    },
+    {
+      "path": "reconstruction_review/actual_scalar_heat_modes.npz",
+      "bytes": 332726,
+      "sha256": "aecfcf655b44d8011ca33984d88b96a4dac95addbfa1ffd55eb1d2cbddb3efd5"
+    },
+    {
+      "path": "reconstruction_review/actual_scalar_linear_matrix_review.json",
+      "bytes": 6309,
+      "sha256": "29811f635b0aa798c86f05a07452d3fbb6e5dc3042bf7ce2cf78080ce2f3c264"
+    },
+    {
+      "path": "reconstruction_review/build_cubic_oracles.py",
+      "bytes": 15147,
+      "sha256": "50a690935593e9962d3a640eb4e36af5343cdff28bbaa443a2030bf60673beb5"
+    },
+    {
+      "path": "reconstruction_review/compare_frozen_matlab.py",
+      "bytes": 15773,
+      "sha256": "9d7bc5d3147247f44d5cd2a0741c73508e5168e8d7dd32dd2715fe2cd8278157"
+    },
+    {
+      "path": "reconstruction_review/comparison_process_final.json",
+      "bytes": 516,
+      "sha256": "844733058c23a55517b0bcddb734893e400ce0caae5be4ebdfb85d04e5c0a7b1"
+    },
+    {
+      "path": "reconstruction_review/comparison_stderr_final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reconstruction_review/comparison_stdout_final.log",
+      "bytes": 853,
+      "sha256": "05fc8a4a5ba5d404a2e3b0febc58ed5ebcf9971b766eba5453d24ffc98c8fbbd"
+    },
+    {
+      "path": "reconstruction_review/cubic_oracle_collection.json",
+      "bytes": 5881,
+      "sha256": "646a171617f40d958d161e0f964b5d133b5afc89558cbc8d55b6ca84f473410f"
+    },
+    {
+      "path": "reconstruction_review/cubic_oracle_final.log",
+      "bytes": 884,
+      "sha256": "d1afe64e94c220144662cb5a9ceb61a47c90e5cb83c36b8cf53d4da5f0444c27"
+    },
+    {
+      "path": "reconstruction_review/cubic_oracle_process_final.json",
+      "bytes": 418,
+      "sha256": "48e9e999e836e0de6d87fd1343f7f23cdd5bd8400fad1ae95b3c2925213068b6"
+    },
+    {
+      "path": "reconstruction_review/finalize_reconstruction_review.py",
+      "bytes": 13011,
+      "sha256": "f20da9aa942175febd9d4b8f657e00657f282d6d86c0e34b761f0ab27ab4b326"
+    },
+    {
+      "path": "reconstruction_review/frozen_matlab_comparison.json",
+      "bytes": 81363,
+      "sha256": "1ea171c6983a07445ef8930625afbfb0a2f29dcc5f6129104d1c6801d435f2a5"
+    },
+    {
+      "path": "reconstruction_review/quadratic_reference_attempt2.log",
+      "bytes": 1123,
+      "sha256": "e33e5bdef1d79ed128680a3685c7d310944c906d60e2466fd65c46484bf36903"
+    },
+    {
+      "path": "reconstruction_review/quadratic_reference_attempt2_process.json",
+      "bytes": 411,
+      "sha256": "07c20289c6ac9c3e70dcf5eb75d019b998fbbf926f75552abb1d46728998e273"
+    },
+    {
+      "path": "reconstruction_review/quadratic_reference_collection.json",
+      "bytes": 9191,
+      "sha256": "86bf56175d199425a21782158f351ef3f1853cf07e14506ef8cd6054835be74e"
+    },
+    {
+      "path": "reconstruction_review/reference_quadratic_fit.py",
+      "bytes": 14570,
+      "sha256": "2fbece19dfa8b39e884d6ef6179cd3ea9840aeca113d4291ac7175ce861abadf"
+    },
+    {
+      "path": "reconstruction_review/review_evidence_manifest.json",
+      "bytes": 17024,
+      "sha256": "ea294ff6d7b0c32ef9437b55b1fe3c2a49008adb10cf64faa44895e93abd4aa7"
+    },
+    {
+      "path": "reconstruction_review/run_compare.ps1",
+      "bytes": 2107,
+      "sha256": "1be2eb4b7ee1b1d736dd7bbb18a8d742e9d1ea1868459f5fdaad9b886266dfdf"
+    },
+    {
+      "path": "reconstruction_review/run_scalar_matrix_review.ps1",
+      "bytes": 1577,
+      "sha256": "8d485940f03d6f3283163452035c9cbd817ac013b4d81b990184ff4382311237"
+    },
+    {
+      "path": "reconstruction_review/scalar_linear_matrix_review.py",
+      "bytes": 18556,
+      "sha256": "cb2d628eaa987a227fbe60031097826b2765d556aaf15ef6aff2241697030271"
+    },
+    {
+      "path": "reconstruction_review/scalar_linear_matrix_review_collection.json",
+      "bytes": 28833,
+      "sha256": "928bb2494660bef16819b458d42b2e2f443092ba807f158f7dfad82e36d5ae32"
+    },
+    {
+      "path": "reconstruction_review/scalar_matrix_process.json",
+      "bytes": 522,
+      "sha256": "659770ab5c63df2b42f473a1038dac465495188dcc981cfb557cd9c43e966fb2"
+    },
+    {
+      "path": "reconstruction_review/scalar_matrix_stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reconstruction_review/scalar_matrix_stdout.log",
+      "bytes": 2879,
+      "sha256": "9241b2e9c78a45a30834977698c12ea256bce73fdfdee5c5e1f0536353afa374"
+    },
+    {
+      "path": "reconstruction_review/scalar_matrix_units_and_scope.json",
+      "bytes": 5855,
+      "sha256": "154c8bd18777fc0a99f7eabbb0662d2c581e7e15ea25a10142cf57aef2372b51"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid12_cubic_oracle.mat",
+      "bytes": 446571,
+      "sha256": "466ed49c7ac29bebad35236baa0ed550328bf5a48921bf3ba919e6791a2cbd3a"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid12_cubic_oracle_summary.json",
+      "bytes": 1286,
+      "sha256": "b683b4e58bfdbe72e93894300dc0c9189458a0ed930ff804967be785230409fc"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid12_quadratic_reference.mat",
+      "bytes": 2891422,
+      "sha256": "ab57d9e038816bde1bca85ef7b28df66cf5c2e65bd316c9ca9c67a26ff1ebdfa"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid12_quadratic_reference_summary.json",
+      "bytes": 1954,
+      "sha256": "7a820b8fb12af20a13fdf34eee054dacf269c21e9bbefb85dab905ba791ba440"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid12_scalar_boundary_map.npz",
+      "bytes": 104859,
+      "sha256": "06fbcad57c1a08893d61a1ef5e95f7a028653ebfd15484f92e3238a4a2666376"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid12_scalar_heat_matrix.npz",
+      "bytes": 471996,
+      "sha256": "ce3a9c10eb94e103087fd9339c27e18d846a39b06191c83523ad0733c2f3247a"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid12_scalar_heat_modes.npz",
+      "bytes": 99090,
+      "sha256": "72a7f2dd63deb8280738df5c038a73ed4a0af1d625d3fd62ef26ef635f2c5296"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid12_scalar_linear_matrix_review.json",
+      "bytes": 6294,
+      "sha256": "ca2ea6dc6e394bc810537a3740b04a01e9816f1e094b9352a991bc8472d98d38"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid16_cubic_oracle.mat",
+      "bytes": 901332,
+      "sha256": "aff6d2990b129d0e4beba83a7451b5f1b96a43b2841a46dc09596c37d735a9cb"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid16_cubic_oracle_summary.json",
+      "bytes": 1286,
+      "sha256": "1e6d44c493b42a4687932822b7735d8eb7982c669e59e687371bae9c536fb630"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid16_quadratic_reference.mat",
+      "bytes": 6306511,
+      "sha256": "cf6a3a702ebe2e6d1970a1a739ea9338c9135458e32637bde94bebfdd3af3e27"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid16_quadratic_reference_summary.json",
+      "bytes": 1974,
+      "sha256": "588dad5ad5168e13f02f6f805a37b84ae95e826ee9a89e6de727e7031ccf90b5"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid16_scalar_boundary_map.npz",
+      "bytes": 142419,
+      "sha256": "513dabe0a8924b01fe91461a700d906cb7100bdb8f987b835be1cad284a58535"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid16_scalar_heat_matrix.npz",
+      "bytes": 1022221,
+      "sha256": "e4bbc5a48ca7197703b5866992be6a7da324c1c8ad5148318deac95d916f0c7f"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid16_scalar_heat_modes.npz",
+      "bytes": 216514,
+      "sha256": "6e53fd685152ecc0928ac339999aebd91b9b540eb12fe58f7efdceeb425d1a19"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid16_scalar_linear_matrix_review.json",
+      "bytes": 6296,
+      "sha256": "eba410d5a3b6bb84a8f9f2b037b1d81eacb6499c0713f4c628d0bc4d1dfda062"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid8_cubic_oracle.mat",
+      "bytes": 200402,
+      "sha256": "551a1b4dddce4c7d574b5e0fd8abf300e708eb224af3db823dbe42db1004c606"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid8_cubic_oracle_summary.json",
+      "bytes": 1278,
+      "sha256": "e1811d9975ef254f9689ab5a6ef5672ca6d8e1bf5c34d725e6e6296d4919abc6"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid8_quadratic_reference.mat",
+      "bytes": 1021881,
+      "sha256": "53bd362a17d3a3b18599be82b4f53932c58e6401513b392b46a7a68d7c6d1db9"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid8_quadratic_reference_summary.json",
+      "bytes": 1967,
+      "sha256": "b9a0fade5be08d86eaaf371cd089dcba0163870171dbba1654cd7d2e395952fb"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid8_scalar_boundary_map.npz",
+      "bytes": 75152,
+      "sha256": "808207c078b5368e43c9d1e00d21a2a8aa2307d3884672096999f8dde84a742d"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid8_scalar_heat_matrix.npz",
+      "bytes": 148114,
+      "sha256": "c483a7ce940143baa4c36ff71dc2e90eb342baa4a5a7920c313ac45ae2abe821"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid8_scalar_heat_modes.npz",
+      "bytes": 35576,
+      "sha256": "3a270f95960322c74dacd4626e8e4dbed442881d2f44756109cbc483ac8be843"
+    },
+    {
+      "path": "reconstruction_review/sphere_grid8_scalar_linear_matrix_review.json",
+      "bytes": 6557,
+      "sha256": "520487ad1564bd58e75cad27a4eecbfb3f4abe996e1e8ffa2b37870340a91761"
+    },
+    {
+      "path": "reconstruction_review/static_formula_bridge.json",
+      "bytes": 2793,
+      "sha256": "f4777c4d69733c03d6cd2cbe50c3e3cf45ef30e6969738a83be0bb8dcab6515b"
+    },
+    {
+      "path": "run_formal_review_final.ps1",
+      "bytes": 1613,
+      "sha256": "fe83dce98cd58ae8941c320f5623ff6cbb5e0453bf36a59d6c0c833cb567346a"
+    },
+    {
+      "path": "run_library_final.ps1",
+      "bytes": 1982,
+      "sha256": "bd653d2f02917032d863f434ef85f8b93dbd3d66b8db206d0af87547abe0fff5"
+    },
+    {
+      "path": "write_v60_summary.py",
+      "bytes": 6935,
+      "sha256": "f5295c4a2ee1fd44accaa0c205ee0f96c81e5348b22950b3fb1a0a482a18a75f"
+    }
+  ],
+  "excluded": [
+    "all development_* and failed attempt records",
+    "first isolated snapshot before real-Cov refusal",
+    "earlier isolated outputs as current-source proof and duplicate preliminary comparisons",
+    "__pycache__",
+    "unspecified local outputs"
+  ],
+  "delivery": {
+    "baseline": "v59",
+    "completeFiles": true,
+    "destination": "C:/Users/bo yunpeng/Documents/Codex/2026-10-17",
+    "state": "delivered",
+    "verification": "v60_release_verification.json"
+  }
+}

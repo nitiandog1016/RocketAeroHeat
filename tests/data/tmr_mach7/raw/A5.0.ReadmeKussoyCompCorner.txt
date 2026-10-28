@@ -1,0 +1,65 @@
+This subdirectory provides the Database files for the Kussoy Mach 7.05 axisymmetric cone-cylinder-flare experiment.
+The experiment was conducted in the NASA Ames 3.5 foot hypersonic wind tunnel using heated dry air.  This facility
+is no longer operational.
+
+Included in the database are data for 4 flare angle cases, including a 20 deg attached, 30 deg incipient separation
+ and 32.5 deg and 35 deg fully separated cases.  In addition to the pressure and heat transfer measurements,
+ boundary layer profiles are provided.
+
+Nominal Test conditions (at X=133 cm from cone-cylinder nose tip) were:
+ Minf= 7.05
+ Uinf= 1274 m/sec
+ Tinf= 81.2 K
+ Pinf= 576 Pa
+ Rhoinf=0.0252 kg/m^3
+ Qinf= 9300 W/m^2
+
+The data source documents are:
+ Settles, G.S. and Dodson, L.J.
+ Hypersonic Shock/Boundary-Layer Interaction Database
+ NASA CR 177577, April 1991.
+
+ Kussoy, M.I, and Horstman, C.C.
+ Documentation of Two- and Three-Dimensional Hypersonic Shock Wave/Turbulent Boundary Layer Interaction Flows
+ NASA TM 101075, Jan 1989.
+
+See Also (for more information on geometry of nose tip)
+ Kussoy, M.I. and Horstman, C.C.
+ An Experiment of a Hypersonic Shock-Wave Turbulent Boundary Layer Interaction Flow-with and without Separation
+ NASA TM X-62412, Feb. 1975.
+
+Grids are given for all cases, along with the CFD solution for the 35 deg case.
+ These are provided by James L Brown of NASA Ames, using the DPLR Navier-Stokes code.
+
+The subdirectory structure is given by:
+
+ A5.KussoyCompCorner
+    KussoyNASATM101075.pdf  ... relevant NASA documents
+    KussoyNASATMX62412.pdf
+    A5.0.ReadmeKussoyCompCorner.txt  ... this file
+    A5.1.ExperimentDataFiles
+         AuthorFiles
+           KussoyAxiCompCorner.txt ... Datafile extracted from Settles and Dodson database
+         TecplotASCII
+           KussoyBLProfile.dat ... Tecplot ASCII file providing experimental boundary layer profiles
+           KussoyCompCorner.dat ... Tecplot ASCII files providing experimental pressure and heat transfer data
+                                    for the 4 cases of Kussoy and Horstman
+           KussoyCylFlare.png  ... graphic plot of wall and heat transfer for the 4 cases
+           KussoyCylFlarePQ.lay  ... Tecplot layout to generate the above
+                                   graphic plot of wall and heat transfer for the 4 cases
+    A5.2.CFDFiles
+         Grid ... subdirectory of Plot3d ASCII files for the 4 cases
+           Kussoy20.p3da
+           Kussoy30.p3da
+           Kussoy32.5.p3da
+           Kussoy35.p3da
+           fconV402.144Blk.inp
+         Kussoy35.SST
+           surf.dat  ... Tecplot ASCII file of surface data from Navier Stokes Solution
+           voldb.dat.bz2  ... Tecplot ASCII file of flowfield from Navier Stokes Solution
+           BLayer.dat  ... Tecplot ASCII file of surface data from Navier Stokes Solution
+           KussoyM.free
+           KussoyM.inp ... DPLR Navier Stokes code input deck for 35 deg case using SST turbulence model
+           PWallB35.png ... Wall Pressure plot comparing solution with experiment
+           QWallB35.png ... Wall heat transfer plot comparing solution with experiment
+           REDWOOD2.pbs

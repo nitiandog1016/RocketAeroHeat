@@ -1,0 +1,2944 @@
+{
+  "version": 83,
+  "status": "tested-same-direction-primitive-coordinate-comparison-and-fresh-current-peak-weighted-research",
+  "recordedUTC": "2026-10-26T08:31:48.648389+00:00",
+  "processID": 20112,
+  "priorProgress": {
+    "path": "docs/validation/v83/progress_current_state_direction.json",
+    "sha256": "a3d727a9cb3d5fcbc39b6ca3230f001f98f9338d1ac69e5ebe016e14d595cbb3",
+    "bytes": 95015
+  },
+  "previousGoalTurnClassification": "progress-current-state-result-source-Jacobian-fresh-direction-Q22-and-original-facet-workbench",
+  "currentGoalTurnClassification": "progress-same-direction-nonlinear-path-test-fresh-Q22-peak-weighted-operator-and-direction",
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/reweightRocketPrimitiveUpdateMetric.m": "d941080d81bbe023925675478d4ea98f3cb11f4bbfc3574f39f7430eddd38dc2",
+    "internalFlow/cutCell/solveRocketRegularizedParentDirection.m": "2ac3c25232e58422015b458fd197e366a182ece55beaa24a5dbb72dcfd5c254f",
+    "internalFlow/cutCell/buildRocketPrimitiveUpdateMetric.m": "364a1aef45e8d86176d93438b0a8aab2eef2e26261fdeafcaacc9cca097b26e4",
+    "internalFlow/cutCell/applyRocketPrimitiveUpdateMetric.m": "2dc93e38dad6bbcaa47be15329ec368826a96cd4a69f4a96fb13ec8794041224",
+    "internalFlow/cutCell/rocketShellTrialState.m": "7dc099e8e570e1ff7ca8fd2fcad74d5aa2513916054201f574f88a131fe65f38",
+    "tests/studyRocketPrimitiveReservoirTrial.m": "acfaa44e6016c251ae683e5cd7c0bf52c04059fd01b84a2b1a0ff13912b264f5",
+    "tests/diagnoseRocketPrimitiveTrialRadius.py": "a63fe51dbb1f27eedacabfe8a9fa62efd1ce78690fa2c575df843f94efa27966",
+    "tests/testRocketPeakWeightedDirection.m": "35e554247bdfddf777638bd4ff61f6e524dcbf20553893390e7f0506518dd728",
+    "tests/studyRocketCurrentPeakDirection.m": "c523f0fbc51c28c780c97f33c548bc6071b29c9dab2f745858ab8abead69a1c2",
+    "tests/auditRocketPeakWeightedDirection.py": "f6be6e0845f68bd521eb79c126e326a51817afcd704bb30cc0d48308218ec5b6",
+    "tests/auditRocketCurrentParentMatrix.py": "965a55304ced0a3e080b82251bad52080d96c821a7bb1904b6e578d0712115a9",
+    "tests/auditRocketPrimitiveReservoirTrial.py": "ad04660a47bb6a9407316a32051658279c951b2b2b29d4a1b5d78435b538c857",
+    "tests/auditRocketSteadyNewtonDirections.py": "82c57218b4e7c837ab0a42bf1311422b50db34f2787b3ad11c4a30444c45b104",
+    "tests/plotRocketTrialCoordinateComparison.py": "bbce1be1daac29fb954fbefb443841a5f1a08e4e44c89c9aa3adbec8ebcf9ac7",
+    "tests/testRocketWallVelocityWorkbench.js": "e86b4c622a1cea898b3282995a0fe3435e0b825f6f04a162849aa08d72e2095c",
+    "tests/auditRocketWallVelocityWorkbench.py": "76042ec282c879e8f4b1d18fa41036500c028e9ee61f1ea2e950e57d653b668d",
+    "tests/testRocketRegularizedZeroStart.m": "7ac50ae41e1e642dd674a5417da759290e2548b0e1e1aa3210c51985a6f25d5c",
+    "tests/studyRocketPeakZeroStart.m": "c4af06c218b820b83f79e6e603f693e86c6123091c3aca0dfa77b1802827d9b7",
+    "tests/continueRocketPeakZeroStart.m": "745037f505374b852f39d8e3360563fb377e4a702f9eac623ec8e3232be94f1d",
+    "tests/auditRocketPeakZeroStart.py": "da59342ada844810f18d93743237e8ea73f16f722e0d3ec361d1185911991d5a",
+    "tests/recordRocketPeakWeightedProgress.py": "3632f583dd7906175e6395d5a506e38bb4051408398a5c7a96f09302a0276a15",
+    "tests/packageRocketPeakResearch.py": "17e77cced6763cbc6607fac72df17d05bc91c5ff501a603edd5559522b8efced",
+    "tests/studyRocketPeakDirectionNS.m": "0647f4cbdc51018999ec7868e345ca6dc578ea78f72c5f7c7e40d792c3a51167",
+    "tests/testRocketDirectionPreparationBinding.m": "92f0ac1c2a922503fb7c663e16f12d2a4a9cc444ea193a252bada1e6ea76886d",
+    "exportRocketWallVelocityStudy.m": "0f8ea9f13c4d519e3a0ead1eba857689616c7d0b07481fff9dfcdf28ab54c754",
+    "web/rocket-wall-velocity.js": "084762a2bd3d8c95603c98f6db5981c0df65d93ee7c6f171aeab727e641d930b",
+    "docs/PEAK_WEIGHTED_DIRECTION_V83.md": "d68892aa71aa43127f7939424d7dc1c33181321586ce03a10222f0d80e590bb6",
+    "docs/PROJECT_GOALS.md": "4b4f341e9e3f70a829335bdcc21347907c0c1c091811c4d5c83c5fe9fec81ebd",
+    "docs/GITHUB_STAGE_READINESS.md": "897d7f9cb58339795f25d6d22ebd9cda467bab9762452b48cfd26af00ab3af1e"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_primitive_reservoir_trial_20261026/auditRocketSteadyNewtonDirections.py",
+      "sha256": "01f2dc1700fa9c021a8abc0fc749e646c688ce1808ce10c6377c0025b347874b",
+      "bytes": 6661
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_primitive_reservoir_trial_20261026/auditRocketWallVelocityWorkbench.py",
+      "sha256": "5799e73ce0ac4bef772d582caf7399054bc954bc64e3e942d72b6282b5bec5fe",
+      "bytes": 17022
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_primitive_reservoir_trial_20261026/exportRocketWallVelocityStudy.m",
+      "sha256": "297665681c981e1aa170d958b53e72d03f73c42937dfd9ab281c75dd60dc2182",
+      "bytes": 21609
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_primitive_reservoir_trial_20261026/rocket-wall-velocity.js",
+      "sha256": "11490825d93207acb514a5e7543e772928eef09ac729d84b097ae06cf91525aa",
+      "bytes": 15396
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_primitive_reservoir_trial_20261026/testRocketWallVelocityWorkbench.js",
+      "sha256": "d00ea5e7ac083f5cb531106dd6be57972c8bb43d64a6570b03b6aea852e16940",
+      "bytes": 18146
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_raw_metric_labels_solveRocketRegularizedParentDirection.m",
+      "sha256": "d218514ae33049069dd59b4eb11dbcaffbcc09d2179cdb506cb80794b64bdec5",
+      "bytes": 6616
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_matrix_layout_auditRocketCurrentParentMatrix.py",
+      "sha256": "b930bc5c89ecb52fcc76c3ef0d51926fa1e245fb9a16b08275d56c7b2c5449b4",
+      "bytes": 8655
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_norm_reference_auditRocketPeakWeightedDirection.py",
+      "sha256": "95a3755e7a18b6cf51b58df5f2dada8a2218ff6d5f5fb94ce4ed9a937f607319",
+      "bytes": 7194
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_fixed_normalization_solveRocketRegularizedParentDirection.m",
+      "sha256": "19f650e10d9a923864c53d4dd96408c16993f4df0ccdbc0b1410242da8f6f9df",
+      "bytes": 7045
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_zero_continue_auditRocketPeakZeroStart.py",
+      "sha256": "7fe39e4067294e2cb9d14205fa90bd55f06752a6e24287eba70c6364f0dd244b",
+      "bytes": 5983
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_option_type_solveRocketRegularizedParentDirection.m",
+      "sha256": "dced07a79b4de346fce331be4cc358b9a1a7502716ff85baec006c1ee2f99c30",
+      "bytes": 7829
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_direction_provenance_20261026/auditRocketWallVelocityWorkbench.py",
+      "sha256": "23f62ad04f697a87f3025b644e7df6c5e428b53f57e8c187a43a72686aa8f3eb",
+      "bytes": 17160
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_direction_provenance_20261026/exportRocketWallVelocityStudy.m",
+      "sha256": "ff22ae47a578f0b093669e86048c0deb464aca723bc4c2177d81387676b1b6a5",
+      "bytes": 21903
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_direction_provenance_20261026/rocket-wall-velocity.js",
+      "sha256": "f25de39087d2bf08dba385559d38a336ad824e8969d9d3f148b85bd9e9f1d6d1",
+      "bytes": 15704
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_peak_direction_provenance_20261026/testRocketWallVelocityWorkbench.js",
+      "sha256": "00f73583e733ea3355c85d1f8d118930d3adea87330355e9068dd35ce4491806",
+      "bytes": 18541
+    }
+  ],
+  "matlabProcesses": {
+    "primitivereservoir01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        20100
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/primitivereservoir01_process.json",
+        "sha256": "4c6223369553c87830a91012c066768baf63595aab1d9807c914c10e10854b07",
+        "bytes": 220667
+      }
+    },
+    "peakweightunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        38656
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/peakweightunit01_process.json",
+        "sha256": "33d1cfdcaff4dfae2b32d9c48046c898ad814a9286cc127589ccd90fe8f43148",
+        "bytes": 221703
+      }
+    },
+    "peakweightreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        56420
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/peakweightreal01_process.json",
+        "sha256": "6305d1292fd73e73e28eaf508b20d151c05f899dd3c7a39e1bf87e63bf1f8d26",
+        "bytes": 222243
+      }
+    },
+    "peakzerounit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        43076
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/peakzerounit01_process.json",
+        "sha256": "d143521e32701250a713651ace43943b46916df1cd01fee641e6569918aea8dc",
+        "bytes": 224557
+      }
+    },
+    "peakzeroreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        52872
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/peakzeroreal01_process.json",
+        "sha256": "c3581939892657cb25b00bf7ea16ccb5230e85e71c602e0ef4cea8943bdf1c43",
+        "bytes": 224783
+      }
+    },
+    "peakzeroreal02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        42144
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/peakzeroreal02_process.json",
+        "sha256": "2790153fdb0c0143f5b80a986639492110997febef50a2a035168e88b136b669",
+        "bytes": 225699
+      }
+    },
+    "peakweightns01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        51952
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/peakweightns01_process.json",
+        "sha256": "18138a65e0817c91b09c28cdbc4390dcdd2d3dc9b7bc86b387fbc3927fe31b76",
+        "bytes": 226323
+      }
+    },
+    "peakweightui01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        24180
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/peakweightui01_process.json",
+        "sha256": "e59fb2d1318320322882251b710aa78a49942bf2cb20d35b28039e728d1e7dab",
+        "bytes": 227021
+      }
+    },
+    "peakweightui02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        51924
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/peakweightui02_process.json",
+        "sha256": "a284711019c2265cdbf33fd57f12ffc2a3a64ee1c1d93bd8c2e8dcd1d471f67f",
+        "bytes": 227203
+      }
+    }
+  },
+  "independentChecks": [
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov23_independent_riemann_reservoir.json",
+        "sha256": "3665dd8f047f9e5adc19a356d776e558d5aa01823f0b88530e4bdfbdbce4de6e",
+        "bytes": 1947
+      },
+      "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov23_independent_direct_ns_probe.json",
+        "sha256": "0fc0aa960de9695a3eeff836cbec21681a279f82867352813adfce4a8baa32e5",
+        "bytes": 3189
+      },
+      "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov23_independent_newton_directions.json",
+        "sha256": "b085ca0ad237e8b0e063dcc5b62e310e45bea4d0a11a131e426f5d04c6f04400",
+        "bytes": 1087
+      },
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/primitivereservoir01_independent_same_direction_trial.json",
+        "sha256": "4cfacdf7abc3fb65ed70a041bb7a89ebdb13bc0a7c4827ded1b7ef41bd0c283a",
+        "bytes": 1581
+      },
+      "status": "passed-independent-same-base-same-original-NS-direction-and-primitive-candidate-branch",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/peakweightunit01_independent_peak_direction.json",
+        "sha256": "81c9146e11903fcc5fea81417cda804cbb1180d2add9ccac35af4c590198f067",
+        "bytes": 1011
+      },
+      "status": "passed-independent-frozen-local-peak-metric-and-total-direction",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/peakweightreal01_independent_current_matrix.json",
+        "sha256": "742698d88c39035d66d36ec95437effff8840b3a457bc9c098212491bf5c0729",
+        "bytes": 1566
+      },
+      "status": "passed-independent-current-Q20-all-parent-coefficients-patch-inverses-and-image-columns",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/peakweightreal01_independent_peak_direction.json",
+        "sha256": "3086dd2af66d4255e80a0b317cb2b0e33fe3b88192bdcaea4bc885da1e5e0b39",
+        "bytes": 2260
+      },
+      "status": "passed-independent-frozen-local-peak-metric-and-total-direction",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/workbench36/node_wall_velocity_summary.json",
+        "sha256": "ab5b7333f172c9c4de211fa53f5976b0e9f8c1aa72e9c7c64a753d9574eb0569",
+        "bytes": 1122
+      },
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "originalSourceEpochBindings": [
+        {
+          "originalPath": "tests\\testRocketWallVelocityWorkbench.js",
+          "originalSource": {
+            "path": "outputs/v83_validation/source_epochs/pre_peak_direction_provenance_20261026/testRocketWallVelocityWorkbench.js",
+            "sha256": "00f73583e733ea3355c85d1f8d118930d3adea87330355e9068dd35ce4491806",
+            "bytes": 18541
+          },
+          "currentCodeQualificationClaimed": false
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/workbench36/independent_wall_velocity_view.json",
+        "sha256": "a28100d47221622f77c6306c9a805f0204db4bbf37cfcdce1cc1d224426bc332",
+        "bytes": 3336
+      },
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/peakzerounit01_independent_zero_start.json",
+        "sha256": "6695a226d2d624215dc52cd77ef4ea9c4cc1f817a01905f40156c68cf031c5ea",
+        "bytes": 915
+      },
+      "status": "passed-independent-fixed-objective-zero-start-and-raw-state-metric",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/peakzeroreal01_independent_zero_start.json",
+        "sha256": "2dfd3a73d8a2502c29884da45cdd6ca2eb9b728322eaf3e343458bfb840531ca",
+        "bytes": 1706
+      },
+      "status": "passed-independent-fixed-objective-zero-start-and-raw-state-metric",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/peakzeroreal02_independent_zero_start.json",
+        "sha256": "914b308c88a5edf0f563df45da2c1243aa4c0c59954698d733947c796211aa94",
+        "bytes": 1853
+      },
+      "status": "passed-independent-fixed-objective-zero-start-and-raw-state-metric",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov24_independent_riemann_reservoir.json",
+        "sha256": "313e96cd1be09029ed04d37f8ea6d4d5ac371791c46ac6f906255123e600e5ec",
+        "bytes": 1947
+      },
+      "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov24_independent_direct_ns_probe.json",
+        "sha256": "c0f47927fe5a32315653b764d39ac12a2a54b5ced17e41bd4ef8376765780ee8",
+        "bytes": 3191
+      },
+      "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov24_independent_newton_directions.json",
+        "sha256": "bb3f82f10590d9989f0db987e590a8f4c771d9a40e2b03b53409047bdc090ef5",
+        "bytes": 1083
+      },
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/workbench38/node_wall_velocity_summary.json",
+        "sha256": "6bf6e47d66a9923c1467fb420dfadcc9e66e081fe1cb06aac6e0acd75c940d31",
+        "bytes": 1122
+      },
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/workbench38/independent_wall_velocity_view.json",
+        "sha256": "0e014c7de80f733196201f373e52d7ed236487a3c50c6d74ac0523e723841023",
+        "bytes": 3627
+      },
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+      "originalSourceEpochBindings": []
+    }
+  ],
+  "primitiveCandidateStudy": {
+    "status": "tested-same-Q20-same-regularized-direction-primitive-tangent-original-NS-trial",
+    "predecessorCase": "krylov20",
+    "referenceCase": "krylov22",
+    "candidateCase": "krylov23",
+    "candidatePath": "primitive-tangent",
+    "referencePath": "conservative",
+    "sameBaseSameDirectionComparison": true,
+    "alternateHistoriesMerged": false,
+    "newStandaloneProbeNS": 0,
+    "newMainActualNS": 6,
+    "main": {
+      "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+      "sourceFaces": 19752,
+      "cellCount": 217272,
+      "acceptedNonlinearIterations": 1,
+      "priorAcceptedNonlinearIterations": 1,
+      "totalNewEquationAcceptedIterations": 2,
+      "candidateTrials": 13,
+      "residualEvaluations": 6,
+      "totalNewEquationResidualEvaluations": 10,
+      "operatorBuilds": 1,
+      "initialMaximumResidual": 4739478.560940738,
+      "maximumResidual": 4761334.867345307,
+      "initialRmsMerit": 519444.27593809797,
+      "rmsMerit": 519076.96686667466,
+      "elapsedSeconds": 132.6041478,
+      "matrixVectorProducts": 2,
+      "jacobianResidualEvaluations": 2,
+      "preconditionerApplications": 1,
+      "lineage": {
+        "sourceState": "krylov19-state-only-explicit-new-Riemann-reservoir-boundary",
+        "sourceHistoryAppended": false,
+        "newBoundaryProblemInitialCounter": 0,
+        "previousProblemAcceptancesNotAppended": 13,
+        "previousProblemNSNotAppended": 258,
+        "externalCFDImported": false,
+        "interiorEulerFlux": "exact-godunov",
+        "wallVelocityGradient": "dirichlet-tangent"
+      },
+      "wallVelocityGradient": "dirichlet-tangent",
+      "sameEquationHistoryContinued": true,
+      "steadyConverged": false,
+      "stopReason": "maximum-nonlinear-iterations",
+      "spatialConservationRelative": 2.6263954804383425e-16,
+      "steadyBoundaryFluxBalance": 0.01002978052860435,
+      "signedHeatPowerW": 923428.6932635275,
+      "wallHeatRangeWm2": [
+        -356383.74230758566,
+        2255791.6236224105
+      ],
+      "physicalTimeAdvanced": 0,
+      "BETimeStepsClaimed": 0,
+      "physicalSolution": false,
+      "newProductionSolvedAreaM2": 0,
+      "engineProcessID": 20100,
+      "priorActualResidualEvaluations": 4,
+      "openBoundaryDiscretization": "exact-Riemann-reservoir",
+      "sourceHistoryAppended": false,
+      "residualEvaluationsAfterLastAcceptedHistory": 0,
+      "normalEulerLinearization": "exact-branch",
+      "physicalSpatialEquationChanged": false,
+      "linearEquation": "steady-newton",
+      "preconditionerTimeStepOnly": true,
+      "steadyInitialGuessReport": {
+        "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\directnsprobereal04\\direct_ns_direction_probe.mat",
+        "sourceVariant": "ns-probe",
+        "directionScale": 1,
+        "sourceFileSHA256": "b7e67f510aadf7680c61371723cb6e3bc7f843050fd2d7a0804b30d6e1a2a4f8",
+        "sourceGeometryFile": "E:\\RocketAeroHeat\\outputs\\v80_validation\\domain02\\shell_domain_evidence.mat",
+        "sourceGeometryFileSHA256": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+        "sourceStateAndGeometryVerified": true,
+        "sourceSavedActualNSRelativeDefect": 0.07407219999606847,
+        "originalNSProbeArithmeticVerified": true,
+        "oldDerivativeReused": false,
+        "originalNSAcceptanceClaimed": false,
+        "newModelApplications": 0,
+        "newActualNSEvaluations": 0,
+        "coarseImageRequired": false,
+        "sourceStateLocation": "result"
+      },
+      "steadyInitialGuessModelApplications": 1
+    },
+    "acceptedAlpha": 0.000244140625,
+    "referenceAcceptedAlpha": 0.000244140625,
+    "referenceRmsMerit": 519063.76917125436,
+    "referenceMaximumResidual": 5026231.2699140515,
+    "rmsBetterThanReference": false,
+    "maximumBetterThanReference": true,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 20100
+  },
+  "currentPeakDirectionStudy": {
+    "status": "tested-fresh-current-state-peak-weighted-total-direction-research",
+    "sourceCase": "krylov22",
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov22\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "41bfea06a21bacfe682c3ab02a045736b1b285dbb3bcdcf3f3749e15088638ff",
+      "stateLocation": "result"
+    },
+    "sourceIdentity": {
+      "applyCutCellSelectedDirection": "f5ec0371d508b8d8cc2972dbe1a6b4f227209374b1751e6a6b55d210518c5cbf",
+      "buildCutCellSelectedDirectionCache": "2481ebf86c5453b3d2b6b5a1f9fa13274e4514854d1d76c6ab80b85f7ca1774b",
+      "buildCutCellGradientOperator": "dc5d35b0fe06b94e729b6313cb50c07743f60c0a5f7d552ece9ac5497456f43e",
+      "cutCellCharacteristicBoundaryDirection": "24580fda99a5da684aa9c80e397ad4d9529c50a04792e10915d596d12e7bc461",
+      "cutCellBoundaryDirectionalState": "8b7f03f5f795fe733ea8b7f6beba07085afbe8ae1a192f9b5688f868bb60affc",
+      "cutCellWlsViscousDirection": "a6be816864e8aa6bcf6170c1091435b4a795744f0095b39aba7265f1c44f5f85",
+      "cutCellSelectedEulerDirection": "d82dc62e57edc7046a13bfcdaa506c3f75fb7a352bec0d1039300147c82b43bb",
+      "cutCellExactEulerBranchJacobian": "1018f50acad9bde439d48e1615f59e1da09d1353ac43e87630bed34bc86ab507",
+      "cutCellExactEulerFlux": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+      "cutCellConservativeDerivatives": "d867bbff5f1d2feb63a864030ea0f0ef77e3e2d121d66398d0cf9a49cd0fa33b",
+      "cutCellBoundaryStencilState": "cece939ebd097eab666dee2757692289f06e57cc52f64d83264a2e7b83b8d2e3",
+      "cutCellNavierStokesResidual": "e13e67511a62e1a7faef37b3d27be698faa72c943b73b2a33cce4bd26797a52b",
+      "resolveNSRiemannReservoir3D": "70f035c1c76f816e6d00dbc9f0460a2728bbb2631d940f512c0fc85cf10fdaf6",
+      "buildCutCellRiemannReservoirBoundaryState": "29613f88092acd22c87795775d2d6f16d12e0e0b1ab43a0609378cf52bdf32ac",
+      "buildCutCellRiemannReservoirJacobian": "a379800fb86348f589ffc1798af50071d5438a95ebd451cc1fff8e24ebc04225",
+      "resolveNSCharacteristicBoundary3D": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9"
+    },
+    "seedFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\updateradiusreal01\\regularized_parent_candidate_evidence.mat",
+    "seedFileSHA256": "48dd342a7a4966d585bb229ec893d2cf2d12cc187df6eb174826f5aafbd17d70",
+    "currentStateCompleteNSExactlyReplayed": true,
+    "oldNumericMatricesFactorsOrDerivativesReused": false,
+    "constructionSeconds": 110.4835071,
+    "factorReport": {
+      "patchCount": 29577,
+      "maximumPatchCells": 8,
+      "includedOriginalBlocksBeforeFallback": 765610,
+      "originalBlocks": 1619664.0,
+      "maximumCertifiedLocalInverseDefect": 9.784854110252921e-09,
+      "inverseDefectThreshold": 1e-08,
+      "fallbackPatchCount": 0,
+      "accurateCheckedPatches": 9,
+      "refinedPatches": 0,
+      "factorStorageUpperBoundBytes": 355781600.0,
+      "algorithmArrayConstructionEstimateBytes": 1173443968.0,
+      "factorSeconds": 1.3253292,
+      "processPeakMemoryClaimed": false,
+      "fallbackPolicy": "certified-original-CV-five-field-diagonal-only-in-preconditioner",
+      "allOriginalCellsAndFiveFieldsKept": true,
+      "physicalEquationChanged": false,
+      "rejectedPatchInverseClaimedValid": false,
+      "diagonalCompensationApplied": false,
+      "fixedLinearMap": true,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "columnConstruction": {
+      "method": "inverse-complete-parent-C-local-five-field-map-column-two-norm",
+      "groups": 29577,
+      "originalBlocksUsedExactlyOnce": 1619664.0,
+      "allOriginalCVs": 217272,
+      "allOriginalUnknownColumnsCoveredExactlyOnce": true,
+      "columnNormRange": [
+        1.0000000076639894,
+        28076.408457276495
+      ],
+      "columnNormSpan": 28076.408242099198,
+      "columnScaleRange": [
+        3.561709117894075e-05,
+        0.9999999923360107
+      ],
+      "maximumSupportedOriginalRows": 50,
+      "maximumDensePanelAndImageArrayBytes": 160000,
+      "additionalWorkspaceArrayBoundBytes": 79910400.0,
+      "fullGlobalPreconditionedMatrixAllocated": false,
+      "processPeakMemoryClaimed": false,
+      "oldSchurUsed": false,
+      "fixedCRepresentativesUsed": false,
+      "originalParentResidualNormUnchanged": true,
+      "elapsedSeconds": 7.858178,
+      "newLocalInverseConstructions": 0,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "weighting": {
+      "method": "frozen-local-primitive-peak-reweighted-quadratic-penalty",
+      "options": {
+        "transitionFraction": 10,
+        "maximumRowWeight": 256
+      },
+      "weightRange": [
+        1.0000000000000002,
+        106.0898712260593
+      ],
+      "weightedComponents": 4090,
+      "upperWeightComponents": 0,
+      "fixedWithinLinearSolve": true,
+      "hardStateUpdateBoundEnforced": false,
+      "physicalStateClipping": false,
+      "referenceMaximumRelativeComponents": [
+        1060.8515813610236,
+        495.03631026137487,
+        683.5192351995325,
+        746.9302741730551,
+        827.6962455140501
+      ],
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "linearReport": {
+      "method": "complete-parent-C-current-state-primitive-update-Tikhonov-LSQR",
+      "options": {
+        "maximumIterations": 256,
+        "regularizationStrength": 0.1,
+        "relativeTolerance": 0.001,
+        "adjointIdentityTolerance": 1e-08,
+        "maximumVectorEstimateBytes": 402653184.0
+      },
+      "penaltyInOriginalResidualUnits": 143.48343828097993,
+      "metricNormalization": 377055.97234931245,
+      "initialRelativeCResidual": 391.84623358360784,
+      "relativeCResidual": 11.82660305881914,
+      "internalCTargetMet": false,
+      "initialPrimitiveUpdateNorm": 377055.97234931245,
+      "primitiveUpdateNorm": 7137467.413618085,
+      "primitiveUpdateNormIncludesRowWeights": true,
+      "initialMaximumDensityFraction": 1060.8515813610236,
+      "maximumDensityFraction": 476694.74363763386,
+      "initialMaximumVelocityOverSound": 851.4521721637205,
+      "maximumVelocityOverSound": 476788.5634323944,
+      "initialMaximumTemperatureFraction": 827.6962455140497,
+      "maximumTemperatureFraction": 192235.4782689573,
+      "initialNormalizedAugmentedObjective": 153543.48077365936,
+      "normalizedAugmentedObjective": 143.45178594302345,
+      "nativeFlag": 1,
+      "nativeRelativeAugmentedCorrectionResidual": 0.03056590709691123,
+      "nativeIterations": 256,
+      "nativeResidualHistory": [
+        211993863653.85672,
+        147226303569.3846,
+        123845327564.18048,
+        111579133675.3571,
+        103068968173.6108,
+        97017602758.27428,
+        91659881902.62569,
+        87232186834.09259,
+        82918994061.3925,
+        76920241930.47153,
+        72551958416.73167,
+        69923382786.80653,
+        67119460251.97416,
+        64335430130.10871,
+        62284107731.01123,
+        60875389197.22436,
+        59546396517.19446,
+        57877376753.21905,
+        55739155145.06481,
+        53824787329.2153,
+        52263081837.9966,
+        50939626455.554184,
+        49797521630.57173,
+        49034856094.884636,
+        47958413993.26293,
+        46488253191.9972,
+        44450386104.98767,
+        42847467266.004715,
+        41882748027.30673,
+        40985620523.62479,
+        39671477623.16013,
+        38289140337.20829,
+        37174786570.01963,
+        36184767517.31618,
+        35446080518.31299,
+        34542101258.72678,
+        33723690639.064594,
+        32795900868.645996,
+        32021033154.75673,
+        31305292546.86977,
+        30597664693.215057,
+        30128854660.127213,
+        29673512427.748425,
+        29275437270.90253,
+        28861115998.99885,
+        28508583948.36982,
+        28192478834.044987,
+        27833361907.68361,
+        27560824338.707718,
+        27296634634.051506,
+        26902959986.017864,
+        26535091425.32265,
+        26284851739.93874,
+        26056122720.54663,
+        25823070655.943584,
+        25492794250.198376,
+        25124957124.2549,
+        24740683096.26891,
+        24425000663.297077,
+        24170293217.37257,
+        23910697729.20665,
+        23595551613.780304,
+        23273034931.156532,
+        23016591859.157227,
+        22837294485.873993,
+        22627549589.040848,
+        22351743645.110863,
+        22043835975.802715,
+        21813383216.75278,
+        21624473657.71486,
+        21428175033.967613,
+        21219620512.85789,
+        20951404079.74095,
+        20681617921.35441,
+        20434561534.02224,
+        20245704668.15474,
+        20058478659.279774,
+        19844249372.388676,
+        19588188332.66601,
+        19383917902.176193,
+        19219893103.313824,
+        19032082990.520046,
+        18833734296.46597,
+        18632598224.077736,
+        18450051748.651814,
+        18237365567.341053,
+        18008533387.294727,
+        17841813641.818924,
+        17638309531.444504,
+        17432965055.30271,
+        17208768770.73957,
+        17004974239.388063,
+        16844761706.610367,
+        16696787484.18964,
+        16503229508.030798,
+        16305062288.83087,
+        16129915049.255877,
+        15990428257.025858,
+        15873578590.313019,
+        15769231004.456627,
+        15657838065.185122,
+        15518302811.40315,
+        15377026901.297766,
+        15257420632.88782,
+        15114161260.956007,
+        14985589028.963795,
+        14872434383.803413,
+        14769868715.987812,
+        14646984818.106865,
+        14526277053.195665,
+        14357881661.914686,
+        14222622973.068903,
+        14124586461.10153,
+        14029612120.035622,
+        13903614248.777128,
+        13756189947.781086,
+        13647402011.245813,
+        13543558247.682693,
+        13429959432.70586,
+        13320647691.49131,
+        13222636893.067284,
+        13108069869.090363,
+        13006346366.005129,
+        12920417072.436642,
+        12842946951.230242,
+        12752216129.75602,
+        12661632125.314114,
+        12574205391.48809,
+        12499863427.748549,
+        12395935769.516985,
+        12296372195.505491,
+        12197787458.5754,
+        12112155645.565557,
+        12017419129.068342,
+        11918321227.474758,
+        11846114373.2914,
+        11769266973.346216,
+        11673382347.910196,
+        11574082581.217176,
+        11500838162.299799,
+        11438866021.835442,
+        11376943200.538351,
+        11298919240.729494,
+        11232469785.19547,
+        11177340867.164154,
+        11119862101.580708,
+        11068158509.37994,
+        11008887325.883118,
+        10946954034.719982,
+        10882731202.060106,
+        10825496066.012135,
+        10774570976.14122,
+        10715373201.839516,
+        10640143021.106451,
+        10586204252.68905,
+        10531521606.964947,
+        10472771417.350414,
+        10412965287.811392,
+        10355883427.01103,
+        10296216290.25869,
+        10234320337.194427,
+        10184383972.529867,
+        10142402507.505327,
+        10098677539.021059,
+        10043303242.219767,
+        9990777532.233139,
+        9941193157.020897,
+        9895339119.595211,
+        9839485770.208677,
+        9778574420.993496,
+        9717379265.272987,
+        9671636878.362638,
+        9626008005.690308,
+        9573262880.669937,
+        9521727163.50641,
+        9474539978.992956,
+        9421863487.39502,
+        9371632764.740849,
+        9320366522.607918,
+        9260467912.806795,
+        9208458719.206219,
+        9168136742.371916,
+        9132380861.425867,
+        9094343872.744867,
+        9047620551.560686,
+        8994332242.231405,
+        8926403926.599806,
+        8877588107.310438,
+        8834434918.811157,
+        8800522814.413116,
+        8755348602.706656,
+        8705382594.65934,
+        8661263389.63764,
+        8623495144.465557,
+        8582202189.76877,
+        8537147937.962548,
+        8494016570.242549,
+        8449055152.081768,
+        8405239478.238627,
+        8362326900.4367485,
+        8327822845.54734,
+        8288373115.573197,
+        8248369868.193879,
+        8205426442.225006,
+        8163843521.165171,
+        8131777109.61059,
+        8099515343.507951,
+        8059275854.700539,
+        8020714796.718716,
+        7981559702.499805,
+        7946467742.04818,
+        7912571200.4007635,
+        7875725001.029451,
+        7839815076.72096,
+        7807488756.31982,
+        7775485300.113273,
+        7743783924.117275,
+        7710209109.510956,
+        7675743887.964224,
+        7638866514.790219,
+        7615156609.271751,
+        7586705065.121261,
+        7548698498.435628,
+        7511685799.7251625,
+        7478886768.548478,
+        7443956684.654172,
+        7410564068.829553,
+        7380841222.147897,
+        7347913500.098631,
+        7312670621.860188,
+        7276304302.2961645,
+        7243491489.302776,
+        7211979641.110689,
+        7180583804.9337435,
+        7148064890.721085,
+        7116786840.725881,
+        7086714495.606099,
+        7057980532.028564,
+        7028460701.713899,
+        6998265128.975958,
+        6969018293.277992,
+        6942815506.293111,
+        6914025878.51675,
+        6881570049.530908,
+        6845924274.589609,
+        6816908406.490823,
+        6788120773.963084,
+        6755830268.475077,
+        6722781059.546335,
+        6689956700.069236,
+        6657643930.548848,
+        6629103471.986924,
+        6597704361.854955,
+        6566402453.1307,
+        6538218942.322694,
+        6511438444.591406,
+        6479784741.559051
+      ],
+      "nativeNormalResidualHistory": [
+        152531353380.82266,
+        49996305463.459946,
+        24300940255.595432,
+        15539050464.399271,
+        11785418826.48172,
+        10202928109.100588,
+        8599262711.649368,
+        7848015166.333683,
+        6724841660.717272,
+        5621642884.992554,
+        4615644849.485458,
+        3647168840.0429964,
+        3741970693.154812,
+        3275776018.4200006,
+        2819115007.0517993,
+        2663063378.543191,
+        2354745963.1086917,
+        2349642683.566005,
+        2709615165.093774,
+        2345402750.472819,
+        1978671485.740803,
+        1922462363.5964234,
+        1438366637.9305623,
+        1314065462.7959018,
+        1490554321.8401508,
+        1805323444.7649984,
+        1738715257.1337519,
+        1379451432.3742576,
+        1143036330.5170946,
+        1281670997.718553,
+        1374994307.0465193,
+        1354757221.3833923,
+        1129828886.3386984,
+        902814723.2221223,
+        873344811.8313514,
+        923730027.2399505,
+        963835965.3385782,
+        816469001.2058542,
+        755566551.8995092,
+        724188786.9972328,
+        632937329.5647702,
+        603309463.1803018,
+        525856614.55373174,
+        522773380.47972876,
+        521850380.4855279,
+        448926189.3677158,
+        428649592.94427687,
+        393354214.55163056,
+        359670914.3002617,
+        422324800.05265903,
+        466925481.68285596,
+        397483668.9511014,
+        330997857.09284884,
+        323621687.08955604,
+        365687190.1837172,
+        412306286.51586103,
+        396411303.2791867,
+        397493628.46637815,
+        329714819.54056364,
+        323545148.2914348,
+        321505497.06383634,
+        339754901.9210731,
+        322766929.3871191,
+        266121676.25802645,
+        263345539.8496115,
+        292570524.3959313,
+        300134686.41443974,
+        296964383.0112217,
+        277450465.10068434,
+        262100833.12610212,
+        268024021.2232844,
+        263820064.75913936,
+        270249405.17494017,
+        260839141.71079114,
+        241036576.21593633,
+        221203044.25390065,
+        225395269.86236697,
+        247909362.1841155,
+        246335482.12798208,
+        219084932.8269262,
+        213715047.40822676,
+        203217250.6434283,
+        210729099.43316776,
+        211623686.79605678,
+        204846008.5797961,
+        213597062.07817855,
+        208322781.75834808,
+        202735497.07154083,
+        213321992.80573753,
+        217114106.74400005,
+        199700732.12843052,
+        175504063.66162315,
+        174735366.4937256,
+        166845031.28810847,
+        171991883.9956977,
+        176358645.9334538,
+        180339984.84147474,
+        151249153.51862556,
+        132954041.89030667,
+        134496057.14925712,
+        134067472.78363004,
+        139295800.88862392,
+        143841872.1350005,
+        141512419.93348208,
+        137185297.29051206,
+        129873759.5614884,
+        121543597.59041284,
+        121469323.07933144,
+        115301109.84355916,
+        131588797.81226605,
+        130230996.46948336,
+        120684107.4414409,
+        109204322.46032803,
+        118617088.79003108,
+        121728020.45828,
+        113931099.13874999,
+        110966463.07133569,
+        109282586.72479238,
+        112489190.94433227,
+        102273448.38243888,
+        101312418.43073529,
+        112904949.77829552,
+        104894880.86084972,
+        102771687.06059758,
+        95154475.0359861,
+        97809449.99765147,
+        95278373.45141697,
+        85925296.66181737,
+        88090849.2639973,
+        96560370.3771386,
+        93456521.79507531,
+        86738817.47926249,
+        87002709.0819974,
+        92602093.92925298,
+        83759747.69159657,
+        75389889.22141448,
+        81313158.05761638,
+        91532612.38896295,
+        83910542.72786325,
+        68461441.99728617,
+        70203678.57730684,
+        77494325.71262872,
+        75504776.4906443,
+        64662568.79245023,
+        68081434.10219558,
+        69930477.36042605,
+        65927517.3743338,
+        69724479.94217268,
+        70464925.0162584,
+        66072939.21012372,
+        68736637.05352603,
+        64083299.81206442,
+        64814016.65825276,
+        66375817.98576875,
+        63556486.44884295,
+        60955928.86859601,
+        66372987.27387305,
+        61897383.831393644,
+        58032641.03763731,
+        60145673.85450267,
+        56533676.716379926,
+        54590881.72864792,
+        56223327.12768815,
+        57645873.81407208,
+        60238126.38054354,
+        54203996.13060099,
+        50285584.726957306,
+        51488150.38121099,
+        54785998.57363575,
+        58611312.63228383,
+        54753034.13030498,
+        49845332.47460707,
+        48666189.14328399,
+        56056806.993543945,
+        59622490.04753063,
+        53864746.4735062,
+        50640878.221668914,
+        50550144.758959495,
+        53989494.95545309,
+        52521152.8108258,
+        48231821.09292032,
+        42761368.78566567,
+        43164921.504400894,
+        46935124.56113872,
+        49211109.190998614,
+        48803763.57409849,
+        50027095.744894676,
+        43414687.59158449,
+        40863346.93038759,
+        41129963.77914018,
+        44153215.361996986,
+        46433945.07203986,
+        41074601.38840772,
+        45172822.0110863,
+        43541822.19218217,
+        41826986.66780112,
+        38756016.418339476,
+        40322724.77265893,
+        41499231.48143503,
+        39439371.151117556,
+        37641510.86293762,
+        39562496.63588484,
+        39610326.26645282,
+        41364465.70578677,
+        36595073.540818214,
+        41361099.108896956,
+        38304998.55170105,
+        36921354.21101638,
+        35043237.78785811,
+        36297345.96308323,
+        34218610.64252968,
+        40170326.13901713,
+        38865222.78940039,
+        35191562.37159872,
+        31226815.124876358,
+        35259667.51199787,
+        35166901.92676714,
+        35242009.1542008,
+        35299226.58473267,
+        34065548.68386143,
+        33186389.003900282,
+        33723642.58656008,
+        33139628.788369805,
+        34204710.12763799,
+        37948086.239037715,
+        34688080.68906513,
+        32685253.453722365,
+        33161143.486406267,
+        32864217.004624378,
+        33651318.567896195,
+        33751957.126612425,
+        31624009.996860906,
+        28164990.809520025,
+        30985418.46141341,
+        32006756.837291297,
+        32250636.4072599,
+        28575852.665088125,
+        26715449.826347522,
+        28429417.29053901,
+        29425762.761692457,
+        28767400.54470696,
+        27471916.883585542,
+        28535448.3839691,
+        29577633.340910945,
+        27538055.113433536,
+        28421034.530421063,
+        30055723.423441574,
+        30416877.556487516,
+        27756913.58202991,
+        27208470.0206615,
+        29096509.222530548,
+        30398774.99621747,
+        27709357.726105686,
+        27124661.96676955,
+        24735438.93547834,
+        25556614.52236486
+      ],
+      "adjointIdentityRelativeDifference": 5.915834441283384e-18,
+      "operatorApplications": {
+        "C": 259,
+        "CT": 258,
+        "M": 258,
+        "MT": 258,
+        "W": 259,
+        "WT": 258
+      },
+      "nativeSolverApplications": {
+        "C": 256,
+        "CT": 257,
+        "M": 256,
+        "MT": 257,
+        "W": 256,
+        "WT": 257
+      },
+      "declaredExtraVectorArrayEstimateBytes": 278108160.0,
+      "processPeakMemoryClaimed": false,
+      "elapsedSeconds": 355.647042,
+      "totalDirectionPenalized": true,
+      "originalParentResidualNormUnchanged": true,
+      "originalNSAcceptanceClaimed": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "physicalSolution": false
+    },
+    "currentSeedCompleteModelRelativeDefect": 391.84653193551014,
+    "completeSelectedModelRelativeDefect": 12.842478696821765,
+    "maximumRawPrimitiveComponentsBefore": [
+      1060.8515813610236,
+      495.03631026137487,
+      683.5192351995325,
+      746.9302741730551,
+      827.6962455140501
+    ],
+    "maximumRawPrimitiveComponentsAfter": [
+      476694.74363763386,
+      18561.384700680093,
+      73712.51743972157,
+      471037.052712543,
+      192235.47826895816
+    ],
+    "rawPrimitiveUpdateNormBefore": 6420.808766198763,
+    "rawPrimitiveUpdateNormAfter": 1426927.9395069117,
+    "newSelectedModelApplications": 2,
+    "newActualNSEvaluations": 1,
+    "newFlowAcceptances": 0,
+    "physicalStateChanged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 56420,
+    "modelPointOneMet": false
+  },
+  "fixedObjectiveZeroStartStudy": {
+    "status": "tested-current-Q22-same-augmented-objective-zero-start-direction",
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov22\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "41bfea06a21bacfe682c3ab02a045736b1b285dbb3bcdcf3f3749e15088638ff",
+      "stateLocation": "result"
+    },
+    "sourceIdentity": {
+      "applyCutCellSelectedDirection": "f5ec0371d508b8d8cc2972dbe1a6b4f227209374b1751e6a6b55d210518c5cbf",
+      "buildCutCellSelectedDirectionCache": "2481ebf86c5453b3d2b6b5a1f9fa13274e4514854d1d76c6ab80b85f7ca1774b",
+      "buildCutCellGradientOperator": "dc5d35b0fe06b94e729b6313cb50c07743f60c0a5f7d552ece9ac5497456f43e",
+      "cutCellCharacteristicBoundaryDirection": "24580fda99a5da684aa9c80e397ad4d9529c50a04792e10915d596d12e7bc461",
+      "cutCellBoundaryDirectionalState": "8b7f03f5f795fe733ea8b7f6beba07085afbe8ae1a192f9b5688f868bb60affc",
+      "cutCellWlsViscousDirection": "a6be816864e8aa6bcf6170c1091435b4a795744f0095b39aba7265f1c44f5f85",
+      "cutCellSelectedEulerDirection": "d82dc62e57edc7046a13bfcdaa506c3f75fb7a352bec0d1039300147c82b43bb",
+      "cutCellExactEulerBranchJacobian": "1018f50acad9bde439d48e1615f59e1da09d1353ac43e87630bed34bc86ab507",
+      "cutCellExactEulerFlux": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+      "cutCellConservativeDerivatives": "d867bbff5f1d2feb63a864030ea0f0ef77e3e2d121d66398d0cf9a49cd0fa33b",
+      "cutCellBoundaryStencilState": "cece939ebd097eab666dee2757692289f06e57cc52f64d83264a2e7b83b8d2e3",
+      "cutCellNavierStokesResidual": "e13e67511a62e1a7faef37b3d27be698faa72c943b73b2a33cce4bd26797a52b",
+      "resolveNSRiemannReservoir3D": "70f035c1c76f816e6d00dbc9f0460a2728bbb2631d940f512c0fc85cf10fdaf6",
+      "buildCutCellRiemannReservoirBoundaryState": "29613f88092acd22c87795775d2d6f16d12e0e0b1ab43a0609378cf52bdf32ac",
+      "buildCutCellRiemannReservoirJacobian": "a379800fb86348f589ffc1798af50071d5438a95ebd451cc1fff8e24ebc04225",
+      "resolveNSCharacteristicBoundary3D": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9"
+    },
+    "linearReport": {
+      "method": "complete-parent-C-current-state-primitive-update-Tikhonov-LSQR",
+      "options": {
+        "maximumIterations": 128,
+        "regularizationStrength": 0.1,
+        "metricNormalization": 377055.97234931245,
+        "relativeTolerance": 0.001,
+        "adjointIdentityTolerance": 1e-08,
+        "maximumVectorEstimateBytes": 402653184.0
+      },
+      "penaltyInOriginalResidualUnits": 143.48343828097993,
+      "metricNormalization": 377055.97234931245,
+      "initialRelativeCResidual": 1,
+      "relativeCResidual": 0.16639589557842935,
+      "internalCTargetMet": false,
+      "initialPrimitiveUpdateNorm": 0,
+      "primitiveUpdateNorm": 15355.532112939423,
+      "primitiveUpdateNormIncludesRowWeights": true,
+      "initialMaximumDensityFraction": 0,
+      "maximumDensityFraction": 149.94891021761637,
+      "initialMaximumVelocityOverSound": 0,
+      "maximumVelocityOverSound": 153.35408876811266,
+      "initialMaximumTemperatureFraction": 0,
+      "maximumTemperatureFraction": 195.0894683629296,
+      "initialNormalizedAugmentedObjective": 1,
+      "normalizedAugmentedObjective": 0.02770417916528686,
+      "zeroDirectionNormalizedObjective": 1,
+      "beatsZeroDirectionObjective": true,
+      "nativeFlag": 1,
+      "nativeRelativeAugmentedCorrectionResidual": 0.16644572436711078,
+      "nativeIterations": 128,
+      "nativeResidualHistory": [
+        541012873.3705745,
+        483557565.5901158,
+        448860382.53623015,
+        421592083.4501985,
+        398509652.8331035,
+        376704723.8724111,
+        357899939.16665816,
+        342036279.03497684,
+        328278061.0408902,
+        315881554.6880672,
+        304491124.6398668,
+        294278736.056455,
+        285056903.75873923,
+        276791771.93275326,
+        269004344.7779202,
+        261488307.52668497,
+        254417873.67694348,
+        247780443.26228106,
+        241559123.21697342,
+        235494110.61690795,
+        229751777.11053428,
+        224482147.2366315,
+        219749663.81982392,
+        215359301.0094503,
+        211162095.10031474,
+        207122104.15534353,
+        203583730.0396611,
+        200371906.2068453,
+        197080239.95627445,
+        193877756.75133812,
+        190931022.45338672,
+        188146510.14078337,
+        185441314.40634498,
+        182810532.9276197,
+        180378353.4983588,
+        177944792.86487645,
+        175644778.98487794,
+        173498190.60311788,
+        171392853.93469477,
+        169322889.0724585,
+        167353298.18146497,
+        165486826.45220104,
+        163629940.55987406,
+        161795965.54528826,
+        160135686.82831794,
+        158542502.09162438,
+        156918551.01146334,
+        155409259.15423554,
+        153851743.87340012,
+        152397589.26350218,
+        150928909.8762048,
+        149523695.2571515,
+        148150869.9017052,
+        146784178.7918076,
+        145396037.27686584,
+        144072324.56861258,
+        142808299.96716926,
+        141567119.03413153,
+        140378730.58535877,
+        139192600.90943143,
+        138060446.4116904,
+        136927528.73136815,
+        135832642.59002727,
+        134739965.6273662,
+        133653054.89088309,
+        132617433.01832275,
+        131658001.88077916,
+        130761078.05116758,
+        129843564.78744745,
+        128870154.16467762,
+        127928394.47815338,
+        127012330.70652172,
+        126067240.96414398,
+        125122391.01235788,
+        124245257.58432335,
+        123380055.7703295,
+        122522309.89561774,
+        121676031.12073016,
+        120864551.00641465,
+        120048940.51957168,
+        119298277.77914737,
+        118555282.25525758,
+        117814146.4152446,
+        117057163.19667691,
+        116302531.87345403,
+        115534079.31302772,
+        114772531.87120315,
+        114022002.7446087,
+        113298872.40339907,
+        112580534.65148139,
+        111852326.50974694,
+        111131586.53470574,
+        110432320.89817113,
+        109784375.92225061,
+        109171702.06102578,
+        108532116.76920147,
+        107879153.25890777,
+        107238924.6121026,
+        106604855.5814778,
+        105967534.79312345,
+        105350858.69386618,
+        104739086.15997152,
+        104134891.26247361,
+        103526414.19140042,
+        102930668.9574346,
+        102329880.49587908,
+        101726638.28362772,
+        101108187.17482696,
+        100511676.12498558,
+        99925833.44349808,
+        99336029.14960705,
+        98761428.28953145,
+        98187989.54030614,
+        97617043.5808201,
+        97062951.4728001,
+        96532350.51642641,
+        95985307.04387915,
+        95424964.87610509,
+        94870233.77173842,
+        94354348.26392816,
+        93883708.42070766,
+        93432758.3201258,
+        92966278.12163009,
+        92475564.10359676,
+        91977513.76444107,
+        91483535.14565977,
+        91012840.25447993,
+        90533624.44893363,
+        90049279.60009724
+      ],
+      "nativeNormalResidualHistory": [
+        242625245.82830644,
+        99688880.66901354,
+        71332061.80590267,
+        57320475.812984996,
+        44047577.66377865,
+        36859616.5749227,
+        30750401.9395434,
+        25404853.82784795,
+        22318226.343413226,
+        19976272.838305913,
+        17653777.672021437,
+        15845934.62906593,
+        14096134.720684627,
+        13256532.214416953,
+        11870442.335250838,
+        10879945.861383712,
+        10238986.575288469,
+        9405052.684177129,
+        8699593.60086091,
+        8181040.554016301,
+        7547634.853719231,
+        6908993.959276655,
+        6483219.018729868,
+        6084677.096852299,
+        5636280.208822535,
+        5398474.781078334,
+        5224770.700334105,
+        4984647.375344615,
+        4766662.090434539,
+        4533644.567845111,
+        4213019.95269417,
+        3939889.6139707766,
+        3738601.8922105036,
+        3579084.512707407,
+        3471657.418670102,
+        3313061.326399608,
+        3143183.028422693,
+        3049566.441264951,
+        2978302.522915822,
+        2785828.4798663147,
+        2669028.0611277265,
+        2628568.27755575,
+        2611467.5875038477,
+        2470215.524819744,
+        2334869.4874693034,
+        2309467.79668477,
+        2278977.7571486277,
+        2209123.955908094,
+        2122313.1353861727,
+        2037876.3073748178,
+        2004310.8986442233,
+        1997625.7806087101,
+        1920937.1044773965,
+        1875784.3989186697,
+        1827052.557222968,
+        1795633.1165963148,
+        1747786.392121722,
+        1665643.3249053224,
+        1638371.1912380294,
+        1598724.2998155253,
+        1555816.2412912797,
+        1509637.7513117096,
+        1519647.2055369522,
+        1465737.3503622145,
+        1472808.7183424963,
+        1486047.5855435664,
+        1450413.741024434,
+        1407856.2934046004,
+        1373028.724261795,
+        1319309.5625633723,
+        1289522.4612505683,
+        1267719.0898930272,
+        1231027.008689688,
+        1236637.8732727687,
+        1186996.0670010368,
+        1188056.02080748,
+        1139841.6523731768,
+        1131563.6311243807,
+        1118097.5054557507,
+        1115196.2429464534,
+        1103247.2474347958,
+        1095067.6948421218,
+        1051747.5759527362,
+        1013052.8330885627,
+        988167.2279691369,
+        989474.9694934754,
+        962377.9655020098,
+        935993.8437999213,
+        948166.6859778847,
+        923713.955366403,
+        917393.2624256703,
+        905643.683347182,
+        913824.2808194127,
+        921024.6061793944,
+        893674.8649934605,
+        847405.5858640897,
+        836802.8576328736,
+        828891.7485200131,
+        823284.9074623872,
+        817241.3526609384,
+        802633.1304836395,
+        816856.0785707318,
+        800690.5526952284,
+        784232.9946201411,
+        756399.0052395483,
+        753436.0803048488,
+        742300.963624241,
+        722782.1705149089,
+        696526.2785962031,
+        698772.7158574717,
+        700323.0121679218,
+        686345.9083989733,
+        683633.010472258,
+        673017.4075579599,
+        671967.126213286,
+        667543.9940048056,
+        646297.9182985603,
+        630290.437723877,
+        628432.0421603422,
+        636263.4334141507,
+        651071.8817998014,
+        644338.1907623215,
+        610283.8111570667,
+        592252.8810106018,
+        588174.0117830585,
+        578894.3729797185,
+        572401.2186620949,
+        568061.388923317
+      ],
+      "adjointIdentityRelativeDifference": 5.915834441283384e-18,
+      "operatorApplications": {
+        "C": 131,
+        "CT": 130,
+        "M": 130,
+        "MT": 130,
+        "W": 131,
+        "WT": 130
+      },
+      "nativeSolverApplications": {
+        "C": 128,
+        "CT": 129,
+        "M": 128,
+        "MT": 129,
+        "W": 128,
+        "WT": 129
+      },
+      "declaredExtraVectorArrayEstimateBytes": 278108160.0,
+      "processPeakMemoryClaimed": false,
+      "elapsedSeconds": 197.2267247,
+      "totalDirectionPenalized": true,
+      "originalParentResidualNormUnchanged": true,
+      "originalNSAcceptanceClaimed": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "physicalSolution": false
+    },
+    "samePenaltyAsWarmRun": true,
+    "warmRunNormalizedObjective": 143.45178594302345,
+    "knownZeroDirectionNormalizedObjective": 1,
+    "completeSelectedModelRelativeDefect": 0.1664421896248697,
+    "maximumRawPrimitiveComponents": [
+      149.94891021761637,
+      108.66277777753913,
+      109.23352878183687,
+      151.49768300952113,
+      195.08946836292967
+    ],
+    "rawPrimitiveUpdateNorm": 2952.628551885655,
+    "newSelectedModelApplications": 1,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "physicalStateChanged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 52872,
+    "modelPointOneMet": false
+  },
+  "fixedObjectiveRestartedContinuation": {
+    "status": "tested-current-Q22-fixed-objective-restarted-zero-start-continuation",
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov22\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "41bfea06a21bacfe682c3ab02a045736b1b285dbb3bcdcf3f3749e15088638ff",
+      "stateLocation": "result"
+    },
+    "sourceIdentity": {
+      "applyCutCellSelectedDirection": "f5ec0371d508b8d8cc2972dbe1a6b4f227209374b1751e6a6b55d210518c5cbf",
+      "buildCutCellSelectedDirectionCache": "2481ebf86c5453b3d2b6b5a1f9fa13274e4514854d1d76c6ab80b85f7ca1774b",
+      "buildCutCellGradientOperator": "dc5d35b0fe06b94e729b6313cb50c07743f60c0a5f7d552ece9ac5497456f43e",
+      "cutCellCharacteristicBoundaryDirection": "24580fda99a5da684aa9c80e397ad4d9529c50a04792e10915d596d12e7bc461",
+      "cutCellBoundaryDirectionalState": "8b7f03f5f795fe733ea8b7f6beba07085afbe8ae1a192f9b5688f868bb60affc",
+      "cutCellWlsViscousDirection": "a6be816864e8aa6bcf6170c1091435b4a795744f0095b39aba7265f1c44f5f85",
+      "cutCellSelectedEulerDirection": "d82dc62e57edc7046a13bfcdaa506c3f75fb7a352bec0d1039300147c82b43bb",
+      "cutCellExactEulerBranchJacobian": "1018f50acad9bde439d48e1615f59e1da09d1353ac43e87630bed34bc86ab507",
+      "cutCellExactEulerFlux": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+      "cutCellConservativeDerivatives": "d867bbff5f1d2feb63a864030ea0f0ef77e3e2d121d66398d0cf9a49cd0fa33b",
+      "cutCellBoundaryStencilState": "cece939ebd097eab666dee2757692289f06e57cc52f64d83264a2e7b83b8d2e3",
+      "cutCellNavierStokesResidual": "e13e67511a62e1a7faef37b3d27be698faa72c943b73b2a33cce4bd26797a52b",
+      "resolveNSRiemannReservoir3D": "70f035c1c76f816e6d00dbc9f0460a2728bbb2631d940f512c0fc85cf10fdaf6",
+      "buildCutCellRiemannReservoirBoundaryState": "29613f88092acd22c87795775d2d6f16d12e0e0b1ab43a0609378cf52bdf32ac",
+      "buildCutCellRiemannReservoirJacobian": "a379800fb86348f589ffc1798af50071d5438a95ebd451cc1fff8e24ebc04225",
+      "resolveNSCharacteristicBoundary3D": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9"
+    },
+    "linearReport": {
+      "method": "complete-parent-C-current-state-primitive-update-Tikhonov-LSQR",
+      "options": {
+        "maximumIterations": 128,
+        "regularizationStrength": 0.1,
+        "metricNormalization": 377055.97234931245,
+        "relativeTolerance": 0.001,
+        "adjointIdentityTolerance": 1e-08,
+        "maximumVectorEstimateBytes": 402653184.0
+      },
+      "penaltyInOriginalResidualUnits": 143.48343828097993,
+      "metricNormalization": 377055.97234931245,
+      "initialRelativeCResidual": 0.16639589557842935,
+      "relativeCResidual": 0.09931165844378197,
+      "internalCTargetMet": false,
+      "initialPrimitiveUpdateNorm": 15355.532112939423,
+      "primitiveUpdateNorm": 16059.35444064435,
+      "primitiveUpdateNormIncludesRowWeights": true,
+      "initialMaximumDensityFraction": 149.94891021761637,
+      "maximumDensityFraction": 207.85209217906154,
+      "initialMaximumVelocityOverSound": 153.35408876811266,
+      "maximumVelocityOverSound": 211.75757089654564,
+      "initialMaximumTemperatureFraction": 195.0894683629296,
+      "maximumTemperatureFraction": 200.74396767450122,
+      "initialNormalizedAugmentedObjective": 0.02770417916528686,
+      "normalizedAugmentedObjective": 0.009880945805085126,
+      "zeroDirectionNormalizedObjective": 1,
+      "beatsZeroDirectionObjective": true,
+      "nativeFlag": 1,
+      "nativeRelativeAugmentedCorrectionResidual": 0.597209372760189,
+      "nativeIterations": 128,
+      "nativeResidualHistory": [
+        90049279.60852781,
+        89807354.09892407,
+        89566462.34155472,
+        89326820.48794717,
+        89082720.13361499,
+        88841426.96347785,
+        88606090.28132872,
+        88375912.06942914,
+        88160518.56645146,
+        87946336.3777328,
+        87712369.33643374,
+        87458971.76922838,
+        87209670.67523403,
+        86964017.59611179,
+        86730414.73425055,
+        86495884.38041985,
+        86248261.04117382,
+        86003893.2602247,
+        85766147.70086786,
+        85522305.36544363,
+        85281551.45828776,
+        85048176.36089644,
+        84817444.47625431,
+        84585300.28196031,
+        84345183.9416449,
+        84099868.65859723,
+        83840706.93717676,
+        83580014.46234569,
+        83314302.61462714,
+        83064319.65761249,
+        82814592.83694038,
+        82561739.56635216,
+        82307072.44173287,
+        82068806.52109706,
+        81844273.21171188,
+        81602309.66800013,
+        81351290.72433242,
+        81104189.90871137,
+        80860271.77550133,
+        80611166.90423886,
+        80368747.8132228,
+        80132241.30386485,
+        79889644.94177003,
+        79628755.95093614,
+        79370309.61585099,
+        79114742.25082417,
+        78856530.38768789,
+        78600931.84891558,
+        78339833.03999668,
+        78078221.80412805,
+        77811199.91985667,
+        77553269.81810483,
+        77291529.04625653,
+        77026848.26274043,
+        76758941.66789933,
+        76497939.66247831,
+        76225611.08615349,
+        75955890.81297518,
+        75695496.8862515,
+        75434843.18290381,
+        75175178.45001201,
+        74924977.8387224,
+        74683713.8534984,
+        74433198.60893233,
+        74170539.57052128,
+        73898066.28972678,
+        73626263.09749001,
+        73354876.44815876,
+        73089002.93229353,
+        72823402.02146485,
+        72547549.2265275,
+        72270762.18633379,
+        71987067.71106371,
+        71698662.7610954,
+        71410536.23103826,
+        71119511.03054628,
+        70830631.44311565,
+        70543270.99492708,
+        70258922.18511526,
+        69974018.0627777,
+        69686318.12731527,
+        69393306.37610704,
+        69109447.6804103,
+        68818083.2912214,
+        68525600.41832612,
+        68235752.61651824,
+        67942884.47249372,
+        67652829.21592557,
+        67374045.43384954,
+        67099822.96637636,
+        66812250.45813923,
+        66511260.88536878,
+        66218220.59881791,
+        65910576.33839539,
+        65592930.17819208,
+        65274990.69790435,
+        64956735.2796288,
+        64631984.364770964,
+        64302172.52433931,
+        63968657.53466931,
+        63630451.971888326,
+        63293093.524126686,
+        62962504.13767287,
+        62618722.09574558,
+        62270847.38448698,
+        61937847.86863721,
+        61616390.20460054,
+        61283741.83759855,
+        60939258.60875121,
+        60580958.36821468,
+        60217712.68704022,
+        59855998.8925248,
+        59492404.02178473,
+        59133461.76162245,
+        58786101.18796443,
+        58452539.70355913,
+        58114986.80805843,
+        57780316.562195025,
+        57424160.37871848,
+        57061202.767179556,
+        56691335.082371406,
+        56328457.556602255,
+        55966019.04505385,
+        55591183.39084502,
+        55216499.16734963,
+        54865931.90040518,
+        54529748.72567431,
+        54181494.58241972,
+        53778273.79251577
+      ],
+      "nativeNormalResidualHistory": [
+        6596355.642723419,
+        3285993.5007077963,
+        2679339.577052757,
+        2317338.7296584174,
+        2081723.8105890455,
+        1891809.7740888752,
+        1767756.243167438,
+        1691861.9555156797,
+        1589745.379772968,
+        1460197.0677061283,
+        1363169.315112913,
+        1290720.4657888743,
+        1251506.8122567672,
+        1222593.8770086973,
+        1187484.3657738124,
+        1145361.6779107598,
+        1112011.181347997,
+        1068274.5588285616,
+        1040128.0368709173,
+        1021070.187200095,
+        1004734.9800004526,
+        993298.8144642,
+        970134.2277876019,
+        945304.3875489887,
+        911397.1997014901,
+        874531.5828257023,
+        854164.3035463095,
+        844960.0366648758,
+        826261.111368033,
+        814545.7533976281,
+        799955.2046123173,
+        787148.5889910319,
+        785482.001897143,
+        788904.9734054388,
+        780517.5068947608,
+        756058.7635102299,
+        753032.2889096672,
+        744225.2018284866,
+        723297.2211014547,
+        709472.2500491184,
+        710570.4494168613,
+        694824.9812343708,
+        679352.7475530136,
+        660831.9449663903,
+        657275.6546523602,
+        648399.2250208335,
+        638400.8561495229,
+        631355.5712299156,
+        627683.3911163172,
+        617846.1643924426,
+        614760.2777703835,
+        605059.7156911304,
+        603675.2111897997,
+        601554.8302301446,
+        591762.9268118026,
+        593224.1452453767,
+        581202.7570593219,
+        583119.8909228503,
+        577775.6602427856,
+        576484.5126737562,
+        577504.8628542025,
+        585736.6552176971,
+        582185.7339905231,
+        568178.0760642303,
+        551733.7084560713,
+        543665.6046241195,
+        544674.3116979409,
+        534653.1317934573,
+        530135.9224483875,
+        523861.8236752974,
+        524220.02671543934,
+        518588.1950116543,
+        519827.74286153074,
+        516373.8917949906,
+        512248.6335083723,
+        509550.2771665032,
+        502110.8903655717,
+        499818.9252166574,
+        495581.1109225586,
+        489148.13273052627,
+        488342.5092561944,
+        491337.8034913472,
+        486263.9270867877,
+        480590.3434116593,
+        475943.3272556375,
+        482020.0000153348,
+        485344.0628785815,
+        483854.05009320227,
+        484063.745786013,
+        484188.26592910837,
+        470371.1271373544,
+        467924.82732910826,
+        467773.798252114,
+        464370.893582389,
+        458259.755492214,
+        453368.13921023137,
+        460325.43209372065,
+        451646.26635327685,
+        449470.89862972684,
+        455743.409573715,
+        459370.81475095573,
+        452261.5764968437,
+        447578.2947509821,
+        446527.4677510445,
+        447015.79331915977,
+        464841.8052513439,
+        460848.67765186576,
+        452573.7037023474,
+        450341.77025768725,
+        448540.98377872765,
+        444504.9712550303,
+        436158.0809452304,
+        433935.15075408015,
+        436996.55925651116,
+        441277.4745488595,
+        438236.4093849886,
+        436616.9934251797,
+        425994.26887042564,
+        412417.70531075366,
+        410773.76344794006,
+        411030.65803391614,
+        404632.32712391525,
+        403768.21069332055,
+        406320.6939151837,
+        405796.05840405007,
+        411619.1802533875,
+        390212.48438653763,
+        377152.10649921495
+      ],
+      "adjointIdentityRelativeDifference": 5.915834441283384e-18,
+      "operatorApplications": {
+        "C": 131,
+        "CT": 130,
+        "M": 130,
+        "MT": 130,
+        "W": 131,
+        "WT": 130
+      },
+      "nativeSolverApplications": {
+        "C": 128,
+        "CT": 129,
+        "M": 128,
+        "MT": 129,
+        "W": 128,
+        "WT": 129
+      },
+      "declaredExtraVectorArrayEstimateBytes": 278108160.0,
+      "processPeakMemoryClaimed": false,
+      "elapsedSeconds": 192.0523982,
+      "totalDirectionPenalized": true,
+      "originalParentResidualNormUnchanged": true,
+      "originalNSAcceptanceClaimed": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "physicalSolution": false
+    },
+    "samePenaltyAsWarmRun": true,
+    "previousNormalizedObjective": 0.02770417916528686,
+    "initialEvidenceFile": "outputs\\v83_validation\\peakzeroreal01\\peak_zero_candidate_evidence.mat",
+    "initialEvidenceFileSHA256": "e770d47bdd7c65b440cb01e34f62d0bd15dfa4dde12a0bd91a3f152265081c83",
+    "unrestartedLSQRClaimed": false,
+    "newLSQRIterationBudget": 128,
+    "completeSelectedModelRelativeDefect": 0.09982072301873517,
+    "maximumRawPrimitiveComponents": [
+      207.85209217906154,
+      114.38448951874857,
+      105.15822555422385,
+      209.1351841740846,
+      200.74396767450116
+    ],
+    "rawPrimitiveUpdateNorm": 3504.8467793234045,
+    "newSelectedModelApplications": 1,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "physicalStateChanged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 42144,
+    "modelPointOneMet": true
+  },
+  "peakOriginalNSStudy": {
+    "status": "tested-current-Q22-peak-weighted-zero-continuation-original-NS-direction-and-main-gates",
+    "candidateFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\peakzeroreal02\\peak_zero_model_evidence.mat",
+    "candidateFileSHA256": "3a6cf37efc2add5fecf121077eeecedefa6401191eaac7c9c53e3b9864649ff8",
+    "predecessorCase": "krylov22",
+    "candidateCase": "krylov24",
+    "probe": {
+      "status": "tested-fresh-original-NS-direction-probe-with-explicit-current-boundary-and-complete-geometry",
+      "originalNSDirectionDefect": 0.09982044342246382,
+      "originalNSDirectionTarget": 0.1,
+      "originalNSDirectionTargetMet": true,
+      "normalizedMeritDerivative": -0.9727392951167354,
+      "physicalStateChanged": false,
+      "newFlowAcceptances": 0,
+      "newActualNSEvaluations": 2,
+      "coarseImageRequired": false,
+      "newProductionSolvedAreaM2": 0,
+      "physicalSolution": false,
+      "engineProcessID": 51952
+    },
+    "main": {
+      "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+      "sourceFaces": 19752,
+      "cellCount": 217272,
+      "acceptedNonlinearIterations": 1,
+      "priorAcceptedNonlinearIterations": 2,
+      "totalNewEquationAcceptedIterations": 3,
+      "candidateTrials": 10,
+      "residualEvaluations": 4,
+      "totalNewEquationResidualEvaluations": 13,
+      "operatorBuilds": 1,
+      "initialMaximumResidual": 5026231.2699140515,
+      "maximumResidual": 6217139.7223834945,
+      "initialRmsMerit": 519063.76917125436,
+      "rmsMerit": 514423.07524315635,
+      "elapsedSeconds": 90.0295451,
+      "matrixVectorProducts": 2,
+      "jacobianResidualEvaluations": 2,
+      "preconditionerApplications": 1,
+      "lineage": {
+        "sourceState": "krylov19-state-only-explicit-new-Riemann-reservoir-boundary",
+        "sourceHistoryAppended": false,
+        "newBoundaryProblemInitialCounter": 0,
+        "previousProblemAcceptancesNotAppended": 13,
+        "previousProblemNSNotAppended": 258,
+        "externalCFDImported": false,
+        "interiorEulerFlux": "exact-godunov",
+        "wallVelocityGradient": "dirichlet-tangent"
+      },
+      "wallVelocityGradient": "dirichlet-tangent",
+      "sameEquationHistoryContinued": true,
+      "steadyConverged": false,
+      "stopReason": "maximum-nonlinear-iterations",
+      "spatialConservationRelative": 4.887496865393808e-16,
+      "steadyBoundaryFluxBalance": 0.010023119360426762,
+      "signedHeatPowerW": 923874.4020662206,
+      "wallHeatRangeWm2": [
+        -355523.3132984889,
+        2295524.185079158
+      ],
+      "physicalTimeAdvanced": 0,
+      "BETimeStepsClaimed": 0,
+      "physicalSolution": false,
+      "newProductionSolvedAreaM2": 0,
+      "engineProcessID": 51952,
+      "priorActualResidualEvaluations": 9,
+      "openBoundaryDiscretization": "exact-Riemann-reservoir",
+      "sourceHistoryAppended": false,
+      "residualEvaluationsAfterLastAcceptedHistory": 0,
+      "normalEulerLinearization": "exact-branch",
+      "physicalSpatialEquationChanged": false,
+      "linearEquation": "steady-newton",
+      "preconditionerTimeStepOnly": true,
+      "steadyInitialGuessReport": {
+        "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\directnsprobereal05\\direct_ns_direction_probe.mat",
+        "sourceVariant": "ns-probe",
+        "directionScale": 1,
+        "sourceFileSHA256": "01f4774081b46d6ed02a3ec43dee2e869cf3e4ebfbd6eb15699b0606a97ff27b",
+        "sourceGeometryFile": "E:\\RocketAeroHeat\\outputs\\v80_validation\\domain02\\shell_domain_evidence.mat",
+        "sourceGeometryFileSHA256": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+        "sourceStateAndGeometryVerified": true,
+        "sourceSavedActualNSRelativeDefect": 0.09982044342246382,
+        "originalNSProbeArithmeticVerified": true,
+        "oldDerivativeReused": false,
+        "originalNSAcceptanceClaimed": false,
+        "newModelApplications": 0,
+        "newActualNSEvaluations": 0,
+        "coarseImageRequired": false,
+        "sourceStateLocation": "result"
+      },
+      "steadyInitialGuessModelApplications": 1
+    },
+    "parallelQ23HistoryAppended": false,
+    "newProbeActualNS": 2,
+    "newMainActualNS": 4,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 51952
+  },
+  "selectedEndpointCase": "krylov24",
+  "selectedEndpoint": {
+    "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 1,
+    "priorAcceptedNonlinearIterations": 2,
+    "totalNewEquationAcceptedIterations": 3,
+    "candidateTrials": 10,
+    "residualEvaluations": 4,
+    "totalNewEquationResidualEvaluations": 13,
+    "operatorBuilds": 1,
+    "initialMaximumResidual": 5026231.2699140515,
+    "maximumResidual": 6217139.7223834945,
+    "initialRmsMerit": 519063.76917125436,
+    "rmsMerit": 514423.07524315635,
+    "elapsedSeconds": 90.0295451,
+    "matrixVectorProducts": 2,
+    "jacobianResidualEvaluations": 2,
+    "preconditionerApplications": 1,
+    "lineage": {
+      "sourceState": "krylov19-state-only-explicit-new-Riemann-reservoir-boundary",
+      "sourceHistoryAppended": false,
+      "newBoundaryProblemInitialCounter": 0,
+      "previousProblemAcceptancesNotAppended": 13,
+      "previousProblemNSNotAppended": 258,
+      "externalCFDImported": false,
+      "interiorEulerFlux": "exact-godunov",
+      "wallVelocityGradient": "dirichlet-tangent"
+    },
+    "wallVelocityGradient": "dirichlet-tangent",
+    "sameEquationHistoryContinued": true,
+    "steadyConverged": false,
+    "stopReason": "maximum-nonlinear-iterations",
+    "spatialConservationRelative": 4.887496865393808e-16,
+    "steadyBoundaryFluxBalance": 0.010023119360426762,
+    "signedHeatPowerW": 923874.4020662206,
+    "wallHeatRangeWm2": [
+      -355523.3132984889,
+      2295524.185079158
+    ],
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 51952,
+    "priorActualResidualEvaluations": 9,
+    "openBoundaryDiscretization": "exact-Riemann-reservoir",
+    "sourceHistoryAppended": false,
+    "residualEvaluationsAfterLastAcceptedHistory": 0,
+    "normalEulerLinearization": "exact-branch",
+    "physicalSpatialEquationChanged": false,
+    "linearEquation": "steady-newton",
+    "preconditionerTimeStepOnly": true,
+    "steadyInitialGuessReport": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\directnsprobereal05\\direct_ns_direction_probe.mat",
+      "sourceVariant": "ns-probe",
+      "directionScale": 1,
+      "sourceFileSHA256": "01f4774081b46d6ed02a3ec43dee2e869cf3e4ebfbd6eb15699b0606a97ff27b",
+      "sourceGeometryFile": "E:\\RocketAeroHeat\\outputs\\v80_validation\\domain02\\shell_domain_evidence.mat",
+      "sourceGeometryFileSHA256": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "sourceStateAndGeometryVerified": true,
+      "sourceSavedActualNSRelativeDefect": 0.09982044342246382,
+      "originalNSProbeArithmeticVerified": true,
+      "oldDerivativeReused": false,
+      "originalNSAcceptanceClaimed": false,
+      "newModelApplications": 0,
+      "newActualNSEvaluations": 0,
+      "coarseImageRequired": false,
+      "sourceStateLocation": "result"
+    },
+    "steadyInitialGuessModelApplications": 1
+  },
+  "selectedEndpointEvidence": {
+    "path": "outputs/v83_validation/krylov24/wall_velocity_krylov_evidence.mat",
+    "sha256": "817d204b76011c0ee0a93f816a463d0e982131eb899510d0ea7effc55eea5379",
+    "bytes": 873303451
+  },
+  "selectedConservativeUpdateRadiusDiagnostic": {
+    "status": "verified-real-conservative-state-radius-and-accepted-local-residual-diagnostic",
+    "case": "krylov24",
+    "processID": 56208,
+    "constraints": [
+      {
+        "constraint": "positiveDensity",
+        "firstExitAlpha": 0.014048814674619374,
+        "location": {
+          "cellID": 76375,
+          "layer": 4,
+          "sourceFacet": 17119,
+          "centroidM": [
+            -0.037250673699783465,
+            0.07675133074060536,
+            0.039904080116654105
+          ]
+        }
+      },
+      {
+        "constraint": "minimumTemperature",
+        "firstExitAlpha": 0.005488015444342229,
+        "location": {
+          "cellID": 77625,
+          "layer": 4,
+          "sourceFacet": 18369,
+          "centroidM": [
+            0.037770222122963736,
+            -0.017872032760553155,
+            -0.027974841301230593
+          ]
+        }
+      },
+      {
+        "constraint": "maximumTemperature",
+        "firstExitAlpha": 0.0028679129141894726,
+        "location": {
+          "cellID": 38959,
+          "layer": 2,
+          "sourceFacet": 19207,
+          "centroidM": [
+            0.047832856598326284,
+            -0.0017343227038753746,
+            -0.014482459316960695
+          ]
+        }
+      }
+    ],
+    "limitingConstraint": {
+      "constraint": "maximumTemperature",
+      "firstExitAlpha": 0.0028679129141894726,
+      "location": {
+        "cellID": 38959,
+        "layer": 2,
+        "sourceFacet": 19207,
+        "centroidM": [
+          0.047832856598326284,
+          -0.0017343227038753746,
+          -0.014482459316960695
+        ]
+      }
+    },
+    "independentBisectionRelativeDifference": 2.7219291085419273e-15,
+    "acceptedAlpha": 0.001953125,
+    "acceptedAlphaFractionOfCellStateRadius": 0.6810266066087961,
+    "fullDirectionRelativeStateMetrics": {
+      "densityFraction": {
+        "maximumFullDirection": 207.85209217906154,
+        "location": {
+          "cellID": 65028,
+          "layer": 4,
+          "sourceFacet": 5772,
+          "centroidM": [
+            -1.8889994042454505,
+            -0.01360270676559699,
+            -0.09908556090294718
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.4059611175372296,
+        "quantilesFullDirection": [
+          0.779134441092673,
+          3.2660646411899155,
+          9.316754794465961,
+          69.92708482966165
+        ]
+      },
+      "velocityOverLocalSound": {
+        "maximumFullDirection": 211.7575708965456,
+        "location": {
+          "cellID": 65028,
+          "layer": 4,
+          "sourceFacet": 5772,
+          "centroidM": [
+            -1.8889994042454505,
+            -0.01360270676559699,
+            -0.09908556090294718
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.4135890056573156,
+        "quantilesFullDirection": [
+          1.0922111229538405,
+          4.906337551274513,
+          17.067854174151535,
+          72.84837351512518
+        ]
+      },
+      "temperatureFraction": {
+        "maximumFullDirection": 200.7439676745008,
+        "location": {
+          "cellID": 78953,
+          "layer": 4,
+          "sourceFacet": 19697,
+          "centroidM": [
+            0.05026516635663524,
+            0.0023370801787311415,
+            -0.0010908122868332733
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.39207806186425936,
+        "quantilesFullDirection": [
+          0.6816444493189744,
+          3.6779256433015846,
+          9.330965312948344,
+          38.337069409375204
+        ]
+      }
+    },
+    "originalNSDirectionDefect": 0.09982044342239281,
+    "acceptedNonlinearRemainderRelativeToBaseResidual": 0.15929373905134675,
+    "acceptedNonlinearRemainderRelativeToLinearChange": 83.43847186391183,
+    "nonlinearRemainderLayerSquareFractions": [
+      1.3288183714086592e-05,
+      6.519430736770602e-06,
+      0.00017057916549328465,
+      0.9568763282454348,
+      0.04293326116957812,
+      1.6249780839725845e-08,
+      3.0742173183717858e-09,
+      4.4530982585085304e-09,
+      2.5728957214573142e-11,
+      1.831473755214767e-12,
+      3.861856614633445e-13
+    ],
+    "residualHotspots": [
+      {
+        "kind": "initial",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -5026231.2699140515
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -4879405.707306637
+          },
+          {
+            "location": {
+              "cellID": 58917,
+              "layer": 3,
+              "sourceFacet": 19413,
+              "centroidM": [
+                0.04907452215001135,
+                -0.00026444780551624936,
+                -0.010394478869966941
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4738323.994277461
+          },
+          {
+            "location": {
+              "cellID": 39446,
+              "layer": 2,
+              "sourceFacet": 19694,
+              "centroidM": [
+                0.04998210687629424,
+                -0.0002004574278186466,
+                -0.0017100382364014903
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": 4734652.528415191
+          },
+          {
+            "location": {
+              "cellID": 58919,
+              "layer": 3,
+              "sourceFacet": 19415,
+              "centroidM": [
+                0.049074519162240274,
+                0.002629095139969149,
+                -0.010054415362205065
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4720379.687548756
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 4714694.663886845
+          },
+          {
+            "location": {
+              "cellID": 58915,
+              "layer": 3,
+              "sourceFacet": 19411,
+              "centroidM": [
+                0.049074517891125054,
+                -0.0031400410731015913,
+                -0.009921693144006248
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4713150.451539398
+          },
+          {
+            "location": {
+              "cellID": 59074,
+              "layer": 3,
+              "sourceFacet": 19570,
+              "centroidM": [
+                0.049543736162372475,
+                -0.0009741661431015629,
+                -0.007836105445647945
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4686318.589908959
+          },
+          {
+            "location": {
+              "cellID": 58992,
+              "layer": 3,
+              "sourceFacet": 19488,
+              "centroidM": [
+                0.04930914392505071,
+                -0.00912313663177983,
+                -0.000483421874193088
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4684932.297443844
+          },
+          {
+            "location": {
+              "cellID": 58913,
+              "layer": 3,
+              "sourceFacet": 19409,
+              "centroidM": [
+                0.049074511218128294,
+                -0.005770954872388321,
+                -0.008667518492688741
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4667864.369835219
+          },
+          {
+            "location": {
+              "cellID": 59076,
+              "layer": 3,
+              "sourceFacet": 19572,
+              "centroidM": [
+                0.0495438130468645,
+                0.0018619566895306033,
+                -0.0076631001298237056
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4663831.4549590405
+          },
+          {
+            "location": {
+              "cellID": 58921,
+              "layer": 3,
+              "sourceFacet": 19417,
+              "centroidM": [
+                0.04907453361293611,
+                0.005313161028179191,
+                -0.00892422204558707
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4661431.788883047
+          }
+        ]
+      },
+      {
+        "kind": "accepted",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 60984,
+              "layer": 4,
+              "sourceFacet": 1728,
+              "centroidM": [
+                -2.5486671611666716,
+                0.012576417357973536,
+                -0.09924676504766022
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6217139.7223834945
+          },
+          {
+            "location": {
+              "cellID": 60984,
+              "layer": 4,
+              "sourceFacet": 1728,
+              "centroidM": [
+                -2.5486671611666716,
+                0.012576417357973536,
+                -0.09924676504766022
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6055707.024899327
+          },
+          {
+            "location": {
+              "cellID": 60984,
+              "layer": 4,
+              "sourceFacet": 1728,
+              "centroidM": [
+                -2.5486671611666716,
+                0.012576417357973536,
+                -0.09924676504766022
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 5832350.863131428
+          },
+          {
+            "location": {
+              "cellID": 65028,
+              "layer": 4,
+              "sourceFacet": 5772,
+              "centroidM": [
+                -1.8889994042454505,
+                -0.01360270676559699,
+                -0.09908556090294718
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -5328078.564528703
+          },
+          {
+            "location": {
+              "cellID": 65028,
+              "layer": 4,
+              "sourceFacet": 5772,
+              "centroidM": [
+                -1.8889994042454505,
+                -0.01360270676559699,
+                -0.09908556090294718
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -5174726.808458648
+          },
+          {
+            "location": {
+              "cellID": 65028,
+              "layer": 4,
+              "sourceFacet": 5772,
+              "centroidM": [
+                -1.8889994042454505,
+                -0.01360270676559699,
+                -0.09908556090294718
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 4999685.387861137
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -4940621.016358934
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -4799436.540806723
+          },
+          {
+            "location": {
+              "cellID": 58917,
+              "layer": 3,
+              "sourceFacet": 19413,
+              "centroidM": [
+                0.04907452215001135,
+                -0.00026444780551624936,
+                -0.010394478869966941
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4734003.8550326675
+          },
+          {
+            "location": {
+              "cellID": 39446,
+              "layer": 2,
+              "sourceFacet": 19694,
+              "centroidM": [
+                0.04998210687629424,
+                -0.0002004574278186466,
+                -0.0017100382364014903
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": 4725566.832164893
+          },
+          {
+            "location": {
+              "cellID": 58915,
+              "layer": 3,
+              "sourceFacet": 19411,
+              "centroidM": [
+                0.049074517891125054,
+                -0.0031400410731015913,
+                -0.009921693144006248
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4711698.1544535
+          },
+          {
+            "location": {
+              "cellID": 58919,
+              "layer": 3,
+              "sourceFacet": 19415,
+              "centroidM": [
+                0.049074519162240274,
+                0.002629095139969149,
+                -0.010054415362205065
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4711444.82438836
+          }
+        ]
+      },
+      {
+        "kind": "acceptedNonlinearRemainder",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 60984,
+              "layer": 4,
+              "sourceFacet": 1728,
+              "centroidM": [
+                -2.5486671611666716,
+                0.012576417357973536,
+                -0.09924676504766022
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -8221065.240224526
+          },
+          {
+            "location": {
+              "cellID": 60984,
+              "layer": 4,
+              "sourceFacet": 1728,
+              "centroidM": [
+                -2.5486671611666716,
+                0.012576417357973536,
+                -0.09924676504766022
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -8046164.062998777
+          },
+          {
+            "location": {
+              "cellID": 60984,
+              "layer": 4,
+              "sourceFacet": 1728,
+              "centroidM": [
+                -2.5486671611666716,
+                0.012576417357973536,
+                -0.09924676504766022
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 7718949.607950717
+          },
+          {
+            "location": {
+              "cellID": 65028,
+              "layer": 4,
+              "sourceFacet": 5772,
+              "centroidM": [
+                -1.8889994042454505,
+                -0.01360270676559699,
+                -0.09908556090294718
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -7506632.380972596
+          },
+          {
+            "location": {
+              "cellID": 65028,
+              "layer": 4,
+              "sourceFacet": 5772,
+              "centroidM": [
+                -1.8889994042454505,
+                -0.01360270676559699,
+                -0.09908556090294718
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -7330625.598354656
+          },
+          {
+            "location": {
+              "cellID": 65028,
+              "layer": 4,
+              "sourceFacet": 5772,
+              "centroidM": [
+                -1.8889994042454505,
+                -0.01360270676559699,
+                -0.09908556090294718
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 7049352.875498833
+          },
+          {
+            "location": {
+              "cellID": 61442,
+              "layer": 4,
+              "sourceFacet": 2186,
+              "centroidM": [
+                -2.4737049070222916,
+                -0.000938212605474825,
+                -0.09999548654069422
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6397229.934757868
+          },
+          {
+            "location": {
+              "cellID": 65583,
+              "layer": 4,
+              "sourceFacet": 6327,
+              "centroidM": [
+                -1.8040421743429274,
+                0.009257696805560324,
+                -0.09961509312899532
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6250034.55102938
+          },
+          {
+            "location": {
+              "cellID": 61442,
+              "layer": 4,
+              "sourceFacet": 2186,
+              "centroidM": [
+                -2.4737049070222916,
+                -0.000938212605474825,
+                -0.09999548654069422
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6216234.981600526
+          },
+          {
+            "location": {
+              "cellID": 65583,
+              "layer": 4,
+              "sourceFacet": 6327,
+              "centroidM": [
+                -1.8040421743429274,
+                0.009257696805560324,
+                -0.09961509312899532
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6093039.973630796
+          },
+          {
+            "location": {
+              "cellID": 61442,
+              "layer": 4,
+              "sourceFacet": 2186,
+              "centroidM": [
+                -2.4737049070222916,
+                -0.000938212605474825,
+                -0.09999548654069422
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 6006220.37204372
+          },
+          {
+            "location": {
+              "cellID": 65583,
+              "layer": 4,
+              "sourceFacet": 6327,
+              "centroidM": [
+                -1.8040421743429274,
+                0.009257696805560324,
+                -0.09961509312899532
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 5869489.956508353
+          }
+        ]
+      }
+    ],
+    "candidateTrials": [
+      {
+        "alpha": 1.0,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.5,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.25,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.0625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.03125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.015625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.0078125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:InternalEnergy"
+      },
+      {
+        "alpha": 0.00390625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:Temperature"
+      },
+      {
+        "alpha": 0.001953125,
+        "accepted": true,
+        "candidateRMS": 514423.07524315635,
+        "candidateMaximum": 6217139.7223834945,
+        "errorIdentifier": ""
+      }
+    ],
+    "newActualNSEvaluations": 0,
+    "flowStateChanged": false,
+    "interfaceOrBoundaryRecomputed": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs/v83_validation/krylov24/wall_velocity_krylov_evidence.mat": "817d204b76011c0ee0a93f816a463d0e982131eb899510d0ea7effc55eea5379",
+      "outputs/v80_validation/domain02/shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa"
+    },
+    "scriptSHA256": "9edb8dd1eb2f33a3759a48691d6ceb773a06656df5135f410b83b338de378387"
+  },
+  "sourceMetadataPreservesFacetFields": {
+    "status": "passed-direction-provenance-preserves-all-three-raw-original-facet-datasets",
+    "allDatasetBytesIdentical": true,
+    "cases": [
+      {
+        "path37": "outputs/v83_validation/workbench37/cases/legacy-wall-source/results.json",
+        "path38": "outputs/v83_validation/workbench38/cases/legacy-wall-source/results.json",
+        "sha256": "9e8e6e6439b9a32b6b56053f468a88934db250eb1e42f8033e97d43d45d1205c"
+      },
+      {
+        "path37": "outputs/v83_validation/workbench37/cases/constrained-wall-baseline/results.json",
+        "path38": "outputs/v83_validation/workbench38/cases/constrained-wall-baseline/results.json",
+        "sha256": "18e2164153f4a177066033081e70f35f317afe9351e9879bf0b408a399ca5767"
+      },
+      {
+        "path37": "outputs/v83_validation/workbench37/cases/constrained-wall-krylov/results.json",
+        "path38": "outputs/v83_validation/workbench38/cases/constrained-wall-krylov/results.json",
+        "sha256": "93416c35179429132f71e189580108b90ec79eb7c7c4162b47a8f55d77c279c2"
+      }
+    ],
+    "newProductionSolvedAreaM2": 0
+  },
+  "selectedStateChangedFromQ22": true,
+  "retainedReferenceFailure": {
+    "receipt": {
+      "path": "outputs/v83_validation/peakweightreal01_norm_reference_failure.json",
+      "sha256": "05ad80a81e84cca8effa874c0144d2a94aa6f429376bc3c968968b0ded9944ce",
+      "bytes": 917
+    },
+    "report": {
+      "status": "retained-positive-square-norm-reference-roundoff-failure",
+      "driverExitCode": 1,
+      "sourceSHA256": "95a3755e7a18b6cf51b58df5f2dada8a2218ff6d5f5fb94ce4ed9a937f607319",
+      "sourceFile": "outputs/v83_validation/source_epochs/pre_peak_norm_reference_auditRocketPeakWeightedDirection.py",
+      "numpyRelativeDifference": 1.05187005e-12,
+      "fsumRelativeDifference": 1.1461626320904768e-12,
+      "reportedSeedDefect": 391.84653193551014,
+      "fsumSeedDefect": 391.84653193595926,
+      "positiveSquareSumLength": 1086360,
+      "positiveSquareSumGamma": 2.4122037706454426e-10,
+      "originalNormComparisonRelativeTolerance": 1e-12,
+      "physicalTargetsChanged": false,
+      "reason": "Original floating Jv arrays remain unchanged. Compare this million-term positive square norm using fsum and the actual summation-length forward bound. Seed and candidate model defects both remain far above the original 0.1 gate."
+    }
+  },
+  "parallelQ20Branches": {
+    "Q22Accepted": 2,
+    "Q22MainNS": 9,
+    "Q23Accepted": 2,
+    "Q23MainNS": 10,
+    "historiesMerged": false
+  },
+  "workAccounting": {
+    "newPrimitiveCoordinateMainNS": 6,
+    "newCurrentStateReplayNS": 1,
+    "newZeroStartAndRestartNS": 0,
+    "newQualifiedDirectionProbeNS": 2,
+    "newSelectedMainNS": 4,
+    "selectedSameProblemMainNS": 13,
+    "selectedSameProblemAcceptances": 3,
+    "parallelAndProbeCallsMergedIntoMainHistory": false
+  },
+  "userInterface": {
+    "selectedWorkbench": "outputs/v83_validation/workbench38/index.html",
+    "actualDirectionPreparationSourceBound": true,
+    "coordinateStudyWorkbench": "outputs/v83_validation/workbench36/index.html",
+    "primitiveCandidatePathExplicit": true,
+    "sameDirectionScientificFigure": {
+      "path": "outputs/v83_validation/primitivereservoir01/trial_coordinate_comparison.png",
+      "sha256": "38d71fd36d86682b04eeb3d5aca9c4df589ed2bf5064bc21a1b0fda7376f7cc3",
+      "bytes": 151351
+    },
+    "scientificPNGsViewed": true,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "formalQualifiedHeatAreaPercent": 66.5626327424,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "latestFormalVersion": 82,
+    "version83IsolatedCompleteEngineeringDelivery": false,
+    "goalStatus": "active",
+    "wholeGoalComplete": false
+  },
+  "delivery": {
+    "gitHEAD": "42601c9",
+    "gitCommitCreated": false,
+    "githubPushed": false,
+    "smallVersionLocalOnly": true
+  },
+  "nextAction": "Use actual Q24 and its same-problem 3-accepted/13-main-NS history. Do not rerun the Q20 coordinate switch or the failed old-seed 256-step warm solve. Separate current-state construction from direction solution: replay NS and rebuild the Q24 operator/source binding, use the latest direction only as a metric reference, and start the bounded fixed-objective solve directly from zero. Q22 Jacobians/probes cannot qualify the changed Q24. Inspect the new 2000-K first-exit at CV38959/layer2/sourceFacet19207 and the still-dominant layer4/5 nonlinear remainder, without relaxing any original state/temperature/RMS/maximum/space/steady-boundary gates. Keep regional grid/near-wall/exterior/boundary/physics/public validation and scientific UI as highest priorities; no qualified area was added.",
+  "recorderSHA256": "3632f583dd7906175e6395d5a506e38bb4051408398a5c7a96f09302a0276a15"
+}

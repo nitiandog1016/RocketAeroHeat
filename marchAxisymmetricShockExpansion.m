@@ -317,6 +317,13 @@ edge.axialWaveTypeNames={'未推进','携带上游状态', ...
     'Prandtl-Meyer 膨胀','二维附体斜激波'};
 edge.axialWaveShockAngleDeg=faceWaveShockAngle;
 edge.axialMarchFace=marchedFace;
+% 模块四补充：波系改写面元后重新同步状态身份，不能沿用局部解的旧掩码。
+% 物理有效外缘与仅供准流线诊断的域外占位仍严格分开。
+edge.numericallyTraceableFace=logical(edge.algebraicallyValid(:));
+edge.diagnosticPlaceholderFace=edge.numericallyTraceableFace & ...
+    logical(edge.thermalExpansionOutOfRangeFace(:));
+edge.thermalStateValidFace=edge.numericallyTraceableFace & ~edge.diagnosticPlaceholderFace;
+edge.physicallyUnresolved=~edge.thermalStateValidFace;
 edge.summary.validFaces=nnz(edge.algebraicallyValid);
 edge.summary.unresolvedFaces=nf-edge.summary.validFaces;
 edge.summary.grazingFaces=nnz(edge.faceMethodID==1);

@@ -1,0 +1,853 @@
+{
+  "status": "tested-real-five-field-spatial-reduction-and-verified-cross-patch-F-error-on-saved-Schur-candidate",
+  "version": 83,
+  "recordedUTC": "2026-10-25T18:36:24.086601+00:00",
+  "processID": 53908,
+  "previousGoalTurnClassification": "progress-real-seven-level-test-independent-audits-and-fixed-spatial-CF-structural-preflight",
+  "currentGoalTurnClassification": "progress-new-complete-MATLAB-spatial-reduction-real-test-and-S-F-error-attribution-with-updated-workbench",
+  "processes": {
+    "spatialreductionunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        58972
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\spatialreductionunit01_process.json",
+        "sha256": "ab76b6a13a74a208ecadcbad3a01ad022700e1645e2b6d0461d95caf90695ee5",
+        "bytes": 176353
+      }
+    },
+    "spatialreductionreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        52900
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\spatialreductionreal01_process.json",
+        "sha256": "defa43e74e422f0bbda6fffb7943b2095a380d45c8e6acf9dccdf12dbe59859e",
+        "bytes": 177025
+      }
+    },
+    "spatialschurreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        56392
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\spatialschurreal01_process.json",
+        "sha256": "0e278e62dfbefcd9b741e32fbac1d1d766aeb496c276b59c0b50bfbaa39c0c3e",
+        "bytes": 178223
+      }
+    },
+    "spatialreductionui01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        58888
+      ],
+      "receipt": {
+        "path": "outputs\\v83_validation\\spatialreductionui01_process.json",
+        "sha256": "857e84ff1f0eaafef530872f188aa3aa97b298e716efba14c467edc10ce17cb3",
+        "bytes": 178711
+      }
+    }
+  },
+  "smallDomainAudit": {
+    "status": "passed-independent-spatial-five-field-split-all-coefficients-block-map-and-all-small-Arnoldi-directions",
+    "processID": 53988,
+    "cases": [
+      {
+        "originalCVs": 32,
+        "coarseCVs": 8,
+        "FCVs": 24,
+        "maximumFInverseReferenceDifference": 4.416873316915861e-18,
+        "maximumCoarseInverseReferenceDifference": 1.9579371339707403e-16,
+        "approximateSchurAllCoefficientDifference": 3.360533042794848e-16,
+        "fullBlockMapDifference": 1.598822451163696e-15,
+        "localFMapToCompleteFInverseDifference": 0.0033107895280691715,
+        "fullCResidual": 4.970335919542092e-11,
+        "allPhysicalArnoldiRelationDifference": 6.009771863508809e-15,
+        "allPhysicalSpatialMapDifference": 1.5038900274205723e-16,
+        "arnoldiSteps": 15
+      },
+      {
+        "originalCVs": 32,
+        "coarseCVs": 8,
+        "FCVs": 24,
+        "maximumFInverseReferenceDifference": 4.416873316915861e-18,
+        "maximumCoarseInverseReferenceDifference": 1.9579371339707403e-16,
+        "approximateSchurAllCoefficientDifference": 3.360533042794848e-16,
+        "fullBlockMapDifference": 1.598822451163696e-15,
+        "localFMapToCompleteFInverseDifference": 0.0033107895280691715,
+        "fullCResidual": 4.9703363500623714e-11,
+        "allPhysicalArnoldiRelationDifference": 6.098798159227448e-15,
+        "allPhysicalSpatialMapDifference": 1.4797572328110295e-16,
+        "arnoldiSteps": 15
+      }
+    ],
+    "explicitSingularLocalFFallbackVerified": true,
+    "newActualNSEvaluations": 0,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\spatialreductionunit01\\spatial_reduction_unit_evidence.mat": "5406973f7bb8444cceb688bcfd25332004aa08d5c14c89edbe25f661387194bf"
+    },
+    "scriptSHA256": "9585b9c24b0a698f875c7470c3f82f69c0d095642edc02da252422362daaf5b2"
+  },
+  "fullSpatialReductionRealAudit": {
+    "status": "passed-independent-real-spatial-split-all-F-and-coarse-inverses-Schur-coefficients-and-complete-C",
+    "processID": 13328,
+    "originalCVs": 217272,
+    "FOriginalCVs": 187749,
+    "coarseOriginalCVs": 29523,
+    "allOriginalCVsAndFiveFieldsKept": true,
+    "allOriginalBCEDCoefficientsExactlyVerified": true,
+    "FLocalInverseChecks": {
+      "localBlocks": 28902,
+      "allUnknownsExactlyOnce": true,
+      "fallbackBlocks": 0,
+      "maximumOrdinaryBLASDefect": 8.987144949838495e-09,
+      "maximumSourceOriginalInputBound": 9.463894809444552e-09,
+      "decimal80CheckedBlocks": 18,
+      "maximumDecimal80InverseDefect": 9.406236959831867e-09
+    },
+    "coarseLocalInverseChecks": {
+      "localBlocks": 4657,
+      "allUnknownsExactlyOnce": true,
+      "fallbackBlocks": 0,
+      "maximumOrdinaryBLASDefect": 2.5477402850346722e-11,
+      "maximumSourceOriginalInputBound": 6.412295627205803e-09,
+      "decimal80CheckedBlocks": 3,
+      "maximumDecimal80InverseDefect": 1.1047873936166232e-11
+    },
+    "approximateSchurBlocks": 254825,
+    "allApproximateSchurCoefficientsVerifiedWithinProductAndSumRoundingBudget": true,
+    "maximumSchurCoefficientNormalizedDifference": 3.1714442479896654e-10,
+    "maximumSchurRoundingBudgetRatio": 0.22559898788351668,
+    "coarsePatternAndRepresentativesMatchFrozenStructuralPreflight": true,
+    "threeImplicitSchurProbes": [
+      {
+        "implicitMapDifference": 0.0,
+        "assembledSImageDifference": 0.0,
+        "actualSActionRelation": 1.4950869381030543e-14
+      },
+      {
+        "implicitMapDifference": 0.0,
+        "assembledSImageDifference": 0.0,
+        "actualSActionRelation": 5.711172361092684e-15
+      },
+      {
+        "implicitMapDifference": 0.0,
+        "assembledSImageDifference": 0.0,
+        "actualSActionRelation": 6.791853658945236e-15
+      }
+    ],
+    "completeSpatialBackSubstitutionMapDifference": 0.0,
+    "singleOriginalCImageDifference": 0.0,
+    "finalOriginalCImageDifference": 0.0,
+    "singleOriginalCResidual": 15.663411211916735,
+    "finalOriginalCResidual": 0.9839211911308634,
+    "internalCTargetMet": false,
+    "nativeArnoldiGatesPassed": true,
+    "realFullArnoldiBasisSaved": false,
+    "independentAllRealArnoldiColumnAuditClaimed": false,
+    "solverCApplications": 33,
+    "spatialMapApplications": 32,
+    "solverFLocalApplications": 64,
+    "solverCoarseLocalApplications": 32,
+    "solverRectangularApplications": 64,
+    "numericalStudyOriginalCApplications": 35,
+    "numericalStudyFLocalApplications": 69,
+    "numericalStudyCoarseLocalApplications": 33,
+    "numericalStudyRectangularApplications": 75,
+    "numericalStudyPackedSchurProbeApplications": 3,
+    "fullFFInverseOrExactSchurClaimed": false,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "originalNSConvergenceOrRegionalQualificationProven": false,
+    "physicalSolution": false,
+    "inputSHA256": {
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_reduction_assembly_evidence.mat": "b04c5c8d604c52c9289ce5d08127270a41c31322eef5ac44cd0fda4ebc0c76ca",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "outputs\\v83_validation\\spatialreductionpreflight01\\spatial_reduction_input.mat": "f7a581f6467423799b0d771923718d56a678040b01b65e4afb9ce4aa83e5df20",
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_coarse_factor_evidence.mat": "fc7fcdf76174f97829eab02cc7b0405f42cdef327abeac2cb9ea691be076efaf",
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_schur_probe_evidence.mat": "5762aabab14dba5617bac2ea674e64337278e62b4dd8e77b54a1fa4736b74074",
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_reduction_real_evidence.mat": "2b9340b851d791c82eec3051d544a39d1c2a5930043dd7349549ae49bfb903a8",
+      "outputs\\v83_validation\\innergraphreal01\\inner_graph_real_evidence.mat": "7ff5e1fc4ba564f91510923c5336643263aa86c06370143f42bf7280a691b1a1"
+    },
+    "scriptSHA256": "632e33acff450471c5bf04b7c6e3765e74fc160e4a46c914032b55f82a5334ec"
+  },
+  "separateSchurKrylovAudit": {
+    "status": "passed-independent-all-spatial-S-physical-directions-condensation-and-parent-F-row-decomposition",
+    "processID": 47832,
+    "assemblyAndFactorPriorFullCoefficientAndInverseAuditReusedByByteIdentity": true,
+    "coarseScalarUnknowns": 147615,
+    "allPhysicalApproximateSArnoldiColumns": 32,
+    "allColumnSImageRelation": 1.2674375421870746e-15,
+    "maximumFixedCoarseMapDifference": 0.0,
+    "basisOrthogonalityError": 3.405090325721644e-13,
+    "finalSCombinationRelation": 6.032827540722338e-15,
+    "originalFullCDiagnosticImageDifference": 0.0,
+    "singleApproximateSResidual": 0.23221935071995595,
+    "finalApproximateSResidual": 0.023920230739320023,
+    "finalOriginalCResidual": 10.874683842004645,
+    "FRowsRelativeToOriginalRHS": 10.870568092303019,
+    "CRowsRelativeToOriginalRHS": 0.2991621870515324,
+    "coarseRowsCondensationConsistency": 7.269358951823013e-13,
+    "FRowsRemainingSquaredNormFraction": 0.999243201748946,
+    "localFInverseEquationDefectRelativeToOriginalRHS": 1.2965712882571838e-12,
+    "crossPatchFFImageRelativeToOriginalRHS": 10.870568092303014,
+    "FRowExactDecompositionDifference": 2.4158950717474422e-15,
+    "attributionScope": "this-saved-same-RHS-vector-only-not-a-global-rank-or-universal-cause-proof",
+    "approximateSTargetMet": false,
+    "originalCInternalTargetMet": false,
+    "actualSAndOriginalCResidualDenominatorsKeptDistinct": true,
+    "newFInverseConstructions": 0,
+    "newSchurAssemblies": 0,
+    "numericalStudyPackedSApplications": 35,
+    "numericalStudyOriginalCDiagnosticApplications": 1,
+    "numericalStudyCoarseLocalApplications": 33,
+    "numericalStudyFLocalApplications": 2,
+    "numericalStudyRectangularApplications": 2,
+    "independentAuditPackedSApplications": 34,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "inputSHA256": {
+      "outputs\\v83_validation\\spatialschurreal01\\spatial_schur_krylov_evidence.mat": "6a9f2798bc996cbe9e1cfdeab594bb7d6e7f79e53be7d05d188ca2ab90b52b3c",
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_reduction_assembly_evidence.mat": "b04c5c8d604c52c9289ce5d08127270a41c31322eef5ac44cd0fda4ebc0c76ca",
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_coarse_factor_evidence.mat": "fc7fcdf76174f97829eab02cc7b0405f42cdef327abeac2cb9ea691be076efaf",
+      "outputs\\v83_validation\\spatialschurreal01\\spatial_schur_condensed_rhs.mat": "fcfe518e6a323a771e2e6ed509ca91031b3c8502780e42178d3161b542b92e8f",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf"
+    },
+    "scriptSHA256": "d2a555f639dacef38bdf0060b9d0069f7c9eb38e4e465ad8df372716b8337ee7"
+  },
+  "compactNumericalSummary": {
+    "status": "tested-bounded-real-five-field-spatial-local-F-Schur-reduction",
+    "stage": "bounded-original-C-study-complete",
+    "candidateRejected": false,
+    "errorIdentifier": "",
+    "message": "",
+    "assemblyComplete": true,
+    "schurProbesComplete": true,
+    "coarseFactorAvailable": true,
+    "singleComplete": true,
+    "innerRunComplete": true,
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "allFiveConservativeFields": true,
+      "sameQOnly": true,
+      "physicalStateChanged": false
+    },
+    "sourceIdentity": {
+      "buildRocketSpatialSplit": "e0cfc43c0251ea1bb2838e897ea395b33e769c24a6ea2dfe9363606ec302e67e",
+      "factorRocketSpatialFBlocks": "e2b44e761b5ebe234b93bcd1f23fc5477278b5821846a4cb6a016493089a8d95",
+      "solveRocketSpatialFBlocks": "69310841a85f0ca8386c4f5867a380d1300e798cd5fffe6b249cbd693a440e3f",
+      "applyRocketRectangularCoupling": "16e4abd1c8cc860cf80b43bbfa34c045d3add4cfb44a348383d3365d107a6c1a",
+      "buildRocketSpatialReduction": "9d1f494230f6be420eab838a625d6da9818fe301988d056b295ede1e7145caa8",
+      "applyRocketSpatialSchur": "e29e24f122f3316f0021827d95bfb73bb4f6416980a4b0c6e7f36a0bc3ec8ba3",
+      "applyRocketSpatialReduction": "d237257fa5791c7a3c278ea72acefe5e45cf234bde3edd80d5d994b006135cf1",
+      "solveRocketSpatialReductionKrylov": "976df1e82ac6053cbe7875b5b27589ddbdd4dbf536e76f3d88e4277e45ebd722",
+      "compactRocketSpatialReductionReport": "f22124fe36f5385c0d465002094d74025062e55945282d3405cc0e247ac12194",
+      "certifyRocketLocalInverse": "976f23217cc52ac335d586b414ee02fcd3c1b28b6cac572876117fafbce684b6",
+      "rocketCompensatedInverseResidual": "a9d18920c8cde0850370bf9cbf6d08fd8765c42127265968c84d3ff6d7d33fd7",
+      "buildRocketStrongPatches": "52d98ebce00e6974e2f9e575eb2e61a807d9242d6faf242c12df7415962fc819",
+      "factorRocketCoupledPatches": "a1b7bd8390e07b5768d2a17b6bce0f5ef118b5a3dc0ac64475988f526a4693f5",
+      "solveRocketCoupledPatches": "408086185e6d91fddb1c2467d588d6071d4b10f4734bcf90a0c223b2ac62f083",
+      "applyRocketPackedGraph": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+      "solveRocketRecycledGMRES": "c2780eb5cf926098640111ab5284d776dc493e1588458f8c95d45025e9a39811"
+    },
+    "newRootMatrixAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newCoarseImageConstructions": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 52900,
+    "assemblyReport": {
+      "coarseCells": 29523,
+      "FCells": 187749,
+      "originalBlocks": 1619664.0,
+      "CFBlocks": 124817,
+      "FCBlocks": 124817,
+      "CCBlocks": 84229,
+      "allLocalEliminationPairPaths": 305329,
+      "schurBlocks": 254825,
+      "storageUpperBoundBytes": 424554616.0,
+      "constructionArrayEstimateBytes": 2040395744.0,
+      "processPeakMemoryClaimed": false,
+      "schurIdentity": "D-E*M_F*B-with-certified-within-original-patch-F-map",
+      "fullFFInverseOrExactSchurClaimed": false,
+      "crossPatchFFKeptInCompleteOuterC": true,
+      "smallOrZeroCoefficientsDropped": false,
+      "allOriginalCVsAndFiveFieldsKept": true,
+      "physicalGridChanged": false,
+      "coarseInverseConstructed": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "FFactorReport": {
+      "includedOriginalFFBlocks": 603745,
+      "maximumCertifiedOriginalInputInverseDefect": 9.463894809444552e-09,
+      "inverseDefectThreshold": 1e-08,
+      "fallbackFBlockCount": 0,
+      "accurateCheckedFBlocks": 18,
+      "refinedFBlocks": 0,
+      "factorStorageUpperBoundBytes": 272695416.0,
+      "constructionArrayEstimateBytes": 714783984.0,
+      "processPeakMemoryClaimed": false,
+      "fixedLinearMap": true,
+      "fullFFInverseClaimed": false,
+      "rejectedFullFInverseClaimedValid": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "maximumSchurProbeRelativeDifference": 1.4950869381028476e-14,
+    "coarseFactorReport": {
+      "patchCount": 4657,
+      "maximumPatchCells": 8,
+      "includedOriginalBlocksBeforeFallback": 94933,
+      "originalBlocks": 254825,
+      "maximumCertifiedLocalInverseDefect": 6.412295627205803e-09,
+      "inverseDefectThreshold": 1e-08,
+      "fallbackPatchCount": 0,
+      "accurateCheckedPatches": 3,
+      "refinedPatches": 0,
+      "factorStorageUpperBoundBytes": 47093304.0,
+      "algorithmArrayConstructionEstimateBytes": 166258652.0,
+      "factorSeconds": 0.2330806,
+      "processPeakMemoryClaimed": false,
+      "fallbackPolicy": "certified-original-CV-five-field-diagonal-only-in-preconditioner",
+      "allOriginalCellsAndFiveFieldsKept": true,
+      "physicalEquationChanged": false,
+      "rejectedPatchInverseClaimedValid": false,
+      "diagonalCompensationApplied": false,
+      "fixedLinearMap": true,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "singleSummary": {
+      "relativeCResidual": 15.663411211914115,
+      "inverseGainSeconds": 6.844016797596246e-05
+    },
+    "singleWork": {
+      "FLocalApplications": 2,
+      "coarseLocalApplications": 1,
+      "rectangularCouplingApplications": 2,
+      "fixedLinearMap": true,
+      "fullFFOrCoarseInverseClaimed": false,
+      "originalNSAcceptanceClaimed": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "innerReport": {
+      "method": "original-full-C-GMRES-with-fixed-five-field-spatial-local-F-Schur-block-reduction",
+      "options": {
+        "maximumIterations": 32,
+        "relativeTolerance": 0.001,
+        "maximumBasisBytes": 1073741824.0,
+        "saveBasisEvidence": false,
+        "failureEvidenceFile": "outputs\\v83_validation\\spatialreductionreal01\\spatial_arnoldi_failure.mat"
+      },
+      "relativeCResidual": 0.9839211911308604,
+      "CApplications": 33,
+      "spatialReductionApplications": 32,
+      "FLocalApplications": 64,
+      "coarseLocalApplications": 32,
+      "rectangularCouplingApplications": 64,
+      "elapsedSeconds": 42.1778641,
+      "baseSpatialMapFixedLinear": true,
+      "innerSolveFixedLinearMapClaimed": false,
+      "originalNSAcceptanceClaimed": false,
+      "physicalSolution": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "krylov": {
+        "method": "SVD-selected-augmented-restarted-right-GMRES",
+        "flag": 1,
+        "stopReason": "bounded-cycles-or-Arnoldi-budget-exhausted",
+        "options": {
+          "restartLength": 32,
+          "maximumCycles": 1,
+          "retainedDirections": 0,
+          "maximumArnoldiSteps": 32,
+          "absoluteTolerance": 108066.80396006095,
+          "maximumBasisBytes": 1073741824.0,
+          "saveBasisEvidence": false,
+          "breakdownRelativeTolerance": 1e-13,
+          "retentionRelativeThreshold": 1e-12
+        },
+        "arnoldiSteps": 32,
+        "modelApplications": 33,
+        "preconditionerApplications": 32,
+        "basisStorageUpperBoundBytes": 695344384.0,
+        "maximumBasisBytes": 1073741824.0,
+        "maximumBasisOrthogonalityError": 8.396751791162152e-13,
+        "absoluteResidual": 106329218.47408834,
+        "relativeResidual": 0.9839211911308604,
+        "residualHistory": [
+          108066803.96006094,
+          107981166.52935039,
+          107979802.37194793,
+          107904310.19377773,
+          107894502.40249582,
+          107892371.64172198,
+          107881173.83970016,
+          107874332.86155759,
+          107732992.1977977,
+          107381952.93319686,
+          107377538.5439596,
+          107336357.73475921,
+          107335152.13777451,
+          107212094.25587104,
+          107190587.03505161,
+          107190165.73657846,
+          107111296.97629018,
+          107109391.08638228,
+          107077623.86725157,
+          106960833.30581269,
+          106931856.3987813,
+          106909898.0480977,
+          106729014.52939714,
+          106711907.03582907,
+          106593595.61445951,
+          106495949.64035158,
+          106492633.0267782,
+          106465188.5895812,
+          106451874.85981269,
+          106445363.71899506,
+          106390450.12012188,
+          106377198.16380802,
+          106329218.47408834
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "arnoldiSteps": 32,
+            "startResidualNorm": 108066803.96006094,
+            "actualResidualNorm": 106329218.47408834,
+            "arnoldiRelationRelativeDifference": 4.1410657748164163e-14,
+            "basisOrthogonalityError": 8.396751791162152e-13,
+            "modelApplications": 33,
+            "preconditionerApplications": 32
+          }
+        ],
+        "basisArraysOmittedFromJSON": true
+      }
+    },
+    "internalCTargetMet": false,
+    "extraRootCDiagnosticApplications": 2,
+    "realFullArnoldiBasisSaved": false
+  },
+  "compactSchurDiagnosticSummary": {
+    "status": "tested-first-bounded-spatial-approximate-Schur-solve-and-parent-C-diagnostic",
+    "stage": "bounded-approximate-S-and-parent-C-diagnostic-complete",
+    "candidateRejected": false,
+    "errorIdentifier": "",
+    "message": "",
+    "numericalRunComplete": true,
+    "systemScope": "approximate-spatial-Schur-S-with-all-five-fields-not-original-full-C",
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov17\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "allFiveConservativeFields": true,
+      "sameQOnly": true,
+      "physicalStateChanged": false
+    },
+    "sourceIdentity": {
+      "solveRocketCoupledPatchKrylov": "19e8490b817d55449c42076c227a0d695c87530a71a23142652eeda13cf73539",
+      "solveRocketCoupledPatches": "408086185e6d91fddb1c2467d588d6071d4b10f4734bcf90a0c223b2ac62f083",
+      "applyRocketPackedGraph": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+      "solveRocketRecycledGMRES": "c2780eb5cf926098640111ab5284d776dc493e1588458f8c95d45025e9a39811",
+      "compactRocketCoupledKrylovReport": "4817355b5c0b5d0605da55b548bbee30cee2ba74ba0e0f4deb3eaa84a5c10701",
+      "solveRocketSpatialFBlocks": "69310841a85f0ca8386c4f5867a380d1300e798cd5fffe6b249cbd693a440e3f",
+      "applyRocketRectangularCoupling": "16e4abd1c8cc860cf80b43bbfa34c045d3add4cfb44a348383d3365d107a6c1a"
+    },
+    "singleApproximateSResidual": 0.23221935071995412,
+    "newFInverseConstructions": 0,
+    "newSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 56392,
+    "diagnostic": {
+      "relativeApproximateSResidual": 0.02392023073932026,
+      "relativeFullCResidual": 10.874683842003664,
+      "fineRowsRelativeToOriginalRHS": 10.870568092302483,
+      "coarseRowsRelativeToOriginalRHS": 0.2991621870515586,
+      "coarseRowsCondensationConsistency": 7.269358951823233e-13,
+      "fineRowsRemainingSquaredNormFraction": 0.9992432017490278,
+      "originalCInternalTargetMet": false,
+      "approximateSTargetMet": false
+    },
+    "innerApproximateSReport": {
+      "method": "full-five-conservation-C-GMRES-with-bounded-strong-connection-local-inverses",
+      "options": {
+        "maximumIterations": 32,
+        "relativeTolerance": 0.001,
+        "maximumBasisBytes": 268435456.0,
+        "saveBasisEvidence": true,
+        "failureEvidenceFile": "outputs\\v83_validation\\spatialschurreal01\\spatial_schur_arnoldi_failure.mat"
+      },
+      "relativeCResidual": 0.02392023073932026,
+      "CApplications": 33,
+      "localBlockApplications": 32,
+      "elapsedSeconds": 5.7191464,
+      "baseLocalMapFixedLinear": true,
+      "innerSolveFixedLinearMapClaimed": false,
+      "requiresFlexibleOuterMethod": true,
+      "originalNSAcceptanceClaimed": false,
+      "physicalSolution": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "krylov": {
+        "method": "SVD-selected-augmented-restarted-right-GMRES",
+        "flag": 1,
+        "stopReason": "bounded-cycles-or-Arnoldi-budget-exhausted",
+        "options": {
+          "restartLength": 32,
+          "maximumCycles": 1,
+          "retainedDirections": 0,
+          "maximumArnoldiSteps": 32,
+          "absoluteTolerance": 1351554.7476396433,
+          "maximumBasisBytes": 268435456.0,
+          "saveBasisEvidence": true,
+          "breakdownRelativeTolerance": 1e-13,
+          "retentionRelativeThreshold": 1e-12
+        },
+        "arnoldiSteps": 32,
+        "modelApplications": 33,
+        "preconditionerApplications": 32,
+        "basisStorageUpperBoundBytes": 184297504.0,
+        "maximumBasisBytes": 268435456.0,
+        "maximumBasisOrthogonalityError": 1.7550807718351753e-13,
+        "absoluteResidual": 32329501.420364026,
+        "relativeResidual": 0.02392023073932026,
+        "residualHistory": [
+          1351554747.6396432,
+          305550733.5514192,
+          235843999.9957802,
+          224272257.17179695,
+          223462403.1459644,
+          195595874.74161446,
+          184215877.42663425,
+          159208753.06073093,
+          153311496.73887253,
+          144062990.70784387,
+          134188232.37777804,
+          134170464.82938923,
+          134170283.27044329,
+          132172775.55340669,
+          130743697.3347967,
+          126901132.84991185,
+          126624312.94637296,
+          126556765.79858245,
+          123883779.20588875,
+          106156049.54327957,
+          84769178.45143943,
+          83788531.1222135,
+          70377582.2871434,
+          70138142.1968558,
+          69981408.45854563,
+          62702631.313636675,
+          56549325.844260745,
+          47450164.579684384,
+          43447342.34672972,
+          38464409.000647366,
+          33671186.89845046,
+          32401926.000112,
+          32329501.420364026
+        ],
+        "cycles": [
+          {
+            "cycle": 1,
+            "arnoldiSteps": 32,
+            "startResidualNorm": 1351554747.6396432,
+            "actualResidualNorm": 32329501.420364026,
+            "arnoldiRelationRelativeDifference": 6.141112889340747e-15,
+            "basisOrthogonalityError": 1.7550807718351753e-13,
+            "modelApplications": 33,
+            "preconditionerApplications": 32
+          }
+        ],
+        "basisArraysOmittedFromJSON": true
+      }
+    },
+    "fullSArnoldiBasisSaved": true,
+    "newOriginalCDiagnosticApplications": 1,
+    "extraSProbeApplications": 2
+  },
+  "compactSummaryReceipts": [
+    {
+      "path": "outputs\\v83_validation\\spatialreductionreal01\\spatial_reduction_real_summary.json",
+      "sha256": "ff69d3ac21c47cdd5fa4897b8bd88d517f578900c1b8a608401b57d227454173",
+      "bytes": 7295
+    },
+    {
+      "path": "outputs\\v83_validation\\spatialschurreal01\\spatial_schur_krylov_summary.json",
+      "sha256": "b41f5f37a906b220e51dedce58479c86d8020c4105dcc05e4921702bccbb17e8",
+      "bytes": 4488
+    }
+  ],
+  "frozenPreflightMATLABInput": {
+    "path": "outputs\\v83_validation\\spatialreductionpreflight01\\spatial_reduction_input.mat",
+    "sha256": "f7a581f6467423799b0d771923718d56a678040b01b65e4afb9ce4aa83e5df20",
+    "bytes": 1093559
+  },
+  "numericalFailuresInThisSliceClaimed": false,
+  "FBlockTopology": {
+    "allOriginalFFBlocks": 1285801.0,
+    "withinOriginalPatchFFBlocks": 603745,
+    "crossPatchFFBlocksKeptInCompleteC": 682056.0,
+    "originalPhysicalCVs": 217272,
+    "FOriginalCVs": 187749,
+    "coarseOriginalCVs": 29523,
+    "physicalGridChanged": false
+  },
+  "codeSourceIdentity": [
+    {
+      "path": "internalFlow\\cutCell\\buildRocketSpatialSplit.m",
+      "sha256": "e0cfc43c0251ea1bb2838e897ea395b33e769c24a6ea2dfe9363606ec302e67e",
+      "bytes": 3035
+    },
+    {
+      "path": "internalFlow\\cutCell\\factorRocketSpatialFBlocks.m",
+      "sha256": "e2b44e761b5ebe234b93bcd1f23fc5477278b5821846a4cb6a016493089a8d95",
+      "bytes": 5342
+    },
+    {
+      "path": "internalFlow\\cutCell\\solveRocketSpatialFBlocks.m",
+      "sha256": "69310841a85f0ca8386c4f5867a380d1300e798cd5fffe6b249cbd693a440e3f",
+      "bytes": 1009
+    },
+    {
+      "path": "internalFlow\\cutCell\\applyRocketRectangularCoupling.m",
+      "sha256": "16e4abd1c8cc860cf80b43bbfa34c045d3add4cfb44a348383d3365d107a6c1a",
+      "bytes": 955
+    },
+    {
+      "path": "internalFlow\\cutCell\\buildRocketSpatialReduction.m",
+      "sha256": "9d1f494230f6be420eab838a625d6da9818fe301988d056b295ede1e7145caa8",
+      "bytes": 6858
+    },
+    {
+      "path": "internalFlow\\cutCell\\applyRocketSpatialSchur.m",
+      "sha256": "e29e24f122f3316f0021827d95bfb73bb4f6416980a4b0c6e7f36a0bc3ec8ba3",
+      "bytes": 895
+    },
+    {
+      "path": "internalFlow\\cutCell\\applyRocketSpatialReduction.m",
+      "sha256": "d237257fa5791c7a3c278ea72acefe5e45cf234bde3edd80d5d994b006135cf1",
+      "bytes": 1478
+    },
+    {
+      "path": "internalFlow\\cutCell\\solveRocketSpatialReductionKrylov.m",
+      "sha256": "976df1e82ac6053cbe7875b5b27589ddbdd4dbf536e76f3d88e4277e45ebd722",
+      "bytes": 2850
+    },
+    {
+      "path": "internalFlow\\cutCell\\compactRocketSpatialReductionReport.m",
+      "sha256": "f22124fe36f5385c0d465002094d74025062e55945282d3405cc0e247ac12194",
+      "bytes": 1436
+    },
+    {
+      "path": "tests\\testRocketSpatialReduction.m",
+      "sha256": "7a2c7e0451f1dfedc91f4b6157e687627f669bd84f566cf288741c84145e5ac0",
+      "bytes": 6759
+    },
+    {
+      "path": "tests\\studyRocketSpatialReduction.m",
+      "sha256": "696857436257fefdf91d5bf7f47b20a2071d079ff624429470935a3afa64e152",
+      "bytes": 8160
+    },
+    {
+      "path": "tests\\studyRocketSpatialSchurKrylov.m",
+      "sha256": "c1b5760078429996ae913074664e40275b7014a420ddf4e18ec5b8a41a247ad1",
+      "bytes": 6160
+    },
+    {
+      "path": "tests\\prepareRocketSpatialReductionInput.py",
+      "sha256": "9105a19117165ce4d3f4b3189d596295f58c0384973051394ab918a12956db64",
+      "bytes": 1137
+    },
+    {
+      "path": "tests\\auditRocketSpatialReductionUnit.py",
+      "sha256": "9585b9c24b0a698f875c7470c3f82f69c0d095642edc02da252422362daaf5b2",
+      "bytes": 6571
+    },
+    {
+      "path": "tests\\auditRocketSpatialReductionReal.py",
+      "sha256": "632e33acff450471c5bf04b7c6e3765e74fc160e4a46c914032b55f82a5334ec",
+      "bytes": 18334
+    },
+    {
+      "path": "tests\\auditRocketSpatialSchurKrylov.py",
+      "sha256": "d2a555f639dacef38bdf0060b9d0069f7c9eb38e4e465ad8df372716b8337ee7",
+      "bytes": 9887
+    },
+    {
+      "path": "tests\\exportRocketSpatialReductionDiagnostics.py",
+      "sha256": "f2cec4b8c0ef3e734f12698833f9c9ea71e5e751d36497fda98b6d6a04445bf2",
+      "bytes": 6293
+    },
+    {
+      "path": "tests\\auditRocketSpatialReductionWorkbench.py",
+      "sha256": "19aa31812af0e065593f8b721077b97bbce5cc33dbbb8b71a3f3d5bfd6ab7ce7",
+      "bytes": 4645
+    }
+  ],
+  "methodDocumentation": {
+    "path": "docs\\SPATIAL_REDUCTION_V83.md",
+    "sha256": "1fd4a3d9be47318974165fde29c3dcc102e1184de58464a25f1cb04c6974431f",
+    "bytes": 8925
+  },
+  "userInterface": {
+    "status": "passed-independent-fourteen-source-bound-rows-separated-C-S-and-unchanged-facet-data",
+    "processID": 54068,
+    "workbench": "outputs/v83_validation/workbench25/index.html",
+    "researchRows": 14,
+    "originalNSAndAcceptanceHistoryExactlyUnchanged": true,
+    "originalCAndApproximateSResidualDenominatorsKeptDistinct": true,
+    "approximateSNativeAndIndependentArnoldiGatesNotClaimedForOriginalC": true,
+    "allThreeFalseSourceOrQualificationExportsRejected": true,
+    "productionQualificationNotClaimed": true,
+    "sourceFacetPayload": [
+      {
+        "path": "outputs\\v83_validation\\workbench25\\cases\\legacy-wall-source\\results.json",
+        "sha256": "5c048e7c893dc4c67064656bde19b17419e0ed6b742f893f0e63bf24db25d04f",
+        "bytes": 9047228
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench25\\cases\\legacy-wall-source\\case-data.js",
+        "sha256": "60cfa644b4ad13d70e9591bd40b6417281801a46698df5688100d62d06bf381c",
+        "bytes": 9047249
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench25\\cases\\constrained-wall-baseline\\results.json",
+        "sha256": "7bd40b17d235011f19be08c8b856f1854eb078bbf9592fa9969557d283a89f5f",
+        "bytes": 9047209
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench25\\cases\\constrained-wall-baseline\\case-data.js",
+        "sha256": "780da22265a80f0e26a55e79f66138a48a1722d38a730dd3de111eb6402f9197",
+        "bytes": 9047230
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench25\\cases\\constrained-wall-krylov\\results.json",
+        "sha256": "b946336d02ea4a81384ba9ff4bf13828e0910bb2ba399b27c48feccd2bcd37b2",
+        "bytes": 9060905
+      },
+      {
+        "path": "outputs\\v83_validation\\workbench25\\cases\\constrained-wall-krylov\\case-data.js",
+        "sha256": "8140318bfa34e28df8dd8320ee5c4541c216addfa533b4925087d3b8ae0c2d57",
+        "bytes": 9060926
+      }
+    ],
+    "previousFullMATFieldAuditReusedByByteIdentity": true,
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "newActualNSEvaluations": 0,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockilufailurediag01\\arnoldi_failure_evidence.mat": "b4c42808fd960db0b827daba4450054724f25b2ea6b7d9306965d7a42a282319",
+      "outputs\\v83_validation\\scaledilureal01\\scaled_arnoldi_failure_evidence.mat": "ecc4dc36726284411c601f2f12058caecce4bc5edcaa76cd0684350d25626fd1",
+      "outputs\\v83_validation\\blockfillreal01\\scaled_arnoldi_failure_evidence.mat": "46f4a5065956e9977037ac39a2b8419c6a1687d44a5edf712eeb7cd196656938",
+      "outputs\\v83_validation\\floworderfactor01\\flow_ordering_actions_evidence.mat": "ae8819df3a2ad68544ac54b23285ca10347c333b74a3a05704e074afb2747856",
+      "outputs\\v83_validation\\schurcheckpointreal01\\schur_failure_checkpoint_summary.json": "5c353f08b38934a3b410b1d25f7bda555f3be47c86faa37f61fa484db2913d0d",
+      "outputs\\v83_validation\\pivotedschurreal02\\pivoted_schur_real_summary.json": "4efe6d754c844452f9b55adb98602be37fd6eaa25a54abd403dba474c1e306f5",
+      "outputs\\v83_validation\\schurscalereal01\\agent_stop_record.json": "f4b4a0e160bca5a8e15233be3e0cb963fe3f1956665ad4c26e863b373c87a67a",
+      "outputs\\v83_validation\\consistentdiagrefine01\\consistent_schur_real_summary.json": "e08f3e895c392f08e14e4c6bee449c4fca9f60e2e2f6c0a716c109f316307865",
+      "outputs\\v83_validation\\momentumlinereport02\\momentum_lines_real_summary.json": "98bb9ebbac1488f46bfcfaf3df613f79ae65f8622e6434b9dbc752ea44c4d199",
+      "outputs\\v83_validation\\rowmomentumreal01\\row_momentum_real_summary.json": "a9c9164c35274e6b1da9ddb28df21fb45186263890ca7981d17dd9d6c73e2024",
+      "outputs\\v83_validation\\coupledpatchreal01\\coupled_patch_real_summary.json": "cd98962666455ef04579c660f08f48634179061d2730c25e9255fea35046145a",
+      "outputs\\v83_validation\\patchhierarchyreal01\\patch_hierarchy_real_summary.json": "8fc26436d44cbb2773678da4577acd71fd79a8c23b715bc0bc5859180c23a978",
+      "outputs\\v83_validation\\spatialreductionreal01\\spatial_reduction_real_summary.json": "ff69d3ac21c47cdd5fa4897b8bd88d517f578900c1b8a608401b57d227454173",
+      "outputs\\v83_validation\\spatialschurreal01\\spatial_schur_krylov_summary.json": "b41f5f37a906b220e51dedce58479c86d8020c4105dcc05e4921702bccbb17e8",
+      "outputs\\v83_validation\\spatialreductionreal01_independent_spatial_reduction.json": "f74d372006c22f6510d57d3dce76839a2154b4c71f657928cb8d2ee559ee1324",
+      "outputs\\v83_validation\\spatialschurreal01_independent_spatial_schur.json": "d8a83dcc4e3270db1fef41e9c1a9d71fb8a52f84a04670e98fa3d8b16be59414"
+    },
+    "scriptSHA256": "19aa31812af0e065593f8b721077b97bbce5cc33dbbb8b71a3f3d5bfd6ab7ce7"
+  },
+  "nodeDataVerification": {
+    "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+    "processID": 24924,
+    "cases": 3,
+    "sourceFaces": 19752,
+    "CSVrows": 592560,
+    "sectionSamples": 6624,
+    "sameHostEvents": 15,
+    "linearDiagnosticRows": 1,
+    "candidateDiagnosticRows": 0,
+    "sourceSHA256": {
+      "tests\\testRocketWallVelocityWorkbench.js": "068069564728d28e7e2d31e201e710bf5a23f61e06620dc022aa94d38a49893e",
+      "outputs\\v83_validation\\workbench25\\rocket-wall-velocity.js": "c1d2f48ad5fc429d1f5d6a0e225a49935945c72d730e70212e82f6365d733e85",
+      "outputs\\v83_validation\\workbench25\\index.html": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+      "web\\viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+      "web\\export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+      "web\\section.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c"
+    },
+    "browserVisualOrWebGLRuntimeVerified": false,
+    "newProductionSolvedAreaM2": 0,
+    "dataSHA256": "10ab3a05069f85a1cf2998b5944bbb0aa5d4c4ca62ddf882fd9089a652562ac2"
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "mainAcceptedIterations": 12,
+    "mainActualNSEvaluations": 246,
+    "actualNSDirectionDefect": 0.19876430371570342,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "actualNSEvaluationsAfterLastAcceptedHistory": 121,
+    "latestEndpoint": {
+      "path": "outputs/v83_validation/krylov17/wall_velocity_krylov_evidence.mat",
+      "sha256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "bytes": 1214364034
+    },
+    "originalNSSource": {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    },
+    "physicalPressureHeatFluxAndHeatPowerUnchanged": true
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "workAccounting": {
+    "mainSpatialStudyOriginalCApplications": 35,
+    "separateSStudyOriginalCDiagnosticApplications": 1,
+    "combinedOriginalCApplications": 36,
+    "combinedPackedSApplications": 38,
+    "combinedFLocalApplications": 71,
+    "combinedCoarseLocalApplications": 66,
+    "combinedRectangularApplications": 77,
+    "newOriginalMatrixAssemblies": 0,
+    "newFInverseConstructions": 1,
+    "newApproximateSchurAssemblies": 1,
+    "separateSStudyNewFInverseConstructions": 0,
+    "separateSStudyNewSchurAssemblies": 0,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newProductionSolvedAreaM2": 0
+  },
+  "nextAction": "Reuse the audited spatial F split, local F inverse, approximate S, frozen coarse factor and saved S/F candidate. The saved diagnostic F rows are dominated by cross-patch F-F coupling (10.870568 relative to original RHS) while the within-patch F equation defect is only 1.30e-12; this is evidence for that vector, not a global cause or rank proof. Build/check the complete all-five-field A_FF sub-operator from the original C, retaining all 682056 cross-patch FF blocks; first dense small reference, then one bounded same-RHS test using the existing fixed local F inverse. Keep it a diagnostic until consistency with the condensed S and original full-C back-substitution is established. Assess overlap or F-only strength grouping from actual full-F coupling/resource evidence if needed. Do not merely extend coarse-S iterations, silently replace M_F while claiming the old S identity, rerun old group-constant hierarchies/global momentum ILU/stopped scalar ILUTP, or relax original gates. All original CVs and original full C remain. Require complete selected-J and original-NS total-direction verification with original norm(R)/0.1 and state/temperature/descent/spatial/steady/flux conditions before any new accepted state; regional physical validation and scientific UI remain mandatory.",
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "4d33354c88573c70239ead84c64eed04e05ff2189ba82d73496c6e4c5adea659"
+}

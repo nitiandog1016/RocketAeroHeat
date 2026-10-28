@@ -1,0 +1,25 @@
+function report=recoverRocketMomentumStudySummary(folder,numericalFolder)
+%RECOVERROCKETMOMENTUMSTUDYSUMMARY 从已完整保存的MAT恢复精简摘要，不重算任何作用。
+% 模块一：绑定原停止记录、数值MAT摘要及进程终态；旧巨大JSON不作验收依据。
+% 模块二：仅加载/整理既有计数与状态，新NS、矩阵作用、预条件作用均为0。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'MomentumSummaryRecovery:Overwrite','摘要恢复必须写新目录。');mkdir(folder);
+stopFile=fullfile(numericalFolder,'agent_reporting_stop_record.json');stop=jsondecode(fileread(stopFile));[~,caseID]=fileparts(numericalFolder);
+processFile=fullfile(root,'outputs','v83_validation',[caseID '_process.json']);process=jsondecode(fileread(processFile));
+assert(strcmp(process.status,'terminal')&&process.exitCode==4294967295&&all(structfun(@(x)x,process.sourceStableAfter)));
+numericFile=fullfile(numericalFolder,'momentum_line_krylov_evidence.mat');assert(strcmp(rocketStreamingFileSHA256(numericFile),stop.savedNumericalEvidenceSHA256));
+f=load(fullfile(numericalFolder,'momentum_line_factor_evidence.mat'),'factor','sourceBinding','sourceIdentity');factorReport=f.factor.factorizationReport;sourceBinding=f.sourceBinding;sourceIdentity=f.sourceIdentity;clear f;
+a=load(fullfile(numericalFolder,'momentum_line_actions.mat'),'summaries','sourceBinding');assert(isequaln(a.sourceBinding,sourceBinding));summaries=a.summaries;clear a;
+k=load(numericFile,'detail','sourceBinding');assert(isequaln(k.sourceBinding,sourceBinding));inner=compactRocketMomentumKrylovReport(k.detail);clear k;
+report=struct('status','numerical-MAT-results-with-recovered-compact-summary','stage','bounded-momentum-study-complete-reporting-recovered', ...
+    'candidateRejected',false,'errorIdentifier','','message','','factorAvailable',true,'threeActionsComplete',true,'innerSolveComplete',true, ...
+    'sourceBinding',sourceBinding,'sourceIdentity',sourceIdentity,'factorizationReport',factorReport,'singleActionSummaries',{summaries},'innerReport',inner, ...
+    'internalMomentumTargetMet',inner.krylov.flag==0,'additionalFullADiagnosticApplications',1,'wholeFiveFieldPreconditionerQualified',false, ...
+    'driverReportingInterrupted',true,'originalDriverExitCode',process.exitCode,'numericalEvidenceFolder',numericalFolder, ...
+    'summaryRecoveryNewAApplications',0,'summaryRecoveryNewPreconditionerApplications',0,'newSelectedJApplications',0,'newActualNSEvaluations',0,'newFlowAcceptances',0,'newProductionSolvedAreaM2',0,'physicalSolution',false, ...
+    'summaryRecoverySourceSHA256',rocketStreamingFileSHA256(which('recoverRocketMomentumStudySummary')),'engineProcessID',feature('getpid'));
+recovery=struct('stopFile',stopFile,'processFile',processFile,'numericalFile',numericFile,'numericalFileSHA256',rocketStreamingFileSHA256(numericFile), ...
+    'helperSHA256',rocketStreamingFileSHA256(which('compactRocketMomentumKrylovReport')),'numericalActionsRecomputed',false);
+save(fullfile(folder,'summary_recovery_evidence.mat'),'report','recovery','-v7');raw=jsonencode(report);assert(numel(raw)<128*1024,'MomentumSummaryRecovery:Size','恢复摘要超限。');
+fid=fopen(fullfile(folder,'momentum_lines_real_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',raw);fprintf('%s\n',raw);
+end

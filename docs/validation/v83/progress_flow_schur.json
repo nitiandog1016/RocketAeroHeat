@@ -1,0 +1,874 @@
+{
+  "version": 83,
+  "status": "tested-flow-ordering-and-field-Schur-studies-real-candidates-unusable-no-new-physical-state-not-delivered",
+  "generatedUTC": "2026-10-25T08:14:53.352342+00:00",
+  "recorderProcessID": 17424,
+  "previousGoalTurnClassification": "progress",
+  "previousGoalTurnEvidence": "The preceding goal turn implemented and independently tested global block ILU0/level1, diagnosed rejected real directions and added source-bound workbench17; this evidence led to cancellation, ordering and field-Schur tests.",
+  "priorProgressPath": "docs/validation/v83/progress_block_ilu.json",
+  "priorProgressSHA256": "ce61c196ed6b91420a4a609034535110d18e2fbd06782a33147b6880ce9f83ef",
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/reorderRocketBlockGraphByFlow.m": "c07c9b9394f78feded6eccadf8f521686e61339cac6fda691b2506ef35508af3",
+    "internalFlow/cutCell/factorRocketFieldILU0.m": "1c8a28fc7e35c214a53d0e8e7898dcf36ce4624996d0732f02d86e77a7013d0b",
+    "internalFlow/cutCell/solveRocketFieldILU0.m": "88f22fb38b4e8d075ea3f738b9dfabb4b0f49a2583e7effabfba4401e8a1a8e6",
+    "internalFlow/cutCell/buildRocketFieldSchurPreconditioner.m": "48f133971a7780439bafcfd8f8d86c13f3bd031ba4b7e7ab944640f4e96cdde0",
+    "internalFlow/cutCell/solveRocketFieldSchurPreconditioner.m": "8d05372fcae6fca6c138a69a43d908c82fe26b4f2dbde957427c10aba3b488da",
+    "tests/testRocketBlockFlowOrdering.m": "6c11f0f22097c0b9bc89650e0b79eefb760cb23558217ed743f6224af8de33ba",
+    "tests/extractRocketFlowOrderingGeometry.m": "a7af73352d93463af016a4c0a153b8b5351c8c3f49251d855730bf8d82157dbb",
+    "tests/studyRocketFlowOrderingFactor.m": "456009ae4ede8fd6d884fb2e2b38f2b495c588172a8a26758035c707ddd0be95",
+    "tests/testRocketFieldSchurPreconditioner.m": "93966e57b7ce1cfa057970f4889cd1a4eb4c8a64b96e7d8d9f6a00a04db1149b",
+    "tests/studyRocketFieldSchurActions.m": "30e2eafbd22e8673b269b7f8ea5175d2cebe8f4b2ebcfa6d19e0c25ec98f3749",
+    "tests/diagnoseRocketBlockDirectionCancellation.py": "7499844e2dbbe9f2461e78ea4ff30993e990f6b62c8371518e4ca8980282ce23",
+    "tests/auditRocketBlockFlowOrdering.py": "7955f5b866d3fd4cccdd095306d4a8c58054934fa722d948ea06538cd3a4ae39",
+    "tests/diagnoseRocketGraphFlowCoupling.py": "3e35d1ff96efd070df351b1c6ed98c3c2dfac9698bebbe2bfa4c98e6af639342",
+    "tests/auditRocketRealFlowOrderingFactor.py": "3f157e5b544ac65725e67d7f83e59e80e4177dd0a7586cc7b610aca240aa88b6",
+    "tests/studyRocketFieldSchurReference.py": "e34a8b594d3fc9cdf745e88f11ef7323c9963b1ea5958010d5b5ea660b8d1163",
+    "tests/auditRocketFieldSchurUnit.py": "253601a73cb8fb20cb991fc37018a75293e91060f83b85f5e3582d9c9232943b",
+    "tests/exportRocketBlockResearchDiagnostics.py": "30c21ed8bf08f858499bbcfba49a38cca18a99e5396712101f2c8447864a25f2",
+    "tests/auditRocketBlockStudyWorkbench.py": "c9fdee599bd34a329398f858c6633c32b0329de23fbb53998f7d5ee42985abb1",
+    "tests/testRocketWallVelocityWorkbench.js": "068069564728d28e7e2d31e201e710bf5a23f61e06620dc022aa94d38a49893e",
+    "exportRocketWallVelocityStudy.m": "f287e46011aa2ed6cb87c26459afdb74a24dcd0ec20209e44dbddbfd6334610d",
+    "web/rocket-wall-velocity.js": "c1d2f48ad5fc429d1f5d6a0e225a49935945c72d730e70212e82f6365d733e85",
+    "web/rocket-wall-velocity.html": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+    "docs/FLOW_ORDER_FIELD_SCHUR_V83.md": "43c998606ac421012d0305dd4c1e830d007d52955cf53fb65faf1c7b09a987f4",
+    "docs/GITHUB_STAGE_READINESS.md": "cf12f9c4617b004ec2ece5beefce22142638d75f578aa77e72869c64c840dd32",
+    "docs/PROJECT_GOALS.md": "5136a7c2910b2d56a3b2203225674452adf8732677a27f33cb0ada3c90dc99d9",
+    "outputs/v83_validation/run_matlab.py": "c5c5419769420438f59f200500aa02fa55f9c6c764c6594ea763ff7cf157adf1",
+    "outputs/v83_validation/record_flow_schur_progress.py": "5d3771e4356f16f30dee164ac7406feeeb0164adae71316474b8c8c6b256e756"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_flow_map_budget_reorderRocketBlockGraphByFlow.m",
+      "sha256": "811cd58165c1e2346bcb97a337bb70ded30cfebd0d43c07389e04629493cfd54",
+      "bytes": 3600
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_flow_map_budget_testRocketBlockFlowOrdering.m",
+      "sha256": "33fbe5481f2103f566598fb17175ae2e105038642ca1edb496e61b304c7c8ae3",
+      "bytes": 4155
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_flow_schur_ui_auditRocketBlockStudyWorkbench.py",
+      "sha256": "2a8ef3065580a0e87c0bded246f66199bde70e50a59c80e3abfe0f2c163bfab3",
+      "bytes": 3182
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_flow_schur_ui_exportRocketWallVelocityStudy.m",
+      "sha256": "f6223e463a02e51ef6f916f5cb7dc4374afd22e17626e46b948709bfaf36dc9a",
+      "bytes": 19605
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_flow_schur_ui_rocket-wall-velocity.html",
+      "sha256": "a3e8cd75f551987abb725845e7c6128a0bb9f93f10a4d4ca5761d02d693a9f5f",
+      "bytes": 3715
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_flow_schur_ui_rocket-wall-velocity.js",
+      "sha256": "8e56a16d58bb2edf7c18a003691eac6eb1a302a627f9ec349834d243eacf7571",
+      "bytes": 13438
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_flow_schur_ui_testRocketWallVelocityWorkbench.js",
+      "sha256": "bb5391f3afaabb8d904bc5a158d8361430cd2c4d60e225dfc75ef0c02c41aa48",
+      "bytes": 16068
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_schur_audit_norm_auditRocketFieldSchurUnit.py",
+      "sha256": "3df3a0564086f9ab5ea310d80a79f704aad59042f98e9df4567d47cb20ba97c1",
+      "bytes": 3727
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_schur_block_U_studyRocketFieldSchurReference.py",
+      "sha256": "4ca78640a93dde60062b36fe2e843c0cb87d4e4222d592dcd52f2993a9adffae",
+      "bytes": 4884
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_schur_scipy_tol_studyRocketFieldSchurReference.py",
+      "sha256": "e2aee166b414d4c8cc6ed198a7ccd00d27b352735b25f180d48c79202e136310",
+      "bytes": 4693
+    }
+  ],
+  "matlabProcesses": [
+    {
+      "path": "outputs/v83_validation/floworderunit01_process.json",
+      "sha256": "5da2e54bc150b1892a739aca60089b7d675aab87a343259a2b50f6a420582136",
+      "bytes": 142005,
+      "case": "floworderunit01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        20636
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/floworderfactor01_process.json",
+      "sha256": "ff181a3a3babf8019d89d733656f0e2db592cffc3d20d4b3fa5491063067476d",
+      "bytes": 143186,
+      "case": "floworderfactor01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        21024
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurunit01_process.json",
+      "sha256": "589242bc235b9d25bab81aae99c07a473f454396708c9b048365bf3ce706893c",
+      "bytes": 145751,
+      "case": "fieldschurunit01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        36604
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurreal01_process.json",
+      "sha256": "24d0c76c6c1d2974b6723263fa89c394f36e7d68b83e3ff93f315c76e0168912",
+      "bytes": 145985,
+      "case": "fieldschurreal01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        51664
+      ]
+    },
+    {
+      "path": "outputs/v83_validation/flowschurui01_process.json",
+      "sha256": "eef9d3dd4d8d63278f7d809d0ab78aa3df571467caa24190e7638220cdaa36a4",
+      "bytes": 146253,
+      "case": "flowschurui01",
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        40492
+      ]
+    }
+  ],
+  "independentChecks": [
+    {
+      "path": "outputs/v83_validation/floworderunit01_independent_flow_order_unit.json",
+      "sha256": "0bd8c7b300ca94d339fc42bd3b694d3c8adde6ee9a21fe89406d15c4b610f289",
+      "bytes": 1020,
+      "status": "passed-independent-flow-ordering-projection-full-C-all-values-factors-and-triangular-solves",
+      "processID": 47936
+    },
+    {
+      "path": "outputs/v83_validation/floworderunit02_independent_flow_order_unit.json",
+      "sha256": "0f6f3fdfac8d99e22bb9e583a188a96d1360ab270d7e45002f8505f95d9bc960",
+      "bytes": 1020,
+      "status": "passed-independent-flow-ordering-projection-full-C-all-values-factors-and-triangular-solves",
+      "processID": 57924
+    },
+    {
+      "path": "outputs/v83_validation/flow_coupling_diagnostic01.json",
+      "sha256": "ae602a2038e81651e946144a982e23171801ba2473f953f03e8695f84cb24050",
+      "bytes": 2598,
+      "status": "passed-source-domain-centroid-identity-and-complete-C-projected-order-coupling-diagnostic",
+      "processID": 22000
+    },
+    {
+      "path": "outputs/v83_validation/floworderfactor01_independent_real_factor.json",
+      "sha256": "3b6238393025c76fe187a5cf2f2574bf80e0e96ff0866bb8afbe2755957634df",
+      "bytes": 2162,
+      "status": "passed-independent-real-flow-order-full-pattern-all-retained-LU-pivots-and-three-C-actions",
+      "processID": 49644
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurunit01_independent_field_schur.json",
+      "sha256": "2168fd35a9f159cc9192fe8d032eab7460800bd98e33f31776e1a5d370492cee",
+      "bytes": 1364,
+      "status": "passed-independent-small-complete-five-field-Schur-assembly-and-full-block-solves",
+      "processID": 14416
+    },
+    {
+      "path": "outputs/v83_validation/workbench18/node_wall_velocity_summary.json",
+      "sha256": "b933e41104ec7943cba9d1595120b3fc1d3adbb4b3155d90d7d7869f053f75b0",
+      "bytes": 1121,
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "processID": 57232
+    },
+    {
+      "path": "outputs/v83_validation/workbench18/independent_block_study_view.json",
+      "sha256": "6efd791869134c4818bbb1d185ae9c8d81ddf11994fd713b4dd1c9abda9a7f57",
+      "bytes": 3573,
+      "status": "passed-independent-research-source-binding-and-unchanged-wall-fields-history-identity",
+      "processID": 36952
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/block_direction_cancellation01.json",
+      "sha256": "9d33ea77fb2f19cec2a143be5186d4144db6487e7a7960e4110cda8a5a77e6f5",
+      "bytes": 3265
+    },
+    {
+      "path": "outputs/v83_validation/flowordergeometry01/flow_ordering_geometry.mat",
+      "sha256": "900b4a943a509129fb461d142bcefe4c8a6009d9493ab364c35ca4d687bc48b5",
+      "bytes": 5825785
+    },
+    {
+      "path": "outputs/v83_validation/floworderunit02/block_flow_order_unit_evidence.mat",
+      "sha256": "7b61427067a67beec230aa44fa3194f89e0db31b940400b38f9326570dcaec5b",
+      "bytes": 441788
+    },
+    {
+      "path": "outputs/v83_validation/floworderfactor01/flow_ordered_pattern_evidence.mat",
+      "sha256": "679767cb0f18d5020bf338e59ede645f232f3ab9d731b389a58e32e3fb3e2a5e",
+      "bytes": 7377209
+    },
+    {
+      "path": "outputs/v83_validation/floworderfactor01/flow_ordered_factor_evidence.mat",
+      "sha256": "a9f8239bd6a8c4353b095a4949898b55ea00c94bdc1c163504cb6933bfe2b43b",
+      "bytes": 341577435
+    },
+    {
+      "path": "outputs/v83_validation/floworderfactor01/flow_ordering_actions_evidence.mat",
+      "sha256": "ae8819df3a2ad68544ac54b23285ca10347c333b74a3a05704e074afb2747856",
+      "bytes": 75701387
+    },
+    {
+      "path": "outputs/v83_validation/floworderfactor01/flow_ordering_factor_summary.json",
+      "sha256": "f8ddcec4b0d14f10e54bbf74dc5e07cad1c7be4947da2cd351a5c938eed32c6e",
+      "bytes": 2305
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurref01/interface_failure.json",
+      "sha256": "0e1ba6e0ed5515ae5fbb3011bcb781cf844776087f374c372ae3c6487bb69530",
+      "bytes": 566
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurref02/field_schur_dense_summary.json",
+      "sha256": "6afbbf050f316db79ef4fb8df6c7cca5c4638512a9b3c8043bea43ce9c1e8df4",
+      "bytes": 4092
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurref02/invalidity.json",
+      "sha256": "f692fdba17896b924afd1900d59a9789887843f163043a58e5e9c00664b12586",
+      "bytes": 604
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurref03/field_schur_dense_summary.json",
+      "sha256": "684fd6ad8201e53e6597aec000ff9bd4bdb9ed8f890b96837a2fd346e5b4285e",
+      "bytes": 4207
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurref03/field_schur_dense_evidence.mat",
+      "sha256": "dbd87fed480c47634f74a31e778db0f2514661ff1aed47649403034c454607f1",
+      "bytes": 278538
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurunit01/independent_audit_attempt1_failure.json",
+      "sha256": "f60c43a1ec4cdcf6c5119c2aa12347e587edf082d9f1e3532b44886146293c1a",
+      "bytes": 713
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurunit01/field_schur_unit_evidence.mat",
+      "sha256": "1d7ac208c419abf75a2e2e16c8fa3f03ad8f45d8ab04d35b90ce514fc2cd95b2",
+      "bytes": 450553
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurreal01/field_schur_real_summary.json",
+      "sha256": "7958c3a2ea5d6f76e5133567659b3caaacfa6ab71a8453d1b9cc4d9005281ec3",
+      "bytes": 478
+    },
+    {
+      "path": "outputs/v83_validation/linearstudybinding02/linear_study_binding_evidence.mat",
+      "sha256": "54092e76e4b455175cbd009d1252cc00fedf60f35df74711ad1408b0db6e12c7",
+      "bytes": 472
+    },
+    {
+      "path": "outputs/v83_validation/block_linear_research_summary_v2.json",
+      "sha256": "f40306742b9e65c82535a340d7df99921333db1a55fafea3c722770cfb4848ba",
+      "bytes": 5832
+    },
+    {
+      "path": "outputs/v83_validation/workbench18/wall-velocity-study-data.json",
+      "sha256": "a6e279f3e41d36cd31e067f9c957ed91012cdc5e2f1a0d3404eafbcde2743311",
+      "bytes": 20141
+    },
+    {
+      "path": "outputs/v83_validation/fieldschurreal01_stdout.log",
+      "sha256": "38f7af747b4fd49685e1511e1c96d891dce61d4f80db8ed5b7e435f877bb3234",
+      "bytes": 974
+    }
+  ],
+  "cancellationDiagnostic": {
+    "status": "diagnosed-saved-rejected-direction-conditioning-and-cancellation-no-new-model",
+    "processID": 53380,
+    "cases": [
+      {
+        "case": "blockilufailurediag01",
+        "arnoldiSteps": 32,
+        "HSmallestSingularValue": 0.9342680306497225,
+        "HLargestSingularValue": 9.681655207839592e+16,
+        "HConditionEstimate": 1.036282404002054e+17,
+        "HRetainedRankAtUnchangedRelativeThreshold": 24,
+        "coefficientNormRelativeToRhs": 1.410500394241013e-06,
+        "physicalDirectionCombinationCancellation": 112061952328.32564,
+        "projectedImageCombinationCancellation": 233428309118.2661,
+        "candidateRecomputationRelativeToFormation": 4.345747102505392e-17,
+        "actualRelativeCResidual": 0.9994393034120967,
+        "savedOrthogonalityError": 16.46157108161325,
+        "savedCombinedRelationDifference": 3.6517976461641324e-05,
+        "basisActiveColumns": 33,
+        "usableDirection": false
+      },
+      {
+        "case": "scaledilureal01",
+        "arnoldiSteps": 23,
+        "HSmallestSingularValue": 1.6488139340169148e-16,
+        "HLargestSingularValue": 4.79583152326912,
+        "HConditionEstimate": 2.908655382105669e+16,
+        "HRetainedRankAtUnchangedRelativeThreshold": 14,
+        "coefficientNormRelativeToRhs": 13151061841.357351,
+        "physicalDirectionCombinationCancellation": 731813629592.1229,
+        "projectedImageCombinationCancellation": 1402245034077.4941,
+        "candidateRecomputationRelativeToFormation": 3.5735371895050444e-17,
+        "actualRelativeCResidual": 0.9993342644424403,
+        "savedOrthogonalityError": 2.7330599779475624e-12,
+        "savedCombinedRelationDifference": 0.00018650621791278007,
+        "basisActiveColumns": 23,
+        "usableDirection": false
+      },
+      {
+        "case": "blockfillreal01",
+        "arnoldiSteps": 32,
+        "HSmallestSingularValue": 9.559367002480664e-10,
+        "HLargestSingularValue": 5.219210791542278,
+        "HConditionEstimate": 5459787023.751561,
+        "HRetainedRankAtUnchangedRelativeThreshold": 32,
+        "coefficientNormRelativeToRhs": 10444361.047597632,
+        "physicalDirectionCombinationCancellation": 1283433954.1491752,
+        "projectedImageCombinationCancellation": 1044263006.4062674,
+        "candidateRecomputationRelativeToFormation": 2.912837398976612e-17,
+        "actualRelativeCResidual": 0.9988498463184203,
+        "savedOrthogonalityError": 1.6536580114859886e-12,
+        "savedCombinedRelationDifference": 6.681583045223887e-08,
+        "basisActiveColumns": 33,
+        "usableDirection": false
+      }
+    ],
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockilufailurediag01\\arnoldi_failure_evidence.mat": "b4c42808fd960db0b827daba4450054724f25b2ea6b7d9306965d7a42a282319",
+      "outputs\\v83_validation\\scaledilureal01\\scaled_arnoldi_failure_evidence.mat": "ecc4dc36726284411c601f2f12058caecce4bc5edcaa76cd0684350d25626fd1",
+      "outputs\\v83_validation\\blockfillreal01\\scaled_arnoldi_failure_evidence.mat": "46f4a5065956e9977037ac39a2b8419c6a1687d44a5edf712eeb7cd196656938"
+    },
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "scriptSHA256": "7499844e2dbbe9f2461e78ea4ff30993e990f6b62c8371518e4ca8980282ce23"
+  },
+  "flowCouplingDiagnostic": {
+    "status": "passed-source-domain-centroid-identity-and-complete-C-projected-order-coupling-diagnostic",
+    "processID": 22000,
+    "cellCount": 217272,
+    "givenUnitFlowDirection": [
+      -0.9396926207859084,
+      -0.0,
+      0.3420201433256687
+    ],
+    "projectionRangeM": [
+      -1.9225825854473513,
+      11.072902638990994
+    ],
+    "metrics": {
+      "symrcm": {
+        "blockCounts": {
+          "diagonal": 217272,
+          "lower": 701196,
+          "upper": 701196,
+          "offDiagonalProjectionTie": 0
+        },
+        "blockFrobeniusSquaredFraction": {
+          "diagonal": 0.7719957664394338,
+          "lower": 0.14738539885443033,
+          "upper": 0.08061883470613596,
+          "offDiagonalProjectionTie": 0.0
+        },
+        "lowerFractionOfOffDiagonalByConservationRow": [
+          0.6534230884568933,
+          0.6353301907331304,
+          0.5664678120531412,
+          0.6285105155464044,
+          0.6575345089695204
+        ],
+        "lowerFractionOfAllOffDiagonal": 0.6464151851604955
+      },
+      "givenFlowProjection": {
+        "blockCounts": {
+          "diagonal": 217272,
+          "lower": 701196,
+          "upper": 701196,
+          "offDiagonalProjectionTie": 0
+        },
+        "blockFrobeniusSquaredFraction": {
+          "diagonal": 0.7719957664394338,
+          "lower": 0.1260405095891566,
+          "upper": 0.10196372397140967,
+          "offDiagonalProjectionTie": 0.0
+        },
+        "lowerFractionOfOffDiagonalByConservationRow": [
+          0.5482884532058644,
+          0.5486490034067152,
+          0.4732542604116282,
+          0.5316844650710507,
+          0.569419477326584
+        ],
+        "lowerFractionOfAllOffDiagonal": 0.5527989880752614
+      }
+    },
+    "interpretation": "These are squared normalized-C block weights, not eigenvalues or pressure/heat errors. Flow projection uses given freestream, not local streamlines. Ordering usefulness requires actual factor/action tests.",
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "outputs\\v83_validation\\flowordergeometry01\\flow_ordering_geometry.mat": "900b4a943a509129fb461d142bcefe4c8a6009d9493ab364c35ca4d687bc48b5",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf"
+    },
+    "scriptSHA256": "3e35d1ff96efd070df351b1c6ed98c3c2dfac9698bebbe2bfa4c98e6af639342"
+  },
+  "flowFactorResults": {
+    "status": "tested-real-prescribed-flow-ordering-factor-and-fixed-triangular-actions",
+    "stage": "bounded-action-probes-complete",
+    "factorAvailable": true,
+    "factorRejected": false,
+    "errorIdentifier": "",
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newCoarseConstructions": 0,
+    "newFlowAcceptances": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 21024,
+    "orderingReport": {
+      "method": "upstream-to-downstream-prescribed-freestream-centroid-projection",
+      "givenUnitFlowDirection": [
+        -0.9396926207859084,
+        0,
+        0.3420201433256687
+      ],
+      "minimumProjectionM": -1.9225825854473513,
+      "maximumProjectionM": 11.072902638990994,
+      "projectionTieBreak": "original-physical-cell-ID",
+      "originalAlgebraicOrdering": "symrcm",
+      "uniqueStoredBlocks": 1619664.0,
+      "allOriginalBlockValuesKept": true,
+      "allOriginalCellsAndFiveEquationsKept": true,
+      "localSolvedStreamlineClaimed": false,
+      "physicalEquationChanged": false,
+      "persistentFactorStorageUpperBoundBytes": 385559044.0,
+      "algorithmArrayConstructionEstimateBytes": 1155096960.0,
+      "sourceOperatorAndLibraryWorkspaceExcluded": true,
+      "processPeakMemoryClaimed": false,
+      "reorderingSeconds": 0.6720571,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "factorizationReport": {
+      "method": "five-by-five-cell-block-ILU-zero-fill",
+      "retainedBlockProducts": 1056732.0,
+      "discardedOutOfPatternFillProducts": 1403866.0,
+      "minimumLocalPivotRcond": 6.9556942833753296e-09,
+      "maximumLocalInverseDefect": 9.313225746154785e-10,
+      "factorSeconds": 7.8346383,
+      "diagonalCompensationApplied": false,
+      "allOriginalCellsAndFiveEquationsKept": true,
+      "originalGraphConnectionsDropped": false,
+      "fixedLinearMap": true,
+      "physicalEquationChanged": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0
+    },
+    "orderingActionRelativeDifference": 1.0560615831821858e-16,
+    "summaries": [
+      {
+        "name": "sameQRemaining",
+        "relativeCResidual": 9.361928000171237e+18,
+        "directionNormToRhsSeconds": 202507215123561.84,
+        "triangularSeconds": 2.2718847,
+        "originalNSAcceptanceClaimed": false
+      },
+      {
+        "name": "sineProbe",
+        "relativeCResidual": 6.579745026467897e+19,
+        "directionNormToRhsSeconds": 154616799779572.9,
+        "triangularSeconds": 1.5710348,
+        "originalNSAcceptanceClaimed": false
+      },
+      {
+        "name": "cosineProbe",
+        "relativeCResidual": 1.920221727668092e+20,
+        "directionNormToRhsSeconds": 451032010824394.1,
+        "triangularSeconds": 1.5749177,
+        "originalNSAcceptanceClaimed": false
+      }
+    ]
+  },
+  "flowFactorAudit": {
+    "status": "passed-independent-real-flow-order-full-pattern-all-retained-LU-pivots-and-three-C-actions",
+    "processID": 49644,
+    "cellCount": 217272,
+    "completePatternAndOriginalValuesKept": true,
+    "retainedLUProductRelativeDifference": 5.960966405098694e-13,
+    "maximumCancellationAwareRetainedBlockBackwardError": 1.5023580954005767e-13,
+    "allPivotInverseDefect": 1.1816019693901872e-09,
+    "fullLUApproximationRelativeDifference": 1.2216449667492126,
+    "retainedBlockProducts": 1056732,
+    "discardedFillProducts": 1403866,
+    "outsidePatternLUBlocks": 1389776,
+    "probes": [
+      {
+        "name": "sameQRemaining",
+        "independentCActionRelativeDifference": 0.0,
+        "relativeCResidual": 9.361928000171528e+18,
+        "directionNormToRhsSeconds": 202507215123564.97
+      },
+      {
+        "name": "sineProbe",
+        "independentCActionRelativeDifference": 0.0,
+        "relativeCResidual": 6.57974502646808e+19,
+        "directionNormToRhsSeconds": 154616799779584.53
+      },
+      {
+        "name": "cosineProbe",
+        "independentCActionRelativeDifference": 0.0,
+        "relativeCResidual": 1.9202217276681532e+20,
+        "directionNormToRhsSeconds": 451032010824424.1
+      }
+    ],
+    "auditSeconds": 42.04700000002049,
+    "correctFactorArithmeticDoesNotCertifyStableInverse": true,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\floworderfactor01\\flow_ordered_factor_evidence.mat": "a9f8239bd6a8c4353b095a4949898b55ea00c94bdc1c163504cb6933bfe2b43b",
+      "outputs\\v83_validation\\flowordergeometry01\\flow_ordering_geometry.mat": "900b4a943a509129fb461d142bcefe4c8a6009d9493ab364c35ca4d687bc48b5",
+      "outputs\\v83_validation\\blockilureal01\\steady_graph_packed_evidence.mat": "beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf",
+      "outputs\\v83_validation\\floworderfactor01\\flow_ordering_actions_evidence.mat": "ae8819df3a2ad68544ac54b23285ca10347c333b74a3a05704e074afb2747856"
+    },
+    "scriptSHA256": "3f157e5b544ac65725e67d7f83e59e80e4177dd0a7586cc7b610aca240aa88b6"
+  },
+  "fieldSchurSmallReference": {
+    "status": "tested-small-dense-five-conservation-momentum-density-energy-Schur-reference-only",
+    "processID": 45512,
+    "cellCount": 32,
+    "basePatternBlocks": 208,
+    "twoHopSchurPatternBlocks": 560,
+    "oldFiveBlockSolveReplayDifference": 9.14583074649881e-15,
+    "scalarUpperTriangularAssumptionUsed": false,
+    "exactSchurInverseDifference": 2.0591532254173823e-14,
+    "localSchurCondition": 98453.5802784746,
+    "exactSchurCondition": 147841.29404727893,
+    "cases": [
+      {
+        "name": "exactCReference",
+        "conditionOfCPreconditioned": 1.0000000000005003,
+        "inverseNorm": 0.15318257747907113,
+        "trials": [
+          {
+            "iterations": 1,
+            "flag": 0,
+            "actualRelativeCResidual": 1.2125772537285198e-14
+          },
+          {
+            "iterations": 1,
+            "flag": 0,
+            "actualRelativeCResidual": 5.863924130587617e-14
+          }
+        ]
+      },
+      {
+        "name": "originalFiveBlockILU0",
+        "conditionOfCPreconditioned": 272.313672245147,
+        "inverseNorm": 0.1338998318821805,
+        "trials": [
+          {
+            "iterations": 10,
+            "flag": 0,
+            "actualRelativeCResidual": 7.940445666400216e-09
+          },
+          {
+            "iterations": 12,
+            "flag": 0,
+            "actualRelativeCResidual": 5.885549613733975e-09
+          }
+        ]
+      },
+      {
+        "name": "exactFullSchurReference",
+        "conditionOfCPreconditioned": 1.000000000006253,
+        "inverseNorm": 0.153182577479076,
+        "trials": [
+          {
+            "iterations": 1,
+            "flag": 0,
+            "actualRelativeCResidual": 2.2407064130790703e-14
+          },
+          {
+            "iterations": 1,
+            "flag": 0,
+            "actualRelativeCResidual": 5.455800218373429e-13
+          }
+        ]
+      },
+      {
+        "name": "localMomentumExactLocalSchur",
+        "conditionOfCPreconditioned": 5022248.509356344,
+        "inverseNorm": 3.450351967058195,
+        "trials": [
+          {
+            "iterations": 31,
+            "flag": 0,
+            "actualRelativeCResidual": 5.26009780640765e-09
+          },
+          {
+            "iterations": 37,
+            "flag": 0,
+            "actualRelativeCResidual": 6.763210946556168e-09
+          }
+        ]
+      },
+      {
+        "name": "exactMomentumExactLocalSchur",
+        "conditionOfCPreconditioned": 10654713.557647284,
+        "inverseNorm": 3.7299750323098215,
+        "trials": [
+          {
+            "iterations": 18,
+            "flag": 0,
+            "actualRelativeCResidual": 6.17786171541984e-09
+          },
+          {
+            "iterations": 20,
+            "flag": 0,
+            "actualRelativeCResidual": 9.71439087379476e-10
+          }
+        ]
+      },
+      {
+        "name": "ILUMomentumExactLocalSchur",
+        "conditionOfCPreconditioned": 8348729.433127126,
+        "inverseNorm": 3.1248630160455106,
+        "trials": [
+          {
+            "iterations": 21,
+            "flag": 0,
+            "actualRelativeCResidual": 6.6338886535389815e-09
+          },
+          {
+            "iterations": 24,
+            "flag": 0,
+            "actualRelativeCResidual": 1.5943687168023466e-09
+          }
+        ]
+      },
+      {
+        "name": "ILUMomentumILULocalSchur",
+        "conditionOfCPreconditioned": 34259209.21082632,
+        "inverseNorm": 12.792773048427106,
+        "trials": [
+          {
+            "iterations": 26,
+            "flag": 0,
+            "actualRelativeCResidual": 4.579527477218312e-09
+          },
+          {
+            "iterations": 30,
+            "flag": 0,
+            "actualRelativeCResidual": 2.6060966970088976e-09
+          }
+        ]
+      }
+    ],
+    "notImplementedForRealDomain": true,
+    "matlabSchurBackendImplemented": false,
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\blockiluunit01\\block_ilu_unit_evidence.mat": "a5ff90f83343db19f59dee25ff3a135097ed322b84646cb0782a555299df5869"
+    },
+    "outputEvidenceSHA256": "dbd87fed480c47634f74a31e778db0f2514661ff1aed47649403034c454607f1",
+    "scriptSHA256": "e34a8b594d3fc9cdf745e88f11ef7323c9963b1ea5958010d5b5ea660b8d1163"
+  },
+  "fieldSchurSmallAudit": {
+    "status": "passed-independent-small-complete-five-field-Schur-assembly-and-full-block-solves",
+    "processID": 14416,
+    "cases": [
+      {
+        "ordering": "natural",
+        "momentumRetainedLUProductDifference": 3.318913927289973e-16,
+        "schurRetainedLUProductDifference": 9.097238243165586e-15,
+        "completeSchurAssemblyDifference": 1.3603403930931385e-15,
+        "fullConservativeSolveDifference": 2.8578637240929855e-14,
+        "scalarTriangularAssumptionUsed": false,
+        "baseBlocks": 208,
+        "twoHopBlocks": 560
+      },
+      {
+        "ordering": "symrcm",
+        "momentumRetainedLUProductDifference": 1.5221734437644743e-16,
+        "schurRetainedLUProductDifference": 2.9557945174422024e-14,
+        "completeSchurAssemblyDifference": 1.3612901392496328e-15,
+        "fullConservativeSolveDifference": 1.4619397797884753e-13,
+        "scalarTriangularAssumptionUsed": false,
+        "baseBlocks": 208,
+        "twoHopBlocks": 560
+      }
+    ],
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs\\v83_validation\\fieldschurunit01\\field_schur_unit_evidence.mat": "1d7ac208c419abf75a2e2e16c8fa3f03ad8f45d8ab04d35b90ce514fc2cd95b2"
+    },
+    "scriptSHA256": "253601a73cb8fb20cb991fc37018a75293e91060f83b85f5e3582d9c9232943b"
+  },
+  "fieldSchurReal": {
+    "status": "tested-real-five-conservation-field-Schur-construction-and-fixed-action-study",
+    "stage": "Schur-construction-and-factorization",
+    "preconditionerAvailable": false,
+    "candidateRejected": true,
+    "errorIdentifier": "FieldILU:FactorDefect",
+    "message": "2\u91cf\u5b50\u5757\u7b2c188887\u5c40\u90e8\u9006\u672a\u8fc7\u539f1e-8\u3002",
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newCoarseConstructions": 0,
+    "newFlowAcceptances": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 51664
+  },
+  "realSchurConstructionLogCounts": {
+    "cellCount": 217272,
+    "baseBlocks": 1619664,
+    "twoHopBlocks": 5767584,
+    "persistentCoreArrayUpperBoundBytes": 530459724,
+    "algorithmArrayConstructionEstimateBytes": 1795061784,
+    "processPeakClaimed": false,
+    "source": "fieldschurreal01_stdout.log"
+  },
+  "realSchurAccuracyLimit": {
+    "allRealSchurCoefficientsIndependentlyAudited": false,
+    "rejectedPivotOrEliminationStateSaved": false,
+    "pivotDefectMagnitude": null,
+    "pivotCondition": null,
+    "usablePreconditionerProduced": false
+  },
+  "failedCell": {
+    "algebraicRow": 188887,
+    "originalControlVolume": 61925,
+    "originalFace": 2669,
+    "layer": 4,
+    "centroidM": [
+      -2.388747667841158,
+      0.10022278694297178,
+      0.0013796913444646007
+    ],
+    "numericalFieldGroup": "density-and-total-energy",
+    "sourcePatternSHA256": "937fbc286cd709b5ea3102ce65658596d99e0584b50ed6e4098ccd3f587c2f05",
+    "localInverseDefectValue": null,
+    "warning": "Only the failed 1e-8 gate and location are known. The rejected pivot matrix was not saved; no defect magnitude or condition number is invented."
+  },
+  "auditRepairs": [
+    {
+      "status": "failed-small-dense-Schur-reference-before-first-GMRES-unavailable-rtol-keyword",
+      "exitCode": 1,
+      "sourceEpoch": "outputs\\v83_validation\\source_epochs\\pre_schur_scipy_tol_studyRocketFieldSchurReference.py",
+      "sourceSHA256": "e2aee166b414d4c8cc6ed198a7ccd00d27b352735b25f180d48c79202e136310",
+      "gmresSignature": "(A, b, x0=None, tol=1e-05, restart=None, maxiter=None, M=None, callback=None, restrt=None, atol=None, callback_type=None)",
+      "completedGMRESReferences": 0,
+      "newSelectedJApplications": 0,
+      "newActualNSEvaluations": 0
+    },
+    {
+      "status": "invalid-small-reference-ILU-applications-treated-full-block-diagonal-U-as-scalar-triangular",
+      "sourceEpoch": "outputs\\v83_validation\\source_epochs\\pre_schur_block_U_studyRocketFieldSchurReference.py",
+      "sourceSHA256": "4ca78640a93dde60062b36fe2e843c0cb87d4e4222d592dcd52f2993a9adffae",
+      "repair": "Use dense solve for full block-upper U and check replay of the saved original five-block triangular action before comparing Schur candidates.",
+      "originalSummaryPreserved": true,
+      "newSelectedJApplications": 0,
+      "newActualNSEvaluations": 0,
+      "physicalSolution": false
+    },
+    {
+      "status": "failed-independent-small-Schur-audit-double-subtracted-reference-in-error-helper",
+      "exitCode": 1,
+      "observedMomentumMetric": 1.0,
+      "observedSchurMetric": 1.0,
+      "independentlyRebuiltML_MU_SL_SUExactlyEqualSavedMatrices": true,
+      "repair": "Use norm of the already formed masked difference; keep original 1e-8 gates. No numerical recomputation.",
+      "sourceEpoch": "outputs\\v83_validation\\source_epochs\\pre_schur_audit_norm_auditRocketFieldSchurUnit.py",
+      "sourceSHA256": "3df3a0564086f9ab5ea310d80a79f704aad59042f98e9df4567d47cb20ba97c1",
+      "newActualNSEvaluations": 0,
+      "realDiagnosticStartedBeforeAuditReaderRepair": true,
+      "realDiagnosticCannotChangePhysicalState": true
+    }
+  ],
+  "workAccounting": {
+    "newSelectedJApplications": 0,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "newCoarseConstructions": 0,
+    "realFlowCApplications": 5,
+    "realFlowTriangularApplications": 3,
+    "realFlowInternalGMRESNotStarted": true,
+    "realSchurRightHandSideProbesNotStarted": true,
+    "note": "Construction/factorization and C-only model diagnostics do not count as new original-NS acceptances."
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench18/index.html",
+    "separateResearchRows": 5,
+    "failedCVAndSourceFaceLayerShown": true,
+    "unexecutedMetricsRemainNullOrUnknown": true,
+    "unknownJSONDecodeRestoredToNaNBeforeExport": true,
+    "sourceFacetPayloadExactlyUnchanged": true,
+    "priorFullMATFieldAuditReusedByPayloadIdentity": true,
+    "CSVRows": 592560,
+    "sectionSamples": 6624,
+    "sameHostEvents": 15,
+    "threeFalseSourceOrQualificationExportsRejected": true,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false,
+    "mainAcceptedIterations": 12,
+    "mainActualNSEvaluations": 246,
+    "actualNSDirectionDefect": 0.19876430371570342,
+    "maximumResidualPerSecond": 4758049.601364592,
+    "rmsResidualPerSecond": 521635.2792153294,
+    "actualNSEvaluationsAfterLastAcceptedHistory": 121,
+    "latestEndpoint": {
+      "path": "outputs/v83_validation/krylov17/wall_velocity_krylov_evidence.mat",
+      "sha256": "71dc35fe56cce987bbe807aa52899a1a17383acd60b667304750f55e99691746",
+      "bytes": 1214364034
+    },
+    "originalNSSource": {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+      "bytes": 21595
+    },
+    "physicalPressureHeatFluxAndHeatPowerUnchanged": true
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false,
+    "gitHEAD": "42601c9"
+  },
+  "nextAction": "Add source-bound assembly checkpoints and structured failure observation to Schur construction/factorization. Save rejected 2-field pivot/inverse, CV mapping and local elimination ledger at the unchanged original 1e-8 gate. Independently distinguish local conditioning, cancellation and Schur approximation before selecting a stable block/pivot strategy. Do not repeat the given-flow ordering or blindly increase fill/GMRES steps; keep all physical CVs, original NS, total-direction/temperature/descent/convergence gates, real-region validation and scientific UI priorities.",
+  "goalStatus": "active",
+  "wholeGoalComplete": false,
+  "recorderSHA256": "5d3771e4356f16f30dee164ac7406feeeb0164adae71316474b8c8c6b256e756"
+}

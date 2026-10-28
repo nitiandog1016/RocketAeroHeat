@@ -1,0 +1,144 @@
+{
+  "version": "v55",
+  "date": "2026-10-14",
+  "runs": [
+    {
+      "log": "workflow_workbench_release_final.log",
+      "status": "completed",
+      "exitCode": 0,
+      "observedSession": 71473,
+      "test": "testWorkflowWorkbench",
+      "logSha256": "34fc7231956d4b887c8f2f737338e98db25b017f17d8db3a2bf53a4074feaa8b"
+    },
+    {
+      "log": "workflow_state_final2.log",
+      "status": "completed",
+      "exitCode": 0,
+      "observedSession": 41588,
+      "test": "testAeroHeatWorkflowState",
+      "logSha256": "78b87e2f743acdb4ed6180523c807749fc598b7b105aed9c05b642b441be2c26"
+    },
+    {
+      "log": "single_case_entry_final.log",
+      "status": "completed",
+      "exitCode": 0,
+      "observedSession": 32742,
+      "test": "testRunAeroHeatSingleCase",
+      "logSha256": "f08cbde73c4ab262c226983b9f6667830cd72ab65a67a3a16438350eed3ac701"
+    },
+    {
+      "log": "geometry_view.log",
+      "status": "completed",
+      "exitCode": 0,
+      "observedSession": 51478,
+      "test": "testAerothermalGeometryView",
+      "logSha256": "f60ae2f0cddc7a2703e6bc411d74218289c841bdaf487bd9861a33e0a7e6b129"
+    },
+    {
+      "log": "unified_main_final.log",
+      "status": "completed",
+      "exitCode": 0,
+      "observedSession": 85229,
+      "test": "testUnifiedMain: current nonblocking main entry",
+      "logSha256": "734f26247cb479acb0caa501ff094d402b9ed2011dbdf58d107723843b09d163"
+    },
+    {
+      "log": "web_export_final.log",
+      "status": "completed",
+      "exitCode": 0,
+      "observedSession": null,
+      "test": "testWebExport.js, current 19752-face results.json",
+      "logSha256": "4492754ea96096de355ee245ac72934aba47f160c1c67acdd0069175a3d6d5c1"
+    },
+    {
+      "log": "web_section_final.log",
+      "status": "completed",
+      "exitCode": 0,
+      "observedSession": null,
+      "test": "testWebSection.js",
+      "logSha256": "14b3197825e8ad6b165204cd32de2eba05ceb5abf036c81d7f156beba4874a68"
+    },
+    {
+      "log": "main_visual_release.log",
+      "status": "completed",
+      "exitCode": 0,
+      "observedSession": 81946,
+      "test": "native layout check; preview before unchanged-boundary footer correction",
+      "logSha256": "0da1a4dbdd52e09d169c97662f0f7fdcac24b279b8574c59efe19640be837af2"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "workflow_workbench.mat",
+      "sha256": "3f6035eaaad414ef12369b11aecdcfdfd23d12202312ad5dabad4d0d8493e953"
+    },
+    {
+      "path": "single_case_entry.mat",
+      "sha256": "bfd60fe9ff32e49916c9bc5e815e4083a52cecf788dc647d3bee2a8e3bf74ad9"
+    },
+    {
+      "path": "workflow_state/workflow_state_regression.mat",
+      "sha256": "528c3c15aa4c94e9d1ad85f06a4d8101904979f2e87812463ad6fb90277fe1ca"
+    },
+    {
+      "path": "geometry/geometry_view_evidence.mat",
+      "sha256": "3068f77cdffb4255fa7b4b8ffc7cba739b05b707d8879c0974ffcdd33496a34d"
+    },
+    {
+      "path": "workflow_actual_rocket/results.json",
+      "sha256": "093a2222d16a1ba07435ba0e0df4cf38e74cc663e8543caadae8231d7c9f6dd0"
+    },
+    {
+      "path": "main_results_visual.png",
+      "sha256": "b3bdbd9d2f9db6c8c9f0aa26dee10e6f5ee154f39468d597baa39f57e6d4bedf"
+    },
+    {
+      "path": "main_boundary_visual.png",
+      "sha256": "a64924aea3b9567585f65e85bd276740e8e2775b8d93d45a928c209daa181046"
+    },
+    {
+      "path": "main_boundary_bottom_visual.png",
+      "sha256": "bce41971be5c37dc91d0feda27b5c3c416c39fb89e699631f0549caa5a8d5910"
+    },
+    {
+      "path": "extract_viewer_json.js",
+      "sha256": "8a05244ccb8895064798da45fe37327029be15d9a7452292e7a82e50e0e4b0d5"
+    }
+  ],
+  "scope": {
+    "implemented": [
+      "同一可操作侧边栏：输入模型→生成网格→添加边界条件→计算→查看结果。",
+      "main默认非阻塞工作台；v54 main逐字节保留为mainLegacy。",
+      "集中模型/朝向/网格/边界/求解版本状态、当前完整快照守卫和失败重试。",
+      "中性几何WebGL与结果WebGL共用宿主；浏览不计算；边界确认不冒充物理求解。",
+      "显式单工况入口保留非均匀/未知壁温和每个变量的算法、状态及NaN。"
+    ],
+    "validation": [
+      "19752面真实箭体实际按钮、PCA/朝向确认、原网格、完整内部计算与实际WebGL回执。",
+      "模型、朝向、网格与边界失效；真实失败/修复/重试；父面板恢复和再次确认有效结果。",
+      "336面实际链路状态守卫及1184面单工况未知/非均匀壁温与早晚失败。",
+      "默认main真实非阻塞启动、5个实际按钮、无自动导入/求解、保留无关变量/对照窗口及空WebGL GL0。",
+      "3176面实际输入几何9380可见像素采样、1725×947、GL0和更新/清空/拒绝。",
+      "当前实际箭体五类全表面CSV独立解码及截面解析几何定向回归。"
+    ],
+    "nativeVisualEvidence": "三张PNG检查布局、当前场量及侧栏操作；来自父面板修复后、再次确认底栏文案修正前的预览。最终文案由workflow_workbench_release_final.log对应测试验证；没有将旧预览当成最新文案验证。",
+    "actualCase": {
+      "Mach": 5,
+      "alphaDeg": 20,
+      "betaDeg": 0,
+      "faces": 19752,
+      "heatComputedAreaFraction": 0.7746161231243999,
+      "totalAreaSquareMeters": 1.9646292565715555
+    },
+    "limitations": [
+      "本轮不改物理区域算法，不增加已求解面积；全面积及总目标未完成。",
+      "鼻部/后体接口、底热、分离/再附以及独立实验精度验证仍未完成。",
+      "没有全库重测；旧材料/历史专题保留原入口，未完全迁入新侧栏。",
+      "原testUnifiedMain完整保留为testLegacyUnifiedMain，只修改函数名及mainLegacy调用；本轮没有重跑legacy测试。",
+      "当前新UI无独立计算中取消按钮；失败恢复不等于取消功能。",
+      "native默认alpha0预览热流约97.87%，与alpha20快照77.4616%是不同工况。",
+      "旧开发失败/中断日志不作本轮发布通过证据；继承v54验证单独标识。"
+    ],
+    "github": "本地小版本，没有提交或推送GitHub；总目标保持active。"
+  }
+}

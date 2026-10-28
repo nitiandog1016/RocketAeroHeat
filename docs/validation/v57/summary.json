@@ -1,0 +1,372 @@
+{
+  "version": "v57",
+  "date": "2026-10-15",
+  "runs": [
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "solver/internal_library_release_final2.log",
+      "logSha256": "0b5583bf665868188fad8b3221fdbe6f3b87ce86de44fb110ffbb30ba206bc99",
+      "purpose": "Promoted characteristic boundary, actual open-domain RK2 transport and steady thermal/Couette/energy balance tests",
+      "statusSource": "root-observed terminal results, preserved in conversation history; spatial session2630 observed in current goal continuation",
+      "observedSession": 11110
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "solver/spatial_library_release_final.log",
+      "logSha256": "77319ec5bf111268f99be1dd8a41e4ffd5f625ccc84edceb9524bbc0a4e8cd41",
+      "purpose": "Promoted complete spatial test: nine independent analytic/conservation/rejection groups against final internalFlow kernel",
+      "statusSource": "root-observed terminal results, preserved in conversation history; spatial session2630 observed in current goal continuation",
+      "observedSession": 2630
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "solver/independent_benchmarks.log",
+      "logSha256": "759ff6ee58326e59e30d2462ce4d6e016b5aa63aa454750f75853bfcb1f1af97",
+      "purpose": "Independent Python reading actual MATLAB terminal states; artificial gas analytic oracles, not air experiment",
+      "statusSource": "root-observed terminal results, preserved in conversation history; spatial session2630 observed in current goal continuation"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "ui/viewer_semantics_release_final2.log",
+      "logSha256": "2e254f55312a31f94a5898fec5e9b0a4ea694420e5f5c8161f69748969118ac9",
+      "purpose": "Six-face synthetic metadata contract then saved actual v56 snapshot metadata-only rebuild; no physical recomputation",
+      "statusSource": "root-observed terminal results, preserved in conversation history; spatial session2630 observed in current goal continuation",
+      "observedSession": 3382
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "ui/viewer_field_state_final.log",
+      "logSha256": "66ee6586b827dd6d65a159fde63821f47a12e0edf2f22cf7863fcb67e833caae",
+      "purpose": "Node per-field coverage, missing/input/attempted provenance, legacy fallback and frozen conditions",
+      "statusSource": "root-observed terminal results, preserved in conversation history; spatial session2630 observed in current goal continuation"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "ui/viewer_export_final.log",
+      "logSha256": "b594ec66e95ffe6b84976e047f2dc53845669ac783ac06e70ed5cbc11aee3596",
+      "purpose": "Node independently decodes seven actual whole-surface CSV fields and checks quantitative export composition",
+      "statusSource": "root-observed terminal results, preserved in conversation history; spatial session2630 observed in current goal continuation"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "ui/viewer_section_final.log",
+      "logSha256": "14b3197825e8ad6b165204cd32de2eba05ceb5abf036c81d7f156beba4874a68",
+      "purpose": "Node analytic cross-section geometry and state/provenance checks",
+      "statusSource": "root-observed terminal results, preserved in conversation history; spatial session2630 observed in current goal continuation"
+    },
+    {
+      "status": "completed",
+      "exitCode": 0,
+      "log": "ui/embedded_viewer_final.log",
+      "logSha256": "8e353c6599c9fa727211b3694af99415a0760bf4ca654a7788c3cb8fb12974de",
+      "purpose": "Actual MATLAB embedded result component render of 19752 faces, visible samples and GL0",
+      "statusSource": "root-observed terminal results, preserved in conversation history; spatial session2630 observed in current goal continuation",
+      "observedSession": 53535
+    }
+  ],
+  "scope": {
+    "newRegionalHeatSolvedAreaM2": 0,
+    "fullSurfaceSolved": false,
+    "actualRocketHeatComputedAreaFraction": 0.6656263274240188,
+    "actualRocketNumericalRecomputed": false,
+    "numericalLibrary": "three-dimensional constant-property uniform Cartesian finite volumes; HLLC/Newton/Fourier; characteristic reservoir/pressure outlet; genuine global SSP-RK2 and atomic retry; five-quantity integrated ledger",
+    "spatialKernelSha256": "ffe638f9daa026f58eacaab9e86a8f332b44c19d44f8fea0335973f91a3785f2",
+    "eligibleForSurfaceCoverage": false,
+    "validationKind": [
+      "independent analytic numerical checks",
+      "actual iteration and conservation",
+      "UI field-state/export contracts",
+      "actual saved rocket embedded/browser display"
+    ],
+    "experimentalValidation": false,
+    "fullLibraryRegression": false,
+    "testGas": "conduction/Couette: artificial gamma1.4 R1J/(kgK) mu0.5Pa.s Pr0.72, 200-500K; not air condition",
+    "couetteGridConvergence": false,
+    "couetteTemperatureGridOffsetSeparatedFromStoppingError": true,
+    "actualRegionMappingCompleted": false,
+    "domainBoundaryConvergenceCompleted": false,
+    "turbulenceAndVariablePropertyClosureCompleted": false,
+    "prescribedWallTemperatureRemainsInput": true,
+    "nativeScreenshotOnlyLayoutEvidence": true,
+    "operatingSystemPNGDownloadVerified": false,
+    "sourceDiscrepancy": "NASA/TM-2011-217181 printed Eq14 sound-speed factor contradicts Eq8; implementation uses algebraically derived (gamma-1)/4, uniform state independently checked",
+    "limitations": "No actual contraction/base/backflow regional heat solution; staircase coarse-wall flux cannot be mapped to original triangles as solved heat; no added air/experimental/grid/domain convergence or full-surface proof"
+  },
+  "currentExample": {
+    "source": "ui/actual_rocket",
+    "sourceSnapshotBaseline": "outputs/v56_validation/workflow_final/workflow_workbench.mat",
+    "fullFreshPipeline": false,
+    "numericalRecomputed": false
+  },
+  "diagnosticExamples": [],
+  "evidence": [
+    {
+      "path": "author_release_summary.py",
+      "sha256": "db73f1611a6beaf9a57e4f03954cf8a3a2ceac0965dbc5f6eb54f9459df225fa"
+    },
+    {
+      "path": "characteristic_source/NASA_TM_2011_217181.pdf",
+      "sha256": "cd03112b94852807ef5c941fc322088688fe3f3d4503c88f5cc4f1b68af56451"
+    },
+    {
+      "path": "characteristic_source/acquire_source.py",
+      "sha256": "79a52c10d6f3b530e5e9427bd963712829d6cef304a0ecca47adf9a254ec5e6b"
+    },
+    {
+      "path": "characteristic_source/fulltext.txt",
+      "sha256": "6cb901211eae39f902b788e78f8e8a7c79b5abba64fd5730ad1a67d207121041"
+    },
+    {
+      "path": "characteristic_source/pdfpage_10.png",
+      "sha256": "fc9d3dbbc0e06e3f03b5c51cb5068549e2be50f477f6907525a1854ed756a094"
+    },
+    {
+      "path": "characteristic_source/pdfpage_10.txt",
+      "sha256": "c24480f677c4fe96a64aa56c055d1c7f294b44cc034b3981cea2168a28d2fe2a"
+    },
+    {
+      "path": "characteristic_source/pdfpage_15.png",
+      "sha256": "3c7ae2a91a0be65b22db0696273aea96b239a1da27464de0d0d8c862e229944a"
+    },
+    {
+      "path": "characteristic_source/pdfpage_15.txt",
+      "sha256": "26cf95e74c1b96b94256c17e1b96e6e73a169a875ca01bb369658f93fa7037fb"
+    },
+    {
+      "path": "characteristic_source/pdfpage_19.png",
+      "sha256": "404a15040114898c9c71ca6d786c92d63f9916a4fc0889010cbbdb28a7b64894"
+    },
+    {
+      "path": "characteristic_source/pdfpage_19.txt",
+      "sha256": "374aad83f97c6d4ddc781ff2f93e8fe78b7f021053de3e6c3806f0cb4e2e439a"
+    },
+    {
+      "path": "characteristic_source/pdfpage_21.png",
+      "sha256": "ad0669c7b5b596de0a7fb0d81d6489b713b2b28ea67b2f03ea43b92845dcc917"
+    },
+    {
+      "path": "characteristic_source/pdfpage_21.txt",
+      "sha256": "e05cc99e972920ee96c1c45c29173f36b58973b33144ba159479dd8b3e7f4d54"
+    },
+    {
+      "path": "characteristic_source/pdfpage_22.png",
+      "sha256": "a109a4458452225726dfca3c182cc8616409032b32a66fed8e162d5d25f373e7"
+    },
+    {
+      "path": "characteristic_source/pdfpage_22.txt",
+      "sha256": "b7512ba8bf0fa29549acea6478cb20a70486406e2969274b3acabf5c465e45bf"
+    },
+    {
+      "path": "characteristic_source/pdfpage_29.png",
+      "sha256": "ad16118388987d979ddc289d5cf780e96bd8b3a00d27a7a166f8368aa589fb96"
+    },
+    {
+      "path": "characteristic_source/pdfpage_29.txt",
+      "sha256": "50f9d1895d281c295d874f8a9b822284c731a04364a31324faf6bb2105f04147"
+    },
+    {
+      "path": "characteristic_source/pdfpage_31.png",
+      "sha256": "ffe6a61a5b38de644e1a1df16ad0b6411ee85a70e14a9776fe51b1427381ea00"
+    },
+    {
+      "path": "characteristic_source/pdfpage_31.txt",
+      "sha256": "5cf53757a33d4df140a175c64d437e4b542f0def9e35d6b9ba8773a021c9b1c9"
+    },
+    {
+      "path": "characteristic_source/pdfpage_32.png",
+      "sha256": "55a5eb2226ee47ae4f8bf0a0d7b1970da05cd3441c6a05edd8d62c803d7d71c0"
+    },
+    {
+      "path": "characteristic_source/pdfpage_32.txt",
+      "sha256": "c56e9b7baa49d85231bf0f6e40b323d52837f7c9fd885fd3542c6e99a4914b9b"
+    },
+    {
+      "path": "characteristic_source/pdfpage_33.png",
+      "sha256": "29a9e34187de8d8210ca601c041d35c7c1b8da354a4d88268a44ad92a0db65f7"
+    },
+    {
+      "path": "characteristic_source/pdfpage_33.txt",
+      "sha256": "c793e374e78fd64abd7e87f9d67442b3662c5c36418a8a0f5347cbd4cf28f6d7"
+    },
+    {
+      "path": "characteristic_source/pdfpage_5.png",
+      "sha256": "89a9ad712857aa199690a874d3ab8066d2f537d5f71744abbce87692de541c90"
+    },
+    {
+      "path": "characteristic_source/pdfpage_5.txt",
+      "sha256": "1f79b71c79c07349544bf7b6a9f2df6fe998cef9a4243202a1dd4ae3abf94510"
+    },
+    {
+      "path": "characteristic_source/pdfpage_8.png",
+      "sha256": "9b89a3b25011c9fc281b8f858af9490c5fc213162c5a7617e508cff7150ad5dd"
+    },
+    {
+      "path": "characteristic_source/pdfpage_8.txt",
+      "sha256": "d09f7c12842f7126fc4cd83652df01bd7f447963b4fa9d15d6b6172dc6e97757"
+    },
+    {
+      "path": "characteristic_source/pdfpage_9.png",
+      "sha256": "4c32707278788adf9c77e211ea9fa4ebc8c97d607b153fe8b38f0ec3c8020c56"
+    },
+    {
+      "path": "characteristic_source/pdfpage_9.txt",
+      "sha256": "796acee8e611040e7a9c302338c2e87b681b3a8e93f70fd47ec5be13eda4444f"
+    },
+    {
+      "path": "characteristic_source/source_manifest.json",
+      "sha256": "ee153bc32ea21a489070abb108ebee9435be3d69c3c5b16941d966529f888c6d"
+    },
+    {
+      "path": "solver/advance_test_evidence.mat",
+      "sha256": "7efe36ac55c6c59023b6db25f8d4101c1fe01c39fea191e077a7c761902ac5a1"
+    },
+    {
+      "path": "solver/advance_test_summary.json",
+      "sha256": "6ffbc02ac630b290464468e44588efa232c405c927ecddbc88c4a57f87048b49"
+    },
+    {
+      "path": "solver/characteristic_test_summary.json",
+      "sha256": "4279cd12fb197485dc78301569acce3a8bbaf052aa030fa15b049c311b8adb02"
+    },
+    {
+      "path": "solver/couette_verification.png",
+      "sha256": "61422c6ccfb20a31b99d527b8d35cc76a252f6513b05512c9bdf81ccb2ca77dc"
+    },
+    {
+      "path": "solver/independent_benchmarks.json",
+      "sha256": "29b77d850e7d9784c32f9ac9e4fc6a0c91d5f3fae7e5bb6e9ba54eab4e8af582"
+    },
+    {
+      "path": "solver/independent_benchmarks.log",
+      "sha256": "759ff6ee58326e59e30d2462ce4d6e016b5aa63aa454750f75853bfcb1f1af97"
+    },
+    {
+      "path": "solver/internal_library_release_final2.log",
+      "sha256": "0b5583bf665868188fad8b3221fdbe6f3b87ce86de44fb110ffbb30ba206bc99"
+    },
+    {
+      "path": "solver/kernel_test_evidence.mat",
+      "sha256": "7b257251a0b81aa25361e3ac25a656a1e8787e55ae71d9d6e267eb836aa4e0db"
+    },
+    {
+      "path": "solver/kernel_test_summary.json",
+      "sha256": "55fc58df9835dae6c6f31a37b1f6ddd55338bb48b5e460ec8713ed5947446672"
+    },
+    {
+      "path": "solver/open_advance_evidence.mat",
+      "sha256": "be5df934dc4fd1c5f9228f9975be39c55a200a40f3936d3e35c6ca6051242792"
+    },
+    {
+      "path": "solver/open_advance_summary.json",
+      "sha256": "5ce0524e32d74505c7572b467672fd0d772acaf8a7065801dcbc714a0aa0b50a"
+    },
+    {
+      "path": "solver/spatial_library_release_final.log",
+      "sha256": "77319ec5bf111268f99be1dd8a41e4ffd5f625ccc84edceb9524bbc0a4e8cd41"
+    },
+    {
+      "path": "ui/actual_rocket/case-data.js",
+      "sha256": "9399697542088eb995cf4112a7da98cf6d00846ed2485c98fa88c0000de36404"
+    },
+    {
+      "path": "ui/actual_rocket/export.js",
+      "sha256": "a9724476bea2499df0a17ba6caac2a3f8dd4692c824cbc68e9a20f7b047bf43d"
+    },
+    {
+      "path": "ui/actual_rocket/index.html",
+      "sha256": "5e704f10e3414dc39804b9d324461d5eb055510762b56faad4330499411aa7ff"
+    },
+    {
+      "path": "ui/actual_rocket/results.json",
+      "sha256": "2636b904de4155a6dc573646316e3a93e9134d368826d2384c6abcd850d19f46"
+    },
+    {
+      "path": "ui/actual_rocket/section.js",
+      "sha256": "6f1567017cd3cdc43de749f77ccee4d8f1034236180b55e36b94050c307ee4fb"
+    },
+    {
+      "path": "ui/actual_rocket/viewer.css",
+      "sha256": "64f10f6fea277195b55e615d3eca51df76c710ae7935f1b9bb1bd89790706690"
+    },
+    {
+      "path": "ui/actual_rocket/viewer.js",
+      "sha256": "ea0103d1d40a4414d234155e4403d605e4e31448a690c9769474244caa8ebe31"
+    },
+    {
+      "path": "ui/browser_observations.json",
+      "sha256": "e809c1c5d3f3622049b91b0b38fb806d84176a9125409e772c77548232a7da9c"
+    },
+    {
+      "path": "ui/embedded_render.json",
+      "sha256": "438d884797eb22649da153399cd4a917197d2e131153d0196352d0555a58b711"
+    },
+    {
+      "path": "ui/embedded_render.mat",
+      "sha256": "ca12bf1aa67021403a79e2d385f090fa1e98e897cc46a3ab7b3b2f1dad8fdf18"
+    },
+    {
+      "path": "ui/embedded_viewer_final.log",
+      "sha256": "8e353c6599c9fa727211b3694af99415a0760bf4ca654a7788c3cb8fb12974de"
+    },
+    {
+      "path": "ui/embedded_viewer_native.jpg",
+      "sha256": "13b68d6821fb1915910cded05f73bdfcb24575ff36d2b21bc07463157abf0907"
+    },
+    {
+      "path": "ui/preview_embedded_viewer.m",
+      "sha256": "e02295494cb46929192bee25a686c0b17cf2e2d6b8a84c842b5f40e013368477"
+    },
+    {
+      "path": "ui/single_time_temperatures.mat",
+      "sha256": "93c0871649b1349cbed76b35d5471e0ac603ec8029cd5e3bda0ed5adf1895f86"
+    },
+    {
+      "path": "ui/temperature_provenance_fixture.json",
+      "sha256": "fb6fffb78b19074dcb3bf73c3945902a5afdd8d10fb97f4516eeff0d736261b9"
+    },
+    {
+      "path": "ui/viewer_export_final.log",
+      "sha256": "b594ec66e95ffe6b84976e047f2dc53845669ac783ac06e70ed5cbc11aee3596"
+    },
+    {
+      "path": "ui/viewer_field_state_final.log",
+      "sha256": "66ee6586b827dd6d65a159fde63821f47a12e0edf2f22cf7863fcb67e833caae"
+    },
+    {
+      "path": "ui/viewer_field_state_fixture.json",
+      "sha256": "2a609525c6cdf446d8269a4e3603a18c0288b92bb7c15fddb81ea87d95f88e2a"
+    },
+    {
+      "path": "ui/viewer_metadata.mat",
+      "sha256": "0d8e6eacee79426c27348805ffba322e7ef8a34b26923787783dc6d615afacd2"
+    },
+    {
+      "path": "ui/viewer_section_final.log",
+      "sha256": "14b3197825e8ad6b165204cd32de2eba05ceb5abf036c81d7f156beba4874a68"
+    },
+    {
+      "path": "ui/viewer_semantics_release_final2.log",
+      "sha256": "2e254f55312a31f94a5898fec5e9b0a4ea694420e5f5c8161f69748969118ac9"
+    }
+  ],
+  "sourceSha256": {
+    "internalFlow/advanceCompressibleNavierStokes3D.m": "a7eebb6fe31f0ec095e8f4469523c4797ed46920e59229535ca4102b85e92ffd",
+    "internalFlow/compressibleNavierStokesResidual3D.m": "ffe638f9daa026f58eacaab9e86a8f332b44c19d44f8fea0335973f91a3785f2",
+    "internalFlow/README.md": "83fa33ca74950baeada7bce7746c24eb392dc992f6192ff401862d8878b39626",
+    "internalFlow/resolveNSCharacteristicBoundary3D.m": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9",
+    "internalFlow/testAdvanceCompressibleNavierStokes3D.m": "f99c4f6186dc9959b5d4a65b50acddbac1c6b564878f27ff19dc4816314ef887",
+    "internalFlow/testCompressibleNavierStokesResidual3D.m": "962d1e0be39a585d9867319103e4ae558e4df1f69fa4c3f3f0421f036c876dbc",
+    "internalFlow/testNSCharacteristicBoundary3D.m": "0686007b788624550a20d3674e01d63f9dc56df49d3d4fbb4da6cf9328ed75e7",
+    "internalFlow/testNSOpenRegionAdvance.m": "75953dff9c37a18c4cd7c28368d53adffb1e91a11cacf7deb645b9cb6412e9e0",
+    "internalFlow/verifyBenchmarks.py": "93bb42f239336aba74e75a53a274557b622a8ae0180242575a4ace82aa6d6c7f"
+  },
+  "githubPushed": false,
+  "nextPhysicalStep": "Actual contraction/base region geometry and control volumes; physically valid inlet total enthalpy/entropy/boundary-layer conditions; curved-wall mapping, transverse/recompression/backflow energy, near-wall/grid/domain/boundary convergence and variable-property/turbulence applicability"
+}

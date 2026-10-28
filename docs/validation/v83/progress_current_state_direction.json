@@ -1,0 +1,2671 @@
+{
+  "version": 83,
+  "status": "tested-current-result-state-Riemann-Jacobian-fresh-parent-and-regularized-krylov22-direction",
+  "recordedUTC": "2026-10-26T07:09:50.896640+00:00",
+  "processID": 37288,
+  "priorProgress": {
+    "path": "docs/validation/v83/progress_riemann_reservoir.json",
+    "sha256": "ca2c3a8aa24535c2dde4c10a21f738e01c0767b998856b9e6608e404265916fb",
+    "bytes": 31870
+  },
+  "previousGoalTurnClassification": "no-progress-status-answer-to-user-GitHub-version-question",
+  "currentGoalTurnClassification": "progress-verified-previous-terminals-local-state-radius-new-regularized-direction-and-original-facet-UI",
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/readRocketNSProbeBase.m": "024e5cddb0670c39dc24a223df5767685a2375da35bbd4199e19cf0874982453",
+    "internalFlow/cutCell/loadRocketDirectNSDirectionProbe.m": "7383c368a2daa6418a07b02b53dc42b879999d9d9c553c88dda95e52b27d9b08",
+    "internalFlow/cutCell/cutCellExactEulerBranchJacobian.m": "1018f50acad9bde439d48e1615f59e1da09d1353ac43e87630bed34bc86ab507",
+    "internalFlow/cutCell/buildCutCellRiemannReservoirJacobian.m": "a379800fb86348f589ffc1798af50071d5438a95ebd451cc1fff8e24ebc04225",
+    "internalFlow/cutCell/buildCutCellSelectedDirectionCache.m": "2481ebf86c5453b3d2b6b5a1f9fa13274e4514854d1d76c6ab80b85f7ca1774b",
+    "internalFlow/cutCell/cutCellBoundaryDirectionalState.m": "8b7f03f5f795fe733ea8b7f6beba07085afbe8ae1a192f9b5688f868bb60affc",
+    "internalFlow/cutCell/rocketSelectedDirectionSourceIdentity.m": "f10aa7a9019c6f5947d2b751802c89d699520a62f3070243b0b8c5eb1e5e61eb",
+    "internalFlow/cutCell/buildRocketPrimitiveUpdateMetric.m": "364a1aef45e8d86176d93438b0a8aab2eef2e26261fdeafcaacc9cca097b26e4",
+    "internalFlow/cutCell/applyRocketPrimitiveUpdateMetric.m": "2dc93e38dad6bbcaa47be15329ec368826a96cd4a69f4a96fb13ec8794041224",
+    "internalFlow/cutCell/solveRocketRegularizedParentDirection.m": "d218514ae33049069dd59b4eb11dbcaffbcc09d2179cdb506cb80794b64bdec5",
+    "tests/createRocketNSDirectionProbe.m": "0a5a9abcd18cdd8305342945dd4706cf4d4cfd78e3df2c8f298768aec621498a",
+    "tests/continueRocketWallVelocityKrylov.m": "f5b6fd3f44515d187dba7d9b4ed96c6158b5ca142c1734f28ec4b542ac22391d",
+    "tests/testRocketNSProbeResultSource.m": "546ed1ed5931cb94cede15bb2a2e4e673071be681f38c54786ff4376635b3a25",
+    "tests/testRiemannReservoirSelectedDirection.m": "518d1ab5a2827afbe109252fceb80c696e2ba0700a1ec7401118752221f8170c",
+    "tests/studyRiemannReservoirSelectedDirection.m": "4eca73026f05a583e7cee09a6d2f64d862015f38f8bf2a03113a20bef1e5db4d",
+    "tests/studyRocketCurrentReservoirParent.m": "93e25b70967ab403aff5a3208ab3cb5d2b8eed627f24681490e4530b6856022f",
+    "tests/testRocketRegularizedParentDirection.m": "f4b9c6767b90dba110635a6a71c7edb2d3cece49ff47446adeff631cc75e5db0",
+    "tests/studyRocketRegularizedParentDirection.m": "42b40f9a6a48e08bbd273d61c99ae3f5eb2f3915efb4cd390f780d0e436e12fd",
+    "tests/studyRocketRegularizedDirectionNS.m": "5995381c37f48a63cb27f444d4853a4770008e72171c0355552392e18d97fef4",
+    "tests/diagnoseRocketCurrentNSDirection.py": "df8e03871128846c19638781c064734e88637906221b4f6be16e96469ee04fff",
+    "tests/diagnoseRocketNSUpdateRadius.py": "9edb8dd1eb2f33a3759a48691d6ceb773a06656df5135f410b83b338de378387",
+    "tests/auditRiemannReservoirSelectedDirection.py": "a9ff50b5cecfe286e8daaa7a2b6c96c532c355b0c2901dee2745599c51c25e3c",
+    "tests/auditRiemannReservoirRealDirection.py": "cc536151c52634cb1c737ff1a3e3e9903d256391f3d96cdd4addab253c31dcb4",
+    "tests/auditRocketCurrentParentMatrix.py": "b930bc5c89ecb52fcc76c3ef0d51926fa1e245fb9a16b08275d56c7b2c5449b4",
+    "tests/auditRocketCurrentParentCandidate.py": "a6887f0a3c957d1bbfbb3e4e6be7cb0194e771e4a0b74b31584c4bf047d7a8c9",
+    "tests/auditRocketDirectNSDirectionProbe.py": "503a36995ac47375deb443b586dfa5595026213d0b7af9c1505feead37109072",
+    "tests/auditNSRiemannReservoir3D.py": "412c6af76ed60ed1bbb4dba754668412873d73818344e954957b603597614ea1",
+    "tests/testRocketWallVelocityWorkbench.js": "d00ea5e7ac083f5cb531106dd6be57972c8bb43d64a6570b03b6aea852e16940",
+    "tests/auditRocketWallVelocityWorkbench.py": "5799e73ce0ac4bef772d582caf7399054bc954bc64e3e942d72b6282b5bec5fe",
+    "tests/auditRocketRegularizedParentDirection.py": "42732e209a64de498657473a02c6be0f23124e7ad152dc6f7678a7c45a05425a",
+    "tests/recordRocketCurrentDirectionProgress.py": "960777910daf83a0db10be1c0a0c87f52018213cc6a09022515973419add0947",
+    "tests/packageRocketCurrentDirectionResearch.py": "c4bfa90dfc597093599d460ada4c60a929961d5de05b6b0ab7c28ae6bb4bbfbf",
+    "exportRocketWallVelocityStudy.m": "297665681c981e1aa170d958b53e72d03f73c42937dfd9ab281c75dd60dc2182",
+    "web/rocket-wall-velocity.js": "11490825d93207acb514a5e7543e772928eef09ac729d84b097ae06cf91525aa",
+    "docs/CURRENT_STATE_DIRECTION_V83.md": "a4b71ce49224bdbf6d5ab7e7c7bcf74d69cc685c4a65cdd937b7930d2870d436",
+    "docs/PROJECT_GOALS.md": "a9573be124170e252798ee517a8357e2059e51e85138cdb98fa56c3e335d1989",
+    "docs/GITHUB_STAGE_READINESS.md": "bb188ac15028169c9b46f7c098ca092bf6508534137a7b4ad783a552015ad140"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_result_source_auditRocketDirectNSDirectionProbe.py",
+      "sha256": "8b940762d7f894cefc54c7c3e9ef0a4043724c067b61e989b3f9ef3133c6859a",
+      "bytes": 5777
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_result_source_continueRocketWallVelocityKrylov.m",
+      "sha256": "534b457131e6a0982393f9b2e9b2b48db5075cba3bb2e29275abe446933f86c6",
+      "bytes": 6999
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_result_source_createRocketNSDirectionProbe.m",
+      "sha256": "893b467e95829afbc54e760216bf0deafc9199ce542dcf36a93b3a5993b173bb",
+      "bytes": 2477
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_result_source_loadRocketDirectNSDirectionProbe.m",
+      "sha256": "d254b73e3342e21f222cb0a668bffde57afcc4ae854d12e38f2d214822303521",
+      "bytes": 4147
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_reservoir_jac_buildCutCellSelectedDirectionCache.m",
+      "sha256": "aeaf4202a6f980ab6c652ca612888bea5fdbe3c29fd238345f332154df90743a",
+      "bytes": 2668
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_reservoir_jac_cutCellBoundaryDirectionalState.m",
+      "sha256": "5f6e6dfd543e9f82e655a0b0d6544276c5520cda730044fec03e00bb8a9bfd92",
+      "bytes": 2773
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_reservoir_jac_cutCellExactEulerBranchJacobian.m",
+      "sha256": "be3741d9943cbd5ae8a5bb03a0fb18a860365637eb6884a8799998c0f7fb60b0",
+      "bytes": 5506
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_reservoir_jac_rocketSelectedDirectionSourceIdentity.m",
+      "sha256": "b1187ff919eb575e334ccdb320f4625ca6bb239623634b444976f92ad4c67cce",
+      "bytes": 1285
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_reservoir_continue_auditNSRiemannReservoir3D.py",
+      "sha256": "258aa99577b6871a9523a4fa444754a3802d1a28b6d69b92b9ce750adcf47fee",
+      "bytes": 7537
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_reservoir_continue_auditRocketWallVelocityWorkbench.py",
+      "sha256": "96de5178c17215874cb14d91d94ed004526dee0d8103156e04435b07cd46a42c",
+      "bytes": 15921
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_reservoir_continue_testRocketWallVelocityWorkbench.js",
+      "sha256": "532573418d04ff0f4cc011aa734068081c953aa0b708845f5b0b35519132a9b5",
+      "bytes": 17110
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_reservoir_norm_roundoff_auditRiemannReservoirRealDirection.py",
+      "sha256": "e188969bf2a2f1f67b4e6d5fd6445d0e9a52d2bb514f811fe58da93d703a3d52",
+      "bytes": 4287
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_residual_trend_20261026/auditRocketWallVelocityWorkbench.py",
+      "sha256": "df40773f6638c4735b371a29c96467649ddedc2cfc22e9f9ca9ead9a3b363b42",
+      "bytes": 16078
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_residual_trend_20261026/exportRocketWallVelocityStudy.m",
+      "sha256": "e39e6a5fee5ba849193eb08b156bcca94b414a06908af4b2950cd22fe756c515",
+      "bytes": 20709
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_residual_trend_20261026/rocket-wall-velocity.js",
+      "sha256": "d9020e65d10026faba649afc6b3031c4d44c0b27e24b59164fc716b63e998207",
+      "bytes": 14609
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_residual_trend_20261026/testRocketWallVelocityWorkbench.js",
+      "sha256": "2eb1d6011e3a2ba2d038d7b745c462bc9f09e60e1244989e4e0f84b9c80b67c3",
+      "bytes": 17327
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_regularized_objective_roundoff_auditRocketRegularizedParentDirection.py",
+      "sha256": "f6586503001ed5940ba9b01dcbe8569fbf42ee9faeea3b69d570ec20020cc4e5",
+      "bytes": 7417
+    },
+    {
+      "path": "outputs/v83_validation/source_epochs/pre_current_progress_epoch_recordRocketCurrentDirectionProgress.py",
+      "sha256": "7d7739d6337b7f62c77fec2401b63068097ebe438ecae3c32e08bc70bce70b76",
+      "bytes": 11334
+    }
+  ],
+  "matlabProcesses": {
+    "nsproberesultunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        58748
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/nsproberesultunit01_process.json",
+        "sha256": "4a221767bf2a643a676da890d41fcb10e8b4c08a1c45f0934b588726e8d43b15",
+        "bytes": 212431
+      }
+    },
+    "riemannreservoircontinue01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        11344
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/riemannreservoircontinue01_process.json",
+        "sha256": "bcdb85a87914447e15212851c01541ea47ef341c901f27e96b9470cc46b39444",
+        "bytes": 213341
+      }
+    },
+    "reservoirjacunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        5612
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/reservoirjacunit01_process.json",
+        "sha256": "9d6077ef9bfae45ec7faddfd107e9fb187277d1d33fcd9d8adf3569eb3075c54",
+        "bytes": 215079
+      }
+    },
+    "reservoirjacreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        50332
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/reservoirjacreal01_process.json",
+        "sha256": "aa9dbf6b34f3be1e2a5ccac32ddc0b389ee292b9ce4467beab971ed23d898cac",
+        "bytes": 215533
+      }
+    },
+    "reservoircurrentparent01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        27596
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/reservoircurrentparent01_process.json",
+        "sha256": "0164c47f131bc0685c001e650a19ac198ac44967b5656ae9ff111757acb31484",
+        "bytes": 215975
+      }
+    },
+    "updateradiusunit01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        34492
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/updateradiusunit01_process.json",
+        "sha256": "c21291c8d2eadef8ee28008f84c7a55cc44cb90be27f5be6b37d51d9382c5fd1",
+        "bytes": 218833
+      }
+    },
+    "updateradiusreal01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        46440
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/updateradiusreal01_process.json",
+        "sha256": "083d3f5265e6c05bf4c8193dcf3eaf843a94a36bdaaa7a2b823139dcef570058",
+        "bytes": 219084
+      }
+    },
+    "updateradiusns01": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        59852
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/updateradiusns01_process.json",
+        "sha256": "7a7b4a336d95334a7f1a2c93720a73c1a9d9db9231f668412c596a25a0af01d1",
+        "bytes": 219775
+      }
+    },
+    "updateradiusui02": {
+      "exitCode": 0,
+      "sourceStable": true,
+      "engineProcessIDs": [
+        50396
+      ],
+      "receipt": {
+        "path": "outputs/v83_validation/updateradiusui02_process.json",
+        "sha256": "8ec3f24009606342492cf4600f46b669fabb5e52a86464dbad07e6ff0c14c46a",
+        "bytes": 220491
+      }
+    }
+  },
+  "independentChecks": [
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/nsproberesultunit01_independent_direct_ns_probe.json",
+        "sha256": "053f4cc8ab9836386194e68291cf1da93e97ed2403bd4aad6d238fbdbb96acb0",
+        "bytes": 3419
+      },
+      "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks",
+      "originalSourceEpochBindings": [
+        {
+          "originalBoundPath": "internalFlow/cutCell/buildCutCellSelectedDirectionCache.m",
+          "originalSource": {
+            "path": "outputs/v83_validation/source_epochs/pre_reservoir_jac_buildCutCellSelectedDirectionCache.m",
+            "sha256": "aeaf4202a6f980ab6c652ca612888bea5fdbe3c29fd238345f332154df90743a",
+            "bytes": 2668
+          },
+          "currentSourceQualificationClaimed": false
+        },
+        {
+          "originalBoundPath": "internalFlow/cutCell/cutCellBoundaryDirectionalState.m",
+          "originalSource": {
+            "path": "outputs/v83_validation/source_epochs/pre_reservoir_jac_cutCellBoundaryDirectionalState.m",
+            "sha256": "5f6e6dfd543e9f82e655a0b0d6544276c5520cda730044fec03e00bb8a9bfd92",
+            "bytes": 2773
+          },
+          "currentSourceQualificationClaimed": false
+        },
+        {
+          "originalBoundPath": "internalFlow/cutCell/cutCellExactEulerBranchJacobian.m",
+          "originalSource": {
+            "path": "outputs/v83_validation/source_epochs/pre_reservoir_jac_cutCellExactEulerBranchJacobian.m",
+            "sha256": "be3741d9943cbd5ae8a5bb03a0fb18a860365637eb6884a8799998c0f7fb60b0",
+            "bytes": 5506
+          },
+          "currentSourceQualificationClaimed": false
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/reservoirjacunit01_independent_reservoir_selected_direction.json",
+        "sha256": "426096781a67ca032c478611ac59c02424661e93799b70493979f46fccf4fc13",
+        "bytes": 1291
+      },
+      "status": "passed-independent-150-public-sample-Jacobian-columns-40-boundary-columns-and-original-NS-arithmetic",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/reservoirjacreal01_independent_real_reservoir_direction.json",
+        "sha256": "fbb07ea5fd89f120ea6be5fb536518aea2146222722af6ef4a1e4d6e8d9be5b6",
+        "bytes": 1860
+      },
+      "status": "passed-independent-real-Q20-full-NS-step-arithmetic-and-all-reservoir-boundary-columns",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/currentparent01_independent_current_matrix.json",
+        "sha256": "3e9681ed5462f3c8f8979e90755e52f37e88da13f8a50b395dfad0d698fc2b5c",
+        "bytes": 1548
+      },
+      "status": "passed-independent-current-Q20-all-parent-coefficients-patch-inverses-and-image-columns",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/currentparent01_independent_current_candidate.json",
+        "sha256": "880795bfa3dde4130ece62af40bbfb05b4d414a9204307c30c48ce531449bf84",
+        "bytes": 1723
+      },
+      "status": "passed-independent-current-parent-LSQR-coordinate-lift-full-image-and-separate-original-NS-direction",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov21_independent_riemann_reservoir.json",
+        "sha256": "b59e2e2727c3aefda7e789d6d8494377cd2f689841338111a9cb9c69247ffcbc",
+        "bytes": 1947
+      },
+      "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov21_independent_direct_ns_probe.json",
+        "sha256": "cc9702bd70df8a4ac9370898f6cd8951756d6c00c7295c4dbea3adcbd443da96",
+        "bytes": 3187
+      },
+      "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov21_independent_newton_directions.json",
+        "sha256": "844e50f8af43d49fe24bb6929ae7d94364befe3ae925b5b2e73a617258d044ca",
+        "bytes": 1035
+      },
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov22_independent_direct_ns_probe.json",
+        "sha256": "1e3b8eb327c81b42769e0b96a9c1fe56255dcc718a274551a777650f703e38f4",
+        "bytes": 3189
+      },
+      "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov22_independent_newton_directions.json",
+        "sha256": "2e8c3ba84d2415e2936c378e01c84def17af3d1845c4b4eeed895a6f7cd25eca",
+        "bytes": 1035
+      },
+      "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/krylov22_independent_riemann_reservoir.json",
+        "sha256": "14c553d4fceb75c3a2178c1decbc87285967bbd2c12005386a4561f12b223d89",
+        "bytes": 1946
+      },
+      "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/updateradiusunit01_independent_regularized_direction.json",
+        "sha256": "4b48e82697303594661cfcb765bbe0cac1dbe1804853de432efb79c28b2ff0ee",
+        "bytes": 1451
+      },
+      "status": "passed-independent-primitive-metric-and-total-augmented-parent-direction",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/updateradiusreal01_independent_regularized_direction.json",
+        "sha256": "88f62bdf3b3529f310ba45b6bbd75ddff01150cc5a16dd158ce8e7c612722b18",
+        "bytes": 2132
+      },
+      "status": "passed-independent-primitive-metric-and-total-augmented-parent-direction",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/workbench34/node_wall_velocity_summary.json",
+        "sha256": "806964f820fa83ee14340d61d0323cdd445032e22a9cb380b1fa4b6075e4e096",
+        "bytes": 1122
+      },
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/workbench34/independent_wall_velocity_view.json",
+        "sha256": "0237decc815fa352582a6440a40abb4da3b561c79fb0eb8d705d1101a0a1a8ab",
+        "bytes": 3336
+      },
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/workbench35/node_wall_velocity_summary.json",
+        "sha256": "8b5da4bf11074dd78b0426a39e97a79b7be90accb3465f1902ded3f5c930f3ec",
+        "bytes": 1122
+      },
+      "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+      "originalSourceEpochBindings": []
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/workbench35/independent_wall_velocity_view.json",
+        "sha256": "ce9127493b6639c11217b5e25e8229eaa8113dd543644760c15ed34c8c17d108",
+        "bytes": 3338
+      },
+      "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+      "originalSourceEpochBindings": []
+    }
+  ],
+  "evidence": [
+    {
+      "path": "outputs/v83_validation/krylov21/wall_velocity_krylov_evidence.mat",
+      "sha256": "f950decf5275ee659c97b1682a47d0a6b8abd059569212334f740ec528fa3e37",
+      "bytes": 870655378
+    },
+    {
+      "path": "outputs/v83_validation/directnsprobereal03/direct_ns_direction_probe.mat",
+      "sha256": "497c682f4dd77ca55c2b33d84d9ed820e1db140a7a73bd16b561659e95479afe",
+      "bytes": 57585089
+    },
+    {
+      "path": "outputs/v83_validation/krylov22/wall_velocity_krylov_evidence.mat",
+      "sha256": "41bfea06a21bacfe682c3ab02a045736b1b285dbb3bcdcf3f3749e15088638ff",
+      "bytes": 870575946
+    },
+    {
+      "path": "outputs/v83_validation/directnsprobereal04/direct_ns_direction_probe.mat",
+      "sha256": "b7e67f510aadf7680c61371723cb6e3bc7f843050fd2d7a0804b30d6e1a2a4f8",
+      "bytes": 57576803
+    },
+    {
+      "path": "outputs/v83_validation/reservoirjacreal01/riemann_selected_direction_real_evidence.mat",
+      "sha256": "87f56ef7cd4677f534022e2461833a350bf92706ac4036ba705e5900e1abc6a6",
+      "bytes": 1220540523
+    },
+    {
+      "path": "outputs/v83_validation/currentparent01/current_parent_candidate_evidence.mat",
+      "sha256": "6e371e84ccc8daa81591253bf08c0d8a38f92530895e255d8926ffeed77e0d6a",
+      "bytes": 66312530
+    },
+    {
+      "path": "outputs/v83_validation/updateradiusunit01/regularized_parent_unit_evidence.mat",
+      "sha256": "569c21367f813210e9467fc94f71dae5e9c61352f7bdc82cf957e37426fd745d",
+      "bytes": 202734
+    },
+    {
+      "path": "outputs/v83_validation/updateradiusreal01/regularized_parent_candidate_evidence.mat",
+      "sha256": "48dd342a7a4966d585bb229ec893d2cf2d12cc187df6eb174826f5aafbd17d70",
+      "bytes": 51999600
+    },
+    {
+      "path": "outputs/v83_validation/updateradiusreal01/regularized_parent_model_evidence.mat",
+      "sha256": "d43a8f182a36602c7ffca65a64f58a643d0a6b60f7918788b80488c8b1567490",
+      "bytes": 16579276
+    },
+    {
+      "path": "outputs/v83_validation/krylov21_update_radius.json",
+      "sha256": "aebfcc33d87228b2103a9317bbf3b3974a394b77dab14d757f21e25dcfa0599b",
+      "bytes": 21419
+    },
+    {
+      "path": "outputs/v83_validation/krylov22_update_radius.json",
+      "sha256": "3d22c3b05ba13a57948be5148ef6585fef64305788dac219004b3f6c2901c089",
+      "bytes": 21425
+    },
+    {
+      "path": "outputs/v83_validation/workbench34/wall-velocity-study-data.json",
+      "sha256": "e3053f60fed94799e8b1c95a80f933e854ac3e4600bef3686cf293ef282e269c",
+      "bytes": 14575
+    },
+    {
+      "path": "outputs/v83_validation/workbench34/static_wall_velocity_comparison.png",
+      "sha256": "ba200246c8545c1023e09ae54c41be92b230e55c370ac3b3dfcbbb4f6e18f399",
+      "bytes": 478586
+    },
+    {
+      "path": "outputs/v83_validation/workbench34/static_wall_velocity_residuals.png",
+      "sha256": "c9e87b73c8b3a91150648c25b7c20f226fbe6e33a44c726c410e72bba6a81cf9",
+      "bytes": 46239
+    },
+    {
+      "path": "outputs/v83_validation/workbench34/static_wall_velocity_balance.png",
+      "sha256": "630094da31b8a7046c8dcbb2934fd8804cb3c1cb2a942ec8c3c8177306ea1d3b",
+      "bytes": 70970
+    },
+    {
+      "path": "outputs/v83_validation/workbench35/wall-velocity-study-data.json",
+      "sha256": "98c52b7842bd4c547ae2bf41086a6f7d5fb69692b163e658954a0510476a55ed",
+      "bytes": 14680
+    },
+    {
+      "path": "outputs/v83_validation/workbench35/static_wall_velocity_comparison.png",
+      "sha256": "c512f8b832211d155c34a4194ebee574b47852f667cf848efb13e92707f61c38",
+      "bytes": 478579
+    },
+    {
+      "path": "outputs/v83_validation/workbench35/static_wall_velocity_residuals.png",
+      "sha256": "3965ae3e0bd0d3bb6e2873c9ce61bf958d944bdd97af154d5fdbcf1c48f98b4d",
+      "bytes": 45629
+    },
+    {
+      "path": "outputs/v83_validation/workbench35/static_wall_velocity_balance.png",
+      "sha256": "5c965d22aa1628768dfe46901620fde45d22e730e85e4d0f1cfc2a9947c2492d",
+      "bytes": 71046
+    }
+  ],
+  "latestAcceptedEndpoint": {
+    "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+    "sourceFaces": 19752,
+    "cellCount": 217272,
+    "acceptedNonlinearIterations": 1,
+    "priorAcceptedNonlinearIterations": 1,
+    "totalNewEquationAcceptedIterations": 2,
+    "candidateTrials": 13,
+    "residualEvaluations": 5,
+    "totalNewEquationResidualEvaluations": 9,
+    "operatorBuilds": 1,
+    "initialMaximumResidual": 4739478.560940738,
+    "maximumResidual": 5026231.2699140515,
+    "initialRmsMerit": 519444.27593809797,
+    "rmsMerit": 519063.76917125436,
+    "elapsedSeconds": 109.2122962,
+    "matrixVectorProducts": 2,
+    "jacobianResidualEvaluations": 2,
+    "preconditionerApplications": 1,
+    "lineage": {
+      "sourceState": "krylov19-state-only-explicit-new-Riemann-reservoir-boundary",
+      "sourceHistoryAppended": false,
+      "newBoundaryProblemInitialCounter": 0,
+      "previousProblemAcceptancesNotAppended": 13,
+      "previousProblemNSNotAppended": 258,
+      "externalCFDImported": false,
+      "interiorEulerFlux": "exact-godunov",
+      "wallVelocityGradient": "dirichlet-tangent"
+    },
+    "wallVelocityGradient": "dirichlet-tangent",
+    "sameEquationHistoryContinued": true,
+    "steadyConverged": false,
+    "stopReason": "maximum-nonlinear-iterations",
+    "spatialConservationRelative": 3.417654539686764e-16,
+    "steadyBoundaryFluxBalance": 0.010029774974618341,
+    "signedHeatPowerW": 923428.6207937065,
+    "wallHeatRangeWm2": [
+      -356383.6901352382,
+      2255791.6499745846
+    ],
+    "physicalTimeAdvanced": 0,
+    "BETimeStepsClaimed": 0,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 59852,
+    "priorActualResidualEvaluations": 4,
+    "openBoundaryDiscretization": "exact-Riemann-reservoir",
+    "sourceHistoryAppended": false,
+    "residualEvaluationsAfterLastAcceptedHistory": 0,
+    "normalEulerLinearization": "exact-branch",
+    "physicalSpatialEquationChanged": false,
+    "linearEquation": "steady-newton",
+    "preconditionerTimeStepOnly": true,
+    "steadyInitialGuessReport": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\directnsprobereal04\\direct_ns_direction_probe.mat",
+      "sourceVariant": "ns-probe",
+      "directionScale": 1,
+      "sourceFileSHA256": "b7e67f510aadf7680c61371723cb6e3bc7f843050fd2d7a0804b30d6e1a2a4f8",
+      "sourceGeometryFile": "E:\\RocketAeroHeat\\outputs\\v80_validation\\domain02\\shell_domain_evidence.mat",
+      "sourceGeometryFileSHA256": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+      "sourceStateAndGeometryVerified": true,
+      "sourceSavedActualNSRelativeDefect": 0.07407219999606847,
+      "originalNSProbeArithmeticVerified": true,
+      "oldDerivativeReused": false,
+      "originalNSAcceptanceClaimed": false,
+      "newModelApplications": 0,
+      "newActualNSEvaluations": 0,
+      "coarseImageRequired": false,
+      "sourceStateLocation": "result"
+    },
+    "steadyInitialGuessModelApplications": 1
+  },
+  "frozenQ21StateRadiusDiagnostic": {
+    "status": "verified-real-conservative-state-radius-and-accepted-local-residual-diagnostic",
+    "case": "krylov21",
+    "processID": 37304,
+    "constraints": [
+      {
+        "constraint": "positiveDensity",
+        "firstExitAlpha": 0.0017650473227771156,
+        "location": {
+          "cellID": 64569,
+          "layer": 4,
+          "sourceFacet": 5313,
+          "centroidM": [
+            -1.968959128126082,
+            -0.004667844221987119,
+            -0.09989884266094327
+          ]
+        }
+      },
+      {
+        "constraint": "minimumTemperature",
+        "firstExitAlpha": 0.0007066054214419326,
+        "location": {
+          "cellID": 75951,
+          "layer": 4,
+          "sourceFacet": 16695,
+          "centroidM": [
+            -0.1097141984195988,
+            -0.1336130585444203,
+            0.02646100526877441
+          ]
+        }
+      },
+      {
+        "constraint": "maximumTemperature",
+        "firstExitAlpha": 0.012365529180260161,
+        "location": {
+          "cellID": 36378,
+          "layer": 2,
+          "sourceFacet": 16626,
+          "centroidM": [
+            -0.11987419216522179,
+            -0.03085078452593224,
+            -0.13943090741355438
+          ]
+        }
+      }
+    ],
+    "limitingConstraint": {
+      "constraint": "minimumTemperature",
+      "firstExitAlpha": 0.0007066054214419326,
+      "location": {
+        "cellID": 75951,
+        "layer": 4,
+        "sourceFacet": 16695,
+        "centroidM": [
+          -0.1097141984195988,
+          -0.1336130585444203,
+          0.02646100526877441
+        ]
+      }
+    },
+    "independentBisectionRelativeDifference": 1.0740669370907471e-15,
+    "acceptedAlpha": 0.000244140625,
+    "acceptedAlphaFractionOfCellStateRadius": 0.3455119612609185,
+    "fullDirectionRelativeStateMetrics": {
+      "densityFraction": {
+        "maximumFullDirection": 1526.9182606131171,
+        "location": {
+          "cellID": 65211,
+          "layer": 4,
+          "sourceFacet": 5955,
+          "centroidM": [
+            -1.864011983649716,
+            -0.018068565901586956,
+            -0.09837979889871742
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.3727827784699993,
+        "quantilesFullDirection": [
+          0.8829793725390125,
+          1.336666733555782,
+          3.8096297319986707,
+          71.62645782635389
+        ]
+      },
+      "velocityOverLocalSound": {
+        "maximumFullDirection": 1528.4066820597377,
+        "location": {
+          "cellID": 65211,
+          "layer": 4,
+          "sourceFacet": 5955,
+          "centroidM": [
+            -1.864011983649716,
+            -0.018068565901586956,
+            -0.09837979889871742
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.37314616261224065,
+        "quantilesFullDirection": [
+          0.4765449212953752,
+          1.3483186982724227,
+          8.33734294777288,
+          81.03592574397855
+        ]
+      },
+      "temperatureFraction": {
+        "maximumFullDirection": 620.0206478441041,
+        "location": {
+          "cellID": 65211,
+          "layer": 4,
+          "sourceFacet": 5955,
+          "centroidM": [
+            -1.864011983649716,
+            -0.018068565901586956,
+            -0.09837979889871742
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.15137222847756449,
+        "quantilesFullDirection": [
+          0.2749227954479563,
+          1.052629938562881,
+          6.002644683254813,
+          38.067968129720036
+        ]
+      }
+    },
+    "originalNSDirectionDefect": 0.09995118319380898,
+    "acceptedNonlinearRemainderRelativeToBaseResidual": 0.07484077847976099,
+    "acceptedNonlinearRemainderRelativeToLinearChange": 305.21379303344213,
+    "nonlinearRemainderLayerSquareFractions": [
+      1.745077198072804e-07,
+      2.894075470050865e-07,
+      0.0003556488458300671,
+      0.9573630744068761,
+      0.0422808124489062,
+      3.8292393353602154e-10,
+      1.548978325226601e-13,
+      1.1937539532061455e-14,
+      2.128421955959284e-15,
+      2.7691446765031905e-14,
+      2.184722581451491e-16
+    ],
+    "residualHotspots": [
+      {
+        "kind": "initial",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 58917,
+              "layer": 3,
+              "sourceFacet": 19413,
+              "centroidM": [
+                0.04907452215001135,
+                -0.00026444780551624936,
+                -0.010394478869966941
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4739478.560940738
+          },
+          {
+            "location": {
+              "cellID": 39446,
+              "layer": 2,
+              "sourceFacet": 19694,
+              "centroidM": [
+                0.04998210687629424,
+                -0.0002004574278186466,
+                -0.0017100382364014903
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": 4735806.777388922
+          },
+          {
+            "location": {
+              "cellID": 58919,
+              "layer": 3,
+              "sourceFacet": 19415,
+              "centroidM": [
+                0.049074519162240274,
+                0.002629095139969149,
+                -0.010054415362205065
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4721533.081478064
+          },
+          {
+            "location": {
+              "cellID": 58915,
+              "layer": 3,
+              "sourceFacet": 19411,
+              "centroidM": [
+                0.049074517891125054,
+                -0.0031400410731015913,
+                -0.009921693144006248
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4714302.120498311
+          },
+          {
+            "location": {
+              "cellID": 59074,
+              "layer": 3,
+              "sourceFacet": 19570,
+              "centroidM": [
+                0.049543736162372475,
+                -0.0009741661431015629,
+                -0.007836105445647945
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4687462.675591617
+          },
+          {
+            "location": {
+              "cellID": 58992,
+              "layer": 3,
+              "sourceFacet": 19488,
+              "centroidM": [
+                0.04930914392505071,
+                -0.00912313663177983,
+                -0.000483421874193088
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4686083.884250039
+          },
+          {
+            "location": {
+              "cellID": 58913,
+              "layer": 3,
+              "sourceFacet": 19409,
+              "centroidM": [
+                0.049074511218128294,
+                -0.005770954872388321,
+                -0.008667518492688741
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4669004.242055893
+          },
+          {
+            "location": {
+              "cellID": 59076,
+              "layer": 3,
+              "sourceFacet": 19572,
+              "centroidM": [
+                0.0495438130468645,
+                0.0018619566895306033,
+                -0.0076631001298237056
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4664970.036593839
+          },
+          {
+            "location": {
+              "cellID": 58921,
+              "layer": 3,
+              "sourceFacet": 19417,
+              "centroidM": [
+                0.04907453361293611,
+                0.005313161028179191,
+                -0.00892422204558707
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4662570.603809185
+          },
+          {
+            "location": {
+              "cellID": 58989,
+              "layer": 3,
+              "sourceFacet": 19485,
+              "centroidM": [
+                0.04930911640855472,
+                -0.00851868147069638,
+                0.0033150954250543213
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4651894.60716816
+          },
+          {
+            "location": {
+              "cellID": 58985,
+              "layer": 3,
+              "sourceFacet": 19481,
+              "centroidM": [
+                0.049308935573932164,
+                -0.004864323072521912,
+                0.007742509575401005
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4636749.502475043
+          },
+          {
+            "location": {
+              "cellID": 59072,
+              "layer": 3,
+              "sourceFacet": 19568,
+              "centroidM": [
+                0.04954365813437602,
+                -0.0036879421198639803,
+                -0.006989334476418908
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4636072.191263401
+          }
+        ]
+      },
+      {
+        "kind": "accepted",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -5647326.906214793
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -5497298.881419512
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 5298025.943851594
+          },
+          {
+            "location": {
+              "cellID": 58917,
+              "layer": 3,
+              "sourceFacet": 19413,
+              "centroidM": [
+                0.04907452215001135,
+                -0.00026444780551624936,
+                -0.010394478869966941
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4738324.087013365
+          },
+          {
+            "location": {
+              "cellID": 39446,
+              "layer": 2,
+              "sourceFacet": 19694,
+              "centroidM": [
+                0.04998210687629424,
+                -0.0002004574278186466,
+                -0.0017100382364014903
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": 4734643.663589925
+          },
+          {
+            "location": {
+              "cellID": 58919,
+              "layer": 3,
+              "sourceFacet": 19415,
+              "centroidM": [
+                0.049074519162240274,
+                0.002629095139969149,
+                -0.010054415362205065
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4720381.633926473
+          },
+          {
+            "location": {
+              "cellID": 58915,
+              "layer": 3,
+              "sourceFacet": 19411,
+              "centroidM": [
+                0.049074517891125054,
+                -0.0031400410731015913,
+                -0.009921693144006248
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4713149.442263446
+          },
+          {
+            "location": {
+              "cellID": 59074,
+              "layer": 3,
+              "sourceFacet": 19570,
+              "centroidM": [
+                0.049543736162372475,
+                -0.0009741661431015629,
+                -0.007836105445647945
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4686317.258726625
+          },
+          {
+            "location": {
+              "cellID": 58992,
+              "layer": 3,
+              "sourceFacet": 19488,
+              "centroidM": [
+                0.04930914392505071,
+                -0.00912313663177983,
+                -0.000483421874193088
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4684948.759895245
+          },
+          {
+            "location": {
+              "cellID": 58913,
+              "layer": 3,
+              "sourceFacet": 19409,
+              "centroidM": [
+                0.049074511218128294,
+                -0.005770954872388321,
+                -0.008667518492688741
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4667864.786355702
+          },
+          {
+            "location": {
+              "cellID": 59076,
+              "layer": 3,
+              "sourceFacet": 19572,
+              "centroidM": [
+                0.0495438130468645,
+                0.0018619566895306033,
+                -0.0076631001298237056
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4663832.151130002
+          },
+          {
+            "location": {
+              "cellID": 58921,
+              "layer": 3,
+              "sourceFacet": 19417,
+              "centroidM": [
+                0.04907453361293611,
+                0.005313161028179191,
+                -0.00892422204558707
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4661433.303421377
+          }
+        ]
+      },
+      {
+        "kind": "acceptedNonlinearRemainder",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -7763417.097625123
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -7597071.141313085
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 7290237.049730531
+          },
+          {
+            "location": {
+              "cellID": 64659,
+              "layer": 4,
+              "sourceFacet": 5403,
+              "centroidM": [
+                -1.9539666905263873,
+                -0.01821298993952901,
+                -0.09834483913270313
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6668986.582584631
+          },
+          {
+            "location": {
+              "cellID": 64659,
+              "layer": 4,
+              "sourceFacet": 5403,
+              "centroidM": [
+                -1.9539666905263873,
+                -0.01821298993952901,
+                -0.09834483913270313
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6503389.648047365
+          },
+          {
+            "location": {
+              "cellID": 65303,
+              "layer": 4,
+              "sourceFacet": 6047,
+              "centroidM": [
+                -1.8490195346861638,
+                -0.018044365742276986,
+                -0.09838509181164037
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6488330.443998024
+          },
+          {
+            "location": {
+              "cellID": 65119,
+              "layer": 4,
+              "sourceFacet": 5863,
+              "centroidM": [
+                -1.8790044351980266,
+                -0.018092766810885934,
+                -0.09837450578026653
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6359140.999283104
+          },
+          {
+            "location": {
+              "cellID": 65303,
+              "layer": 4,
+              "sourceFacet": 6047,
+              "centroidM": [
+                -1.8490195346861638,
+                -0.018044365742276986,
+                -0.09838509181164037
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6330227.568821131
+          },
+          {
+            "location": {
+              "cellID": 64659,
+              "layer": 4,
+              "sourceFacet": 5403,
+              "centroidM": [
+                -1.9539666905263873,
+                -0.01821298993952901,
+                -0.09834483913270313
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 6262241.113731166
+          },
+          {
+            "location": {
+              "cellID": 65119,
+              "layer": 4,
+              "sourceFacet": 5863,
+              "centroidM": [
+                -1.8790044351980266,
+                -0.018092766810885934,
+                -0.09837450578026653
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6197536.618780545
+          },
+          {
+            "location": {
+              "cellID": 65395,
+              "layer": 4,
+              "sourceFacet": 6139,
+              "centroidM": [
+                -1.8340270857226129,
+                -0.018020165580362388,
+                -0.09839038470758198
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6140787.717321213
+          },
+          {
+            "location": {
+              "cellID": 65303,
+              "layer": 4,
+              "sourceFacet": 6047,
+              "centroidM": [
+                -1.8490195346861638,
+                -0.018044365742276986,
+                -0.09838509181164037
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 6093087.150141662
+          }
+        ]
+      }
+    ],
+    "candidateTrials": [
+      {
+        "alpha": 1.0,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.5,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.25,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.0625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.03125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.015625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.0078125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.00390625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.001953125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.0009765625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:InternalEnergy"
+      },
+      {
+        "alpha": 0.00048828125,
+        "accepted": false,
+        "candidateRMS": 523344.5993097792,
+        "candidateMaximum": 16200426.263047174,
+        "errorIdentifier": ""
+      },
+      {
+        "alpha": 0.000244140625,
+        "accepted": true,
+        "candidateRMS": 519102.70093790017,
+        "candidateMaximum": 5647326.906214793,
+        "errorIdentifier": ""
+      }
+    ],
+    "newActualNSEvaluations": 0,
+    "flowStateChanged": false,
+    "interfaceOrBoundaryRecomputed": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs/v83_validation/krylov21/wall_velocity_krylov_evidence.mat": "f950decf5275ee659c97b1682a47d0a6b8abd059569212334f740ec528fa3e37",
+      "outputs/v80_validation/domain02/shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa"
+    },
+    "scriptSHA256": "9edb8dd1eb2f33a3759a48691d6ceb773a06656df5135f410b83b338de378387"
+  },
+  "localStateRadiusDiagnostic": {
+    "status": "verified-real-conservative-state-radius-and-accepted-local-residual-diagnostic",
+    "case": "krylov22",
+    "processID": 29692,
+    "constraints": [
+      {
+        "constraint": "positiveDensity",
+        "firstExitAlpha": 0.001900943276733733,
+        "location": {
+          "cellID": 64569,
+          "layer": 4,
+          "sourceFacet": 5313,
+          "centroidM": [
+            -1.968959128126082,
+            -0.004667844221987119,
+            -0.09989884266094327
+          ]
+        }
+      },
+      {
+        "constraint": "minimumTemperature",
+        "firstExitAlpha": 0.0007288188882317144,
+        "location": {
+          "cellID": 75951,
+          "layer": 4,
+          "sourceFacet": 16695,
+          "centroidM": [
+            -0.1097141984195988,
+            -0.1336130585444203,
+            0.02646100526877441
+          ]
+        }
+      },
+      {
+        "constraint": "maximumTemperature",
+        "firstExitAlpha": 0.01106908259145227,
+        "location": {
+          "cellID": 36378,
+          "layer": 2,
+          "sourceFacet": 16626,
+          "centroidM": [
+            -0.11987419216522179,
+            -0.03085078452593224,
+            -0.13943090741355438
+          ]
+        }
+      }
+    ],
+    "limitingConstraint": {
+      "constraint": "minimumTemperature",
+      "firstExitAlpha": 0.0007288188882317144,
+      "location": {
+        "cellID": 75951,
+        "layer": 4,
+        "sourceFacet": 16695,
+        "centroidM": [
+          -0.1097141984195988,
+          -0.1336130585444203,
+          0.02646100526877441
+        ]
+      }
+    },
+    "independentBisectionRelativeDifference": 1.4876153595799818e-16,
+    "acceptedAlpha": 0.000244140625,
+    "acceptedAlphaFractionOfCellStateRadius": 0.3349811989537516,
+    "fullDirectionRelativeStateMetrics": {
+      "densityFraction": {
+        "maximumFullDirection": 1431.6427000967724,
+        "location": {
+          "cellID": 65211,
+          "layer": 4,
+          "sourceFacet": 5955,
+          "centroidM": [
+            -1.864011983649716,
+            -0.018068565901586956,
+            -0.09837979889871742
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.34952214357831357,
+        "quantilesFullDirection": [
+          0.8825990822826485,
+          1.3209275400293914,
+          3.6955677114551375,
+          70.79071458688581
+        ]
+      },
+      "velocityOverLocalSound": {
+        "maximumFullDirection": 1434.2441443301432,
+        "location": {
+          "cellID": 65211,
+          "layer": 4,
+          "sourceFacet": 5955,
+          "centroidM": [
+            -1.864011983649716,
+            -0.018068565901586956,
+            -0.09837979889871742
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.35015726179935136,
+        "quantilesFullDirection": [
+          0.45078853711596734,
+          1.1853383660676866,
+          7.796640317407243,
+          78.67358358865287
+        ]
+      },
+      "temperatureFraction": {
+        "maximumFullDirection": 582.285320096733,
+        "location": {
+          "cellID": 65211,
+          "layer": 4,
+          "sourceFacet": 5955,
+          "centroidM": [
+            -1.864011983649716,
+            -0.018068565901586956,
+            -0.09837979889871742
+          ]
+        },
+        "maximumAtAcceptedAlpha": 0.14215950197674146,
+        "quantilesFullDirection": [
+          0.24932247156167114,
+          0.9145853721106972,
+          5.2389804469903005,
+          38.09348969505816
+        ]
+      }
+    },
+    "originalNSDirectionDefect": 0.07407219999602314,
+    "acceptedNonlinearRemainderRelativeToBaseResidual": 0.07051398329247775,
+    "acceptedNonlinearRemainderRelativeToLinearChange": 288.1793291200254,
+    "nonlinearRemainderLayerSquareFractions": [
+      4.5363145669901464e-07,
+      4.7194714347544483e-07,
+      0.0003702613247169261,
+      0.9571274757493303,
+      0.0425013369825488,
+      3.6450074001013076e-10,
+      8.939546489914312e-14,
+      1.9591867074409494e-14,
+      1.271934832680445e-14,
+      1.759719055522028e-13,
+      5.381371406504565e-15
+    ],
+    "residualHotspots": [
+      {
+        "kind": "initial",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 58917,
+              "layer": 3,
+              "sourceFacet": 19413,
+              "centroidM": [
+                0.04907452215001135,
+                -0.00026444780551624936,
+                -0.010394478869966941
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4739478.560940738
+          },
+          {
+            "location": {
+              "cellID": 39446,
+              "layer": 2,
+              "sourceFacet": 19694,
+              "centroidM": [
+                0.04998210687629424,
+                -0.0002004574278186466,
+                -0.0017100382364014903
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": 4735806.777388922
+          },
+          {
+            "location": {
+              "cellID": 58919,
+              "layer": 3,
+              "sourceFacet": 19415,
+              "centroidM": [
+                0.049074519162240274,
+                0.002629095139969149,
+                -0.010054415362205065
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4721533.081478064
+          },
+          {
+            "location": {
+              "cellID": 58915,
+              "layer": 3,
+              "sourceFacet": 19411,
+              "centroidM": [
+                0.049074517891125054,
+                -0.0031400410731015913,
+                -0.009921693144006248
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4714302.120498311
+          },
+          {
+            "location": {
+              "cellID": 59074,
+              "layer": 3,
+              "sourceFacet": 19570,
+              "centroidM": [
+                0.049543736162372475,
+                -0.0009741661431015629,
+                -0.007836105445647945
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4687462.675591617
+          },
+          {
+            "location": {
+              "cellID": 58992,
+              "layer": 3,
+              "sourceFacet": 19488,
+              "centroidM": [
+                0.04930914392505071,
+                -0.00912313663177983,
+                -0.000483421874193088
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4686083.884250039
+          },
+          {
+            "location": {
+              "cellID": 58913,
+              "layer": 3,
+              "sourceFacet": 19409,
+              "centroidM": [
+                0.049074511218128294,
+                -0.005770954872388321,
+                -0.008667518492688741
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4669004.242055893
+          },
+          {
+            "location": {
+              "cellID": 59076,
+              "layer": 3,
+              "sourceFacet": 19572,
+              "centroidM": [
+                0.0495438130468645,
+                0.0018619566895306033,
+                -0.0076631001298237056
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4664970.036593839
+          },
+          {
+            "location": {
+              "cellID": 58921,
+              "layer": 3,
+              "sourceFacet": 19417,
+              "centroidM": [
+                0.04907453361293611,
+                0.005313161028179191,
+                -0.00892422204558707
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4662570.603809185
+          },
+          {
+            "location": {
+              "cellID": 58989,
+              "layer": 3,
+              "sourceFacet": 19485,
+              "centroidM": [
+                0.04930911640855472,
+                -0.00851868147069638,
+                0.0033150954250543213
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4651894.60716816
+          },
+          {
+            "location": {
+              "cellID": 58985,
+              "layer": 3,
+              "sourceFacet": 19481,
+              "centroidM": [
+                0.049308935573932164,
+                -0.004864323072521912,
+                0.007742509575401005
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4636749.502475043
+          },
+          {
+            "location": {
+              "cellID": 59072,
+              "layer": 3,
+              "sourceFacet": 19568,
+              "centroidM": [
+                0.04954365813437602,
+                -0.0036879421198639803,
+                -0.006989334476418908
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4636072.191263401
+          }
+        ]
+      },
+      {
+        "kind": "accepted",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -5026231.2699140515
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -4879405.707306637
+          },
+          {
+            "location": {
+              "cellID": 58917,
+              "layer": 3,
+              "sourceFacet": 19413,
+              "centroidM": [
+                0.04907452215001135,
+                -0.00026444780551624936,
+                -0.010394478869966941
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4738323.994277461
+          },
+          {
+            "location": {
+              "cellID": 39446,
+              "layer": 2,
+              "sourceFacet": 19694,
+              "centroidM": [
+                0.04998210687629424,
+                -0.0002004574278186466,
+                -0.0017100382364014903
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": 4734652.528415191
+          },
+          {
+            "location": {
+              "cellID": 58919,
+              "layer": 3,
+              "sourceFacet": 19415,
+              "centroidM": [
+                0.049074519162240274,
+                0.002629095139969149,
+                -0.010054415362205065
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4720379.687548756
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 4714694.663886845
+          },
+          {
+            "location": {
+              "cellID": 58915,
+              "layer": 3,
+              "sourceFacet": 19411,
+              "centroidM": [
+                0.049074517891125054,
+                -0.0031400410731015913,
+                -0.009921693144006248
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4713150.451539398
+          },
+          {
+            "location": {
+              "cellID": 59074,
+              "layer": 3,
+              "sourceFacet": 19570,
+              "centroidM": [
+                0.049543736162372475,
+                -0.0009741661431015629,
+                -0.007836105445647945
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4686318.589908959
+          },
+          {
+            "location": {
+              "cellID": 58992,
+              "layer": 3,
+              "sourceFacet": 19488,
+              "centroidM": [
+                0.04930914392505071,
+                -0.00912313663177983,
+                -0.000483421874193088
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4684932.297443844
+          },
+          {
+            "location": {
+              "cellID": 58913,
+              "layer": 3,
+              "sourceFacet": 19409,
+              "centroidM": [
+                0.049074511218128294,
+                -0.005770954872388321,
+                -0.008667518492688741
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4667864.369835219
+          },
+          {
+            "location": {
+              "cellID": 59076,
+              "layer": 3,
+              "sourceFacet": 19572,
+              "centroidM": [
+                0.0495438130468645,
+                0.0018619566895306033,
+                -0.0076631001298237056
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4663831.4549590405
+          },
+          {
+            "location": {
+              "cellID": 58921,
+              "layer": 3,
+              "sourceFacet": 19417,
+              "centroidM": [
+                0.04907453361293611,
+                0.005313161028179191,
+                -0.00892422204558707
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": 4661431.788883047
+          }
+        ]
+      },
+      {
+        "kind": "acceptedNonlinearRemainder",
+        "largestEntries": [
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -7142303.80993364
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6979211.817713934
+          },
+          {
+            "location": {
+              "cellID": 65211,
+              "layer": 4,
+              "sourceFacet": 5955,
+              "centroidM": [
+                -1.864011983649716,
+                -0.018068565901586956,
+                -0.09837979889871742
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 6707044.510501357
+          },
+          {
+            "location": {
+              "cellID": 65303,
+              "layer": 4,
+              "sourceFacet": 6047,
+              "centroidM": [
+                -1.8490195346861638,
+                -0.018044365742276986,
+                -0.09838509181164037
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6485883.719898987
+          },
+          {
+            "location": {
+              "cellID": 65303,
+              "layer": 4,
+              "sourceFacet": 6047,
+              "centroidM": [
+                -1.8490195346861638,
+                -0.018044365742276986,
+                -0.09838509181164037
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6327730.163810363
+          },
+          {
+            "location": {
+              "cellID": 65119,
+              "layer": 4,
+              "sourceFacet": 5863,
+              "centroidM": [
+                -1.8790044351980266,
+                -0.018092766810885934,
+                -0.09837450578026653
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -6194474.968097806
+          },
+          {
+            "location": {
+              "cellID": 65303,
+              "layer": 4,
+              "sourceFacet": 6047,
+              "centroidM": [
+                -1.8490195346861638,
+                -0.018044365742276986,
+                -0.09838509181164037
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 6090735.269466095
+          },
+          {
+            "location": {
+              "cellID": 65119,
+              "layer": 4,
+              "sourceFacet": 5863,
+              "centroidM": [
+                -1.8790044351980266,
+                -0.018092766810885934,
+                -0.09837450578026653
+              ]
+            },
+            "equation": "energy",
+            "signedScaledResidualPerSecond": -6034657.8600999005
+          },
+          {
+            "location": {
+              "cellID": 64014,
+              "layer": 4,
+              "sourceFacet": 4758,
+              "centroidM": [
+                -2.0539163459645686,
+                -0.027235561130039075,
+                -0.09622604498041544
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -5841008.877865852
+          },
+          {
+            "location": {
+              "cellID": 65119,
+              "layer": 4,
+              "sourceFacet": 5863,
+              "centroidM": [
+                -1.8790044351980266,
+                -0.018092766810885934,
+                -0.09837450578026653
+              ]
+            },
+            "equation": "xMomentum",
+            "signedScaledResidualPerSecond": 5816870.829279176
+          },
+          {
+            "location": {
+              "cellID": 65395,
+              "layer": 4,
+              "sourceFacet": 6139,
+              "centroidM": [
+                -1.8340270857226129,
+                -0.018020165580362388,
+                -0.09839038470758198
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -5778363.979219896
+          },
+          {
+            "location": {
+              "cellID": 64659,
+              "layer": 4,
+              "sourceFacet": 5403,
+              "centroidM": [
+                -1.9539666905263873,
+                -0.01821298993952901,
+                -0.09834483913270313
+              ]
+            },
+            "equation": "mass",
+            "signedScaledResidualPerSecond": -5775705.216108476
+          }
+        ]
+      }
+    ],
+    "candidateTrials": [
+      {
+        "alpha": 1.0,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.5,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.25,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.0625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.03125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.015625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.0078125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.00390625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.001953125,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:State"
+      },
+      {
+        "alpha": 0.0009765625,
+        "accepted": false,
+        "candidateRMS": null,
+        "candidateMaximum": null,
+        "errorIdentifier": "CutNS:InternalEnergy"
+      },
+      {
+        "alpha": 0.00048828125,
+        "accepted": false,
+        "candidateRMS": 522760.9584851007,
+        "candidateMaximum": 14889568.410871502,
+        "errorIdentifier": ""
+      },
+      {
+        "alpha": 0.000244140625,
+        "accepted": true,
+        "candidateRMS": 519063.76917125436,
+        "candidateMaximum": 5026231.2699140515,
+        "errorIdentifier": ""
+      }
+    ],
+    "newActualNSEvaluations": 0,
+    "flowStateChanged": false,
+    "interfaceOrBoundaryRecomputed": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "inputSHA256": {
+      "outputs/v83_validation/krylov22/wall_velocity_krylov_evidence.mat": "41bfea06a21bacfe682c3ab02a045736b1b285dbb3bcdcf3f3749e15088638ff",
+      "outputs/v80_validation/domain02/shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa"
+    },
+    "scriptSHA256": "9edb8dd1eb2f33a3759a48691d6ceb773a06656df5135f410b83b338de378387"
+  },
+  "regularizedDirectionResearch": {
+    "status": "bounded-current-Q20-total-primitive-update-regularized-parent-direction",
+    "sourceBinding": {
+      "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\krylov20\\wall_velocity_krylov_evidence.mat",
+      "sourceFileSHA256": "bbf2b714dd146c102b7f31e93dc9287c73f7d6c0847e23a78042e654cad51e87",
+      "stateLocation": "result"
+    },
+    "sourceIdentity": {
+      "applyCutCellSelectedDirection": "f5ec0371d508b8d8cc2972dbe1a6b4f227209374b1751e6a6b55d210518c5cbf",
+      "buildCutCellSelectedDirectionCache": "2481ebf86c5453b3d2b6b5a1f9fa13274e4514854d1d76c6ab80b85f7ca1774b",
+      "buildCutCellGradientOperator": "dc5d35b0fe06b94e729b6313cb50c07743f60c0a5f7d552ece9ac5497456f43e",
+      "cutCellCharacteristicBoundaryDirection": "24580fda99a5da684aa9c80e397ad4d9529c50a04792e10915d596d12e7bc461",
+      "cutCellBoundaryDirectionalState": "8b7f03f5f795fe733ea8b7f6beba07085afbe8ae1a192f9b5688f868bb60affc",
+      "cutCellWlsViscousDirection": "a6be816864e8aa6bcf6170c1091435b4a795744f0095b39aba7265f1c44f5f85",
+      "cutCellSelectedEulerDirection": "d82dc62e57edc7046a13bfcdaa506c3f75fb7a352bec0d1039300147c82b43bb",
+      "cutCellExactEulerBranchJacobian": "1018f50acad9bde439d48e1615f59e1da09d1353ac43e87630bed34bc86ab507",
+      "cutCellExactEulerFlux": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+      "cutCellConservativeDerivatives": "d867bbff5f1d2feb63a864030ea0f0ef77e3e2d121d66398d0cf9a49cd0fa33b",
+      "cutCellBoundaryStencilState": "cece939ebd097eab666dee2757692289f06e57cc52f64d83264a2e7b83b8d2e3",
+      "cutCellNavierStokesResidual": "e13e67511a62e1a7faef37b3d27be698faa72c943b73b2a33cce4bd26797a52b",
+      "resolveNSRiemannReservoir3D": "70f035c1c76f816e6d00dbc9f0460a2728bbb2631d940f512c0fc85cf10fdaf6",
+      "buildCutCellRiemannReservoirBoundaryState": "29613f88092acd22c87795775d2d6f16d12e0e0b1ab43a0609378cf52bdf32ac",
+      "buildCutCellRiemannReservoirJacobian": "a379800fb86348f589ffc1798af50071d5438a95ebd451cc1fff8e24ebc04225",
+      "resolveNSCharacteristicBoundary3D": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9"
+    },
+    "linearReport": {
+      "method": "complete-parent-C-current-state-primitive-update-Tikhonov-LSQR",
+      "options": {
+        "maximumIterations": 128,
+        "regularizationStrength": 0.01,
+        "relativeTolerance": 0.001,
+        "adjointIdentityTolerance": 1e-08,
+        "maximumVectorEstimateBytes": 402653184.0
+      },
+      "penaltyInOriginalResidualUnits": 639.4486681397846,
+      "metricNormalization": 8466.816762670014,
+      "initialRelativeCResidual": 0.09629431176405591,
+      "relativeCResidual": 0.06948788836110135,
+      "internalCTargetMet": false,
+      "initialPrimitiveUpdateNorm": 8466.816762670014,
+      "primitiveUpdateNorm": 8018.052394062865,
+      "initialMaximumDensityFraction": 1526.918260613117,
+      "maximumDensityFraction": 1431.6427000967724,
+      "initialMaximumVelocityOverSound": 1528.4066820597375,
+      "maximumVelocityOverSound": 1434.2441443301436,
+      "initialMaximumTemperatureFraction": 620.020647844105,
+      "maximumTemperatureFraction": 582.2853200967365,
+      "initialNormalizedAugmentedObjective": 0.009372594478113196,
+      "normalizedAugmentedObjective": 0.0049182470125892115,
+      "nativeFlag": 1,
+      "nativeRelativeAugmentedCorrectionResidual": 0.7243946846441304,
+      "nativeIterations": 128,
+      "nativeResidualHistory": [
+        52415020.688462995,
+        52294975.01804277,
+        52169749.592520334,
+        52046418.85464033,
+        51917902.98553436,
+        51783801.1031508,
+        51646269.95759963,
+        51516855.888221815,
+        51410897.870855525,
+        51297753.73615605,
+        51154829.19976275,
+        51015626.73698452,
+        50906629.681403846,
+        50783023.10564232,
+        50646033.61093698,
+        50512608.468284644,
+        50384971.81061131,
+        50265448.83466632,
+        50138426.0667453,
+        50018446.215444654,
+        49890732.346719034,
+        49757009.623298235,
+        49624760.03428025,
+        49504490.45080373,
+        49383423.947307214,
+        49259097.86941932,
+        49143155.813879594,
+        49010231.3301817,
+        48869773.1045518,
+        48748809.63257766,
+        48629430.49374001,
+        48505651.74545169,
+        48378441.70794544,
+        48245126.909842685,
+        48108515.63808599,
+        47989343.966700844,
+        47876226.28669595,
+        47748658.64417734,
+        47624016.008456044,
+        47506258.33024063,
+        47387011.366696514,
+        47266425.709444806,
+        47147980.36251267,
+        47018151.43156603,
+        46889750.451265484,
+        46772821.85399963,
+        46664218.93534323,
+        46545501.521336816,
+        46414087.27850849,
+        46299541.52612415,
+        46193683.827759035,
+        46087736.92599086,
+        45983860.513477825,
+        45883709.149647765,
+        45786835.00767715,
+        45674298.96243474,
+        45553143.35699729,
+        45447525.45579556,
+        45340610.38375229,
+        45223915.51753429,
+        45119883.30835693,
+        45006596.22873077,
+        44898388.90664969,
+        44788017.71516075,
+        44664395.04347142,
+        44558099.06440679,
+        44465266.01284074,
+        44359285.415507406,
+        44254832.333431765,
+        44142439.94208375,
+        44027281.58082496,
+        43924085.25880504,
+        43819954.16319652,
+        43715417.72854044,
+        43609887.02609175,
+        43501852.872112654,
+        43394783.9332564,
+        43293595.589418344,
+        43189166.01389169,
+        43085716.31273933,
+        42978455.34923118,
+        42871987.06110885,
+        42774229.261470824,
+        42680467.27942098,
+        42577652.548936605,
+        42470401.97811813,
+        42372498.59277886,
+        42262605.947160244,
+        42154321.96282004,
+        42051292.47658988,
+        41946254.940101184,
+        41844274.61387338,
+        41736493.54434712,
+        41632491.09854169,
+        41525775.26607642,
+        41426196.13768876,
+        41333235.48105448,
+        41245673.67551051,
+        41144984.56380461,
+        41044464.50137016,
+        40950290.00009416,
+        40845728.01867936,
+        40728563.58894293,
+        40619802.30973055,
+        40521896.45544361,
+        40424080.366674066,
+        40318128.29722134,
+        40202145.944502026,
+        40094268.698236056,
+        40000130.37579952,
+        39890524.018888615,
+        39776166.167520724,
+        39681955.998413965,
+        39583789.49164054,
+        39474306.77857176,
+        39359400.87638982,
+        39256964.844854765,
+        39162252.23855561,
+        39067958.61922986,
+        38968952.70896544,
+        38858756.380934276,
+        38736276.95333423,
+        38621332.06312809,
+        38511473.292755365,
+        38407803.56282436,
+        38296855.522691235,
+        38183125.53746716,
+        38076348.809109606,
+        37969162.38223472
+      ],
+      "nativeNormalResidualHistory": [
+        3545416.9901840803,
+        1826269.5698170676,
+        1544570.4008635036,
+        1281130.8109467484,
+        1140335.1705025714,
+        978749.5420461965,
+        975258.8719985208,
+        937375.7038444014,
+        904625.671158205,
+        802499.3950915482,
+        801132.5633377773,
+        720868.2529808047,
+        677625.7473770779,
+        668420.8729659584,
+        630013.2084380678,
+        634370.3297408996,
+        636006.098311589,
+        612336.7657360509,
+        558384.1767029724,
+        534143.0944526352,
+        545247.369291287,
+        556796.4306901336,
+        510104.7948050348,
+        482085.70620940835,
+        495001.2415377908,
+        499789.81147594424,
+        467586.4687444991,
+        474164.98292948725,
+        465746.82663972286,
+        449474.24367706676,
+        429294.80714830203,
+        432380.78560384037,
+        421792.05176676175,
+        420165.2547177869,
+        416251.8696747406,
+        393342.9749132152,
+        395843.1350021396,
+        380993.5319657464,
+        374008.60327934386,
+        380366.3104203138,
+        383340.0000481315,
+        362963.6097673827,
+        339622.34740898566,
+        350770.8200546679,
+        345260.7580060733,
+        345648.5625375019,
+        341423.728823487,
+        336610.8804862587,
+        324890.98509676964,
+        311722.9365079478,
+        322658.78256294754,
+        332865.71024342795,
+        326783.8334959935,
+        310568.8572129766,
+        303539.2758374432,
+        307311.75019693637,
+        301723.84544369706,
+        298600.1977597009,
+        296165.2918313662,
+        277163.2594837596,
+        279050.1102215081,
+        287029.31155325635,
+        274684.4554358922,
+        279575.53955090407,
+        278251.35577335826,
+        256301.08024187418,
+        260462.20220923916,
+        258543.89250709309,
+        257690.8608445685,
+        266586.39798620815,
+        259328.9692816906,
+        251800.58139759387,
+        242896.39333497573,
+        242521.5224381516,
+        233105.44363340814,
+        243159.2809907273,
+        239260.6703119583,
+        246533.61239224917,
+        246227.14692367153,
+        235723.9580044189,
+        230043.38903878434,
+        226209.52601263332,
+        224665.34305271273,
+        231535.9110355893,
+        228699.47093147167,
+        217051.15967406792,
+        223207.89942474122,
+        230617.54336699625,
+        219322.93309035574,
+        216683.1721469392,
+        208067.98053935368,
+        212230.53761506703,
+        231751.60271909044,
+        223147.08184738315,
+        206888.26472948946,
+        203535.81262148684,
+        210864.03081247403,
+        223653.42448454135,
+        214643.36028160295,
+        208792.13515668525,
+        205546.58423707396,
+        199844.60673085286,
+        204154.80869789745,
+        197550.92478453479,
+        194152.21840612008,
+        191248.65015749863,
+        200313.3781385556,
+        206420.67960102312,
+        195451.7449601665,
+        191594.2757542851,
+        201039.46129368633,
+        195108.07107959618,
+        184940.33845674896,
+        186205.34254122834,
+        189835.95646216883,
+        189405.82056883397,
+        188389.34791339576,
+        188139.67800997174,
+        178183.52187876296,
+        173574.29563776724,
+        185237.98305554898,
+        182619.39426486654,
+        182893.4912883887,
+        176525.72004070252,
+        179238.45016492755,
+        178456.50468760246,
+        178433.1289182775,
+        176177.75187883654
+      ],
+      "adjointIdentityRelativeDifference": 3.316606459647807e-17,
+      "operatorApplications": {
+        "C": 131,
+        "CT": 130,
+        "M": 130,
+        "MT": 130,
+        "W": 131,
+        "WT": 130
+      },
+      "nativeSolverApplications": {
+        "C": 128,
+        "CT": 129,
+        "M": 128,
+        "MT": 129,
+        "W": 128,
+        "WT": 129
+      },
+      "declaredExtraVectorArrayEstimateBytes": 278108160.0,
+      "processPeakMemoryClaimed": false,
+      "elapsedSeconds": 202.5150685,
+      "totalDirectionPenalized": true,
+      "originalParentResidualNormUnchanged": true,
+      "originalNSAcceptanceClaimed": false,
+      "newActualNSEvaluations": 0,
+      "newProductionSolvedAreaM2": 0,
+      "physicalSolution": false
+    },
+    "completeSelectedModelRelativeDefect": 0.07407177128812888,
+    "modelPointOneMet": true,
+    "newSelectedModelApplications": 1,
+    "newActualNSEvaluations": 0,
+    "newFlowAcceptances": 0,
+    "physicalStateChanged": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0,
+    "engineProcessID": 46440
+  },
+  "regularizedDirectionOriginalNSStudy": {
+    "status": "tested-alternate-Q20-regularized-direction-with-original-NS-and-unchanged-main-line-search",
+    "candidateDirectionSource": "E:\\RocketAeroHeat\\outputs\\v83_validation\\updateradiusreal01\\regularized_parent_model_evidence.mat",
+    "candidateDirectionSourceSHA256": "d43a8f182a36602c7ffca65a64f58a643d0a6b60f7918788b80488c8b1567490",
+    "alternatePredecessorCase": "krylov20",
+    "referenceAcceptedCase": "krylov21",
+    "candidateCase": "krylov22",
+    "sameBaseDirectionComparison": true,
+    "alternateHistoriesMerged": false,
+    "probe": {
+      "status": "tested-fresh-original-NS-direction-probe-with-explicit-current-boundary-and-complete-geometry",
+      "originalNSDirectionDefect": 0.07407219999606847,
+      "originalNSDirectionTarget": 0.1,
+      "originalNSDirectionTargetMet": true,
+      "normalizedMeritDerivative": -0.9995006406008712,
+      "physicalStateChanged": false,
+      "newFlowAcceptances": 0,
+      "newActualNSEvaluations": 2,
+      "coarseImageRequired": false,
+      "newProductionSolvedAreaM2": 0,
+      "physicalSolution": false,
+      "engineProcessID": 59852
+    },
+    "main": {
+      "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+      "sourceFaces": 19752,
+      "cellCount": 217272,
+      "acceptedNonlinearIterations": 1,
+      "priorAcceptedNonlinearIterations": 1,
+      "totalNewEquationAcceptedIterations": 2,
+      "candidateTrials": 13,
+      "residualEvaluations": 5,
+      "totalNewEquationResidualEvaluations": 9,
+      "operatorBuilds": 1,
+      "initialMaximumResidual": 4739478.560940738,
+      "maximumResidual": 5026231.2699140515,
+      "initialRmsMerit": 519444.27593809797,
+      "rmsMerit": 519063.76917125436,
+      "elapsedSeconds": 109.2122962,
+      "matrixVectorProducts": 2,
+      "jacobianResidualEvaluations": 2,
+      "preconditionerApplications": 1,
+      "lineage": {
+        "sourceState": "krylov19-state-only-explicit-new-Riemann-reservoir-boundary",
+        "sourceHistoryAppended": false,
+        "newBoundaryProblemInitialCounter": 0,
+        "previousProblemAcceptancesNotAppended": 13,
+        "previousProblemNSNotAppended": 258,
+        "externalCFDImported": false,
+        "interiorEulerFlux": "exact-godunov",
+        "wallVelocityGradient": "dirichlet-tangent"
+      },
+      "wallVelocityGradient": "dirichlet-tangent",
+      "sameEquationHistoryContinued": true,
+      "steadyConverged": false,
+      "stopReason": "maximum-nonlinear-iterations",
+      "spatialConservationRelative": 3.417654539686764e-16,
+      "steadyBoundaryFluxBalance": 0.010029774974618341,
+      "signedHeatPowerW": 923428.6207937065,
+      "wallHeatRangeWm2": [
+        -356383.6901352382,
+        2255791.6499745846
+      ],
+      "physicalTimeAdvanced": 0,
+      "BETimeStepsClaimed": 0,
+      "physicalSolution": false,
+      "newProductionSolvedAreaM2": 0,
+      "engineProcessID": 59852,
+      "priorActualResidualEvaluations": 4,
+      "openBoundaryDiscretization": "exact-Riemann-reservoir",
+      "sourceHistoryAppended": false,
+      "residualEvaluationsAfterLastAcceptedHistory": 0,
+      "normalEulerLinearization": "exact-branch",
+      "physicalSpatialEquationChanged": false,
+      "linearEquation": "steady-newton",
+      "preconditionerTimeStepOnly": true,
+      "steadyInitialGuessReport": {
+        "sourceFile": "E:\\RocketAeroHeat\\outputs\\v83_validation\\directnsprobereal04\\direct_ns_direction_probe.mat",
+        "sourceVariant": "ns-probe",
+        "directionScale": 1,
+        "sourceFileSHA256": "b7e67f510aadf7680c61371723cb6e3bc7f843050fd2d7a0804b30d6e1a2a4f8",
+        "sourceGeometryFile": "E:\\RocketAeroHeat\\outputs\\v80_validation\\domain02\\shell_domain_evidence.mat",
+        "sourceGeometryFileSHA256": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+        "sourceStateAndGeometryVerified": true,
+        "sourceSavedActualNSRelativeDefect": 0.07407219999606847,
+        "originalNSProbeArithmeticVerified": true,
+        "oldDerivativeReused": false,
+        "originalNSAcceptanceClaimed": false,
+        "newModelApplications": 0,
+        "newActualNSEvaluations": 0,
+        "coarseImageRequired": false,
+        "sourceStateLocation": "result"
+      },
+      "steadyInitialGuessModelApplications": 1
+    },
+    "referenceRmsMerit": 519102.70093790017,
+    "referenceMaximumResidual": 5647326.906214793,
+    "referenceAcceptedAlpha": 0.000244140625,
+    "newProbeActualNSEvaluations": 2,
+    "newMainActualNSEvaluations": 5,
+    "candidateRMSBetterThanReference": true,
+    "candidateMaximumBetterThanReference": true,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "engineProcessID": 59852
+  },
+  "retainedReferenceFailures": [
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/updateradiusreal01_objective_reference_failure.json",
+        "sha256": "8a2907031f8ebe5f9eac59304730b5a21d83b8c57581d6c45188926ffc183804",
+        "bytes": 688
+      },
+      "report": {
+        "status": "retained-independent-objective-reference-failure",
+        "driverExitCode": 1,
+        "sourceFile": "outputs/v83_validation/source_epochs/pre_regularized_objective_roundoff_auditRocketRegularizedParentDirection.py",
+        "sourceSHA256": "f6586503001ed5940ba9b01dcbe8569fbf42ee9faeea3b69d570ec20020cc4e5",
+        "absoluteObjectiveDifference": 5.46437895e-15,
+        "relativeObjectiveDifference": 1.11104199e-12,
+        "originalReferenceRelativeTolerance": 1e-12,
+        "reason": "Original-C residual comparison passed 1e-12; squaring that value in the augmented objective requires propagating the independently bounded component error. No MATLAB result or physical acceptance gate changed."
+      }
+    },
+    {
+      "receipt": {
+        "path": "outputs/v83_validation/current_direction_recorder_source_epoch_failure.json",
+        "sha256": "327f8feb102ca6bb03b74b07991d36e593313a4023943e251559c1818abda689",
+        "bytes": 610
+      },
+      "report": {
+        "status": "retained-progress-recorder-old-source-epoch-binding-failure",
+        "driverExitCode": 1,
+        "sourceFile": "outputs/v83_validation/source_epochs/pre_current_progress_epoch_recordRocketCurrentDirectionProgress.py",
+        "sourceSHA256": "7d7739d6337b7f62c77fec2401b63068097ebe438ecae3c32e08bc70bce70b76",
+        "reason": "The original result-source unit audit binds three pre-reservoir-Jacobian files. Current files correctly differ. Preserve its original source epoch and record that qualification separately; do not rewrite old audit hashes or pretend this old unit audit qualifies the new source."
+      }
+    }
+  ],
+  "workAccounting": {
+    "oldCharacteristicProblemAccepted": 13,
+    "oldCharacteristicProblemMainNS": 258,
+    "frozenQ21BranchAccepted": 2,
+    "frozenQ21BranchMainNS": 9,
+    "selectedQ22BranchAccepted": 2,
+    "selectedQ22BranchMainNS": 9,
+    "regularizedLinearResearchNewNS": 0,
+    "parallelBranchesMerged": false,
+    "alternateQ20BranchProbeNS": 2,
+    "alternateQ20BranchMainNS": 5,
+    "oldAndNewProblemHistoriesMerged": false,
+    "independentDerivativeAndProbeNSCallsKeptSeparate": true
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench35/index.html",
+    "latestCase": "krylov22",
+    "originalFaces": 19752,
+    "segmentRMSDownMaximumUpExplicit": true,
+    "scientificPNGsViewed": true,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "production": {
+    "formalQualifiedHeatAreaPercent": 66.5626327424,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "latestFormalVersion": 82,
+    "version83IsolatedCompleteEngineeringDelivery": false,
+    "wholeGoalComplete": false,
+    "goalStatus": "active"
+  },
+  "delivery": {
+    "gitHEAD": "42601c9",
+    "gitCommitCreated": false,
+    "githubPushed": false,
+    "smallVersionLocalOnly": true,
+    "researchSourceSnapshotIsFormalDelivery": false
+  },
+  "nextAction": "Do not repeat the same weak 0.01 L2-regularized 128-step configuration: Q22 improves the same-base residuals but still takes 1/4096 and its maximum residual rises 6.05 percent from Q20. The limiting CV75951 is unchanged; the state radius increases only to 0.000728819 and nonlinear remainder still concentrates in layers 4/5. Investigate explicit control of rare large local primitive updates, with an accurately matched current-state metric, total-direction consistency and unchanged original model/NS 0.1 gates before any nonlinear update. Q22 is the selected endpoint, but Q20/Q21 numeric Jacobians or probe qualifications cannot be inherited to Q22; refresh current sources and state. Keep parallel Q21 and Q22 histories separate. Verify regional steady or justified statistical convergence, near-wall/grid/exterior/boundary/physics and public benchmarks; full-area single-condition results and scientific UI remain highest priority.",
+  "recorderSHA256": "960777910daf83a0db10be1c0a0c87f52018213cc6a09022515973419add0947"
+}

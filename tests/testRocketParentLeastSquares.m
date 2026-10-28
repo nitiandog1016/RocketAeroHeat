@@ -1,0 +1,39 @@
+function report=testRocketParentLeastSquares(folder)
+%TESTROCKETPARENTLEASTSQUARES 两排序独立稠密核对全父矩阵、局部伴随、像列和实际LSQR解。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'));mkdir(folder);sourceFile=fullfile(root,'outputs','v83_validation','coupledpatchunit03','coupled_patches_unit_evidence.mat');s=load(sourceFile,'cases');cases=cell(2,1);
+for j=1:2
+    a=s.cases{j};packed=a.packed;factor=a.factor;n=packed.cellCount;N=5*n;C=zeros(N);CT=C;M=C;MT=C;
+    for q=1:N
+        v=zeros(n,5);v(q)=1;z=applyRocketPackedGraph(packed,v);C(:,q)=z(:);z=applyRocketPackedGraphTranspose(packed,v);CT(:,q)=z(:);
+        z=solveRocketCoupledPatches(factor,v);M(:,q)=z(:);z=solveRocketCoupledPatchesTranspose(factor,v);MT(:,q)=z(:);
+    end
+    cached=zeros(N);
+    for k=1:numel(factor.buckets)
+        b=factor.buckets{k};for page=1:numel(b.patchIDs)
+            ids=reshape(double(b.members(:,page))'+(0:4)'*n,[],1);cached(ids,ids)=b.inverse(:,:,page);
+        end
+    end
+    % 旧P是单独backslash参考，不要求它与认证缓存逐位相同；实际作用必须精确复现缓存。
+    referenceRoundoffDifference=norm(M-a.P,'fro')/max(1,norm(a.P,'fro'));
+    assert(norm(CT-C','fro')<1e-12*max(1,norm(C,'fro'))&&norm(MT-M','fro')<1e-12*max(1,norm(M,'fro'))&& ...
+        isequal(M,cached)&&referenceRoundoffDifference<64*eps);
+    [columnScale,columnNorm,construction]=buildRocketParentImageScale(packed,factor);expected=reshape(vecnorm(C*M,2,1),n,5);
+    assert(max(abs(columnNorm-expected)./expected,[],'all')<1e-12);
+    rhs=a.rhs;direct=C\rhs(:);initial=.2*reshape(a.direct,n,5);options=struct('maximumIterations',600,'relativeTolerance',1e-10);
+    [value,detail,coordinates]=solveRocketParentLeastSquares(packed,factor,rhs,initial,options,columnScale);
+    assert(detail.internalCTargetMet&&norm(value(:)-direct)/max(1,norm(direct))<1e-8&&detail.adjointIdentityRelativeDifference<1e-12);
+    [plain,plainDetail]=solveRocketParentLeastSquares(packed,factor,rhs,initial,options);
+    [identity,identityDetail]=solveRocketParentLeastSquares(packed,factor,rhs,initial,options,ones(size(rhs)));
+    assert(isequal(plain,identity)&&isequal(plainDetail.nativeResidualHistory,identityDetail.nativeResidualHistory));
+    [zero,zeroDetail]=solveRocketParentLeastSquares(packed,factor,zeros(size(rhs)),zeros(size(rhs)),options,columnScale);assert(all(zero==0,'all')&&zeroDetail.nativeIterations==0);
+    [early,earlyDetail]=solveRocketParentLeastSquares(packed,factor,rhs,reshape(direct,n,5),options,columnScale);assert(earlyDetail.internalCTargetMet&&earlyDetail.nativeIterations==0);
+    rejected=false;try,buildRocketParentImageScale(packed,factor,struct('maximumWorkspaceBytes',1));catch ex,rejected=strcmp(ex.identifier,'ParentImageScale:Budget');end;assert(rejected);
+    bad=columnScale;bad(1)=0;rejected=false;try,solveRocketParentLeastSquares(packed,factor,rhs,initial,options,bad);catch ex,rejected=strcmp(ex.identifier,'ParentLSQR:Scale');end;assert(rejected);
+    cases{j}=struct('packed',packed,'factor',factor,'C',C,'CT',CT,'M',M,'MT',MT,'columnScale',columnScale,'columnNorm',columnNorm,'construction',construction, ...
+        'rhs',rhs,'initial',initial,'value',value,'coordinates',coordinates,'detail',detail,'referenceRoundoffDifference',referenceRoundoffDifference, ...
+        'plainValue',plain,'plainDetail',plainDetail,'zeroDetail',zeroDetail,'earlyDetail',earlyDetail);
+end
+report=struct('status','passed-two-orderings-complete-parent-columns-adjoints-scales-and-dense-LSQR','cases',2,'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'parent_least_squares_unit_evidence.mat'),'report','cases','sourceFile','-v7');fprintf('%s\n',jsonencode(report));
+end

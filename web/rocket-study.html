@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RocketAeroHeat · 完整箭体研究</title><link rel="stylesheet" href="rocket-study.css"></head>
+<body>
+<header><strong>RocketAeroHeat</strong><span>完整箭体 · 单工况研究</span><span id="stage"></span></header>
+<main><aside><nav aria-label="科研工作流">
+<button data-step="0">1　输入模型</button><button data-step="1">2　生成网格</button>
+<button data-step="2">3　添加边界条件</button><button data-step="3">4　计算</button>
+<button data-step="4">5　查看结果</button></nav>
+<section><h1 id="stepTitle"></h1><p id="description"></p><dl id="details"></dl></section>
+<p class="note">冻结的数值研究快照。浏览页面不触发重算；可编辑与计算操作沿用 MATLAB 的主工作台。</p>
+<p class="note">鼻尖 +X · 来流 −X · SI<br>压力、热流保留算法来源。给定壁温与未解温度分开显示。</p></aside>
+<div class="content"><iframe id="viewer" title="同窗科研三维工作台"></iframe>
+<section id="iterationPanel" hidden>
+<div id="rootIterationGroup" hidden><h2>内部定常Newton准备</h2><p>直接求原空间残差为零；这些迭代不计作BE步，也不是物理时间。</p>
+<div class="table"><table><thead><tr><th>Newton迭代</th><th>原五量残差 / s⁻¹</th><th>边界与源通量相对平衡</th></tr></thead><tbody id="rootIterationRows"></tbody></table></div></div>
+<h2>实际接受BE端点</h2><p>伪时间用于求稳态，不能解释为飞行时间或真实热历史。</p>
+<div class="table"><table><thead><tr><th>接受步</th><th>原五量残差 / s⁻¹</th><th>伪步 / s</th><th>五量守恒相对账</th></tr></thead><tbody id="iterationRows"></tbody></table></div></section></div>
+</main><footer id="footer"></footer><script src="study-data.js"></script><script src="rocket-study.js"></script></body></html>

@@ -1,0 +1,536 @@
+{
+  "version": "v59",
+  "date": "2026-10-16",
+  "status": "delivered-local-stage",
+  "scope": {
+    "newRegionalHeatSolvedAreaM2": 0,
+    "fullSurfaceSolved": false,
+    "actualProductionHeatAreaFraction": 0.6656263274240188,
+    "productionNumericalRecomputed": false,
+    "physicalSolution": false,
+    "experimentalValidation": false,
+    "completeCutCellExperimentalLibraryTested": true,
+    "portableFixtureFallbackTested": true,
+    "currentFieldCsvReasonTested": true,
+    "old40ColumnsUnchangedForValidV57Snapshot": true,
+    "quadraticFVInputsAreVolumeAverages": true,
+    "manufacturedStudyIsUnforcedNSStationarySolution": false,
+    "observedWallHeatOrders": [
+      1.2272859974756354,
+      1.2890827922484323
+    ],
+    "finestManufacturedWallHeatRMSRelative": 0.08225553570703248,
+    "fullNavierStokesStabilityProven": false,
+    "githubPushed": false
+  },
+  "runs": [
+    {
+      "process": "library/process.json",
+      "observedSession": 13415,
+      "exitCode": 0,
+      "observedBy": "root write_stdin actual terminal",
+      "purpose": "library"
+    },
+    {
+      "process": "geometry/process.json",
+      "observedSession": 14321,
+      "exitCode": 0,
+      "observedBy": "root write_stdin actual terminal",
+      "purpose": "geometry"
+    },
+    {
+      "process": "accuracy/process.json",
+      "observedSession": 43231,
+      "exitCode": 0,
+      "observedBy": "root write_stdin actual terminal",
+      "purpose": "accuracy"
+    },
+    {
+      "process": "portable/process.json",
+      "observedSession": 34878,
+      "exitCode": 0,
+      "observedBy": "root write_stdin actual terminal",
+      "purpose": "portable"
+    },
+    {
+      "process": "ui/csv_reason_targeted_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "ui/csv_reason_targeted_process_final.json"
+    },
+    {
+      "process": "ui/web_export_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "ui/web_export_process_final.json"
+    },
+    {
+      "process": "ui/viewer_field_state_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "ui/viewer_field_state_process_final.json"
+    },
+    {
+      "process": "ui/old_prefix_compatibility_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "ui/old_prefix_compatibility_process_final.json"
+    },
+    {
+      "process": "curved_accuracy_oracle/actual_python_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "curved_accuracy_oracle/actual_python_process_final.json"
+    },
+    {
+      "process": "curved_accuracy_oracle/sphere_grid8_python_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "curved_accuracy_oracle/sphere_grid8_python_process_final.json"
+    },
+    {
+      "process": "curved_accuracy_oracle/sphere_grid12_python_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "curved_accuracy_oracle/sphere_grid12_python_process_final.json"
+    },
+    {
+      "process": "curved_accuracy_oracle/sphere_grid16_python_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "curved_accuracy_oracle/sphere_grid16_python_process_final.json"
+    },
+    {
+      "process": "curved_accuracy_oracle/saved_moment_bounds_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "curved_accuracy_oracle/saved_moment_bounds_process_final.json"
+    },
+    {
+      "process": "curved_accuracy_oracle/accuracy_readback_process_final.json",
+      "exitCode": 0,
+      "observedBy": "agent observed actual terminal plus process record",
+      "purpose": "curved_accuracy_oracle/accuracy_readback_process_final.json"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "accuracy/curved_quadratic_evidence.mat",
+      "sha256": "f437753f564716ef7b321b6bbb883da384e36fc76487829d660d6c178f9c54f9"
+    },
+    {
+      "path": "accuracy/curved_quadratic_summary.json",
+      "sha256": "d024d030c053e3900925dcd68cc331693f6c2963a16adfde6e5be71289b3266e"
+    },
+    {
+      "path": "accuracy/process.json",
+      "sha256": "e7c255b45d8146445e8ca06d48b7ccdf01a42a6336b2298547337296e706733a"
+    },
+    {
+      "path": "accuracy/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "accuracy/stdout.log",
+      "sha256": "b4954e9f20975c8c0e0df05d384f293bff7d5726a74fbe1c8343b233f669597b"
+    },
+    {
+      "path": "curved_accuracy_oracle/README.md",
+      "sha256": "4b6cc63f0817d095004cd93c07b1f737ea5aec0b6243620b6d259f90ef115046"
+    },
+    {
+      "path": "curved_accuracy_oracle/accuracy_readback_process_final.json",
+      "sha256": "757dffbc7f4bbf3e2c1dcd338352e0196a1c89a47e09a88ec6ac68c3f8e0c176"
+    },
+    {
+      "path": "curved_accuracy_oracle/accuracy_readback_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "curved_accuracy_oracle/accuracy_readback_stdout.log",
+      "sha256": "f2c5f198d4b54caaa9a8594b2b8f91c15d3b79a8613458f08b75f4692668edcb"
+    },
+    {
+      "path": "curved_accuracy_oracle/actual_fv_volume_moments.mat",
+      "sha256": "e3fde7821bea6f5d434a3ae392aa435205ba481f90dd74d24962f4cf006e7faf"
+    },
+    {
+      "path": "curved_accuracy_oracle/actual_oracle_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "curved_accuracy_oracle/actual_oracle_stdout.log",
+      "sha256": "15698f8524c3d3877ffe6bbcf867d7281698408dae09cdb7ae5e19d13d5e9c80"
+    },
+    {
+      "path": "curved_accuracy_oracle/actual_oracle_summary.json",
+      "sha256": "4830500d0a739f80bfaffaab7a9775e93c1748a60c4ac93979d6534479c822a2"
+    },
+    {
+      "path": "curved_accuracy_oracle/actual_python_process_final.json",
+      "sha256": "a5c9d8da5408ee6d1e073f71d07ac7d26efe5b557a19b18c316eeaa1a21fa0c2"
+    },
+    {
+      "path": "curved_accuracy_oracle/check_quadratic_accuracy.py",
+      "sha256": "5ff4c532ade02d9b9d14877e77f9d3be0f4fd6ce79185e5fd0c2e6c8832132fd"
+    },
+    {
+      "path": "curved_accuracy_oracle/check_saved_moment_bounds.py",
+      "sha256": "4e77a6d7f3825fb623287f03ad647967dd3cfc87143453cb762cc723c6037860"
+    },
+    {
+      "path": "curved_accuracy_oracle/independent_accuracy_readback.json",
+      "sha256": "ba23cfb053d8d10b78128da846d9caa5823560c87fde9b7956bca97ef2ebd107"
+    },
+    {
+      "path": "curved_accuracy_oracle/oracle_evidence_manifest.json",
+      "sha256": "0e26d740f0e6c8891ca62c4252d6e76c265c5a526886626b11e9a1e0d2991ed2"
+    },
+    {
+      "path": "curved_accuracy_oracle/run_accuracy_readback.ps1",
+      "sha256": "4152f469e7c58c4530af373a7bcf74e74097adc479e3d151af3ba288f9a09a99"
+    },
+    {
+      "path": "curved_accuracy_oracle/run_bound_check.ps1",
+      "sha256": "977d3c0021203db944b42c5cd87277366d280eb5bf78a473bd2752e68871d3ca"
+    },
+    {
+      "path": "curved_accuracy_oracle/run_oracle.ps1",
+      "sha256": "8861fafb475daf65b0ae673a1ad2f37d960f7a7b270662f226d65b6c9c81ed6a"
+    },
+    {
+      "path": "curved_accuracy_oracle/saved_moment_bounds_process_final.json",
+      "sha256": "0df068b67f896cd176966c593937319e39cfb1d947d0127c47bdfc2f1ef44c5f"
+    },
+    {
+      "path": "curved_accuracy_oracle/saved_moment_bounds_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "curved_accuracy_oracle/saved_moment_bounds_stdout.log",
+      "sha256": "abe1388b127b61f68843595813b9169331c4116515489db9b1ce6b387ff4f2ed"
+    },
+    {
+      "path": "curved_accuracy_oracle/saved_moment_bounds_summary.json",
+      "sha256": "fdc76a9458728373cd1d888279a3887bc1e31e88cf7929b15233724ea8739809"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid12_fv_volume_moments.mat",
+      "sha256": "a1b3cca62f348969fdd8107c0a5edcab9d195f74d2cfa692ac4d50f1f6a71c51"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid12_oracle_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid12_oracle_stdout.log",
+      "sha256": "adfd4054f4fcc007a4d2671d1a043614f25f497f866fc9477f8822a86c374930"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid12_oracle_summary.json",
+      "sha256": "b87e10a174bc5a4ae80cd6f7f72278a9e626f7ea92fd0411bb853955f41af124"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid12_python_process_final.json",
+      "sha256": "2fb2b5e1b0785f0d1b07585eeb150f0d8cf244f555a348e4fb49c289fdfdc9de"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid16_fv_volume_moments.mat",
+      "sha256": "34b4c6163e5000af4a3a4df96ed5d62cc89fe2e7b0026372050682b17af0a1d2"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid16_oracle_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid16_oracle_stdout.log",
+      "sha256": "7b654e4a50edf54c36e5b0f86563c9c4e4d5bf0cd0a4fca22a89cb57f347c058"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid16_oracle_summary.json",
+      "sha256": "d380324b877d64a8a8da4f0aacef2156ea3080bf725ab9b34c4f47fbb8975d41"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid16_python_process_final.json",
+      "sha256": "3a90043753c112007cc46f449eb6946436291b4ba9ebb8502b37a1827275eb71"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid8_fv_volume_moments.mat",
+      "sha256": "e535ef181a046673f1c3d0d7ae964d6d0eaa58da7a95eab98e4c2dc53eae425d"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid8_oracle_stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid8_oracle_stdout.log",
+      "sha256": "8339ead330bec3725f4fbae6793b754643c57a7ac21197045e397623dacb1df8"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid8_oracle_summary.json",
+      "sha256": "13c9d6a38c45d1b7a4bc1014df2a51efbaf59d021d2f38234eef23acf62b35dd"
+    },
+    {
+      "path": "curved_accuracy_oracle/sphere_grid8_python_process_final.json",
+      "sha256": "649dca53cb4e4a09a06319606f10f449d9324d3292253a90bf5a7fcb1cfe71c0"
+    },
+    {
+      "path": "curved_accuracy_oracle/volume_second_moment_oracle.py",
+      "sha256": "24b5739462d7032f10683442f406f9bbb4679c32ec96297986bcb084afe908cc"
+    },
+    {
+      "path": "curved_accuracy_oracle/write_oracle_manifest.py",
+      "sha256": "acb224847032eb67c015abc161cb8a24fe27ccdff6ef7c835e07e303d587705e"
+    },
+    {
+      "path": "geometry/geometry_summary.json",
+      "sha256": "6a848001da98ffa2d919002472af8555536c63b9558c70e1c3156ff10f1e6dc3"
+    },
+    {
+      "path": "geometry/process.json",
+      "sha256": "7540d864782bdfe8b38333fc3e1a4ea9fefa9136ffb19ef79336f19c4b106164"
+    },
+    {
+      "path": "geometry/sphere_grid12.mat",
+      "sha256": "6bb4b74a28c13aeb39e0428e50bbafd233f2ae39dbc3229b0e21592b85c7f069"
+    },
+    {
+      "path": "geometry/sphere_grid16.mat",
+      "sha256": "3deef1919a5808f877011308bef1c96e222a5fad7aa2fdf388766de05fcc24ec"
+    },
+    {
+      "path": "geometry/sphere_grid8.mat",
+      "sha256": "22b980e0138d4c3f10bfc712129ca8785820d6166e2d7a85ef44942c95a8b179"
+    },
+    {
+      "path": "geometry/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "geometry/stdout.log",
+      "sha256": "196141408df3e0e2f3c067d81c614c7b85ae92defff8ea010fc78961ce6ff97d"
+    },
+    {
+      "path": "library/library_integration.json",
+      "sha256": "59963534d8f5cf14bdb655d796a79eb160839bdb339eaa2ff2cb2e8f93be28a1"
+    },
+    {
+      "path": "library/library_integration.mat",
+      "sha256": "af1baa2ca30c94b73af307ab98ec3aafcd21465cd5c9fc3f2ccc694bbea7e6fb"
+    },
+    {
+      "path": "library/process.json",
+      "sha256": "47d058e0cb2cd61be0df209371f7d3f28563bb43b419e45b11b40f740d67a984"
+    },
+    {
+      "path": "library/source_migration.json",
+      "sha256": "605cb2d4cf3442cbaf3ed5264a6288241993bd9594d8456fa8be60daf1cd52da"
+    },
+    {
+      "path": "library/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "library/stdout.log",
+      "sha256": "894704781a1ca26089d2749512dbf08efe55e1db4b20cce65ac9ee156682eebc"
+    },
+    {
+      "path": "portable/curved_quadratic_summary.json",
+      "sha256": "d024d030c053e3900925dcd68cc331693f6c2963a16adfde6e5be71289b3266e"
+    },
+    {
+      "path": "portable/library_integration.json",
+      "sha256": "a9d62a2fe0db05d9c05f8da72e2fca48e98bd45e37ed5b1b8f5751914709902f"
+    },
+    {
+      "path": "portable/portable_inputs.json",
+      "sha256": "ce284b9407efa255a89b8118901493d105b2bbd9401ee1600c6e740336159c4f"
+    },
+    {
+      "path": "portable/process.json",
+      "sha256": "7b3f1761bfd7102f5fa99b131f4c4162f9083647672065e3d1aa3b6974bbf83b"
+    },
+    {
+      "path": "portable/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "portable/stdout.log",
+      "sha256": "aceba809c36f87ba4f69896cfe38f2451c6b04e0f150e3f3228f054efa614f2c"
+    },
+    {
+      "path": "prepare_summary.py",
+      "sha256": "7b7a8830a8105755c5bb81fbf0095b5f32de0f698f6592b5a091d4506a300f55"
+    },
+    {
+      "path": "run_validation.ps1",
+      "sha256": "d61a98cb2b8f15cd05a58efe131a6e14232b749e57bc9af377d70ec789b58f66"
+    },
+    {
+      "path": "ui/CSV_REASON_VALIDATION.md",
+      "sha256": "77e79cd1e487103949a7fca1613df2e58bfc88844a85365b1339ac2ed6de75bf"
+    },
+    {
+      "path": "ui/csv_reason_before_fix.json",
+      "sha256": "dbbfe714c6123e12fdee0261ff5186e8d11a93633c15f44b6e805c8d9d75607b"
+    },
+    {
+      "path": "ui/csv_reason_examples/edgePressure.csv",
+      "sha256": "a9a7aa717c09396f6829e90172c70cb279f9f96be2f7fba4df55a0e18b306628"
+    },
+    {
+      "path": "ui/csv_reason_examples/heatFlux.csv",
+      "sha256": "e1dbb88c1f839ba065855098fc2cfd78984419c68b726debaa800f519c3f69fd"
+    },
+    {
+      "path": "ui/csv_reason_examples/wallInput.csv",
+      "sha256": "188ba42a2410d0b78041d619a9f36a667433fa7134eb77dd64ad65b36cdf50b3"
+    },
+    {
+      "path": "ui/csv_reason_examples/wallSolved.csv",
+      "sha256": "5c5731ee38c625f3e9cf1e97eba75ddb62c2e6d11949a36f4c2010e0b3633c42"
+    },
+    {
+      "path": "ui/csv_reason_targeted_final.log",
+      "sha256": "22ad171b2c6e4ef79fcb6832c1bdef2f9563430620a51ad4cf9ee203577eed52"
+    },
+    {
+      "path": "ui/csv_reason_targeted_process_final.json",
+      "sha256": "1bf1450466dc3ea8d13dfc557e849e45b37dd438bb1090d8cfd3223446b9f57b"
+    },
+    {
+      "path": "ui/csv_reason_targeted_summary.json",
+      "sha256": "927fbe714075264d1e933f9c96676245b6c6ad074f2971ee5a0f964d94739651"
+    },
+    {
+      "path": "ui/old_prefix_compatibility_final.log",
+      "sha256": "4b473f30b083e03d68f6a8ea70a1af87babd45df75cf02d13b968d3431fd2cb9"
+    },
+    {
+      "path": "ui/old_prefix_compatibility_process_final.json",
+      "sha256": "a0f837c8841b9907902e656c2addf81efff51b8c2608e68d3d717faf41aad7ab"
+    },
+    {
+      "path": "ui/old_prefix_compatibility_summary.json",
+      "sha256": "baf64b036d255486bbac8b489d2e18d9fbdbd43c2ffcf9ca89b8a55f2b0b9128"
+    },
+    {
+      "path": "ui/ui_validation_manifest.json",
+      "sha256": "f1ed52117462ffe65300085af94bafddfabe15cab19605643c50f0311730b4bb"
+    },
+    {
+      "path": "ui/verifyLegacyCsvPrefix.js",
+      "sha256": "c4dd3362c26f05939c899fb6fd2d276b4cf6aca11b28f8f74c79c2c385254b22"
+    },
+    {
+      "path": "ui/viewer_field_state_final.log",
+      "sha256": "66ee6586b827dd6d65a159fde63821f47a12e0edf2f22cf7863fcb67e833caae"
+    },
+    {
+      "path": "ui/viewer_field_state_process_final.json",
+      "sha256": "630d1363559c0bbac452eff0c28767aa2f999e32d9e45f4d15eae746217938bb"
+    },
+    {
+      "path": "ui/web_export_final.log",
+      "sha256": "b594ec66e95ffe6b84976e047f2dc53845669ac783ac06e70ed5cbc11aee3596"
+    },
+    {
+      "path": "ui/web_export_process_final.json",
+      "sha256": "2bbc908bece7ac5d769e29491a281cb7f3fc0e60955032ec88cf1fe6cc670b17"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "docs/CURVED_WALL_ACCURACY.md",
+      "sha256": "056cb6f43308d46fd00f30a7bda6b2dafaee68a378a948afa9aaf9ec82eb62f0"
+    },
+    {
+      "path": "internalFlow/cutCell/README.md",
+      "sha256": "7f36383e98dfe34e5944ec106e91a918b6662b9f5f99b93ba4c5f934c7e5e088"
+    },
+    {
+      "path": "internalFlow/cutCell/advanceCutCellNavierStokes.m",
+      "sha256": "0801d3dfc373b6cbbffb593b3708ae02b7d8ad02e8e29ab744e8797ddcbaad99"
+    },
+    {
+      "path": "internalFlow/cutCell/agglomerateFluidControlVolumes.m",
+      "sha256": "af3f6a469e0774883ba5ea8e90d1733ff4016dead02bf417a4951fbfdefedb33"
+    },
+    {
+      "path": "internalFlow/cutCell/buildCutCellDiffusionStencil.m",
+      "sha256": "e2f9a7eaa91af70f9b24ad02c4841509e4a90aef8f41147b67508f2293af9f74"
+    },
+    {
+      "path": "internalFlow/cutCell/buildOriginalSurfaceCutCells.m",
+      "sha256": "946550a1af5f8f7df381861bc2393bf97c9542538c942ad5aec19d2e5e820b11"
+    },
+    {
+      "path": "internalFlow/cutCell/cutCellBoundaryStencilState.m",
+      "sha256": "728e0edb4f3e7762d7851e7944bd0e147ee6266f99b3f6f0eba15ed47f30cbb6"
+    },
+    {
+      "path": "internalFlow/cutCell/cutCellNavierStokesResidual.m",
+      "sha256": "68f3b2c08de7bcb5f1f11d5504ad7b8b6840c441344b99730ba01f2fe7f14bc2"
+    },
+    {
+      "path": "internalFlow/cutCell/mapCutCellWallFields.m",
+      "sha256": "aedc1d827351b2886f8b91689345663e96cf1274cc12f063ef631f124a468d46"
+    },
+    {
+      "path": "internalFlow/cutCell/partitionOrientedTriangles.m",
+      "sha256": "ff5c6b19f6a0fd770948a2e956090e9b977811d73afdaab50ce45fc1c6fb9a62"
+    },
+    {
+      "path": "internalFlow/setupCutCellFlow.m",
+      "sha256": "55577b4a399494f622548ec48a6575538fe4f4491fe8e724b35d77e7deeba4de"
+    },
+    {
+      "path": "tests/prepareQuadraticCurvedFixtures.m",
+      "sha256": "800fda45b3ab6992aa1996dd933ac8d001ee776f04ea680ecf1c4f1f16d4970b"
+    },
+    {
+      "path": "tests/studyCurvedWallQuadraticAccuracy.m",
+      "sha256": "0acc8815093dae82d802978987725a59f459162aa850536491329945ad55869e"
+    },
+    {
+      "path": "tests/testCutCellLibrary.m",
+      "sha256": "1c83c63433a87f77c05d054ba08de5ae9ccaaff2a17be08c46c17e12246d923a"
+    },
+    {
+      "path": "tests/testViewerFieldState.js",
+      "sha256": "ee90c030c556a94f309777d1a3560835b084cc5ae041480be24294f68b62dba8"
+    },
+    {
+      "path": "tests/testWebExport.js",
+      "sha256": "40a72b0b2cd8cee22850c79d2805863c7218af74da8c2dcfe675f77db76c7ba8"
+    },
+    {
+      "path": "tests/testWebExportReasons.js",
+      "sha256": "06e1250e98ec63a80fc56d1e04b0f34f023d752440a6c0bb999e971821324ca9"
+    },
+    {
+      "path": "web/export.js",
+      "sha256": "99aa0344ecae2a958df74560df0bdfdb11b0888baecb2401d06c888dc3777a6a"
+    },
+    {
+      "path": "web/index.html",
+      "sha256": "457ebec03f2b29b88a9792674697d6b170bb7f3c46354f13a9d61e804ec22d15"
+    },
+    {
+      "path": "web/viewer.js",
+      "sha256": "bf8cb9d56aaef83a09e620a44d3a2d9f0c340b47dabe09f550ccc20bbaddf09f"
+    }
+  ],
+  "inheritedV58": "docs/validation/v58/progress.json; tested numerical drafts explicitly retained, not new physical coverage",
+  "currentExample": {
+    "source": "v57 frozen example_web data with current viewer assets",
+    "numericalRecomputed": false,
+    "fieldsAndStatusUnchanged": true
+  },
+  "limitations": [
+    "near-wall study shows approximately first-order behavior, not second-order or engineering accuracy",
+    "actual cut-cell flow only six short nonsteady steps; no new region heat solution",
+    "no new visual layout/render or browser OS download verification; UI change is CSV reasons",
+    "constant-property artificial-gas manufacturing is not air or experimental validation"
+  ]
+}

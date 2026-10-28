@@ -386,6 +386,12 @@ edge.wedgeThermalStatus=wedgeThermalStatus;
 edge.coneThermalStatus=coneThermalStatus;
 edge.expansionThermalStatus=expansionThermalStatus;
 edge.thermalExpansionOutOfRangeFace=thermalExpansionOutOfRangeFace;
+% 模块八补充：域外定比热状态只维持准流线诊断，不是已求物理外缘。
+% 保留代数可追踪状态，另给字段有效性；显示和流态判断不能混用两者。
+edge.diagnosticPlaceholderFace=valid & thermalExpansionOutOfRangeFace;
+edge.thermalStateValidFace=valid & ~edge.diagnosticPlaceholderFace;
+edge.stateValidityMethod=['代数可追踪与物理场有效性分开；低于所选热物性下限的' ...
+    '定比热膨胀仅作流向诊断占位，不作为外缘p/T或真实稀薄流证据'];
 edge.shockAngleDeg=shockAngle;
 edge.shockAngleMethod=['切锥 ' coneThermalStatus '；切楔 ' ...
     wedgeThermalStatus ' 的局部附体弱激波角'];
@@ -412,7 +418,8 @@ edge.velocityVector=velocity; edge.speed=U; edge.Mach=M;
 edge.speedOfSound=sound; edge.dynamicViscosity=viscosity;
 edge.totalPressure=p0; edge.totalTemperature=T0;
 edge.algebraicallyValid=valid;
-edge.physicallyUnresolved=~valid;
+edge.numericallyTraceableFace=valid;
+edge.physicallyUnresolved=~edge.thermalStateValidFace;
 edge.freestream=freestream;
 edge.status='内置外流工程估算；无解面元为 NaN';
 edge.summary=struct('validFaces',nnz(valid),'unresolvedFaces',nnz(~valid), ...

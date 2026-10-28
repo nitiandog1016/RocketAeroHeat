@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RocketAeroHeat · 网格与外域对照</title><link rel="stylesheet" href="rocket-sensitivity.css"></head>
+<body><header><strong>RocketAeroHeat</strong><span>完整零攻角箭体 · 网格与外域敏感性</span><span>数值定常 / 物理精度待验收</span></header>
+<main><aside><label for="caseChoice">选择对照工况</label><select id="caseChoice"></select><nav aria-label="科研工作流"><button data-step="0">1　输入模型</button><button data-step="1">2　生成网格</button><button data-step="2">3　添加边界条件</button><button data-step="3">4　计算</button><button data-step="4">5　查看结果</button></nav><h1 id="title"></h1><p id="description"></p><dl id="details"></dl><p class="note">同一几何、飞行条件和物理边界。插值只是新网格初猜；Newton准备与真实BE确认分列。近壁偏移不是体质心墙距。</p><p class="note">Tw给定300 K；邻壁气体温度为单元代理；Te、Tr及求解Tw仍未知。此对照不增加生产合格面积。</p><a href="wall_sensitivity.csv" download>导出逐墙段对照 CSV</a></aside>
+<section class="content"><iframe id="viewer" title="同窗科研三维工作台"></iframe><section class="comparison"><div class="controls"><strong>同一墙段的分布对照</strong><label>变量 <select id="curveField"><option value="signedHeatWm2">有符号热流 / kW·m⁻²</option><option value="pressurePa">压力 / kPa</option><option value="wallAdjacentGasProxyK">邻壁气体温度代理 / K</option><option value="yPlusWallDensityProxy">y+ 墙密度代理</option><option value="signedWallTractionAlongWallPa">有符号切向牵引 / Pa</option></select></label></div><svg id="comparisonCurve" viewBox="0 0 960 255" role="img" aria-label="同墙段分布比较"></svg><p class="note">横轴为相邻墙段中心的累积直线距离 / m，首墙心为0，包含底面径向段。轴对称周向曲线在上方三维工作台中查看。y+与切向牵引仅作诊断；底面牵引符号不作为流向分离判据。</p><div class="table"><table><thead><tr><th>工况</th><th>控制体</th><th>原残差 / s⁻¹</th><th>总有符号热功率 / kW</th><th>相对基线变化</th><th>y+代理最大值</th></tr></thead><tbody id="comparisonRows"></tbody></table></div></section><section id="wallProfilePanel" class="comparison" hidden>
+ <div class="controls"><strong>实际控制体法向剖面</strong><label>变量 <select id="profileField">
+  <option value="temperatureK">内部气体温度 / K</option><option value="tangentialVelocityMps">沿墙切向速度 / m·s⁻¹</option>
+  <option value="pressurePa">内部压力 / kPa</option><option value="muTOverMu">湍流/层流黏度比</option>
+  <option value="EulerEnergyFluxMinusArithmeticPhysicalWm2">Euler能量通量减算术物理参考 / kW·m⁻²</option>
+  <option value="viscousTotalEnergyFluxWm2">实际黏性总能通量 / kW·m⁻²</option>
+ </select></label></div>
+ <div class="profileControls"><label>墙段 <input id="profileWall" type="range" min="1" max="115" step="1" value="56"></label><output id="profilePosition"></output>
+ <label>最大法向距离 / mm <input id="profileExtent" type="number" value="20" min="0.001" step="any"></label><label><input id="profileLog" type="checkbox" checked>距离对数坐标</label></div>
+ <svg id="profileCurve" viewBox="0 0 960 275" role="img" aria-label="真实控制体法向剖面比较"></svg><a href="sensitivity-data.json" download>导出四档场量、剖面与算法 JSON</a>
+ <p id="profileBoundaryNote" class="note"></p><details><summary>当前剖面的算法与身份</summary><p id="profileAlgorithmText" class="note"></p></details><p class="note">实线连接实际单元中心代理；不是沿法线重新求解或边界层外缘识别。能量通量差是实际离散量减算术参考，不是独立误差估计或纯物理热流。Tw、墙速为给定，Te、Tr与求解Tw仍未知。</p>
+</section>
+
+
+<section id="iterations" hidden><h2>当前工况 · 定常Newton准备</h2><div id="newtonRows"></div><h2>独立BE确认</h2><div id="beRows"></div></section></section></main><footer>网格敏感性尚明显；未宣称网格独立或实验合格。真实20°横流、分离再附、底面与附件的资格仍须逐项建立。</footer><script src="sensitivity-data.js"></script><script src="rocket-sensitivity.js"></script></body></html>

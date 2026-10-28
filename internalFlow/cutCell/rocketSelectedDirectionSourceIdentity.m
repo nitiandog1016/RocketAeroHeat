@@ -1,0 +1,18 @@
+function identity=rocketSelectedDirectionSourceIdentity
+%ROCKETSELECTEDDIRECTIONSOURCEIDENTITY 绑定内部细层方向及原NS源码，防止跨版本误用粗层缓存。
+% 模块一：只读明确列出的项目计算文件，逐字节SHA-256，不读取外部CFD或凭据。
+root=fileparts(mfilename('fullpath'));
+names={'applyCutCellSelectedDirection','buildCutCellSelectedDirectionCache','buildCutCellGradientOperator', ...
+    'cutCellCharacteristicBoundaryDirection','cutCellBoundaryDirectionalState','cutCellWlsViscousDirection', ...
+    'cutCellSelectedEulerDirection','cutCellExactEulerBranchJacobian','cutCellExactEulerFlux', ...
+    'cutCellConservativeDerivatives','cutCellBoundaryStencilState','cutCellNavierStokesResidual', ...
+    'resolveNSRiemannReservoir3D','buildCutCellRiemannReservoirBoundaryState','buildCutCellRiemannReservoirJacobian'};
+identity=struct;
+for entry=[names {'resolveNSCharacteristicBoundary3D'}]
+    name=entry{1};path=fullfile(root,[name '.m']);
+    if strcmp(name,'resolveNSCharacteristicBoundary3D'),path=fullfile(fileparts(root),[name '.m']);end
+    fid=fopen(path,'rb');assert(fid>=0,'RocketCoarse:Source','计算源文件缺失。');bytes=fread(fid,Inf,'*uint8');fclose(fid);
+    md=java.security.MessageDigest.getInstance('SHA-256');md.update(typecast(bytes,'int8'));
+    identity.(name)=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
+end
+end

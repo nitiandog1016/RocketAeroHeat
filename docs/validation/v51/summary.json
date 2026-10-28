@@ -1,0 +1,50 @@
+{
+  "version": "v51",
+  "date": "2026-10-12",
+  "goalStatus": "active",
+  "fullSurfaceSolved": false,
+  "experimentalValidationAdded": false,
+  "allTestsRun": false,
+  "newKernelEnabledByDefault": false,
+  "actualCase": {
+    "faces": 19752,
+    "Mach": 5,
+    "alphaDeg": 20,
+    "heatFluxComputedAreaFractionApprox": 0.775,
+    "sectionX_m": -1.1,
+    "segments": 92,
+    "contours": 1,
+    "perimeter_m": 0.627573406082509,
+    "pressureRange_kPa": [
+      1.197,
+      5.6308
+    ],
+    "pressurePrescribedSegments": 46,
+    "wallSolvedMissingSegments": 92
+  },
+  "targetedMatlabTests": [
+    "testAerothermalViewerTemperatures",
+    "testAerothermalViewerData",
+    "testAerothermalViewerHistory",
+    "testAerothermalFlowHistory",
+    "testShockEntropyEdgeState",
+    "testAerothermalWebGUI"
+  ],
+  "uiTestInput": "saved actual mesh and computed state; GUI/export retested, not a new full solver run",
+  "uiFinalExitCode": 0,
+  "shockKernelFinalExitCode": 0,
+  "browserChecks": [
+    "pressure local scale and 92 exact intersection segments",
+    "curve click selects face 10649 and displays separate pressure/edge temperature/recovery/input wall/unsolved wall fields",
+    "wallSolved has 100% missing and blank CSV values",
+    "actual generated CSV data URL independently checked",
+    "generated PNG data URL retrieved and visually inspected"
+  ],
+  "downloadOSReceiptVerified": false,
+  "screenshots": {
+    "single_time_section.png": "earlier wide-screen v51 interaction; before topology refusal repair; actual displayed cylinder values unchanged",
+    "pressure_workbench_final.png": "final browser viewport with pressure cloud and export link",
+    "pressure_export_final.png": "final generated PNG including units, bounds and condition"
+  },
+  "validationClassification": "software integration and analytical/numerical checks; no new experimental heating validation"
+}

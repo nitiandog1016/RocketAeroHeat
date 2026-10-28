@@ -1,0 +1,34 @@
+function report=testRocketTemperatureActiveSet(folder)
+%TESTROCKETTEMPERATUREACTIVESET 多面/双温域选择、加热冷却分离与独立稠密受限方向校核。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'));mkdir(folder);
+s=load(rocketTemperatureResearchFixture('riemann_reservoir_unit_evidence.mat','outputs/v83_validation/riemannreservoirunit02/riemann_reservoir_unit_evidence.mat'),'result','cut','gas');
+cut=s.cut;gas=s.gas;scale=s.result.residualScale;inside=find(cut.openFaces.area>0&cut.openFaces.cellMinus>0&cut.openFaces.cellPlus>0);
+n=size(s.result.Q,1);cv=gas.R/(gas.gamma-1);rho=.1*ones(n,1);u=repmat([50 0 0],n,1);T=300*ones(n,1);
+hot=[cut.openFaces.cellMinus(inside(1));cut.openFaces.cellPlus(inside(1))];
+cold=[cut.openFaces.cellMinus(inside(end));cut.openFaces.cellPlus(inside(end))];assert(isempty(intersect(hot,cold)));
+T(hot)=1995;T(cold)=85;Q=[rho rho.*u rho.*(cv*T+.5*sum(u.^2,2))];
+[~,audit]=cutCellExactEulerFlux(Q(cut.openFaces.cellMinus(inside),:),Q(cut.openFaces.cellPlus(inside),:),cut.openFaces.normal(inside,:),gas);audit.faceID=inside;
+info=struct('exactEulerFluxAudit',audit);bandRows=selectRocketTemperatureBandRows(Q,info,cut,gas,scale);
+assert(any(bandRows.temperatureBoundSigns==1)&&any(bandRows.temperatureBoundSigns==-1));
+rejected=false;try,selectRocketTemperatureBandRows(Q,info,cut,gas,scale,struct('maximumConstraintRows',1));catch e,rejected=strcmp(e.identifier,'TemperatureActive:Budget');end;assert(rejected);
+p=load(rocketTemperatureResearchFixture('parent_least_squares_unit_evidence.mat','outputs/v83_validation/parentlsqrunit02/parent_least_squares_unit_evidence.mat'),'cases');
+m=load(rocketTemperatureResearchFixture('peak_weighted_unit_evidence.mat','outputs/v83_validation/peakweightunit01/peak_weighted_unit_evidence.mat'),'cases');cases=cell(2,1);
+for j=1:2
+    a=p.cases{j};b=m.cases{j};factor=buildRocketAugmentedPatchQR(a.packed,a.factor,b.metric,b.detail.penaltyInOriginalResidualUnits);
+    rows=bandRows;rows.temperatureBoundSigns=ones(size(rows.faceIDs));
+    free=solveRocketAugmentedQRDirection(a.packed,factor,b.base.rhs,b.metric,struct('maximumIterations',900));t=rows.H*free(:);
+    assert(all(abs(t)>1e-8));rows.temperatureBoundSigns=sign(t);rows.temperatureBoundSigns(2)=-rows.temperatureBoundSigns(2);
+    [value,detail,evidence]=solveRocketTemperatureActiveDirection(a.packed,factor,b.base.rhs,b.metric,rows,struct('maximumIterations',900));
+    assert(detail.bandDirectionFeasible&&detail.activeSolveCount>=1&&~ismember(2,evidence.cycles{1}.activeRowIndices));
+    A=[b.base.C;factor.penaltyInOriginalResidualUnits*b.W];augmented=[b.base.rhs(:);zeros(5*n,1)];H=full(rows.H(detail.activeRowIndices,:));
+    Z=null(H);dense=Z*((A*Z)\augmented);difference=norm(value(:)-dense)/max(1,norm(dense));assert(difference<1e-8);
+    assert(all(rows.temperatureBoundSigns.*(rows.H*value(:))<=detail.localDotRoundoffBoundK));
+    cases{j}=struct('source',b,'packed',a.packed,'factor',factor,'rows',rows,'value',value,'detail',detail,'evidence',evidence, ...
+        'dense',dense,'denseDifference',difference);
+end
+report=struct('status','passed-multiple-current-temperature-rows-both-bands-cooling-release-and-dense-final-active-subspace', ...
+    'bandRows',numel(bandRows.faceIDs),'rowBudgetRejection',rejected,'manufacturedStateNotPhysicalSolution',true, ...
+    'inequalityOptimumClaimed',false,'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0);
+save(fullfile(folder,'temperature_active_unit.mat'),'cases','report','bandRows','Q','gas','scale','-v7');disp(report);
+end

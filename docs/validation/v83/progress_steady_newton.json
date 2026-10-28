@@ -1,0 +1,1551 @@
+{
+  "version": 83,
+  "status": "tested-direct-steady-Newton-failed-real-linear-target-and-lateral-action-study-not-delivered",
+  "generatedUTC": "2026-10-24T10:25:45.262234+00:00",
+  "recorderProcessID": 25656,
+  "priorProgressPath": "docs\\validation\\v83\\progress_tight_line.json",
+  "priorProgressSHA256": "2d6c2847d16ccc700ac3599b18e412cdc2ca43c66c4526a93a2d550899707b56",
+  "oldEvidenceRebound": false,
+  "currentSourcesSHA256": {
+    "internalFlow/cutCell/solveRocketShellSteadyKrylov.m": "5f63155ddec424a7b33042467c469b221d33b3433f03ca150f8c04608d30808a",
+    "internalFlow/cutCell/cutCellNavierStokesResidual.m": "84c096e0f0629ab0d34c33320d8c3f8e76a08a0b9e4f225a0530635ee52abe8b",
+    "internalFlow/cutCell/mergeRocketKrylovHistory.m": "97e59c63c26aefa259a40909cf1f9f454839c2534a4d08715e45b4dbf55df2e7",
+    "tests/continueRocketWallVelocityKrylov.m": "ec075d3a8a0554c6702b6ccdbd4aad3766b30fd9af7e0e8af7e7e6aa0cebbfd3",
+    "tests/testRocketShellSteadyNewton.m": "bf7b1b1b38bf82aea230f01dcaea35a5e7479af47321d6474d31ee5909442cb0",
+    "tests/testRocketShellTrialCompatibility.m": "ce8785ad85efd01d3053e9de0dc033c9aca53b51e80c3e440656e3435bf266c1",
+    "tests/auditRocketSteadyNewtonDirections.py": "56ea2b1e60e4b434c7036d14dc884e5c6685816ca5b0d28d3b258fa536573edb",
+    "tests/auditRocketWallVelocity.py": "4065aae9ae143c53e9c77e7e19f1131a7632608535223fe938e8446306637a00",
+    "exportRocketWallVelocityStudy.m": "6bf617d12398e465bef52dfa8f9726e7db2a78b66f71e5d896a6a72cab03cc78",
+    "web/rocket-wall-velocity.js": "b998c45727c274a75fd4eb43b55f779b5c7258524ad5f16418bf40f4230f812c",
+    "web/rocket-wall-velocity.html": "82b7f301cf0db8ab44029abdc5b9b1c49129c536e4e4aa60d63dc7bbf672620d",
+    "tests/testRocketWallVelocityWorkbench.js": "5e52300244f644000dba43af108ae233d6f1c9aa75ba059fc6e2cfbbc06d2cd0",
+    "tests/auditRocketWallVelocityWorkbench.py": "dfd8ca1bb068edb1ffc1a40ed66857b2775a25c519d3bcef809601e8d2d9a350",
+    "tests/studyRocketShellLateralCoupling.m": "999a711381a47443d5183991b3f7e66aa2f8bf8eecb9d3948d1fff17d856c0eb",
+    "tests/auditRocketShellLateralCoupling.py": "c25377d2bb70353fe7a7aa7b2ee2ed457bd913f692385a4fcd8e33c6636061ed",
+    "docs/DIRECT_STEADY_NEWTON_3D.md": "74efc863b0d72738d05e613cf805aae48dc02f8c10a964ad3a11fb198fe103a7",
+    "docs/EXACT_NORMAL_LINE_PRECONDITIONER.md": "7d98811751f060e0c41de3a9a2d09f91bcbb8b3858e958d583502499c945dd89",
+    "docs/STATIC_WALL_VELOCITY_3D.md": "d015e45a9c49ab4a89ec69d43daea540352751aef703041897729dcecc2bb750",
+    "docs/GITHUB_STAGE_READINESS.md": "acd0cc4512a8280ed7af4cc74996a5b4b42d040f2cf6b4486625e8da6666b4b5",
+    "docs/PROJECT_GOALS.md": "8654bc04fd4814d84f5826beddebd89ac5ef07541f5510b49f04ee26389b74b2"
+  },
+  "sourceEpochs": [
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\newton_candidate01_solveRocketShellSteadyKrylov.m",
+      "sha256": "4c7eba60009071c1d5c7860d8fc8e32b3a06821f47fb35b4ca1ca0fe7834fada"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\newton_candidate01_testRocketShellSteadyNewton.m",
+      "sha256": "f90d9de80ca4ed13fd6905a943672c0a2d77c16b4693f062ddd2864c7ebd78b8"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\newton_candidate02_auditRocketSteadyNewtonDirections.py",
+      "sha256": "7a1ba18ee1e88d583b50eae2f10a2c9c4c1e48452320f5fd039624f598583d8d"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\newton_candidate02_solveRocketShellSteadyKrylov.m",
+      "sha256": "66c9f6d11d28fe98b6f17fe8d7e6b952f35196638f20294656d64c03e71d6988"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\newton_candidate02_testRocketShellSteadyNewton.m",
+      "sha256": "3ccb4bbeeb3cb3a4e17823f5e41851b63293e826f6eaa2122ca68242da2e1a23"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_auditRocketWallVelocity.py",
+      "sha256": "a070ca6d4f704a230f8d7b05036faac919d305397d140a6214e36c8ffb3ff39b"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_auditRocketWallVelocityWorkbench.py",
+      "sha256": "234e0bd3293d1ff2e68cd191e0b2eb518479d74d6a4f415d2779f19c5de1afac"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_continueRocketWallVelocityKrylov.m",
+      "sha256": "f6d78306270660083abbfa76334f28c13c9a098fe02ccd9412f729b359a8d09f"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_exportRocketWallVelocityStudy.m",
+      "sha256": "625bfdd3fc69339e16004cd708efdb31b2be932c4b70fd4c63c0b5f12e9ec7db"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_rocket-wall-velocity.html",
+      "sha256": "db9080e8cd59b6c42842d2560d33bfaa8d08c9990654f36cee72a05441f8eac4"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_rocket-wall-velocity.js",
+      "sha256": "86db6d58aa7d955d818b6d796513e38551e68ff8012ad36bfdfac3c8bf6008dd"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_solveRocketShellSteadyKrylov.m",
+      "sha256": "095fca3d94bec190e67a2d9b0e905c5d7b15fc1b68222edd51290194e3643f26"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_testRocketShellTrialCompatibility.m",
+      "sha256": "433faf584361e95ff355cc5f0e94adab69cc3bda72f29dec8f7c0e567e03d8b0"
+    },
+    {
+      "path": "outputs\\v83_validation\\source_epochs\\pre_steady_newton_testRocketWallVelocityWorkbench.js",
+      "sha256": "230d559f0de48dbcae3f8d4810bc55122ccbcaa0c756e5e1f89493b5391b3e10"
+    }
+  ],
+  "actualMatlabTerminals": [
+    {
+      "name": "newtonunit01",
+      "path": "outputs\\v83_validation\\newtonunit01_process.json",
+      "sha256": "96f9660c4ef24b2d1728cb88afc31fa9f5610a0590baa874060f0b173f6a2fc7",
+      "expectedExitCode": 1,
+      "status": "terminal",
+      "exitCode": 1,
+      "startedUTC": "2026-10-24T09:37:26.120706+00:00",
+      "endedUTC": "2026-10-24T09:37:40.802487+00:00",
+      "engineProcessIDs": [
+        17308
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "newtonunit02",
+      "path": "outputs\\v83_validation\\newtonunit02_process.json",
+      "sha256": "25fdc8f14af12b76c1b6e1f4d9a1add69ffdb5337a44b01fe212aeedb617f892",
+      "expectedExitCode": 0,
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T09:40:38.932809+00:00",
+      "endedUTC": "2026-10-24T09:40:59.588015+00:00",
+      "engineProcessIDs": [
+        10176
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "newtonunit03",
+      "path": "outputs\\v83_validation\\newtonunit03_process.json",
+      "sha256": "1fbf1ab1f2e4099f4335af4e60f7d2e06a56a5def9a615ab9be23d60da7495b5",
+      "expectedExitCode": 0,
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T09:45:13.095795+00:00",
+      "endedUTC": "2026-10-24T09:45:28.457467+00:00",
+      "engineProcessIDs": [
+        59244
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "krylov06",
+      "path": "outputs\\v83_validation\\krylov06_process.json",
+      "sha256": "6579e9c05d7a00c9593905fa423e9bcdaf878588497f03259157adf1fcb4c817",
+      "expectedExitCode": 0,
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T09:47:23.774980+00:00",
+      "endedUTC": "2026-10-24T09:55:21.666078+00:00",
+      "engineProcessIDs": [
+        60040
+      ],
+      "sourceLockScope": "numerics",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "workbench05",
+      "path": "outputs\\v83_validation\\workbench05_process.json",
+      "sha256": "cd91558ce55ea43e6c080db3c3e71dcb59c011de1bb1d67b2e210ccbc3d3b7b2",
+      "expectedExitCode": 0,
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T10:11:50.074836+00:00",
+      "endedUTC": "2026-10-24T10:12:15.060629+00:00",
+      "engineProcessIDs": [
+        38364
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "lateralunit01",
+      "path": "outputs\\v83_validation\\lateralunit01_process.json",
+      "sha256": "af0f63d2bdc1ce63dbf50a0cfd9e991fd592a5c07b55fdf76df053f1005c56b8",
+      "expectedExitCode": 0,
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T10:15:30.003917+00:00",
+      "endedUTC": "2026-10-24T10:15:44.276808+00:00",
+      "engineProcessIDs": [
+        16008
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    },
+    {
+      "name": "lateralrocket01",
+      "path": "outputs\\v83_validation\\lateralrocket01_process.json",
+      "sha256": "7b34dedeab0704ba40acfcb385ffeca0ef10f7f279424d7f4ed7b4bbf1b7c25a",
+      "expectedExitCode": 0,
+      "status": "terminal",
+      "exitCode": 0,
+      "startedUTC": "2026-10-24T10:17:26.686975+00:00",
+      "endedUTC": "2026-10-24T10:17:55.810229+00:00",
+      "engineProcessIDs": [
+        44152
+      ],
+      "sourceLockScope": "all",
+      "sourceStableAfter": true
+    }
+  ],
+  "checkedReports": {
+    "unit": {
+      "path": "outputs\\v83_validation\\newtonunit03\\steady_newton_unit_summary.json",
+      "sha256": "8aec30d467bacede7f07ce4049b937e03cec610cd5d40fb5fa9b4f0b32096e9a",
+      "report": {
+        "status": "passed-actual-small-3D-steady-Newton-system-direction-descent-and-half-step-Jvp",
+        "cellCount": 32,
+        "acceptedIterations": 1,
+        "linearRelativeDefect": 0.06380775166956769,
+        "normalizedMeritDerivative": -0.9959285951226845,
+        "inexactNewtonUpperBound": -0.9361922483304324,
+        "halfDifferenceSensitivity": 7.43668493157614e-07,
+        "initialRmsMerit": 3593.762878196233,
+        "finalRmsMerit": 2238.8520973290833,
+        "alpha": 1,
+        "solverOriginalResidualEvaluations": 6,
+        "extraProbeOriginalResidualEvaluations": 1,
+        "invalidPolicyRejections": 2,
+        "rejectedBudgetOriginalResidualEvaluations": 4,
+        "failedBudgetStateKept": true,
+        "failedLinearDirectionSaved": true,
+        "preconditionerOnlyTimeScale": true,
+        "physicalTimeAdvanced": 0,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 59244
+      }
+    },
+    "compatibility": {
+      "path": "outputs\\v83_validation\\solvercompat05\\trial_compatibility_summary.json",
+      "sha256": "6e804bfa41dcf997dde997c55ba08d927a6ad9ae36836581b78f623630ec9cab",
+      "report": {
+        "status": "passed-complete-small-3D-default-and-explicit-conservative-prior-source-replay",
+        "cellCount": 32,
+        "acceptedIterations": 2,
+        "completeDefaultResultExactlyReplayed": true,
+        "onlyRuntimeTimingsExcluded": true,
+        "invalidPolicyRejections": 2,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 59244,
+        "completeExplicitPseudoResultExactlyReplayed": true
+      }
+    },
+    "rocket": {
+      "path": "outputs\\v83_validation\\krylov06\\wall_velocity_krylov_summary.json",
+      "sha256": "2653d19717efc4b6848c404e8dc2393fdb1fe463b77ddaccbfa9e26a94ce9898",
+      "report": {
+        "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+        "sourceFaces": 19752,
+        "cellCount": 217272,
+        "acceptedNonlinearIterations": 0,
+        "priorAcceptedNonlinearIterations": 12,
+        "totalNewEquationAcceptedIterations": 12,
+        "candidateTrials": 0,
+        "residualEvaluations": 27,
+        "totalNewEquationResidualEvaluations": 201,
+        "operatorBuilds": 1,
+        "initialMaximumResidual": 4758049.601364592,
+        "maximumResidual": 4758049.601364592,
+        "initialRmsMerit": 521635.2792153294,
+        "rmsMerit": 521635.2792153294,
+        "elapsedSeconds": 439.1723723,
+        "matrixVectorProducts": 26,
+        "jacobianResidualEvaluations": 26,
+        "preconditionerApplications": 27,
+        "lineage": {
+          "sourceState": "v82-exact-conservative-three-corrections-internal-initial-guess",
+          "sourceHistoryAppended": false,
+          "newEquationInitialCounter": 0,
+          "wallVelocityGradientChanged": true,
+          "interiorEulerFlux": "exact-godunov",
+          "viscousWorkVelocity": "arithmetic",
+          "wallVelocityGradient": "dirichlet-tangent",
+          "physicalWallVelocityAndTemperatureKept": true,
+          "externalCFDImported": false
+        },
+        "wallVelocityGradient": "dirichlet-tangent",
+        "sameEquationHistoryContinued": true,
+        "steadyConverged": false,
+        "stopReason": "steady-newton-linear-target-not-met",
+        "spatialConservationRelative": 4.762501927036358e-16,
+        "steadyBoundaryFluxBalance": 0.011954482698849347,
+        "signedHeatPowerW": 925861.9660217352,
+        "wallHeatRangeWm2": [
+          -358287.2316281634,
+          2267395.715238431
+        ],
+        "physicalTimeAdvanced": 0,
+        "BETimeStepsClaimed": 0,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 60040,
+        "priorActualResidualEvaluations": 174,
+        "residualEvaluationsAfterLastAcceptedHistory": 76,
+        "normalEulerLinearization": "exact-branch",
+        "physicalSpatialEquationChanged": false,
+        "linearEquation": "steady-newton",
+        "preconditionerTimeStepOnly": true
+      }
+    },
+    "rocketDirections": {
+      "path": "outputs\\v83_validation\\krylov06_independent_newton_directions.json",
+      "sha256": "309407f298b58a78f8820b7fc638d3ae6221d2734306758832bc1c8f2c835262",
+      "report": {
+        "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+        "case": "krylov06",
+        "kind": "rocket",
+        "variant": "result",
+        "processID": 40852,
+        "linearDirections": [
+          {
+            "iteration": 1,
+            "retry": 0,
+            "actualSteadyLinearDefect": 0.9931321994833844,
+            "normalizedMeritDerivative": -0.013688424408150405,
+            "inexactNewtonUpperBound": -0.006867800516615619,
+            "targetMet": false,
+            "originalJvpArithmeticRelativeDifference": 0.0
+          }
+        ],
+        "allDirectionsIncludingFailuresSaved": true,
+        "candidateTrials": 0,
+        "candidateNSEvaluations": 0,
+        "jacobianNSEvaluations": 26,
+        "totalSolverNSEvaluations": 27,
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\krylov06\\wall_velocity_krylov_evidence.mat": "c2623c667b32d3e8c0a4c8f2db611f08d7a29ed14379fa1c922a3469cf044863"
+        },
+        "scriptSHA256": "56ea2b1e60e4b434c7036d14dc884e5c6685816ca5b0d28d3b258fa536573edb"
+      }
+    },
+    "rocketIndependent": {
+      "path": "outputs\\v83_validation\\krylov06_independent_audit.json",
+      "sha256": "5c43235abdcf6ea55aa05c0b2d2ad4acb1c25515d274ac2259532b1887b4180f",
+      "report": {
+        "status": "passed-independent-actual-static-wall-flux-constitutive-Jacobian-conservation-and-update-audit",
+        "case": "krylov06",
+        "processID": 27628,
+        "predecessorCase": "krylov05",
+        "wallCount": 19752,
+        "wallFiveQuantityFluxRelativeDifference": 8.214909892934539e-16,
+        "wallHeatRelativeDifference": 8.214909892934539e-16,
+        "wallConstitutiveJacobianFDRelativeDifference": 7.139504669576014e-11,
+        "constitutiveJacobianSampleWalls": 6,
+        "mechanicalCoolingWalls": 0,
+        "negativeWallEntropyFaces": 0,
+        "fiveQuantityDivergenceRelativeDifference": 1.6086095796155252e-15,
+        "independentSpatialConservationRelative": 4.521171563967075e-16,
+        "iterationAudit": {
+          "acceptedIterations": 0,
+          "maximumResidual": 4758049.601364592,
+          "rmsMerit": 521635.2792153296,
+          "updateArithmeticRelativeDifference": 0.0,
+          "firstFullResidualJvpArithmeticDifference": 0.0,
+          "acceptedTemperatureRangeK": null,
+          "maximumKrylovIterations": 24,
+          "linearRelativeTolerance": 0.1,
+          "originalLinearToleranceUpperBoundNotWeakened": true,
+          "residualEvaluationsAfterLastLocalHistory": 26,
+          "residualEvaluationsAfterLastAcceptedHistory": 76,
+          "originalSteadyAndTemperatureGuardrailsPreserved": true,
+          "steadyConverged": false,
+          "sourceHistoryAppended": false
+        },
+        "fullIndependentNSSolver": false,
+        "wholeOpenBoundaryEntropyBalanceProved": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\krylov06\\wall_velocity_krylov_evidence.mat": "c2623c667b32d3e8c0a4c8f2db611f08d7a29ed14379fa1c922a3469cf044863",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "outputs\\v83_validation\\krylov05\\wall_velocity_krylov_evidence.mat": "ee3fe63637937c65900bcf68827be7c12a77b4de846bb5defaebe733dbfeb6ba"
+        },
+        "scriptSHA256": "4065aae9ae143c53e9c77e7e19f1131a7632608535223fe938e8446306637a00"
+      }
+    },
+    "unitDirections": {
+      "path": "outputs\\v83_validation\\newtonunit03_independent_newton_directions.json",
+      "sha256": "60f89b9acd4457ebc6a5f875abfda9f9a20e4cb6c1ba63b249453d70799d86e6",
+      "report": {
+        "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+        "case": "newtonunit03",
+        "kind": "unit",
+        "variant": "result",
+        "processID": 56568,
+        "linearDirections": [
+          {
+            "iteration": 1,
+            "retry": 0,
+            "actualSteadyLinearDefect": 0.06380775166956769,
+            "normalizedMeritDerivative": -0.9959285951226846,
+            "inexactNewtonUpperBound": -0.9361922483304324,
+            "targetMet": true,
+            "originalJvpArithmeticRelativeDifference": 0.0
+          }
+        ],
+        "allDirectionsIncludingFailuresSaved": true,
+        "candidateTrials": 1,
+        "candidateNSEvaluations": 1,
+        "jacobianNSEvaluations": 4,
+        "totalSolverNSEvaluations": 6,
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\newtonunit03\\steady_newton_unit_evidence.mat": "213c757584e7385b4eb2868d17dc5e0db05f0962e244fd440e7203246203429b"
+        },
+        "scriptSHA256": "56ea2b1e60e4b434c7036d14dc884e5c6685816ca5b0d28d3b258fa536573edb"
+      }
+    },
+    "unitLimitedDirections": {
+      "path": "outputs\\v83_validation\\newtonunit03_limited_independent_newton_directions.json",
+      "sha256": "d795276d290ee3c0fee024365278625bf702f3d9893bb0cf091e8fd74a5f74dd",
+      "report": {
+        "status": "passed-independent-all-steady-Newton-direction-evidence-descent-and-candidate-work-audit",
+        "case": "newtonunit03",
+        "kind": "unit",
+        "variant": "limited",
+        "processID": 15260,
+        "linearDirections": [
+          {
+            "iteration": 1,
+            "retry": 0,
+            "actualSteadyLinearDefect": 0.27586184280357734,
+            "normalizedMeritDerivative": -0.9239002436850142,
+            "inexactNewtonUpperBound": -0.7241381571964227,
+            "targetMet": false,
+            "originalJvpArithmeticRelativeDifference": 0.0
+          }
+        ],
+        "allDirectionsIncludingFailuresSaved": true,
+        "candidateTrials": 0,
+        "candidateNSEvaluations": 0,
+        "jacobianNSEvaluations": 3,
+        "totalSolverNSEvaluations": 4,
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\newtonunit03\\steady_newton_unit_evidence.mat": "213c757584e7385b4eb2868d17dc5e0db05f0962e244fd440e7203246203429b"
+        },
+        "scriptSHA256": "56ea2b1e60e4b434c7036d14dc884e5c6685816ca5b0d28d3b258fa536573edb"
+      }
+    },
+    "node": {
+      "path": "outputs\\v83_validation\\workbench05\\node_wall_velocity_summary.json",
+      "sha256": "2f889e073ba436604b4aa84cb38bbb2d637449873b279ee8ad918f3878f25b85",
+      "report": {
+        "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+        "processID": 49868,
+        "cases": 3,
+        "sourceFaces": 19752,
+        "CSVrows": 592560,
+        "sectionSamples": 6624,
+        "sameHostEvents": 15,
+        "linearDiagnosticRows": 1,
+        "candidateDiagnosticRows": 0,
+        "sourceSHA256": {
+          "tests\\testRocketWallVelocityWorkbench.js": "5e52300244f644000dba43af108ae233d6f1c9aa75ba059fc6e2cfbbc06d2cd0",
+          "outputs\\v83_validation\\workbench05\\rocket-wall-velocity.js": "b998c45727c274a75fd4eb43b55f779b5c7258524ad5f16418bf40f4230f812c",
+          "outputs\\v83_validation\\workbench05\\index.html": "82b7f301cf0db8ab44029abdc5b9b1c49129c536e4e4aa60d63dc7bbf672620d",
+          "web\\viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+          "web\\export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+          "web\\section.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c"
+        },
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "newProductionSolvedAreaM2": 0,
+        "dataSHA256": "94dd28f276625684b20bda77327c556462ce8771c48c141e7dc5f3ba263cabf7"
+      }
+    },
+    "viewerIndependent": {
+      "path": "outputs\\v83_validation\\workbench05\\independent_wall_velocity_view.json",
+      "sha256": "52871341b5b30fef3e989093761add3743cda4031674af71e2f332002895c489",
+      "report": {
+        "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+        "processID": 45908,
+        "cases": [
+          {
+            "case": "legacy-wall-source",
+            "sourceRelativeDifferences": {
+              "pressure": 2.4865056369363964e-16,
+              "heatFlux": 2.9471930864008487e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 2.8653818713341003e-16,
+              "steadyBoundaryFluxBalance": 0.015713480397044875
+            }
+          },
+          {
+            "case": "constrained-wall-baseline",
+            "sourceRelativeDifferences": {
+              "pressure": 2.4865056369363964e-16,
+              "heatFlux": 2.9471930864008487e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 2.8653818713341003e-16,
+              "steadyBoundaryFluxBalance": 0.015119531285283542
+            }
+          },
+          {
+            "case": "constrained-wall-krylov",
+            "sourceRelativeDifferences": {
+              "pressure": 2.8413742184432045e-16,
+              "heatFlux": 2.0055932355797212e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 4.762501927036352e-16,
+              "steadyBoundaryFluxBalance": 0.01195448269884938
+            }
+          }
+        ],
+        "sourceFaces": 19752,
+        "solverDiagnosticAudit": {
+          "linearAttempts": 1,
+          "rejectedLinearAttempts": 1,
+          "nonlinearTrials": 0,
+          "rejectedNonlinearTrials": 0
+        },
+        "scientificPNGs": [
+          "static_wall_velocity_comparison.png",
+          "static_wall_velocity_residuals.png",
+          "static_wall_velocity_balance.png"
+        ],
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "outputs\\v83_validation\\workbench05\\wall-velocity-study-data.json": "94dd28f276625684b20bda77327c556462ce8771c48c141e7dc5f3ba263cabf7",
+          "outputs\\v83_validation\\workbench05\\cases\\legacy-wall-source\\results.json": "5c048e7c893dc4c67064656bde19b17419e0ed6b742f893f0e63bf24db25d04f",
+          "outputs\\v82_validation\\exact_krylov01\\steady_krylov_evidence.mat": "4412d1d91f7911d4fc84269f82e70ebcafc8943491041b357da9317dd32a570e",
+          "outputs\\v83_validation\\workbench05\\cases\\constrained-wall-baseline\\results.json": "7bd40b17d235011f19be08c8b856f1854eb078bbf9592fa9969557d283a89f5f",
+          "outputs\\v83_validation\\integration01\\wall_velocity_integration_evidence.mat": "9d14bc8626323d57745540613baff91063749748ed4d4ce89b3110c22e097f5b",
+          "outputs\\v83_validation\\workbench05\\cases\\constrained-wall-krylov\\results.json": "b946336d02ea4a81384ba9ff4bf13828e0910bb2ba399b27c48feccd2bcd37b2",
+          "outputs\\v83_validation\\krylov06\\wall_velocity_krylov_evidence.mat": "c2623c667b32d3e8c0a4c8f2db611f08d7a29ed14379fa1c922a3469cf044863"
+        },
+        "scriptSHA256": "dfd8ca1bb068edb1ffc1a40ed66857b2775a25c519d3bcef809601e8d2d9a350"
+      }
+    },
+    "lateralUnit": {
+      "path": "outputs\\v83_validation\\lateralunit01\\lateral_coupling_summary.json",
+      "sha256": "578b48b94b7929af34ea486ed75ece6d0cc2a4e99a1fe48c35303eecb726c64a",
+      "report": {
+        "status": "measured-saved-full-NS-direction-line-versus-lateral-graph-actions",
+        "sourceCase": "newtonunit03",
+        "sourceKind": "unit",
+        "cellCount": 32,
+        "sideFaceCount": 96,
+        "comparison": {
+          "line": {
+            "relativeActionError": 0.030565897184348444,
+            "equationRelativeActionErrors": [
+              0.017104532478746094,
+              0.05277280988724583,
+              0.22507126392164198,
+              0.15527613320712358,
+              0.007394827642284255
+            ],
+            "steadyLinearDefect": 0.05735389540481163,
+            "cosineToOriginalAction": 0.9995340723954506
+          },
+          "rusanovGraph": {
+            "relativeActionError": 0.02214180115111794,
+            "equationRelativeActionErrors": [
+              0.009242084510054108,
+              0.03122048512383792,
+              0.18947916975281015,
+              0.12990349060302386,
+              0.004868385690261345
+            ],
+            "steadyLinearDefect": 0.06352519255697571,
+            "cosineToOriginalAction": 0.9997552873325436
+          },
+          "exactSideGraph": {
+            "relativeActionError": 0.0003350754397256488,
+            "equationRelativeActionErrors": [
+              0.00027547955910282043,
+              0.00035147584224422474,
+              0.002241087635926997,
+              0.0013435574588453623,
+              0.00023409693232705038
+            ],
+            "steadyLinearDefect": 0.06378658169031633,
+            "cosineToOriginalAction": 0.9999999438632722
+          }
+        },
+        "lineApplySeconds": 0.011884,
+        "rusanovSideSeconds": 0.0318233,
+        "exactSideSeconds": 0.095148,
+        "maximumDerivativeBatchBytes": 76800,
+        "batchSize": 2048,
+        "sideReplacementVolumeConservationRelative": 6.510224374699867e-17,
+        "sampleSideFaces": 65,
+        "sparseGraphStructuralNonzerosUpperBound": 6800,
+        "sparseGraphCSCBytesUpperBound": 110088,
+        "factorizationFillMemoryMeasured": false,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "fullOriginalNSJacobian": false,
+        "physicalEquationChanged": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 16008
+      }
+    },
+    "lateralRocket": {
+      "path": "outputs\\v83_validation\\lateralrocket01\\lateral_coupling_summary.json",
+      "sha256": "87a7032cea192fbcb5bdda57064738e0c7d6bb7d1255f9e0dc719c76cf6f0f20",
+      "report": {
+        "status": "measured-saved-full-NS-direction-line-versus-lateral-graph-actions",
+        "sourceCase": "krylov06",
+        "sourceKind": "rocket",
+        "cellCount": 217272,
+        "sideFaceCount": 651816,
+        "comparison": {
+          "line": {
+            "relativeActionError": 1.3461277781565761,
+            "equationRelativeActionErrors": [
+              1.338394332926258,
+              1.373373427685181,
+              1.4888528415289268,
+              1.2170414170432797,
+              1.3446855305700494
+            ],
+            "steadyLinearDefect": 1.041638061283897,
+            "cosineToOriginalAction": -0.2502140250853352
+          },
+          "rusanovGraph": {
+            "relativeActionError": 0.5412705884536079,
+            "equationRelativeActionErrors": [
+              0.4721670687327835,
+              0.587164746570673,
+              0.6907752333248439,
+              0.7533917912244843,
+              0.5405243148298907
+            ],
+            "steadyLinearDefect": 0.9935069883104111,
+            "cosineToOriginalAction": 0.8591932371112938
+          },
+          "exactSideGraph": {
+            "relativeActionError": 0.1287904336720663,
+            "equationRelativeActionErrors": [
+              7.518444958025622e-06,
+              0.07881260357618566,
+              0.30038027133039363,
+              0.4929074524074951,
+              0.09978058617794157
+            ],
+            "steadyLinearDefect": 0.9929099396798184,
+            "cosineToOriginalAction": 0.9917509341371449
+          }
+        },
+        "lineApplySeconds": 0.0822043,
+        "rusanovSideSeconds": 2.7692960999999996,
+        "exactSideSeconds": 7.2197216999999965,
+        "maximumDerivativeBatchBytes": 1638400.0,
+        "batchSize": 2048,
+        "sideReplacementVolumeConservationRelative": 9.806545122660344e-17,
+        "sampleSideFaces": 65,
+        "sparseGraphStructuralNonzerosUpperBound": 47898600.0,
+        "sparseGraphCSCBytesUpperBound": 775068488.0,
+        "factorizationFillMemoryMeasured": false,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "fullOriginalNSJacobian": false,
+        "physicalEquationChanged": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 44152
+      }
+    },
+    "lateralUnitIndependent": {
+      "path": "outputs\\v83_validation\\lateralunit01_independent_lateral_coupling.json",
+      "sha256": "3026337a91c58fe43a9f33de521feecfb860d004d5e5d276e1480661d00ae422",
+      "report": {
+        "status": "passed-independent-all-lateral-actions-and-public-Riemann-direction-samples",
+        "case": "lateralunit01",
+        "processID": 47996,
+        "cellCount": 32,
+        "sideFaceCount": 96,
+        "allActionRelativeDifferences": {
+          "lineAction": 0.0,
+          "sideOffDiagonal": 2.050949515359972e-16,
+          "exactSideCorrection": 2.783715648867472e-16,
+          "rusanovGraphAction": 1.0876033324324628e-17,
+          "exactSideGraphAction": 1.16065447215386e-17
+        },
+        "comparison": {
+          "line": {
+            "relativeActionError": 0.030565897184348434,
+            "equationRelativeActionErrors": [
+              0.017104532478746094,
+              0.05277280988724582,
+              0.22507126392164192,
+              0.15527613320712355,
+              0.007394827642284254
+            ],
+            "steadyLinearDefect": 0.05735389540481161,
+            "cosineToOriginalAction": 0.9995340723954503
+          },
+          "rusanovGraph": {
+            "relativeActionError": 0.022141801151117926,
+            "equationRelativeActionErrors": [
+              0.009242084510054108,
+              0.031220485123837915,
+              0.18947916975281015,
+              0.1299034906030238,
+              0.004868385690261345
+            ],
+            "steadyLinearDefect": 0.06352519255697568,
+            "cosineToOriginalAction": 0.9997552873325434
+          },
+          "exactSideGraph": {
+            "relativeActionError": 0.00033507543972564863,
+            "equationRelativeActionErrors": [
+              0.00027547955910282043,
+              0.0003514758422442246,
+              0.0022410876359269974,
+              0.0013435574588453614,
+              0.00023409693232705043
+            ],
+            "steadyLinearDefect": 0.06378658169031631,
+            "cosineToOriginalAction": 0.9999999438632714
+          }
+        },
+        "exactDirectionSamples": [
+          {
+            "sideIndex": 1,
+            "faceID": 9,
+            "relativeDifference": 2.9872718513185805e-10
+          },
+          {
+            "sideIndex": 3,
+            "faceID": 11,
+            "relativeDifference": 5.4085284966012295e-11
+          },
+          {
+            "sideIndex": 4,
+            "faceID": 12,
+            "relativeDifference": 3.1325400189948794e-10
+          },
+          {
+            "sideIndex": 6,
+            "faceID": 14,
+            "relativeDifference": 5.026994748127871e-10
+          },
+          {
+            "sideIndex": 7,
+            "faceID": 15,
+            "relativeDifference": 8.642440325510838e-10
+          },
+          {
+            "sideIndex": 9,
+            "faceID": 17,
+            "relativeDifference": 4.539927020031669e-10
+          },
+          {
+            "sideIndex": 10,
+            "faceID": 18,
+            "relativeDifference": 1.5782739058167262e-10
+          },
+          {
+            "sideIndex": 12,
+            "faceID": 20,
+            "relativeDifference": 3.108115773983062e-10
+          },
+          {
+            "sideIndex": 13,
+            "faceID": 21,
+            "relativeDifference": 2.9872718513185805e-10
+          },
+          {
+            "sideIndex": 15,
+            "faceID": 23,
+            "relativeDifference": 5.4085284966012295e-11
+          },
+          {
+            "sideIndex": 16,
+            "faceID": 24,
+            "relativeDifference": 3.1325400189948794e-10
+          },
+          {
+            "sideIndex": 18,
+            "faceID": 26,
+            "relativeDifference": 5.026994748127871e-10
+          },
+          {
+            "sideIndex": 19,
+            "faceID": 27,
+            "relativeDifference": 8.642440325510838e-10
+          },
+          {
+            "sideIndex": 21,
+            "faceID": 29,
+            "relativeDifference": 4.539927020031669e-10
+          },
+          {
+            "sideIndex": 22,
+            "faceID": 30,
+            "relativeDifference": 1.5782739058167262e-10
+          },
+          {
+            "sideIndex": 24,
+            "faceID": 32,
+            "relativeDifference": 3.108115773983062e-10
+          },
+          {
+            "sideIndex": 25,
+            "faceID": 41,
+            "relativeDifference": 5.28344791966275e-10
+          },
+          {
+            "sideIndex": 27,
+            "faceID": 43,
+            "relativeDifference": 1.053296713517551e-10
+          },
+          {
+            "sideIndex": 28,
+            "faceID": 44,
+            "relativeDifference": 2.514085657747384e-10
+          },
+          {
+            "sideIndex": 30,
+            "faceID": 46,
+            "relativeDifference": 1.2499154350606855e-10
+          },
+          {
+            "sideIndex": 31,
+            "faceID": 47,
+            "relativeDifference": 3.875732967176865e-10
+          },
+          {
+            "sideIndex": 32,
+            "faceID": 48,
+            "relativeDifference": 1.4402905320744496e-10
+          },
+          {
+            "sideIndex": 33,
+            "faceID": 49,
+            "relativeDifference": 1.3655923739397755e-10
+          },
+          {
+            "sideIndex": 34,
+            "faceID": 50,
+            "relativeDifference": 2.6581004967068673e-10
+          },
+          {
+            "sideIndex": 36,
+            "faceID": 52,
+            "relativeDifference": 2.2780638845265874e-10
+          },
+          {
+            "sideIndex": 37,
+            "faceID": 53,
+            "relativeDifference": 5.28344791966275e-10
+          },
+          {
+            "sideIndex": 39,
+            "faceID": 55,
+            "relativeDifference": 1.053296713517551e-10
+          },
+          {
+            "sideIndex": 40,
+            "faceID": 56,
+            "relativeDifference": 2.514085657747384e-10
+          },
+          {
+            "sideIndex": 42,
+            "faceID": 58,
+            "relativeDifference": 1.2499154350606855e-10
+          },
+          {
+            "sideIndex": 43,
+            "faceID": 59,
+            "relativeDifference": 3.875732967176865e-10
+          },
+          {
+            "sideIndex": 45,
+            "faceID": 61,
+            "relativeDifference": 1.3655923739397755e-10
+          },
+          {
+            "sideIndex": 46,
+            "faceID": 62,
+            "relativeDifference": 2.6581004967068673e-10
+          },
+          {
+            "sideIndex": 48,
+            "faceID": 64,
+            "relativeDifference": 2.2780638845265874e-10
+          },
+          {
+            "sideIndex": 49,
+            "faceID": 73,
+            "relativeDifference": 7.101056673733537e-11
+          },
+          {
+            "sideIndex": 51,
+            "faceID": 75,
+            "relativeDifference": 4.388802019043127e-10
+          },
+          {
+            "sideIndex": 52,
+            "faceID": 76,
+            "relativeDifference": 3.408291270749581e-10
+          },
+          {
+            "sideIndex": 54,
+            "faceID": 78,
+            "relativeDifference": 2.7642806686703133e-10
+          },
+          {
+            "sideIndex": 55,
+            "faceID": 79,
+            "relativeDifference": 2.169790431662312e-10
+          },
+          {
+            "sideIndex": 57,
+            "faceID": 81,
+            "relativeDifference": 4.278567671291512e-10
+          },
+          {
+            "sideIndex": 58,
+            "faceID": 82,
+            "relativeDifference": 4.1254738569797363e-10
+          },
+          {
+            "sideIndex": 60,
+            "faceID": 84,
+            "relativeDifference": 4.7819471301593516e-11
+          },
+          {
+            "sideIndex": 61,
+            "faceID": 85,
+            "relativeDifference": 7.101056673733537e-11
+          },
+          {
+            "sideIndex": 63,
+            "faceID": 87,
+            "relativeDifference": 4.388802019043127e-10
+          },
+          {
+            "sideIndex": 64,
+            "faceID": 88,
+            "relativeDifference": 3.408291270749581e-10
+          },
+          {
+            "sideIndex": 66,
+            "faceID": 90,
+            "relativeDifference": 2.7642806686703133e-10
+          },
+          {
+            "sideIndex": 67,
+            "faceID": 91,
+            "relativeDifference": 2.169790431662312e-10
+          },
+          {
+            "sideIndex": 69,
+            "faceID": 93,
+            "relativeDifference": 4.278567671291512e-10
+          },
+          {
+            "sideIndex": 70,
+            "faceID": 94,
+            "relativeDifference": 4.1254738569797363e-10
+          },
+          {
+            "sideIndex": 72,
+            "faceID": 96,
+            "relativeDifference": 4.7819471301593516e-11
+          },
+          {
+            "sideIndex": 73,
+            "faceID": 105,
+            "relativeDifference": 1.3427837648544877e-10
+          },
+          {
+            "sideIndex": 75,
+            "faceID": 107,
+            "relativeDifference": 2.229300278126168e-10
+          },
+          {
+            "sideIndex": 76,
+            "faceID": 108,
+            "relativeDifference": 1.2783206886851771e-10
+          },
+          {
+            "sideIndex": 78,
+            "faceID": 110,
+            "relativeDifference": 2.1072846282280618e-10
+          },
+          {
+            "sideIndex": 79,
+            "faceID": 111,
+            "relativeDifference": 9.378225254513056e-11
+          },
+          {
+            "sideIndex": 81,
+            "faceID": 113,
+            "relativeDifference": 3.140358363936447e-10
+          },
+          {
+            "sideIndex": 82,
+            "faceID": 114,
+            "relativeDifference": 5.841890809637433e-10
+          },
+          {
+            "sideIndex": 84,
+            "faceID": 116,
+            "relativeDifference": 5.241643535234482e-11
+          },
+          {
+            "sideIndex": 85,
+            "faceID": 117,
+            "relativeDifference": 1.3427837648544877e-10
+          },
+          {
+            "sideIndex": 87,
+            "faceID": 119,
+            "relativeDifference": 2.229300278126168e-10
+          },
+          {
+            "sideIndex": 88,
+            "faceID": 120,
+            "relativeDifference": 1.2783206886851771e-10
+          },
+          {
+            "sideIndex": 90,
+            "faceID": 122,
+            "relativeDifference": 2.1072846282280618e-10
+          },
+          {
+            "sideIndex": 91,
+            "faceID": 123,
+            "relativeDifference": 9.378225254513056e-11
+          },
+          {
+            "sideIndex": 93,
+            "faceID": 125,
+            "relativeDifference": 3.140358363936447e-10
+          },
+          {
+            "sideIndex": 94,
+            "faceID": 126,
+            "relativeDifference": 5.841890809637433e-10
+          },
+          {
+            "sideIndex": 96,
+            "faceID": 128,
+            "relativeDifference": 5.241643535234482e-11
+          }
+        ],
+        "maximumPublicExactDirectionRelativeDifference": 8.642440325510838e-10,
+        "branchStepReductions": 0,
+        "sideReplacementVolumeConservationRelative": 6.739721958055132e-17,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\lateralunit01\\lateral_coupling_evidence.mat": "cf40b4aeef6a37ed0a9dc4f7ef6748ab300696a0f2696202865730a4e1244ba8",
+          "outputs\\v83_validation\\newtonunit03\\steady_newton_unit_evidence.mat": "213c757584e7385b4eb2868d17dc5e0db05f0962e244fd440e7203246203429b",
+          "outputs\\v82_validation\\clawpack_exact_euler.py": "2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef",
+          "outputs\\v82_validation\\probe_exact_riemann.py": "402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a"
+        },
+        "scriptSHA256": "c25377d2bb70353fe7a7aa7b2ee2ed457bd913f692385a4fcd8e33c6636061ed"
+      }
+    },
+    "lateralRocketIndependent": {
+      "path": "outputs\\v83_validation\\lateralrocket01_independent_lateral_coupling.json",
+      "sha256": "f1d19823107638a620e2d1809a88c8c343f1e89bd70b2dcdb355cd6875ec6316",
+      "report": {
+        "status": "passed-independent-all-lateral-actions-and-public-Riemann-direction-samples",
+        "case": "lateralrocket01",
+        "processID": 55460,
+        "cellCount": 217272,
+        "sideFaceCount": 651816,
+        "allActionRelativeDifferences": {
+          "lineAction": 0.0,
+          "sideOffDiagonal": 1.4228688649404754e-16,
+          "exactSideCorrection": 3.7999489518693883e-16,
+          "rusanovGraphAction": 1.808566206810893e-16,
+          "exactSideGraphAction": 2.1252783409693266e-16
+        },
+        "comparison": {
+          "line": {
+            "relativeActionError": 1.3461277781567307,
+            "equationRelativeActionErrors": [
+              1.3383943329261796,
+              1.3733734276851541,
+              1.488852841528921,
+              1.2170414170432458,
+              1.3446855305699927
+            ],
+            "steadyLinearDefect": 1.041638061284001,
+            "cosineToOriginalAction": -0.2502140250852671
+          },
+          "rusanovGraph": {
+            "relativeActionError": 0.5412705884536816,
+            "equationRelativeActionErrors": [
+              0.47216706873276487,
+              0.5871647465706324,
+              0.6907752333248207,
+              0.7533917912244342,
+              0.5405243148298838
+            ],
+            "steadyLinearDefect": 0.9935069883104882,
+            "cosineToOriginalAction": 0.8591932371111145
+          },
+          "exactSideGraph": {
+            "relativeActionError": 0.12879043367206372,
+            "equationRelativeActionErrors": [
+              7.518444958025172e-06,
+              0.07881260357618405,
+              0.30038027133037426,
+              0.492907452407485,
+              0.09978058617793874
+            ],
+            "steadyLinearDefect": 0.9929099396799121,
+            "cosineToOriginalAction": 0.9917509341369513
+          }
+        },
+        "exactDirectionSamples": [
+          {
+            "sideIndex": 1,
+            "faceID": 19753,
+            "relativeDifference": 3.7907206902436346e-10
+          },
+          {
+            "sideIndex": 10347,
+            "faceID": 30099,
+            "relativeDifference": 3.871111830540496e-11
+          },
+          {
+            "sideIndex": 20694,
+            "faceID": 40446,
+            "relativeDifference": 4.3860194040723594e-11
+          },
+          {
+            "sideIndex": 31040,
+            "faceID": 50792,
+            "relativeDifference": 2.411232768982077e-10
+          },
+          {
+            "sideIndex": 41386,
+            "faceID": 61138,
+            "relativeDifference": 1.5232837556377353e-10
+          },
+          {
+            "sideIndex": 51732,
+            "faceID": 71484,
+            "relativeDifference": 4.017549581973189e-11
+          },
+          {
+            "sideIndex": 62079,
+            "faceID": 101583,
+            "relativeDifference": 2.375776498174925e-11
+          },
+          {
+            "sideIndex": 72425,
+            "faceID": 111929,
+            "relativeDifference": 1.4205742026178272e-10
+          },
+          {
+            "sideIndex": 82771,
+            "faceID": 122275,
+            "relativeDifference": 3.1015241287044965e-11
+          },
+          {
+            "sideIndex": 93117,
+            "faceID": 132621,
+            "relativeDifference": 2.4755215493578262e-11
+          },
+          {
+            "sideIndex": 103464,
+            "faceID": 142968,
+            "relativeDifference": 6.199115206592201e-11
+          },
+          {
+            "sideIndex": 113810,
+            "faceID": 153314,
+            "relativeDifference": 2.683676528664803e-10
+          },
+          {
+            "sideIndex": 124156,
+            "faceID": 183412,
+            "relativeDifference": 3.77444498178949e-11
+          },
+          {
+            "sideIndex": 134503,
+            "faceID": 193759,
+            "relativeDifference": 3.469694223633239e-11
+          },
+          {
+            "sideIndex": 144849,
+            "faceID": 204105,
+            "relativeDifference": 8.26908643218704e-11
+          },
+          {
+            "sideIndex": 155195,
+            "faceID": 214451,
+            "relativeDifference": 1.0796849228604253e-10
+          },
+          {
+            "sideIndex": 165541,
+            "faceID": 224797,
+            "relativeDifference": 6.714791967755718e-12
+          },
+          {
+            "sideIndex": 175888,
+            "faceID": 235144,
+            "relativeDifference": 3.4594219126000223e-10
+          },
+          {
+            "sideIndex": 186234,
+            "faceID": 265242,
+            "relativeDifference": 1.927473195832702e-10
+          },
+          {
+            "sideIndex": 196580,
+            "faceID": 275588,
+            "relativeDifference": 8.158748502932305e-11
+          },
+          {
+            "sideIndex": 202764,
+            "faceID": 281772,
+            "relativeDifference": 1.41726861862483e-11
+          },
+          {
+            "sideIndex": 206926,
+            "faceID": 285934,
+            "relativeDifference": 8.284511057815221e-11
+          },
+          {
+            "sideIndex": 217273,
+            "faceID": 296281,
+            "relativeDifference": 1.2212307818180375e-10
+          },
+          {
+            "sideIndex": 227619,
+            "faceID": 306627,
+            "relativeDifference": 8.870834597047119e-11
+          },
+          {
+            "sideIndex": 237965,
+            "faceID": 336725,
+            "relativeDifference": 4.0409691526708465e-11
+          },
+          {
+            "sideIndex": 248311,
+            "faceID": 347071,
+            "relativeDifference": 9.295932005758518e-11
+          },
+          {
+            "sideIndex": 258658,
+            "faceID": 357418,
+            "relativeDifference": 5.4060073330012697e-11
+          },
+          {
+            "sideIndex": 269004,
+            "faceID": 367764,
+            "relativeDifference": 3.8488470749085526e-10
+          },
+          {
+            "sideIndex": 279350,
+            "faceID": 378110,
+            "relativeDifference": 1.1746605515392395e-10
+          },
+          {
+            "sideIndex": 289697,
+            "faceID": 388457,
+            "relativeDifference": 5.0930208969179745e-11
+          },
+          {
+            "sideIndex": 300043,
+            "faceID": 418555,
+            "relativeDifference": 4.3864902929480495e-10
+          },
+          {
+            "sideIndex": 310389,
+            "faceID": 428901,
+            "relativeDifference": 9.444105300954957e-11
+          },
+          {
+            "sideIndex": 320735,
+            "faceID": 439247,
+            "relativeDifference": 1.5636674209258164e-10
+          },
+          {
+            "sideIndex": 331082,
+            "faceID": 449594,
+            "relativeDifference": 3.636051176678004e-11
+          },
+          {
+            "sideIndex": 341428,
+            "faceID": 459940,
+            "relativeDifference": 9.587524613677574e-11
+          },
+          {
+            "sideIndex": 351774,
+            "faceID": 470286,
+            "relativeDifference": 2.4713270084245656e-12
+          },
+          {
+            "sideIndex": 362120,
+            "faceID": 500384,
+            "relativeDifference": 2.331211374648439e-10
+          },
+          {
+            "sideIndex": 372467,
+            "faceID": 510731,
+            "relativeDifference": 1.4715420948949017e-10
+          },
+          {
+            "sideIndex": 382813,
+            "faceID": 521077,
+            "relativeDifference": 1.4800936089905997e-14
+          },
+          {
+            "sideIndex": 393159,
+            "faceID": 531423,
+            "relativeDifference": 1.541756897291217e-13
+          },
+          {
+            "sideIndex": 403506,
+            "faceID": 541770,
+            "relativeDifference": 8.648795920522652e-11
+          },
+          {
+            "sideIndex": 413852,
+            "faceID": 552116,
+            "relativeDifference": 9.16024481659897e-15
+          },
+          {
+            "sideIndex": 424198,
+            "faceID": 582214,
+            "relativeDifference": 3.155321813637748e-16
+          },
+          {
+            "sideIndex": 434544,
+            "faceID": 592560,
+            "relativeDifference": 1.019433269628316e-14
+          },
+          {
+            "sideIndex": 444891,
+            "faceID": 602907,
+            "relativeDifference": 1.8960570860458038e-12
+          },
+          {
+            "sideIndex": 455237,
+            "faceID": 613253,
+            "relativeDifference": 4.219882735964219e-12
+          },
+          {
+            "sideIndex": 465583,
+            "faceID": 623599,
+            "relativeDifference": 6.273468838049578e-11
+          },
+          {
+            "sideIndex": 475929,
+            "faceID": 653697,
+            "relativeDifference": 1.246804774415335e-13
+          },
+          {
+            "sideIndex": 486276,
+            "faceID": 664044,
+            "relativeDifference": 5.394113082054843e-13
+          },
+          {
+            "sideIndex": 496622,
+            "faceID": 674390,
+            "relativeDifference": 5.429465294624157e-12
+          },
+          {
+            "sideIndex": 506968,
+            "faceID": 684736,
+            "relativeDifference": 3.2748711584414435e-14
+          },
+          {
+            "sideIndex": 517314,
+            "faceID": 695082,
+            "relativeDifference": 2.741122606251867e-14
+          },
+          {
+            "sideIndex": 527661,
+            "faceID": 705429,
+            "relativeDifference": 2.3881664281807917e-13
+          },
+          {
+            "sideIndex": 538007,
+            "faceID": 735527,
+            "relativeDifference": 3.099937961247631e-21
+          },
+          {
+            "sideIndex": 548353,
+            "faceID": 745873,
+            "relativeDifference": 4.9925442138840496e-20
+          },
+          {
+            "sideIndex": 558700,
+            "faceID": 756220,
+            "relativeDifference": 1.0935530208523496e-21
+          },
+          {
+            "sideIndex": 569046,
+            "faceID": 766566,
+            "relativeDifference": 2.4393869160371967e-16
+          },
+          {
+            "sideIndex": 579392,
+            "faceID": 776912,
+            "relativeDifference": 1.0122153888485238e-17
+          },
+          {
+            "sideIndex": 589738,
+            "faceID": 787258,
+            "relativeDifference": 9.635034124452437e-23
+          },
+          {
+            "sideIndex": 600085,
+            "faceID": 817357,
+            "relativeDifference": 1.777746919778085e-16
+          },
+          {
+            "sideIndex": 610431,
+            "faceID": 827703,
+            "relativeDifference": 1.2609029616172339e-14
+          },
+          {
+            "sideIndex": 620777,
+            "faceID": 838049,
+            "relativeDifference": 4.442459415062743e-25
+          },
+          {
+            "sideIndex": 631123,
+            "faceID": 848395,
+            "relativeDifference": 1.453830754508703e-15
+          },
+          {
+            "sideIndex": 641470,
+            "faceID": 858742,
+            "relativeDifference": 1.6124788293458858e-14
+          },
+          {
+            "sideIndex": 651816,
+            "faceID": 869088,
+            "relativeDifference": 1.7515395608608672e-25
+          }
+        ],
+        "maximumPublicExactDirectionRelativeDifference": 4.3864902929480495e-10,
+        "branchStepReductions": 0,
+        "sideReplacementVolumeConservationRelative": 5.493265894213653e-18,
+        "newOriginalNSEvaluations": 0,
+        "newAcceptedIterations": 0,
+        "fullIndependentNSSolver": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\lateralrocket01\\lateral_coupling_evidence.mat": "32d8293d04ff402d22a46cb258b2e420f899cf48745c5a1340fde001e78ee377",
+          "outputs\\v83_validation\\krylov06\\wall_velocity_krylov_evidence.mat": "c2623c667b32d3e8c0a4c8f2db611f08d7a29ed14379fa1c922a3469cf044863",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "outputs\\v82_validation\\clawpack_exact_euler.py": "2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef",
+          "outputs\\v82_validation\\probe_exact_riemann.py": "402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a"
+        },
+        "scriptSHA256": "c25377d2bb70353fe7a7aa7b2ee2ed457bd913f692385a4fcd8e33c6636061ed"
+      }
+    }
+  },
+  "evidence": [
+    {
+      "path": "outputs\\v83_validation\\newtonunit03\\steady_newton_unit_evidence.mat",
+      "sha256": "213c757584e7385b4eb2868d17dc5e0db05f0962e244fd440e7203246203429b",
+      "bytes": 183710
+    },
+    {
+      "path": "outputs\\v83_validation\\solvercompat05\\trial_compatibility_evidence.mat",
+      "sha256": "be84622dedd97c8134f53cf246db31c2e706e3014cceb9110c144b44e010028b",
+      "bytes": 249609
+    },
+    {
+      "path": "outputs\\v83_validation\\krylov06\\wall_velocity_krylov_evidence.mat",
+      "sha256": "c2623c667b32d3e8c0a4c8f2db611f08d7a29ed14379fa1c922a3469cf044863",
+      "bytes": 749245851
+    },
+    {
+      "path": "outputs\\v83_validation\\lateralunit01\\lateral_coupling_evidence.mat",
+      "sha256": "cf40b4aeef6a37ed0a9dc4f7ef6748ab300696a0f2696202865730a4e1244ba8",
+      "bytes": 10680
+    },
+    {
+      "path": "outputs\\v83_validation\\lateralrocket01\\lateral_coupling_evidence.mat",
+      "sha256": "32d8293d04ff402d22a46cb258b2e420f899cf48745c5a1340fde001e78ee377",
+      "bytes": 67141593
+    },
+    {
+      "path": "outputs\\v83_validation\\workbench05\\wall-velocity-study-data.json",
+      "sha256": "94dd28f276625684b20bda77327c556462ce8771c48c141e7dc5f3ba263cabf7",
+      "bytes": 9914
+    },
+    {
+      "path": "outputs\\v83_validation\\workbench05\\static_wall_velocity_comparison.png",
+      "sha256": "79ec8ff917c241b93bc17544f0fcc405ba0ecc121eace6e4d36fdad078a14169",
+      "bytes": 476061
+    },
+    {
+      "path": "outputs\\v83_validation\\workbench05\\static_wall_velocity_residuals.png",
+      "sha256": "46577cee0c0bc8596218022c0c7504c5f28ddbc1c7a3ab69ded97be55cb48c6a",
+      "bytes": 62434
+    },
+    {
+      "path": "outputs\\v83_validation\\workbench05\\static_wall_velocity_balance.png",
+      "sha256": "edad2433c601fd6645c38491226dbb563c64b37240c20454121bb5b8e7bc2c9a",
+      "bytes": 72084
+    }
+  ],
+  "developmentFailurePreserved": {
+    "case": "newtonunit01",
+    "actualExitCode": 1,
+    "reason": "GMRES restart equals dimension MAXIT interpreted as total inner iterations; repaired only explicit new mode"
+  },
+  "production": {
+    "qualifiedHeatFluxAreaPercent": 66.5626327424,
+    "newQualifiedAreaM2": 0,
+    "steadyConverged": false
+  },
+  "userInterface": {
+    "workbench": "outputs/v83_validation/workbench05/index.html",
+    "scientificPNGsActuallyInspected": 3,
+    "browserVisualOrWebGLRuntimeVerified": false
+  },
+  "delivery": {
+    "v83FullStageDelivered": false,
+    "latestFormalFrozenVersion": 82,
+    "v82Receipt": "docs/validation/v82/delivery.json",
+    "githubCommitOrPushPerformed": false
+  },
+  "nextAction": "Include measured lateral neighbours and selected exact side Euler derivatives in a memory-bounded right preconditioner; verify full small-domain assembly/solve before a bounded real same-endpoint direction solve; preserve original NS and all gates.",
+  "recorderSHA256": "c106157d5c82dd4c6540c43adb63abf0c1e2cae8fe0c3c8c9c38795531e52104"
+}

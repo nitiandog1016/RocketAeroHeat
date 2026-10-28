@@ -1,0 +1,44 @@
+function report=studyRocketPatchHierarchy(folder)
+%STUDYROCKETPATCHHIERARCHY 复用真实同Q完整C和局部因子，作一次有界多层对照。
+% 模块一：原矩阵和因子SHA绑定，不重做原NS、Schur、粗像或局部因子。
+% 模块二：真实新粗层完整汇总原系数，最粗逆不能通过则明确拒绝。
+% 模块三：32步完整C结果与原NS/物理解资格保持不同身份。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'PatchHierarchyStudy:Overwrite','不得覆盖真实代数层次研究。');mkdir(folder);
+factorFile=fullfile(root,'outputs','v83_validation','coupledpatchreal01','coupled_patch_factor_evidence.mat');
+assert(strcmp(rocketStreamingFileSHA256(factorFile),'09b04be0c77f76f8c04bd717745a0dd2fbcef7cdb6809d53bc403a07ed6349e0'));
+f=load(factorFile,'factor','packedFile','rhsFile','sourceBinding');factor=f.factor;packedFile=f.packedFile;rhsFile=f.rhsFile;sourceBinding=f.sourceBinding;clear f;
+assert(strcmp(rocketStreamingFileSHA256(packedFile),'beaa643c209d36ead3d7b859f5968f34c06435023cab2b1e676ac080c9bd0dcf'));
+s=load(packedFile,'packed','sourceBinding');assert(isequaln(s.sourceBinding,sourceBinding));packed=s.packed;clear s;
+assert(strcmp(rocketStreamingFileSHA256(sourceBinding.sourceFile),sourceBinding.sourceFileSHA256));
+s=load(rhsFile,'remaining','sourceFile');assert(strcmp(s.sourceFile,sourceBinding.sourceFile));rhs=s.remaining;clear s;
+sourceIdentity=struct;for key={'restrictRocketPatchResidual','prolongRocketPatchCorrection','coarsenRocketPackedGraph','buildRocketPatchHierarchy', ...
+        'applyRocketPatchHierarchy','solveRocketPatchHierarchyKrylov','compactRocketPatchHierarchyReport','buildRocketStrongPatches','factorRocketCoupledPatches', ...
+        'certifyRocketLocalInverse','solveRocketCoupledPatches','applyRocketPackedGraph','solveRocketRecycledGMRES'},sourceIdentity.(key{1})=rocketStreamingFileSHA256(which(key{1}));end
+stage='hierarchy-construction';rejected=false;identifier='';message='';hierarchyAvailable=false;singleComplete=false;innerComplete=false;
+try
+    opt=struct('maximumPatchCells',8,'maximumLevels',8,'terminalMaximumCells',16,'maximumHierarchyBytes',1024*1024^2, ...
+        'maximumConstructionBytes',3072*1024^2,'failureEvidenceFile',fullfile(folder,'hierarchy_inverse_failure.mat'));
+    hierarchy=buildRocketPatchHierarchy(packed,factor,opt);hierarchyAvailable=true;
+    hierarchyFile=fullfile(folder,'patch_hierarchy_factor_evidence.mat');save(hierarchyFile,'hierarchy','factorFile','packedFile','rhsFile','sourceBinding','sourceIdentity','-v7');
+    stage='single-fixed-V-cycle';[single,singleWork]=applyRocketPatchHierarchy(hierarchy,rhs);singleImage=applyRocketPackedGraph(packed,single);singleComplete=true;
+    singleSummary=struct('relativeCResidual',norm(rhs-singleImage,'fro')/norm(rhs,'fro'),'inverseGainSeconds',norm(single,'fro')/norm(rhs,'fro'));
+    stage='bounded-complete-C-GMRES';kopt=struct('maximumIterations',32,'relativeTolerance',1e-3,'maximumBasisBytes',1024*1024^2,'saveBasisEvidence',false, ...
+        'failureEvidenceFile',fullfile(folder,'hierarchy_arnoldi_failure.mat'));
+    [value,detail]=solveRocketPatchHierarchyKrylov(hierarchy,rhs,kopt);innerComplete=true;image=applyRocketPackedGraph(packed,value);
+    save(fullfile(folder,'patch_hierarchy_real_evidence.mat'),'rhs','single','singleImage','singleWork','singleSummary','value','image','detail', ...
+        'hierarchyFile','factorFile','packedFile','rhsFile','sourceBinding','sourceIdentity','-v7');stage='bounded-complete-C-study-finished';
+catch ex
+    if ~(startsWith(ex.identifier,'PatchHierarchy:')||startsWith(ex.identifier,'PatchCoarse:')||startsWith(ex.identifier,'PatchTransfer:')||startsWith(ex.identifier,'StrongPatches:')|| ...
+            startsWith(ex.identifier,'CoupledPatches:')||startsWith(ex.identifier,'LocalInverse:')||startsWith(ex.identifier,'InverseResidual:')||startsWith(ex.identifier,'RecycledGMRES:')),rethrow(ex);end
+    rejected=true;identifier=ex.identifier;message=ex.message;
+end
+report=struct('status','tested-bounded-five-field-strong-connection-algebraic-hierarchy-study','stage',stage,'candidateRejected',rejected,'errorIdentifier',identifier,'message',message, ...
+    'hierarchyAvailable',hierarchyAvailable,'innerRunComplete',innerComplete,'sourceBinding',sourceBinding,'sourceIdentity',sourceIdentity, ...
+    'newRootLocalFactorConstructions',0,'newSelectedJApplications',0,'newActualNSEvaluations',0,'newCoarseImageConstructions',0, ...
+    'newFlowAcceptances',0,'newProductionSolvedAreaM2',0,'physicalSolution',false,'engineProcessID',feature('getpid'));
+if hierarchyAvailable,report.hierarchyReport=hierarchy.constructionReport;end
+if singleComplete,report.singleSummary=singleSummary;report.singleWork=singleWork;end
+if innerComplete,report.innerReport=compactRocketPatchHierarchyReport(detail);report.internalCTargetMet=detail.krylov.flag==0;report.extraRootCDiagnosticApplications=2;report.realFullArnoldiBasisSaved=false;end
+raw=jsonencode(report);assert(numel(raw)<128*1024,'PatchHierarchyStudy:Summary','层次报告过大。');fid=fopen(fullfile(folder,'patch_hierarchy_real_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',raw);fprintf('%s\n',raw);
+end

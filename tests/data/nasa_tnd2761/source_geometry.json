@@ -1,0 +1,608 @@
+{
+  "schema": "RocketAeroHeat.nasa-tnd2761.source-draft.v1",
+  "status": "source-and-geometry-draft-not-MATLAB-tested-not-experimental-validation",
+  "source": {
+    "report": "NASA TN D-2761",
+    "citation": "19650013004",
+    "pdfSHA256": "8cc36817a2dcfb95a138e4436a0455bceaae02fbd7fe39c74c5a1bf0eef2c4d5",
+    "URL": "https://ntrs.nasa.gov/api/citations/19650013004/downloads/19650013004.pdf",
+    "geometryPDFPage": 19,
+    "geometryPrintedPage": 17,
+    "supportPDFPage": 20,
+    "pressureFigure": 9,
+    "pressurePDFPage": 35
+  },
+  "scope": {
+    "axisymmetric": true,
+    "planarEquivalent": false,
+    "alphaDeg": 0,
+    "pressureCandidateOnly": true,
+    "heatValidationComplete": false,
+    "productionAreaAddedM2": 0
+  },
+  "geometry": {
+    "inchToM": 0.0254,
+    "diameterM": 0.085725,
+    "basicCylinderLengthM": 0.254,
+    "interchangeableAfterbodyLengthM": 0.1016,
+    "assembledNoseBaseToBaseLengthM": 0.35559999999999997,
+    "boattailAxialLengthM": 0.029972,
+    "cylinderLengthBeforeBoattailM": 0.325628,
+    "axialRatioPrintedRounded": 0.35,
+    "axialRatioFromDimensions": 0.3496296296296296,
+    "noseTipPositiveX": true,
+    "projectBaseX_m": 0
+  },
+  "coordinateContract": {
+    "source": "x grows downstream; x=0 is one diameter ahead of base; x-prime=0 at cylinder/boattail junction",
+    "project": "X nose-positive, base X=0, zero-alpha freestream -X",
+    "sourceXoverDToProjectX": "X_m=D_m*(1-source_x_over_D)",
+    "sourceXprimeOverD": "source_x_prime_over_D=source_x_over_D-(1-Lbt_m/D_m)",
+    "signedBaseTapYUsedToInferWindward": false
+  },
+  "conditions": {
+    "freestreamMachNominal": 5.98,
+    "cylinderMachForNose1FromPressureRatio": 5.8,
+    "stagnationPressureApproxPsia": 400,
+    "stagnationTemperatureApproxF": 470,
+    "nominalRePerFoot": 7000000.0,
+    "nominalRePerM": 22965879.265091863,
+    "experimentalWallTemperatureK": null,
+    "inletVelocityTemperatureTurbulenceProfiles": null,
+    "nominalStagnationValuesAreExactRunInputs": false
+  },
+  "support": {
+    "stingDiameterRatioPrinted": 0.37,
+    "stingLengthRatioPrinted": 2.97,
+    "supportReconstructedInSolver": false,
+    "basePressureComparisonQualified": false
+  },
+  "uncertainty": {
+    "transducer1psiaFractionFullScaleUpperBound": 0.0025,
+    "transducer5psiaFractionFullScaleUpperBound": 0.005,
+    "fullExperimentPressureUncertainty": null,
+    "digitizationUncertainty": null,
+    "nominalAlphaToleranceDeg": 0.25
+  },
+  "cases": [
+    {
+      "noseSection": 1,
+      "noseHalfAngleDeg": 15,
+      "boattailHalfAngleDeg": 6,
+      "angleOfAttackDeg": 0,
+      "conicalNoseLengthM": 0.159965027739421,
+      "baseRadiusM": 0.039712315860617145,
+      "taps": [
+        {
+          "orifice": 1,
+          "source_x_over_D": 0.408,
+          "project_X_m": 0.0507492,
+          "radius_m": 0.0428625,
+          "region": "cylinder",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 2,
+          "source_x_over_D": 0.709,
+          "project_X_m": 0.024945975000000002,
+          "radius_m": 0.04233424348594882,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 3,
+          "source_x_over_D": 0.765,
+          "project_X_m": 0.020145374999999997,
+          "radius_m": 0.04182968009413242,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 4,
+          "source_x_over_D": 0.822,
+          "project_X_m": 0.015259050000000003,
+          "radius_m": 0.04131610664174786,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 5,
+          "source_x_over_D": 0.879,
+          "project_X_m": 0.010372725,
+          "radius_m": 0.040802533189363305,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 6,
+          "source_x_over_D": 0.936,
+          "project_X_m": 0.0054863999999999954,
+          "radius_m": 0.04028895973697875,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 7,
+          "source_x_over_D": 0.936,
+          "project_X_m": 0.0054863999999999954,
+          "radius_m": 0.04028895973697875,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 8,
+          "source_x_over_D": 0.879,
+          "project_X_m": 0.010372725,
+          "radius_m": 0.040802533189363305,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 9,
+          "source_x_over_D": 0.822,
+          "project_X_m": 0.015259050000000003,
+          "radius_m": 0.04131610664174786,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 10,
+          "source_x_over_D": 0.765,
+          "project_X_m": 0.020145374999999997,
+          "radius_m": 0.04182968009413242,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 11,
+          "source_x_over_D": 0.709,
+          "project_X_m": 0.024945975000000002,
+          "radius_m": 0.04233424348594882,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 12,
+          "source_x_over_D": 0.408,
+          "project_X_m": 0.0507492,
+          "radius_m": 0.0428625,
+          "region": "cylinder",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 13,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": 0.398,
+          "project_X_m": 0.0,
+          "radius_m": 0.03411855,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 14,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": 0.352,
+          "project_X_m": 0.0,
+          "radius_m": 0.030175199999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 15,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": -0.352,
+          "project_X_m": 0.0,
+          "radius_m": 0.030175199999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 16,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": -0.398,
+          "project_X_m": 0.0,
+          "radius_m": 0.03411855,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        }
+      ],
+      "measurementsDigitized": false,
+      "physicalSolveInputComplete": false
+    },
+    {
+      "noseSection": 1,
+      "noseHalfAngleDeg": 15,
+      "boattailHalfAngleDeg": 12,
+      "angleOfAttackDeg": 0,
+      "conicalNoseLengthM": 0.159965027739421,
+      "baseRadiusM": 0.03649175473362609,
+      "taps": [
+        {
+          "orifice": 1,
+          "source_x_over_D": 0.408,
+          "project_X_m": 0.0507492,
+          "radius_m": 0.0428625,
+          "region": "cylinder",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 2,
+          "source_x_over_D": 0.715,
+          "project_X_m": 0.024431625000000002,
+          "radius_m": 0.04168485693963745,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 3,
+          "source_x_over_D": 0.771,
+          "project_X_m": 0.019631024999999996,
+          "radius_m": 0.04066445790968434,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 4,
+          "source_x_over_D": 0.825,
+          "project_X_m": 0.015001875000000003,
+          "radius_m": 0.03968050170222956,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 5,
+          "source_x_over_D": 0.881,
+          "project_X_m": 0.010201275,
+          "radius_m": 0.03866010267227645,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 6,
+          "source_x_over_D": 0.937,
+          "project_X_m": 0.005400674999999995,
+          "radius_m": 0.037639703642323344,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 7,
+          "source_x_over_D": 0.937,
+          "project_X_m": 0.005400674999999995,
+          "radius_m": 0.037639703642323344,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 8,
+          "source_x_over_D": 0.881,
+          "project_X_m": 0.010201275,
+          "radius_m": 0.03866010267227645,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 9,
+          "source_x_over_D": 0.825,
+          "project_X_m": 0.015001875000000003,
+          "radius_m": 0.03968050170222956,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 10,
+          "source_x_over_D": 0.771,
+          "project_X_m": 0.019631024999999996,
+          "radius_m": 0.04066445790968434,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 11,
+          "source_x_over_D": 0.715,
+          "project_X_m": 0.024431625000000002,
+          "radius_m": 0.04168485693963745,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 12,
+          "source_x_over_D": 0.408,
+          "project_X_m": 0.0507492,
+          "radius_m": 0.0428625,
+          "region": "cylinder",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 13,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": 0.37,
+          "project_X_m": 0.0,
+          "radius_m": 0.031718249999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 14,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": 0.352,
+          "project_X_m": 0.0,
+          "radius_m": 0.030175199999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 15,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": -0.352,
+          "project_X_m": 0.0,
+          "radius_m": 0.030175199999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 16,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": -0.37,
+          "project_X_m": 0.0,
+          "radius_m": 0.031718249999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        }
+      ],
+      "measurementsDigitized": false,
+      "physicalSolveInputComplete": false
+    },
+    {
+      "noseSection": 1,
+      "noseHalfAngleDeg": 15,
+      "boattailHalfAngleDeg": 18,
+      "angleOfAttackDeg": 0,
+      "conicalNoseLengthM": 0.159965027739421,
+      "baseRadiusM": 0.03312400686450733,
+      "taps": [
+        {
+          "orifice": 1,
+          "source_x_over_D": 0.408,
+          "project_X_m": 0.0507492,
+          "radius_m": 0.0428625,
+          "region": "cylinder",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 2,
+          "source_x_over_D": 0.722,
+          "project_X_m": 0.02383155,
+          "radius_m": 0.040867346851266646,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 3,
+          "source_x_over_D": 0.777,
+          "project_X_m": 0.019116674999999996,
+          "radius_m": 0.039335391098490526,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 4,
+          "source_x_over_D": 0.833,
+          "project_X_m": 0.014316075000000003,
+          "radius_m": 0.03777558160475484,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 5,
+          "source_x_over_D": 0.889,
+          "project_X_m": 0.009515474999999999,
+          "radius_m": 0.036215772111019146,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 6,
+          "source_x_over_D": 0.944,
+          "project_X_m": 0.004800600000000004,
+          "radius_m": 0.034683816358243025,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 7,
+          "source_x_over_D": 0.944,
+          "project_X_m": 0.004800600000000004,
+          "radius_m": 0.034683816358243025,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 8,
+          "source_x_over_D": 0.889,
+          "project_X_m": 0.009515474999999999,
+          "radius_m": 0.036215772111019146,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 9,
+          "source_x_over_D": 0.833,
+          "project_X_m": 0.014316075000000003,
+          "radius_m": 0.03777558160475484,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 10,
+          "source_x_over_D": 0.777,
+          "project_X_m": 0.019116674999999996,
+          "radius_m": 0.039335391098490526,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 11,
+          "source_x_over_D": 0.722,
+          "project_X_m": 0.02383155,
+          "radius_m": 0.040867346851266646,
+          "region": "boattail",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 12,
+          "source_x_over_D": 0.408,
+          "project_X_m": 0.0507492,
+          "radius_m": 0.0428625,
+          "region": "cylinder",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 13,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": 0.37,
+          "project_X_m": 0.0,
+          "radius_m": 0.031718249999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 14,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": 0.352,
+          "project_X_m": 0.0,
+          "radius_m": 0.030175199999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 15,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": -0.352,
+          "project_X_m": 0.0,
+          "radius_m": 0.030175199999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        },
+        {
+          "orifice": 16,
+          "source_x_over_D": 1.0,
+          "source_signed_y_over_D": -0.37,
+          "project_X_m": 0.0,
+          "radius_m": 0.031718249999999996,
+          "region": "base",
+          "pressureRatio": null,
+          "heatFluxWm2": null,
+          "wallTemperatureK": null
+        }
+      ],
+      "measurementsDigitized": false,
+      "physicalSolveInputComplete": false
+    }
+  ],
+  "remainingRequirements": [
+    "Digitize original pressure symbols with pixel calibration, point identity and read-off uncertainty.",
+    "Resolve each selected run condition and wall/transition/support assumptions before a solver comparison.",
+    "Reconstruct complete forebody internally; do not silently prescribe missing inlet profiles.",
+    "Compare dimensionless pbt/pc using matching local cylinder reference, not arbitrary freestream pressure.",
+    "Keep heat flow, edge/recovery temperatures and solved wall temperature unknown until actually solved and applicable."
+  ],
+  "sourceTableVisuallyChecked": true,
+  "MATLABReaderTested": false,
+  "solverValidationComplete": false,
+  "wholeGoalComplete": false
+}

@@ -35,6 +35,31 @@ failed=false;
 try, assessContinuumRegime(m,fs,tooLoose); catch, failed=true; end
 assert(failed);
 
+%% 2b. 域外定比热仅流向占位：不能冒充稀薄流，且不能放行其下游热流
+unknown=m;
+unknown.boundaryLayerEdge.thermalExpansionOutOfRangeFace=[false;true;false;false];
+checkedUnknown=assessContinuumRegime(unknown,fs,cfg);
+u=checkedUnknown.continuumRegime;
+assert(isnan(u.knudsen(2)) && isnan(u.edgeMeanFreePath(2)));
+assert(u.diagnosticKnudsen(2)>=0.01);
+assert(~any(u.knudsenUnresolvedFace));
+assert(isequal(u.directStateUnresolvedFace,[false;true;false;false]));
+assert(isequal(u.downstreamStateUnresolvedFace,[false;false;true;true]));
+assert(isequal(u.applicabilityID,[1;6;7;7]));
+assert(isequal(u.unresolvedFace,[false;true;true;true]));
+assert(u.summary.directStateUnresolvedFaces==1 && ...
+    u.summary.downstreamStateUnresolvedFaces==2);
+% 即使诊断占位的数值Kn较小，未知热力状态也不能作为有效上游。
+unknown.boundaryLayerEdge.pressure(2)=101325;
+checkedUnknown=assessContinuumRegime(unknown,fs,cfg);
+assert(checkedUnknown.continuumRegime.diagnosticKnudsen(2)<0.01);
+assert(all(checkedUnknown.continuumRegime.unresolvedFace(2:4)));
+% 输入新增有效标志不允许尺寸不一致。
+unknown.boundaryLayerEdge.thermalStateValidFace=true(3,1);
+rejected=false;
+try,assessContinuumRegime(unknown,fs,cfg);catch,rejected=true;end
+assert(rejected);
+
 %% 3. 自由来流本身稀薄时，即使局部压力升高也不能恢复连续介质
 rare=fs; rare.pressure=40;
 checked=assessContinuumRegime(m,rare,cfg);
