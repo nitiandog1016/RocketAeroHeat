@@ -14,7 +14,7 @@
 - 最新接受状态：`outputs/v83_validation/krylov39/wall_velocity_krylov_evidence.mat`（v91有界试算，尚未稳态）。
 - 原几何：`outputs/v80_validation/domain02/shell_domain_evidence.mat`。
 - 最近方向：`outputs/v91_validation/continuous01/step01/active_direction.mat`。
-- 最近准备系统：`outputs/v91_validation/continuous01/step01/current/`。该系统属于Q38输入状态，不得当作Q39的导数直接复用；下一次实际推进应从Q39重建。
+- 下一次实际推进必须从Q39重建准备系统。`outputs/v91_validation/continuous01/step01/current/`属于Q38，已在本次存储维护中回收六项派生矩阵，保留原清单、输入、方向和`CACHE_PRUNED.json`；不能直接加载旧清单续算。
 - 保留历史输入、实际数值结果、自由/受限检查点、公开参考审计及当前工作台。
 
 ## 旧缓存清理后的复算
@@ -28,9 +28,19 @@ prepareRocketCurrentPeakSystem(newFolder, sourceFile, geometryFile, 'domain');
 
 `sourceFile` 和 `geometryFile` 来自清理计划对应条目。后续使用新生成的准备清单，不能绕过来源检查，也不能冒称重建 MAT 文件的历史 SHA 会完全相同。重建需要额外计算；本轮没有为了清理重新执行数值求解。
 
-v84 三组旧缓存的一项构造模块已经变化，本轮没有清理。原始数值结果、检查点和失败记录没有因为“看起来旧”就删除。
+首轮因构造模块变化而保留的v84三组缓存，已在后续清理中找到并保存完全匹配的历史源码后回收。原始数值结果、检查点和失败记录保留。
 
 v91完成实际试算与独立审计后，已另行核对并删除被替代的v90六项派生缓存，实际回收2094682112字节；Q37输入、Q38/Q39结果、几何、方向与v91最近系统保留。回执见`docs/validation/v91/obsolete_v90_cache_cleanup.json`，旧v90目录同样带`CACHE_PRUNED.json`。这不会恢复或改写被清理缓存的原SHA，也没有把GitHub源码当作MAT结果备份。
+
+## 用户再次要求清理后的处理
+
+2026-10-28本次核对四组过时系统：v84的`q24system`、`full02/baseline/system2`、`full02/minimum/system2`，以及v91的Q38准备系统。删除其24个派生矩阵文件，文件长度合计8,329,067,703字节，执行前后磁盘空闲实际增加8,329,019,392字节，约8.33GB。实际空闲变化与文件长度有少量差异，不能将路径累计大小当作磁盘实收。
+
+v84三组系统所绑定的`cutCellExactEulerBranchJacobian.m`与当前版本不同。完全匹配的原字节已保存到`docs/validation/storage_20261028/followup/historical_sources/`，其余绑定模块与Git提交`267af60ab27fadd56417dcacf8237481eb78f982`逐项核对。历史复查应从该版本的独立源码目录开始，按清单覆盖对应历史文件，再使用保留的状态和几何在**新目录**重建系统；不要将历史源码覆盖到当前开发目录。重建仍要执行原NS回放和来源检查，本次没有运行重建，不保证历史MAT文件SHA相同，也不能将新文件套用旧清单。
+
+当前Q39、Q38与其他历史独有结果、原几何、自由/受限方向、线性检查点、公开参考、v92小域试验及现有三维界面均保留。`outputs/`去除硬链接重复后的唯一文件长度从约88.01GB降为79.68GB；按资源管理器路径相加仍会偏大。这些保留数据包含未上传GitHub的续算状态和独有证据，因此不宜整目录删除。详细计划、执行回执、压缩文件目录和独立核对结果见`docs/validation/storage_20261028/followup/`。
+
+清理前压缩目录时遇到本机Python接口兼容问题，第一次执行在预检查阶段拒绝，没有删除计算文件；修复后重新完整核对并执行。相关失败记录保留，本次维护没有修改计算算法或物理结论。
 
 ## 后续约定
 

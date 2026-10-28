@@ -1,0 +1,7 @@
+{
+  "status": "preflight-refused-before-any-output-deletion",
+  "exitCode": 1,
+  "reason": "Local gzip.compress does not accept mtime; inventory compression failed; executor refused missing inventory during preflight.",
+  "deletedOutputFiles": 0,
+  "fix": "Use gzip.GzipFile(mtime=0); regenerate complete inventory and plan before retry."
+}
