@@ -1,0 +1,1258 @@
+{
+  "version": 85,
+  "status": "tested-current-QR-real-NS-step-and-original-facet-workbench",
+  "recordedUTC": "2026-10-27T01:21:45.450235+00:00",
+  "previousProgress": {
+    "file": "docs\\validation\\v84\\progress_finite_step.json",
+    "sha256": "58e3f382dcfd363b0f9e0d3ab2fafd32d334d6374b776adf5d98829641947491"
+  },
+  "previousGoalTurnClassification": "no-progress-in-physics-or-UI-version-estimate-and-document-correction-only",
+  "currentGoalTurnClassification": "progress-implemented-independent-validated-new-linear-map-actual-NS-step-and-bound-UI",
+  "inputState": {
+    "sourceFile": "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\krylov01\\wall_velocity_krylov_evidence.mat",
+    "sourceFileSHA256": "e2bad6166361de0fbf382bd8f55a4e915d790b38363976dadbd21c7ad64b7b2f",
+    "stateLocation": "result"
+  },
+  "inputPreparation": {
+    "file": "outputs/v84_validation/full02/baseline/system2/peak_system.json",
+    "sha256": "01731a3acdc12d60f8a4a96cc0990a093e973f328f9c5285ae385f311ade7311"
+  },
+  "originalPhysicsSourcesUnchanged": {
+    "applyCutCellSelectedDirection": "f5ec0371d508b8d8cc2972dbe1a6b4f227209374b1751e6a6b55d210518c5cbf",
+    "buildCutCellSelectedDirectionCache": "2481ebf86c5453b3d2b6b5a1f9fa13274e4514854d1d76c6ab80b85f7ca1774b",
+    "buildCutCellGradientOperator": "dc5d35b0fe06b94e729b6313cb50c07743f60c0a5f7d552ece9ac5497456f43e",
+    "cutCellCharacteristicBoundaryDirection": "24580fda99a5da684aa9c80e397ad4d9529c50a04792e10915d596d12e7bc461",
+    "cutCellBoundaryDirectionalState": "8b7f03f5f795fe733ea8b7f6beba07085afbe8ae1a192f9b5688f868bb60affc",
+    "cutCellWlsViscousDirection": "a6be816864e8aa6bcf6170c1091435b4a795744f0095b39aba7265f1c44f5f85",
+    "cutCellSelectedEulerDirection": "d82dc62e57edc7046a13bfcdaa506c3f75fb7a352bec0d1039300147c82b43bb",
+    "cutCellExactEulerBranchJacobian": "1018f50acad9bde439d48e1615f59e1da09d1353ac43e87630bed34bc86ab507",
+    "cutCellExactEulerFlux": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+    "cutCellConservativeDerivatives": "d867bbff5f1d2feb63a864030ea0f0ef77e3e2d121d66398d0cf9a49cd0fa33b",
+    "cutCellBoundaryStencilState": "cece939ebd097eab666dee2757692289f06e57cc52f64d83264a2e7b83b8d2e3",
+    "cutCellNavierStokesResidual": "e13e67511a62e1a7faef37b3d27be698faa72c943b73b2a33cce4bd26797a52b",
+    "resolveNSRiemannReservoir3D": "70f035c1c76f816e6d00dbc9f0460a2728bbb2631d940f512c0fc85cf10fdaf6",
+    "buildCutCellRiemannReservoirBoundaryState": "29613f88092acd22c87795775d2d6f16d12e0e0b1ab43a0609378cf52bdf32ac",
+    "buildCutCellRiemannReservoirJacobian": "a379800fb86348f589ffc1798af50071d5438a95ebd451cc1fff8e24ebc04225",
+    "resolveNSCharacteristicBoundary3D": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9"
+  },
+  "actualTerminalProcesses": {
+    "qrunit85": {
+      "file": "outputs\\v83_validation\\qrunit85_process.json",
+      "sha256": "4a7ab9afa3753d6a64cdbc6b3a1f8e15d08d04f10c99b6330e9f80b8f0713127",
+      "status": "terminal",
+      "exitCode": 0,
+      "allLockedSourcesStable": true,
+      "engineProcessIDs": [
+        34892
+      ]
+    },
+    "qrreal85": {
+      "file": "outputs\\v83_validation\\qrreal85_process.json",
+      "sha256": "3a2ea2cf5f3766f2d59c7eb0698d47f23b58e908935fb159d398868f58d0221d",
+      "status": "terminal",
+      "exitCode": 0,
+      "allLockedSourcesStable": true,
+      "engineProcessIDs": [
+        13596
+      ]
+    },
+    "qrview85": {
+      "file": "outputs\\v83_validation\\qrview85_process.json",
+      "sha256": "343ea27a36d67c75f0adcecb8e9707c87e9d8483149986cf7094b9b945bd6977",
+      "status": "terminal",
+      "exitCode": 0,
+      "allLockedSourcesStable": true,
+      "engineProcessIDs": [
+        34956
+      ]
+    },
+    "qrisolated85": {
+      "file": "outputs\\v83_validation\\qrisolated85_process.json",
+      "sha256": "115f7b3b376ea65522dc46efcd4a26ecff3083bd195983db330420b987e83b4d",
+      "status": "terminal",
+      "exitCode": 0,
+      "allLockedSourcesStable": true,
+      "engineProcessIDs": [
+        42524
+      ]
+    }
+  },
+  "evidence": {
+    "independentSameObjectiveScreen": {
+      "file": "outputs\\v85_validation\\qr_screen02\\qr_screen.json",
+      "sha256": "eeb606ddf400c6c53dcb7db519e0f54eac3a3f24ce2a5ae036504174f771f8ae",
+      "result": {
+        "status": "tested-independent-current-system-same-objective-128-step-right-preconditioning-screen",
+        "sourceBinding": {
+          "sourceFile": "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\krylov01\\wall_velocity_krylov_evidence.mat",
+          "sourceFileSHA256": "e2bad6166361de0fbf382bd8f55a4e915d790b38363976dadbd21c7ad64b7b2f",
+          "stateLocation": "result"
+        },
+        "preparationFile": "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\system2\\peak_system.json",
+        "preparationSHA256": "01731a3acdc12d60f8a4a96cc0990a093e973f328f9c5285ae385f311ade7311",
+        "originalCVs": 217272,
+        "unknowns": 1086360,
+        "regularizationStrength": 0.1,
+        "penalty": 7796.962802567232,
+        "allOriginalEquationsKept": true,
+        "smallReferences": [
+          {
+            "denseSolutionRelativeDifference": 1.735528851938015e-14,
+            "adjointRelativeError": 6.401339173302621e-17,
+            "construction": {
+              "originalBlocksUsedExactlyOnce": 208,
+              "maximumAugmentedLocalGramDefect": 1.5877198963427083e-14,
+              "minimumNormalizedQRDiagonal": 0.07025033495537923,
+              "oldMinimumWithinPatchImageSingularRatio": 0.0014982080785623892,
+              "constructionSeconds": 0.0021674000000000415,
+              "globalConditionNumberClaimed": false
+            }
+          },
+          {
+            "denseSolutionRelativeDifference": 1.7374905139169654e-14,
+            "adjointRelativeError": 3.0481655209030565e-17,
+            "construction": {
+              "originalBlocksUsedExactlyOnce": 208,
+              "maximumAugmentedLocalGramDefect": 1.7398477903805995e-14,
+              "minimumNormalizedQRDiagonal": 0.0702503349553792,
+              "oldMinimumWithinPatchImageSingularRatio": 0.0014982080785623873,
+              "constructionSeconds": 0.001819499999999974,
+              "globalConditionNumberClaimed": false
+            }
+          }
+        ],
+        "construction": {
+          "originalBlocksUsedExactlyOnce": 1619664,
+          "maximumAugmentedLocalGramDefect": 6.151297465661318e-12,
+          "minimumNormalizedQRDiagonal": 0.00031301205736091294,
+          "oldMinimumWithinPatchImageSingularRatio": 1.0456247102746779e-05,
+          "constructionSeconds": 14.597063200000001,
+          "globalConditionNumberClaimed": false
+        },
+        "comparisons": [
+          {
+            "method": "old-patch-inverse-image-column-scale",
+            "originalCRelativeResidual": 0.21711085100340768,
+            "normalizedAugmentedObjective": 0.04848520503088531,
+            "nativeIterations": 128,
+            "nativeStopCode": 7,
+            "actualOperatorCalls": {
+              "forward": 128,
+              "transpose": 129
+            },
+            "elapsedSeconds": 28.9495262,
+            "adjointRelativeError": 1.669919496262978e-17,
+            "originalCTargetMet": false
+          },
+          {
+            "method": "full-augmented-image-patch-QR",
+            "originalCRelativeResidual": 0.011659413632965066,
+            "normalizedAugmentedObjective": 0.00031242134110647153,
+            "nativeIterations": 128,
+            "nativeStopCode": 7,
+            "actualOperatorCalls": {
+              "forward": 128,
+              "transpose": 129
+            },
+            "elapsedSeconds": 29.2650412,
+            "adjointRelativeError": 3.061669630555695e-18,
+            "originalCTargetMet": false
+          }
+        ],
+        "newActualNSEvaluations": 0,
+        "newFlowAcceptances": 0,
+        "newProductionSolvedAreaM2": 0,
+        "physicalSolution": false,
+        "processID": 33752,
+        "recordedUTC": "2026-10-27T00:50:48.441861+00:00",
+        "inputSHA256": {
+          "E:\\RocketAeroHeat\\outputs\\v83_validation\\parentlsqrunit02\\parent_least_squares_unit_evidence.mat": "26d3c1da497562aefab7a4e9bf50ba2d4aad837bef3ac03c5c503d468ad8b2fd",
+          "E:\\RocketAeroHeat\\outputs\\v83_validation\\peakweightunit01\\peak_weighted_unit_evidence.mat": "e0d6f6dd9746321d0df3e6b1b3f3a6f41ba3eece61483c8fd84d56ff29542e37",
+          "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\system2\\peak_system.json": "01731a3acdc12d60f8a4a96cc0990a093e973f328f9c5285ae385f311ade7311",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\prepareRocketCurrentPeakSystem.m": "21dc4a5ad844fb43db29cacbf5b1d146a05df4c5b5f700e7c7e04eb060445bd2",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\assertRocketNSReplay.m": "41a1cf6b028b073763bb3bca7c1264eabcbf2f15d74124d0876101a98257a3ea",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\loadRocketPeakSystem.m": "27927ac1721d856376d1b0877822eb18e34797c6900aee82a5febbb40f261bd4",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\solveRocketPreparedPeakDirection.m": "2b99244139f4cc25e5d80d26b31e3e080085ea93241c96dd7a988d3d72c1d4c4",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildRocketShellGraphPreconditioner.m": "d51d82c393bdaa7f63b09e02264b2d5e1e834f41f7e545edb16d74aa380eef54",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildRocketWlsNormalPreconditioner.m": "e891bc038076f6b4f5ab3d6e68cae770199a98b44d92ca53a742945a85e9f049",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\packRocketSteadyGraph.m": "b97c307906ae6097c6bae92ec791ac7234c563692a1d40539136015bbb27fafc",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildRocketStrongPatches.m": "52d98ebce00e6974e2f9e575eb2e61a807d9242d6faf242c12df7415962fc819",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\factorRocketCoupledPatches.m": "a1b7bd8390e07b5768d2a17b6bce0f5ef118b5a3dc0ac64475988f526a4693f5",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildRocketParentImageScale.m": "53f31974c206ea1361831bf2b6b193fdd449370f238cce5f51da66f63266aa2f",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildRocketPrimitiveUpdateMetric.m": "364a1aef45e8d86176d93438b0a8aab2eef2e26261fdeafcaacc9cca097b26e4",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\applyRocketPrimitiveUpdateMetric.m": "2dc93e38dad6bbcaa47be15329ec368826a96cd4a69f4a96fb13ec8794041224",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\reweightRocketPrimitiveUpdateMetric.m": "d941080d81bbe023925675478d4ea98f3cb11f4bbfc3574f39f7430eddd38dc2",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\solveRocketRegularizedParentDirection.m": "2ac3c25232e58422015b458fd197e366a182ece55beaa24a5dbb72dcfd5c254f",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\solveRocketCoupledPatches.m": "408086185e6d91fddb1c2467d588d6071d4b10f4734bcf90a0c223b2ac62f083",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\solveRocketCoupledPatchesTranspose.m": "7ee52b25e0892ba8def3ed0c38166615ab1f1d88d68346479d8148d65c79bb1d",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\applyRocketPackedGraph.m": "0ef05529fe9719078a0d656d9d4dcf708cd6a60723df927a0345a8454635c338",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\applyRocketPackedGraphTranspose.m": "a8c6279b89d20ee504f23d6a5284d12f060d46773bdef53a8bff8ac72f4256a3",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\applyCutCellSelectedDirection.m": "f5ec0371d508b8d8cc2972dbe1a6b4f227209374b1751e6a6b55d210518c5cbf",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildCutCellSelectedDirectionCache.m": "2481ebf86c5453b3d2b6b5a1f9fa13274e4514854d1d76c6ab80b85f7ca1774b",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildCutCellGradientOperator.m": "dc5d35b0fe06b94e729b6313cb50c07743f60c0a5f7d552ece9ac5497456f43e",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellCharacteristicBoundaryDirection.m": "24580fda99a5da684aa9c80e397ad4d9529c50a04792e10915d596d12e7bc461",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellBoundaryDirectionalState.m": "8b7f03f5f795fe733ea8b7f6beba07085afbe8ae1a192f9b5688f868bb60affc",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellWlsViscousDirection.m": "a6be816864e8aa6bcf6170c1091435b4a795744f0095b39aba7265f1c44f5f85",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellSelectedEulerDirection.m": "d82dc62e57edc7046a13bfcdaa506c3f75fb7a352bec0d1039300147c82b43bb",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellExactEulerBranchJacobian.m": "1018f50acad9bde439d48e1615f59e1da09d1353ac43e87630bed34bc86ab507",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellExactEulerFlux.m": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellConservativeDerivatives.m": "d867bbff5f1d2feb63a864030ea0f0ef77e3e2d121d66398d0cf9a49cd0fa33b",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellBoundaryStencilState.m": "cece939ebd097eab666dee2757692289f06e57cc52f64d83264a2e7b83b8d2e3",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\cutCellNavierStokesResidual.m": "e13e67511a62e1a7faef37b3d27be698faa72c943b73b2a33cce4bd26797a52b",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\resolveNSRiemannReservoir3D.m": "70f035c1c76f816e6d00dbc9f0460a2728bbb2631d940f512c0fc85cf10fdaf6",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildCutCellRiemannReservoirBoundaryState.m": "29613f88092acd22c87795775d2d6f16d12e0e0b1ab43a0609378cf52bdf32ac",
+          "E:\\RocketAeroHeat\\internalFlow\\cutCell\\buildCutCellRiemannReservoirJacobian.m": "a379800fb86348f589ffc1798af50071d5438a95ebd451cc1fff8e24ebc04225",
+          "E:\\RocketAeroHeat\\internalFlow\\resolveNSCharacteristicBoundary3D.m": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9",
+          "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\system2\\current_peak_packed_evidence.mat": "58576bf102779cac84c677dd1d43b2026b7224c0082c5aabfdfe9b933af852bc",
+          "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\system2\\current_peak_factor_evidence.mat": "acacf1395b7b3a6f7f392c9495d3aafd65a3357b6a862ca1c80f8ae8f8e54aef",
+          "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\system2\\current_peak_metric_evidence.mat": "0d990f2b120d923fc7848d44925ad13395a8b1f6b880e2a2ad1940b748cd84ce",
+          "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\system2\\current_peak_scale_evidence.mat": "583c4f28700ad4735faa550d8fb64bbbe8d15e756e558fee930a39c7ba89266c"
+        },
+        "scriptSHA256": "15d3964e36e1cd3e249a6166c619d9beb19aceec6a0607c60aa2ba74190b3b8e"
+      }
+    },
+    "unitIndependentAudit": {
+      "file": "outputs\\v85_validation\\qr_unit01\\independent_qr_audit.json",
+      "sha256": "681a7cc54b4bc48bc5deea3cd058dfe64e1c9df8dc056329238e3ccbcdbc7282",
+      "result": {
+        "status": "passed-independent-complete-augmented-QR-map-objective-and-state-metric",
+        "mode": "unit",
+        "checks": [
+          {
+            "zeroAndWarmDenseDifferences": [
+              5.3735912333746134e-12,
+              4.749082308429724e-12
+            ],
+            "maximumFullAugmentedLocalGramDefect": 2.6685342710509527e-14
+          },
+          {
+            "zeroAndWarmDenseDifferences": [
+              5.372759291051539e-12,
+              4.749077845499549e-12
+            ],
+            "maximumFullAugmentedLocalGramDefect": 1.3438577507740579e-14
+          }
+        ],
+        "processID": 35692,
+        "recordedUTC": "2026-10-27T00:54:04.715671+00:00",
+        "inputSHA256": {
+          "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_unit01\\augmented_qr_unit_evidence.mat": "5292572b1ca944f315988811dc9b1e1c4c4e587e7a743ff7ec6b0d7d9c1f80d3"
+        },
+        "scriptSHA256": "74e83d9f5a500a3cbb6a32d9353ce46b34e9042c65f7c0d4e3f682127fcfa7ea",
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0
+      }
+    },
+    "realStudy": {
+      "file": "outputs\\v85_validation\\qr_real01\\augmented_qr_study.json",
+      "sha256": "1e4aa3d80284a286e2a5583b81c33c39020e774cbd674665357aae0175dd28a0",
+      "result": {
+        "status": "tested-current-state-augmented-patch-QR-direction-and-gated-one-step-NS-study",
+        "sourceBinding": {
+          "sourceFile": "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\krylov01\\wall_velocity_krylov_evidence.mat",
+          "sourceFileSHA256": "e2bad6166361de0fbf382bd8f55a4e915d790b38363976dadbd21c7ad64b7b2f",
+          "stateLocation": "result"
+        },
+        "preparationFile": "outputs/v84_validation/full02/baseline/system2/peak_system.json",
+        "preparationSHA256": "01731a3acdc12d60f8a4a96cc0990a093e973f328f9c5285ae385f311ade7311",
+        "construction": {
+          "method": "complete-augmented-image-patch-column-normalization-thin-QR-right-map",
+          "originalBlocksUsedExactlyOnce": 1619664.0,
+          "patchCount": 29439,
+          "allOriginalCVs": 217272,
+          "maximumPatchCells": 8,
+          "maximumAugmentedLocalGramDefect": 5.785004217334298e-12,
+          "minimumNormalizedQRDiagonal": 0.0003130120573608272,
+          "maximumDensePanelArrayBytes": 291200,
+          "additionalConstructionArrayBoundBytes": 80115200.0,
+          "normalEquationsFormed": false,
+          "rankTruncationUsed": false,
+          "diagonalCompensationApplied": false,
+          "globalConditionNumberClaimed": false,
+          "processPeakMemoryClaimed": false,
+          "constructionSeconds": 15.0667991,
+          "originalParentResidualNormUnchanged": true,
+          "newActualNSEvaluations": 0,
+          "newProductionSolvedAreaM2": 0
+        },
+        "linearReport": {
+          "method": "complete-parent-C-fixed-primitive-penalty-augmented-patch-QR-LSQR",
+          "options": {
+            "maximumIterations": 128,
+            "relativeTolerance": 0.001
+          },
+          "penaltyInOriginalResidualUnits": 7796.962802562431,
+          "relativeCResidual": 0.011659413648201477,
+          "internalCTargetMet": false,
+          "normalizedAugmentedObjective": 0.0003124213414070949,
+          "initialNormalizedAugmentedObjective": 1,
+          "primitiveUpdateNorm": 911.702642365379,
+          "primitiveUpdateNormIncludesRowWeights": true,
+          "maximumDensityFraction": 15.964609615582019,
+          "maximumVelocityOverSound": 20.564592011381418,
+          "maximumTemperatureFraction": 18.932504776970266,
+          "nativeFlag": 1,
+          "nativeIterations": 128,
+          "nativeRelativeAugmentedCorrectionResidual": 0.017675444588534765,
+          "nativeResidualHistory": [
+            535095930.792274,
+            279065142.250371,
+            197817105.7163245,
+            152302159.00448722,
+            125059789.8303369,
+            102720241.60925815,
+            88234287.51130171,
+            76681140.3771225,
+            68038890.5228016,
+            61374633.32222261,
+            55927065.304127954,
+            51613947.513776116,
+            47577150.42926901,
+            44183312.18003744,
+            41143075.603497446,
+            38741780.17922306,
+            36531465.161408015,
+            34379001.85025503,
+            32392804.709709436,
+            30621184.004857603,
+            29100847.101226874,
+            27765687.18369332,
+            26575965.32443487,
+            25523452.862392835,
+            24595736.79365019,
+            23713049.255015742,
+            22966525.045534126,
+            22287990.221188612,
+            21674697.40693228,
+            21119818.75197412,
+            20617272.06721707,
+            20149883.656166248,
+            19725203.61384821,
+            19319638.73960511,
+            18954358.773252442,
+            18612425.057177685,
+            18296040.270992827,
+            18001813.855104923,
+            17725862.313374806,
+            17464406.253915932,
+            17214912.614366602,
+            16976179.555693366,
+            16747126.677924529,
+            16531582.492858352,
+            16324875.375073694,
+            16129842.132391822,
+            15939190.031745572,
+            15757546.459833262,
+            15577473.11781199,
+            15403876.024879642,
+            15232196.022750787,
+            15067395.693277335,
+            14908376.986797715,
+            14754368.727387298,
+            14604365.381581165,
+            14457481.653936338,
+            14318633.476958275,
+            14190104.844355386,
+            14069259.840599421,
+            13942911.344284888,
+            13816269.157738501,
+            13689982.681648297,
+            13566536.347633919,
+            13445916.939592693,
+            13330324.102645222,
+            13217142.358849104,
+            13106542.743290167,
+            12998906.701570379,
+            12893914.280526252,
+            12790607.51572716,
+            12691604.69132194,
+            12595860.068548605,
+            12500720.685924217,
+            12406937.961487072,
+            12313534.228095554,
+            12222583.321725655,
+            12134985.75915131,
+            12050323.868742991,
+            11967971.58768822,
+            11890278.155288443,
+            11814947.145099072,
+            11739830.124193007,
+            11663828.417432627,
+            11589551.095286436,
+            11516846.559021723,
+            11445182.92246581,
+            11375915.629073093,
+            11308135.178912012,
+            11241871.008834021,
+            11177029.792206397,
+            11114044.59861815,
+            11053133.493955733,
+            10991786.063244523,
+            10931095.1796624,
+            10872651.058687242,
+            10816343.999952087,
+            10761636.319444284,
+            10707214.49123105,
+            10653608.931771886,
+            10600865.558051944,
+            10550231.99805783,
+            10501276.560574612,
+            10453152.613667408,
+            10407284.43728542,
+            10365944.209859105,
+            10325975.350707516,
+            10284327.492026122,
+            10241695.379433531,
+            10199477.25999437,
+            10157599.038904969,
+            10116252.37700563,
+            10075732.541147305,
+            10036109.360331558,
+            9995835.667371385,
+            9956380.871506346,
+            9917601.863565877,
+            9878668.992545752,
+            9840143.991716605,
+            9802147.44099697,
+            9764589.701027365,
+            9728236.50580817,
+            9692431.464493351,
+            9656588.117578438,
+            9621647.09649043,
+            9587849.531788817,
+            9554547.351237226,
+            9521322.381052472,
+            9489023.446005076,
+            9458058.474269273
+          ],
+          "nativeNormalResidualHistory": [
+            456563578.8488064,
+            120270429.17327692,
+            61876686.86313285,
+            35831503.96205325,
+            24844205.039814577,
+            18079097.33060462,
+            13188832.23075124,
+            10221644.59939693,
+            7956870.215924926,
+            6439939.017665799,
+            5357290.0453971205,
+            4680484.104898396,
+            3799852.924511383,
+            3131679.985789693,
+            2836540.8993888167,
+            2547385.082818111,
+            2173285.8469228037,
+            1857011.7326774832,
+            1730044.0010609545,
+            1509691.222465243,
+            1365722.685917096,
+            1246297.3036531687,
+            1121904.0919590113,
+            1014205.012667499,
+            940803.6218848681,
+            856169.5249817463,
+            792991.3985306874,
+            721114.9491558416,
+            649374.432732223,
+            594382.1813773619,
+            554988.3733356727,
+            530667.3972740342,
+            492517.17952239816,
+            460180.49259262753,
+            429458.0444783843,
+            408814.421329014,
+            388204.6972404902,
+            369918.77688780264,
+            345475.41957396653,
+            329123.038582805,
+            313998.8256936047,
+            304417.08607910725,
+            293204.5798795288,
+            279508.26386092947,
+            264836.4068312759,
+            255659.2264417493,
+            248407.1672832499,
+            241122.7312436563,
+            234681.82527243142,
+            229259.02717699067,
+            221637.20262874482,
+            215234.20987339012,
+            209025.90576090396,
+            201730.72388064672,
+            195635.87724164105,
+            192753.5400919556,
+            191857.4224491385,
+            192363.86681960488,
+            186672.67930375665,
+            179356.26192034638,
+            171490.22556356702,
+            164355.72605781376,
+            159510.92689505988,
+            154366.9328821877,
+            149289.10874163164,
+            148363.09569710982,
+            144987.65278627814,
+            141119.72275088658,
+            137392.88263238015,
+            133853.51842439876,
+            130221.394690074,
+            128887.48058972527,
+            127212.21796159427,
+            123100.47933691945,
+            120431.10495891665,
+            119420.27491705443,
+            116645.48009739803,
+            114085.19828303008,
+            113503.2844389571,
+            112702.00767923011,
+            109269.94626414667,
+            105228.2914106028,
+            103093.71924177784,
+            100432.15503907131,
+            98359.09122351593,
+            96243.66807428154,
+            94364.75745911275,
+            91966.98535102855,
+            90260.20712197933,
+            88106.68180809298,
+            86957.55664788169,
+            85043.24981763928,
+            82470.02910524885,
+            80920.90022986244,
+            79404.90080325837,
+            78610.14504224906,
+            76951.59042804319,
+            75207.26864346756,
+            73439.34930444369,
+            72658.37435929006,
+            71236.74757530694,
+            70571.74596933275,
+            69321.73410091721,
+            69607.72106497998,
+            70349.24843260975,
+            68012.07858953268,
+            65336.58444713837,
+            63578.59642436434,
+            62256.458504283015,
+            61106.981256983316,
+            60076.89401509602,
+            59402.2622765088,
+            59018.94264584204,
+            57872.98850943386,
+            57588.51851602394,
+            57104.04401209929,
+            56402.689501872075,
+            55614.340505859414,
+            55107.10423781546,
+            54350.50402682973,
+            53072.119428458675,
+            51898.370867495585,
+            51677.16926880474,
+            51164.03043706936,
+            50161.86464005501,
+            49252.38037908134,
+            48230.74404995107,
+            47764.465756884754
+          ],
+          "adjointIdentityRelativeDifference": 4.9399917217313866e-17,
+          "operatorApplications": {
+            "C": 131,
+            "CT": 130,
+            "P": 130,
+            "PT": 130,
+            "W": 131,
+            "WT": 130
+          },
+          "nativeSolverApplications": {
+            "C": 128,
+            "CT": 129,
+            "P": 128,
+            "PT": 129,
+            "W": 128,
+            "WT": 129
+          },
+          "elapsedSeconds": 176.2275121,
+          "originalParentResidualNormUnchanged": true,
+          "originalNSAcceptanceClaimed": false,
+          "physicalSolution": false,
+          "newActualNSEvaluations": 0,
+          "newProductionSolvedAreaM2": 0
+        },
+        "completeSelectedModelRelativeDefect": 0.011971467579664807,
+        "modelPointOneMet": true,
+        "probe": {
+          "status": "tested-fresh-original-NS-direction-probe-with-explicit-current-boundary-and-complete-geometry",
+          "originalNSDirectionDefect": 0.011971472999565426,
+          "originalNSDirectionTarget": 0.1,
+          "originalNSDirectionTargetMet": true,
+          "normalizedMeritDerivative": -0.999816752901305,
+          "physicalStateChanged": false,
+          "newFlowAcceptances": 0,
+          "newActualNSEvaluations": 2,
+          "coarseImageRequired": false,
+          "newProductionSolvedAreaM2": 0,
+          "physicalSolution": false,
+          "engineProcessID": 13596
+        },
+        "main": {
+          "status": "bounded-real-20deg-same-static-wall-equation-Krylov-continuation",
+          "sourceFaces": 19752,
+          "cellCount": 217272,
+          "acceptedNonlinearIterations": 1,
+          "priorAcceptedNonlinearIterations": 4,
+          "totalNewEquationAcceptedIterations": 5,
+          "candidateTrials": 12,
+          "residualEvaluations": 6,
+          "totalNewEquationResidualEvaluations": 23,
+          "operatorBuilds": 1,
+          "initialMaximumResidual": 6210405.935315283,
+          "maximumResidual": 6207352.260300363,
+          "initialRmsMerit": 513386.87927111686,
+          "rmsMerit": 513136.14194245025,
+          "elapsedSeconds": 109.6019452,
+          "matrixVectorProducts": 2,
+          "jacobianResidualEvaluations": 2,
+          "preconditionerApplications": 1,
+          "lineage": {
+            "sourceState": "krylov19-state-only-explicit-new-Riemann-reservoir-boundary",
+            "sourceHistoryAppended": false,
+            "newBoundaryProblemInitialCounter": 0,
+            "previousProblemAcceptancesNotAppended": 13,
+            "previousProblemNSNotAppended": 258,
+            "externalCFDImported": false,
+            "interiorEulerFlux": "exact-godunov",
+            "wallVelocityGradient": "dirichlet-tangent"
+          },
+          "wallVelocityGradient": "dirichlet-tangent",
+          "sameEquationHistoryContinued": true,
+          "steadyConverged": false,
+          "stopReason": "maximum-nonlinear-iterations",
+          "spatialConservationRelative": 2.629073761922743e-16,
+          "steadyBoundaryFluxBalance": 0.010002219531365295,
+          "signedHeatPowerW": 923913.5361480418,
+          "wallHeatRangeWm2": [
+            -354882.5143506844,
+            2322643.5411189054
+          ],
+          "physicalTimeAdvanced": 0,
+          "BETimeStepsClaimed": 0,
+          "physicalSolution": false,
+          "newProductionSolvedAreaM2": 0,
+          "engineProcessID": 13596,
+          "priorActualResidualEvaluations": 17,
+          "replayReport": {
+            "rateAndLocalInfoBitwiseIdentical": true,
+            "globalReductionAbsoluteDifference": [
+              [
+                1.5543122344752192e-15,
+                4.547473508864641e-13,
+                1.7763568394002505e-14,
+                1.3642420526593924e-12,
+                1.280568540096283e-09
+              ],
+              [
+                1.5543122344752192e-15,
+                4.547473508864641e-13,
+                1.7763568394002505e-14,
+                1.3642420526593924e-12,
+                1.280568540096283e-09
+              ]
+            ],
+            "globalReductionForwardRoundoffBound": [
+              1.528812143194546e-09,
+              2.1063012946642266e-06,
+              4.222734770119075e-07,
+              7.763280462750949e-07,
+              0.0020948492384601195
+            ],
+            "physicalAcceptanceToleranceChanged": false
+          },
+          "openBoundaryDiscretization": "exact-Riemann-reservoir",
+          "sourceHistoryAppended": false,
+          "residualEvaluationsAfterLastAcceptedHistory": 0,
+          "normalEulerLinearization": "exact-branch",
+          "physicalSpatialEquationChanged": false,
+          "linearEquation": "steady-newton",
+          "preconditionerTimeStepOnly": true,
+          "steadyInitialGuessReport": {
+            "sourceFile": "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_real01\\probe\\direct_ns_direction_probe.mat",
+            "sourceVariant": "ns-probe",
+            "directionScale": 1,
+            "sourceFileSHA256": "65b07019c7dbdfacf70f812b37a0c379f8f6266949eeca6bdde3b0a3c3562d2a",
+            "sourceGeometryFile": "E:\\RocketAeroHeat\\outputs\\v80_validation\\domain02\\shell_domain_evidence.mat",
+            "sourceGeometryFileSHA256": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+            "sourceStateAndGeometryVerified": true,
+            "sourceSavedActualNSRelativeDefect": 0.011971472999565426,
+            "originalNSProbeArithmeticVerified": true,
+            "oldDerivativeReused": false,
+            "originalNSAcceptanceClaimed": false,
+            "newModelApplications": 0,
+            "newActualNSEvaluations": 0,
+            "coarseImageRequired": false,
+            "sourceStateLocation": "result"
+          },
+          "steadyInitialGuessModelApplications": 1
+        },
+        "newProbeActualNS": 2,
+        "newMainActualNS": 6,
+        "newSelectedModelApplications": 1,
+        "newProductionSolvedAreaM2": 0,
+        "physicalSolution": false
+      }
+    },
+    "realIndependentQRAudit": {
+      "file": "outputs\\v85_validation\\qr_real01\\independent_qr_audit.json",
+      "sha256": "cc5ba1aec846dfae6bb3f47ad34a0fde35131c56ce52bc0d9d76d4b144c5cec7",
+      "result": {
+        "status": "passed-independent-complete-augmented-QR-map-objective-and-state-metric",
+        "mode": "real",
+        "checks": [
+          {
+            "allOriginalCVs": 217272,
+            "allOriginalBlocks": 1619664,
+            "allLocalMaps": 29439,
+            "maximumFullAugmentedLocalGramDefect": 5.784775819304847e-12,
+            "coordinateLiftRelativeDifference": 0.0,
+            "rawStateMetricRelativeDifference": 1.098752419825374e-15,
+            "originalCRelativeResidual": 0.01165941364819445,
+            "normalizedAugmentedObjective": 0.0003124213414067147,
+            "completeSelectedModelRelativeDefect": 0.011971467579657676,
+            "originalCTargetMet": false,
+            "allNativeBidiagonalizationVectorsIndependentlyVerified": false
+          }
+        ],
+        "processID": 52952,
+        "recordedUTC": "2026-10-27T01:04:57.463744+00:00",
+        "inputSHA256": {
+          "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_real01\\augmented_qr_direction.mat": "aa58faedc42e6b6fe1afd27df6d80603415f9cacd8bb9e3fba2a7adc02e7e131",
+          "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\system2\\current_peak_packed_evidence.mat": "58576bf102779cac84c677dd1d43b2026b7224c0082c5aabfdfe9b933af852bc",
+          "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_real01\\augmented_qr_factor.mat": "99353facadbd8d36704c1d48498dbcf55db6bb22ee35db54abfd22f817dff2b5",
+          "E:\\RocketAeroHeat\\outputs\\v84_validation\\full02\\baseline\\system2\\current_peak_cache_evidence.mat": "5167146ff10cc097fe0d66d6ecc4803d34347aa38230826712106f2bb4c2bc78",
+          "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_real01\\augmented_qr_model.mat": "8b74eb99107ec58da43c4f5476173c980ad815d8854f89754aeeb1a9b4001870"
+        },
+        "scriptSHA256": "74e83d9f5a500a3cbb6a32d9353ce46b34e9042c65f7c0d4e3f682127fcfa7ea",
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0
+      }
+    },
+    "wallAndUpdateAudit": {
+      "file": "outputs\\v83_validation\\krylov26_independent_audit.json",
+      "sha256": "0ccb52a1cdc129d60035eef7b802adcfb8164f4f0af6b2a9637ceb3e3014c79b",
+      "result": {
+        "status": "passed-independent-actual-static-wall-flux-constitutive-Jacobian-conservation-and-update-audit",
+        "case": "krylov26",
+        "processID": 35672,
+        "predecessorCase": "krylov25",
+        "wallCount": 19752,
+        "wallFiveQuantityFluxRelativeDifference": 6.014628750351583e-16,
+        "wallHeatRelativeDifference": 6.014628750351583e-16,
+        "wallConstitutiveJacobianFDRelativeDifference": 8.965341042114787e-11,
+        "constitutiveJacobianSampleWalls": 6,
+        "mechanicalCoolingWalls": 0,
+        "negativeWallEntropyFaces": 0,
+        "fiveQuantityDivergenceRelativeDifference": 1.2122880978542472e-15,
+        "independentSpatialConservationRelative": 2.6577479862033444e-16,
+        "iterationAudit": {
+          "acceptedIterations": 1,
+          "maximumResidual": 6207352.260300363,
+          "rmsMerit": 513136.14194244985,
+          "updateArithmeticRelativeDifference": 0.0,
+          "firstFullResidualJvpArithmeticDifference": 0.0,
+          "acceptedTemperatureRangeK": [
+            128.0601085306084,
+            1992.2152456000413
+          ],
+          "maximumKrylovIterations": 48,
+          "linearRelativeTolerance": 0.1,
+          "originalLinearToleranceUpperBoundNotWeakened": true,
+          "residualEvaluationsAfterLastLocalHistory": 0,
+          "residualEvaluationsAfterLastAcceptedHistory": 0,
+          "originalSteadyAndTemperatureGuardrailsPreserved": true,
+          "steadyConverged": false,
+          "sourceHistoryAppended": false
+        },
+        "fullIndependentNSSolver": false,
+        "wholeOpenBoundaryEntropyBalanceProved": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\krylov26\\wall_velocity_krylov_evidence.mat": "e93be3bc29a72753cab8b08851fc93261109434b0c948aef3a78cb2cc5c785f3",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "outputs\\v83_validation\\krylov25\\wall_velocity_krylov_evidence.mat": "e2bad6166361de0fbf382bd8f55a4e915d790b38363976dadbd21c7ad64b7b2f"
+        },
+        "scriptSHA256": "20d6241506577f81c0e5f8e2b25b90b9232a07be19fc52ceb779d33a45cd7a0c"
+      }
+    },
+    "freshNSDirectionAudit": {
+      "file": "outputs\\v83_validation\\krylov26_independent_direct_ns_probe.json",
+      "sha256": "41b9e3868e67b5f3ab9b47609fa0c6cea43db057276b1cef8c740079642f6ffb",
+      "result": {
+        "status": "passed-independent-direct-NS-probe-current-base-geometry-sources-and-two-fresh-checks",
+        "case": "krylov26",
+        "kind": "real",
+        "processID": 44588,
+        "sourceProbeDefect": 0.011971472999558088,
+        "freshMainNSDefect": 0.011971472999558088,
+        "sourceGuardEvidenceChecked": [],
+        "coarseImageRequired": false,
+        "sourceStateLocation": "result",
+        "acceptedFlowUpdates": 1,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs/v83_validation/krylov26/wall_velocity_krylov_evidence.mat": "e93be3bc29a72753cab8b08851fc93261109434b0c948aef3a78cb2cc5c785f3",
+          "outputs/v85_validation/qr_real01/probe/direct_ns_direction_probe.mat": "65b07019c7dbdfacf70f812b37a0c379f8f6266949eeca6bdde3b0a3c3562d2a",
+          "outputs/v84_validation/full02/baseline/krylov01/wall_velocity_krylov_evidence.mat": "e2bad6166361de0fbf382bd8f55a4e915d790b38363976dadbd21c7ad64b7b2f",
+          "outputs/v80_validation/domain02/shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "internalFlow/cutCell/applyCutCellSelectedDirection.m": "f5ec0371d508b8d8cc2972dbe1a6b4f227209374b1751e6a6b55d210518c5cbf",
+          "internalFlow/cutCell/buildCutCellSelectedDirectionCache.m": "2481ebf86c5453b3d2b6b5a1f9fa13274e4514854d1d76c6ab80b85f7ca1774b",
+          "internalFlow/cutCell/buildCutCellGradientOperator.m": "dc5d35b0fe06b94e729b6313cb50c07743f60c0a5f7d552ece9ac5497456f43e",
+          "internalFlow/cutCell/cutCellCharacteristicBoundaryDirection.m": "24580fda99a5da684aa9c80e397ad4d9529c50a04792e10915d596d12e7bc461",
+          "internalFlow/cutCell/cutCellBoundaryDirectionalState.m": "8b7f03f5f795fe733ea8b7f6beba07085afbe8ae1a192f9b5688f868bb60affc",
+          "internalFlow/cutCell/cutCellWlsViscousDirection.m": "a6be816864e8aa6bcf6170c1091435b4a795744f0095b39aba7265f1c44f5f85",
+          "internalFlow/cutCell/cutCellSelectedEulerDirection.m": "d82dc62e57edc7046a13bfcdaa506c3f75fb7a352bec0d1039300147c82b43bb",
+          "internalFlow/cutCell/cutCellExactEulerBranchJacobian.m": "1018f50acad9bde439d48e1615f59e1da09d1353ac43e87630bed34bc86ab507",
+          "internalFlow/cutCell/cutCellExactEulerFlux.m": "40debbfc818ff7f60c02df9d5db4d4989ec5b93a1bf0d9850aafdcee6cb45de7",
+          "internalFlow/cutCell/cutCellConservativeDerivatives.m": "d867bbff5f1d2feb63a864030ea0f0ef77e3e2d121d66398d0cf9a49cd0fa33b",
+          "internalFlow/cutCell/cutCellBoundaryStencilState.m": "cece939ebd097eab666dee2757692289f06e57cc52f64d83264a2e7b83b8d2e3",
+          "internalFlow/cutCell/cutCellNavierStokesResidual.m": "e13e67511a62e1a7faef37b3d27be698faa72c943b73b2a33cce4bd26797a52b",
+          "internalFlow/cutCell/resolveNSRiemannReservoir3D.m": "70f035c1c76f816e6d00dbc9f0460a2728bbb2631d940f512c0fc85cf10fdaf6",
+          "internalFlow/cutCell/buildCutCellRiemannReservoirBoundaryState.m": "29613f88092acd22c87795775d2d6f16d12e0e0b1ab43a0609378cf52bdf32ac",
+          "internalFlow/cutCell/buildCutCellRiemannReservoirJacobian.m": "a379800fb86348f589ffc1798af50071d5438a95ebd451cc1fff8e24ebc04225",
+          "internalFlow/resolveNSCharacteristicBoundary3D.m": "2ee57d9ec6f2c1fd93224cde5ae98e8ed36e090c973943947502a60e8dc2a3e9"
+        },
+        "scriptSHA256": "503a36995ac47375deb443b586dfa5595026213d0b7af9c1505feead37109072"
+      }
+    },
+    "publicOpenFaceAndHistoryAudit": {
+      "file": "outputs\\v83_validation\\krylov26_independent_riemann_reservoir.json",
+      "sha256": "02b6d25188e87139e1b517177f995fb95884bf99c7909ddba7513bf79f70b62e",
+      "result": {
+        "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+        "case": "krylov26",
+        "kind": "newton",
+        "processID": 46912,
+        "checks": {
+          "acceptedEndpoint": {
+            "cells": 217272,
+            "openReservoirFaces": 19752,
+            "publicFluxRelativeDifference": 1.5141508996747282e-13,
+            "publicPrimitiveRelativeDifference": 9.165755085542777e-15,
+            "ambiguousReferenceRegions": 0,
+            "wallFiveQuantityRelativeDifference": 6.014628750351583e-16,
+            "fiveQuantityDivergenceRelativeDifference": 1.2122880978542472e-15,
+            "independentSpatialConservationRelative": 2.6577479862033444e-16
+          },
+          "continuation": {
+            "predecessorCase": "krylov25",
+            "priorAccepted": 4,
+            "priorActualNS": 17,
+            "totalAccepted": 5,
+            "totalActualNS": 23,
+            "allMergedHistoryFieldsExactlyVerified": true
+          }
+        },
+        "completeIndependentNSSolver": false,
+        "oldCharacteristicGuardRelaxed": false,
+        "productionQualified": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v83_validation\\krylov26\\wall_velocity_krylov_evidence.mat": "e93be3bc29a72753cab8b08851fc93261109434b0c948aef3a78cb2cc5c785f3",
+          "outputs\\v82_validation\\clawpack_exact_euler.py": "2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef",
+          "outputs\\v82_validation\\probe_exact_riemann.py": "402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a",
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "outputs\\v83_validation\\krylov25\\wall_velocity_krylov_evidence.mat": "e2bad6166361de0fbf382bd8f55a4e915d790b38363976dadbd21c7ad64b7b2f"
+        },
+        "scriptSHA256": "412c6af76ed60ed1bbb4dba754668412873d73818344e954957b603597614ea1",
+        "referenceHelperSHA256": "a11904a2017d7bb0b7bf53bf14e04bcc2c3fda0ab3538350df1807438577efca"
+      }
+    },
+    "rejectedInterface": {
+      "file": "outputs\\v85_validation\\rejected01\\rejected_interface_summary.json",
+      "sha256": "d54b1ccff202e2061590015fb917980c06dfcb0d0878a16ad8e66775d0608520",
+      "result": {
+        "status": "observed-real-rejected-interface-temperature-with-valid-cell-state",
+        "newEquationIteration": 5,
+        "segmentIteration": 1,
+        "alpha": 0.0009765625,
+        "errorIdentifier": "CutExactEuler:Temperature",
+        "message": "精确界面采样越过原物性域：批次面19207，T=2002.155749958765 K（整批131.73622030765836—2002.155749958765K）；不裁温或回退。",
+        "sourceEvidenceFolder": "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_real01\\krylov01",
+        "actualOriginalInterfaceCallCount": 1,
+        "fullNSResidualRecomputed": false,
+        "globalInteriorFaceID": 19207,
+        "batchFaceIndex": 19207,
+        "centroidM": [
+          0.04780415032620952,
+          -0.0017332945766899293,
+          -0.014473813696548524
+        ],
+        "ownerCV": 19207,
+        "neighbourCV": 38959,
+        "ownerLayer": 1,
+        "neighbourLayer": 2,
+        "ownerSourceFacet": 19207,
+        "neighbourSourceFacet": 19207,
+        "candidateCellTemperatureRangeK": [
+          128.16419571945445,
+          1994.5273543029489
+        ],
+        "candidateAccepted": false,
+        "originalTemperatureRangeKept": true,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "engineProcessID": 34956
+      }
+    },
+    "independentTemperatureLimit": {
+      "file": "outputs\\v85_validation\\qr_temperature_limit.json",
+      "sha256": "9ff24f0364a00e1cac9211a6e35fad79508ddccf6914fde711c95e1551b874ab",
+      "result": {
+        "status": "passed-independent-public-Riemann-reference-real-rejected-interface-and-local-upper-temperature-root",
+        "globalInteriorFaceID": 19207,
+        "ownerCV": 19207,
+        "neighbourCV": 38959,
+        "sourceFacet": 19207,
+        "centroidM": [
+          0.04780415032620952,
+          -0.0017332945766899293,
+          -0.014473813696548524
+        ],
+        "samples": [
+          {
+            "alpha": 0.0,
+            "cellTemperatureK": [
+              1426.877936000491,
+              1989.9098011123456
+            ],
+            "sampleTemperatureK": 1997.543403179414,
+            "cellStagnationTemperatureK": [
+              1429.6871342109412,
+              1994.8636713805367
+            ],
+            "sampleRegion": 5,
+            "primitiveLeft": [
+              0.11995238166643944,
+              5.105338250221495,
+              -36.30306212605259,
+              65.58004317307875,
+              1426.877936000491
+            ],
+            "primitiveRight": [
+              0.08505993800361937,
+              1.2412395453289675,
+              -47.029157238050054,
+              87.98225071293267,
+              1989.9098011123456
+            ]
+          },
+          {
+            "alpha": 0.00048828125,
+            "cellTemperatureK": [
+              1427.861840857678,
+              1992.215245600041
+            ],
+            "sampleTemperatureK": 1999.84624398373,
+            "cellStagnationTemperatureK": [
+              1430.6969285001087,
+              1997.215978411268
+            ],
+            "sampleRegion": 5,
+            "primitiveLeft": [
+              0.11982424193974328,
+              5.196086963221699,
+              -36.38853860218237,
+              65.92128070582804,
+              1427.861840857678
+            ],
+            "primitiveRight": [
+              0.08493098030968363,
+              1.3743612646418217,
+              -47.159723989153925,
+              88.44430170080047,
+              1992.215245600041
+            ]
+          },
+          {
+            "alpha": 0.0009765625,
+            "cellTemperatureK": [
+              1428.8476678302848,
+              1994.5273543029489
+            ],
+            "sampleTemperatureK": 2002.1557499587648,
+            "cellStagnationTemperatureK": [
+              1431.7088321275037,
+              1999.5753404150707
+            ],
+            "sampleRegion": 5,
+            "primitiveLeft": [
+              0.11969610221304712,
+              5.28702997687275,
+              -36.47419809065906,
+              66.26324885692456,
+              1428.8476678302848
+            ],
+            "primitiveRight": [
+              0.08480202261574787,
+              1.5078878580226718,
+              -47.29068784369017,
+              88.90775796245865,
+              1994.5273543029489
+            ]
+          }
+        ],
+        "localFace2000KCrossingAlpha": 0.0005208326202697118,
+        "acceptedFractionOfLocalFaceRadius": 0.9375012835162759,
+        "globalAdmissibilityRadiusClaimed": false,
+        "temperatureRootRelativeDifference": 1.1356442946454834e-16,
+        "referenceKind": "public-pressure-curves-and-independent-Brent-sampling-arithmetic-not-experimental-validation",
+        "completeNSRecomputed": false,
+        "newActualNSEvaluations": 0,
+        "newFlowAcceptances": 0,
+        "newProductionSolvedAreaM2": 0,
+        "physicalSolution": false,
+        "inputSHA256": {
+          "outputs\\v85_validation\\rejected01\\rejected_interface_evidence.mat": "e08500a06d486184743aad8fbf6ba98286a27b3ee851b1e33d218d1581cf9f16",
+          "outputs\\v85_validation\\qr_real01\\krylov01\\wall_velocity_krylov_evidence.mat": "e93be3bc29a72753cab8b08851fc93261109434b0c948aef3a78cb2cc5c785f3",
+          "outputs\\v82_validation\\clawpack_exact_euler.py": "2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef",
+          "outputs\\v82_validation\\probe_exact_riemann.py": "402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a"
+        },
+        "scriptSHA256": "6ae17c669c80f598847336e8d009ab62638d78d670ff2c66c05ab71d429d5ce3",
+        "processID": 50788
+      }
+    },
+    "displaySourceBinding": {
+      "file": "outputs\\v85_validation\\qr_view_source_binding.json",
+      "sha256": "a3e04c2b58b4f14de506e3d856382d0379b53e7407bf57200e9d0155cfee0dca",
+      "result": {
+        "status": "byte-identical-display-alias-of-actual-QR-accepted-state",
+        "sourceFolder": "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_real01\\krylov01",
+        "displayCase": "krylov26",
+        "fileSHA256": "e93be3bc29a72753cab8b08851fc93261109434b0c948aef3a78cb2cc5c785f3",
+        "newFlowAcceptances": 0,
+        "newProductionSolvedAreaM2": 0
+      }
+    },
+    "workbenchBinding": {
+      "file": "outputs\\v85_validation\\workbench01\\qr_view_binding.json",
+      "sha256": "5c2a92af5213cf75282f438577fdf6de05c6a6b7525e40774792d0d58b05f3d1",
+      "result": {
+        "status": "bound-actual-QR-direction-and-original-NS-state-in-five-step-workbench",
+        "directionPreparation": {
+          "kind": "augmented-patch-QR-LSQR-v1",
+          "methodLabel": "完整增广像分块QR右预处理；零初猜128步LSQR",
+          "studyFile": "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_real01\\augmented_qr_study.json",
+          "studyFileSHA256": "1e4aa3d80284a286e2a5583b81c33c39020e774cbd674665357aae0175dd28a0",
+          "candidateFile": "E:\\RocketAeroHeat\\outputs\\v85_validation\\qr_real01\\augmented_qr_direction.mat",
+          "candidateFileSHA256": "aa58faedc42e6b6fe1afd27df6d80603415f9cacd8bb9e3fba2a7adc02e7e131",
+          "baseCase": "krylov25",
+          "usedTotalDirectionExactlyVerified": true,
+          "hardUpdateLimitClaimed": false,
+          "firstSegmentIterations": 128,
+          "restartedSegmentIterations": 0,
+          "internalCRelativeResidual": 0.011659413648201477,
+          "internalCTarget": 0.001,
+          "internalCTargetMet": false,
+          "completeModelRelativeDefect": 0.011971467579664807,
+          "originalNSDirectionDefect": 0.011971472999565426,
+          "originalNSDirectionTarget": 0.1
+        },
+        "originalFacetDatasetsByteIdentical": [
+          "cases\\constrained-wall-baseline\\results.json",
+          "cases\\constrained-wall-krylov\\results.json",
+          "cases\\legacy-wall-source\\results.json"
+        ],
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "browserVisualOrWebGLRuntimeVerified": false
+      }
+    },
+    "workbenchNodeAudit": {
+      "file": "outputs\\v85_validation\\workbench01\\node_wall_velocity_summary.json",
+      "sha256": "f9c596536e2052ba06db1215bf9df2cc0d4f0965cf1ab100515748dbe352757d",
+      "result": {
+        "status": "passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events",
+        "processID": 50040,
+        "cases": 3,
+        "sourceFaces": 19752,
+        "CSVrows": 592560,
+        "sectionSamples": 6624,
+        "sameHostEvents": 15,
+        "linearDiagnosticRows": 1,
+        "candidateDiagnosticRows": 12,
+        "sourceSHA256": {
+          "tests\\testRocketWallVelocityWorkbench.js": "b6f9b71fccb488a202f1df2a9afcc93f1f9072c1786dc39a6b503196ae6bbf93",
+          "outputs\\v85_validation\\workbench01\\rocket-wall-velocity.js": "2e40500d626c61ecfeda6cba7faed3cc1057c3a83072d6c1632f87e83644ab8c",
+          "outputs\\v85_validation\\workbench01\\index.html": "bbe0d790aaff879f2c723a453a99ed47e71199ca4bc6b514ddaa4a70842ccb90",
+          "web\\viewer.js": "6278f502871f8eda7d6eb000bae900facf8e62c3120d9336b080cf1bd37eee6b",
+          "web\\export.js": "8cb1bb73e4b84d7147aad789da8893c58cbae10adeceb7f27c0bf39f98513b23",
+          "web\\section.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c"
+        },
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "newProductionSolvedAreaM2": 0,
+        "dataSHA256": "43ec655f28b070a5c08bcb4164a6ad11ef067760f6f260cc5398daeac0e2029c"
+      }
+    },
+    "workbenchIndependentAudit": {
+      "file": "outputs\\v85_validation\\workbench01\\independent_wall_velocity_view.json",
+      "sha256": "a2040bc173668a9a25423a87edc93661a23744201e870e7227353edf2679d495",
+      "result": {
+        "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+        "processID": 7476,
+        "cases": [
+          {
+            "case": "legacy-wall-source",
+            "sourceRelativeDifferences": {
+              "pressure": 2.4865056369363964e-16,
+              "heatFlux": 2.9471930864008487e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 2.8653818713341003e-16,
+              "steadyBoundaryFluxBalance": 0.015713480397044875
+            }
+          },
+          {
+            "case": "constrained-wall-baseline",
+            "sourceRelativeDifferences": {
+              "pressure": 2.4865056369363964e-16,
+              "heatFlux": 2.9471930864008487e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 2.8653818713341003e-16,
+              "steadyBoundaryFluxBalance": 0.015119531285283542
+            }
+          },
+          {
+            "case": "constrained-wall-krylov",
+            "sourceRelativeDifferences": {
+              "pressure": 2.856535588259357e-16,
+              "heatFlux": 1.9578869630050725e-16,
+              "wallAdjacentTemperature": 0.0,
+              "temperatureRate": 0.0,
+              "wallMechanicalExchange": 0.0,
+              "wallInput": 1.8947806286936006e-16
+            },
+            "balance": {
+              "spatialConservationRelative": 2.629073761922739e-16,
+              "steadyBoundaryFluxBalance": 0.010002219531365347
+            }
+          }
+        ],
+        "sourceFaces": 19752,
+        "solverDiagnosticAudit": {
+          "linearAttempts": 1,
+          "rejectedLinearAttempts": 0,
+          "nonlinearTrials": 12,
+          "rejectedNonlinearTrials": 11
+        },
+        "scientificPNGs": [
+          "static_wall_velocity_comparison.png",
+          "static_wall_velocity_residuals.png",
+          "static_wall_velocity_balance.png"
+        ],
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "physicalSolution": false,
+        "newProductionSolvedAreaM2": 0,
+        "inputSHA256": {
+          "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+          "outputs\\v85_validation\\workbench01\\wall-velocity-study-data.json": "43ec655f28b070a5c08bcb4164a6ad11ef067760f6f260cc5398daeac0e2029c",
+          "outputs\\v85_validation\\workbench01\\cases\\legacy-wall-source\\results.json": "af2226ba32ce3076b28c516c71c6826c796e3a1cf33ba4c5ed9684958064faa4",
+          "outputs\\v82_validation\\exact_krylov01\\steady_krylov_evidence.mat": "4412d1d91f7911d4fc84269f82e70ebcafc8943491041b357da9317dd32a570e",
+          "outputs\\v85_validation\\workbench01\\cases\\constrained-wall-baseline\\results.json": "34dab43b588c3bafe43291dbe6800aaafa4111d545ef6e306c80727209f3281b",
+          "outputs\\v83_validation\\integration01\\wall_velocity_integration_evidence.mat": "9d14bc8626323d57745540613baff91063749748ed4d4ce89b3110c22e097f5b",
+          "outputs\\v85_validation\\workbench01\\cases\\constrained-wall-krylov\\results.json": "280809a6d92dc3fe30c9ca7a962dd477e1068751ec82a81cf6828985a87e79f4",
+          "outputs\\v83_validation\\krylov26\\wall_velocity_krylov_evidence.mat": "e93be3bc29a72753cab8b08851fc93261109434b0c948aef3a78cb2cc5c785f3",
+          "outputs\\v85_validation\\qr_real01\\augmented_qr_study.json": "1e4aa3d80284a286e2a5583b81c33c39020e774cbd674665357aae0175dd28a0",
+          "outputs\\v85_validation\\qr_real01\\augmented_qr_direction.mat": "aa58faedc42e6b6fe1afd27df6d80603415f9cacd8bb9e3fba2a7adc02e7e131"
+        },
+        "scriptSHA256": "000298ec4a89eb5543817c63c6c27cb91288f2d65247fc494aac92ac86044584"
+      }
+    },
+    "sourceRejectionAudit": {
+      "file": "outputs\\v85_validation\\qr_view_binding_rejections.json",
+      "sha256": "94975e0be95494e3cd558b7dbce182459db61a65bcd2b3e7f96368c3402a6e24",
+      "result": {
+        "status": "passed-wrong-state-and-source-SHA-provenance-rejections",
+        "rejected": [
+          "wrong-actual-result-state",
+          "wrong-source-state-SHA"
+        ],
+        "originalStudySHA256": "1e4aa3d80284a286e2a5583b81c33c39020e774cbd674665357aae0175dd28a0",
+        "candidateSHA256": "aa58faedc42e6b6fe1afd27df6d80603415f9cacd8bb9e3fba2a7adc02e7e131",
+        "scriptSHA256": "60b302544e8beb36e1fd2418be3a81a9611f98583afa0dc126d3fb6ca706a310",
+        "newProductionSolvedAreaM2": 0
+      }
+    },
+    "scientificVisualReview": {
+      "file": "outputs\\v85_validation\\visual_review.json",
+      "sha256": "7e137b146d322b93b9f19325bc0360960e164e64508661ec2fd7a89bd797ff54",
+      "result": {
+        "status": "reviewed-three-scientific-PNGs-legible-full-geometry-colorbar-and-quantitative-labels",
+        "images": {
+          "static_wall_velocity_balance.png": "9fe0cb5a9b237e1178dddb6528eff7d9d9f64595ea378ffba41624c07e3839ad",
+          "static_wall_velocity_comparison.png": "6cfc2579ed410a79b75ba42c8adeb0d5b80a54346c81b78341242d3af999356c",
+          "static_wall_velocity_residuals.png": "1ba8ae92ebf73d16b8a1ffc8bf618b8b8b94b77ae9f668b0dfd69588e17e27e8"
+        },
+        "browserVisualOrWebGLRuntimeVerified": false,
+        "newProductionSolvedAreaM2": 0
+      }
+    }
+  },
+  "sourceSHA256": {
+    "internalFlow/cutCell/buildRocketAugmentedPatchQR.m": "5f131a800c0ff4445a87e95947a68ff3344445d9c10817e6bfd1147061b06c81",
+    "internalFlow/cutCell/applyRocketAugmentedPatchQR.m": "7e6bcce893db4231182b3423bcd4c8e89ae36818b3fd15b26371937df619edce",
+    "internalFlow/cutCell/solveRocketAugmentedQRDirection.m": "dd5c078b33dd76576f3f54d693d392904836f753ba2da913f234f911c2f7995a",
+    "tests/testRocketAugmentedPatchQR.m": "801e307ec644b8786964c677ac3f7e9ec46c5fb2b8cb86c0fd166dc1f48274c4",
+    "tests/studyRocketAugmentedPatchQR.m": "50debb40537973c683b985d7840aa0b9978edbe9ef4d82d762317765caf87a5e",
+    "runRocketAugmentedQRResearch.m": "9457fb39a5df34904bef1d84576c4e93b635b658656138053ae64845989889cb",
+    "tests/screenRocketAugmentedPatchQR.py": "15d3964e36e1cd3e249a6166c619d9beb19aceec6a0607c60aa2ba74190b3b8e",
+    "tests/auditRocketAugmentedPatchQR.py": "74e83d9f5a500a3cbb6a32d9353ce46b34e9042c65f7c0d4e3f682127fcfa7ea",
+    "tests/buildRocketQRWorkbench.py": "d128ed9f5391365163a0501ebf97b044c0d24e4c163efaec6e8c330084532199",
+    "tests/testRocketQRViewBinding.py": "60b302544e8beb36e1fd2418be3a81a9611f98583afa0dc126d3fb6ca706a310",
+    "tests/diagnoseRocketQRTemperatureLimit.py": "6ae17c669c80f598847336e8d009ab62638d78d670ff2c66c05ab71d429d5ce3",
+    "tests/auditRocketWallVelocityWorkbench.py": "000298ec4a89eb5543817c63c6c27cb91288f2d65247fc494aac92ac86044584",
+    "tests/packageRocketAugmentedQR.py": "0276aa2e20ce6d443d4630561c30d750c0bc7b32b284f9e004b6c504b25f33d8",
+    "tests/recordRocketAugmentedQRProgress.py": "5b78cfa39afcca59c98afd3beb9a1f7f29c2232db60c56ae5d8710d2aa375779",
+    "docs/AUGMENTED_PATCH_QR_V85.md": "eca4437300fc2b9b66826ae0376743bbf76a83491a9d16dc7b9cb068cab3aff2",
+    "docs/GITHUB_STAGE_READINESS.md": "360eed1ff1b337d0bfbc80a990c3b6100aa354caf13c5dea2efd75299888605a",
+    "docs/PROJECT_GOALS.md": "ad2ca408b6a229eb208a2b5bbeb7e6204a80db71fed5bee60a4bd68a0a8e5b40"
+  },
+  "isolatedUnitReproduction": {
+    "status": "passed-isolated-QR-entry-and-all-nontiming-small-domain-objects",
+    "comparisons": 602,
+    "isolatedProof": {
+      "status": "passed-isolated-QR-entry-unit-run",
+      "resolvedQR": "E:\\RocketAeroHeat\\outputs\\v85_validation\\delivery\\isolated\\RocketAeroHeat\\internalFlow\\cutCell\\buildRocketAugmentedPatchQR.m",
+      "resolvedEntry": "E:\\RocketAeroHeat\\outputs\\v85_validation\\delivery\\isolated\\RocketAeroHeat\\runRocketAugmentedQRResearch.m",
+      "fullDomainRecomputedInIsolation": false,
+      "newProductionSolvedAreaM2": 0
+    },
+    "allStagedMAndJSSourcesUnchanged": true,
+    "fullDomainRecomputedInIsolation": false,
+    "physicalSolution": false,
+    "newProductionSolvedAreaM2": 0
+  },
+  "delivery": null,
+  "production": {
+    "formalHeatAreaPercent": 66.5626327424,
+    "newProductionSolvedAreaM2": 0,
+    "physicalSolution": false,
+    "fullAreaMilestoneCompleted": false,
+    "wholeRocketNonlinearBottleneckResolved": false,
+    "defaultSolverReplaced": false
+  },
+  "git": {
+    "HEAD": "42601c945cdc3a8a7bd4b84699615e8043f0adc9",
+    "committed": false,
+    "pushed": false
+  },
+  "nextAction": "Use actual Q26 and first/second-layer face19207 temperature margin. Inspect the interface-temperature chain derivative and constrained-direction/energy-transport feasibility at the current state, preserving original NS/temperature/steady gates. Do not repeat the old 15-column selection or assume a better linear residual resolves nonlinear convergence. Continue regional/near-wall/grid/outer-domain/property/turbulence/public physical validation before adding qualified area."
+}
