@@ -3,6 +3,8 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import re
+import subprocess
 
 import numpy as np
 from scipy.io import loadmat
@@ -140,6 +142,7 @@ def audit_case(result, spec):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('folder');parser.add_argument('process')
     parser.add_argument('--report',help='将复核结果写入新的项目内路径，避免改写冻结输入或历史回执。')
+    parser.add_argument('--source-ref',help='显式核对历史Git提交中的MATLAB原字节；不会将旧输入冒充当前代码重算。')
     args=parser.parse_args()
     folder=Path(args.folder).resolve();folder.relative_to(ROOT);source=folder/'pressure_surface_flow_evidence.mat'
     target=Path(args.report).resolve() if args.report else folder/'independent_pressure_surface_flow.json'
@@ -168,15 +171,27 @@ def main():
     label_errors=np.array([item['relativeMetricError'] for item in rows(d['label'])]);label_ratios=label_errors[:-1]/label_errors[1:]
     assert np.all((ratios>8)&(ratios<24)) and np.all((label_ratios>3.9)&(label_ratios<4.1))
     bindings={source.relative_to(ROOT).as_posix():sha(source),process_path.relative_to(ROOT).as_posix():sha(process_path)}
+    source_reference=None;historical_modules={}
+    if args.source_ref:
+        assert re.fullmatch('[0-9a-fA-F]{7,40}',args.source_ref),'必须显式指定Git提交SHA。'
+        source_reference=subprocess.check_output(['git','rev-parse','--verify',args.source_ref+'^{commit}'],cwd=ROOT,text=True).strip()
     for rel in ['setupSurfacePressureFlow.m','regionalFlow/surface/marchPressureDrivenSurfaceFlow.m',
                 'regionalFlow/surface/pressureSurfaceFlowRHS.m','regionalFlow/surface/pressureSurfaceFlowOptions.m',
                 'tests/testPressureDrivenSurfaceFlow.m','tests/pressureSurfaceBenchmarkProblem.m']:
-        assert sha(ROOT/rel)==process['sourceSHA256'][rel],rel;bindings[rel]=sha(ROOT/rel)
+        if source_reference:
+            content=subprocess.check_output(['git','show',source_reference+':'+rel],cwd=ROOT)
+            digest=hashlib.sha256(content).hexdigest();assert digest==process['sourceSHA256'][rel],rel
+            historical_modules[rel]=digest
+        else:
+            assert sha(ROOT/rel)==process['sourceSHA256'][rel],rel;bindings[rel]=sha(ROOT/rel)
     report=dict(status='passed-independent-analytic-pressure-turn-geometry-dual-metric-and-prefix-audit',
                 checks=checks,RKErrorRatios=ratios.tolist(),labelErrorRatios=label_ratios.tolist(),
                 focusFirstUnresolvedArcM=float(s[bad]),metricDifferenceIsRigorousBound=False,
                 inputSHA256=bindings,scriptSHA256=sha(__file__),independentExperimentalValidation=False,
                 fullExternalFlowOrHeatingSolved=False,newActualNSEvaluations=0,newProductionSolvedAreaM2=0)
+    if source_reference:
+        report['historicalSourceIdentity']={'gitCommit':source_reference,'modules':historical_modules,
+                                          'currentMATLABCodeRerunClaimed':False}
     target.write_text(json.dumps(report,indent=2)+'\n',encoding='utf8')
     print(json.dumps(dict(status=report['status'],auditedResults=len(checks),rays=5*len(checks),
                          RKErrorRatios=report['RKErrorRatios'],labelErrorRatios=report['labelErrorRatios'],focusM=float(s[bad]))))

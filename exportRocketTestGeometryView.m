@@ -58,7 +58,19 @@ for k=1:numel(meshes)
             assert(all(vecnorm(c.normals,2,2)>0));
         end
         flow.curves=curves;payloads{k}.surfaceFlowLines=flow;
+        % 模块用途：默认科研视角属于模型，隐藏流线查看网格时也保持同一方向。
+        for cameraKey={'initialCameraAzimuthRad','initialCameraElevationRad'}
+            key=cameraKey{1};
+            if isfield(flow,key)
+                validateattributes(flow.(key),{'double'},{'real','finite','scalar'});
+                payloads{k}.(key)=flow.(key);
+            end
+        end
         payloads{k}.coordinateNote='SI / m · X鼻尖正向 · 条件流线数值研究；压力/热状态为输入，热流未求解';
+        if isfield(flow,'thermodynamicStateIsConditionallyRestored')&& ...
+                isequal(flow.thermodynamicStateIsConditionallyRestored,true)
+            payloads{k}.coordinateNote='SI / m · X鼻尖正向 · 压力为流线输入，Te/rho/U为同物性条件反算；Tr/Tw/热流未求';
+        end
     end
 end
 

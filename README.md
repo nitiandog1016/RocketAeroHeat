@@ -6,15 +6,15 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 小版本也同步到本GitHub仓库，不再默认生成大型本地工程包。用户已于2026-10-28确认保持仓库公开并直接同步。后文的“不推送/本地包/私有”属于历史阶段说明，以本节及[项目约定](AGENTS.md)为准。
 
-最新v94完成独立的压力驱动表面流线/流管横向尺度模块：曲面切向Euler压力转向、五条RK4射线、双标签间距差分与有效前缀护栏。四模型工作台保持同一侧栏的五步骤，支持真实三维站点拾取、滑块、沿程曲线和CSV，逐项区分数值流向/尺度与给定压力/热状态。核心16组/80射线、工作台31流管/1271站点以及实际浏览器核验通过；小型冻结输入可直接独立复核。详见[方法、使用与限制](docs/PRESSURE_DRIVEN_SURFACE_FLOW_V94.md)及[验证索引](docs/validation/v94/README.md)。
+最新v95完成同物性压力恢复与曲面流线衔接：显式定比热/NASA7接口、1000K处焓/熵积分连续匹配，以及从实际内部切锥p/T/rho/U转换一次总状态约定。六组实际核验、独立热力/切锥复算及三维站点到CSV逐值核对通过；三个验证模型保持同一侧栏的五步骤，提供三维拾取、曲线、探针和逐变量方法，Te、Tr、给定Tw与求解Tw分别呈现。见[方法、使用与限制](docs/THERMAL_PRESSURE_SURFACE_FLOW_V95.md)及[验证索引](docs/validation/v95/README.md)。原v94的16组/80射线回归及研究入口保留，原保存对象逐值相等。
 
-v94属于相容输入下的条件流线研究，尚未求解新的整箭外流、热流、壁温或分离/再附，新增合格面积0。最新已接受的真实三维NS状态仍为Q41，累计19次接受/82次主NS调用，未稳态；正式合格热流面积66.5626%，全表面里程碑尚未完成。v93真实坐标/方向、墙热和全部开放面核对、单元/界面约束与科研UI结果保留，见[方法与限制](docs/TEMPERATURE_COORDINATE_PREVIEW_V93.md)及[验证索引](docs/validation/v93/README.md)。
+v95仍是单一固定总状态光滑附着补片的条件流线模块，尚未求解新的整箭外流、热流、壁温或分离/再附，新增合格面积0。原生产物性不变，不逐站重置总压；最新接受的真实三维NS状态仍为Q41，累计19次接受/82次主NS且未稳态；正式合格热流面积66.5626327424%，全表面里程碑尚未完成。v93真实坐标/方向、墙热、开放面与科研UI结果保留，见[方法与限制](docs/TEMPERATURE_COORDINATE_PREVIEW_V93.md)及[验证索引](docs/validation/v93/README.md)。
 
 在MATLAB中运行`main`打开统一工作流。默认小域研究入口为`runRocketTemperatureActiveResearch`和`runRocketTemperatureLookaheadResearch`；必要的小型制造场输入随仓库保存在`tests/data/temperature_research/`。大型真实状态、矩阵缓存、计算输出和历史ZIP不入库；重放完整研究需相应本地状态或重新准备，不能声称代码仓库已备份这些结果。
 
-v94复现：`setupSurfacePressureFlow; addpath('tests'); testPressureDrivenSurfaceFlow('outputs/surface_flow_check_new'); studyPressureDrivenSurfaceFlow('outputs/surface_flow_study_new');`。使用尚未存在的输出目录；本地工作台的打开方式及无需MATLAB的冻结输入检查命令见v94方法说明。下一步接内部合格压力/热状态及NASA7变比热采样合同，不把解析验证输入直接标为真实20°箭体已求外缘。
+v95小型冻结MAT保存在`tests/data/thermal_surface_flow/`，可直接进行Python独立复核。MATLAB中先运行`setupSurfacePressureFlow; addpath('tests');`，再用`testThermalPressureSurfaceFlow`重算核验，或用`exportThermalPressureSurfaceFlowStudy`从冻结MAT重导出工作台；新输出目录必须尚不存在，完整命令见v95说明。下一步按入口标签携带非均匀总焓/熵，恢复正确横向梯度，再连接真实附着区域、边界层入口和面元；不把零攻角直锥或解析平面当作20°整箭已求外缘。
 
-v93小域复现仍为`addpath('tests'); testRocketTemperatureTrialCoordinates('outputs/coordinates_new'); testRocketTemperatureRowConditioning('outputs/row_conditioning_new');`。此前回收Q40矩阵及五项旧缓存实际释放约4.27GB；本轮存储维护又清理四项旧Q17缓存释放约1.29GB，必要输入、当前状态和独有结果保留。若继续内部NS，从Q41建立新系统；工程区域与UI不以其先收敛为前提。[输出用途与保留规则](docs/OUTPUTS_STORAGE.md)说明GitHub未备份的大型本地结果。
+v93小域复现入口仍保留。最新存储维护另行清理旧QR构造缓存释放约1.95GB，当前输入、独有结果及全部v95数据保留。旧上游准备系统及相关QR审计须在新目录重建；若继续内部NS，从Q41建立新系统，工程区域与UI不以其先收敛为前提。[输出用途与保留规则](docs/OUTPUTS_STORAGE.md)说明GitHub未备份的大型本地结果及约74.23GB去重文件长度。
 
 ## 当前开发目标
 

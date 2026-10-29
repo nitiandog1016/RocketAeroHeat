@@ -1,0 +1,35 @@
+function state=surfaceFlowThermodynamicState(T,p,gas)
+%SURFACEFLOWTHERMODYNAMICSTATE 同一理想气体的局部cp、原焓和参考熵。
+% 模块一：保留原定比热运算顺序；显式NASA7模式才调用温度相关物性。
+% 模块二：定比热保持原运算；NASA7显式采用连续匹配的焓/熵积分约定。
+% 模块三：温域/气体不匹配时拒绝，不用常gamma或裁温代替变比热状态。
+validateattributes(T,{'double'},{'real','finite','scalar','positive'});
+validateattributes(p,{'double'},{'real','finite','scalar','positive'});
+assert(isfield(gas,'R')&&isfinite(gas.R)&&isscalar(gas.R)&&gas.R>0, ...
+    'SurfaceFlow:Gas','需要正的气体常数R。');
+assert(T>=gas.temperatureRangeK(1)&&T<=gas.temperatureRangeK(2), ...
+    'SurfaceFlow:Temperature','外缘温度超出声明范围。');
+mode='caloricallyPerfect';if isfield(gas,'thermalPropertyMode'),mode=gas.thermalPropertyMode;end
+R=gas.R;
+if strcmp(mode,'caloricallyPerfect')
+    gamma=gas.gamma;
+    assert(isfinite(gamma)&&isscalar(gamma)&&gamma>1,'SurfaceFlow:Gas','定比热需要gamma>1。');
+    cp=gamma*R/(gamma-1);h=cp*T;
+    entropy=cp*log(T/gas.referenceTemperatureK)-R*log(p/gas.referencePressurePa);
+    method='定比热cp*T与cp*ln(T/Tref)-R*ln(p/pref)';
+elseif strcmp(mode,'thermallyPerfect')
+    assert(abs(R-287.05)<=5&&gas.temperatureRangeK(1)>=80&&gas.temperatureRangeK(2)<=2500, ...
+        'SurfaceFlow:Gas','NASA7仅接受项目固定组分干空气及其80–2500K范围。');
+    assert(isfield(gas,'thermalPropertyConvention')&&strcmp(gas.thermalPropertyConvention,'continuous-project-cp-v1'), ...
+        'SurfaceFlow:Gas','NASA7流线须明确选择分段连续约定，不能静默混用旧总状态。');
+    [cp,h,s]=surfaceFlowAirThermalProperties(T);
+    [~,~,referenceS]=surfaceFlowAirThermalProperties(gas.referenceTemperatureK);
+    entropy=s-referenceS-R*log(p/gas.referencePressurePa);
+    method='原NASA7/低温冻结cp(T)，1000K连续匹配焓/熵积分与参考熵差';
+else
+    error('SurfaceFlow:Gas','未知热物性模式，不自动切换定比热。');
+end
+assert(all(isfinite([cp h entropy]))&&cp>R,'SurfaceFlow:Temperature','热物性失效或cp不大于R。');
+state=struct('specificHeat',cp,'enthalpy',h,'entropy',entropy, ...
+    'gammaLocal',cp/(cp-R),'thermalPropertyMode',mode,'method',method);
+end

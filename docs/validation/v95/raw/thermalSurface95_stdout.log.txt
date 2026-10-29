@@ -1,0 +1,18 @@
+RAH_ENGINE_PID=53408
+                               status: 'passed-pressure-driven-surface-rays-analytic-geometry-coordinate-and-refusal-checks'
+                                cases: 6
+                    RKPositionErrorsM: [3x1 double]
+            labelRelativeMetricErrors: [3x1 double]
+                             refusals: {1x7 cell}
+    pressureAndThermalFieldsAreInputs: 1
+      fullExternalFlowOrHeatingSolved: 0
+               newActualNSEvaluations: 0
+            newProductionSolvedAreaM2: 0
+
+{错误使用 assert
+断言失败。
+
+出错 testThermalPressureSurfaceFlow (第 43 行)
+    assert(max(abs(conserved-expectedYSpeed))/expectedYSpeed<2e-7);
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

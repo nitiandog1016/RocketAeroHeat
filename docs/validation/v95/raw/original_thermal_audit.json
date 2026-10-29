@@ -1,0 +1,95 @@
+{
+  "status": "passed-independent-continuous-thermodynamics-plane-invariant-cone-and-anchor-audit",
+  "cases": 6,
+  "checks": [
+    {
+      "kind": "plane",
+      "rayCount": 5,
+      "maximumPositionErrorM": 1.0007415106216803e-15,
+      "maximumTangentError": 0.0,
+      "maximumEOSGradientResidual": 0.0,
+      "finiteMetricCheckedStations": 31,
+      "pressureIsInput": true,
+      "fullExternalContinuityOrHeatingValidated": false
+    },
+    {
+      "kind": "vortex",
+      "rayCount": 5,
+      "maximumPositionErrorM": 2.4632191361394083e-11,
+      "maximumTangentError": 1.9019932086372586e-11,
+      "maximumEOSGradientResidual": 2.6481109003003224e-16,
+      "finiteMetricCheckedStations": 33,
+      "pressureIsInput": true,
+      "fullExternalContinuityOrHeatingValidated": false
+    },
+    {
+      "kind": "NASA7_exponential_pressure_plane",
+      "rays": 5,
+      "maximumPositionErrorM": 1.159082415203687e-11,
+      "maximumTangentError": 4.202889448149663e-12,
+      "maximumRelativeYMomentumError": 1.551214712236515e-11
+    },
+    {
+      "kind": "NASA7_exponential_pressure_plane",
+      "rays": 5,
+      "maximumPositionErrorM": 1.166718712515962e-11,
+      "maximumTangentError": 7.749615524129049e-12,
+      "maximumRelativeYMomentumError": 2.7124857915339362e-11
+    },
+    {
+      "kind": "internal_NASA7_Taylor_Maccoll_cone",
+      "rays": 5,
+      "maximumPositionErrorM": 1.7554381625844956e-16,
+      "maximumTangentError": 1.1102230246251565e-16,
+      "maximumRelativeYMomentumError": 0.0
+    },
+    {
+      "kind": "internal_NASA7_Taylor_Maccoll_cone",
+      "rays": 5,
+      "maximumPositionErrorM": 1.7512976435879405e-16,
+      "maximumTangentError": 1.1443916996305594e-16,
+      "maximumRelativeYMomentumError": 0.0
+    }
+  ],
+  "independentCone": {
+    "pressurePa": 4439.071465649322,
+    "temperatureK": 334.89967038189366,
+    "speedMS": 1406.9584213452397,
+    "wallPolarSpeedMS": 2.580530589213481e-08,
+    "sourceRelativeStateError": 8.628653347386717e-13,
+    "experimentalValidation": false
+  },
+  "originalNASA7HighMinusLowCpHStdS": [
+    -2.0262924181224662e-05,
+    -0.023498939583078027,
+    -0.0011304263634883682
+  ],
+  "maximumRelativeYMomentumError": 2.7124857915339362e-11,
+  "originalFailedRelativeYMomentumError": 7.795108556423321e-07,
+  "originalProductionAirLibraryUnchanged": true,
+  "totalPressureResetPrefixRejected": true,
+  "inputSHA256": {
+    "outputs/v95_validation/thermal03/thermal_pressure_surface_flow_evidence.mat": "adf156e52224a72e5abe3d0a19bca99e383c4fe3d78f12f22d62d1740b8e4aa8",
+    "outputs/v95_validation/thermalContinuous95_process.json": "04f72dcb9c1d8a0fa1753508a63555f57eb7adf1dadf7a324fccd94eb12a76d9",
+    "setupSurfacePressureFlow.m": "bb551a1cece3396fae1d08265d06bdb8237bf7554eca0ae534a203265d8ee3ca",
+    "airThermalProperties.m": "b944e4b2def4786deac2121651a6675339a21eecbe999814499824ad1627c885",
+    "airRecoveryTemperature.m": "e1fc8bdca9a03a01f859868787a4c7572ea8d77f040b91316cab95515ab2e71b",
+    "selectAirThermalModel.m": "5805b0deda083cae9dc6de0ac540a4bbf9cbc1a83af1b65bc09401976dde1eb5",
+    "solveThermallyPerfectConicalShock.m": "f901ecc4bcce7d3b2298daf36ce4a7c4eab4fcbb24bfc047737f6e6d99e1f20a",
+    "tests/testThermalPressureSurfaceFlow.m": "f1ba9de06b3478ce7c4bbe813ca20814bde9683f9cf6aa73c2007874fb9dfcd4",
+    "tests/pressureSurfaceBenchmarkProblem.m": "2b45e49421ebd24beea7341211e05c0d5f904617a42b8c3233a189ddc194218c",
+    "regionalFlow/surface/createSurfaceFlowGas.m": "66231deb371817c56e4f56d2fa13e34582c12b94c9d19aa5e28bb7b35f049d8d",
+    "regionalFlow/surface/surfaceFlowAirThermalProperties.m": "e38c3571202a0c09aeb57304dcb15a0af13b61e8c7e5846197c8a049960b04f3",
+    "regionalFlow/surface/surfaceFlowThermodynamicState.m": "7dbe0f922d6bb959adba2a0805aad4cd500a3a3435f775a0cb1e4247440f984d",
+    "regionalFlow/surface/surfaceFlowTotalStateFromAnchor.m": "571b94f3d1e50185eaf719ffdf6f8be34105cfdd07cac48b8b778beaf65f8d2d",
+    "regionalFlow/surface/bindIsentropicSurfacePressure.m": "f309b60d62a2c9fc6b74308b151e0ea0411e20ffa431dcdeb1538c758428a922",
+    "regionalFlow/surface/marchPressureDrivenSurfaceFlow.m": "8659718cd2c61fcdc2efee0069814fc553ec7d870efd7311915969a9b39dfd52",
+    "regionalFlow/surface/pressureSurfaceFlowRHS.m": "cbbe99f041d0714fcc0e0b401d533f3b7cdbe3f1ff4a39061f9ab2d6121af6fb",
+    "regionalFlow/surface/pressureSurfaceFlowOptions.m": "bbc0805162c3587597ae96e212ff5aac48cd5df82ca671730f5c4c69384418ec",
+    "outputs/v95_validation/thermal02/thermal_case1_before_invariant.mat": "1d3bf7663ded6d6c900de585f87ca984753ccdc3de2364e95b0b1cd915e38704"
+  },
+  "scriptSHA256": "c824993fc45f759e56eb8a2bda54efe8fb38789920b78799a0fe631f2615be79",
+  "caloricReferenceHelperSHA256": "0c2fe48d2111fe7221255c984dfb34fcf8d157cec58e02a0a0985f35997fc5f1",
+  "independentExperimentalValidation": false,
+  "newProductionSolvedAreaM2": 0
+}

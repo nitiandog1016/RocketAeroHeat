@@ -1,0 +1,61 @@
+/* 模块用途：真实导出上的五步骤、三维消息绑定、站点曲线、输入身份和CSV核对。 */
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+const folder=path.resolve(process.argv[2]),file=path.join(folder,'pressure-surface-flow-data.json'),raw=fs.readFileSync(file,'utf8'),data=JSON.parse(raw);
+assert.equal(data.kind,'pressure-surface-flow-study-v1');assert.equal(data.productionQualified,false);assert.equal(data.cases.length,4);
+assert.ok(fs.readFileSync(path.join(folder,'index.html'),'utf8').includes('href="pressure-surface-flow-data.json"'));
+assert.equal(fs.readFileSync(path.join(folder,'pressure-surface-flow-data.js'),'utf8'),'window.PRESSURE_SURFACE_FLOW_STUDY='+raw+';\n');
+class E{
+ constructor(id){this.id=id;this.children=[];this.attrs={};this.events={};this.value='';this.checked=false;this.clientWidth=800;this.clientHeight=145;}
+ append(...x){this.children.push(...x);}replaceChildren(...x){this.children=[...x];}addEventListener(k,f){this.events[k]=f;}
+ setAttribute(k,v){this.attrs[k]=String(v);}getAttribute(k){return this.attrs[k];}click(){if(this.events.click)this.events.click({});}
+ getContext(){return context;}getBoundingClientRect(){return{left:0,top:0,width:this.clientWidth,height:this.clientHeight};}
+}
+const context=Object.fromEntries(['setTransform','clearRect','fillText','beginPath','moveTo','lineTo','stroke','arc','fill'].map(k=>[k,(...args)=>{assert.ok(args.filter(x=>typeof x==='number').every(Number.isFinite));}]));
+const ids=Object.fromEntries(['caseChoice','title','description','details','scope','sources','viewer','probe','station','stationNote','curve','field','sharedScale','plotNote','saveCSV'].map(k=>[k,new E(k)]));
+ids.field.value='metricRatio';ids.sharedScale.checked=true;ids.viewer.parentElement={scrollTop:500};ids.viewer.contentWindow={};
+const buttons=Array.from({length:5},()=>new E('button')),listeners={};let csvBlob=null,downloads=0;
+const document={getElementById:k=>{assert.ok(ids[k],k);return ids[k];},querySelectorAll:q=>{assert.equal(q,'[data-step]');return buttons;},createElement:tag=>{const e=new E(tag);if(tag==='a')e.click=()=>{downloads++;};return e;}};
+const location={origin:'http://127.0.0.1:8775'},window={PRESSURE_SURFACE_FLOW_STUDY:data,devicePixelRatio:1,addEventListener:(k,fn)=>{listeners[k]=fn;}};
+const URLmock={createObjectURL:b=>{csvBlob=b;return'blob:surface-flow-test';},revokeObjectURL:()=>{}};
+const program=path.join(folder,'pressure-surface-study.js');vm.runInNewContext(fs.readFileSync(program,'utf8'),{window,document,location,Blob,URL:URLmock});
+const readProbe=name=>{const i=ids.probe.children.findIndex(e=>e.textContent===name);assert.ok(i>=0,name);return ids.probe.children[i+1].textContent;};
+let events=0,ignored=0,rows=0;
+(async()=>{
+ for(let c=0;c<data.cases.length;c++){
+  const entry=data.cases[c];assert.equal(entry.pressureIsInput,true);assert.equal(entry.thermodynamicStateIsInput,true);assert.equal(entry.heatFluxSolved,false);
+  assert.equal(entry.productionQualified,false);assert.equal(entry.newProductionSolvedAreaM2,0);
+  entry.tubes.forEach((t,i)=>{assert.equal(t.position.length,t.arcLengthM.length);assert.deepEqual(entry.curves[i].points,t.position);assert.equal(entry.curves[i].sourceTubeIndexOneBased,i+1);});
+  ids.caseChoice.value=String(c);ids.caseChoice.events.change();
+  for(let s=0;s<5;s++){
+   ids.viewer.parentElement.scrollTop=400;buttons[s].events.click();assert.equal(ids.viewer.parentElement.scrollTop,0);
+   const query=new URL(ids.viewer.attrs.src,location.origin+'/').searchParams;
+   assert.equal(query.get('case'),String(c));assert.equal(query.get('flow'),s>=3?'1':'0');assert.equal(query.get('wire'),s===1?'1':'0');events++;
+  }
+  const message={kind:'pressure-surface-view-event',caseIndex:c,payload:{kind:'surface-flow-probe',revision:c+1,curveIndex:2,stationIndex:12}};
+  listeners.message({origin:location.origin,source:ids.viewer.contentWindow,data:message});
+  assert.equal(ids.station.value,'12');assert.ok(ids.stationNote.textContent.includes('流管 3'));
+  assert.ok(ids.stationNote.textContent.includes('数值h')&&ids.stationNote.textContent.includes('输入p')&&ids.stationNote.textContent.includes('q未求'));
+  const t=entry.tubes[2];assert.equal(readProbe('输入压力 / kPa'),Number((t.pressureInputPa[12]*.001).toPrecision(6)).toString());
+  assert.equal(readProbe('数值横向h / '+entry.metricUnit),Number(t.metric[12].toPrecision(6)).toString());
+  assert.ok(readProbe('热流 / 求解壁温').includes('未求解'));
+  const before=ids.station.value;
+  for(const wrong of [
+   {origin:'https://unrelated.invalid',source:ids.viewer.contentWindow,data:message},
+   {origin:location.origin,source:{},data:message},
+   {origin:location.origin,source:ids.viewer.contentWindow,data:{...message,caseIndex:(c+1)%4}},
+   {origin:location.origin,source:ids.viewer.contentWindow,data:{...message,payload:{...message.payload,revision:0}}},
+   {origin:location.origin,source:ids.viewer.contentWindow,data:{...message,payload:{...message.payload,stationIndex:9999}}}
+  ]){listeners.message(wrong);assert.equal(ids.station.value,before);ignored++;}
+  for(const key of ['metricRatio','metric','pressureInputPa','temperatureInputK','speedInputMS']){ids.field.value=key;ids.field.events.change();assert.ok(ids.plotNote.textContent.includes('实际有效积分前缀'));}
+  ids.station.value='20';ids.station.events.input();assert.equal(readProbe('实际积分站点'),'21 / 41');
+  ids.saveCSV.events.click();const csv=await csvBlob.text();const lines=csv.trim().split(/\r?\n/);assert.equal(lines.length,42);
+  assert.ok(lines[0].includes('input_pressure_Pa')&&lines[0].includes('conditional_metric'));assert.ok(lines[1].includes('"unknown","unknown"'));rows+=41;
+  // 未知输入不能在单位换算后变成0；只改变测试副本，不改导出物理数据。
+  const old=t.pressureInputPa[20];t.pressureInputPa[20]=null;ids.station.events.input();assert.equal(readProbe('输入压力 / kPa'),'未求解');t.pressureInputPa[20]=old;
+ }
+ assert.equal(downloads,4);
+ const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+ const report={status:'passed-actual-surface-flow-study-five-step-probe-message-input-roles-curves-and-CSV',cases:4,workflowEvents:events,ignoredUnrelatedOrStaleMessages:ignored,CSVrows:rows,unknownInputDidNotBecomeZero:true,browserVisualOrWebGLRuntimeVerified:false,newProductionSolvedAreaM2:0,dataSHA256:sha(file),scriptSHA256:sha(__filename),programSHA256:sha(program)};
+ const target=process.argv[3]?path.resolve(process.argv[3]):path.join(folder,'node_pressure_surface_flow.json');assert.equal(fs.existsSync(target),false);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
+})().catch(e=>{console.error(e);process.exitCode=1;});

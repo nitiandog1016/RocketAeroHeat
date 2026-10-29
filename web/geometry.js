@@ -35,7 +35,7 @@
     }
     if(gl){buffer(flowPositions,ps);buffer(flowColors,cs);}
     const note=document.querySelector('footer span:last-child');
-    if(note)note.textContent=overlay?'条件流线数值 · 压力/热状态为输入 · 热流未求':'几何预览 · 尚未计算物理场量';
+    if(note)note.textContent=overlay?(overlay.thermodynamicStateIsConditionallyRestored===true?'条件流线数值 · 输入p / 同物性反算Te · Tr/Tw/热流未求':'条件流线数值 · 压力/热状态为输入 · 热流未求'):'几何预览 · 尚未计算物理场量';
   }
   function camera(){direction=[Math.cos(el)*Math.cos(az),Math.cos(el)*Math.sin(az),Math.sin(el)];right=[-Math.sin(az),Math.cos(az),0];up=[-Math.sin(el)*Math.cos(az),-Math.sin(el)*Math.sin(az),Math.cos(el)];sx=baseScale*zoom;sy=sx*canvas.clientWidth/Math.max(1,canvas.clientHeight);}
   function fit(){camera();if(!vertices.length)return;let w=0,h=0;vertices.forEach(v=>{w=Math.max(w,Math.abs(dot(v,right)));h=Math.max(h,Math.abs(dot(v,up)));});const aspect=canvas.clientWidth/Math.max(1,canvas.clientHeight);baseScale=Math.min(.82/Math.max(w,1e-8),.76/Math.max(h*aspect,1e-8));zoom=1;pan=[0,0];}
@@ -56,7 +56,7 @@
       $('caption').textContent=data.caption||'几何预览';$('coordinates').textContent=data.coordinateNote||'SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例';$('wire').checked=Boolean(data.showWire);
       $('summary').textContent=F.length?V.length.toLocaleString()+' 顶点 · '+F.length.toLocaleString()+' 三角面':'等待导入模型';$('empty').hidden=Boolean(F.length);
       $('bounds').textContent=V.length?'几何尺寸 / m：X '+fmt(hi[0]-lo[0])+' · Y '+fmt(hi[1]-lo[1])+' · Z '+fmt(hi[2]-lo[2]):'几何尺寸 / m：—';
-      if(data.resetCamera){az=-Math.PI/2;el=.35;fit();}if(gl)$('error').hidden=true;pendingReport=true;render();
+      if(data.resetCamera){const view=finite(data.initialCameraAzimuthRad)?data:data.surfaceFlowLines;az=view&&finite(view.initialCameraAzimuthRad)?view.initialCameraAzimuthRad:-Math.PI/2;el=view&&finite(view.initialCameraElevationRad)?Math.max(-1.55,Math.min(1.55,view.initialCameraElevationRad)):.35;fit();}if(gl)$('error').hidden=true;pendingReport=true;render();
     }catch(e){problem(e.message);}
   }
   // 模块三：正交投影与像素回执；透明清屏便于核验实际非背景像素。

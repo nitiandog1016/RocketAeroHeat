@@ -1,0 +1,158 @@
+function report=testThermalPressureSurfaceFlow(folder)
+%TESTTHERMALPRESSURESURFACEFLOW 同物性压力恢复、变比热流线与内部锥流衔接。
+% 模块一：旧定比热平面/旋涡通过恢复适配后仍保持原轨迹和横向尺度。
+% 模块二：NASA7变压平面核对横向速度守恒、标签尺度及跨物性分段。
+% 模块三：真正调用内部NASA7切锥求解器，核对总状态/锥面状态往返。
+% 模块四：总压逐站重置、物性混用及域外压力必须拒绝，失败前缀保留未知。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);setupSurfacePressureFlow;
+assert(~exist(folder,'dir'),'SurfaceFlow:TestOverwrite','测试必须使用新目录。');mkdir(folder);
+cases={};rejections={};
+
+%% 一、定比热恢复适配与原解析状态保持一致
+for kind={'plane','vortex'}
+    [original,spec]=pressureSurfaceBenchmarkProblem(kind{1});
+    baseSample=original.sample;problem=original;problem.sample=@(q)pressureOnly(baseSample(q));
+    total=struct('totalPressure',spec.totalPressurePa,'totalTemperature',spec.totalTemperatureK, ...
+        'thermalPropertyMode','caloricallyPerfect','method','v94同一解析完全气体总状态');
+    problem=bindIsentropicSurfacePressure(problem,total);
+    direct=marchPressureDrivenSurfaceFlow(original,struct('maximumArcStepM',0.01));
+    recovered=marchPressureDrivenSurfaceFlow(problem,struct('maximumArcStepM',0.01));
+    assert(all(recovered.validStation));
+    for name={'position','tangent','pressure','temperature','density','speed'}
+        key=name{1};a=recovered.center.(key);b=direct.center.(key);
+        assert(max(abs(a(:)-b(:)))/max(1,max(abs(b(:))))<2e-11);
+    end
+    assert(max(abs(recovered.metric-direct.metric))<2e-10);
+    cases{end+1}=struct('kind',['caloric_' kind{1}],'result',recovered, ...
+        'specification',spec,'directReference',direct); %#ok<AGROW>
+end
+
+%% 二、显式NASA7压力梯度；跨1000K及150K分段，单位仍为SI
+thermalCases={[1600 1150 400000 2 .6],[300 180 200000 3 .3]};
+for k=1:numel(thermalCases)
+    values=thermalCases{k};
+    spec=struct('totalTemperatureK',values(1),'entryTemperatureK',values(2), ...
+        'totalPressurePa',values(3),'pressureExponentPerM',values(4),'finishArcM',values(5), ...
+        'entryAngleRad',0.3,'R',287.05,'labelStepM',0.004);
+    [problem,spec,total]=thermalPlane(spec);
+    result=marchPressureDrivenSurfaceFlow(problem,struct('maximumArcStepM',0.01));
+    assert(all(result.validStation),'SurfaceFlow:ThermalTestPrefix','声明的变压平面应完整通过。');
+    assert(strcmp(result.thermalPropertyMode,'thermallyPerfect'));
+    conserved=result.center.speed.*result.center.tangent(:,2);
+    expectedYSpeed=spec.entrySpeedMS*sin(spec.entryAngleRad);
+    momentumRelativeError=max(abs(conserved-expectedYSpeed))/expectedYSpeed;
+    save(fullfile(folder,sprintf('thermal_case%d_before_invariant.mat',k)), ...
+        'result','spec','total','conserved','expectedYSpeed','momentumRelativeError','-v7');
+    fprintf('THERMAL_SURFACE_INVARIANT case=%d relativeYMomentum=%.17g maxTangentDrift=%.17g\n', ...
+        k,momentumRelativeError,max(result.rays{3}.unitTangentError));
+    assert(max(abs(conserved-expectedYSpeed))/expectedYSpeed<2e-7);
+    assert(max(abs(result.metric+result.center.tangent(:,1)))<2e-9);
+    assert(max(result.center.temperature)>values(2)-1e-7&&all(diff(result.center.temperature)<0));
+    knot=1000;if k==2,knot=150;end
+    assert(min(result.center.temperature)<knot&&max(result.center.temperature)>knot);
+    % 远离分段点用独立坐标差分检查恢复导数；不改核心相容性门槛。
+    derivative=cell(2,1);
+    for j=1:2
+        q=[-0.03*j;0];h=1e-6;a=problem.sample(q+[h;0]);b=problem.sample(q-[h;0]);c=problem.sample(q);
+        errors=zeros(3,1);fields={'temperature','density','speed'};
+        for m=1:3
+            name=fields{m};actual=(a.(name)-b.(name))/(2*h);gradient=c.([name 'Gradient']);
+            errors(m)=abs(actual-gradient(1))/max(1,abs(gradient(1)));
+        end
+        assert(max(errors)<2e-6);derivative{j}=struct('coordinate',q,'relativeErrors',errors);
+    end
+    cases{end+1}=struct('kind','NASA7_exponential_pressure_plane','specification',spec, ...
+        'result',result,'totalState',total,'derivativeChecks',{derivative}); %#ok<AGROW>
+end
+
+%% 三、实际内部切锥结果；不以解析验证总状态代替锥形激波求解
+R=287.05;T=220;p=1200;gamma=1.4;Mach=5;
+freestream=struct('Mach',Mach,'gamma',gamma,'R',R,'pressure',p,'temperature',T, ...
+    'density',p/(R*T),'speed',Mach*sqrt(gamma*R*T));
+coneAngleDeg=15;cone=solveThermallyPerfectConicalShock(freestream,coneAngleDeg);
+assert(cone.available&&cone.attached,'SurfaceFlow:ConeSource','内部锥流没有可用附体解。');
+[problem,spec]=pressureSurfaceBenchmarkProblem('cone', ...
+    struct('coneAngleRad',deg2rad(coneAngleDeg),'startMeridianM',0.04));
+problem.gas=createSurfaceFlowGas('thermallyPerfect',R,gamma);
+problem.arcStationsM=linspace(0,.30,31)';problem.labelStep=.02;
+problem.sample=@(q)conePressure(q,deg2rad(coneAngleDeg),cone.pressure);
+problem.sources.pressure=cone.method;
+problem.sources.entryDirection='零攻角直锥实际无穿透母线方向，与切锥几何一致';
+problem=bindIsentropicSurfacePressure(problem,cone);
+for beta=[0 pi/4]
+    problem.labelCenter=beta;result=marchPressureDrivenSurfaceFlow(problem,struct('maximumArcStepM',.01));
+    assert(all(result.validStation));
+    relativeRoundtrip=[max(abs(result.center.temperature/cone.temperature-1)), ...
+        max(abs(result.center.speed/cone.speed-1)),max(abs(result.center.density/cone.density-1))];
+    assert(max(relativeRoundtrip)<5e-8,'SurfaceFlow:ConeRoundtrip','锥流状态与同物性恢复不一致。');
+    expected=(spec.startMeridianM+result.arcLengthM)*sin(spec.coneAngleRad)*sin(problem.labelStep/2)/(problem.labelStep/2);
+    assert(max(abs(result.metric-expected))<2e-9);
+    cases{end+1}=struct('kind','internal_NASA7_Taylor_Maccoll_cone','specification',spec, ...
+        'result',result,'sourceFreestream',freestream,'sourceCone',cone, ...
+        'roundtripRelativeErrors',relativeRoundtrip); %#ok<AGROW>
+end
+
+%% 四、拒绝合同与总压重置：不能用局部自洽掩盖沿同一射线熵跳变
+[problem,spec,total]=thermalPlane(struct('totalTemperatureK',1600,'entryTemperatureK',1150, ...
+    'totalPressurePa',400000,'pressureExponentPerM',2,'finishArcM',.30,'entryAngleRad',.3,'R',287.05,'labelStepM',.004));
+bad=total;bad.thermalPropertyMode='caloricallyPerfect';
+unbound=problem;unbound.sample=@(q)planePressure(q,spec.entryPressurePa,spec.pressureExponentPerM);
+rejections{end+1}=reject(@()bindIsentropicSurfacePressure(unbound,bad),'SurfaceFlow:Gas');
+bad=total;bad.available=false;rejections{end+1}=reject(@()bindIsentropicSurfacePressure(unbound,bad),'SurfaceFlow:PressureAdapter');
+bad=unbound;bad.sample=@(q)planePressure(q,total.totalPressure*1.1,0);bad=bindIsentropicSurfacePressure(bad,total);
+rejections{end+1}=reject(@()marchPressureDrivenSurfaceFlow(bad),'SurfaceFlow:ThermalPressure');
+bad=unbound;bad.sample=@(q)planePressure(q,total.totalPressure*1e-40,0);bad=bindIsentropicSurfacePressure(bad,total);
+rejections{end+1}=reject(@()marchPressureDrivenSurfaceFlow(bad),'SurfaceFlow:ThermalPressure');
+bad=unbound;bad.sample=@(q)withResetField(planePressure(q,spec.entryPressurePa,0),total.totalPressure);
+bad=bindIsentropicSurfacePressure(bad,total);rejections{end+1}=reject(@()marchPressureDrivenSurfaceFlow(bad),'SurfaceFlow:PressureAdapter');
+otherTotal=total;otherTotal.totalPressure=1.05*total.totalPressure;
+other=bindIsentropicSurfacePressure(unbound,otherTotal);a=problem.sample;b=other.sample;
+reset=problem;reset.sample=@(q)resetSample(q,a,b);
+prefix=marchPressureDrivenSurfaceFlow(reset,struct('maximumArcStepM',.01));
+assert(any(prefix.validStation)&&any(~prefix.validStation));
+first=find(~prefix.validStation,1);assert(all(~prefix.validStation(first:end)));
+assert(all(isnan(prefix.center.temperature(first:end)))&&all(isnan(prefix.metric(first:end))));
+assert(any(cellfun(@(r)strcmp(r.failureIdentifier,'SurfaceFlow:Entropy'),prefix.rays)));
+report=struct('status','passed-pressure-state-adapter-variable-cp-and-internal-cone-surface-flow', ...
+    'cases',numel(cases),'rejections',{rejections},'internalConeSolved',true, ...
+    'fullExternalContinuityOrHeatingSolved',false,'newProductionSolvedAreaM2',0);
+save(fullfile(folder,'thermal_pressure_surface_flow_evidence.mat'),'cases','prefix','report','-v7');disp(report);
+end
+
+function value=pressureOnly(value)
+% 模块用途：明确选择连续压力输入，不能静默覆写原外缘状态。
+value=rmfield(value,{'temperature','density','speed','temperatureGradient','densityGradient','speedGradient'});
+end
+function [problem,spec,total]=thermalPlane(spec)
+% 模块用途：给定连续压力而非预先给定流向；NASA7恢复与切向Euler各自求解。
+g=createSurfaceFlowGas('thermallyPerfect',spec.R,1.4);
+[~,h0,s0]=airThermalProperties(spec.totalTemperatureK);[~,h,s]=airThermalProperties(spec.entryTemperatureK);
+spec.entryPressurePa=spec.totalPressurePa*exp((s-s0)/spec.R);spec.entrySpeedMS=sqrt(2*(h0-h));
+problem=struct('gas',g,'sample',@(q)planePressure(q,spec.entryPressurePa,spec.pressureExponentPerM), ...
+    'seed',@(beta)struct('coordinate',[0;-beta],'direction',[-cos(spec.entryAngleRad);sin(spec.entryAngleRad);0]), ...
+    'labelCenter',0,'labelStep',spec.labelStepM,'labelUnit','m','arcStationsM',linspace(0,spec.finishArcM,31)', ...
+    'sources',struct('geometry','解析平面坐标，X/Y均为米','pressure','连续指数压力验证输入，非真实箭体已求压力', ...
+    'thermodynamics','显式NASA7验证总状态','entryDirection','明确给定斜入口；横向速度守恒用于独立核对'));
+total=struct('totalPressure',spec.totalPressurePa,'totalTemperature',spec.totalTemperatureK, ...
+    'thermalPropertyMode','thermallyPerfect','method','明确给定的单一NASA7验证总状态');
+problem=bindIsentropicSurfacePressure(problem,total);
+end
+function value=planePressure(q,p,k)
+value=struct('position',[q;0],'firstDerivatives',[1 0;0 1;0 0],'secondDerivatives',zeros(3,3), ...
+    'pressure',p*exp(k*q(1)),'pressureGradient',[k*p*exp(k*q(1));0],'isSmooth',true,'isAttached',true);
+end
+function value=conePressure(q,angle,p)
+s=q(1);beta=q(2);r=s*sin(angle);
+value=struct('position',[-s*cos(angle);r*cos(beta);r*sin(beta)], ...
+    'firstDerivatives',[[-cos(angle);sin(angle)*cos(beta);sin(angle)*sin(beta)],[0;-r*sin(beta);r*cos(beta)]], ...
+    'secondDerivatives',[zeros(3,1),[0;-sin(angle)*sin(beta);sin(angle)*cos(beta)],[0;-r*cos(beta);-r*sin(beta)]], ...
+    'pressure',p,'pressureGradient',[0;0],'isSmooth',true,'isAttached',s>.02);
+end
+function value=withResetField(value,p0),value.totalPressure=p0;end
+function value=resetSample(q,a,b)
+if q(1)<-.12,value=b(q);else,value=a(q);end
+end
+function identifier=reject(action,expected)
+identifier='';try,action();catch ex,identifier=ex.identifier;end
+assert(strcmp(identifier,expected),'SurfaceFlow:RefusalTest','预期%s，实际%s。',expected,identifier);
+end

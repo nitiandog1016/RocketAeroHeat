@@ -5,7 +5,7 @@ function result=marchPressureDrivenSurfaceFlow(problem,inputOptions)
 % 模块三：两组标签间距的中心差分投影至n×t得到横向h；不能用总距离
 % 替代横向度量。两组差值是分辨率指标，不是严格误差上界，仍需外部收敛核对。
 % 模块四：遇物性/接口/积分失效或流管聚焦后保留NaN与失败原因，不补值。
-% 范围：有明确入口的光滑附着表面流线；压力与热状态仍为输入，不是
+% 范围：有明确入口、同物性相容状态的光滑附着表面流线；压力仍为输入，不是
 % 完整外流连续方程、激波层、边界层、热流或分离再附求解器。
 if nargin<2, inputOptions=struct; end
 options=pressureSurfaceFlowOptions(inputOptions);
@@ -72,8 +72,13 @@ for key={'coordinate','position','tangent','normal','pressure','temperature','de
     name=key{1};center.(name)(~valid,:)=NaN;
 end
 center.valid=valid;center.missingReason=reason;
+thermalMode='caloricallyPerfect';if isfield(g,'thermalPropertyMode'),thermalMode=g.thermalPropertyMode;end
+scope='声明的光滑附着区、定比热相容外缘输入；不解未知压力、激波层、边界层或分离再附';
+if strcmp(thermalMode,'thermallyPerfect')
+    scope='声明的光滑附着区、同NASA7/低温冻结物性相容外缘；不解未知压力、激波层、边界层或分离再附';
+end
 result=struct('method','曲面切向Euler压力转向 + 五条RK4射线 + 双间距标签中心差分横向度量', ...
-    'scope','声明的光滑附着区、定比热相容外缘输入；不解未知压力、激波层、边界层或分离再附', ...
+    'scope',scope,'thermalPropertyMode',thermalMode, ...
     'sourceURL','https://ntrs.nasa.gov/api/citations/20040121205/downloads/20040121205.pdf', ...
     'sourceEquations','印刷第4页式13的曲面切向Euler形式；h由相邻射线的横向分离独立构造，非完整VII复现', ...
     'arcLengthM',stations,'center',center,'rays',{rays},'metric',metric, ...
@@ -88,6 +93,7 @@ result=struct('method','曲面切向Euler压力转向 + 五条RK4射线 + 双间
     'massContinuityOfFullExternalFlowSolved',false,'separationBoundarySolved',false, ...
     'metricDifferenceIsRigorousBound',false,'entryValidationRHSCalls',5, ...
     'physicalStateClipped',false,'productionQualified',false,'newProductionSolvedAreaM2',0);
+if isfield(problem,'thermalPressureCoupling'),result.thermalPressureCoupling=problem.thermalPressureCoupling;end
 end
 
 function ray=integrate(state,problem,stations,options)
