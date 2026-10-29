@@ -6,11 +6,15 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 小版本也同步到本GitHub仓库，不再默认生成大型本地工程包。用户已于2026-10-28确认保持仓库公开并直接同步。后文的“不推送/本地包/私有”属于历史阶段说明，以本节及[项目约定](AGENTS.md)为准。
 
-最新已接受的真实三维研究状态为Q41，累计19次接受/82次主NS调用，仍未稳态；正式合格热流面积为66.5626%，全表面里程碑尚未完成。v93让单元/界面前瞻与实际候选采用同一坐标路径，保留全部条件作精确行预处理，在1/8步接受一次，RMS下降12.0269%。真实方向、原面墙热和全部开放面核对通过，完整NS门槛保持。工作台新增长侧栏与结果区独立滚动、固定五步骤入口，色标、探针、任意截面曲线与同窗定量对照经实际浏览器核验。详见[方法与限制](docs/TEMPERATURE_COORDINATE_PREVIEW_V93.md)及[验证索引](docs/validation/v93/README.md)。
+最新v94完成独立的压力驱动表面流线/流管横向尺度模块：曲面切向Euler压力转向、五条RK4射线、双标签间距差分与有效前缀护栏。四模型工作台保持同一侧栏的五步骤，支持真实三维站点拾取、滑块、沿程曲线和CSV，逐项区分数值流向/尺度与给定压力/热状态。核心16组/80射线、工作台31流管/1271站点以及实际浏览器核验通过；小型冻结输入可直接独立复核。详见[方法、使用与限制](docs/PRESSURE_DRIVEN_SURFACE_FLOW_V94.md)及[验证索引](docs/validation/v94/README.md)。
+
+v94属于相容输入下的条件流线研究，尚未求解新的整箭外流、热流、壁温或分离/再附，新增合格面积0。最新已接受的真实三维NS状态仍为Q41，累计19次接受/82次主NS调用，未稳态；正式合格热流面积66.5626%，全表面里程碑尚未完成。v93真实坐标/方向、墙热和全部开放面核对、单元/界面约束与科研UI结果保留，见[方法与限制](docs/TEMPERATURE_COORDINATE_PREVIEW_V93.md)及[验证索引](docs/validation/v93/README.md)。
 
 在MATLAB中运行`main`打开统一工作流。默认小域研究入口为`runRocketTemperatureActiveResearch`和`runRocketTemperatureLookaheadResearch`；必要的小型制造场输入随仓库保存在`tests/data/temperature_research/`。大型真实状态、矩阵缓存、计算输出和历史ZIP不入库；重放完整研究需相应本地状态或重新准备，不能声称代码仓库已备份这些结果。
 
-v93小域复现：`addpath('tests'); testRocketTemperatureTrialCoordinates('outputs/coordinates_new'); testRocketTemperatureRowConditioning('outputs/row_conditioning_new');`。请使用尚未存在的输出目录；基础小输入随仓库保留。阶段结束已回收被替代的Q40六项矩阵及五项旧分解缓存，实际释放约4.27GB；Q41/Q40状态、方向、检查点和证据保留。若继续内部NS，从Q41建立新系统；工程主线转向压力驱动的表面流线/流管接口，不能把NS研究作为工程区域与UI的前置。[输出用途与保留规则](docs/OUTPUTS_STORAGE.md)说明GitHub未备份的大型本地结果。
+v94复现：`setupSurfacePressureFlow; addpath('tests'); testPressureDrivenSurfaceFlow('outputs/surface_flow_check_new'); studyPressureDrivenSurfaceFlow('outputs/surface_flow_study_new');`。使用尚未存在的输出目录；本地工作台的打开方式及无需MATLAB的冻结输入检查命令见v94方法说明。下一步接内部合格压力/热状态及NASA7变比热采样合同，不把解析验证输入直接标为真实20°箭体已求外缘。
+
+v93小域复现仍为`addpath('tests'); testRocketTemperatureTrialCoordinates('outputs/coordinates_new'); testRocketTemperatureRowConditioning('outputs/row_conditioning_new');`。此前回收Q40矩阵及五项旧缓存实际释放约4.27GB；本轮存储维护又清理四项旧Q17缓存释放约1.29GB，必要输入、当前状态和独有结果保留。若继续内部NS，从Q41建立新系统；工程区域与UI不以其先收敛为前提。[输出用途与保留规则](docs/OUTPUTS_STORAGE.md)说明GitHub未备份的大型本地结果。
 
 ## 当前开发目标
 

@@ -1,7 +1,8 @@
-function path=exportRocketTestGeometryView(meshes,folder,captions)
+function path=exportRocketTestGeometryView(meshes,folder,captions,surfaceFlows)
 %EXPORTROCKETTESTGEOMETRYVIEW 导出可切换对照模型的离线三维几何页。
 % 模块用途：复用正式工作台的几何WebGL管线，检查自绘箭体及突起。
-% 这里只输出真实V/F，不生成压力、热流或温度；几何通过不是物理解。
+% 只输出真实V/F，不生成压力、热流或温度；可选surfaceFlows叠加已保存的条件流线。
+% 流线附带来源和非生产身份，不把输入p/T变成几何云图中的求解场。
 % meshes 为非空cell，每项为含V/F的网格；captions为等长中文标题cell。
 % 示例：exportRocketTestGeometryView({m0,m1},'outputs/rocket_view', ...
 %       {'光顺基线','带整流罩箭体'});
@@ -9,6 +10,9 @@ function path=exportRocketTestGeometryView(meshes,folder,captions)
 %% 模块一：核验完整网格和对照标题，拒绝非法数值及三角形编号
 if nargin<3,captions=arrayfun(@(k)sprintf('箭体几何 %d',k), ...
         1:numel(meshes),'UniformOutput',false);end
+if nargin<4,surfaceFlows={};end
+assert(iscell(surfaceFlows)&&(isempty(surfaceFlows)||numel(surfaceFlows)==numel(meshes)), ...
+    'RocketAeroHeat:RocketPreview:Flows','可选流线负载须与模型数一致。');
 if ~iscell(meshes)||isempty(meshes)||~iscell(captions)||numel(meshes)~=numel(captions)
     error('RocketAeroHeat:RocketPreview:Cases','模型与标题必须为等长非空cell。');
 end
@@ -40,6 +44,22 @@ for k=1:numel(meshes)
         'vertices',double(mesh.V),'faces',double(mesh.F)-1, ...
         'caption',char(label),'revision',k,'showWire',false,'resetCamera',true, ...
         'coordinateNote','几何测试，尚无物理场 · SI / m · 主轴X，鼻尖+X · 突起不得视为已解区域');
+    if ~isempty(surfaceFlows)
+        flow=surfaceFlows{k};
+        assert(isstruct(flow)&&isscalar(flow)&&isfield(flow,'kind')&& ...
+            strcmp(flow.kind,'pressure-surface-flow-research')&&isfield(flow,'productionQualified')&& ...
+            isequal(flow.productionQualified,false)&&isfield(flow,'curves'), ...
+            'RocketAeroHeat:RocketPreview:Flows','流线须具有明确研究身份和曲线。');
+        curves=flow.curves;if isstruct(curves),curves=num2cell(curves);end
+        assert(iscell(curves));
+        for j=1:numel(curves)
+            c=curves{j};validateattributes(c.points,{'double'},{'real','finite','ncols',3});
+            validateattributes(c.normals,{'double'},{'real','finite','size',size(c.points)});
+            assert(all(vecnorm(c.normals,2,2)>0));
+        end
+        flow.curves=curves;payloads{k}.surfaceFlowLines=flow;
+        payloads{k}.coordinateNote='SI / m · X鼻尖正向 · 条件流线数值研究；压力/热状态为输入，热流未求解';
+    end
 end
 
 %% 模块二：复制既有WebGL查看器，不另建不一致的几何显示算法

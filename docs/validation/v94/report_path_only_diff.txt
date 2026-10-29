@@ -1,0 +1,58 @@
+--- raw/auditPressureDrivenSurfaceFlow_before_report_path.py.raw
++++ tests/auditPressureDrivenSurfaceFlow.py
+@@ -138,9 +138,12 @@
+ 
+ 
+ def main():
+-    parser=argparse.ArgumentParser();parser.add_argument('folder');parser.add_argument('process');args=parser.parse_args()
++    parser=argparse.ArgumentParser();parser.add_argument('folder');parser.add_argument('process')
++    parser.add_argument('--report',help='将复核结果写入新的项目内路径，避免改写冻结输入或历史回执。')
++    args=parser.parse_args()
+     folder=Path(args.folder).resolve();folder.relative_to(ROOT);source=folder/'pressure_surface_flow_evidence.mat'
+-    target=folder/'independent_pressure_surface_flow.json';assert not target.exists()
++    target=Path(args.report).resolve() if args.report else folder/'independent_pressure_surface_flow.json'
++    target.relative_to(ROOT);assert not target.exists();target.parent.mkdir(parents=True,exist_ok=True)
+     process_path=Path(args.process).resolve();process=json.loads(process_path.read_text(encoding='utf-8-sig'))
+     assert process['status']=='terminal' and process['exitCode']==0 and all(process['sourceStableAfter'].values())
+     d=loadmat(source,simplify_cells=True);cases=rows(d['cases']);checks=[]
+--- raw/auditPressureSurfaceFlowStudy_before_report_path.py.raw
++++ tests/auditPressureSurfaceFlowStudy.py
+@@ -1,6 +1,7 @@
+ """核对闭合经典箭体的条件流线、原始站点、可视化负载与输入/求解身份。"""
+ from pathlib import Path
+ import hashlib
++import argparse
+ import json
+ import re
+ import sys
+@@ -14,7 +15,11 @@
+ 
+ 
+ def main():
+-    folder=Path(sys.argv[1]).resolve();folder.relative_to(ROOT);target=folder/'independent_surface_flow_study.json'
++    parser=argparse.ArgumentParser();parser.add_argument('folder');parser.add_argument('process',nargs='?')
++    parser.add_argument('--report',help='另存新复核报告，不覆盖历史数值或审核记录。');args=parser.parse_args()
++    folder=Path(args.folder).resolve();folder.relative_to(ROOT)
++    target=Path(args.report).resolve() if args.report else folder/'independent_surface_flow_study.json'
++    target.relative_to(ROOT);target.parent.mkdir(parents=True,exist_ok=True)
+     assert not target.exists();source=folder/'pressure_surface_study_evidence.mat';d=loadmat(source,simplify_cells=True)
+     web=folder/'workbench';raw=(web/'pressure-surface-flow-data.json').read_bytes();payload=json.loads(raw)
+     assert 'href="pressure-surface-flow-data.json"' in (web/'index.html').read_text(encoding='utf8')
+@@ -60,7 +65,7 @@
+         for name,short in re.findall(r'(?:src|href)="([^"?]+)\?v=([0-9a-f]+)"',page.read_text(encoding='utf8')):
+             assert sha(page.parent/name).startswith(short),(page,name)
+     name,short=payload['geometryURL'].split('?v=');assert sha(web/name).startswith(short)
+-    process_path=Path(sys.argv[2]).resolve() if len(sys.argv)>2 else folder.parent/'surfaceflowview94_process.json'
++    process_path=Path(args.process).resolve() if args.process else folder.parent/'surfaceflowview94_process.json'
+     process=json.loads(process_path.read_text())
+     assert process['status']=='terminal' and process['exitCode']==0 and all(process['sourceStableAfter'].values())
+     export=json.loads((folder/'study_export.json').read_text());assert export['legacyGeometryThreeArgumentContractPassed']
+--- raw/testPressureSurfaceFlowWorkbench_before_report_path.js.raw
++++ tests/testPressureSurfaceFlowWorkbench.js
+@@ -57,5 +57,5 @@
+  assert.equal(downloads,4);
+  const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+  const report={status:'passed-actual-surface-flow-study-five-step-probe-message-input-roles-curves-and-CSV',cases:4,workflowEvents:events,ignoredUnrelatedOrStaleMessages:ignored,CSVrows:rows,unknownInputDidNotBecomeZero:true,browserVisualOrWebGLRuntimeVerified:false,newProductionSolvedAreaM2:0,dataSHA256:sha(file),scriptSHA256:sha(__filename),programSHA256:sha(program)};
+- const target=path.join(folder,'node_pressure_surface_flow.json');assert.equal(fs.existsSync(target),false);fs.writeFileSync(target,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
++ const target=process.argv[3]?path.resolve(process.argv[3]):path.join(folder,'node_pressure_surface_flow.json');assert.equal(fs.existsSync(target),false);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
+ })().catch(e=>{console.error(e);process.exitCode=1;});

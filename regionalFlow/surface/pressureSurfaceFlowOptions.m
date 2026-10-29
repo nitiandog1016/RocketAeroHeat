@@ -1,0 +1,26 @@
+function options=pressureSurfaceFlowOptions(input)
+%PRESSURESURFACEFLOWOPTIONS 定义流线积分、输入一致性和流管失效护栏。
+% 模块一：弧长步长使用米；相对判据与带单位的绝对判据分别记录。
+% 模块二：拒绝未知选项，不通过自动裁温、重归一或重播种放行失败输入。
+if nargin<1, input=struct; end
+options=struct('maximumArcStepM',0.01,'maximumSubstepsPerRay',100000, ...
+    'maximumUnitTangentError',1e-6,'minimumMetricRatio',1e-6,'maximumRelativeMetricDifference',0.02, ...
+    'minimumChartAngleSin',1e-6,'minimumSpeedMS',1e-8, ...
+    'relativeStateTolerance',1e-9,'relativeGradientTolerance',1e-8, ...
+    'absolutePressureGradientTolerancePaPerM',1e-9, ...
+    'absoluteEnergyGradientToleranceJPerKgM',1e-8, ...
+    'absoluteEntropyGradientToleranceJPerKgKM',1e-10);
+assert(isstruct(input)&&isscalar(input),'SurfaceFlow:Options','选项必须为标量结构体。');
+names=fieldnames(input);
+for j=1:numel(names)
+    key=names{j};assert(isfield(options,key),'SurfaceFlow:Options','未知选项：%s。',key);
+    options.(key)=input.(key);
+end
+names=fieldnames(options);
+for j=1:numel(names)
+    validateattributes(options.(names{j}),{'double'},{'scalar','real','finite','positive'});
+end
+assert(options.maximumSubstepsPerRay==fix(options.maximumSubstepsPerRay));
+assert(options.minimumMetricRatio<1&&options.minimumChartAngleSin<1);
+assert(options.maximumRelativeMetricDifference<1);
+end

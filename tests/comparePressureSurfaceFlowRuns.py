@@ -1,0 +1,43 @@
+"""对比前端资源修复前后的完整数值对象，保留所有数值与状态字段。"""
+from pathlib import Path
+import hashlib
+import json
+import sys
+import numpy as np
+from scipy.io import loadmat
+
+ROOT=Path(__file__).resolve().parents[1]
+count=0
+
+
+def same(a,b):
+    global count
+    count+=1
+    if isinstance(a,dict):
+        assert isinstance(b,dict) and set(a)==set(b)
+        for key in a:same(a[key],b[key])
+    elif isinstance(a,(list,tuple)):
+        assert isinstance(b,(list,tuple)) and len(a)==len(b)
+        for left,right in zip(a,b):same(left,right)
+    elif isinstance(a,np.ndarray) and a.dtype.kind=='O':
+        assert isinstance(b,np.ndarray) and a.shape==b.shape and b.dtype.kind=='O'
+        for left,right in zip(a.flat,b.flat):same(left,right)
+    elif isinstance(a,str):assert a==b
+    else:np.testing.assert_array_equal(a,b)
+
+
+def main():
+    old=Path(sys.argv[1]).resolve();new=Path(sys.argv[2]).resolve();target=Path(sys.argv[3]).resolve()
+    old.relative_to(ROOT);new.relative_to(ROOT);target.relative_to(ROOT);assert not target.exists()
+    a=loadmat(old,simplify_cells=True);b=loadmat(new,simplify_cells=True)
+    keys=set(a)-{'__header__'};assert keys==set(b)-{'__header__'}
+    for key in sorted(keys):same(a[key],b[key])
+    sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    result=dict(status='passed-exact-all-saved-numerical-and-report-objects-after-frontend-asset-fix',
+                objectsExactlyCompared=count,excluded='MAT container header only; all saved numerical and report objects compared',
+                inputSHA256={old.relative_to(ROOT).as_posix():sha(old),new.relative_to(ROOT).as_posix():sha(new)},
+                scriptSHA256=sha(Path(__file__)),newActualNSEvaluations=0,newProductionSolvedAreaM2=0)
+    target.write_text(json.dumps(result,indent=2)+'\n',encoding='utf8');print(json.dumps(result))
+
+
+if __name__=='__main__':main()

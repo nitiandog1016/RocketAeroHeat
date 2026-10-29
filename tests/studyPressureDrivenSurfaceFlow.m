@@ -1,0 +1,133 @@
+function report=studyPressureDrivenSurfaceFlow(folder)
+%STUDYPRESSUREDRIVENSURFACEFLOW 将已实现流线内核接回统一科研工作台。
+% 模块一：内部生成旋涡与闭合锥柱/球头柱几何，保持鼻尖+X和SI单位。
+% 模块二：真实积分多组射线，保存入口/压力/热状态输入身份，不伪造壁热或覆盖。
+% 模块三：原几何WebGL管线叠加数值路径；三维拾取绑定真实积分站点和来源。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);setupSurfacePressureFlow;
+assert(~exist(folder,'dir'),'SurfaceFlow:StudyOverwrite','研究输出须使用新目录。');mkdir(folder);
+kinds={'vortex','cylinder','cone','sphere_sine'};
+captions={'平面自由旋涡：压力驱动转向','完整锥柱：柱段螺旋入口','完整锥柱：锥段流管扩散','完整球头柱：球鼻表面流线'};
+meshes=cell(4,1);overlays=cell(4,1);saved=cell(4,1);viewCases=cell(4,1);
+for k=1:4
+    overrides=struct;
+    if strcmp(kinds{k},'cylinder'),overrides=struct('radius',0.1,'directionAngleRad',0.12);end
+    if strcmp(kinds{k},'cone'),overrides=struct('startMeridianM',0.04);end
+    if strcmp(kinds{k},'sphere_sine'),overrides=struct('radius',0.1);end
+    [p,spec]=pressureSurfaceBenchmarkProblem(kinds{k},overrides);
+    p.labelStep=0.04;
+    if k==1
+        centers=linspace(-0.2,0.2,7);p.arcStationsM=linspace(0,1.28,41)';
+        meshes{k}=struct('V',[-1.7 -1.7 0;1.7 -1.7 0;1.7 1.7 0;-1.7 1.7 0],'F',[1 2 3;1 3 4]);
+        geometryScope='平面解析验证片，非闭合箭体；可压缩自由旋涡的切向Euler基准';
+    elseif k==2
+        centers=(0:7)*2*pi/8;p.arcStationsM=linspace(0,0.8,41)';
+        meshes{k}=buildCanonicalBody('coneCylinder',struct('radius',0.1,'cylinderLength',0.9,'resolution',32));
+        meshes{k}=translateX(meshes{k},-0.9);
+        geometryScope='底图为完整闭合锥柱；仅柱段给定螺旋入口，未求鼻锥—柱段接口';
+    elseif k==3
+        centers=(0:7)*2*pi/8;radius=0.1;
+        p.arcStationsM=linspace(0,radius/sin(spec.coneAngleRad)-spec.startMeridianM,41)';
+        meshes{k}=buildCanonicalBody('coneCylinder',struct('radius',radius,'cylinderLength',0.6,'coneAngleDeg',rad2deg(spec.coneAngleRad),'resolution',32));
+        meshes{k}=translateX(meshes{k},-max(meshes{k}.V(:,1)));
+        geometryScope='底图为完整闭合锥柱；仅锥段流线，柱段、肩部和底面未由本模块计算';
+    else
+        centers=(0:7)*2*pi/8;p.arcStationsM=linspace(0,0.095,41)';
+        meshes{k}=buildCanonicalBody('hemisphereCylinder',struct('radius',0.1,'cylinderLength',0.8,'resolution',32));
+        meshes{k}=translateX(meshes{k},-0.8);
+        geometryScope='底图为完整闭合球头柱；仅给定相容外缘的球鼻前缀，未求球鼻—柱段衔接';
+    end
+    topology=geometryAudit(meshes{k},k>1);tubes=cell(numel(centers),1);curves=cell(numel(centers),1);results=cell(numel(centers),1);
+    maximumDrift=0;validCount=0;RHSCalls=0;
+    for j=1:numel(centers)
+        p.labelCenter=centers(j);a=marchPressureDrivenSurfaceFlow(p,struct('maximumArcStepM',0.01));
+        assert(all(a.validStation),'SurfaceFlow:StudyPrefix','本组验证输入应完成其声明范围。');
+        ids=find(a.validStation);r=a.center;
+        tubes{j}=struct('labelCenter',centers(j),'arcLengthM',a.arcLengthM(ids), ...
+            'position',r.position(ids,:),'tangent',r.tangent(ids,:),'metric',a.metric(ids), ...
+            'metricRatio',a.metricRatio(ids),'metricDifferenceIndicator',a.metricDifferenceIndicator(ids), ...
+            'pressureInputPa',r.pressure(ids),'temperatureInputK',r.temperature(ids), ...
+            'densityInputKgM3',r.density(ids),'speedInputMS',r.speed(ids));
+        curves{j}=struct('sourceTubeIndexOneBased',j,'points',r.position(ids,:),'normals',r.normal(ids,:));
+        for ray=1:numel(a.rays)
+            maximumDrift=max(maximumDrift,max(a.rays{ray}.unitTangentError(a.rays{ray}.valid)));
+            RHSCalls=RHSCalls+a.rays{ray}.RHSCalls;
+        end
+        RHSCalls=RHSCalls+a.entryValidationRHSCalls;validCount=validCount+numel(ids);results{j}=a;
+    end
+    viewCases{k}=struct('id',kinds{k},'caption',captions{k},'scope',geometryScope, ...
+        'geometryScope',geometryScope,'geometry',topology,'labelUnit',p.labelUnit, ...
+        'metricUnit',a.metricUnit,'methodScope',a.scope,'sources',p.sources, ...
+        'totalTemperatureK',spec.totalTemperatureK,'totalPressurePa',spec.totalPressurePa, ...
+        'maximumRelativeMetricDifference',a.options.maximumRelativeMetricDifference, ...
+        'tubes',{tubes},'curves',{curves},'summary',struct('validStations',validCount, ...
+        'requestedStations',numel(p.arcStationsM)*numel(centers),'maximumUnitTangentError',maximumDrift,'RHSCalls',RHSCalls), ...
+        'pressureIsInput',true,'thermodynamicStateIsInput',true,'heatFluxSolved',false,'wallTemperatureSolved',false, ...
+        'productionQualified',false,'newProductionSolvedAreaM2',0);
+    overlays{k}=struct('kind','pressure-surface-flow-research','curves',{curves},'productionQualified',false);
+    saved{k}=struct('kind',kinds{k},'specification',spec,'labelCenters',centers, ...
+        'arcStationsM',p.arcStationsM,'mesh',meshes{k},'geometry',topology,'results',{results});
+end
+
+%% 保存完整数值证据；工作台只发布必要站点，不把内部大数组写入JSON
+report=struct('status','computed-analytic-pressure-input-surface-flow-study-with-closed-classical-body-backgrounds', ...
+    'cases',4,'tubes',sum(cellfun(@(c)numel(c.results),saved)), ...
+    'newActualNSEvaluations',0,'physicalFlowOrHeatingQualified',false,'newProductionSolvedAreaM2',0);
+evidenceFile=fullfile(folder,'pressure_surface_study_evidence.mat');save(evidenceFile,'saved','report','-v7');
+workbench=fullfile(folder,'workbench');geometryFolder=fullfile(workbench,'geometry');
+exportRocketTestGeometryView(meshes,geometryFolder,captions,overlays);
+copyfile(fullfile(root,'web','pressure-surface-geometry.js'),fullfile(geometryFolder,'rocket-geometry-bootstrap.js'));
+stamp(fullfile(geometryFolder,'index.html'),geometryFolder,{'geometry.css','geometry.js','rocket-geometry-data.js','rocket-geometry-bootstrap.js'});
+for name={'rocket-sensitivity.css','pressure-surface-study.css','pressure-surface-study.js'}
+    copyfile(fullfile(root,'web',name{1}),fullfile(workbench,name{1}));
+end
+copyfile(fullfile(root,'web','pressure-surface-study.html'),fullfile(workbench,'index.html'));
+data=struct('kind','pressure-surface-flow-study-v1','cases',{viewCases}, ...
+    'geometryURL',['geometry/index.html?v=' fileSHA(fullfile(geometryFolder,'index.html'))], ...
+    'sourceEvidenceFile',strrep(evidenceFile,'\','/'),'sourceEvidenceSHA256',fileSHA(evidenceFile), ...
+    'productionQualified',false,'newProductionSolvedAreaM2',0);
+text=jsonencode(data);writeUtf8(fullfile(workbench,'pressure-surface-flow-data.json'),text);
+writeUtf8(fullfile(workbench,'pressure-surface-flow-data.js'),['window.PRESSURE_SURFACE_FLOW_STUDY=' text ';' newline]);
+stamp(fullfile(workbench,'index.html'),workbench,{'rocket-sensitivity.css','pressure-surface-study.css','pressure-surface-study.js','pressure-surface-flow-data.js'});
+assert(contains(fileread(fullfile(workbench,'index.html')),'href="pressure-surface-flow-data.json"'), ...
+    'SurfaceFlow:AssetURL','资源版本标记不得误改JSON下载链接。');
+
+%% 旧三参数几何导出合同回归：不传流线时不能凭空增加物理身份
+legacy=fullfile(folder,'legacy_geometry');exportRocketTestGeometryView(meshes(2:3),legacy,captions(2:3));
+script=fileread(fullfile(legacy,'rocket-geometry-data.js'));prefix='window.ROCKET_GEOMETRY_CASES=';
+payload=jsondecode(script(numel(prefix)+1:end-1));assert(~isfield(payload,'surfaceFlowLines'));
+assert(~isfield(payload,'pressure')&&~isfield(payload,'heatFlux')&&contains(payload(1).coordinateNote,'尚无物理场'));
+assert(isequal(payload(1).vertices,meshes{2}.V)&&isequal(payload(2).faces,meshes{3}.F-1));
+report.legacyGeometryThreeArgumentContractPassed=true;report.dataDownloadURLVerified=true;report.workbench=fullfile(workbench,'index.html');
+report.sourceEvidenceSHA256=fileSHA(evidenceFile);writeUtf8(fullfile(folder,'study_export.json'),jsonencode(report));disp(report);
+end
+
+function mesh=translateX(mesh,offset)
+% 模块用途：同时平移真实坐标和已有轴向参数，避免遗留过时截面位置。
+mesh.V(:,1)=mesh.V(:,1)+offset;if isfield(mesh,'param'),mesh.param.sectionX=mesh.param.sectionX+offset;end
+end
+function result=geometryAudit(mesh,closed)
+% 模块用途：闭合箭体逐边/朝向/有向体积核对；平面片明确另列。
+V=mesh.V;F=mesh.F;edge=[F(:,[1 2]);F(:,[2 3]);F(:,[3 1])];[~,~,group]=unique(sort(edge,2),'rows');
+count=accumarray(group,1);orientation=accumarray(group,sign(edge(:,2)-edge(:,1)));
+volume=sum(dot(V(F(:,1),:),cross(V(F(:,2),:),V(F(:,3),:),2),2))/6;
+if closed,assert(all(count==2)&&all(orientation==0)&&volume>0);end
+result=struct('vertices',size(V,1),'faces',size(F,1),'closed',closed, ...
+    'boundaryEdges',nnz(count==1),'nonManifoldEdges',nnz(count>2),'signedVolumeM3',volume);
+end
+function stamp(file,folder,names)
+% 模块用途：按实际字节内容更新本地资源URL，避免多层工作台沿用旧缓存。
+html=fileread(file);
+for k=1:numel(names)
+    name=names{k};digest=fileSHA(fullfile(folder,name));pattern=[regexptranslate('escape',name) '(?:\?[^" ]*)?(?=[" ])'];
+    html=regexprep(html,pattern,[name '?v=' digest(1:12)]);
+end
+writeUtf8(file,html);
+end
+function digest=fileSHA(file)
+fid=fopen(file,'rb');assert(fid>=0);guard=onCleanup(@()fclose(fid));md=java.security.MessageDigest.getInstance('SHA-256');
+while ~feof(fid),bytes=fread(fid,1024^2,'*uint8');if ~isempty(bytes),md.update(typecast(bytes,'int8'));end,end
+digest=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
+end
+function writeUtf8(file,value)
+fid=fopen(file,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',value);
+end

@@ -1,0 +1,11 @@
+/* 模块用途：统一研究框架中的三维流线、定量曲线和站点来源；不使用装饰效果。 */
+.surface-study iframe{height:calc(100vh - 390px);height:calc(100dvh - 390px);min-height:270px}
+.surface-study .comparison{padding:12px 16px}.curveControls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px}
+.curveControls select{font-size:12px;padding:5px;max-width:260px}.curveControls label{display:flex;align-items:center;gap:5px}
+.curveControls button{border-color:#b9c7d2;padding:5px 8px;background:white}
+#curve{display:block;width:100%;height:145px;margin-top:8px;touch-action:none}
+.stationControl{display:flex;gap:15px;align-items:center;font-size:12px}.stationControl label{display:flex;align-items:center;gap:10px;flex:1}
+.stationControl input{width:100%;min-width:70px}.stationControl span{color:#526879;white-space:nowrap}
+#probe{display:grid;grid-template-columns:180px minmax(0,1fr);gap:4px 16px;margin:10px 0}#probe dt{margin:0}#probe dd{margin:0}
+.surface-study pre{white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.6 "Segoe UI","Microsoft YaHei",sans-serif;color:#526879}
+@media(max-width:950px){#probe{grid-template-columns:150px minmax(0,1fr)}.curveControls{gap:7px}.stationControl{flex-wrap:wrap}}
