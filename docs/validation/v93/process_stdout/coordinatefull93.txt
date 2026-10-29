@@ -1,0 +1,24 @@
+RAH_ENGINE_PID=53752
+BLOCK_GRAPH cells=217272 raw=2271480 unique=1619664 persistentBound=379080388 constructionEstimate=902071808
+COUPLED_PATCHES cells=217272 patches=29404 max=8 fallback=0 bound=9.92881314e-09 bytes=342087610
+PEAK_SYSTEM_PREPARED cells=217272 NS=1 referenceOnly=true cacheBytes=762895391
+AUGMENTED_QR cells=217272 groups=29404 blocks=1619664 maxGram=4.45633303e-12
+{错误使用 assert
+显式约束数值相关，拒绝而不截断约束。
+
+出错 buildRocketCompactTemperatureProjector (第 38 行)
+assert(all(pivots>1e-10),'TemperatureProjection:Rank','显式约束数值相关，拒绝而不截断约束。');
+
+出错 buildRocketTemperatureProjector (第 29 行)
+    projector=buildRocketCompactTemperatureProjector(factor,rows,representatives,originalToUnique);return;
+
+出错 finishRocketTemperatureRepreviewDirection (第 60 行)
+    projector=buildRocketTemperatureProjector(factor,selected);
+
+出错 solveRocketTemperatureActiveDirection (第 55 行)
+    [value,report,evidence]=finishRocketTemperatureRepreviewDirection(packed,factor,rhs,metric,rows,options, ...
+
+出错 studyRocketTemperatureLookahead (第 32 行)
+[value,directionReport,evidence]=solveRocketTemperatureActiveDirection(a.packed,factor,m.rhs,m.metric,initialRows, ...
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

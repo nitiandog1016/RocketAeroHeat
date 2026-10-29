@@ -8,13 +8,17 @@ if nargin<6,options=struct;end
 lookahead=[];
 if isstruct(options)&&isscalar(options)&&isfield(options,'lookaheadPreview')
     lookahead=options.lookaheadPreview;options=rmfield(options,'lookaheadPreview');
-    required={'Q','info','cut','gas','scale','targetAlpha'};allowed=[required {'selectionPolicy'}];
+    required={'Q','info','cut','gas','scale','targetAlpha'};allowed=[required {'selectionPolicy','trialStateCoordinates'}];
     assert(isstruct(lookahead)&&isscalar(lookahead)&&all(isfield(lookahead,required))&& ...
         all(ismember(fieldnames(lookahead),allowed)), ...
         'TemperatureLookahead:Input','前瞻请求必须明确同一当前状态、采样、几何、气体、缩放和目标步长。');
     assert(isequal(size(lookahead.Q),[packed.cellCount 5])&&rows.options.temperatureBandK==10, ...
         'TemperatureLookahead:Input','前瞻仅接受当前全部CV和原10K基础行，不继承其他筛选。');
     validateattributes(lookahead.targetAlpha,{'numeric'},{'scalar','real','finite','positive','<=',1});
+    if isfield(lookahead,'trialStateCoordinates')
+        assert(ischar(lookahead.trialStateCoordinates)&&ismember(lookahead.trialStateCoordinates,{'conservative','primitive-tangent'}), ...
+            'TemperatureLookahead:Coordinates','拒绝未知候选路径，不能先计算昂贵自由方向。');
+    end
 end
 defaults=struct('maximumIterations',128,'maximumActiveSolves',3,'checkpointFolder','');
 assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))), ...
@@ -38,6 +42,7 @@ if ~isempty(lookahead)
     end
     selectionOptions=struct;
     if isfield(lookahead,'selectionPolicy'),selectionOptions.selectionPolicy=lookahead.selectionPolicy;end
+    if isfield(lookahead,'trialStateCoordinates'),selectionOptions.trialStateCoordinates=lookahead.trialStateCoordinates;end
     if iterative,selectionOptions.selectionPolicy='original-and-predicted-cell-and-interface-faces';end
     [rows,lookaheadReport]=selectRocketTemperatureLookaheadRows(lookahead.Q,lookahead.info,lookahead.cut, ...
         lookahead.gas,lookahead.scale,free,lookahead.targetAlpha,selectionOptions);

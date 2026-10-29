@@ -1,5 +1,5 @@
 function [value,report,evidence]=finishRocketTemperatureRepreviewDirection(packed,factor,rhs,metric,rows,options,free,freeDetail,freeCoordinates,preview,firstSelection,originalRows)
-%FINISHROCKETTEMPERATUREREPREVIEWDIRECTION 在同一当前状态内有预算地复查投影后的实际守恒候选。
+%FINISHROCKETTEMPERATUREREPREVIEWDIRECTION 在同一当前状态内有预算地复查指定路径的实际五量候选。
 % 模块一：复用本次已计算自由方向，最多三次受限求解、四次候选温域预览，不重算自由段。
 % 模块二：所有旧行/活跃面只增不减；每次补全全部新越温CV原态面及可检查的越温界面。
 % 模块三：有限步已越域的必要面显式激活，即使一阶导数朝内也不能冒充有限步合法。
@@ -10,6 +10,8 @@ assert(options.maximumActiveSolves>=1&&options.maximumActiveSolves<=3&& ...
 value=free;detail=freeDetail;coordinates=freeCoordinates;cycles={};previews={};history={};
 activeFaces=zeros(0,1);allRequired=zeros(0,1);allCells=zeros(0,1);allPure=zeros(0,1);allInterfaces=zeros(0,1);
 stopReason='bounded-repreview-budget-exhausted';targetFeasible=false;allEvaluable=true;
+coordinatesName='conservative';
+if isfield(preview,'trialStateCoordinates'),coordinatesName=preview.trialStateCoordinates;end
 if ~isempty(options.checkpointFolder)
     file=fullfile(options.checkpointFolder,'free_direction.mat');assert(~isfile(file));
     save(file,'free','freeDetail','freeCoordinates','-v7');
@@ -20,7 +22,7 @@ for round=0:options.maximumActiveSolves
         selection=firstSelection;selected=rows;
     else
         [selected,selection]=selectRocketTemperatureCellInterfaceRows(preview.Q,preview.info,preview.cut, ...
-            preview.gas,preview.scale,value,preview.targetAlpha);
+            preview.gas,preview.scale,value,preview.targetAlpha,coordinatesName);
     end
     rows=mergeRocketTemperatureRequiredRows(rows,selected);
     evaluable=selection.previewCellStateEvaluable;allEvaluable=allEvaluable&&evaluable;
@@ -107,6 +109,9 @@ report=struct('method','bounded-current-candidate-repreview-add-only-QR-LSQR', .
         'forcedRequiredRowsActuallySolved',forcedSolved,'allPreviousRowsRetained',true, ...
         'allPreviousActiveFacesRetained',true,'initialFreeDirectionRecomputed',false), ...
     'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0,'physicalSolution',false);
+if ~strcmp(coordinatesName,'conservative')
+    report.repreview.trialStateCoordinates=coordinatesName;
+end
     function [t,b,v]=inspect(direction)
         t=rows.H*direction(:);b=128*eps*full(abs(rows.H)*abs(direction(:)));
         v=find(rows.temperatureBoundSigns.*t>b);

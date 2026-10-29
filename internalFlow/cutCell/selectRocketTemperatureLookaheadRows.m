@@ -6,12 +6,16 @@ function [rows,report]=selectRocketTemperatureLookaheadRows(Q,info,cut,gas,scale
 % 模块四：扩大的是数值方向筛选范围，80—2000K等原物性/NS门槛完全不变。
 % 模块五：目标驱动策略只补全部预测越域单元所需面，不按秩或求解结果删除原条件。
 if nargin<8,options=struct;end
-assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),{'selectionPolicy'})), ...
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),{'selectionPolicy','trialStateCoordinates'})), ...
     'TemperatureLookahead:Options','未知前瞻选面选项。');
 if ~isfield(options,'selectionPolicy'),options.selectionPolicy='all-extended-band';end
+coordinates='conservative';
+if isfield(options,'trialStateCoordinates'),coordinates=options.trialStateCoordinates;end
+assert(ischar(coordinates)&&ismember(coordinates,{'conservative','primitive-tangent'}), ...
+    'TemperatureLookahead:Coordinates','前瞻必须使用实际候选的坐标路径。');
 % 新策略显式启用；原两种策略的默认算法、输出字段和数值保持。
 if isequal(options.selectionPolicy,'original-and-predicted-cell-and-interface-faces')
-    [rows,report]=selectRocketTemperatureCellInterfaceRows(Q,info,cut,gas,scale,directionU,targetAlpha);return;
+    [rows,report]=selectRocketTemperatureCellInterfaceRows(Q,info,cut,gas,scale,directionU,targetAlpha,coordinates);return;
 end
 assert(ischar(options.selectionPolicy)&&ismember(options.selectionPolicy, ...
     {'all-extended-band','original-and-predicted-required-faces'}), ...
@@ -30,7 +34,12 @@ report=struct('method','current-conservative-target-preview-pure-Riemann-state-f
     'selectedBandFaceIDs',base.faceIDs,'additionalConstructionArrayBoundBytes',arrayBound, ...
     'newActualNSEvaluations',0,'newFlowAcceptances',0,'physicalBoundaryConditionAdded',false, ...
     'nonlinearTemperatureBoundGuaranteed',false,'physicalSolution',false,'newProductionSolvedAreaM2',0);
-candidate=rocketShellTrialState(Q,directionU,scale,targetAlpha,gas,'conservative');
+% 模块六：显式原始变量选项检查真实候选，不以守恒直线替代；缺省输出保持。
+if ~strcmp(coordinates,'conservative')
+    report.trialStateCoordinates=coordinates;
+    report.method='current-primitive-tangent-target-preview-pure-Riemann-state-face-selection';
+end
+candidate=rocketShellTrialState(Q,directionU,scale,targetAlpha,gas,coordinates);
 rho=candidate(:,1);
 if any(rho<=0),report.stopReason='target-preview-density-invalid-no-temperature-selection';return;end
 velocity=candidate(:,2:4)./rho;internal=candidate(:,5)-.5*rho.*sum(velocity.^2,2);
@@ -84,6 +93,9 @@ report.predictedViolatingCellCandidateTemperatureK=temperature(bad);report.origi
 report.selectedBandFaceIDs=rows.faceIDs;report.stopReason='retained-original-band-and-all-required-current-pure-state-faces';
 if strcmp(options.selectionPolicy,'original-and-predicted-required-faces')
     report.method='current-conservative-target-preview-original-band-plus-all-predicted-required-pure-state-faces';
+    if ~strcmp(coordinates,'conservative')
+        report.method='current-primitive-tangent-target-preview-original-band-plus-all-predicted-required-pure-state-faces';
+    end
     report.selectionPolicy=options.selectionPolicy;report.candidateExtendedBandFaceIDs=candidateBandFaceIDs;
     report.allPredictedViolatingCellsRepresented=all(included);
     report.constraintRankUsedToSelectFaces=false;report.allExtendedBandFacesSelected=false;

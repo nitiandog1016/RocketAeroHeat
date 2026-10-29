@@ -3,6 +3,11 @@
 (function(){
  const d=window.ROCKET_WALL_VELOCITY_STUDY,$=id=>document.getElementById(id),buttons=[...document.querySelectorAll('[data-step]')];
  const num=x=>Number.isFinite(x)?Number(x.toPrecision(6)).toString():'未知';let selected=d.cases.length-1,step=4;
+ // 模块用途：步骤和定量诊断共用右侧查看区，切换时把该区回到顶部，侧栏独立滚动。
+ function showViewer(url){
+  const viewer=$('viewer');if(viewer.getAttribute('src')!==url)viewer.setAttribute('src',url);
+  if(viewer.parentElement)viewer.parentElement.scrollTop=0;
+ }
  d.cases.forEach((c,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=c.label;$('caseChoice').append(o);});$('caseChoice').value=String(selected);
  function panel(){
   const c=d.cases[selected],s=c.summary,scheme=c.wallVelocityGradient==='legacy'?'旧WLS加斜位移约束':'静止壁零切向导数与真实正dn约束';
@@ -27,11 +32,26 @@
   if(coordinates)panels[3][2].push(['非线性候选路径',coordinates==='primitive-tangent'?'原始变量切向更新后恢复守恒量；每步仍由完整NS验收':'守恒变量直线更新；每步由完整NS验收']);
   const preparation=c.solverDiagnostics&&c.solverDiagnostics.directionPreparation;
   if(preparation){
+   if(preparation.proposedTrialStateCoordinates){
+    const pathLabel=x=>x==='primitive-tangent'?'原始变量切向更新后恢复守恒量':x==='conservative'?'守恒变量直线更新':'未知';
+    panels[3][2].push(['本次前瞻候选路径',pathLabel(preparation.proposedTrialStateCoordinates)],
+     ['云图当前态来源路径',pathLabel(preparation.displayedStateTrialStateCoordinates)]);
+   }
    panels[3][2].push(['本次方向构造',preparation.methodLabel],
     ['近似父矩阵C剩余',num(preparation.internalCRelativeResidual)+(preparation.internalCTargetMet?'；内部目标通过':'；未达内部目标 '+num(preparation.internalCTarget))],
     ['完整模型 / 原NS缺陷',num(preparation.completeModelRelativeDefect)+' / '+num(preparation.originalNSDirectionDefect)+'（原NS目标≤'+num(preparation.originalNSDirectionTarget)+'）'],
     ['幅度控制身份','峰值软惩罚；不保证硬幅度上限，实际候选仍由完整NS验收']);
-   if(preparation.displayedStateUnchanged)panels[3][2].push(['本次方向状态','未接受流场更新；云图保持原检查点，拒绝诊断单独列出']);
+   if(preparation.displayedStateUnchanged){
+    const sourceCount=panels[3][2].find(row=>row[0]==='本段修正 / NS调用');
+    if(sourceCount)sourceCount[0]='云图来源段修正 / NS调用';
+    panels[3][2].push(['本次方向状态','未接受流场更新；云图保持原检查点，拒绝诊断单独列出']);
+    if(preparation.unacceptedAttemptNSCounts){
+     const n=preparation.unacceptedAttemptNSCounts;
+     panels[3][2].push(['本次未接受试算NS调用','准备 '+n.preparation+'；探针 '+n.probe+'；主线 '+n.main+'（与云图来源段分列）']);
+    }
+   }
+   const conditioned=(preparation.projectionRepresentation||[]).filter(p=>p.rowPreconditioning);
+   if(conditioned.length)panels[3][2].push(['约束等价表示','全部原条件保留；各轮精确差值行 '+conditioned.map(p=>p.rowPreconditioning.transformedRows).join(' / ')+'；未按秩删行']);
    if(preparation.kind==='temperature-comparison-QR-LSQR-v1')panels[3][2].push(['界面温度方向约束',preparation.constraintApplied?'原内部面19207：一阶温度变化约为0；未增加物理温度边界，非线性候选仍须原温域检查':'同态自由方向对照；未施加界面温度投影']);
    if(preparation.kind==='current-band-active-temperature-v1'){
     const count=v=>Array.isArray(v)?v.length:v==null?0:1;
@@ -82,17 +102,17 @@
   if(finite&&(step===3||step===4)){
    const dt=document.createElement('dt'),dd=document.createElement('dd'),a=document.createElement('a');
    dt.textContent='诊断与连续步记录';a.textContent='查看对照图、各步残差及适用限制';a.setAttribute('href',finite.reportURL);
-   a.addEventListener('click',event=>{event.preventDefault();$('viewer').setAttribute('src',finite.reportURL);});dd.append(a);$('details').append(dt,dd);
+   a.addEventListener('click',event=>{event.preventDefault();showViewer(finite.reportURL);});dd.append(a);$('details').append(dt,dd);
   }
   if(temperatureStudy&&temperatureStudy.selectedCase===s.resultEvidenceFolder&&(step===3||step===4)){
    const dt=document.createElement('dt'),dd=document.createElement('dd'),detail=document.createElement('details'),summary=document.createElement('summary'),a=document.createElement('a');
    dt.textContent='方向对照与温域限制';summary.textContent='展开定量比较与适用限制';detail.append(summary);
    [temperatureStudy.comparisonLabel,temperatureStudy.scopeLabel,temperatureStudy.constraintLabel].forEach(text=>{const p=document.createElement('p');p.textContent=text;detail.append(p);});
    a.textContent='在当前工作台查看定量对照';a.setAttribute('href',temperatureStudy.reportURL);
-   a.addEventListener('click',event=>{event.preventDefault();$('viewer').setAttribute('src',temperatureStudy.reportURL);});detail.append(a);dd.append(detail);$('details').append(dt,dd);
+   a.addEventListener('click',event=>{event.preventDefault();showViewer(temperatureStudy.reportURL);});detail.append(a);dd.append(detail);$('details').append(dt,dd);
   }
   buttons.forEach((b,i)=>b.setAttribute('aria-selected',String(i===step)));
-  const url=step===4?c.resultsURL:step===1?d.domainURL:d.geometryURL;if($('viewer').getAttribute('src')!==url)$('viewer').setAttribute('src',url);
+  const url=step===4?c.resultsURL:step===1?d.domainURL:d.geometryURL;showViewer(url);
   $('historyRows').replaceChildren();const h=c.history;
   if(h&&Array.isArray(h.iteration))h.iteration.forEach((it,j)=>{const tr=document.createElement('tr');[it,num(h.pseudoDt[j]),num(h.alpha[j]),num(h.maximumResidualPerSecond[j]),num(h.rmsMerit[j]),num(h.spatialConservationRelative[j]),num(h.steadyBoundaryFluxBalance[j]),h.residualEvaluations[j]].forEach(x=>{const td=document.createElement('td');td.textContent=String(x);tr.append(td);});$('historyRows').append(tr);});
   // 按需展示本段真实失败检查；不将线预条件器的微小缺陷当成完整NS线性精度。

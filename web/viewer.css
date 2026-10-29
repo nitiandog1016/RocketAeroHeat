@@ -15,3 +15,5 @@
 .caseCondition{flex-shrink:0;margin:0;padding:8px 15px;border-bottom:1px solid var(--line);background:#152131;font-size:11px;line-height:1.6;font-variant-numeric:tabular-nums;color:#c0cedd}.coverageNote{font-size:11px;line-height:1.65;margin:0 0 12px}.probeRow .fieldReason{font-size:11px;line-height:1.6;margin:5px 0 7px;color:#c2cbd6}#coverageTitle{line-height:1.45;font-size:14px}#coverageNumbers{gap:16px}@media(max-width:720px){.caseCondition{padding:8px 12px;font-size:10px}}
 /* 短视口下将截色/缺失说明放在色标下方，避免竖排换列遮挡箭体和数值。 */
 .legend{width:64px;right:15px;bottom:30px;gap:5px}.legend .gradient{min-height:24px}.legend #legendNote{position:static;writing-mode:horizontal-tb;width:160px;align-self:flex-end;text-align:right;white-space:normal;line-height:1.4;flex-shrink:0}
+/* 色标使用独立右侧空间；短视口下说明文字不再覆盖鼻部，画布拾取仍按实际尺寸计算。 */
+#scene{width:calc(100% - 100px)}.legend #legendNote{width:80px}

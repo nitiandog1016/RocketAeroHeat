@@ -1,0 +1,79 @@
+{
+  "status": "passed-independent-all-original-facet-static-wall-study-source-identity",
+  "processID": 7676,
+  "cases": [
+    {
+      "case": "legacy-wall-source",
+      "sourceRelativeDifferences": {
+        "pressure": 2.4865056369363964e-16,
+        "heatFlux": 2.9471930864008487e-16,
+        "wallAdjacentTemperature": 0.0,
+        "temperatureRate": 0.0,
+        "wallMechanicalExchange": 0.0,
+        "wallInput": 1.8947806286936006e-16
+      },
+      "balance": {
+        "spatialConservationRelative": 2.8653818713341003e-16,
+        "steadyBoundaryFluxBalance": 0.015713480397044875
+      }
+    },
+    {
+      "case": "constrained-wall-baseline",
+      "sourceRelativeDifferences": {
+        "pressure": 2.4865056369363964e-16,
+        "heatFlux": 2.9471930864008487e-16,
+        "wallAdjacentTemperature": 0.0,
+        "temperatureRate": 0.0,
+        "wallMechanicalExchange": 0.0,
+        "wallInput": 1.8947806286936006e-16
+      },
+      "balance": {
+        "spatialConservationRelative": 2.8653818713341003e-16,
+        "steadyBoundaryFluxBalance": 0.015119531285283542
+      }
+    },
+    {
+      "case": "constrained-wall-krylov",
+      "sourceRelativeDifferences": {
+        "pressure": 1.9469127245229128e-16,
+        "heatFlux": 1.2356948950189505e-16,
+        "wallAdjacentTemperature": 0.0,
+        "temperatureRate": 0.0,
+        "wallMechanicalExchange": 0.0,
+        "wallInput": 1.8947806286936006e-16
+      },
+      "balance": {
+        "spatialConservationRelative": 7.238347542871384e-16,
+        "steadyBoundaryFluxBalance": 0.002407097056858919
+      }
+    }
+  ],
+  "sourceFaces": 19752,
+  "solverDiagnosticAudit": {
+    "linearAttempts": 1,
+    "rejectedLinearAttempts": 0,
+    "nonlinearTrials": 4,
+    "rejectedNonlinearTrials": 3
+  },
+  "scientificPNGs": [
+    "static_wall_velocity_comparison.png",
+    "static_wall_velocity_residuals.png",
+    "static_wall_velocity_balance.png"
+  ],
+  "browserVisualOrWebGLRuntimeVerified": false,
+  "physicalSolution": false,
+  "newProductionSolvedAreaM2": 0,
+  "inputSHA256": {
+    "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+    "outputs\\v93_validation\\workbench01\\wall-velocity-study-data.json": "8034d0a211b6fde300407b533d36ad2d119441e6a4bbfc93b5dbd9eacb9967c7",
+    "outputs\\v93_validation\\workbench01\\cases\\legacy-wall-source\\results.json": "3ec4d9a8f5575318c57f9051e9fc325630460d434df6e82cc6ae7afa4d4656c5",
+    "outputs\\v82_validation\\exact_krylov01\\steady_krylov_evidence.mat": "4412d1d91f7911d4fc84269f82e70ebcafc8943491041b357da9317dd32a570e",
+    "outputs\\v93_validation\\workbench01\\cases\\constrained-wall-baseline\\results.json": "db41c31c4a42d7f2ab18e752f3cc1725805e826ca7036aeddb843a72e517ccf4",
+    "outputs\\v83_validation\\integration01\\wall_velocity_integration_evidence.mat": "9d14bc8626323d57745540613baff91063749748ed4d4ce89b3110c22e097f5b",
+    "outputs\\v93_validation\\workbench01\\cases\\constrained-wall-krylov\\results.json": "18872feb889d9f6c539705d930d8315900c9b257746440715905fa7f307707b7",
+    "outputs\\v83_validation\\krylov41\\wall_velocity_krylov_evidence.mat": "dc9fea4e454f137fa4e4ead736bed37ffb5407eed2cbc6b5f5012ca9e4ffd1ce",
+    "outputs\\v93_validation\\continuous01\\active_continuation.json": "3281b6fe9571982cd61794097a97c05f1b204c6de1da85320735cf557aab7c99",
+    "outputs\\v93_validation\\continuous01\\step01\\active_direction.mat": "1e68666a183292764659224785b50bf9c12fb958a64b7c0627c51906d2dce3f9"
+  },
+  "scriptSHA256": "8bd6667063a6ca0ed15e7636067fe68054ae913571c715f86652e3e0fd906b5b"
+}

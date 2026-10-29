@@ -1,0 +1,475 @@
+{
+  "status": "passed-independent-coordinate-path-all-small-interfaces-and-dense-repreview-audit",
+  "pairs": [
+    {
+      "preview": {
+        "interiorFaces": 2,
+        "independentlyAssessedFaces": 0,
+        "blockedFaces": [
+          1,
+          2
+        ],
+        "violatingFaces": [],
+        "publicViolatingTemperatureK": [],
+        "allAssessableFacesIndependentlyRecomputed": true
+      },
+      "originalRows": 2,
+      "predictedViolatingCells": 2,
+      "selectedRows": 2,
+      "currentOriginalCVSparseMappingExactlyVerified": true,
+      "coordinates": "conservative",
+      "publicTemperatureDerivatives": [
+        {
+          "allTemperatureDerivativeColumnCount": 20,
+          "publicTemperatureFDRelativeDifference": 2.0038818512185415e-10,
+          "baseTemperatureK": [
+            80.04999999999998,
+            80.04999999999998
+          ],
+          "allPerturbationsStayedInSameSelectedRegion": true
+        },
+        {
+          "allTemperatureDerivativeColumnCount": 20,
+          "publicTemperatureFDRelativeDifference": 3.1560754104241767e-10,
+          "baseTemperatureK": [
+            80.04999999999998,
+            80.04999999999998
+          ],
+          "allPerturbationsStayedInSameSelectedRegion": true
+        }
+      ]
+    },
+    {
+      "preview": {
+        "interiorFaces": 2,
+        "independentlyAssessedFaces": 2,
+        "blockedFaces": [],
+        "violatingFaces": [],
+        "publicViolatingTemperatureK": [],
+        "allAssessableFacesIndependentlyRecomputed": true
+      },
+      "originalRows": 2,
+      "predictedViolatingCells": 0,
+      "selectedRows": 2,
+      "currentOriginalCVSparseMappingExactlyVerified": true,
+      "coordinates": "primitive-tangent",
+      "publicTemperatureDerivatives": [
+        {
+          "allTemperatureDerivativeColumnCount": 20,
+          "publicTemperatureFDRelativeDifference": 2.0038818512185415e-10,
+          "baseTemperatureK": [
+            80.04999999999998,
+            80.04999999999998
+          ],
+          "allPerturbationsStayedInSameSelectedRegion": true
+        },
+        {
+          "allTemperatureDerivativeColumnCount": 20,
+          "publicTemperatureFDRelativeDifference": 3.1560754104241767e-10,
+          "baseTemperatureK": [
+            80.04999999999998,
+            80.04999999999998
+          ],
+          "allPerturbationsStayedInSameSelectedRegion": true
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "arithmetic": {
+        "rounds": [
+          {
+            "round": 0,
+            "selectedRows": 32,
+            "newActiveFaceIDs": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              16,
+              17,
+              19,
+              20,
+              21,
+              24,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32
+            ],
+            "targetCandidateThermallyFeasible": false
+          },
+          {
+            "round": 1,
+            "selectedRows": 32,
+            "newActiveFaceIDs": [
+              6,
+              15,
+              22,
+              25
+            ],
+            "targetCandidateThermallyFeasible": true
+          },
+          {
+            "round": 2,
+            "selectedRows": 32,
+            "newActiveFaceIDs": [],
+            "targetCandidateThermallyFeasible": true
+          }
+        ],
+        "actualProjectedSolves": 2,
+        "totalNativeIterations": 77,
+        "original128EpsDotGatePassed": false,
+        "targetThermalCheckPassed": true
+      },
+      "freeDenseRelativeDifference": 1.4789769616538395e-11,
+      "projectedDenseRelativeDifferences": [
+        4.627603106365584e-12,
+        6.4718650501550135e-12
+      ],
+      "previews": [
+        {
+          "preview": {
+            "interiorFaces": 32,
+            "independentlyAssessedFaces": 30,
+            "blockedFaces": [
+              1,
+              32
+            ],
+            "violatingFaces": [],
+            "publicViolatingTemperatureK": [],
+            "allAssessableFacesIndependentlyRecomputed": true
+          },
+          "originalRows": 32,
+          "predictedViolatingCells": 1,
+          "selectedRows": 32,
+          "currentOriginalCVSparseMappingExactlyVerified": true
+        },
+        {
+          "preview": {
+            "interiorFaces": 32,
+            "independentlyAssessedFaces": 32,
+            "blockedFaces": [],
+            "violatingFaces": [],
+            "publicViolatingTemperatureK": [],
+            "allAssessableFacesIndependentlyRecomputed": true
+          },
+          "originalRows": 32,
+          "predictedViolatingCells": 0,
+          "selectedRows": 32,
+          "currentOriginalCVSparseMappingExactlyVerified": true
+        },
+        {
+          "preview": {
+            "interiorFaces": 32,
+            "independentlyAssessedFaces": 32,
+            "blockedFaces": [],
+            "violatingFaces": [],
+            "publicViolatingTemperatureK": [],
+            "allAssessableFacesIndependentlyRecomputed": true
+          },
+          "originalRows": 32,
+          "predictedViolatingCells": 0,
+          "selectedRows": 32,
+          "currentOriginalCVSparseMappingExactlyVerified": true
+        }
+      ],
+      "publicTemperatureDerivatives": [
+        {
+          "allTemperatureDerivativeColumnCount": 320,
+          "publicTemperatureFDRelativeDifference": 1.8261250176331784e-10,
+          "baseTemperatureK": [
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999
+          ],
+          "allPerturbationsStayedInSameSelectedRegion": true
+        },
+        {
+          "allTemperatureDerivativeColumnCount": 320,
+          "publicTemperatureFDRelativeDifference": 2.595313002780873e-10,
+          "baseTemperatureK": [
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999
+          ],
+          "allPerturbationsStayedInSameSelectedRegion": true
+        }
+      ]
+    },
+    {
+      "arithmetic": {
+        "rounds": [
+          {
+            "round": 0,
+            "selectedRows": 32,
+            "newActiveFaceIDs": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              16,
+              17,
+              19,
+              20,
+              21,
+              24,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32
+            ],
+            "targetCandidateThermallyFeasible": false
+          },
+          {
+            "round": 1,
+            "selectedRows": 32,
+            "newActiveFaceIDs": [
+              6,
+              15,
+              22,
+              25
+            ],
+            "targetCandidateThermallyFeasible": true
+          },
+          {
+            "round": 2,
+            "selectedRows": 32,
+            "newActiveFaceIDs": [],
+            "targetCandidateThermallyFeasible": true
+          }
+        ],
+        "actualProjectedSolves": 2,
+        "totalNativeIterations": 77,
+        "original128EpsDotGatePassed": false,
+        "targetThermalCheckPassed": true
+      },
+      "freeDenseRelativeDifference": 1.4788123846602594e-11,
+      "projectedDenseRelativeDifferences": [
+        4.6280225358138995e-12,
+        6.473008005418239e-12
+      ],
+      "previews": [
+        {
+          "preview": {
+            "interiorFaces": 32,
+            "independentlyAssessedFaces": 30,
+            "blockedFaces": [
+              1,
+              32
+            ],
+            "violatingFaces": [],
+            "publicViolatingTemperatureK": [],
+            "allAssessableFacesIndependentlyRecomputed": true
+          },
+          "originalRows": 32,
+          "predictedViolatingCells": 1,
+          "selectedRows": 32,
+          "currentOriginalCVSparseMappingExactlyVerified": true
+        },
+        {
+          "preview": {
+            "interiorFaces": 32,
+            "independentlyAssessedFaces": 32,
+            "blockedFaces": [],
+            "violatingFaces": [],
+            "publicViolatingTemperatureK": [],
+            "allAssessableFacesIndependentlyRecomputed": true
+          },
+          "originalRows": 32,
+          "predictedViolatingCells": 0,
+          "selectedRows": 32,
+          "currentOriginalCVSparseMappingExactlyVerified": true
+        },
+        {
+          "preview": {
+            "interiorFaces": 32,
+            "independentlyAssessedFaces": 32,
+            "blockedFaces": [],
+            "violatingFaces": [],
+            "publicViolatingTemperatureK": [],
+            "allAssessableFacesIndependentlyRecomputed": true
+          },
+          "originalRows": 32,
+          "predictedViolatingCells": 0,
+          "selectedRows": 32,
+          "currentOriginalCVSparseMappingExactlyVerified": true
+        }
+      ],
+      "publicTemperatureDerivatives": [
+        {
+          "allTemperatureDerivativeColumnCount": 320,
+          "publicTemperatureFDRelativeDifference": 1.8261250176331784e-10,
+          "baseTemperatureK": [
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999
+          ],
+          "allPerturbationsStayedInSameSelectedRegion": true
+        },
+        {
+          "allTemperatureDerivativeColumnCount": 320,
+          "publicTemperatureFDRelativeDifference": 2.595313002780873e-10,
+          "baseTemperatureK": [
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999,
+            80.89999999999999
+          ],
+          "allPerturbationsStayedInSameSelectedRegion": true
+        }
+      ]
+    }
+  ],
+  "actualEmptySelectorIdentityVerified": true,
+  "inputSHA256": {
+    "outputs/v93_validation/coordinate_unit01/temperature_trial_coordinates_unit.mat": "43817f027db240ab2411c20161a94500dff458b069cdf9adf9cd5bac38cd60b7"
+  },
+  "scriptSHA256": "dde33230e03190224cdfa072b8b1c2df9d6367c1fffd1d5777603535cd5b4a3a",
+  "publicReferenceSHA256": {
+    "tests\\data\\riemann_reference\\raw\\clawpack_exact_euler.py": "2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef",
+    "tests\\data\\riemann_reference\\raw\\probe_exact_riemann.py": "402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a"
+  },
+  "newActualNSEvaluations": 0,
+  "newFlowAcceptances": 0,
+  "manufacturedFacesNotClosedNSGeometry": true,
+  "manufacturedCNotPhysicalNSJacobian": true,
+  "physicalSolution": false,
+  "newProductionSolvedAreaM2": 0
+}

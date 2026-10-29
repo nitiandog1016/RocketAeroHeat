@@ -15,7 +15,7 @@
 
 ## 当前续算需要的数据
 
-- 最新本地接受状态：`outputs/v93_validation/continuous01/step01/krylov01/wall_velocity_krylov_evidence.mat`；`outputs/v83_validation/krylov41/wall_velocity_krylov_evidence.mat`是同一文件的硬链接。v93数值试算与独立审计已完成，仍未稳态；UI交付收口另行进行，本次存储维护不发布v93算法。
+- 最新本地接受状态：`outputs/v93_validation/continuous01/step01/krylov01/wall_velocity_krylov_evidence.mat`；`outputs/v83_validation/krylov41/wall_velocity_krylov_evidence.mat`是同一文件的硬链接。v93数值与实际浏览器核验已完成，仍未稳态；源码、测试和小型证据随后纳入v93 GitHub交付，大型状态仍只保留在本地，见[验证索引](validation/v93/README.md)。此前存储维护提交没有混入v93算法。
 - 原几何：`outputs/v80_validation/domain02/shell_domain_evidence.mat`。
 - 最近方向：`outputs/v93_validation/continuous01/step01/active_direction.mat`。Q40前驱、原失败、自由前缀、恢复绑定、各轮检查点与数值审计保留。
 - 下一次实际推进必须从Q41建立新准备系统。v93的Q40系统已在实际试算和独立数值审计后回收六项派生矩阵，原清单、输入、方向和`CACHE_PRUNED.json`保留；不能直接加载旧清单续算。更早Q38/Q39准备系统也已按各自记录清理。

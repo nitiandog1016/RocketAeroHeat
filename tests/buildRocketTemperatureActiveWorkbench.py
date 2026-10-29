@@ -36,6 +36,10 @@ def stamp_viewer_urls(folder, data):
         html, count = re.subn(r'src="'+re.escape(name)+r'(?:\?[^"]*)?"',
                              'src="'+name+'?v='+sha(folder/name)[:12]+'"', html)
         assert count == 1
+    name = 'rocket-sensitivity.css'
+    html, count = re.subn(r'href="'+re.escape(name)+r'(?:\?[^\"]*)?"',
+                         'href="'+name+'?v='+sha(folder/name)[:12]+'"', html)
+    assert count == 1
     page.write_bytes(html.encode('utf8'))
 
 
@@ -110,6 +114,12 @@ def bind(study_file, candidate_file, state_file, step_number):
     else:
         assert sha(state_file) == candidate['sourceBinding']['sourceFileSHA256'], '拒绝试算只能展示实际当前态。'
     report = candidate['directionReport']
+    coordinates = report.get('repreview', {}).get('trialStateCoordinates',
+                       report.get('lookaheadSelection', {}).get('trialStateCoordinates', 'conservative'))
+    assert coordinates in ('conservative', 'primitive-tangent')
+    assert report.get('lookaheadSelection', {}).get('trialStateCoordinates', 'conservative') == coordinates
+    if accepted:
+        assert actual['options'].get('trialStateCoordinates', 'conservative') == coordinates, '前瞻路径与实际接受路径不符。'
     assert (report['bandDirectionFeasible'] or not accepted) and not report['oldActiveSetInherited']
     detail = report['linearReport']
     cycles = candidate['evidence']['cycles']
@@ -118,12 +128,20 @@ def bind(study_file, candidate_file, state_file, step_number):
     for cycle in cycles:
         p = cycle['projector']
         q = int(p.get('independentConstraintCount', np.size(p['normalizedQRDiagonal'])))
-        projections.append(dict(originalRows=int(p['constraintCount']), distinctConditions=q,
+        representation = dict(originalRows=int(p['constraintCount']), distinctConditions=q,
             compactStorage='basisCoordinateIndices' in p, storedCoordinates=int(np.size(p.get('basisCoordinateIndices', []))),
             basisArrayBytes=int(p.get('basisArrayBytes', np.asarray(p['basis']).nbytes)),
             equivalentFullBasisArrayBytes=int(p.get('equivalentFullBasisArrayBytes', np.asarray(p['basis']).nbytes)),
             allOriginalRowsExactlyRepresented=bool(p.get('allOriginalRowsExactlyRepresented',p['constraintCount']==q)),
-            rankTruncationUsed=bool(p.get('rankTruncationUsed',False))))
+            rankTruncationUsed=bool(p.get('rankTruncationUsed',False)))
+        if 'constraintRowPreconditioning' in p:
+            exact = p['constraintRowPreconditioning']
+            assert exact['allOriginalConditionsRetained'] and not exact['rankBasedRowSelection'] and not exact['rankTruncationUsed']
+            representation['rowPreconditioning'] = dict(method=exact['kind'],
+                transformedRows=int(np.size(exact['transformedRowIndices'])),
+                allOriginalConditionsRetained=True, rankTruncationUsed=False,
+                exactBinaryInverseVerified=bool(exact['binaryInverseReconstructionVerified']))
+        projections.append(representation)
     target = detail.get('internalCTarget', detail.get('options', {}).get('relativeTolerance'))
     assert target == .001 and (not accepted or step['probe']['originalNSDirectionTargetMet'])
     preparation = dict(kind='current-band-active-temperature-v1',
@@ -165,6 +183,13 @@ def bind(study_file, candidate_file, state_file, step_number):
         preparation['newFreeNativeIterations'] = report['freeCheckpointReplay']['newFreeNativeIterations']
         preparation['reusedFreeNativeIterations'] = report['reusedFreeNativeIterations']
         preparation['newProjectedNativeIterations'] = report['newNativeIterations']
+    if coordinates != 'conservative':
+        preparation['proposedTrialStateCoordinates'] = coordinates
+        preparation['displayedStateTrialStateCoordinates'] = actual['options'].get('trialStateCoordinates', 'conservative')
+        preparation['methodLabel'] += '；采用原始变量切向候选路径'
+    if not accepted:
+        preparation['unacceptedAttemptNSCounts'] = dict(preparation=step['newPreparationActualNS'],
+            probe=step['newProbeActualNS'], main=step['newMainActualNS'])
     return preparation
 
 
@@ -220,6 +245,11 @@ def build():
         '存储大小仅指投影基，不是进程峰值，也不是计算加速或新增物理面积。</p><table><thead><tr>'
         '<th>步骤</th><th>所选原面</th><th>激活原行</th><th>不同条件</th><th>表示</th>'
         '<th>基存储 KiB</th><th>等价完整基 KiB</th></tr></thead><tbody>' + ''.join(representation_rows)+'</tbody></table>')
+    conditioned = [p['rowPreconditioning'] for p in preparation['projectionRepresentation'] if 'rowPreconditioning' in p]
+    if conditioned:
+        representation_table += ('<p>全部不同条件均保留；同支撑近重复行采用精确差值与二进制幂缩放，'
+            '逐轮变换行数：'+ '、'.join(str(p['transformedRows']) for p in conditioned)+
+            '。未按秩删行；仅证明保存浮点矩阵的可逆表示，不证明微小差异具有独立物理意义。</p>')
     lookahead_rows = []
     interface_policy = False
     for item in steps:

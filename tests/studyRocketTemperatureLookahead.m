@@ -1,4 +1,4 @@
-function report=studyRocketTemperatureLookahead(folder,previousFolder,targetAlpha,selectionPolicy)
+function report=studyRocketTemperatureLookahead(folder,previousFolder,targetAlpha,selectionPolicy,trialStateCoordinates)
 %STUDYROCKETTEMPERATURELOOKAHEAD 从显式真实端点重建一次前瞻选面方向并由原NS验收。
 % 模块一：完整回放当前NS、重建C/W/QR；旧Q35夹具和Q36导数不用于新状态。
 % 模块二：自由128步只算一次；显式逐轮策略最多三次受限重算，检查投影后新暴露的温域条件。
@@ -7,6 +7,9 @@ function report=studyRocketTemperatureLookahead(folder,previousFolder,targetAlph
 if nargin<2,previousFolder='outputs/v83_validation/krylov37';end
 if nargin<3,targetAlpha=1/8;end
 if nargin<4,selectionPolicy='all-extended-band';end
+if nargin<5,trialStateCoordinates='conservative';end
+assert(ischar(trialStateCoordinates)&&ismember(trialStateCoordinates,{'conservative','primitive-tangent'}), ...
+    'TemperatureLookahead:Coordinates','需要明确的实际候选路径。');
 assert(ischar(selectionPolicy)&&ismember(selectionPolicy,{'all-extended-band','original-and-predicted-required-faces', ...
     'original-and-predicted-cell-and-interface-faces','original-and-iteratively-predicted-cell-and-interface-faces'}), ...
     'TemperatureLookahead:Options','需要明确的前瞻选面策略。');
@@ -23,6 +26,7 @@ factor=buildRocketAugmentedPatchQR(a.packed,b.factor,m.metric,.1*norm(m.rhs,'fro
 c=load(p.artifacts.cache.file,'cache');initialRows=selectRocketTemperatureBandRows(c.cache.Q,c.cache.baseInfo,c.cache.geometry,c.cache.gas,c.cache.scale);
 preview=struct('Q',c.cache.Q,'info',c.cache.baseInfo,'cut',c.cache.geometry,'gas',c.cache.gas,'scale',c.cache.scale,'targetAlpha',targetAlpha, ...
     'selectionPolicy',selectionPolicy);clear c;
+if ~strcmp(trialStateCoordinates,'conservative'),preview.trialStateCoordinates=trialStateCoordinates;end
 save(fullfile(stepFolder,'direction_context.mat'),'factor','initialRows','preparationFile','preparationSHA256','p','-v7');
 checkpoints=fullfile(stepFolder,'linear_checkpoints');mkdir(checkpoints);
 [value,directionReport,evidence]=solveRocketTemperatureActiveDirection(a.packed,factor,m.rhs,m.metric,initialRows, ...
@@ -48,6 +52,7 @@ if directionReport.bandDirectionFeasible&&defect<=.1
             'maximumIterations',1,'initialPseudoDt',1e-7,'maximumKrylovIterations',48,'linearRelativeTolerance',.1, ...
             'maximumStepRetries',0,'maximumLineSearch',16,'steadyInitialGuess', ...
             struct('file',fullfile(probeFolder,'direct_ns_direction_probe.mat'),'variant','ns-probe','scale',1));
+        if ~strcmp(trialStateCoordinates,'conservative'),options.trialStateCoordinates=trialStateCoordinates;end
         row.resultFolder=fullfile(stepFolder,'krylov01');row.main=continueRocketWallVelocityKrylov(row.resultFolder,previousFolder,options);
         row.newMainActualNS=row.main.residualEvaluations;row.stopReason=row.main.stopReason;
         if row.main.acceptedNonlinearIterations>0,lastAccepted=row.resultFolder;end
@@ -57,6 +62,7 @@ write(fullfile(stepFolder,'step.json'),row);write(fullfile(folder,'progress.json
 report=struct('status','tested-bounded-current-state-predictive-temperature-selection-NS-study','initialStateFile',stateFile, ...
     'maximumSteps',1,'targetPreviewAlpha',targetAlpha,'steps',{{row}},'lastAcceptedFolder',lastAccepted, ...
     'sameEquationHistoryContinued',true,'oldActiveSetsInherited',false,'physicalSolution',false,'newProductionSolvedAreaM2',0);
+if ~strcmp(trialStateCoordinates,'conservative'),report.trialStateCoordinates=trialStateCoordinates;end
 write(fullfile(folder,'active_continuation.json'),report);disp(report);
 end
 function write(file,data)

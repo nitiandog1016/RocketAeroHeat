@@ -50,6 +50,7 @@ assert.notDeepEqual(fields[0].temperatureRate.values,fields[1].temperatureRate.v
 assert.ok(d.cases[0].mechanicalCoolingWallCount>0);assert.equal(d.cases[1].mechanicalCoolingWallCount,0);assert.equal(d.cases[2].history.iteration[0],0);
 class E{constructor(tag){this.tag=tag;this.children=[];this.attrs={};this.events={};this.value='';this.textContent='';}append(...e){this.children.push(...e);}replaceChildren(...e){this.children=[...e];}setAttribute(k,v){this.attrs[k]=String(v);}getAttribute(k){return this.attrs[k];}addEventListener(k,f){this.events[k]=f;}}
 const ids=Object.fromEntries(['caseChoice','title','description','details','viewer','historyRows','linearRows','trialRows','diagnosticNote','layerRows','layerNote','wallNote','stateNote','linearResearchRows','linearResearchNote'].map(x=>[x,new E(x)])),buttons=Array.from({length:5},()=>new E('button')),viewer=ids.viewer;
+viewer.parentElement={scrollTop:0};
 const document={getElementById:x=>{assert.ok(ids[x],x);return ids[x];},querySelectorAll:q=>{assert.equal(q,'[data-step]');return buttons;},createElement:t=>new E(t)};
 const program=process.argv[3]?path.resolve(process.argv[3]):path.join(folder,'rocket-wall-velocity.js');
 vm.runInNewContext(fs.readFileSync(program,'utf8'),{window:{ROCKET_WALL_VELOCITY_STUDY:d},document});let events=0,linearDiagnosticRows=0,candidateDiagnosticRows=0;
@@ -71,7 +72,7 @@ for(let j=0;j<3;j++){
    const flatten=e=>[e,...(e.children||[]).flatMap(flatten)],nodes=ids.details.children.flatMap(flatten);
    assert.ok(nodes.some(e=>e.tag==='details'));assert.ok(nodes.some(e=>e.textContent===study.constraintLabel));
    const links=nodes.filter(e=>e.tag==='a');const link=links.find(e=>e.attrs.href===study.reportURL);assert.ok(link);
-   let prevented=false;link.events.click({preventDefault(){prevented=true;}});assert.ok(prevented);assert.equal(ids.viewer.attrs.src,study.reportURL);
+   viewer.parentElement.scrollTop=350;let prevented=false;link.events.click({preventDefault(){prevented=true;}});assert.ok(prevented);assert.equal(ids.viewer.attrs.src,study.reportURL);assert.equal(viewer.parentElement.scrollTop,0);
    buttons[4].events.click();assert.equal(ids.viewer.attrs.src,d.cases[j].resultsURL);
   }
   if(preparation.kind==='current-band-active-temperature-v1'){
@@ -123,10 +124,19 @@ for(let j=0;j<3;j++){
      assert.equal(p.allOriginalRowsExactlyRepresented,true);assert.equal(p.rankTruncationUsed,false);
      assert.ok(p.basisArrayBytes>0&&p.equivalentFullBasisArrayBytes>=p.basisArrayBytes);
      if(p.compactStorage)assert.ok(p.storedCoordinates>0);
+     if(p.rowPreconditioning){
+      assert.equal(p.rowPreconditioning.allOriginalConditionsRetained,true);
+      assert.equal(p.rowPreconditioning.rankTruncationUsed,false);
+      assert.equal(p.rowPreconditioning.exactBinaryInverseVerified,true);
+      assert.ok(p.rowPreconditioning.transformedRows>0);
+     }
     });
     if(preparation.projectionRepresentation.length){
      const last=preparation.projectionRepresentation.at(-1),faces=preparation.activeFaceIDs;
      assert.equal(last.originalRows,Array.isArray(faces)?faces.length:faces==null?0:1);
+    }
+    if(preparation.projectionRepresentation.some(p=>p.rowPreconditioning)){
+     assert.ok(ids.details.children.some(e=>e.textContent.includes('各轮精确差值行')));
     }
     const page=fs.readFileSync(path.join(folder,d.temperatureActiveResearch.reportURL),'utf8');
     assert.ok(page.includes('方向约束与表示核对')&&page.includes('等价完整基 KiB'));
@@ -168,7 +178,7 @@ for(let j=0;j<3;j++){
   assert.equal(tr.children.length,8);assert.ok(Math.abs(Number(tr.children[6].textContent)-h.steadyBoundaryFluxBalance[i])/Math.max(1e-30,Math.abs(h.steadyBoundaryFluxBalance[i]))<1e-5);
   assert.ok(Number(tr.children[5].textContent)<d.convergenceTargets.spatialConservationRelative);
  });
- for(let step=0;step<5;step++){buttons[step].events.click();events++;assert.equal(ids.viewer,viewer);assert.equal(viewer.attrs.src,step===4?d.cases[j].resultsURL:step===1?d.domainURL:d.geometryURL);assert.equal(buttons[step].attrs['aria-selected'],'true');
+ for(let step=0;step<5;step++){viewer.parentElement.scrollTop=750;buttons[step].events.click();events++;assert.equal(viewer.parentElement.scrollTop,0);assert.equal(ids.viewer,viewer);assert.equal(viewer.attrs.src,step===4?d.cases[j].resultsURL:step===1?d.domainURL:d.geometryURL);assert.equal(buttons[step].attrs['aria-selected'],'true');
   if(step===3){assert.ok(ids.details.children.some(e=>e.textContent==='定常边界不平衡'));assert.ok(ids.details.children.some(e=>e.textContent.includes('目标≤5e−10')));
    if(d.cases[j].summary.stopReason==='bounded-line-search-and-pseudostep-retries-exhausted')assert.ok(ids.details.children.some(e=>e.textContent==='有限线搜索与伪步重试已用尽（未收敛）'));
    if(d.cases[j].summary.stopReason==='steady-newton-linear-target-not-met')assert.ok(ids.details.children.some(e=>e.textContent==='直接稳态线性目标未达到（未提交更新）'));
@@ -269,6 +279,11 @@ if(process.argv[4]){
   assert.ok(text.includes('不包含开放边界、完整NS、稳态或物理验证'));
   assert.equal(text.includes('指定步长全部单元与内部界面温域通过'),r.targetCandidateThermallyFeasible);
   assert.equal(text.includes('通过原128eps点积界'),p.bandDirectionFeasible);
+  if(p.proposedTrialStateCoordinates){
+   assert.ok(text.includes('本次前瞻候选路径')&&text.includes('云图当前态来源路径'));
+   assert.ok(text.includes('原始变量切向更新后恢复守恒量')&&text.includes('守恒变量直线更新'));
+   assert.ok(text.includes('未接受流场更新；云图保持原检查点'));
+  }
   if(r.targetCandidateThermallyFeasible&&!p.bandDirectionFeasible)assert.ok(text.includes('内部温度合法也不能放行方向'));
   repreviewPresentationCases++;
  }
@@ -284,4 +299,5 @@ if(d.finiteStepResearch){
 }
 const report={status:'passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events',processID:process.pid,cases:3,sourceFaces:19752,
  CSVrows,sectionSamples,sameHostEvents:events,linearDiagnosticRows,candidateDiagnosticRows,repreviewPresentationCases,sourceSHA256,inPlaceDiagnosticNavigationVerified:Boolean(d.temperatureProjectionResearch||d.temperatureActiveResearch),browserVisualOrWebGLRuntimeVerified:false,newProductionSolvedAreaM2:0,dataSHA256:crypto.createHash('sha256').update(raw).digest('hex')};
-fs.writeFileSync(path.join(folder,'node_wall_velocity_summary.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
+const summaryFile=process.argv[5]?path.resolve(process.argv[5]):path.join(folder,'node_wall_velocity_summary.json');
+fs.writeFileSync(summaryFile,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

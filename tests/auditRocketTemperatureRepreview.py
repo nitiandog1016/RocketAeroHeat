@@ -9,6 +9,7 @@ from scipy.linalg import null_space
 from riemannReservoirReference import ROOT, sha, PUBLIC_BINDINGS
 from auditRocketCellInterfaceLookahead import selected_reference, vector
 from auditRocketTemperatureProjection import row_reference
+from rocketTrialCoordinatesReference import trial_candidate
 
 
 def cells(x):
@@ -98,7 +99,8 @@ def unit(folder):
             arithmetic = repreview_arithmetic(evidence['rows'], evidence, report); dense = []; previews = []
             directions = [evidence['free']] + [c['value'] for c in cells(evidence['cycles'])]
             for value, selection in zip(directions, cells(evidence['previewSelections'])):
-                candidate = Q + report['repreview']['targetAlpha']*value*case['scale']
+                candidate = trial_candidate(Q,value,case['scale'],report['repreview']['targetAlpha'],case['gas'],
+                                            report['repreview'].get('trialStateCoordinates','conservative'))
                 selected = subset(evidence['rows'], vector(selection['selectedBandFaceIDs'], int))
                 previews.append(selected_reference(Q, candidate, info, case['cut'], case['gas'], selected, selection))
             for cycle in cells(evidence['cycles']):

@@ -1,9 +1,10 @@
-function projector=buildRocketCompactTemperatureProjector(factor,rows,representatives,originalToUnique)
+function projector=buildRocketCompactTemperatureProjector(factor,rows,representatives,originalToUnique,workingRows,rowConditioning)
 %BUILDROCKETCOMPACTTEMPERATUREPROJECTOR 在完整局部支撑上表示原QR坐标投影。
 % 模块一：H涉及的CV扩展到其所属完整QR组，不忽略组内任何五量耦合。
 % 模块二：逐组形成P转置H转置，仅存支撑坐标；外部坐标上的基严格为零。
 % 模块三：保留全部原行及精确重复映射，不截断相关行，不增加448MiB构造预算。
 n=factor.cellCount;N=5*n;m=size(rows.H,1);q=numel(representatives);
+if nargin<5,[workingRows,rowConditioning]=conditionRocketTemperatureRows(rows.H(representatives,:));end
 [~,physicalColumns]=find(rows.H);touched=false(n,1);touched(mod(physicalColumns-1,n)+1)=true;
 covered=false(n,1);pages=cell(numel(factor.buckets),1);
 for k=1:numel(factor.buckets)
@@ -18,6 +19,7 @@ cells=find(covered);s=5*numel(cells);assert(q<=s,'TemperatureProjection:Rank','�
 % 上界包括四套支撑稠密面板、六套小矩阵、稀疏行副本、索引和逐组临时数组。
 % 输入factor/rows单列为调用者持有，本报告不声称进程峰值内存。
 bound=8*(4*s*q+6*q*q+8*N+32*m+64*s)+64*nnz(rows.H)+65536;
+if ~isempty(rowConditioning.transformedRowIndices),bound=bound+rowConditioning.additionalArrayBoundBytes;end
 assert(bound<=448*1024^2,'TemperatureProjection:Budget', ...
     '保留全部原行的紧凑投影超过448MiB额外数组上界，不删约束。');
 lookup=zeros(n,1,'uint32');lookup(cells)=uint32(1:numel(cells));
@@ -28,18 +30,23 @@ for k=1:numel(factor.buckets)
         members=double(b.members(:,page));
         original=reshape((members+(0:4)*n)',[],1);
         compact=reshape((double(lookup(members))+(0:4)*numel(cells))',[],1);
-        raw=full(rows.H(representatives,original))';
+        raw=full(workingRows(:,original))';
         image=b.map(:,:,page)'*raw;columns(compact,:)=image;
         info=whos('raw','image','original','compact');maximumPanelBytes=max(maximumPanelBytes,sum([info.bytes]));
     end
 end
 norms=vecnorm(columns,2,1);assert(all(isfinite(norms)&norms>0),'TemperatureProjection:Rank','约束在右坐标中为零或非有限。');
+originalNorms=norms;
+for k=1:numel(rowConditioning.transformedRowIndices)
+    j=rowConditioning.transformedRowIndices(k);reference=rowConditioning.referenceRowIndices(k);
+    originalNorms(j)=norm(columns(:,reference)+pow2(columns(:,j),-rowConditioning.powerTwoExponents(k)));
+end
 [basis,R]=qr(columns./norms,0);pivots=abs(diag(R));
 assert(all(pivots>1e-10),'TemperatureProjection:Rank','显式约束数值相关，拒绝而不截断约束。');
 orthogonality=norm(basis'*basis-eye(q),Inf);
 assert(orthogonality<=1e-10,'TemperatureProjection:Orthogonality','紧凑投影基未通过原正交检查。');
 projector=struct('kind','fixed-current-temperature-row-nullspace-in-QR-right-coordinates','cellCount',n, ...
-    'basis',basis,'constraintCount',m,'constraintColumnNorms',norms(originalToUnique),'normalizedQRDiagonal',pivots, ...
+    'basis',basis,'constraintCount',m,'constraintColumnNorms',originalNorms(originalToUnique),'normalizedQRDiagonal',pivots, ...
     'basisOrthogonalityError',orthogonality,'faceIDs',rows.faceIDs,'homogeneousDerivativeTargetK',zeros(m,1), ...
     'physicalBoundaryConditionAdded',false,'nonlinearTemperatureBoundGuaranteed',false,'newProductionSolvedAreaM2',0, ...
     'independentConstraintCount',q,'exactRepresentativeRowIndices',representatives, ...
@@ -48,4 +55,7 @@ projector=struct('kind','fixed-current-temperature-row-nullspace-in-QR-right-coo
     'supportCellIDs',cells,'additionalConstructionArrayBoundBytes',bound,'originalConstructionBudgetBytes',448*1024^2, ...
     'basisArrayBytes',8*numel(basis),'equivalentFullBasisArrayBytes',8*N*q, ...
     'maximumTemporaryPatchPanelBytes',maximumPanelBytes,'processPeakMemoryClaimed',false);
+if ~isempty(rowConditioning.transformedRowIndices)
+    projector.constraintRowPreconditioning=rowConditioning;projector.conditionedConstraintColumnNorms=norms;
+end
 end

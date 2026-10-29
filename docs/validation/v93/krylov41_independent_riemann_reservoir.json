@@ -1,0 +1,39 @@
+{
+  "status": "passed-independent-public-Riemann-reservoir-all-open-faces-walls-divergence-and-state-evidence",
+  "case": "krylov41",
+  "kind": "newton",
+  "processID": 42980,
+  "checks": {
+    "acceptedEndpoint": {
+      "cells": 217272,
+      "openReservoirFaces": 19752,
+      "publicFluxRelativeDifference": 1.5253070003062894e-13,
+      "publicPrimitiveRelativeDifference": 9.162599150262858e-15,
+      "ambiguousReferenceRegions": 0,
+      "wallFiveQuantityRelativeDifference": 1.8980273587491081e-16,
+      "fiveQuantityDivergenceRelativeDifference": 1.1887873150304114e-15,
+      "independentSpatialConservationRelative": 7.822927096377005e-16
+    },
+    "continuation": {
+      "predecessorCase": "krylov40",
+      "priorAccepted": 18,
+      "priorActualNS": 78,
+      "totalAccepted": 19,
+      "totalActualNS": 82,
+      "allMergedHistoryFieldsExactlyVerified": true
+    }
+  },
+  "completeIndependentNSSolver": false,
+  "oldCharacteristicGuardRelaxed": false,
+  "productionQualified": false,
+  "newProductionSolvedAreaM2": 0,
+  "inputSHA256": {
+    "outputs\\v83_validation\\krylov41\\wall_velocity_krylov_evidence.mat": "dc9fea4e454f137fa4e4ead736bed37ffb5407eed2cbc6b5f5012ca9e4ffd1ce",
+    "tests\\data\\riemann_reference\\raw\\clawpack_exact_euler.py": "2a926d59d4935807b93c425aa617bf64d64858e65231fd556b6ae6202d0ec2ef",
+    "tests\\data\\riemann_reference\\raw\\probe_exact_riemann.py": "402ffeee97aed006c6784fa6b46d3276a3ab428897d77d07921308d9708c067a",
+    "outputs\\v80_validation\\domain02\\shell_domain_evidence.mat": "a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa",
+    "outputs\\v83_validation\\krylov40\\wall_velocity_krylov_evidence.mat": "3ba7f649bb86fc211a1bd30aad9fca31c296e6d321cdb14c039dd4316b26ddb1"
+  },
+  "scriptSHA256": "412c6af76ed60ed1bbb4dba754668412873d73818344e954957b603597614ea1",
+  "referenceHelperSHA256": "8472dd5ca67879b40d152f0fee2dc7645578ac1294d7eec33aaa098c965791b3"
+}

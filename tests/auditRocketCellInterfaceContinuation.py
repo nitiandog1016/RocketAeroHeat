@@ -8,11 +8,13 @@ from scipy.io import loadmat
 from riemannReservoirReference import ROOT, sha, exact, PUBLIC_BINDINGS
 from auditRocketCellInterfaceLookahead import primitive, vector
 from auditRocketTemperatureRepreview import cells, repreview_arithmetic
+from rocketTrialCoordinatesReference import trial_candidate
 
 
 def audit_preview(Q, scale, gas, cut, value, selection, rows, original):
     """不借用未来集合证明本轮选面；全部CV温度独立复算，界面原解只抽样。"""
-    low, high = gas['temperatureRange']; candidate = Q+selection['targetAlpha']*value*scale
+    low, high = gas['temperatureRange']
+    candidate = trial_candidate(Q, value, scale, selection['targetAlpha'], gas, selection.get('trialStateCoordinates','conservative'))
     rho = candidate[:, 0]; positive_density = bool(np.all(rho > 0))
     internal = candidate[:, 4]-.5*np.sum(candidate[:, 1:4]**2, axis=1)/rho if positive_density else np.array([-1.])
     evaluable = positive_density and bool(np.all(internal > 0))

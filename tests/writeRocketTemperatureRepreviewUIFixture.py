@@ -17,9 +17,11 @@ def plain(value):
 
 def main(folder):
     folder = Path(folder).resolve(); source = folder/'temperature_repreview_unit.mat'
+    coordinate_cases = not source.exists()
+    if coordinate_cases: source = folder/'temperature_trial_coordinates_unit.mat'
     data = loadmat(source, simplify_cells=True); preparations = []
     for case in cells(data['cases']):
-        for name in ('detail', 'budget', 'stall', 'stress'):
+        for name in (('detail',) if coordinate_cases else ('detail', 'budget', 'stall', 'stress')):
             report = case[name]
             p = {k: plain(report[k]) for k in ('activeSolveCount', 'bandFaceIDs', 'activeFaceIDs', 'repreview', 'lookaheadSelection', 'bandDirectionFeasible')}
             # SciPy将MATLAB逻辑标量读为整数；显示夹具必须保持正式jsonencode的布尔类型。
@@ -31,6 +33,9 @@ def main(folder):
                 h['targetCandidateThermallyFeasible'] = bool(h['targetCandidateThermallyFeasible'])
             p.update(kind='current-band-active-temperature-v1', methodLabel='制造系统的实际复查显示测试',
                      repreviewStopReason=report['stopReason'])
+            if coordinate_cases:
+                p.update(proposedTrialStateCoordinates='primitive-tangent',
+                         displayedStateTrialStateCoordinates='conservative', displayedStateUnchanged=True)
             preparations.append(p)
     result = dict(sourceFile=source.relative_to(ROOT).as_posix(), sourceSHA256=sha(source),
                   manufacturedPresentationOnly=True, physicalSolution=False, preparations=preparations)

@@ -88,7 +88,8 @@ def main():
     a.set_xticks(number); a.set_xlabel('Current-state direction study step')
     for ax in axes.ravel():
         ax.grid(True, axis='y', alpha=.2)
-    fig.suptitle('M5 / 30 km / 20 deg / prescribed Tw=300 K / UNCONVERGED RESEARCH\nCurrent derivatives rebuilt every step; original NS and 80-2000 K gates unchanged; qualified area added = 0', fontsize=11)
+    coordinate_note = '\nActual candidate path: primitive tangent, conservative recovery' if study.get('trialStateCoordinates') == 'primitive-tangent' else ''
+    fig.suptitle('M5 / 30 km / 20 deg / prescribed Tw=300 K / UNCONVERGED RESEARCH\nCurrent derivatives rebuilt every step; original NS and 80-2000 K gates unchanged; qualified area added = 0'+coordinate_note, fontsize=11)
     for ext in ('png', 'pdf'):
         fig.savefig(OUT / f'temperature_active_continuation.{ext}', dpi=160)
     plt.close(fig)
@@ -109,7 +110,7 @@ def main():
         for a in axes:
             a.set_xlabel('Preview round (0 = free candidate)'); a.set_xticks(x); a.grid(axis='y', alpha=.2); a.legend(fontsize=8)
         axes[0].set_ylabel('Count (blocked interfaces remain unassessed)'); axes[1].set_ylabel('Count (no rank-based row removal)')
-        fig.suptitle('Bounded post-projection recheck at specified alpha; internal temperature only\nOpen boundary / full NS / steady state require separate checks', fontsize=11)
+        fig.suptitle('Bounded post-projection recheck at specified alpha; internal temperature only\nOpen boundary / full NS / steady state require separate checks'+coordinate_note, fontsize=11)
         for ext in ('png', 'pdf'):
             fig.savefig(OUT/f'temperature_repreview_rounds.{ext}', dpi=160)
         plt.close(fig)

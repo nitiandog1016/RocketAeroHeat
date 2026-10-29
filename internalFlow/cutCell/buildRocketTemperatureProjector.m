@@ -23,23 +23,33 @@ q=numel(representatives);
 assert(isequal(rows.H,rows.H(representatives(originalToUnique),:)), ...
     'TemperatureProjection:ExactDuplicates','原约束无法逐项精确重构，拒绝合并表示。');
 clear Ht;
+[workingRows,rowConditioning]=conditionRocketTemperatureRows(rows.H(representatives,:));
 % 模块五：旧小规模路径逐值保留；超过原16行或稠密预算时按完整局部支撑存储。
 % 扩展路径仍使用同一P转置、薄QR和1e-10秩门槛，不能靠删行或增加预算通过。
-if m>16||3*8*N*q>448*1024^2
-    projector=buildRocketCompactTemperatureProjector(factor,rows,representatives,originalToUnique);return;
+extra=0;if ~isempty(rowConditioning.transformedRowIndices),extra=rowConditioning.additionalArrayBoundBytes;end
+if m>16||3*8*N*q+extra>448*1024^2
+    projector=buildRocketCompactTemperatureProjector(factor,rows,representatives,originalToUnique,workingRows,rowConditioning);return;
 end
 columns=zeros(N,q);shape=[factor.cellCount 5];
 for j=1:q
-    v=reshape(full(rows.H(representatives(j),:))',shape);v=applyRocketAugmentedPatchQR(factor,v,'transp');columns(:,j)=v(:);
+    v=reshape(full(workingRows(j,:))',shape);v=applyRocketAugmentedPatchQR(factor,v,'transp');columns(:,j)=v(:);
 end
 norms=vecnorm(columns,2,1);assert(all(isfinite(norms)&norms>0),'TemperatureProjection:Rank','约束在右坐标中为零或非有限。');
+originalNorms=norms;
+for k=1:numel(rowConditioning.transformedRowIndices)
+    j=rowConditioning.transformedRowIndices(k);reference=rowConditioning.referenceRowIndices(k);
+    originalNorms(j)=norm(columns(:,reference)+pow2(columns(:,j),-rowConditioning.powerTwoExponents(k)));
+end
 [basis,R]=qr(columns./norms,0);pivots=abs(diag(R));
 assert(all(pivots>1e-10),'TemperatureProjection:Rank','显式约束数值相关，拒绝而不截断约束。');
 orthogonality=norm(basis'*basis-eye(q),Inf);assert(orthogonality<=1e-10,'TemperatureProjection:Orthogonality','投影基未通过正交检查。');
 projector=struct('kind','fixed-current-temperature-row-nullspace-in-QR-right-coordinates','cellCount',factor.cellCount, ...
-    'basis',basis,'constraintCount',m,'constraintColumnNorms',norms(originalToUnique),'normalizedQRDiagonal',pivots, ...
+    'basis',basis,'constraintCount',m,'constraintColumnNorms',originalNorms(originalToUnique),'normalizedQRDiagonal',pivots, ...
     'basisOrthogonalityError',orthogonality,'faceIDs',rows.faceIDs,'homogeneousDerivativeTargetK',zeros(m,1), ...
     'physicalBoundaryConditionAdded',false,'nonlinearTemperatureBoundGuaranteed',false,'newProductionSolvedAreaM2',0, ...
     'independentConstraintCount',q,'exactRepresentativeRowIndices',representatives, ...
     'originalToUniqueRow',originalToUnique,'allOriginalRowsExactlyRepresented',true,'rankTruncationUsed',false);
+if ~isempty(rowConditioning.transformedRowIndices)
+    projector.constraintRowPreconditioning=rowConditioning;projector.conditionedConstraintColumnNorms=norms;
+end
 end

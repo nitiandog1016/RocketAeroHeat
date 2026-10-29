@@ -1,18 +1,21 @@
-function [rows,report]=selectRocketTemperatureCellInterfaceRows(Q,info,cut,gas,scale,directionU,targetAlpha)
+function [rows,report]=selectRocketTemperatureCellInterfaceRows(Q,info,cut,gas,scale,directionU,targetAlpha,coordinates)
 %SELECTROCKETTEMPERATURECELLINTERFACEROWS 同时前瞻候选单元与真实内部Riemann采样温度。
 % 模块一：完整复用原10K与全部预测越温CV的原态面，原H/符号不改。
 % 模块二：原内核检查全部合法输入单元对，新增真正预测越温界面的当前解析H。
 % 模块三：星区/扇区保持真实Riemann导数，不当作单元EOS；选面不读取秩或NS结果。
 % 模块四：只做一次当前自由候选预览，不能保证投影后候选合法，原完整NS仍独立验收。
-[rows,report]=selectRocketTemperatureLookaheadRows(Q,info,cut,gas,scale,directionU,targetAlpha, ...
-    struct('selectionPolicy','original-and-predicted-required-faces'));
+if nargin<8,coordinates='conservative';end
+options=struct('selectionPolicy','original-and-predicted-required-faces');
+if ~strcmp(coordinates,'conservative'),options.trialStateCoordinates=coordinates;end
+[rows,report]=selectRocketTemperatureLookaheadRows(Q,info,cut,gas,scale,directionU,targetAlpha,options);
 report.method='current-conservative-cell-and-original-Riemann-interface-temperature-preview-union';
+if ~strcmp(coordinates,'conservative'),report.method='current-primitive-tangent-cell-and-original-Riemann-interface-temperature-preview-union';end
 report.selectionPolicy='original-and-predicted-cell-and-interface-faces';
 report.interfacePreview=[];report.constraintRankUsedToSelectFaces=false;
 if ~report.previewCellStateEvaluable
     report.stopReason='global-candidate-state-invalid-no-interface-preview';return;
 end
-candidate=rocketShellTrialState(Q,directionU,scale,targetAlpha,gas,'conservative');
+candidate=rocketShellTrialState(Q,directionU,scale,targetAlpha,gas,coordinates);
 preview=findRocketCandidateTemperatureFaces(candidate,cut,gas);report.interfacePreview=preview;
 required=preview.predictedViolatingInterfaceFaceIDs;candidateT=preview.predictedInterfaceTemperatureK;
 candidateSigns=ones(numel(required),1);candidateSigns(candidateT<gas.temperatureRange(1))=-1;

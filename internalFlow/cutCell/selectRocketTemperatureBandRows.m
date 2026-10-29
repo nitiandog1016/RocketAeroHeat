@@ -10,6 +10,8 @@ assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fi
 for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
 validateattributes(options.temperatureBandK,{'numeric'},{'scalar','real','finite','positive'});
 validateattributes(options.maximumConstraintRows,{'numeric'},{'scalar','integer','finite','positive'});
+assert(isequal(size(scale),[1 5])&&all(isfinite(scale)&scale>0), ...
+    'TemperatureRows:Scale','空集合也必须保留真实五量正缩放。');
 assert(options.temperatureBandK<diff(gas.temperatureRange)/2&&isfield(info,'exactEulerFluxAudit'), ...
     'TemperatureActive:Audit','需要当前精确内部采样及不重叠的温度带。');
 audit=info.exactEulerFluxAudit;f=cut.openFaces;allIDs=find(f.area>0&f.cellMinus>0&f.cellPlus>0);
@@ -22,7 +24,8 @@ selected=find(upper|lower);assert(numel(selected)<=options.maximumConstraintRows
     'TemperatureActive:Budget','当前激活带包含%d面，超过%d行预算；不截断约束。',numel(selected),options.maximumConstraintRows);
 if isempty(selected)
     rows=struct('kind','current-interior-selected-Riemann-sample-temperature-tangent-rows','cellCount',size(Q,1), ...
-        'faceIDs',zeros(0,1),'H',sparse(0,5*size(Q,1)),'baseTemperatureK',zeros(0,1));
+        'faceIDs',zeros(0,1),'H',sparse(0,5*size(Q,1)),'baseTemperatureK',zeros(0,1), ...
+        'scale',scale,'gas',gas);
 else
     rows=buildRocketInterfaceTemperatureRows(Q,cut,gas,scale,allIDs(selected));
     assert(max(abs(rows.baseTemperatureK-T(selected)))<=1e-10, ...

@@ -4,6 +4,7 @@ from pathlib import Path
 import hashlib,json,os,sys
 import numpy as np
 from scipy.io import loadmat
+from rocketTrialCoordinatesReference import trial_candidate
 ROOT=Path(__file__).resolve().parents[1];VAL=ROOT/'outputs/v83_validation'
 case=sys.argv[1] if len(sys.argv)>1 else 'integration01';assert case.replace('_','').isalnum()
 previous_case=sys.argv[2] if len(sys.argv)>2 else {'krylov02':'krylov01'}.get(case)
@@ -89,7 +90,8 @@ if 'result' in s:
         bindings[str(integration_file.relative_to(ROOT))]=sha(integration_file)
         base=loadmat(integration_file,simplify_cells=True,variable_names=['Q','rate'])
     assert np.array_equal(base['Q'],r['initialQ']) and np.array_equal(base['rate'],r['initialRate']);del base
-    assert r['options'].get('trialStateCoordinates','conservative')=='conservative'
+    coordinates=r['options'].get('trialStateCoordinates','conservative')
+    assert coordinates in ('conservative','primitive-tangent')
     # 允许显式收紧线性目标，但不允许越过原0.2上限；物理/稳态门槛不变。
     assert 0<r['options']['linearRelativeTolerance']<=.2 and r['options']['steadyResidualTolerance']==2e-6
     assert r['options']['steadyFluxTolerance']==5e-10 and r['options']['spatialConservationTolerance']==1e-9
@@ -98,7 +100,7 @@ if 'result' in s:
     previous=r['initialQ'];previous_rate=r['initialRate'];update_error=0.;temperature_range=[]
     for item in trace:
         assert np.array_equal(previous,item['initialQ']) and np.array_equal(previous_rate,item['initialRate'])
-        expected=item['initialQ']+item['alpha']*item['linearUpdateU']*scale
+        expected=trial_candidate(item['initialQ'],item['linearUpdateU'],scale,item['alpha'],gas,coordinates)
         update_error=max(update_error,relative(item['Q'],expected));assert update_error<3e-15
         iq=item['Q'];ir=iq[:,0];iv=iq[:,1:4]/ir[:,None];it=(iq[:,4]-.5*ir*np.sum(iv*iv,axis=1))/(ir*cv)
         assert np.all(ir>0) and np.all((it>=gas['temperatureRange'][0])&(it<=gas['temperatureRange'][1]));temperature_range += [float(it.min()),float(it.max())]
@@ -121,6 +123,7 @@ if 'result' in s:
                          residualEvaluationsAfterLastAcceptedHistory=int(s['report'].get('totalNewEquationResidualEvaluations',r['residualEvaluations'])-np.atleast_1d(s.get('displayHistory',r['history'])['residualEvaluations'])[-1]),
                          originalSteadyAndTemperatureGuardrailsPreserved=True,
                          steadyConverged=bool(r['steadyConverged']),sourceHistoryAppended=False)
+    if coordinates!='conservative':iteration_audit['trialStateCoordinates']=coordinates
 assert all(sha(ROOT/p)==h for p,h in bindings.items())
 report=dict(status='passed-independent-actual-static-wall-flux-constitutive-Jacobian-conservation-and-update-audit',case=case,processID=os.getpid(),
             predecessorCase=previous_case,wallCount=len(owner),wallFiveQuantityFluxRelativeDifference=wall_error,wallHeatRelativeDifference=heat_error,
