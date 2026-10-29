@@ -1,0 +1,116 @@
+function stencil=rocketShellStencilAllocationReference(cut,boundaryState)
+%BUILDCUTCELLDIFFUSIONSTENCILBATCHED 原冻结扩散模板的等价批量稀疏装配候选。
+% 模块用途：保留原LS约束的顺序、A累加、rcond及逆解算术，只将逐行写入
+% 稀疏B/W及关联矩阵改为owner选择映射与spdiags乘法；不改变边界分支。
+% 仍然只代表冻结边界的温度/速度扩散，不提供完整NS稳定性证明。
+v=cut.cells.volume(:);c=cut.cells.centroid;n=numel(v);fluid=v>0;f=cut.openFaces;w=cut.walls;
+A=zeros(3,3,n);row=[];col=[];value=zeros(0,3);
+for k=find(f.area>0)'
+    m=f.cellMinus(k);p=f.cellPlus(k);
+    if m>0 && p>0
+        add(m,p,c(p,:)-c(m,:),f.area(k));add(p,m,c(m,:)-c(p,:),f.area(k));
+    elseif boundaryState.incoming(k)
+        id=max(m,p);add(id,0,f.centroid(k,:)-c(id,:),f.area(k));
+    end
+end
+for k=find(w.ownerCell>0)',id=w.ownerCell(k);add(id,0,w.centroid(k,:)-c(id,:),w.area(k));end
+H=cell(1,3);C=cell(1,3);inverse=zeros(3,3,n);
+for d=1:3,H{d}=sparse(row,col,value(:,d),n,n);C{d}=sparse(n,n);end
+for id=find(fluid)'
+    assert(rcond(A(:,:,id))>1e-13,'CutAdvance:GradientRank','扩散模板最小二乘退化。');
+    inverse(:,:,id)=A(:,:,id)\eye(3);
+end
+for d=1:3
+    for e=1:3,C{d}=C{d}+spdiags(reshape(inverse(d,e,:),n,1),0,n,n)*H{e};end
+end
+
+%% 面/墙梯度：owner稀疏映射先选取LS行，再批量应用完整位移投影
+% interior: S=.5*(owner_m+owner_p), D=owner_p-owner_m；
+% incoming: S=owner, D=-owner；outgoing: S=owner, D=0。
+% P=I-d*d'/|d|^2；出流分支使用P=I-n*n'，与原逐行project完全相同。
+nf=numel(f.area);nw=numel(w.area);B=cell(1,3);W=cell(1,3);
+if nw==0,w.normal=zeros(0,3);end
+faceID=find(f.area>0);m=double(f.cellMinus(faceID));p=double(f.cellPlus(faceID));
+inside=m>0 & p>0;ii=faceID(inside);mi=m(inside);pi=p(inside);
+outside=~inside;oo=faceID(outside);oi=max(m(outside),p(outside));
+incoming=logical(boundaryState.incoming(oo));bi=oo(incoming);bo=oi(incoming);
+out=oo(~incoming);
+select=sparse([ii;ii;oo],[mi;pi;oi],[.5*ones(2*numel(ii),1);ones(numel(oo),1)],nf,n);
+difference=sparse([ii;ii;bi],[mi;pi;bo],[-ones(numel(ii),1);ones(numel(ii),1);-ones(numel(bi),1)],nf,n);
+direction=zeros(nf,3);denominator=ones(nf,1);
+direction(ii,:)=c(pi,:)-c(mi,:);direction(bi,:)=f.centroid(bi,:)-c(bo,:);
+corrected=[ii;bi];
+denominator(corrected)=sum(direction(corrected,:).^2,2);
+assert(all(denominator(corrected)>0),'CutAdvance:Distance','方向修正位移为零。');
+direction(out,:)=f.normal(out,:); % 正交法向投影没有除以任何带符号墙距。
+base=cell(1,3);for e=1:3,base{e}=select*C{e};end
+for d=1:3
+    B{d}=sparse(nf,n);
+    for e=1:3
+        coefficient=double(e==d)-direction(:,e).*direction(:,d)./denominator;
+        B{d}=B{d}+spdiags(coefficient,0,nf,nf)*base{e};
+    end
+    B{d}=B{d}+spdiags(direction(:,d)./denominator,0,nf,nf)*difference;
+end
+
+wi=find(w.ownerCell>0);owner=double(w.ownerCell(wi));
+selectWall=sparse(wi,owner,ones(numel(wi),1),nw,n);
+directionWall=zeros(nw,3);wallDenominator=ones(nw,1);
+directionWall(wi,:)=w.centroid(wi,:)-c(owner,:);
+wallDenominator(wi)=sum(directionWall(wi,:).^2,2);
+assert(all(wallDenominator(wi)>0),'CutAdvance:Distance','方向修正位移为零。');
+baseWall=cell(1,3);for e=1:3,baseWall{e}=selectWall*C{e};end
+for d=1:3
+    W{d}=sparse(nw,n);
+    for e=1:3
+        coefficient=double(e==d)-directionWall(:,e).*directionWall(:,d)./wallDenominator;
+        W{d}=W{d}+spdiags(coefficient,0,nw,nw)*baseWall{e};
+    end
+    W{d}=W{d}-spdiags(directionWall(:,d)./wallDenominator,0,nw,nw)*selectWall;
+end
+
+%% 体积加权关联：共享面仍唯一，不按组逐面插入稀疏列
+positiveMinus=faceID(m>0);minusOwner=m(m>0);
+positivePlus=faceID(p>0);plusOwner=p(p>0);
+inc=sparse([minusOwner;plusOwner],[positiveMinus;positivePlus], ...
+    [f.area(positiveMinus)./v(minusOwner);-f.area(positivePlus)./v(plusOwner)],n,nf);
+incWall=sparse(owner,wi,w.area(wi)./v(owner),n,nw);
+
+%% 保留原热扩散/完整Newton应力的装配与输出合同
+heat=sparse(n,n);normalB=sparse(nf,n);normalW=sparse(nw,n);
+for d=1:3
+    normalB=normalB+spdiags(f.normal(:,d),0,nf,nf)*B{d};
+    normalW=normalW+spdiags(w.normal(:,d),0,nw,nw)*W{d};
+end
+if isfield(boundaryState,'thermalDirichletSolidWall')&&boundaryState.thermalDirichletSolidWall
+    dn=sum(directionWall(wi,:).*w.normal(wi,:),2);
+    assert(all(dn>0),'CutNS:WallThermalGeometry','显式温度模板要求正的真实法向壁距。');
+    normalHeatWall=sparse(wi,owner,-sum(w.normal(wi,:).^2,2)./dn,nw,n);
+    heat=inc*normalB+incWall*normalHeatWall;
+else
+    heat=inc*normalB+incWall*normalW;
+end
+stress=cell(3,3);
+for a=1:3
+    for b=1:3
+        face=spdiags(f.normal(:,b),0,nf,nf)*B{a}-(2/3)*spdiags(f.normal(:,a),0,nf,nf)*B{b};
+        wall=spdiags(w.normal(:,b),0,nw,nw)*W{a}-(2/3)*spdiags(w.normal(:,a),0,nw,nw)*W{b};
+        if a==b,face=face+normalB;wall=wall+normalW;end
+        stress{a,b}=inc*face+incWall*wall;
+    end
+end
+stress=cell2mat(stress);
+stencil=struct('gradientOperator',{C},'heatGeometricMatrix',heat, ...
+    'stressGeometricMatrix',stress,'heatAbsoluteRowSum',full(sum(abs(heat),2)), ...
+    'stressAbsoluteRowSum',full(sum(abs(stress),2)), ...
+    'incoming',boundaryState.incoming,'wall',boundaryState.wall, ...
+    'boundaryStateSensitivityIncluded',false,'fullNavierStokesStabilityProven',false, ...
+    'scope','冻结边界输入的实际LS/完整位移修正扩散模板；行和仅作刚度估计');
+
+    function add(id,other,delta,area)
+        d2=dot(delta,delta);assert(isfinite(d2)&&d2>0,'CutAdvance:Distance','模板采样位移为零。');
+        weight=area/d2;A(:,:,id)=A(:,:,id)+weight*(delta'*delta);
+        row(end+1)=id;col(end+1)=id;value(end+1,:)=-weight*delta; %#ok<AGROW>
+        if other>0,row(end+1)=id;col(end+1)=other;value(end+1,:)=weight*delta;end %#ok<AGROW>
+    end
+end

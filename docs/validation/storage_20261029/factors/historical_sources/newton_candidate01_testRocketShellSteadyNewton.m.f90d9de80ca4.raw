@@ -1,0 +1,51 @@
+function report=testRocketShellSteadyNewton(folder)
+%TESTROCKETSHELLSTEADYNEWTON 直接稳态线性方程、真实原NS方向及下降模型的小三维域校核。
+% 模块一：实际32CV/160未知量，三个动量/静止等温墙/特征远场，不模拟替代残差。
+% 模块二：原完整NS求(-J)delta=R；记录全组合方向，核对缺陷、Cauchy界和实际RMS下降。
+% 模块三：半差分步独立调用核对方向敏感性；不是实验或真实箭体热流资格。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'SteadyNewtonTest:Overwrite','不得覆盖新的实际校核。');mkdir(folder);
+V=[1 0 0;-1 0 0;0 1 0;0 -1 0;0 0 1;0 0 -1];F=convhull(V);
+n=cross(V(F(:,2),:)-V(F(:,1),:),V(F(:,3),:)-V(F(:,1),:),2);flip=sum(n.*V(F(:,1),:),2)<0;F(flip,:)=F(flip,[1 3 2]);
+cut=buildRocketTriangularShellDomain(V,F,struct('normalLayerHeightsM',[0 .01 .03],'outerScaleFactors',[1.2 1.5]));
+gas=struct('gamma',1.4,'R',287,'mu',1.8e-5,'Pr',.72,'temperatureRange',[80 2000]);
+c=cut.cells.centroid;P=[1+.02*c(:,1),100+5*c(:,2),-20+3*c(:,3),30+2*c(:,1),300+3*c(:,2)];
+Q=[P(:,1),P(:,1).*P(:,2:4),P(:,1).*(gas.R/(gas.gamma-1)*P(:,5)+.5*sum(P(:,2:4).^2,2))];
+given=struct('type','characteristic','mode','riemannFarfield','reservoirPrimitive',[1 100 -20 30 300]);
+boundary=struct('xmin',given,'xmax',given,'ymin',given,'ymax',given,'zmin',given,'zmax',given, ...
+    'interiorEulerFlux','exact-godunov','viscousWorkVelocity','arithmetic', ...
+    'solidWall',struct('type','wall','velocity',[0 0 0],'temperature',320,'thermalGradient','dirichlet-tangent','velocityGradient','dirichlet-tangent'));
+options=struct('linearEquation','steady-newton','normalEulerLinearization','exact-branch', ...
+    'residualScale',[1 200 200 200 300000],'maximumIterations',1,'initialPseudoDt',1e-4, ...
+    'maximumKrylovIterations',160,'linearRelativeTolerance',.1,'maximumStepRetries',0);
+result=solveRocketShellSteadyKrylov(Q,cut,gas,boundary,options);
+assert(strcmp(result.linearEquation,'steady-newton')&&result.preconditionerTimeStepOnly&&result.acceptedNonlinearIterations==1, ...
+    'SteadyNewtonTest:Actual','小域直接稳态方向没有实际通过原线性/状态/下降检查。');
+linear=result.linearLog{1};e=linear.steadyDirectionEvidence;rhs=result.initialRate./result.residualScale;
+defect=norm(-e.value(:)-rhs(:))/norm(rhs(:));slope=dot(rhs(:),e.value(:))/dot(rhs(:),rhs(:));
+assert(abs(defect-linear.fullSystemRelativeDefect)<1e-14&&abs(slope-linear.normalizedMeritDerivative)<1e-14);
+assert(defect<=.1&&slope<=-1+defect+1e-12&&linear.meritDescentVerified);
+[half,halfEvidence]=rocketShellResidualDirectionalDerivative(Q,e.directionU,result.initialRate,cut,gas,boundary,result.residualScale, ...
+    struct('differenceStep',optionsStep(result)/2,'scheme','forward','saveEvidence',true));
+sensitivity=max(abs(half-e.value),[],'all')/max(1,max(abs(e.value),[],'all'));
+assert(sensitivity<1e-3,'SteadyNewtonTest:Difference','实际组合方向对半差分步过于敏感。');
+rejections=0;
+for value={'unknown',17}
+    bad=options;bad.linearEquation=value{1};caught=false;
+    try,solveRocketShellSteadyKrylov(Q,cut,gas,boundary,bad);catch ex,caught=strcmp(ex.identifier,'ShellKrylov:LinearEquation');end
+    assert(caught);rejections=rejections+1;
+end
+assert(result.rmsMerit<=(1-result.options.sufficientDecrease*result.history.alpha(end))*result.initialRmsMerit);
+report=struct('status','passed-actual-small-3D-steady-Newton-system-direction-descent-and-half-step-Jvp', ...
+    'cellCount',size(Q,1),'acceptedIterations',result.acceptedNonlinearIterations,'linearRelativeDefect',defect, ...
+    'normalizedMeritDerivative',slope,'inexactNewtonUpperBound',-1+defect,'halfDifferenceSensitivity',sensitivity, ...
+    'initialRmsMerit',result.initialRmsMerit,'finalRmsMerit',result.rmsMerit,'alpha',result.history.alpha(end), ...
+    'solverOriginalResidualEvaluations',result.residualEvaluations,'extraProbeOriginalResidualEvaluations',halfEvidence.actualOriginalResidualEvaluations, ...
+    'invalidPolicyRejections',rejections,'preconditionerOnlyTimeScale',true,'physicalTimeAdvanced',0, ...
+    'physicalSolution',false,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'steady_newton_unit_evidence.mat'),'report','result','cut','gas','boundary','half','halfEvidence','-v7');
+fid=fopen(fullfile(folder,'steady_newton_unit_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end
+function step=optionsStep(result)
+step=result.options.differenceStep;
+end

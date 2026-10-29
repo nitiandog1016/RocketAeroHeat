@@ -1,0 +1,83 @@
+function report=testRocketSchurEquilibration(folder)
+%TESTROCKETSCHUREQUILIBRATION 验证行列尺度均衡、原单位回映及旧默认路径。
+% 模块一：两种CV排序均与保存的旧因子完整比对（仅除计时），并保留旧字段排列回放。
+% 模块二：核对R*S*C、行主元/标量排列及完整五量回代，不改变原S、C或NS方程。
+% 模块三：用跨批次稀疏图和宽尺度已知解检查尺度构造，拒绝零行列及下溢。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'SchurScaleTest:Overwrite','不得覆盖尺度均衡测试。');mkdir(folder);
+parentFile=fullfile(root,'outputs','v83_validation','fieldschurunit01','field_schur_unit_evidence.mat');parent=load(parentFile,'cases');
+old=load(fullfile(root,'outputs','v83_validation','pivotedschurunit03','pivoted_schur_unit_evidence.mat'),'cases');
+legacy=load(fullfile(root,'outputs','v83_validation','pivotedschurunit02','pivoted_schur_unit_evidence.mat'),'cases');cases=cell(2,1);
+options=struct('dropTolerance',0,'maximumFactorBytes',8*1024^2,'maximumConstructionBytes',64*1024^2);
+for j=1:2
+    a=load(fullfile(root,'outputs','v83_validation','schurcheckpointunit01',sprintf('assembly%d',j),'schur_assembly_evidence.mat'));
+    m=load(fullfile(root,'outputs','v83_validation','schurcheckpointunit01',sprintf('assembly%d',j),'momentum_factor_evidence.mat'),'M');
+    unscaled=factorRocketPivotedSchur(a.schurMatrix,options);before=old.cases{j}.factor;
+    assert(isequaln(withoutTiming(unscaled),withoutTiming(before)),'SchurScaleTest:Legacy','默认未缩放因子除计时外必须完整一致。');
+    none=options;none.equilibration='none';explicitNone=factorRocketPivotedSchur(a.schurMatrix,none);
+    assert(isequaln(withoutTiming(unscaled),withoutTiming(explicitNone)));
+    assert(isequaln(solveRocketPivotedSchur(legacy.cases{j}.factor,legacy.cases{j}.rhs),legacy.cases{j}.value));
+    scaledOptions=options;scaledOptions.equilibration='row-column-max';factor=factorRocketPivotedSchur(a.schurMatrix,scaledOptions);n=factor.cellCount;S=parent.cases{j}.referenceS;
+    order=double(factor.scalarOrder);rmax=max(abs(S),[],2);expectedR=1./rmax;expectedC=1./max(abs(expectedR.*S),[],1)';
+    assert(norm(factor.rowScale-expectedR(order),inf)==0&&norm(factor.columnScale-expectedC(order),inf)<1e-12*norm(expectedC,inf));
+    balanced=factor.rowScale.*S(order,order).*factor.columnScale';
+    relation=norm(full(factor.L*factor.U)-balanced(double(factor.rowPermutation),:),'fro')/norm(balanced,'fro');assert(relation<1e-8);
+    rhs=parent.cases{j}.rhs(a.algebraicOrder,[1 5]);value=solveRocketPivotedSchur(factor,rhs);direct=S\rhs(:);
+    originalResidual=norm(S*value(:)-rhs(:))/norm(rhs(:));assert(originalResidual<1e-8&&norm(value(:)-direct)/max(1,norm(direct))<1e-8);
+    pre=struct('kind','fixed-five-conservation-with-pivoted-scalar-Schur','cellCount',n,'order',a.algebraicOrder, ...
+        'rowPointer',m.M.rowPointer,'column',m.M.column,'owners',uint32(repelem((1:n)',diff(double(m.M.rowPointer)))), ...
+        'B',a.couplingB,'E',a.couplingE,'momentumFactor',m.M,'schurFactor',factor);
+    fullRhs=parent.cases{j}.rhs;full=solveRocketPivotedFieldSchur(pre,fullRhs);physical=old.cases{j}.fullReference;
+    relative=norm(full-physical,'fro')/max(1,norm(physical,'fro'));assert(relative<1e-8);
+    other=reshape(cos((1:numel(fullRhs))'*.29),size(fullRhs));v=solveRocketPivotedFieldSchur(pre,other);combined=solveRocketPivotedFieldSchur(pre,.7*fullRhs-1.3*other);
+    linearity=norm(combined-.7*full+1.3*v,'fro')/max(1,norm(combined,'fro'));assert(linearity<1e-9);
+    approximateOptions=scaledOptions;approximateOptions.dropTolerance=1e-2;approximate=factorRocketPivotedSchur(a.schurMatrix,approximateOptions);
+    assert(factor.factorizationReport.factorStorageUpperBoundBytes<=scaledOptions.maximumFactorBytes);
+    cases{j}=struct('pre',pre,'factor',factor,'approximate',approximate,'S',S,'rhs',rhs,'value',value,'fullRhs',fullRhs,'fullValue',full, ...
+        'fullReference',physical,'fullRelativeDifference',relative,'linearity',linearity,'originalUnitResidual',originalResidual,'balancedFactorRelation',relation,'defaultCompleteOutputReplayed',true);
+end
+toy=struct('kind','unfactored-conservative-field-block-CSR','dimension',2,'cellCount',1,'rowPointer',uint32([1;2]),'column',uint32(1),'diagonalPosition',uint32(1),'values',[0 1;1 1]);
+forced=factorRocketPivotedSchur(toy,scaledOptions);toyValue=solveRocketPivotedSchur(forced,[2 3]);assert(forced.factorizationReport.permutedRows>0&&norm(toy.values*toyValue(:)-[2;3])<1e-12);
+
+% 模块四：跨4096块的批次边界独立比较稀疏矩阵行列最大范数，不需要稠密大矩阵。
+n=1600;pattern=spdiags(ones(n,5),-2:2,n,n);[rr,cc]=find(pattern);[~,idx]=sortrows([rr cc]);rr=rr(idx);cc=cc(idx);nb=numel(rr);
+vals=zeros(2,2,nb);for k=1:nb,vals(:,:,k)=[2+.1*sin(k),.3;.7,3+.2*cos(k)];end
+batch=struct('dimension',2,'cellCount',n,'rowPointer',uint32([1;1+cumsum(accumarray(rr,1,[n 1]))]),'column',uint32(cc),'values',vals);
+[batchR,batchC,batchReport]=equilibrateRocketSchurScales(batch,rr);rows=[];columns=[];values=[];
+for b=1:2,for aa=1:2,rows=[rows;rr+(aa-1)*n];columns=[columns;cc+(b-1)*n];values=[values;reshape(vals(aa,b,:),[],1)];end,end %#ok<AGROW>
+batchS=sparse(rows,columns,values,2*n,2*n);referenceR=1./full(max(abs(batchS),[],2));referenceC=1./full(max(abs(spdiags(referenceR,0,2*n,2*n)*batchS),[],1))';
+assert(isequal(batchR(:),referenceR)&&norm(batchC(:)-referenceC,inf)<1e-14&&nb>4096);batchReport.blockCount=nb;
+
+% 模块五：已知解在均衡坐标给定，避免用原病态矩阵的稠密逆作虚假精度标准。
+N=8;K=diag(4*ones(N,1))+diag(.2*ones(N-1,1),1)+diag(-.3*ones(N-1,1),-1);rawRows=10.^linspace(-8,8,N)';rawColumns=10.^linspace(7,-7,N)';
+stressS=rawRows.*K.*rawColumns';knownBalanced=sin((1:N)'*.37);known=knownBalanced./rawColumns;stressRhs=rawRows.*(K*knownBalanced);stressMatrix=fromDense(stressS);stressCases=cell(2,1);
+for j=1:2
+    opt=scaledOptions;if j==2,opt.scalarOrdering='field-major';end;f=factorRocketPivotedSchur(stressMatrix,opt);x=solveRocketPivotedSchur(f,reshape(stressRhs,N/2,2));
+    err=norm(rawColumns.*x(:)-knownBalanced)/norm(knownBalanced);componentwise=max(abs(stressS*x(:)-stressRhs)./max(realmin,abs(stressS)*abs(x(:))+abs(stressRhs)));assert(err<1e-9&&componentwise<1e-12);
+    stressCases{j}=struct('factor',f,'value',x,'balancedKnownSolutionRelativeError',err,'componentwiseOriginalBackwardError',componentwise);
+end
+bad=options;bad.equilibration='row-column-max';bad.maximumFactorBytes=1;budgetRejected=rejects(@()factorRocketPivotedSchur(toy,bad),'PivotedSchur:Budget');assert(budgetRejected);
+zeroRow=toy;zeroRow.values(1,:)=0;assert(rejects(@()factorRocketPivotedSchur(zeroRow,scaledOptions),'SchurScale:ZeroRow'));
+zeroColumn=toy;zeroColumn.values(:,1)=0;assert(rejects(@()factorRocketPivotedSchur(zeroColumn,scaledOptions),'SchurScale:ZeroColumn'));
+tiny=toy;tiny.values=eye(2)*(realmin/16);assert(rejects(@()factorRocketPivotedSchur(tiny,scaledOptions),'SchurScale:Nonfinite'));
+loss=toy;loss.values=[1e300 realmin;1 1];assert(rejects(@()factorRocketPivotedSchur(loss,scaledOptions),'SchurScale:CoefficientLoss'));
+invalid=forced;invalid=rmfield(invalid,'columnScale');assert(rejects(@()solveRocketPivotedSchur(invalid,[2 3]),'PivotedSchur:ScaleState'));
+report=struct('status','passed-small-reversible-Schur-equilibration-old-defaults-original-units-and-full-five-field-map', ...
+    'defaultFullOutputExceptTimingReplayed',true,'oldFieldMajorSolveReplayed',true,'forcedRowPivotVerified',true,'budgetRejected',budgetRejected, ...
+    'zeroRowsAndColumnsRejected',true,'nonfiniteScalesAndUnderflowRejected',true,'incompleteScaleStateRejected',true,'batchReport',batchReport, ...
+    'newSelectedJApplications',0,'newActualNSEvaluations',0,'physicalSolution',false,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'pivoted_schur_unit_evidence.mat'),'report','parentFile','cases','toy','forced','toyValue','stressS','rawRows','rawColumns','knownBalanced','known','stressRhs','stressCases','-v7');
+fid=fopen(fullfile(folder,'pivoted_schur_unit_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end
+
+function f=withoutTiming(f)
+f.factorizationReport=rmfield(f.factorizationReport,'factorSeconds');
+end
+function ok=rejects(action,identifier)
+ok=false;try,action();catch ex,ok=strcmp(ex.identifier,identifier);end
+end
+function m=fromDense(S)
+n=size(S,1)/2;values=zeros(2,2,n*n);col=zeros(n*n,1,'uint32');for i=1:n,for j=1:n,k=(i-1)*n+j;values(:,:,k)=S(i+(0:1)*n,j+(0:1)*n);col(k)=j;end,end
+m=struct('kind','unfactored-conservative-field-block-CSR','dimension',2,'cellCount',n,'rowPointer',uint32((1:n:n*n+1)'), ...
+    'column',col,'diagonalPosition',uint32((1:n+1:n*n)'),'values',values);
+end

@@ -1,0 +1,65 @@
+function operator=buildRocketShellLineOperator(Q,cut,gas,boundary,scale,pseudoDt)
+%BUILDROCKETSHELLLINEOPERATOR 为真实原面三维层域装配五量法向线近似隐式算子。
+% 模块一：所有真实面贡献对角块，只保留跨层同原面邻居的非对角块。
+% 模块二：B=I/dtau-Japprox；未知U=Q/scale，完整残差不由此近似替换。
+% 模块三：静止Dirichlet墙的热通量owner导数精确保留；应力采用两点法向近似。
+assert(strcmp(cut.kind,'original-triangle-body-fitted-three-dimensional-shell'), ...
+    'ShellLine:Geometry','本候选要求已验收的原三角面层域。');
+assert(strcmp(cutCellWallThermalPolicy(boundary.solidWall),'dirichlet-tangent')&& ...
+    ~isa(boundary.solidWall.velocity,'function_handle')&&all(boundary.solidWall.velocity==0), ...
+    'ShellLine:Wall','当前预条件仅支持显式Dirichlet静止墙，不能忽略壁面运动。');
+scale=reshape(scale,1,5);validateattributes(scale,{'numeric'},{'real','finite','positive','numel',5});
+validateattributes(pseudoDt,{'numeric'},{'real','finite','positive','scalar'});
+v=cut.cells.volume(:);n=numel(v);nf=size(cut.inputGeometry.F,1);nl=n/nf;
+assert(nl==floor(nl)&&isequal(size(Q),[n 5])&&all(v>0),'ShellLine:Geometry','需要全部正控制体及完整五量。');
+f=cut.openFaces;w=cut.walls;m=double(f.cellMinus);p=double(f.cellPlus);inside=p>0;
+assert(all(m>0)&&all(m<=n)&&all(p>=0&p<=n),'ShellLine:Geometry','共享面所有者不符。');
+normalFace=inside&f.kind==1;sideFace=inside&f.kind==3;
+assert(all(p(normalFace)==m(normalFace)+nf)&&all(floor((m(sideFace)-1)/nf)==floor((p(sideFace)-1)/nf))&& ...
+    nnz(normalFace)==nf*(nl-1),'ShellLine:Topology','法向线与原面身份不符。');
+ids=find(inside);mi=m(ids);pi=p(ids);dn=sum((cut.cells.centroid(pi,:)-cut.cells.centroid(mi,:)).*f.normal(ids,:),2);
+[DL,DR]=cutCellLineFaceLinearization(Q(mi,:),Q(pi,:),f.normal(ids,:),dn,gas);
+diagonal=zeros(5,5,n);lower=diagonal;upper=diagonal;
+for a=1:5
+    for b=1:5
+        left=reshape(DL(a,b,:),[],1);right=reshape(DR(a,b,:),[],1);
+        diagonal(a,b,:)=reshape(accumarray(mi,f.area(ids)./v(mi).*left,[n 1])- ...
+            accumarray(pi,f.area(ids)./v(pi).*right,[n 1]),1,1,n);
+        pick=normalFace(ids);rows=mi(pick);cols=pi(pick);
+        upper(a,b,rows)=reshape(f.area(ids(pick))./v(rows).*right(pick),1,1,[]);
+        lower(a,b,cols)=reshape(-f.area(ids(pick))./v(cols).*left(pick),1,1,[]);
+    end
+end
+clear DL DR;
+% 远场仅作冻结储库Rusanov对角近似；原特征边界在完整残差中重新求解。
+ids=find(~inside);owner=m(ids);normal=f.normal(ids,:);distance=sum((f.centroid(ids,:)-cut.cells.centroid(owner,:)).*normal,2);
+assert(all(distance>0),'ShellLine:Distance','外边界真实法向距须为正。');
+[D,~,~]=cutCellLineFaceLinearization(Q(owner,:),Q(owner,:),normal,distance,gas);
+for a=1:5,for b=1:5
+    diagonal(a,b,:)=diagonal(a,b,:)+reshape(accumarray(owner,f.area(ids)./v(owner).*reshape(D(a,b,:),[],1),[n 1]),1,1,n);
+end,end
+clear D;
+% 墙压力导数、静止墙两点Newton应力与精确Dirichlet导热owner项。
+owner=w.ownerCell;normal=w.normal;distance=sum((w.centroid-cut.cells.centroid(owner,:)).*normal,2);
+assert(all(distance>0),'ShellLine:Distance','墙真实法向距须为正。');
+[~,H,P]=cutCellConservativeDerivatives(Q(owner,:),normal,gas);N=numel(owner);gm=gas.gamma-1;
+dp=[.5*gm*sum(P(:,2:4).^2,2),-gm*P(:,2:4),repmat(gm,N,1)];k=gas.mu*gas.gamma*gas.R/gm/gas.Pr;
+for b=1:5
+    for a=1:3
+        value=normal(:,a).*dp(:,b);
+        for c=1:3,value=value+gas.mu./distance.*(double(a==c)+normal(:,a).*normal(:,c)/3).*reshape(H(c,b,:),[],1);end
+        diagonal(a+1,b,:)=diagonal(a+1,b,:)+reshape(accumarray(owner,w.area./v(owner).*value,[n 1]),1,1,n);
+    end
+    value=k./distance.*reshape(H(4,b,:),[],1);
+    diagonal(5,b,:)=diagonal(5,b,:)+reshape(accumarray(owner,w.area./v(owner).*value,[n 1]),1,1,n);
+end
+for a=1:5,for b=1:5
+    ratio=scale(b)/scale(a);diagonal(a,b,:)=diagonal(a,b,:)*ratio;lower(a,b,:)=lower(a,b,:)*ratio;upper(a,b,:)=upper(a,b,:)*ratio;
+end,end
+for a=1:5,diagonal(a,a,:)=diagonal(a,a,:)+1/pseudoDt;end
+assert(all(isfinite(diagonal),'all')&&all(isfinite(lower),'all')&&all(isfinite(upper),'all'),'ShellLine:Operator','线算子非有限。');
+operator=struct('kind','five-quantity-original-facet-normal-line-approximate-pseudotime-operator', ...
+    'diagonal',diagonal,'lower',lower,'upper',upper,'sourceFaces',nf,'layers',nl, ...
+    'residualScale',scale,'pseudoTimeStepSeconds',pseudoDt,'physicalTimeAdvanced',0, ...
+    'fullOriginalNSJacobian',false,'originalResidualReplaced',false,'newProductionSolvedAreaM2',0);
+end

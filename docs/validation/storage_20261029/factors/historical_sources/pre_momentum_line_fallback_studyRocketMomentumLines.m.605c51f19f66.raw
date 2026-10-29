@@ -1,0 +1,41 @@
+function report=studyRocketMomentumLines(folder)
+%STUDYROCKETMOMENTUMLINES 在同一真实A和同Q剩余上核对法向列逆及一次有界内部求解。
+% 模块一：复用原A/原面层映射与已审计三动量右端，不调用失败全局ILU。
+% 模块二：三条固定右端先检查有限作用；仅对同Q右端运行一次32方向GMRES。
+% 模块三：内部结果不作为固定Schur作用或新的原NS方向，原物理解和面积保持。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'MomentumLinesStudy:Overwrite','不得覆盖法向动量研究。');mkdir(folder);
+assemblyFile=fullfile(root,'outputs','v83_validation','schurcheckpointreal01','checkpoint','schur_assembly_evidence.mat');
+s=load(assemblyFile,'momentumMatrix','algebraicOrder','sourceBinding');matrix=s.momentumMatrix;order=s.algebraicOrder;sourceBinding=s.sourceBinding;clear s;
+assert(strcmp(rocketStreamingFileSHA256(sourceBinding.sourceFile),sourceBinding.sourceFileSHA256));
+rhsFile=fullfile(root,'outputs','v83_validation','consistentschurreal02','consistent_schur_real_evidence.mat');r=load(rhsFile,'momentumRhs','sourceBinding','algebraicOrder');assert(isequaln(sourceBinding,r.sourceBinding)&&isequal(order,r.algebraicOrder));rhs=r.momentumRhs;clear r;
+matrix.owners=uint32(repelem((1:matrix.cellCount)',diff(double(matrix.rowPointer))));
+options=struct('maximumFactorBytes',384*1024^2,'maximumConstructionBytes',1024*1024^2,'failureEvidenceFile',fullfile(folder,'line_inverse_failure.mat'));
+sourceIdentity=struct;for key={'factorRocketMomentumLines','solveRocketMomentumLines','applyRocketMomentumGraph','solveRocketMomentumKrylov','solveRocketRecycledGMRES','rocketCompensatedInverseResidual'},sourceIdentity.(key{1})=rocketStreamingFileSHA256(which(key{1}));end
+stage='normal-line-factorization';rejected=false;identifier='';message='';factorAvailable=false;actionsComplete=false;innerComplete=false;summaries={};
+try
+    factor=factorRocketMomentumLines(matrix,order,sourceBinding.sourceFaces,sourceBinding.layers,options);factorAvailable=true;
+    factorFile=fullfile(folder,'momentum_line_factor_evidence.mat');save(factorFile,'factor','assemblyFile','rhsFile','sourceBinding','sourceIdentity','-v7');
+    stage='three-fixed-normal-line-actions';cases=cell(3,1);names={'sameQMomentumRemaining','sineProbe','cosineProbe'};summaries=cell(3,1);
+    for j=1:3
+        if j==1,b=rhs;elseif j==2,b=reshape(sin((1:numel(rhs))'*.37),size(rhs));else,b=reshape(cos((1:numel(rhs))'*.23),size(rhs));end
+        timer=tic;value=solveRocketMomentumLines(factor,b);image=applyRocketMomentumGraph(matrix,value);seconds=toc(timer);
+        summaries{j}=struct('name',names{j},'relativeAResidual',norm(b-image,'fro')/norm(b,'fro'),'inverseGainSeconds',norm(value,'fro')/norm(b,'fro'),'applyAndAuditSeconds',seconds);
+        cases{j}=struct('rhs',b,'value',value,'Avalue',image,'summary',summaries{j});fprintf('MOMENTUM_LINE_ACTION case=%d relativeA=%.9g gain=%.9g\n',j,summaries{j}.relativeAResidual,summaries{j}.inverseGainSeconds);
+    end
+    actionsComplete=true;save(fullfile(folder,'momentum_line_actions.mat'),'cases','summaries','factorFile','sourceBinding','sourceIdentity','assemblyFile','rhsFile','-v7');
+    stage='bounded-raw-A-inner-GMRES';krylovOptions=struct('maximumIterations',32,'relativeTolerance',1e-3,'maximumBasisBytes',1024*1024^2,'saveBasisEvidence',true,'failureEvidenceFile',fullfile(folder,'momentum_arnoldi_failure.mat'));
+    [value,detail]=solveRocketMomentumKrylov(matrix,factor,rhs,krylovOptions);innerComplete=true;image=applyRocketMomentumGraph(matrix,value);
+    save(fullfile(folder,'momentum_line_krylov_evidence.mat'),'rhs','value','image','detail','factorFile','sourceBinding','sourceIdentity','assemblyFile','rhsFile','-v7');stage='bounded-momentum-study-complete';
+catch ex
+    if ~(startsWith(ex.identifier,'MomentumLines:')||startsWith(ex.identifier,'MomentumGraph:')||startsWith(ex.identifier,'RecycledGMRES:')),rethrow(ex);end
+    rejected=true;identifier=ex.identifier;message=ex.message;
+end
+report=struct('status','tested-original-three-momentum-A-normal-line-inverse-and-bounded-inner-study','stage',stage,'candidateRejected',rejected,'errorIdentifier',identifier,'message',message, ...
+    'factorAvailable',factorAvailable,'threeActionsComplete',actionsComplete,'innerSolveComplete',innerComplete,'sourceBinding',sourceBinding,'sourceIdentity',sourceIdentity, ...
+    'wholeFiveFieldPreconditionerQualified',false,'newSelectedJApplications',0,'newActualNSEvaluations',0,'newFlowAcceptances',0,'newProductionSolvedAreaM2',0,'physicalSolution',false,'engineProcessID',feature('getpid'));
+if factorAvailable,report.factorizationReport=factor.factorizationReport;end
+if actionsComplete,report.singleActionSummaries=summaries;end
+if innerComplete,report.innerReport=detail;report.additionalFullADiagnosticApplications=1;report.internalMomentumTargetMet=detail.krylov.flag==0;end
+fid=fopen(fullfile(folder,'momentum_lines_real_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end

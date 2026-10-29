@@ -1,0 +1,77 @@
+function factor=factorRocketMomentumLines(matrix,order,sourceFaces,layers,options)
+%FACTORROCKETMOMENTUMLINES 按原面法向列构造小型三动量精确块逆预条件。
+% 模块一：每个原面保留全部径向层及该列内所有原A连接，只在预条件中忽略跨列项。
+% 模块二：每列作可逆行列尺度与行主元LU，缓存原单位逆；原A及物理网格不改变。
+% 模块三：原单位逆乘积必须小于1e-8，失败保存原块，不补对角或裁状态。
+if nargin<5,options=struct;end
+defaults=struct('maximumFactorBytes',384*1024^2,'maximumConstructionBytes',1024*1024^2,'failureEvidenceFile','');
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))),'MomentumLines:Options','未知法向列选项。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+for key={'maximumFactorBytes','maximumConstructionBytes'},validateattributes(options.(key{1}),{'numeric'},{'real','finite','scalar','positive'});end
+assert(ischar(options.failureEvidenceFile)&&(isempty(options.failureEvidenceFile)||~exist(options.failureEvidenceFile,'file')),'MomentumLines:Observation','失败证据不得覆盖旧文件。');
+assert(strcmp(matrix.kind,'unfactored-conservative-field-block-CSR')&&matrix.dimension==3,'MomentumLines:Kind','需要原始三动量A。');
+n=matrix.cellCount;validateattributes(sourceFaces,{'numeric'},{'scalar','integer','positive'});validateattributes(layers,{'numeric'},{'scalar','integer','positive'});
+assert(sourceFaces*layers==n&&numel(order)==n&&isequal(sort(double(order(:))),(1:n)'),'MomentumLines:Order','原面/层数及代数到物理CV的双射无效。');
+assert(all(isfinite(matrix.values),'all'),'MomentumLines:Nonfinite','原A系数必须有限。');
+N=3*layers;nb=numel(matrix.column);factorBound=8*N*N*sourceFaces+8*n+sourceFaces*32+8192;
+inputBound=nb*(9*8+4)+(n+1)*4+n*4;constructionBound=inputBound+2*factorBound+nb*64+n*48+N*N*8*16;
+assert(factorBound<=options.maximumFactorBytes&&constructionBound<=options.maximumConstructionBytes,'MomentumLines:Budget','法向列因子或构造数组超预算，不删物理CV。');
+owners=repelem((1:n)',diff(double(matrix.rowPointer)));rowCV=double(order(owners));columnCV=double(order(matrix.column));
+selected=find(mod(rowCV-1,sourceFaces)==mod(columnCV-1,sourceFaces));face=mod(rowCV(selected)-1,sourceFaces)+1;
+rowLayer=floor((rowCV(selected)-1)/sourceFaces);columnLayer=floor((columnCV(selected)-1)/sourceFaces);clear rowCV columnCV owners;
+key=rowLayer+layers*columnLayer+layers*layers*(face-1);assert(numel(unique(key))==numel(selected),'MomentumLines:Pattern','原A同一CV对重复，不隐式覆盖系数。');clear key;
+inverseLine=zeros(N,N,sourceFaces);
+for a=1:3,for b=1:3,index=sub2ind([N N sourceFaces],3*rowLayer+a,3*columnLayer+b,face);inverseLine(index)=reshape(matrix.values(a,b,selected),[],1);end,end
+lineBlocks=numel(selected);clear selected face rowLayer columnLayer index;
+maximumDefect=0;maximumRelation=0;permutedRows=0;inverseNormInf=zeros(sourceFaces,1);timer=tic;
+ordinaryDefects=zeros(sourceFaces,1);certifiedBounds=ordinaryDefects;residualErrorBounds=ordinaryDefects;accurateChecked=false(sourceFaces,1);refinementSteps=zeros(sourceFaces,1,'uint8');
+for face=1:sourceFaces
+    originalLine=inverseLine(:,:,face);rowMax=max(abs(originalLine),[],2);assert(all(rowMax>0),'MomentumLines:ZeroRow','法向列有零行，不能补值。');
+    R=1./rowMax;assert(all(isfinite(R)&R>0),'MomentumLines:Scale','法向列行尺度非有限，不裁值。');
+    rowScaled=R.*originalLine;columnMax=max(abs(rowScaled),[],1)';assert(all(columnMax>0),'MomentumLines:ZeroColumn','法向列有零列。');C=1./columnMax;
+    assert(all(isfinite(C)&C>0),'MomentumLines:Scale','法向列列尺度非有限，不裁值。');balanced=rowScaled.*C';
+    assert(all(isfinite(balanced),'all')&&all(originalLine==0|balanced~=0,'all'),'MomentumLines:Scale','尺度变换产生非有限值或非零系数下溢。');
+    [L,U,permutation]=lu(balanced,'vector');candidateInverse=[];defect=Inf;ordinaryDefect=Inf;residualErrorBound=Inf;refinementHistory=[];
+    if all(isfinite(diag(U)))&&all(diag(U)~=0)
+        right=R.*eye(N);candidateInverse=C.*(U\(L\right(permutation,:)));ordinaryDefect=max(abs(originalLine*candidateInverse-eye(N)),[],'all');
+        if all(isfinite(candidateInverse),'all')
+            gamma=N*eps/(1-N*eps);residualErrorBound=gamma*norm(originalLine,inf)*max(abs(candidateInverse),[],'all')/(1-gamma)^2;defect=ordinaryDefect+residualErrorBound;
+            if defect>=1e-8
+                accurateChecked(face)=true;[residual,residualErrorBound]=rocketCompensatedInverseResidual(originalLine,candidateInverse);defect=max(abs(residual),[],'all')+residualErrorBound;
+                refinementHistory=[0 ordinaryDefect defect];
+                % 只在残差证书未过门槛时作至多两次经典精化；不改变原块或阈值。
+                for step=1:2
+                    if defect<1e-8,break;end
+                    right=R.*residual;proposal=candidateInverse+C.*(U\(L\right(permutation,:)));
+                    [nextResidual,nextErrorBound]=rocketCompensatedInverseResidual(originalLine,proposal);nextDefect=max(abs(nextResidual),[],'all')+nextErrorBound;
+                    refinementHistory(end+1,:)=[step max(abs(originalLine*proposal-eye(N)),[],'all') nextDefect]; %#ok<AGROW>
+                    if nextDefect>=defect,break;end
+                    candidateInverse=proposal;residual=nextResidual;residualErrorBound=nextErrorBound;defect=nextDefect;refinementSteps(face)=step;
+                end
+                ordinaryDefect=max(abs(originalLine*candidateInverse-eye(N)),[],'all');
+            end
+        end
+    end
+    relation=norm(balanced(permutation,:)-L*U,'fro')/max(realmin,norm(balanced,'fro'));
+    if isempty(candidateInverse)||~all(isfinite(candidateInverse),'all')||~isfinite(defect)||defect>=1e-8||relation>=1e-8
+        if ~isempty(options.failureEvidenceFile),save(options.failureEvidenceFile,'face','originalLine','balanced','L','U','permutation','R','C','candidateInverse','defect','ordinaryDefect','residualErrorBound','refinementHistory','relation','-v7');end
+        error('MomentumLines:InverseDefect','法向列原单位逆未通过原1e-8，原面=%d。',face);
+    end
+    inverseLine(:,:,face)=candidateInverse;inverseNormInf(face)=norm(candidateInverse,inf);maximumDefect=max(maximumDefect,defect);maximumRelation=max(maximumRelation,relation);permutedRows=permutedRows+nnz(permutation(:)~=(1:N)');
+    ordinaryDefects(face)=ordinaryDefect;certifiedBounds(face)=defect;residualErrorBounds(face)=residualErrorBound;
+end
+inverseOrder=zeros(n,1,'uint32');inverseOrder(order)=uint32(1:n);
+factor=struct('kind','fixed-three-momentum-original-normal-line-inverse','cellCount',n,'sourceFaces',sourceFaces,'layers',layers, ...
+    'inverseOrder',inverseOrder,'inverseLine',inverseLine,'inverseNormInf',inverseNormInf,'options',options, ...
+    'inverseCertification',struct('ordinaryBLASDefects',ordinaryDefects,'originalInputResidualUpperBounds',certifiedBounds, ...
+    'residualEvaluationErrorBounds',residualErrorBounds,'accurateCheckedFaces',accurateChecked,'refinementSteps',refinementSteps), ...
+    'factorizationReport',struct('originalUnitMaximumInverseDefect',maximumDefect,'maximumBalancedLURelationDifference',maximumRelation, ...
+    'inverseDefectThreshold',1e-8,'inverseDefectEvaluation','original-double-input-residual-plus-roundoff-bound','maximumOrdinaryBLASDefect',max(ordinaryDefects), ...
+    'accurateResidualCheckedLines',nnz(accurateChecked),'refinedLines',nnz(refinementSteps),'lineCount',sourceFaces,'unknownsPerLine',N,'originalBlocks',nb,'includedNormalLineBlocks',lineBlocks, ...
+    'crossLineBlocksIgnoredOnlyInPreconditioner',nb-lineBlocks,'permutedRowsAcrossLines',permutedRows, ...
+    'factorStorageUpperBoundBytes',factorBound,'algorithmArrayConstructionEstimateBytes',constructionBound,'processPeakMemoryClaimed',false, ...
+    'maximumLocalInverseInfinityNormSeconds',max(inverseNormInf),'factorSeconds',toc(timer),'fixedLinearMap',true, ...
+    'allPhysicalCellsKept',true,'originalAChanged',false,'diagonalCompensationApplied',false,'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0));
+storage=whos('factor');assert(storage.bytes<=options.maximumFactorBytes,'MomentumLines:Budget','实际完整法向列因子超预算。');
+fprintf('MOMENTUM_LINES faces=%d lineUnknowns=%d inverseDefect=%.9g bytes=%.0f\n',sourceFaces,N,maximumDefect,storage.bytes);
+end

@@ -1,0 +1,7 @@
+{
+  "stage": "first-read-only-preflight-before-any-deletion",
+  "result": "rejected-missing-local-archive-for-exportRocketTestGeometryView.m",
+  "reason": "Current v94 working file differs from historical source identity. The first planner did not consult the exact committed file before rejecting.",
+  "resolution": "Added exact SHA-checked git HEAD fallback and saved the original bytes under historical_sources. The current uncommitted file was not changed. Re-ran the complete preflight successfully.",
+  "deletionBeforeResolution": false
+}
