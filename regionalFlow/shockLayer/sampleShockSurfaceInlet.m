@@ -1,0 +1,26 @@
+function inlet=sampleShockSurfaceInlet(problem,coordinates)
+%SAMPLESHOCKSURFACEINLET 对同一候选激波几何采样三维跃迁，不拼二维激波银行。
+% 模块一：所有点调用同一几何函数和同一均匀上游，保存真实三维法向与来源。
+% 模块二：输出激波紧后的p/T/rho/速度、入口H/S和物理两向梯度。
+% 模块三：强制注明形状与壁面匹配未求；禁止直接当作边界层外缘或热流解。
+required={'sample','upstream','gas','normalOrientation','sources'};
+assert(isstruct(problem)&&isscalar(problem)&&all(isfield(problem,required))&&isa(problem.sample,'function_handle'), ...
+    'ShockLayer:Problem','需要共同激波曲面、均匀上游、物性和取向。');
+for name={'geometry','upstream','jumpRelations'}
+    key=name{1};assert(isfield(problem.sources,key)&&strlength(string(problem.sources.(key)))>0, ...
+        'ShockLayer:Source','激波几何、上游和跃迁方程来源均须明确。');
+end
+validateattributes(coordinates,{'double'},{'real','finite','2d','ncols',2,'nonempty'});
+count=size(coordinates,1);states=cell(count,1);geometry=states;
+for j=1:count
+    geometry{j}=problem.sample(coordinates(j,:)');
+    states{j}=shockSurfaceJumpState(problem.upstream,problem.gas,geometry{j},problem.normalOrientation);
+end
+inlet=struct('method','共同三维激波曲面 + 三维Rankine-Hugoniot + 隐式入口梯度', ...
+    'coordinates',coordinates,'states',{states},'geometrySamples',{geometry},'uniformUpstream',problem.upstream, ...
+    'sources',problem.sources,'normalOrientation',problem.normalOrientation,'gas',problem.gas, ...
+    'shockShapeRole','给定的候选共同曲面，尚未通过激波层与箭体反算匹配', ...
+    'stateLocation','候选激波紧后；不能直接作为壁面或边界层外缘', ...
+    'shockShapeSolved',false,'bodyMatched',false,'boundaryLayerEdgeAvailable',false, ...
+    'heatFluxSolved',false,'wallTemperatureSolved',false,'productionQualified',false,'newProductionSolvedAreaM2',0);
+end

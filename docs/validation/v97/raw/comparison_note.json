@@ -1,0 +1,11 @@
+{
+  "status": "equivalence-comparator-corrected-no-MAT-recalculation",
+  "failures": [
+    "Initial one-off comparator treated SciPy lists as scalar values, yielding an ambiguous NumPy truth comparison.",
+    "Persistent comparator initially omitted mat_struct objects inside nested object cells, causing a false mismatch at MAT.differences[0][0]."
+  ],
+  "correction": "Handle dictionaries, MATLAB structs, lists, tuples and object arrays recursively; exact equality without tolerances.",
+  "partialCopyNote": "The evidence copy stopped at the missing equivalence report before its manifest was written. Resume verified all existing destinations byte-for-byte and copied only absent files.",
+  "scientificMATChanged": false,
+  "numericalRecomputationTriggeredByComparator": false
+}
