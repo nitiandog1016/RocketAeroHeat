@@ -1,0 +1,68 @@
+{
+  "status": "passed-final-view03-labelled-inlet-resolution-probe-curves-five-steps-and-actual-download",
+  "url": "http://127.0.0.1:8778/view03/workbench/index.html",
+  "workflowChecks": [
+    {
+      "step": "1 输入模型",
+      "title": "输入模型 · 内部斜激波锚点：圆柱熵剪切",
+      "iframe": "geometry/index.html?v=ac9b6a36c10859a514ba8d455f0f0aa015e0375073681a22fdbfd9362ab41150&case=2&flow=0&wire=0"
+    },
+    {
+      "step": "2 生成网格",
+      "title": "生成网格 · 内部斜激波锚点：圆柱熵剪切",
+      "iframe": "geometry/index.html?v=ac9b6a36c10859a514ba8d455f0f0aa015e0375073681a22fdbfd9362ab41150&case=2&flow=0&wire=1"
+    },
+    {
+      "step": "3 添加边界条件",
+      "title": "添加边界条件 · 内部斜激波锚点：圆柱熵剪切",
+      "iframe": "geometry/index.html?v=ac9b6a36c10859a514ba8d455f0f0aa015e0375073681a22fdbfd9362ab41150&case=2&flow=0&wire=0",
+      "boundary": "入口方向来源\n声明的光滑附着切向入口；斜置入口包含沿程标签偏移\n入口总温范围 / K\n1240.45 ～ 1240.45\n入口总压范围 / kPa\n233.149 ～ 353.665\n入口H₀/S₀来源\n程序内部NASA7二维弱斜激波20+8sin(beta)度的独立锚点，显式转换约定；非同一三维激波面\n压力来源（流线输入）\n给定共同静压/连续指数压力验证输入；内部斜激波只提供入口总状态锚点，未求整箭压力\n外缘热状态\n连续压力与逐入口标签H₀/S₀条件反算；不是独立完整外流解\n热物性约定\n逐标签H/S；原cp及连续积分约定\n入口总状态\n随标签变化；每条流线独立守恒，沿程不重置\n物理横向梯度\n相邻入口标签 + n×t横向尺度；辅助延拓导数不作物理场\n流线方向\n曲面切向Euler压力转向 + RK4\n横向度量\n两组标签间距的横向投影差分\n入口标签单位\nrad\n流管标签组\n2\n实际有效站点\n42 / 42\n几何范围\n独立二维弱斜激波锚点构造的圆柱熵剪切验证；不是20度整箭或同一三维激波面，锥段/底面未求\n热流与求解壁温\n未求解\n新增合格热流面积\n0 m²"
+    },
+    {
+      "step": "4 计算",
+      "title": "计算 · 内部斜激波锚点：圆柱熵剪切",
+      "iframe": "geometry/index.html?v=ac9b6a36c10859a514ba8d455f0f0aa015e0375073681a22fdbfd9362ab41150&case=2&flow=1&wire=0"
+    },
+    {
+      "step": "5 查看结果",
+      "title": "查看结果 · 内部斜激波锚点：圆柱熵剪切",
+      "iframe": "geometry/index.html?v=ac9b6a36c10859a514ba8d455f0f0aa015e0375073681a22fdbfd9362ab41150&case=2&flow=1&wire=0"
+    }
+  ],
+  "curveChecks": [
+    {
+      "field": "沿线总焓H₀ / kJ/kg",
+      "note": "三维点击可见流线站点，或点击曲线/拖动站点滑块；沿线总焓H₀，只显示实际有效积分前缀。横向h取n×t投影，不取两线总距离。"
+    },
+    {
+      "field": "沿线熵 / J/(kg·K)",
+      "note": "三维点击可见流线站点，或点击曲线/拖动站点滑块；沿线熵，只显示实际有效积分前缀。横向h取n×t投影，不取两线总距离。"
+    },
+    {
+      "field": "物理熵梯度幅值 / J/(kg·K·m)",
+      "note": "三维点击可见流线站点，或点击曲线/拖动站点滑块；物理熵梯度幅值，只显示实际有效积分前缀。横向h取n×t投影，不取两线总距离。"
+    }
+  ],
+  "cylinderPick": {
+    "screenXY": [
+      848,
+      218
+    ],
+    "tubeOneBased": 2,
+    "stationOneBased": 11,
+    "arcLengthM": 0.1,
+    "probe": "实际积分站点\n11 / 21\nXYZ / m\n-0.573562, 0.0707107, 0.0707107\n数值单位流向\n-1, 0, 0\n数值横向h / m/rad\n0.0999999\n数值h/h₀\n1\n标签差值指标 / m/rad\n6.66666e-8（非严格误差上界）\n输入压力 / kPa\n30\n条件反算外缘温度Te / K\n737.048\n条件反算密度 / kg/m³\n0.141797\n条件反算速度幅值 / m/s\n1069.3\n入口标签 / rad\n0.785398\n该入口总温 / 总压\n1240.45 K / 233.548 kPa\n沿线总焓H₀ / kJ/kg\n1028.75\n沿线熵 / J/(kg·K)\n1276.23\n入口导数分辨状态\n总焓变化未分辨（低于源状态一致性尺度）；熵变化已分辨；一致性尺度不是严格误差界\n物理gradH₀ / J/(kg·m)\n0, -0.000222876, 0.000222876\n物理gradS₀ / J/(kg·K·m)\n0, -868.907, 868.907\n物理gradTe / K/m\n0, -591.306, 591.306\n横向梯度方法\nb=n×t；gradH=H0_beta*b/h，gradS=S0_beta*b/h；同cp Gibbs/总焓恢复Te/rho/U两向导数；标签二阶差分，需收敛核对，非严格误差界\n恢复温度Tr / K\n未计算\n给定壁温Tw / K\n本研究未设置\n热流 / 求解壁温\n未求解；不能由轨迹或反算Te推得\n压力方法\n共同给定静压/连续指数压力；本模块未求真实箭体压力\n外缘状态方法\n逐入口标签固定H0/S0；同cp积分恢复，不沿程重置总压\n算法与状态\n声明的光滑附着补片；压力为输入，不求完整外流连续方程、激波层、热流或分离再附；每标签H0/S0守恒，中心两向梯度由物理横向h恢复；Tr/Tw/热流未求"
+  },
+  "actualCSV": "labelled_cylinder_tube2_final.csv",
+  "unresolvedEnthalpyNoticeVisible": true,
+  "consoleWarningsErrors": [
+    {
+      "level": "error",
+      "message": "Uncaught TypeError: Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'.",
+      "timestamp": "2026-10-29T14:16:03.100Z"
+    }
+  ],
+  "newNumericalIntegrationExecutedByBrowser": false,
+  "fullExternalFlowOrHeatFluxValidated": false,
+  "newProductionSolvedAreaM2": 0
+}

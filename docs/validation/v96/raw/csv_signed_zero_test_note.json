@@ -1,0 +1,6 @@
+{
+  "issue": "Node strict equality distinguishes +0 from -0, while the standard CSV String conversion writes both as 0.",
+  "originalTestSHA256": "3534a11e0f1c262ba971b733795eec2b54729d59accd4cc05494a402c24b954a",
+  "resolution": "Compare every finite nonempty numeric cell with exact numeric equality; explicitly count signed-zero normalization. No tolerance on nonzero values, no product or physical change.",
+  "numericAndCasePayloadUnchanged": true
+}

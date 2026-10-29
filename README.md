@@ -6,13 +6,13 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 小版本也同步到本GitHub仓库，不再默认生成大型本地工程包。用户已于2026-10-28确认保持仓库公开并直接同步。后文的“不推送/本地包/私有”属于历史阶段说明，以本节及[项目约定](AGENTS.md)为准。
 
-最新v95完成同物性压力恢复与曲面流线衔接：显式定比热/NASA7接口、1000K处焓/熵积分连续匹配，以及从实际内部切锥p/T/rho/U转换一次总状态约定。六组实际核验、独立热力/切锥复算及三维站点到CSV逐值核对通过；三个验证模型保持同一侧栏的五步骤，提供三维拾取、曲线、探针和逐变量方法，Te、Tr、给定Tw与求解Tw分别呈现。见[方法、使用与限制](docs/THERMAL_PRESSURE_SURFACE_FLOW_V95.md)及[验证索引](docs/validation/v95/README.md)。原v94的16组/80射线回归及研究入口保留，原保存对象逐值相等。
+最新v96完成非均匀入口总焓/熵的曲面流线及物理横向梯度接口，单射线辅助延拓导数与真实相邻标签梯度分开保存。八组/40射线、独立热恢复/轨迹/斜激波/Crocco关系核对通过；入口导数分辨率检查会拒绝未分辨跳跃，并明确标注微小总焓残差。统一五步骤工作台新增H/S及熵梯度曲线、探针和48列CSV，实际点选及21行下载核对通过。见[方法、使用与限制](docs/LABELLED_PRESSURE_SURFACE_FLOW_V96.md)及[验证索引](docs/validation/v96/README.md)。旧v95数值叶函数保持，当前界面也通过v94/v95旧数据兼容核对。
 
-v95仍是单一固定总状态光滑附着补片的条件流线模块，尚未求解新的整箭外流、热流、壁温或分离/再附，新增合格面积0。原生产物性不变，不逐站重置总压；最新接受的真实三维NS状态仍为Q41，累计19次接受/82次主NS且未稳态；正式合格热流面积66.5626327424%，全表面里程碑尚未完成。v93真实坐标/方向、墙热、开放面与科研UI结果保留，见[方法与限制](docs/TEMPERATURE_COORDINATE_PREVIEW_V93.md)及[验证索引](docs/validation/v93/README.md)。
+v96仍是给定连续压力下的光滑附着补片条件模块，独立二维激波锚点不构成真实20°整箭或同一三维激波面；尚未求解新的整箭外流、热流、壁温或分离/再附，新增合格面积0。原生产物性不变，各入口标签沿线不重置总压；最新真实三维NS状态仍为Q41，19次接受/82次主NS且未稳态，正式合格热流面积66.5626327424%，全表面里程碑尚未完成。v93真实坐标、墙热、开放面及科研UI结果保留，见[方法与限制](docs/TEMPERATURE_COORDINATE_PREVIEW_V93.md)。
 
 在MATLAB中运行`main`打开统一工作流。默认小域研究入口为`runRocketTemperatureActiveResearch`和`runRocketTemperatureLookaheadResearch`；必要的小型制造场输入随仓库保存在`tests/data/temperature_research/`。大型真实状态、矩阵缓存、计算输出和历史ZIP不入库；重放完整研究需相应本地状态或重新准备，不能声称代码仓库已备份这些结果。
 
-v95小型冻结MAT保存在`tests/data/thermal_surface_flow/`，可直接进行Python独立复核。MATLAB中先运行`setupSurfacePressureFlow; addpath('tests');`，再用`testThermalPressureSurfaceFlow`重算核验，或用`exportThermalPressureSurfaceFlowStudy`从冻结MAT重导出工作台；新输出目录必须尚不存在，完整命令见v95说明。下一步按入口标签携带非均匀总焓/熵，恢复正确横向梯度，再连接真实附着区域、边界层入口和面元；不把零攻角直锥或解析平面当作20°整箭已求外缘。
+v96小型冻结输入保存在`tests/data/labelled_surface_flow/`，可直接进行Python独立复核、门槛前后18378个对象精确比较及真实下载校核。MATLAB中先运行`setupSurfacePressureFlow; addpath('tests');`，再用`testLabelledPressureSurfaceFlow`重算核验，或用`exportLabelledPressureSurfaceFlowStudy`从冻结MAT重导出工作台；新输出目录必须尚不存在，完整命令见v96说明。下一步转向真实箭体的内部入口/连续压力来源、边界层入口和面元映射，不继续以新增验证场替代真实20°横流—收缩—后体缺口。
 
 v93小域复现入口仍保留。最新存储维护另行清理旧QR构造缓存释放约1.95GB，当前输入、独有结果及全部v95数据保留。旧上游准备系统及相关QR审计须在新目录重建；若继续内部NS，从Q41建立新系统，工程区域与UI不以其先收敛为前提。[输出用途与保留规则](docs/OUTPUTS_STORAGE.md)说明GitHub未备份的大型本地结果及约74.23GB去重文件长度。
 

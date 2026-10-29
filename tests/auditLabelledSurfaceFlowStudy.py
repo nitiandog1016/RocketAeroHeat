@@ -1,0 +1,98 @@
+# -*- coding: utf-8 -*-
+"""独立核对非均匀入口MAT到三维、曲线、探针和CSV字段的逐值映射。"""
+from pathlib import Path
+import argparse
+import json
+import re
+
+import numpy as np
+from scipy.io import loadmat
+
+from auditThermalPressureSurfaceFlow import sha
+from auditPressureDrivenSurfaceFlow import rows
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def main():
+    parser = argparse.ArgumentParser(); parser.add_argument('folder'); parser.add_argument('evidence'); parser.add_argument('process'); parser.add_argument('--report')
+    args = parser.parse_args(); folder = Path(args.folder).resolve(); folder.relative_to(ROOT)
+    evidence = Path(args.evidence).resolve(); evidence.relative_to(ROOT)
+    target = Path(args.report).resolve() if args.report else folder/'independent_labelled_surface_flow_study.json'
+    target.relative_to(ROOT); assert not target.exists()
+    source = loadmat(evidence, simplify_cells=True); source_cases = rows(source['cases']); assert len(source_cases) == 8
+    web = folder/'workbench'; raw = (web/'pressure-surface-flow-data.json').read_bytes(); data = json.loads(raw)
+    assert (web/'pressure-surface-flow-data.js').read_bytes() == b'window.PRESSURE_SURFACE_FLOW_STUDY='+raw+b';\n'
+    assert data['sourceEvidenceSHA256'] == sha(evidence) and not data['productionQualified']
+    text = (web/'geometry/rocket-geometry-data.js').read_text(encoding='utf8'); prefix = 'window.ROCKET_GEOMETRY_CASES='
+    assert text.startswith(prefix) and text.endswith(';'); geometry = json.loads(text[len(prefix):-1])
+    assert len(data['cases']) == len(geometry) == 3
+    checks = []; stations = 0; segments = 0
+    for i, (case, model, source_ids) in enumerate(zip(data['cases'], geometry, [[1], [3], [6, 7]])):
+        assert case['inletVariesByLabel'] and case['pressureIsInput'] and not case['thermodynamicStateIsInput']
+        assert case['thermodynamicStateIsConditionallyRestored'] and case['thermodynamicConvention'] == 'continuous-project-cp-v1'
+        assert not any(case[k] for k in ['heatFluxSolved', 'wallTemperatureSolved', 'productionQualified', 'newProductionSolvedAreaM2'])
+        assert not any(k in case for k in ['totalPressurePa', 'totalTemperatureK'])
+        assert '辅助延拓' in case['sources']['derivativeRole'] and '标签' in case['sources']['transverseGradients']
+        assert '未求' in model['coordinateNote'] and model['surfaceFlowLines']['thermodynamicStateIsConditionallyRestored']
+        V = np.asarray(model['vertices']); F = np.asarray(model['faces'], dtype=int)
+        assert V.shape[1] == F.shape[1] == 3 and np.all(np.isfinite(V)) and F.min() >= 0 and F.max() < len(V)
+        edges = np.vstack([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]]); unique, ids, count = np.unique(np.sort(edges, axis=1), axis=0, return_inverse=True, return_counts=True)
+        if i == 2:
+            assert np.all(count == 2) and np.all(np.bincount(ids, weights=np.sign(edges[:, 1]-edges[:, 0])) == 0)
+            assert len(V)-len(unique)+len(F) == 2
+            assert np.sum(V[F[:, 0]]*np.cross(V[F[:, 1]], V[F[:, 2]]))/6 > 0
+            assert case['geometry']['closed'] and '不是20度整箭' in case['scope']
+            assert all(text in case['sources']['entryProfile'] for text in ['二维弱斜激波', '独立锚点', '非同一三维激波面'])
+        else:
+            assert not case['geometry']['closed'] and np.all(V[:, 2] == 0)
+        assert len(case['tubes']) == len(case['curves']) == len(source_ids)
+        T0 = []; p0 = []
+        for j, source_id in enumerate(source_ids):
+            original = source_cases[source_id]['result']; c = original['center']; g = original['physicalGradients']; tube = case['tubes'][j]; curve = case['curves'][j]
+            assert np.all(original['validStation']) and tube['labelCenter'] == original['labelCenter']
+            for key in ['arcLengthM', 'metric', 'metricRatio', 'metricDifferenceIndicator']:
+                np.testing.assert_array_equal(tube[key], original[key])
+            for key in ['position', 'tangent']:
+                np.testing.assert_array_equal(tube[key], c[key])
+            for key, old in [('pressureInputPa', 'pressure'), ('temperatureRecoveredK', 'temperature'), ('densityRecoveredKgM3', 'density'), ('speedRecoveredMS', 'speed'), ('totalEnthalpyJPerKg', 'totalEnthalpy'), ('entropyJPerKgK', 'entropy')]:
+                np.testing.assert_array_equal(tube[key], c[old])
+            for key in ['totalEnthalpyGradient', 'entropyGradient', 'temperatureGradient']:
+                np.testing.assert_array_equal(tube[key], g[key])
+            np.testing.assert_allclose(tube['entropyGradientNormJPerKgKM'], np.linalg.norm(g['entropyGradient'], axis=1), rtol=2e-15)
+            entry = rows(original['entryTotalStates'])[2]
+            for key, value in original['entryDerivativeResolution'].items():
+                assert tube['inletDerivativeResolution'][key] == value
+            assert tube['inletTotalPressurePa'] == entry['totalPressure'] and tube['inletTotalTemperatureK'] == entry['totalTemperature']
+            for e in rows(original['entryTotalStates']): T0.append(e['totalTemperature']); p0.append(e['totalPressure'])
+            np.testing.assert_array_equal(curve['points'], c['position']); np.testing.assert_array_equal(curve['normals'], c['normal'])
+            assert curve['sourceTubeIndexOneBased'] == j+1
+            assert not any(k in tube for k in ['temperatureInputK', 'densityInputKgM3', 'speedInputMS', 'heatFlux', 'wallSolvedTemperature'])
+            if i == 2:
+                p = np.asarray(tube['position']); np.testing.assert_allclose(np.linalg.norm(p[:, 1:], axis=1), .1, rtol=0, atol=1e-14)
+                assert np.all(p[:, 0] < -.1/np.tan(np.pi/12)) and np.all(p[:, 0] > V[:, 0].min())
+            stations += len(tube['arcLengthM']); segments += len(tube['arcLengthM'])-1
+        assert case['entryTotalTemperatureRangeK'] == [min(T0), max(T0)] and case['entryTotalPressureRangePa'] == [min(p0), max(p0)]
+        az = model['initialCameraAzimuthRad']; el = model['initialCameraElevationRad']; direction = np.array([np.cos(el)*np.cos(az), np.cos(el)*np.sin(az), np.sin(el)])
+        visible = [int(np.count_nonzero(np.asarray(curve['normals'])@direction > 0)) for curve in case['curves']]; assert all(visible)
+        checks.append(dict(model=case['id'], sourceCaseIndicesZeroBased=source_ids, initialVisibleStationsPerTube=visible))
+    assert stations == 84 and segments == 80
+    for page in [web/'index.html', web/'geometry/index.html']:
+        for name, stamp in re.findall(r'(?:src|href)="([^"?]+)\?v=([0-9a-f]+)"', page.read_text(encoding='utf8')):
+            assert sha(page.parent/name).startswith(stamp)
+    name, stamp = data['geometryURL'].split('?v='); assert sha(web/name).startswith(stamp)
+    process_path = Path(args.process).resolve(); process = json.loads(process_path.read_text(encoding='utf-8-sig'))
+    assert process['status'] == 'terminal' and process['exitCode'] == 0 and all(process['sourceStableAfter'].values())
+    assert evidence.relative_to(ROOT).as_posix() in process['explicitInputs']
+    bindings = {p.relative_to(ROOT).as_posix(): sha(p) for p in [evidence, process_path, web/'pressure-surface-flow-data.json', web/'geometry/rocket-geometry-data.js', folder/'labelled_study_export.json']}
+    for rel in ['regionalFlow/surface/exportLabelledPressureSurfaceFlowStudy.m', 'exportRocketTestGeometryView.m', 'web/pressure-surface-study.js', 'web/geometry.js']:
+        assert sha(ROOT/rel) == process['sourceSHA256'][rel]; bindings[rel] = sha(ROOT/rel)
+    report = dict(status='passed-independent-labelled-HS-physical-gradient-MAT-to-workbench-mapping', models=3,
+                  conditionalTubes=4, actualStations=stations, visibleSegments=segments, checks=checks, inputSHA256=bindings,
+                  scriptSHA256=sha(__file__), experimentalValidation=False, browserOrGPUVerified=False, newProductionSolvedAreaM2=0)
+    target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes((json.dumps(report, indent=2)+'\n').encode('utf8'))
+    print(json.dumps({k: report[k] for k in ['status', 'models', 'conditionalTubes', 'actualStations']}))
+
+
+if __name__ == '__main__':
+    main()

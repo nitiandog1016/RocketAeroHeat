@@ -1,0 +1,188 @@
+function result=marchLabelledPressureSurfaceFlow(problem,inputOptions)
+%MARCHLABELLEDPRESSURESURFACEFLOW 每条入口标签携带独立总焓/熵的曲面射线族。
+% 模块一：压力及几何采样保持公共；每条射线只转换/冻结一次入口总状态。
+% 模块二：固定标签的辅助热状态延拓只用于沿线积分，明确不是物理两向梯度。
+% 模块三：用相邻标签真实位置和入口H/S差分重建中心线物理横向梯度。
+% 模块四：独立回代同一曲面Euler/EOS/能量/熵合同；失效后保留NaN，不补值。
+% 范围：连续压力已知的光滑附着补片；不求未知压力、完整外流连续方程或热流。
+if nargin<2,inputOptions=struct;end
+entryDifferenceLimit=.02;
+if isfield(inputOptions,'maximumRelativeEntryDerivativeDifference')
+    entryDifferenceLimit=inputOptions.maximumRelativeEntryDerivativeDifference;
+    inputOptions=rmfield(inputOptions,'maximumRelativeEntryDerivativeDifference');
+end
+validateattributes(entryDifferenceLimit,{'double'},{'real','finite','scalar','>',0,'<',1});
+options=pressureSurfaceFlowOptions(inputOptions);options.maximumRelativeEntryDerivativeDifference=entryDifferenceLimit;
+required={'sample','seed','entryTotalState','labelCenter','labelStep','labelUnit','arcStationsM','gas','sources'};
+assert(isstruct(problem)&&isscalar(problem)&&all(isfield(problem,required)), ...
+    'SurfaceFlow:LabelledProblem','缺少公共压力、几何、入口标签或逐标签总状态。');
+assert(isa(problem.sample,'function_handle')&&isa(problem.seed,'function_handle')&& ...
+    isa(problem.entryTotalState,'function_handle'),'SurfaceFlow:LabelledProblem','采样和入口须为函数。');
+for key={'geometry','pressure','thermodynamics','entryDirection','entryProfile'}
+    name=key{1};assert(isfield(problem.sources,name)&& ...
+        (ischar(problem.sources.(name))||isstring(problem.sources.(name)))&&strlength(string(problem.sources.(name)))>0, ...
+        'SurfaceFlow:Source','几何、压力、逐标签总状态及入口方向均须明确来源。');
+end
+assert(any(strcmp(problem.labelUnit,{'m','rad','dimensionless'})),'SurfaceFlow:Label','标签单位须明确。');
+validateattributes(problem.labelCenter,{'double'},{'real','finite','scalar'});
+validateattributes(problem.labelStep,{'double'},{'real','finite','scalar','positive'});
+stations=problem.arcStationsM(:);validateattributes(stations,{'double'},{'real','finite','column','nonnegative'});
+assert(numel(stations)>=2&&stations(1)==0&&all(diff(stations)>0),'SurfaceFlow:Stations','弧长须从零递增。');
+labels=problem.labelCenter+[-1 -.5 0 .5 1]*problem.labelStep;
+rays=cell(5,1);entries=rays;localProblems=rays;H=zeros(5,1);S=H;cpEntry=H;initialStates=zeros(4,5);
+
+%% 一、每条射线的固定标签辅助延拓；不将此导数标为物理横向梯度
+for j=1:5
+    total=problem.entryTotalState(labels(j));
+    local=bindIsentropicSurfacePressure(problem,total);
+    entry=problem.seed(labels(j));
+    assert(isstruct(entry)&&all(isfield(entry,{'coordinate','direction'})), ...
+        'SurfaceFlow:Seed','入口须提供曲面坐标及三维方向。');
+    validateattributes(entry.coordinate,{'double'},{'real','finite','size',[2 1]});
+    validateattributes(entry.direction,{'double'},{'real','finite','size',[3 1]});
+    assert(norm(entry.direction)>0,'SurfaceFlow:Seed','入口方向不能为零。');
+    initial=local.sample(entry.coordinate);A=initial.firstDerivatives;
+    lengths=vecnorm(A,2,1)';unitA=A./lengths';t=entry.direction/norm(entry.direction);
+    v=((unitA'*unitA)\(unitA'*t))./lengths;
+    assert(norm(A*v-t)<=options.maximumUnitTangentError,'SurfaceFlow:Seed','入口不能靠法向投影修正。');
+    state=[entry.coordinate;v];[~,info]=pressureSurfaceFlowRHS(state,local,options);
+    local.referenceTotalEnthalpy=info.totalEnthalpy;local.referenceEntropy=info.entropy;
+    H(j)=info.totalEnthalpy;S(j)=info.entropy;cpEntry(j)=info.specificHeat;
+    entries{j}=total;localProblems{j}=local;initialStates(:,j)=state;
+end
+
+%% 入口导数分辨率：先检查两组标签间距，不把舍入残差解释为物理变化
+derivativeH=(H(4)-H(2))/problem.labelStep;derivativeS=(S(4)-S(2))/problem.labelStep;
+coarseH=(H(5)-H(1))/(2*problem.labelStep);coarseS=(S(5)-S(1))/(2*problem.labelStep);
+differenceH=abs(coarseH-derivativeH)/3;differenceS=abs(coarseS-derivativeS)/3;
+scaleH=4*options.relativeStateTolerance*max(1,max(abs(H)))/problem.labelStep;
+scaleS=4*options.relativeStateTolerance*max([problem.gas.R;abs(S);cpEntry])/problem.labelStep;
+assert(differenceH<=entryDifferenceLimit*abs(derivativeH)+scaleH&& ...
+    differenceS<=entryDifferenceLimit*abs(derivativeS)+scaleS, ...
+    'SurfaceFlow:EntryDerivativeResolution','入口H/S的两组标签导数不相容；须加密或明确拆分入口接口。');
+entryResolution=struct('relativeDifferenceLimit',entryDifferenceLimit, ...
+    'enthalpyDifferenceIndicator',differenceH,'entropyDifferenceIndicator',differenceS, ...
+    'enthalpyConsistencyScale',scaleH,'entropyConsistencyScale',scaleS, ...
+    'enthalpyVariationResolved',abs(derivativeH)>scaleH,'entropyVariationResolved',abs(derivativeS)>scaleS, ...
+    'consistencyScalesAreRigorousErrorBounds',false);
+for j=1:5
+    rays{j}=integrate(initialStates(:,j),localProblems{j},stations,options);rays{j}.label=labels(j);
+    rays{j}.sampleDerivativeRole='固定入口标签的辅助延拓，非物理两向梯度';
+end
+
+%% 二、横向宽度只取n×t投影；总分离距离中的沿程偏移必须单列
+count=numel(stations);h=nan(count,1);hCoarse=h;hDifference=h;alongShift=h;fullSeparation=h;
+valid=true(count,1);reasons=repmat({''},count,1);J=nan(count,3);
+for k=1:count
+    if ~all(cellfun(@(r)r.valid(k),rays))
+        valid(k:end)=false;reasons(k:end)={'相邻标签射线没有完成相同弧长，禁止外推'};break;
+    end
+    fine=(rays{4}.position(k,:)-rays{2}.position(k,:))/problem.labelStep;
+    coarse=(rays{5}.position(k,:)-rays{1}.position(k,:))/(2*problem.labelStep);
+    b=cross(rays{3}.normal(k,:),rays{3}.tangent(k,:));
+    h(k)=dot(b,fine);hCoarse(k)=dot(b,coarse);hDifference(k)=abs(hCoarse(k)-h(k))/3;
+    J(k,:)=fine;alongShift(k)=dot(rays{3}.tangent(k,:),fine);fullSeparation(k)=norm(fine);
+    if k==1
+        assert(h(k)>0&&hDifference(k)<=options.maximumRelativeMetricDifference*h(k), ...
+            'SurfaceFlow:MetricSeed','入口标签须沿n×t正向且两组间距可分辨。');
+    elseif ~isfinite(h(k))||h(k)<=options.minimumMetricRatio*h(1)|| ...
+            hDifference(k)>options.maximumRelativeMetricDifference*h(k)
+        valid(k:end)=false;reasons(k:end)={'流管聚焦或标签宽度失去分辨率'};break;
+    end
+end
+
+%% 三、入口H/S沿线守恒；先除以物理横向h，再恢复真正的两向热状态导数
+center=rays{3};names={'totalEnthalpyGradient','entropyGradient','temperatureGradient', ...
+    'speedGradient','densityGradient','pressureGradient','transverseDirection'};
+gradients=struct;for name=names,gradients.(name{1})=nan(count,3);end
+physicalSamples=cell(count,1);directionResidual=nan(count,1);thermalCrossCheck=nan(count,3);
+for k=1:count
+    if ~valid(k),break;end
+    sample=center.samples{k};A=sample.firstDerivatives;t=center.tangent(k,:)';n=center.normal(k,:)';b=cross(n,t);
+    lengths=vecnorm(A,2,1)';unitA=A./lengths';C=unitA'*unitA;
+    gradP=unitA*(C\(sample.pressureGradient./lengths));
+    thermal=surfaceFlowThermodynamicState(sample.temperature,sample.pressure,problem.gas);
+    gradH=derivativeH/h(k)*b;gradS=derivativeS/h(k)*b;
+    gradT=sample.temperature/thermal.specificHeat*(gradS+problem.gas.R*gradP/sample.pressure);
+    gradU=(gradH-thermal.specificHeat*gradT)/sample.speed;
+    gradRho=sample.density*(gradP/sample.pressure-gradT/sample.temperature);
+    sample.temperatureGradient=A'*gradT;sample.speedGradient=A'*gradU;sample.densityGradient=A'*gradRho;
+    sample.sampleDerivativeRole='入口标签H/S与物理横向宽度重建的曲面两向梯度';
+    % 不继承辅助延拓的温度/速度导数；用物理梯度重新回代原合同。
+    checkProblem=localProblems{3};checkProblem.sample=@(~)sample;
+    [physicalRHS,~]=pressureSurfaceFlowRHS(center.state(k,:)',checkProblem,options);
+    [auxiliaryRHS,~]=pressureSurfaceFlowRHS(center.state(k,:)',localProblems{3},options);
+    directionResidual(k)=norm(physicalRHS-auxiliaryRHS);
+    gradientValues={gradH,gradS,gradT,gradU,gradRho,gradP,b};
+    for j=1:numel(names),gradients.(names{j})(k,:)=gradientValues{j}';end
+    % 链式关系包含J沿程分量；不能把固定s的标签导数直接当横向导数。
+    dT=(rays{4}.temperature(k)-rays{2}.temperature(k))/problem.labelStep;
+    dU=(rays{4}.speed(k)-rays{2}.speed(k))/problem.labelStep;
+    dRho=(rays{4}.density(k)-rays{2}.density(k))/problem.labelStep;
+    thermalCrossCheck(k,:)=[dT-dot(gradT,J(k,:)'),dU-dot(gradU,J(k,:)'),dRho-dot(gradRho,J(k,:)')];
+    physicalSamples{k}=sample;
+end
+h(~valid)=NaN;
+for name={'coordinate','position','tangent','normal','pressure','temperature','density','speed','totalEnthalpy','entropy'}
+    center.(name{1})(~valid,:)=NaN;
+end
+center.valid=valid;center.missingReason=reasons;center.samples=physicalSamples;
+result=struct('method','逐入口标签独立H/S的五射线曲面Euler + 物理横向梯度恢复', ...
+    'scope','声明的光滑附着补片；压力为输入，不求完整外流连续方程、激波层、热流或分离再附', ...
+    'arcLengthM',stations,'center',center,'rays',{rays},'labels',labels,'entryTotalStates',{entries}, ...
+    'entryTotalEnthalpy',H,'entryEntropy',S,'labelCenter',problem.labelCenter,'labelStep',problem.labelStep, ...
+    'labelUnit',problem.labelUnit,'metricUnit',['m/' problem.labelUnit],'metric',h,'metricRatio',h/h(1), ...
+    'coarseMetricDiagnostic',hCoarse,'metricDifferenceIndicator',hDifference,'labelPositionDerivative',J, ...
+    'labelAlongStreamShift',alongShift,'fullLabelSeparationNorm',fullSeparation, ...
+    'entryEnthalpyLabelDerivative',derivativeH,'entryEntropyLabelDerivative',derivativeS, ...
+    'entryEnthalpyDerivativeDifferenceIndicator',differenceH, ...
+    'entryEntropyDerivativeDifferenceIndicator',differenceS,'entryDerivativeResolution',entryResolution, ...
+    'physicalGradients',gradients,'physicalGradientRHSIdentityResidual',directionResidual, ...
+    'thermalLabelChainRuleDifference',thermalCrossCheck,'validStation',valid,'missingReason',{reasons}, ...
+    'gas',problem.gas,'sources',problem.sources,'options',options, ...
+    'gradientMethod','b=n×t；gradH=H0_beta*b/h，gradS=S0_beta*b/h；同cp Gibbs/总焓恢复Te/rho/U两向导数', ...
+    'gradientDifferenceIsRigorousBound',false,'auxiliaryRayDerivativesArePhysical',false, ...
+    'entryTotalStateResetAlongRay',false,'pressureSolved',false,'fullExternalContinuitySolved',false, ...
+    'heatFluxSolved',false,'wallTemperatureSolved',false,'productionQualified',false,'newProductionSolvedAreaM2',0);
+end
+
+function ray=integrate(state,problem,stations,options)
+% 模块用途：沿线保持同一入口H/S，只保存真实端点；既有v95积分器及结果不修改。
+n=numel(stations);ray=struct('valid',false(n,1),'coordinate',nan(n,2),'position',nan(n,3), ...
+    'tangent',nan(n,3),'normal',nan(n,3),'pressure',nan(n,1),'temperature',nan(n,1), ...
+    'density',nan(n,1),'speed',nan(n,1),'totalEnthalpy',nan(n,1),'entropy',nan(n,1), ...
+    'state',nan(n,4),'unitTangentError',nan(n,1),'samples',{cell(n,1)}, ...
+    'stopReason','','failureIdentifier','','failedRequestedStation',NaN,'substeps',0,'RHSCalls',0);
+for k=1:n
+    try
+        if k>1
+            count=ceil((stations(k)-stations(k-1))/options.maximumArcStepM);
+            assert(ray.substeps+count<=options.maximumSubstepsPerRay,'SurfaceFlow:Budget','超出射线预算。');
+            h=(stations(k)-stations(k-1))/count;
+            for j=1:count
+                a=callRHS(state);b=callRHS(state+h*a/2);c=callRHS(state+h*b/2);d=callRHS(state+h*c);
+                state=state+h*(a+2*b+2*c+d)/6;ray.substeps=ray.substeps+1;
+            end
+        end
+        [~,info]=callRHS(state);
+        assert(info.unitTangentError<=options.maximumUnitTangentError,'SurfaceFlow:ArcLength','弧长漂移超限。');
+        ray.valid(k)=true;ray.coordinate(k,:)=state(1:2)';ray.state(k,:)=state';
+        for name={'position','tangent','normal','totalEnthalpy','entropy','unitTangentError'}
+            key=name{1};ray.(key)(k,:)=info.(key)';
+        end
+        for name={'pressure','temperature','density','speed'}
+            key=name{1};ray.(key)(k)=info.sample.(key);
+        end
+        ray.samples{k}=info.sample;
+        ray.samples{k}.sampleDerivativeRole='固定入口标签的辅助延拓，非物理两向梯度';
+    catch ex
+        if ~startsWith(ex.identifier,'SurfaceFlow:'),rethrow(ex);end
+        if k==1,rethrow(ex);end
+        ray.stopReason=ex.message;ray.failureIdentifier=ex.identifier;ray.failedRequestedStation=k;return;
+    end
+end
+ray.stopReason='全部请求站点完成，不代表完整外流或气动热已求';
+    function [value,details]=callRHS(y)
+        ray.RHSCalls=ray.RHSCalls+1;[value,details]=pressureSurfaceFlowRHS(y,problem,options);
+    end
+end

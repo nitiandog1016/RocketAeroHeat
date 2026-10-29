@@ -20,7 +20,16 @@ const location={origin:'http://127.0.0.1:8775'},window={PRESSURE_SURFACE_FLOW_ST
 const URLmock={createObjectURL:b=>{csvBlob=b;return'blob:surface-flow-test';},revokeObjectURL:()=>{}};
 const program=process.argv[4]?path.resolve(process.argv[4]):path.join(folder,'pressure-surface-study.js');vm.runInNewContext(fs.readFileSync(program,'utf8'),{window,document,location,Blob,URL:URLmock});
 const readProbe=name=>{const i=ids.probe.children.findIndex(e=>e.textContent===name);assert.ok(i>=0,name);return ids.probe.children[i+1].textContent;};
-let events=0,ignored=0,rows=0;
+let events=0,ignored=0,rows=0,labelledCases=0,gradientCSVRows=0,optionalCurveSelections=0,signedZeroCSVNormalizations=0;
+function exactNumericCell(text,expected){
+ assert.notEqual(text,'');const actual=Number(text);assert.ok(Number.isFinite(actual)&&Number.isFinite(expected));assert.ok(actual===expected);
+ if(Object.is(expected,-0)&&Object.is(actual,0))signedZeroCSVNormalizations++;
+}
+function parseCSVLine(line){
+ const result=[];let value='',quoted=false;
+ for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(quoted&&line[i+1]==='"'){value+='"';i++;}else quoted=!quoted;}else if(ch===','&&!quoted){result.push(value);value='';}else value+=ch;}
+ assert.equal(quoted,false);result.push(value);return result;
+}
 (async()=>{
  for(let c=0;c<data.cases.length;c++){
   const entry=data.cases[c],restored=entry.thermodynamicStateIsConditionallyRestored===true;assert.equal(entry.pressureIsInput,true);assert.equal(entry.thermodynamicStateIsInput,!restored);assert.equal(entry.heatFluxSolved,false);
@@ -53,12 +62,43 @@ let events=0,ignored=0,rows=0;
    {origin:location.origin,source:ids.viewer.contentWindow,data:{...message,payload:{...message.payload,stationIndex:9999}}}
   ]){listeners.message(wrong);assert.equal(ids.station.value,before);ignored++;}
   for(const key of ['metricRatio','metric','pressureInputPa','temperatureInputK','speedInputMS']){ids.field.value=key;ids.field.events.change();assert.ok(ids.plotNote.textContent.includes('实际有效积分前缀'));}
+  if(entry.inletVariesByLabel){
+   labelledCases++;
+   for(const key of ['totalEnthalpyJPerKg','entropyJPerKgK','entropyGradientNormJPerKgKM']){ids.field.value=key;ids.field.events.change();assert.ok(ids.plotNote.textContent.includes('实际有效积分前缀'));optionalCurveSelections++;}
+   assert.ok(ids.roleNote.textContent.includes('辅助延拓导数不作物理场'));
+   assert.equal(readProbe('横向梯度方法'),entry.sources.transverseGradients);
+   assert.ok(readProbe('入口导数分辨状态').includes(t.inletDerivativeResolution.enthalpyVariationResolved?'总焓变化已分辨':'总焓变化未分辨'));
+   assert.equal(readProbe('物理gradS₀ / J/(kg·K·m)'),t.entropyGradient[12].map(x=>Number(x.toPrecision(6)).toString()).join(', '));
+  }
   ids.station.value='20';ids.station.events.input();assert.equal(readProbe('实际积分站点'),'21 / '+t.arcLengthM.length);
   ids.saveCSV.events.click();const csv=await csvBlob.text();const lines=csv.trim().split(/\r?\n/);assert.equal(lines.length,t.arcLengthM.length+1);
   assert.ok(lines[0].includes('input_pressure_Pa')&&lines[0].includes('conditional_metric'));assert.ok(lines[1].includes('"unknown","unknown"'));rows+=t.arcLengthM.length;
   assert.ok(lines[0].includes(restored?'conditionally_recovered_edge_temperature_K':'input_temperature_K'));
   if(restored)assert.ok(lines[1].includes('"conditional-recovery","continuous-project-cp-v1"'));
   if(restored){assert.ok(lines[0].includes('pressure_method')&&lines[0].includes('edge_state_method'));assert.ok(lines[1].includes(entry.sources.pressure)&&lines[1].includes(entry.sources.thermodynamics));}
+  if(entry.inletVariesByLabel){
+   const headers=parseCSVLine(lines[0]);
+   for(let i=0;i<t.arcLengthM.length;i++){
+    const cells=parseCSVLine(lines[i+1]);assert.equal(cells.length,headers.length);const row=Object.fromEntries(headers.map((name,j)=>[name,cells[j]]));
+    assert.equal(Number(row.entry_label),t.labelCenter);assert.equal(row.entry_label_unit,entry.labelUnit);
+    assert.equal(Number(row.inlet_total_pressure_Pa),t.inletTotalPressurePa);assert.equal(Number(row.inlet_total_temperature_K),t.inletTotalTemperatureK);
+    assert.equal(Number(row.total_enthalpy_J_kg),t.totalEnthalpyJPerKg[i]);assert.equal(Number(row.entropy_J_kg_K),t.entropyJPerKgK[i]);
+    for(const [axis,j] of [['x',0],['y',1],['z',2]]){
+     exactNumericCell(row['gradH_'+axis+'_J_kg_m'],t.totalEnthalpyGradient[i][j]);
+     exactNumericCell(row['gradS_'+axis+'_J_kg_K_m'],t.entropyGradient[i][j]);
+     exactNumericCell(row['gradTe_'+axis+'_K_m'],t.temperatureGradient[i][j]);
+    }
+    assert.equal(row.entry_state_method,entry.sources.entryProfile);assert.equal(row.physical_gradient_method,entry.sources.transverseGradients);
+    assert.equal(row.derivative_role,'physical-surface-gradient-from-inlet-labels');gradientCSVRows++;
+    const r=t.inletDerivativeResolution;
+    exactNumericCell(row.inlet_H_derivative_difference,r.enthalpyDifferenceIndicator);exactNumericCell(row.inlet_S_derivative_difference,r.entropyDifferenceIndicator);
+    exactNumericCell(row.inlet_H_consistency_scale,r.enthalpyConsistencyScale);exactNumericCell(row.inlet_S_consistency_scale,r.entropyConsistencyScale);
+    assert.equal(row.inlet_H_variation_resolved,String(r.enthalpyVariationResolved));assert.equal(row.inlet_S_variation_resolved,String(r.entropyVariationResolved));
+    assert.equal(row.inlet_consistency_scale_is_rigorous_error_bound,'false');
+   }
+   const savedH=t.totalEnthalpyJPerKg[20];t.totalEnthalpyJPerKg[20]=null;ids.station.events.input();assert.equal(readProbe('沿线总焓H₀ / kJ/kg'),'未求解');t.totalEnthalpyJPerKg[20]=savedH;
+   const savedP0=t.inletTotalPressurePa;t.inletTotalPressurePa=null;ids.station.events.input();assert.ok(readProbe('该入口总温 / 总压').includes('未求解'));t.inletTotalPressurePa=savedP0;
+  }
   // 未知输入不能在单位换算后变成0；只改变测试副本，不改导出物理数据。
   const old=t.pressureInputPa[20];t.pressureInputPa[20]=null;ids.station.events.input();assert.equal(readProbe('输入压力 / kPa'),'未求解');t.pressureInputPa[20]=old;
   const temperatureKey=restored?'temperatureRecoveredK':'temperatureInputK',savedTemperature=t[temperatureKey][20];
@@ -66,6 +106,6 @@ let events=0,ignored=0,rows=0;
  }
  assert.equal(downloads,data.cases.length);
  const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
- const report={status:'passed-actual-surface-flow-study-five-step-probe-message-input-roles-curves-and-CSV',cases:data.cases.length,conditionallyRestoredCases:data.cases.filter(c=>c.thermodynamicStateIsConditionallyRestored===true).length,workflowEvents:events,ignoredUnrelatedOrStaleMessages:ignored,CSVrows:rows,unknownInputDidNotBecomeZero:true,browserVisualOrWebGLRuntimeVerified:false,newProductionSolvedAreaM2:0,dataSHA256:sha(file),scriptSHA256:sha(__filename),programSHA256:sha(program)};
+ const report={status:'passed-actual-surface-flow-study-five-step-probe-message-input-roles-curves-and-CSV',cases:data.cases.length,conditionallyRestoredCases:data.cases.filter(c=>c.thermodynamicStateIsConditionallyRestored===true).length,labelledInletCases:labelledCases,physicalGradientCSVRows:gradientCSVRows,optionalCurveSelections,signedZeroCSVNormalizations,workflowEvents:events,ignoredUnrelatedOrStaleMessages:ignored,CSVrows:rows,unknownInputDidNotBecomeZero:true,browserVisualOrWebGLRuntimeVerified:false,newProductionSolvedAreaM2:0,dataSHA256:sha(file),scriptSHA256:sha(__filename),programSHA256:sha(program)};
  const target=process.argv[3]?path.resolve(process.argv[3]):path.join(folder,'node_pressure_surface_flow.json');assert.equal(fs.existsSync(target),false);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
 })().catch(e=>{console.error(e);process.exitCode=1;});

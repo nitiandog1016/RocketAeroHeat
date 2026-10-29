@@ -1,0 +1,11 @@
+# v96小型冻结输入
+
+`labelled_pressure_surface_flow_evidence.mat`为最终实际MATLAB核验的八组结果及失效前缀，283395字节，SHA256：
+
+`e1e01ce0398d1f075a5bcf9260f2ede74d31481f5faf722593d9ccc98f182309`
+
+`before_resolution/labelled_pressure_surface_flow_evidence.mat`为入口分辨率门槛加入前的280111字节结果，用于公共物理对象精确回归，SHA256：
+
+`a4e9a71edb70446a203d26fc5568af912b3484351a228a09cc14e532a64f0453`
+
+两份文件均为实际保存结果，不是实验数据或整箭热流场。独立校核可用Python直接运行，查看工作台可用MATLAB从最终MAT在新目录导出，无须重复积分。命令、来源和限制见`docs/LABELLED_PRESSURE_SURFACE_FLOW_V96.md`及`docs/validation/v96/README.md`。
