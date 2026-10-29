@@ -51,16 +51,18 @@ assert.ok(d.cases[0].mechanicalCoolingWallCount>0);assert.equal(d.cases[1].mecha
 class E{constructor(tag){this.tag=tag;this.children=[];this.attrs={};this.events={};this.value='';this.textContent='';}append(...e){this.children.push(...e);}replaceChildren(...e){this.children=[...e];}setAttribute(k,v){this.attrs[k]=String(v);}getAttribute(k){return this.attrs[k];}addEventListener(k,f){this.events[k]=f;}}
 const ids=Object.fromEntries(['caseChoice','title','description','details','viewer','historyRows','linearRows','trialRows','diagnosticNote','layerRows','layerNote','wallNote','stateNote','linearResearchRows','linearResearchNote'].map(x=>[x,new E(x)])),buttons=Array.from({length:5},()=>new E('button')),viewer=ids.viewer;
 const document={getElementById:x=>{assert.ok(ids[x],x);return ids[x];},querySelectorAll:q=>{assert.equal(q,'[data-step]');return buttons;},createElement:t=>new E(t)};
-vm.runInNewContext(fs.readFileSync(path.join(folder,'rocket-wall-velocity.js'),'utf8'),{window:{ROCKET_WALL_VELOCITY_STUDY:d},document});let events=0,linearDiagnosticRows=0,candidateDiagnosticRows=0;
+const program=process.argv[3]?path.resolve(process.argv[3]):path.join(folder,'rocket-wall-velocity.js');
+vm.runInNewContext(fs.readFileSync(program,'utf8'),{window:{ROCKET_WALL_VELOCITY_STUDY:d},document});let events=0,linearDiagnosticRows=0,candidateDiagnosticRows=0;
 for(let j=0;j<3;j++){
  ids.caseChoice.value=String(j);ids.caseChoice.events.change();const h=d.cases[j].history;assert.equal(ids.historyRows.children.length,h&&Array.isArray(h.iteration)?h.iteration.length:0);
  const trend=d.cases[j].solverDiagnostics&&d.cases[j].solverDiagnostics.segmentResidualTrend;
  const coordinates=d.cases[j].solverDiagnostics&&d.cases[j].solverDiagnostics.trialStateCoordinates;
  const preparation=d.cases[j].solverDiagnostics&&d.cases[j].solverDiagnostics.directionPreparation;
  if(preparation){
-  assert.ok(preparation.usedTotalDirectionExactlyVerified&&!preparation.hardUpdateLimitClaimed);
+  assert.ok(!preparation.hardUpdateLimitClaimed);
+  assert.ok(preparation.usedTotalDirectionExactlyVerified||(preparation.proposedTotalDirectionBoundToCurrentState&&preparation.displayedStateUnchanged));
   assert.equal(preparation.internalCTargetMet,preparation.internalCRelativeResidual<=preparation.internalCTarget);
-  assert.ok(preparation.originalNSDirectionDefect<=preparation.originalNSDirectionTarget);
+  if(preparation.usedTotalDirectionExactlyVerified)assert.ok(preparation.originalNSDirectionDefect<=preparation.originalNSDirectionTarget);
   buttons[3].events.click();assert.ok(ids.details.children.some(e=>e.textContent===preparation.methodLabel));
   assert.ok(ids.details.children.some(e=>e.textContent.includes('不保证硬幅度上限')));
   if(preparation.kind==='temperature-comparison-QR-LSQR-v1'){
@@ -98,6 +100,14 @@ for(let j=0;j<3;j++){
      q.interfacePreview=[];buttons[3].events.click();
      assert.ok(ids.details.children.some(e=>e.textContent.includes('未执行：目标候选')));
      q.interfacePreview=preview;buttons[3].events.click();
+    }
+    if(q.selectionPolicy==='original-and-iteratively-predicted-cell-and-interface-faces'){
+     const r=preparation.repreview,h=Array.isArray(r.history)?r.history:[r.history];
+     assert.equal(h.length,r.previewCount);assert.ok(r.previewCount<=4&&preparation.activeSolveCount<=3);
+     assert.deepEqual(asArray(preparation.bandFaceIDs),[...new Set([...originals,...required,...asArray(q.predictedViolatingInterfaceFaceIDs)])].sort((a,b)=>a-b));
+     assert.ok(ids.details.children.some(e=>e.textContent.includes('仅指定步长的全部单元和内部Riemann温域')));
+     const page=fs.readFileSync(path.join(folder,d.temperatureActiveResearch.reportURL),'utf8');
+     assert.ok(page.includes('投影后逐轮温域复查')&&page.includes('累计必要面'));
     }
     assert.ok(ids.details.children.some(e=>e.textContent.includes('原10 K带内 '+originals.length+' 面')));
     assert.ok(ids.details.children.some(e=>e.textContent.includes('实际选择 '+asArray(preparation.bandFaceIDs).length+' 面')));
@@ -245,7 +255,26 @@ for(let j=0;j<3;j++){
   trials.forEach((a,i)=>{assert.equal(ids.trialRows.children[i].children[4].textContent,a.accepted?'接受':'拒绝');assert.equal(ids.trialRows.children[i].children[5].textContent,a.errorIdentifier||'无护栏错误');});
  }else{assert.equal(ids.linearRows.children.length,0);assert.equal(ids.trialRows.children.length,0);assert.equal(ids.layerRows.children.length,0);}
 }
-const sourceSHA256=Object.fromEntries([__filename,path.join(folder,'rocket-wall-velocity.js'),path.join(folder,'index.html'),require.resolve('../web/viewer.js'),require.resolve('../web/export.js'),require.resolve('../web/section.js')].map(p=>[path.relative(path.resolve(__dirname,'..'),p),crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')]));
+// 模块用途：用实际小域输出检查“温域通过/方向拒绝/预算不足”呈现，不将制造系统映射为真实流场。
+let repreviewPresentationCases=0;
+if(process.argv[4]){
+ const fixture=JSON.parse(fs.readFileSync(process.argv[4],'utf8')),base=d.cases[2].solverDiagnostics.directionPreparation;
+ const source=path.resolve(__dirname,'..',fixture.sourceFile);
+ assert.equal(crypto.createHash('sha256').update(fs.readFileSync(source)).digest('hex'),fixture.sourceSHA256);
+ ids.caseChoice.value='2';ids.caseChoice.events.change();
+ for(const p of fixture.preparations){
+  d.cases[2].solverDiagnostics.directionPreparation={...base,...p};buttons[3].events.click();
+  const text=ids.details.children.map(e=>e.textContent).join('\n'),r=p.repreview;
+  assert.ok(text.includes('预览 '+r.previewCount+' 次')&&text.includes('受限重算 '+p.activeSolveCount+' 次'));
+  assert.ok(text.includes('不包含开放边界、完整NS、稳态或物理验证'));
+  assert.equal(text.includes('指定步长全部单元与内部界面温域通过'),r.targetCandidateThermallyFeasible);
+  assert.equal(text.includes('通过原128eps点积界'),p.bandDirectionFeasible);
+  if(r.targetCandidateThermallyFeasible&&!p.bandDirectionFeasible)assert.ok(text.includes('内部温度合法也不能放行方向'));
+  repreviewPresentationCases++;
+ }
+ d.cases[2].solverDiagnostics.directionPreparation=base;buttons[3].events.click();
+}
+const sourceSHA256=Object.fromEntries([__filename,program,path.join(folder,'index.html'),require.resolve('../web/viewer.js'),require.resolve('../web/export.js'),require.resolve('../web/section.js')].map(p=>[path.relative(path.resolve(__dirname,'..'),p),crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')]));
 if(d.finiteStepResearch){
  const f=d.finiteStepResearch;assert.equal(f.physicalSolution,false);assert.equal(f.newProductionSolvedAreaM2,0);
  buttons[3].events.click();assert.ok(ids.details.children.some(e=>e.textContent===f.patchComparisonLabel));
@@ -254,5 +283,5 @@ if(d.finiteStepResearch){
  assert.ok(f.fullComparison.branches.every(b=>b.history.every(r=>!r.steadyConverged)));
 }
 const report={status:'passed-three-real-wall-velocity-cases-CSV-sections-and-same-host-events',processID:process.pid,cases:3,sourceFaces:19752,
- CSVrows,sectionSamples,sameHostEvents:events,linearDiagnosticRows,candidateDiagnosticRows,sourceSHA256,inPlaceDiagnosticNavigationVerified:Boolean(d.temperatureProjectionResearch||d.temperatureActiveResearch),browserVisualOrWebGLRuntimeVerified:false,newProductionSolvedAreaM2:0,dataSHA256:crypto.createHash('sha256').update(raw).digest('hex')};
+ CSVrows,sectionSamples,sameHostEvents:events,linearDiagnosticRows,candidateDiagnosticRows,repreviewPresentationCases,sourceSHA256,inPlaceDiagnosticNavigationVerified:Boolean(d.temperatureProjectionResearch||d.temperatureActiveResearch),browserVisualOrWebGLRuntimeVerified:false,newProductionSolvedAreaM2:0,dataSHA256:crypto.createHash('sha256').update(raw).digest('hex')};
 fs.writeFileSync(path.join(folder,'node_wall_velocity_summary.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

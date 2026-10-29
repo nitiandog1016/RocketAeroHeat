@@ -1,0 +1,26 @@
+RAH_ENGINE_PID=47784
+BLOCK_GRAPH cells=217272 raw=2271480 unique=1619664 persistentBound=379080388 constructionEstimate=902071808
+COUPLED_PATCHES cells=217272 patches=29300 max=8 fallback=0 bound=9.89568955e-09 bytes=342448074
+PEAK_SYSTEM_PREPARED cells=217272 NS=1 referenceOnly=true cacheBytes=763255855
+AUGMENTED_QR cells=217272 groups=29300 blocks=1619664 maxGram=3.23387596e-12
+{"status":"tested-fresh-original-NS-direction-probe-with-explicit-current-boundary-and-complete-geometry","originalNSDirectionDefect":0.056190260662181871,"originalNSDirectionTarget":0.1,"originalNSDirectionTargetMet":true,"normalizedMeritDerivative":-0.98779781993961735,"physicalStateChanged":false,"newFlowAcceptances":0,"newActualNSEvaluations":2,"coarseImageRequired":false,"newProductionSolvedAreaM2":0,"physicalSolution":false,"engineProcessID":47784}
+SHELL_STEADY_GUESS modelDefect=0.0561902607 originalTarget=0.1 correctionTolerance=1
+SHELL_KRYLOV_TOTAL count=2 scheme=forward h=2.51567469e-07 evaluations=3
+SHELL_KRYLOV_LINEAR iteration=1 retry=0 flag=0 actual=0.0561902607 target=0.1 matvecs=2
+SHELL_LINE_BUILD iteration=1 retry=0 dtau=1e-07 build=9.28 solve=49.2 linear=0
+SHELL_LINE_TRIAL iteration=1 search=0 alpha=1 rms=NaN max=NaN accepted=0 error=CutNS:State
+SHELL_LINE_TRIAL iteration=1 search=1 alpha=0.5 rms=NaN max=NaN accepted=0 error=CutNS:InternalEnergy
+SHELL_LINE_TRIAL iteration=1 search=2 alpha=0.25 rms=NaN max=NaN accepted=0 error=CutNS:InternalEnergy
+SHELL_LINE_TRIAL iteration=1 search=3 alpha=0.125 rms=166723.703 max=2173149.99 accepted=1 error=
+{"status":"bounded-real-20deg-same-static-wall-equation-Krylov-continuation","sourceFaces":19752,"cellCount":217272,"acceptedNonlinearIterations":1,"priorAcceptedNonlinearIterations":17,"totalNewEquationAcceptedIterations":18,"candidateTrials":4,"residualEvaluations":4,"totalNewEquationResidualEvaluations":78,"operatorBuilds":1,"initialMaximumResidual":2.4897852826045956E+6,"maximumResidual":2.1731499900976438E+6,"initialRmsMerit":190396.97733345832,"rmsMerit":166723.70349271654,"elapsedSeconds":123.1369315,"matrixVectorProducts":2,"jacobianResidualEvaluations":2,"preconditionerApplications":1,"lineage":{"sourceState":"krylov19-state-only-explicit-new-Riemann-reservoir-boundary","sourceHistoryAppended":false,"newBoundaryProblemInitialCounter":0,"previousProblemAcceptancesNotAppended":13,"previousProblemNSNotAppended":258,"externalCFDImported":false,"interiorEulerFlux":"exact-godunov","wallVelocityGradient":"dirichlet-tangent"},"wallVelocityGradient":"dirichlet-tangent","sameEquationHistoryContinued":true,"steadyConverged":false,"stopReason":"maximum-nonlinear-iterations","spatialConservationRelative":5.7142643157802942E-16,"steadyBoundaryFluxBalance":0.0028444277589994064,"signedHeatPowerW":453630.42643867159,"wallHeatRangeWm2":[-89893.322222065137,1.8366257988656873E+6],"physicalTimeAdvanced":0,"BETimeStepsClaimed":0,"physicalSolution":false,"newProductionSolvedAreaM2":0,"engineProcessID":47784,"priorActualResidualEvaluations":74,"replayReport":{"rateAndLocalInfoBitwiseIdentical":true,"globalReductionAbsoluteDifference":[[0,0,0,0,0],[0,0,0,0,0]],"globalReductionForwardRoundoffBound":[1.9460327824510041E-9,2.7884221323563634E-6,4.5713958280155966E-7,1.2315774279354422E-6,0.0027338654886187169],"physicalAcceptanceToleranceChanged":false},"openBoundaryDiscretization":"exact-Riemann-reservoir","sourceHistoryAppended":false,"residualEvaluationsAfterLastAcceptedHistory":0,"normalEulerLinearization":"exact-branch","physicalSpatialEquationChanged":false,"linearEquation":"steady-newton","preconditionerTimeStepOnly":true,"steadyInitialGuessReport":{"sourceFile":"E:\\RocketAeroHeat\\outputs\\v92_validation\\continuous01\\step01\\probe\\direct_ns_direction_probe.mat","sourceVariant":"ns-probe","directionScale":1,"sourceFileSHA256":"e245e150c1abfd133315add235fce143f1f753fa32e56e51262f21cc9a10dff8","sourceGeometryFile":"E:\\RocketAeroHeat\\outputs\\v80_validation\\domain02\\shell_domain_evidence.mat","sourceGeometryFileSHA256":"a342dd6530eadb88b6f562f426be9aa35c99d33803ce5da308922473e1d213fa","sourceStateAndGeometryVerified":true,"sourceSavedActualNSRelativeDefect":0.056190260662181871,"originalNSProbeArithmeticVerified":true,"oldDerivativeReused":false,"originalNSAcceptanceClaimed":false,"newModelApplications":0,"newActualNSEvaluations":0,"coarseImageRequired":false,"sourceStateLocation":"result"},"steadyInitialGuessModelApplications":1}
+                          status: 'tested-bounded-current-state-predictive-temperature-selection-NS-study'
+                initialStateFile: 'E:\RocketAeroHeat\outputs\v83_validation\krylov39\wall_velocity_krylov_evidence.mat'
+                    maximumSteps: 1
+              targetPreviewAlpha: 0.1250
+                           steps: {[1x1 struct]}
+              lastAcceptedFolder: 'E:\RocketAeroHeat\outputs\v92_validation\continuous01\step01\krylov01'
+    sameEquationHistoryContinued: 1
+          oldActiveSetsInherited: 0
+                physicalSolution: 0
+       newProductionSolvedAreaM2: 0
+

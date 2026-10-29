@@ -27,6 +27,8 @@ assert(rows.cellCount==packed.cellCount&&all(ismember(rows.temperatureBoundSigns
 if ~isempty(options.checkpointFolder),assert(isfolder(options.checkpointFolder));end
 [free,freeDetail,freeCoordinates]=solveRocketAugmentedQRDirection(packed,factor,rhs,metric,struct('maximumIterations',options.maximumIterations));
 lookaheadReport=[];
+iterative=~isempty(lookahead)&&isfield(lookahead,'selectionPolicy')&& ...
+    strcmp(lookahead.selectionPolicy,'original-and-iteratively-predicted-cell-and-interface-faces');
 if ~isempty(lookahead)
     originalRows=rows;
     if ~isempty(options.checkpointFolder)
@@ -36,12 +38,17 @@ if ~isempty(lookahead)
     end
     selectionOptions=struct;
     if isfield(lookahead,'selectionPolicy'),selectionOptions.selectionPolicy=lookahead.selectionPolicy;end
+    if iterative,selectionOptions.selectionPolicy='original-and-predicted-cell-and-interface-faces';end
     [rows,lookaheadReport]=selectRocketTemperatureLookaheadRows(lookahead.Q,lookahead.info,lookahead.cut, ...
         lookahead.gas,lookahead.scale,free,lookahead.targetAlpha,selectionOptions);
     [retained,locations]=ismember(originalRows.faceIDs,rows.faceIDs);
     assert(all(retained)&&isequal(originalRows.H,rows.H(locations,:))&& ...
         isequal(originalRows.temperatureBoundSigns,rows.temperatureBoundSigns(locations)), ...
         'TemperatureLookahead:Retention','调用者原10K条件未逐项保留，拒绝当前请求。');
+end
+if iterative
+    [value,report,evidence]=finishRocketTemperatureRepreviewDirection(packed,factor,rhs,metric,rows,options, ...
+        free,freeDetail,freeCoordinates,lookahead,lookaheadReport,originalRows);return;
 end
 [value,report,evidence]=finishRocketTemperatureActiveDirection(packed,factor,rhs,metric,rows,options,free,freeDetail,freeCoordinates);
 if ~isempty(lookaheadReport),report.lookaheadSelection=lookaheadReport;end

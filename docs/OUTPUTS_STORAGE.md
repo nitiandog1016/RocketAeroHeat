@@ -11,10 +11,10 @@
 
 ## 当前续算需要的数据
 
-- 最新接受状态：`outputs/v83_validation/krylov39/wall_velocity_krylov_evidence.mat`（v91有界试算，尚未稳态）。
+- 最新接受状态：`outputs/v83_validation/krylov40/wall_velocity_krylov_evidence.mat`（v92有界试算，尚未稳态）。
 - 原几何：`outputs/v80_validation/domain02/shell_domain_evidence.mat`。
-- 最近方向：`outputs/v91_validation/continuous01/step01/active_direction.mat`。
-- 下一次实际推进必须从Q39重建准备系统。`outputs/v91_validation/continuous01/step01/current/`属于Q38，已在本次存储维护中回收六项派生矩阵，保留原清单、输入、方向和`CACHE_PRUNED.json`；不能直接加载旧清单续算。
+- 最近方向：`outputs/v92_validation/continuous01/step01/active_direction.mat`。
+- 下一次实际推进必须从Q40重建准备系统。v91的Q38系统及v92的Q39系统已在各自验收后回收六项派生矩阵，原清单、输入、方向和`CACHE_PRUNED.json`保留；不能直接加载旧清单续算。
 - 保留历史输入、实际数值结果、自由/受限检查点、公开参考审计及当前工作台。
 
 ## 旧缓存清理后的复算
@@ -43,6 +43,8 @@ v84三组系统所绑定的`cutCellExactEulerBranchJacobian.m`与当前版本不
 清理前压缩目录时遇到本机Python接口兼容问题，第一次执行在预检查阶段拒绝，没有删除计算文件；修复后重新完整核对并执行。相关失败记录保留，本次维护没有修改计算算法或物理结论。
 
 ## 后续约定
+
+2026-10-29已在v92所有实际任务及审计终态后核对34项绑定模块、16项保留依赖，删除Q39系统的六项可重建派生矩阵，共2,096,371,772字节；磁盘空闲实际增加2,096,381,952字节。独立核对仅计划六项缺失，其他v92文件的大小、修改时间、文件ID不变，保留依赖及源码SHA通过。回执见`docs/validation/v92/obsolete_cache_*.json`。当前Q40状态、Q39前驱、几何、数值方向、线性检查点及工作台保留，未生成工程ZIP。历史完整方向审计依赖原已清理缓存；需要重放历史研究时，从保留Q39及相应源码在新目录重建整个研究及新来源绑定，不将旧方向文件套到新准备清单，也不保证历史MAT文件SHA相同。
 
 每次阶段结束检查缓存是否仍在使用；能由已保留输入和对应源码重建的旧缓存及时回收。保留当前工作所需数据、独有数值结果和小型验证记录，不再默认累积全套旧矩阵、工程 ZIP 或隔离工程副本。具有相同内容的历史大文件可共享一份磁盘数据；资源管理器按路径累计的大小会高于实际占用。
 

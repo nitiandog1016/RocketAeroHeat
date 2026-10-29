@@ -1,14 +1,14 @@
 function report=studyRocketTemperatureLookahead(folder,previousFolder,targetAlpha,selectionPolicy)
 %STUDYROCKETTEMPERATURELOOKAHEAD 从显式真实端点重建一次前瞻选面方向并由原NS验收。
 % 模块一：完整回放当前NS、重建C/W/QR；旧Q35夹具和Q36导数不用于新状态。
-% 模块二：自由128步只算一次，依据该方向在目标步长的单元温度预览补充原10K面。
+% 模块二：自由128步只算一次；显式逐轮策略最多三次受限重算，检查投影后新暴露的温域条件。
 % 模块三：方向仍过原完整模型/新鲜NS0.1，候选仍从全步按原温域/下降规则搜索。
 % 模块四：仅一次有界真实推进，保留自由前缀/全部原行/拒绝；不保证目标步长可接受。
 if nargin<2,previousFolder='outputs/v83_validation/krylov37';end
 if nargin<3,targetAlpha=1/8;end
 if nargin<4,selectionPolicy='all-extended-band';end
 assert(ischar(selectionPolicy)&&ismember(selectionPolicy,{'all-extended-band','original-and-predicted-required-faces', ...
-    'original-and-predicted-cell-and-interface-faces'}), ...
+    'original-and-predicted-cell-and-interface-faces','original-and-iteratively-predicted-cell-and-interface-faces'}), ...
     'TemperatureLookahead:Options','需要明确的前瞻选面策略。');
 root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
 folder=char(java.io.File(folder).getCanonicalPath());previousFolder=char(java.io.File(previousFolder).getCanonicalPath());

@@ -19,6 +19,9 @@ def cells(x):
 
 
 def active_arithmetic(rows,evidence,report):
+    if 'repreview' in report:
+        from auditRocketTemperatureRepreview import repreview_arithmetic
+        return repreview_arithmetic(rows,evidence,report)
     H=rows['H'];signs=np.atleast_1d(rows['temperatureBoundSigns']);free=evidence['free'];active=np.array([],dtype=int)
     def inspect(v):
         t=np.atleast_1d(H@v.ravel(order='F'));b=128*np.finfo(float).eps*np.atleast_1d(abs(H)@abs(v.ravel(order='F')))

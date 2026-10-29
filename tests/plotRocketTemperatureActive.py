@@ -68,8 +68,10 @@ def main():
     a = axes[1, 1]
     counts = [len(np.atleast_1d(s['directionReport']['bandFaceIDs'])) if np.size(s['directionReport']['bandFaceIDs']) else 0 for s in steps]
     active = [len(np.atleast_1d(s['directionReport']['activeFaceIDs'])) if np.size(s['directionReport']['activeFaceIDs']) else 0 for s in steps]
-    interface = any(s['directionReport'].get('lookaheadSelection', {}).get('selectionPolicy') ==
-                    'original-and-predicted-cell-and-interface-faces' for s in steps)
+    iterative = any('repreview' in s['directionReport'] for s in steps)
+    interface = any(s['directionReport'].get('lookaheadSelection', {}).get('selectionPolicy') in
+                    ('original-and-predicted-cell-and-interface-faces',
+                     'original-and-iteratively-predicted-cell-and-interface-faces') for s in steps)
     targeted = interface or any(s['directionReport'].get('lookaheadSelection', {}).get('selectionPolicy') ==
                                'original-and-predicted-required-faces' for s in steps)
     if targeted:
@@ -77,7 +79,7 @@ def main():
         a.bar(number - .24, original, .22, label='Original interfaces within 10 K')
         a.bar(number, counts, .22, label=('Original + predicted CV/interface required faces' if interface
                                         else 'Original + all predicted required faces'))
-        a.bar(number + .24, active, .22, label='Outward rows actually activated')
+        a.bar(number + .24, active, .22, label='Outward or finite-step-required active rows' if iterative else 'Outward rows actually activated')
         a.set_ylim(0, max(original+counts+active)*1.4)
     else:
         a.bar(number - .17, counts, .32, label='Current interfaces within 10 K of bounds')
@@ -90,6 +92,27 @@ def main():
     for ext in ('png', 'pdf'):
         fig.savefig(OUT / f'temperature_active_continuation.{ext}', dpi=160)
     plt.close(fig)
+    # 逐轮图只表示指定步长的内部温域检查，不表示开放边界/完整NS或稳态通过。
+    if iterative:
+        fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), layout='constrained')
+        for step in steps:
+            recheck = step['directionReport'].get('repreview')
+            if not recheck:
+                continue
+            rounds = recheck['history']
+            rounds = [rounds] if isinstance(rounds, dict) else rounds
+            x = [h['round'] for h in rounds]
+            axes[0].plot(x, [np.size(h['predictedViolatingCellIDs']) for h in rounds], 'o-', label='Out-of-range CV')
+            axes[0].plot(x, [np.size(h['predictedViolatingInterfaceFaceIDs']) for h in rounds], 's-', label='Out-of-range assessable Riemann face')
+            axes[1].plot(x, [np.size(h['selectedFaceIDs']) for h in rounds], 'o-', label='Accumulated original rows')
+            axes[1].plot(x, [np.size(h['forcedActiveFaceIDs']) for h in rounds], 's-', label='Finite-step-required faces')
+        for a in axes:
+            a.set_xlabel('Preview round (0 = free candidate)'); a.set_xticks(x); a.grid(axis='y', alpha=.2); a.legend(fontsize=8)
+        axes[0].set_ylabel('Count (blocked interfaces remain unassessed)'); axes[1].set_ylabel('Count (no rank-based row removal)')
+        fig.suptitle('Bounded post-projection recheck at specified alpha; internal temperature only\nOpen boundary / full NS / steady state require separate checks', fontsize=11)
+        for ext in ('png', 'pdf'):
+            fig.savefig(OUT/f'temperature_repreview_rounds.{ext}', dpi=160)
+        plt.close(fig)
     assert all(sha(ROOT / name) == digest for name, digest in bindings.items())
     receipt = dict(status='plotted-actual-current-state-continuation-and-temperature-direction-policy',
                    actualAcceptedSteps=len(actual), acceptedAlpha=alphas,

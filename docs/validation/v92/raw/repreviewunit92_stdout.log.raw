@@ -1,0 +1,14 @@
+RAH_ENGINE_PID=55244
+{错误使用 .*
+整数只能与同类的整数或双精度标量值组合使用。
+
+出错 buildRocketInterfaceTemperatureRows (第 23 行)
+    left(ids,:)=reshape(sample.left(5,:,:),5,count)'.*scale;
+
+出错 selectRocketTemperatureBandRows (第 27 行)
+    rows=buildRocketInterfaceTemperatureRows(Q,cut,gas,scale,allIDs(selected));
+
+出错 testRocketTemperatureRepreview (第 16 行)
+audit.faceID=ids;info=struct('exactEulerFluxAudit',audit);base=selectRocketTemperatureBandRows(Q,info,cut,gas,scale);
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

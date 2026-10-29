@@ -31,18 +31,30 @@
     ['近似父矩阵C剩余',num(preparation.internalCRelativeResidual)+(preparation.internalCTargetMet?'；内部目标通过':'；未达内部目标 '+num(preparation.internalCTarget))],
     ['完整模型 / 原NS缺陷',num(preparation.completeModelRelativeDefect)+' / '+num(preparation.originalNSDirectionDefect)+'（原NS目标≤'+num(preparation.originalNSDirectionTarget)+'）'],
     ['幅度控制身份','峰值软惩罚；不保证硬幅度上限，实际候选仍由完整NS验收']);
+   if(preparation.displayedStateUnchanged)panels[3][2].push(['本次方向状态','未接受流场更新；云图保持原检查点，拒绝诊断单独列出']);
    if(preparation.kind==='temperature-comparison-QR-LSQR-v1')panels[3][2].push(['界面温度方向约束',preparation.constraintApplied?'原内部面19207：一阶温度变化约为0；未增加物理温度边界，非线性候选仍须原温域检查':'同态自由方向对照；未施加界面温度投影']);
    if(preparation.kind==='current-band-active-temperature-v1'){
     const count=v=>Array.isArray(v)?v.length:v==null?0:1;
     const lookahead=preparation.lookaheadSelection;
-    const selectionLabel=lookahead?'原10 K带内 '+count(lookahead.originalBandFaceIDs)+' 面；预测越温 '+count(lookahead.predictedViolatingCellIDs)+' 单元；实际选择 '+count(preparation.bandFaceIDs)+' 面，激活 '+count(preparation.activeFaceIDs)+' 行':'当前两端10 K带内 '+count(preparation.bandFaceIDs)+' 面；实际激活 '+count(preparation.activeFaceIDs)+' 行';
+    const selectionLabel=lookahead?'原10 K带内 '+count(lookahead.originalBandFaceIDs)+' 面；'+(preparation.repreview?'累计暴露越温 ':'预测越温 ')+count(lookahead.predictedViolatingCellIDs)+' 单元；实际选择 '+count(preparation.bandFaceIDs)+' 面，激活 '+count(preparation.activeFaceIDs)+' 行':'当前两端10 K带内 '+count(preparation.bandFaceIDs)+' 面；实际激活 '+count(preparation.activeFaceIDs)+' 行';
     panels[3][2].push(['当前温域方向选择',selectionLabel],
-     ['方向与边界身份','每步重建当前导数；朝域内方向保持自由。未增加物理温度边界，实际候选仍须原NS和温域检查']);
-    if(lookahead&&lookahead.interfacePreview&&!Array.isArray(lookahead.interfacePreview)){
+     ['方向与边界身份','每步重建当前导数；有限步必要条件可强制激活。未增加物理温度边界，实际候选仍须原NS和温域检查']);
+    if(preparation.repreview){
+     // 模块用途：投影后末轮与初始自由预览分开；内部温域通过不代替完整NS、开放边界或稳态。
+     const r=preparation.repreview,h=Array.isArray(r.history)?r.history:[r.history],last=h.at(-1);
+     const reasons={'specified-target-candidate-temperature-checked-with-all-current-rows-feasible':'指定步长内部温域通过；原方向门槛另验','repreview-has-no-new-actionable-original-condition':'没有可新增条件，停止受限重算','bounded-repreview-budget-exhausted':'已用尽本次受限重算预算'};
+     panels[3][2].push(['投影后温域复查','目标步长 '+num(r.targetAlpha)+'；预览 '+r.previewCount+' 次；受限重算 '+preparation.activeSolveCount+' 次'],
+      ['末轮内部温域',!last||!last.previewCellStateEvaluable?'未执行完整内部检查：候选单元状态无法评估':
+       r.targetCandidateThermallyFeasible?'指定步长全部单元与内部界面温域通过；完整NS另验':
+       '未通过：越温单元 '+count(last.predictedViolatingCellIDs)+'；可检查越温界面 '+count(last.predictedViolatingInterfaceFaceIDs)+'；阻挡面 '+last.blockedInterfaceCount],
+      ['原方向精度门槛',typeof preparation.bandDirectionFeasible!=='boolean'?'未知：缺少原方向检查结果':preparation.bandDirectionFeasible?'通过原128eps点积界及全部必要条件检查':'未通过；内部温度合法也不能放行方向'],
+      ['复查停止原因',reasons[preparation.repreviewStopReason]||preparation.repreviewStopReason||'未知'],
+      ['复查适用范围','仅指定步长的全部单元和内部Riemann温域；不包含开放边界、完整NS、稳态或物理验证']);
+    }else if(lookahead&&lookahead.interfacePreview&&!Array.isArray(lookahead.interfacePreview)){
      const preview=lookahead.interfacePreview;
      panels[3][2].push(['Riemann界面前瞻','预测越温 '+count(preview.predictedViolatingInterfaceFaceIDs)+' 面；已检查 '+count(preview.assessedFaceIDs)+' 面；因单元超域阻挡 '+count(preview.blockedFaceIDs)+' 面'],
       ['前瞻适用范围',preview.allInteriorFacesAssessed?'本次自由候选的全部内部面已检查；投影后候选仍须完整NS验收':'仅检查候选输入单元合法的内部面；阻挡面尚未检查，不能宣称候选合法']);
-    }else if(lookahead&&lookahead.selectionPolicy==='original-and-predicted-cell-and-interface-faces'){
+    }else if(lookahead&&['original-and-predicted-cell-and-interface-faces','original-and-iteratively-predicted-cell-and-interface-faces'].includes(lookahead.selectionPolicy)){
      panels[3][2].push(['Riemann界面前瞻','未执行：目标候选的单元状态无法评估；没有界面已检查结论']);
     }
     if(preparation.freeCheckpointReplay)panels[3][2].push(['检查点接续','同一当前状态和方程已核对；复用自由方向 '+preparation.reusedFreeNativeIterations+' 步，新算受限方向 '+preparation.newProjectedNativeIterations+' 步']);

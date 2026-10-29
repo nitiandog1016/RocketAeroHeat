@@ -64,16 +64,27 @@ def main():
                 np.testing.assert_array_equal(np.atleast_1d(selection['originalBandFaceIDs']), original_ids)
                 if selection.get('selectionPolicy') == 'original-and-predicted-required-faces':
                     expected = np.union1d(original_ids, np.atleast_1d(selection['requiredOriginalStateFaceIDs']))
-                elif selection.get('selectionPolicy') == 'original-and-predicted-cell-and-interface-faces':
+                elif selection.get('selectionPolicy') in ('original-and-predicted-cell-and-interface-faces',
+                                                          'original-and-iteratively-predicted-cell-and-interface-faces'):
                     expected = np.union1d(np.union1d(original_ids, np.atleast_1d(selection['requiredOriginalStateFaceIDs'])),
                                           np.atleast_1d(selection['predictedViolatingInterfaceFaceIDs']))
-                    preview = selection['interfacePreview']
-                    assessed = np.atleast_1d(preview['assessedFaceIDs']).astype(int)
-                    blocked = np.atleast_1d(preview['blockedFaceIDs']).astype(int)
-                    assert not np.intersect1d(assessed, blocked).size
-                    np.testing.assert_array_equal(np.sort(np.r_[assessed, blocked]), ids+1)
-                    assert preview['allInputFacesAccountedFor'] and not preview['temperatureDomainRelaxed']
-                    assert bool(preview['allInteriorFacesAssessed']) == (not len(blocked))
+                    previews = [selection['interfacePreview']]
+                    if 'repreview' in direction:
+                        direction_path = Path(steps[state_number]['directionFile'])
+                        bindings[str(direction_path.relative_to(ROOT))] = sha(direction_path)
+                        saved_direction = loadmat(direction_path, simplify_cells=True,
+                                                  variable_names=['evidence'])['evidence']
+                        sequence = saved_direction['previewSelections']
+                        sequence = [sequence] if isinstance(sequence, dict) else list(sequence)
+                        previews = [p['interfacePreview'] for p in sequence if p['previewCellStateEvaluable']]
+                        assert len(sequence) == direction['repreview']['previewCount']
+                    for preview in previews:
+                        assessed = np.atleast_1d(preview['assessedFaceIDs']).astype(int)
+                        blocked = np.atleast_1d(preview['blockedFaceIDs']).astype(int)
+                        assert not np.intersect1d(assessed, blocked).size
+                        np.testing.assert_array_equal(np.sort(np.r_[assessed, blocked]), ids+1)
+                        assert preview['allInputFacesAccountedFor'] and not preview['temperatureDomainRelaxed']
+                        assert bool(preview['allInteriorFacesAssessed']) == (not len(blocked))
                 else:
                     assert selection.get('selectionPolicy', 'all-extended-band') == 'all-extended-band'
                     width = selection['selectedTemperatureBandK']

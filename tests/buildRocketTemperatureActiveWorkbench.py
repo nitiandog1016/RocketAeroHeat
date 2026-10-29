@@ -19,6 +19,26 @@ def configure(output_folder):
     STUDY = OUT / 'continuous01/active_continuation.json'
 
 
+def stamp_viewer_urls(folder, data):
+    """按实际文件内容给内嵌页面和脚本加版本，防止父页面刷新后仍沿用旧嵌套资源。"""
+    for case in data['cases']:
+        relative = case['resultsURL'].split('?', 1)[0]
+        file = folder/relative
+        file.resolve().relative_to(folder.resolve())
+        assert file.is_file()
+        case['resultsURL'] = relative+'?view='+sha(file)[:12]
+    raw = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
+    (folder/'wall-velocity-study-data.json').write_bytes(raw.encode('utf8'))
+    script = folder/'wall-velocity-study-data.js'
+    script.write_bytes(('window.ROCKET_WALL_VELOCITY_STUDY='+raw+';\n').encode('utf8'))
+    page = folder/'index.html'; html = page.read_text('utf8')
+    for name in ('wall-velocity-study-data.js', 'rocket-wall-velocity.js'):
+        html, count = re.subn(r'src="'+re.escape(name)+r'(?:\?[^"]*)?"',
+                             'src="'+name+'?v='+sha(folder/name)[:12]+'"', html)
+        assert count == 1
+    page.write_bytes(html.encode('utf8'))
+
+
 def aliases():
     """仅建立已保存端点的逐字节别名；不执行计算，不增加接受次数。"""
     final = STUDY.is_file()
@@ -45,9 +65,12 @@ def aliases():
                             predecessorCase=previous, SHA256=sha(target / 'wall_velocity_krylov_evidence.mat'),
                             RMS=step['main']['rmsMerit'], maximum=step['main']['maximumResidual']))
         previous = target.name
-    assert entries, '没有新接受态，不能生成新结果别名。'
+    # 没有接受更新时显示原检查点，诊断仍可接回工作台；不伪造新态或新接受编号。
+    selected = entries[-1] if entries else dict(step=steps[-1]['step'], sourceFolder=str(Path(steps[0]['sourceBinding']['sourceFile']).parent),
+        displayCase=Path(steps[0]['sourceBinding']['sourceFile']).parent.name, predecessorCase=previous,
+        SHA256=sha(steps[0]['sourceBinding']['sourceFile']), displayedStateUnchanged=True)
     result = dict(status='byte-identical-actual-continuous-current-state-display-aliases',
-                  studyTerminal=final, entries=entries, selected=entries[-1],
+                  studyTerminal=final, entries=entries, selected=selected,
                   newFlowAcceptances=0, newProductionSolvedAreaM2=0)
     if final:
         target = OUT / 'view_source_binding.json'
@@ -64,29 +87,30 @@ def bind(study_file, candidate_file, state_file, step_number):
     if isinstance(steps, dict):
         steps = [steps]
     step = next(item for item in steps if item['step'] == step_number)
-    assert step['main'] and step['main']['acceptedNonlinearIterations'] == 1
+    accepted = bool(step['main'] and step['main']['acceptedNonlinearIterations'] == 1)
     assert sha(candidate_file) == step['directionFileSHA256'] == sha(step['directionFile'])
     candidate = loadmat(candidate_file, simplify_cells=True,
                         variable_names=['value', 'directionReport', 'sourceBinding', 'evidence',
                                         'preparationFile', 'preparationSHA256'])
     state = loadmat(state_file, simplify_cells=True, variable_names=['result', 'report'])
     actual = state['result']
-    line = actual['linearLog']
-    if not isinstance(line, dict):
-        line = line[0]
     assert candidate['sourceBinding'] == step['sourceBinding']
     assert sha(candidate['preparationFile']) == candidate['preparationSHA256'] == step['preparationSHA256']
     assert sha(candidate['sourceBinding']['sourceFile']) == candidate['sourceBinding']['sourceFileSHA256']
-    np.testing.assert_array_equal(candidate['value'], line['steadyDirectionEvidence']['directionU'])
-    probe = loadmat(actual['options']['steadyInitialGuess']['file'], simplify_cells=True,
-                    variable_names=['sourceBinding', 'directionU'])
-    assert probe['sourceBinding']['sha256'] == candidate['sourceBinding']['sourceFileSHA256']
-    np.testing.assert_array_equal(probe['directionU'], candidate['value'])
-    assert step['main']['totalNewEquationAcceptedIterations'] == state['report']['totalNewEquationAcceptedIterations']
-    assert step['main']['totalNewEquationResidualEvaluations'] == state['report']['totalNewEquationResidualEvaluations']
-    assert sha(state_file) == sha(Path(step['resultFolder']) / 'wall_velocity_krylov_evidence.mat')
+    if accepted:
+        line = actual['linearLog']; line = line if isinstance(line, dict) else line[0]
+        np.testing.assert_array_equal(candidate['value'], line['steadyDirectionEvidence']['directionU'])
+        probe = loadmat(actual['options']['steadyInitialGuess']['file'], simplify_cells=True,
+                        variable_names=['sourceBinding', 'directionU'])
+        assert probe['sourceBinding']['sha256'] == candidate['sourceBinding']['sourceFileSHA256']
+        np.testing.assert_array_equal(probe['directionU'], candidate['value'])
+        assert step['main']['totalNewEquationAcceptedIterations'] == state['report']['totalNewEquationAcceptedIterations']
+        assert step['main']['totalNewEquationResidualEvaluations'] == state['report']['totalNewEquationResidualEvaluations']
+        assert sha(state_file) == sha(Path(step['resultFolder']) / 'wall_velocity_krylov_evidence.mat')
+    else:
+        assert sha(state_file) == candidate['sourceBinding']['sourceFileSHA256'], '拒绝试算只能展示实际当前态。'
     report = candidate['directionReport']
-    assert report['bandDirectionFeasible'] and not report['oldActiveSetInherited']
+    assert (report['bandDirectionFeasible'] or not accepted) and not report['oldActiveSetInherited']
     detail = report['linearReport']
     cycles = candidate['evidence']['cycles']
     cycles = [cycles] if isinstance(cycles, dict) else list(np.atleast_1d(cycles).ravel())
@@ -101,20 +125,22 @@ def bind(study_file, candidate_file, state_file, step_number):
             allOriginalRowsExactlyRepresented=bool(p.get('allOriginalRowsExactlyRepresented',p['constraintCount']==q)),
             rankTruncationUsed=bool(p.get('rankTruncationUsed',False))))
     target = detail.get('internalCTarget', detail.get('options', {}).get('relativeTolerance'))
-    assert target == .001 and step['probe']['originalNSDirectionTargetMet']
+    assert target == .001 and (not accepted or step['probe']['originalNSDirectionTargetMet'])
     preparation = dict(kind='current-band-active-temperature-v1',
                 methodLabel=f"当前温域双侧筛选；自由方向及{report['activeSolveCount']}次活跃行投影重算",
                 studyFile=str(study_file), studyFileSHA256=sha(study_file),
                 candidateFile=str(candidate_file), candidateFileSHA256=sha(candidate_file),
                 step=step_number, baseCase=Path(candidate['sourceBinding']['sourceFile']).parent.name,
-                usedTotalDirectionExactlyVerified=True, hardUpdateLimitClaimed=False,
+                usedTotalDirectionExactlyVerified=accepted, proposedTotalDirectionBoundToCurrentState=True,
+                displayedStateUnchanged=not accepted, hardUpdateLimitClaimed=False,
                 firstSegmentIterations=report['freeLinearReport']['nativeIterations'],
                 restartedSegmentIterations=report['totalNativeIterations'] - report['freeLinearReport']['nativeIterations'],
                 internalCRelativeResidual=detail['relativeCResidual'], internalCTarget=target,
                 internalCTargetMet=bool(detail['internalCTargetMet']),
                 completeModelRelativeDefect=step['completeSelectedModelRelativeDefect'],
-                originalNSDirectionDefect=line['fullSystemRelativeDefect'],
-                originalNSDirectionTarget=actual['options']['linearRelativeTolerance'],
+                originalNSDirectionDefect=line['fullSystemRelativeDefect'] if accepted else
+                    (step['probe']['originalNSDirectionDefect'] if step['probe'] else None),
+                originalNSDirectionTarget=actual['options']['linearRelativeTolerance'] if accepted else .1,
                 bandFaceIDs=step['directionReport']['bandFaceIDs'],
                 activeFaceIDs=step['directionReport']['activeFaceIDs'],
                 temperatureDerivativeK=step['directionReport']['temperatureDerivativeK'],
@@ -129,6 +155,11 @@ def bind(study_file, candidate_file, state_file, step_number):
         preparation['methodLabel'] = f"当前自由候选前瞻；保留原温域带并补全部预测越温单元；{report['activeSolveCount']}次受限重算"
         if selection.get('selectionPolicy') == 'original-and-predicted-cell-and-interface-faces':
             preparation['methodLabel'] = f"当前单元与Riemann界面共同前瞻；保留原温域带、单元所需面与可检查的越温界面；{report['activeSolveCount']}次受限重算"
+    if 'repreview' in report:
+        preparation['repreview'] = step['directionReport']['repreview']
+        preparation['repreviewStopReason'] = report['stopReason']
+        preparation['bandDirectionFeasible'] = bool(report['bandDirectionFeasible'])
+        preparation['methodLabel'] = f"投影后逐轮检查指定步长的内部温域；累计保留必要条件；{report['activeSolveCount']}次受限重算"
     if 'freeCheckpointReplay' in report:
         preparation['freeCheckpointReplay'] = step['directionReport']['freeCheckpointReplay']
         preparation['newFreeNativeIterations'] = report['freeCheckpointReplay']['newFreeNativeIterations']
@@ -151,7 +182,8 @@ def build():
     shutil.copy2(ROOT / 'web/rocket-wall-velocity.js', folder / 'rocket-wall-velocity.js')
     data = json.loads((folder / 'wall-velocity-study-data.json').read_text('utf8'))
     version = OUT.name.split('_')[0] if re.fullmatch(r'v\d+_validation', OUT.name) else '当前研究'
-    data['cases'][2]['label'] = f"{version} 当前态重建：第{selected['step']}步实际接受态（未收敛）"
+    data['cases'][2]['label'] = (f"{version} 第{selected['step']}步方向未接受，保留当前态（未收敛）" if selected.get('displayedStateUnchanged') else
+                               f"{version} 当前态重建：第{selected['step']}步实际接受态（未收敛）")
     data['cases'][2]['solverDiagnostics']['directionPreparation'] = preparation
     labels = []
     for item in steps:
@@ -161,13 +193,14 @@ def build():
     data['temperatureActiveResearch'] = dict(selectedCase=selected['displayCase'],
         comparisonLabel='；'.join(labels),
         scopeLabel='逐态重建当前方程、方向和温域行；未收敛研究，新增合格面积0',
-        constraintLabel='接近温域上/下限且朝域外变化的方向才激活；朝域内变化可保持自由；实际候选仍须原NS验收',
+        constraintLabel='保留原温域行；指定有限步越域所需面显式激活；每轮检查不能代替开放边界、完整NS或稳态验收',
         reportURL='temperature-active-diagnostics.html', physicalSolution=False,
         newProductionSolvedAreaM2=0, continuation=study)
     raw = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     (folder / 'wall-velocity-study-data.json').write_text(raw, encoding='utf8')
     # 固定离线脚本字节，不让Windows文本换行转换破坏JSON/JS一致性。
     (folder / 'wall-velocity-study-data.js').write_bytes(('window.ROCKET_WALL_VELOCITY_STUDY=' + raw + ';\n').encode('utf8'))
+    stamp_viewer_urls(folder, data)
     # 诊断页逐步列出真实原行/不同条件及表示大小，不把存储节省写成物理或加速收益。
     representation_rows = []
     for item in steps:
@@ -199,7 +232,7 @@ def build():
         interface_policy = interface_policy or preview is not None
         cells = [str(item['step']), str(size(selection['originalBandFaceIDs'])),
                  str(size(selection['predictedViolatingCellIDs'])), str(size(selection['requiredOriginalStateFaceIDs'])),
-                 str(size(preview['predictedViolatingInterfaceFaceIDs'])) if preview is not None else '未启用',
+                 str(size(selection.get('predictedViolatingInterfaceFaceIDs', preview['predictedViolatingInterfaceFaceIDs'] if preview else []))) if preview is not None else '未启用',
                  str(size(preview['blockedFaceIDs'])) if preview is not None else '未启用',
                  str(size(selection['selectedBandFaceIDs'])), str(size(selection.get('candidateExtendedBandFaceIDs', selection['selectedBandFaceIDs'])))]
         lookahead_rows.append('<tr>'+''.join('<td>'+x+'</td>' for x in cells)+'</tr>')
@@ -212,6 +245,26 @@ def build():
             '所有候选仍须原完整NS、80–2000 K温域和下降检查。</p><table><thead><tr>'
             '<th>步骤</th><th>原10 K面</th><th>预测越温单元</th><th>所需原态面</th><th>预测越温界面</th><th>阻挡面</th><th>实际选择面</th><th>候选扩展带面</th>'
             '</tr></thead><tbody>'+''.join(lookahead_rows)+'</tbody></table>')
+    repreview_rows = []
+    for item in steps:
+        r = item['directionReport'].get('repreview')
+        if not r:
+            continue
+        history = r['history']; history = [history] if isinstance(history, dict) else history
+        for h in history:
+            counts = lambda key: str(np.size(h[key]))
+            values = [str(item['step']), str(h['round']), counts('predictedViolatingCellIDs'),
+                      counts('predictedViolatingInterfaceFaceIDs'), str(h['assessedInterfaceCount']), str(h['blockedInterfaceCount']),
+                      counts('selectedFaceIDs'), counts('forcedActiveFaceIDs'),
+                      '通过（仅内部温域）' if h['targetCandidateThermallyFeasible'] else ('未通过' if h['previewCellStateEvaluable'] else '未执行完整检查')]
+            repreview_rows.append('<tr>'+''.join('<td>'+v+'</td>' for v in values)+'</tr>')
+    if repreview_rows:
+        representation_table += ('<h2>投影后逐轮温域复查</h2><p>第0轮是自由候选，随后逐轮重新检查投影方向。'
+            '累计必要条件包含先前暴露的全部面，旧约束及旧活跃面不删除；有限步越界面即使一阶朝内也需显式激活。'
+            '通过仅表示指定步长的单元与内部Riemann温域；开放边界、原128eps方向精度、完整NS和稳态另行检查。</p>'
+            '<table><thead><tr><th>步骤</th><th>预览轮</th><th>越温单元</th><th>预测越温界面</th><th>已检查面</th><th>阻挡面</th>'
+            '<th>累计选择面</th><th>累计必要面</th><th>内部温域</th></tr></thead><tbody>'+''.join(repreview_rows)+'</tbody></table>'
+            '<img src="temperature_repreview_rounds.png" alt="逐轮内部温域检查及累计必要条件">')
     page = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>当前温域与连续推进</title>
 <style>body{font:16px/1.7 system-ui,sans-serif;max-width:1350px;margin:28px auto;padding:0 24px;color:#213747;background:#f7f9fb}img{width:100%;background:white}a{color:#146da2}.note{padding:16px;border-left:4px solid #ae7c24;background:#fff3d9}table{border-collapse:collapse;width:100%;background:#fff;font-size:14px}th,td{border-bottom:1px solid #d8e0e7;padding:8px;text-align:right}th{color:#324b60}</style>
 <a href="index.html" target="_top">返回当前结果工作台</a><h1>真实20°箭体：当前温域与连续推进</h1>
@@ -224,6 +277,8 @@ def build():
     (folder / 'temperature_active_record.json').write_text(json.dumps(study, ensure_ascii=False, indent=2), encoding='utf8')
     for ext in ('png', 'pdf'):
         shutil.copy2(OUT / f'temperature_active_continuation.{ext}', folder / f'temperature_active_continuation.{ext}')
+        if repreview_rows:
+            shutil.copy2(OUT/f'temperature_repreview_rounds.{ext}', folder/f'temperature_repreview_rounds.{ext}')
     same = []
     for file in (source / 'cases').glob('*/results.json'):
         relative = file.relative_to(source)
