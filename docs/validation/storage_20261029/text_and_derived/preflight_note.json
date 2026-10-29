@@ -1,0 +1,18 @@
+{
+  "status": "two-read-only-planning-refusals-corrected-before-any-deletion",
+  "attempts": [
+    {
+      "result": "refused-before-plan-and-deletion",
+      "reason": "The process snapshot uses Windows path separators; the original entry-name check assumed forward slashes.",
+      "correction": "Compare Path.name and preserve the recorded source SHA."
+    },
+    {
+      "result": "refused-before-plan-and-deletion",
+      "reason": "The original momentumlinereal03 process ended with 4294967295 after its numerical MAT files were saved, during oversized report serialization.",
+      "correction": "Keep that original exit code and stop record; require the preserved numerical MAT SHA and the terminal exit0 momentumlinereport02 recovery before retiring the derived factor."
+    }
+  ],
+  "successfulPlan": "plan.json",
+  "originalFailedProcessRewritten": false,
+  "numericalComputationRepeated": false
+}
