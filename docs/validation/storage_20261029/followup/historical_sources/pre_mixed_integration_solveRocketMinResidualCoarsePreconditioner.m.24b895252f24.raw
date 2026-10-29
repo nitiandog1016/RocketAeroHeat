@@ -1,0 +1,13 @@
+function [update,report]=solveRocketMinResidualCoarsePreconditioner(graph,coarse,cache,rhs)
+%SOLVEROCKETMINRESIDUALCOARSEPRECONDITIONER 图扫描加细层最小残差粗校正，固定线性右预条件。
+% 模块一：细层完整空间模型形成剩余量，像空间投影不能放大该剩余量。
+% 模块二：所有原NS组合方向和候选仍须另行验收，本函数不更新流场。
+assert(isequaln(coarse.baseQ,cache.Q)&&isequaln(coarse.space.geometry,cache.geometry)&&isequaln(coarse.gas,cache.gas)&& ...
+    isequaln(coarse.boundary,cache.boundary)&&isequaln(coarse.scale,cache.scale),'RocketCoarse:Cache','粗像缓存不属于当前基态。');
+[initial,report]=solveRocketShellGraphPreconditioner(graph,rhs);remaining=rhs+applyCutCellSelectedDirection(cache,initial);
+[correction,coarseReport]=solveRocketLeastSquaresCoarseSystem(coarse,remaining);update=initial+correction;
+report.status='applied-fixed-graph-and-fine-L2-minimum-residual-coarse-correction';
+for key=fieldnames(coarseReport)',report.(key{1})=coarseReport.(key{1});end
+report.coarseCorrectionModelApplications=1;report.coarseConstructionModelApplications=coarse.constructionModelApplications;
+report.preconditionerResidualIsInitialGraphScan=true;report.fixedLinearMap=true;
+end

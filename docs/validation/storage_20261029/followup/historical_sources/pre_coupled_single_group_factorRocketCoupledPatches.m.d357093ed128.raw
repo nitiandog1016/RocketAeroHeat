@@ -1,0 +1,59 @@
+function factor=factorRocketCoupledPatches(packed,partition,options)
+%FACTORROCKETCOUPLEDPATCHES 缓存五量强连接局部块逆，避免全局长三角误差传播。
+% 模块一：每组包含密度、三动量、能量全部未知量，原C完整连接不改变。
+% 模块二：原组逆未过1e-8时可显式采用组内原CV五量对角块；旧组逆仍拒绝。
+% 模块三：构造前核对数组预算，按组大小分桶批量作用，不删除任何CV。
+if nargin<3,options=struct;end
+defaults=struct('maximumFactorBytes',512*1024^2,'maximumConstructionBytes',2048*1024^2,'failureEvidenceFile','');
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))),'CoupledPatches:Options','未知局部块选项。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+assert(strcmp(packed.kind,'complete-five-conservation-block-CSR-unshifted-steady-graph')&&strcmp(partition.kind,'bounded-connected-five-field-strength-patches')&&partition.cellCount==packed.cellCount,'CoupledPatches:Input','原C与完整局部组不匹配。');
+n=packed.cellCount;ng=partition.patchCount;K=partition.maximumPatchCells;nb=numel(packed.column);sizes=double(partition.sizes);
+factorBound=8*25*sum(sizes.^2)+64*n+128*ng+65536;constructionBound=nb*204+2*factorBound+nb*64+n*128;
+assert(factorBound<=options.maximumFactorBytes&&constructionBound<=options.maximumConstructionBytes,'CoupledPatches:Budget','全部五量局部块超预算，不缩物理区域。');
+position=zeros(n,1,'uint8');position(partition.members)=uint8((1:n)'-repelem(double(partition.groupPointer(1:end-1)),sizes)+1);
+buckets=cell(K,1);pageOfGroup=zeros(ng,1,'uint32');
+for k=1:K
+    groups=find(sizes==k);pageOfGroup(groups)=uint32(1:numel(groups));members=zeros(k,numel(groups),'uint32');
+    for j=1:numel(groups),g=groups(j);members(:,j)=partition.members(double(partition.groupPointer(g)):double(partition.groupPointer(g+1))-1);end
+    buckets{k}=struct('patchIDs',uint32(groups),'members',members,'inverse',zeros(5*k,5*k,numel(groups)), ...
+        'certifiedBounds',zeros(numel(groups),1),'ordinaryDefects',zeros(numel(groups),1),'fallback',false(numel(groups),1),'rejectedPatchBounds',nan(numel(groups),1));
+end
+owners=repelem((1:n)',diff(double(packed.rowPointer)));rowCV=packed.order(owners);columnCV=packed.order(packed.column);rowGroup=partition.groupID(rowCV);columnGroup=partition.groupID(columnCV);selected=find(rowGroup==columnGroup);includedBlocks=numel(selected);
+for k=1:K
+    ids=selected(sizes(rowGroup(selected))==k);if isempty(ids),continue;end
+    page=double(pageOfGroup(rowGroup(ids)));rr=double(position(rowCV(ids)));cc=double(position(columnCV(ids)));N=5*k;pages=numel(buckets{k}.patchIDs);
+    for a=1:5,for b=1:5,index=sub2ind([N N pages],5*(rr-1)+a,5*(cc-1)+b,page);buckets{k}.inverse(index)=reshape(packed.values(a,b,ids),[],1);end,end
+end
+clear owners rowCV columnCV rowGroup columnGroup selected page rr cc index;maximumBound=0;fallbackCount=0;accurateCount=0;refinedCount=0;timer=tic;
+for k=1:K
+    bucket=buckets{k};buckets{k}=struct([]);
+    for page=1:numel(bucket.patchIDs)
+        original=bucket.inverse(:,:,page);[candidate,certificate]=certifyRocketLocalInverse(original);accurateCount=accurateCount+certificate.accurateResidualUsed;refinedCount=refinedCount+(certificate.refinementSteps>0);
+        if ~certificate.usable
+            rejectedBound=certificate.upperBound;replacement=zeros(5*k);bound=0;ordinary=0;
+            for member=1:k
+                ids=5*(member-1)+(1:5);[local,localCertificate]=certifyRocketLocalInverse(original(ids,ids));
+                if ~localCertificate.usable
+                    patchID=bucket.patchIDs(page);originalCV=bucket.members(member,page);
+                    if ~isempty(options.failureEvidenceFile),save(options.failureEvidenceFile,'original','patchID','originalCV','candidate','certificate','localCertificate','-v7');end
+                    error('CoupledPatches:UnsafeCV','原CV%d五量对角逆未通过1e-8。',originalCV);
+                end
+                replacement(ids,ids)=local;bound=max(bound,localCertificate.upperBound);ordinary=max(ordinary,localCertificate.ordinaryBLASDefect);
+            end
+            candidate=replacement;certificate.upperBound=bound;certificate.ordinaryBLASDefect=ordinary;bucket.fallback(page)=true;bucket.rejectedPatchBounds(page)=rejectedBound;fallbackCount=fallbackCount+1;
+        end
+        bucket.inverse(:,:,page)=candidate;bucket.certifiedBounds(page)=certificate.upperBound;bucket.ordinaryDefects(page)=certificate.ordinaryBLASDefect;maximumBound=max(maximumBound,certificate.upperBound);
+    end
+    buckets{k}=bucket;clear bucket;
+end
+factor=struct('kind','fixed-five-conservation-strong-connection-local-block-inverse','cellCount',n,'buckets',{buckets},'partition',partition,'options',options, ...
+    'factorizationReport',struct('patchCount',ng,'maximumPatchCells',K,'includedOriginalBlocksBeforeFallback',includedBlocks,'originalBlocks',nb, ...
+    'maximumCertifiedLocalInverseDefect',maximumBound,'inverseDefectThreshold',1e-8,'fallbackPatchCount',fallbackCount,'accurateCheckedPatches',accurateCount,'refinedPatches',refinedCount, ...
+    'factorStorageUpperBoundBytes',factorBound,'algorithmArrayConstructionEstimateBytes',constructionBound,'factorSeconds',toc(timer),'processPeakMemoryClaimed',false, ...
+    'fallbackPolicy','certified-original-CV-five-field-diagonal-only-in-preconditioner', ...
+    'allOriginalCellsAndFiveFieldsKept',true,'physicalEquationChanged',false,'rejectedPatchInverseClaimedValid',false,'diagonalCompensationApplied',false, ...
+    'fixedLinearMap',true,'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0));
+storage=whos('factor');assert(storage.bytes<=factorBound&&storage.bytes<=options.maximumFactorBytes,'CoupledPatches:Budget','实际因子超过上界或预算。');
+fprintf('COUPLED_PATCHES cells=%d patches=%d max=%d fallback=%d bound=%.9g bytes=%.0f\n',n,ng,K,fallbackCount,maximumBound,storage.bytes);
+end

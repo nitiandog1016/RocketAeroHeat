@@ -1,0 +1,30 @@
+function report=testRocketMomentumLines(folder)
+%TESTROCKETMOMENTUMLINES 两种排列下独立核对原面/层映射、缓存逆、完整A与内部求解。
+% 模块一：每列与稠密主子块直接逆比较，全部原面和层必须一一保留。
+% 模块二：完整A作用/GMRES与稠密解比较，检查线性、零右端及预算/奇异拒绝。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'MomentumLinesTest:Overwrite','不得覆盖法向列测试。');mkdir(folder);
+parentFile=fullfile(root,'outputs','v83_validation','fieldschurunit01','field_schur_unit_evidence.mat');p=load(parentFile,'cases');cases=cell(2,1);
+for j=1:2
+    c=p.cases{j};assembly=load(fullfile(root,'outputs','v83_validation','schurcheckpointunit01',sprintf('assembly%d',j),'schur_assembly_evidence.mat'),'momentumMatrix');matrix=assembly.momentumMatrix;packed=c.packed;
+    options=struct('maximumFactorBytes',8*1024^2,'maximumConstructionBytes',64*1024^2);factor=factorRocketMomentumLines(matrix,packed.order,packed.sourceFaces,packed.layers,options);n=matrix.cellCount;P=zeros(3*n);
+    for face=1:packed.sourceFaces
+        original=face+(0:packed.layers-1)*packed.sourceFaces;alg=double(factor.inverseOrder(original));ids=reshape(alg(:)'+(0:2)'*n,[],1);line=c.A(ids,ids);reference=line\eye(numel(ids));
+        assert(norm(factor.inverseLine(:,:,face)-reference,'fro')/max(1,norm(reference,'fro'))<1e-9);P(ids,ids)=reference;
+    end
+    rhs=reshape(sin((1:3*n)'*.37),n,3);value=solveRocketMomentumLines(factor,rhs);assert(norm(value(:)-P*rhs(:))/max(1,norm(P*rhs(:)))<1e-10);
+    image=applyRocketMomentumGraph(matrix,value);assert(norm(image(:)-c.A*value(:))/max(1,norm(c.A*value(:)))<1e-11);
+    other=reshape(cos((1:3*n)'*.23),n,3);mix=solveRocketMomentumLines(factor,.7*rhs-1.3*other);linearity=norm(mix-.7*value+1.3*solveRocketMomentumLines(factor,other),'fro')/max(1,norm(mix,'fro'));assert(linearity<1e-10);
+    opt=struct('maximumIterations',3*n,'relativeTolerance',1e-10,'maximumBasisBytes',64*1024^2,'saveBasisEvidence',true);[solved,detail]=solveRocketMomentumKrylov(matrix,factor,rhs,opt);direct=c.A\rhs(:);
+    assert(detail.krylov.flag==0&&detail.relativeAResidual<1.1e-10&&norm(solved(:)-direct)/max(1,norm(direct))<1e-8);
+    [zero,z]=solveRocketMomentumKrylov(matrix,factor,zeros(n,3),opt);assert(all(zero==0,'all')&&z.AApplications==0&&z.lineInverseApplications==0);
+    bad=options;bad.maximumFactorBytes=1;rejected=false;try,factorRocketMomentumLines(matrix,packed.order,packed.sourceFaces,packed.layers,bad);catch ex,rejected=strcmp(ex.identifier,'MomentumLines:Budget');end;assert(rejected);
+    cases{j}=struct('factor',factor,'matrix',matrix,'A',c.A,'P',P,'rhs',rhs,'singleValue',value,'singleImage',image,'solved',solved,'detail',detail,'direct',direct,'linearity',linearity);
+end
+toy=struct('kind','unfactored-conservative-field-block-CSR','cellCount',1,'dimension',3,'rowPointer',uint32([1;2]),'column',uint32(1),'values',ones(3));bad=options;bad.failureEvidenceFile=fullfile(folder,'singular_line.mat');singularRejected=false;
+try,factorRocketMomentumLines(toy,1,1,1,bad);catch ex,singularRejected=strcmp(ex.identifier,'MomentumLines:InverseDefect');end;assert(singularRejected&&exist(bad.failureEvidenceFile,'file')==2);
+tiny=toy;tiny.values=eye(3)*(realmin/16);scaleRejected=false;try,factorRocketMomentumLines(tiny,1,1,1,options);catch ex,scaleRejected=strcmp(ex.identifier,'MomentumLines:Scale');end;assert(scaleRejected);
+report=struct('status','passed-two-orderings-original-normal-line-inverse-full-A-and-dense-Krylov-reference', ...
+    'cases',2,'budgetRejected',true,'singularLineRejectedWithoutCompensation',singularRejected,'nonfiniteScaleRejected',scaleRejected,'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'momentum_lines_unit_evidence.mat'),'report','parentFile','cases','-v7');fid=fopen(fullfile(folder,'momentum_lines_unit_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end

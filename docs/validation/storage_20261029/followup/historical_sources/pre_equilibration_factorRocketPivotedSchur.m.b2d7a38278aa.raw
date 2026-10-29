@@ -1,0 +1,52 @@
+function factor=factorRocketPivotedSchur(matrix,options)
+%FACTORROCKETPIVOTEDSCHUR 对密度/能量Schur采用标量行主元ILUTP，保留全部方程。
+% 模块一：完整2量块矩阵转换为同顺序标量稀疏矩阵，不改变原S或原NS。
+% 模块二：milu=off、udiag=0禁止补对角；允许换行选主元，丢弃只属于预条件近似。
+% 模块三：检查构造/因子预算及原1e-8标量主元逆精度；不宣称旧2量主元通过。
+if nargin<2,options=struct;end
+defaults=struct('dropTolerance',1e-2,'maximumFactorBytes',448*1024^2,'maximumConstructionBytes',2048*1024^2,'scalarOrdering','cell-interleaved');
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))),'PivotedSchur:Options','未知主元Schur选项。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+validateattributes(options.dropTolerance,{'numeric'},{'scalar','real','finite','nonnegative','<',1});
+assert(ischar(options.scalarOrdering)&&ismember(options.scalarOrdering,{'cell-interleaved','field-major'}),'PivotedSchur:Ordering','未知标量排列。');
+for key={'maximumFactorBytes','maximumConstructionBytes'},validateattributes(options.(key{1}),{'numeric'},{'scalar','real','finite','positive'});end
+assert(strcmp(matrix.kind,'unfactored-conservative-field-block-CSR')&&matrix.dimension==2,'PivotedSchur:Kind','需要未因子化的完整密度/能量Schur。');
+n=matrix.cellCount;N=2*n;nb=numel(matrix.column);scalarUpper=4*nb;
+inputBytes=nb*36+(n+1)*4+n*4;tripletBytes=scalarUpper*24;CSCBytes=scalarUpper*16+(N+1)*8;
+constructionBytes=max(inputBytes+tripletBytes+2*CSCBytes+nb*24,inputBytes+CSCBytes+2*options.maximumFactorBytes+N*64);
+assert(N*64<=options.maximumFactorBytes&&constructionBytes<=options.maximumConstructionBytes,'PivotedSchur:Budget','标量Schur构造/因子最低存储超预算，不裁CV或方程。');
+owners=repelem((1:n)',diff(double(matrix.rowPointer)));rows=zeros(scalarUpper,1);columns=rows;values=rows;part=0;
+for b=1:2,for a=1:2
+    ids=part*nb+(1:nb);
+    if strcmp(options.scalarOrdering,'cell-interleaved')
+        rows(ids)=2*(owners-1)+a;columns(ids)=2*(double(matrix.column)-1)+b;
+    else,rows(ids)=owners+(a-1)*n;columns(ids)=double(matrix.column)+(b-1)*n;end
+    values(ids)=reshape(matrix.values(a,b,:),[],1);part=part+1;
+end,end
+A=sparse(rows,columns,values,N,N);clear rows columns values owners;
+if strcmp(options.scalarOrdering,'cell-interleaved'),scalarOrder=uint32(reshape([(1:n);n+(1:n)],[],1));else,scalarOrder=uint32((1:N)');end
+configuration=struct('type','ilutp','droptol',options.dropTolerance,'milu','off','udiag',0,'thresh',1);
+fprintf('PIVOTED_SCHUR unknowns=%d scalarNNZ=%d constructionEstimate=%.0f\n',N,nnz(A),constructionBytes);
+timer=tic;[L,U,P]=ilu(A,configuration);seconds=toc(timer);[pr,pc,pv]=find(P);
+assert(numel(pr)==N&&all(pv==1)&&numel(unique(pr))==N&&numel(unique(pc))==N,'PivotedSchur:Permutation','行主元置换不是完整双射。');
+permutation=zeros(N,1,'uint32');permutation(pr)=uint32(pc);clear P pr pc pv;
+diagonal=full(diag(U));assert(all(isfinite(diagonal))&&all(diagonal~=0),'PivotedSchur:Pivot','换行分解产生零或非有限标量主元，未补对角。');
+defect=max(abs(diagonal.*(1./diagonal)-1));assert(isfinite(defect)&&defect<1e-8,'PivotedSchur:FactorDefect','标量主元逆未过原1e-8。');
+storage=whos('L','U','permutation','scalarOrder');factorBytes=sum([storage.bytes])+8192;
+assert(factorBytes<=options.maximumFactorBytes,'PivotedSchur:Budget','实际L/U与置换超预算，拒绝使用。');
+probes=cell(2,1);
+for j=1:2
+    if j==1,probe=sin((1:N)'*.37);else,probe=cos((1:N)'*.23);end
+    original=A*probe;original=original(permutation);approx=L*(U*probe);
+    probes{j}=struct('name',j,'relativePAminusLUAction',norm(original-approx)/max(realmin,norm(original)));
+end
+factor=struct('kind','fixed-pivoted-scalar-ILUTP-for-density-total-energy-Schur','cellCount',n,'L',L,'U',U,'rowPermutation',permutation,'scalarOrder',scalarOrder, ...
+    'options',options,'factorizationReport',struct('method','MATLAB-ILUTP-row-pivoting','configuration',configuration,'scalarUnknowns',N, ...
+    'inputScalarNonzeros',nnz(A),'LNonzeros',nnz(L),'UNonzeros',nnz(U),'permutedRows',nnz(double(permutation)~=(1:N)'), ...
+    'scalarOrdering',options.scalarOrdering,'scalarOrderingIsOnlyEquivalentPermutation',true, ...
+    'factorStorageUpperBoundBytes',factorBytes,'algorithmArrayConstructionEstimateBytes',constructionBytes,'libraryWorkspaceExcluded',true, ...
+    'processPeakMemoryClaimed',false,'maximumScalarInverseDefect',defect,'originalInverseDefectThreshold',1e-8, ...
+    'diagonalCompensationApplied',false,'zeroDiagonalReplacementEnabled',false,'oldRejectedBlockInverseClaimedValid',false, ...
+    'allCellsAndBothConservativeFieldsKept',true,'probes',{probes},'factorSeconds',seconds,'matlabVersion',version, ...
+    'physicalEquationChanged',false,'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0));
+end

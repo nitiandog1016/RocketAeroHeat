@@ -1,0 +1,486 @@
+function cfg = createCaseConfig()
+%% ========================================================================
+% createCaseConfig.m
+%
+% Rocket AeroHeat
+%
+% 全局配置
+%
+%% ========================================================================
+
+
+%% ========================================================================
+% 1. 工程目录
+% ========================================================================
+
+cfg.projectRoot = ...
+    fileparts( ...
+        mfilename('fullpath'));
+
+
+
+%% ========================================================================
+% 2. STL
+% ========================================================================
+
+cfg.geometry.stlName = ...
+    'rocket.stl';
+
+
+cfg.geometry.stlFile = ...
+    fullfile( ...
+        cfg.projectRoot, ...
+        'cases', ...
+        cfg.geometry.stlName);
+
+
+
+%% ========================================================================
+% 3. STL 单位转换
+%
+% NX / UG 常用 mm：
+%
+%       1e-3
+%
+% STL 已经为 m：
+%
+%       1
+%% ========================================================================
+
+cfg.geometry.scale = ...
+    1e-3;
+
+
+
+%% ========================================================================
+% 4. Rocket AeroHeat 内部统一坐标
+%
+% 所有后续模块强制使用：
+%
+%       主轴       = X
+%       鼻尖方向   = +X
+%
+%% ========================================================================
+
+cfg.geometry.bodyAxis = ...
+    [1 0 0];
+
+
+cfg.geometry.noseDirection = ...
+    [1 0 0];
+
+
+
+%% ========================================================================
+% 5. 几何旋转信息
+%
+% 在 meshGUI 中由用户确认以后更新。
+%% ========================================================================
+
+cfg.geometry.rotationMatrix = ...
+    eye(3);
+
+
+cfg.geometry.rotationCenter = ...
+    [0 0 0];
+
+
+cfg.geometry.isAligned = ...
+    false;
+
+
+cfg.geometry.alignmentMethod = ...
+    'none';
+
+
+
+%% ========================================================================
+% 6. 自动重构面元
+% ========================================================================
+
+cfg.remesh.enable = ...
+    true;
+
+
+
+%% ========================================================================
+% 7. 网格尺寸
+%% ========================================================================
+
+cfg.remesh.hMin = ...
+    0.003;
+
+
+cfg.remesh.hMax = ...
+    0.030;
+
+
+cfg.remesh.initialAxialSpacing = ...
+    0.030;
+
+
+cfg.remesh.axialSpacingFactor = ...
+    1.25;
+
+
+
+%% ========================================================================
+% 8. 轴向自适应
+%% ========================================================================
+
+cfg.remesh.maxSectionPerimeterChange = ...
+    0.12;
+
+
+cfg.remesh.sectionRefineIterations = ...
+    8;
+
+
+cfg.remesh.maxStations = ...
+    1200;
+
+
+
+%% ========================================================================
+% 9. 曲率尺寸控制
+%% ========================================================================
+
+cfg.remesh.curvatureAngleTarget = ...
+    8.0;
+
+
+cfg.remesh.curvatureSensitivity = ...
+    1.0;
+
+% 特征边法向夹角阈值 [deg]，以及相对 hMin 的目标尺寸。
+cfg.remesh.featureAngle = 30.0;
+cfg.remesh.featureSizeFactor = 1.0;
+
+
+
+%% ========================================================================
+% 10. 周向节点
+%% ========================================================================
+
+cfg.remesh.minCircumPoints = ...
+    8;
+
+
+cfg.remesh.maxCircumPoints = ...
+    160;
+
+
+cfg.remesh.maxCircumCountRatio = ...
+    1.35;
+
+
+
+%% ========================================================================
+% 11. 质量标准
+%% ========================================================================
+
+cfg.remesh.maxAspectRatio = ...
+    5.0;
+
+
+cfg.remesh.minAngle = ...
+    20.0;
+
+
+
+%% ========================================================================
+% 12. 截面求交容差
+%% ========================================================================
+
+cfg.remesh.sectionMergeToleranceFraction = ...
+    1e-7;
+
+
+cfg.remesh.planeToleranceFraction = ...
+    1e-10;
+
+
+cfg.remesh.minimumEndOffsetFraction = ...
+    1e-5;
+
+
+
+%% ========================================================================
+% 13. 端部判断
+%% ========================================================================
+
+cfg.remesh.flatEndRadiusRatio = ...
+    0.40;
+
+
+cfg.remesh.extremeVertexToleranceFraction = ...
+    1e-6;
+
+
+
+%% ========================================================================
+% 14. 面数保护
+%% ========================================================================
+
+cfg.remesh.minFaces = ...
+    3000;
+
+
+cfg.remesh.maxFaces = ...
+    100000;
+
+
+cfg.remesh.targetFaceNumber = ...
+    [];
+
+
+
+%% ========================================================================
+% 15. 法向检查
+%% ========================================================================
+
+cfg.normal.verbose = ...
+    true;
+
+
+cfg.normal.failOnNonManifold = ...
+    false;
+
+
+
+%% ========================================================================
+% 16. 网格绘图
+%% ========================================================================
+
+cfg.plot.showEdges = ...
+    true;
+
+
+cfg.plot.showNormals = ...
+    true;
+
+
+cfg.plot.maxNormalNumber = ...
+    500;
+
+
+cfg.plot.normalScale = ...
+    0.015;
+
+
+cfg.plot.showMeshQuality = ...
+    true;
+
+
+cfg.plot.showGrid = ...
+    true;
+
+
+cfg.plot.fontName = ...
+    'Times New Roman';
+
+
+cfg.plot.fontSize = ...
+    12;
+
+
+cfg.plot.viewAzimuth = ...
+    35;
+
+
+cfg.plot.viewElevation = ...
+    25;
+
+
+
+%% ========================================================================
+% 17. Mesh GUI 滑块
+%% ========================================================================
+
+cfg.gui.hMinSliderRange_mm = ...
+    [0.5 20];
+
+
+cfg.gui.hMaxSliderRange_mm = ...
+    [5 100];
+
+
+cfg.gui.axialSpacingSliderRange_mm = ...
+    [2 100];
+
+
+cfg.gui.curvatureAngleSliderRange_deg = ...
+    [2 20];
+
+
+
+%% ========================================================================
+% 18. Flight GUI 滑块
+%% ========================================================================
+
+cfg.gui.alphaSliderRange_deg = ...
+    [-30 30];
+
+
+cfg.gui.betaSliderRange_deg = ...
+    [-30 30];
+
+
+
+%% ========================================================================
+% 19. 飞行条件默认值
+%% ========================================================================
+
+cfg.flight.altitude = ...
+    30000;
+
+
+cfg.flight.Mach = ...
+    5.0;
+
+
+cfg.flight.alpha = ...
+    0.0;
+
+
+cfg.flight.beta = ...
+    0.0;
+
+
+cfg.flight.Twall = ...
+    300.0;
+
+
+%% ========================================================================
+% 19a. 气动热工程模型参数
+% Prandtl：当前定比热空气工程模型采用常数 Pr。
+% transitionRe：局部外缘 Reynolds 数经验转捩阈值。
+% maxContinuumKnudsen：无滑移气动热关联式的 Kn 筛选阈值，
+% 只能取 0~0.01 内的值；不能靠提高阈值冒充稀薄流求解。
+% 特征长度优先用已确认的物理鼻端半径；若需指定其他长度，
+% 可设置 cfg.heating.continuumLength [m] 并在结果中查看来源。
+% stagnationCoefficient：Sutton-Graves 地球空气 SI 系数。
+% stagnationReferenceWallTemperature：冷壁经验值的参考壁温 [K]。
+% 球形钝鼻经多尺度几何检查通过时，程序从 STL 自动取得鼻尖半径。
+% 非球形鼻端如有经确认的等效半径，可手动设置以覆盖自动值：
+% cfg.stagnation.physicalNoseRadius = ...; [m]
+%% ========================================================================
+
+cfg.heating.Prandtl = 0.72;
+cfg.heating.transitionRe = 5e5;
+cfg.heating.maxContinuumKnudsen = 0.01;
+% 默认 Head 卷吸积分同时推进动量厚度和形状因子 H；H>=2.4 为
+% 疑似准二维分离，其下游不计算附着热流。fixedShape 为旧版对照。
+cfg.heating.turbulentModel = 'head';
+% 固定/飞行历程壁温默认每步重算沿程热边界；local 保留旧局部幂指数对照。
+% streamline 使用一维厚度导热；飞行历程的自动子步也更新外流工况。
+cfg.heating.wallCoupling = 'streamline';
+% 无上游解时局部平板启动，Re_theta 超出 300~1e6 时回退平板 Cf。
+% Thwaites 速度梯度的上游准流线割线步数；抑制局部数值跳变。
+cfg.heating.gradientPathSteps = 4;
+cfg.heating.stagnationCoefficient = 1.83e-4;
+cfg.heating.stagnationReferenceWallTemperature = 300;
+% 鼻区默认保留已有低阶延拓对照。零合成攻角的 sphericalLocalSimilarity 可选择
+% 已核验球面前缀的局部相似 BVP 单工况方法；超域面元不作余弦补值。
+% 新模型不解鼻部/后体熵层接口，也未验证壁体热历史耦合。
+cfg.heating.noseModel = 'cosineExtension';
+  % 鼻端法向激波、局部切锥/切楔/膨胀及热流优先使用 NASA7 干空气。
+  % 80~150 K 用振动冻结低温近似；零攻角轴向波系若低于 80 K，
+  % 侧壁整条退回定比热并标记。
+  % 设为 'caloricallyPerfect' 可复现旧版定比热工程外流与热流。
+cfg.heating.airThermalModel = 'thermallyPerfect';
+
+% 底压模块：默认明确给定Cp；sand93Laminar只接入经核验的孤立尖直锥。
+% 无尾撑/无喷流工况不能从STL推断，使用关联前须在工作台显式声明
+% cfg.basePressure.hasRearSupport/hasGasInjection及operationSource。
+% 当前关联限零攻角9~10度层流、定比热gamma=1.4空气；不映射代表底热。
+cfg.basePressure.model = 'prescribed';
+cfg.basePressure.operationSource = '';
+
+% 飞行历程内部计算站的最大时间间隔 [s]；用户表格站点会完整保留。
+% 站间飞行条件线性插值，每个新增站独立计算定常外流/热流。
+cfg.flightHistory.maxTimeStep = 1;
+
+% 三维外缘速度的面元有向图步进最大偏离角；仅影响准流线追踪。
+cfg.streamline.maxStepDeviationDeg = 80;
+
+% 内置外流解析角度节点步长 [deg]；节点之间连续插值。
+cfg.externalFlow.angleStepDeg = 0.5;
+% 圆形直母线区域用经过几何检查的截面法向计算外流入射角。
+% 'facet' 保留原始面法向，适合真实多面体或用于离散误差对照。
+% 不改变网格/压力积分法向，也不跨越肩部折角做平均。
+cfg.externalFlow.normalModel = 'validatedSections';
+% 局部切楔无附体弱解时，仅光滑前体受限区域启用低阶脱体闭合。
+% false 可关闭并保留原来的 NaN，便于比较工程近似的影响。
+cfg.externalFlow.detachedClosureEnabled = true;
+% 零攻角近轴对称箭体：从直鼻锥状态沿截面逐段推进激波/膨胀。
+% false 保留逐面元局部外流，可用于模型差异对照。
+cfg.externalFlow.axisymmetricMarchEnabled = true;
+
+
+
+%% ========================================================================
+% 20. 输出
+%% ========================================================================
+
+cfg.output.verbose = ...
+    true;
+
+
+
+%% ========================================================================
+% 21. 摘要
+%% ========================================================================
+
+if cfg.output.verbose
+
+    fprintf('\n');
+    fprintf('============================================================\n');
+    fprintf(' Rocket AeroHeat Configuration\n');
+    fprintf('============================================================\n');
+
+
+    fprintf('STL file:\n%s\n', ...
+        cfg.geometry.stlFile);
+
+
+    fprintf('\n');
+
+
+    fprintf('STL scale                : %.6e\n', ...
+        cfg.geometry.scale);
+
+
+    fprintf('Internal body axis       : +X\n');
+    fprintf('Internal nose direction  : +X\n');
+
+
+    fprintf('\n');
+
+
+    fprintf('hMin                     : %.3f mm\n', ...
+        cfg.remesh.hMin*1000);
+
+
+    fprintf('hMax                     : %.3f mm\n', ...
+        cfg.remesh.hMax*1000);
+
+
+    fprintf('Initial axial spacing    : %.3f mm\n', ...
+        cfg.remesh.initialAxialSpacing*1000);
+
+
+    fprintf('Curvature target         : %.3f deg\n', ...
+        cfg.remesh.curvatureAngleTarget);
+
+
+    fprintf('Circumferential points   : %d ~ %d\n', ...
+        cfg.remesh.minCircumPoints, ...
+        cfg.remesh.maxCircumPoints);
+
+
+    fprintf('============================================================\n');
+
+end
+
+end
