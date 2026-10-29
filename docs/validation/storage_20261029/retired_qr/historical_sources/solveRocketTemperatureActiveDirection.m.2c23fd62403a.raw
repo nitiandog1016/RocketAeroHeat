@@ -1,0 +1,56 @@
+function [value,report,evidence]=solveRocketTemperatureActiveDirection(packed,factor,rhs,metric,rows,options)
+%SOLVEROCKETTEMPERATUREACTIVEDIRECTION 从自由方向开始，逐次加入朝原温域外变化的界面行。
+% 模块一：每个当前状态从零自由方向重算，上一状态的约束与导数不继承。
+% 模块二：投影后若其他带内行转向界外，再加入并重算；当前状态内不删已激活行。
+% 模块三：只是可行方向原型，不声称不等式最优解或非线性温域保证，原NS仍独立验收。
+if nargin<6,options=struct;end
+defaults=struct('maximumIterations',128,'maximumActiveSolves',3,'checkpointFolder','');
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))), ...
+    'TemperatureActive:Options','未知活跃方向选项。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+validateattributes(options.maximumIterations,{'numeric'},{'scalar','integer','positive'});
+validateattributes(options.maximumActiveSolves,{'numeric'},{'scalar','integer','positive','<=',3});
+assert(rows.cellCount==packed.cellCount&&all(ismember(rows.temperatureBoundSigns,[-1 1]))&& ...
+    numel(rows.temperatureBoundSigns)==size(rows.H,1),'TemperatureActive:Rows','当前温度行或上/下界符号不符。');
+if ~isempty(options.checkpointFolder),assert(isfolder(options.checkpointFolder));end
+[free,freeDetail,freeCoordinates]=solveRocketAugmentedQRDirection(packed,factor,rhs,metric,struct('maximumIterations',options.maximumIterations));
+value=free;detail=freeDetail;coordinates=freeCoordinates;[tangent,bound,violating]=inspect(value);active=zeros(0,1);cycles={};
+if ~isempty(options.checkpointFolder)
+    file=fullfile(options.checkpointFolder,'free_direction.mat');assert(~isfile(file));
+    save(file,'free','freeDetail','freeCoordinates','tangent','bound','violating','-v7');
+end
+stopReason='free-direction-points-inside-temperature-band';
+for cycle=1:options.maximumActiveSolves
+    if isempty(violating),break;end
+    added=setdiff(violating,active);if isempty(added),stopReason='active-row-arithmetic-feasibility-not-met';break;end
+    active=unique([active;added]);selected=rows;selected.H=rows.H(active,:);selected.faceIDs=rows.faceIDs(active);
+    projector=buildRocketTemperatureProjector(factor,selected);
+    [value,detail,coordinates]=solveRocketTemperatureProjectedDirection(packed,factor,rhs,metric,projector,selected,options.maximumIterations);
+    [tangent,bound,violating]=inspect(value);
+    item=struct('activeRowIndices',active,'activeFaceIDs',rows.faceIDs(active),'newRowIndices',added, ...
+        'projector',projector,'value',value,'detail',detail,'coordinates',coordinates, ...
+        'temperatureDerivativeK',tangent,'localDotRoundoffBoundK',bound,'remainingViolatingRowIndices',violating);
+    cycles{end+1}=item; %#ok<AGROW>
+    if ~isempty(options.checkpointFolder)
+        file=fullfile(options.checkpointFolder,sprintf('active_cycle%02d.mat',cycle));assert(~isfile(file));save(file,'item','-v7');
+    end
+    stopReason='current-band-direction-feasible';
+    if ~isempty(violating),stopReason='bounded-active-solve-budget-exhausted';end
+end
+evidence=struct('free',free,'freeDetail',freeDetail,'freeCoordinates',freeCoordinates,'cycles',{cycles}, ...
+    'selectedCoordinates',coordinates,'selectedDetail',detail,'rows',rows);
+report=struct('method','current-temperature-band-add-only-feasible-direction-QR-LSQR-prototype', ...
+    'options',options,'freeLinearReport',freeDetail,'linearReport',detail,'activeSolveCount',numel(cycles), ...
+    'totalNativeIterations',freeDetail.nativeIterations+sum(cellfun(@(x)x.detail.nativeIterations,cycles)), ...
+    'activeRowIndices',active,'activeFaceIDs',rows.faceIDs(active),'bandFaceIDs',rows.faceIDs, ...
+    'temperatureBoundSigns',rows.temperatureBoundSigns,'temperatureDerivativeK',tangent, ...
+    'localDotRoundoffBoundK',bound,'remainingViolatingRowIndices',violating,'bandDirectionFeasible',isempty(violating), ...
+    'stopReason',stopReason,'oldActiveSetInherited',false,'coolingRowsMayRemainFree',true, ...
+    'constrainedOptimumClaimed',false,'nonlinearTemperatureBoundGuaranteed',false,'physicalBoundaryConditionAdded',false, ...
+    'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0,'physicalSolution',false);
+    function [t,b,v]=inspect(direction)
+        t=rows.H*direction(:);b=128*eps*full(abs(rows.H)*abs(direction(:)));
+        % 仅约束十项点积的参考舍入，不放宽任何物理温度或原NS门槛。
+        v=find(rows.temperatureBoundSigns.*t>b);
+    end
+end

@@ -1,0 +1,35 @@
+function rows=selectRocketTemperatureBandRows(Q,info,cut,gas,scale,options)
+%SELECTROCKETTEMPERATUREBANDROWS 从当前完整NS采样中选取接近原温域两端的全部内部面。
+% 模块一：温差带仅用于数值方向激活，不是物理模型适用域或新的温度边界。
+% 模块二：上限行取正号，下限行取负号；方向朝界内变化时可以保持自由。
+% 模块三：超过明确预算时拒绝，不悄悄截取面元或沿用上一状态的活跃行。
+if nargin<6,options=struct;end
+defaults=struct('temperatureBandK',10,'maximumConstraintRows',16);
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))), ...
+    'TemperatureActive:Options','未知温度激活带选项。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+validateattributes(options.temperatureBandK,{'numeric'},{'scalar','real','finite','positive'});
+validateattributes(options.maximumConstraintRows,{'numeric'},{'scalar','integer','positive','<=',16});
+assert(options.temperatureBandK<diff(gas.temperatureRange)/2&&isfield(info,'exactEulerFluxAudit'), ...
+    'TemperatureActive:Audit','需要当前精确内部采样及不重叠的温度带。');
+audit=info.exactEulerFluxAudit;f=cut.openFaces;allIDs=find(f.area>0&f.cellMinus>0&f.cellPlus>0);
+assert(isequal(audit.faceID(:),allIDs)&&size(audit.samplePrimitive,1)==numel(allIDs), ...
+    'TemperatureActive:Audit','完整内部面采样身份不符。');
+T=audit.samplePrimitive(:,5);assert(all(isfinite(T)&T>=gas.temperatureRange(1)&T<=gas.temperatureRange(2)), ...
+    'TemperatureActive:Audit','当前内部采样已经越过原物性域。');
+upper=gas.temperatureRange(2)-T<=options.temperatureBandK;lower=T-gas.temperatureRange(1)<=options.temperatureBandK;
+selected=find(upper|lower);assert(numel(selected)<=options.maximumConstraintRows, ...
+    'TemperatureActive:Budget','当前激活带包含%d面，超过%d行预算；不截断约束。',numel(selected),options.maximumConstraintRows);
+if isempty(selected)
+    rows=struct('kind','current-interior-selected-Riemann-sample-temperature-tangent-rows','cellCount',size(Q,1), ...
+        'faceIDs',zeros(0,1),'H',sparse(0,5*size(Q,1)),'baseTemperatureK',zeros(0,1));
+else
+    rows=buildRocketInterfaceTemperatureRows(Q,cut,gas,scale,allIDs(selected));
+    assert(max(abs(rows.baseTemperatureK-T(selected)))<=1e-10, ...
+        'TemperatureActive:State','温度行基态与完整NS采样不符。');
+end
+signs=ones(numel(selected),1);signs(lower(selected))=-1;
+rows.temperatureBoundSigns=signs;rows.options=options;rows.currentCompleteInteriorFaceCount=numel(allIDs);
+rows.selectionPolicy='all-current-interfaces-in-explicit-numerical-temperature-band';
+rows.physicalBoundaryConditionAdded=false;rows.oldActiveSetInherited=false;
+end

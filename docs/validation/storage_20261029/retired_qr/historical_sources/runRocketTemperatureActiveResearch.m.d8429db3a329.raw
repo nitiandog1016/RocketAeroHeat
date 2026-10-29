@@ -1,0 +1,19 @@
+function report=runRocketTemperatureActiveResearch(folder,runFullDomain)
+%RUNROCKETTEMPERATUREACTIVERESEARCH 快速校核多温域行，或从真实Q28重建最多三步连续研究。
+% 模块一：缺省只运行制造小域双温域选择、冷却行释放和稠密受限子空间校核。
+% 模块二：显式true才逐态重建当前NS/C/W/QR及温度行，保留所有原非线性护栏。
+% 模块三：输出使用新目录，完整输入随包；未收敛研究不得增加正式求解面积。
+root=fileparts(mfilename('fullpath'));addpath(root,fullfile(root,'tests'),fullfile(root,'internalFlow'));setupCutCellFlow;
+if nargin<1
+    base=fullfile(root,'outputs','temperature_active_reproduction');folder=base;index=0;
+    while exist(folder,'dir'),index=index+1;folder=sprintf('%s_%02d',base,index);end
+end
+if nargin<2,runFullDomain=false;end
+validateattributes(runFullDomain,{'logical'},{'scalar'});assert(~exist(folder,'dir'));mkdir(folder);
+report=struct('unit',testRocketTemperatureActiveSet(fullfile(folder,'unit')),'fullDomain',[], ...
+    'physicalSolution',false,'newProductionSolvedAreaM2',0);
+if runFullDomain
+    report.fullDomain=continueRocketTemperatureActive(fullfile(folder,'continuous'), ...
+        fullfile(root,'outputs/v83_validation/krylov28'),3);
+end
+end
