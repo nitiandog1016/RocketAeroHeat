@@ -1,0 +1,70 @@
+function [value,report,coordinates]=solveRocketRegularizedParentDirection(packed,factor,rhs,initial,columnScale,metric,options)
+%SOLVEROCKETREGULARIZEDPARENTDIRECTION 在完整父C上惩罚过大的局部原始变量方向。
+% 模块一：求min ||C*v-rhs||^2+penalty^2*||W*v||^2，W由当前真实初态构造。
+% 模块二：v=initial+M*D*y，增广右端包含-penalty*W*initial，约束的是总方向而非仅增量。
+% 模块三：正则化只产生候选方向；原C的1e-3、完整模型/原NS的0.1及所有物理门槛保持。
+% 方法依据：增广Tikhonov最小二乘及Paige/Saunders LSQR；不改正式求解器缺省路径。
+if nargin<7,options=struct;end
+defaults=struct('maximumIterations',64,'relativeTolerance',1e-3,'regularizationStrength',.01, ...
+    'adjointIdentityTolerance',1e-8,'maximumVectorEstimateBytes',384*1024^2);
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))), ...
+    'RegularizedParent:Options','未知正则方向选项。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+validateattributes(options.maximumIterations,{'numeric'},{'scalar','integer','positive'});
+assert(isscalar(options.relativeTolerance)&&options.relativeTolerance>0&&options.relativeTolerance<=1e-3&& ...
+    isscalar(options.regularizationStrength)&&isfinite(options.regularizationStrength)&&options.regularizationStrength>0&& ...
+    isscalar(options.adjointIdentityTolerance)&&options.adjointIdentityTolerance>0&&options.adjointIdentityTolerance<=1e-8, ...
+    'RegularizedParent:Options','内部目标、伴随门槛或正则参数非法。');
+n=packed.cellCount;shape=[n 5];N=5*n;
+assert(strcmp(packed.kind,'complete-five-conservation-block-CSR-unshifted-steady-graph')&&factor.cellCount==n&& ...
+    isequal(size(rhs),shape)&&isequal(size(initial),shape)&&isequal(size(columnScale),shape)&& ...
+    all(isfinite(rhs),'all')&&all(isfinite(initial),'all')&&all(isfinite(columnScale)&columnScale>0,'all')&&metric.cellCount==n, ...
+    'RegularizedParent:Input','完整父矩阵、五量向量、尺度或状态度量非法。');
+estimate=8*N*32;assert(estimate<=options.maximumVectorEstimateBytes,'RegularizedParent:Budget','额外全向量数组估计超预算。');
+counts=struct('C',0,'CT',0,'M',0,'MT',0,'W',0,'WT',0);timer=tic;
+denominator=max(realmin,norm(rhs,'fro'));initialImage=original(initial);initialMetric=weight(initial,'notransp');
+metricDenominator=max(1,norm(initialMetric,'fro'));penalty=options.regularizationStrength*denominator/metricDenominator;
+augmentedRhs=[reshape(rhs-initialImage,[],1);-penalty*initialMetric(:)];
+% 独立伴随探针同时经过C、M、D和完整状态耦合W，不只检查各部件。
+v=sin((1:N)');w=cos((1:2*N)'/sqrt(2));bv=operate(v,'notransp');btw=operate(w,'transp');
+adjointDifference=abs(bv'*w-v'*btw)/max([1,norm(bv)*norm(w),norm(btw)*norm(v)]);
+assert(adjointDifference<=options.adjointIdentityTolerance,'RegularizedParent:Adjoint','增广完整方向伴随检查失败。');clear v w bv btw;
+before=counts;
+[y,flag,nativeRelative,iterations,residualHistory,normalHistory]=lsqr(@operate,augmentedRhs,1e-12,options.maximumIterations);
+solverCounts=counts;for key=fieldnames(counts)',solverCounts.(key{1})=counts.(key{1})-before.(key{1});end
+coordinates=reshape(y,shape);counts.M=counts.M+1;correction=solveRocketCoupledPatches(factor,coordinates.*columnScale);value=initial+correction;
+image=original(value);metricValue=weight(value,'notransp');initialC=norm(rhs-initialImage,'fro')/denominator;relative=norm(rhs-image,'fro')/denominator;
+objective=relative^2+(penalty*norm(metricValue,'fro')/denominator)^2;
+initialObjective=initialC^2+(penalty*norm(initialMetric,'fro')/denominator)^2;
+% 全局实际回代检验目标；flag只记录原生状态，不能替代原C的实际残差。
+assert(all(isfinite(value),'all')&&objective<=initialObjective*(1+1e-10),'RegularizedParent:Objective','增广方向目标未下降。');
+report=struct('method','complete-parent-C-current-state-primitive-update-Tikhonov-LSQR', ...
+    'options',options,'penaltyInOriginalResidualUnits',penalty,'metricNormalization',metricDenominator, ...
+    'initialRelativeCResidual',initialC,'relativeCResidual',relative,'internalCTargetMet',relative<=options.relativeTolerance, ...
+    'initialPrimitiveUpdateNorm',norm(initialMetric,'fro'),'primitiveUpdateNorm',norm(metricValue,'fro'), ...
+    'initialMaximumDensityFraction',max(abs(initialMetric(:,1))),'maximumDensityFraction',max(abs(metricValue(:,1))), ...
+    'initialMaximumVelocityOverSound',max(vecnorm(initialMetric(:,2:4),2,2)),'maximumVelocityOverSound',max(vecnorm(metricValue(:,2:4),2,2)), ...
+    'initialMaximumTemperatureFraction',max(abs(initialMetric(:,5))),'maximumTemperatureFraction',max(abs(metricValue(:,5))), ...
+    'initialNormalizedAugmentedObjective',initialObjective,'normalizedAugmentedObjective',objective, ...
+    'nativeFlag',flag,'nativeRelativeAugmentedCorrectionResidual',nativeRelative,'nativeIterations',iterations, ...
+    'nativeResidualHistory',residualHistory,'nativeNormalResidualHistory',normalHistory, ...
+    'adjointIdentityRelativeDifference',adjointDifference,'operatorApplications',counts,'nativeSolverApplications',solverCounts, ...
+    'declaredExtraVectorArrayEstimateBytes',estimate,'processPeakMemoryClaimed',false,'elapsedSeconds',toc(timer), ...
+    'totalDirectionPenalized',true,'originalParentResidualNormUnchanged',true,'originalNSAcceptanceClaimed',false, ...
+    'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0,'physicalSolution',false);
+    function out=original(update),counts.C=counts.C+1;out=applyRocketPackedGraph(packed,update);end
+    function out=weight(update,flag)
+        if strcmp(flag,'notransp'),counts.W=counts.W+1;else,counts.WT=counts.WT+1;end
+        out=applyRocketPrimitiveUpdateMetric(metric,update,flag);
+    end
+    function out=operate(v,flag)
+        if strcmp(flag,'notransp')
+            counts.M=counts.M+1;mapped=solveRocketCoupledPatches(factor,reshape(v,shape).*columnScale);
+            top=original(mapped);bottom=penalty*weight(mapped,'notransp');out=[top(:);bottom(:)];
+        elseif strcmp(flag,'transp')
+            counts.CT=counts.CT+1;counts.MT=counts.MT+1;
+            back=applyRocketPackedGraphTranspose(packed,reshape(v(1:N),shape))+penalty*weight(reshape(v(N+1:end),shape),'transp');
+            mapped=columnScale.*solveRocketCoupledPatchesTranspose(factor,back);out=mapped(:);
+        else,error('RegularizedParent:TransposeFlag','未知增广最小二乘作用方向。');end
+    end
+end

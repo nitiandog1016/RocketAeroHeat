@@ -1,0 +1,9 @@
+function value=solveRocketPivotedSchur(factor,rhs)
+%SOLVEROCKETPIVOTEDSCHUR 求解固定L*U≈P*S，正确应用行置换并还原全部密度/能量量。
+% 模块一：两字段按MATLAB列序组成向量；无按右端筛选、裁值或残差早停。
+% 模块二：新的换行分解不放行旧2量块逆，完整C和原NS精度仍须分别验收。
+assert(strcmp(factor.kind,'fixed-pivoted-scalar-ILUTP-for-density-total-energy-Schur'),'PivotedSchur:Kind','需要已固定标量主元Schur因子。');
+n=factor.cellCount;assert(isequal(size(rhs),[n 2])&&isreal(rhs)&&all(isfinite(rhs),'all'),'PivotedSchur:RHS','两量右端非法。');
+b=rhs(:);x=factor.U\(factor.L\b(factor.rowPermutation));value=reshape(x,n,2);
+assert(all(isfinite(value),'all'),'PivotedSchur:Nonfinite','主元Schur解非有限，不裁值。');
+end

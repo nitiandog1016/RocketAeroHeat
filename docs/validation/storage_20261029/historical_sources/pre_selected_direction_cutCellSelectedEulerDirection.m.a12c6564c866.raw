@@ -1,0 +1,39 @@
+function [value,detail]=cutCellSelectedEulerDirection(Q,directionU,baseInfo,cut,gas,boundary,scale,baseBoundary,boundaryDirection)
+%CUTCELLSELECTEDEULERDIRECTION 精确内部波系、开放特征迹与静止墙压力的方向导数。
+% 模块一：原内部Godunov当前选中分支，按全部真实共享面传播五量扰动。
+% 模块二：开放面物理通量对rho/u/T的完整链式项，给定储库保持不变。
+% 模块三：原静止墙只含流体压力导数；与WLS黏性模块相加才是所检查的完整方向。
+assert(strcmp(cutCellInteriorEulerPolicy(boundary),'exact-godunov'),'CutDirection:EulerPolicy','当前模块要求明确精确Godunov内部通量。');
+scale=reshape(scale,1,5);dq=directionU.*scale;f=cut.openFaces;w=cut.walls;n=size(Q,1);nf=numel(f.area);nw=numel(w.area);
+flux=zeros(nf,5);wallFlux=zeros(nw,5);sampleCounts=zeros(6,1);inside=find(f.area>0&f.cellMinus>0&f.cellPlus>0);
+for first=1:2048:numel(inside)
+    ids=inside(first:min(first+2047,numel(inside)));m=f.cellMinus(ids);p=f.cellPlus(ids);
+    [EL,ER,audit]=cutCellExactEulerBranchJacobian(Q(m,:),Q(p,:),f.normal(ids,:),gas);
+    flux(ids,:)=reshape(pagemtimes(EL,permute(dq(m,:),[2 3 1]))+pagemtimes(ER,permute(dq(p,:),[2 3 1])),5,[])';
+    sampleCounts=sampleCounts+accumarray(audit.sampleRegion,1,[6 1]);
+end
+outside=find(f.area>0&xor(f.cellMinus>0,f.cellPlus>0));
+given=baseBoundary.primitive(outside,:);dP=boundaryDirection.primitiveDerivative(outside,:);normal=f.normal(outside,:);
+rho=given(:,1);u=given(:,2:4);T=given(:,5);drho=dP(:,1);du=dP(:,2:4);dT=dP(:,5);cv=gas.R/(gas.gamma-1);
+p=rho*gas.R.*T;dp=gas.R*(T.*drho+rho.*dT);energy=rho.*(cv*T+.5*sum(u.^2,2));
+de=(cv*T+.5*sum(u.^2,2)).*drho+rho.*(cv*dT+sum(u.*du,2));momentum=rho.*u;dm=drho.*u+rho.*du;
+un=sum(u.*normal,2);dun=sum(du.*normal,2);
+flux(outside,:)=[drho.*un+rho.*dun,dm.*un+momentum.*dun+dp.*normal,(de+dp).*un+(energy+p).*dun];
+% 开放面若明确配置成wall，原对流只有内部压力，不使用given的穿透速度。
+wallOuter=outside(baseBoundary.wall(outside));
+P=baseInfo.primitive;u=P(:,2:4);pressureDirection=(gas.gamma-1)*(dq(:,5)-sum(u.*dq(:,2:4),2)+.5*sum(u.^2,2).*dq(:,1));
+if ~isempty(wallOuter)
+    owner=max(f.cellMinus(wallOuter),f.cellPlus(wallOuter));flux(wallOuter,:)=[zeros(numel(owner),1),pressureDirection(owner).*f.normal(wallOuter,:),zeros(numel(owner),1)];
+end
+ids=find(w.ownerCell>0);wallFlux(ids,2:4)=pressureDirection(w.ownerCell(ids)).*w.normal(ids,:);
+v=cut.cells.volume(:);m=f.cellMinus;p=f.cellPlus;left=f.area>0&m>0;right=f.area>0&p>0;value=zeros(n,5);
+for a=1:5
+    value(:,a)=-accumarray(m(left),f.area(left)./v(m(left)).*flux(left,a),[n 1])+ ...
+        accumarray(p(right),f.area(right)./v(p(right)).*flux(right,a),[n 1])- ...
+        accumarray(w.ownerCell(ids),w.area(ids)./v(w.ownerCell(ids)).*wallFlux(ids,a),[n 1]);
+end
+value=value./scale;assert(all(isfinite(value),'all'),'CutDirection:Nonfinite','Euler方向导数非有限。');
+detail=struct('faceEulerFluxDerivative',flux,'wallEulerFluxDerivative',wallFlux,'sampleRegionCounts',sampleCounts, ...
+    'boundarySensitivityIncluded',boundaryDirection.boundarySensitivityIncluded,'selectedBranchOnly',true, ...
+    'fullNSJacobianClaimed',false,'newOriginalNSEvaluations',0,'newProductionSolvedAreaM2',0);
+end

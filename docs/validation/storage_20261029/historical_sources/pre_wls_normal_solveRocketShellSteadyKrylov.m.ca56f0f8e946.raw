@@ -1,0 +1,450 @@
+function result=solveRocketShellSteadyKrylov(Q,cut,gas,boundary,options)
+%SOLVEROCKETSHELLSTEADYKRYLOV 以法向线右预条件和原完整三维方向导数做有界Krylov稳态修正。
+% 模块一：法向线只作右预条件；缺省为I/dtau-J，显式稳态Newton为-J。
+% 模块四：Krylov线性目标由实际矩阵自由作用重新核对；未达目标不提交方向。
+% 原solveRocketShellSteadyLine及其受限三次对照保持，不重绑旧证据。
+% 模块二：显式RMS残差下降规则、正性/温域与空间五量通量账；失败候选不提交。
+% 模块三：pseudoDt不是物理时间，不称BE方程已解；原最大残差与定常边界账才决定稳态。
+if nargin<5,options=struct;end
+% 显式非线性候选坐标；缺省路径和缺省完整输出结构保持原样。
+trialCoordinates='conservative';
+if isstruct(options)&&isscalar(options)&&isfield(options,'trialStateCoordinates')
+    trialCoordinates=options.trialStateCoordinates;options=rmfield(options,'trialStateCoordinates');
+end
+assert(ischar(trialCoordinates)&&ismember(trialCoordinates,{'conservative','primitive-tangent'}), ...
+    'ShellKrylov:TrialCoordinates','候选坐标必须为显式conservative或primitive-tangent。');
+% 法向线预条件的Euler近似单独选择；缺省/显式旧选项不改变原完整输出合同。
+normalEulerLinearization='rusanov-frozen';
+if isstruct(options)&&isscalar(options)&&isfield(options,'normalEulerLinearization')
+    normalEulerLinearization=options.normalEulerLinearization;options=rmfield(options,'normalEulerLinearization');
+end
+assert(ischar(normalEulerLinearization)&&ismember(normalEulerLinearization,{'rusanov-frozen','exact-branch'}), ...
+    'ShellKrylov:EulerPolicy','法向线Euler导数选项无效。');
+% 显式直接稳态模式不把I/dtau加入实际线性方程，tau仅保留在右预条件器中。
+linearEquation='pseudo-transient';
+if isstruct(options)&&isscalar(options)&&isfield(options,'linearEquation')
+    linearEquation=options.linearEquation;options=rmfield(options,'linearEquation');
+end
+assert(ischar(linearEquation)&&ismember(linearEquation,{'pseudo-transient','steady-newton'}), ...
+    'ShellKrylov:LinearEquation','线性方程必须为pseudo-transient或steady-newton。');
+steadyNewton=strcmp(linearEquation,'steady-newton');
+% 新侧向图策略显式启用；缺省/显式normal-line仍逐字段保留原合同。
+rightPreconditioner='normal-line';graphSweeps=1;
+if isstruct(options)&&isscalar(options)&&isfield(options,'rightPreconditioner')
+    rightPreconditioner=options.rightPreconditioner;options=rmfield(options,'rightPreconditioner');
+end
+if isstruct(options)&&isscalar(options)&&isfield(options,'graphSweeps')
+    graphSweeps=options.graphSweeps;options=rmfield(options,'graphSweeps');
+    assert(ismember(rightPreconditioner,{'lateral-colored-line','two-level-minres'}),'ShellKrylov:Preconditioner','graphSweeps仅用于显式侧向图。');
+end
+assert(ischar(rightPreconditioner)&&ismember(rightPreconditioner,{'normal-line','lateral-colored-line','two-level-minres'}), ...
+    'ShellKrylov:Preconditioner','右预条件策略无效。');
+coarseMode=strcmp(rightPreconditioner,'two-level-minres');
+graphMode=ismember(rightPreconditioner,{'lateral-colored-line','two-level-minres'});
+validateattributes(graphSweeps,{'numeric'},{'real','finite','scalar','integer','positive'});
+assert(~graphMode||strcmp(normalEulerLinearization,'exact-branch'),'ShellKrylov:Preconditioner', ...
+    '侧向图要求显式exact-branch法向导数，不能隐式替换配置。');
+% 选中分支解析作用只用于GMRES模型；最终组合方向必须重新调用原NS。
+jacobianAction='original-difference';
+if isstruct(options)&&isscalar(options)&&isfield(options,'jacobianAction')
+    jacobianAction=options.jacobianAction;options=rmfield(options,'jacobianAction');
+end
+assert(ischar(jacobianAction)&&ismember(jacobianAction,{'original-difference','selected-analytic'}), ...
+    'ShellKrylov:JacobianAction','方向作用策略无效。');
+analyticMode=strcmp(jacobianAction,'selected-analytic');
+assert(~analyticMode||steadyNewton,'ShellKrylov:JacobianAction','解析模型仅用于显式直接稳态并保留原NS组合方向复核。');
+% 模块五：显式两层策略在固定图扫描后最小化细层模型残差；旧缺省输出合同保持。
+coarseSpaceOptions=struct;coarseMaximumImageBytes=256*1024^2;coarseOperatorFile='';coarseTargetRefinement=[];coarseMixedColumns=[];coarseLocalColumns=[];
+for key={'coarseSpaceOptions','coarseMaximumImageBytes','coarseOperatorFile','coarseTargetRefinement','coarseMixedColumns','coarseLocalColumns'}
+    name=key{1};if ~isstruct(options)||~isscalar(options)||~isfield(options,name),continue;end
+    assert(coarseMode,'ShellKrylov:CoarseOptions','粗层选项仅用于显式two-level-minres。');
+    switch name
+        case 'coarseSpaceOptions',coarseSpaceOptions=options.(name);
+        case 'coarseMaximumImageBytes',coarseMaximumImageBytes=options.(name);
+        case 'coarseOperatorFile',coarseOperatorFile=options.(name);
+        case 'coarseTargetRefinement',coarseTargetRefinement=options.(name);
+        case 'coarseMixedColumns',coarseMixedColumns=options.(name);
+        case 'coarseLocalColumns',coarseLocalColumns=options.(name);
+    end
+    options=rmfield(options,name);
+end
+assert(~coarseMode||(analyticMode&&steadyNewton),'ShellKrylov:CoarseOptions','两层策略要求显式直接稳态和selected-analytic。');
+validateattributes(coarseMaximumImageBytes,{'numeric'},{'real','finite','scalar','positive'});
+assert(ischar(coarseOperatorFile),'ShellKrylov:CoarseOptions','粗像复用路径须为字符。');
+% 显式同Q方向初猜只在第一非线性状态使用；其模型剩余每次重新计算。
+steadyInitialGuess=[];
+if isstruct(options)&&isscalar(options)&&isfield(options,'steadyInitialGuess')
+    steadyInitialGuess=options.steadyInitialGuess;options=rmfield(options,'steadyInitialGuess');
+    assert(coarseMode&&analyticMode&&steadyNewton,'SteadyGuess:Mode','方向初猜要求显式两层解析直接稳态模式。');
+end
+recycledKrylov=[];
+if isstruct(options)&&isscalar(options)&&isfield(options,'recycledKrylov')
+    recycledKrylov=options.recycledKrylov;options=rmfield(options,'recycledKrylov');
+    assert(coarseMode&&analyticMode&&steadyNewton,'RecycledGMRES:Mode','多方向增强要求显式两层解析直接稳态。');
+    assert(isstruct(recycledKrylov)&&isscalar(recycledKrylov)&&all(ismember(fieldnames(recycledKrylov), ...
+        {'restartLength','maximumCycles','retainedDirections','maximumBasisBytes','saveBasisEvidence'})), ...
+        'RecycledGMRES:Options','主链只接受明确的重启、保留和基存储配置。');
+end
+defaults=struct('maximumIterations',6,'initialPseudoDt',1e-8,'maximumPseudoDt',1e-4, ...
+    'minimumPseudoDt',1e-13,'pseudoDtGrowth',3,'maximumStepRetries',3,'maximumLineSearch',8, ...
+    'residualScale',[],'steadyResidualTolerance',2e-6,'steadyFluxTolerance',5e-10, ...
+    'spatialConservationTolerance',1e-9,'sufficientDecrease',1e-4,'saveTrace',true,'saveFirstOperator',true, ...
+    'maximumKrylovIterations',4,'linearRelativeTolerance',.2,'differenceStep',1e-6,'jacobianScheme','forward');
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))), ...
+    'ShellSteady:Options','未知线预条件迭代选项。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+for key={'maximumIterations','maximumStepRetries','maximumLineSearch','maximumKrylovIterations'}
+    validateattributes(options.(key{1}),{'numeric'},{'real','finite','integer','scalar','nonnegative'});
+end
+assert(options.maximumIterations>0&&options.maximumKrylovIterations>0);
+assert(options.linearRelativeTolerance<1&&ismember(options.jacobianScheme,{'forward','central'}),'ShellKrylov:Options','Krylov容差或差分形式无效。');
+for key={'initialPseudoDt','maximumPseudoDt','minimumPseudoDt','pseudoDtGrowth','steadyResidualTolerance', ...
+        'steadyFluxTolerance','spatialConservationTolerance','sufficientDecrease','linearRelativeTolerance','differenceStep'}
+    validateattributes(options.(key{1}),{'numeric'},{'real','finite','scalar','positive'});
+end
+assert(options.minimumPseudoDt<=options.initialPseudoDt&&options.initialPseudoDt<=options.maximumPseudoDt&& ...
+    options.pseudoDtGrowth>=1&&options.sufficientDecrease<1,'ShellSteady:Options','伪步范围或下降系数不符。');
+validateattributes(options.residualScale,{'numeric'},{'real','finite','positive','numel',5});scale=reshape(options.residualScale,1,5);
+checkState(Q);initialQ=Q;evaluations=0;[rate,info,spatialBalance,fluxBalance]=evaluate(Q);
+initialRate=rate;initialInfo=info;[maximum,merit]=norms(rate);initialMaximum=maximum;initialMerit=merit;
+tau=options.initialPseudoDt;accepted=0;trials=0;builds=0;linearSolves=0;trace={};firstOperator=[];
+history=struct('iteration',0,'pseudoDt',0,'alpha',0,'maximumResidualPerSecond',maximum,'rmsMerit',merit, ...
+    'steadyBoundaryFluxBalance',fluxBalance,'spatialConservationRelative',spatialBalance,'linearDefect',0, ...
+    'operatorBuildSeconds',0,'linearSolveSeconds',0,'residualEvaluations',evaluations);
+lineLog=struct([]);reason='maximum-nonlinear-iterations';steady=false;
+linearLog={};jvpLog={};firstJvpEvidence=[];matvecs=0;jacobianEvaluations=0;preconditionerApplications=0;
+captureSteadyAction=false;lastSteadyEvidence=[];
+analyticCache=[];analyticApplications=0;analyticCacheBuilds=0;analyticCacheBuildSeconds=0;
+coarse=[];coarseSpace=[];coarseBuilds=0;coarseReuses=0;coarseConstructionApplications=0;
+coarsePreconditionerApplications=0;coarseReuseApplications=0;coarseReuseReport=struct([]);
+coarseBuildSeconds=0;coarseSetupSeconds=0;
+guessDirection=[];guessReport=struct;guessModelApplications=0;
+recycledActions=0;recycledPreconditions=0;recycledSteps=0;lastRecycledPreconditionerReport=struct;
+if coarseMode
+    coarseSpace=buildRocketVolumeCoarseSpace(cut,coarseSpaceOptions);
+    primitiveCoarseSpace=coarseSpace;
+    if ~isempty(coarseTargetRefinement),coarseSpace=buildRocketTargetedCoarseSpace(coarseSpace,coarseTargetRefinement);end
+    if ~isempty(coarseMixedColumns)
+        validateattributes(coarseMixedColumns,{'numeric'},{'real','finite','vector','integer','positive','<=',5*primitiveCoarseSpace.groupCount});
+        coarseMixedColumns=coarseMixedColumns(:);assert(numel(unique(coarseMixedColumns))==numel(coarseMixedColumns),'ShellKrylov:MixedColumns','互补列不能重复。');
+    end
+    if ~isempty(coarseLocalColumns)
+        assert(~isempty(coarseMixedColumns),'LocalCoarse:Columns','局部增强要求显式父混合列配置。');
+        coarseLocalColumns=validateRocketLocalCoarseColumns(coarseLocalColumns,size(Q,1),5*coarseSpace.groupCount,numel(coarseMixedColumns));
+    end
+end
+for iteration=1:options.maximumIterations
+    if maximum<=options.steadyResidualTolerance&&fluxBalance<=options.steadyFluxTolerance,steady=true;reason='original-spatial-residual-and-steady-boundary-balance-met';break;end
+    before=Q;beforeRate=rate;beforeMerit=merit;found=false;iterationTrialsStart=trials;
+    if analyticMode
+        if coarseMode,coarse=[];end % 新Q必须重建粗像，不沿用上一接受步的数值算子。
+        timerCache=tic;analyticCache=buildCutCellSelectedDirectionCache(Q,info,cut,gas,boundary,scale);
+        analyticCacheBuildSeconds=analyticCacheBuildSeconds+toc(timerCache);analyticCacheBuilds=analyticCacheBuilds+1;
+    end
+    warmActive=~isempty(steadyInitialGuess)&&iteration==1;
+    if warmActive,[guessDirection,guessReport,steadyInitialGuess]=loadRocketSteadyDirectionGuess(steadyInitialGuess,Q,cut,gas,boundary,scale);end
+    if coarseMode
+        timerCoarse=tic;
+        if iteration==1&&~isempty(coarseOperatorFile)
+            if ~isempty(coarseLocalColumns)
+                [coarse,coarseReuseReport]=loadRocketLocalCoarseOperator(coarseOperatorFile,analyticCache,coarseSpace,primitiveCoarseSpace,coarseMixedColumns,coarseLocalColumns,coarseMaximumImageBytes);
+            elseif ~isempty(coarseMixedColumns)
+                [coarse,coarseReuseReport]=loadRocketMixedCoarseOperator(coarseOperatorFile,analyticCache,coarseSpace,primitiveCoarseSpace,coarseMixedColumns,coarseMaximumImageBytes);
+            else,[coarse,coarseReuseReport]=loadRocketLeastSquaresCoarseOperator(coarseOperatorFile,analyticCache,coarseSpace,coarseMaximumImageBytes);end
+            coarseReuses=coarseReuses+1;coarseReuseApplications=coarseReuseApplications+coarseReuseReport.reuseVerificationModelApplications;
+        else
+            if ~isempty(coarseLocalColumns)
+                coarse=rebuildRocketLocalCoarseOperator(analyticCache,coarseSpace,primitiveCoarseSpace,coarseMixedColumns,coarseLocalColumns,coarseMaximumImageBytes);
+            elseif ~isempty(coarseMixedColumns)
+                coarse=rebuildRocketMixedCoarseOperator(analyticCache,coarseSpace,primitiveCoarseSpace,coarseMixedColumns,coarseMaximumImageBytes);
+            else,coarse=buildRocketLeastSquaresCoarseOperator(analyticCache,coarseSpace,coarseMaximumImageBytes);end
+            coarseBuilds=coarseBuilds+1;coarseConstructionApplications=coarseConstructionApplications+coarse.constructionModelApplications;
+            coarseBuildSeconds=coarseBuildSeconds+coarse.buildSeconds;
+        end
+        coarseSetupSeconds=coarseSetupSeconds+toc(timerCoarse);
+    end
+    for retry=0:options.maximumStepRetries
+        assert(tau>=options.minimumPseudoDt,'ShellSteady:MinimumPseudoDt','伪步已低于显式下限，没有提交失败状态。');
+        ticBuild=tic;
+        if graphMode
+            operator=buildRocketShellGraphPreconditioner(Q,cut,gas,boundary,scale,tau,graphSweeps);
+        elseif strcmp(normalEulerLinearization,'exact-branch')
+            operator=buildRocketShellLineOperator(Q,cut,gas,boundary,scale,tau,normalEulerLinearization);
+        else
+            operator=buildRocketShellLineOperator(Q,cut,gas,boundary,scale,tau);
+        end
+        buildSeconds=toc(ticBuild);builds=builds+1;
+        if options.saveFirstOperator&&isempty(firstOperator),firstOperator=operator;end
+        ticSolve=tic;rhs=rate./scale;solveRhs=rhs;effectiveTolerance=options.linearRelativeTolerance;
+        if warmActive
+            [guessModel,detail]=applyCutCellSelectedDirection(analyticCache,guessDirection);
+            analyticApplications=analyticApplications+1;guessModelApplications=guessModelApplications+1;matvecs=matvecs+1;
+            detail.initialGuessModelAction=true;jvpLog{end+1}=detail;
+            solveRhs=rhs+guessModel;initialGuessDefect=norm(solveRhs(:))/norm(rhs(:));
+            effectiveTolerance=min(1-eps,options.linearRelativeTolerance/max(initialGuessDefect,realmin));
+            fprintf('SHELL_STEADY_GUESS modelDefect=%.9g originalTarget=%.9g correctionTolerance=%.9g\n',initialGuessDefect,options.linearRelativeTolerance,effectiveTolerance);
+        end
+        skipped=warmActive&&initialGuessDefect<=options.linearRelativeTolerance;
+        recycleThis=~isempty(recycledKrylov)&&~skipped;
+        if recycleThis
+            config=recycledKrylov;config.maximumArnoldiSteps=options.maximumKrylovIterations;
+            config.absoluteTolerance=options.linearRelativeTolerance*norm(rhs(:));
+            [increment,recycleReport]=solveRocketRecycledGMRES(@recycledPhysicalAction,@recycledPreconditionerAction,solveRhs(:),config);
+            direction=reshape(increment,size(Q));lineReport=lastRecycledPreconditionerReport;
+            recycledActions=recycledActions+recycleReport.modelApplications;recycledPreconditions=recycledPreconditions+recycleReport.preconditionerApplications;
+            recycledSteps=recycledSteps+recycleReport.arnoldiSteps;
+            flag=recycleReport.flag;reportedResidual=recycleReport.relativeResidual;resvec=recycleReport.residualHistory;
+            krylovIterations=[numel(recycleReport.cycles) recycleReport.arnoldiSteps];
+        elseif skipped
+            rightUnknown=zeros(numel(rhs),1);flag=0;reportedResidual=NaN;krylovIterations=[0 0];resvec=norm(solveRhs(:));
+        elseif steadyNewton&&options.maximumKrylovIterations>=numel(rhs)
+            % MATLAB在restart等于系统维数时将maxit解释为总内迭代数，不能仍传1。
+            [rightUnknown,flag,reportedResidual,krylovIterations,resvec]=gmres(@rightAction,solveRhs(:),[],effectiveTolerance,min(options.maximumKrylovIterations,numel(rhs)));
+        else
+            [rightUnknown,flag,reportedResidual,krylovIterations,resvec]=gmres(@rightAction,solveRhs(:),options.maximumKrylovIterations,effectiveTolerance,1);
+        end
+        if ~recycleThis
+            [direction,lineReport]=applyPreconditioner(reshape(rightUnknown,size(Q)));preconditionerApplications=preconditionerApplications+1;
+        end
+        if warmActive
+            correctionDirection=direction;direction=guessDirection+correctionDirection;
+            linearProduct=originalTotalDirectionAction(direction);
+        elseif recycleThis
+            linearProduct=originalTotalDirectionAction(direction);
+        else
+            if steadyNewton,captureSteadyAction=true;end
+            linearProduct=rightAction(rightUnknown);
+        end
+        actualLinearDefect=norm(linearProduct-rhs(:))/norm(rhs(:));
+        captureSteadyAction=false;
+        solveSeconds=toc(ticSolve);linearSolves=linearSolves+1;linear=lineReport;
+        linear.fullSystemRelativeDefect=actualLinearDefect;linear.target=options.linearRelativeTolerance;
+        linear.fullSystemTargetMet=actualLinearDefect<=options.linearRelativeTolerance;
+        linear.gmresFlag=flag;linear.gmresReportedResidual=reportedResidual;linear.gmresIterations=krylovIterations;linear.gmresResidualHistory=resvec;
+        if recycleThis
+            linear.krylovMethod=recycleReport.method;linear.recycledKrylovReport=recycleReport;
+            linear.preconditionerReportScope='last-Arnoldi-preconditioner-application';
+        end
+        if warmActive
+            linear.initialGuessUsed=true;linear.initialGuessModelRelativeDefect=initialGuessDefect;
+            linear.effectiveCorrectionTolerance=effectiveTolerance;linear.gmresSkipped=skipped;
+            linear.gmresResidualDenominator='current-initial-guess-correction-RHS';linear.actualNSResidualDenominator='original-base-RHS';
+            linear.initialGuessEvidence=struct('directionU',guessDirection,'currentModelValue',guessModel, ...
+                'correctionRhs',solveRhs,'correctionDirectionU',correctionDirection,'sourceReport',guessReport);
+        end
+        if analyticMode
+            linear.jacobianAction=jacobianAction;linear.actualCombinedDirectionCheckedWithOriginalNS=true;
+        end
+        if steadyNewton
+            % 保留最终组合方向的实际原NS差分证据，包括未达线性目标的方向。
+            assert(isequaln(lastSteadyEvidence.directionU,direction),'ShellNewton:Direction','实际线性检查方向不一致。');
+            slope=dot(rhs(:),lastSteadyEvidence.value(:))/dot(rhs(:),rhs(:));bound=-1+actualLinearDefect;
+            roundoff=512*eps*max([1 abs(slope) abs(bound)]);
+            assert(isfinite(slope)&&slope<=bound+roundoff,'ShellNewton:DescentBound','实际-J方向不符合Cauchy下降界。');
+            linear.linearEquation=linearEquation;linear.normalizedMeritDerivative=slope;linear.inexactNewtonUpperBound=bound;
+            linear.meritDescentVerified=slope<0&&slope<=bound+roundoff;
+            linear.fullSystemTargetMet=linear.fullSystemTargetMet&&linear.meritDescentVerified;
+            lastSteadyEvidence.baseAcceptedIteration=accepted;lastSteadyEvidence.iteration=iteration;lastSteadyEvidence.retry=retry;
+            linear.steadyDirectionEvidence=lastSteadyEvidence;linear.preconditionerTimeStepOnly=true;
+        end
+        linearLog{end+1}=linear;
+        fprintf('SHELL_KRYLOV_LINEAR iteration=%d retry=%d flag=%d actual=%.9g target=%.9g matvecs=%d\n',iteration,retry,flag,actualLinearDefect,options.linearRelativeTolerance,matvecs);
+        if ~linear.fullSystemTargetMet,tau=tau/4;continue;end
+        fprintf('SHELL_LINE_BUILD iteration=%d retry=%d dtau=%.9g build=%.3g solve=%.3g linear=%.3g\n',iteration,retry,tau,buildSeconds,solveSeconds,linear.relativeLinearDefect);
+        alpha=1;
+        for search=0:options.maximumLineSearch
+            trials=trials+1;identifier='';candidateMerit=NaN;candidateMaximum=NaN;candidateFluxBalance=NaN;
+            try
+                if strcmp(trialCoordinates,'conservative'),candidate=Q+alpha*direction.*scale;
+                else,candidate=rocketShellTrialState(Q,direction,scale,alpha,gas,trialCoordinates);end
+                checkState(candidate);
+                [newRate,newInfo,newSpatial,newFlux]=evaluate(candidate);[candidateMaximum,candidateMerit]=norms(newRate);candidateFluxBalance=newFlux;
+                found=candidateMerit<=(1-options.sufficientDecrease*alpha)*merit;
+            catch exception
+                identifier=exception.identifier;
+                recoverable={'CutNS:State','CutNS:InternalEnergy','CutNS:Temperature','CutNS:HLLC','CutNS:HLLCStarPressure', ...
+                    'CutExactEuler:State','CutExactEuler:InternalEnergy','CutExactEuler:Temperature','CutExactEuler:Vacuum', ...
+                    'CutNS:BoundaryMach','RocketAeroHeat:NSDraft:CharacteristicState','RocketAeroHeat:NSDraft:CharacteristicSound', ...
+                    'RocketAeroHeat:NSDraft:CharacteristicRegime','RocketAeroHeat:NSDraft:CharacteristicSonic', ...
+                    'RocketAeroHeat:NSDraft:CharacteristicAmbiguous'};
+                if ~ismember(identifier,recoverable),rethrow(exception);end
+            end
+            row=struct('iteration',iteration,'retry',retry,'search',search,'pseudoDt',tau,'alpha',alpha, ...
+                'baseRmsMerit',merit,'candidateRmsMerit',candidateMerit,'candidateMaximumResidual',candidateMaximum, ...
+                'candidateSteadyBoundaryBalance',candidateFluxBalance,'accepted',found,'errorIdentifier',identifier);
+            if isempty(lineLog),lineLog=row;else,lineLog(end+1)=row;end %#ok<AGROW>
+            fprintf('SHELL_LINE_TRIAL iteration=%d search=%d alpha=%.6g rms=%.9g max=%.9g accepted=%d error=%s\n',iteration,search,alpha,candidateMerit,candidateMaximum,found,identifier);
+            if found,break;end;alpha=alpha/2;
+        end
+        if found,break;end
+        tau=tau/4;
+    end
+    if ~found
+        reason='bounded-line-search-and-pseudostep-retries-exhausted';
+        if steadyNewton&&trials==iterationTrialsStart,reason='steady-newton-linear-target-not-met';end
+        break;
+    end
+    Q=candidate;rate=newRate;info=newInfo;spatialBalance=newSpatial;fluxBalance=newFlux;maximum=candidateMaximum;merit=candidateMerit;accepted=accepted+1;
+    if options.saveTrace
+        trace{end+1}=struct('iteration',accepted,'initialQ',before,'initialRate',beforeRate,'linearUpdateU',direction, ...
+            'pseudoDt',tau,'alpha',alpha,'Q',Q,'rate',rate,'initialRmsMerit',beforeMerit,'rmsMerit',merit, ...
+            'spatialConservationRelative',spatialBalance,'linearReport',linear,'physicalTimeAdvanced',0); %#ok<AGROW>
+        if ~strcmp(trialCoordinates,'conservative'),trace{end}.trialStateCoordinates=trialCoordinates;end
+        if steadyNewton,trace{end}.linearReport=rmfield(linear,'steadyDirectionEvidence');end
+    end
+    for key={'iteration','pseudoDt','alpha','maximumResidualPerSecond','rmsMerit','steadyBoundaryFluxBalance', ...
+             'spatialConservationRelative','linearDefect','operatorBuildSeconds','linearSolveSeconds','residualEvaluations'}
+        name=key{1};switch name
+            case 'iteration',value=accepted;case 'pseudoDt',value=tau;case 'alpha',value=alpha;
+            case 'maximumResidualPerSecond',value=maximum;case 'rmsMerit',value=merit;
+            case 'steadyBoundaryFluxBalance',value=fluxBalance;case 'spatialConservationRelative',value=spatialBalance;
+            case 'linearDefect',value=linear.relativeLinearDefect;case 'operatorBuildSeconds',value=buildSeconds;
+            case 'linearSolveSeconds',value=solveSeconds;case 'residualEvaluations',value=evaluations;
+        end
+        history.(name)(end+1)=value;
+    end
+    if alpha==1,tau=min(options.maximumPseudoDt,tau*options.pseudoDtGrowth);end
+end
+if maximum<=options.steadyResidualTolerance&&fluxBalance<=options.steadyFluxTolerance,steady=true;reason='original-spatial-residual-and-steady-boundary-balance-met';end
+result=struct('kind','full-three-dimensional-original-NS-line-right-preconditioned-Krylov-correction', ...
+    'initialQ',initialQ,'initialRate',initialRate,'initialInfo',initialInfo,'Q',Q,'rate',rate,'info',info, ...
+    'initialMaximumResidual',initialMaximum,'maximumResidual',maximum,'initialRmsMerit',initialMerit,'rmsMerit',merit, ...
+    'acceptedNonlinearIterations',accepted,'candidateTrials',trials,'residualEvaluations',evaluations,'operatorBuilds',builds, ...
+    'matrixVectorProducts',matvecs,'jacobianResidualEvaluations',jacobianEvaluations, ...
+    'preconditionerApplications',preconditionerApplications,'linearLog',{linearLog},'jvpLog',{jvpLog},'firstJvpEvidence',firstJvpEvidence, ...
+    'linearSolves',linearSolves,'history',history,'lineLog',lineLog,'trace',{trace},'firstOperator',firstOperator, ...
+    'steadyConverged',steady,'stopReason',reason,'options',options,'residualScale',scale, ...
+    'spatialConservationRelative',spatialBalance,'steadyBoundaryFluxBalance',fluxBalance, ...
+    'physicalTimeAdvanced',0,'BETimeStepsClaimed',0,'originalSpatialEquationReplaced',false, ...
+    'positivityClippingCount',0,'physicalSolution',false,'eligibleForSurfaceCoverage',false,'newProductionSolvedAreaM2',0);
+if ~strcmp(trialCoordinates,'conservative')
+    result.options.trialStateCoordinates=trialCoordinates;
+    result.nonlinearTrialStateCoordinates=trialCoordinates;
+    result.candidatePathIsPhysicalTime=false;
+end
+if strcmp(normalEulerLinearization,'exact-branch')
+    result.options.normalEulerLinearization=normalEulerLinearization;
+    result.normalEulerLinearization=normalEulerLinearization;
+    result.physicalSpatialEquationChanged=false;
+end
+if steadyNewton
+    result.options.linearEquation=linearEquation;result.linearEquation=linearEquation;
+    result.preconditionerTimeStepOnly=true;result.steadyDirectionsSaved=true;
+end
+if graphMode
+    result.options.rightPreconditioner=rightPreconditioner;result.options.graphSweeps=graphSweeps;
+    result.rightPreconditioner=rightPreconditioner;result.fixedLinearPreconditioner=true;
+end
+if analyticMode
+    result.options.jacobianAction=jacobianAction;result.jacobianAction=jacobianAction;
+    result.selectedAnalyticApplications=analyticApplications;result.analyticCacheBuilds=analyticCacheBuilds;
+    result.analyticCacheBuildSeconds=analyticCacheBuildSeconds;result.originalNSCombinedDirectionCheckPreserved=true;
+end
+if ~isempty(steadyInitialGuess)
+    result.options.steadyInitialGuess=steadyInitialGuess;result.steadyInitialGuessReport=guessReport;
+    result.steadyInitialGuessModelApplications=guessModelApplications;
+end
+if ~isempty(recycledKrylov)
+    result.options.recycledKrylov=recycledKrylov;result.krylovMethod='SVD-selected-augmented-restarted-right-GMRES';
+    result.recycledKrylovModelApplications=recycledActions;result.recycledKrylovPreconditionerApplications=recycledPreconditions;
+    result.recycledKrylovArnoldiSteps=recycledSteps;
+end
+if coarseMode
+    result.options.coarseSpaceOptions=coarseSpace.options;result.options.coarseMaximumImageBytes=coarseMaximumImageBytes;
+    result.options.coarseOperatorFile=coarseOperatorFile;result.coarseOperatorBuilds=coarseBuilds;result.coarseOperatorReuses=coarseReuses;
+    result.coarseConstructionModelApplications=coarseConstructionApplications;
+    result.coarsePreconditionerModelApplications=coarsePreconditionerApplications;
+    result.coarseReuseVerificationModelApplications=coarseReuseApplications;result.coarseReuseReport=coarseReuseReport;
+    result.coarseBuildSeconds=coarseBuildSeconds;result.coarseSetupSeconds=coarseSetupSeconds;
+    result.coarseUnknowns=coarseSpace.coarseUnknowns+numel(coarseMixedColumns);result.coarseImageBytes=0;
+    if ~isempty(coarse),result.coarseImageBytes=coarse.imageBytes;end
+    result.coarseCorrectionChangesPhysicalMesh=false;
+    if ~isempty(coarseTargetRefinement)
+        result.options.coarseTargetRefinement=coarseSpace.targetRefinement.options;
+        result.coarseBasis='conservative-targeted-spatial';result.coarseTargetCellCount=coarseSpace.targetRefinement.targetCellCount;
+        result.parentCoarseUnknowns=5*coarseSpace.targetRefinement.parentGroupCount;
+    end
+    if ~isempty(coarseMixedColumns)
+        result.options.coarseMixedColumns=coarseMixedColumns;result.coarseBasis='mixed-conservative-primitive';
+        result.coarseBaseConservativeColumns=5*coarseSpace.groupCount;result.coarseAdditionalPrimitiveColumns=numel(coarseMixedColumns);
+    end
+    if ~isempty(coarseLocalColumns)
+        result.options.coarseLocalColumns=coarseLocalColumns;result.coarseBasis='local-conservative-enriched-mixed';
+        result.coarseRetainedMixedColumns=numel(coarseLocalColumns.retainedMixedColumns);
+        result.coarseLocalConservativeColumns=numel(coarseLocalColumns.cellIDs);
+        result.coarseLocalDistinctCells=numel(unique(coarseLocalColumns.cellIDs));
+        result.coarseUnknowns=result.coarseRetainedMixedColumns+result.coarseLocalConservativeColumns;
+        result.coarseAdditionalPrimitiveColumns=result.coarseRetainedMixedColumns-result.coarseBaseConservativeColumns;
+    end
+end
+    function out=recycledPhysicalAction(v)
+        [jv,detail]=applyCutCellSelectedDirection(analyticCache,reshape(v,size(Q)));
+        analyticApplications=analyticApplications+1;matvecs=matvecs+1;detail.recycledKrylovModelAction=true;
+        jvpLog{end+1}=detail;out=-jv(:);
+    end
+    function out=recycledPreconditionerAction(v)
+        [value,lastRecycledPreconditionerReport]=applyPreconditioner(reshape(v,size(Q)));
+        preconditionerApplications=preconditionerApplications+1;out=value(:);
+    end
+    function out=originalTotalDirectionAction(direction)
+        % 总方向直接调用原NS；不能把初猜/增量各自的近似导数相加冒充本检查。
+        config=struct('differenceStep',options.differenceStep,'scheme',options.jacobianScheme, ...
+            'saveEvidence',true,'spatialConservationTolerance',options.spatialConservationTolerance);
+        [jv,detail]=rocketShellResidualDirectionalDerivative(Q,direction,rate,cut,gas,boundary,scale,config);
+        evaluations=evaluations+detail.actualOriginalResidualEvaluations;jacobianEvaluations=jacobianEvaluations+detail.actualOriginalResidualEvaluations;matvecs=matvecs+1;
+        if isempty(firstJvpEvidence),firstJvpEvidence=detail;firstJvpEvidence.baseQ=Q;firstJvpEvidence.value=jv;end
+        lastSteadyEvidence=detail;lastSteadyEvidence.value=jv;
+        logged=rmfield(detail,{'directionU','ratePlus','rateMinusOrBase'});jvpLog{end+1}=logged;out=-jv(:);
+        fprintf('SHELL_KRYLOV_TOTAL count=%d scheme=%s h=%.9g evaluations=%d\n',matvecs,detail.scheme,detail.actualScalarStep,evaluations);
+    end
+    function [w,detail]=applyPreconditioner(y)
+        if coarseMode
+            [w,detail]=solveRocketMinResidualCoarsePreconditioner(operator,coarse,analyticCache,y);
+            coarsePreconditionerApplications=coarsePreconditionerApplications+detail.coarseCorrectionModelApplications;
+        elseif graphMode,[w,detail]=solveRocketShellGraphPreconditioner(operator,y);
+        else,[w,detail]=solveRocketShellLineSystem(operator,y);end
+    end
+    function out=rightAction(y)
+        if all(y==0)
+            out=zeros(size(y));
+            if steadyNewton&&captureSteadyAction
+                lastSteadyEvidence=struct('scheme','zero-direction','actualScalarStep',0,'directionU',zeros(size(Q)), ...
+                    'ratePlus',rate,'rateMinusOrBase',rate,'value',zeros(size(Q)), ...
+                    'actualOriginalResidualEvaluations',0,'fullThreeDimensionalResidualCalled',false,'physicalTimeAdvanced',0);
+            end
+            return;
+        end
+        [w,~]=applyPreconditioner(reshape(y,size(Q)));preconditionerApplications=preconditionerApplications+1;
+        if analyticMode&&~captureSteadyAction
+            [jv,detail]=applyCutCellSelectedDirection(analyticCache,w);analyticApplications=analyticApplications+1;
+        else
+            config=struct('differenceStep',options.differenceStep,'scheme',options.jacobianScheme, ...
+                'saveEvidence',isempty(firstJvpEvidence)||(steadyNewton&&captureSteadyAction),'spatialConservationTolerance',options.spatialConservationTolerance);
+            [jv,detail]=rocketShellResidualDirectionalDerivative(Q,w,rate,cut,gas,boundary,scale,config);
+        end
+        evaluations=evaluations+detail.actualOriginalResidualEvaluations;jacobianEvaluations=jacobianEvaluations+detail.actualOriginalResidualEvaluations;matvecs=matvecs+1;
+        if isempty(firstJvpEvidence)&&detail.actualOriginalResidualEvaluations>0,firstJvpEvidence=detail;firstJvpEvidence.baseQ=Q;firstJvpEvidence.value=jv;end
+        if steadyNewton&&captureSteadyAction,lastSteadyEvidence=detail;lastSteadyEvidence.value=jv;end
+        if isfield(detail,'directionU'),detail=rmfield(detail,{'directionU','ratePlus','rateMinusOrBase'});end
+        jvpLog{end+1}=detail;
+        if steadyNewton,out=reshape(-jv,[],1);else,out=reshape(w/tau-jv,[],1);end
+        fprintf('SHELL_KRYLOV_JVP count=%d scheme=%s h=%.9g evaluations=%d\n',matvecs,detail.scheme,detail.actualScalarStep,evaluations);
+    end
+    function checkState(q)
+        assert(isequal(size(q),[numel(cut.cells.volume) 5])&&all(isfinite(q),'all')&&isreal(q)&&all(q(:,1)>0),'CutNS:State','候选五量/密度非法。');
+        rho=q(:,1);u=q(:,2:4)./rho;internal=q(:,5)-.5*rho.*sum(u.^2,2);assert(all(internal>0),'CutNS:InternalEnergy','候选内能非正，不裁剪。');
+        T=internal./(rho*gas.R/(gas.gamma-1));assert(all(T>=gas.temperatureRange(1)&T<=gas.temperatureRange(2)), ...
+            'CutNS:Temperature','候选温度超出原物性域，不裁温。');
+    end
+    function [r,i,spatial,flux]=evaluate(q)
+        evaluations=evaluations+1;[r,i]=cutCellNavierStokesResidual(q,cut,gas,boundary);
+        f=cut.openFaces;mask=f.cellPlus==0;w=cut.walls;
+        magnitude=sum(abs(i.faceFlux(mask,:)).*f.area(mask),1)+sum(abs(i.wallFlux).*w.area,1);
+        denom=max(1,magnitude);spatial=max(abs(i.balanceResidual)./denom);flux=max(abs(i.netBoundaryFlux)./denom);
+        assert(spatial<=options.spatialConservationTolerance,'ShellSteady:Conservation','原空间五量账未通过，不提交候选。');
+    end
+    function [maximum,rms]=norms(r)
+        z=r./scale;maximum=max(abs(z),[],'all');rms=sqrt(mean(z.^2,'all'));
+        assert(isfinite(maximum)&&isfinite(rms),'ShellSteady:Nonfinite','原空间残差非有限。');
+    end
+end

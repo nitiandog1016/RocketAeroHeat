@@ -1,0 +1,69 @@
+function report=studyRocketConsistentSchurActions(folder)
+%STUDYROCKETCONSISTENTSCHURACTIONS 量化已存二跳Schur与真实固定动量逆之间的代数差异。
+% 模块一：复用已核对的S/B/E及三动量因子，不重新组装S或启动稀疏ILUTP。
+% 模块二：同Q凝聚右端、两条均衡探针及两个全局常量模式各检查一次。
+% 模块三：核对局部对角弱耦合与A动量剩余；这些不是全局数值秩或物理收敛证明。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'ConsistentSchurStudy:Overwrite','不得覆盖一致Schur真实研究。');mkdir(folder);
+assemblyFile=fullfile(root,'outputs','v83_validation','schurcheckpointreal01','checkpoint','schur_assembly_evidence.mat');
+a=load(assemblyFile,'momentumMatrix','schurMatrix','couplingB','couplingE','algebraicOrder','sourceBinding');sourceBinding=a.sourceBinding;algebraicOrder=a.algebraicOrder;
+assert(strcmp(rocketStreamingFileSHA256(sourceBinding.sourceFile),sourceBinding.sourceFileSHA256));
+assert(strcmp(rocketStreamingFileSHA256(sourceBinding.packedFile),sourceBinding.packedFileSHA256));
+scaleFile=fullfile(root,'outputs','v83_validation','schurscalereal01','schur_equilibration_evidence.mat');scales=load(scaleFile,'rowScale','columnScale','assemblySHA256');
+assert(strcmp(rocketStreamingFileSHA256(assemblyFile),scales.assemblySHA256));
+momentumFile=fullfile(fileparts(assemblyFile),'momentum_factor_evidence.mat');m=load(momentumFile,'M','sourceBinding');assert(isequaln(m.sourceBinding,sourceBinding));n=m.M.cellCount;
+s=load(sourceBinding.packedFile,'packed');packed=s.packed;clear s;assert(isequal(packed.order,algebraicOrder));
+operator=struct('kind','fixed-momentum-inverse-consistent-Schur-action','cellCount',n,'rowPointer',packed.rowPointer,'column',packed.column, ...
+    'owners',uint32(repelem((1:n)',diff(double(packed.rowPointer)))),'D',packed.values([1 5],[1 5],:), ...
+    'B',a.couplingB,'E',a.couplingE,'momentumFactor',m.M);clear packed m;
+rawMomentum=a.momentumMatrix;schur=a.schurMatrix;clear a;
+localDiagonal=rawMomentum.values(:,:,rawMomentum.diagonalPosition);identity=repmat(eye(3),1,1,n);localInverse=pagemldivide(localDiagonal,identity);
+localDefect=max(abs(pagemtimes(localDiagonal,localInverse)-identity),[],'all');assert(localDefect<1e-8&&all(isfinite(localInverse),'all'));clear identity localDiagonal;
+rhsFile=fullfile(root,'outputs','v83_validation','innergraphreal01','inner_graph_real_evidence.mat');r=load(rhsFile,'remaining','sourceFile');assert(strcmp(r.sourceFile,sourceBinding.sourceFile));
+sameQRemaining=r.remaining;clear r;ordered=sameQRemaining(algebraicOrder,:);momentumRhs=ordered(:,2:4);condensedMomentum=solveRocketFieldILU0(operator.momentumFactor,momentumRhs);
+condensedRhs=ordered(:,[1 5])-product(operator.E,operator.column,operator.owners,condensedMomentum,n);clear ordered;
+schurOwners=uint32(repelem((1:n)',diff(double(schur.rowPointer))));names={'sameQCondensedRemaining','balancedSine','balancedCosine','balancedConstantDensity','balancedConstantEnergy'};
+cases=cell(5,1);summaries=cell(5,1);R=scales.rowScale;C=scales.columnScale;
+for j=1:5
+    if j==1,value=C.*(R.*condensedRhs);elseif j==2,value=C.*reshape(sin((1:2*n)'*.37),n,2);elseif j==3,value=C.*reshape(cos((1:2*n)'*.23),n,2);
+    elseif j==4,value=C.*[ones(n,1) zeros(n,1)];else,value=C.*[zeros(n,1) ones(n,1)];end
+    timer=tic;[image,detail]=applyRocketConsistentSchur(operator,value);elapsed=toc(timer);
+    localMomentum=reshape(pagemtimes(localInverse,reshape(detail.Bvalue',3,1,[])),3,n)';
+    localCoupling=product(operator.E,operator.column,operator.owners,localMomentum,n);localClosed=detail.Dvalue-localCoupling;
+    savedImage=product(schur.values,schur.column,schurOwners,value,n);
+    formation=max(realmin,norm(R.*detail.Dvalue,'fro')+norm(R.*localCoupling,'fro'));
+    assemblyDifference=norm(R.*(savedImage-localClosed),'fro')/formation;assert(assemblyDifference<1e-9);
+    momentumImage=product(rawMomentum.values,rawMomentum.column,operator.owners,detail.momentumValue,n);
+    identityDifference=norm((image-savedImage)-(localCoupling-detail.EmomentumValue),'fro')/max(realmin,norm(detail.Dvalue,'fro')+norm(localCoupling,'fro')+norm(detail.EmomentumValue,'fro'));assert(identityDifference<1e-9);
+    summaries{j}=struct('name',names{j},'balancedLocalVersusConsistentRelativeDifference',norm(R.*(savedImage-image),'fro')/max(realmin,norm(R.*image,'fro')), ...
+        'balancedLocalImageToDirection',norm(R.*savedImage,'fro')/max(realmin,norm(value./C,'fro')), ...
+        'balancedConsistentImageToDirection',norm(R.*image,'fro')/max(realmin,norm(value./C,'fro')), ...
+        'rawMomentumRelativeResidual',norm(momentumImage-detail.Bvalue,'fro')/max(realmin,norm(detail.Bvalue,'fro')), ...
+        'fixedMomentumInverseGainSeconds',norm(detail.momentumValue,'fro')/max(realmin,norm(detail.Bvalue,'fro')), ...
+        'savedSchurVersusLocalClosedFormationRelativeDifference',assemblyDifference,'couplingDifferenceIdentityRelativeError',identityDifference,'consistentActionSeconds',elapsed);
+    cases{j}=struct('value',value,'image',image,'savedLocalImage',savedImage,'localMomentum',localMomentum,'localCoupling',localCoupling,'momentumImage',momentumImage,'detail',detail,'summary',summaries{j});
+    fprintf('CONSISTENT_SCHUR case=%d discrepancy=%.9g momentumResidual=%.9g\n',j,summaries{j}.balancedLocalVersusConsistentRelativeDifference,summaries{j}.rawMomentumRelativeResidual);
+end
+
+% 模块四：全部局部2量对角的最小/最大奇异值比；不能由此推断整个S的秩。
+diagonal=schur.values(:,:,schur.diagonalPosition).*reshape(R',2,1,n).*reshape(C',1,2,n);
+aa=reshape(diagonal(1,1,:),[],1);bb=reshape(diagonal(1,2,:),[],1);cc=reshape(diagonal(2,1,:),[],1);dd=reshape(diagonal(2,2,:),[],1);
+trace=aa.^2+bb.^2+cc.^2+dd.^2;determinant=aa.*dd-bb.*cc;sigmaMax=sqrt((trace+sqrt(max(0,trace.^2-4*determinant.^2)))/2);sigmaRatio=abs(determinant)./max(realmin,sigmaMax.^2);
+[sorted,ids]=sort(sigmaRatio);worst=ids(1:min(12,n));originalCV=algebraicOrder(worst);sourceFaces=sourceBinding.sourceFaces;
+localDiagnostics=struct('scaledDiagonalSingularRatioRange',[min(sigmaRatio) max(sigmaRatio)],'ratiosBelow1e8',nnz(sigmaRatio<1e-8), ...
+    'ratiosBelow1e12',nnz(sigmaRatio<1e-12),'worstAlgebraicRows',worst,'worstOriginalCV',originalCV,'worstOriginalFace',mod(originalCV-1,sourceFaces)+1, ...
+    'worstLayers',floor((originalCV-1)/sourceFaces)+1,'worstRatios',sorted(1:numel(worst)),'globalNumericalRankProven',false);
+sourceIdentity=struct('applyRocketConsistentSchur',rocketStreamingFileSHA256(which('applyRocketConsistentSchur')), ...
+    'solveRocketFieldILU0',rocketStreamingFileSHA256(which('solveRocketFieldILU0')));
+report=struct('status','tested-real-local-versus-fixed-momentum-consistent-Schur-actions-only','cellCount',n,'sourceBinding',sourceBinding, ...
+    'localDiagnostics',localDiagnostics,'maximumOriginalLocalMomentumInverseDefect',localDefect,'summaries',{summaries}, ...
+    'fixedMomentumSolves',6,'consistentSchurActions',5,'savedLocalSchurActions',5,'newSelectedJApplications',0,'newActualNSEvaluations',0, ...
+    'newFlowAcceptances',0,'newProductionSolvedAreaM2',0,'globalNumericalRankOrUsableInverseProven',false,'physicalSolution',false,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'consistent_schur_real_evidence.mat'),'report','cases','sourceBinding','sourceIdentity','assemblyFile','momentumFile','scaleFile','rhsFile','condensedRhs','condensedMomentum','momentumRhs','localInverse','diagonal','sigmaRatio','algebraicOrder','-v7');
+fid=fopen(fullfile(folder,'consistent_schur_real_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end
+function out=product(blocks,column,owners,in,n)
+out=zeros(n,size(blocks,1));d=size(in,2);for first=1:4096:numel(column),ids=first:min(first+4095,numel(column));rr=double(owners(ids));a=rr(1);b=rr(end);v=pagemtimes(blocks(:,:,ids),reshape(in(column(ids),:)',d,1,[]));
+    for k=1:size(blocks,1),out(a:b,k)=out(a:b,k)+accumarray(rr-a+1,reshape(v(k,1,:),[],1),[b-a+1 1]);end
+end
+end

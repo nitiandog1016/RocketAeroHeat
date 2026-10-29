@@ -1,0 +1,47 @@
+function report=studyRocketPivotedSchurActions(folder)
+%STUDYROCKETPIVOTEDSCHURACTIONS 读取已独立核对检查点，比较行主元Schur而不重组原S。
+% 模块一：原固定2量块逆仍拒绝；本候选换行选标量主元，不补对角或改变C/NS。
+% 模块二：先单独分解S，再核对完整五量存储与三条右端；不盲目开始GMRES。
+% 模块三：任何失败保存阶段和来源，不能改写当前压力/热流或新增合格面积。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'),'PivotedSchurStudy:Overwrite','不得覆盖主元Schur真实研究。');mkdir(folder);
+assemblyFile=fullfile(root,'outputs','v83_validation','schurcheckpointreal01','checkpoint','schur_assembly_evidence.mat');a=load(assemblyFile,'schurMatrix','sourceBinding');
+sourceBinding=a.sourceBinding;assert(strcmp(rocketStreamingFileSHA256(sourceBinding.sourceFile),sourceBinding.sourceFileSHA256));
+assert(strcmp(rocketStreamingFileSHA256(sourceBinding.packedFile),sourceBinding.packedFileSHA256));
+options=struct('dropTolerance',1e-2,'maximumFactorBytes',448*1024^2,'maximumConstructionBytes',2048*1024^2);
+stage='pivoted-scalar-Schur-factorization';rejected=false;identifier='';message='';factorReady=false;preReady=false;
+try
+    factor=factorRocketPivotedSchur(a.schurMatrix,options);clear a;factorReady=true;
+    sourceIdentity=struct;for key={'factorRocketPivotedSchur','solveRocketPivotedSchur','solveRocketPivotedFieldSchur'},sourceIdentity.(key{1})=rocketStreamingFileSHA256(which(key{1}));end
+    factorFile=fullfile(folder,'pivoted_schur_factor_evidence.mat');save(factorFile,'factor','assemblyFile','sourceBinding','sourceIdentity','options','-v7');
+    stage='whole-five-conservation-preconditioner-budget';a=load(assemblyFile,'couplingB','couplingE','algebraicOrder');
+    m=load(fullfile(fileparts(assemblyFile),'momentum_factor_evidence.mat'),'M','sourceBinding');assert(isequaln(sourceBinding,m.sourceBinding));
+    n=m.M.cellCount;pre=struct('kind','fixed-five-conservation-with-pivoted-scalar-Schur','cellCount',n,'order',a.algebraicOrder, ...
+        'rowPointer',m.M.rowPointer,'column',m.M.column,'owners',uint32(repelem((1:n)',diff(double(m.M.rowPointer)))), ...
+        'B',a.couplingB,'E',a.couplingE,'momentumFactor',m.M,'schurFactor',factor);clear a m factor;
+    memory=whos('pre');assert(memory.bytes<=768*1024^2,'PivotedSchur:Budget','完整五量预条件器数组超原768MiB预算。');preReady=true;
+    preFile=fullfile(folder,'pivoted_field_schur_preconditioner.mat');save(preFile,'pre','sourceBinding','assemblyFile','sourceIdentity','-v7');
+    stage='three-fixed-five-conservation-actions';s=load(sourceBinding.packedFile,'packed');packed=s.packed;clear s;
+    anchorFile=fullfile(root,'outputs','v83_validation','innergraphreal01','inner_graph_real_evidence.mat');s=load(anchorFile,'remaining','sourceFile');assert(strcmp(s.sourceFile,sourceBinding.sourceFile));remaining=s.remaining;clear s;
+    names={'sameQRemaining','sineProbe','cosineProbe'};cases=cell(3,1);summaries=cell(3,1);
+    for j=1:3
+        if j==1,rhs=remaining;elseif j==2,rhs=reshape(sin((1:numel(remaining))'*.37),size(remaining));else,rhs=reshape(cos((1:numel(remaining))'*.23),size(remaining));end
+        timer=tic;[value,detail]=solveRocketPivotedFieldSchur(pre,rhs);seconds=toc(timer);image=applyRocketPackedGraph(packed,value);
+        summaries{j}=struct('name',names{j},'relativeCResidual',norm(rhs-image,'fro')/norm(rhs,'fro'), ...
+            'directionNormToRhsSeconds',norm(value,'fro')/norm(rhs,'fro'),'applySeconds',seconds,'originalNSAcceptanceClaimed',false);
+        cases{j}=struct('rhs',rhs,'value',value,'Cvalue',image,'summary',summaries{j},'detail',detail);
+    end
+    save(fullfile(folder,'pivoted_field_schur_actions.mat'),'cases','summaries','preFile','sourceBinding','anchorFile','assemblyFile','-v7');stage='bounded-fixed-actions-complete';
+catch ex
+    if ~(startsWith(ex.identifier,'PivotedSchur:')||startsWith(ex.identifier,'PivotedFieldSchur:')||startsWith(ex.identifier,'MATLAB:ilu:')),rethrow(ex);end
+    rejected=true;identifier=ex.identifier;message=ex.message;
+end
+report=struct('status','tested-real-row-pivoted-scalar-Schur-candidate-with-unchanged-physical-equation', ...
+    'stage',stage,'factorReady',factorReady,'wholePreconditionerReady',preReady,'candidateRejected',rejected,'errorIdentifier',identifier,'message',message, ...
+    'sourceBinding',sourceBinding,'oldRejectedBlockInverseClaimedValid',false,'newSelectedJApplications',0,'newActualNSEvaluations',0,'newFlowAcceptances',0, ...
+    'physicalSolution',false,'newProductionSolvedAreaM2',0,'engineProcessID',feature('getpid'));
+if factorReady&&exist('pre','var'),report.scalarFactorReport=pre.schurFactor.factorizationReport;end
+if preReady,report.wholePreconditionerArrayBytes=memory.bytes;end
+if ~rejected,report.summaries=summaries;end
+fid=fopen(fullfile(folder,'pivoted_schur_real_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end

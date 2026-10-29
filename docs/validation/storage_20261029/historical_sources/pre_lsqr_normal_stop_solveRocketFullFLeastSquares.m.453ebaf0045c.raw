@@ -1,0 +1,62 @@
+function [value,report]=solveRocketFullFLeastSquares(graph,factor,rhs,initial,options)
+%SOLVEROCKETFULLFLEASTSQUARES 在原F剩余上作有界右预条件LSQR，保持原F范数与全部五量。
+% 模块一：B=A_FF*M_F，B转置=M_F转置*A_FF转置；先检查实际伴随恒等式。
+% 模块二：原局部映射固定，LSQR只解校正；最终按原F右端检查总方向的完整残差。
+% 模块三：本模块不替换旧Schur或原NS，不把LSQR内部停止当成物理/稳态合格。
+% 方法来源：Paige与Saunders，LSQR，ACM TOMS 8(1),1982，doi:10.1145/355984.355989。
+if nargin<5,options=struct;end
+defaults=struct('maximumIterations',32,'relativeTolerance',1e-3,'adjointIdentityTolerance',1e-8);
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))),'FullFLSQR:Options','未知完整F最小二乘选项。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+validateattributes(options.maximumIterations,{'numeric'},{'scalar','integer','positive'});
+validateattributes(options.relativeTolerance,{'numeric'},{'scalar','real','finite','positive','<',1});
+assert(isscalar(options.adjointIdentityTolerance)&&isfinite(options.adjointIdentityTolerance)&& ...
+    options.adjointIdentityTolerance>0&&options.adjointIdentityTolerance<=1e-8,'FullFLSQR:Options','伴随恒等式门槛不能放宽至1e-8以上。');
+assert(isfield(graph,'systemScope')&&strcmp(graph.systemScope,'exact-spatial-F-submatrix-A_FF-not-original-full-C')&& ...
+    graph.cellCount==factor.cellCount&&isequal(size(rhs),[graph.cellCount 5])&&isequal(size(initial),size(rhs))&& ...
+    isreal(rhs)&&isreal(initial)&&all(isfinite(rhs),'all')&&all(isfinite(initial),'all'),'FullFLSQR:Input','完整F、固定局部逆、右端或初猜非法。');
+counts=struct('F',0,'FT',0,'M',0,'MT',0);composite=struct('forward',0,'transpose',0);timer=tic;
+image=original(initial);remaining=rhs-image;denominator=max(realmin,norm(rhs,'fro'));target=options.relativeTolerance*denominator;
+initialRelative=norm(remaining,'fro')/denominator;adjointDifference=NaN;nativeFlag=0;nativeRelative=0;iterations=0;residualHistory=norm(remaining,'fro');leastSquaresHistory=[];
+solverCounts=struct('F',0,'FT',0,'M',0,'MT',0);nativeTolerance=NaN;reconstruction=0;
+if norm(remaining,'fro')>target
+    % 确定性探针不改变随机种子；检查原物理排列下的实际组合，而非缓存中的摘要。
+    v=sin((1:numel(rhs))');w=cos((1:numel(rhs))'/sqrt(2));forward=operate(v,'notransp');transposed=operate(w,'transp');
+    adjointDifference=abs(forward'*w-v'*transposed)/max([1,norm(forward)*norm(w),norm(transposed)*norm(v)]);
+    assert(adjointDifference<=options.adjointIdentityTolerance,'FullFLSQR:Adjoint','完整F右预条件伴随恒等式未通过，拒绝LSQR。');
+    clear v w forward transposed;
+    before=counts;nativeTolerance=target/norm(remaining,'fro');
+    [coordinates,nativeFlag,nativeRelative,iterations,residualHistory,leastSquaresHistory]=lsqr(@operate,remaining(:),nativeTolerance,options.maximumIterations);
+    for key=fieldnames(counts)',solverCounts.(key{1})=counts.(key{1})-before.(key{1});end
+    counts.M=counts.M+1;correction=solveRocketSpatialFBlocks(factor,reshape(coordinates,size(rhs)));
+    correctionImage=original(correction);value=initial+correction;image=original(value);
+    reconstruction=norm((rhs-image)-(remaining-correctionImage),'fro')/max(1,denominator);
+    assert(all(isfinite(value),'all')&&reconstruction<1e-8,'FullFLSQR:Reconstruction','总方向与完整F校正像不一致。');
+else
+    value=initial;
+end
+relative=norm(rhs-image,'fro')/denominator;
+report=struct('method','bounded-LSQR-on-exact-A_FF-times-certified-fixed-M_F','options',options, ...
+    'initialRelativeFullFResidual',initialRelative,'relativeFullFResidual',relative,'fullFInternalTargetMet',relative<=options.relativeTolerance, ...
+    'nativeFlag',nativeFlag,'nativeRelativeCorrectionResidual',nativeRelative,'nativeIterations',iterations, ...
+    'nativeToleranceRelativeToCorrectionRHS',nativeTolerance,'nativeResidualHistory',residualHistory,'nativeLeastSquaresHistory',leastSquaresHistory, ...
+    'adjointIdentityRelativeDifference',adjointDifference,'totalDirectionReconstructionDifference',reconstruction, ...
+    'operatorApplications',counts,'nativeSolverApplications',solverCounts,'compositeApplications',composite, ...
+    'elapsedSeconds',toc(timer),'fullFOperatorIncludesCrossPatchBlocks',true,'baseLocalFMapFixedLinear',true, ...
+    'innerSolveFixedLinearMapClaimed',false,'originalCOrNSConvergenceClaimed',false,'oldApproximateSchurIdentityReplaced',false, ...
+    'nativeGMRESArnoldiColumnChecksClaimed',false,'independentAllRealBidiagonalizationColumnsClaimed',false, ...
+    'physicalSolution',false,'newActualNSEvaluations',0,'newProductionSolvedAreaM2',0);
+    function out=original(update)
+        counts.F=counts.F+1;out=applyRocketPackedGraph(graph,update);
+    end
+    function out=operate(v,flag)
+        if strcmp(flag,'notransp')
+            composite.forward=composite.forward+1;counts.M=counts.M+1;
+            mapped=solveRocketSpatialFBlocks(factor,reshape(v,size(rhs)));result=original(mapped);
+        elseif strcmp(flag,'transp')
+            composite.transpose=composite.transpose+1;counts.FT=counts.FT+1;counts.MT=counts.MT+1;
+            mapped=applyRocketPackedGraphTranspose(graph,reshape(v,size(rhs)));result=solveRocketSpatialFBlocksTranspose(factor,mapped);
+        else,error('FullFLSQR:TransposeFlag','未知LSQR作用方向。');end
+        out=result(:);
+    end
+end

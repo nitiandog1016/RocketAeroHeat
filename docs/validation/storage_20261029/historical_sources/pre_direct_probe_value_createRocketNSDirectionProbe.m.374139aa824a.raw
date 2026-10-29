@@ -1,0 +1,21 @@
+function report=createRocketNSDirectionProbe(folder,baseFile,geometryFile,geometryVariable,directionU)
+%CREATEROCKETNSDIRECTIONPROBE 对显式来源方向在当前同Q/边界上重新检查完整原NS。
+% 本函数不接受状态，不继承种子方向的旧导数，不建立或伪造任何粗层像。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'));mkdir(folder);s=load(baseFile,'Q','rate','gas','boundary','scale','result');
+Q=s.Q;gas=s.gas;boundary=s.boundary;baseRate=s.rate;
+if isfield(s,'scale'),scale=s.scale;else,scale=s.result.residualScale;end
+d=load(geometryFile,geometryVariable);cut=d.(geometryVariable);clear d;
+[freshRate,freshInfo]=cutCellNavierStokesResidual(Q,cut,gas,boundary);assert(isequaln(freshRate,baseRate));
+[jv,nsEvidence]=rocketShellResidualDirectionalDerivative(Q,directionU,baseRate,cut,gas,boundary,scale, ...
+    struct('differenceStep',1e-6,'scheme','forward','saveEvidence',true,'spatialConservationTolerance',1e-9));
+rhs=baseRate./scale;defect=norm(rhs+jv,'fro')/norm(rhs,'fro');slope=dot(rhs(:),jv(:))/dot(rhs(:),rhs(:));
+sourceBinding=struct('file',baseFile,'sha256',rocketStreamingFileSHA256(baseFile));
+geometryBinding=struct('file',geometryFile,'variable',geometryVariable,'sha256',rocketStreamingFileSHA256(geometryFile));sourceIdentity=rocketNSProbeSourceIdentity;
+report=struct('status','tested-fresh-original-NS-direction-probe-with-explicit-current-boundary-and-complete-geometry', ...
+    'originalNSDirectionDefect',defect,'originalNSDirectionTarget',.1,'originalNSDirectionTargetMet',defect<=.1&&slope<0&&slope<=-1+defect+512*eps, ...
+    'normalizedMeritDerivative',slope,'physicalStateChanged',false,'newFlowAcceptances',0,'newActualNSEvaluations',1+nsEvidence.actualOriginalResidualEvaluations, ...
+    'coarseImageRequired',false,'newProductionSolvedAreaM2',0,'physicalSolution',false,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'direct_ns_direction_probe.mat'),'Q','baseRate','scale','gas','boundary','directionU','nsEvidence','report','sourceBinding','geometryBinding','sourceIdentity','-v7');
+fid=fopen(fullfile(folder,'direct_ns_direction_probe_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+end

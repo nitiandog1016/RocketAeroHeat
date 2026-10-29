@@ -1,0 +1,24 @@
+function factor=factorRocketFieldILU0(factor)
+%FACTORROCKETFIELDILU0 对三动量或密度能量子块作固定模式ILU，保留全部原CV。
+% 模块一：仅处理2×2/3×3完整对角块，块内不假定标量三角性。
+% 模块二：不补对角；奇异或原1e-8局部逆检查失败明确拒绝。
+assert(strcmp(factor.kind,'unfactored-conservative-field-block-CSR')&&ismember(factor.dimension,[2 3]), ...
+    'FieldILU:Kind','需要未因子化的2或3量子块图。');
+n=factor.cellCount;d=factor.dimension;inverse=zeros(d,d,n);position=zeros(n,1,'uint32');minimumRcond=Inf;maximumDefect=0;retained=0;discarded=0;timer=tic;
+for row=1:n
+    ids=double(factor.rowPointer(row)):double(factor.rowPointer(row+1))-1;columns=double(factor.column(ids));position(columns)=uint32(ids);diagonal=double(factor.diagonalPosition(row));
+    for entry=double(factor.rowPointer(row)):diagonal-1
+        pivot=double(factor.column(entry));mult=factor.values(:,:,entry)*inverse(:,:,pivot);factor.values(:,:,entry)=mult;
+        up=double(factor.diagonalPosition(pivot))+1:double(factor.rowPointer(pivot+1))-1;where=position(factor.column(up));keep=where>0;
+        retained=retained+nnz(keep);discarded=discarded+nnz(~keep);
+        if any(keep),factor.values(:,:,double(where(keep)))=factor.values(:,:,double(where(keep)))-pagemtimes(mult,factor.values(:,:,up(keep)));end
+    end
+    D=factor.values(:,:,diagonal);condition=rcond(D);assert(isfinite(condition)&&condition>0,'FieldILU:Singular','%d量子块第%d主元奇异，不补对角。',d,row);
+    inv=D\eye(d);defect=max(abs(D*inv-eye(d)),[],'all');assert(all(isfinite(inv),'all')&&defect<1e-8,'FieldILU:FactorDefect','%d量子块第%d局部逆未过原1e-8。',d,row);
+    inverse(:,:,row)=inv;minimumRcond=min(minimumRcond,condition);maximumDefect=max(maximumDefect,defect);position(columns)=0;
+    if mod(row,50000)==0,fprintf('FIELD_ILU d=%d row=%d/%d\n',d,row,n);end
+end
+factor.inverseDiagonal=inverse;factor.kind='factored-conservative-field-block-ILU0';
+factor.factorizationReport=struct('dimension',d,'minimumLocalPivotRcond',minimumRcond,'maximumLocalInverseDefect',maximumDefect, ...
+    'retainedProducts',retained,'discardedFillProducts',discarded,'factorSeconds',toc(timer),'diagonalCompensationApplied',false,'allOriginalCellsKept',true);
+end

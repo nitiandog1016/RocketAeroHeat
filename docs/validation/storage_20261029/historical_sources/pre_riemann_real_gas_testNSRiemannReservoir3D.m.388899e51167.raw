@@ -1,0 +1,93 @@
+function report=testNSRiemannReservoir3D(folder)
+%TESTNSRIEMANNRESERVOIR3D 校核显式新储库、声速转换、旧完整算子兼容和小域NS。
+% 模块一：正反法向、三个动量、均匀亚/超声速及恰声速状态，保存独立复算输入。
+% 模块二：重现真实被拒面并检查新波系；不删旧guard，不把候选当区域物理解。
+% 模块三：完整旧NS逐字段回放，新NS五量账、实际外边界通量与小域Newton守门。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root,fullfile(root,'internalFlow'));setupCutCellFlow;
+assert(~exist(folder,'dir'));mkdir(folder);gas=struct('gamma',1.4,'R',287,'mu',1.8e-5,'Pr',.72,'temperatureRange',[80 2000]);cv=gas.R/(gas.gamma-1);
+PL=zeros(0,5);PR=PL;normal=zeros(0,3);faces=PL;fluxes=PL;regions=zeros(0,1);tags={};maximumUniform=0;
+normals=[1 0 0;-1 0 0;1 2 -1];normals=normals./vecnorm(normals,2,2);
+for j=1:size(normals,1)
+    n=normals(j,:);t=cross(n,[0 0 1]);t=t/norm(t);a=sqrt(gas.gamma*gas.R*300);
+    for mach=[-2 -1-1e-7 -1 -1+1e-7 0 1-1e-7 1 1+1e-7 2]
+        p=[1,mach*a*n+17*t,300];[face,flux,tag]=evaluate(p,p,n);expected=physical(p,n);
+        error=max(abs([face-p flux-expected]))/max(1,max(abs([p expected])));maximumUniform=max(maximumUniform,error);assert(error<3e-13);
+        assert(tag.isInflow==(flux(1)<0)&&~tag.temperatureClipped&&~tag.pressureClipped);
+    end
+end
+% 压力相同的静止接触面：切向速度可跳变，质量恰为0时不伪造入流。
+[~,flux,tag]=evaluate([1 0 40 9 300],[2 0 -70 20 150],[1 0 0]);assert(flux(1)==0&&~tag.isInflow);
+[~,~,~]=evaluate([1 0 30 -15 350],[.125 0 -12 4 280],[1 0 0]);
+
+source=fullfile(root,'outputs','v83_validation','boundarypath01','newton_boundary_path_evidence.mat');s=load(source,'trials','reservoir','map','report');
+realRejected=0;legacyRejected=0;
+for j=1:numel(s.trials)
+    trial=s.trials(j);ids=find(trial.failed);
+    if isempty(ids),continue;end
+    for k=ids'
+        p=trial.primitive(k,:);r=s.reservoir(k,:);n=s.map.normal(k,:);[~,~,~]=evaluate(p,r,n);realRejected=realRejected+1;
+        old=struct('type','characteristic','mode','riemannFarfield','reservoirPrimitive',r);caught=false;
+        try,resolveNSCharacteristicBoundary3D(p,old,n,gas);catch ex,caught=strcmp(ex.identifier,'RocketAeroHeat:NSDraft:CharacteristicRegime');end
+        assert(caught);legacyRejected=legacyRejected+1;
+    end
+end
+% 同一真实转换面跨过单元M_n=1，使用真实波系而非切换旧亚声速重构公式。
+t=s.trials(end-1);k=t.firstFailedIndex;n=s.map.normal(k,:);p=t.primitive(k,:);r=s.reservoir(k,:);sound=sqrt(gas.gamma*gas.R*p(5));
+sonic=struct([]);
+for h=[1e-3 1e-4 1e-5 1e-6]
+    pair=zeros(2,5);
+    for sign=[-1 1]
+        q=p;q(2:4)=p(2:4)+((1+sign*h)*sound-dot(p(2:4),n))*n;
+        [~,value,~]=evaluate(q,r,n);pair((sign+3)/2,:)=value;
+    end
+    jump=norm(pair(2,:)-pair(1,:))/max(1,norm(pair(1,:)));assert(jump<30*h);
+    item=struct('machOffset',h,'relativeFluxJump',jump);if isempty(sonic),sonic=item;else,sonic(end+1)=item;end %#ok<AGROW>
+end
+assert(all(diff([sonic.relativeFluxJump])<0));
+bad=struct('type','riemannReservoir','primitive',[1 0 0 0 300]);rejected=false(5,1);
+for j=1:5
+    b=bad;p=bad.primitive;n=[1 0 0];
+    if j==1,b.pressure=1e5;elseif j==2,b.primitive(1)=-1;elseif j==3,b.primitive(5)=79;
+    elseif j==4,n=[2 0 0];else,p(2)=-2000;b.primitive(2)=2000;end
+    try,resolveNSRiemannReservoir3D(p,b,n,gas);catch ex,rejected(j)=startsWith(ex.identifier,'NSRiemann:')||strcmp(ex.identifier,'CutExactEuler:Vacuum');end
+    assert(rejected(j));
+end
+
+V=[1 0 0;-1 0 0;0 1 0;0 -1 0;0 0 1;0 0 -1];F=convhull(V);nf=cross(V(F(:,2),:)-V(F(:,1),:),V(F(:,3),:)-V(F(:,1),:),2);
+flip=sum(nf.*V(F(:,1),:),2)<0;F(flip,:)=F(flip,[1 3 2]);cut=buildRocketTriangularShellDomain(V,F,struct('normalLayerHeightsM',[0 .01 .03],'outerScaleFactors',[1.2 1.5]));
+c=cut.cells.centroid;P=[1+.02*c(:,1),100+5*c(:,2),-20+3*c(:,3),30+2*c(:,1),300+3*c(:,2)];Q=cons(P);
+oldGiven=struct('type','characteristic','mode','riemannFarfield','reservoirPrimitive',[1 100 -20 30 300]);
+boundary=struct('xmin',oldGiven,'xmax',oldGiven,'ymin',oldGiven,'ymax',oldGiven,'zmin',oldGiven,'zmax',oldGiven, ...
+    'interiorEulerFlux','exact-godunov','viscousWorkVelocity','arithmetic', ...
+    'solidWall',struct('type','wall','velocity',[0 0 0],'temperature',320,'thermalGradient','dirichlet-tangent','velocityGradient','dirichlet-tangent'));
+text=fileread(fullfile(root,'outputs','v83_validation','source_epochs','pre_riemann_reservoir_cutCellNavierStokesResidual.m'));
+text=strrep(text,'function [rate,info]=cutCellNavierStokesResidual(', 'function [rate,info]=cutCellNavierStokesResidualReference(');
+fid=fopen(fullfile(folder,'cutCellNavierStokesResidualReference.m'),'w','n','UTF-8');assert(fid>=0);fprintf(fid,'%s',text);fclose(fid);addpath(folder);pathGuard=onCleanup(@()rmpath(folder));
+[oldRate,oldInfo]=cutCellNavierStokesResidualReference(Q,cut,gas,boundary);[keptRate,keptInfo]=cutCellNavierStokesResidual(Q,cut,gas,boundary);
+assert(isequaln(oldRate,keptRate)&&isequaln(oldInfo,keptInfo),'NSRiemannTest:Legacy','旧完整NS输出没有逐字段复现。');
+newGiven=struct('type','riemannReservoir','primitive',oldGiven.reservoirPrimitive);
+for key={'xmin','xmax','ymin','ymax','zmin','zmax'},boundary.(key{1})=newGiven;end
+[rate,info]=cutCellNavierStokesResidual(Q,cut,gas,boundary);audit=info.riemannReservoirBoundaryAudit;
+f=cut.openFaces;ids=audit.faceID;assert(isequal(info.convectiveFaceFlux(ids,:),audit.outwardConvectiveFlux));
+stencilState=cutCellBoundaryStencilState(Q,cut,gas,boundary);assert(isequal(stencilState.primitive(ids,:),audit.primitive)&&isequal(stencilState.incoming(ids),audit.incoming));
+denom=max(1,sum(abs(info.faceFlux(f.cellPlus==0,:)).*f.area(f.cellPlus==0),1)+sum(abs(info.wallFlux).*cut.walls.area,1));balance=max(abs(info.balanceResidual)./denom);assert(balance<1e-9);
+options=struct('linearEquation','steady-newton','normalEulerLinearization','exact-branch','residualScale',[1 200 200 200 300000], ...
+    'maximumIterations',1,'initialPseudoDt',1e-4,'maximumKrylovIterations',160,'linearRelativeTolerance',.1,'maximumStepRetries',0,'maximumLineSearch',16);
+result=solveRocketShellSteadyKrylov(Q,cut,gas,boundary,options);
+assert(result.linearLog{1}.fullSystemTargetMet&&result.acceptedNonlinearIterations==1&&result.rmsMerit<result.initialRmsMerit);
+report=struct('status','passed-explicit-exact-3D-reservoir-sonic-path-legacy-complete-replay-and-small-NS-Newton', ...
+    'maximumUniformFluxError',maximumUniform,'realLegacyRejectedFacesTested',realRejected,'oldGuardRejectionsKept',legacyRejected, ...
+    'sonicContinuity',sonic,'invalidInputRejections',rejected,'oldCompleteNSReplayed',true,'smallSpatialConservationRelative',balance, ...
+    'smallAcceptedUpdates',result.acceptedNonlinearIterations,'smallActualNSCalls',result.residualEvaluations, ...
+    'standaloneSmallNSCalls',3,'mainHistoricalNSCallsAppended',0,'newProductionSolvedAreaM2',0,'physicalSolution',false,'engineProcessID',feature('getpid'));
+save(fullfile(folder,'riemann_reservoir_unit_evidence.mat'),'report','PL','PR','normal','faces','fluxes','regions','tags','sonic','cut','Q','gas','boundary','rate','info','result','-v7');
+fid=fopen(fullfile(folder,'riemann_reservoir_unit_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));fprintf('%s\n',jsonencode(report));
+    function [face,flux,tag]=evaluate(p,r,n)
+        [face,flux,tag]=resolveNSRiemannReservoir3D(p,struct('type','riemannReservoir','primitive',r),n,gas);
+        PL(end+1,:)=p;PR(end+1,:)=r;normal(end+1,:)=n;faces(end+1,:)=face;fluxes(end+1,:)=flux;regions(end+1,1)=tag.sampleRegion;tags{end+1}=tag;
+    end
+    function q=cons(p),q=[p(:,1),p(:,1).*p(:,2:4),p(:,1).*(cv*p(:,5)+.5*sum(p(:,2:4).^2,2))];end
+    function f=physical(p,n)
+        q=cons(p);un=dot(p(2:4),n);pressure=p(1)*gas.R*p(5);f=[p(1)*un,p(1)*p(2:4)*un+pressure*n,(q(5)+pressure)*un];
+    end
+end
