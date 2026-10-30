@@ -1,0 +1,87 @@
+function [rows,report]=selectRocketTemperatureLookaheadRows(Q,info,cut,gas,scale,directionU,targetAlpha,options)
+%SELECTROCKETTEMPERATURELOOKAHEADROWS 用当前方向的候选温度预览补充原10K数值激活带。
+% 模块一：原10K内全部面保持；只预览同一守恒方向，不调用新NS或改变流场。
+% 模块二：为越域单元寻找当前原态Riemann采样面，以实际采样温差决定所需带宽。
+% 模块三：只接受region1/4原态面，并与单元EOS导数核对，不把混合采样冒充单元温度。
+% 模块四：扩大的是数值方向筛选范围，80—2000K等原物性/NS门槛完全不变。
+% 模块五：目标驱动策略只补全部预测越域单元所需面，不按秩或求解结果删除原条件。
+if nargin<8,options=struct;end
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),{'selectionPolicy'})), ...
+    'TemperatureLookahead:Options','未知前瞻选面选项。');
+if ~isfield(options,'selectionPolicy'),options.selectionPolicy='all-extended-band';end
+assert(ischar(options.selectionPolicy)&&ismember(options.selectionPolicy, ...
+    {'all-extended-band','original-and-predicted-required-faces'}), ...
+    'TemperatureLookahead:Options','前瞻策略必须明确为整带或原行加全部预测所需面。');
+validateattributes(targetAlpha,{'numeric'},{'scalar','real','finite','positive','<=',1});
+n=size(Q,1);assert(isequal(size(Q),[n 5])&&isequal(size(directionU),size(Q))&& ...
+    isreal(directionU)&&all(isfinite(directionU),'all'),'TemperatureLookahead:Input','需要同一当前五量方向。');
+audit=info.exactEulerFluxAudit;ids=audit.faceID(:);ni=numel(ids);
+arrayBound=8*(40*n+16*ni)+64*1024^2+65536;
+assert(arrayBound<=256*1024^2,'TemperatureLookahead:Budget','前瞻附加数组上界超过256MiB，不删约束。');
+base=selectRocketTemperatureBandRows(Q,info,cut,gas,scale);rows=base;
+report=struct('method','current-conservative-target-preview-pure-Riemann-state-face-derived-band-extension', ...
+    'targetAlpha',targetAlpha,'originalTemperatureBandK',10,'selectedTemperatureBandK',10, ...
+    'originalBandFaceIDs',base.faceIDs,'originalRowsExactlyRetained',true,'previewCellStateEvaluable',false, ...
+    'predictedViolatingCellIDs',zeros(0,1),'requiredOriginalStateFaceIDs',zeros(0,1), ...
+    'selectedBandFaceIDs',base.faceIDs,'additionalConstructionArrayBoundBytes',arrayBound, ...
+    'newActualNSEvaluations',0,'newFlowAcceptances',0,'physicalBoundaryConditionAdded',false, ...
+    'nonlinearTemperatureBoundGuaranteed',false,'physicalSolution',false,'newProductionSolvedAreaM2',0);
+candidate=rocketShellTrialState(Q,directionU,scale,targetAlpha,gas,'conservative');
+rho=candidate(:,1);
+if any(rho<=0),report.stopReason='target-preview-density-invalid-no-temperature-selection';return;end
+velocity=candidate(:,2:4)./rho;internal=candidate(:,5)-.5*rho.*sum(velocity.^2,2);
+if any(internal<=0),report.stopReason='target-preview-internal-energy-invalid-no-temperature-selection';return;end
+cv=gas.R/(gas.gamma-1);temperature=internal./(rho*cv);
+bad=find(temperature<gas.temperatureRange(1)|temperature>gas.temperatureRange(2));
+report.previewCellStateEvaluable=true;report.predictedViolatingCellIDs=bad;
+report.previewCellTemperatureRangeK=[min(temperature) max(temperature)];
+if isempty(bad),report.stopReason='all-preview-cell-temperatures-already-in-original-range';return;end
+% 原态采样的温度就是该CV的EOS温度；星区/扇区不具有这个身份，不能替代。
+f=cut.openFaces;region=audit.sampleRegion(:);pureCV=zeros(ni,1);
+left=region==1;right=region==4;
+pureCV(left)=double(f.cellMinus(ids(left)));pureCV(right)=double(f.cellPlus(ids(right)));
+[found,slots]=ismember(bad,pureCV);
+assert(all(found),'TemperatureLookahead:PureSamples','%d个越域单元没有当前原态内部采样面，受限原型拒绝而不省略。',nnz(~found));
+required=ids(slots);sampleT=audit.samplePrimitive(slots,5);
+baseRho=Q(bad,1);baseU=Q(bad,2:4)./baseRho;
+baseT=(Q(bad,5)-.5*baseRho.*sum(baseU.^2,2))./(baseRho*cv);
+assert(max(abs(baseT-sampleT))<=1e-10,'TemperatureLookahead:Identity','原态面与当前单元EOS温度不符。');
+margins=min(sampleT-gas.temperatureRange(1),gas.temperatureRange(2)-sampleT);
+band=max([10;margins]);
+assert(band<diff(gas.temperatureRange)/2,'TemperatureLookahead:Band','所需前瞻数值带失去双端分离，拒绝原型。');
+rows=selectRocketTemperatureBandRows(Q,info,cut,gas,scale,struct('temperatureBandK',band));
+candidateBandFaceIDs=rows.faceIDs;
+if strcmp(options.selectionPolicy,'original-and-predicted-required-faces')
+    % 决策只依赖原10K集合和当前自由候选；此处不观察H的秩、投影结果或NS接受。
+    keep=ismember(rows.faceIDs,unique([base.faceIDs;required]));
+    rowFields={'faceIDs','ownerCV','neighbourCV','normal','QL','QR','H','leftRowsK','rightRowsK', ...
+        'baseSamplePrimitive','baseTemperatureK','remainingUpperTemperatureK','sampleRegion', ...
+        'rowTwoNormK','temperatureBoundSigns'};
+    for key=rowFields
+        assert(size(rows.(key{1}),1)==numel(keep),'TemperatureLookahead:Metadata','选面元数据未按当前面排列。');
+        rows.(key{1})=rows.(key{1})(keep,:);
+    end
+    rows.selectionPolicy='all-original-10K-plus-every-predicted-violating-CV-required-current-pure-state-face';
+end
+[retained,oldSlots]=ismember(base.faceIDs,rows.faceIDs);[included,newSlots]=ismember(required,rows.faceIDs);
+assert(all(retained)&&all(included)&&isequal(base.H,rows.H(oldSlots,:))&& ...
+    isequal(base.temperatureBoundSigns,rows.temperatureBoundSigns(oldSlots)), ...
+    'TemperatureLookahead:Retention','原10K全部行或所需原态采样面未完整保留。');
+derivativeError=zeros(numel(bad),1);
+for j=1:numel(bad)
+    expected=[(.5*sum(baseU(j,:).^2)-cv*baseT(j)),-baseU(j,:),1]./(baseRho(j)*cv).*scale;
+    truth=sparse(1,bad(j)+(0:4)*n,expected,1,5*n);actual=rows.H(newSlots(j),:);
+    derivativeError(j)=norm(actual-truth)/max(1,norm(truth));
+end
+assert(all(derivativeError<=1e-12),'TemperatureLookahead:Derivative','原态面与独立单元EOS链式导数不符。');
+report.selectedTemperatureBandK=band;report.requiredOriginalStateFaceIDs=required;
+report.requiredFaceCurrentSampleRegion=region(slots);report.predictedViolatingCellBaseTemperatureK=baseT;
+report.predictedViolatingCellCandidateTemperatureK=temperature(bad);report.originalStateEOSRowRelativeDifference=derivativeError;
+report.selectedBandFaceIDs=rows.faceIDs;report.stopReason='retained-original-band-and-all-required-current-pure-state-faces';
+if strcmp(options.selectionPolicy,'original-and-predicted-required-faces')
+    report.method='current-conservative-target-preview-original-band-plus-all-predicted-required-pure-state-faces';
+    report.selectionPolicy=options.selectionPolicy;report.candidateExtendedBandFaceIDs=candidateBandFaceIDs;
+    report.allPredictedViolatingCellsRepresented=all(included);
+    report.constraintRankUsedToSelectFaces=false;report.allExtendedBandFacesSelected=false;
+end
+end

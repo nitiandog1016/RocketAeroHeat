@@ -1,0 +1,284 @@
+"""回收已退役法向线矩阵；完整保留科学结果，显式核对全部硬链接。"""
+
+from datetime import datetime, timezone
+from pathlib import Path
+import gzip
+import hashlib
+import json
+import shutil
+import subprocess
+import sys
+
+from scipy.io import loadmat
+
+from compactNestedOutputOperators import migrate, records, raw_hash
+from compactRetiredOutputCaches import no_matlab, read, save
+from mat5NestedCache import scan_result, same_science
+from planLegacyOutputCleanup import ROOT, OUT, rec, safe, sha
+
+DEST = ROOT / 'docs/validation/storage_20261031/retired_lines'
+RETAINED = OUT / 'retained_line_results_20261031'
+BASELINE = ROOT / 'docs/validation/storage_20261031/graph_operators/inventory_before.json.gz'
+CACHE_FIELDS = {'diagonal', 'lower', 'upper'}
+TARGETS = [
+    ('v81_validation/krylov01/steady_krylov_evidence.mat', 'v81_validation/krylov01_process.json'),
+    ('v81_validation/arithmetic01/steady_krylov_evidence.mat', 'v81_validation/arithmetic01_process.json'),
+    ('v81_validation/arithmetic02/steady_krylov_evidence.mat', 'v81_validation/arithmetic02_process.json'),
+    ('v82_validation/primitive_krylov01/steady_krylov_evidence.mat', 'v82_validation/primitive_krylov01_process.json'),
+]
+JOBS = {
+    20: 'riemannreservoirnewton01', 21: 'reservoircurrentparent01',
+    22: 'updateradiusns01', 23: 'primitivereservoir01', 24: 'peakweightns01',
+    26: 'qrreal85', 27: 'temperaturefull86', 28: 'temperaturefull86',
+    29: 'activefull87', 30: 'activefull87', 31: 'activefull87',
+    32: 'activefull88', 33: 'activefull88', 34: 'activerecovery88',
+    35: 'capacityfull89', 36: 'capacityfull89', 37: 'capacityfull89',
+    38: 'targetedrecovery90',
+}
+TARGETS += [('v83_validation/krylov%02d/wall_velocity_krylov_evidence.mat' % v,
+             'v83_validation/' + job + '_process.json') for v, job in sorted(JOBS.items())]
+TARGETS += [
+    ('v83_validation/krylov39/wall_velocity_krylov_evidence.mat', 'v91_validation/interfacefull91_process.json'),
+    ('v83_validation/krylov40/wall_velocity_krylov_evidence.mat', 'v92_validation/repreviewfull92_process.json'),
+]
+DRIVERS = {'setupInternalFlow.m', 'studyRocketShellSteadyKrylov.m',
+           'continueRocketShellSteadyKrylov.m', 'studyRocketWallVelocityKrylov.m',
+           'continueRocketWallVelocityKrylov.m'}
+
+
+def process_engine_ids(process):
+    """兼容两种明确的旧引擎标记；不得拿启动器PID代替MATLAB引擎。"""
+    if 'engineProcessIDs' in process:
+        return process['engineProcessIDs']
+    assert 'engineProcessIDsFromBatchMarker' in process
+    return process['engineProcessIDsFromBatchMarker']
+
+
+def aliases_from_inventory(path, inventory):
+    """模块一：只接受清单覆盖全部链接的原对象，不把链接长度重复算成回收量。"""
+    path = safe(path)
+    stat = path.stat()
+    aliases = []
+    for relative, value in inventory.items():
+        if (value['device'], value['fileID']) != (stat.st_dev, stat.st_ino):
+            continue
+        candidate = safe(ROOT / relative)
+        candidate.relative_to(OUT)
+        assert candidate.is_file(), '旧清单中的共享路径已变化：' + relative
+        current = candidate.stat()
+        assert (current.st_dev, current.st_ino, current.st_size, current.st_mtime_ns) == (
+            stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns), relative
+        aliases.append(relative)
+    assert path.relative_to(ROOT).as_posix() in aliases
+    assert len(aliases) == stat.st_nlink, '存在清单未覆盖的硬链接，拒绝回收。'
+    return sorted(aliases)
+
+
+def plan():
+    """模块二：先绑定旧进程、精确构造源码和当前输入，再迁存；本步骤不删除。"""
+    no_matlab()
+    assert not RETAINED.exists(), '不覆盖旧迁存结果。'
+    if DEST.exists():
+        assert {p.name for p in DEST.iterdir()} <= {'preflight'}, '不覆盖旧回执。'
+    DEST.mkdir(parents=True, exist_ok=True)
+    before_free = shutil.disk_usage(str(OUT)).free
+    baseline = read(BASELINE.parent / 'final_postcheck.json')
+    assert baseline['status'] == 'passed-after-documented-README-update'
+    with gzip.open(BASELINE, 'rt', encoding='utf-8') as stream:
+        inventory = json.load(stream)['files']
+    historical = {}
+    for file in (ROOT / 'docs/validation').glob('storage_*/**/*.raw'):
+        historical.setdefault(sha(file), file)
+    output_sources = {}
+    for name in inventory:
+        if name.endswith('.m'):
+            output_sources.setdefault(Path(name).name, []).append(ROOT / name)
+    sources, protected, prepared = {}, {}, []
+    head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+
+    def source(relative, expected):
+        relative = relative.replace('\\', '/')
+        key = (relative, expected)
+        if key in sources:
+            return
+        current = safe(ROOT / relative)
+        candidate = current if current.is_file() and sha(current) == expected else historical.get(expected)
+        if candidate is None:
+            candidate = next((p for p in output_sources.get(current.name, [])
+                              if p.is_file() and sha(p) == expected), None)
+        if candidate is None:
+            revisions = subprocess.check_output(['git', 'log', '--all', '--format=%H', '--', relative],
+                                                 cwd=ROOT, text=True).splitlines()
+            for revision in revisions:
+                old = subprocess.run(['git', 'show', revision + ':' + relative], cwd=ROOT,
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if old.returncode == 0 and hashlib.sha256(old.stdout).hexdigest() == expected:
+                    folder = DEST / 'historical_sources'; folder.mkdir(exist_ok=True)
+                    candidate = folder / (current.name + '.' + expected[:16] + '.raw')
+                    if not candidate.exists():
+                        candidate.write_bytes(old.stdout)
+                    break
+        assert candidate is not None, '缺少准确历史构造源码：' + relative
+        # outputs中的唯一旧源码另存原字节；不依赖未上传GitHub的旧隔离副本。
+        if not candidate.relative_to(ROOT).as_posix().startswith('docs/'):
+            old = subprocess.run(['git', 'show', head + ':' + candidate.relative_to(ROOT).as_posix()],
+                                 cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if old.returncode != 0 or hashlib.sha256(old.stdout).hexdigest() != expected:
+                folder = DEST / 'historical_sources'; folder.mkdir(exist_ok=True)
+                target = folder / (current.name + '.' + expected[:16] + '.raw')
+                if not target.exists():
+                    target.write_bytes(candidate.read_bytes())
+                candidate = target
+        sources[key] = dict(rec(candidate, expected), restorePath=relative)
+
+    def protect(path):
+        item = rec(path); protected[item['path']] = item
+
+    for name in ('v83_validation/krylov41/wall_velocity_krylov_evidence.mat',
+                 'v83_validation/krylov25/wall_velocity_krylov_evidence.mat',
+                 'v93_validation/continuous01/step01/active_direction.mat',
+                 'v93_validation/continuous01/step01/direction_context.mat',
+                 'v80_validation/domain02/shell_domain_evidence.mat'):
+        protect(OUT / name)
+    for version in (101, 102, 103):
+        for file in (OUT / ('v%d_validation' % version)).rglob('*.mat'):
+            protect(file)
+    all_aliases = set()
+    # 所有来源/链接/进程预检查先于大文件迁存；未知或失败身份不被改写。
+    for tail, process_tail in TARGETS:
+        original = safe(OUT / tail)
+        aliases = aliases_from_inventory(original, inventory)
+        assert not all_aliases.intersection(aliases)
+        all_aliases.update(aliases)
+        process_file = safe(OUT / process_tail)
+        process = read(process_file)
+        expected_exit = 1 if process_tail.endswith('activefull88_process.json') else 0
+        assert process['status'] == 'terminal' and process['exitCode'] == expected_exit
+        assert process['sourceStableAfter'] and all(process['sourceStableAfter'].values())
+        report = loadmat(original, variable_names=['report'], simplify_cells=True)['report']
+        assert report['engineProcessID'] in process_engine_ids(process)
+        protect(process_file)
+        for relative, digest in process['sourcesBefore'].items():
+            normalized = relative.replace('\\', '/')
+            if normalized.endswith('.m') and (normalized.startswith('internalFlow/') or
+                                              Path(normalized).name in DRIVERS):
+                source(normalized, digest)
+        assert any(Path(r).name == 'buildRocketShellLineOperator.m' for r in process['sourcesBefore'])
+        prepared.append((tail, aliases, process_file, expected_exit))
+    assert not all_aliases.intersection(protected)
+    save(DEST / 'preflight.json', dict(status='passed-before-migration',
+         baselineInventory=rec(BASELINE), targetedDataObjects=len(prepared),
+         targetAliasPaths=len(all_aliases), protectedFiles=list(protected.values()),
+         exactSourceVersions=len(sources), freeBytesBeforeMigration=before_free))
+    print('PREFLIGHT objects=%d aliases=%d sources=%d' % (
+          len(prepared), len(all_aliases), len(sources)), flush=True)
+    # migrate引用已测试的流式内核，只移除三个5×5×N矩阵，其他MAT元素逐字节核对。
+    import compactNestedOutputOperators as core
+    core.CACHE_FIELDS = CACHE_FIELDS
+    groups = []
+    for tail, aliases, process_file, exit_code in prepared:
+        no_matlab()
+        original = safe(OUT / tail)
+        stat = original.stat()
+        old_record = rec(original)
+        retained = safe(RETAINED / tail)
+        migration = migrate(original, retained)
+        assert original.stat().st_mtime_ns == stat.st_mtime_ns
+        assert rec(original)['sha256'] == old_record['sha256']
+        assert len(migration['resultScan']['removed']) == 3
+        group = dict(original=old_record, retained=rec(retained), aliases=aliases,
+                     originalFileID=stat.st_ino, originalDevice=stat.st_dev,
+                     originalLinkCount=stat.st_nlink, originalMtimeNS=stat.st_mtime_ns,
+                     process=rec(process_file), originalProcessExitCode=exit_code, **migration)
+        groups.append(group)
+        save(DEST / 'migration_progress.json', dict(status='originals-not-deleted', groups=groups))
+        print('VERIFIED %s fields=%d netMB=%.3f' % (tail, group['retainedScientificFields'],
+              (old_record['bytes'] - group['retained']['bytes']) / 1e6), flush=True)
+    data = dict(kind='retired-line-operator-cache-cleanup-20261031',
+                status='planned-originals-not-deleted', workspace=str(ROOT), gitHead=head,
+                createdUTC=datetime.now(timezone.utc).isoformat(), groups=groups,
+                protectedFiles=list(protected.values()), sourceFiles=list(sources.values()),
+                baselineInventory=rec(BASELINE), freeBytesBeforeMigration=before_free,
+                scientificFields=sum(g['retainedScientificFields'] for g in groups),
+                originalBytes=sum(g['original']['bytes'] for g in groups),
+                retainedBytes=sum(g['retained']['bytes'] for g in groups),
+                originalAliasPaths=len(all_aliases), numericalSolvePerformed=False)
+    data['netContentBytesReclaimed'] = data['originalBytes'] - data['retainedBytes']
+    assert data['netContentBytesReclaimed'] > 0
+    save(DEST / 'plan.json', data)
+    print('PLAN_READY objects=%d aliases=%d netBytes=%d' % (
+          len(groups), len(all_aliases), data['netContentBytesReclaimed']), flush=True)
+
+
+def predelete():
+    """模块三：删除前独立重开全部文件，确认无新增共享路径或当前依赖冲突。"""
+    no_matlab()
+    data = read(DEST / 'plan.json')
+    assert data['status'] == 'planned-originals-not-deleted'
+    assert {(OUT / tail).relative_to(ROOT).as_posix() for tail, _ in TARGETS} == {
+        g['original']['path'] for g in data['groups']}
+    paths = set()
+    for group in data['groups']:
+        original = safe(ROOT / group['original']['path'])
+        stat = original.stat()
+        assert (stat.st_dev, stat.st_ino, stat.st_mtime_ns, stat.st_nlink) == (
+            group['originalDevice'], group['originalFileID'], group['originalMtimeNS'], len(group['aliases']))
+        rec(original, group['original']['sha256'])
+        rec(ROOT / group['retained']['path'], group['retained']['sha256'])
+        for relative in group['aliases']:
+            candidate = safe(ROOT / relative); candidate.relative_to(OUT)
+            value = candidate.stat()
+            assert (value.st_dev, value.st_ino) == (stat.st_dev, stat.st_ino)
+            assert relative not in paths
+            assert not candidate.with_name('LINE_CACHE_PRUNED_20261031.json').exists()
+            paths.add(relative)
+    assert not paths.intersection(item['path'] for item in data['protectedFiles'])
+    for item in data['protectedFiles'] + data['sourceFiles']:
+        rec(ROOT / item['path'], item['sha256'])
+    save(DEST / 'predelete.json', dict(status='passed', planSHA256=sha(DEST / 'plan.json'),
+         originalAliasPaths=len(paths), allHardlinksCovered=True,
+         currentAndLatestInputsVerified=len(data['protectedFiles'])))
+    print('PREDELETE_PASSED aliases=%d' % len(paths), flush=True)
+
+
+def audit():
+    """模块四：删除后逐字段独立复核科学结果、当前输入、源码及每条清理标记。"""
+    no_matlab()
+    data = read(DEST / 'plan.json'); receipt = read(DEST / 'execution.json')
+    assert receipt['status'] == 'completed-retired-line-cache-cleanup'
+    assert receipt['planSHA256'] == sha(DEST / 'plan.json')
+    for group in data['groups']:
+        file = safe(ROOT / group['retained']['path'])
+        rec(file, group['retained']['sha256'])
+        _, items = records(file)
+        result = next(r for r in items if r['name'] == 'result')
+        with file.open('rb') as stream:
+            actual = scan_result(stream, result['offset'] + 8, result['bytes'] - 8,
+                                 CACHE_FIELDS, require_removed=False)
+            same_science(group['resultScan'], actual)
+            for item in group['copiedRecords']:
+                assert raw_hash(stream, item['retainedOffset'], item['bytes']) == item['sha256']
+        for relative in group['aliases']:
+            assert not (ROOT / relative).exists()
+            marker = read((ROOT / relative).with_name('LINE_CACHE_PRUNED_20261031.json'))
+            assert marker['original'] == group['original'] and marker['retained'] == group['retained']
+            assert marker['originalAliasPath'] == relative
+        print('AUDITED ' + group['original']['path'], flush=True)
+    for item in data['protectedFiles'] + data['sourceFiles']:
+        rec(ROOT / item['path'], item['sha256'])
+    free_after = shutil.disk_usage(str(OUT)).free
+    result = dict(status='passed', auditedUTC=datetime.now(timezone.utc).isoformat(),
+                  deletedObjects=len(data['groups']), deletedAliasPaths=data['originalAliasPaths'],
+                  retainedScientificFields=data['scientificFields'],
+                  protectedFilesVerified=len(data['protectedFiles']), exactSourceVersions=len(data['sourceFiles']),
+                  netContentBytesReclaimed=data['netContentBytesReclaimed'],
+                  freeBytesBeforeMigration=data['freeBytesBeforeMigration'], freeBytesAfterAudit=free_after,
+                  freeIncreaseSinceBeforeMigration=free_after-data['freeBytesBeforeMigration'],
+                  fullHistoricalRescanPerformed=False, originalContainerSHAReproductionClaimed=False,
+                  numericalSolvePerformed=False, largeOutputsUploaded=False)
+    save(DEST / 'postcheck.json', result)
+    print(json.dumps(result), flush=True)
+
+
+if __name__ == '__main__':
+    {'plan': plan, 'predelete': predelete, 'audit': audit}[sys.argv[1]]()
