@@ -1,0 +1,105 @@
+# -*- coding: utf-8 -*-
+"""独立核对当前Q20全部C系数、局部组逆及全部完整像列范数。"""
+from pathlib import Path
+from decimal import Decimal,localcontext
+import json,os,sys,gc
+for key in ('OPENBLAS_NUM_THREADS','MKL_NUM_THREADS','OMP_NUM_THREADS'):os.environ[key]='1'
+import numpy as np
+from scipy.io import loadmat
+from scipy.sparse import csr_matrix
+from screenRocketParentImageScale import setup
+from screenRocketImageScaledFullF import column_norms
+from screenRocketFullFLeastSquares import ROOT,VAL,sha
+
+case=sys.argv[1];assert case.replace('_','').isalnum();folder=VAL/case;target=VAL/(case+'_independent_current_matrix.json');assert not target.exists();bindings={}
+def read(path,variables=None):
+    path=Path(path);path=path if path.is_absolute() else ROOT/path;bindings[path.relative_to(ROOT).as_posix()]=sha(path)
+    return loadmat(path,simplify_cells=True,variable_names=variables)
+data=read(folder/'current_packed_evidence.mat');packed=data['packed'];binding=data['sourceBinding'];assert sha(binding['sourceFile'])==binding['sourceFileSHA256']
+source=read(binding['sourceFile'],['result'])['result'];operator_data=read(data['operatorFile'],['operator','Q','rhs','sourceBinding']);op=operator_data['operator']
+np.testing.assert_array_equal(operator_data['Q'],source['Q']);np.testing.assert_array_equal(operator_data['rhs'],source['rate']/source['residualScale']);del source
+assert operator_data['sourceBinding']==binding
+for key in ('wlsNormalFactor','colorGroups'):op.pop(key,None)
+n=int(packed['cellCount']);nf=int(packed['sourceFaces']);ptr=np.asarray(packed['rowPointer'],int)-1;col=np.asarray(packed['column'],int)-1
+order=np.asarray(packed['order'],int)-1;inv=np.asarray(packed['inverseOrder'],int)-1;nb=len(col)
+np.testing.assert_array_equal(np.sort(order),np.arange(n));np.testing.assert_array_equal(order[inv],np.arange(n))
+position_map=csr_matrix((np.arange(nb,dtype=np.int64)+1,col.astype(np.int32),ptr.astype(np.int32)),shape=(n,n))
+expected=np.zeros((nb,5,5));covered=np.zeros(nb,bool);raw=0
+def add(rr,cc,pages,page_ids=None):
+    global raw
+    raw+=len(rr)
+    for first in range(0,len(rr),4096):
+        rows=rr[first:first+4096];cols=cc[first:first+4096];where=np.asarray(position_map[inv[rows],inv[cols]]).ravel()-1
+        assert np.all(where>=0);ids=slice(first,first+len(rows)) if page_ids is None else page_ids[first:first+len(rows)]
+        np.add.at(expected,where,pages[:,:,ids].transpose(2,0,1));covered[where]=True
+self_ids=np.arange(n);normal=np.arange(n-nf);second=np.arange(n-2*nf);D=op['diagonal'].copy()
+for a in range(5):D[a,a]-=1/op['pseudoTimeStepSeconds']
+add(self_ids,self_ids,D);del D
+add(normal,normal+nf,op['upper'],normal);add(normal+nf,normal,op['lower'],normal+nf)
+add(second,second+2*nf,op['secondUpper'],second);add(second+2*nf,second,op['secondLower'],second+2*nf)
+add(np.asarray(op['sideMinus'],int)-1,np.asarray(op['sidePlus'],int)-1,op['minusCoupling'])
+add(np.asarray(op['sidePlus'],int)-1,np.asarray(op['sideMinus'],int)-1,op['plusCoupling'])
+values=packed['values'].transpose(2,0,1);err2=den2=0.
+for first in range(0,nb,4096):
+    e=expected[first:first+4096];d=e-values[first:first+4096];err2+=float(np.sum(d*d));den2+=float(np.sum(e*e))
+assembly=float(np.sqrt(err2/max(1,den2)));assert assembly<2e-11 and np.all(covered) and raw==packed['packingReport']['rawBlockContributions']
+del op,operator_data,expected,covered,position_map;gc.collect()
+fd=read(folder/'current_factor_evidence.mat',['factor','sourceBinding']);factor=fd['factor'];assert fd['sourceBinding']==binding
+partition=factor['partition'];group=np.asarray(partition['groupID'],int)-1;members=np.asarray(partition['members'],int)-1
+group_ptr=np.asarray(partition['groupPointer'],int)-1;sizes=np.asarray(partition['sizes'],int);ng=int(partition['patchCount'])
+np.testing.assert_array_equal(np.sort(members),np.arange(n));np.testing.assert_array_equal(group[members],np.repeat(np.arange(ng),sizes))
+np.testing.assert_array_equal(np.diff(group_ptr),sizes);assert np.all((sizes>=1)&(sizes<=8))
+owners=np.repeat(np.arange(n),np.diff(ptr));physical_rows=order[owners];physical_cols=order[col]
+selected=np.flatnonzero(group[physical_rows]==group[physical_cols]);selected=selected[np.argsort(group[physical_rows[selected]],kind='stable')]
+edge_ptr=np.r_[0,np.cumsum(np.bincount(group[physical_rows[selected]],minlength=ng))]
+position=np.empty(n,int);position[members]=np.arange(n)-np.repeat(group_ptr[:-1],sizes)
+assert len(selected)==factor['factorizationReport']['includedOriginalBlocksBeforeFallback']
+buckets=[factor['buckets']] if isinstance(factor['buckets'],dict) else list(np.atleast_1d(factor['buckets']).ravel())
+checked=decimal_count=0;maximum_ordinary=maximum_exact=0.
+for size,bucket in enumerate(buckets,1):
+    groups=np.atleast_1d(bucket['patchIDs']).astype(int)-1;count=len(groups)
+    if count==0:continue
+    assert not np.any(bucket['fallback']);inverse=np.asarray(bucket['inverse']).reshape(5*size,5*size,count,order='F').transpose(2,0,1)
+    source_bounds=np.atleast_1d(bucket['certifiedBounds']);assert np.all(source_bounds<1e-8)
+    page_of_group=np.full(ng,-1,int);page_of_group[groups]=np.arange(count);N=5*size;gamma=N*np.finfo(float).eps/(1-N*np.finfo(float).eps)
+    for first in range(0,count,128):
+        last=min(first+128,count);batch=groups[first:last];edges=np.concatenate([selected[edge_ptr[q]:edge_ptr[q+1]] for q in batch])
+        page=page_of_group[group[physical_rows[edges]]]-first;rr=position[physical_rows[edges]];cc=position[physical_cols[edges]]
+        block=np.zeros((last-first,N,N));adjacent=np.zeros((last-first,size,size),bool)
+        adjacent[page,rr,cc]=np.any(values[edges]!=0,axis=(1,2));adjacent|=adjacent.transpose(0,2,1)
+        for a in range(5):
+            for b in range(5):block[page,5*rr+a,5*cc+b]=values[edges,a,b]
+        for k in range(last-first):
+            visited={0}
+            while True:
+                added={q for q in range(size) if any(adjacent[k,q,v] for v in visited)}-visited
+                if not added:break
+                visited|=added
+            assert len(visited)==size;checked+=1
+        inverse_batch=inverse[first:last];ordinary=np.max(abs(block@inverse_batch-np.eye(N)),axis=(1,2));maximum_ordinary=max(maximum_ordinary,float(ordinary.max()))
+        rounding=gamma*np.max(np.sum(abs(block),axis=2),axis=1)*np.max(abs(inverse_batch),axis=(1,2))/(1-gamma)**2
+        exact_ids=np.flatnonzero(ordinary+rounding>=1e-8)
+        with localcontext() as context:
+            context.prec=80
+            for k in exact_ids:
+                AA=[[Decimal.from_float(float(v)) for v in row] for row in block[k]];XX=[[Decimal.from_float(float(v)) for v in row] for row in inverse_batch[k]]
+                exact_error=max(abs((Decimal(1) if i==j else Decimal(0))-sum((AA[i][q]*XX[q][j] for q in range(N)),Decimal(0))) for i in range(N) for j in range(N))
+                assert exact_error<Decimal('1e-8') and exact_error<=Decimal.from_float(float(source_bounds[first+k]))
+                maximum_exact=max(maximum_exact,float(exact_error));decimal_count+=1
+    print('CURRENT_MATRIX_ALL_PATCH_BUCKET_'+str(size),flush=True)
+assert checked==ng and factor['factorizationReport']['fallbackPatchCount']==0
+del owners,physical_rows,physical_cols,selected,edge_ptr,position,block;gc.collect()
+A,plan,algebraic_order=setup(packed,factor);norms,construction=column_norms(A,plan)
+scale=read(folder/'current_image_scale_evidence.mat',['columnNorm','columnScale'])
+physical=np.empty_like(norms);physical[algebraic_order]=norms
+norm_error=float(np.max(abs(physical-scale['columnNorm'])/physical));assert norm_error<1e-12
+assert np.max(abs(scale['columnNorm']*scale['columnScale']-1))<1e-12
+assert construction['groups']==ng and construction['originalBlocksUsedExactlyOnce']==nb
+assert all(sha(ROOT/p)==digest for p,digest in bindings.items())
+out=dict(status='passed-independent-current-Q20-all-parent-coefficients-patch-inverses-and-image-columns',processID=os.getpid(),
+    sourceCells=n,originalBlocks=nb,rawBlockContributions=raw,allCoefficientAssemblyRelativeDifference=assembly,
+    originalCVsAndFiveFieldsExactlyCovered=True,patches=ng,allPatchConnectivityVerified=True,
+    maximumOrdinaryInverseDefect=maximum_ordinary,decimal80Checks=decimal_count,maximumDecimal80InverseDefect=maximum_exact,
+    allImageColumns=5*n,maximumImageColumnNormDifference=norm_error,newProductionSolvedAreaM2=0,
+    originalNSOrFullParentConvergenceClaimed=False,inputSHA256=bindings,scriptSHA256=sha(__file__))
+target.write_text(json.dumps(out,indent=2)+'\n',encoding='utf8');print(json.dumps({k:v for k,v in out.items() if k!='inputSHA256'}))

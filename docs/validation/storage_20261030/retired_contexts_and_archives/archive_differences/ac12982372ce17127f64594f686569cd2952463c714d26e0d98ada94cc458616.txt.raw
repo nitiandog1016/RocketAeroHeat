@@ -1,0 +1,15 @@
+RocketAeroHeat v83 局部峰值约束研究（2026-10-26）
+
+研究源码快照/完整替换文件；本包没有隔离MATLAB完整工程重算，不是正式v83交付。
+最新正式交付仍为v82，正式合格热流覆盖66.5626327424%，本轮新增0。
+
+源码包保留当前非忽略的源码、测试、模型和文档。main.m为工程入口。
+替换文件均为完整文件，需要既有RocketAeroHeat工程。MATLAB后端/X主轴/鼻尖+X/来流-X/SI保持。
+selected-preview/index.html展示当前选用端点krylov24。
+coordinate-study-preview/index.html展示同Q20、同方向的Q23候选坐标对照。
+Q22和Q23是并列子分支，不能合并累计接受和NS调用。所有研究值仍未具区域物理资格。
+Tw=300K是输入，Te/Tr/求解Tw未知。数据/科研PNG检查不是浏览器/WebGL视觉验收。
+
+数值研究依赖本机outputs中的大型MAT检查点和公开参考缓存，本包不包含这些大型依赖。
+ZIP CRC和逐文件SHA通过不代表隔离物理解重算或实验验证。
+详见docs/PEAK_WEIGHTED_DIRECTION_V83.md与docs/validation/v83/progress_peak_weighted_direction.json。

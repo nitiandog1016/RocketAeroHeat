@@ -1,0 +1,314 @@
+"""核实旧QR缓存与八个v83源码包；保留原始元数据、差异原文和全部独有结果。"""
+
+from datetime import datetime, timezone
+from pathlib import Path
+import collections
+import gzip
+import hashlib
+import json
+import os
+import shutil
+import struct
+import subprocess
+import sys
+import zipfile
+
+from scipy.io import loadmat, whosmat
+from planLegacyOutputCleanup import ROOT, OUT, inventory, rec, safe, sha
+from planOutputStorageMaintenance import allocated
+from planRetiredQRCacheCleanup import equal
+
+DEST = ROOT / 'docs/validation/storage_20261030/retired_contexts_and_archives'
+CONTEXTS = (
+    ('v88_validation/continuous01/step03/direction_context.mat', 'activefull88', 1),
+    ('v90_validation/continuous01/step01/direction_context.mat', 'lookaheadfull90', 1),
+    ('v90_validation/recovery01/direction_context.mat', 'targetedrecovery90', 0),
+)
+ARCHIVES = (
+    'RocketAeroHeat_v83_current_state_complete_replacements.zip',
+    'RocketAeroHeat_v83_current_state_complete_replacements_attempt01.zip',
+    'RocketAeroHeat_v83_current_state_research_source.zip',
+    'RocketAeroHeat_v83_current_state_research_source_attempt01.zip',
+    'RocketAeroHeat_v83_peak_complete_replacements.zip',
+    'RocketAeroHeat_v83_peak_research_source.zip',
+    'RocketAeroHeat_v83_riemann_complete_replacements.zip',
+    'RocketAeroHeat_v83_riemann_research_source.zip',
+)
+
+
+def read(path):
+    return json.loads(safe(path).read_text(encoding='utf-8-sig'))
+
+
+def save_json(path, data):
+    safe(path).write_bytes((json.dumps(data, ensure_ascii=False, indent=2) + '\n').encode('utf-8'))
+
+
+def save_gzip(path, data):
+    with safe(path).open('wb') as stream:
+        with gzip.GzipFile(filename='', mode='wb', fileobj=stream, mtime=0) as zipped:
+            zipped.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
+
+
+def retained_mat_records(original, target):
+    """模块一：逐条复制MAT压缩记录，只移除可重建factor，不重编码任何保留变量。"""
+    variables = whosmat(original)
+    names = [v[0] for v in variables]
+    allowed = {'p', 'factor', 'initialRows', 'preparationFile', 'preparationSHA256', 'rows', 'freeReplay'}
+    assert len(names) == len(set(names)) and set(names) <= allowed and 'factor' in names
+    target.parent.mkdir(exist_ok=True)
+    assert not target.exists()
+    records = []
+    with safe(original).open('rb') as source, safe(target).open('xb') as output:
+        header = source.read(128)
+        assert header[:19] == b'MATLAB 5.0 MAT-file,' and header[-2:] == b'IM'
+        output.write(header)
+        for name in names:
+            start = source.tell()
+            tag = source.read(8)
+            kind, length = struct.unpack('<II', tag)
+            assert kind == 15 and length > 0, '仅接受已核实的独立压缩MAT5记录。'
+            h = hashlib.sha256(tag)
+            if name != 'factor':
+                output.write(tag)
+            remaining = length
+            while remaining:
+                block = source.read(min(remaining, 8 * 1024**2))
+                assert block
+                h.update(block)
+                if name != 'factor':
+                    output.write(block)
+                remaining -= len(block)
+            records.append(dict(variable=name, sourceOffset=start, bytes=length+8,
+                                rawRecordSHA256=h.hexdigest(), retained=name != 'factor'))
+        assert source.tell() == original.stat().st_size
+    assert whosmat(target) == [v for v in variables if v[0] != 'factor']
+    # 独立再读两文件逐段比较；字段、MAT数据类型和压缩原字节均保留。
+    with original.open('rb') as old, target.open('rb') as new:
+        assert old.read(128) == new.read(128)
+        for entry in records:
+            if not entry['retained']:
+                continue
+            old.seek(entry['sourceOffset'])
+            assert old.read(entry['bytes']) == new.read(entry['bytes'])
+        assert not new.read(1)
+    return records
+
+
+def plan():
+    """模块二：保存非factor记录和ZIP差异，核对上游、准确源码及全部硬链接后固定计划。"""
+    assert not DEST.exists(), '禁止覆盖已有维护记录。'
+    assert not subprocess.check_output(['tasklist', '/FI', 'IMAGENAME eq MATLAB.exe', '/FO', 'CSV'], text=True).count('"MATLAB.exe"')
+    before = inventory()
+    aliases, by_name = {}, collections.defaultdict(list)
+    for relative, item in before['files'].items():
+        aliases.setdefault((item['device'], item['fileID']), []).append(relative)
+        by_name[(Path(relative).name, item['bytes'])].append(relative)
+    DEST.mkdir(parents=True)
+    protected, versions, groups = {}, {}, []
+    archive_paths = {('outputs/v83_validation/' + name) for name in ARCHIVES}
+
+    def protect(file, expected=None):
+        item = rec(file, expected)
+        protected[item['path']] = item
+        return item
+
+    def group(file, kind, **extra):
+        st = file.stat()
+        links = aliases[(st.st_dev, st.st_ino)]
+        assert len(links) == st.st_nlink, '存在outputs之外的硬链接。'
+        markers = sorted({(Path(p).parent / 'RETIRED_OUTPUTS_20261030.json').as_posix() for p in links})
+        groups.append(dict(kind=kind, file=rec(file), aliases=[rec(ROOT/p, sha(file)) for p in links],
+                           markerPaths=markers, allocatedBytesBefore=allocated(file), **extra))
+
+    # 小型历史源码按精确SHA复用既有原文；未找到时从Git历史逐版本恢复。
+    historical = {}
+    for path in (ROOT/'docs/validation').rglob('*.raw'):
+        historical.setdefault(sha(path), path)
+
+    def source(relative, expected):
+        relative = relative.replace('\\', '/')
+        key = (relative, expected)
+        if key in versions:
+            return
+        file = safe(ROOT/relative)
+        candidate = file if file.is_file() and sha(file) == expected else historical.get(expected)
+        if candidate is None:
+            for p in by_name.get((file.name, file.stat().st_size if file.exists() else -1), []):
+                if sha(ROOT/p) == expected:
+                    candidate = ROOT/p
+                    break
+        if candidate is None:
+            # 历史文件长度可能变化，按同名搜索，不假定等长。
+            for p in before['files']:
+                if Path(p).name == file.name and sha(ROOT/p) == expected:
+                    candidate = ROOT/p
+                    break
+        if candidate is not None:
+            versions[key] = dict(rec(candidate, expected), restorePath=relative)
+            return
+        revisions = subprocess.check_output(['git', 'log', '--all', '--format=%H', '--', relative], cwd=ROOT, text=True).splitlines()
+        content = None
+        for revision in revisions:
+            result = subprocess.run(['git', 'show', revision+':'+relative], cwd=ROOT, capture_output=True)
+            if result.returncode == 0 and hashlib.sha256(result.stdout).hexdigest() == expected:
+                content = result.stdout
+                break
+        assert content is not None, '缺少准确历史源码：'+relative
+        folder = DEST/'historical_sources'
+        folder.mkdir(exist_ok=True)
+        target = folder/(file.name+'.'+expected[:16]+'.raw')
+        target.write_bytes(content)
+        versions[key] = dict(rec(target, expected), restorePath=relative)
+
+    for relative, job, exit_code in CONTEXTS:
+        file = safe(OUT/relative)
+        metadata = DEST/'mat_metadata'/('%s_%s.mat' % (relative.split('/')[0], relative.split('/')[-2]))
+        records = retained_mat_records(file, metadata)
+        m = loadmat(metadata, simplify_cells=True)
+        prep = safe(Path(m['preparationFile']))
+        p = read(prep)
+        protect(prep, m['preparationSHA256'])
+        assert equal(m['p'], p)
+        protect(p['sourceBinding']['sourceFile'], p['sourceBinding']['sourceFileSHA256'])
+        protect(p['geometryBinding']['file'], p['geometryBinding']['sha256'])
+        protect(prep.parent/'CACHE_PRUNED.json')
+        process_file = OUT/'v83_validation'/(job+'_process.json')
+        process = read(process_file)
+        assert process['status'] == 'terminal' and process['exitCode'] == exit_code
+        assert process['sourceStableAfter'] and all(process['sourceStableAfter'].values())
+        protect(process_file)
+        drivers = {'tests/continueRocketTemperatureActive.m', 'tests/studyRocketTemperatureLookahead.m',
+                   'tests/recoverRocketTemperatureLookaheadStep.m', 'tests/prepareRocketCurrentPeakSystem.m',
+                   'tests/loadRocketPeakSystem.m', 'tests/createRocketNSDirectionProbe.m',
+                   'tests/continueRocketWallVelocityKrylov.m'}
+        for path, digest in process['sourcesBefore'].items():
+            if path.endswith('.m') and (not path.startswith('tests/') or path in drivers):
+                source(path, digest)
+        group(file, 'retired-QR-factor-with-original-nonfactor-records-retained',
+              retainedMetadata=protect(metadata), variableRecords=records, process=rec(process_file),
+              rebuildRequired=True, rebuildEntry='tests/prepareRocketCurrentPeakSystem.m',
+              oldInputManifestReusable=False)
+        print('CONTEXT_VERIFIED '+relative, flush=True)
+
+    # 每一ZIP成员均匹配保留文件；没有匹配的不同原文另存小型内容寻址快照。
+    members, content_locations = [], {}
+    for name in ARCHIVES:
+        file = OUT/'v83_validation'/name
+        rows = []
+        with zipfile.ZipFile(file) as zipped:
+            for item in zipped.infolist():
+                if item.is_dir():
+                    continue
+                content = zipped.read(item)
+                digest = hashlib.sha256(content).hexdigest()
+                retained = content_locations.get(digest)
+                if retained is None:
+                    candidates = by_name[(Path(item.filename).name, item.file_size)]
+                    # 可保留参考资料ZIP，但绝不把本轮待删ZIP作为替代副本。
+                    direct = ROOT/item.filename
+                    if direct.is_file() and direct.stat().st_size == item.file_size:
+                        candidates = [item.filename] + candidates
+                    for candidate in candidates:
+                        if candidate not in archive_paths and sha(ROOT/candidate) == digest:
+                            retained = protect(ROOT/candidate, digest)
+                            break
+                if retained is None:
+                    folder = DEST/'archive_differences'
+                    folder.mkdir(exist_ok=True)
+                    target = folder/(digest+Path(item.filename).suffix+'.raw')
+                    assert not target.exists()
+                    target.write_bytes(content)
+                    retained = protect(target, digest)
+                content_locations[digest] = retained
+                rows.append(dict(member=item.filename, bytes=item.file_size, sha256=digest, retained=retained))
+        members.append(dict(archive=rec(file), members=rows))
+        group(file, 'all-ZIP-members-retained-by-exact-SHA', memberCount=len(rows))
+        print('ARCHIVE_VERIFIED '+name, flush=True)
+
+    for relative in ('v93_validation/continuous01/step01/direction_context.mat',
+                     'v93_validation/continuous01/step01/active_direction.mat',
+                     'v93_validation/continuous01/step01/krylov01/wall_velocity_krylov_evidence.mat',
+                     'v80_validation/domain02/shell_domain_evidence.mat'):
+        protect(OUT/relative)
+    for version in range(94, 100):
+        for file in (OUT/('v%d_validation'%version)).rglob('*'):
+            if file.is_file():
+                protect(file)
+    delete = [v for g in groups for v in g['aliases']]
+    assert not set(protected).intersection(x['path'] for x in delete)
+    assert len(groups) == 11 and len(delete) == 14
+    inv, mem = DEST/'inventory_before.json.gz', DEST/'zip_members.json.gz'
+    save_gzip(inv, before)
+    save_gzip(mem, members)
+    data = dict(kind='three-retired-QR-contexts-and-eight-v83-source-archives', workspace=str(ROOT),
+                createdUTC=datetime.now(timezone.utc).isoformat(), groups=groups, deleteFiles=delete,
+                protectedFiles=list(protected.values()), sourceFiles=list(versions.values()),
+                inventoryBefore=rec(inv), zipMembers=rec(mem),
+                plannedUniqueBytes=sum(g['file']['bytes'] for g in groups),
+                plannedAllocatedBytes=sum(g['allocatedBytesBefore'] for g in groups),
+                sourceCommit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+                numericalRebuildExecuted=False, allUniqueResultsAndCheckpointsRetained=True)
+    save_json(DEST/'plan.json', data)
+    print(json.dumps(dict(objects=len(groups), paths=len(delete), uniqueBytes=data['plannedUniqueBytes'],
+                          retainedRecords=len(protected), sourceVersions=len(versions))))
+
+
+def audit():
+    """模块三：独立确认只有固定文件消失，所有其余原文件身份和保留字节不变。"""
+    data, receipt = read(DEST/'plan.json'), read(DEST/'execution.json')
+    assert receipt['status'] == 'completed-retired-context-and-archive-cleanup'
+    assert receipt['planSHA256'] == sha(DEST/'plan.json')
+    for item in data['protectedFiles']+data['sourceFiles']+[data['inventoryBefore'],data['zipMembers']]:
+        rec(ROOT/item['path'], item['sha256'])
+    with gzip.open(DEST/'inventory_before.json.gz','rb') as stream:
+        before = json.load(stream)
+    after = inventory()
+    removed = {p['path'] for p in data['deleteFiles']}
+    markers = {p for g in data['groups'] for p in g['markerPaths']}
+    assert set(before['files'])-set(after['files']) == removed
+    assert set(after['files'])-set(before['files']) == markers
+    assert all(before['files'][p] == after['files'][p] for p in before['files'] if p not in removed)
+    with gzip.open(DEST/'zip_members.json.gz','rb') as stream:
+        members = json.load(stream)
+    assert len(members) == 8
+    for archive in members:
+        for member in archive['members']:
+            retained = member['retained']
+            assert retained['bytes'] == member['bytes'] and retained['sha256'] == member['sha256']
+            rec(ROOT/retained['path'], member['sha256'])
+    metadata_variables = 0
+    for group in data['groups']:
+        if 'retainedMetadata' not in group:
+            continue
+        file = ROOT/group['retainedMetadata']['path']
+        records = [v for v in group['variableRecords'] if v['retained']]
+        assert [v[0] for v in whosmat(file)] == [v['variable'] for v in records]
+        with file.open('rb') as stream:
+            stream.seek(128)
+            for v in records:
+                assert hashlib.sha256(stream.read(v['bytes'])).hexdigest() == v['rawRecordSHA256']
+            assert not stream.read(1)
+        metadata_variables += len(records)
+    # 计入现有透明压缩，逐文件ID只计一次，不将硬链接路径之和作为磁盘实占。
+    unique, by_dir = {}, collections.Counter()
+    for name, info in after['files'].items():
+        key = (info['device'],info['fileID'])
+        if key not in unique:
+            unique[key] = allocated(ROOT/name)
+            by_dir[Path(name).parts[1]] += unique[key]
+    report = dict(status='passed-all-original-file-identities-and-retained-content-audit',
+                  deletedObjects=len(data['groups']), deletedPaths=len(removed),
+                  unchangedOriginalFiles=before['fileCount']-len(removed),
+                  zipMemberCount=sum(len(v['members']) for v in members), retainedMATVariables=metadata_variables,
+                  protectedSHARecords=len(data['protectedFiles']), historicalSourceVersions=len(data['sourceFiles']),
+                  deletedUniqueBytes=data['plannedUniqueBytes'], actualFreeIncreaseBytes=receipt['actualFreeIncreaseBytes'],
+                  uniqueContentBytesAfter=after['uniqueFileLengthBytes'], allocatedFileDataBytesAfter=sum(unique.values()),
+                  largestOutputDirectories=by_dir.most_common(5), freeBytesAtAudit=shutil.disk_usage(OUT).free,
+                  allUniqueResultsAndCheckpointsRetained=True, numericalRebuildExecuted=False)
+    save_json(DEST/'postcheck.json',report)
+    print(json.dumps(report))
+
+
+if __name__ == '__main__':
+    {'plan':plan, 'audit':audit}[sys.argv[1]]()
