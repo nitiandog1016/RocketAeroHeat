@@ -1,0 +1,35 @@
+{
+  "reviewDate": "2026-10-30",
+  "purpose": "根据实际Cauchy高阶/外侧敏感性复核下一步局部真实壁面—共同激波闭合路线",
+  "sources": [
+    {
+      "report": "NASA TP-1154",
+      "title": "Solution of Axisymmetric and Two-Dimensional Inviscid Flow Over Blunt Bodies by the Method of Lines",
+      "author": "H. Harris Hamilton II",
+      "year": 1978,
+      "url": "https://ntrs.nasa.gov/api/citations/19780014389/downloads/19780014389.pdf",
+      "readScope": "PDF摘要、引言及方法开头；未逐页复现全部方程和算例",
+      "projectUse": "给定激波反算的混合型初值问题与线数/舍入限制；不把其特定线数经验当本项目统一上限或精度证明"
+    },
+    {
+      "report": "NASA TN D-6283",
+      "title": "A Time-Dependent Method for Calculating Supersonic Angle-of-Attack Flow About Axisymmetric Blunt Bodies With Sharp Shoulders and Smooth Nonaxisymmetric Blunt Bodies",
+      "author": "Richard W. Barnwell",
+      "year": 1971,
+      "url": "https://ntrs.nasa.gov/api/citations/19710021731/downloads/19710021731.pdf",
+      "readScope": "PDF摘要和引言；未实现其完整数值方法",
+      "projectUse": "比较给定真实体形的非定常/共同激波拟合局部路线，保留攻角、光滑性和对称性适用限制"
+    },
+    {
+      "record": "NTRS 20205002191",
+      "title": "High-Order Shock Fitting with Finite Element Methods",
+      "year": 2020,
+      "url": "https://ntrs.nasa.gov/citations/20205002191",
+      "readScope": "NASA目录摘要；未读取或复现完整有限元实现",
+      "projectUse": "确认ALE移动网格、激波运动条件及几何守恒的候选方向，不移用论文收敛阶或实验精度"
+    }
+  ],
+  "directShockFittedSolverImplementedThisStage": false,
+  "experimentalValidation": false,
+  "newProductionSolvedAreaM2": 0
+}

@@ -12,11 +12,11 @@
  data.cases.forEach((c,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=c.caption;$('caseChoice').append(o);});
  function show(){
   const c=current(),fs=data.freestream;$('title').textContent=labels[step]+' · '+c.caption;$('scope').textContent=c.scope;
-  const items=[['工况','M'+fmt(fs.Mach)+' · '+fmt(fs.altitudeM/1000)+' km · 攻角'+fmt(fs.alphaDeg)+'°'],['原箭体网格',data.geometry.faces.length+' 面 · 闭合定向'],['当前组',c.columns.length+' 个法向列'],['状态身份','共同激波层原型，真实体形未匹配'],['匹配门槛',fmt(c.bodyMatchToleranceM*1e6)+' µm，保持原值'],['热流与求解壁温','未求解'],['新增合格热流面积','0 m²']];
+  const items=[['工况','M'+fmt(fs.Mach)+' · '+fmt(fs.altitudeM/1000)+' km · 攻角'+fmt(fs.alphaDeg)+'°'],['原箭体网格',data.geometry.faces.length+' 面 · 闭合定向'],['当前组',c.columns.length+' 个法向列'],['状态身份',c.stateDescription||'共同激波层原型，真实体形未匹配'],['匹配门槛',fmt(c.bodyMatchToleranceM*1e6)+' µm，保持原值'],['热流与求解壁温','未求解'],['新增合格热流面积','0 m²']];
   if(step===0)items.unshift(['模型来源','冻结的原V/F与真实自由流；不读取旧壁面场']);
   if(step===1)items.unshift(['鼻部网格','原三角面子集，为开放片，未重新生成或平滑']);
   if(step===2)items.unshift(['自由流p / T',fmt(fs.pressurePa)+' Pa / '+fmt(fs.temperatureK)+' K'],['壁面温度输入','本研究未设置']);
-  if(step===3)items.unshift(['计算方式','读取已保存的内部薄层结果；本页不重算'],['资格','拟合及独立检查均未通过体形门槛']);
+  if(step===3)items.unshift(['计算方式',data.calculationDescription||'读取已保存的内部薄层结果；本页不重算'],['资格',data.qualificationDescription||'拟合及独立检查均未通过体形门槛']);
   rows($('details'),items);$('methodScope').textContent=data.methodScope;
   $('fitRows').replaceChildren();data.fitSummary.names.forEach((name,i)=>{const tr=document.createElement('tr'),a=document.createElement('td'),b=document.createElement('td');a.textContent=name;b.textContent=fmt(data.fitSummary.maximumM[i]*1e6);tr.append(a,b);$('fitRows').append(tr);});
   $('columnChoice').replaceChildren();c.columns.forEach((_,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent='法向列 '+(i+1);$('columnChoice').append(o);});$('columnChoice').value=String(column);

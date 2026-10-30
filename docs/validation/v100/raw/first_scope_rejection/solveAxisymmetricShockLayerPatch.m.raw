@@ -1,0 +1,122 @@
+function patch=solveAxisymmetricShockLayerPatch(upstream,gas,shape,outerRadiusM,eta,input)
+%SOLVEAXISYMMETRICSHOCKLAYERPATCH 连续式确定法向速度的耦合轴对称激波层反算。
+% 模块一：用z=r^2、u=r*w正则化轴线；轴线u=0来自对称性，w仍参与求解。
+% 模块二：同一投影流量psi_s=rho_inf*U_inf*z/2决定入口z_entry=z*eta及熵。
+% 模块三：同时推进内法向距离n、正则切向速度w及法向速度v；保留u*dv/ds项。
+% 模块四：由同H0/S恢复p/T/rho，检查法线聚焦、温域、Cauchy声速行列式及质量约束。
+% 范围：均匀上游、来流轴对称、光滑共同激波给定；不是一般三维或真实箭体完整解。
+if nargin<6,input=struct;end
+N=11;if isfield(input,'radialNodeCount'),N=input.radialNodeCount;end
+relativeTolerance=2e-10;if isfield(input,'relativeTolerance'),relativeTolerance=input.relativeTolerance;end
+maximumStep=.003;if isfield(input,'maximumEtaStep'),maximumStep=input.maximumEtaStep;end
+validateattributes(N,{'double'},{'scalar','integer','>=',7,'<=',25});
+validateattributes(relativeTolerance,{'double'},{'scalar','real','finite','>=',1e-13,'<=',1e-6});
+validateattributes(maximumStep,{'double'},{'scalar','real','finite','positive','<=',.05});
+validateattributes(outerRadiusM,{'double'},{'scalar','real','finite','positive'});
+validateattributes(eta,{'double'},{'vector','real','finite','>=',0,'<=',1});eta=eta(:);
+assert(numel(eta)>=3&&eta(1)==1&&eta(end)==0&&all(diff(eta)<0), ...
+    'ShockPatch:MassCoordinate','质量比须从激波1严格递减至候选体表0。');
+assert(isfield(upstream,'method')&&strlength(string(upstream.method))>0, ...
+    'ShockPatch:Source','上游状态必须保留来源。');
+validateattributes(upstream.velocityVector,{'double'},{'real','finite','size',[3 1]});
+validateattributes(shape.origin,{'double'},{'real','finite','size',[3 1]});
+validateattributes(shape.frame,{'double'},{'real','finite','size',[3 3]});
+U=norm(upstream.velocityVector);ex=upstream.velocityVector/U;
+assert(U>0&&norm(shape.frame'*shape.frame-eye(3),'fro')<1e-11&&det(shape.frame)>0&& ...
+    norm(shape.frame(:,1)-ex)<1e-11,'ShockPatch:Frame','共同激波框架须正交右手且第一轴沿实际来流。');
+assert(~isfield(shape,'deformationWeights')||all(shape.deformationWeights==0), ...
+    'ShockPatch:Axisymmetry','本轴对称分支不接受未实现的非轴对称形变。');
+z=(1-cos(pi*(0:N-1)'/(N-1)))/2*outerRadiusM^2;
+bary=(-1).^(0:N-1)';bary([1 end])=.5*bary([1 end]);difference=z-z';difference(1:N+1:end)=1;
+D=(bary'./bary)./difference;D(1:N+1:end)=0;D=D-diag(sum(D,2));
+geometry=axisymmetricShockGraph(shape,z);inverseG=geometry.inverseMeridionalMetric;
+km=geometry.meridionalCurvaturePerM;kb=geometry.azimuthalCurvaturePerM;k=geometry.apexCurvaturePerM;
+first=surfaceFlowThermodynamicState(upstream.temperature,upstream.pressure,gas);
+H0=first.enthalpy+U^2/2;[~,maximumH]=shockLayerThermalBatch(gas.temperatureRangeK(2),gas);
+assert(H0<=maximumH,'ShockPatch:Temperature','统一总焓超出声明物性温域。');
+entry=shockLayerNormalJumpBatch(upstream,gas,U*inverseG);
+mu=upstream.density*U/2;B=upstream.density*U*inverseG;
+initial=[zeros(N,1);U*kb;entry.normalSpeed];
+calls=0;minimumDet=Inf;minimumFocal=Inf;minimumTemperature=Inf;
+absoluteTolerance=[repmat(3e-11*outerRadiusM,N,1);repmat(1e-11*U*k,N,1);repmat(1e-12*U,N,1)];
+options=odeset('RelTol',relativeTolerance,'AbsTol',absoluteTolerance,'MaxStep',maximumStep);
+timer=tic;solution=ode113(@rhs,[1 0],initial,options);allValues=deval(solution,eta');
+n=allValues(1:N,:)';w=allValues(N+(1:N),:)';v=allValues(2*N+(1:N),:)';
+count=numel(eta);p=zeros(count,N);T=p;rho=p;cp=p;S=p;sound2=p;enthalpy=p;sourceS=p;sourceSz=p;
+for j=1:count
+    sourceGeometry=axisymmetricShockGraph(shape,z*eta(j));
+    source=shockLayerNormalJumpBatch(upstream,gas,U*sourceGeometry.inverseMeridionalMetric);
+    state=shockLayerStateFromHS(H0-(z'.*w(j,:).^2+v(j,:).^2)/2,source.entropy',gas);
+    p(j,:)=state.pressure;T(j,:)=state.temperature;rho(j,:)=state.density;cp(j,:)=state.specificHeat;
+    S(j,:)=state.entropy;enthalpy(j,:)=state.enthalpy;sound2(j,:)=state.soundSpeedSquared;
+    sourceS(j,:)=source.entropy';sourceSz(j,:)=(source.entropyDerivativeByNormalSpeed.* ...
+        U.*sourceGeometry.inverseMetricDerivativeByRadiusSquared)';
+end
+h=1-n.*km';gphi=1-n.*kb';J=h.*gphi;u=w.*sqrt(z)';nz=n*D';
+bhat=2*inverseG'.*nz./h;A=eta.*B'./(rho.*J);
+constraint=v-A-z'.*w.*bhat;
+determinant=1-A.*v./sound2+z'.*bhat.*(bhat+A.*w./sound2);
+assert(max(abs(constraint),[],'all')<1e-8*U,'ShockPatch:MassConstraint','离散积分未保持连续式法向速度约束。');
+assert(max(abs(v(end,1)))<1e-8*U,'ShockPatch:AxisLimit','轴线端点尚未达到有限驻止极限。');
+axial=geometry.axialPositionM'+n.*inverseG';radial=sqrt(z)'.*gphi;
+axialVelocity=z'.*kb'.*w+inverseG'.*v;radialVelocity=sqrt(z)'.*(inverseG'.*w-kb'.*v);
+position=zeros(count,N,3);velocity=position;
+for dimension=1:3
+    position(:,:,dimension)=shape.origin(dimension)+shape.frame(dimension,1)*axial+shape.frame(dimension,2)*radial;
+    velocity(:,:,dimension)=shape.frame(dimension,1)*axialVelocity+shape.frame(dimension,2)*radialVelocity;
+end
+energy=(enthalpy+(u.^2+v.^2)/2-H0)/max(1,abs(H0));
+methods=struct('pressure','连续式与含u*dv/ds的法向动量耦合推进，再由同一入口熵/静焓恢复压力', ...
+    'temperature','统一H0扣除实际切向/法向动能，同cp积分反解温度', ...
+    'speed','连续式及流向耦合法向动量的n/w/v系统；u=r*w正则轴线', ...
+    'entropy','同一投影流线入口r_entry^2=r^2*eta的正常激波熵', ...
+    'distance','正向投影质量连续式dn/deta=-rho_inf*U*h/(2*rho*w*J)');
+patch=struct('method','给定轴对称共同激波的正则n/w/v连续式—法向动量耦合Cauchy反算', ...
+    'methods',methods,'shape',shape,'upstream',upstream,'gas',gas,'eta',eta,'radiusM',sqrt(z), ...
+    'radiusSquaredM2',z,'radialDerivativeMatrix',D,'shockGeometry',geometry,'shockState',entry, ...
+    'normalDistanceM',n,'regularStreamwiseSpeedPerS',w,'streamwiseSpeedMS',u,'normalSpeedMS',v, ...
+    'pressurePa',p,'temperatureK',T,'densityKgM3',rho,'specificHeat',cp,'entropyJPerKgK',S, ...
+    'sourceEntropyJPerKgK',sourceS,'sourceEntropyDerivativeByRadiusSquared',sourceSz, ...
+    'sourceRadiusSquaredM2',eta*z','staticEnthalpyJPerKg',enthalpy,'soundSpeedSquared',sound2, ...
+    'totalEnthalpyReferenceJPerKg',H0,'energyResidual',energy,'entropyResidual',S-sourceS, ...
+    'massConstraintMS',constraint,'jacobianRatio',J,'meridionalScaleRatio',h,'azimuthalScaleRatio',gphi, ...
+    'normalCoordinateDeterminant',determinant,'axialPositionM',axial,'radialPositionM',radial, ...
+    'axialVelocityMS',axialVelocity,'radialVelocityMS',radialVelocity,'position',position,'velocityVector',velocity, ...
+    'radialNodeCount',N,'relativeTolerance',relativeTolerance,'absoluteTolerance',absoluteTolerance, ...
+    'maximumEtaStep',maximumStep,'integrationRHSCalls',calls,'integrationSeconds',toc(timer), ...
+    'minimumObservedDeterminant',minimumDet,'minimumObservedFocalScale',minimumFocal, ...
+    'minimumObservedTemperatureK',minimumTemperature,'axisVelocityIsSymmetryCondition',true, ...
+    'sourceCoordinateMeaning','z=r^2为局部半径平方，非世界坐标Z；内法向n为正，eta从1到0', ...
+    'scope','来流轴对称、光滑给定激波的局部亚声速Cauchy反算；外侧截断及节点加密须单独验证', ...
+    'stateRole','激波层及候选生成体表；不是已匹配真实箭体壁面或边界层外缘', ...
+    'fullEulerSolved',false,'shockShapeSolved',false,'bodyMatched',false,'boundaryLayerEdgeAvailable',false, ...
+    'heatFluxSolved',false,'wallTemperatureSolved',false,'productionQualified',false,'newProductionSolvedAreaM2',0);
+
+    function derivative=rhs(fraction,value)
+        calls=calls+1;
+        distance=value(1:N);regular=value(N+(1:N));normal=value(2*N+(1:N));
+        meridional=1-distance.*km;azimuthal=1-distance.*kb;jacobian=meridional.*azimuthal;
+        assert(all(isfinite(value))&&all(meridional>0&azimuthal>0&regular>0), ...
+            'ShockPatch:Caustic','法线聚焦、切向倒流或非有限状态使本Cauchy分支失效。');
+        sourceGeometry=axisymmetricShockGraph(shape,z*fraction);
+        source=shockLayerNormalJumpBatch(upstream,gas,U*sourceGeometry.inverseMeridionalMetric);
+        sourceDerivative=source.entropyDerivativeByNormalSpeed.*U.*sourceGeometry.inverseMetricDerivativeByRadiusSquared;
+        state=shockLayerStateFromHS(H0-(z.*regular.^2+normal.^2)/2,source.entropy,gas);
+        density=state.density;temperature=state.temperature;a2=state.soundSpeedSquared;
+        distanceEta=-mu*meridional./(density.*regular.*jacobian);
+        b=2*inverseG.*(D*distance)./meridional;a=B*fraction./(density.*jacobian);
+        Rw=-temperature.*sourceDerivative./regular-mu*km./(density.*jacobian) ...
+            -2*mu*(D*normal).*inverseG./(density.*jacobian.*regular);
+        logJn=-km./meridional-kb./azimuthal;
+        C=B./(density.*jacobian)+a.*(z.*sourceDerivative/gas.R-logJn.*distanceEta) ...
+            +2*z.*regular.*(D*distanceEta).*inverseG./meridional ...
+            +z.*regular.*b.*km./meridional.*distanceEta;
+        detValue=1-a.*normal./a2+z.*b.*(b+a.*regular./a2);
+        assert(all(isfinite(detValue)&detValue>0),'ShockPatch:Sonic','法向质量坐标达到声速行列式零点，不能跨越继续积分。');
+        regularEta=((1-a.*normal./a2).*Rw-b.*C)./detValue;
+        normalEta=(C+z.*(b+a.*regular./a2).*Rw)./detValue;
+        derivative=[distanceEta;regularEta;normalEta];
+        minimumDet=min(minimumDet,min(detValue));minimumFocal=min(minimumFocal,min([meridional;azimuthal]));
+        minimumTemperature=min(minimumTemperature,min(temperature));
+    end
+end

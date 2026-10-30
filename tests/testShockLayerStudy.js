@@ -49,7 +49,8 @@ function parse(line){return [...line.matchAll(/"((?:[^"]|"")*)"(?:,|$)/g)].map(m
   const stale=message(k,0,0);stale.data.payload.revision--;listeners.message(stale);assert.equal(ids.station.value,before);ignored++;
   const col=c.columns[Number(ids.columnChoice.value)],i=Number(ids.station.value),old=col.pressurePa[i];col.pressurePa[i]=null;ids.station.events.input();assert.equal(row('probe','层内压力 / kPa'),'未求解');col.pressurePa[i]=old;
  }
- assert.equal(stations,112);assert.equal(csvRows,112);assert.equal(downloads,47);
+ const expectedStations=data.cases.reduce((sum,c)=>sum+c.columns.reduce((n,col)=>n+col.eta.length,0),0),expectedDownloads=data.cases.reduce((sum,c)=>sum+c.columns.length,0);
+ assert.equal(stations,expectedStations);assert.equal(csvRows,expectedStations);assert.equal(downloads,expectedDownloads);
  const report={status:'passed-shock-layer-five-step-point-probe-message-isolation-methods-and-exact-CSV',workflowEvents:workflow,stationsChecked:stations,CSVrows:csvRows,CSVdownloads:downloads,ignoredUnrelatedOrStaleMessages:ignored,unknownHeatAndTemperaturesRemainUnknown:true,browserVisualOrWebGLVerified:false,newProductionSolvedAreaM2:0,dataSHA256:crypto.createHash('sha256').update(raw).digest('hex')};
  const target=path.resolve(process.argv[3]);assert.equal(fs.existsSync(target),false);fs.writeFileSync(target,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
 })().catch(e=>{console.error(e);process.exitCode=1;});

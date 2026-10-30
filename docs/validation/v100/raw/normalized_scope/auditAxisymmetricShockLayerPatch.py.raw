@@ -1,0 +1,235 @@
+"""独立Brent/DOP853及物理坐标差分复核耦合激波层，不把局部原型冒充整箭解。"""
+
+from pathlib import Path
+from functools import lru_cache
+import argparse
+import json
+
+import numpy as np
+from scipy.integrate import solve_ivp
+from scipy.io import loadmat
+from scipy.optimize import brentq
+from auditShockSurfaceInlet import thermal
+from auditThermalPressureSurfaceFlow import sha
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def plain(value):
+    """模块一：显式展开二维cell中的mat_struct，保留矩阵方向与数值类型。"""
+    if hasattr(value, '_fieldnames'):
+        return {k: plain(getattr(value, k)) for k in value._fieldnames}
+    if isinstance(value, dict):
+        return {k: plain(v) for k, v in value.items()}
+    if isinstance(value, np.ndarray) and value.dtype == object:
+        out = np.empty(value.shape, dtype=object)
+        for index in np.ndindex(value.shape):
+            out[index] = plain(value[index])
+        return out
+    return value
+
+
+def derivative_matrix(z):
+    # 独立从Chebyshev系数微分恢复矩阵，不读取MATLAB保存的D或复写重心微分公式。
+    t = 2*z/z[-1]-1
+    coefficients = np.polynomial.chebyshev.chebfit(t, np.eye(len(z)), len(z)-1)
+    derivative = np.polynomial.chebyshev.chebder(coefficients, scl=2/z[-1], axis=0)
+    return np.polynomial.chebyshev.chebval(t, derivative).T
+
+
+def graph(shape, z):
+    k = float(np.trace(shape['K'])/2); B = float(shape.get('profileB', 0))
+    z = np.asarray(z, dtype=float); L = 1+B*k*z; W = 1+k*(B+k)*z
+    assert np.all(L > 0) and np.all(W > 0)
+    invG = np.sqrt(L/W)
+    return k*z/(1+np.sqrt(L)), invG, k/W**1.5, k/np.sqrt(W), -k*k/(2*np.sqrt(L)*W**1.5)
+
+
+class Reference:
+    """模块二：以独立组分多项式/Brent根重建同一物性、RH和耦合初值问题。"""
+    def __init__(self, patch):
+        self.gas, self.up, self.shape = patch['gas'], patch['upstream'], patch['shape']
+        self.R = float(self.gas['R']); self.U = float(np.linalg.norm(self.up['velocityVector']))
+        self.rho1 = float(self.up['density']); self.p1 = float(self.up['pressure']); self.T1 = float(self.up['temperature'])
+        self.cp1, self.h1, self.S1 = thermal(self.T1, self.p1, self.gas)
+        self.H0 = self.h1+self.U*self.U/2
+        self.mu = self.rho1*self.U/2
+
+    @lru_cache(maxsize=8192)
+    def normal(self, w):
+        g = self.cp1/(self.cp1-self.R); M2 = w*w/(g*self.R*self.T1)
+        assert M2 > 1
+        if self.gas['thermalPropertyMode'] == 'caloricallyPerfect':
+            ratio = (g+1)*M2/((g-1)*M2+2)
+        else:
+            H = self.h1+w*w/2
+            def energy_fraction(fraction):
+                inverse_ratio = 1-fraction
+                T = (self.p1+self.rho1*w*w*fraction)*inverse_ratio/(self.rho1*self.R)
+                if T < self.gas['temperatureRangeK'][0]:
+                    return -1.
+                if T > self.gas['temperatureRangeK'][1]:
+                    return 1.
+                return (thermal(T, self.p1, self.gas)[1]+(w*inverse_ratio)**2/2-H)/fraction
+            fraction = brentq(energy_fraction, 1e-6, .9999, xtol=2e-14, rtol=2e-14)
+            ratio = 1/(1-fraction)
+        p = self.p1+self.rho1*w*w*(1-1/ratio); rho = self.rho1*ratio; T = p/(rho*self.R)
+        cp, h, S = thermal(T, p, self.gas)
+        Fr = cp*(-self.T1/ratio**2+w*w/self.R*(2-ratio)/ratio**3)-w*w/ratio**3
+        Fw = cp*(2*w/self.R*(ratio-1)/ratio**2)+w*(1/ratio**2-1)
+        dr = -Fw/Fr; dp = self.rho1*(2*w*(1-1/ratio)+w*w/ratio**2*dr)
+        dT = T*(dp/p-dr/ratio); dS = cp/T*dT-self.R/p*dp
+        return S, dS, p, T, rho, w/ratio
+
+    def source(self, z):
+        _, invG, _, _, dG = graph(self.shape, z)
+        values = np.array([self.normal(float(w)) for w in self.U*invG])
+        return values[:, 0], values[:, 1]*self.U*dG
+
+    def state(self, H, S):
+        H = np.asarray(H, dtype=float); S = np.asarray(S, dtype=float)
+        if self.gas['thermalPropertyMode'] == 'caloricallyPerfect':
+            T = H/(self.gas['gamma']*self.R/(self.gas['gamma']-1))
+        else:
+            T = np.array([brentq(lambda t: thermal(t, self.p1, self.gas)[1]-h,
+                                *self.gas['temperatureRangeK'], xtol=2e-10, rtol=2e-14) for h in H])
+        values = np.array([thermal(t, self.gas['referencePressurePa'], self.gas) for t in T])
+        p = self.gas['referencePressurePa']*np.exp((values[:, 2]-S)/self.R)
+        rho = p/(self.R*T); a2 = values[:, 0]/(values[:, 0]-self.R)*self.R*T
+        return T, p, rho, a2
+
+    def integrate(self, patch):
+        z = np.asarray(patch['radiusSquaredM2'], dtype=float); N = len(z); D = derivative_matrix(z)
+        _, invG, km, kb, _ = graph(self.shape, z); Bmass = self.rho1*self.U*invG
+        entry = np.array([self.normal(float(w)) for w in self.U*invG])
+        initial = np.r_[np.zeros(N), self.U*kb, entry[:, -1]]
+        def rhs(eta, y):
+            n, w, v = np.split(y, 3); h = 1-n*km; gp = 1-n*kb; J = h*gp
+            S, Sz = self.source(z*eta)
+            T, _, rho, a2 = self.state(self.H0-(z*w*w+v*v)/2, S)
+            ne = -self.mu*h/(rho*w*J); b = 2*invG*(D@n)/h; A = Bmass*eta/(rho*J)
+            Rw = -T*Sz/w-self.mu*km/(rho*J)-2*self.mu*(D@v)*invG/(rho*J*w)
+            C = Bmass/(rho*J)+A*(z*Sz/self.R+(km/h+kb/gp)*ne)+2*z*w*(D@ne)*invG/h+z*w*b*km/h*ne
+            determinant = 1-A*v/a2+z*b*(b+A*w/a2)
+            assert np.min(determinant) > 0
+            # 独立逐点线性代数求解，不使用MATLAB显式2x2解的运算次序。
+            matrices = np.zeros((N, 2, 2)); matrices[:, 0, 0] = 1; matrices[:, 0, 1] = b
+            matrices[:, 1, 0] = -z*(b+A*w/a2); matrices[:, 1, 1] = 1-A*v/a2
+            solved = np.linalg.solve(matrices, np.c_[Rw, C])
+            return np.r_[ne, solved[:, 0], solved[:, 1]]
+        result = solve_ivp(rhs, (1, 0), initial, method='DOP853', dense_output=True, rtol=1e-11,
+                           atol=np.r_[np.full(N, 1e-12), np.full(N, 1e-8), np.full(N, 1e-10)], max_step=.002)
+        assert result.success
+        actual = result.sol(patch['eta'])
+        stored = np.r_[np.asarray(patch['normalDistanceM']).T,
+                       np.asarray(patch['regularStreamwiseSpeedPerS']).T,
+                       np.asarray(patch['normalSpeedMS']).T]
+        error = np.max(abs(actual-stored), axis=1).reshape(3, N)
+        assert np.max(error[0]) < 2e-9, error
+        assert np.max(error[1:])/self.U < 2e-7, error
+        return dict(maximumDistanceDifferenceM=float(error[0].max()),
+                    maximumRegularSpeedDifferencePerS=float(error[1].max()),
+                    maximumNormalSpeedDifferenceMS=float(error[2].max()), evaluations=result.nfev)
+
+
+def physical_euler(patch, stride=1):
+    """模块三：只用输出场和物理坐标差分，直接核对圆柱坐标连续式及两向Euler。"""
+    z = np.asarray(patch['radiusSquaredM2'], dtype=float); r = np.sqrt(z); Dz = derivative_matrix(z)
+    eta = np.asarray(patch['eta'], dtype=float)[::stride]; step = float(eta[1]-eta[0])
+    assert len(eta) >= 11 and np.max(abs(np.diff(eta)-step)) < 2e-15
+    array = lambda name: np.asarray(patch[name], dtype=float)[::stride]
+    n = array('normalDistanceM'); x = array('axialPositionM'); rho = array('densityKgM3')
+    vx = array('axialVelocityMS'); p = array('pressurePa'); S = array('entropyJPerKgK')
+    _, invG, _, kb, _ = graph(patch['shape'], z)
+    w = array('regularStreamwiseSpeedPerS'); v = array('normalSpeedMS')
+    phi = 1-n*kb; c = w*invG-v*kb  # Vr=r_shock*c，绕开sqrt(z)轴线不可微。
+    def de(a):
+        return (a[:-4]-8*a[1:-3]+8*a[3:-1]-a[4:])/(12*step)
+    def dz(a):
+        return (a@Dz.T)[2:-2]
+    xz, xe = dz(x)[:, 1:], de(x)[:, 1:]
+    rz = phi[2:-2, 1:]/(2*r[1:])+r[1:]*dz(phi)[:, 1:]
+    re = r[1:]*de(phi)[:, 1:]; determinant = xz*re-rz*xe
+    def gradient(a, radial_coefficient=False):
+        az, ae = dz(a)[:, 1:], de(a)[:, 1:]
+        if radial_coefficient:
+            az = a[2:-2, 1:]/(2*r[1:])+r[1:]*az; ae = r[1:]*ae
+        return (az*re-rz*ae)/determinant, (xz*ae-az*xe)/determinant
+    vxx, vxr = gradient(vx); vrx, vrr = gradient(c, True); px, pr = gradient(p)
+    massx, _ = gradient(rho*vx); _, massr = gradient(rho*c, True); sx, sr = gradient(S)
+    a = vx[2:-2, 1:]; b = r[1:]*c[2:-2, 1:]; density = rho[2:-2, 1:]
+    axial = a*vxx+b*vxr+px/density; radial = a*vrx+b*vrr+pr/density
+    mass = massx+massr+(rho*c/phi)[2:-2, 1:]
+    entropy = a*sx+b*sr
+    axis_mass = de(rho*vx)[:, 0]/de(x)[:, 0]+2*(rho*c/phi)[2:-2, 0]
+    axis_momentum = vx[2:-2, 0]*de(vx)[:, 0]/de(x)[:, 0]+de(p)[:, 0]/de(x)[:, 0]/rho[2:-2, 0]
+    U = float(np.linalg.norm(patch['upstream']['velocityVector'])); length = float(r[-1])
+    mass_scale = float(patch['upstream']['density'])*U/length; momentum_scale = U*U/length
+    return dict(axialMomentum=float(np.max(abs(axial))/momentum_scale),
+                radialMomentum=float(np.max(abs(radial))/momentum_scale),
+                continuity=float(np.max(abs(mass))/mass_scale),
+                axisMomentum=float(np.max(abs(axis_momentum))/momentum_scale),
+                axisContinuity=float(np.max(abs(axis_mass))/mass_scale),
+                entropyAdvection=float(np.max(abs(entropy)))/(U/length*1000),
+                etaStep=abs(step), allSavedRadialNodesUsed=True,
+                momentumNormalizerMPerS2=momentum_scale, massNormalizerKgPerM3S=mass_scale,
+                differentiation='Chebyshev coefficients in z + independent 4th-order physical-coordinate eta differences')
+
+
+def audit(evidence, process, target):
+    """模块四：核对全部主场、独立积分及直接守恒残差，明确数值验证的实际范围。"""
+    assert not target.exists()
+    status = json.loads(process.read_text(encoding='utf-8-sig'))
+    assert status['status'] == 'terminal' and status['exitCode'] == 0 and all(status['sourceStableAfter'].values())
+    saved = plain(loadmat(evidence, simplify_cells=True)); cases = saved['cases']
+    count = len(np.asarray(saved['nodes']).reshape(-1))
+    assert saved['report']['primaryMatrixValidated'] and cases.shape == (2, count)
+    assert saved['geometry']['F'].shape == (19752, 3)
+    all_rows, integration = [], []
+    for mode in range(2):
+        for j in range(count):
+            patch = cases[mode, j]; reference = Reference(patch)
+            assert not patch['productionQualified'] and not patch['bodyMatched'] and not patch['heatFluxSolved']
+            z = np.asarray(patch['radiusSquaredM2'], dtype=float); eta = np.asarray(patch['eta'], dtype=float)
+            n = np.asarray(patch['normalDistanceM']); w = np.asarray(patch['regularStreamwiseSpeedPerS']); v = np.asarray(patch['normalSpeedMS'])
+            f, invG, km, kb, _ = graph(patch['shape'], z); errors = []
+            for index, fraction in enumerate(eta):
+                S, _ = reference.source(z*fraction)
+                T, p, rho, _ = reference.state(reference.H0-(z*w[index]**2+v[index]**2)/2, S)
+                for name, expected in [('pressurePa', p), ('temperatureK', T), ('densityKgM3', rho), ('entropyJPerKgK', S)]:
+                    actual = np.asarray(patch[name])[index]
+                    error = float(np.max(abs(actual-expected)/np.maximum(1, abs(expected))))
+                    assert error < 2e-9, (name, error); errors.append(error)
+            np.testing.assert_allclose(patch['axialPositionM'], f+n*invG, rtol=0, atol=3e-15)
+            np.testing.assert_allclose(patch['radialPositionM'], np.sqrt(z)*(1-n*kb), rtol=0, atol=3e-15)
+            np.testing.assert_allclose(patch['axialVelocityMS'], z*kb*w+invG*v, rtol=3e-14, atol=3e-11)
+            np.testing.assert_allclose(patch['radialVelocityMS'], np.sqrt(z)*(invG*w-kb*v), rtol=3e-14, atol=3e-11)
+            physical = physical_euler(patch)
+            row = dict(gasMode=patch['gas']['thermalPropertyMode'], radialNodes=len(z),
+                       maximumRelativeThermalDifference=max(errors), physicalResiduals=physical,
+                       axisPressurePa=float(patch['pressurePa'][-1, 0]), axisNormalVelocityMS=float(v[-1, 0]))
+            all_rows.append(row)
+            if j == count-1:
+                assert max(physical[k] for k in ['axialMomentum','radialMomentum','continuity','axisMomentum','axisContinuity']) < 1e-5, physical
+                integration.append(dict(gasMode=patch['gas']['thermalPropertyMode'], result=reference.integrate(patch),
+                                        coarserEtaResiduals=[physical_euler(patch, stride) for stride in [2, 4]]))
+            print('AUDITED_PATCH %s N=%d' % (row['gasMode'], len(z)), flush=True)
+    source_verified = 0
+    for relative, expected in status['sourceSHA256'].items():
+        if relative.startswith('outputs/'):
+            continue
+        assert sha(ROOT/relative) == expected, relative
+        source_verified += 1
+    report = dict(status='passed-independent-thermal-DOP853-and-physical-Euler-audit',
+                  evidenceSHA256=sha(evidence), processSHA256=sha(process), programSHA256=sha(Path(__file__)),
+                  primaryPatches=all_rows, independentIntegrations=integration, sourceSHARecordsVerified=source_verified,
+                  experimentalValidation=False, real20DegreeBodyMatched=False, fullEulerSolved=False,
+                  productionQualified=False, newProductionSolvedAreaM2=0)
+    target.write_bytes((json.dumps(report, ensure_ascii=False, indent=2)+'\n').encode('utf-8'))
+    print(json.dumps(report))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(); parser.add_argument('evidence', type=Path); parser.add_argument('process', type=Path)
+    parser.add_argument('--report', type=Path, required=True)
+    args = parser.parse_args(); audit(args.evidence, args.process, args.report)

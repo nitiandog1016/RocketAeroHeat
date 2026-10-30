@@ -1,0 +1,25 @@
+RAH_ENGINE_PID=26824
+COUPLED_PATCH mode=caloricallyPerfect N=7 axisP=39087.1198079 axisV=3.78841e-13 n0=0.0078810864536 mass=1.68257e-11 calls=687
+COUPLED_PATCH mode=caloricallyPerfect N=9 axisP=39087.1198079 axisV=5.60362e-13 n0=0.00788103128158 mass=2.14726e-11 calls=687
+COUPLED_PATCH mode=caloricallyPerfect N=11 axisP=39087.1198079 axisV=4.20265e-13 n0=0.0078810235496 mass=3.71827e-11 calls=687
+COUPLED_PATCH mode=caloricallyPerfect N=13 axisP=39087.1198079 axisV=4.69242e-13 n0=0.00788102226763 mass=5.0548e-11 calls=687
+COUPLED_PATCH mode=thermallyPerfect N=7 axisP=39369.5625101 axisV=-8.94696e-14 n0=0.00738770829874 mass=1.20224e-11 calls=687
+COUPLED_PATCH mode=thermallyPerfect N=9 axisP=39369.5625101 axisV=-8.4787e-14 n0=0.00738765542843 mass=2.10321e-11 calls=687
+COUPLED_PATCH mode=thermallyPerfect N=11 axisP=39369.5625101 axisV=-7.6116e-13 n0=0.00738764777065 mass=4.58584e-11 calls=687
+COUPLED_PATCH mode=thermallyPerfect N=13 axisP=39369.5625101 axisV=-7.068e-13 n0=0.00738764644634 mass=4.07638e-11 calls=687
+{错误使用 assert
+法向质量坐标达到声速行列式零点，不能跨越继续积分。
+
+出错 solveAxisymmetricShockLayerPatch/rhs (第 115 行)
+        assert(all(isfinite(detValue)&detValue>0),'ShockPatch:Sonic','法向质量坐标达到声速行列式零点，不能跨越继续积分。');
+
+出错 ode113 (第 368 行)
+    yp = ode(t,p);
+
+出错 solveAxisymmetricShockLayerPatch (第 43 行)
+timer=tic;solution=ode113(@rhs,[1 0],initial,options);allValues=deval(solution,eta');
+
+出错 testAxisymmetricShockLayerPatch (第 82 行)
+        radii=[.028 .036];outerChecks{mode,j}=solveAxisymmetricShockLayerPatch(upstream,gas,shape,radii(j),eta,struct('radialNodeCount',13));
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

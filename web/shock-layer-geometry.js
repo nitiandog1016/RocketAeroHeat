@@ -10,7 +10,9 @@
  window.setup(bridge);
  value={kind:'aerothermal-geometry',schemaVersion:1,revision,vertices:geometry.vertices,faces:geometry.faces,
   caption:focus?'原箭体鼻部开放片 · 层内法向列':'原完整箭体 · 层内法向列',resetCamera:true,showWire:q.get('wire')==='1',
-  coordinateNote:'SI / m · 原X轴与鼻尖方向保持 · 层内候选值未赋给真实壁面',initialCameraAzimuthRad:-.35,initialCameraElevationRad:.3};
+  coordinateNote:'SI / m · 原X轴与鼻尖方向保持 · 层内候选值未赋给真实壁面',
+  initialCameraAzimuthRad:Number.isFinite(study.initialCameraAzimuthRad)?study.initialCameraAzimuthRad:-.35,
+  initialCameraElevationRad:Number.isFinite(study.initialCameraElevationRad)?study.initialCameraElevationRad:.3};
  if(q.get('layer')==='1')value.surfaceFlowLines={kind:'pressure-surface-flow-research',productionQualified:false,curves:c.columns.map(col=>({points:col.position,normals:col.pickNormals}))};
  listeners.forEach(fn=>fn());
  const note=document.querySelector('footer span:last-child');if(note)note.textContent=q.get('layer')==='1'?'激波内法向坐标列（不是流线） · 未通过体形匹配 · 热流未求':'原几何预览 · 无新增物理解面积';

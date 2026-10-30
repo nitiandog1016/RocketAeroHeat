@@ -1,0 +1,97 @@
+function report=exportCoupledShockPatchStudy(evidenceFile,auditFile,folder)
+%EXPORTCOUPLEDSHOCKPATCHSTUDY 在统一科研工作流中查看耦合激波层及明确失败的范围检验。
+% 模块一：只读取已保存物理场和独立审计，不在导出期间重算压力或流动。
+% 模块二：原V/F保持闭合，法向列映射回原面号；几何命中不赋予正式壁面资格。
+% 模块三：每个数值保留方法；未通过的外侧/缩放/独立积分检验如实显示，热流/壁温留空。
+root=fileparts(fileparts(fileparts(mfilename('fullpath'))));
+assert(~exist(folder,'dir'),'ShockPatch:Overwrite','科研视图必须写入新目录。');
+d=load(evidenceFile);audit=jsondecode(fileread(auditFile));
+assert(d.report.primaryMatrixValidated&&~d.report.productionQualified&&d.report.newProductionSolvedAreaM2==0);
+assert(strcmp(audit.status,'completed-independent-audit-with-explicit-Cauchy-stability-and-resolution-gates')&& ...
+    strcmp(audit.evidenceSHA256,fileSHA(evidenceFile))&&~audit.productionQualified, ...
+    'ShockPatch:ExportSource','需要同一物理文件的已完成独立审计，不能借用其他来源。');
+V=double(d.geometry.V);F=double(d.geometry.F);edges=[F(:,[1 2]);F(:,[2 3]);F(:,[3 1])];
+[~,~,index]=unique(sort(edges,2),'rows');counts=accumarray(index,1);directions=accumarray(index,sign(edges(:,2)-edges(:,1)));
+assert(all(counts==2)&&all(directions==0),'ShockPatch:BodyMesh','原整箭网格必须闭合定向。');
+centers=(V(F(:,1),:)+V(F(:,2),:)+V(F(:,3),:))/3;
+originalIDs=find(centers(:,1)>=max(V(:,1))-.065);sub=F(originalIDs,:);[vertices,~,indices]=unique(sub(:));
+focus=struct('vertices',V(vertices,:),'faces',reshape(indices,size(sub))-1,'originalFaceIDs',originalIDs, ...
+    'closed',false,'scope','原鼻部三角面开放子集，仅用于放大查看');
+geometry=struct('vertices',V,'faces',F-1,'closed',true,'boundaryEdges',0,'nonManifoldEdges',0,'focus',focus);
+groups=cell(4,1);names=cell(4,1);maximum=zeros(1,4);columnCount=0;stationCount=0;number=0;
+for mode=1:2
+    for grid=[1 numel(d.nodes)]
+        number=number+1;patch=d.cases{mode,grid};N=patch.radialNodeCount;
+        assert(~patch.bodyMatched&&~patch.productionQualified&&~patch.heatFluxSolved&&~patch.wallTemperatureSolved);
+        keep=unique([1:20:numel(patch.eta),numel(patch.eta)]);columns=cell(N,1);
+        frame=patch.shape.frame;r=patch.radiusM;g=patch.shockGeometry;
+        shockPositions=patch.shape.origin'+g.axialPositionM*frame(:,1)'+r*frame(:,2)';
+        normals=g.inverseMeridionalMetric*frame(:,1)'-(r.*g.azimuthalCurvaturePerM)*frame(:,2)';
+        mapping=intersectShockNormalsWithBody(V,F,shockPositions,normals);
+        residual=nan(N,1);residual(mapping.hit)=patch.normalDistanceM(end,mapping.hit)'-mapping.distanceM(mapping.hit);
+        for j=1:N
+            positions=reshape(patch.position(keep,j,:),numel(keep),3);
+            sourceCoordinate=[sqrt(patch.sourceRadiusSquaredM2(keep,j)),zeros(numel(keep),1)];
+            face=[];bary=[];if mapping.hit(j),face=mapping.originalFaceID(j);bary=mapping.barycentric(j,:);end
+            columns{j}=struct('eta',patch.eta(keep),'position',positions, ...
+                'pickNormals',repmat(-normals(j,:),numel(keep),1),'normalDistanceM',patch.normalDistanceM(keep,j), ...
+                'pressurePa',patch.pressurePa(keep,j),'temperatureK',patch.temperatureK(keep,j), ...
+                'densityKgM3',patch.densityKgM3(keep,j),'speedMS',hypot(patch.streamwiseSpeedMS(keep,j),patch.normalSpeedMS(keep,j)), ...
+                'entropyJPerKgK',patch.entropyJPerKgK(keep,j),'jacobianRatio',patch.jacobianRatio(keep,j), ...
+                'sourceShockCoordinateM',sourceCoordinate,'gasMode',patch.gas.thermalPropertyMode,'methods',patch.methods, ...
+                'bodyResidualM',residual(j),'originalFaceID',face,'barycentric',bary, ...
+                'stateRole','耦合激波层/候选生成体表；未匹配真实箭体，稳定范围未收口', ...
+                'heatFluxWPerM2',[],'wallTemperatureInputK',[],'wallTemperatureSolvedK',[], ...
+                'edgeTemperatureK',[],'recoveryTemperatureK',[],'productionQualified',false);
+        end
+        if mode==1,gasLabel='定比热';gasID='cp';else,gasLabel='NASA7';gasID='nasa';end
+        if grid==1,gridLabel='粗网格诊断';else,gridLabel='守恒加密';end
+        caption=sprintf('%s · N%d · %s',gasLabel,N,gridLabel);
+        row=find(strcmp({audit.primaryPatches.gasMode},patch.gas.thermalPropertyMode)&[audit.primaryPatches.radialNodes]==N);
+        assert(isscalar(row));mass=audit.primaryPatches(row).physicalResiduals.continuity;
+        scope=sprintf('给定球形共同激波，绕实际来流轴的额外轴对称假设；直接连续式残差 %.3g。原20°箭体未匹配，热流/壁温未求。',mass);
+        groups{number}=struct('id',sprintf('%s_n%d',gasID,N),'caption',caption,'scope',scope, ...
+            'columns',{columns},'usedDuringFit',false,'bodyMatchToleranceM',1e-5,'productionQualified',false, ...
+            'stateDescription','轴线正则已检验；真实体形及高阶/外侧稳定范围未收口');
+        names{number}=[caption '，固定形状未拟合'];maximum(number)=max(abs(residual));
+        columnCount=columnCount+N;stationCount=stationCount+numel(keep)*N;
+    end
+end
+data=struct('kind','shock-layer-study-v1','geometry',geometry,'cases',{groups}, ...
+    'freestream',struct('Mach',double(d.fs.Mach),'altitudeM',double(d.fs.altitude),'alphaDeg',double(d.fs.alpha), ...
+        'pressurePa',double(d.fs.pressure),'temperatureK',double(d.fs.temperature)), ...
+    'fitSummary',struct('names',{names},'maximumM',maximum,'toleranceM',1e-5,'experimentalValidation',false), ...
+    'sources',struct('coupledEvidence',fileRecord(evidenceFile),'independentAudit',fileRecord(auditFile)), ...
+    'productionQualified',false,'newProductionSolvedAreaM2',0,'coordinateConvention','SI · X主轴 · 鼻尖+X · 零攻角来流−X', ...
+    'calculationDescription','读取已保存的连续式—法向动量耦合结果；本页不重新计算', ...
+    'qualificationDescription','真实体形尚未匹配；缩放/高阶独立积分及外侧域检验存在未通过项', ...
+    'methodScope','给定轴对称共同激波的正则n/w/v耦合反算，保留流向法向速度导数；不是TP-3018显式压力。19节点的直接守恒门槛通过，但缩放/高阶独立积分与36mm外侧域未收口；原20°箭体三维横向动量、体形和边界层外缘未求。', ...
+    'validation',struct('scaleCheck',d.scaleCheck,'fullScopeValidation',audit.fullScopeValidation, ...
+        'allIndependentIntegrationsPassed',audit.allIndependentIntegrationsPassed,'experimentalValidation',false));
+mkdir(folder);web=fullfile(folder,'workbench');mkdir(web);geoweb=fullfile(web,'geometry');mkdir(geoweb);
+for name={'geometry.html','geometry.css','geometry.js'},copyfile(fullfile(root,'web',name{1}),fullfile(geoweb,name{1}));end
+html=fileread(fullfile(geoweb,'geometry.html'));
+html=strrep(html,'</body>','<script src="../shock-layer-data.js"></script><script src="shock-layer-geometry.js"></script></body>');
+writeUtf8(fullfile(geoweb,'index.html'),html);
+copyfile(fullfile(root,'web/shock-layer-geometry.js'),fullfile(geoweb,'shock-layer-geometry.js'));
+for name={'rocket-sensitivity.css','shock-layer-study.css','shock-layer-study.js'},copyfile(fullfile(root,'web',name{1}),fullfile(web,name{1}));end
+copyfile(fullfile(root,'web/shock-layer-study.html'),fullfile(web,'index.html'));
+text=jsonencode(data);writeUtf8(fullfile(web,'shock-layer-data.json'),text);
+writeUtf8(fullfile(web,'shock-layer-data.js'),['window.SHOCK_LAYER_STUDY=' text ';' newline]);
+report=struct('status','exported-conditional-coupled-shock-patch-with-explicit-unpassed-gates', ...
+    'cases',4,'columns',columnCount,'stations',stationCount,'originalFaces',size(F,1), ...
+    'newPhysicalIntegrations',0,'newShapeFits',0,'productionQualified',false,'newProductionSolvedAreaM2',0, ...
+    'dataSHA256',fileSHA(fullfile(web,'shock-layer-data.json')),'workbench',fullfile(web,'index.html'));
+writeUtf8(fullfile(folder,'coupled_patch_export.json'),jsonencode(report));disp(report);
+end
+function value=fileRecord(file)
+value=struct('path',strrep(file,'\','/'),'sha256',fileSHA(file));
+end
+function value=fileSHA(file)
+fid=fopen(file,'rb');assert(fid>=0);guard=onCleanup(@()fclose(fid));md=java.security.MessageDigest.getInstance('SHA-256');
+while ~feof(fid),b=fread(fid,1024^2,'*uint8');if ~isempty(b),md.update(typecast(b,'int8'));end,end
+value=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
+end
+function writeUtf8(file,value)
+fid=fopen(file,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',value);
+end

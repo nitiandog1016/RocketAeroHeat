@@ -1,0 +1,28 @@
+AUDITED_PATCH caloricallyPerfect N=7
+AUDITED_PATCH caloricallyPerfect N=9
+AUDITED_PATCH caloricallyPerfect N=11
+AUDITED_PATCH caloricallyPerfect N=13
+AUDITED_PATCH caloricallyPerfect N=15
+AUDITED_PATCH caloricallyPerfect N=17
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\tests\auditAxisymmetricShockLayerPatch.py", line 243, in <module>
+    args = parser.parse_args(); audit(args.evidence, args.process, args.report)
+  File "E:\RocketAeroHeat\tests\auditAxisymmetricShockLayerPatch.py", line 216, in audit
+    integration.append(dict(gasMode=patch['gas']['thermalPropertyMode'], result=reference.integrate(patch),
+  File "E:\RocketAeroHeat\tests\auditAxisymmetricShockLayerPatch.py", line 129, in integrate
+    assert np.max(error[1:])/self.U < 2e-7, error
+AssertionError: [[1.30454328e-12 3.44554246e-13 3.70172643e-13 3.77850529e-13
+  3.83516136e-13 3.88435811e-13 3.91218308e-13 3.88534691e-13
+  3.73123407e-13 3.29620012e-13 2.24898225e-13 4.44869835e-14
+  6.59149818e-13 2.74321191e-12 1.15408429e-11 1.74307461e-11
+  2.12680269e-10 1.19572819e-10 9.21085066e-11]
+ [5.22528098e-05 1.43887082e-05 1.55879206e-05 1.62644901e-05
+  1.70490057e-05 1.80428142e-05 1.92743064e-05 2.07200974e-05
+  2.22272429e-05 2.32753373e-05 2.22471972e-05 1.37558964e-05
+  2.33895189e-05 1.92999716e-04 8.46137227e-04 3.10400242e-03
+  3.79994120e-02 8.36473576e-02 8.67729577e-02]
+ [2.46275889e-10 6.85228013e-09 2.64519233e-08 8.21639223e-08
+  1.64760676e-07 2.80037748e-07 4.36760404e-07 6.48462301e-07
+  9.36551540e-07 1.33667306e-06 1.91220253e-06 2.78672552e-06
+  4.25358639e-06 7.57730372e-06 2.58037384e-05 1.47697639e-04
+  7.07415546e-05 1.09163610e-03 1.64753967e-03]]
