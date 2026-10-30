@@ -1,0 +1,180 @@
+"""独立Brent压力曲线、NASA7热力根、Gauss时空几何和五量账核验；不授予箭体资格。"""
+from pathlib import Path
+import argparse
+import json
+import math
+
+import numpy as np
+from scipy.io import loadmat
+from scipy.optimize import brentq
+from auditShockSurfaceInlet import thermal
+from auditThermalPressureSurfaceFlow import sha
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def relative(actual, expected):
+    return float(np.max(np.abs(np.asarray(actual)-expected)/np.maximum(1., np.abs(expected))))
+
+
+def pressure_curve(p, rho, pressure, sound, gamma):
+    if p > pressure:
+        return (p-pressure)*math.sqrt(2/((gamma+1)*rho)/(p+(gamma-1)/(gamma+1)*pressure))
+    return 2*sound/(gamma-1)*math.expm1((gamma-1)/(2*gamma)*math.log(p/pressure))
+
+
+def exact_at(PL, PR, normal, sample_speed, gas):
+    """模块一：实验室Riemann在xi=D处直接采样，不复写MATLAB移动系通量变换。"""
+    gamma, R = gas['gamma'], gas['R']
+    rhoL, rhoR = PL[0], PR[0]; vL, vR = PL[1:4], PR[1:4]
+    pL, pR = rhoL*R*PL[4], rhoR*R*PR[4]
+    uL, uR = float(vL@normal), float(vR@normal)
+    aL, aR = math.sqrt(gamma*pL/rhoL), math.sqrt(gamma*pR/rhoR)
+    def curve(p):
+        return pressure_curve(p,rhoL,pL,aL,gamma)+pressure_curve(p,rhoR,pR,aR,gamma)+uR-uL
+    upper=max(pL,pR)
+    while curve(upper)<0: upper*=2
+    pstar=brentq(curve,min(pL,pR)*1e-10,upper,xtol=1e-10,rtol=8*np.finfo(float).eps)
+    ustar=(uL+uR+pressure_curve(pstar,rhoR,pR,aR,gamma)-pressure_curve(pstar,rhoL,pL,aL,gamma))/2
+    left=ustar>=sample_speed
+    rho,u,p,a,v=(rhoL,uL,pL,aL,vL) if left else (rhoR,uR,pR,aR,vR)
+    sign=-1 if left else 1; ratio=pstar/p
+    if pstar>p:
+        speed=u+sign*a*math.sqrt((gamma+1)/(2*gamma)*ratio+(gamma-1)/(2*gamma))
+        original=sample_speed<=speed if left else sample_speed>=speed
+        if not original:
+            rho*= (ratio+(gamma-1)/(gamma+1))/(1+(gamma-1)/(gamma+1)*ratio);u=ustar;p=pstar
+    else:
+        head=u+sign*a;tail=ustar+sign*a*ratio**((gamma-1)/(2*gamma))
+        original=sample_speed<=head if left else sample_speed>=head
+        star=sample_speed>=tail if left else sample_speed<=tail
+        if not original and star:
+            rho*=ratio**(1/gamma);u=ustar;p=pstar
+        elif not original:
+            sound=2/(gamma+1)*(a-sign*(gamma-1)/2*(u-sample_speed))
+            old_sound=a;rho*= (sound/old_sound)**(2/(gamma-1));p*= (sound/old_sound)**(2*gamma/(gamma-1))
+            u=sample_speed-sign*sound
+    tangent=v-float(v@normal)*normal;velocity=tangent+u*normal
+    Q=np.r_[rho,rho*velocity,p/(gamma-1)+rho*float(velocity@velocity)/2]
+    flux=np.r_[rho*u,rho*velocity*u+p*normal,(Q[4]+p)*u]-sample_speed*Q
+    return flux,pstar
+
+
+def geometry(mesh, X0, X1, dt):
+    """模块二：独立行列式和四点Gauss积分，不使用MATLAB的Simpson或保存关联矩阵。"""
+    tetra=np.asarray(mesh['tetrahedra'],int)-1;faces=np.asarray(mesh['faces'],int)-1
+    owner=np.asarray(mesh['owner'],int)-1;neighbour=np.asarray(mesh['neighbour'],int)-1
+    def volume(X):
+        d=X[tetra[:,1:]]-X[tetra[:,0,None]]
+        return np.linalg.det(d)/6
+    V0,V1=volume(X0),volume(X1);assert np.all(V0>0) and np.all(V1>0)
+    grid_velocity=(X1-X0)/dt;velocity=grid_velocity[faces].mean(axis=1)
+    points,weights=np.polynomial.legendre.leggauss(4);Abar=np.zeros((len(faces),3))
+    for point,weight in zip((points+1)/2,weights/2):
+        X=X0+point*(X1-X0);xyz=X[faces]
+        Abar+=weight*np.cross(xyz[:,1]-xyz[:,0],xyz[:,2]-xyz[:,0])/2
+    swept=dt*np.sum(Abar*velocity,axis=1);summed=np.zeros(len(tetra))
+    np.add.at(summed,owner,swept);inside=neighbour>=0;np.add.at(summed,neighbour[inside],-swept[inside])
+    closure=abs(V1-V0-summed)/np.maximum(V0,V1)
+    assert closure.max()<2e-11
+    # 每个无向三角面必须来自恰好一个边界单元或两个相邻单元。
+    incident={}
+    for cell,ids in enumerate(tetra):
+        for omitted in range(4): incident.setdefault(tuple(sorted(np.delete(ids,omitted))),[]).append(cell)
+    assert len(incident)==len(faces)
+    for row,f in enumerate(faces):
+        cells=incident[tuple(sorted(f))];assert len(cells) in (1,2) and owner[row] in cells
+        assert (len(cells)==2)==bool(inside[row])
+        if inside[row]:assert neighbour[row] in cells and neighbour[row]!=owner[row]
+    return dict(V0=V0,V1=V1,Abar=Abar,swept=swept,gcl=float(closure.max()),owner=owner,neighbour=neighbour)
+
+
+def uniform_step(step, mesh, X0, X1, dt, Q, gas):
+    independent=geometry(mesh,X0,X1,dt);saved=step['geometry'];A=independent['Abar'];area=np.linalg.norm(A,axis=1)
+    np.testing.assert_allclose(saved['volume0'],independent['V0'],rtol=2e-12,atol=1e-22)
+    np.testing.assert_allclose(saved['sweptVolumeM3'],independent['swept'],rtol=2e-11,atol=1e-23)
+    rho=Q[0];velocity=Q[1:4]/rho;p=(gas['gamma']-1)*(Q[4]-rho*float(velocity@velocity)/2)
+    mass=A@velocity*rho;momentum=mass[:,None]*velocity+p*A
+    energy=(Q[4]+p)*(A@velocity);integral=np.column_stack((mass,momentum,energy))-independent['swept'][:,None]/dt*Q
+    flux_error=relative(step['faceALEFlux'],integral/area[:,None]);assert flux_error<2e-10
+    divergence=np.zeros((len(independent['V0']),5));np.add.at(divergence,independent['owner'],integral)
+    inside=independent['neighbour']>=0;np.add.at(divergence,independent['neighbour'][inside],-integral[inside])
+    reference=(independent['V0'][:,None]*Q-dt*divergence)/independent['V1'][:,None]
+    error=relative(step['Q'],reference);assert error<2e-11
+    return dict(cells=len(reference),faces=len(A),gclRelative=independent['gcl'],fluxRelativeDifference=flux_error,stateRelativeDifference=error)
+
+
+def audit(evidence, process_file, target):
+    assert not target.exists()
+    process=json.loads(process_file.read_text(encoding='utf-8-sig'))
+    assert process['status']=='terminal' and process['exitCode']==0 and all(process['sourceStableAfter'].values())
+    s=loadmat(evidence,simplify_cells=True);report=s['report'];assert report['completeKernelValidation'] and not report['productionQualified']
+    up=s['up'];u=np.asarray(up['velocityVector']);shock_errors=[];piston=[]
+    for mode,(gas,group,pist) in enumerate(zip(np.atleast_1d(s['gases']),np.atleast_1d(s['jumpCases']),np.atleast_1d(s['pistons']))):
+        cp,h,S=thermal(up['temperature'],up['pressure'],gas);g=cp/(cp-gas['R']);a=math.sqrt(g*gas['R']*up['temperature'])
+        for j,(normal,D) in enumerate(zip(group['base']['normal'],group['base']['shockNormalSpeedMS'])):
+            w=float(u@normal-D)
+            if mode==0:r=(g+1)*(w/a)**2/((g-1)*(w/a)**2+2)
+            else:
+                def energy(f):
+                    ratio=1/(1-f);T=(up['pressure']+up['density']*w*w*f)/(up['density']*ratio*gas['R'])
+                    return (thermal(T,up['pressure'],gas)[1]+.5*(w/ratio)**2-h-.5*w*w)/f
+                f=brentq(energy,.01,.85,xtol=1e-14,rtol=1e-14);r=1/(1-f)
+            pressure=up['pressure']+up['density']*w*w*(1-1/r);rho=up['density']*r;T=pressure/(rho*gas['R']);v=u+(w/r-w)*normal
+            actual=group['base']['state'];error=relative([actual['pressure'][j],actual['temperature'][j],actual['density'][j]],[pressure,T,rho]);shock_errors.append(error)
+            assert error<2e-11;np.testing.assert_allclose(actual['velocity'][j],v,rtol=2e-12,atol=2e-9)
+            H=thermal(T,pressure,gas)[1]+float(v@v)/2
+            assert abs(H-h-float(u@u)/2-D*float((v-u)@normal))<2e-7
+        delta=float(u@pist['normal']-pist['pistonNormalVelocityMS'])
+        # 独立以密度比为根，同时代入活塞无穿透与能量，不调用MATLAB的w1根。
+        def piston_energy(r):
+            w=delta/(1-1/r);pressure=up['pressure']+up['density']*w*delta;T=pressure/(up['density']*r*gas['R'])
+            return thermal(T,pressure,gas)[1]+.5*(w/r)**2-h-.5*w*w
+        values=[];bracket=None
+        for r in np.linspace(1.2,10.,160):
+            try:value=piston_energy(r)
+            except AssertionError:continue
+            if values and value*values[-1][1]<0:bracket=(values[-1][0],r);break
+            values.append((r,value))
+        assert bracket is not None
+        ratio=brentq(piston_energy,*bracket,xtol=2e-14,rtol=2e-14);w=delta/(1-1/ratio)
+        assert abs(w-pist['upstreamRelativeShockSpeedMS'])<2e-9
+        item=dict(mode=gas['thermalPropertyMode'],independentRelativeShockSpeedMS=w,shockSpeedDifferenceMS=abs(w-pist['upstreamRelativeShockSpeedMS']),ALEAdvanced=bool(pist['ALEAdvanced']))
+        if mode==0:
+            q=np.asarray(pist['jump']['state']['Q']);time=np.asarray(pist['times']);dt=time[-1]-time[-2]
+            # 从两个保存端点和恒定节点速度恢复实际最后一步起点。
+            X0=pist['nodes1']-(pist['nodes1']-pist['nodes0'])*(dt/time[-1])
+            item['lastStep']=uniform_step(pist['lastStep'],pist['mesh'],X0,pist['nodes1'],dt,q,gas)
+        else:assert not pist['ALEAdvanced'] and np.size(pist['history'])==0
+        piston.append(item)
+    fc=s['fluxChecks'];gas=s['gases'][0];flux_errors=[]
+    for i,n in enumerate(fc['normal']):
+        PL=np.r_[fc['left']['density'][i],fc['left']['velocity'][i],fc['left']['temperature'][i]]
+        PR=np.r_[fc['right']['density'][i],fc['right']['velocity'][i],fc['right']['temperature'][i]]
+        flux,_=exact_at(PL,PR,n,fc['gridNormalSpeed'][i],gas);error=relative(fc['flux'][i],flux);assert error<2e-11;flux_errors.append(error)
+    wall_errors=[]
+    for i,n in enumerate(fc['wallNormals']):
+        PL=np.r_[fc['wallState']['density'][i],fc['wallState']['velocity'][i],fc['wallState']['temperature'][i]]
+        PR=PL.copy();PR[1:4]-=2*(PL[1:4]@n-fc['wallNormalSpeed'][i])*n
+        _,p=exact_at(PL,PR,n,fc['wallNormalSpeed'][i],gas)
+        error=relative(fc['wallFlux'][i],np.r_[0.,p*n,p*fc['wallNormalSpeed'][i]]);assert error<2e-11;wall_errors.append(error)
+    body=s['bodyCheck'];shell=body['shell'];np.testing.assert_array_equal(shell['nodes'][:len(shell['originalVertexIDs'])],s['geometry']['V'][np.asarray(shell['originalVertexIDs'],int)-1])
+    np.testing.assert_array_equal(s['geometry']['F'][np.asarray(shell['originalFaceIDs'],int)-1],np.asarray(shell['originalVertexIDs'],int)[np.asarray(shell['bodyFaces'],int)-1])
+    Q=np.r_[up['density'],up['density']*u,up['pressure']/(gas['gamma']-1)+up['density']*float(u@u)/2]
+    real=uniform_step(body['uniformStep'],shell['mesh'],shell['nodes'],body['nodes1'],1e-8,Q,gas)
+    assert body['sourceMach']==5 and body['sourceAlphaDeg']==20 and len(shell['originalFaceIDs'])==483
+    for key in ['pressureOnBodySolved','shockShapeSolved','heatFluxSolved','productionQualified']:assert not body[key]
+    result=dict(status='passed-independent-moving-RH-direct-xiD-flux-Gauss-GCL-and-real-mesh-audit',
+        evidenceSHA256=sha(evidence),processSHA256=sha(process_file),movingShockCases=6,
+        maximumShockStateRelativeDifference=max(shock_errors),maximumDirectALEFluxRelativeDifference=max(flux_errors),
+        maximumWallFluxRelativeDifference=max(wall_errors),piston=piston,realMesh=real,
+        cacheAndTemporaryArrayBudgetBytes=int(report['largestDeclaredArrayBudgetBytes']),
+        processPeakMemoryMeasured=False,experimentalValidation=False,rocketShockShapeSolved=False,
+        heatFluxSolved=False,productionQualified=False,newProductionSolvedAreaM2=0)
+    target.write_bytes((json.dumps(result,ensure_ascii=False,indent=2)+'\n').encode('utf-8'))
+    print(json.dumps(result,ensure_ascii=False))
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('evidence',type=Path);parser.add_argument('process',type=Path);parser.add_argument('target',type=Path)
+    a=parser.parse_args();audit(a.evidence,a.process,a.target)

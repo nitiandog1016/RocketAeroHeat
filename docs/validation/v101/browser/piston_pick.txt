@@ -1,0 +1,127 @@
+Browser tab: 11, Title: "RocketAeroHeat · 激波拟合内核", URL: "http://127.0.0.1:8781/view05/workbench/index.html".
+1 AXWebArea RocketAeroHeat · 激波拟合内核, URL: 127.0.0.1:8781/view05/workbench/index.html
+	2 container
+		3 text RocketAeroHeat 移动激波 · 共享面三维守恒 研究验证 · 新增合格热流面积 0 m²
+	4 container
+		5 text 已保存的研究
+		6 pop up button (collapsed, settable) Description: 选择研究, Value: 移动活塞 · 内求激波速度基准, ID: caseChoice, Secondary Actions: Expand
+			7 menu
+				8 (selected) 移动活塞 · 内求激波速度基准
+				9 真实20°箭体鼻部 · 几何与GCL检查
+		10 container 科研工作流
+			11 button 1 输入模型
+			12 button 2 生成网格
+			13 button 3 添加边界条件
+			14 button 4 计算
+			15 button 5 查看结果
+		16 heading 查看结果 · 移动活塞 · 内求激波速度基准, Value: 1, ID: title
+			17 text 查看结果 · 移动活塞 · 内求激波速度基准
+		18 text 给定活塞速度与均匀上游共同求移动激波；平面解析基准，不是实际箭体外流
+		19 definition list details
+			20 container 当前范围
+				21 text 当前范围
+			22 text 48 个三角面
+			23 container 研究身份
+				24 text 研究身份
+			25 text 解析活塞初态/实际三维ALE推进末态；云图取边界邻接单元值
+			26 container 数值核验
+				27 text 数值核验
+			28 text 激波相对入射速度674.880371893 m/s；8次实际ALE步；五量账最大2.67e-17。
+			29 container 正式新增热流面积
+				30 text 正式新增热流面积
+			31 text 0 m²
+		32 button (collapsed) 算法与适用范围, Secondary Actions: Expand
+			33 text 算法与适用范围
+		34 link Description: 下载数值与来源记录, Value: 127.0.0.1:8781/view05/workbench/ale-data.json
+		35 text 三维范围
+		36 pop up button (collapsed, settable) 三维范围, Value: 全部边界, ID: view, Secondary Actions: Expand
+			37 menu
+				38 (selected) 全部边界
+				39 壁面
+				40 激波 / 候选外壳
+				41 完整箭体（未求场量）
+		42 pop up button (collapsed, settable) Description: 云图变量, Value: 流体压力 / Pa, ID: field, Secondary Actions: Expand
+			43 menu
+				44 (selected) 流体压力 / Pa
+				45 流体温度 / K
+				46 速度幅值 / m/s
+				47 Riemann壁压 / Pa
+				48 热流 / W/m²
+				49 求解壁温 / K
+		50 text 三维网格已显示 · 可点选面元
+		51 container Description: 实际保存的三维网格与面元云图, ID: viewer
+			52 AXWebArea RocketAeroHeat · 几何与网格, URL: 127.0.0.1:8781/view05/workbench/geometry/index.html?case=0&frame=1&revision=1&view=all&field=pressurePa&layer=1&wire=1
+				53 container
+					54 text 移动活塞 · 内求激波速度基准
+					55 text 26 顶点 · 48 三角面
+					56 button 适配模型, ID: reset
+					57 button 侧视
+					58 button 鼻端
+					59 button 立体
+					60 checkbox (settable, integer) Description: 网格线, Value: 1, ID: wire
+					61 checkbox (settable, integer) Description: 平移, Value: 0, ID: panMode
+					62 text SI / m · 已保存研究 · 原箭体物理场未求
+				63 container
+					64 image Description: 几何和实际三角网格，拖动旋转，Shift或右键拖动平移，滚轮缩放, ID: scene
+					65 container Description: 当前视角坐标方向, ID: axes
+						66 text X Y Z
+					67 text 拖动旋转 · Shift / 右键平移 · 滚轮缩放
+				68 container Description: 逐面研究场量色标, ID: fieldLegend
+					69 text 流体压力 / Pa · 固定范围 0—40000 · 超范围使用端点色；灰色为未知
+				70 container
+					71 text 几何尺寸 / m：X 0.03455 · Y 0.034526 · Z 0.03214
+					72 text 移动活塞解析基准 · 不是箭体解
+		73 text 保存帧
+		74 slider (settable, integer) Description: 实际保存帧, Value: 1, ID: frame
+		75 text 基准推进 t = 0.000002 s · 仅初末实际保存帧
+		76 container
+			77 text 边界面元分布 面元
+			78 slider (settable, integer) Description: 边界面元, Value: 28, ID: face
+			79 button 导出当前范围 CSV, ID: csv
+			80 image Description: 实际面元值，缺失处断开, ID: curve
+			81 text 按当前范围面元顺序列出实际值；不插补未知值，不将连线解释为流线或周向截线。
+		82 container
+			83 text 面元探针
+			125 text 解析活塞初态/实际三维ALE推进末态；云图取边界邻接单元值
+			85 definition list probe
+				126 container 当前面元
+					127 text 当前面元
+				128 text 29 / 48
+				129 container 坐标 / m
+					130 text 坐标 / m
+				131 text 0.01636935, -0.019554705, 0.0055812033
+				132 container 所属原箭面号
+					133 text 所属原箭面号
+				134 text 基准面元，无原箭体对应
+				135 container 边界身份
+					136 text 边界身份
+				137 text 储库侧面
+				138 container 流体压力 / Pa
+					139 text 流体压力 / Pa
+				140 text 6788.1126
+				141 container 流体温度 / K
+					142 text 流体温度 / K
+				143 text 428.0112
+				144 container 速度幅值 / m/s
+					145 text 速度幅值 / m/s
+				146 text 1083.8918
+				147 container Riemann壁压 / Pa
+					148 text Riemann壁压 / Pa
+				149 text 未求解
+				150 container 热流 / W/m²
+					151 text 热流 / W/m²
+				152 text 未求解
+				153 container 求解壁温 / K
+					154 text 求解壁温 / K
+				155 text 未求解
+				156 container 外缘Te / 恢复Tr
+					157 text 外缘Te / 恢复Tr
+				158 text 未求 / 未求
+				159 container 给定壁温 / 求解壁温
+					160 text 给定壁温 / 求解壁温
+				161 text 未设置 / 未求
+			122 button (collapsed) 逐场量方法、状态与来源, Secondary Actions: Expand
+				123 text 逐场量方法、状态与来源
+	124 text SI · 主轴 X、鼻尖 +X · 层内流体温度、Te、Tr、给定Tw、求解Tw分别标明 · 未知为灰色
+
+The focused UI element is 52 AXWebArea RocketAeroHeat · 几何与网格, URL: 127.0.0.1:8781/view05/workbench/geometry/index.html?case=0&frame=1&revision=1&view=all&field=pressurePa&layer=1&wire=1

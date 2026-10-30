@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RocketAeroHeat · 几何与网格</title><link rel="stylesheet" href="geometry.css?v=1"></head>
+<body>
+<header><div class="title"><strong id="caption">几何预览</strong><span id="summary">等待导入模型</span></div>
+<div class="controls"><button id="reset">适配模型</button><button data-view="side">侧视</button><button data-view="nose">鼻端</button><button data-view="iso">立体</button><label><input id="wire" type="checkbox">网格线</label><label><input id="panMode" type="checkbox">平移</label></div>
+<small id="coordinates">SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例</small></header>
+<main><canvas id="scene" aria-label="几何和实际三角网格，拖动旋转，Shift或右键拖动平移，滚轮缩放"></canvas>
+<div id="empty"><strong>尚未导入模型</strong><span>从侧边栏“输入模型”开始。</span></div><div id="error" hidden></div>
+<div id="fieldLegend" hidden aria-label="逐面研究场量色标"></div>
+<div id="axes" aria-label="当前视角坐标方向"></div><div class="hint">拖动旋转 · Shift / 右键平移 · 滚轮缩放</div></main>
+<footer><span id="bounds">几何尺寸 / m：—</span><span>几何预览 · 尚未计算物理场量</span></footer>
+<script src="geometry.js?v=1"></script></body></html>

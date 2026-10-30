@@ -1,0 +1,13 @@
+RAH_ENGINE_PID=27204
+MOVING_SHOCK mode=caloricallyPerfect maxRH=8.4318e-16 pistonRelativeSpeed=674.880371893 ALEAdvanced=1
+MOVING_SHOCK mode=thermallyPerfect maxRH=8.4318e-16 pistonRelativeSpeed=674.412266691 ALEAdvanced=0
+{错误使用 assert
+拒绝身份不符：实际，需要ShockFit:MemoryBudget。
+
+出错 testShockFittedALEKernel>reject (第 139 行)
+assert(strcmp(id,expected),'ShockFit:RefusalTest','拒绝身份不符：实际%s，需要%s。',id,expected);
+
+出错 testShockFittedALEKernel (第 116 行)
+rejections.memory=reject(@()advanceShockFittedALE3D(base.initialQ,base.mesh,base.nodes0,base.nodes1,base.times(end),base.boundary,gas,1000),'ShockFit:MemoryBudget');
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

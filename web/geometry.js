@@ -1,8 +1,9 @@
-/* RocketAeroHeat 无物理场的离线几何预览：真实比例、旋转、平移与网格线。 */
+/* RocketAeroHeat 离线几何预览；可选逐面研究场量，未知值保持灰色和可拾取。 */
 'use strict';
 (function(){
   const $=id=>document.getElementById(id),canvas=$('scene'),finite=x=>typeof x==='number'&&Number.isFinite(x);
   const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],fmt=x=>Number(x.toPrecision(5)).toString();
+  const fieldColor=t=>{const stops=[[.94,.97,.99],[.67,.82,.90],[.28,.60,.75],[.08,.35,.56],[.025,.15,.31]],x=Math.max(0,Math.min(1,t))*4,i=Math.min(3,Math.floor(x)),f=x-i;return stops[i].map((v,j)=>v+(stops[i+1][j]-v)*f);};
   let gl,program,positions,colorBuffer,edges,flowPositions,flowColors,bridge,model=null,vertices=[],lo,hi,initializationError='';
   let modelCenter=[0,0,0],modelExtent=1,flowSegments=0,flowPoints=[];
   let az=-Math.PI/2,el=.35,zoom=1,pan=[0,0],baseScale=1,right,up,direction,sx,sy,frame=0,pendingReport=false,drag;
@@ -46,13 +47,16 @@
       let V=data.vertices,F=data.faces;
       if(Array.isArray(V)&&typeof V[0]==='number')V=[V];if(Array.isArray(F)&&typeof F[0]==='number')F=[F];
       if(!Array.isArray(V)||!Array.isArray(F)||Boolean(V.length)!==Boolean(F.length)||V.some(v=>!Array.isArray(v)||v.length!==3||v.some(x=>!finite(x)))||F.some(f=>!Array.isArray(f)||f.length!==3||f.some(i=>!Number.isInteger(i)||i<0||i>=V.length)))throw Error('顶点坐标或三角形编号无效。');
-      model={vertices:V,faces:F,revision:data.revision};
+      const field=data.faceField;
+      if(field&&(!Array.isArray(field.values)||field.values.length!==F.length||field.values.some(v=>v!==null&&!finite(v))||!Array.isArray(field.range)||field.range.length!==2||!field.range.every(finite)||field.range[1]<=field.range[0]||typeof field.name!=='string'||typeof field.unit!=='string'||field.productionQualified!==false))throw Error('逐面研究场量、单位、色标或资格无效。');
+      model={vertices:V,faces:F,revision:data.revision,faceField:field||null};
       if(initializationError)throw Error(initializationError);
       vertices=[];lo=[Infinity,Infinity,Infinity];hi=[-Infinity,-Infinity,-Infinity];
       V.forEach(v=>v.forEach((x,j)=>{lo[j]=Math.min(lo[j],x);hi[j]=Math.max(hi[j],x);}));
       if(V.length){const extent=Math.max(...hi.map((x,j)=>x-lo[j]));if(!(extent>0))throw Error('模型尺寸为零。');const center=lo.map((x,j)=>(x+hi[j])/2);modelCenter=center;modelExtent=extent;vertices=V.map(v=>v.map((x,j)=>(x-center[j])/extent));}
       loadFlow(data.surfaceFlowLines);
-      if(gl){const ts=[],cs=[],es=[];F.forEach(f=>{const a=vertices[f[0]],b=vertices[f[1]],c=vertices[f[2]],ab=b.map((x,j)=>x-a[j]),ac=c.map((x,j)=>x-a[j]);let n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];const norm=Math.hypot(...n);n=norm>0?n.map(x=>x/norm):[0,0,0];const light=.65+.22*Math.abs(dot(n,[.3,.4,.8660254])),color=[.52,.60,.67].map(x=>x*light);f.forEach(i=>{ts.push(...vertices[i]);cs.push(...color);});[0,1,1,2,2,0].forEach(j=>es.push(...vertices[f[j]]));});buffer(positions,ts);buffer(colorBuffer,cs);buffer(edges,es);}
+      if(gl){const ts=[],cs=[],es=[];F.forEach((f,faceIndex)=>{const a=vertices[f[0]],b=vertices[f[1]],c=vertices[f[2]],ab=b.map((x,j)=>x-a[j]),ac=c.map((x,j)=>x-a[j]);let n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];const norm=Math.hypot(...n);n=norm>0?n.map(x=>x/norm):[0,0,0];const light=.65+.22*Math.abs(dot(n,[.3,.4,.8660254])),color=field?(finite(field.values[faceIndex])?fieldColor((field.values[faceIndex]-field.range[0])/(field.range[1]-field.range[0])):[.66,.69,.72]):[.52,.60,.67].map(x=>x*light);f.forEach(i=>{ts.push(...vertices[i]);cs.push(...color);});[0,1,1,2,2,0].forEach(j=>es.push(...vertices[f[j]]));});buffer(positions,ts);buffer(colorBuffer,cs);buffer(edges,es);}
+      const legend=$('fieldLegend');if(legend){legend.hidden=!field;if(field){legend.replaceChildren();const label=document.createElement('span'),bar=document.createElement('div');label.textContent=field.name+' / '+field.unit+' · 固定范围 '+fmt(field.range[0])+'—'+fmt(field.range[1])+' · 超范围使用端点色；灰色为未知';bar.className='fieldColorBar';legend.append(label,bar);}}
       $('caption').textContent=data.caption||'几何预览';$('coordinates').textContent=data.coordinateNote||'SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例';$('wire').checked=Boolean(data.showWire);
       $('summary').textContent=F.length?V.length.toLocaleString()+' 顶点 · '+F.length.toLocaleString()+' 三角面':'等待导入模型';$('empty').hidden=Boolean(F.length);
       $('bounds').textContent=V.length?'几何尺寸 / m：X '+fmt(hi[0]-lo[0])+' · Y '+fmt(hi[1]-lo[1])+' · Z '+fmt(hi[2]-lo[2]):'几何尺寸 / m：—';
@@ -74,7 +78,10 @@
   canvas.onpointermove=e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;if(drag.pan){pan[0]+=2*dx/Math.max(1,canvas.clientWidth);pan[1]-=2*dy/Math.max(1,canvas.clientHeight);}else{az-=dx*.008;el=Math.max(-1.55,Math.min(1.55,el+dy*.008));}render();};
   canvas.onpointerup=e=>{
     const pick=drag&&!drag.pan&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<4;drag=null;
-    if(!pick||!flowPoints.length||!bridge)return;camera();const rect=canvas.getBoundingClientRect();let chosen=null,best=12*12,depth=-Infinity;
+    if(!pick||!bridge)return;camera();const rect=canvas.getBoundingClientRect();let chosen=null,best=12*12,depth=-Infinity;
+    // 模块用途：按真实三角面投影重心及前后深度拾取，不要求场量有限，不让未知区消失。
+    if(model&&model.faceField&&!flowPoints.length){let hit=null;model.faces.forEach((f,faceIndex)=>{const p=f.map(i=>vertices[i]),xy=p.map(v=>[rect.left+(1+dot(v,right)*sx+pan[0])*rect.width/2,rect.top+(1-dot(v,up)*sy-pan[1])*rect.height/2]);const a=xy[0],b=xy[1],c=xy[2],den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);if(Math.abs(den)<1e-12)return;const u=((b[1]-c[1])*(e.clientX-c[0])+(c[0]-b[0])*(e.clientY-c[1]))/den,v=((c[1]-a[1])*(e.clientX-c[0])+(a[0]-c[0])*(e.clientY-c[1]))/den,w=1-u-v;if(Math.min(u,v,w)<-1e-9)return;const bary=[u,v,w],z=bary.reduce((s,t,i)=>s+t*dot(p[i],direction),0);if(z>depth){depth=z;hit={faceIndex,barycentric:bary,position:[0,1,2].map(j=>bary.reduce((s,t,i)=>s+t*model.vertices[f[i]][j],0))};}});if(hit)bridge.Data={kind:'geometry-face-probe',revision:model.revision,...hit,nonce:Date.now()};return;}
+    if(!flowPoints.length)return;
     flowPoints.forEach(point=>{if(dot(point.normal,direction)<=0)return;const x=rect.left+(1+dot(point.p,right)*sx+pan[0])*rect.width/2,y=rect.top+(1-dot(point.p,up)*sy-pan[1])*rect.height/2;const distance=(x-e.clientX)**2+(y-e.clientY)**2,z=dot(point.p,direction);if(distance<best||(distance===best&&z>depth)){chosen=point;best=distance;depth=z;}});
     if(chosen)bridge.Data={kind:'surface-flow-probe',revision:model.revision,curveIndex:chosen.curveIndex,stationIndex:chosen.stationIndex,nonce:Date.now()};
   };canvas.onpointercancel=()=>{drag=null;};canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.05,Math.min(30,zoom*Math.exp(-e.deltaY*.001)));render();},{passive:false});

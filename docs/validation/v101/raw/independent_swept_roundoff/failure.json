@@ -1,0 +1,7 @@
+{
+  "actualExitCode": 1,
+  "reason": "Independent last-step start nodes reconstructed from saved endpoints introduce rounding at analytically zero-swept side faces. Fixed absolute 1e-23 m^3 asserted too narrowly.",
+  "observedMaximumAbsoluteDifferenceM3": 1.55509955e-22,
+  "sourceSHA256": "4111619258c9ccd25594faf001f24e6542e6b7f0c0e79a09c0ad27e465298afe",
+  "correction": "Keep relative gate, add pointwise floating-point propagation bound based on actual face area and coordinate magnitude. No MATLAB result or physics gate changed."
+}

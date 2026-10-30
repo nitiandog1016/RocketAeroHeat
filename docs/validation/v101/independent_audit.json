@@ -1,0 +1,76 @@
+{
+  "status": "passed-independent-moving-RH-direct-xiD-flux-Gauss-GCL-and-real-mesh-audit",
+  "evidenceSHA256": "13fd81da06dac551f12de78d8967399858f23a11090ba4e5eb686e016cf3e006",
+  "processSHA256": "37ec9ca395fcd7cbee56533cae64b69fcd11016880fc9d5a20ff89efa75ef27d",
+  "movingShockCases": 6,
+  "maximumShockStateRelativeDifference": 5.763539337482627e-16,
+  "maximumDirectALEFluxRelativeDifference": 2.4331461018019548e-15,
+  "maximumWallFluxRelativeDifference": 5.727300044805537e-16,
+  "piston": [
+    {
+      "mode": "caloricallyPerfect",
+      "independentRelativeShockSpeedMS": 674.8803718932088,
+      "shockSpeedDifferenceMS": 0.0,
+      "ALEAdvanced": true,
+      "lastStep": {
+        "cells": 48,
+        "faces": 120,
+        "gclRelative": 1.617976117993193e-16,
+        "fluxRelativeDifference": 2.2226201578766716e-14,
+        "stateRelativeDifference": 1.658597554223969e-15,
+        "sweptComparisonMaximumRoundoffBudgetM3": 1.7992219916747295e-19,
+        "fluxNormalization": "per-conserved-component maximum magnitude over actual reference face fluxes",
+        "fluxNormalizationScale": [
+          23.337149861917812,
+          25394.36976061185,
+          9457.068935486399,
+          10754.886626448235,
+          23743850.91926399
+        ],
+        "maximumAbsoluteFluxDifferenceByComponent": [
+          5.186961971048731e-13,
+          5.238689482212067e-10,
+          6.912159733474255e-11,
+          1.9281287677586079e-10,
+          4.5821070671081543e-07
+        ]
+      }
+    },
+    {
+      "mode": "thermallyPerfect",
+      "independentRelativeShockSpeedMS": 674.4122666907186,
+      "shockSpeedDifferenceMS": 1.1368683772161603e-13,
+      "ALEAdvanced": false
+    }
+  ],
+  "realMesh": {
+    "cells": 2898,
+    "faces": 6337,
+    "gclRelative": 6.530443785506099e-15,
+    "fluxRelativeDifference": 7.099330601177531e-15,
+    "stateRelativeDifference": 6.91935662355466e-15,
+    "sweptComparisonMaximumRoundoffBudgetM3": 2.78883315981614e-20,
+    "fluxNormalization": "per-conserved-component maximum magnitude over actual reference face fluxes",
+    "fluxNormalizationScale": [
+      28.459192014370245,
+      41490.86838316791,
+      1197.027099749554,
+      14995.170464072376,
+      38796592.04921756
+    ],
+    "maximumAbsoluteFluxDifferenceByComponent": [
+      1.1723955140041653e-13,
+      1.673470251262188e-10,
+      8.498091119690798e-12,
+      6.730260793119669e-11,
+      1.6391277313232422e-07
+    ]
+  },
+  "cacheAndTemporaryArrayBudgetBytes": 62364794,
+  "processPeakMemoryMeasured": false,
+  "experimentalValidation": false,
+  "rocketShockShapeSolved": false,
+  "heatFluxSolved": false,
+  "productionQualified": false,
+  "newProductionSolvedAreaM2": 0
+}

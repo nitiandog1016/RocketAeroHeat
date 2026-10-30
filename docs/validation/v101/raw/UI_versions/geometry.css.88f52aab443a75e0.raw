@@ -1,0 +1,14 @@
+/* 模块一：保持中性背景与稳定文档流；显示区域不承载物理场色标。 */
+:root{color-scheme:light;font-family:"Microsoft YaHei","Segoe UI",sans-serif;color:#263442;background:#edf0f3;font-size:12px}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{display:flex;flex-direction:column}
+header{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:9px 16px;padding:11px 15px;background:#f8f9fa;border-bottom:1px solid #cdd4db}
+.title{display:flex;align-items:baseline;gap:14px;flex:1 1 270px}.title strong{font-size:14px;font-weight:600}.title span{color:#63717e}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:7px}.controls label{white-space:nowrap;display:flex;align-items:center;gap:3px}
+.controls label[hidden]{display:none}
+button{font:inherit;line-height:20px;padding:3px 10px;color:#334555;background:#fff;border:1px solid #bbc6d0;border-radius:3px;cursor:pointer}button:hover{background:#e8eef3;border-color:#8da2b6}button:focus-visible,input:focus-visible{outline:2px solid #426f95;outline-offset:2px}
+header small{flex:1 0 100%;color:#677886;font-size:11px}main{position:relative;flex:1 1 auto;min-height:0;background:#e9edf1}#scene{display:block;width:100%;height:100%;touch-action:none}
+#empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;pointer-events:none;color:#7a8792}#empty strong{font-size:16px;font-weight:500}#empty span{font-size:12px}#empty[hidden]{display:none}
+#error{position:absolute;top:16px;left:16px;right:16px;padding:10px;background:#fff0ec;border:1px solid #ce9588;color:#863e30;white-space:pre-wrap}
+#axes{position:absolute;bottom:39px;left:20px;width:72px;height:72px;pointer-events:none}#axes span{position:absolute;font-weight:600;font-size:12px}
+.hint{position:absolute;left:15px;bottom:12px;font-size:11px;color:#637582;pointer-events:none}footer{flex:none;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 15px;background:#f7f8fa;border-top:1px solid #cdd4db;color:#63717e;font-size:11px}
+#fieldLegend{position:absolute;left:96px;right:16px;bottom:36px;max-width:640px;padding:7px 10px;background:#f8fafc;color:#334155;font:12px system-ui;border:1px solid #d6dfe7;pointer-events:none}#fieldLegend[hidden]{display:none}.fieldColorBar{height:10px;margin-top:5px;background:linear-gradient(to right,#f0f7fc,#abd1e6,#4799bf,#14598f,#06264f)}

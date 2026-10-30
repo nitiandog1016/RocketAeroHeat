@@ -1,0 +1,64 @@
+{
+  "status": "actual-exit1-source-stable-before-delivery",
+  "reason": "advanceShockFittedALE3D has eight inputs but its default branch used nargin<9, overwriting the explicit memory budget. Final negative test detected absence of the required budget refusal.",
+  "engineProcessID": 27204,
+  "originalSources": [
+    {
+      "path": "setupShockFittedFlow.m",
+      "sha256": "14175d8cfb283630fca768010280b4cdcd6d7fffb21c229d27edda356c3b0001",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/setupShockFittedFlow.m.raw"
+    },
+    {
+      "path": "tests/testShockFittedALEKernel.m",
+      "sha256": "e5d0e2b1f0bb69fab4166729f96e3a6c7d895238f9bea87aef0b28c1866f6353",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/testShockFittedALEKernel.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/advanceShockFittedALE3D.m",
+      "sha256": "9a9a2edb3174b960c11efad45075cabd7ccd95e3c2351b542e0b44c39a5a9e9c",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/advanceShockFittedALE3D.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/buildShockFittedSurfaceShell.m",
+      "sha256": "4316fd9ec0cf0ef4110c61588f9174136e6d1a678ec2d14920d4b2428f9969af",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/buildShockFittedSurfaceShell.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/buildShockFittedTetraTopology.m",
+      "sha256": "523df2bed66174e00485fed602d5a7ab7c711576084a1f5671c320439ffd49b5",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/buildShockFittedTetraTopology.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/movingShockJump3D.m",
+      "sha256": "29be2fd82e765edca4deedcfe9f3804c56bbb0f04ebd50ad48e8d33ce48d91ce",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/movingShockJump3D.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/shockFittedALEFlux3D.m",
+      "sha256": "0faaf0a4336e5f8718eb9c76f42c9601ac5ddad66e79d66468752917b966fef1",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/shockFittedALEFlux3D.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/shockFittedALEGeometry.m",
+      "sha256": "f24206ed9c469e07ab461ecc7398da532f19ecb775ac60125ec6cc94d959cfbe",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/shockFittedALEGeometry.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/shockFittedSlipWallFlux3D.m",
+      "sha256": "a01a4119b560a665c028e4bb8dc4203b6cf3f6894f39fa85a8df901436cc79e6",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/shockFittedSlipWallFlux3D.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/shockFittedState3D.m",
+      "sha256": "85581bba419bf18871404ce0208f60c5a591db15a4724d4241f55730301f5b60",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/shockFittedState3D.m.raw"
+    },
+    {
+      "path": "regionalFlow/shockFitting/solveShockFittedPiston3D.m",
+      "sha256": "bc8eb77b5436563dd2c8a82b8888a9748532f332857a7164e36eb6e972ced89e",
+      "preserved": "docs/validation/v101/raw/first_budget_refusal/solveShockFittedPiston3D.m.raw"
+    }
+  ],
+  "physicalQualificationClaimed": false,
+  "correction": "Use nargin<8. No numerical threshold or physics changed."
+}

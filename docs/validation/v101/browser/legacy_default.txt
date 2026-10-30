@@ -1,0 +1,134 @@
+Browser tab: 12, Title: "RocketAeroHeat · 共同激波层研究", URL: "http://127.0.0.1:8781/legacy01/workbench/index.html".
+0 AXWebArea RocketAeroHeat · 共同激波层研究, URL: 127.0.0.1:8781/legacy01/workbench/index.html
+	1 container
+		2 text RocketAeroHeat 共同激波层 · 层内状态与真实体形匹配 研究原型 · 匹配未通过 · 热流未求
+	3 container
+		4 container
+			5 text 已保存的数值研究
+			6 pop up button (collapsed, settable) Description: 选择激波层研究, Value: 定比热 · N7 · 粗网格诊断, ID: caseChoice, Secondary Actions: Expand
+				7 menu
+					8 (selected) 定比热 · N7 · 粗网格诊断
+					9 定比热 · N19 · 守恒加密
+					10 NASA7 · N7 · 粗网格诊断
+					11 NASA7 · N19 · 守恒加密
+			12 container 科研工作流
+				13 button 1 输入模型
+				14 button 2 生成网格
+				15 button 3 添加边界条件
+				16 button 4 计算
+				17 button 5 查看结果
+		18 heading 查看结果 · 定比热 · N7 · 粗网格诊断, Value: 1, ID: title
+			19 text 查看结果 · 定比热 · N7 · 粗网格诊断
+		20 text 给定球形共同激波，绕实际来流轴的额外轴对称假设；直接连续式残差 0.00644。原20°箭体未匹配，热流/壁温未求。
+		21 definition list details
+			22 container 工况
+				23 text 工况
+			24 text M5 · 30 km · 攻角20°
+			25 container 原箭体网格
+				26 text 原箭体网格
+			27 text 19752 面 · 闭合定向
+			28 container 当前组
+				29 text 当前组
+			30 text 7 个法向列
+			31 container 状态身份
+				32 text 状态身份
+			33 text 轴线正则已检验；真实体形及高阶/外侧稳定范围未收口
+			34 container 匹配门槛
+				35 text 匹配门槛
+			36 text 10 µm，保持原值
+			37 container 热流与求解壁温
+				38 text 热流与求解壁温
+			39 text 未求解
+			40 container 新增合格热流面积
+				41 text 新增合格热流面积
+			42 text 0 m²
+		43 button (collapsed) 形状匹配与方法适用范围, Secondary Actions: Expand
+			44 text 形状匹配与方法适用范围
+		45 text 本页查看已保存结果；切换步骤不重新计算。鼻部开放片只用于放大，整箭网格保持原V/F。
+		46 link Description: 下载数值与来源记录, Value: 127.0.0.1:8781/legacy01/workbench/shock-layer-data.json
+		47 text 三维范围
+		48 pop up button (collapsed, settable) Description: 三维显示范围, Value: 鼻部放大, ID: viewChoice, Secondary Actions: Expand
+			49 menu
+				50 (selected) 鼻部放大
+				51 完整箭体
+		52 text 原几何已显示 · 可旋转/平移/缩放
+		53 container Description: 原箭体与激波内法向列, ID: viewer
+			54 AXWebArea RocketAeroHeat · 几何与网格, URL: 127.0.0.1:8781/legacy01/workbench/geometry/index.html?case=0&view=nose&layer=1&wire=0&revision=1
+				55 container
+					56 text 原箭体鼻部开放片 · 层内法向列
+					57 text 907 顶点 · 1,720 三角面
+					58 button 适配模型, ID: reset
+					59 button 侧视
+					60 button 鼻端
+					61 button 立体
+					62 checkbox (settable, integer) Description: 网格线, Value: 0, ID: wire
+					63 checkbox (settable, integer) Description: 平移, Value: 0, ID: panMode
+					64 text SI / m · 原X轴与鼻尖方向保持 · 层内候选值未赋给真实壁面
+				65 container
+					66 image Description: 几何和实际三角网格，拖动旋转，Shift或右键拖动平移，滚轮缩放, ID: scene
+					67 container Description: 当前视角坐标方向, ID: axes
+						68 text X Y Z
+					69 text 拖动旋转 · Shift / 右键平移 · 滚轮缩放
+				70 container
+					71 text 几何尺寸 / m：X 0.026263 · Y 0.088709 · Z 0.088502
+					72 text 激波内法向坐标列（不是流线） · 未通过体形匹配 · 热流未求
+		73 container
+			74 text 激波内法向剖面 法向列
+			75 pop up button (collapsed, settable) Description: 选择法向列, Value: 法向列 1, ID: columnChoice, Secondary Actions: Expand
+				76 menu
+					77 (selected) 法向列 1
+					78 法向列 2
+					79 法向列 3
+					80 法向列 4
+					81 法向列 5
+					82 法向列 6
+					83 法向列 7
+			84 pop up button (collapsed, settable) Description: 层内曲线物理量, Value: 层内压力 / kPa, ID: field, Secondary Actions: Expand
+				85 menu
+					86 (selected) 层内压力 / kPa
+					87 层内温度 / K
+					88 层内速度幅值 / m/s
+					89 同流线来源熵 / J/(kg·K)
+					90 法线Jacobian比 / 1
+			91 button 导出当前列 CSV, ID: saveCSV
+			92 image Description: 层内法向剖面；点为实际保存站点, ID: curve
+			93 text 保存站点
+			94 slider (settable, integer) Description: 层内保存站点, Value: 8, ID: station
+			131 text 列 1 · 站 9/21 · η = 0.6 · n = 2.868651 mm
+			96 text 线为法向坐标列，不是流线；站点连线不代表额外积分。点击三维可见站点或使用滑块。
+		97 container
+			98 text 层内站点探针
+			132 text 激波内法向列上的条件反算状态；不是边界层外缘或壁面。
+			100 definition list probe
+				133 container XYZ / m
+					134 text XYZ / m
+				135 text 0.05166146, -0.00001557238, -0.01878013
+				136 container 层内压力 / kPa
+					137 text 层内压力 / kPa
+				138 text 37.36254
+				139 container 层内温度 / K
+					140 text 层内温度 / K
+				141 text 1341.645
+				142 container 层内速度 / m/s
+					143 text 层内速度 / m/s
+				144 text 187.0347
+				145 container 层内密度 / kg/m³
+					146 text 层内密度 / kg/m³
+				147 text 0.09701454
+				148 container 同流线来源熵 / J/(kg·K)
+					149 text 同流线来源熵 / J/(kg·K)
+				150 text 1791.269
+				151 container 外缘Te / 恢复Tr / 给定Tw / 求解Tw
+					152 text 外缘Te / 恢复Tr / 给定Tw / 求解Tw
+				153 text 未求 / 未求 / 未设置 / 未求
+				154 container 热流 / W/m²
+					155 text 热流 / W/m²
+				156 text 未求解
+				157 container 本列体形残差 / µm
+					158 text 本列体形残差 / µm
+				159 text -0.3056984
+			128 button (collapsed) 逐场量算法、原面元及适用范围, Secondary Actions: Expand
+				129 text 逐场量算法、原面元及适用范围
+	130 text SI · 主轴X、鼻尖+X · 灰色为原几何，蓝线为激波内法向列 · 层内温度不是Te、Tr或Tw · 新增合格热流面积0
+
+The focused UI element is 94 slider (settable, integer) Description: 层内保存站点, Value: 8, ID: station
