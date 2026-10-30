@@ -1,0 +1,98 @@
+﻿$ErrorActionPreference = 'Stop'
+# 模块一：验证固定白名单、准确原文件和保留副本；不进行目录递归删除。
+$taskRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+$taskDestination = Join-Path $taskRoot 'docs/validation/storage_20261030/embedded_caches'
+$taskPlanPath = Join-Path $taskDestination 'plan.json'
+$taskReceiptPath = Join-Path $taskDestination 'execution.json'
+$taskJournalPath = Join-Path $taskDestination 'operations.jsonl'
+if (Test-Path -LiteralPath $taskReceiptPath) { throw '已有执行记录，不覆盖。' }
+if (Get-Process -Name MATLAB -ErrorAction SilentlyContinue) { throw 'MATLAB正在运行。' }
+$taskPlan = Get-Content -LiteralPath $taskPlanPath -Raw -Encoding UTF8 | ConvertFrom-Json
+if ($taskPlan.workspace -ne $taskRoot -or $taskPlan.kind -ne 'retired-embedded-MAT-cache-records') { throw '计划身份不符。' }
+$taskCanonical = @(
+ 'coarserocket01/volume_coarse_real_evidence.mat',
+ 'coarselsrocket01/least_squares_coarse_evidence.mat',
+ 'layercoarserocket01/coarse_layer_evidence.mat',
+ 'basiscandidatesrocket01/primitive/coarse_candidate_evidence.mat',
+ 'basiscandidatesrocket01/spatial/coarse_candidate_evidence.mat',
+ 'mixedrocket01/mixed_coarse_evidence.mat',
+ 'mixedrocket02/mixed_coarse_evidence.mat',
+ 'localrocket02/local_coarse_evidence.mat',
+ 'reservoirjacreal01/riemann_selected_direction_real_evidence.mat',
+ 'schurcheckpointreal01/checkpoint/schur_assembly_evidence.mat',
+ 'schurcheckpointreal01/checkpoint/momentum_factor_evidence.mat'
+)
+function Get-CheckedPath([string]$Relative) {
+ if ([IO.Path]::IsPathRooted($Relative)) { throw '拒绝绝对输入路径。' }
+ $path = [IO.Path]::GetFullPath((Join-Path $taskRoot $Relative))
+ if (-not $path.StartsWith($taskRoot + '\', [StringComparison]::OrdinalIgnoreCase)) { throw '目标超出项目。' }
+ $item = Get-Item -LiteralPath $path -ErrorAction SilentlyContinue
+ if ($item -and ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw '拒绝重解析文件。' }
+ $parent = [IO.DirectoryInfo]::new([IO.Path]::GetDirectoryName($path))
+ while ($parent -and $parent.FullName.Length -ge $taskRoot.Length) {
+  if ($parent.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw '拒绝重解析目录。' }
+  $parent = $parent.Parent
+ }
+ return $path
+}
+function Assert-Record($Entry) {
+ $path = Get-CheckedPath $Entry.path
+ $item = Get-Item -LiteralPath $path
+ if ($item.PSIsContainer -or $item.Length -ne $Entry.bytes -or (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $Entry.sha256) { throw "文件身份不符：$($Entry.path)" }
+}
+if (@($taskPlan.groups).Count -ne $taskCanonical.Count) { throw '范围数量不符。' }
+$taskSeen = @{}
+foreach ($group in $taskPlan.groups) {
+ $relative = $group.original.path
+ if (-not $relative.StartsWith('outputs/v83_validation/')) { throw '原文件超范围。' }
+ $tail = $relative.Substring('outputs/v83_validation/'.Length)
+ if ($taskCanonical -notcontains $tail -or $taskSeen.ContainsKey($relative)) { throw '不在固定范围或路径重复。' }
+ $taskSeen[$relative] = $true
+ if ($group.retained.path -ne ('outputs/retained_evidence_20261030/v83_validation/' + $tail)) { throw '保留位置不符。' }
+ if ($group.markerPath -ne (($relative.Substring(0, $relative.LastIndexOf('/'))) + '/EMBEDDED_CACHE_PRUNED_20261030.json')) { throw '标记位置不符。' }
+ if (Test-Path -LiteralPath (Get-CheckedPath $group.markerPath)) { throw '已有清理标记。' }
+ Assert-Record $group.original
+ Assert-Record $group.retained
+}
+foreach ($entry in @($taskPlan.protectedFiles) + @($taskPlan.sourceFiles)) {
+ if ($taskSeen.ContainsKey($entry.path)) { throw '保留与删除冲突。' }
+ Assert-Record $entry
+}
+Write-Output "PREFLIGHT_PASSED originals=$($taskPlan.groups.Count)"
+
+# 模块二：先有保留副本并再次核对SHA，再逐文件回收原容器；每一步写入回执。
+$receipt = [ordered]@{
+ status='executing'; startedUTC=[DateTime]::UtcNow.ToString('o')
+ planSHA256=(Get-FileHash -LiteralPath $taskPlanPath -Algorithm SHA256).Hash.ToLowerInvariant()
+ freeBefore=[IO.DriveInfo]::new($taskRoot).AvailableFreeSpace; deleted=@()
+}
+foreach ($group in $taskPlan.groups) {
+ Assert-Record $group.retained
+ Assert-Record $group.original
+ $path = Get-CheckedPath $group.original.path
+ if (-not $path.StartsWith((Join-Path $taskRoot 'outputs\v83_validation') + '\', [StringComparison]::OrdinalIgnoreCase)) { throw '删除目标不在固定outputs子目录。' }
+ Remove-Item -LiteralPath $path
+ if (Test-Path -LiteralPath $path) { throw '删除后仍存在。' }
+ $receipt.deleted += $group.original
+ $group.original | ConvertTo-Json -Compress | Add-Content -LiteralPath $taskJournalPath -Encoding UTF8
+}
+foreach ($marker in @($taskPlan.groups.markerPath | Sort-Object -Unique)) {
+ $groups = @($taskPlan.groups | Where-Object { $_.markerPath -eq $marker })
+ @{
+  status='retired-embedded-caches-pruned-results-retained'
+  plan='docs/validation/storage_20261030/embedded_caches/plan.json'
+  groups=$groups
+  note='仅移除旧构造缓存；其余变量原MAT压缩记录完整迁存。历史入口须先在新目录按准确源码重建缓存并建立新来源，不承诺原MAT容器SHA复现。独有失败和当前状态保留。'
+ } | ConvertTo-Json -Depth 15 | Set-Content -LiteralPath (Get-CheckedPath $marker) -Encoding UTF8
+}
+
+# 模块三：保留副本和来源再次核对；迁存前后净空间另由独立审计统计。
+foreach ($entry in @($taskPlan.protectedFiles) + @($taskPlan.sourceFiles) + @($taskPlan.groups.retained)) { Assert-Record $entry }
+$receipt.status = 'completed-embedded-cache-cleanup'
+$receipt.completedUTC = [DateTime]::UtcNow.ToString('o')
+$receipt.freeAfter = [IO.DriveInfo]::new($taskRoot).AvailableFreeSpace
+$receipt.actualFreeIncreaseBytes = $receipt.freeAfter - $receipt.freeBefore
+$receipt.retainedResultBytes = $taskPlan.retainedResultBytes
+$receipt.removedCacheBytes = $taskPlan.plannedRemovedCacheBytes
+$receipt | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $taskReceiptPath -Encoding UTF8
+Write-Output "CLEANUP_COMPLETED originals=$($receipt.deleted.Count) deleteWindowFreeIncreaseBytes=$($receipt.actualFreeIncreaseBytes)"
