@@ -1,0 +1,25 @@
+{
+  "status": "corrected-before-any-output-deletion",
+  "attempts": [
+    {
+      "stage": "read-only-plan",
+      "count": 2,
+      "reason": "Historical selectRocketTemperatureCellInterfaceRows.m was absent from current source and earlier storage archives.",
+      "resolution": "Found exact SHA e26103bac8323de32cba177eb2fa47cd809c0b56b187438b7178b06fba95f77c in Git commit d26909016c4bff124d93c1d0d8f52892a77256ae and preserved raw bytes."
+    },
+    {
+      "stage": "read-only-plan",
+      "count": 1,
+      "reason": "Full-project snapshot also listed an unrelated testRocketTemperatureRepreview.m version not used by the actual QR construction.",
+      "resolution": "Preserved complete original process snapshot; reconstruction source verification covers calculation modules and explicit driver dependencies, not unused test scripts. All 411 selected historical MATLAB source versions were verified."
+    },
+    {
+      "stage": "PowerShell-parse",
+      "count": 1,
+      "reason": "Windows PowerShell read new UTF-8 Chinese script without BOM using its legacy encoding. No command executed.",
+      "resolution": "Added UTF-8 BOM; subsequent execution passed all preflight checks before deletion."
+    }
+  ],
+  "outputsDeletedDuringRejectedAttempts": false,
+  "MATLABExecuted": false
+}
