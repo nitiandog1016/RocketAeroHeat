@@ -1,0 +1,245 @@
+"""独立核对MAT场量、真实三角面映射与CSV截面；不调用浏览器的截面算法。"""
+
+from pathlib import Path
+import argparse
+import csv
+import io
+import json
+import math
+
+import numpy as np
+from scipy.io import loadmat
+from scipy.spatial import cKDTree
+from scipy.sparse import coo_matrix
+from scipy.sparse.csgraph import connected_components
+
+from auditThermalPressureSurfaceFlow import sha
+
+ROOT = Path(__file__).resolve().parents[1]
+FIELDS = ('pressurePa', 'temperatureK', 'speedMS', 'wallPressurePa', 'heatFluxWm2',
+          'wallTemperatureK', 'edgeTemperatureK', 'recoveryTemperatureK', 'inputWallTemperatureK')
+
+
+def numeric(values):
+    return np.array([np.nan if x is None else x for x in values], float)
+
+
+def intersect(triangle, x, eps, trace):
+    """模块一：用重心坐标线性约束和零空间裁剪求截线，独立于JS逐边求交。"""
+    d = triangle[:, 0] - x
+    near = np.abs(d) <= eps
+    d[near] = 0
+    if near.all() or d.min() > 0 or d.max() < 0:
+        return None
+    if near.sum() == 2 and d[~near][0] * trace < 0:
+        return None
+    a = np.vstack((d / np.max(np.abs(d)), np.ones(3)))
+    _, _, vt = np.linalg.svd(a, full_matrices=True)
+    direction = vt[-1]
+    seed = np.linalg.lstsq(a, np.array([0., 1.]), rcond=None)[0]
+    low, high = -np.inf, np.inf
+    for value, slope in zip(seed, direction):
+        if slope > 1e-14:
+            low = max(low, -value / slope)
+        elif slope < -1e-14:
+            high = min(high, -value / slope)
+        elif value < -1e-12:
+            return None
+    if not (np.isfinite(low) and np.isfinite(high) and high > low):
+        return None
+    points = np.stack(((seed + low * direction) @ triangle, (seed + high * direction) @ triangle))
+    points[:, 0] = x
+    length = np.linalg.norm(points[1] - points[0])
+    return points if length > eps else None
+
+
+def contours(segments, x, eps):
+    """模块二：空间KD树合并端点并求连通分量，独立核对轮廓和角度中心。"""
+    if not segments:
+        return {}
+    keys = list(segments)
+    points = np.concatenate([segments[key] for key in keys])
+    parent = np.arange(len(points))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for i, j in cKDTree(points).query_pairs(eps * 2):
+        parent[find(i)] = find(j)
+    ids = np.array([find(i) for i in range(len(points))])
+    _, ids = np.unique(ids, return_inverse=True)
+    edges = ids.reshape(-1, 2)
+    graph = coo_matrix((np.ones(2 * len(edges)),
+                       (np.r_[edges[:, 0], edges[:, 1]], np.r_[edges[:, 1], edges[:, 0]])))
+    _, labels = connected_components(graph, directed=False)
+    component = labels[edges[:, 0]]
+    degree = np.bincount(edges.ravel())
+    result = {}
+    for group in np.unique(component):
+        selected = np.flatnonzero(component == group)
+        group_edges = edges[selected]
+        group_points = points.reshape(-1, 2, 3)[selected]
+        lengths = np.linalg.norm(group_points[:, 1] - group_points[:, 0], axis=1)
+        center = np.sum(group_points.mean(axis=1) * lengths[:, None], axis=0) / lengths.sum()
+        center[0] = x
+        ds = degree[np.unique(group_edges)]
+        for index in selected:
+            result[keys[index]] = dict(group=int(group), center=center,
+                                      closed=bool(np.all(ds == 2)), branched=bool(np.any(ds > 2)))
+    return result
+
+
+def audit(folder, sections, target):
+    """模块三：逐帧从原五量恢复数值，所有未求温度及热流必须保持未知。"""
+    assert not target.exists()
+    data = json.loads((folder / 'ale-data.json').read_text(encoding='utf8'))
+    assert data['kind'] == 'shock-fitted-dynamics-study-v102'
+    assert not data['productionQualified'] and data['newProductionSolvedAreaM2'] == 0
+    assert not data['experimentalValidation']
+    assert (folder / 'ale-data.js').read_bytes() == b'window.ALE_STUDY=' + (folder / 'ale-data.json').read_bytes() + b';\n'
+    loaded, checked = {}, 0
+
+    def source(case):
+        identity = case['source']
+        file = Path(identity['evidenceFile'])
+        assert sha(file) == identity['evidenceSHA256']
+        assert sha(Path(identity['auditFile'])) == identity['auditSHA256']
+        if str(file) not in loaded:
+            loaded[str(file)] = loadmat(file, simplify_cells=True, uint16_codec='utf-8')
+        return loaded[str(file)]
+
+    legacy = source(data['cases'][0])
+    np.testing.assert_array_equal(data['originalGeometry']['vertices'], legacy['geometry']['V'])
+    np.testing.assert_array_equal(data['originalGeometry']['faces'], legacy['geometry']['F'] - 1)
+    for index, case in enumerate(data['cases']):
+        saved = source(case)
+        if index == 0:
+            study = saved['pistons'][0]
+            mesh = study['mesh']; gas = study['gas']
+            states = [study['initialQ'], study['Q']]
+            nodes = [study['nodes0'], study['nodes1']]
+            time = study['times'][-1]
+        elif index == 1:
+            study = saved['bodyCheck']; shell = study['shell']; mesh = shell['mesh']; gas = None
+            nodes = [shell['nodes'], study['nodes1']]; time = 1e-8
+        elif index < 5:
+            study = saved['study']; shell = study['cap']['shell']; mesh = shell['mesh']; gas = study['gas']
+            states = [study['initialQ'], study['Q']]
+            nodes = [study['initialNodes'], study['nodes']]; time = study['timeS']
+            assert not study['productionQualified'] and not case['productionQualified']
+            assert '非原箭体' in case['sourceFaceLabel']
+        else:
+            study = saved['tubes'][index - 5]; mesh = study['box']['mesh']; gas = study['gas']
+            states = [study['initialQ'], study['Q']]
+            nodes = [study['nodes0'], study['nodes1']]; time = study['timeS']
+        boundary = np.atleast_1d(mesh['boundaryFaces']).astype(int) - 1
+        owner = np.asarray(mesh['owner'], int)[boundary] - 1
+        np.testing.assert_array_equal(case['faces'], np.asarray(mesh['faces'])[boundary] - 1)
+        if index in (1, 2, 3, 4):
+            np.testing.assert_array_equal(case['sourceFaceIDs'], shell['cellOriginalFaceIDs'][owner])
+        if index != 1:
+            np.testing.assert_array_equal(case['boundaryKind'], study['boundary']['kind'])
+        for frame_index, frame in enumerate(case['frames']):
+            np.testing.assert_array_equal(frame['position'], nodes[frame_index])
+            assert frame['timeS'] == (time if frame_index else 0)
+            expected = {name: np.full(len(owner), np.nan) for name in FIELDS}
+            if index != 1:
+                q = states[frame_index]; rho = q[:, 0]; velocity = q[:, 1:4] / rho[:, None]
+                p = (gas['gamma'] - 1) * (q[:, 4] - rho * np.sum(velocity * velocity, axis=1) / 2)
+                expected.update(pressurePa=p[owner], temperatureK=p[owner] / (rho[owner] * gas['R']),
+                                speedMS=np.linalg.norm(velocity[owner], axis=1))
+                if frame_index:
+                    expected['wallPressurePa'] = study['lastStep']['wallPressurePa']
+            for name in FIELDS:
+                actual = numeric(frame.get(name, [None] * len(owner)))
+                np.testing.assert_allclose(actual, expected[name], rtol=4e-15, atol=0, equal_nan=True)
+                checked += len(actual)
+
+    # 模块四：CSV面号、来源与交线全集逐项核对；通过线性约束检查交点确实位于原三角形。
+    manifest = json.loads((sections / 'node_audit.json').read_text(encoding='utf8'))
+    assert manifest['dataSHA256'] == sha(folder / 'ale-data.json')
+    row_count = 0; maximum_endpoint_error = 0.; maximum_angle_error = 0.
+    for record in manifest['sectionFiles']:
+        path = sections / record['name']; assert sha(path) == record['sha256']
+        case = data['cases'][record['caseIndex']]; frame = case['frames'][record['frameIndex']]
+        chosen = [i for i, kind in enumerate(case['boundaryKind'])
+                  if record['view'] == 'all' or kind == (2 if record['view'] == 'wall' else 3)]
+        faces = np.asarray(case['faces'], int)[chosen]
+        vertices = np.asarray(frame['position'], float)
+        used = vertices[np.unique(faces)]
+        size = np.ptp(used, axis=0).max(); mag = np.abs(used).max(); x = record['x']
+        eps = max(size * 1e-10, mag * np.finfo(float).eps * 128)
+        tolerance = max(size * 1e-11, mag * np.finfo(float).eps * 512)
+        trace = -1 if x >= used[:, 0].max() - eps else 1
+        segments = {}
+        for i, face in enumerate(faces):
+            segment = intersect(vertices[face], x, eps, trace)
+            if segment is not None:
+                segments[i] = segment
+        topology = contours(segments, x, eps)
+        rows = list(csv.reader(io.StringIO(path.read_text(encoding='utf-8-sig'))))
+        assert len(rows[0]) == 18 and len(rows)-1 == record['rows'] == len(segments)
+        observed, group_ids = set(), {}
+        for row in rows[1:]:
+            assert len(row) == 18 and float(row[0]) == x
+            local = int(row[2])-1; assert local in segments and local not in observed; observed.add(local)
+            actual = np.array([[x, float(row[5]), float(row[6])], [x, float(row[7]), float(row[8])]])
+            expected = segments[local]
+            error = min(np.max(np.linalg.norm(actual-expected, axis=1)),
+                        np.max(np.linalg.norm(actual-expected[::-1], axis=1)))
+            assert error <= tolerance, (record['name'], local, error, tolerance)
+            maximum_endpoint_error = max(maximum_endpoint_error, error)
+            tri = vertices[faces[local]]
+            for point in actual:
+                coordinates = np.linalg.lstsq((tri[1:]-tri[0]).T, point-tri[0], rcond=None)[0]
+                assert coordinates.min() >= -1e-9 and coordinates.sum() <= 1+1e-9
+                assert np.linalg.norm(tri[0]+coordinates @ (tri[1:]-tri[0])-point) <= tolerance
+            assert abs(float(row[9])-np.linalg.norm(actual[1]-actual[0])) <= tolerance
+            contour = topology[local]; group_ids.setdefault(contour['group'], set()).add(int(row[1]))
+            assert row[16] == ('+X' if trace == 1 else '-X')
+            value = frame.get(record['field'], [None] * len(case['faces']))[chosen[local]]
+            assert row[10] == ('' if value is None else str(value)) or (value is not None and float(row[10]) == value)
+            assert row[11] == ('未求解' if value is None else frame['valueRole'])
+            assert row[12] == case['methods'][record['field']] and row[13] == case['scope']
+            assert case['source']['evidenceSHA256'] in row[14] and case['id'] in row[14]
+            center = contour['center']; a, b = actual[:, 1:]-center[1:]
+            span = b-a; parameter = np.clip(-a @ span / (span @ span), 0, 1)
+            valid = (contour['closed'] and not contour['branched'] and
+                     np.linalg.norm(a+parameter*span) > eps and
+                     abs(np.cross(a, b)) > eps*(np.linalg.norm(a)+np.linalg.norm(b)))
+            if valid:
+                assert row[17] == '有效周向角'
+                expected_angles = np.degrees(np.arctan2(actual[:, 2]-center[2], actual[:, 1]-center[1])) % 360
+                error_angle = np.max(np.abs((np.array([float(row[3]),float(row[4])])-expected_angles+180)%360-180))
+                assert error_angle <= 2e-9
+                maximum_angle_error = max(maximum_angle_error, error_angle)
+            else:
+                assert row[3] == row[4] == '' and row[17] != '有效周向角'
+            row_count += 1
+        assert observed == set(segments) and all(len(values) == 1 for values in group_ids.values())
+        assert len({next(iter(values)) for values in group_ids.values()}) == len(group_ids)
+    assets = {}
+    for name in ('ale-study.js','ale-study.html','ale-study.css','ale-section-core.js',
+                 'geometry/geometry.js','geometry/geometry.css','geometry/ale-study-geometry.js'):
+        original = ROOT/'web'/Path(name).name
+        if name == 'ale-study.html':
+            assert (folder/'index.html').read_bytes() == original.read_bytes(); assets['index.html'] = sha(original)
+        else:
+            assert (folder/name).read_bytes() == original.read_bytes(); assets[name] = sha(original)
+    result = dict(status='passed-independent-MAT-fields-SVD-triangle-intersections-KDtree-contours-and-CSV',
+                  dataSHA256=sha(folder/'ale-data.json'),cases=len(data['cases']),frames=2*len(data['cases']),
+                  checkedFieldValues=checked,sectionFiles=len(manifest['sectionFiles']),sectionRows=row_count,
+                  maximumEndpointErrorM=maximum_endpoint_error,maximumAngleErrorDeg=maximum_angle_error,
+                  originalFaces=len(data['originalGeometry']['faces']),currentUIAssetSHA256=assets,
+                  productionQualified=False,newProductionSolvedAreaM2=0,experimentalValidation=False)
+    target.write_bytes((json.dumps(result,ensure_ascii=False,indent=2)+'\n').encode('utf8'))
+    print(json.dumps(result))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('folder', type=Path); parser.add_argument('sections', type=Path); parser.add_argument('target', type=Path)
+    args = parser.parse_args(); audit(args.folder,args.sections,args.target)

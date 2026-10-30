@@ -1,0 +1,114 @@
+"""绑定v102实际进程、MAT输入、准确MATLAB及实际UI版本；不重跑数值。"""
+
+from pathlib import Path
+import hashlib
+import json
+import subprocess
+
+from auditThermalPressureSurfaceFlow import sha
+
+ROOT = Path(__file__).resolve().parents[1]
+VAL = ROOT/'outputs/v102_validation'
+DEST = ROOT/'docs/validation/v102'
+JOBS = ('shockDynamics102a','shockDynamics102b','shockCap102a','shockMotion102a',
+        'shockCap102b','shockResume102a','shockCap102c','shockDynamics102c','shockView102a')
+UI = {'web/'+name for name in ('geometry.js','geometry.css','geometry.html','ale-study.js',
+      'ale-study.css','ale-study.html','ale-study-geometry.js','ale-section-core.js')}
+
+
+def preserve(path, content):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        assert path.read_bytes() == content, str(path)
+    else:
+        path.write_bytes(content)
+
+
+def main():
+    """模块一：建立精确字节来源；只归档小型源码和实际日志。"""
+    assert not (DEST/'provenance.json').exists()
+    candidates, versions, processes, inputs, missing = {}, {}, [], {}, []
+    for directory in (ROOT/'docs/validation/v101', DEST):
+        for path in directory.rglob('*.raw'):
+            candidates.setdefault(sha(path),path)
+    folder = VAL/'view01/workbench'
+    for path in folder.rglob('*'):
+        if path.suffix in ('.js','.css','.html') and path.name not in ('ale-data.js',):
+            candidates.setdefault(sha(path),path)
+    appended = b'<script src="../ale-data.js"></script><script src="ale-study-geometry.js"></script>'
+    geometry = (folder/'geometry/index.html').read_bytes()
+    assert geometry.count(appended) == 1
+    raw = geometry.replace(appended,b'')
+    path = DEST/'raw/UI_versions'/('geometry.html.'+hashlib.sha256(raw).hexdigest()[:16]+'.raw')
+    preserve(path,raw); candidates[sha(path)] = path
+
+    def resolve(relative, expected):
+        relative = relative.replace('\\','/'); key = (relative,expected)
+        if key in versions:
+            return
+        current = ROOT/relative
+        candidate = current if current.is_file() and sha(current)==expected else candidates.get(expected)
+        if candidate is None:
+            old = subprocess.run(['git','show','HEAD:'+relative],cwd=ROOT,
+                                 stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            if old.returncode == 0 and hashlib.sha256(old.stdout).hexdigest()==expected:
+                candidate = DEST/'raw/source_versions'/(Path(relative).name+'.'+expected[:16]+'.raw')
+                preserve(candidate,old.stdout)
+        if candidate is None:
+            missing.append(dict(restorePath=relative,sha256=expected)); return
+        if str(candidate).startswith(str(VAL)):
+            archived = DEST/'raw/UI_versions'/(Path(relative).name+'.'+expected[:16]+'.raw')
+            preserve(archived,candidate.read_bytes()); candidate = archived
+        versions[key] = dict(restorePath=relative,sha256=expected,
+                             exactBytesAt=candidate.relative_to(ROOT).as_posix())
+
+    # 模块二：所有实际任务均须终态及源稳定，原始回执/日志只按字节复制。
+    for job in JOBS:
+        file = VAL/(job+'_process.json'); process = json.loads(file.read_text(encoding='utf-8-sig'))
+        assert process['status']=='terminal' and process['exitCode']==0
+        assert process['sourceStableAfter'] and all(process['sourceStableAfter'].values())
+        preserve(DEST/'raw/processes'/(file.name+'.raw'),file.read_bytes())
+        for suffix in ('.log','_stdout.log'):
+            source = VAL/(job+suffix)
+            preserve(DEST/'raw/logs'/(source.name+'.raw'),source.read_bytes())
+        required = {p:h for p,h in process['sourceSHA256'].items() if p.endswith('.m') and
+                    p != 'tests/testRocketFeatureRetentionMatrix.m'}
+        if job=='shockView102a':
+            required.update({p:h for p,h in process['sourceSHA256'].items() if p in UI})
+        for relative,digest in required.items():
+            resolve(relative,digest)
+        for relative in process['explicitInputs']:
+            expected = process['sourceSHA256'][relative]
+            assert sha(ROOT/relative)==expected, relative
+            inputs[relative] = expected
+        processes.append(dict(job=job,status='terminal',exitCode=0,
+            engineProcessIDs=process['engineProcessIDs'],wholeSnapshotStable=True,
+            exactMATLABAndUsedUIVersionsVerified=len(required),processSHA256=sha(file),
+            expression=process['expression']))
+    if missing:
+        preserve(DEST/'provenance_missing.json',(json.dumps(missing,indent=2)+'\n').encode('utf8'))
+        raise AssertionError('Missing accurate source versions: '+str(len(missing)))
+    # 模块三：小型回归参考明确为数值/解析证据，不冒称实验验证。
+    names = ('dynamics_final_audit.json','cap_coarse_audit.json','cap_fine_audit.json',
+             'cap_resumed_audit.json','motion_audit.json','export_audit.json')
+    reference = dict(kind='saved-numerical-and-analytic-regression-reference-not-experiment',
+                     audits={name:json.loads((DEST/name).read_text(encoding='utf8')) for name in names},
+                     productionQualified=False,newProductionSolvedAreaM2=0)
+    preserve(ROOT/'tests/data/shock_fitted_dynamics/reference.json',
+             (json.dumps(reference,ensure_ascii=False,indent=2)+'\n').encode('utf8'))
+    result = dict(status='passed-terminal-processes-explicit-inputs-and-exact-source-versions',
+        processes=processes,sourceVersions=list(versions.values()),explicitInputSHA256=inputs,
+        currentAuditSHA256={p:sha(ROOT/p) for p in (
+            'tests/auditShockFittedDynamics.py','tests/auditShockFittedCap.py',
+            'tests/auditShockFittedDynamicsExport.py','tests/testShockFittedDynamicsStudy.js',
+            'tests/auditShockFittedDynamicsProvenance.py')},
+        unrelatedOpenCodeTestExcluded='tests/testRocketFeatureRetentionMatrix.m is not called by these jobs',
+        allUnrelatedSnapshotBytesClaimedArchived=False,productionQualified=False,
+        newProductionSolvedAreaM2=0,goalRemainsActive=True)
+    preserve(DEST/'provenance.json',(json.dumps(result,ensure_ascii=False,indent=2)+'\n').encode('utf8'))
+    print(json.dumps(dict(status='passed',terminalProcesses=len(processes),exactSourceVersions=len(versions),
+                          explicitInputs=len(inputs),physicalQualification=False)))
+
+
+if __name__=='__main__':
+    main()

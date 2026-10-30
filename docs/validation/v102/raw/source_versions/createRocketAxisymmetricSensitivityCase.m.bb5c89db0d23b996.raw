@@ -1,0 +1,69 @@
+function item=createRocketAxisymmetricSensitivityCase(options)
+%CREATEROCKETAXISYMMETRICSENSITIVITYCASE 完整零攻角箭体的单参数敏感性工况。
+% 模块一：同一v75普通算术定常根为内部供体，单独改变网格或外域。
+% 模块二：新网格五量插值仅作初猜；真实墙、飞行、Tw、SA和方程不变。
+% 模块三：显式提供新根SHA时载入已求新根，供独立三步BE确认及导出。
+% 所有阶段都不是实验合格或真实20度横流；不给生产覆盖率增加面积。
+if nargin<1,options=struct;end
+defaults=struct('kind','radial48','rootEvidenceSHA256','');
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),fieldnames(defaults))), ...
+    'RocketSensitivity:Options','只接受明确的kind和可选新根SHA。');
+for key=fieldnames(defaults)',if ~isfield(options,key{1}),options.(key{1})=defaults.(key{1});end,end
+kind=char(options.kind);expected=char(options.rootEvidenceSHA256);
+assert(ismember(kind,{'baseline','radial48','nearwall_half','farfield1p5'}), ...
+    'RocketSensitivity:Kind','只支持已定义的单参数对照。');
+assert(isempty(expected)||~isempty(regexp(expected,'^[a-f0-9]{64}$','once')), ...
+    'RocketSensitivity:Evidence','新根SHA须为64位小写十六进制。');
+parent=createRocketAxisymmetricRootCase;
+domain=parent.domain.options;collar=parent.domain.collar.options;
+switch kind
+    case 'radial48',domain.radialLayers=48;
+    case 'nearwall_half',collar.firstNormalSpacing=collar.firstNormalSpacing/2;
+    case 'farfield1p5',domain.outerRadius=domain.outerRadius*1.5;
+end
+base=struct('initialGuess','uniform','domain',domain,'collar',collar, ...
+    'flight',parent.inputContract.flight,'solverInitialPseudoCFL',5,'solverMaximumPseudoCFL',1e6);
+item=createRocketAxisymmetricLocalCase(base);
+assert(isequaln(item.surfaceMesh,parent.surfaceMesh)&&isequal(item.domain.wallPolylineXR,parent.domain.wallPolylineXR)&& ...
+    isequal(item.boundary,parent.boundary)&&isequal(item.gas,parent.gas), ...
+    'RocketSensitivity:Inputs','敏感性工况不能改变完整源面、墙、气体或物理边界。');
+[item.Q,mapping]=mapRocketAxisymmetricInitialGuess(parent,parent.Q,item);
+study=struct('kind',kind,'referenceRootSHA256',parent.initialization.seed.sourceEvidenceSHA256, ...
+    'baselineCellCount',parent.mesh.cellCount,'cellCount',item.mesh.cellCount, ...
+    'baselineDomainOptions',parent.domain.options,'effectiveDomainOptions',domain, ...
+    'baselineCollarOptions',parent.domain.collar.options,'effectiveCollarOptions',collar, ...
+    'sameWallAndSourceSurface',true,'streamwiseRefinementPerformed',false, ...
+    'gridIndependentClaimed',false,'experimentalValidation',false,'newProductionSolvedAreaM2',0);
+item.initialization.kind='internal-v75-root-interpolated-new-grid-numerical-initial-guess';
+item.initialization.allFiveComponentsUniform=false;item.initialization.mapping=mapping;
+item.initialization.seed=struct('kind','v75-root-interpolated','sourceEvidenceSHA256',study.referenceRootSHA256, ...
+    'priorAcceptedSteps',0,'initialGuessIsBoundaryCondition',false,'externalCFDImported',false,'physicalSolution',false);
+item.initialization.initialConservedIntegralPerRadian=sum(item.Q.*item.mesh.volumePerRadian,1);
+item.gridSensitivity=study;item.caseFactory='createRocketAxisymmetricSensitivityCase';item.options=options;
+item.inputContract.gridSensitivity=study;item.inputContract.internalInitialGuess=item.initialization.seed;
+item.inputContract.interiorFluxArithmetic='double';
+if ~isempty(expected)
+    root=fileparts(fileparts(fileparts(mfilename('fullpath'))));
+    path=fullfile(root,'validation','v76',kind,'spatial_root_evidence.mat');
+    if ~exist(path,'file'),path=fullfile(root,'outputs','v76_validation',kind,'spatial_root_evidence.mat');end
+    assert(exist(path,'file')&&strcmp(fileSHA(path),expected),'RocketSensitivity:Evidence','新根胶囊缺失或改字节。');
+    d=load(path,'solution','c','sourceBindings');original=item;original.options.rootEvidenceSHA256='';
+    assert(isequaln(original,d.c)&&isequaln(d.sourceBindings,rocketSensitivitySourceBindings)&& ...
+        d.solution.spatialRootConverged&&d.solution.options.steadyResidualTolerance==2e-6&& ...
+        d.solution.options.conservationTolerance==5e-10&&isequal(d.solution.initialQ,item.Q), ...
+        'RocketSensitivity:Root','新根实际工况、计算依赖或原门槛不成立。');
+    item.Q=d.solution.Q;item.initialization.kind='internal-v76-new-grid-spatial-root-for-independent-BE-confirmation';
+    item.initialization.seed.kind='v76-sensitivity-spatial-root';
+    item.initialization.seed.sourceEvidenceSHA256=expected;
+    item.initialization.seed.priorNewtonIterations=d.solution.acceptedNewtonIterations;
+    item.initialization.seed.parentRootSHA256=study.referenceRootSHA256;
+    item.initialization.spatialRootHistory=d.solution.history;
+    item.initialization.initialConservedIntegralPerRadian=sum(item.Q.*item.mesh.volumePerRadian,1);
+    item.inputContract.internalInitialGuess=item.initialization.seed;
+    item.inputContract.initializationSolver='solveAxisymmetricSteadyNewton';
+end
+end
+function digest=fileSHA(path)
+fid=fopen(path,'rb');assert(fid>=0);guard=onCleanup(@()fclose(fid));bytes=fread(fid,Inf,'*uint8');clear guard;
+md=java.security.MessageDigest.getInstance('SHA-256');md.update(bytes);digest=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
+end

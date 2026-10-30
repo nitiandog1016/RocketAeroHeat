@@ -4,8 +4,8 @@
   const $=id=>document.getElementById(id),canvas=$('scene'),finite=x=>typeof x==='number'&&Number.isFinite(x);
   const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],fmt=x=>Number(x.toPrecision(5)).toString();
   const fieldColor=t=>{const stops=[[.94,.97,.99],[.67,.82,.90],[.28,.60,.75],[.08,.35,.56],[.025,.15,.31]],x=Math.max(0,Math.min(1,t))*4,i=Math.min(3,Math.floor(x)),f=x-i;return stops[i].map((v,j)=>v+(stops[i+1][j]-v)*f);};
-  let gl,program,positions,colorBuffer,edges,flowPositions,flowColors,bridge,model=null,vertices=[],lo,hi,initializationError='';
-  let modelCenter=[0,0,0],modelExtent=1,flowSegments=0,flowPoints=[];
+  let gl,program,positions,colorBuffer,edges,flowPositions,flowColors,sectionPositions,bridge,model=null,vertices=[],lo,hi,initializationError='';
+  let modelCenter=[0,0,0],modelExtent=1,flowSegments=0,flowPoints=[],sectionSegmentCount=0;
   let az=-Math.PI/2,el=.35,zoom=1,pan=[0,0],baseScale=1,right,up,direction,sx,sy,frame=0,pendingReport=false,drag;
   // 模块一：独立 WebGL 管线，仅使用几何法向和固定中性色，不接收物理字段。
   try{
@@ -16,7 +16,7 @@
     gl.attachShader(program,shader(gl.VERTEX_SHADER,'attribute vec3 p,c;uniform vec3 r,u,d;uniform vec2 scale,pan;varying vec3 color;void main(){gl_Position=vec4(dot(p,r)*scale.x+pan.x,dot(p,u)*scale.y+pan.y,-dot(p,d)*0.45,1.0);color=c;}'));
     gl.attachShader(program,shader(gl.FRAGMENT_SHADER,'precision mediump float;varying vec3 color;void main(){gl_FragColor=vec4(color,1.0);}'));
     gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
-    positions=gl.createBuffer();colorBuffer=gl.createBuffer();edges=gl.createBuffer();flowPositions=gl.createBuffer();flowColors=gl.createBuffer();gl.enable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
+    positions=gl.createBuffer();colorBuffer=gl.createBuffer();edges=gl.createBuffer();flowPositions=gl.createBuffer();flowColors=gl.createBuffer();sectionPositions=gl.createBuffer();gl.enable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
   }catch(e){initializationError=e.message;problem(e.message);}
   function problem(text){$('error').hidden=false;$('error').textContent=text;if(bridge)bridge.Data={kind:'geometry-error',revision:model?model.revision:0,message:text,nonce:Date.now()};}
   const buffer=(b,v)=>{gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW);};
@@ -49,12 +49,17 @@
       if(!Array.isArray(V)||!Array.isArray(F)||Boolean(V.length)!==Boolean(F.length)||V.some(v=>!Array.isArray(v)||v.length!==3||v.some(x=>!finite(x)))||F.some(f=>!Array.isArray(f)||f.length!==3||f.some(i=>!Number.isInteger(i)||i<0||i>=V.length)))throw Error('顶点坐标或三角形编号无效。');
       const field=data.faceField;
       if(field&&(!Array.isArray(field.values)||field.values.length!==F.length||field.values.some(v=>v!==null&&!finite(v))||!Array.isArray(field.range)||field.range.length!==2||!field.range.every(finite)||field.range[1]<=field.range[0]||typeof field.name!=='string'||typeof field.unit!=='string'||field.productionQualified!==false))throw Error('逐面研究场量、单位、色标或资格无效。');
-      model={vertices:V,faces:F,revision:data.revision,faceField:field||null};
+      model={vertices:V,faces:F,revision:data.revision,faceField:field||null,hasSectionOverlay:Array.isArray(data.sectionSegments)};
       if(initializationError)throw Error(initializationError);
       vertices=[];lo=[Infinity,Infinity,Infinity];hi=[-Infinity,-Infinity,-Infinity];
       V.forEach(v=>v.forEach((x,j)=>{lo[j]=Math.min(lo[j],x);hi[j]=Math.max(hi[j],x);}));
       if(V.length){const extent=Math.max(...hi.map((x,j)=>x-lo[j]));if(!(extent>0))throw Error('模型尺寸为零。');const center=lo.map((x,j)=>(x+hi[j])/2);modelCenter=center;modelExtent=extent;vertices=V.map(v=>v.map((x,j)=>(x-center[j])/extent));}
       loadFlow(data.surfaceFlowLines);
+      // 模块用途：仅叠加真实空间截面交线，保持原相机和面元拾取，不把交线当流线。
+      const sections=data.sectionSegments||[];
+      if(!Array.isArray(sections)||sections.length>100000||sections.some(s=>!Array.isArray(s)||s.length!==2||s.some(p=>!Array.isArray(p)||p.length!==3||p.some(x=>!finite(x)))))throw Error('截面交线坐标无效。');
+      sectionSegmentCount=sections.length;
+      if(gl)buffer(sectionPositions,sections.flatMap(s=>s.flatMap(p=>p.map((x,j)=>(x-modelCenter[j])/modelExtent))));
       if(gl){const ts=[],cs=[],es=[];F.forEach((f,faceIndex)=>{const a=vertices[f[0]],b=vertices[f[1]],c=vertices[f[2]],ab=b.map((x,j)=>x-a[j]),ac=c.map((x,j)=>x-a[j]);let n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];const norm=Math.hypot(...n);n=norm>0?n.map(x=>x/norm):[0,0,0];const light=.65+.22*Math.abs(dot(n,[.3,.4,.8660254])),color=field?(finite(field.values[faceIndex])?fieldColor((field.values[faceIndex]-field.range[0])/(field.range[1]-field.range[0])):[.66,.69,.72]):[.52,.60,.67].map(x=>x*light);f.forEach(i=>{ts.push(...vertices[i]);cs.push(...color);});[0,1,1,2,2,0].forEach(j=>es.push(...vertices[f[j]]));});buffer(positions,ts);buffer(colorBuffer,cs);buffer(edges,es);}
       const legend=$('fieldLegend');if(legend){legend.hidden=!field;if(field){legend.replaceChildren();const label=document.createElement('span'),bar=document.createElement('div');label.textContent=field.name+' / '+field.unit+' · 固定范围 '+fmt(field.range[0])+'—'+fmt(field.range[1])+' · 超范围使用端点色；灰色为未知';bar.className='fieldColorBar';legend.append(label,bar);}}
       $('caption').textContent=data.caption||'几何预览';$('coordinates').textContent=data.coordinateNote||'SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例';$('wire').checked=Boolean(data.showWire);
@@ -70,8 +75,9 @@
     attribute('p',positions);attribute('c',colorBuffer);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);gl.drawArrays(gl.TRIANGLES,0,model.faces.length*3);gl.disable(gl.POLYGON_OFFSET_FILL);
     if($('wire').checked){attribute('p',edges);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,[.17,.23,.29]);gl.drawArrays(gl.LINES,0,model.faces.length*6);}
     if(flowSegments){attribute('p',flowPositions);attribute('c',flowColors);gl.drawArrays(gl.LINES,0,flowSegments*2);}
+    if(sectionSegmentCount){attribute('p',sectionPositions);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,[.74,.29,.10]);gl.drawArrays(gl.LINES,0,sectionSegmentCount*2);}
     $('axes').replaceChildren();['X','Y','Z'].forEach((t,i)=>{const s=document.createElement('span');s.textContent=t;s.style.left=(32+right[i]*27)+'px';s.style.top=(32-up[i]*27)+'px';s.style.color=['#9c5046','#427357','#466d92'][i];$('axes').append(s);});
-    if(pendingReport&&bridge){pendingReport=false;const pixels=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);let visible=0;for(let i=3;i<pixels.length;i+=64)if(pixels[i])visible++;bridge.Data={kind:'geometry-rendered',revision:model.revision,faces:model.faces.length,vertices:model.vertices.length,visiblePixelSamples:visible,webglError:gl.getError(),width:w,height:h,firstVertex:model.vertices[0]||[],bounds:model.vertices.length?[lo,hi]:[],...(flowSegments?{surfaceFlowSegments:flowSegments,surfaceFlowPointCount:flowPoints.length}:{}),nonce:Date.now()};}
+    if(pendingReport&&bridge){pendingReport=false;const pixels=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);let visible=0;for(let i=3;i<pixels.length;i+=64)if(pixels[i])visible++;bridge.Data={kind:'geometry-rendered',revision:model.revision,faces:model.faces.length,vertices:model.vertices.length,visiblePixelSamples:visible,webglError:gl.getError(),width:w,height:h,firstVertex:model.vertices[0]||[],bounds:model.vertices.length?[lo,hi]:[],...(flowSegments?{surfaceFlowSegments:flowSegments,surfaceFlowPointCount:flowPoints.length}:{}),...(model.hasSectionOverlay?{sectionSegments:sectionSegmentCount}:{}),nonce:Date.now()};}
   }
   // 模块四：旋转/平移/缩放及标准视角；无持续动画或外部资源请求。
   canvas.oncontextmenu=e=>e.preventDefault();canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,pan:e.shiftKey||e.button===2||$('panMode').checked};canvas.setPointerCapture(e.pointerId);};

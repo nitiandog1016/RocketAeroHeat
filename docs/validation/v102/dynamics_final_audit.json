@@ -1,0 +1,125 @@
+{
+  "status": "passed-independent-Riemann-Sod-volume-average-ALE-CFL-and-conservation-audit",
+  "evidenceSHA256": "6d3cd601e3fa2a97734330d7ad19918aeea67f5a3db241e7c6a138a4a0072ed6",
+  "processSHA256": "10718b433fb4fc5aa000f78adc865dc3b6bdc71d513a9f7da3852e156c90b76e",
+  "shockSpeedErrorMS": 1.348325895378366e-10,
+  "tubes": [
+    {
+      "nx": 12,
+      "actualSteps": 86,
+      "conservedCellAverageL1ByPhysicalScale": [
+        0.018760790692740007,
+        0.014887038609251687,
+        0.003924840844523467,
+        0.004254812296938873,
+        0.020490921761706884
+      ],
+      "transverseRmsVelocityMS": 10.576561481162281,
+      "exactSod": {
+        "pressureStarPa": 30313.017805064683,
+        "velocityStarMS": 293.2862701245426,
+        "leftHeadMS": -374.16573867739413,
+        "leftTailMS": -22.22221452794298,
+        "rightShockMS": 554.0802928535006,
+        "leftStarDensity": 0.4263194281784952,
+        "rightStarDensity": 0.2655737117053071
+      },
+      "lastStepFluxRelativeError": 1.8160790235651586e-13,
+      "lastStepStateRelativeError": 4.262519104069601e-15,
+      "independentGCLRelative": 0.0,
+      "cflRelativeError": 1.6653345369377348e-15,
+      "cflPressureRootRelativeError": 1.9872992140790302e-13,
+      "allStepsBalanceByPhysicalScale": 2.337035727062763e-16
+    },
+    {
+      "nx": 24,
+      "actualSteps": 152,
+      "conservedCellAverageL1ByPhysicalScale": [
+        0.013209485708446947,
+        0.010531039870170228,
+        0.002353322793618546,
+        0.002562754267267466,
+        0.013930963196391751
+      ],
+      "transverseRmsVelocityMS": 6.6332704354907195,
+      "exactSod": {
+        "pressureStarPa": 30313.017805064683,
+        "velocityStarMS": 293.2862701245426,
+        "leftHeadMS": -374.16573867739413,
+        "leftTailMS": -22.22221452794298,
+        "rightShockMS": 554.0802928535006,
+        "leftStarDensity": 0.4263194281784952,
+        "rightStarDensity": 0.2655737117053071
+      },
+      "lastStepFluxRelativeError": 1.7782440409064293e-13,
+      "lastStepStateRelativeError": 5.04493968540054e-16,
+      "independentGCLRelative": 0.0,
+      "cflRelativeError": 1.2212453270876722e-15,
+      "cflPressureRootRelativeError": 1.7785772854495008e-13,
+      "allStepsBalanceByPhysicalScale": 2.3151450602959524e-16
+    },
+    {
+      "nx": 48,
+      "actualSteps": 287,
+      "conservedCellAverageL1ByPhysicalScale": [
+        0.00942056385770362,
+        0.007435604607380753,
+        0.0013020063919763846,
+        0.001411622680078324,
+        0.009237619249600816
+      ],
+      "transverseRmsVelocityMS": 3.6603554607883266,
+      "exactSod": {
+        "pressureStarPa": 30313.017805064683,
+        "velocityStarMS": 293.2862701245426,
+        "leftHeadMS": -374.16573867739413,
+        "leftTailMS": -22.22221452794298,
+        "rightShockMS": 554.0802928535006,
+        "leftStarDensity": 0.4263194281784952,
+        "rightStarDensity": 0.2655737117053071
+      },
+      "lastStepFluxRelativeError": 1.7575421415930968e-13,
+      "lastStepStateRelativeError": 2.0545449346904285e-15,
+      "independentGCLRelative": 0.0,
+      "cflRelativeError": 4.440892098500626e-16,
+      "cflPressureRootRelativeError": 1.887379141862766e-13,
+      "allStepsBalanceByPhysicalScale": 4.41181670943111e-16
+    }
+  ],
+  "transformedLastStep": {
+    "lastStepFluxRelativeError": 1.971591742880906e-13,
+    "lastStepStateRelativeError": 4.614582975983632e-15,
+    "independentGCLRelative": 1.7055753372504512e-15,
+    "cflRelativeError": 2.886579864025407e-15,
+    "cflPressureRootRelativeError": 1.9895196601282805e-13,
+    "allStepsBalanceByPhysicalScale": 2.4180673061742144e-16
+  },
+  "frameErrorByPhysicalScales": 1.4432899320127035e-15,
+  "nonuniformSharedNodeGCLRelative": 4.690447608368911e-15,
+  "supersonicUniformOutlet": {
+    "cells": 6,
+    "faces": 18,
+    "gclRelative": 0.0,
+    "fluxRelativeDifference": 3.3796132464765935e-16,
+    "stateRelativeDifference": 1.4725318648068432e-16,
+    "sweptComparisonMaximumRoundoffBudgetM3": 6.961868572213855e-20,
+    "fluxNormalization": "per-conserved-component maximum magnitude over actual reference face fluxes",
+    "fluxNormalizationScale": [
+      600.0,
+      446115.86100000003,
+      86115.86099999999,
+      86115.86099999999,
+      288843308.1
+    ],
+    "maximumAbsoluteFluxDifferenceByComponent": [
+      5.684341886080802e-14,
+      5.820766091346741e-11,
+      2.9103830456733704e-11,
+      2.9103830456733704e-11,
+      5.960464477539063e-08
+    ]
+  },
+  "exactSodComparison": "tetrahedron volume averages integrated with Beta(k,4-k) X-density; wave-front split Gauss quadrature",
+  "productionQualified": false,
+  "newProductionSolvedAreaM2": 0
+}

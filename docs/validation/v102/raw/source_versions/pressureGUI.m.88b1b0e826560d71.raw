@@ -1,0 +1,2323 @@
+function fig = pressureGUI(mesh,cfg,host)
+%PRESSUREGUI 统一框架内的压力查看页，也支持独立调用。
+% 输入：已计算压力的 mesh、cfg，以及可选宿主面板 host。
+% 输出：顶层窗口句柄。显示切换和飞行参数重设均在该窗口内进行。
+if nargin < 2, cfg = struct; end
+if ~isfield(mesh,'pressure')
+    error('RocketAeroHeat:PressureGUI:Input','请先执行 modifiedNewtonianPressure。');
+end
+p = mesh.pressure;
+mesh = integrateAerodynamicLoads(mesh,cfg);
+mesh = findStagnationRegion(mesh,p.freestream,cfg);
+if ~isfield(mesh,'externalFlow')
+    mesh=solveExternalFlow(mesh,p.freestream,cfg);
+end
+if ~isfield(mesh,'axisymmetricMarch')
+    mesh=marchAxisymmetricShockExpansion(mesh,p.freestream,cfg);
+end
+if ~isfield(mesh,'surfaceStreamlines') && ...
+        isfield(mesh.boundaryLayerEdge,'velocityVector')
+    mesh=traceSurfaceStreamlines(mesh,cfg);
+end
+% 气动热页使用同一工况；温度、算法及未计算区域均随压力同步更新。
+% 若窗口因取消飞行条件编辑而重建，只有热流边界条件逐项一致时
+% 才恢复原壁温/累计热量；不同工况的旧热历程绝不能混入新页面。
+savedThermal=struct('available',false);
+if isfield(mesh,'heating') && isfield(mesh,'wallThermal') && ...
+        isfield(mesh,'aerothermalExposure')
+    savedThermal=struct('available',true, ...
+        'heating',mesh.heating,'wall',mesh.wallThermal, ...
+        'exposure',mesh.aerothermalExposure);
+    if isfield(mesh,'flightHeatingHistory')
+        savedThermal.flightHistory=mesh.flightHeatingHistory;
+    end
+end
+mesh = calcSurfaceHeating(mesh,p.freestream,cfg);
+if savedThermal.available && ...
+        isfield(cfg,'flight') && isfield(cfg.flight,'Twall') && ...
+        isequal(savedThermal.wall.initialTemperature,cfg.flight.Twall) && ...
+        isequaln(savedThermal.heating.heatTransferCoefficient, ...
+            mesh.heating.heatTransferCoefficient) && ...
+        isequaln(savedThermal.heating.recoveryTemperature, ...
+            mesh.heating.recoveryTemperature) && ...
+        isequaln(savedThermal.heating.eligibleFace,mesh.heating.eligibleFace)
+    mesh.wallThermal=completeWallEnergyBalance(savedThermal.wall);
+    mesh=calcAerothermalExposure(mesh);
+    if isfield(savedThermal,'flightHistory')
+        mesh.flightHeatingHistory=savedThermal.flightHistory;
+    end
+end
+profiles = computePressureProfiles(mesh);
+validateattributes(p.Cp,{'numeric'},{'real','size',[size(mesh.F,1),1]});
+if nargin < 3 || isempty(host)
+    [fig,host] = createAeroHeatWindow();
+    if isfield(cfg,'pressureGUI') && isfield(cfg.pressureGUI,'visible')
+        fig.Visible = cfg.pressureGUI.visible;
+    end
+else
+    fig = ancestor(host,'figure');
+end
+hideAeroHeatPages(host); setAeroHeatStage(fig,3);
+fig.CloseRequestFcn = @(src,event)delete(src);
+
+%% 1. 自适应布局：工具栏、压力云图、状态与模型说明
+layout = uigridlayout(host,[4 1]);
+layout.RowHeight = {44,'1x',32,36};
+bar = uigridlayout(layout,[1 11]); bar.Padding = [0 0 0 0];
+legacyToolbarWidths = {0,0,185,110,100,95,170,160,155,145,'1x'};
+bar.ColumnWidth = legacyToolbarWidths;
+% 科研工作台使用自己的显示工具；顶部只保留工况和气动力入口，
+% 收起旧版禁用控件，避免小窗口中重复工具栏挤压云图与重算按钮。
+workbenchLabel=uilabel(bar,'Text','当前工况 · 三维结果与逐面元来源', ...
+    'FontWeight','bold','Visible','off');
+noseSelector=uidropdown(bar, ...
+    'Items',{'鼻区：驻点余弦延拓（对照）','鼻区：球面局部相似（0°层流）'}, ...
+    'ItemsData',{'cosineExtension','sphericalLocalSimilarity'}, ...
+    'Value',mesh.heating.noseModel,'Visible','off', ...
+    'Tooltip','仅重算当前工况；球面局部相似限定零合成攻角、已核验球鼻的连续流层流，不解后体接口，超域保持未解。', ...
+    'ValueChangedFcn',@changeNoseModel);
+selector = uidropdown(bar,'Items',{'表面压力系数 Cp','表面压力 p / kPa', ...
+    '表面压力增量 Δp / kPa','驻点候选区域','内置外流压力 p / kPa'}, ...
+    'ItemsData',[1 2 3 4 5],'Value',1,'ValueChangedFcn',@updatePlot);
+wire = uicheckbox(bar,'Text','显示网格线','ValueChangedFcn',@toggleWire);
+resetButton=uibutton(bar,'Text','重置视角','ButtonPushedFcn',@resetView);
+exportButton=uibutton(bar,'Text','导出当前图','ButtonPushedFcn',@exportPlot);
+viewSelector = uidropdown(bar,'Items',{'观察迎风侧','从 +Z 侧观察','从 -Z 侧观察'}, ...
+    'ItemsData',[1 2 3],'Value',1,'ValueChangedFcn',@resetView);
+defaultScale=1;
+if profiles.available && hypot(p.freestream.alpha,p.freestream.beta)>0.5
+    defaultScale=2;
+end
+colorScale=uidropdown(bar,'Items',{'全模型色标','柱段专用色标'}, ...
+    'ItemsData',[1 2],'Value',defaultScale,'ValueChangedFcn',@updatePlot);
+% 只改变三维坐标轴的显示比例，不改网格顶点、面元数值和点击交点。
+displayScale=uidropdown(bar, ...
+    'Items',{'真实比例 1×','径向 3×（仅显示）','径向 5×（仅显示）'}, ...
+    'ItemsData',[1 3 5],'Value',3,'ValueChangedFcn',@updateDisplayScale);
+loadToggle=uibutton(bar,'Text','显示气动力/参考量', ...
+    'ButtonPushedFcn',@toggleLoadsPanel);
+back = uibutton(bar,'Text','修改飞行条件并重新计算','ButtonPushedFcn',@changeFlight);
+baseButton=uibutton(bar,'Text','底压方法 / 条件','Visible','off', ...
+    'Tooltip','在本窗口配置底压关联与无尾撑/无喷流声明；拒绝区域保持未解，代表底热不作为全面积热流。', ...
+    'ButtonPushedFcn',@editBasePressure);
+baseButton.Layout.Row=1;baseButton.Layout.Column=3;
+% 用独立面板容纳坐标轴和色标，防止色标占用外层布局行。
+plotPanel = uipanel(layout,'BorderType','none'); plotPanel.Layout.Row = 2;
+content = uigridlayout(plotPanel,[1 2]); content.ColumnWidth={'1x',355};
+chart = uipanel(content,'BorderType','none');
+tabs=uitabgroup(chart,'Units','normalized','Position',[0 0 1 1]);
+% 自定义 WebGL 作为默认结果入口；既有专题页暂保留供核对和参数设置。
+webUI=createAerothermalWebTab(tabs,mesh);
+mapTab=uitab(tabs,'Title','压力诊断（旧版）');
+curveTab=uitab(tabs,'Title','选定截面周向压力');
+heatTab=uitab(tabs,'Title','气动热工程估算');
+wallTab=uitab(tabs,'Title','壁温响应');
+flightTab=uitab(tabs,'Title','飞行历程气动热');
+materialTab=uitab(tabs,'Title','材料物性');
+backBoundaryTab=uitab(tabs,'Title','内侧边界');
+% 内部 PDE 验证页独立保留模型来源，尚不混入现有工程热流结果。
+eulerUI=createAxisymmetricEulerTab(tabs,mesh,p.freestream);
+ax = uiaxes(mapTab,'Units','normalized','Position',[0.01 0.035 0.965 0.94]);
+curveGrid=uigridlayout(curveTab,[4 2]);
+curveGrid.RowHeight={30,'1x',34,38};
+curveGrid.ColumnWidth={'1x','1x'}; curveGrid.Padding=[12 10 12 10];
+guide=uilabel(curveGrid,'Text','点击模型选截面，或拖动滑块：尾端 → 鼻尖');
+guide.Layout.Row=1; guide.Layout.Column=1;
+curveMetric=uidropdown(curveGrid, ...
+    'Items',{'压力系数 Cp','绝对压力 p / kPa'},'ItemsData',[1 2], ...
+    'Value',1,'ValueChangedFcn',@updateSectionMetric);
+curveMetric.Layout.Row=1; curveMetric.Layout.Column=2;
+sectionPanel=uipanel(curveGrid,'BorderType','none');
+sectionPanel.Layout.Row=2; sectionPanel.Layout.Column=1;
+curvePanel=uipanel(curveGrid,'BorderType','none');
+curvePanel.Layout.Row=2; curvePanel.Layout.Column=2;
+sectionAxes=uiaxes(sectionPanel,'Units','normalized','Position',[0.015 0.055 0.94 0.92]);
+angularAxes=uiaxes(curvePanel,'Units','normalized','Position',[0.05 0.08 0.92 0.87]);
+sectionSurface=patch(sectionAxes,'Vertices',mesh.V,'Faces',mesh.F, ...
+    'FaceVertexCData',p.Cp,'FaceColor','flat','EdgeColor','none', ...
+    'ButtonDownFcn',@pickSection,'PickableParts','all','HitTest','on');
+axis(sectionAxes,'tight'); axis(sectionAxes,'equal');
+grid(sectionAxes,'on'); view(sectionAxes,[0 12]);
+camproj(sectionAxes,'orthographic');
+xlabel(sectionAxes,'X / m'); ylabel(sectionAxes,'Y / m'); zlabel(sectionAxes,'Z / m');
+colormap(sectionAxes,turbo(256)); sectionColorbar=colorbar(sectionAxes);
+hold(sectionAxes,'on');
+yzMin=min(mesh.V(:,2:3),[],1); yzMax=max(mesh.V(:,2:3),[],1);
+yzPad=0.08*max(yzMax-yzMin);
+yzMin=yzMin-yzPad; yzMax=yzMax+yzPad;
+sectionPlane=patch(sectionAxes,'Faces',[1 2 3 4], ...
+    'Vertices',zeros(4,3),'FaceColor',[1 0.28 0.42], ...
+    'FaceAlpha',0.10,'EdgeColor',[0.9 0.08 0.25],'LineWidth',1.2, ...
+    'PickableParts','none','HitTest','off');
+sectionMarker=scatter3(sectionAxes,NaN,NaN,NaN,10,[1 0.2 0.6],'filled');
+hold(sectionAxes,'off');
+sectionMarker.PickableParts='none'; sectionMarker.HitTest='off';
+sliceSlider=uislider(curveGrid,'Limits',[min(mesh.V(:,1)) max(mesh.V(:,1))], ...
+    'ValueChangedFcn',@sliderChanged,'ValueChangingFcn',@sliderMoving);
+sliceSlider.Layout.Row=3; sliceSlider.Layout.Column=[1 2];
+% 不显示拥挤的刻度；下方状态行给出精确目标 X 与实际环带范围。
+sliceSlider.MajorTicks=[]; sliceSlider.MinorTicks=[];
+stationLabel=uilabel(curveGrid,'WordWrap','on');
+stationLabel.Layout.Row=4; stationLabel.Layout.Column=[1 2];
+angularLine=plot(angularAxes,nan(36,1),nan(36,1),'-o', ...
+    'Color',[0.13 0.37 0.78],'MarkerSize',4,'LineWidth',1.4);
+xlim(angularAxes,[0 360]); grid(angularAxes,'on');
+xlabel(angularAxes,'周向角 θ / °（+Y 为 0°，+Z 为 90°）');
+ylabel(angularAxes,'面积平均 Cp');
+stations=[]; selectedProfile=[];
+initialSectionX=(min(mesh.V(:,1))+max(mesh.V(:,1)))/2;
+if isfield(cfg,'pressureGUI') && isfield(cfg.pressureGUI,'initialSectionX')
+    initialSectionX=cfg.pressureGUI.initialSectionX;
+end
+selectSection(initialSectionX);
+% 气动热结果分项显示：默认将画布留给三维云图，算法摘要始终可见。
+% 完整算法与适用范围仍在同一页按需展开，不另开窗口。
+heatGrid=uigridlayout(heatTab,[4 1]);
+heatGrid.RowHeight={35,'1x',40,0}; heatGrid.Padding=[8 6 8 6];
+heatGrid.RowSpacing=8;
+heatTop=uigridlayout(heatGrid,[1 6]); heatTop.Layout.Row=1;
+heatTop.ColumnWidth={'1x',170,105,145,150,110};
+heatTop.Padding=[0 0 0 0];
+heatChoice=uidropdown(heatTop, ...
+    'Items',{'按经验转捩选取 q / W·cm^{-2}','层流假设 q / W·cm^{-2}', ...
+    '湍流假设 q / W·cm^{-2}','外缘温度 T_e / K','可计算区域', ...
+    '外流求解方法','层流/转捩/湍流','层流压力梯度参数', ...
+    '局部附体激波角','热流面元算法','未计算原因', ...
+    '外流热物性模型','连续介质 log10(Kn)','流动稀薄程度', ...
+    '湍流积分来源','湍流摩擦系数 Cf','湍流压力梯度参数', ...
+    '湍流形状因子 H','疑似湍流分离及下游','热流计算使用的壁温 / K'}, ...
+    'ItemsData',1:20, ...
+    'Value',1,'ValueChangedFcn',@updateHeat);
+heatChoice.Layout.Column=1;
+shockPreviewCheckbox=uicheckbox(heatTop, ...
+    'Text','显示鼻端激波（放大）','Enable','off', ...
+    'ValueChangedFcn',@toggleShockPreview);
+shockPreviewCheckbox.Layout.Column=2;
+noseZoomButton=uibutton(heatTop,'Text','放大鼻端', ...
+    'ButtonPushedFcn',@zoomNose);
+noseZoomButton.Layout.Column=3;
+streamlineCheckbox=uicheckbox(heatTop, ...
+    'Text','点击显示准流线','Enable','off', ...
+    'ValueChangedFcn',@toggleStreamline);
+streamlineCheckbox.Layout.Column=4;
+heatScale=uidropdown(heatTop, ...
+    'Items',{'主体稳健色标','全模型色标'},'ItemsData',[2 1], ...
+    'Value',2,'ValueChangedFcn',@updateHeat);
+heatScale.Layout.Column=5;
+heatDetailsButton=uibutton(heatTop,'Text','展开算法说明', ...
+    'ButtonPushedFcn',@toggleHeatDetails);
+heatDetailsButton.Layout.Column=6;
+if isfield(mesh,'surfaceStreamlines') && ...
+        isfield(mesh.surfaceStreamlines,'crossingPoint')
+    streamlineCheckbox.Enable='on';
+end
+heatPlotPanel=uipanel(heatGrid,'BorderType','none','AutoResizeChildren','off');
+heatPlotPanel.Layout.Row=2;
+heatAxis=uiaxes(heatPlotPanel,'Units','normalized', ...
+    'PositionConstraint','innerposition','Position',[0.015 0.04 0.96 0.91]);
+heatValues=mesh.heating.heatFlux/1e4;
+heatSurface=patch(heatAxis,'Vertices',mesh.V,'Faces',mesh.F, ...
+    'FaceVertexCData',heatValues,'FaceColor','flat','EdgeColor','none', ...
+    'ButtonDownFcn',@pickStreamline,'PickableParts','all','HitTest','on');
+shockPreview=gobjects(1);
+heatOriginalLimits=[];
+heatOriginalCamera=[];
+heatLocalView=false;
+if isfield(mesh,'bowShockPreview') && mesh.bowShockPreview.available
+    hold(heatAxis,'on');
+    shockPreview=patch(heatAxis,'Vertices',mesh.bowShockPreview.V, ...
+        'Faces',mesh.bowShockPreview.F,'FaceColor',[0.08 0.78 0.95], ...
+        'FaceAlpha',0.32,'EdgeColor','none','Visible','off', ...
+        'PickableParts','none','HitTest','off');
+    hold(heatAxis,'off');
+    shockPreviewCheckbox.Enable='on';
+end
+hold(heatAxis,'on');
+streamlineLine=plot3(heatAxis,NaN,NaN,NaN,'-', ...
+    'Color',[0.96 0.18 0.12],'LineWidth',2.8,'Visible','off', ...
+    'PickableParts','none','HitTest','off');
+hold(heatAxis,'off');
+streamlineSelection='准流线：勾选后点击模型上的面元；红线为离散流动路径。';
+axis(heatAxis,'tight'); axis(heatAxis,'equal');
+grid(heatAxis,'on'); orientHeatToFlow();
+camproj(heatAxis,'orthographic'); colormap(heatAxis,turbo(256));
+heatColorbar=colorbar(heatAxis);
+xlabel(heatAxis,'X / m（鼻尖 +X）'); ylabel(heatAxis,'Y / m'); zlabel(heatAxis,'Z / m');
+heatSummary=uilabel(heatGrid,'Text','','WordWrap','on');
+heatSummary.Layout.Row=3;
+heatDescription=uitextarea(heatGrid,'Editable','off','Visible','off');
+heatDescription.Layout.Row=4;
+updateHeat();
+% 材料参数必须由用户给定；0 表示尚未配置，不暗中猜测材料性质。
+wallGrid=uigridlayout(wallTab,[3 2]);
+wallGrid.RowHeight={42,'1x',125}; wallGrid.ColumnWidth={'1x',310};
+wallControls=uigridlayout(wallGrid,[1 4]);
+wallControls.Layout.Row=1; wallControls.Layout.Column=[1 2];
+wallControls.ColumnWidth={'1x',205,175,145};
+wallTimeSlider=uislider(wallControls,'Limits',[0 1], ...
+    'Value',0,'Enable','off','ValueChangedFcn',@updateWallTime);
+wallTimeSlider.Layout.Column=1;
+wallTimeSlider.MajorTicks=[]; wallTimeSlider.MinorTicks=[];
+wallTimeLabel=uilabel(wallControls,'Text','先计算壁温历程');
+wallTimeLabel.Layout.Column=2;
+wallMetric=uidropdown(wallControls, ...
+    'Items',{'壁温 / K','累计净入壁 / MJ·m^{-2}', ...
+    '累计对流热量 / MJ·m^{-2}','峰值对流热流 / W·cm^{-2}', ...
+    '累计外侧辐射 / MJ·m^{-2}','背面温度 / K', ...
+    '内侧净散热 / W/cm²','累计内侧散热 / MJ/m²', ...
+    '内侧对流 / W/cm²','内侧辐射 / W/cm²'}, ...
+    'ItemsData',1:10,'Value',1, ...
+    'ValueChangedFcn',@updateWallTime);
+wallMetric.Layout.Column=3;
+wallDepthView=uicheckbox(wallControls,'Text','末时刻厚度剖面','Value',false, ...
+    'ValueChangedFcn',@updateWallTime);
+wallDepthView.Layout.Column=4;
+wallView=uigridlayout(wallGrid,[2 1]);
+wallView.Layout.Row=2; wallView.Layout.Column=1;
+wallView.RowHeight={'3x','1x'};
+wallAxis=uiaxes(wallView); wallAxis.Layout.Row=1;
+wallSurface=patch(wallAxis,'Vertices',mesh.V,'Faces',mesh.F, ...
+    'FaceVertexCData',nan(size(mesh.F,1),1),'FaceColor','flat', ...
+    'EdgeColor','none','ButtonDownFcn',@pickWallFace, ...
+    'PickableParts','all','HitTest','on');
+axis(wallAxis,'tight'); axis(wallAxis,'equal');
+grid(wallAxis,'on'); view(wallAxis,[0 12]);
+camproj(wallAxis,'orthographic'); colormap(wallAxis,turbo(256));
+wallColorbar=colorbar(wallAxis); wallColorbar.Label.String='壁温 / K';
+title(wallAxis,'填写材料参数后计算壁温');
+xlabel(wallAxis,'X / m（鼻尖 +X）'); ylabel(wallAxis,'Y / m'); zlabel(wallAxis,'Z / m');
+wallHistoryAxis=uiaxes(wallView); wallHistoryAxis.Layout.Row=2;
+title(wallHistoryAxis,'点击模型查看面元温度历程');
+xlabel(wallHistoryAxis,'时间 / s'); ylabel(wallHistoryAxis,'温度 / K');
+grid(wallHistoryAxis,'on');
+wallPanel=uipanel(wallGrid,'Title','材料参数与固定工况时间');
+wallPanel.Layout.Row=2; wallPanel.Layout.Column=2;
+wallForm=uigridlayout(wallPanel,[9 2]);
+wallForm.ColumnWidth={160,'1x'};
+wallForm.RowHeight={30,30,30,30,30,30,30,30,40};
+wallNames={'密度 / kg·m^{-3}','比热 / J·kg^{-1}·K^{-1}', ...
+    '厚度 / m','导热系数 / W·m^{-1}·K^{-1}', ...
+    '发射率 / 0–1','辐射环境温度 / K','固定工况时长 / s','固定工况时间点数'};
+wallDefaults=[0 0 0 0 0 0 10 51];
+if isfield(mesh,'wallThermal')
+    restoredMaterial=mesh.wallThermal.material;
+    wallDefaults(1:6)=[restoredMaterial.density restoredMaterial.specificHeat ...
+        restoredMaterial.thickness restoredMaterial.thermalConductivity ...
+        restoredMaterial.emissivity restoredMaterial.radiationTemperature];
+end
+wallFields=gobjects(8,1);
+wallLabels=gobjects(8,1);
+for k=1:8
+    label=uilabel(wallForm,'Text',wallNames{k});
+    wallLabels(k)=label;
+    label.Layout.Row=k; label.Layout.Column=1;
+    wallFields(k)=uieditfield(wallForm,'numeric','Value',wallDefaults(k));
+    wallFields(k).Layout.Row=k; wallFields(k).Layout.Column=2;
+end
+runWallButton=uibutton(wallForm,'Text','计算固定工况壁温','ButtonPushedFcn',@runWall);
+runWallButton.Layout.Row=9; runWallButton.Layout.Column=[1 2];
+wallDescription=uitextarea(wallGrid,'Editable','off', ...
+    'Value',{'默认算法：沿程边界层重算 + 一维厚度导热 + 隐式耦合/辐射。', ...
+    '请填写实际材料参数；该耦合比局部反馈耗时更长，完成后显示方法与覆盖范围。'});
+wallDescription.Layout.Row=3; wallDescription.Layout.Column=[1 2];
+wallSelectedFace=NaN;
+wallMetricLimits=repmat([0 1],10,1);
+% 多站飞行条件在同一窗口编辑；材料参数沿用“壁温响应”页的输入。
+flightGrid=uigridlayout(flightTab,[4 1]);
+flightGrid.RowHeight={52,175,42,'1x'};
+flightGrid.Padding=[12 10 12 10];
+flightGuide=uilabel(flightGrid,'WordWrap','on', ...
+    'Text',['先在“壁温响应”页填写材料参数，再编辑下表。' ...
+    '每一行是用户时间站；站间飞行条件线性插值，' ...
+    '按最大计算间隔增站后重算外流，壁温用右端热边界推进。']);
+flightGuide.Layout.Row=1;
+initialFlight=[0 5 10]';
+flightTable=uitable(flightGrid, ...
+    'Data',[initialFlight, ...
+        repmat(cfg.flight.altitude/1000,3,1), ...
+        repmat(cfg.flight.Mach,3,1), ...
+        repmat(cfg.flight.alpha,3,1), ...
+        repmat(cfg.flight.beta,3,1)], ...
+    'ColumnName',{'时间 / s','海拔 / km','Mach','攻角 / °','侧滑角 / °'}, ...
+    'ColumnEditable',true(1,5));
+flightTable.Layout.Row=2;
+flightButtons=uigridlayout(flightGrid,[1 5]);
+flightButtons.Layout.Row=3;
+flightButtons.ColumnWidth={120,120,130,100,'1x'};
+flightButtons.Padding=[0 0 0 0];
+addFlightButton=uibutton(flightButtons,'Text','新增时间站', ...
+    'ButtonPushedFcn',@addFlightStation);
+removeFlightButton=uibutton(flightButtons,'Text','删除末站', ...
+    'ButtonPushedFcn',@removeFlightStation);
+uilabel(flightButtons,'Text','最大计算间隔 / s');
+defaultFlightStep=1;
+if isfield(cfg,'flightHistory') && ...
+        isfield(cfg.flightHistory,'maxTimeStep')
+    defaultFlightStep=cfg.flightHistory.maxTimeStep;
+end
+maxFlightStep=uieditfield(flightButtons,'numeric','Value',defaultFlightStep);
+runFlightButton=uibutton(flightButtons,'Text','计算飞行历程并查看壁温', ...
+    'ButtonPushedFcn',@runFlightHistory);
+flightDescription=uitextarea(flightGrid,'Editable','off', ...
+    'Value',{'算法：用户站间线性插值；加密站逐站求内置外流和气动热。', ...
+    '默认每步重算沿程边界层，与一维导热/辐射隐式耦合；不求非定常激波。', ...
+    '零攻角近轴对称直鼻锥可启用轴向波系推进；结果将逐站标明是否采用。', ...
+    '结果将在“壁温响应”页显示；不依赖外部 CFD。'});
+flightDescription.Layout.Row=4;
+% 温度相关材料输入在同一框架独立标签中编辑，不挤占三维云图空间。
+materialGrid=uigridlayout(materialTab,[7 1]);
+materialGrid.RowHeight={32,130,36,32,'1x',36,105}; materialGrid.Padding=[12 10 12 10];
+layerEnabled=uicheckbox(materialGrid,'Text','使用多层结构（按外表面 → 内表面排列）', ...
+    'Value',false,'ValueChangedFcn',@updateMaterialInputMode);
+layerEnabled.Layout.Row=1;
+layerTable=uitable(materialGrid,'Data',[NaN NaN NaN NaN 8 0;NaN NaN NaN NaN 8 0], ...
+    'ColumnName',{'厚度 / m','密度 / kg·m⁻³','常数 cp / J·kg⁻¹·K⁻¹', ...
+    '常数 k / W·m⁻¹·K⁻¹','层内节点','与下一层 Rc / m²·K·W⁻¹'}, ...
+    'ColumnEditable',true(1,6),'RowName','numbered');
+layerTable.Layout.Row=2;
+layerButtons=uigridlayout(materialGrid,[1 4]); layerButtons.Layout.Row=3;
+layerButtons.ColumnWidth={120,120,180,'1x'}; layerButtons.Padding=[0 0 0 0];
+addLayerButton=uibutton(layerButtons,'Text','添加内侧层','ButtonPushedFcn',@addWallLayer);
+removeLayerButton=uibutton(layerButtons,'Text','删除最内层','ButtonPushedFcn',@removeWallLayer);
+uilabel(layerButtons,'Text','下方物性表编辑对象：');
+layerSelector=uidropdown(layerButtons,'Items',{'第 1 层（外侧）','第 2 层'}, ...
+    'ItemsData',[1 2],'Value',1,'ValueChangedFcn',@selectMaterialLayer);
+materialEnabled=uicheckbox(materialGrid,'Text', ...
+    '当前材料使用温度相关 cp(T)、k(T)（替代对应的常数 cp、k）','Value',false, ...
+    'ValueChangedFcn',@updateMaterialInputMode);
+materialEnabled.Layout.Row=4;
+materialTable=uitable(materialGrid,'Data',nan(2,3), ...
+    'ColumnName',{'温度 / K','比热 cp / J/(kg·K)','导热系数 k / W/(m·K)'}, ...
+    'ColumnEditable',true(1,3),'RowName','numbered');
+materialTable.Layout.Row=5;
+materialButtons=uigridlayout(materialGrid,[1 2]); materialButtons.Layout.Row=6;
+materialButtons.Padding=[0 0 0 0];
+addMaterialButton=uibutton(materialButtons,'Text','添加物性行','ButtonPushedFcn',@addMaterialRow);
+removeMaterialButton=uibutton(materialButtons,'Text','删除末行','ButtonPushedFcn',@removeMaterialRow);
+materialDescription=uitextarea(materialGrid,'Editable','off','Value',{ ...
+    '请输入实际材料数据；空白项不是推荐参数。多层表从外向内，末层 Rc 必须为 0；最多 10 层、共 100 个温度节点。', ...
+    '每层可独立启用温度表，启用后该层常数 cp/k 不参与求解；切换编辑层会保留物性表。温度严格递增、cp/k 为正，禁止表外外推。', ...
+    '算法：逐层比热积分储热、Kirchhoff 通量、隐式 Euler；Rc=0 共用界面温度，Rc>0 允许温差。背面边界在“内侧边界”页设置。', ...
+    '发射率/辐射环境温度在壁温页输入。多层采用逐层导热，不用单一 Biot 数分流；不含相变、烧蚀或横向导热。', ...
+    '壁温页可查看背面温度和末时刻厚度剖面；三维云图显示相应面元，厚度剖面只表示最后时刻。'});
+materialDescription.Layout.Row=7;
+% 编辑缓存仅用于保留各层独立的表；实际计算前重新验证全部层输入。
+materialEditorIndex=0;
+singleMaterialEditor=struct('enabled',false,'table',nan(2,3));
+layerMaterialEditors={singleMaterialEditor,singleMaterialEditor};
+if isfield(mesh,'wallThermal') && isfield(mesh.wallThermal.material,'layers') && ...
+        ~isempty(mesh.wallThermal.material.layers)
+    restoredLayerGrid=buildLayeredWallGrid(mesh.wallThermal.material);
+    restoredLayerRows=zeros(numel(restoredLayerGrid.layers),6);
+    layerMaterialEditors=cell(1,numel(restoredLayerGrid.layers));
+    for restoredLayerIndex=1:numel(restoredLayerGrid.layers)
+        restoredLayer=restoredLayerGrid.layers{restoredLayerIndex};
+        restoredLayerProperties=wallMaterialProperties(restoredLayer,cfg.flight.Twall);
+        restoredLayerRows(restoredLayerIndex,:)=[restoredLayer.thickness restoredLayer.density ...
+            restoredLayerProperties.specificHeat restoredLayerProperties.thermalConductivity ...
+            restoredLayer.thermalNodes 0];
+        layerMaterialEditors{restoredLayerIndex}=singleMaterialEditor;
+        if isfield(restoredLayer,'propertyTable') && ~isempty(restoredLayer.propertyTable)
+            restoredTable=restoredLayer.propertyTable;
+            layerMaterialEditors{restoredLayerIndex}=struct('enabled',true,'table', ...
+                [restoredTable.temperature(:) restoredTable.specificHeat(:) restoredTable.thermalConductivity(:)]);
+        end
+    end
+    restoredLayerRows(1:end-1,6)=restoredLayerGrid.contactResistance(:);
+    layerTable.Data=restoredLayerRows; layerEnabled.Value=true;
+    refreshLayerSelector(1);
+elseif isfield(mesh,'wallThermal') && isfield(mesh.wallThermal.material,'propertyTable')
+    restoredTable=mesh.wallThermal.material.propertyTable;
+    if ~isempty(restoredTable)
+        materialEnabled.Value=true;
+        materialTable.Data=[restoredTable.temperature(:) restoredTable.specificHeat(:) ...
+            restoredTable.thermalConductivity(:)];
+    end
+end
+updateMaterialInputMode();
+% 内侧边界使用独立标签，保持壁温页的大三维视图区。
+backBoundaryGrid=uigridlayout(backBoundaryTab,[4 1]);
+backBoundaryGrid.RowHeight={38,175,75,'1x'}; backBoundaryGrid.Padding=[16 12 16 12];
+backBoundaryEnabled=uicheckbox(backBoundaryGrid,'Text', ...
+    '启用内侧对流/辐射换热（关闭时背面绝热）','Value',false, ...
+    'ValueChangedFcn',@updateBackBoundaryMode);
+backBoundaryEnabled.Layout.Row=1;
+backBoundaryForm=uigridlayout(backBoundaryGrid,[4 2]); backBoundaryForm.Layout.Row=2;
+backBoundaryForm.ColumnWidth={300,200}; backBoundaryForm.RowHeight={34,34,34,34};
+backBoundaryForm.Padding=[0 0 0 0];
+backBoundaryLabels={'内侧换热系数 h / W·m⁻²·K⁻¹','内侧流体温度 / K', ...
+    '内侧有效辐射率 / 0–1','内侧辐射环境温度 / K'};
+backBoundaryDefaults=[0 0 0 0];
+if isfield(mesh,'wallThermal')
+    restoredBackBoundary=wallBackBoundary(mesh.wallThermal.material);
+    if restoredBackBoundary.active
+        backBoundaryEnabled.Value=true;
+        backBoundaryDefaults=[restoredBackBoundary.heatTransferCoefficient ...
+            restoredBackBoundary.fluidTemperature restoredBackBoundary.emissivity ...
+            restoredBackBoundary.radiationTemperature];
+    end
+end
+backBoundaryFields=gobjects(4,1);
+for backInputIndex=1:4
+    backInputLabel=uilabel(backBoundaryForm,'Text',backBoundaryLabels{backInputIndex});
+    backInputLabel.Layout.Row=backInputIndex; backInputLabel.Layout.Column=1;
+    backBoundaryFields(backInputIndex)=uieditfield(backBoundaryForm,'numeric', ...
+        'Value',backBoundaryDefaults(backInputIndex));
+    backBoundaryFields(backInputIndex).Layout.Row=backInputIndex;
+    backBoundaryFields(backInputIndex).Layout.Column=2;
+end
+backBoundaryGuide=uilabel(backBoundaryGrid,'WordWrap','on','Text', ...
+    ['请提供实际内环境参数；两个温度均须为正，h 可为 0，有效辐射率可为 0。' ...
+    '填写后到“壁温响应”或“飞行历程气动热”页重新计算。输入改变不会改写已有结果。']);
+backBoundaryGuide.Layout.Row=3;
+backBoundaryDescription=uitextarea(backBoundaryGrid,'Editable','off','Value',{ ...
+    '算法：q内=h内(T背面－T流体)+ε有效σ(T背面⁴－T辐射环境⁴)。正值表示材料向内环境散热，负值表示内环境加热材料。', ...
+    '外侧对流/辐射与内侧边界在同一个隐式导热时间步求解；启用后全部有效面元求完整厚度导热。', ...
+    '储热收支：材料净输入=外侧对流输入－外侧辐射散热－内侧净散热。不能把外侧净输入全部当成材料储热。', ...
+    '适用范围：内侧 h 和环境温度是用户指定的均匀常数；采用内外面积相同的平壁近似，不求内腔流动或封闭腔体辐射网络。', ...
+    '壁温页提供背面温度、内侧对流/辐射及累计散热云图；内侧热流使用零点居中的蓝白红色标，蓝色为内环境加热。', ...
+    '更改工况后，无可信外侧热流的面元仍保持未解；内侧边界不会填补外流或边界层的无解区域。'});
+backBoundaryDescription.Layout.Row=4;
+updateBackBoundaryMode();
+% 参考量可独立修改：只重新积分和归一化，不重建网格或压力。
+loadPanel = uipanel(content,'Title','压力气动力与力矩');
+loadGrid = uigridlayout(loadPanel,[9 2]);
+loadGrid.ColumnWidth={145,'1x'};
+loadGrid.RowHeight={30,30,30,30,30,36,58,'1x',42};
+ref = mesh.aerodynamicLoads.reference;
+names={'参考面积 / m²','参考长度 / m','参考点 X / m','参考点 Y / m','参考点 Z / m'};
+referenceDefaults=[ref.area ref.length ref.momentPoint]; refFields=gobjects(5,1);
+for k=1:5
+    label=uilabel(loadGrid,'Text',names{k}); label.Layout.Row=k; label.Layout.Column=1;
+    refFields(k)=uieditfield(loadGrid,'numeric','Value',referenceDefaults(k));
+    refFields(k).Layout.Row=k; refFields(k).Layout.Column=2;
+end
+applyReference=uibutton(loadGrid,'Text','应用参考量','ButtonPushedFcn',@updateReference);
+applyReference.Layout.Row=6; applyReference.Layout.Column=1;
+autoReference=uibutton(loadGrid,'Text','恢复模型自动值','ButtonPushedFcn',@restoreAutomatic);
+autoReference.Layout.Row=6; autoReference.Layout.Column=2;
+refSource=uilabel(loadGrid,'WordWrap','on'); refSource.Layout.Row=7; refSource.Layout.Column=[1 2];
+loadsTable=uitable(loadGrid,'ColumnName',{'量','数值','单位'},'ColumnWidth',{105,105,65});
+loadsTable.Layout.Row=8; loadsTable.Layout.Column=[1 2];
+scope=uilabel(loadGrid,'Text', ...
+    '载荷由当前逐面元表压积分；各面元保留独立方法；仅压力贡献，不含摩擦阻力。', ...
+    'WordWrap','on');
+scope.Layout.Row=9; scope.Layout.Column=[1 2];
+surface = patch(ax,'Vertices',mesh.V,'Faces',mesh.F,'FaceVertexCData',p.Cp, ...
+    'FaceColor','flat','EdgeColor','none','FaceLighting','none','Clipping','on');
+axis(ax,'equal'); grid(ax,'on'); colormap(ax,turbo(256)); cb = colorbar(ax);
+xlabel(ax,'X / m（鼻尖 +X）'); ylabel(ax,'Y / m'); zlabel(ax,'Z / m');
+status = uilabel(layout); status.Layout.Row = 3;
+note = uilabel(layout,'Text',sprintf( ...
+    '压力算法：%s。背风 Cp=%g，非迎风尾盖 Cp=%g；不含尾迹、遮挡和真实气体效应。', ...
+    p.model,p.leewardCp,p.aftBaseCp));
+note.Layout.Row = 4; note.WordWrap = 'on';
+if isfield(p,'baseRegion') && ~isempty(p.baseRegion)
+    note.Text=['迎风修正牛顿；底压审核：' p.baseRegion.status '；各面元压力来源可在三维探针中核对。'];
+end
+pressureNoteText=note.Text;
+% 保留框架句柄，同时公开显示控件用于自动测试。
+data = fig.UserData;
+% 同一窗口切换工况时，先移除旧页面的派生结果和选中时间索引。
+for key={'wallThermal','aerothermalExposure','flightHeatingHistory', ...
+        'wallTimeIndex','wallSelectedFace','eulerResult'}
+    if isfield(data,key{1}), data=rmfield(data,key{1}); end
+end
+data.axes = ax; data.surface = surface; data.selector = selector;
+data.wire = wire; data.colorbar = cb; data.status = status;
+data.viewSelector = viewSelector; data.changeFlight = back;
+data.resetButton=resetButton;
+data.referenceFields=refFields; data.applyReference=applyReference;
+data.autoReference=autoReference;
+data.loadsTable=loadsTable;
+data.loadsPanel=loadPanel; data.loadToggle=loadToggle;
+data.contentGrid=content;
+data.resultToolbar=bar; data.workbenchLabel=workbenchLabel;
+data.noseSelector=noseSelector; data.currentMesh=mesh; data.currentCfg=cfg;
+data.basePressureButton=baseButton;
+data.colorScale=colorScale; data.tabs=tabs; data.mapTab=mapTab;
+data.displayScale=displayScale;
+data.curveTab=curveTab; data.angularAxes=angularAxes;
+data.sectionAxes=sectionAxes; data.sectionSurface=sectionSurface;
+data.sectionMarker=sectionMarker; data.sectionPlane=sectionPlane;
+data.sectionSlider=sliceSlider;
+data.sectionMetric=curveMetric; data.stationLabel=stationLabel;
+data.sectionLine=angularLine; data.selectedProfile=selectedProfile;
+data.profiles=profiles;
+data.heatTab=heatTab; data.heatAxis=heatAxis; data.heatSurface=heatSurface;
+data.heatColorbar=heatColorbar;
+data.heatChoice=heatChoice; data.heatDescription=heatDescription;
+data.heatGrid=heatGrid; data.heatSummary=heatSummary;
+data.heatScale=heatScale; data.heatDetailsButton=heatDetailsButton;
+data.shockPreviewCheckbox=shockPreviewCheckbox;
+data.shockPreview=shockPreview;
+data.noseZoomButton=noseZoomButton;
+data.streamlineCheckbox=streamlineCheckbox;
+data.streamlineLine=streamlineLine;
+if isfield(mesh,'surfaceStreamlines')
+    data.surfaceStreamlines=mesh.surfaceStreamlines;
+end
+data.heating=mesh.heating; data.boundaryLayerEdge=mesh.boundaryLayerEdge;
+data.heatingCoverage=mesh.heatingCoverage;
+data.continuumRegime=mesh.continuumRegime;
+data.wallTab=wallTab; data.wallAxis=wallAxis; data.wallSurface=wallSurface;
+data.wallFields=wallFields; data.runWallButton=runWallButton;
+data.wallDescription=wallDescription; data.wallTimeSlider=wallTimeSlider;
+data.wallMetric=wallMetric;
+data.wallTimeLabel=wallTimeLabel; data.wallHistoryAxis=wallHistoryAxis;
+data.flightTab=flightTab; data.flightTable=flightTable;
+data.maxFlightStep=maxFlightStep;
+data.runFlightButton=runFlightButton;
+data.addFlightButton=addFlightButton;
+data.removeFlightButton=removeFlightButton;
+data.flightDescription=flightDescription;
+data.backBoundaryTab=backBoundaryTab; data.backBoundaryEnabled=backBoundaryEnabled;
+data.eulerUI=eulerUI;
+data.webUI=webUI;
+data.backBoundaryFields=backBoundaryFields; data.backBoundaryDescription=backBoundaryDescription;
+data.layerEnabled=layerEnabled; data.layerTable=layerTable; data.layerSelector=layerSelector;
+data.addLayerButton=addLayerButton; data.removeLayerButton=removeLayerButton;
+data.wallDepthView=wallDepthView;
+data.materialTab=materialTab; data.materialEnabled=materialEnabled;
+data.materialTable=materialTable; data.materialDescription=materialDescription;
+data.addMaterialButton=addMaterialButton; data.removeMaterialButton=removeMaterialButton;
+fig.UserData = data;
+% 默认让三维云图占满内容宽度；气动力与参考量可随时展开。
+loadPanel.Visible='off';
+content.ColumnWidth={'1x',0};
+content.ColumnSpacing=0;
+updatePlot(); resetView(); updateLoadsDisplay();
+% 标签页实际显示时才有可靠的像素尺寸；此时再适配整箭体相机。
+tabs.SelectionChangedFcn=@fitSelectedTab;
+tabs.SelectedTab=webUI.tab;
+fitSelectedTab([],[]);
+% 画布采用归一化位置，禁止面板二次缩放子对象；实际页面尺寸改变时
+% 重新固定内框，避免异步布局把整箭体云图挤到角落。
+heatPlotPanel.SizeChangedFcn=@(~,~)restoreHeatCanvas();
+setDisplayAspect(sectionAxes);
+setDisplayAspect(heatAxis);
+setDisplayAspect(wallAxis);
+fitWholeModelView(sectionAxes);
+fitWholeModelView(heatAxis);
+fitWholeModelView(wallAxis);
+if isfield(mesh,'wallThermal') && isfield(mesh,'aerothermalExposure')
+    showWallResult(mesh.wallThermal);
+    if isfield(mesh,'flightHeatingHistory')
+        state=fig.UserData;
+        state.flightHeatingHistory=mesh.flightHeatingHistory;
+        fig.UserData=state;
+    end
+end
+
+    function updateHeat(~,~)
+        h=mesh.heating;
+        switch heatChoice.Value
+            case 1, v=h.heatFlux/1e4; label='选取热流 q / W·cm^{-2}';
+            case 2, v=h.laminarHeatFlux/1e4; label='层流热流 q / W·cm^{-2}';
+            case 3, v=h.turbulentHeatFlux/1e4; label='湍流热流 q / W·cm^{-2}';
+            case 4, v=mesh.boundaryLayerEdge.temperature; label='外缘温度 T_e / K';
+            case 5, v=double(h.eligibleFace); label='可计算区域（1=可计算）';
+            case 6
+                if isfield(mesh.boundaryLayerEdge,'faceMethodID')
+                    v=double(mesh.boundaryLayerEdge.faceMethodID);
+                    label='外流求解方法';
+                else
+                    v=double(mesh.boundaryLayerEdge.algebraicallyValid);
+                    label='导入外流方法（1=有效，0=无解）';
+                end
+            case 7
+                v=h.transition.intermittency;
+                v(h.transition.onsetFace)=2;
+                label='经验转捩（0=层流，1=湍流，2=首次转捩）';
+            case 8
+                if isfield(mesh,'boundaryLayer')
+                    v=mesh.boundaryLayer.pressureGradientParameter;
+                else
+                    v=nan(size(h.heatFlux));
+                end
+                label='Thwaites 层流压力梯度参数 λ';
+            case 9
+                if isfield(mesh.boundaryLayerEdge,'shockAngleDeg')
+                    v=mesh.boundaryLayerEdge.shockAngleDeg;
+                else
+                    v=nan(size(h.heatFlux));
+                end
+                label='局部附体弱激波角 β / deg（含轴向压缩波，非激波面位置）';
+            case 10
+                v=double(h.faceMethodID);
+                label='热流面元算法';
+            case 11
+                v=double(mesh.heatingCoverage.reasonCode);
+                label='热流未计算的首要原因';
+            case 12
+                if isfield(mesh.boundaryLayerEdge,'thermalPropertyModeByFace')
+                    v=double(mesh.boundaryLayerEdge.thermalPropertyModeByFace);
+                    label='外流热物性模型';
+                else
+                    v=nan(size(h.heatFlux));
+                    label='当前外流未提供逐面元热物性来源';
+                end
+            case 13
+                v=log10(mesh.continuumRegime.knudsen);
+                label='log10(Kn)，较大者=自由来流/外缘平均自由程÷特征长度';
+            case 14
+                v=double(mesh.continuumRegime.applicabilityID);
+                label='连续介质适用性与流动稀薄程度';
+            case 15
+                v=nan(size(h.heatFlux));
+                if isstruct(h.turbulentBoundaryLayer)
+                    v=double(h.turbulentBoundaryLayer.sourceID);
+                end
+                label='湍流边界层积分来源';
+            case 16
+                v=nan(size(h.heatFlux));
+                if isstruct(h.turbulentBoundaryLayer)
+                    v=h.turbulentBoundaryLayer.skinFrictionCoefficient;
+                end
+                label='湍流局部摩擦系数 Cf';
+            case 17
+                v=nan(size(h.heatFlux));
+                if isstruct(h.turbulentBoundaryLayer)
+                    v=h.turbulentBoundaryLayer.adversePressureGradientParameter;
+                end
+                label='湍流压力梯度参数（正值为减速）';
+            case 18
+                v=nan(size(h.heatFlux));
+                if isstruct(h.turbulentBoundaryLayer)
+                    v=h.turbulentBoundaryLayer.shapeFactor;
+                end
+                label='湍流形状因子 H=δ*/θ（启动/平板回退取 H=1.4）';
+            case 19
+                v=zeros(size(h.heatFlux));
+                if isstruct(h.turbulentBoundaryLayer)
+                    state=h.turbulentBoundaryLayer;
+                    v(state.separationUnresolvedFace)=2;
+                    v(state.possibleSeparationFace)=1;
+                    v(state.numericalUnresolvedFace)=3;
+                end
+                label='Head 分离/积分失效筛选（0 仅表示未触发）';
+            case 20
+                v=h.wallTemperatureByFace;
+                label='当前热流评估的给定壁温 / K（不是瞬态壁温历程）';
+        end
+        heatSurface.FaceVertexCData=v;
+        finite=v(isfinite(v));
+        if isempty(finite), limits=[0 1]; else, limits=[min(finite) max(finite)]; end
+        % 连续热流与 Cf 的主体色标只改变显示上/下限，绝不裁剪计算值。
+        % 以附着侧壁为基数，避免球鼻热点掩盖长柱段的热流层次。
+        scalarHeat=ismember(heatChoice.Value,[1 2 3 16]);
+        if scalarHeat
+            heatScale.Enable='on';
+        else
+            heatScale.Enable='off';
+        end
+        clipped=false;
+        if scalarHeat && heatScale.Value==2
+            if heatChoice.Value==16
+                side=mesh.heating.turbulentFace;
+            else
+                side=mesh.heating.laminarFace | mesh.heating.turbulentFace;
+            end
+            sample=sort(v(side & isfinite(v)));
+            n=numel(sample);
+            if n>=20
+                lower=sample(1+floor(0.02*(n-1)));
+                upper=sample(1+ceil(0.98*(n-1)));
+                if upper>lower
+                    limits=[lower upper];
+                    clipped=true;
+                end
+            end
+        end
+        if limits(1)==limits(2), limits=limits+[-1 1]*max(1e-6,abs(limits(1))*0.01); end
+        clim(heatAxis,limits);
+        heatColorbar.Label.String=label;
+        if heatChoice.Value==6
+            if isfield(mesh.boundaryLayerEdge,'faceMethodID')
+                colormap(heatAxis,[0.72 0.72 0.72;0.16 0.45 0.78; ...
+                    0.98 0.58 0.08;0.83 0.16 0.13;0.43 0.21 0.68; ...
+                    0.92 0.42 0.72;0.18 0.65 0.40]);
+                clim(heatAxis,[-0.5 6.5]);
+                heatColorbar.Ticks=0:6;
+                heatColorbar.TickLabels={'无解','自由流','切锥','切楔', ...
+                    '膨胀','脱体闭合','轴向波系'};
+            else
+                colormap(heatAxis,[0.72 0.72 0.72;0.18 0.52 0.80]);
+                clim(heatAxis,[-0.5 1.5]);
+                heatColorbar.Ticks=[0 1];
+                heatColorbar.TickLabels={'无解','导入值'};
+            end
+        elseif heatChoice.Value==7
+            colormap(heatAxis,[0.16 0.48 0.86;0.89 0.24 0.16;0.99 0.77 0.12]);
+            clim(heatAxis,[-0.5 2.5]);
+            heatColorbar.Ticks=0:2;
+            heatColorbar.TickLabels={'层流','湍流','首次转捩'};
+        elseif heatChoice.Value==10
+            colormap(heatAxis,[0.72 0.72 0.72;0.18 0.52 0.80; ...
+                0.90 0.27 0.17;0.18 0.76 0.76; ...
+                0.64 0.33 0.80;0.90 0.42 0.66;0.65 0.73 0.30]);
+            clim(heatAxis,[-0.5 6.5]);
+            heatColorbar.Ticks=0:6;
+            heatColorbar.TickLabels={'未算','层流','湍流', ...
+                '球鼻延拓','脱体层流','脱体湍流','球鼻局部相似'};
+        elseif heatChoice.Value==11
+            colormap(heatAxis,[0.18 0.65 0.40;0.50 0.50 0.50; ...
+                0.55 0.32 0.65;0.95 0.61 0.15;0.80 0.16 0.16; ...
+                0.19 0.46 0.78;0.95 0.82 0.16;0.28 0.72 0.76; ...
+                0.85 0.48 0.11;0.69 0.69 0.69;0.92 0.17 0.68; ...
+                0.66 0.10 0.25;0.18 0.18 0.25;0.12 0.62 0.55]);
+            clim(heatAxis,[-0.5 13.5]);
+            heatColorbar.Ticks=0:13;
+            heatColorbar.TickLabels={'有解','端盖','几何','鼻端', ...
+                '外流','流线','层流分离','相关式','热物性','其他','稀薄流', ...
+                '湍流分离','积分失败','壁温无效'};
+        elseif heatChoice.Value==12
+            colormap(heatAxis,[0.72 0.72 0.72;0.20 0.46 0.83; ...
+                0.95 0.45 0.12;0.37 0.72 0.35]);
+            clim(heatAxis,[-0.5 3.5]);
+            heatColorbar.Ticks=0:3;
+            heatColorbar.TickLabels={'无解','定比热','NASA7','低温冻结'};
+        elseif heatChoice.Value==14
+            colormap(heatAxis,[0.72 0.72 0.72;0.18 0.65 0.40; ...
+                0.96 0.68 0.13;0.91 0.29 0.20;0.57 0.24 0.72; ...
+                0.22 0.49 0.83]);
+            clim(heatAxis,[-0.5 5.5]);
+            heatColorbar.Ticks=0:5;
+            heatColorbar.TickLabels={'无外缘','连续介质','滑移流', ...
+                '过渡流','自由分子流','上游失效影响'};
+        elseif heatChoice.Value==15
+            colormap(heatAxis,[0.72 0.72 0.72;0.20 0.64 0.34; ...
+                0.16 0.46 0.84;0.95 0.66 0.12;0.89 0.25 0.21; ...
+                0.66 0.10 0.25;0.18 0.18 0.25;0.15 0.72 0.72]);
+            clim(heatAxis,[-0.5 7.5]);
+            heatColorbar.Ticks=0:7;
+            heatColorbar.TickLabels={'非湍流/无解','层流交接', ...
+                '逐段积分','局部启动','域外平板回退','分离及下游','积分失败','域边衔接'};
+        elseif heatChoice.Value==19
+            colormap(heatAxis,[0.72 0.72 0.72;0.90 0.18 0.10; ...
+                0.98 0.65 0.15;0.28 0.20 0.45]);
+            clim(heatAxis,[-0.5 3.5]);
+            heatColorbar.Ticks=0:3;
+            heatColorbar.TickLabels={'未触发','分离起点','分离下游','数值失效'};
+            heatColorbar.Label.String='Head 筛选类别';
+        elseif heatChoice.Value==17
+            blue=[0.14 0.37 0.72]; pale=[0.97 0.97 0.96];
+            red=[0.82 0.16 0.15];
+            half=(0:127)'/127;
+            colormap(heatAxis,[blue+(pale-blue).*half; ...
+                pale+(red-pale).*half]);
+            if ~isempty(finite)
+                bound=max(abs(finite));
+                if bound>0, clim(heatAxis,[-bound bound]); end
+            end
+            heatColorbar.TicksMode='auto';
+            heatColorbar.TickLabelsMode='auto';
+        else
+            colormap(heatAxis,turbo(256));
+            heatColorbar.TicksMode='auto';
+            heatColorbar.TickLabelsMode='auto';
+        end
+        if ismember(heatChoice.Value,[13 14])
+            continuumState=mesh.continuumRegime;
+            title(heatAxis,{label,sprintf( ...
+                'Kn_{∞}=%.3g，阈值 %.3g；直接失效 %d，沿流线受影响 %d 面元', ...
+                continuumState.freestreamKnudsen, ...
+                continuumState.maxContinuumKnudsen, ...
+                continuumState.summary.directUnresolvedFaces, ...
+                continuumState.summary.downstreamUnresolvedFaces)});
+        elseif heatChoice.Value==18
+            title(heatAxis,{label,sprintf('H 有效值 %d / %d 面元；含局部平板 H=1.4 工程假设', ...
+                nnz(isfinite(v)),size(mesh.F,1))});
+        elseif heatChoice.Value==19
+            title(heatAxis,{label,'灰色仅表示未触发该筛选，不表示已有热流解'});
+        elseif heatChoice.Value==20
+            title(heatAxis,{label,sprintf('已知壁温 %d / %d 面元', ...
+                nnz(isfinite(v)),size(mesh.F,1))});
+        else
+            title(heatAxis,{label,sprintf('已计算 %d / %d 面元；空白区域未计算', ...
+                h.summary.calculatedFaces,size(mesh.F,1))});
+        end
+        if mesh.stagnationHeating.available
+            stagnationLine=sprintf('驻点：%s；q=%.3f W/cm²；Rn=%.5g m；入射角 %.1f°；单点壁温 %.1f K', ...
+                mesh.stagnationHeating.method, ...
+                mesh.stagnationHeating.heatFlux/1e4, ...
+                mesh.stagnationHeating.radius, ...
+                mesh.stagnationHeating.incidenceAngleDeg, ...
+                mesh.stagnationHeating.wallTemperature);
+            point=mesh.stagnationHeating.position;
+            stagnationPositionLine=sprintf('驻点位置 [%.4g %.4g %.4g] m；%s', ...
+                point,mesh.stagnationHeating.positionMethod);
+        else
+            stagnationLine=['驻点：' mesh.stagnationHeating.status];
+            stagnationPositionLine='驻点位置：当前模型不适用';
+        end
+        coverage=mesh.heatingCoverage;
+        unresolvedArea=coverage.areaByReason(2:end);
+        [~,reasonOrder]=sort(unresolvedArea,'descend');
+        reasonText={};
+        for j=1:min(3,numel(reasonOrder))
+            index=reasonOrder(j);
+            if unresolvedArea(index)<=0, break; end
+            reasonText{end+1}=sprintf('%s %.2f%%', ...
+                coverage.reasonNames{index+1}, ...
+                100*unresolvedArea(index)/coverage.summary.totalArea); %#ok<AGROW>
+        end
+        if isempty(reasonText), reasonText={'无'}; end
+        edgeScope='当前外缘模块未提供适用范围';
+        if isfield(mesh.boundaryLayerEdge,'scope')
+            edgeScope=mesh.boundaryLayerEdge.scope;
+        end
+        closureLine='前体脱体闭合：当前外缘未使用该方法。';
+        if isfield(mesh.boundaryLayerEdge,'detachedClosureStatus')
+            closureLine=sprintf('前体脱体闭合：%s；其中 %d 面元进入热流计算。', ...
+                mesh.boundaryLayerEdge.detachedClosureStatus, ...
+                h.summary.detachedClosureHeatFaces);
+        end
+        marchLine='轴向波系：当前没有可用的轴向推进结果。';
+        if isfield(mesh,'axisymmetricMarch')
+            marchLine=sprintf('轴向波系：%s；方法：%s。', ...
+                mesh.axisymmetricMarch.status,mesh.axisymmetricMarch.method);
+        end
+        thermalLine='外流热物性：当前外缘没有逐面元来源编号。';
+        if isfield(mesh.boundaryLayerEdge,'thermalPropertyModeByFace')
+            thermalMode=mesh.boundaryLayerEdge.thermalPropertyModeByFace;
+            thermalLine=sprintf(['外流热物性面元：NASA7 %d，' ...
+                '80~150 K 低温振动冻结 %d，定比热 %d；' ...
+                '低温近似不包含凝结与稀薄流修正。'], ...
+                nnz(thermalMode==2),nnz(thermalMode==3), ...
+                nnz(thermalMode==1));
+        end
+        separationLine='分离/再附：没有三维准流线路径，未评估下游分离影响。';
+        if isfield(h,'separationTrace') && isstruct(h.separationTrace) && ...
+                ~isempty(h.separationTrace)
+            separationLine=sprintf(['分离/再附：%s；疑似层流分离起点 %d 面元，' ...
+                '沿准流线无解 %d 面元（未假定自动再附）。'], ...
+                h.separationTrace.method, ...
+                h.separationTrace.summary.onsetFaces, ...
+                h.separationTrace.summary.unresolvedFaces);
+        end
+        continuumState=mesh.continuumRegime;
+        continuumLine=sprintf(['连续介质筛选：%s；L=%.4g m（%s），' ...
+            'Kn_{∞}=%.3g，当前阈值 %.3g；直接不适用 %d 面元，' ...
+            '沿准流线下游 %d 面元。%s'], ...
+            continuumState.method,continuumState.characteristicLength, ...
+            continuumState.lengthSource,continuumState.freestreamKnudsen, ...
+            continuumState.maxContinuumKnudsen, ...
+            continuumState.summary.directUnresolvedFaces, ...
+            continuumState.summary.downstreamUnresolvedFaces, ...
+            continuumState.scope);
+        % 摘要随当前云图切换；详细算法及限制可在同一页展开查看。
+        if heatChoice.Value==1
+            if isfield(mesh,'surfaceStreamlines')
+                summaryMethod='Eckert + 沿流线层/湍流积分 + Reynolds 比拟';
+            else
+                summaryMethod='Eckert + 局部平板 Cf + Reynolds 比拟';
+            end
+        elseif heatChoice.Value==2
+            summaryMethod=h.boundaryLayerMethod;
+        elseif heatChoice.Value==3
+            summaryMethod=h.turbulentAssumptionMethod;
+        elseif heatChoice.Value==20
+            summaryMethod=h.wallTemperatureMethod;
+        elseif heatChoice.Value==10
+            summaryMethod='逐面元区分层流、湍流、球鼻延拓和脱体闭合';
+        elseif ismember(heatChoice.Value,[15 16 17 18 19])
+            summaryMethod=h.turbulentMethod;
+        elseif ismember(heatChoice.Value,[7])
+            summaryMethod=h.transitionMethod;
+        elseif ismember(heatChoice.Value,[8])
+            summaryMethod=h.boundaryLayerMethod;
+        elseif ismember(heatChoice.Value,[13 14])
+            summaryMethod=continuumState.method;
+        else
+            if isfield(mesh.boundaryLayerEdge,'faceMethodID')
+                summaryMethod='内置切锥/切楔、膨胀及轴向波系工程外流';
+            else
+                summaryMethod='已校验的逐面元外缘状态';
+            end
+        end
+        heatSummary.Text=['当前图：' label '；算法：' summaryMethod];
+        if clipped
+            heatSummary.Text=[heatSummary.Text ...
+                '；侧壁 2–98% 色限，超出范围颜色饱和（原值不变）'];
+        end
+        turbulentLine=['湍流边界层：' h.turbulentMethod '；' h.turbulentScope];
+        if isstruct(h.turbulentBoundaryLayer)
+            count=h.turbulentBoundaryLayer.summary;
+            turbulentLine=sprintf(['湍流边界层：%s；层流交接 %d，逐段积分 %d，' ...
+                '局部启动 %d，域外平板回退 %d 面元。%s'], ...
+                h.turbulentMethod,count.laminarHandoffFaces, ...
+                count.integratedFaces,count.localStartupFaces, ...
+                count.flatPlateFallbackFaces,h.turbulentScope);
+            turbulentLine=[turbulentLine sprintf( ...
+                ' 疑似湍流分离起点 %d，含下游 %d；积分失败起点 %d，含下游 %d。', ...
+                count.separationOnsetFaces,count.separationUnresolvedFaces, ...
+                count.numericalFailureFaces,count.numericalUnresolvedFaces)];
+            turbulentLine=[turbulentLine sprintf(' 域边连续衔接 %d 面元。',count.blendedFaces)];
+        end
+        heatDescription.Value={ ...
+            ['外缘：' mesh.boundaryLayerEdge.method], ...
+            ['外缘适用范围：' edgeScope], ...
+            shockDescription(), ...
+            stagnationShockDescription(), ...
+            bowShockPreviewDescription(), ...
+            ['边界层：' h.boundaryLayerMethod], ...
+            turbulentLine, ...
+            ['热流：' h.method], ...
+            ['壁温输入：' h.wallTemperatureMethod], ...
+            ['空气热物性：' h.thermalPropertyScope], ...
+            thermalLine, ...
+            continuumLine, ...
+            closureLine, ...
+            marchLine, ...
+            sprintf('鼻端：%s；覆盖 %d 面元（低阶估算）', ...
+                h.noseMethod,h.summary.noseFaces), ...
+            ['鼻端适用范围：' h.noseScope], ...
+            sprintf('转捩：%s；Re_s=%.3g',h.transitionMethod,h.transitionRe), ...
+            sprintf(['转捩状态连续性：%s；仅传递标签的湍流面元 %d，' ...
+                '热流空白后保持湍流 %d，热流域外首次转捩 %d。%s'], ...
+                h.transition.continuityMethod, ...
+                h.transition.summary.turbulentCarrierFaces, ...
+                h.transition.summary.inheritedThroughUnavailableFaces, ...
+                h.transition.summary.onsetsOutsideHeatDomain, ...
+                h.transition.continuityScope), ...
+            separationLine, ...
+            stagnationLine, ...
+            stagnationPositionLine, ...
+            ['鼻尖半径来源：' mesh.stagnationHeating.radiusSource], ...
+            ['流线假设：' h.streamlineDistanceAssumption], ...
+            sprintf('热流面积覆盖 %.2f%%；未计算区域首要原因：%s', ...
+                100*coverage.summary.computedAreaFraction, ...
+                strjoin(reasonText,'；')), ...
+            ['空白诊断：' coverage.method '；' coverage.scope], ...
+            streamlineSelection, ...
+            ['适用范围：' h.validity]};
+    end
+
+    function toggleHeatDetails(~,~)
+        % 在统一窗口内扩展完整方法说明；关闭时归还三维画布高度。
+        if strcmp(heatDescription.Visible,'off')
+            heatGrid.RowHeight={35,'1x',40,190};
+            heatDescription.Visible='on';
+            heatDetailsButton.Text='收起算法说明';
+        else
+            heatDescription.Visible='off';
+            heatGrid.RowHeight={35,'1x',40,0};
+            heatDetailsButton.Text='展开算法说明';
+        end
+        drawnow limitrate;
+        if ~heatLocalView, fitWholeModelView(heatAxis); end
+    end
+
+    function toggleStreamline(~,~)
+        if ~streamlineCheckbox.Value
+            streamlineLine.Visible='off';
+            streamlineSelection='准流线：已隐藏；勾选后点击模型上的面元。';
+        else
+            streamlineSelection='准流线：请点击模型上的面元以显示上游路径。';
+        end
+        updateHeat();
+    end
+
+    function pickStreamline(~,event)
+        % 将面元前驱链绘成三维折线，并给出对应边界层流动距离。
+        if ~streamlineCheckbox.Value || ~isfield(mesh,'surfaceStreamlines')
+            return;
+        end
+        if isstruct(event)
+            hasPoint=isfield(event,'IntersectionPoint');
+        else
+            hasPoint=isprop(event,'IntersectionPoint');
+        end
+        if ~hasPoint, return; end
+        point=double(event.IntersectionPoint(:)');
+        ids=find(mesh.surfaceStreamlines.connectedFace);
+        if isempty(ids), return; end
+        centers=mesh.localGeometry.center(ids,:);
+        [~,nearest]=min(sum((centers-point).^2,2));
+        id=ids(nearest);
+        path=traceSurfacePath(mesh,id);
+        if path.available
+            % 绘图时沿外法向抬高少量像素对应的几何量，避免折线被表面遮住。
+            normals=mesh.localGeometry.normal(path.faceIDs,:);
+            displayNormals=zeros(size(path.points));
+            displayNormals(1,:)=normals(1,:);
+            for k=2:numel(path.faceIDs)
+                joint=normals(k-1,:)+normals(k,:);
+                displayNormals(2*k-2,:)=joint/max(norm(joint),eps);
+                displayNormals(2*k-1,:)=normals(k,:);
+            end
+            diameter=max(max(mesh.V(:,2:3))-min(mesh.V(:,2:3)));
+            displayPoints=path.points+0.012*diameter*displayNormals;
+            streamlineLine.XData=displayPoints(:,1);
+            streamlineLine.YData=displayPoints(:,2);
+            streamlineLine.ZData=displayPoints(:,3);
+            streamlineLine.Visible='on';
+            streamlineSelection=sprintf( ...
+                '准流线：面元 %d，离散路径 %.4g m；%s', ...
+                id,path.distance,path.scope);
+            if isstruct(mesh.heating.turbulentBoundaryLayer) && ...
+                    mesh.heating.turbulentBoundaryLayer.sourceID(id)>0
+                state=mesh.heating.turbulentBoundaryLayer;
+                source=state.sourceNames{double(state.sourceID(id))+1};
+                streamlineSelection=sprintf('%s；湍流 H=%.4g，Cf=%.4g，%s', ...
+                    streamlineSelection,state.shapeFactor(id),state.skinFrictionCoefficient(id),source);
+            end
+        else
+            streamlineLine.Visible='off';
+            streamlineSelection=['准流线：' path.status];
+        end
+        updateHeat();
+    end
+
+    function toggleShockPreview(~,~)
+        if ~isgraphics(shockPreview), return; end
+        if shockPreviewCheckbox.Value
+            heatLocalView=true;
+            % 鼻端半径远小于箭体全长；启用预览时放大真实几何附近。
+            heatOriginalLimits=[xlim(heatAxis);ylim(heatAxis);zlim(heatAxis)];
+            heatOriginalCamera=struct('position',heatAxis.CameraPosition, ...
+                'target',heatAxis.CameraTarget, ...
+                'angle',heatAxis.CameraViewAngle);
+            shockPreview.Visible='on';
+            b=mesh.bowShockPreview;
+            xTip=b.tipPosition(1); R=b.noseRadius;
+            xlim(heatAxis,[xTip-2.5*R,xTip+b.standOffDistance+1.2*R]);
+            ylim(heatAxis,b.tipPosition(2)+[-1.8 1.8]*R);
+            zlim(heatAxis,b.tipPosition(3)+[-1.8 1.8]*R);
+            target=[xTip-0.5*R,b.tipPosition(2:3)];
+            heatAxis.CameraTarget=target;
+            heatAxis.CameraPosition=target+R*[5 -6 4];
+            heatAxis.CameraViewAngle=33;
+        else
+            shockPreview.Visible='off';
+            if ~isempty(heatOriginalLimits)
+                xlim(heatAxis,heatOriginalLimits(1,:));
+                ylim(heatAxis,heatOriginalLimits(2,:));
+                zlim(heatAxis,heatOriginalLimits(3,:));
+                heatAxis.CameraTarget=heatOriginalCamera.target;
+                heatAxis.CameraPosition=heatOriginalCamera.position;
+                heatAxis.CameraViewAngle=heatOriginalCamera.angle;
+                heatOriginalLimits=[];
+                heatOriginalCamera=[];
+            end
+            heatLocalView=false;
+        end
+    end
+
+    function zoomNose(~,~)
+        % 球鼻热流在整箭体视图中很小；沿当前来流方向放大偏置驻点。
+        if ~mesh.stagnationHeating.available, return; end
+        if shockPreviewCheckbox.Value
+            shockPreviewCheckbox.Value=false;
+            toggleShockPreview();
+        end
+        R=mesh.stagnationHeating.radius;
+        point=mesh.stagnationHeating.position;
+        xTip=max(mesh.V(:,1));
+        xlim(heatAxis,[xTip-1.6*R,xTip+0.5*R]);
+        ylim(heatAxis,point(2)+[-1.4 1.4]*R);
+        zlim(heatAxis,point(3)+[-1.4 1.4]*R);
+        upstream=-mesh.stagnation.unitFlowDirection;
+        heatAxis.CameraTarget=point;
+        heatAxis.CameraPosition=point+R*(5*upstream+[0 0.7 0]);
+        heatAxis.CameraViewAngle=25;
+        camproj(heatAxis,'orthographic');
+        heatLocalView=true;
+    end
+
+    function line=shockDescription()
+        if isfield(mesh.boundaryLayerEdge,'shockAngleMethod')
+            line=['激波角：' mesh.boundaryLayerEdge.shockAngleMethod];
+        else
+            line='激波角：当前外流未提供局部附体激波解';
+        end
+    end
+
+    function line=stagnationShockDescription()
+        if isfield(mesh,'stagnationShock') && mesh.stagnationShock.available
+            s=mesh.stagnationShock;
+            line=sprintf(['驻点法向激波：%s；p2=%.3g kPa，T2=%.3g K，' ...
+                'M2=%.3g，p02/p01=%.3g'], ...
+                s.method,s.postShockPressure/1e3, ...
+                s.postShockTemperature,s.postShockMach,s.totalPressureRatio);
+        elseif isfield(mesh,'stagnationShock')
+            line=['驻点法向激波：' mesh.stagnationShock.status];
+        else
+            line='驻点法向激波：当前工况未计算';
+        end
+    end
+
+    function line=bowShockPreviewDescription()
+        if isfield(mesh,'bowShockPreview') && mesh.bowShockPreview.available
+            b=mesh.bowShockPreview;
+            line=sprintf('鼻端激波预览：%s；估计脱体距离 %.3f mm；仅 r<=Rn', ...
+                b.method,1e3*b.standOffDistance);
+        elseif isfield(mesh,'bowShockPreview')
+            line=['鼻端激波预览：' mesh.bowShockPreview.status];
+        else
+            line='鼻端激波预览：当前工况未计算';
+        end
+    end
+
+    function runWall(~,~)
+        try
+            entries=[wallFields.Value];
+            if entries(7)<=0 || entries(8)<2 || entries(8)>2000 || ...
+                    entries(8)~=round(entries(8))
+                error('RocketAeroHeat:WallThermal:Time', ...
+                    '总时间须为正，时间点数须为 2~2000 的整数。');
+            end
+            material=readWallMaterial(entries);
+            times=linspace(0,entries(7),entries(8));
+            wallDescription.Value={'正在迭代壁温与沿程边界层，请等待；完成后更新温度、热量与能量残差。'};
+            drawnow nocallbacks;
+            mesh=calcWallThermalResponse(mesh,times,material,cfg);
+            mesh=calcAerothermalExposure(mesh);
+            if isfield(mesh,'flightHeatingHistory')
+                mesh=rmfield(mesh,'flightHeatingHistory');
+            end
+            showWallResult(mesh.wallThermal);
+            state=fig.UserData;
+            if isfield(state,'flightHeatingHistory')
+                state=rmfield(state,'flightHeatingHistory');
+                fig.UserData=state;
+            end
+        catch ME
+            wallDescription.Value={['壁温计算失败：' ME.message]};
+            if strcmp(fig.Visible,'off'), rethrow(ME); end
+            uialert(fig,ME.message,'壁温计算输入无效');
+        end
+    end
+
+    function runFlightHistory(~,~)
+        try
+            values=double(flightTable.Data);
+            if size(values,2)~=5 || size(values,1)<2 || ...
+                    any(~isfinite(values),'all')
+                error('RocketAeroHeat:FlightHistory:Table', ...
+                    '飞行表至少需要两行、五列有限数值。');
+            end
+            entries=[wallFields.Value];
+            material=readWallMaterial(entries);
+            flightHistory=struct('time',values(:,1)', ...
+                'altitude',1000*values(:,2)', ...
+                'Mach',values(:,3)','alpha',values(:,4)', ...
+                'beta',values(:,5)');
+            runCfg=cfg;
+            if ~isfield(runCfg,'flightHistory')
+                runCfg.flightHistory=struct;
+            end
+            runCfg.flightHistory.maxTimeStep=maxFlightStep.Value;
+            flightDescription.Value={'正在计算逐站外流和沿程壁温耦合，请等待。'};
+            drawnow nocallbacks;
+            heatingHistory=calcFlightHeatingHistory(mesh,flightHistory,runCfg);
+            updated=calcWallThermalHistory(mesh,heatingHistory,material,runCfg);
+            updated=calcAerothermalExposure(updated);
+            mesh=updated;
+            cfg=runCfg;
+            [~,lowestCoverage]=min( ...
+                heatingHistory.summary.calculatedAreaFractionByStation);
+            [~,largestGap]=max( ...
+                heatingHistory.summary.reasonAreaByStation(2:end,lowestCoverage));
+            if heatingHistory.summary.reasonAreaByStation( ...
+                    largestGap+1,lowestCoverage)>0
+                gapName=heatingHistory.reasonNames{largestGap+1};
+            else
+                gapName='无';
+            end
+            % 逐站列出轴向波系算法的实际采用情况和未采用原因。
+            axialStatus=cell(1,numel(heatingHistory.time));
+            for station=1:numel(axialStatus)
+                sourceType='插值站';
+                if any(heatingHistory.stationRefinement.inputStationIndex==station)
+                    sourceType='用户站';
+                end
+                if heatingHistory.axisymmetricMarchAppliedByStation(station)
+                    axialStatus{station}=sprintf( ...
+                        '第 %d 计算站 t=%.3g s（%s）：轴向波系已采用（%d 面元）', ...
+                        station,heatingHistory.time(station),sourceType, ...
+                        heatingHistory.summary.axialMarchFacesByStation(station));
+                else
+                    axialStatus{station}=sprintf( ...
+                        '第 %d 计算站 t=%.3g s（%s）：轴向波系未采用（%s）', ...
+                        station,heatingHistory.time(station),sourceType, ...
+                        heatingHistory.axisymmetricMarchStatusByStation{station});
+                end
+            end
+            flightDescription.Value=[{ ...
+                ['逐站热流：' heatingHistory.method], ...
+                ['适用范围：' heatingHistory.scope], ...
+                sprintf(['输入 %d 站 → 内部计算 %d 站；最大间隔 %.3g s，' ...
+                    '重用相同定常工况 %d 站。'], ...
+                    heatingHistory.summary.inputStations, ...
+                    heatingHistory.summary.evaluationStations, ...
+                    heatingHistory.stationRefinement.maxTimeStep, ...
+                    heatingHistory.summary.reusedSteadyStates), ...
+                '轴向波系逐站状态：'}, axialStatus, { ...
+                sprintf('初始壁温基准各站可算面元：%s；基准全历程可算 %d 面元。', ...
+                    mat2str(heatingHistory.summary.calculatedFacesByStation), ...
+                    heatingHistory.summary.validAcrossHistory), ...
+                sprintf('初始壁温基准各站有解面积：%s %%；基准全历程有解面积 %.1f%%。', ...
+                    mat2str(round(100* ...
+                    heatingHistory.summary.calculatedAreaFractionByStation,1)), ...
+                    100*heatingHistory.summary.validAcrossHistoryAreaFraction), ...
+                sprintf('覆盖率最低站 t=%.3g s；最大空白原因：%s。', ...
+                    heatingHistory.time(lowestCoverage), ...
+                    gapName)}];
+            flightDescription.Value=[flightDescription.Value; {sprintf( ...
+                '实际热壁历程：%d 时间站，有解面积 %.1f%%；算法：%s', ...
+                numel(mesh.wallThermal.time), ...
+                100*mesh.aerothermalExposure.summary.resolvedAreaFraction, ...
+                mesh.wallThermal.method)}];
+            tabs.SelectedTab=wallTab;
+            showWallResult(mesh.wallThermal);
+            state=fig.UserData;
+            state.flightHeatingHistory=heatingHistory;
+            fig.UserData=state;
+        catch ME
+            if strcmp(fig.Visible,'off'), rethrow(ME); end
+            uialert(fig,ME.message,'飞行历程计算输入无效');
+        end
+    end
+
+    function updateBackBoundaryMode(~,~)
+        for boundaryFieldIndex=1:4
+            backBoundaryFields(boundaryFieldIndex).Enable=onOff(backBoundaryEnabled.Value);
+        end
+    end
+
+    function material=readWallMaterial(entries)
+        % 两个壁温入口共用表输入；表启用后标量 cp/k 仅作为初温参考记录。
+        updateMaterialInputMode();
+        material=struct('density',entries(1),'specificHeat',entries(2), ...
+            'thickness',entries(3),'thermalConductivity',entries(4), ...
+            'emissivity',entries(5),'radiationTemperature',entries(6));
+        material.backBoundary=struct('type','adiabatic');
+        if backBoundaryEnabled.Value
+            boundaryValues=arrayfun(@(field)field.Value,backBoundaryFields);
+            material.backBoundary=struct('type','convectionRadiation', ...
+                'heatTransferCoefficient',boundaryValues(1),'fluidTemperature',boundaryValues(2), ...
+                'emissivity',boundaryValues(3),'radiationTemperature',boundaryValues(4));
+            wallBackBoundary(material); % 两个壁温入口共用严格校验，不能猜测内环境。
+        end
+        if layerEnabled.Value
+            saveMaterialEditor();
+            layerInputRows=double(layerTable.Data);
+            if size(layerInputRows,2)~=6 || isempty(layerInputRows) || ...
+                    any(~isfinite(layerInputRows(:,[1 2 5 6])),'all') || layerInputRows(end,6)~=0
+                error('RocketAeroHeat:LayeredWall:Table','层表须有六列，厚度/密度/节点/Rc 有限；最内层 Rc 必须为 0。');
+            end
+            material.layers=cell(1,size(layerInputRows,1));
+            for readLayerIndex=1:size(layerInputRows,1)
+                readLayer=struct('thickness',layerInputRows(readLayerIndex,1), ...
+                    'density',layerInputRows(readLayerIndex,2),'specificHeat',layerInputRows(readLayerIndex,3), ...
+                    'thermalConductivity',layerInputRows(readLayerIndex,4),'thermalNodes',layerInputRows(readLayerIndex,5));
+                if layerMaterialEditors{readLayerIndex}.enabled
+                    readLayerTable=layerMaterialEditors{readLayerIndex}.table;
+                    readLayer.propertyTable=struct('temperature',readLayerTable(:,1), ...
+                        'specificHeat',readLayerTable(:,2),'thermalConductivity',readLayerTable(:,3));
+                end
+                material.layers{readLayerIndex}=readLayer;
+            end
+            material.contactResistance=layerInputRows(1:end-1,6)';
+            material=normalizeLayeredWallMaterial(material,cfg.flight.Twall);
+            wallFields(1).Value=material.density; wallFields(2).Value=material.specificHeat;
+            wallFields(3).Value=material.thickness; wallFields(4).Value=material.thermalConductivity;
+        elseif materialEnabled.Value
+            tableValues=double(materialTable.Data);
+            if size(tableValues,2)~=3 || size(tableValues,1)<2
+                error('RocketAeroHeat:Material:Table','材料物性表至少两行、三列。');
+            end
+            material.propertyTable=struct('temperature',tableValues(:,1), ...
+                'specificHeat',tableValues(:,2),'thermalConductivity',tableValues(:,3));
+            initialProperties=wallMaterialProperties(material,cfg.flight.Twall);
+            material.specificHeat=initialProperties.specificHeat;
+            material.thermalConductivity=initialProperties.thermalConductivity;
+            wallFields(2).Value=material.specificHeat;
+            wallFields(4).Value=material.thermalConductivity;
+        end
+    end
+
+    function updateMaterialInputMode(~,~)
+        % 切换单层/多层时保留独立编辑数据；参考标量不参与多层求解。
+        if layerEnabled.Value && materialEditorIndex==0
+            saveMaterialEditor(); loadMaterialEditor(layerSelector.Value);
+        elseif ~layerEnabled.Value && materialEditorIndex>0
+            saveMaterialEditor(); loadMaterialEditor(0);
+        end
+        for inputFieldIndex=1:4
+            wallFields(inputFieldIndex).Enable='on';
+            wallLabels(inputFieldIndex).Text=wallNames{inputFieldIndex};
+        end
+        layerTable.Enable=onOff(layerEnabled.Value);
+        layerSelector.Enable=onOff(layerEnabled.Value);
+        addLayerButton.Enable=onOff(layerEnabled.Value);
+        removeLayerButton.Enable=onOff(layerEnabled.Value);
+        if layerEnabled.Value
+            for inputFieldIndex=1:4, wallFields(inputFieldIndex).Enable='off'; end
+            wallLabels(1).Text='参考平均密度（不用于求解）';
+            wallLabels(2).Text='初温参考 cp（不用于求解）';
+            wallLabels(3).Text='各层总厚度 / m';
+            wallLabels(4).Text='参考等效 k（不用于求解）';
+        elseif materialEnabled.Value
+            wallFields(2).Enable='off'; wallFields(4).Enable='off';
+            wallLabels(2).Text='初温比热 cp（按表）';
+            wallLabels(4).Text='初温导热 k（按表）';
+        end
+    end
+
+    function saveMaterialEditor()
+        editorSnapshot=struct('enabled',materialEnabled.Value,'table',double(materialTable.Data));
+        if materialEditorIndex==0, singleMaterialEditor=editorSnapshot;
+        else, layerMaterialEditors{materialEditorIndex}=editorSnapshot; end
+    end
+
+    function loadMaterialEditor(editorTarget)
+        materialEditorIndex=editorTarget;
+        if editorTarget==0, editorSnapshot=singleMaterialEditor;
+        else, editorSnapshot=layerMaterialEditors{editorTarget}; end
+        materialEnabled.Value=editorSnapshot.enabled; materialTable.Data=editorSnapshot.table;
+    end
+
+    function selectMaterialLayer(~,~)
+        saveMaterialEditor(); loadMaterialEditor(layerSelector.Value);
+        updateMaterialInputMode();
+    end
+
+    function refreshLayerSelector(targetLayer)
+        layerCount=size(layerTable.Data,1);
+        layerSelector.Items=arrayfun(@(n)sprintf('第 %d 层',n),1:layerCount,'UniformOutput',false);
+        layerSelector.Items{1}='第 1 层（外侧）';
+        layerSelector.ItemsData=1:layerCount; layerSelector.Value=targetLayer;
+    end
+
+    function addWallLayer(~,~)
+        if size(layerTable.Data,1)>=10, return; end
+        saveMaterialEditor();
+        layerTable.Data=[layerTable.Data;NaN NaN NaN NaN 8 0];
+        layerMaterialEditors{end+1}=struct('enabled',false,'table',nan(2,3));
+        refreshLayerSelector(size(layerTable.Data,1));
+        loadMaterialEditor(layerSelector.Value);
+    end
+
+    function removeWallLayer(~,~)
+        if size(layerTable.Data,1)<=1, return; end
+        saveMaterialEditor(); layerTable.Data(end,:)=[];
+        layerTable.Data(end,6)=0; layerMaterialEditors(end)=[];
+        refreshLayerSelector(min(materialEditorIndex,size(layerTable.Data,1)));
+        loadMaterialEditor(layerSelector.Value);
+    end
+
+    function switchValue=onOff(enabledValue)
+        switchValue='off'; if enabledValue, switchValue='on'; end
+    end
+
+    function addMaterialRow(~,~)
+        materialTable.Data=[materialTable.Data;NaN NaN NaN];
+    end
+
+    function removeMaterialRow(~,~)
+        if size(materialTable.Data,1)>2, materialTable.Data(end,:)=[]; end
+    end
+
+    function addFlightStation(~,~)
+        % 复制上一站工况，并按上一段时间间隔增加一个可编辑站点。
+        values=double(flightTable.Data);
+        next=values(end,:);
+        next(1)=next(1)+max(1,values(end,1)-values(end-1,1));
+        flightTable.Data=[values;next];
+    end
+
+    function removeFlightStation(~,~)
+        values=double(flightTable.Data);
+        if size(values,1)>2
+            flightTable.Data=values(1:end-1,:);
+        end
+    end
+
+    function showWallResult(wall)
+        % 固定和变工况共用热暴露统计、色标、时间滑块和说明。
+        updateAerothermalWebTab(webUI,mesh);
+        exposure=mesh.aerothermalExposure;
+        metricValues={wall.temperature, ...
+            exposure.cumulativeNetHeat/1e6, ...
+            exposure.cumulativeConvectiveHeat/1e6, ...
+            [wall.convectiveHeatFlux(:,1), ...
+            exposure.peakConvectiveHeatFlux]/1e4, ...
+            exposure.cumulativeRadiativeHeat/1e6,backTemperatureHistory(wall), ...
+            wall.backHeatFlux/1e4,exposure.cumulativeBackHeat/1e6, ...
+            wall.backConvectiveHeatFlux/1e4,wall.backRadiativeHeatFlux/1e4};
+        for metric=1:10
+            values=metricValues{metric};
+            finite=values(isfinite(values));
+            if isempty(finite), limits=[0 1];
+            else, limits=[min(finite) max(finite)]; end
+            if limits(1)==limits(2)
+                limits=limits+[-1 1]*max(1e-6,abs(limits(1))*0.01);
+            end
+            if ismember(metric,[1 6]) && diff(limits)<.1
+                % 近乎未升温时，不把微开尔文差异放大成明显冷热区。
+                limits=mean(limits)+[-.05 .05];
+            end
+            if metric>=7
+                signedSpan=max(abs(limits)); limits=[-signedSpan signedSpan];
+            end
+            wallMetricLimits(metric,:)=limits;
+        end
+        validIDs=find(wall.validFace);
+        if isempty(validIDs)
+            wallSelectedFace=NaN;
+        else
+            [~,hotIndex]=max(wall.temperature(validIDs,end));
+            wallSelectedFace=validIDs(hotIndex);
+        end
+        wallTimeSlider.Value=1;
+        wallTimeSlider.Limits=[1 numel(wall.time)];
+        wallTimeSlider.Value=numel(wall.time);
+        wallTimeSlider.Enable='on';
+        updateWallTime();
+        maxBi=NaN;
+        if any(wall.validFace)
+            maxBi=max(wall.maximumEstimatedBiot(wall.validFace));
+        end
+        if wall.stagnationPoint.available
+            pointLine=sprintf('驻点单点末温：%.2f K；末时刻净热流 %.3f W/cm²。', ...
+                wall.stagnationPoint.temperature(end), ...
+                wall.stagnationPoint.netHeatFlux(end)/1e4);
+        else
+            pointLine=['驻点单点：' wall.stagnationPoint.status];
+        end
+        biotLine=sprintf('壁温反馈：%d；最大估计 Bi=%.3g。',wall.wallTemperatureFeedback,maxBi);
+        if isfield(wall.material,'layers') && ~isempty(wall.material.layers)
+            biotLine='多层结构采用逐层导热，不用单一 Biot 数分流。';
+        elseif wall.backBoundary.active
+            biotLine='内侧换热启用：全部有效面元使用完整一维导热，不用单一 Biot 数分流。';
+        end
+        wallDescription.Value={['壁温算法：' wall.method], ...
+            ['热量积分：' exposure.method], ...
+            ['适用范围：' wall.scope], ...
+            biotLine, ...
+            sprintf('已计算 %d 面元；其中 %d 面元使用一维厚度导热。', ...
+                wall.summary.calculatedFaces,wall.summary.oneDimensionalFaces), ...
+            sprintf('已求解面积 %.1f%%；该区域累计净能量 %.4g kJ；最大储热闭合差 %.3g J/m²。', ...
+                100*exposure.summary.resolvedAreaFraction, ...
+                exposure.summary.totalNetEnergyResolved/1e3, ...
+                exposure.summary.maximumEnergyBalanceResidual), ...
+            sprintf('该区域累计对流输入 %.4g kJ；辐射散出 %.4g kJ。', ...
+                exposure.summary.totalConvectiveEnergyResolved/1e3, ...
+                exposure.summary.totalRadiativeEnergyResolved/1e3), ...
+            pointLine};
+        wallDescription.Value=[wallDescription.Value; {['内侧边界：' wall.backBoundary.method]}; ...
+            {sprintf('内侧累计净散热 %.4g kJ（对流 %.4g、辐射 %.4g）；负值表示内环境加热。', ...
+            exposure.summary.totalBackEnergyResolved/1e3, ...
+            exposure.summary.totalBackConvectiveEnergyResolved/1e3, ...
+            exposure.summary.totalBackRadiativeEnergyResolved/1e3)}; {wall.energyConvention}];
+        if isfield(wall,'materialMethod')
+            wallDescription.Value=[wallDescription.Value; {['材料物性：' wall.materialMethod]}];
+        end
+        if isfield(wall,'coupling')
+            wallDescription.Value=[wallDescription.Value; {sprintf( ...
+                '沿程耦合：最多 %d 次/步；时间细分 %d 次；途中失效 %d 面元，整条历程留空。', ...
+                max(wall.coupling.iterationsByStep),wall.coupling.timeSubdivisions, ...
+                nnz(wall.coupling.lostFace))}; ...
+                {['末时刻热边界：' wall.coupling.finalHeating.method]}; ...
+                {['湍流闭合：' wall.coupling.finalHeating.turbulentMethod]}];
+        end
+        assignin('base','mesh',mesh);
+        state=fig.UserData;
+        state.wallThermal=wall;
+        state.aerothermalExposure=exposure;
+        fig.UserData=state;
+    end
+
+    function updateWallTime(~,~)
+        % 滑块与结果选择只切换已计算的温度/热量，不重新求解外流。
+        if ~isfield(mesh,'wallThermal') || ...
+                ~isfield(mesh,'aerothermalExposure'), return; end
+        wall=mesh.wallThermal;
+        exposure=mesh.aerothermalExposure;
+        index=max(1,min(numel(wall.time),round(wallTimeSlider.Value)));
+        metric=wallMetric.Value;
+        switch metric
+            case 1
+                values=wall.temperature(:,index);
+                label='壁温 / K';
+                history=wall.temperature;
+                pointHistory=nan(1,numel(wall.time));
+                if wall.stagnationPoint.available
+                    pointHistory=wall.stagnationPoint.temperature;
+                end
+            case 2
+                values=exposure.cumulativeNetHeat(:,index)/1e6;
+                label='累计净入壁 / MJ·m^{-2}';
+                history=exposure.cumulativeNetHeat/1e6;
+                pointHistory=nan(1,numel(wall.time));
+                if exposure.stagnationPoint.available
+                    pointHistory= ...
+                        exposure.stagnationPoint.cumulativeNetHeat/1e6;
+                end
+            case 3
+                values=exposure.cumulativeConvectiveHeat(:,index)/1e6;
+                label='累计对流热量 / MJ·m^{-2}';
+                history=exposure.cumulativeConvectiveHeat/1e6;
+                pointHistory=nan(1,numel(wall.time));
+                if exposure.stagnationPoint.available
+                    pointHistory= ...
+                        exposure.stagnationPoint.cumulativeConvectiveHeat/1e6;
+                end
+            case 4
+                % 峰值是从起始时刻到滑块时刻的采样点最大值。
+                % 这样云图、时间标签和下方曲线始终指向同一时间范围。
+                history=cummax(wall.convectiveHeatFlux,2)/1e4;
+                values=history(:,index);
+                label='截至当前时刻峰值对流热流 / W·cm^{-2}';
+                pointHistory=nan(1,numel(wall.time));
+                if wall.stagnationPoint.available
+                    pointHistory=cummax( ...
+                        wall.stagnationPoint.convectiveHeatFlux)/1e4;
+                end
+            case 6
+                history=backTemperatureHistory(wall);
+                values=history(:,index); label='背面温度 / K';
+                pointHistory=nan(1,numel(wall.time));
+            case {7,9,10}
+                componentNames={'backHeatFlux','backConvectiveHeatFlux','backRadiativeHeatFlux'};
+                componentLabels={'内侧净散热 / W·cm^{-2}','内侧对流 / W·cm^{-2}','内侧辐射 / W·cm^{-2}'};
+                componentIndex=find([7 9 10]==metric);
+                history=wall.(componentNames{componentIndex})/1e4;
+                values=history(:,index); label=componentLabels{componentIndex};
+                pointHistory=nan(1,numel(wall.time));
+                if wall.stagnationPoint.available && isfield(wall.stagnationPoint,componentNames{componentIndex})
+                    pointHistory=wall.stagnationPoint.(componentNames{componentIndex})/1e4;
+                end
+            case 8
+                history=exposure.cumulativeBackHeat/1e6;
+                values=history(:,index); label='累计内侧散热 / MJ·m^{-2}';
+                pointHistory=nan(1,numel(wall.time));
+                if exposure.stagnationPoint.available && isfield(exposure.stagnationPoint,'cumulativeBackHeat')
+                    pointHistory=exposure.stagnationPoint.cumulativeBackHeat/1e6;
+                end
+            otherwise
+                values=exposure.cumulativeRadiativeHeat(:,index)/1e6;
+                label='累计辐射散热 / MJ·m^{-2}';
+                history=exposure.cumulativeRadiativeHeat/1e6;
+                pointHistory=nan(1,numel(wall.time));
+                if exposure.stagnationPoint.available
+                    pointHistory= ...
+                        exposure.stagnationPoint.cumulativeRadiativeHeat/1e6;
+                end
+        end
+        wallSurface.FaceVertexCData=values;
+        clim(wallAxis,wallMetricLimits(metric,:));
+        if metric>=7
+            backMapSpan=linspace(0,1,128)'; backBlue=[.14 .4 .82]; backPale=[.98 .98 .98]; backRed=[.84 .18 .13];
+            colormap(wallAxis,[backBlue+(backPale-backBlue).*backMapSpan; ...
+                backPale+(backRed-backPale).*backMapSpan]);
+        else
+            colormap(wallAxis,turbo(256));
+        end
+        wallColorbar.Label.String=label;
+        wallTicks=linspace(wallMetricLimits(metric,1),wallMetricLimits(metric,2),6);
+        colorNumberFormat='%.4g';
+        if ismember(metric,[1 6]), colorNumberFormat='%.2f'; end
+        if metric>=7
+            % 对称色标保留精确零刻度，避免科学记数尾数被挤出画布。
+            wallTicks=linspace(wallMetricLimits(metric,1),wallMetricLimits(metric,2),5);
+            wallTicks(3)=0; colorNumberFormat='%.3g';
+        end
+        wallColorbar.Ticks=wallTicks;
+        wallColorbar.TickLabels=arrayfun(@(v)sprintf(colorNumberFormat,v), ...
+            wallTicks,'UniformOutput',false);
+        title(wallAxis,{label,sprintf('t=%.3g s；已计算 %d / %d 面元', ...
+            wall.time(index),wall.summary.calculatedFaces,size(mesh.F,1))});
+        % allchild 包括不进图例的时间/界面标记，避免切图后残留。
+        delete(allchild(wallHistoryAxis)); legend(wallHistoryAxis,'off');
+        wallHistoryAxis.XLimMode='auto'; wallHistoryAxis.YLimMode='auto';
+        hold(wallHistoryAxis,'on');
+        labels={};
+        if isfinite(wallSelectedFace) && wall.validFace(wallSelectedFace)
+            plot(wallHistoryAxis,wall.time, ...
+                history(wallSelectedFace,:),'-', ...
+                'LineWidth',1.7,'Color',[0.13 0.38 0.82]);
+            labels{end+1}='选定面元'; %#ok<AGROW>
+        end
+        if all(isfinite(pointHistory))
+            plot(wallHistoryAxis,wall.time, ...
+                pointHistory,'-', ...
+                'LineWidth',1.7,'Color',[0.86 0.25 0.13]);
+            labels{end+1}='驻点单点'; %#ok<AGROW>
+        end
+        xline(wallHistoryAxis,wall.time(index),'--k','HandleVisibility','off');
+        hold(wallHistoryAxis,'off');
+        if ~isempty(labels), legend(wallHistoryAxis,labels,'Location','best'); end
+        grid(wallHistoryAxis,'on');
+        xlabel(wallHistoryAxis,'时间 / s');
+        xlim(wallHistoryAxis,[wall.time(1) wall.time(end)]);
+        ylabel(wallHistoryAxis,label);
+        if isfinite(wallSelectedFace)
+            faceText=sprintf('面元 %d',wallSelectedFace);
+        else
+            faceText='没有可计算的面元';
+        end
+        historyTitle=[faceText ' 温度/热量历程'];
+        if wall.stagnationPoint.available, historyTitle=[faceText ' 与驻点单点历程']; end
+        title(wallHistoryAxis,historyTitle);
+        if isfield(wall,'coupling') && isfinite(wallSelectedFace) && ...
+                wall.validFace(wallSelectedFace)
+            % 读取当前时间、当前面元的来源，不能用末时刻方法冒充整条历程。
+            c=wall.coupling; finalHeat=c.finalHeating;
+            id=double(c.faceMethodIDHistory(wallSelectedFace,index));
+            algorithm=finalHeat.faceMethodNames{id+1};
+            source=double(c.turbulentSourceIDHistory(wallSelectedFace,index));
+            if source>0 && isstruct(finalHeat.turbulentBoundaryLayer)
+                algorithm=[algorithm '；' finalHeat.turbulentBoundaryLayer.sourceNames{source+1}];
+            end
+            title(wallHistoryAxis,{historyTitle,['当前热流：' algorithm]},'FontSize',11);
+        end
+        if metric>=7
+            title(wallHistoryAxis,{historyTitle,wall.backBoundary.method},'FontSize',11);
+        elseif metric==6
+            title(wallHistoryAxis,{historyTitle,['背面温度：一维导热；' wall.backBoundary.method]},'FontSize',11);
+        end
+        if wallDepthView.Value
+            showFinalDepthProfile(wall);
+        elseif metric==1 && isfinite(wallSelectedFace) && wall.validFace(wallSelectedFace)
+            backCurve=backTemperatureHistory(wall);
+            if all(isfinite(backCurve(wallSelectedFace,:)))
+                hold(wallHistoryAxis,'on');
+                plot(wallHistoryAxis,wall.time,backCurve(wallSelectedFace,:),'--', ...
+                    'LineWidth',1.5,'Color',[0.12 .6 .35]);
+                hold(wallHistoryAxis,'off');
+                labels{end+1}='选定面元背面';
+                legend(wallHistoryAxis,labels,'Location','best');
+            end
+        end
+        wallTimeLabel.Text=sprintf('t=%.3g s / %.3g s；%s', ...
+            wall.time(index),wall.time(end),faceText);
+        state=fig.UserData;
+        state.wallTimeIndex=index;
+        state.wallSelectedFace=wallSelectedFace;
+        fig.UserData=state;
+    end
+
+    function backResult=backTemperatureHistory(wallData)
+        % 背面历程只在保存了完整逐层结果时显示；缺失数据不复制表面温度。
+        backResult=nan(size(wallData.temperature));
+        if isfield(wallData,'backTemperature')
+            backResult=wallData.backTemperature; return;
+        end
+        if isfield(wallData.oneDimensional,'backTemperature')
+            backResult(wallData.oneDimensionalFace,:)=wallData.oneDimensional.backTemperature;
+        end
+    end
+
+    function showFinalDepthProfile(wallData)
+        % 只保存最终剖面；图题明确最终时间，滑块仍只控制三维历程。
+        delete(allchild(wallHistoryAxis)); legend(wallHistoryAxis,'off');
+        wallHistoryAxis.XLimMode='auto'; wallHistoryAxis.YLimMode='auto';
+        depthFaces=find(wallData.oneDimensionalFace);
+        depthRow=find(depthFaces==wallSelectedFace,1);
+        if isempty(depthRow) || ~isfield(wallData.oneDimensional,'finalDepthTemperature')
+            title(wallHistoryAxis,'选定面元没有可用的厚度剖面'); return;
+        end
+        depthData=wallData.oneDimensional;
+        plot(wallHistoryAxis,depthData.depth*1000,depthData.finalDepthTemperature(depthRow,:), ...
+            '-o','LineWidth',1.6,'MarkerSize',3);
+        xlabel(wallHistoryAxis,'从外表面向内的深度 / mm'); ylabel(wallHistoryAxis,'温度 / K');
+        title(wallHistoryAxis,sprintf('面元 %d：末时刻 t=%.3g s 厚度剖面（不随时间滑块改变）', ...
+            wallSelectedFace,wallData.time(end)),'FontSize',11);
+        grid(wallHistoryAxis,'on');
+        if isfield(depthData,'materialGrid')
+            hold(wallHistoryAxis,'on');
+            for depthInterfaceIndex=1:size(depthData.materialGrid.interfaceNodes,1)
+                depthInterfaceNode=depthData.materialGrid.interfaceNodes(depthInterfaceIndex,1);
+                xline(wallHistoryAxis,depthData.depth(depthInterfaceNode)*1000,':', ...
+                    sprintf('界面 %d',depthInterfaceIndex),'HandleVisibility','off');
+            end
+            hold(wallHistoryAxis,'off');
+        end
+    end
+
+    function pickWallFace(~,event)
+        % 点击三维壁温图时，选取离点击位置最近的有效三角面。
+        if ~isfield(mesh,'wallThermal')
+            return;
+        end
+        if isstruct(event)
+            hasPoint=isfield(event,'IntersectionPoint');
+        else
+            hasPoint=isprop(event,'IntersectionPoint');
+        end
+        if ~hasPoint, return; end
+        wall=mesh.wallThermal;
+        ids=find(wall.validFace);
+        if isempty(ids), return; end
+        point=double(event.IntersectionPoint(:)');
+        centers=mesh.localGeometry.center(ids,:);
+        [~,nearest]=min(sum((centers-point).^2,2));
+        wallSelectedFace=ids(nearest);
+        updateWallTime();
+    end
+
+%% 参考量应用：成功后才更新状态，非法值保留原结果
+    function updateReference(~,~)
+        candidate=cfg;
+        candidate.aerodynamics.referenceArea=refFields(1).Value;
+        candidate.aerodynamics.referenceLength=refFields(2).Value;
+        candidate.aerodynamics.momentReference=[refFields(3:5).Value];
+        try
+            updatedMesh=integrateAerodynamicLoads(mesh,candidate);
+            mesh=updatedMesh; cfg=candidate;
+            assignin('base','mesh',mesh); assignin('base','cfg',cfg);
+            updateLoadsDisplay();
+        catch ME
+            uialert(fig,ME.message,'参考量无效');
+        end
+    end
+    function updateLoadsDisplay()
+        loads=mesh.aerodynamicLoads;
+        labels={'Fx';'Fy';'Fz';'阻力 D';'侧向力 Y';'升力 L';'Mx';'My';'Mz'; ...
+            'Cx';'Cy';'Cz';'CD';'CY';'CL';'CMx';'CMy';'CMz'};
+        numbers=[loads.forceBody loads.forceWind loads.momentBody ...
+            loads.forceCoefficientBody loads.CD loads.CY loads.CL loads.momentCoefficientBody]';
+        units=[repmat({'N'},6,1);repmat({'N·m'},3,1);repmat({'—'},9,1)];
+        loadsTable.Data=[labels,num2cell(numbers),units];
+        refSource.Text=sprintf('面积：%s；长度：%s；参考点：%s', ...
+            loads.reference.areaSource,loads.reference.lengthSource,loads.reference.pointSource);
+        scope.Text=loads.description;
+    end
+    function restoreAutomatic(~,~)
+        candidate=cfg;
+        if isfield(candidate,'aerodynamics')
+            keys=intersect(fieldnames(candidate.aerodynamics), ...
+                {'referenceArea','referenceLength','momentReference'});
+            if ~isempty(keys), candidate.aerodynamics=rmfield(candidate.aerodynamics,keys); end
+        end
+        updatedMesh=integrateAerodynamicLoads(mesh,candidate);
+        mesh=updatedMesh; cfg=candidate;
+        ref=mesh.aerodynamicLoads.reference; values=[ref.area ref.length ref.momentPoint];
+        for index=1:5, refFields(index).Value=values(index); end
+        assignin('base','mesh',mesh); assignin('base','cfg',cfg);
+        updateLoadsDisplay();
+    end
+
+%% 2. 显示切换：面元常值着色，不做平滑插值
+    function updatePlot(~,~)
+        switch selector.Value
+            case 1, values = p.Cp; label = '压力系数 Cp';
+            case 2, values = p.staticPressure/1000; label = '绝对压力 p / kPa';
+            case 3, values = p.pressureIncrement/1000; label = '压力增量 Δp / kPa';
+            case 4
+                values=double(mesh.stagnation.candidateFace);
+                label='驻点候选区域（1=候选，0=其他；并非精确驻点）';
+            otherwise
+                values=mesh.boundaryLayerEdge.pressure/1000;
+                label='内置外流压力 p / kPa';
+        end
+        surface.FaceVertexCData = values;
+        finiteValues=values(isfinite(values));
+        if isempty(finiteValues), limits=[0 1];
+        else, limits=[min(finiteValues) max(finiteValues)]; end
+        if limits(1)==limits(2), limits=limits+[-1 1]*max(1e-6,abs(limits(1))*0.01); end
+        if (selector.Value<=3 || selector.Value==5) && ...
+                colorScale.Value==2 && profiles.available
+            switch selector.Value
+                case 1
+                    limits=profiles.cylinderCpRange;
+                case 2
+                    limits=p.freestreamPressure/1000 + ...
+                        p.dynamicPressure/1000*profiles.cylinderCpRange;
+                case 3
+                    limits=p.dynamicPressure/1000*profiles.cylinderCpRange;
+                otherwise
+                    cylinderValues=values(profiles.cylinderMask & isfinite(values));
+                    if ~isempty(cylinderValues)
+                        limits=[min(cylinderValues) max(cylinderValues)];
+                    end
+            end
+            if limits(1)==limits(2)
+                limits=limits+[-1 1]*max(1e-6,abs(limits(1))*0.01);
+            end
+            label=[label '（柱段范围；鼻部超出色标会饱和）'];
+        end
+        clim(ax,limits); cb.Label.String = label;
+        if selector.Value<=3 || selector.Value==5, colorScale.Enable='on';
+        else, colorScale.Enable='off'; end
+        if selector.Value==5
+            title(ax,{label,sprintf('M=%.3f | alpha=%.2f° | beta=%.2f° | %s', ...
+                p.freestream.Mach,p.freestream.alpha,p.freestream.beta, ...
+                mesh.boundaryLayerEdge.method)});
+        else
+            title(ax,{label,sprintf('M=%.3f | alpha=%.2f° | beta=%.2f° | Cp,max=%.4f', ...
+                p.freestream.Mach,p.freestream.alpha,p.freestream.beta,p.CpMax)});
+        end
+        status.Text = sprintf('%d 面元 | 最小 %.6g，最大 %.6g | 空气方向 [% .3f % .3f % .3f]', ...
+            size(mesh.F,1),limits(1),limits(2),mesh.aerothermalRegion.unitFlowDirection);
+        if selector.Value==4
+            s=mesh.stagnation;
+            status.Text=sprintf('候选面 %d | 连通区域 %d | 最大迎流 mu=%.4f | 代表面 %d | %s', ...
+                nnz(s.candidateFace),s.numberComponents,s.peakMu,s.representativeFaceID,s.radiusSource);
+            colormap(ax,[0.75 0.78 0.82;0.95 0.18 0.08]);
+            clim(ax,[0 1]); cb.Ticks=[0 1]; cb.TickLabels={'其他','候选'};
+            focusCandidate();
+        else
+            colormap(ax,turbo(256)); cb.TicksMode='auto'; cb.TickLabelsMode='auto';
+            if selector.Value==5
+                state=mesh.boundaryLayerEdge;
+                status.Text=sprintf('%s | %s | 有效 %d/%d；空白为无附体解', ...
+                    status.Text,state.method,nnz(state.algebraicallyValid),numel(values));
+            end
+            if (selector.Value<=3 || selector.Value==5) && ...
+                    colorScale.Value==2 && profiles.available
+                status.Text=sprintf('%s | 柱段色标 %.4g～%.4g；鼻部超出范围会饱和', ...
+                    status.Text,limits(1),limits(2));
+            end
+            resetView();
+        end
+        status.Text=sprintf('%s | 径向显示倍率 %g×（仅显示）', ...
+            status.Text,displayScale.Value);
+    end
+    function selectSection(targetX)
+        % 点击与滑块都落到最近实际环带；面元范围和样本数同步显示。
+        [selectedProfile,stations]=computeCircumferentialPressure(mesh,targetX,stations);
+        sliceSlider.Value=min(max(targetX,sliceSlider.Limits(1)),sliceSlider.Limits(2));
+        ids=selectedProfile.faceIDs;
+        nodes=unique(mesh.F(ids,:));
+        sectionMarker.XData=mesh.V(nodes,1);
+        sectionMarker.YData=mesh.V(nodes,2);
+        sectionMarker.ZData=mesh.V(nodes,3);
+        sectionPlane.Vertices=[ ...
+            selectedProfile.stationX yzMin(1) yzMin(2); ...
+            selectedProfile.stationX yzMax(1) yzMin(2); ...
+            selectedProfile.stationX yzMax(1) yzMax(2); ...
+            selectedProfile.stationX yzMin(1) yzMax(2)];
+        updateSectionMetric();
+        stationLabel.Text=sprintf( ...
+            '目标 X=%.4f m → 实际取样 X=%.4f m（范围 %.4f～%.4f m）；%d 面元，周向覆盖 %.0f%%。%s', ...
+            targetX,selectedProfile.stationX,selectedProfile.xRange(1), ...
+            selectedProfile.xRange(2),selectedProfile.faceCount, ...
+            100*selectedProfile.coverage,selectedProfile.message);
+        if isstruct(fig.UserData)
+            state=fig.UserData; state.selectedProfile=selectedProfile; fig.UserData=state;
+        end
+    end
+    function sliderMoving(~,event)
+        selectSection(event.Value);
+    end
+    function sliderChanged(src,~)
+        selectSection(src.Value);
+    end
+    function pickSection(~,event)
+        % 图面点击提供三维交点；老版本 MATLAB 则取坐标轴当前点。
+        hasPoint=(isobject(event) && isprop(event,'IntersectionPoint')) || ...
+            (isstruct(event) && isfield(event,'IntersectionPoint'));
+        if hasPoint && numel(event.IntersectionPoint)>=3
+            clickedX=event.IntersectionPoint(1);
+        else
+            point=sectionAxes.CurrentPoint; clickedX=point(1,1);
+        end
+        if isfinite(clickedX), selectSection(clickedX); end
+    end
+    function updateSectionMetric(~,~)
+        if isempty(selectedProfile), return; end
+        if curveMetric.Value==1
+            values=p.Cp; curve=selectedProfile.Cp;
+            label='压力系数 Cp';
+        else
+            values=p.staticPressure/1000;
+            curve=selectedProfile.staticPressurePa/1000;
+            label='绝对压力 p / kPa';
+        end
+        sectionSurface.FaceVertexCData=values;
+        limits=[min(values) max(values)];
+        if limits(1)==limits(2)
+            limits=limits+[-1 1]*max(1e-6,abs(limits(1))*0.01);
+        end
+        clim(sectionAxes,limits); sectionColorbar.Label.String=label;
+        angularLine.XData=selectedProfile.angleDeg;
+        angularLine.YData=curve;
+        ylabel(angularAxes,['面积平均 ' label]);
+        title(angularAxes,sprintf('X=%.4f m 的周向分布：%s', ...
+            selectedProfile.stationX,label));
+        title(sectionAxes,'点击三维表面选择轴向位置');
+    end
+    function toggleWire(~,~)
+        if wire.Value, surface.EdgeColor=[0.25 0.25 0.25]; else, surface.EdgeColor='none'; end
+        sectionSurface.EdgeColor=surface.EdgeColor;
+    end
+    function toggleLoadsPanel(~,~)
+        % 显示载荷时分出右侧列；隐藏后把宽度立即还给三维图。
+        if strcmp(loadPanel.Visible,'off')
+            content.ColumnWidth={'1x',355};
+            content.ColumnSpacing=10;
+            loadPanel.Visible='on';
+            loadToggle.Text='隐藏气动力/参考量';
+        else
+            loadPanel.Visible='off';
+            content.ColumnWidth={'1x',0};
+            content.ColumnSpacing=0;
+            loadToggle.Text='显示气动力/参考量';
+        end
+        drawnow limitrate;
+    end
+    function updateDisplayScale(~,~)
+        % 倍率只用于坐标轴的数据纵横比；所有图元仍保留真实 X/Y/Z。
+        % 若鼻端局部视图已经打开，先恢复整箭体相机，再按新比例适配。
+        if shockPreviewCheckbox.Value
+            shockPreviewCheckbox.Value=false;
+            toggleShockPreview();
+        end
+        if heatLocalView
+            heatLocalView=false;
+            axis(heatAxis,'normal'); axis(heatAxis,'tight');
+            orientHeatToFlow(); camproj(heatAxis,'orthographic');
+        end
+        threeDAxes=[ax sectionAxes heatAxis wallAxis];
+        for index=1:numel(threeDAxes)
+            setDisplayAspect(threeDAxes(index));
+            fitWholeModelView(threeDAxes(index));
+        end
+        updatePlot();
+    end
+    function setDisplayAspect(viewAxis)
+        % DataAspectRatio=[s 1 1] 使 Y/Z 在屏幕上相对 X 放大 s 倍。
+        % MATLAB 的 IntersectionPoint 仍返回原始模型坐标。
+        viewAxis.DataAspectRatio=[displayScale.Value 1 1];
+    end
+    function orientHeatToFlow()
+        % 非零攻角从迎风侧观察，使偏置鼻端热点位于可见面。
+        % 零攻角略提高俯角，在长箭体侧视中显示圆柱三维曲率。
+        flow=mesh.aerothermalRegion.unitFlowDirection;
+        transverse=norm(flow(2:3));
+        if transverse>1e-8
+            direction=[-0.1 -flow(2)/transverse -flow(3)/transverse];
+            view(heatAxis,direction);
+            heatAxis.CameraUpVector=cross(direction,[1 0 0]);
+        else
+            view(heatAxis,[0 18]);
+        end
+    end
+    function restoreHeatCanvas()
+        % MATLAB 在鼻端局部放大后会因 axis equal 和色标联动缩小
+        % uiaxes 的 Position；明确恢复归一化画布和色标位置。
+        if ~isgraphics(heatAxis) || ~isgraphics(heatColorbar), return; end
+        heatColorbar.Units='normalized';
+        heatColorbar.Position=[0.925 0.063 0.014 0.865];
+        heatAxis.Units='normalized';
+        heatAxis.PositionConstraint='innerposition';
+        heatAxis.Position=[0.015 0.04 0.885 0.91];
+    end
+    function resetView(~,~)
+        if tabs.SelectedTab==curveTab
+            axis(sectionAxes,'tight'); axis(sectionAxes,'equal');
+            setDisplayAspect(sectionAxes);
+            view(sectionAxes,[0 12]); camproj(sectionAxes,'orthographic');
+            fitWholeModelView(sectionAxes);
+            return;
+        end
+        if tabs.SelectedTab==heatTab
+            if shockPreviewCheckbox.Value
+                shockPreviewCheckbox.Value=false;
+                toggleShockPreview();
+            end
+            heatLocalView=false;
+            axis(heatAxis,'normal'); axis(heatAxis,'tight');
+            setDisplayAspect(heatAxis);
+            orientHeatToFlow(); camproj(heatAxis,'orthographic');
+            fitWholeModelView(heatAxis);
+            return;
+        end
+        if tabs.SelectedTab==wallTab
+            axis(wallAxis,'tight'); axis(wallAxis,'equal');
+            setDisplayAspect(wallAxis);
+            view(wallAxis,[0 12]); camproj(wallAxis,'orthographic');
+            fitWholeModelView(wallAxis);
+            return;
+        end
+        if selector.Value==4, focusCandidate(); return; end
+        axis(ax,'tight'); axis(ax,'equal'); setDisplayAspect(ax);
+        camproj(ax,'orthographic');
+        switch viewSelector.Value
+            case 2, view(ax,[0 35]);
+            case 3, view(ax,[0 -35]);
+            otherwise
+                flow=mesh.aerothermalRegion.unitFlowDirection; transverse=norm(flow(2:3));
+                if transverse>1e-8
+                    cameraDirection=[-0.1 -flow(2)/transverse -flow(3)/transverse];
+                    view(ax,cameraDirection);
+                    % 自动的近极轴上方向可能把箭体竖起来；固定 +X 向右。
+                    ax.CameraUpVector=cross(cameraDirection,[1 0 0]);
+                else
+                    view(ax,[0 12]);
+                end
+        end
+        fitWholeModelView(ax);
+    end
+    function fitSelectedTab(~,~)
+        % UI Grid 在页面切换后才给坐标轴分配真实宽高。
+        drawnow limitrate;
+        % Euler 页有自己的数值场和工具，不让顶部工程压力控件混淆来源。
+        pressureControls=[selector,wire,resetButton,exportButton,viewSelector,colorScale,displayScale];
+        % 切换页面时恢复原布局；WebGL 和 Euler 页只展示有实际用途的入口。
+        bar.ColumnWidth=legacyToolbarWidths;
+        set(pressureControls,'Visible','on');
+        workbenchLabel.Visible='off';noseSelector.Visible='off';baseButton.Visible='off';
+        loadToggle.Visible='on';loadToggle.Enable='on';
+        if tabs.SelectedTab==webUI.tab
+            set(pressureControls,'Enable','off','Visible','off');
+            bar.ColumnWidth={'1x',230,145,0,0,0,0,0,0,155,245};
+            workbenchLabel.Visible='on';
+            noseSelector.Visible='on';
+            baseButton.Visible='on';
+            if strcmp(loadPanel.Visible,'on'),toggleLoadsPanel();end
+            note.Text='自定义 WebGL：面元常值、真实比例；灰色区域未解，给定边界与工程计算分开统计。';
+            if isfield(p,'baseRegion') && ~isempty(p.baseRegion)
+                note.Text=['底压审核：' p.baseRegion.status '。代表底热不作为底面热流。'];
+            end
+            status.Text='请使用工作台内的旋转/缩放、色标和探针；热响应末时刻与单点工况分开标注。';
+        elseif tabs.SelectedTab==eulerUI.tab
+            set(pressureControls,'Enable','off','Visible','off');
+            bar.ColumnWidth={'1x',0,0,0,0,0,0,0,0,0,245};
+            workbenchLabel.Visible='on';loadToggle.Visible='off';
+            if strcmp(loadPanel.Visible,'on'),toggleLoadsPanel();end
+            note.Text='本页：内部轴对称 Euler PDE、定比热完全气体；每次计算独立检查残差与边界，尚不驱动气动热。';
+            status.Text='Euler 图使用真实比例；请使用页内显示/导出控件。既有工程压力与热流保留各自方法。';
+        else
+            set(pressureControls,'Enable','on');note.Text=pressureNoteText;updatePlot();
+        end
+        if tabs.SelectedTab==mapTab
+            fitWholeModelView(ax);
+        elseif tabs.SelectedTab==curveTab
+            fitWholeModelView(sectionAxes);
+        elseif tabs.SelectedTab==heatTab && ~heatLocalView
+            fitWholeModelView(heatAxis);
+        elseif tabs.SelectedTab==wallTab
+            fitWholeModelView(wallAxis);
+        end
+    end
+    function fitWholeModelView(viewAxis)
+        % 根据模型在当前观察方向的投影与坐标轴实际像素比例设定正交相机。
+        % 长细比、窗口大小和色标预留均参与计算；不会把不同 STL 的
+        % 视角固定成某一个角度，也不改鼻端激波的局部放大范围。
+        bounds=[min(mesh.V,[],1);max(mesh.V,[],1)];
+        middle=mean(bounds,1);
+        viewAxis.CameraTarget=middle;
+        camPos=viewAxis.CameraPosition;
+        % 投影包围盒和相机距离采用显示空间，才能在径向放大后完整入框。
+        displayWeights=[1 displayScale.Value displayScale.Value];
+        direction=(camPos-middle).*displayWeights;
+        distance=norm(direction);
+        if ~(isfinite(distance) && distance>0), return; end
+        direction=direction/distance;
+        right=cross(viewAxis.CameraUpVector.*displayWeights,direction);
+        if norm(right)<1e-10, return; end
+        right=right/norm(right);
+        up=cross(direction,right);
+        [xb,yb,zb]=ndgrid(bounds(:,1),bounds(:,2),bounds(:,3));
+        corners=([xb(:),yb(:),zb(:)]-middle).*displayWeights;
+        halfWidth=max(abs(corners*right'));
+        halfHeight=max(abs(corners*up'));
+        % 隐藏的标签页可能暂时只有 MATLAB 的 260 px 占位尺寸。
+        % 以主窗口尺寸估算可用空间，并仅在实际面板已完成布局时
+        % 使用其精确尺寸，避免首次切页时模型被缩成一小条。
+        canvasWidth=max(400,fig.Position(3)-70);
+        canvasHeight=max(240,fig.Position(4)-210);
+        if strcmp(loadPanel.Visible,'on'), canvasWidth=canvasWidth-365; end
+        if viewAxis==sectionAxes
+            estimate=[0 0 0.49*canvasWidth-20 0.75*canvasHeight];
+        elseif viewAxis==wallAxis
+            estimate=[0 0 canvasWidth-320 0.52*canvasHeight];
+        elseif viewAxis==heatAxis
+            estimate=[0 0 canvasWidth-20 0.65*canvasHeight];
+        else
+            estimate=[0 0 canvasWidth 0.85*canvasHeight];
+        end
+        pixels=getpixelposition(viewAxis.Parent,true);
+        if pixels(3)<0.7*estimate(3) || pixels(4)<0.7*estimate(4)
+            pixels=estimate;
+        end
+        % 标签、刻度和色标占去一部分矩形；保留 18%% 安全边距。
+        usableWidth=max(100,pixels(3)-145);
+        usableHeight=max(100,pixels(4)-85);
+        aspect=usableWidth/usableHeight;
+        safetyFraction=0.82;
+        if viewAxis==ax
+            % 压力页比热流页高；MATLAB 的等比例 plot box 会额外展宽。
+            % 为色标及两端留足空间，避免整箭体压到色标上。
+            safetyFraction=0.64;
+        end
+        neededHalfHeight=max(halfHeight,halfWidth/aspect)/safetyFraction;
+        viewAxis.CameraViewAngle=min(60,max(0.5, ...
+            2*atand(neededHalfHeight/distance)));
+        if viewAxis==heatAxis, restoreHeatCanvas(); end
+    end
+    function focusCandidate()
+        % 自动放大候选局部并从来流上游观察，避免小鼻尖在全长图中不可见。
+        nodes=unique(mesh.F(mesh.stagnation.candidateFace,:));
+        points=mesh.V(nodes,:); lower=min(points,[],1); upper=max(points,[],1);
+        middle=(lower+upper)/2;
+        width=max(max(upper-lower)*0.8,max(max(mesh.V)-min(mesh.V))*0.003);
+        xlim(ax,middle(1)+[-width width]); ylim(ax,middle(2)+[-width width]);
+        zlim(ax,middle(3)+[-width width]);
+        axis(ax,'equal'); setDisplayAspect(ax);
+        view(ax,-mesh.stagnation.unitFlowDirection); camproj(ax,'orthographic');
+    end
+    function exportPlot(~,~)
+        [file,path]=uiputfile('*.png','保存压力分布图','pressure.png');
+        if isequal(file,0), return; end
+        if tabs.SelectedTab==mapTab
+            exportgraphics(ax,fullfile(path,file),'Resolution',200);
+        else
+            exportapp(fig,fullfile(path,file));
+        end
+    end
+
+%% 3. 同一窗口内重设飞行条件，确认后重算，取消则恢复旧结果
+    function editBasePressure(~,~)
+        % 模块作用：在统一宿主内配置区域方法与不可从STL推断的工况输入。
+        % 新页不启动另一窗口；确认后独立重建当前压力及热边界，取消恢复。
+        hideAeroHeatPages(host);
+        page=uipanel(host,'Units','normalized','Position',[0 0 1 1], ...
+            'Title','底压方法与适用工况','BackgroundColor',[.96 .97 .98]);
+        grid=uigridlayout(page,[8 2]);grid.ColumnWidth={220,'1x'};
+        grid.RowHeight={34,34,34,34,34,'1x',42,36};grid.Padding=[24 18 24 18];
+        keys={'底压方法','外流/热流空气物性','是否有尾撑','是否有底部喷流','操作声明来源'};
+        for j=1:5
+            lab=uilabel(grid,'Text',keys{j});lab.Layout.Row=j;lab.Layout.Column=1;
+        end
+        currentModel='prescribed';bp=struct;
+        if isfield(cfg,'basePressure'),bp=cfg.basePressure;end
+        if isfield(bp,'model'),currentModel=bp.model;end
+        model=uidropdown(grid,'Items',{'给定尾底Cp（明确边界输入）','SAND93-0280层流尖锥底压'}, ...
+            'ItemsData',{'prescribed','sand93Laminar'},'Value',currentModel);
+        model.Layout.Row=1;model.Layout.Column=2;
+        [airMode,~]=selectAirThermalModel(p.freestream,cfg);
+        thermal=uidropdown(grid,'Items',{'NASA7变比热空气','定比热空气'}, ...
+            'ItemsData',{'thermallyPerfect','caloricallyPerfect'},'Value',airMode);
+        thermal.Layout.Row=2;thermal.Layout.Column=2;
+        support=uidropdown(grid,'Items',{'未声明','无尾撑','有尾撑'}, ...
+            'ItemsData',{'unknown','no','yes'},'Value',operationValue(bp,'hasRearSupport'));
+        support.Layout.Row=3;support.Layout.Column=2;
+        injection=uidropdown(grid,'Items',{'未声明','无底部喷流','有底部喷流'}, ...
+            'ItemsData',{'unknown','no','yes'},'Value',operationValue(bp,'hasGasInjection'));
+        injection.Layout.Row=4;injection.Layout.Column=2;
+        source='';if isfield(bp,'operationSource'),source=char(bp.operationSource);end
+        sourceField=uieditfield(grid,'text','Value',source, ...
+            'Placeholder','填写工况依据；STL不能证明发动机状态或试验尾撑');
+        sourceField.Layout.Row=5;sourceField.Layout.Column=2;
+        help=uitextarea(grid,'Editable','off','Value',{ ...
+            '本模块计算底面压力，不把代表底热当作底面径向热流分布。', ...
+            '当前接入范围：零攻角/侧滑、真实孤立尖头直圆锥、9~10°半锥角、平圆底、定比热gamma=1.4空气。', ...
+            '内部求肩部Taylor–Maccoll流动、按当前Re经验阈值审核层流，并解物理剖面审核delta/rb≤0.05。该厚度门限是本实现工程接受准则。', ...
+            '操作声明是用户输入，不标为程序求解；选择定比热会同步重算全工况外流和热流。', ...
+            '未通过审核的尾底压力保持NaN；没有给定Cp回退。缺失压力时总气动力/力矩保持未解。', ...
+            ['当前底压模型：' currentModel]});
+        help.Layout.Row=6;help.Layout.Column=[1 2];
+        apply=uibutton(grid,'Text','应用并重算当前工况','ButtonPushedFcn',@applyBase);
+        apply.Layout.Row=7;apply.Layout.Column=2;
+        cancel=uibutton(grid,'Text','取消，返回原结果','ButtonPushedFcn',@cancelBase);
+        cancel.Layout.Row=7;cancel.Layout.Column=1;
+        progress=uilabel(grid,'Text','所有长度采用m；重新计算保留真实网格和当前飞行条件。','WordWrap','on');
+        progress.Layout.Row=8;progress.Layout.Column=[1 2];
+        fig.UserData.basePressureEditor=struct('page',page,'model',model, ...
+            'thermalModel',thermal,'support',support,'injection',injection, ...
+            'source',sourceField,'apply',apply,'cancel',cancel);
+        function applyBase(~,~)
+            nextCfg=cfg;nextCfg.basePressure=bp;nextCfg.basePressure.model=model.Value;
+            nextCfg.basePressure.operationSource=sourceField.Value;
+            for entry={'hasRearSupport','hasGasInjection'}
+                key=entry{1};control=support;if strcmp(key,'hasGasInjection'),control=injection;end
+                if strcmp(control.Value,'unknown')
+                    if isfield(nextCfg.basePressure,key),nextCfg.basePressure=rmfield(nextCfg.basePressure,key);end
+                else
+                    nextCfg.basePressure.(key)=strcmp(control.Value,'yes');
+                end
+            end
+            nextCfg.heating.airThermalModel=thermal.Value;
+            apply.Enable='off';cancel.Enable='off';progress.Text='正在审核底区并重算当前工况…';drawnow;
+            try
+                updated=calcFlightStationState(mesh,nextCfg.flight,nextCfg);
+                pressureGUI(updated,nextCfg,host);
+                assignin('base','mesh',fig.UserData.currentMesh);assignin('base','cfg',nextCfg);
+            catch errorInfo
+                if isgraphics(apply)
+                    apply.Enable='on';cancel.Enable='on';progress.Text=errorInfo.message;
+                end
+            end
+        end
+        function cancelBase(~,~)
+            pressureGUI(mesh,cfg,host);
+        end
+    end
+    function value=operationValue(bp,key)
+        value='unknown';
+        if isfield(bp,key) && isscalar(bp.(key)) && ismember(bp.(key),[0 1])
+            value='no';if logical(bp.(key)),value='yes';end
+        end
+    end
+    function changeNoseModel(src,~)
+        % 模块作用：同一工况/网格切换鼻区工程方法；不复用旧热历史。
+        % pressureGUI 自身更新热边界和网页，所有区域拒绝状态随结果保存。
+        nextCfg=cfg; nextCfg.heating.noseModel=src.Value;
+        workbenchLabel.Text='正在重算当前工况热边界…（局部相似剖面可能需数分钟）';
+        src.Enable='off';back.Enable='off';drawnow;
+        try
+            pressureGUI(mesh,nextCfg,host);
+            assignin('base','mesh',fig.UserData.currentMesh);
+            assignin('base','cfg',fig.UserData.currentCfg);
+        catch errorInfo
+            if isgraphics(src)
+                src.Value=mesh.heating.noseModel;src.Enable='on';back.Enable='on';
+                workbenchLabel.Text='当前工况 · 三维结果与逐面元来源';
+            end
+            uialert(fig,errorInfo.message,'鼻区模型计算失败');
+        end
+    end
+    function changeFlight(~,~)
+        nextCfg = cfg; nextCfg.flight = p.freestream;
+        if ~isfield(nextCfg,'pressureGUI'), nextCfg.pressureGUI=struct; end
+        nextCfg.pressureGUI.initialSectionX=selectedProfile.stationX;
+        if isfield(cfg,'flight') && isfield(cfg.flight,'Twall')
+            nextCfg.flight.Twall = cfg.flight.Twall;
+        else
+            nextCfg.flight.Twall = 300;
+        end
+        setAeroHeatStage(fig,2);
+        try
+            [newFlight,newStream,action] = createFlightCondition(nextCfg,mesh,host);
+            if ~isgraphics(fig), return; end
+            if strcmp(action,'continue')
+                if newStream.Mach < 1
+                    error('RocketAeroHeat:Pressure:Subsonic','压力模型要求 Mach >= 1；已恢复原工况结果。');
+                end
+                nextCfg.flight = newFlight;
+                updated = modifiedNewtonianPressure(mesh,newStream,nextCfg);
+                updated = integrateAerodynamicLoads(updated,nextCfg);
+                updated = findStagnationRegion(updated,newStream,nextCfg);
+                updated = solveExternalFlow(updated,newStream,nextCfg);
+                updated = marchAxisymmetricShockExpansion(updated,newStream,nextCfg);
+                updated = traceSurfaceStreamlines(updated,nextCfg);
+                updated = calcSurfaceHeating(updated,newStream,nextCfg);
+                assignin('base','mesh',updated); assignin('base','cfg',nextCfg);
+                assignin('base','flight',newFlight); assignin('base','freestream',newStream);
+                assignin('base','atmosphere',newFlight.atmosphere);
+                pressureGUI(updated,nextCfg,host);
+            else
+                restorePrevious();
+            end
+        catch ME
+            if isgraphics(fig)
+                restorePrevious(); uialert(fig,ME.message,'飞行条件更新失败');
+            end
+        end
+    end
+    function restorePrevious()
+        % 确认页会写工作区；失败时一并回滚，避免新工况配旧压力。
+        assignin('base','mesh',mesh); assignin('base','cfg',cfg);
+        assignin('base','freestream',p.freestream);
+        if isfield(cfg,'flight'), assignin('base','flight',cfg.flight); end
+        if isfield(p.freestream,'atmosphere'), assignin('base','atmosphere',p.freestream.atmosphere); end
+        pressureGUI(mesh,cfg,host);
+    end
+end

@@ -1,0 +1,37 @@
+function study=studyShockFittedShockTube(gas,nx,boost,rotation)
+%STUDYSHOCKFITTEDSHOCKTUBE 真实三维五量推进Sod波管，测量非均匀解、加密及移动坐标效应。
+% 模块一：仅初始/远端状态给定，内部所有五量由共享面通量推进，不施加一维解析场。
+% 模块二：侧面移动滑移，左右远端储库；结束前波系尚未碰到远端边界。
+% 模块三：原始三维结果保留横向速度，不人为清零以制造一维一致性。
+if nargin<3,boost=zeros(3,1);end;if nargin<4,rotation=eye(3);end
+box=buildShockFittedBoxMesh([nx 1 1],[.04 .008 .006]);mesh=box.mesh;
+QL=shockFittedState3D([1 boost' 1e5/gas.R],gas,'primitive');
+QR=shockFittedState3D([.125 boost' 1e4/(.125*gas.R)],gas,'primitive');
+initial=repmat(QR.Q,mesh.cellCount,1);left=box.cellCentroidM(:,1)<.02;initial(left,:)=repmat(QL.Q,nnz(left),1);
+X0=box.nodes*rotation';Q=initial;time=0;endTime=1e-5;history=zeros(0,7);
+geometry=shockFittedALEGeometry(mesh,X0,X0,1);integrals=sum(geometry.volume0.*Q,1);boundaryRates=zeros(0,5);
+boundary=struct('kind',2*ones(numel(mesh.boundaryFaces),1),'exteriorQ',nan(numel(mesh.boundaryFaces),5), ...
+    'upstream',struct('pressure',1e5,'temperature',1e5/gas.R,'density',1,'velocityVector',boost,'method','Sod左远端明确储库'));
+boundary.kind(box.leftBoundaryMask|box.rightBoundaryMask)=1;
+boundary.exteriorQ(box.leftBoundaryMask,:)=repmat(QL.Q,nnz(box.leftBoundaryMask),1);
+boundary.exteriorQ(box.rightBoundaryMask,:)=repmat(QR.Q,nnz(box.rightBoundaryMask),1);
+velocity=repmat(boost',mesh.nodeCount,1);last=struct;
+for j=1:3000
+    if time>=endTime,break;end
+    X=X0+time*boost';estimate=shockFittedTimeStep3D(Q,mesh,X,velocity,gas,.18,boundary);dt=min(estimate.dt,endTime-time);
+    lastInputQ=Q;lastNodes0=X;
+    last=advanceShockFittedALE3D(Q,mesh,X,X0+(time+dt)*boost',dt,boundary,gas);
+    integrals(end+1,:)=sum(last.geometry.volume1.*last.Q,1);boundaryRates(end+1,:)=last.boundaryFluxRate; %#ok<AGROW>
+    history(end+1,:)=[time+dt,dt,min(last.state.temperature),max(last.state.temperature), ...
+        max(abs(last.conservationResidual)./last.conservationScale),max(last.geometry.gclRelative), ...
+        last.budget.declaredTotalArrayUpperBytes]; %#ok<AGROW>
+    Q=last.Q;time=time+dt;
+end
+assert(time==endTime,'ShockFit:TubeTime','波管步数预算耗尽，不能声称完成规定时刻。');
+study=struct('gas',gas,'box',box,'boost',boost,'rotation',rotation,'initialQ',initial,'Q',Q,'timeS',time, ...
+    'nodes0',X0,'nodes1',X0+time*boost','history',history,'lastStep',last,'boundary',boundary, ...
+    'lastInputQ',lastInputQ,'lastNodes0',lastNodes0,'lastTimeStepEstimate',estimate, ...
+    'conservedIntegrals',integrals,'boundaryFluxRates',boundaryRates, ...
+    'method','三维四面体非均匀Sod波管/实际五量Godunov-ALE推进/未清零横向速度', ...
+    'analyticSolutionImposedInsideDomain',false,'productionQualified',false);
+end

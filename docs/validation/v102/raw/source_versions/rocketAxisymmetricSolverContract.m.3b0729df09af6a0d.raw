@@ -1,0 +1,22 @@
+function contract=rocketAxisymmetricSolverContract(item)
+%ROCKETAXISYMMETRICSOLVERCONTRACT 区分实际数值求解器/扰动与初始CFL，不改变物理门槛。
+% 模块一：旧链保留原默认配置；新链的数值配置由已重建的工况显式给出。
+% 模块二：导出和逐端点验收共用同一身份，不能把局部扰动标成旧算法或改变旧链绑定。
+contract=struct('solver','advanceAxisymmetricSteady','jacobianDifferencePolicy','legacy-normalized-unit-floor', ...
+    'differenceStep',2e-6,'initialPseudoCFL',.5,'maximumPseudoCFL',1e6);
+if isfield(item,'caseFactory')&&ismember(item.caseFactory,{'createRocketAxisymmetricLocalCase','createRocketAxisymmetricRootCase','createRocketAxisymmetricSensitivityCase','createRocketAxisymmetricWallResolutionCase','createRocketAxisymmetricContactCase','createRocketAxisymmetricContactRefinedCase'})
+    c=item.solverConfiguration;contract.solver='advanceAxisymmetricSteadyLocal';
+    contract.jacobianDifferencePolicy=item.inputContract.jacobianDifferencePolicy;
+    contract.differenceStep=c.differenceStep;contract.initialPseudoCFL=c.initialPseudoCFL;
+    contract.maximumPseudoCFL=c.maximumPseudoCFL;
+    assert(strcmp(contract.jacobianDifferencePolicy,'local-conservative-acoustic-SA-roundoff-floor-v1')&& ...
+        contract.differenceStep==item.inputContract.jacobianRelativeStep, ...
+        'RocketLocalCase:Contract','局部差分身份/配置不一致。');
+end
+if isfield(item,'caseFactory')&&ismember(item.caseFactory,{'createRocketAxisymmetricRootCase','createRocketAxisymmetricSensitivityCase','createRocketAxisymmetricWallResolutionCase','createRocketAxisymmetricContactCase','createRocketAxisymmetricContactRefinedCase'})&& ...
+        isfield(item.initialization.seed,'priorNewtonIterations')
+    contract.initializationSolver='solveAxisymmetricSteadyNewton';
+    contract.initializationNewtonIterations=item.initialization.seed.priorNewtonIterations;
+    contract.interiorFluxArithmetic=item.inputContract.interiorFluxArithmetic;
+end
+end

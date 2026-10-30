@@ -1,0 +1,61 @@
+function testTurbulentBoundaryLayerState()
+%TESTTURBULENTBOUNDARYLAYERSTATE 验证湍流沿程积分的基本物理趋势。
+% 模块作用：用可控的准流线检查平板、压力梯度、转捩交接及域外回退。
+addpath(fileparts(fileparts(mfilename('fullpath'))));
+n=101; ds=0.01; U0=100; nu=1.5e-5;
+m.F=repmat([1 2 3],n,1);
+m.boundaryLayerEdge.method='解析外缘';
+m.boundaryLayerEdge.speed=U0*ones(n,1);
+p=struct('velocitySource',m.boundaryLayerEdge.method, ...
+    'distance',(0:n-1)'*ds,'pathCost',(0:n-1)'*ds, ...
+    'predecessorFace',[0;(1:n-1)'], ...
+    'stepLength',[0;ds*ones(n-1,1)], ...
+    'connectedFace',true(n,1));
+m.surfaceStreamlines=p;
+% 层流平板 theta=0.664*x/sqrt(Re_x)，在第 20 个面元后转捩。
+theta=nan(n,1); x=p.distance(20);
+theta(20)=0.664*x/sqrt(U0*x/nu);
+m.boundaryLayer.momentumThickness=theta;
+t=struct('laminarFace',false(n,1),'turbulentFace',false(n,1));
+t.laminarFace(1:20)=true; t.turbulentFace(21:end)=true;
+cfg.heating.turbulentModel='fixedShape';
+flat=calcTurbulentBoundaryLayerState(m,nu*ones(n,1),t,cfg);
+assert(flat.sourceID(21)==1 && all(flat.sourceID(22:end)==2));
+assert(all(diff(flat.momentumThickness(21:end))>0));
+assert(all(flat.skinFrictionCoefficient(21:end)>0));
+assert(all(diff(flat.skinFrictionCoefficient(21:end))<0));
+assert(all(abs(flat.edgeVelocityGradient(21:end))<1e-10));
+assert(flat.summary.laminarHandoffFaces==1);
+assert(flat.summary.integratedFaces==n-21);
+% 动量积分在零压梯度下应满足离散的 von Karman 平衡。
+ids=22:n;
+residual=diff(flat.momentumThickness(21:end))/ds- ...
+    (flat.skinFrictionCoefficient(ids-1)+ ...
+    flat.skinFrictionCoefficient(ids))/4;
+assert(max(abs(residual))<1e-9);
+
+% 正速度梯度使动量厚度变薄，负速度梯度使其变厚。
+accelerating=m; decelerating=m;
+accelerating.boundaryLayerEdge.speed(31:end)=linspace(100,110,n-30)';
+decelerating.boundaryLayerEdge.speed(31:end)=linspace(100,90,n-30)';
+fast=calcTurbulentBoundaryLayerState(accelerating,nu*ones(n,1),t,cfg);
+slow=calcTurbulentBoundaryLayerState(decelerating,nu*ones(n,1),t,cfg);
+assert(fast.momentumThickness(end)<flat.momentumThickness(end));
+assert(slow.momentumThickness(end)>flat.momentumThickness(end));
+assert(fast.adversePressureGradientParameter(end)<0);
+assert(slow.adversePressureGradientParameter(end)>0);
+
+% 没有上游层流值时局部启动；Re_theta 域外使用明确的平板回退。
+missing=m; missing.boundaryLayer.momentumThickness(:)=NaN;
+startup=calcTurbulentBoundaryLayerState(missing,nu*ones(n,1),t,cfg);
+assert(startup.sourceID(21)==3 && startup.sourceID(22)==2);
+short=m; short.surfaceStreamlines.distance(21)=1e-5;
+short.boundaryLayer.momentumThickness(:)=NaN;
+fallback=calcTurbulentBoundaryLayerState(short,nu*ones(n,1),t,cfg);
+assert(fallback.sourceID(21)==4 && fallback.fallbackFace(21));
+assert(fallback.skinFrictionCoefficient(21)== ...
+    fallback.flatPlateSkinFrictionCoefficient(21));
+assert(isnan(fallback.momentumThickness(21)));
+fprintf('Turbulent boundary layer passed: flat-plate, gradients, handoff and fallback.\n');
+end
+

@@ -1,0 +1,195 @@
+Browser tab: 5, Title: "RocketAeroHeat · 激波拟合内核", URL: "http://127.0.0.1:8782/view01/workbench/index.html".
+0 AXWebArea RocketAeroHeat · 激波拟合内核, URL: 127.0.0.1:8782/view01/workbench/index.html
+	1 container
+		2 text RocketAeroHeat 移动激波 · 共享面三维守恒 研究验证 · 新增合格热流面积 0 m²
+	3 container
+		4 text 已保存的研究
+		5 pop up button (collapsed, settable) Description: 选择研究, Value: Sod型波管 · Nx=24 · 152步, ID: caseChoice, Secondary Actions: Expand
+			6 menu
+				7 移动活塞 · 内求激波速度基准
+				8 真实20°箭体鼻部 · 几何与GCL检查
+				9 球鼻 · 84面 / 756单元 · t=9e-06 s
+				10 球鼻 · 198面 / 2376单元 · t=9e-06 s
+				11 球鼻 · 198面 / 2376单元 · t=2e-05 s
+				12 Sod型波管 · Nx=12 · 86步
+				13 (selected) Sod型波管 · Nx=24 · 152步
+				14 Sod型波管 · Nx=48 · 287步
+		15 container 科研工作流
+			16 button 1 输入模型
+			17 button 2 生成网格
+			18 button 3 添加边界条件
+			19 button 4 计算
+			20 button 5 查看结果
+		21 heading 查看结果 · Sod型波管 · Nx=24 · 152步, Value: 1, ID: title
+			246 text 查看结果 · Sod型波管 · Nx=24 · 152步
+		247 text 非均匀三维推进及Sod解析体平均加密校核；不是箭体物理解或热流结果
+		24 definition list details
+			248 container 工况
+				249 text 工况
+			250 text ρL/ρR=1/0.125 kg/m³；pL/pR=100000/10000 Pa；初始静止；γ=1.4
+			251 container 当前范围
+				252 text 当前范围
+			253 text 192 个三角面
+			254 container 研究身份
+				255 text 研究身份
+			256 text 保留三维横向数值速度；初末帧均来自同一实际保存MAT
+			257 container 数值核验
+				258 text 数值核验
+			259 text 密度体平均L1/rhoL=0.01321；能量L1/eL=0.01393；横向RMS速度6.633 m/s。
+			260 container 正式新增热流面积
+				261 text 正式新增热流面积
+			262 text 0 m²
+		40 button (collapsed) 算法与适用范围, Secondary Actions: Expand
+			41 text 算法与适用范围
+		42 link Description: 下载数值与来源记录, Value: 127.0.0.1:8782/view01/workbench/ale-data.json
+		43 text 三维范围
+		44 pop up button (collapsed, settable) 三维范围, Value: 壁面, ID: view, Secondary Actions: Expand
+			45 menu
+				46 全部边界
+				47 (selected) 壁面
+				48 激波 / 候选外壳
+				49 完整箭体（未求场量）
+		50 pop up button (collapsed, settable) Description: 云图变量, Value: 流体压力 / Pa, ID: field, Secondary Actions: Expand
+			51 menu
+				52 (selected) 流体压力 / Pa
+				53 流体温度 / K
+				54 速度幅值 / m/s
+				55 Riemann壁压 / Pa
+				56 热流 / W/m²
+				57 求解壁温 / K
+				58 外缘 Te / K
+				59 恢复 Tr / K
+				60 给定壁温 / K
+		263 text 加载三维网格
+		62 container Description: 实际保存的三维网格与面元云图, ID: viewer
+			264 AXWebArea RocketAeroHeat · 几何与网格, URL: 127.0.0.1:8782/view01/workbench/geometry/index.html?case=6&frame=1&revision=10&view=wall&field=pressurePa&layer=1&wire=0
+				265 container
+					266 text Sod型波管 · Nx=24 · 152步
+					267 text 100 顶点 · 192 三角面
+					268 button 适配模型, ID: reset
+					269 button 侧视
+					270 button 鼻端
+					271 button 立体
+					272 checkbox (settable, integer) Description: 网格线, Value: 0, ID: wire
+					273 checkbox (settable, integer) Description: 平移, Value: 0, ID: panMode
+					274 text SI / m · 独立波管沿+X传播；箭体坐标与来流约定保持
+				275 container
+					276 image Description: 几何和实际三角网格，拖动旋转，Shift或右键拖动平移，滚轮缩放, ID: scene
+					277 container Description: 当前视角坐标方向, ID: axes
+					278 text 拖动旋转 · Shift / 右键平移 · 滚轮缩放
+				279 container Description: 逐面研究场量色标, ID: fieldLegend
+					280 text 流体压力 / Pa · 固定范围 0—110000 · 超范围使用端点色；灰色为未知
+				281 container
+					282 text 几何尺寸 / m：X 0.04 · Y 0.008 · Z 0.006
+					283 text Sod型三维数值基准 · 未复制解析场 · 灰色为未求
+		84 text 保存帧
+		85 slider (settable, integer) Description: 实际保存帧, Value: 1, ID: frame
+		284 text 实际保存 t = 0.00001 s · 仅实际保存帧
+		87 container
+			88 text 真实截面周向分布
+			89 text 面元
+			90 slider (settable, integer) Description: 边界面元, Value: 0, ID: face
+			91 button 导出当前范围 CSV, ID: csv
+			92 container sectionControls
+				93 container
+					94 text X / m 
+					95 stepper (settable, float) Description: 真实截面 X 坐标 / m, Value: 0.019999999552965164, Details: 0.02, ID: sliceX
+				96 slider (settable, integer) Description: 轴向截面滑块, Value: 500, ID: slice
+				97 button 导出周向 CSV, ID: sectionCsv
+				285 text 0.02 m · 4 条交线 / 1 个轮廓 · 4 项有效值
+			99 image Description: 实际面元值或真实周向交线，缺失处断开, ID: curve
+			100 text 点击三维面元选择真实 X，也可输入或拖动滑块。沿交线保留面元常值；+Y 为 0°，+Z 为 90°。开放/分支轮廓单列，未解值断开。
+			242 container csvPreviewDetails
+				243 button (collapsed) 本次导出预览, Secondary Actions: Expand
+					244 text 本次导出预览
+		101 container
+			102 text 面元探针
+			286 text 保留三维横向数值速度；初末帧均来自同一实际保存MAT
+			104 definition list probe
+				287 container 当前面元
+					288 text 当前面元
+				289 text 1 / 192
+				290 container 坐标 / m
+					291 text 坐标 / m
+				292 text 0.0011111111, 0.0026666667, 0
+				293 container 所属原箭面号
+					294 text 所属原箭面号
+				295 text 基准面元，无原箭体对应
+				296 container 边界身份
+					297 text 边界身份
+				298 text 移动/固定滑移壁面
+				299 container 流体压力 / Pa
+					300 text 流体压力 / Pa
+				301 text 100000
+				302 container 流体温度 / K
+					303 text 流体温度 / K
+				304 text 348.36788
+				305 container 速度幅值 / m/s
+					306 text 速度幅值 / m/s
+				307 text 1.7231061e-13
+				308 container Riemann壁压 / Pa
+					309 text Riemann壁压 / Pa
+				310 text 100000
+				311 container 热流 / W/m²
+					312 text 热流 / W/m²
+				313 text 未求解
+				314 container 求解壁温 / K
+					315 text 求解壁温 / K
+				316 text 未求解
+				317 container 外缘温度 Te / K
+					318 text 外缘温度 Te / K
+				319 text 未求解
+				320 container 恢复温度 Tr / K
+					321 text 恢复温度 Tr / K
+				322 text 未求解
+				323 container 给定壁温 / K
+					324 text 给定壁温 / K
+				325 text 未设置
+			144 button (expanded) 逐场量方法、状态与来源, Secondary Actions: Collapse
+				145 text 逐场量方法、状态与来源
+			245 definition list methods
+				326 container 数据SHA256
+					327 text 数据SHA256
+				328 text 6d3cd601e3fa2a97734330d7ad19918aeea67f5a3db241e7c6a138a4a0072ed6
+				329 container 审计SHA256
+					330 text 审计SHA256
+				331 text 74f2d7212b55df7b64dbd2ebd49ab3f839de31224e20a014d2080a5146e187ce
+				332 container 适用范围
+					333 text 适用范围
+				334 text 非均匀三维推进及Sod解析体平均加密校核；不是箭体物理解或热流结果
+				335 container 流体压力方法
+					336 text 流体压力方法
+				337 text 实际三维Godunov-ALE五量推进/常gamma压力恢复；未施加内部解析场
+				338 container 流体温度方法
+					339 text 流体温度方法
+				340 text 保存五量的常gamma状态方程恢复；这是相邻单元流体温度，不是Te、Tr或壁温
+				341 container 速度幅值方法
+					342 text 速度幅值方法
+				343 text 保存的三维动量/密度恢复速度幅值；保留全部横向数值分量
+				344 container Riemann壁压方法
+					345 text Riemann壁压方法
+				346 text 侧面滑移镜像精确Riemann压力；不是给定壁压
+				347 container 热流方法
+					348 text 热流方法
+				349 text 本研究未计算黏性热流，不能用无黏模型的零值替代气动热结果
+				350 container 求解壁温方法
+					351 text 求解壁温方法
+				352 text 未求解壁体温度，也未把流体温度充当壁温
+				353 container 外缘温度 Te方法
+					354 text 外缘温度 Te方法
+				355 text 未完成合格边界层外缘匹配；层内流体温度不能代替Te
+				356 container 恢复温度 Tr方法
+					357 text 恢复温度 Tr方法
+				358 text 本研究未计算恢复温度或恢复焓
+				359 container 给定壁温方法
+					360 text 给定壁温方法
+				361 text 无黏滑移区域研究未设置壁温边界
+				362 container 字段状态
+					363 text 字段状态
+				364 text 已核验的三维波管数值基准；不是箭体区域解
+				365 container 物理资格
+					366 text 物理资格
+				367 text 研究验证；未授予真实箭体解资格
+	146 text SI · 主轴 X、鼻尖 +X · 层内流体温度、Te、Tr、给定Tw、求解Tw分别标明 · 未知为灰色
+
+The focused UI element is 50 pop up button (collapsed, settable) Description: 云图变量, Value: 流体压力 / Pa, ID: field, Secondary Actions: Expand

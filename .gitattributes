@@ -58,3 +58,10 @@ docs/validation/storage_20261030/nested_operators/**/*.raw -whitespace
 docs/validation/storage_20261031/** -text -eol
 docs/validation/storage_20261031/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/validation/storage_20261031/**/*.raw -whitespace
+# v102实际进程、MAT与UI回执保留原字节，避免换行规范化破坏来源SHA。
+docs/validation/v102/** -text -eol
+docs/validation/v102/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v102/**/*.raw -whitespace
+tests/data/shock_fitted_dynamics/** -text -eol
+# 浏览器AX原始记录保留显示标签的尾随空格，不把证据当源码格式化。
+docs/validation/v102/browser/*.txt -whitespace

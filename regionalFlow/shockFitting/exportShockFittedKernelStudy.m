@@ -51,7 +51,7 @@ for name={'geometry.js','geometry.css'},copyfile(fullfile(root,'web',name{1}),fu
 html=fileread(fullfile(root,'web/geometry.html'));
 html=strrep(html,'</body>','<script src="../ale-data.js"></script><script src="ale-study-geometry.js"></script></body>');
 write(fullfile(geo,'index.html'),html);copyfile(fullfile(root,'web/ale-study-geometry.js'),fullfile(geo,'ale-study-geometry.js'));
-for name={'ale-study.js','ale-study.css'},copyfile(fullfile(root,'web',name{1}),fullfile(web,name{1}));end
+for name={'ale-study.js','ale-study.css','ale-section-core.js'},copyfile(fullfile(root,'web',name{1}),fullfile(web,name{1}));end
 copyfile(fullfile(root,'web/ale-study.html'),fullfile(web,'index.html'));
 text=jsonencode(data);write(fullfile(web,'ale-data.json'),text);write(fullfile(web,'ale-data.js'),['window.ALE_STUDY=' text ';' newline]);
 report=struct('status','exported-saved-piston-and-real-nose-geometry-with-explicit-unsolved-fields', ...

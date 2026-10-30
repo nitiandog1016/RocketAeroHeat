@@ -1,0 +1,98 @@
+Browser tab: 5, Title: "RocketAeroHeat · 激波拟合内核", URL: "http://127.0.0.1:8782/view01/workbench/index.html".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 263, 266-267, 274, 280, 282-283, 285-294, 296-297, 299-300, 302-303, 305-306, 308-309, 311-312, 314-315, 317-318, 320-321, 323-324, 326-333, 335-336, 338-339, 341-342, 344-345, 347-348, 350-351, 353-354, 356-357, 359-360, 362-363, 365-366
++		285 text 三维网格已显示 · 可点选面元
++					286 text Sod型波管 · Nx=24 · 152步
++					287 text 100 顶点 · 192 三角面
++					288 text SI / m · 独立波管沿+X传播；箭体坐标与来流约定保持
++						289 text X Y Z
++					290 text 流体压力 / Pa · 固定范围 0—110000 · 超范围使用端点色；灰色为未知
++					291 text 几何尺寸 / m：X 0.04 · Y 0.008 · Z 0.006
++					292 text Sod型三维数值基准 · 未复制解析场 · 灰色为未求
+~			90 slider (settable, integer) Description: 边界面元, Value: 54, ID: face
+~					95 stepper (settable, float) Description: 真实截面 X 坐标 / m, Value: 0.02222222276031971, Details: 0.022222222222222223, ID: sliceX
+~				96 slider (settable, float) Description: 轴向截面滑块, Value: 555.5555419921875, Details: 555.555555555556, ID: slice
++				293 text 0.022222222 m · 8 条交线 / 1 个轮廓 · 8 项有效值
++			294 text 保留三维横向数值速度；初末帧均来自同一实际保存MAT
+~				295 container 当前面元
++					296 text 当前面元
++				297 text 55 / 192
+~				298 container 坐标 / m
++					299 text 坐标 / m
++				300 text 0.022222222, 0.0053333333, 0
+~				301 container 所属原箭面号
++					302 text 所属原箭面号
++				303 text 基准面元，无原箭体对应
+~				304 container 边界身份
++					305 text 边界身份
++				306 text 移动/固定滑移壁面
+~				307 container 流体压力 / Pa
++					308 text 流体压力 / Pa
++				309 text 10000
+~				310 container 流体温度 / K
++					311 text 流体温度 / K
++				312 text 278.6943
+~				313 container 速度幅值 / m/s
++					314 text 速度幅值 / m/s
++				315 text 0
+~				316 container Riemann壁压 / Pa
++					317 text Riemann壁压 / Pa
++				318 text 未求解
+~				319 container 热流 / W/m²
++					320 text 热流 / W/m²
++				321 text 未求解
+~				322 container 求解壁温 / K
++					323 text 求解壁温 / K
++				324 text 未求解
+~				325 container 外缘温度 Te / K
++					326 text 外缘温度 Te / K
++				327 text 未求解
++				328 container 恢复温度 Tr / K
++					329 text 恢复温度 Tr / K
++				330 text 未求解
++				331 container 给定壁温 / K
++					332 text 给定壁温 / K
++				333 text 未设置
+~				334 container 数据SHA256
++					335 text 数据SHA256
++				336 text 6d3cd601e3fa2a97734330d7ad19918aeea67f5a3db241e7c6a138a4a0072ed6
+~				337 container 审计SHA256
++					338 text 审计SHA256
++				339 text 74f2d7212b55df7b64dbd2ebd49ab3f839de31224e20a014d2080a5146e187ce
+~				340 container 适用范围
++					341 text 适用范围
++				342 text 非均匀三维推进及Sod解析体平均加密校核；不是箭体物理解或热流结果
+~				343 container 流体压力方法
++					344 text 流体压力方法
++				345 text 实际三维Godunov-ALE五量推进/常gamma压力恢复；未施加内部解析场
+~				346 container 流体温度方法
++					347 text 流体温度方法
++				348 text 保存五量的常gamma状态方程恢复；这是相邻单元流体温度，不是Te、Tr或壁温
+~				349 container 速度幅值方法
++					350 text 速度幅值方法
++				351 text 保存的三维动量/密度恢复速度幅值；保留全部横向数值分量
+~				352 container Riemann壁压方法
++					353 text Riemann壁压方法
++				354 text 侧面滑移镜像精确Riemann压力；不是给定壁压
+~				355 container 热流方法
++					356 text 热流方法
++				357 text 本研究未计算黏性热流，不能用无黏模型的零值替代气动热结果
+~				358 container 求解壁温方法
++					359 text 求解壁温方法
++				360 text 未求解壁体温度，也未把流体温度充当壁温
+~				361 container 外缘温度 Te方法
++					362 text 外缘温度 Te方法
++				363 text 未完成合格边界层外缘匹配；层内流体温度不能代替Te
+~				364 container 恢复温度 Tr方法
++					365 text 恢复温度 Tr方法
++				366 text 本研究未计算恢复温度或恢复焓
+~				367 container 给定壁温方法
++					368 text 给定壁温方法
++				369 text 无黏滑移区域研究未设置壁温边界
++				370 container 字段状态
++					371 text 字段状态
++				372 text 给定的Riemann初始数据；不是推进结果
++				373 container 物理资格
++					374 text 物理资格
++				375 text 研究验证；未授予真实箭体解资格
+The focused UI element is 90 slider (settable, integer) Description: 边界面元, Value: 54, ID: face

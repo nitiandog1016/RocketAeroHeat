@@ -1,0 +1,85 @@
+function report=testShockFittedDynamics(folder,referenceFile)
+%TESTSHOCKFITTEDDYNAMICS 检验下游特征相容、共享节点运动和非均匀三维显式推进。
+% 模块一：已知移动RH的反算速度、Galilean/旋转、双向声学扰动；压力不能直接复制。
+% 模块二：Sod三档加密与移动/旋转坐标，用独立Python复算解析波系。
+% 模块三：重放旧活塞基准，拒绝NASA7、非压缩波和非法外流，保持未解资格。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);setupShockFittedFlow;addpath(fullfile(root,'tests'));
+assert(~exist(folder,'dir'),'ShockFit:Overwrite','必须写新验证目录。');mkdir(folder);
+old=load(referenceFile,'pistons','gases','up');gas=old.gases{1};up=old.up;
+normals=-[up.velocityVector'/norm(up.velocityVector);.94*up.velocityVector'/norm(up.velocityVector)+sqrt(1-.94^2)*[0 1 0]];
+D=[35;-60];known=movingShockJump3D(up,gas,-normals,-D);
+result=shockFittedBoundarySpeed3D(known.state.Q,normals,up,gas);
+assert(max(abs(result.normalSpeedMS-D))<2e-8);
+boost=[40;-25;30];shifted=up;shifted.velocityVector=up.velocityVector+boost;
+state=shockFittedState3D([known.state.density known.state.velocity+boost' known.state.temperature],gas,'primitive');
+galilean=shockFittedBoundarySpeed3D(state.Q,normals,shifted,gas);
+assert(max(abs(galilean.normalSpeedMS-D-normals*boost))<2e-8);
+angle=.31;rotation=[cos(angle) -sin(angle) 0;sin(angle) cos(angle) 0;0 0 1];turned=up;turned.velocityVector=rotation*up.velocityVector;
+state=known.state.Q;state(:,2:4)=state(:,2:4)*rotation';
+rotated=shockFittedBoundarySpeed3D(state,normals*rotation',turned,gas);
+assert(max(abs(rotated.normalSpeedMS-D))<2e-8);
+base=known.state;n=normals(1,:);dp=base.pressure(1)*1e-4;rho=base.density(1);a=base.soundSpeed(1);
+acoustic=cell(2,1);
+for j=1:2
+    sign=3-2*j;pressure=base.pressure(1)+dp;velocity=base.velocity(1,:)+sign*dp/(rho*a)*n;
+    % 一阶等熵密度响应；测试的是相容方向，不预先指定激波速度。
+    density=rho+dp/a^2;T=pressure/(density*gas.R);
+    perturb=shockFittedState3D([density velocity T],gas,'primitive');
+    acoustic{j}=shockFittedBoundarySpeed3D(perturb.Q,n,up,gas);
+end
+outgoing=abs(acoustic{1}.normalSpeedMS-D(1));incoming=abs(acoustic{2}.normalSpeedMS-D(1));
+assert(outgoing>1e-3&&incoming/outgoing<1e-3,'ShockFit:Acoustics','相容边界没有区分两向声学信息。');
+legacy=old.pistons{1};replay=solveShockFittedPiston3D(legacy.upstream,gas,legacy.normal,legacy.pistonNormalVelocityMS,legacy.gridCounts,legacy.times);
+assert(isequal(replay.Q,legacy.Q)&&isequal(replay.lastStep.faceALEFlux,legacy.lastStep.faceALEFlux), ...
+    'ShockFit:LegacyReplay','新增边界分支改变了旧实际活塞结果。');
+%% 模块四：明确的负例与合法超声速出口，不以缺失测试代替实际拒绝证据。
+rejections=struct;
+rejections.NASA7Speed=reject(@()shockFittedBoundarySpeed3D(known.state.Q,normals,up,old.gases{2}),'ShockFit:ShockSpeedGas');
+low=shockFittedState3D([up.density up.velocityVector' up.temperature/2],gas,'primitive');
+rejections.rarefaction=reject(@()shockFittedBoundarySpeed3D(low.Q,n,up,gas),'ShockFit:ShockBoundaryWave');
+box=buildShockFittedBoxMesh([1 1 1],[.01 .01 .01]);mesh=box.mesh;
+constant=shockFittedState3D([1 600 0 0 300],gas,'primitive');uniform=repmat(constant.Q,mesh.cellCount,1);
+bd=struct('kind',ones(numel(mesh.boundaryFaces),1),'exteriorQ',repmat(constant.Q,numel(mesh.boundaryFaces),1),'upstream',up);
+bd.kind(box.rightBoundaryMask)=4;
+estimate=shockFittedTimeStep3D(uniform,mesh,box.nodes,zeros(size(box.nodes)),gas,.18,bd);
+validOutlet=advanceShockFittedALE3D(uniform,mesh,box.nodes,box.nodes,min(1e-8,estimate.dt),bd,gas);
+validOutletBox=box;validOutletBoundary=bd;
+assert(max(abs(validOutlet.Q-uniform)./max(1,abs(uniform)),[],'all')<2e-14&& ...
+    all(validOutlet.supersonicOutflowAudit.relativeNormalMach>1),'ShockFit:Outlet','合法全特征出流改变均匀态。');
+still=shockFittedState3D([1 0 0 0 300],gas,'primitive');bad=bd;bad.kind(:)=4;
+rejections.subsonicOutlet=reject(@()advanceShockFittedALE3D(repmat(still.Q,mesh.cellCount,1), ...
+    mesh,box.nodes,box.nodes,1e-8,bad,gas),'ShockFit:SubsonicOutlet');
+tubes=cell(3,1);grids=[12 24 48];
+for j=1:3
+    tubes{j}=studyShockFittedShockTube(gas,grids(j));
+    fprintf('NONUNIFORM_TUBE nx=%d steps=%d T=%.9g--%.9g maxBalance=%.6g\n',grids(j), ...
+        size(tubes{j}.history,1),min(tubes{j}.history(:,3)),max(tubes{j}.history(:,4)),max(tubes{j}.history(:,5)));
+end
+shiftedTube=studyShockFittedShockTube(gas,12,boost,rotation);
+Q=tubes{1}.Q;expected=[Q(:,1),Q(:,2:4)*rotation'+Q(:,1).*boost', ...
+    Q(:,5)+(Q(:,2:4)*rotation')*boost+.5*Q(:,1)*sum(boost.^2)];
+shiftError=max(abs(shiftedTube.Q-expected)./max(1,abs(expected)),[],'all');
+assert(shiftError<2e-10,'ShockFit:TubeFrame','非均匀推进未保持刚体/Galilean一致性。');
+cap=buildShockFittedSphericalCap(.05,60,4,12,.008,3);shell=cap.shell;
+geom=shockFittedALEGeometry(shell.mesh,shell.nodes,shell.nodes,1);outside=shell.mesh.boundaryFaces(shell.outerBoundaryMask);
+motion=shockFittedShellMotion3D(shell,shell.nodes,zeros(numel(outside),1));assert(all(motion.nodeVelocityMS==0,'all')&&motion.bodyNodesFixed);
+moving=shockFittedShellMotion3D(shell,shell.nodes,10+3*sin((1:numel(outside))'));
+movingGeometry=shockFittedALEGeometry(shell.mesh,shell.nodes,shell.nodes+2e-7*moving.nodeVelocityMS,2e-7);
+assert(moving.bodyNodesFixed&&max(abs(moving.projectionResidualMS))>1e-6&& ...
+    max(movingGeometry.gclRelative)<3e-12,'ShockFit:Projection','非均匀共享节点投影或GCL记录不符。');
+report=struct('status','tested-downstream-shock-compatibility-and-nonuniform-three-dimensional-ALE', ...
+    'knownShockSpeedErrorMS',max(abs(result.normalSpeedMS-D)), ...
+    'outgoingAcousticShockResponseMS',outgoing,'incomingAcousticShockResponseMS',incoming, ...
+    'nonuniformFrameRelativeError',shiftError,'legacyPistonExactlyReplayed',true, ...
+    'refusalsActuallyTested',{fieldnames(rejections)},'nonuniformProjectionResidualMS',max(abs(moving.projectionResidualMS)), ...
+    'tubeGridCounts',grids,'sphereCells',shell.mesh.cellCount,'productionQualified',false,'newProductionSolvedAreaM2',0, ...
+    'engineProcessID',feature('getpid'));
+save(fullfile(folder,'shock_dynamics_evidence.mat'),'report','gas','up','known','normals','D','result','galilean','rotated', ...
+    'acoustic','boost','rotation','tubes','shiftedTube','cap','motion','moving','movingGeometry', ...
+    'rejections','validOutlet','validOutletBox','validOutletBoundary','estimate','-v7');
+fid=fopen(fullfile(folder,'shock_dynamics_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(report));disp(report);
+end
+function id=reject(action,expected)
+id='';try,action();catch ex,id=ex.identifier;end
+assert(strcmp(id,expected),'ShockFit:RefusalTest','拒绝身份不符：实际%s，需要%s。',id,expected);
+end

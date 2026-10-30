@@ -1,0 +1,446 @@
+function report=testAxisymmetricWallVelocityGradient(folder,v68EvidenceFile,v67EvidenceFile)
+%TESTAXISYMMETRICWALLVELOCITYGRADIENT 静止斜壁速度梯度的独立边界与守恒校核。
+% 模块一：独立积分真r权守恒均值，验证平/斜强偏斜墙的线性速度及二次总能量。
+% 模块二：非线性零壁速度负对照，只允许所选墙动量通量改变；热流/能量/SA保持。
+% 模块三：独立逐列Jacobian、全分量方向及真实四/五量BE检查新离散进入实际方程。
+% 模块四：非法合同必须拒绝，默认v68全部13端点和v67完整info逐值重放。
+% 这些是数值合同校核，不是完整箭体新稳态、实验精度或生产求解面积验收。
+root=fileparts(fileparts(mfilename('fullpath')));
+addpath(root,fullfile(root,'regionalFlow','axisymmetric'),fullfile(root,'internalFlow'));
+if nargin<1,folder=fullfile(root,'outputs','v69_validation','wall_velocity');end
+if nargin<2,v68EvidenceFile=pick(root,'v68','actual_rocket','rocket_axisymmetric_evidence.mat');end
+if nargin<3,v67EvidenceFile=pick(root,'v67','both','tmr_sensitivity_evidence.mat');end
+assert(exist(v68EvidenceFile,'file')==2&&exist(v67EvidenceFile,'file')==2, ...
+    'WallVelocityTest:Evidence','必须提供冻结v68/v67真实证据，不能跳过默认路径回放。');
+if ~exist(folder,'dir'),mkdir(folder);end
+gas=axisymmetricFVGas(struct('gamma',1.4,'R',1,'mu',.05,'Pr',.72,'temperatureRange',[100 1500], ...
+    'transport',struct('model','sutherland','referenceViscosity',.05,'referenceTemperature',300,'sutherlandTemperature',110.4)));
+rho=1.2;Tw=400;slopes=[0 .3];skews=[5 1.8];linearRecords=cell(2,1);refusals=struct('label',{},'identifier',{});
+
+%% 一、线性速度的真FV均值：动量为线性，而总能量必须积分速度平方
+for fixture=1:2
+    m=slopes(fixture);a=skews(fixture);ri=.03;
+    [s,eta]=ndgrid([0 .02 .05 .08],[0 .006 .017 .03]);
+    mesh=buildAxisymmetricFVGeometry(s+a*eta,ri+m*s+eta);f=mesh.faces;
+    wallFaces=find(f.boundarySide==3);wallNormal=[m -1]/sqrt(1+m^2);
+    tangent=[1 m]/sqrt(1+m^2);skewRatio=abs(f.delta(wallFaces,:)*tangent')./(f.delta(wallFaces,:)*wallNormal');
+    assert(min(skewRatio)>3,'WallVelocityTest:Excitation','墙网格必须激活强切向偏移。');
+    k=[220 -75];gradientX=-m*k/sqrt(1+m^2);gradientR=k/sqrt(1+m^2);
+    primitive=@(p)profile(p,rho,Tw,ri,m,a,k,[0 0]);
+    [Q,quadrature]=trueMeans(mesh,gas,primitive);
+    P=axisymmetricFVState(Q,gas);velocityExact=primitive(quadrature.independentVolumeCentroidXR);
+    velocityRelative=max(abs(P(:,2:3)-velocityExact(:,2:3)),[],'all')/max(abs(velocityExact(:,2:3)),[],'all');
+    assert(velocityRelative<5e-13&&all(P(:,4)>Tw), ...
+        'WallVelocityTest:FVMean','真线性动量均值或总能量中的速度方差未正确保留。');
+    boundary=makeBoundary(primitive,Tw);boundary.jMin.velocityGradient='dirichlet-tangent';
+    [rate,info]=axisymmetricNavierStokesResidual(Q,mesh,gas,boundary);audit=info.wallVelocityGradient;
+    constraintsRecord=constraints(audit,mesh);
+    expectedX=repmat(gradientX,numel(wallFaces),1);expectedR=repmat(gradientR,numel(wallFaces),1);
+    gradientRelative=max(abs([audit.gradientXPerS-expectedX,audit.gradientRPerS-expectedR]),[],'all')/max(abs([gradientX gradientR]));
+    assert(gradientRelative<2e-10,'WallVelocityTest:Linear','静止斜壁线性速度解析梯度未还原。');
+    mu=independentMu(Tw,gas);div=gradientX(1)+gradientR(2);
+    txx=2*mu*(gradientX(1)-div/3);trr=2*mu*(gradientR(2)-div/3);txr=mu*(gradientR(1)+gradientX(2));
+    expectedTraction=[txx*wallNormal(1)+txr*wallNormal(2),txr*wallNormal(1)+trr*wallNormal(2)];
+    tractionRelative=max(abs(info.wall.viscousTraction-expectedTraction),[],'all')/max(abs(expectedTraction));
+    assert(tractionRelative<2e-10&&all(info.wall.mechanicalPowerIntoFluidPerRadian==0), ...
+        'WallVelocityTest:Stress','独立Newton应力或静止墙机械功不符。');
+    linearRecords{fixture}=struct('wallSlope',m,'minimumTangentialSkewRatio',min(skewRatio), ...
+        'trueConservativeQuadrature',quadrature,'velocityMeanRelative',velocityRelative, ...
+        'gradientRelative',gradientRelative,'tractionRelative',tractionRelative,'constraints',constraintsRecord, ...
+        'eosTemperatureProxyRangeK',[min(P(:,4)) max(P(:,4))],'physicalTemperatureCellMeanK',Tw, ...
+        'eosTemperatureProxyCalledExactMean',false,'ledger',ledger(rate,info,mesh));
+end
+
+%% 二、非线性多项式真实守恒均值；同一Q的改动范围必须只在选中墙的动量通量
+k=[150 -45];variation=[1500 650];primitive=@(p)profile(p,rho,Tw,ri,m,a,k,variation);
+[Qnonlinear,nonlinearQuadrature]=trueMeans(mesh,gas,primitive);Pnonlinear=axisymmetricFVState(Qnonlinear,gas);
+legacyBoundary=makeBoundary(primitive,Tw);boundary=legacyBoundary;boundary.jMin.velocityGradient='dirichlet-tangent';
+[oldRate,oldInfo]=axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,legacyBoundary);
+[newRate,newInfo]=axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,boundary);
+assert(~isfield(oldInfo,'wallVelocityGradient')&&isequaln(oldInfo.wallThermalGradient,newInfo.wallThermalGradient));
+audit=newInfo.wallVelocityGradient;nonlinearConstraints=constraints(audit,mesh);
+oldTangential=max(abs(audit.oldTangentialGradientPerS),[],'all');
+newTangential=max(abs(audit.gradientXPerS.*audit.tangentXR(:,1)+audit.gradientRPerS.*audit.tangentXR(:,2)),[],'all');
+assert(oldTangential>1&&newTangential<=1e-9*oldTangential, ...
+    'WallVelocityTest:NegativeControl','旧非线性切向导数未被激活，或显式静止壁约束未消除该误差。');
+fourScope=assertMomentumWallOnly(oldRate,oldInfo,newRate,newInfo,mesh,wallFaces);
+fourLedger=ledger(newRate,newInfo,mesh);
+explicitLegacy=legacyBoundary;explicitLegacy.jMin.velocityGradient='legacy';
+[explicitRate,explicitInfo]=axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,explicitLegacy);
+assert(isequal(explicitRate,oldRate)&&isequaln(explicitInfo,oldInfo), ...
+    'WallVelocityTest:Legacy','显式legacy未保持原运算及全部info。');
+
+% 直接helper使用任意旧梯度作输入；非墙逐值保持，新墙解不得依赖旧梯度。
+nf=numel(f.owner);oldX=reshape(sin((1:2*nf)'*.27),nf,2);oldR=reshape(cos((1:2*nf)'*.13),nf,2);
+wallVelocity=zeros(numel(wallFaces),2);
+[directX,directR,directAudit]=axisymmetricWallVelocityGradient(mesh,Pnonlinear(:,2:3),boundary,wallFaces,wallVelocity,oldX,oldR);
+nonwall=true(nf,1);nonwall(wallFaces)=false;
+assert(isequal(directX(nonwall,:),oldX(nonwall,:))&&isequal(directR(nonwall,:),oldR(nonwall,:))&& ...
+    isequal(directAudit.gradientXPerS,audit.gradientXPerS)&&isequal(directAudit.gradientRPerS,audit.gradientRPerS));
+[unchangedX,unchangedR,emptyAudit]=axisymmetricWallVelocityGradient(mesh,Pnonlinear(:,2:3),legacyBoundary,wallFaces,wallVelocity,oldX,oldR);
+assert(isequal(unchangedX,oldX)&&isequal(unchangedR,oldR)&&isempty(emptyAudit.faceID));
+
+N=.1+.003*sin((1:mesh.cellCount)');Q5=[Qnonlinear,Qnonlinear(:,1).*N];
+[oldRate5,oldInfo5]=axisymmetricRANSResidual(Q5,mesh,gas,legacyBoundary);
+[newRate5,newInfo5]=axisymmetricRANSResidual(Q5,mesh,gas,boundary);
+fiveScope=assertMomentumWallOnly(oldRate5,oldInfo5,newRate5,newInfo5,mesh,wallFaces);
+assert(isequaln(oldInfo5.sa,newInfo5.sa)&&isequal(oldRate5(:,5),newRate5(:,5)), ...
+    'WallVelocityTest:SA','墙速度梯度同时篡改了第五量源/通量或SA本构。');
+fiveLedger=ledger(newRate5,newInfo5,mesh);
+scale4=[rho 30 30 2000];scale5=[scale4 .2];
+jacobian4=serialJacobian(Qnonlinear,mesh,gas,boundary,scale4);
+jacobian5=serialJacobian(Q5,mesh,gas,boundary,scale5);
+be4=oneBE(Qnonlinear,mesh,gas,boundary,scale4);be5=oneBE(Q5,mesh,gas,boundary,scale5);
+
+%% 三、坏策略与几何是输入错误，不得回退成legacy或吞进状态重试
+bad=boundary;bad.jMin.velocityGradient='unreviewed-normal';
+reject('unknown-policy',@()axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,bad),'AxisFV:WallVelocityBoundary');
+bad=boundary;bad.iMin.velocityGradient='dirichlet-tangent';
+reject('nonwall-policy',@()axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,bad),'AxisFV:WallVelocityBoundary');
+bad=boundary;bad.jMin.velocity=@(p)[0 0];
+reject('function-velocity-not-supported',@()axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,bad),'AxisFV:WallVelocityBoundary');
+bad=boundary;bad.jMin.velocity=[1 m];
+reject('moving-wall-not-supported',@()axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,bad),'AxisFV:WallVelocityBoundary');
+bad=boundary;bad.jMin.velocityTangentialGradient=[0 0];
+reject('extra-tangent-data',@()axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,bad),'AxisFV:WallVelocityBoundary');
+bad=legacyBoundary;bad.jMin.velocityTangentialGradient=[0 0];
+reject('orphan-tangent-data',@()axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,bad),'AxisFV:WallVelocityBoundary');
+bad=explicitLegacy;bad.jMin.velocityTangentialGradient=[0 0];
+reject('legacy-cannot-ignore-tangent',@()axisymmetricNavierStokesResidual(Qnonlinear,mesh,gas,bad),'AxisFV:WallVelocityBoundary');
+reject('wrong-cell-velocity-size',@()axisymmetricWallVelocityGradient(mesh,Pnonlinear(1:end-1,2:3),boundary,wallFaces,wallVelocity,oldX,oldR),'AxisFV:WallVelocityState');
+badX=oldX;badX(1)=NaN;
+reject('nonfinite-gradient',@()axisymmetricWallVelocityGradient(mesh,Pnonlinear(:,2:3),boundary,wallFaces,wallVelocity,badX,oldR),'AxisFV:WallVelocityState');
+badWalls=wallFaces;badWalls(1)=badWalls(2);
+reject('duplicate-wall-face',@()axisymmetricWallVelocityGradient(mesh,Pnonlinear(:,2:3),boundary,badWalls,wallVelocity,oldX,oldR),'AxisFV:WallVelocityGeometry');
+badWalls=wallFaces;badWalls(1)=find(f.neighbour>0,1);
+reject('internal-face-cannot-be-wall',@()axisymmetricWallVelocityGradient(mesh,Pnonlinear(:,2:3),boundary,badWalls,wallVelocity,oldX,oldR),'AxisFV:WallVelocityGeometry');
+badMesh=mesh;face=wallFaces(1);owner=f.owner(face);
+badMesh.volumeCentroid(owner,:)=f.centroid(face,:)+.001*f.normal(face,:);
+badMesh.faces.delta(face,:)=badMesh.faces.centroid(face,:)-badMesh.volumeCentroid(owner,:);
+assert(dot(badMesh.faces.delta(face,:),f.normal(face,:))<0);
+reject('negative-true-normal-distance',@()axisymmetricWallVelocityGradient(badMesh,Pnonlinear(:,2:3),boundary,wallFaces,wallVelocity,oldX,oldR),'AxisFV:WallVelocityGeometry');
+badMesh=mesh;badMesh.faces.delta(face,1)=badMesh.faces.delta(face,1)+1e-6;
+reject('fabricated-wall-displacement',@()axisymmetricWallVelocityGradient(badMesh,Pnonlinear(:,2:3),boundary,wallFaces,wallVelocity,oldX,oldR),'AxisFV:WallVelocityGeometry');
+badVelocity=wallVelocity;badVelocity(1,1)=1;
+reject('actual-wall-value-conflicts-with-input',@()axisymmetricWallVelocityGradient(mesh,Pnonlinear(:,2:3),boundary,wallFaces,badVelocity,oldX,oldR),'AxisFV:WallVelocityBoundary');
+
+%% 四、默认冻结基线逐值重放；真实后体状态仅作同Q空间诊断，不冒称已修复或稳态
+v68SHA=fileSHA(v68EvidenceFile);v68=load(v68EvidenceFile,'caseDefinition','implicit','durable');
+c=v68.caseDefinition;saved=v68.implicit;[v68Rate,v68Info]=axisymmetricRANSResidual(saved.Q,c.mesh,c.gas,c.boundary);
+storedV68Rate=(-c.mesh.incidence*saved.finalInfo.faceFluxIntegralPerRadian+saved.finalInfo.cellSourceIntegral)./c.mesh.volumePerRadian;
+assert(isequaln(v68Info,saved.finalInfo)&&isequal(v68Rate,storedV68Rate)&& ...
+    max(abs(v68Rate)./saved.residualScale,[],'all')==saved.residualNorm);
+assert(numel(v68.durable.steps)==13,'WallVelocityTest:Frozen','必须保留全部13个真实端点默认回放。');
+for j=1:numel(v68.durable.steps)
+    entry=v68.durable.steps(j);stepPath=fullfile(fileparts(v68EvidenceFile),entry.relativePath);
+    assert(strcmp(fileSHA(stepPath),entry.sha256));payload=load(stepPath,'segment');segment=payload.segment;
+    [stepRate,stepInfo]=axisymmetricRANSResidual(segment.Q,c.mesh,c.gas,c.boundary);
+    storedStepRate=(-c.mesh.incidence*segment.finalInfo.faceFluxIntegralPerRadian+segment.finalInfo.cellSourceIntegral)./c.mesh.volumePerRadian;
+    assert(isequaln(stepInfo,segment.finalInfo)&&isequal(stepRate,storedStepRate)&& ...
+        max(abs(stepRate)./segment.residualScale,[],'all')==segment.residualNorm);
+end
+v67SHA=fileSHA(v67EvidenceFile);v67=load(v67EvidenceFile,'mesh','gas','boundary','implicit');
+[v67Rate,v67Info]=axisymmetricRANSResidual(v67.implicit.Q,v67.mesh,v67.gas,v67.boundary);
+storedV67Rate=(-v67.mesh.incidence*v67.implicit.finalInfo.faceFluxIntegralPerRadian+v67.implicit.finalInfo.cellSourceIntegral)./v67.mesh.volumePerRadian;
+assert(isequaln(v67Info,v67.implicit.finalInfo)&&isequal(v67Rate,storedV67Rate)&& ...
+    max(abs(v67Rate)./v67.implicit.residualScale,[],'all')==v67.implicit.residualNorm);
+sameQBoundary=c.boundary;sameQBoundary.jMin.velocityGradient='dirichlet-tangent';
+[sameQRate,sameQInfo]=axisymmetricRANSResidual(saved.Q,c.mesh,c.gas,sameQBoundary);
+realScope=assertMomentumWallOnly(v68Rate,v68Info,sameQRate,sameQInfo,c.mesh,v68Info.wall.faceID);
+realConstraints=constraints(sameQInfo.wallVelocityGradient,c.mesh);
+realAudit=sameQInfo.wallVelocityGradient;hit=find(realAudit.ownerCell==106);
+assert(isscalar(hit)&&max(abs(realAudit.oldTangentialGradientPerS(hit,:)))>1e5, ...
+    'WallVelocityTest:RealExcitation','真实后体热点的旧切向速度导数诊断未激活。');
+realDiagnostic=struct('sourceEvidenceSHA256',v68SHA,'acceptedEndpointsReplayed',13, ...
+    'defaultV68CompleteInfoReplayed',true,'defaultV67CompleteInfoReplayed',true, ...
+    'hotOwnerCell',106,'hotWallFace',realAudit.faceID(hit),'hotOwnerVelocity',realAudit.cellVelocityProxyXR(hit,:), ...
+    'hotNormalDistanceM',realAudit.normalDistanceM(hit),'hotTangentialOffsetM',realAudit.tangentialOffsetM(hit), ...
+    'oldTangentialVelocityGradientPerS',realAudit.oldTangentialGradientPerS(hit,:), ...
+    'newTangentialVelocityGradientPerS',realAudit.gradientXPerS(hit,:)*realAudit.tangentXR(hit,1)+ ...
+        realAudit.gradientRPerS(hit,:)*realAudit.tangentXR(hit,2), ...
+    'newSameStateOriginalResidual',max(abs(sameQRate)./saved.residualScale,[],'all'), ...
+    'newSameStateIsSteady',false,'actualRocketAdvancedWithNewPolicy',false,'physicalSolution',false);
+assert(strcmp(v68SHA,fileSHA(v68EvidenceFile))&&strcmp(v67SHA,fileSHA(v67EvidenceFile)));
+report=struct('status','passed-explicit-static-wall-velocity-Dirichlet-gradient-numerical-contract', ...
+    'linearFixtures',[linearRecords{:}],'nonlinearConservativeQuadrature',nonlinearQuadrature, ...
+    'oldNonlinearTangentialMaximumPerS',oldTangential,'newNonlinearTangentialMaximumPerS',newTangential, ...
+    'nonlinearConstraints',nonlinearConstraints,'fourQuantityScope',fourScope,'fiveQuantityScope',fiveScope, ...
+    'fourQuantityLedger',fourLedger,'fiveQuantityLedger',fiveLedger,'jacobian4',jacobian4,'jacobian5',jacobian5, ...
+    'be4',be4,'be5',be5,'refusals',refusals,'realDiagnostic',realDiagnostic,'realScope',realScope, ...
+    'realConstraints',realConstraints,'v67EvidenceSHA256',v67SHA,'sourceBindings',sourceBindings(root), ...
+    'physicalSolution',false,'experimentalValidation',false,'eligibleForSurfaceCoverage',false,'newProductionSolvedAreaM2',0);
+save(fullfile(folder,'wall_velocity_gradient_evidence.mat'),'report','gas','mesh','boundary','Qnonlinear','Q5', ...
+    'legacyBoundary','oldRate','oldInfo','newRate','newInfo','oldRate5','oldInfo5','newRate5','newInfo5', ...
+    'directX','directR','directAudit','v68Rate','v68Info','sameQRate','sameQInfo','sameQBoundary');
+fid=fopen(fullfile(folder,'wall_velocity_gradient_summary.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));
+fprintf(fid,'%s',jsonencode(report));clear guard;
+fprintf('Wall velocity gradient passed: true FV means, flat/sloped skew walls, Newton stress, 4/5 ledger/Jacobian/BE, %d refusals, v68 13 endpoints and complete v67 default replay.\n',numel(refusals));
+    function reject(label,action,expected)
+        try,action();catch exception
+            assert(strcmp(exception.identifier,expected),'WallVelocityTest:UnexpectedRefusal', ...
+                '%s期望%s，实际%s。',label,expected,exception.identifier);
+            refusals(end+1)=struct('label',label,'identifier',exception.identifier);return;
+        end
+        error('WallVelocityTest:MissingRefusal','非法合同%s没有拒绝。',label);
+    end
+end
+
+function p=profile(point,rho,T,ri,m,a,k,variation)
+% 模块用途：零壁速度的线性/二次多项式；守恒能量含速度平方，必须真实积分。
+d=(point(:,2)-ri-m*point(:,1))/sqrt(1+m^2);
+s=(point(:,1)-a*(point(:,2)-ri))/(1-a*m);
+velocity=d.*(k+s.*variation);p=[rho*ones(size(d)),velocity,T*ones(size(d))];
+end
+function boundary=makeBoundary(primitive,Twall)
+edge=struct('type','prescribedTrace','primitive',primitive,'nuTilde',.1);
+boundary=struct('iMin',edge,'iMax',edge,'jMin',struct('type','wall','temperature',Twall, ...
+    'velocity',[0 0],'thermalGradient','dirichlet-tangent'),'jMax',edge);
+end
+function record=constraints(a,mesh)
+% 模块用途：独立检验两条物理约束；每个速度分量有各自有单位舍入预算。
+assert(strcmp(a.kind,'explicit-Dirichlet-tangent-static-wall-velocity-gradient-v1')&& ...
+    ~a.cellStateClipped&&~a.cellVelocityIsExactFVMean&&all(a.wallVelocityInputXR==0,'all'));
+ids=a.faceID;normal=mesh.faces.normal(ids,:);tangent=[-normal(:,2),normal(:,1)];
+delta=mesh.faces.centroid(ids,:)-mesh.volumeCentroid(mesh.faces.owner(ids),:);
+assert(isequal(a.normalXR,normal)&&isequal(a.tangentXR,tangent)&& ...
+    isequal(a.normalDistanceM,sum(delta.*normal,2))&&isequal(a.tangentialOffsetM,sum(delta.*tangent,2)));
+gx=a.gradientXPerS;gr=a.gradientRPerS;
+tangentResidual=gx.*tangent(:,1)+gr.*tangent(:,2)-a.tangentialGradientInputPerS;
+jumpResidual=gx.*delta(:,1)+gr.*delta(:,2)-(a.wallVelocityInputXR-a.cellVelocityProxyXR);
+tangentBudget=256*eps*(abs(gx.*tangent(:,1))+abs(gr.*tangent(:,2))+abs(a.tangentialGradientInputPerS))+realmin;
+jumpBudget=256*eps*(abs(gx.*delta(:,1))+abs(gr.*delta(:,2))+abs(a.wallVelocityInputXR)+abs(a.cellVelocityProxyXR))+realmin;
+assert(all(abs(tangentResidual)<=tangentBudget,'all')&&all(abs(jumpResidual)<=jumpBudget,'all'), ...
+    'WallVelocityTest:Constraints','墙速度梯度未同时满足沿壁导数和真实位移速度差。');
+record=struct('maximumTangentialResidualPerS',max(abs(tangentResidual),[],1), ...
+    'maximumVelocityJumpResidualMs',max(abs(jumpResidual),[],1), ...
+    'maximumTangentialRoundoffBudgetPerS',max(tangentBudget,[],1), ...
+    'maximumVelocityJumpRoundoffBudgetMs',max(jumpBudget,[],1),'passed',true);
+end
+function record=assertMomentumWallOnly(oldRate,old,newRate,new,mesh,wallFaces)
+% 模块用途：显式静止壁只改牵引动量通量；机械功、热流及完整第五量不能暗改。
+nq=size(oldRate,2);unchanged=[1 4:nq];nonwall=true(numel(mesh.faces.owner),1);nonwall(wallFaces)=false;
+assert(isequal(oldRate(:,unchanged),newRate(:,unchanged))&& ...
+    isequal(old.faceFluxIntegralPerRadian(:,unchanged),new.faceFluxIntegralPerRadian(:,unchanged))&& ...
+    isequal(old.faceFluxIntegralPerRadian(nonwall,:),new.faceFluxIntegralPerRadian(nonwall,:))&& ...
+    isequal(old.cellSourceIntegral,new.cellSourceIntegral)&&isequal(old.primitive,new.primitive)&& ...
+    isequal(old.cellVelocityGradientX,new.cellVelocityGradientX)&&isequal(old.cellVelocityGradientR,new.cellVelocityGradientR)&& ...
+    isequal(old.wall.heatFluxIntoWall,new.wall.heatFluxIntoWall)&& ...
+    isequal(old.wall.pressure,new.wall.pressure)&&isequaln(old.transport,new.transport)&& ...
+    isequal(old.convectiveFrequency,new.convectiveFrequency)&&isequal(old.diffusiveFrequency,new.diffusiveFrequency), ...
+    'WallVelocityTest:Scope','显式静止壁策略超出墙动量通量范围，改变了热/SA/内场或状态。');
+assert(all(new.wall.velocityInput==0,'all')&&all(new.wall.mechanicalPowerIntoFluidPerRadian==0)&& ...
+    isequal(new.wall.totalEnergyFluxOutPerRadian,old.wall.totalEnergyFluxOutPerRadian));
+change=new.faceFluxIntegralPerRadian-old.faceFluxIntegralPerRadian;
+tractionDifference=-(new.wall.viscousTraction-old.wall.viscousTraction).*new.wall.areaPerRadian;
+budget=256*eps*(abs(new.faceFluxIntegralPerRadian(wallFaces,2:3))+ ...
+    abs(old.faceFluxIntegralPerRadian(wallFaces,2:3))+ ...
+    (abs(new.wall.viscousTraction)+abs(old.wall.viscousTraction)).*new.wall.areaPerRadian)+realmin;
+assert(any(change(wallFaces,2:3)~=0,'all')&&all(abs(change(wallFaces,2:3)-tractionDifference)<=budget,'all'), ...
+    'WallVelocityTest:MomentumFlux','墙动量变化不是原Newton牵引差或负对照没有激活。');
+expected=-mesh.incidence*change./mesh.volumePerRadian;actual=newRate-oldRate;
+formation=(abs(mesh.incidence)*(abs(new.faceFluxIntegralPerRadian)+abs(old.faceFluxIntegralPerRadian))+ ...
+    abs(new.cellSourceIntegral)+abs(old.cellSourceIntegral))./mesh.volumePerRadian;
+rateBudget=1024*eps*(abs(newRate)+abs(oldRate)+abs(expected)+formation)+realmin;
+assert(all(abs(actual-expected)<=rateBudget,'all'));
+record=struct('quantityCount',nq,'onlySelectedWallMomentumFluxChanged',true,'stateAndCellWLSUnchanged',true, ...
+    'fourOrFiveQuantitySourceUnchanged',true,'wallHeatAndEnergyUnchanged',true,'staticWallMechanicalPowerExactlyZero',true, ...
+    'maximumWallMomentumFluxChange',max(abs(change(wallFaces,2:3)),[],1));
+end
+function record=ledger(rate,info,mesh)
+terms=rate.*mesh.volumePerRadian;source=info.cellSourceIntegral;boundary=info.faceFluxIntegralPerRadian(mesh.boundaryFaces,:);
+defect=sum(terms,1)+sum(boundary,1)-sum(source,1);
+arithmetic=sum(abs(terms),1)+sum(abs(source),1)+sum(abs(info.faceFluxIntegralPerRadian).*full(sum(mesh.cellFaceMultiplicity,1))',1);
+budget=2048*eps*arithmetic+realmin;
+assert(all(abs(defect)<=budget),'WallVelocityTest:Ledger','完整共享面/几何源账不闭合。');
+record=struct('quantityCount',size(rate,2),'rawDefect',defect,'roundoffBudget',budget,'unitSeparated',true,'perRadian',true);
+end
+function record=serialJacobian(Q,mesh,gas,boundary,scale)
+% 模块用途：在同一可微离散分支上，逐列/有色/全分量方向独立对照完整Jacobian。
+% 真FV速度方差使本例EOS温度只比400K高0.003--0.038K；原2e-6扰动会
+% 跨越Barth-Jespersen活跃约束，中央割线不能充当同一个线性导数。
+% 因此显式使用7e-8，并逐列核查BJ上下界/活跃点和HLLC三波/波速选择不变。
+% 保留原1e-5方向门槛和原生产默认；另用2e-7方向交叉验证及2e-6跨分支负对照。
+n=mesh.cellCount;nq=size(Q,2);U=Q./scale;differenceStep=7e-8;
+[~,baseInfo]=spatial(Q,mesh,gas,boundary);baseBranch=jacobianBranches(Q,mesh,gas,boundary,baseInfo);
+[J,details,pattern]=axisymmetricFVJacobian(Q,mesh,gas,boundary,scale, ...
+    struct('differenceStep',differenceStep,'differenceScheme','central'));
+assert(details.success&&details.columnsDifferentiated==numel(Q));dense=zeros(n*nq);h=differenceStep*max(1,abs(U(:)));
+columnBranchChanges=zeros(numel(Q),4);coarseBranchChanges=columnBranchChanges;
+for k=1:numel(Q)
+    plus=U;minus=U;plus(k)=plus(k)+h(k);minus(k)=minus(k)-h(k);
+    [rp,ip]=spatial(plus.*scale,mesh,gas,boundary);[rm,im]=spatial(minus.*scale,mesh,gas,boundary);
+    rp=rp./scale;rm=rm./scale;dense(:,k)=(rp(:)-rm(:))/(2*h(k));
+    bp=jacobianBranches(plus.*scale,mesh,gas,boundary,ip);bm=jacobianBranches(minus.*scale,mesh,gas,boundary,im);
+    columnBranchChanges(k,:)=branchChanges(baseBranch,bp,bm);
+    hc=2e-6*max(1,abs(U(k)));plus=U;minus=U;plus(k)=plus(k)+hc;minus(k)=minus(k)-hc;
+    bp=jacobianBranches(plus.*scale,mesh,gas,boundary);bm=jacobianBranches(minus.*scale,mesh,gas,boundary);
+    coarseBranchChanges(k,:)=branchChanges(baseBranch,bp,bm);
+end
+assert(all(columnBranchChanges==0,'all')&&sum(coarseBranchChanges(:,1:2),'all')>0, ...
+    'WallVelocityTest:JacobianBranch','小扰动未保持可微分支，或原步长跨BJ分支的负对照未激活。');
+relative=max(abs(full(J)-dense),[],'all')/max(abs(dense),[],'all');
+assert(relative<2e-6,'WallVelocityTest:Jacobian','完整有色与独立逐列Jacobian不符。');
+outside=~full(kron(ones(nq),pattern.cellPattern));outsideMaximum=max([0;abs(dense(outside))]);
+assert(outsideMaximum<1e-6,'WallVelocityTest:Stencil','静止壁梯度依赖超出原保守稀疏支持。');
+v=reshape(sin((1:numel(Q))'*.63),size(Q));action=reshape(J*v(:),size(Q));directionSteps=[2e-7 7e-8];directions=cell(2,1);
+for j=1:numel(directionSteps)
+    epsilon=directionSteps(j);
+    [rp,ip]=spatial((U+epsilon*v).*scale,mesh,gas,boundary);[rm,im]=spatial((U-epsilon*v).*scale,mesh,gas,boundary);
+    bp=jacobianBranches((U+epsilon*v).*scale,mesh,gas,boundary,ip);
+    bm=jacobianBranches((U-epsilon*v).*scale,mesh,gas,boundary,im);changes=branchChanges(baseBranch,bp,bm);
+    direct=(rp-rm)./scale/(2*epsilon);direction=max(abs(action-direct),[],'all')/max(abs(direct),[],'all');
+    assert(all(changes==0)&&direction<1e-5,'WallVelocityTest:Direction', ...
+        '同分支完整Jacobian作用与独立全分量方向差分不符。');
+    integral=sum(action.*scale.*mesh.volumePerRadian,1);
+    expected=(-(ip.netBoundaryFlux-im.netBoundaryFlux)+(ip.sourceIntegral-im.sourceIntegral))/(2*epsilon);
+    arithmetic=sum(abs(action.*scale.*mesh.volumePerRadian),1)+abs(expected);
+    assert(all(abs(integral-expected)<=1e-5*arithmetic+512*eps*arithmetic));
+    directions{j}=struct('differenceStep',epsilon,'direct',direct,'relative',direction, ...
+        'branchChanges',changes,'integratedDerivativeDefect',integral-expected,'integratedDerivativeScale',arithmetic);
+end
+% 模块用途：明确展示原默认差分的跨分支割线误差，不把它归因于新墙梯度或放宽容差。
+[coarseJ,coarseDetails]=axisymmetricFVJacobian(Q,mesh,gas,boundary,scale, ...
+    struct('differenceStep',2e-6,'differenceScheme','central'));
+assert(coarseDetails.success);epsilon=7e-7;
+[rp,ip]=spatial((U+epsilon*v).*scale,mesh,gas,boundary);[rm,im]=spatial((U-epsilon*v).*scale,mesh,gas,boundary);
+bp=jacobianBranches((U+epsilon*v).*scale,mesh,gas,boundary,ip);
+bm=jacobianBranches((U-epsilon*v).*scale,mesh,gas,boundary,im);coarseDirectionChanges=branchChanges(baseBranch,bp,bm);
+coarseAction=reshape(coarseJ*v(:),size(Q));coarseDirect=(rp-rm)./scale/(2*epsilon);
+coarseRelative=max(abs(coarseAction-coarseDirect),[],'all')/max(abs(coarseDirect),[],'all');
+assert(sum(coarseDirectionChanges(1:2))>0&&coarseRelative>1e-5&&all(coarseDirectionChanges(3:4)==0), ...
+    'WallVelocityTest:BranchNegativeControl','原步长必须激活BJ跨分支误差，不能以未诊断原因解释。');
+record=struct('quantityCount',nq,'coloredVsSerialRelative',relative,'differenceStep',differenceStep, ...
+    'directionRelative',directions{end}.relative,'directionChecks',[directions{:}],'J',full(J),'serialJ',dense, ...
+    'directionVector',v,'Jaction',action,'columnBranchChanges',columnBranchChanges,'baseBranches',baseBranch, ...
+    'outsideOriginalStencilMaximum',outsideMaximum,'allColumnsChecked',numel(Q), ...
+    'integratedDerivativeDefect',directions{end}.integratedDerivativeDefect, ...
+    'coarseNegativeControl',struct('jacobianStep',2e-6,'directionStep',epsilon,'J',full(coarseJ), ...
+        'Jaction',coarseAction,'direct',coarseDirect,'directionRelative',coarseRelative, ...
+        'columnBranchChanges',coarseBranchChanges,'directionBranchChanges',coarseDirectionChanges, ...
+        'cause','Barth-Jespersen active limiter and local bound switches; HLLC branches unchanged', ...
+        'productionDefaultChanged',false));
+end
+function b=jacobianBranches(Q,mesh,gas,boundary,info)
+% 模块用途：独立重建局部上下界/活跃限幅点及HLLC分支，识别差分是否跨非光滑面。
+P=axisymmetricFVState(Q(:,1:4),gas);f=mesh.faces;o=f.owner;r=f.neighbour;inside=r>0;bf=mesh.boundaryFaces;nc=mesh.cellCount;
+T=P(:,4);trace=P(o(bf),:);wall=false(numel(bf),1);names={'iMin','iMax','jMin','jMax'};
+for k=1:numel(bf)
+    bc=boundary.(names{f.boundarySide(bf(k))});
+    if strcmp(bc.type,'wall')
+        trace(k,2:4)=[bc.velocity,bc.temperature];trace(k,1)=trace(k,5)/(gas.R*bc.temperature);wall(k)=true;
+    else
+        value=bc.primitive(f.centroid(bf(k),:));
+        trace(k,:)=axisymmetricFVState(axisymmetricFVConservative(value,gas),gas);
+    end
+end
+trace=axisymmetricFVState(axisymmetricFVConservative(trace(:,1:4),gas),gas);
+gx=mesh.gradientX*[T;trace(:,4)];gr=mesh.gradientR*[T;trace(:,4)];bt=trace(:,4);
+for k=find(wall)',bc=boundary.(names{f.boundarySide(bf(k))});bt(k)=bc.temperature;end
+boundCell=[(1:nc)';o(inside);r(inside);o(bf)];boundTemp=[T;T(r(inside));T(o(inside));bt];
+lo=zeros(nc,1);hi=lo;lowSource=lo;highSource=lo;
+for c=1:nc
+    ids=find(boundCell==c);[lo(c),ix]=min(boundTemp(ids));lowSource(c)=ids(ix);
+    [hi(c),ix]=max(boundTemp(ids));highSource(c)=ids(ix);
+end
+dl=f.centroid-mesh.volumeCentroid(o,:);
+dr=f.centroid(inside,:)-f.neighbourShift(inside,:)-mesh.volumeCentroid(r(inside),:);
+ds=mesh.planarCentroid-mesh.volumeCentroid;
+inc=[gx(o).*dl(:,1)+gr(o).*dl(:,2);gx(r(inside)).*dr(:,1)+gr(r(inside)).*dr(:,2);gx.*ds(:,1)+gr.*ds(:,2)];
+target=[o;r(inside);(1:nc)'];candidate=ones(size(inc));pos=inc>0;neg=inc<0;
+candidate(pos)=(hi(target(pos))-T(target(pos)))./inc(pos);
+candidate(neg)=(lo(target(neg))-T(target(neg)))./inc(neg);
+alpha=zeros(nc,1);active=zeros(nc,1);
+for c=1:nc
+    ids=find(target==c);[alpha(c),ix]=min([1;candidate(ids)]);if ix>1,active(c)=ids(ix-1);end
+end
+limited=alpha<1;alpha(limited)=alpha(limited)*(1-16*eps);
+if nargin>=5
+    actual=info.transport.reconstruction;
+    assert(isequal(lo,actual.cellLower)&&isequal(hi,actual.cellUpper)&& ...
+        max(abs(alpha-actual.cellLimiter))<=256*eps, ...
+        'WallVelocityTest:BranchReconstruction','独立BJ分支重建未对上实际本构采样。');
+end
+ids=find(inside);L=P(o(ids),:);R=P(r(ids),:);normal=f.normal(ids,:);
+ul=sum(L(:,2:3).*normal,2);ur=sum(R(:,2:3).*normal,2);
+ll=ul-L(:,6);lr=ur-R(:,6);rl=ul+L(:,6);rr=ur+R(:,6);SL=min(ll,lr);SR=max(rl,rr);
+dL=L(:,1).*(SL-ul);dR=R(:,1).*(SR-ur);SM=(R(:,5)-L(:,5)+dL.*ul-dR.*ur)./(dL-dR);
+hllc=double(SL>=0)+2*double(SR<=0)+3*double(SL<0&SR>0&SM>=0)+4*double(SL<0&SR>0&SM<0);
+b=struct('temperatureK',T,'cellLower',lo,'cellUpper',hi,'lowSource',lowSource,'highSource',highSource, ...
+    'cellLimiter',alpha,'active',active,'hllc',hllc,'lowWave',ll<lr,'highWave',rl>rr);
+end
+function result=branchChanges(a,p,m)
+% 顺序：活跃BJ点、上下界来源、HLLC采样波区、Davis左右波速来源；每项均双侧统计。
+result=[nnz(p.active~=a.active)+nnz(m.active~=a.active), ...
+    nnz(p.lowSource~=a.lowSource)+nnz(p.highSource~=a.highSource)+nnz(m.lowSource~=a.lowSource)+nnz(m.highSource~=a.highSource), ...
+    nnz(p.hllc~=a.hllc)+nnz(m.hllc~=a.hllc), ...
+    nnz(p.lowWave~=a.lowWave)+nnz(p.highWave~=a.highWave)+nnz(m.lowWave~=a.lowWave)+nnz(m.highWave~=a.highWave)];
+end
+function record=oneBE(Q,mesh,gas,boundary,scale)
+% 模块用途：真正耦合BE端点，独立按实际前后状态/完整方程/原Newton目标验算。
+opts=struct('maxSteps',1,'initialPseudoCFL',10,'maximumPseudoCFL',10,'maximumPseudoStep',2e-8, ...
+    'residualScale',scale,'maxNewtonIterations',18,'jacobianRefreshEvery',1);
+before=spatial(Q,mesh,gas,boundary);result=advanceAxisymmetricSteady(Q,mesh,gas,boundary,opts);
+assert(result.acceptedSteps==1&&~result.steadyConverged&&result.history.dt(end)==opts.maximumPseudoStep);
+[rate,info]=spatial(result.Q,mesh,gas,boundary);dt=result.history.dt(end);U0=Q./scale;U1=result.Q./scale;
+defect=max(abs(U1-U0-dt*(rate./scale)),[],'all');
+target=1e-11+1e-9*max(abs(dt*(before./scale)),[],'all');
+roundoff=512*eps*max(abs(U0)+abs(U1)+abs(dt*(rate./scale)),[],'all');
+assert(result.history.newtonTarget(end)==target&&defect<=target+roundoff&&isequaln(info,result.finalInfo));
+ledgerRaw=sum((result.Q-Q).*mesh.volumePerRadian,1)+dt*(info.netBoundaryFlux-info.sourceIntegral);
+relative=abs(ledgerRaw)./(sum(mesh.volumePerRadian)*scale);assert(all(relative<=result.options.conservationTolerance));
+assert(any(result.Q~=Q,'all')&&all(isfinite(result.Q),'all')&&~result.pseudoTimeIsPhysical&&result.physicalTimeAdvanced==0);
+record=struct('quantityCount',size(Q,2),'acceptedSteps',result.acceptedSteps,'steadyConverged',false, ...
+    'actualDt',dt,'BEStateDefect',defect,'actualNewtonTarget',target,'roundoffBudget',roundoff, ...
+    'fourOrFiveQuantityLedger',ledgerRaw,'ledgerRelative',relative,'solverResidualEvaluations',result.residualEvaluations, ...
+    'stateWasClipped',false,'physicalTimeAdvanced',0);
+end
+function [rate,info]=spatial(Q,mesh,gas,boundary)
+if size(Q,2)==5,[rate,info]=axisymmetricRANSResidual(Q,mesh,gas,boundary);
+else,[rate,info]=axisymmetricNavierStokesResidual(Q,mesh,gas,boundary);end
+end
+function [Q,record]=trueMeans(mesh,gas,primitive)
+% 模块用途：两三角形独立Duffy/Gauss积分r*Q，包含速度平方和独立体质心。
+x=([-.8611363115940526;-.3399810435848563;.3399810435848563;.8611363115940526]+1)/2;
+w=[.3478548451374539;.6521451548625461;.6521451548625461;.3478548451374539]/2;
+Q=zeros(mesh.cellCount,4);volume=zeros(mesh.cellCount,1);moment=zeros(mesh.cellCount,2);
+for c=1:mesh.cellCount
+    vertices=mesh.vertices(mesh.cells(c,:),:);integral=zeros(1,4);
+    for tri=[1 2 3;1 3 4]'
+        A=vertices(tri(1),:);B=vertices(tri(2),:);C=vertices(tri(3),:);jac=abs(det([B-A;C-A]));
+        for i=1:4
+            for j=1:4
+                point=A+x(i)*(B-A)+(1-x(i))*x(j)*(C-A);weight=w(i)*w(j)*jac*(1-x(i))*point(2);
+                p=primitive(point);q=[p(1),p(1)*p(2:3),p(1)*(gas.cv*p(4)+.5*sum(p(2:3).^2))];
+                integral=integral+weight*q;volume(c)=volume(c)+weight;moment(c,:)=moment(c,:)+weight*point;
+            end
+        end
+    end
+    Q(c,:)=integral/volume(c);
+end
+centroid=moment./volume;volumeRelative=max(abs(volume-mesh.volumePerRadian)./mesh.volumePerRadian);
+centroidAbsolute=max(abs(centroid-mesh.volumeCentroid),[],'all');
+assert(volumeRelative<5e-13&&centroidAbsolute<5e-13);
+record=struct('kind','true-r-weighted-conservative-FV-means','method','independent two-triangle 4x4 Duffy/Gauss', ...
+    'polynomialEnergyIncludesVelocitySquare',true,'volumeRelative',volumeRelative, ...
+    'centroidAbsoluteErrorM',centroidAbsolute,'independentVolumeCentroidXR',centroid,'primitivePointMeansNotAssumed',true);
+end
+function mu=independentMu(T,gas)
+t=gas.transport;mu=t.referenceViscosity*(T/t.referenceTemperature).^1.5.* ...
+    ((t.referenceTemperature+t.sutherlandTemperature)./(T+t.sutherlandTemperature));
+end
+function path=pick(root,version,subfolder,name)
+path=fullfile(root,'outputs',[version '_validation'],subfolder,name);
+if ~exist(path,'file'),path=fullfile(root,'validation',version,subfolder,name);end
+end
+function records=sourceBindings(root)
+names={'tests/testAxisymmetricWallVelocityGradient.m','regionalFlow/axisymmetric/axisymmetricWallVelocityGradient.m', ...
+    'regionalFlow/axisymmetric/axisymmetricNavierStokesResidual.m','regionalFlow/axisymmetric/axisymmetricRANSResidual.m', ...
+    'regionalFlow/axisymmetric/axisymmetricFVJacobian.m','regionalFlow/axisymmetric/advanceAxisymmetricSteady.m'};
+records=struct('path',{},'sha256',{});
+for k=1:numel(names),records(k)=struct('path',names{k},'sha256',fileSHA(fullfile(root,names{k})));end
+end
+function digest=fileSHA(path)
+fid=fopen(path,'rb');assert(fid>=0);guard=onCleanup(@()fclose(fid));bytes=fread(fid,Inf,'*uint8');clear guard;
+md=java.security.MessageDigest.getInstance('SHA-256');md.update(bytes);
+digest=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
+end
