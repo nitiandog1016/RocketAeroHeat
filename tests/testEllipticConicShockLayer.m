@@ -1,0 +1,46 @@
+function report=testEllipticConicShockLayer(folder,parabolicFile)
+%TESTELLIPTICCONICSHOCKLAYER 在同一真实箭体上扩展纵向二次曲线，不放宽匹配门槛。
+% 模块一：B=0的全部跨层载荷与已保存抛物分支逐值相同，仅方法入口变化。
+% 模块二：实际拟合额外的物理纵向形状参数，所有列仍共用一张激波。
+% 模块三：把未通过整体/驻点及真实区域验证的状态保留为原型，不填生产场。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);setupEngineeringShockLayer;
+assert(~exist(folder,'dir'),'ShockLayer:Overwrite','二次曲线研究须在新目录运行。');
+d=load(parabolicFile);fs=d.fs;geometry=d.geometry;
+upstream=struct('pressure',double(fs.pressure),'temperature',double(fs.temperature), ...
+    'density',double(fs.density),'velocityVector',double(fs.flowVelocityVector(:)), ...
+    'method','原19752面箭体M5/30km/alpha20均匀自由流；未使用旧压力/外缘/NS状态');
+cases=cell(2,1);zeroProfileExact=true;
+for j=1:2
+    prior=d.cases{j};old=prior.column;gas=old.shock.gas;
+    current=solveEllipticConicShockLayerColumn(upstream,gas,old.shape,old.coordinate,old.eta, ...
+        struct('quadratureOrder',old.quadratureOrder));
+    assert(isequaln(current,old),'ShockLayer:ConicRegression','B=0的全部保存载荷必须逐值等于旧分支。');
+    shape=old.shape;shape.profileB=8;
+    c=solveEllipticConicShockLayerColumn(upstream,gas,shape,old.coordinate,old.eta,struct('quadratureOrder',16));
+    a=prior.sameStreamlineUpstream;b=prior.sameStreamlineDownstream;
+    sameA=solveEllipticConicShockLayerColumn(upstream,gas,shape,a.coordinate,a.eta);
+    sameB=solveEllipticConicShockLayerColumn(upstream,gas,shape,b.coordinate,b.eta);
+    assert(norm(sameA.state.sourceShockCoordinate(2,:)-sameB.state.sourceShockCoordinate(2,:))<1e-14);
+    assert(abs(sameA.state.entropy(2)-sameB.state.entropy(2))<1e-9);
+    cases{j}=struct('column',c,'sameStreamlineUpstream',sameA,'sameStreamlineDownstream',sameB);
+end
+mkdir(folder);save(fullfile(folder,'columns_before_fit.mat'),'cases','zeroProfileExact','-v7');
+gas=d.cases{2}.column.shock.gas;seed=d.seed;seed.profileB=0;
+timer=tic;bodyFit=fitEllipticConicShockToBody(double(geometry.V),double(geometry.F),upstream,gas,seed,d.coordinates, ...
+    struct('maximumIterations',10,'bodyMatchToleranceM',1e-5,'quadratureOrder',8));elapsed=toc(timer);
+save(fullfile(folder,'fit_before_reporting.mat'),'bodyFit','elapsed','-v7');
+assert(isequaln(bodyFit.initial.residualM,d.bodyFit.initial.residualM),'ShockLayer:ConicRegression','同一初始形状不能更换残差定义。');
+assert(norm(bodyFit.result.residualM)<norm(d.bodyFit.result.residualM),'ShockLayer:ConicStudy','新形状族没有改善原真实体形残差。');
+report=struct('status','tested-longitudinal-conic-shock-layer-and-real-body-matching-prototype', ...
+    'zeroProfilePayloadExactlyEqualsParabolic',zeroProfileExact,'actualFaces',19752,'actualAngleDeg',20, ...
+    'shapeMatchingConverged',bodyFit.shapeMatchingConverged,'bodyMatchToleranceM',bodyFit.bodyMatchToleranceM, ...
+    'initialBodyRMSM',norm(bodyFit.initial.residualM)/3,'parabolicBodyRMSM',norm(d.bodyFit.result.residualM)/3, ...
+    'finalBodyRMSM',norm(bodyFit.result.residualM)/3,'maximumBodyResidualM',max(abs(bodyFit.result.residualM)), ...
+    'bodyFitSeconds',elapsed,'bodyFitEvaluations',bodyFit.evaluations, ...
+    'stagnationGlobalMatchingSolved',false,'boundaryLayerEdgeAvailable',false, ...
+    'experimentalValidation',false,'newProductionSolvedAreaM2',0);
+fs=d.fs;coordinates=d.coordinates;nose=d.nose;
+save(fullfile(folder,'conic_shock_layer_evidence.mat'),'cases','bodyFit','seed','coordinates','geometry','fs','nose','report','-v7');
+fid=fopen(fullfile(folder,'conic_shock_layer_report.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));
+fprintf(fid,'%s',jsonencode(report));disp(report);
+end

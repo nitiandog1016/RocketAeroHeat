@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RocketAeroHeat · 共同激波层研究</title>
+<link rel="stylesheet" href="rocket-sensitivity.css"><link rel="stylesheet" href="shock-layer-study.css"></head>
+<body class="wall-study shock-study">
+<header><strong>RocketAeroHeat</strong><span>共同激波层 · 层内状态与真实体形匹配</span><span>研究原型 · 匹配未通过 · 热流未求</span></header>
+<main>
+ <aside>
+  <div class="workflowControls">
+   <label for="caseChoice">已保存的数值研究</label><select id="caseChoice" aria-label="选择激波层研究"></select>
+   <nav aria-label="科研工作流"><button data-step="0">1 输入模型</button><button data-step="1">2 生成网格</button><button data-step="2">3 添加边界条件</button><button data-step="3">4 计算</button><button data-step="4">5 查看结果</button></nav>
+  </div>
+  <h1 id="title"></h1><p id="scope"></p><dl id="details"></dl>
+  <details><summary>形状匹配与方法适用范围</summary><table id="fits"><thead><tr><th>形状/检查组</th><th>最大偏差 / µm</th></tr></thead><tbody id="fitRows"></tbody></table><p id="methodScope" class="note"></p></details>
+  <p class="note">本页查看已保存结果；切换步骤不重新计算。鼻部开放片只用于放大，整箭网格保持原V/F。</p>
+  <a href="shock-layer-data.json" download>下载数值与来源记录</a>
+ </aside>
+ <section class="content">
+  <div class="viewTools"><label for="viewChoice">三维范围</label><select id="viewChoice" aria-label="三维显示范围"><option value="nose">鼻部放大</option><option value="full">完整箭体</option></select><span id="renderState">等待三维显示</span></div>
+  <iframe id="viewer" title="原箭体与激波内法向列"></iframe>
+  <section class="comparison profilePanel">
+   <div class="profileTools"><strong>激波内法向剖面</strong><label for="columnChoice">法向列</label><select id="columnChoice" aria-label="选择法向列"></select><select id="field" aria-label="层内曲线物理量"><option value="pressurePa">层内压力 / kPa</option><option value="temperatureK">层内温度 / K</option><option value="speedMS">层内速度幅值 / m/s</option><option value="entropyJPerKgK">同流线来源熵 / J/(kg·K)</option><option value="jacobianRatio">法线Jacobian比 / 1</option></select><button id="saveCSV">导出当前列 CSV</button></div>
+   <canvas id="curve" aria-label="层内法向剖面；点为实际保存站点"></canvas>
+   <div class="stationControl"><label for="station">保存站点</label><input id="station" type="range" min="0" max="1" value="0" step="1" aria-label="层内保存站点"><span id="stationNote"></span></div>
+   <p id="plotNote" class="note">线为法向坐标列，不是流线；站点连线不代表额外积分。点击三维可见站点或使用滑块。</p>
+  </section>
+  <section class="comparison"><strong>层内站点探针</strong><p id="stateRole" class="note"></p><dl id="probe"></dl><details><summary>逐场量算法、原面元及适用范围</summary><dl id="methods"></dl></details></section>
+ </section>
+</main>
+<footer>SI · 主轴X、鼻尖+X · 灰色为原几何，蓝线为激波内法向列 · 层内温度不是Te、Tr或Tw · 新增合格热流面积0</footer>
+<script src="shock-layer-data.js"></script><script src="shock-layer-study.js"></script>
+</body></html>

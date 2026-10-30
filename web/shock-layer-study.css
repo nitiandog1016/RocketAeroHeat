@@ -1,0 +1,11 @@
+/* 模块用途：科研剖面与三维几何共用稳定侧栏，不使用装饰动画或额外弹窗。 */
+.shock-study .content{display:grid;grid-template-rows:auto minmax(440px,1fr) auto auto;gap:10px;padding:10px 14px}
+.shock-study iframe{height:100%;min-height:440px}.shock-study .comparison{margin:0;padding:10px 14px}
+.viewTools,.profileTools,.stationControl{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12px}
+.viewTools select,.profileTools select{padding:5px;max-width:260px;font-size:12px}.viewTools span{margin-left:auto;color:#536879}
+.profileTools button{padding:5px 8px;border-color:#b9c7d2;background:#fff;font-size:12px}
+#curve{display:block;width:100%;height:140px;margin:7px 0;touch-action:none}.stationControl input{flex:1;min-width:90px}.stationControl span{font-size:12px;color:#526879}
+#probe,#methods{display:grid;grid-template-columns:180px minmax(0,1fr);gap:4px 14px;margin:8px 0}
+#probe dt,#probe dd,#methods dt,#methods dd{margin:0;line-height:1.5}#methods{grid-template-columns:130px minmax(0,1fr)}
+.shock-study .note{margin:6px 0}#fits th,#fits td{font-size:11px;padding:5px 2px;white-space:normal}
+@media(max-width:950px){.shock-study .content{padding:8px;grid-template-rows:auto minmax(410px,1fr) auto auto}.shock-study iframe{min-height:410px}#probe{grid-template-columns:155px minmax(0,1fr)}}

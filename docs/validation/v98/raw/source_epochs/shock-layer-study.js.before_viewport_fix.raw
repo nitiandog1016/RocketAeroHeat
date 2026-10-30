@@ -1,0 +1,73 @@
+/* 模块用途：逐变量保留层内候选身份，连接五步骤、三维站点、法向剖面与数值导出。 */
+'use strict';
+(function(){
+ const data=window.SHOCK_LAYER_STUDY,$=id=>document.getElementById(id),buttons=[...document.querySelectorAll('[data-step]')];
+ if(!data||data.kind!=='shock-layer-study-v1'||data.productionQualified!==false||data.newProductionSolvedAreaM2!==0)throw Error('激波层研究身份无效。');
+ const fields={pressurePa:{name:'层内压力（候选反算）',unit:'kPa',factor:.001},temperatureK:{name:'层内温度（同入口熵恢复）',unit:'K',factor:1},speedMS:{name:'层内速度幅值',unit:'m/s',factor:1},entropyJPerKgK:{name:'同流线来源熵',unit:'J/(kg·K)',factor:1},jacobianRatio:{name:'法线Jacobian比',unit:'1',factor:1}};
+ const fmt=x=>Number.isFinite(x)?Number(x.toPrecision(7)).toString():'未求解';
+ const labels=['输入模型','生成网格','添加边界条件','计算','查看结果'];
+ let selected=0,column=0,station=0,step=4,revision=0,bounds=null;
+ function rows(node,items){node.replaceChildren();for(const [name,value] of items){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=name;dd.textContent=String(value);node.append(dt,dd);}}
+ function current(){return data.cases[selected];}function col(){return current().columns[column];}
+ data.cases.forEach((c,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=c.caption;$('caseChoice').append(o);});
+ function show(){
+  const c=current(),fs=data.freestream;$('title').textContent=labels[step]+' · '+c.caption;$('scope').textContent=c.scope;
+  const items=[['工况','M'+fmt(fs.Mach)+' · '+fmt(fs.altitudeM/1000)+' km · 攻角'+fmt(fs.alphaDeg)+'°'],['原箭体网格',data.geometry.faces.length+' 面 · 闭合定向'],['当前组',c.columns.length+' 个法向列'],['状态身份','共同激波层原型，真实体形未匹配'],['匹配门槛',fmt(c.bodyMatchToleranceM*1e6)+' µm，保持原值'],['热流与求解壁温','未求解'],['新增合格热流面积','0 m²']];
+  if(step===0)items.unshift(['模型来源','冻结的原V/F与真实自由流；不读取旧壁面场']);
+  if(step===1)items.unshift(['鼻部网格','原三角面子集，为开放片，未重新生成或平滑']);
+  if(step===2)items.unshift(['自由流p / T',fmt(fs.pressurePa)+' Pa / '+fmt(fs.temperatureK)+' K'],['壁面温度输入','本研究未设置']);
+  if(step===3)items.unshift(['计算方式','读取已保存的内部薄层结果；本页不重算'],['资格','拟合及独立检查均未通过体形门槛']);
+  rows($('details'),items);$('methodScope').textContent=data.methodScope;
+  $('fitRows').replaceChildren();data.fitSummary.names.forEach((name,i)=>{const tr=document.createElement('tr'),a=document.createElement('td'),b=document.createElement('td');a.textContent=name;b.textContent=fmt(data.fitSummary.maximumM[i]*1e6);tr.append(a,b);$('fitRows').append(tr);});
+  $('columnChoice').replaceChildren();c.columns.forEach((_,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent='法向列 '+(i+1);$('columnChoice').append(o);});$('columnChoice').value=String(column);
+  buttons.forEach((b,i)=>b.setAttribute('aria-selected',String(i===step)));revision++;
+  const view=step===0?'full':$('viewChoice').value;
+  $('viewer').setAttribute('src','geometry/index.html?case='+selected+'&view='+view+'&layer='+(step>=3?'1':'0')+'&wire='+(step===1?'1':'0')+'&revision='+revision);
+  $('renderState').textContent='加载原几何';probe();draw();
+ }
+ // 模块一：未知量保持未知；η=0只是候选生成体表，不能标为真实壁面。
+ function probe(){
+  const c=col(),n=c.eta.length;station=Math.max(0,Math.min(n-1,station));$('station').max=String(n-1);$('station').value=String(station);
+  $('stationNote').textContent='列 '+(column+1)+' · 站 '+(station+1)+'/'+n+' · η = '+fmt(c.eta[station])+' · n = '+fmt(c.normalDistanceM[station]*1000)+' mm';
+  $('stateRole').textContent=c.eta[station]===0?'候选生成体表端点；未通过真实体形匹配，数值不代表真实壁面场。':'激波内法向列上的条件反算状态；不是边界层外缘或壁面。';
+  rows($('probe'),[['XYZ / m',c.position[station].map(fmt).join(', ')],['层内压力 / kPa',fmt(Number.isFinite(c.pressurePa[station])?c.pressurePa[station]*.001:NaN)],['层内温度 / K',fmt(c.temperatureK[station])],['层内速度 / m/s',fmt(c.speedMS[station])],['层内密度 / kg/m³',fmt(c.densityKgM3[station])],['同流线来源熵 / J/(kg·K)',fmt(c.entropyJPerKgK[station])],['外缘Te / 恢复Tr / 给定Tw / 求解Tw','未求 / 未求 / 未设置 / 未求'],['热流 / W/m²','未求解'],['本列体形残差 / µm',Number.isFinite(c.bodyResidualM)?fmt(c.bodyResidualM*1e6):'未进行真实体形匹配']]);
+  rows($('methods'),[['压力方法',c.methods.pressure],['温度方法',c.methods.temperature],['速度方法',c.methods.speed],['熵来源',c.methods.entropy],['法向距离',c.methods.distance],['气体模型',c.gasMode],['原三角面号',Number.isInteger(c.originalFaceID)?c.originalFaceID:'本验证列未关联'],['原面重心权重',Array.isArray(c.barycentric)&&c.barycentric.length?c.barycentric.map(fmt).join(', '):'未关联'],['适用范围',data.methodScope]]);
+ }
+ // 模块二：只连接已保存站点，横轴为法向距离n，绝不借用表面流线s标签。
+ function draw(){
+  const canvas=$('curve'),ctx=canvas.getContext('2d');if(!ctx)return;const dpr=Math.min(window.devicePixelRatio||1,2),w=Math.max(320,canvas.clientWidth),h=Math.max(120,canvas.clientHeight);canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  const c=col(),field=fields[$('field').value],values=c[$('field').value],finite=values.filter(Number.isFinite).map(v=>v*field.factor);if(!finite.length){ctx.fillText('当前量未求解',10,20);bounds=null;return;}
+  let lo=Math.min(...finite),hi=Math.max(...finite);if(hi-lo<1e-10*Math.max(1,Math.abs(lo),Math.abs(hi))){const p=Math.max(.01,Math.abs(lo)*.04);lo-=p;hi+=p;}
+  const left=78,right=w-14,top=22,bottom=h-25,max=c.normalDistanceM.at(-1)*1000,px=x=>left+x/max*(right-left),py=y=>bottom-(y-lo)/(hi-lo)*(bottom-top);
+  ctx.font='11px Segoe UI,Microsoft YaHei,sans-serif';ctx.fillStyle='#536879';ctx.fillText(field.name+' / '+field.unit,5,12);
+  for(let j=0;j<3;j++){const v=lo+(hi-lo)*j/2;ctx.strokeStyle='#e0e6eb';ctx.beginPath();ctx.moveTo(left,py(v));ctx.lineTo(right,py(v));ctx.stroke();ctx.fillText(fmt(v),3,py(v)+4);}
+  for(let j=0;j<4;j++){const x=max*j/3;ctx.fillText(fmt(x),px(x)-8,h-8);}ctx.fillText('n / mm',right-40,h-8);
+  ctx.beginPath();ctx.strokeStyle='#176b85';ctx.lineWidth=1.6;let started=false;values.forEach((v,i)=>{if(!Number.isFinite(v)){started=false;return;}const x=px(c.normalDistanceM[i]*1000),y=py(v*field.factor);if(started)ctx.lineTo(x,y);else ctx.moveTo(x,y);started=true;});ctx.stroke();
+  if(Number.isFinite(values[station])){ctx.fillStyle='#176b85';ctx.beginPath();ctx.arc(px(c.normalDistanceM[station]*1000),py(values[station]*field.factor),3,0,Math.PI*2);ctx.fill();}
+  bounds={left,right,max};
+ }
+ buttons.forEach((b,i)=>b.addEventListener('click',()=>{step=i;show();}));
+ $('caseChoice').addEventListener('change',()=>{selected=Number($('caseChoice').value);column=0;station=0;show();});
+ $('columnChoice').addEventListener('change',()=>{column=Number($('columnChoice').value);station=0;probe();draw();});
+ $('viewChoice').addEventListener('change',show);$('field').addEventListener('change',draw);
+ $('station').addEventListener('input',()=>{station=Number($('station').value);probe();draw();});
+ $('curve').addEventListener('click',e=>{if(!bounds)return;const r=$('curve').getBoundingClientRect(),x=(e.clientX-r.left-bounds.left)/(bounds.right-bounds.left)*bounds.max;station=col().normalDistanceM.reduce((best,n,i)=>Math.abs(n*1000-x)<Math.abs(col().normalDistanceM[best]*1000-x)?i:best,0);probe();draw();});
+ // 模块三：只接受当前iframe、当前请求版本和有效站点，拒绝过期或无关消息。
+ window.addEventListener('message',e=>{
+  if(e.origin!==location.origin||e.source!==$('viewer').contentWindow||!e.data||e.data.kind!=='shock-layer-view-event'||e.data.caseIndex!==selected)return;
+  const p=e.data.payload;if(!p||p.revision!==revision)return;
+  if(p.kind==='geometry-error'){$('renderState').textContent='三维显示失败：'+p.message;return;}
+  if(p.kind==='geometry-rendered'){$('renderState').textContent=p.webglError===0&&p.visiblePixelSamples>0?'原几何已显示 · 可旋转/平移/缩放':'三维显示需要检查';return;}
+  if(step<3||p.kind!=='surface-flow-probe'||!Number.isInteger(p.curveIndex)||!Number.isInteger(p.stationIndex))return;
+  const next=current().columns[p.curveIndex];if(!next||p.stationIndex<0||p.stationIndex>=next.eta.length)return;
+  column=p.curveIndex;station=p.stationIndex;$('columnChoice').value=String(column);probe();draw();
+ });
+ // 模块四：CSV单位和方法固定；未知热流/壁温留空并另带unknown状态。
+ $('saveCSV').addEventListener('click',()=>{
+  const c=col(),quote=v=>'"'+(v==null?'':String(v)).replace(/"/g,'""')+'"';
+  const header=['eta','normal_distance_m','x_m','y_m','z_m','layer_pressure_Pa','layer_temperature_K','layer_density_kg_m3','layer_speed_m_s','entropy_J_kg_K','normal_jacobian_ratio','body_residual_m','original_face_id','heat_flux_W_m2','wall_temperature_input_K','wall_temperature_solved_K','edge_temperature_K','recovery_temperature_K','heat_flux_status','wall_temperature_status','state_role','pressure_method','temperature_method','speed_method','method_scope'];
+  const lines=[header.map(quote).join(',')];c.eta.forEach((eta,i)=>{const values=[eta,c.normalDistanceM[i],...c.position[i],c.pressurePa[i],c.temperatureK[i],c.densityKgM3[i],c.speedMS[i],c.entropyJPerKgK[i],c.jacobianRatio[i],Number.isFinite(c.bodyResidualM)?c.bodyResidualM:null,Number.isInteger(c.originalFaceID)?c.originalFaceID:null,null,null,null,null,null,'unknown','unknown',c.stateRole,c.methods.pressure,c.methods.temperature,c.methods.speed,data.methodScope];lines.push(values.map(quote).join(','));});
+  const blob=new Blob(['\uFEFF'+lines.join('\n')+'\n'],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='shock_layer_'+current().id+'_column'+(column+1)+'.csv';a.click();URL.revokeObjectURL(url);
+ });
+ if(typeof ResizeObserver==='function')new ResizeObserver(draw).observe($('curve'));show();
+})();
