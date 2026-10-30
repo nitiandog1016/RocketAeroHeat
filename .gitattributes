@@ -51,3 +51,6 @@ tests/data/coupled_shock_patch/** -text -eol
 docs/validation/v101/** -text -eol
 docs/validation/v101/**/*.raw -whitespace
 tests/data/shock_fitted_kernel/** -text -eol
+# 原始存储回执可能使用CRLF；保持原SHA并把CR识别为换行。
+docs/validation/storage_20261030/nested_operators/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/storage_20261030/nested_operators/**/*.raw -whitespace
