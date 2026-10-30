@@ -1,0 +1,37 @@
+{
+  "status": "exact-archived-source-for-terminal-MATLAB-snapshot",
+  "versions": [
+    {
+      "restorePath": "tests/auditGeneralShockSurfaceMass.py",
+      "path": "docs/validation/v99/raw/auditGeneralShockSurfaceMass.before_float_cast.py.raw",
+      "sha256": "a5efd58aa16e2cdbb01cc59dd21edb7eecdd95855888ee8b9e7d2749f3731771"
+    },
+    {
+      "restorePath": "tests/auditGeneralShockSurfaceMass.py",
+      "path": "docs/validation/v99/raw/auditGeneralShockSurfaceMass.before_cell_conversion.py.raw",
+      "sha256": "24affbb2008fb026b09b47e07dcb6b92e7d02cc59a21dffc04c60dbee0f3699e"
+    }
+  ],
+  "diagnostic": {
+    "stage": "independent-Python-separable-reference",
+    "actualFailure": "unsigned-integer-negation-overflow-before-QUADPACK",
+    "storedKType": "uint8",
+    "storedDiagonal": [
+      17,
+      21
+    ],
+    "negatedBeforeFloatCast": [
+      239,
+      235
+    ],
+    "resolution": "cast diagonal to float before unary negation",
+    "numericalMATFilesModified": false,
+    "physicalThresholdsChanged": false
+  },
+  "secondDiagnostic": {
+    "stage": "independent-Python-neighbor-cell-reference",
+    "actualFailure": "mat_struct-in-2D-cell-array-is-not-subscriptable",
+    "resolution": "convert each neighbor structure through its named MATLAB fields",
+    "numericalMATFilesModified": false
+  }
+}

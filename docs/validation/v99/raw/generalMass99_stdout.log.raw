@@ -1,0 +1,11 @@
+RAH_ENGINE_PID=38716
+{错误使用 assert
+实际拒绝MATLAB:notGreaterEqual，期望MATLAB:expectedNonnegative。
+
+出错 testGeneralShockSurfaceMass>reject (第 92 行)
+assert(strcmp(identifier,expected),'ShockLayer:TestRejection','实际拒绝%s，期望%s。',identifier,expected);
+
+出错 testGeneralShockSurfaceMass (第 77 行)
+refused{end+1}=reject(@()shockSurfaceMassSource(map,-.1),'MATLAB:expectedNonnegative');
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

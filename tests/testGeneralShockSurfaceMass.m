@@ -1,0 +1,95 @@
+function report=testGeneralShockSurfaceMass(folder,parabolicFile,conicFile)
+%TESTGENERALSHOCKSURFACEMASS 一般共同曲面的连续式、入口来源和原曲面退化验收。
+% 模块一：原抛物面/二次曲线与两种物性作严格数值退化，不改旧叶函数。
+% 模块二：整体非椭圆形变核对连续式、同流线来源、步长加密和单位缩放。
+% 模块三：所有结果保持研究身份，不将几何/质量映射称为真实热流面积。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);setupEngineeringShockLayer;
+assert(~exist(folder,'dir'),'ShockLayer:Overwrite','质量映射试验须写入新目录。');
+p=load(parabolicFile);c=load(conicFile);fs=p.fs;
+up=struct('pressure',double(fs.pressure),'temperature',double(fs.temperature),'density',double(fs.density), ...
+    'velocityVector',double(fs.flowVelocityVector(:)),'method','冻结原箭体M5/30km/alpha20均匀上游；不读取壁面场');
+regression=cell(4,1);index=0;
+for source=1:2
+    if source==1,saved=p;else,saved=c;end
+    for mode=1:2
+        old=saved.cases{mode}.column;shape=old.shape;
+        actual=solveGeneralShockLayerColumn(up,old.shock.gas,shape,old.coordinate,old.eta);
+        sourceExpected=old.state.sourceShockCoordinate';
+        assert(max(abs(actual.state.sourceShockCoordinate'-sourceExpected),[],'all')<2e-10);
+        assert(abs(actual.massPerShockWidthKgPerMS/old.massPerShockWidthKgPerMS-1)<2e-9);
+        assert(max(abs(actual.normalDistanceM-old.normalDistanceM))<2e-9);
+        for key={'pressure','temperature','density','streamwiseSpeed','normalSpeed','entropy'}
+            before=old.state.(key{1});after=actual.state.(key{1});
+            assert(max(abs(after-before)./max(1,abs(before)))<2e-9,'ShockLayer:GeneralRegression','一般映射未退化回原列。');
+        end
+        index=index+1;regression{index}=struct('sourceFamily',source,'sourceMode',mode,'column',actual);
+    end
+end
+
+%% 二、全局三方向四次形变；真实入口不再是K矩阵指数
+shape=p.cases{2}.column.shape;shape.profileB=0;
+shape.deformationDirections=[1 0 sqrt(.5);0 1 sqrt(.5)];shape.deformationWeights=[.12;.07;.05];
+shape.deformationReferenceLengthM=.05;q=[.022;.013];eta=[1;.7;.3;0];
+gas=p.cases{2}.column.shock.gas;
+general=solveGeneralShockLayerColumn(up,gas,shape,q,eta);
+fine=solveGeneralShockLayerColumn(up,gas,shape,q,eta,struct('quadratureOrder',32,'massMapOptions',struct('gridRateStep',.0075)));
+assert(max(abs(general.normalDistanceM-fine.normalDistanceM))<2e-9);
+assert(max(abs(general.state.sourceShockCoordinate-fine.state.sourceShockCoordinate),[],'all')<2e-10);
+oldMap=expm(shape.K*log(.7)/trace(shape.K))*q;
+assert(norm(general.state.sourceShockCoordinate(2,:)'-oldMap)>1e-7, ...
+    'ShockLayer:GeneralTest','本例须真正区别于旧椭圆曲面入口映射。');
+map=general.massCoordinateMap;qB=shockSurfaceMassSource(map,.6);
+mapB=buildShockSurfaceMassMap(@(location)deformedConicShockSample(shape,location),qB,[0;0]);
+a=shockSurfaceMassSource(map,.2);b=shockSurfaceMassSource(mapB,.2/.6);
+assert(norm(a-b)<2e-10,'ShockLayer:SameSource','同一共同激波线上不同列没有回溯同一入口。');
+% 可分离四次图另有闭式梯度轨迹；独立审核不必复用数值质量ODE。
+separableShape=shape;separableShape.K=diag([17 21]);separableShape.deformationDirections=eye(2);
+separableShape.deformationWeights=[.12;.07];
+separableMap=buildShockSurfaceMassMap(@(location)deformedConicShockSample(separableShape,location),q,[0;0]);
+separableEta=[1;.8;.5;.2;.01;0];separableSources=shockSurfaceMassSource(separableMap,separableEta);
+
+%% 三、Cartesian投影质量散度由独立相邻列差分核对，保留加密趋势
+steps=[2e-4 1e-4 5e-5];divergence=zeros(3,1);neighbors=cell(3,4);
+for j=1:3
+    value=0;
+    for axis=1:2
+        dq=zeros(2,1);dq(axis)=steps(j);
+        plus=buildShockSurfaceMassMap(@(location)deformedConicShockSample(shape,location),q+dq,[0;0]);
+        minus=buildShockSurfaceMassMap(@(location)deformedConicShockSample(shape,location),q-dq,[0;0]);
+        value=value+(plus.projectedMassVectorPerDensitySpeedM(axis)-minus.projectedMassVectorPerDensitySpeedM(axis))/(2*steps(j));
+        neighbors{j,2*axis-1}=summary(plus);neighbors{j,2*axis}=summary(minus);
+    end
+    divergence(j)=value;
+end
+assert(abs(divergence(end)-1)<2e-6,'ShockLayer:MassDivergence','一般曲面Cartesian质量连续式未通过。');
+assert(abs(divergence(3)-1)<abs(divergence(1)-1),'ShockLayer:MassDivergence','投影质量散度没有随网格差分加密改善。');
+
+%% 四、单位缩放和输入拒绝不改变物理身份
+scale=2.3;moved=shape;moved.origin=shape.origin*scale;moved.K=shape.K/scale;
+moved.deformationReferenceLengthM=shape.deformationReferenceLengthM*scale;
+scaled=buildShockSurfaceMassMap(@(location)deformedConicShockSample(moved,location),q*scale,[0;0]);
+assert(abs(scaled.coefficientM/map.coefficientM/scale-1)<2e-9);
+assert(norm(shockSurfaceMassSource(scaled,.3)/scale-shockSurfaceMassSource(map,.3))<2e-10);
+mkdir(folder);save(fullfile(folder,'before_rejections.mat'),'regression','general','fine','shape','up','gas', ...
+    'mapB','neighbors','scaled','steps','divergence','separableShape','separableMap','separableEta','separableSources','-v7');
+refused={};bad=shape;bad.deformationWeights=[-100;0;0];
+refused{end+1}=reject(@()buildShockSurfaceMassMap(@(location)deformedConicShockSample(bad,location),q,[0;0]),'ShockLayer:MassConvexity');
+refused{end+1}=reject(@()buildShockSurfaceMassMap(@(location)deformedConicShockSample(shape,location),q,[.001;0]),'ShockLayer:MassApex');
+refused{end+1}=reject(@()solveGeneralShockLayerColumn(up,gas,shape,[0;0],eta),'ShockLayer:StagnationLimit');
+refused{end+1}=reject(@()shockSurfaceMassSource(map,-.1),'MATLAB:notGreaterEqual');
+report=struct('status','tested-general-common-shock-mass-continuity-and-source-map-prototype', ...
+    'regressionColumns',4,'actualAngleDeg',20,'cartesianDivergence',divergence,'differenceStepsM',steps, ...
+    'sameStreamlineSourceDifferenceM',norm(a-b),'oldEllipticSourceDifferenceM',norm(general.state.sourceShockCoordinate(2,:)'-oldMap), ...
+    'maximumRefinementThicknessDifferenceM',max(abs(general.normalDistanceM-fine.normalDistanceM)), ...
+    'rejections',{refused},'productionQualified',false,'boundaryLayerEdgeAvailable',false,'newProductionSolvedAreaM2',0);
+save(fullfile(folder,'general_mass_evidence.mat'),'regression','general','fine','shape','up','gas', ...
+    'mapB','neighbors','scaled','steps','divergence','separableShape','separableMap','separableEta','separableSources','report','-v7');
+fid=fopen(fullfile(folder,'general_mass_report.json'),'w','n','UTF-8');assert(fid>=0);closer=onCleanup(@()fclose(fid));fprintf(fid,'%s',jsonencode(report));disp(report);
+end
+function value=summary(map)
+value=rmfield(map,{'traceParameter','sourceCoordinateGridM','coordinateDerivative','logMassRatio','logMassDerivative','coefficientGridM','logProjectedAreaRatio'});
+end
+function identifier=reject(action,expected)
+identifier='';try,action();catch ex,identifier=ex.identifier;end
+assert(strcmp(identifier,expected),'ShockLayer:TestRejection','实际拒绝%s，期望%s。',identifier,expected);
+end
