@@ -1,0 +1,44 @@
+{
+  "kind": "complete-rocket-three-dimensional-su2-volume",
+  "flight": {
+    "Mach": 5,
+    "temperature": 226.51,
+    "pressure": 1171.9,
+    "alpha": 20,
+    "beta": 0,
+    "wallTemperature": 300,
+    "iterations": 30000,
+    "outputEvery": 250
+  },
+  "expectedVelocity": [
+    -1417.5698748689454,
+    0,
+    515.9532394447612
+  ],
+  "nodes": 59122,
+  "cells": 58560,
+  "hexes": 56640,
+  "wedges": 1920,
+  "wallFaces": 1464,
+  "wallArea": 0.9332096015422157,
+  "bodyVolume": 0.04813865155103432,
+  "fluidVolume": 319.45731511892836,
+  "minimumSubTetVolume": 5.213144874988641e-12,
+  "regions": [
+    "afterbody",
+    "base",
+    "cone",
+    "contraction",
+    "cylinder",
+    "sphericalNose"
+  ],
+  "referenceArea": 0.04523893421169303,
+  "originalSurfaceFaceCount": 2448,
+  "coordinateConvention": "X-axis; nose +X; zero-incidence flow -X; positive alpha flow +Z; SI",
+  "thermalPropertyMode": "caloricallyPerfect; gamma1.4; Sutherland; Pr0.72",
+  "nativeOrientation": "SU2v8.6.0 prism inward triangular ends; boundary normals into fluid domain",
+  "physicalSolution": false,
+  "productionQualified": false,
+  "fieldProjectionImplemented": true,
+  "initialization": "smooth-wall-to-freestream-guess; not-a-physical-boundary-layer"
+}

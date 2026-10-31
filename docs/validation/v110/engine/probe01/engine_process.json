@@ -1,0 +1,56 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T11:45:09.081441+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 120,
+    "sourceFiles": [
+      "scripts/prepareSU2CheckpointProbe.py",
+      "outputs/v110_validation/probe01/probe_manifest.json"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\engine_request.json": "143febfe3cfc63515ebfde79c5f32234bd860c4e674e2be7ee007d3fe3e71cd3",
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\case.cfg": "a8865d82aab8a1a4f418d6596052241d00521c62655550bbb5bfc0eca1271088",
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\mesh.su2": "d4c982d8bafd9138d0bfe6361ee36de33c46917598307c56defcb8fd7acf44e9",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "9ebd6186f7086ffe78318b6a7e5900851f3671db6bb9540427aba4730aac2e28",
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2CheckpointProbe.py": "a92be8d53f49c466f688897ccb7517a244bf0d07b3622d6597bd1c8be19a0fd7",
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\probe_manifest.json": "fb16861e99541e19571dba79e78500a6df599155b14e6153eb4df18a3ec0111c",
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\initial_flow.csv": "02193e28689cb99d28459cf85afe5055b9af2e2aec984fcd8fb86133f602ad2f"
+  },
+  "executableVersion": "8.6.0",
+  "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+  "supervisorProcessID": 34992,
+  "physicalSolutionQualified": false,
+  "processID": 17272,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 0.26600000000325963,
+  "progress": {},
+  "exitCode": 1,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T11:45:09.345729+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2CheckpointProbe.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\probe_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v110_validation\\probe01\\initial_flow.csv": true
+  },
+  "outputSHA256": {
+    "engine_stdout.log": "e933a043b634ef5f29ebd52cecfac1f878dfc1791e74dd18b07e3e6d08b02069",
+    "source_case_manifest.json": "ff6592173cb6f303cc8c5da8c84b257a51cc47512f38fed3133a3dddf98f8ee6"
+  }
+}

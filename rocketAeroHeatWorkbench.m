@@ -628,6 +628,7 @@ renderEditor();sync();showGeometry(true);
             result.receipt=receipt;result.flight=state.frozenInputs.cfg.flight;
             result.wallTemperatureInput=result.flight.Twall;result.sourceRevision=state.revision;result.solveId=state.solveId;
             result.resultDirectory=engineJob.folder;
+            result.convergenceAudit=auditSU2ResultConvergence(engineJob.folder,result);
             save(fullfile(engineJob.folder,'mapped_research.mat'),'result','-v7');
             state=aeroHeatWorkflowState('completeResearch',state,struct('result',result,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
             message('实际进程已结束；原面元研究快照已接收，未授予物理资格。');go(5);
@@ -660,6 +661,14 @@ renderEditor();sync();showGeometry(true);
             isequaln(input.frozen.freestream,state.freestream),'保存结果的边界/物性/网格设置与当前工况不同。');
         receipt=jsondecode(fileread(fullfile(folder,'engine_process.json')));
         assert(isequaln(receipt,result.receipt),'保存结果与实际进程回执不一致。');
+        auditFolder=folder;
+        % 便携小快照可引用原运行目录；只有同一真实回执才可用其完整历史补审核。
+        if (~isfile(fullfile(auditFolder,'history.csv')) || ~isfile(fullfile(auditFolder,'restart_flow.csv'))) && isfield(result,'resultDirectory') && ...
+                isfile(fullfile(result.resultDirectory,'engine_process.json'))
+            original=jsondecode(fileread(fullfile(result.resultDirectory,'engine_process.json')));
+            if isequaln(original,receipt),auditFolder=result.resultDirectory;end
+        end
+        result.convergenceAudit=auditSU2ResultConvergence(auditFolder,result);
         origin=struct('sourceRevision',result.sourceRevision,'solveId',result.solveId,'file',file);
         state=aeroHeatWorkflowState('beginSolve',state);
         try

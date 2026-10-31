@@ -1,0 +1,13 @@
+{
+  "engine": [{"name":"probe01","exitCode":1,"elapsedSeconds":0.266,"reason":"WRT_MESH_QUALITY is not an 8.6.0 config option; config parse failed before numerical iteration","resolution":"Official CConfig confirms VOLUME_OUTPUT MESH_QUALITY automatically enables quality output; corrected in new probe02 directory."}],
+  "matlab": [
+    {"name":"audit110_01","reason":"Test incorrectly assumed a converged flat-plate HF uniquely identifies the checkpoint; 17 candidates were indistinguishable.","resolution":"Keep checkpoint unknown and retain terminal residual pass; fix expectation only."},
+    {"name":"audit110_02","reason":"MATLAB JSON decoding truncates long absolute path keys, causing hash lookup collision.","resolution":"Read exact native JSON key for config hash and raw stability entries."},
+    {"name":"audit110_03","reason":"Portable snapshot contains history but no restart; original-directory fallback only tested history absence.","resolution":"Also check missing restart and require same original receipt before fallback."},
+    {"name":"audit110_04","reason":"Test compared MATLAB NaN with JSON null decoded as an empty array.","resolution":"Compare the same JSON round-trip contract, retaining unknown semantics."}
+  ],
+  "python": [{"name":"auditSU2V110 first attempt","reason":"CSV quoted header contains leading spaces; decoder lacked skipinitialspace.","resolution":"Correct header parsing only; keep failed source version."}],
+  "numericalFieldsAlteredToPassTests": false,
+  "physicsQualified": false,
+  "newQualifiedArea": 0
+}

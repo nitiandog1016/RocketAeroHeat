@@ -3,8 +3,10 @@ function view=createSU2ResearchView(host,result)
 % 模块一：保留原面元、原始q及独立保守热负荷，不将有限值算入合格面积。
 % 模块二：固定色标可编辑；拾取同时给出p/q/温度角色和方法。
 % 模块三：导出当前快照CSV和身份JSON，不重算且不给未知壁温补零。
-grid=uigridlayout(host,[3 1]);grid.RowHeight={38,'1x',130};grid.Padding=[0 0 0 0];
-bar=uigridlayout(grid,[1 6]);bar.Layout.Row=1;bar.ColumnWidth={'1x',100,100,110,110,110};
+grid=uigridlayout(host,[4 1]);grid.RowHeight={67,38,'1x',130};grid.Padding=[0 0 0 0];
+% 模块四：固定显示当前场的保存时刻和真实终态，不能用末次历史冒充云图时刻。
+auditText=uilabel(grid,'Text',strjoin(describeSU2Convergence(result),newline),'FontSize',11,'WordWrap','on');auditText.Layout.Row=1;
+bar=uigridlayout(grid,[1 6]);bar.Layout.Row=2;bar.ColumnWidth={'1x',100,100,110,110,110};
 bar.Padding=[0 0 0 0];bar.RowHeight={'1x'};
 keys={'pressureRaw','heatFluxRaw','fluidNodeTemperatureMeanRaw','conservativeHeatLoadDensityRaw','wallInput','wallSolved'};
 labels={'压力（研究）','物面平均热流（研究）','流体节点温度（研究）','保守热负荷密度（研究）','给定壁温（输入）','求解壁温（未知）'};
@@ -15,15 +17,15 @@ low.Tooltip='固定色标下限（当前变量单位）';high.Tooltip='固定色
 apply=uibutton(bar,'Text','应用固定色标','ButtonPushedFcn',@(~,~)render(false));
 auto=uibutton(bar,'Text','按当前值范围','ButtonPushedFcn',@(~,~)render(true));
 export=uibutton(bar,'Text','导出当前CSV','ButtonPushedFcn',@exportDialog);
-panel=uipanel(grid,'BorderType','none');panel.Layout.Row=2;
+panel=uipanel(grid,'BorderType','none');panel.Layout.Row=3;
 geometry=createAerothermalGeometryView(panel,result,struct('su2Section',true));
-probe=uitextarea(grid,'Editable','off');probe.Layout.Row=3;
+probe=uitextarea(grid,'Editable','off');probe.Layout.Row=4;
 oldCallback=geometry.html.DataChangedFcn;geometry.html.DataChangedFcn=@receive;
 select.ValueChangedFcn=@(~,~)render(true);
 sliceX=mean([min(result.V(:,1)),max(result.V(:,1))]);selectedFace=1;sectionState=[];
 view=struct('geometry',geometry,'select',select,'low',low,'high',high,'apply',apply, ...
     'probe',probe,'export',export,'exportTo',@exportTo,'inspectFace',@inspectFace, ...
-    'setSectionX',@setSectionX,'exportSectionTo',@exportSectionTo,'getSection',@getSection);
+    'setSectionX',@setSectionX,'exportSectionTo',@exportSectionTo,'getSection',@getSection,'auditText',auditText);
 render(true);inspectFace(1,[]);
 
     function render(resetRange)
@@ -105,6 +107,8 @@ render(true);inspectFace(1,[]);
         meta=struct('x',sectionState.x,'field',sectionState.fieldKey,'revision',sectionState.revision, ...
             'sourceRevision',result.sourceRevision,'solveId',result.solveId,'flight',result.flight, ...
             'productionQualified',false,'method',geometry.html.UserData.payload.sectionView.method);
+        if isfield(result,'convergenceAudit'),meta.convergenceAudit=result.convergenceAudit;end
+        meta.processStatus=struct('exitCode',result.receipt.exitCode,'timedOut',result.receipt.timedOut,'cancelled',result.receipt.cancelled);
         fid=fopen([file '.json'],'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(meta));
     end
     function exportDialog(~,~)
