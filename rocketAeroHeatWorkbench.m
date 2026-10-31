@@ -221,7 +221,7 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isEmbedded()
-                    grid=form(28);c=state.cfg;
+                    grid=form(35);c=state.cfg;
                     controls.altitude=numberField(grid,1,'高度 / km',c.flight.altitude/1000,[0 86]);
                     controls.mach=numberField(grid,2,'Mach',c.flight.Mach,[1.01 10]);
                     controls.alpha=numberField(grid,3,'攻角 / °',c.flight.alpha,[-89 89]);
@@ -252,6 +252,13 @@ renderEditor();sync();showGeometry(true);
                         controls.altitude.Enable='off';
                         tip(grid,27,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
                     end
+                    % 初猜不是流场解；显式研究选项只对已核对的混合域和等温壁开放。
+                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究'}, ...
+                        {'freestream','wallEnthalpy'},getOption(c.su2,'initialMode','freestream'));
+                    controls.initialThickness=numberField(grid,29,'初猜厚度 / mm',1000*getOption(c.su2,'initialThicknessM',.001),[.001 1000]);
+                    controls.checkpointLimit=numberField(grid,30,'检查点上限 / MiB',getOption(c.su2,'checkpointLimitMiB',100),[1 1024]);
+                    for key={'initialMode','initialThickness','checkpointLimit'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
+                    tip(grid,32,'厚度仅用于数值初猜，必须位于完整棱柱层内；不代表已解边界层。保存上限只限制检查点估计，网格/初态另计。');
                     sync();return;
                 end
                 grid=form(24+12*methodDetailsOpen);c=state.cfg;
@@ -512,6 +519,18 @@ renderEditor();sync();showGeometry(true);
             % 旧快照未含默认字段时保持结构不变，避免只确认就使同工况复开失效。
             if named || isfield(next.su2,'namedCheckpoints'),next.su2.namedCheckpoints=named;end
             if every~=1000 || isfield(next.su2,'outputEvery'),next.su2.outputEvery=every;end
+            initial=controls.initialMode.Value;thickness=controls.initialThickness.Value/1000;
+            if ~strcmp(initial,'freestream') || isfield(next.su2,'initialMode'),next.su2.initialMode=initial;end
+            if ~strcmp(initial,'freestream') || isfield(next.su2,'initialThicknessM'),next.su2.initialThicknessM=thickness;end
+            limit=controls.checkpointLimit.Value;
+            if limit~=100 || isfield(next.su2,'checkpointLimitMiB'),next.su2.checkpointLimitMiB=limit;end
+            if strcmp(initial,'wallEnthalpy')
+                assert(strcmp(thermal,'isothermal'),'壁面相容初猜目前只支持给定统一壁温。');
+                assert(~isempty(embeddedVolume) && strcmp(embeddedVolume.sourceKind,'original-triangle-hybrid-volume'),'壁面相容初猜需要原三角混合体网格。');
+                nv=size(embeddedVolume.sourceVertices,1);nl=embeddedVolume.meshConstruction.prisms/size(state.mesh.F,1);
+                height=vecnorm(embeddedVolume.vertices(nl*nv+(1:nv),:)-embeddedVolume.sourceVertices,2,2);
+                assert(all(height>=thickness),'初猜厚度超出完整棱柱区，请调整网格或厚度。');
+            end
             validateattributes(every,{'numeric'},{'scalar','integer','positive'});
             validateattributes(next.su2.iterations,{'numeric'},{'scalar','integer','positive'});return;
         end
@@ -710,7 +729,7 @@ renderEditor();sync();showGeometry(true);
         try
             assert(~isempty(embeddedVolume),'请先生成当前原生体网格。');
             budget=checkpointBudget(state.cfg);
-            assert(budget.withinLimit,'预计检查点%.1f MiB超过100 MiB研究限制；请增大保存间隔或选择覆盖写。',budget.estimatedBytes/1024^2);
+            assert(budget.withinLimit,'预计检查点%.1f MiB超过%.0f MiB研究限制；请调整保存设置或显式上限。',budget.estimatedBytes/1024^2,budget.limitBytes/1024^2);
             state=aeroHeatWorkflowState('beginSolve',state);
             frozen=state.frozenInputs;fs=frozen.freestream;
             folder=fullfile(fileparts(mfilename('fullpath')),'outputs','embedded_workbench',char(java.util.UUID.randomUUID()));
@@ -725,6 +744,10 @@ renderEditor();sync();showGeometry(true);
                 flight.thermalBoundary=frozen.cfg.su2.wallTemperatureProfile;
             end
             manifest=writeSU2RocketCase(embeddedVolume,folder,flight);
+            if strcmp(getOption(frozen.cfg.su2,'initialMode','freestream'),'wallEnthalpy')
+                writeSU2HybridInitialState(embeddedVolume,folder,frozen.cfg.su2.initialThicknessM);
+                manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));
+            end
             projection=buildSU2WallProjection(embeddedVolume,frozen.mesh);
             save(fullfile(folder,'input_snapshot.mat'),'frozen','manifest','projection','budget','-v7');
             engineJob=embeddedSU2Job('start',folder,struct('threads',2, ...
@@ -787,11 +810,11 @@ renderEditor();sync();showGeometry(true);
     end
     function budget=checkpointBudget(c)
         budget=estimateSU2CheckpointStorage(embeddedVolume,getOption(c.su2,'iterations',1000), ...
-            getOption(c.su2,'outputEvery',1000),getOption(c.su2,'namedCheckpoints',false));
+            getOption(c.su2,'outputEvery',1000),getOption(c.su2,'namedCheckpoints',false),getOption(c.su2,'checkpointLimitMiB',100));
     end
     function text=checkpointBudgetText(c)
         if isempty(embeddedVolume),text='生成体网格后估计输出体量。';return;end
-        b=checkpointBudget(c);text=sprintf('检查点预计最多 %.1f MiB / 限制100 MiB；含基础文件及具名副本。估计不含网格、快照、求解内存；2线程。',b.estimatedBytes/1024^2);
+        b=checkpointBudget(c);text=sprintf('检查点预计最多 %.1f MiB / 限制%.0f MiB；含基础文件及具名副本。估计不含网格、快照、求解内存；2线程。',b.estimatedBytes/1024^2,b.limitBytes/1024^2);
     end
     function readTimeoutDialog(~,~)
         folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择本程序原超时运行目录');
