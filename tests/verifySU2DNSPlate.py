@@ -1,0 +1,63 @@
+"""从具名CSV和MATLAB回读独立复算本轮测站/热流，核对未通过资格没有被掩盖。"""
+from pathlib import Path
+import hashlib,json,sys
+import numpy as np
+from scipy.io import loadmat
+ROOT=Path(__file__).resolve().parents[1]
+BASE=ROOT/'outputs/v129_validation';CASE=BASE/'dns01/plate'
+
+
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def main():
+    target=BASE/'independent_check02.json';assert not target.exists()
+    r=json.loads((BASE/'dns01/comparison03/comparison.json').read_text(encoding='utf-8'))
+    receipt=json.loads((CASE/'engine_process.json').read_text())
+    assert receipt['status']=='terminal' and receipt['exitCode']==0 and all(receipt['inputsStable'].values())
+    for p,h in receipt['inputSHA256'].items():assert digest(Path(p))==h,p
+    for name,h in receipt['outputSHA256'].items():assert digest(CASE/name)==h,name
+    a=np.genfromtxt(str(CASE/'restart_flow.csv'),names=True,delimiter=',')
+    tab=np.loadtxt(str(BASE/'dns01/comparison03/wall.csv'),delimiter=',',skiprows=1)
+    U,T,rho,R=869.1,55.2,.044,287.;mu=1.458e-6*T**1.5/(T+110.4)
+    rows=[]
+    for s in np.unique(-a['x']):
+        col=a[-a['x']==s];col=col[np.argsort(col['y'])]
+        v=-col['Momentum_x']/col['Density']/U
+        integ=col['Density']/rho*v*(1-v)
+        theta=np.sum((integ[:-1]+integ[1:])*.5*np.diff(col['y']))
+        rows.append([s,rho*U*theta/mu,col['Heat_Flux'][0],-col['Skin_Friction_Coefficient_x'][0],col['Pressure'][0],col['Y_Plus'][0]])
+    raw=np.array(rows);actualwall=raw[raw[:,0]>=0]
+    assert len(tab)==len(actualwall)==65 and min(tab[:,0])==0
+    error=float(np.max(abs(actualwall-tab)/np.maximum(abs(actualwall),1)))
+    assert error<2e-12
+    bracket=np.where((raw[:-1,1]<=2121)&(raw[1:,1]>2121)&(raw[:-1,0]>=.05*.35)&(raw[1:,0]<=.85*.35))[0]
+    assert len(bracket)==1;i=int(bracket[0]);weight=(2121-raw[i,1])/(raw[i+1,1]-raw[i,1]);w=raw[i]*(1-weight)+raw[i+1]*weight
+    assert abs(w[0]-r['stationM'])<1e-13 and abs(w[2]/r['heatFluxIntoWallWm2']-1)<1e-12
+    assert abs(w[3]/r['skinFrictionCoefficient']-1)<1e-12
+    assert abs(abs(w[4]/(rho*R*T)-1)-r['wallPressureDeviationFraction'])<1e-12
+    m=loadmat(str(BASE/'dns01/matlab_receipt.mat'),struct_as_record=False,squeeze_me=True)
+    # MATLAB已读comparison02；第三版仅剔除非壁CSV列，比较数值须精确保持。
+    old=json.loads((BASE/'dns01/comparison02/comparison.json').read_text(encoding='utf-8'))
+    assert {k:v for k,v in old.items() if k!='sourceSHA256'}=={k:v for k,v in r.items() if k!='sourceSHA256'}
+    surf=m['data'];ids=np.argsort(surf.vertices[:,0]);wall=a[a['y']==0];wall=wall[wall['x']<=0];wall=wall[np.argsort(wall['x'])]
+    assert len(ids)==len(wall)==65
+    vtkerr=max(float(np.max(abs(getattr(surf,field)[ids]/wall[name]-1)))
+               for field,name in [('pressureRaw','Pressure'),('temperatureRaw','Temperature'),('heatFluxRaw','Heat_Flux')])
+    assert vtkerr<2e-6 and np.isnan(m['solvedWallTemperature']).all() and m['prescribedWallTemperature']==97.5
+    assert r['stationMatched'] and not r['residualConverged'] and not r['eligibleSingleGridScreening'] and not r['singleGridScreeningPassed']
+    assert not r['eligibilityChecks']['pressureWithin2Percent'] and r['newQualifiedRocketAreaM2']==0
+    assert all(r['screeningDifferencesWithinLimits'].values())
+    middle=np.genfromtxt(str(CASE/'restart_flow_005000.csv'),names=True,delimiter=',')
+    floor=1e-4*(1+8*np.finfo(float).eps)
+    report=dict(passed=True,wallRows=65,maximumCSVRelativeDifference=error,maximumMATLABVTKRelativeDifference=vtkerr,
+        matchedStationM=float(w[0]),heatFluxWm2=float(w[2]),pressureDeviationFraction=r['wallPressureDeviationFraction'],
+        midpointOmegaFloorNodes=int(sum(middle['Omega']<=floor)),finalOmegaFloorNodes=int(sum(a['Omega']<=floor)),
+        midpointLocalIteration=5000,finalLocalIteration=9999,allInputsAndOutputsSHAStable=True,
+        failedResidualAndPressureGatesPreserved=True,qualifiedRocketAreaM2=0,nonwallRowsExcluded=True,
+        comparisonMetricsUnchangedFromMATLABReviewedVersion=True,
+        sourceSHA256=digest(Path(__file__)),comparisonSHA256=digest(BASE/'dns01/comparison03/comparison.json'))
+    target.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8');print(json.dumps(report,indent=2))
+
+
+if __name__=='__main__':main()

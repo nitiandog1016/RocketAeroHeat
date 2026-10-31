@@ -1,0 +1,60 @@
+"""归档M6受限对照和真实失败的小证据；不搬动独有数值场或历史对象库。"""
+from pathlib import Path
+import json,shutil,subprocess
+from prepareSU2CheckpointContinuation import ROOT,read,sha
+BASE=ROOT/'outputs/v129_validation';DEST=ROOT/'docs/validation/v129'
+
+
+def main():
+    assert not (DEST/'delivery_manifest.json').exists()
+    matlab=[]
+    for name in ['dns_plate01','dns_readonly02']:
+        r=read(BASE/(name+'_process.json'));assert r['status']=='terminal' and all(r['sourceStableAfter'].values())
+        matlab.append(dict(name=name,exitCode=r['exitCode'],sourceStable=True))
+    assert [v['exitCode'] for v in matlab]==[1,0]
+    native=read(BASE/'dns01/plate/engine_process.json')
+    assert native['status']=='terminal' and native['exitCode']==0 and all(native['inputsStable'].values())
+    assert len(list(BASE.rglob('engine_process.json')))==1
+    files=[]
+    for p in sorted(BASE.rglob('*')):
+        if not p.is_file():continue
+        if p.suffix not in ['.json','.log','.cfg','.png'] and p.name not in ['history.csv','wall.csv','matched_profile.csv']:continue
+        q=DEST/'evidence'/p.relative_to(BASE);q.parent.mkdir(parents=True,exist_ok=True)
+        if q.exists():assert sha(q)==sha(p)
+        else:shutil.copyfile(p,q)
+        files.append(dict(source=p.relative_to(ROOT).as_posix(),archived=q.relative_to(ROOT).as_posix(),bytes=p.stat().st_size,sha256=sha(p)))
+    selected=set('buildSU2FlatPlateCase.m studySU2DNSPlate.m reviewSU2DNSPlate.m testSU2FlatPlateProperties.m prepareSU2DNSPlate.py compareSU2DNSPlate.py prepareSU2SSTCase.py su2SSTInterface.py su2ThermalRuntime.py runEmbeddedSU2.py runEmbeddedSU2Case.m runMatlabResearch.py readSU2SurfaceResult.m describeSU2Runtime.m auditSU2SSTState.py prepareSU2CheckpointContinuation.py'.split())
+    available={sha(p):p for d in [DEST/'failure_versions',DEST/'source_versions'] for p in d.glob('*') if p.is_file()};bindings=[]
+    def save(p,h):
+        source=p if p.is_file() and sha(p)==h else available.get(h);assert source is not None,(str(p),h)
+        q=DEST/'source_versions'/(p.name+'.'+h+'.raw');q.parent.mkdir(parents=True,exist_ok=True)
+        if not q.exists():shutil.copyfile(source,q)
+        assert sha(q)==h
+        row=dict(path=str(p),sha256=h,archived=q.relative_to(ROOT).as_posix())
+        if row not in bindings:bindings.append(row)
+    for name in ['dns_plate01','dns_readonly02']:
+        for p,h in read(BASE/(name+'_process.json'))['sourceSHA256'].items():
+            if Path(p).name in selected:save(ROOT/p,h)
+    for name in ['scripts/archiveSU2V129Evidence.py','scripts/compareSU2DNSPlate.py','tests/verifySU2DNSPlate.py','tests/testSU2DNSComparison.py']:
+        p=ROOT/name;save(p,sha(p))
+    logical=sum(p.stat().st_size for p in BASE.rglob('*') if p.is_file())
+    seen=set();unique=0
+    for p in BASE.rglob('*'):
+        if not p.is_file():continue
+        st=p.stat();key=(st.st_dev,st.st_ino)
+        if key not in seen:seen.add(key);unique+=st.st_size
+    evidence=sum(p.stat().st_size for p in DEST.rglob('*') if p.is_file())
+    assert logical<100*1024**2 and evidence<15*1024**2
+    m=dict(baseCommit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT).decode().strip(),
+        matlab=matlab,nativeEngineRuns=1,nativeElapsedSeconds=native['elapsedSeconds'],nativeLocalIteration=9999,
+        numericalReruns=0,files=files,sourceBindings=bindings,physicsQualified=False,newQualifiedRocketAreaM2=0,
+        originalResidualGatePassed=False,pressureMatchingGatePassed=False,newMainUIOrBrowserTested=False,
+        finalCombinedEntryRerun=False,preparationAndNativeCallTested=True,finalReadonlyReviewAndPropertyBuilderTested=True,
+        storage=dict(logicalBytes=logical,uniqueFileLengthBytes=unique,notDiskAllocation=True,
+            researchBudgetBytes=100*1024**2,evidenceBytesBeforeManifest=evidence,evidenceBudgetBytes=15*1024**2,
+            deletedFiles=0,largeResultsBackedUpToGitHub=False))
+    (DEST/'delivery_manifest.json').write_text(json.dumps(m,indent=2)+'\n',encoding='utf-8')
+    print(json.dumps(dict(evidenceFiles=len(files),sourceVersions=len(bindings),nativeRuns=1,storage=m['storage']),indent=2))
+
+
+if __name__=='__main__':main()

@@ -1,0 +1,187 @@
+"""公开冷壁DNS的同Re_theta平板对照；入口历史不同，禁止当作DNS域复现。"""
+from pathlib import Path
+import argparse, csv, io, json, sys
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from prepareSU2CheckpointContinuation import sha, read, config
+from su2SSTInterface import state
+from auditSU2SSTState import audit
+
+REFERENCE = ROOT / 'docs/validation/v119/research/M6Tw025_Stat.dat'
+REFERENCE_SHA = '29b132ba72b726777d7a7ef3fc8e27dfeab6b782553e530e8bb68280d4055be2'
+
+
+def viscosity(t):
+    return 1.458e-6 * np.asarray(t)**1.5 / (np.asarray(t) + 110.4)
+
+
+def reference(path=REFERENCE):
+    """固定源文件及列语义；头部舍入热流和剖面导数分别报告。"""
+    path = Path(path)
+    assert sha(path) == REFERENCE_SHA, '公开参考身份变化'
+    meta = read(path.with_suffix('.source.json'))
+    assert meta['sha256'] == REFERENCE_SHA
+    text = path.read_text(encoding='utf-8')
+    lines = text.splitlines()
+    start = next(i for i, s in enumerate(lines) if s.startswith('#variables='))
+    names = lines[start].split('=', 1)[1].strip().split(',')
+    a = np.loadtxt(io.StringIO('\n'.join(lines[start+1:])))
+    assert a.shape == (330, 28) and names[:8] == ['z','zod','zplus','zstar','u_uinf','p_pinf','t_tinf','r_rhow']
+    assert np.isfinite(a).all() and a[0, 0] == 0 and np.all(np.diff(a[:, 0]) > 0)
+    rho, U, T, Tw, R, gamma, Pr = .044, 869.1, 55.2, 97.5, 287., 1.4, .71
+    cp = gamma*R/(gamma-1); p = rho*R*T
+    rhow = a[0, 5]*p/(R*Tw)
+    q = .14*rhow*cp*33.8*Tw
+    cf = rhow*33.8**2/(.5*rho*U**2)
+    slopes = []
+    # 固定3/4/5点、各自最高次数多项式；不按SU2结果挑选导数。
+    for n in (3, 4, 5):
+        z = a[:n, 0]; scale = z[-1]
+        dT = np.polynomial.polynomial.polyfit(z/scale, a[:n, 6]*T, n-1)[1]/scale
+        dU = np.polynomial.polynomial.polyfit(z/scale, a[:n, 4]*U, n-1)[1]/scale
+        slopes.append(dict(points=n,heatFluxIntoWallWm2=float(viscosity(Tw)*cp/Pr*dT),
+                           skinFrictionCoefficient=float(viscosity(Tw)*dU/(.5*rho*U**2))))
+    summary = dict(case='M6Tw025',sourceURL=meta['url'],sourceSHA256=REFERENCE_SHA,
+        DOI='10.2514/1.J057296',referenceClass='DNS numerical reference; not experiment',
+        densityKgM3=rho,speedMs=U,temperatureK=T,givenWallK=Tw,pressurePa=p,
+        gamma=gamma,gasConstant=R,Prandtl=Pr,MachFromSpeed=U/np.sqrt(gamma*R*T),
+        headerMach=5.84,ReTheta=2121.,deltaM=.0036,DNSStationFromDNSInletM=88.6*.0013,
+        wallDensityFromMeanPressureAndGivenTw=rhow,heatFluxIntoWallWm2=q,
+        skinFrictionCoefficient=cf,minusBq=.14,utauMs=33.8,
+        BqLastDigitHalfWidth=.005,heatReferenceRoundingFraction=.005/.14,
+        roundingIsNotExperimentalUncertainty=True,profileWallTemperatureK=float(a[0,6]*T),
+        derivativeCrossChecks=slopes,meanVelocityConvention='DNS Reynolds mean; RANS Favre mean differs',
+        exactInletAvailable=False,productionQualified=False)
+    return summary, a
+
+
+def station_bracket(s, reynolds, target, length):
+    """仅唯一内区上升穿越允许内插；禁止外推或用热流选择测站。"""
+    s = np.asarray(s); r = np.asarray(reynolds)
+    assert np.isfinite(s).all() and np.isfinite(r).all() and np.all(np.diff(s)>0)
+    pairs = [i for i in range(len(s)-1) if s[i]>=.05*length and s[i+1]<=.85*length
+             and r[i]<=target<r[i+1]]
+    assert len(pairs)==1, 'Re_theta内区穿越不唯一或不存在；禁止外推'
+    i=pairs[0]; f=(target-r[i])/(r[i+1]-r[i])
+    return i,float(f)
+
+
+def compare(folder):
+    """热阶段及来源先审核，再作匹配；未收敛仍给数值差但不授予初筛资格。"""
+    folder=Path(folder).resolve(); manifest=read(folder/'case_manifest.json')
+    b=manifest['publicBenchmark']; ref,dns=reference()
+    assert b['referenceSHA256']==REFERENCE_SHA and b['matchingRule']=='unique-ReTheta-2121-interior-v1'
+    assert b['exactDNSReplication'] is False
+    checks=audit(folder)
+    c=config(folder/'case.cfg');o=manifest['options']
+    for key,val in [('GAS_CONSTANT',287),('GAMMA_VALUE',1.4),('PRANDTL_LAM',.71),
+                    ('FREESTREAM_TEMPERATURE',55.2),('PRANDTL_TURB',.9)]:
+        assert float(c[key])==val,key
+    assert abs(float(c['FREESTREAM_PRESSURE'])/ref['pressurePa']-1)<1e-14
+    assert abs(float(c['MACH_NUMBER'])/ref['MachFromSpeed']-1)<1e-14
+    assert float(c['MU_T_REF'])==273.15 and float(c['SUTHERLAND_CONSTANT'])==110.4
+    assert abs(float(c['MU_REF'])/viscosity(273.15)-1)<1e-14
+    assert float(o['wallTemperature'])==ref['givenWallK']
+    a,keys,nd,rho,uv,_=state(folder/'restart_flow.csv',True,True); assert nd==2
+    T=a[:,keys.index('Temperature')];p=a[:,keys.index('Pressure')]
+    ss=np.unique(-a[:,1]); y=np.unique(a[:,2]);ncol=len(ss)
+    assert len(a)==ncol*len(y)
+    column=[];profiles=[]
+    for s in ss:
+        ids=np.flatnonzero(-a[:,1]==s);ids=ids[np.argsort(a[ids,2])]
+        assert np.array_equal(a[ids,2],y)
+        velocity=-uv[ids,0]/ref['speedMs']
+        theta=np.trapz(rho[ids]/ref['densityKgM3']*velocity*(1-velocity),y)
+        re=ref['densityKgM3']*ref['speedMs']*theta/viscosity(ref['temperatureK'])
+        iw=ids[0]
+        column.append([s,re,a[iw,keys.index('Heat_Flux')],-a[iw,keys.index('Skin_Friction_Coefficient_x')],
+                       p[iw],a[iw,keys.index('Y_Plus')]])
+        profiles.append(np.column_stack([velocity,T[ids]/ref['temperatureK'],rho[ids],p[ids]]))
+    column=np.array(column);profiles=np.array(profiles)
+    with (folder/'history.csv').open() as f:
+        rr=list(csv.reader(f,skipinitialspace=True)); hk=[v.strip() for v in rr[0]]; h=np.array(rr[1:],float)
+    heat=h[-200:,hk.index('HF')]
+    heat_range=float(np.ptp(heat)/max(abs(np.mean(heat)),1)) if len(heat)==200 else None
+    result=dict(reference=ref,caseDirectory=str(folder),interfaceAudit=checks,
+        exactDNSReplication=False,comparisonIdentity=b,
+        residualConverged=checks['originalResidualThresholdPassed'],
+        last200HeatPowerRangeFraction=heat_range,newQualifiedRocketAreaM2=0,physicsQualified=False,
+        stationMatched=False,eligibleSingleGridScreening=False,singleGridScreeningPassed=False,
+        caveats=['Uniform fully turbulent inlet is an assumption; inlet memory not bounded.',
+                 'DNS Reynolds mean vs RANS Favre mean; profile differences include that distinction.',
+                 'No grid, outer-domain or inlet sensitivity; no separated/base/protuberance validation.'],
+        sourceSHA256={str(p):sha(p) for p in [Path(__file__),REFERENCE,folder/'engine_process.json',folder/'case_manifest.json']})
+    matched=None
+    try:
+        i,f=station_bracket(ss,column[:,1],ref['ReTheta'],o['length'])
+    except AssertionError as ex:
+        result['stationRejection']=str(ex)
+        return result,column,matched,dns
+    wall=(1-f)*column[i]+f*column[i+1]; profile=(1-f)*profiles[i]+f*profiles[i+1]
+    dpdx=(column[i+1,4]-column[i,4])/(ss[i+1]-ss[i])
+    grad=abs(wall[0]*dpdx/wall[4]);pressure=abs(wall[4]/ref['pressurePa']-1)
+    # 固定DNS维度y，不用各自delta重新缩放以掩盖厚度差。
+    z=dns[dns[:,0]<=1.5*ref['deltaM'],0];target=dns[:len(z)]
+    u=np.interp(z,y,profile[:,0]);t=np.interp(z,y,profile[:,1])
+    ue=u-target[:,4];te=t/target[:,6]-1
+    uerr=float(np.sqrt(np.trapz(ue**2,z)/(z[-1]-z[0])))
+    terr=float(np.sqrt(np.trapz(te**2,z)/(z[-1]-z[0])))
+    qerr=float(wall[2]/ref['heatFluxIntoWallWm2']-1);cferr=float(wall[3]/ref['skinFrictionCoefficient']-1)
+    eligibility=dict(originalFourResidualsBelowMinus8=checks['originalResidualThresholdPassed'],
+        last200HeatRangeBelowHalfPercent=heat_range is not None and heat_range<=.005,
+        stationNeighborYPlusBelow1=bool(max(column[i:i+2,5])<=1),
+        pressureWithin2Percent=bool(pressure<=.02),pressureGradientBelow002=bool(grad<=.02))
+    screening=dict(heatWithin15Percent=abs(qerr)<=.15,shearWithin15Percent=abs(cferr)<=.15,
+                   velocityRMSBelow005=uerr<=.05,temperatureRelativeRMSBelow10Percent=terr<=.10)
+    result.update(stationMatched=True,stationM=float(wall[0]),matchingReTheta=float(wall[1]),
+        interpolationColumns=[int(i),int(i+1)],interpolationFraction=f,
+        heatFluxIntoWallWm2=float(wall[2]),skinFrictionCoefficient=float(wall[3]),
+        heatFluxRelativeDifference=qerr,skinFrictionRelativeDifference=cferr,
+        velocityNormalizedRMSDifference=uerr,temperatureRelativeRMSDifference=terr,
+        wallPressureDeviationFraction=float(pressure),wallPressureGradientIndicator=float(grad),
+        eligibilityChecks=eligibility,screeningDifferencesWithinLimits=screening,
+        eligibleSingleGridScreening=all(eligibility.values()),
+        singleGridScreeningPassed=all(eligibility.values()) and all(screening.values()))
+    matched=np.column_stack([z,target[:,4],u,target[:,6],t])
+    return result,column,matched,dns
+
+
+def plot(folder, report, columns, matched, destination):
+    """科研图保留未收敛身份；只展示实际计算与固定参考。"""
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    with (folder/'history.csv').open() as f:
+        rr=list(csv.reader(f,skipinitialspace=True)); keys=[v.strip() for v in rr[0]];h=np.array(rr[1:],float)
+    fig,axes=plt.subplots(2,2,figsize=(10,7),constrained_layout=True)
+    for k in ('rms[Rho]','rms[RhoE]','rms[k]','rms[w]'):
+        axes[0,0].plot(h[:,keys.index('Inner_Iter')],h[:,keys.index(k)],label=k)
+    axes[0,0].axhline(-8,color='k',ls=':',lw=.8);axes[0,0].set(xlabel='Local iteration',ylabel='Native log RMS');axes[0,0].legend(fontsize=8)
+    use=columns[:,0]>0
+    axes[0,1].plot(columns[use,1],columns[use,2]/1000,label='SST-2003m')
+    axes[0,1].scatter([2121],[report['reference']['heatFluxIntoWallWm2']/1000],color='#b54b36',label='DNS header-derived')
+    axes[0,1].set(xlabel='Re_theta (computed)',ylabel='Heat flux into wall [kW/m²]');axes[0,1].legend(fontsize=8)
+    if matched is not None:
+        for ax,lo,hi,label in [(axes[1,0],1,2,'U / U_inf'),(axes[1,1],3,4,'T / T_inf')]:
+            ax.plot(matched[:,lo],matched[:,0]*1000,label='DNS Reynolds mean')
+            ax.plot(matched[:,hi],matched[:,0]*1000,ls='--',label='SST Favre mean')
+            ax.set(xlabel=label,ylabel='Wall-normal distance [mm]');ax.legend(fontsize=8)
+    else:
+        for ax in axes[1]: ax.text(.1,.5,'No eligible station crossing',transform=ax.transAxes)
+    for ax in axes.flat: ax.grid(alpha=.2)
+    status='NUMERICALLY CONVERGED' if report['residualConverged'] else 'NOT CONVERGED'
+    fig.suptitle('M6 cold-wall developing plate — '+status+'\nMatched Re_theta comparison; different inlet history; no rocket qualification',fontsize=11)
+    fig.savefig(str(destination),dpi=160);plt.close(fig)
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('--folder',required=True);parser.add_argument('--out',required=True)
+    args=parser.parse_args();folder=Path(args.folder);out=Path(args.out)
+    assert not out.exists();r,c,m,d=compare(folder);out.mkdir(parents=True)
+    (out/'comparison.json').write_text(json.dumps(r,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf-8')
+    np.savetxt(str(out/'wall.csv'),c,delimiter=',',header='s_m,Re_theta,q_into_wall_W_m2,Cf_streamwise,p_wall_Pa,yplus',comments='')
+    if m is not None: np.savetxt(str(out/'matched_profile.csv'),m,delimiter=',',header='y_m,DNS_U_Uinf,SST_U_Uinf,DNS_T_Tinf,SST_T_Tinf',comments='')
+    plot(folder,r,c,m,out/'comparison.png')
+    print(json.dumps({k:r[k] for k in ('stationMatched','residualConverged','eligibleSingleGridScreening','singleGridScreeningPassed')},ensure_ascii=False))
