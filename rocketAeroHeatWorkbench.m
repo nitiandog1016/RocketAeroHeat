@@ -47,7 +47,8 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'confirmBoundary',@()confirmBoundary([],[]),'run',@()solveCase([],[]),'getState',@getState, ...
     'loadNative',@()loadNative([],[]),'cancel',@()cancelEngine([],[]),'readResearch',@readResearch, ...
     'readTimeoutCheckpoint',@readTimeoutCheckpoint,'useSurfaceForSU2',@useSurfaceForSU2, ...
-    'loadNativeFeature',@()loadNative([],[],true),'loadClassic',@loadClassic);
+    'loadNativeFeature',@()loadNative([],[],true),'loadClassic',@loadClassic, ...
+    'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -179,6 +180,8 @@ renderEditor();sync();showGeometry(true);
                         {'normalLayers','starRay','hybridTriangles'},mode);
                     controls.volumeMode.ValueChangedFcn=@nativeMeshEdited;
                     controls.generate=button(grid,2,'生成完整三维体网格',@generate);
+                    controls.reuseMesh=button(grid,3,'复用本程序已生成的混合体网格',@readHybridMeshDialog);
+                    controls.reuseMesh.Enable=onoff(strcmp(mode,'hybridTriangles'));
                     description='待生成；保留完整原三角面，网格参数改变后须重新确认边界。';
                     if ~isempty(embeddedVolume)
                         description=sprintf('已生成 %d 节点 / %d 体单元\n原表面 %d 面，近壁精度尚未合格。', ...
@@ -186,7 +189,9 @@ renderEditor();sync();showGeometry(true);
                     end
                     controls.volumeSummary=tip(grid,4,description);
                     if strcmp(mode,'hybridTriangles')
-                        tip(grid,7,'保留全部原三角面：6层法向棱柱，首层顶点位移20 µm、增长1.4；Gmsh生成完整四面体外域。此档用于导入研究，尚未验证热流分辨率。');
+                        opts=getOption(state.cfg.su2,'hybridMesh',struct);
+                        heights=getOption(opts,'layerHeights',[0 cumsum(2e-5*1.4.^(0:5))]);
+                        tip(grid,7,sprintf('保留全部原三角面：%d层法向棱柱，首层顶点位移%.5g µm；Gmsh四面体外域。热流分辨率尚未验证。',numel(heights)-1,1e6*(heights(2)-heights(1))));
                     elseif strcmp(mode,'normalLayers')
                         tip(grid,7,'24层近壁偏置 + 16层外域；首层母线法向距离2 µm，近壁增长率1.25。三维面法向距离略受周向多边形影响，不能据此宣称y+或热流精度通过。');
                     else
@@ -216,7 +221,7 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isEmbedded()
-                    grid=form(24);c=state.cfg;
+                    grid=form(28);c=state.cfg;
                     controls.altitude=numberField(grid,1,'高度 / km',c.flight.altitude/1000,[0 86]);
                     controls.mach=numberField(grid,2,'Mach',c.flight.Mach,[1.01 10]);
                     controls.alpha=numberField(grid,3,'攻角 / °',c.flight.alpha,[-89 89]);
@@ -228,16 +233,24 @@ renderEditor();sync();showGeometry(true);
                     controls.checkpointMode=choice(grid,8,'检查点保存',{'覆盖写 · 默认','按迭代保留'}, {'overwrite','indexed'},mode);
                     controls.outputEvery=numberField(grid,9,'保存间隔 / 步',getOption(c.su2,'outputEvery',1000),[1 30000]);
                     thermal=getOption(c.su2,'wallThermalMode','isothermal');
-                    controls.thermalMode=choice(grid,10,'壁面热边界',{'给定统一壁温','绝热 · 给定热流0'}, {'isothermal','adiabatic'},thermal);
-                    controls.wall.Enable=onoff(~strcmp(thermal,'adiabatic'));
+                    controls.thermalMode=choice(grid,10,'壁面热边界',{'给定统一壁温','绝热 · 给定热流0','沿X变化的壁温'}, ...
+                        {'isothermal','adiabatic','axialTemperature'},thermal);
+                    controls.wall.Enable=onoff(strcmp(thermal,'isothermal'));
                     for key={'altitude','mach','alpha','beta','wall','iterations','seconds','checkpointMode','outputEvery','thermalMode'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
-                    controls.confirm=button(grid,11,'确认内嵌引擎边界',@confirmBoundary);
-                    tip(grid,13,'SU2 8.6.0：层流NS、定比热理想气体γ1.4、Sutherland、Pr0.72；无湍流/转捩模型。参数可运行不代表已验证。');
-                    controls.storageEstimate=tip(grid,17,checkpointBudgetText(c));
-                    tip(grid,20,'绝热q=0属于给定边界，不能计作自主热流；流体温度不等于材料壁温解。空间Tw调用器待接入。');
+                    controls.wallProfile=button(grid,11,'导入X—壁温分布表',@importWallTemperatureProfile);
+                    controls.confirm=button(grid,12,'确认内嵌引擎边界',@confirmBoundary);
+                    tip(grid,14,'SU2 8.6.0：层流NS、定比热理想气体γ1.4、Sutherland、Pr0.72；无湍流/转捩模型。空间壁温使用原生输入适配版本。');
+                    controls.storageEstimate=tip(grid,18,checkpointBudgetText(c));
+                    text='CSV两列：X_m、T_K；覆盖整个模型，温度为给定条件，节点间线性变化。';
+                    if isfield(c.su2,'wallTemperatureProfile')
+                        p=c.su2.wallTemperatureProfile;
+                        text=sprintf('已导入%d站：X %.5g—%.5g m，给定壁温 %.5g—%.5g K。',numel(p.x),min(p.x),max(p.x),min(p.temperature),max(p.temperature));
+                    end
+                    controls.thermalSummary=tip(grid,21,text);
+                    tip(grid,24,'绝热q=0属于给定边界；流体节点温度不等于材料壁温解。输入变化后须重新确认与计算。');
                     if isfield(c.flight,'atmosphere') && ~isfield(c.flight.atmosphere,'geometricAltitude')
                         controls.altitude.Enable='off';
-                        tip(grid,23,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
+                        tip(grid,27,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
                     end
                     sync();return;
                 end
@@ -520,7 +533,7 @@ renderEditor();sync();showGeometry(true);
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
             if isEmbedded() && isfield(controls,'storageEstimate'),controls.storageEstimate.Text=checkpointBudgetText(state.cfg);end
-            if isEmbedded(),controls.wall.Enable=onoff(~strcmp(controls.thermalMode.Value,'adiabatic'));end
+            if isEmbedded(),controls.wall.Enable=onoff(strcmp(controls.thermalMode.Value,'isothermal'));end
             updateMethodScope();message('边界设置已编辑；请重新确认并显式计算，旧结果不会冒充新工况。');showGeometry(false);
         catch ex,showError(ex);end
     end
@@ -528,6 +541,10 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         try
             next=boundaryConfiguration();fs=calcFreestream(next.flight);
+            if isEmbedded() && strcmp(getOption(next.su2,'wallThermalMode','isothermal'),'axialTemperature')
+                assert(isfield(next.su2,'wallTemperatureProfile'),'请先导入覆盖整个模型的X—壁温表。');
+                resolveSU2ThermalBoundary(state.mesh,next.su2.wallTemperatureProfile);
+            end
             if fs.Mach<=1,error('RocketAeroHeat:Workbench:Mach','当前完整工程链要求M>1。');end
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
             state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',fs));
@@ -538,6 +555,25 @@ renderEditor();sync();showGeometry(true);
             end
             go(4);
         catch ex,showError(ex);end
+    end
+
+    function importWallTemperatureProfile(~,~)
+        % 两列显式SI表导入后把数值冻结到当前边界，不依赖外部文件继续存在。
+        if state.busy || preparing,return;end
+        [file,folder]=uigetfile('*.csv','导入壁温表（列名X_m、T_K）');if isequal(file,0),return;end
+        try
+            table=readtable(fullfile(folder,file),'VariableNamingRule','preserve');
+            assert(isequal(table.Properties.VariableNames,{'X_m','T_K'}),'CSV须严格包含X_m、T_K两列。');
+            setWallTemperatureProfile(struct('mode','axialTemperature','x',table.X_m, ...
+                'temperature',table.T_K,'source',['用户导入：' file]));
+        catch ex,showError(ex);end
+    end
+    function setWallTemperatureProfile(profile)
+        assert(~state.busy && ~preparing && isEmbedded() && ~isempty(state.mesh),'请先完成当前表面网格。');
+        assert(strcmp(profile.mode,'axialTemperature'));resolveSU2ThermalBoundary(state.mesh,profile);
+        next=state.cfg;next.su2.wallThermalMode='axialTemperature';next.su2.wallTemperatureProfile=profile;
+        state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));report=[];
+        go(3);message('已导入全模型壁温分布；这是给定边界，旧结果已失效，请重新确认。');
     end
 
 %% 模块十：唯一物理计算入口；输入冻结，阶段失败不接受中间快照。
@@ -651,6 +687,25 @@ renderEditor();sync();showGeometry(true);
             renderEditor();showGeometry(false);message('体网格模式已改变；请重新生成网格并确认边界。');
         catch ex,showError(ex);end
     end
+    function readHybridMeshDialog(~,~)
+        folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs','hybrid_mesh'),'选择本程序已完成的混合体网格目录');
+        if isequal(folder,0),return;end
+        try,readHybridMesh(folder);catch ex,showError(ex);end
+    end
+    function readHybridMesh(folder)
+        % 复用本程序体网格前重新审核SHA、原面、正体积与边界；不加载外部CFD场。
+        assert(~state.busy && ~preparing && isEmbedded() && ~isempty(state.orientedMesh));
+        [~,mode]=su2WorkbenchMeshOptions(state.cfg);assert(strcmp(mode,'hybridTriangles'),'请先选择原三角面混合模式。');
+        candidate=readSU2HybridVolume(folder,state.orientedMesh);
+        source=load(candidate.meshReceipt.input,'optionsJSON');
+        next=state.cfg;next.su2.hybridMesh=jsondecode(source.optionsJSON);
+        next.su2.hybridMesh.layerHeights=next.su2.hybridMesh.layerHeights(:)';
+        state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
+        embeddedVolume=candidate;state=aeroHeatWorkflowState('setMesh',state,struct('mesh',state.orientedMesh));
+        researchUI=[];webUI=[];report=[];delete(resultHost.Children);
+        renderEditor();showGeometry(true);
+        message(sprintf('已核对并复用%d体单元，原表面不变；加载原网格参数，请重新确认边界。',numel(candidate.cells)));
+    end
     function startEngine()
         try
             assert(~isempty(embeddedVolume),'请先生成当前原生体网格。');
@@ -666,6 +721,8 @@ renderEditor();sync();showGeometry(true);
                 'namedCheckpoints',getOption(frozen.cfg.su2,'namedCheckpoints',false));
             if strcmp(getOption(frozen.cfg.su2,'wallThermalMode','isothermal'),'adiabatic')
                 flight.thermalBoundary=struct('mode','adiabatic','source','工作台明确选择绝热边界');
+            elseif strcmp(getOption(frozen.cfg.su2,'wallThermalMode','isothermal'),'axialTemperature')
+                flight.thermalBoundary=frozen.cfg.su2.wallTemperatureProfile;
             end
             manifest=writeSU2RocketCase(embeddedVolume,folder,flight);
             projection=buildSU2WallProjection(embeddedVolume,frozen.mesh);

@@ -56,18 +56,17 @@ def main():
     cfg = folder / request['configFile']
     mesh = folder / request['meshFile']
     assert cfg.parent == folder and mesh.parent == folder
-    runtime = json.loads((ROOT / 'tools/runtime/su2/8.6.0/runtime.json').read_text(encoding='utf-8'))
-    exe = Path(runtime['executable']).resolve()
-    runtime_dir = ROOT / 'tools/runtime/su2/8.6.0'
-    exe.relative_to(runtime_dir)
-    for item in runtime['files']:
-        assert sha(runtime_dir / item['path']) == item['sha256'], '运行时身份改变'
+    from su2ThermalRuntime import resolve, audit_applied
+    config_text = cfg.read_text(encoding='utf-8-sig')
+    exe,runtime,runtime_flavor,thermal_profile,thermal_locks=resolve(folder,config_text)
     timeout = float(request['maximumSeconds'])
     threads = int(request['threads'])
     assert 1 <= threads <= 8 and 1 <= timeout <= 720
     receipt = folder / 'engine_process.json'
     assert not receipt.exists(), '已有真实进程记录，禁止覆盖或盲目重启'
     locked = {str(file): sha(file) for file in (request_path, cfg, mesh, exe, Path(__file__).resolve())}
+    locked.update(thermal_locks)
+    locked[str(Path(__file__).with_name('su2ThermalRuntime.py').resolve())]=sha(Path(__file__).with_name('su2ThermalRuntime.py'))
     for name in request.get('sourceFiles', []):
         file = (ROOT / name).resolve()
         file.relative_to(ROOT)
@@ -75,7 +74,6 @@ def main():
         locked[str(file)] = sha(file)
     # 重启动初场是数值输入，必须和配置/网格一起绑定，输出不得覆写它。
     import re
-    config_text = cfg.read_text(encoding='utf-8-sig')
     if re.search(r'^\s*RESTART_SOL\s*=\s*YES', config_text, re.M):
         match = re.search(r'^\s*SOLUTION_FILENAME\s*=\s*([^\s%]+)', config_text, re.M)
         assert match, '重启动必须显式指定SOLUTION_FILENAME'
@@ -95,7 +93,7 @@ def main():
     state = dict(status='starting', startedUTC=datetime.now(timezone.utc).isoformat(),
                  request=request, inputSHA256=locked, executableVersion=runtime['version'],
                  archiveSHA256=runtime['archiveSHA256'], supervisorProcessID=os.getpid(),
-                 physicalSolutionQualified=False)
+                 physicalSolutionQualified=False,runtimeFlavor=runtime_flavor)
 
     def save():
         atomic_write_json(receipt,state)
@@ -105,10 +103,13 @@ def main():
     if request.get('dryRun', False):
         command.append('--dryrun')
     start = time.monotonic()
+    # 明确清除继承的温度表环境变量，只允许本次冻结输入指定其绝对路径。
+    child_env=dict(os.environ,OMP_NUM_THREADS=str(threads));child_env.pop('RAH_WALL_TEMPERATURE_FILE',None)
+    if thermal_profile is not None:child_env['RAH_WALL_TEMPERATURE_FILE']=str(thermal_profile)
     with (folder / 'engine_stdout.log').open('wb') as stream:
         process = subprocess.Popen(command, cwd=str(folder), stdout=stream, stderr=subprocess.STDOUT,
                                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
-                                   env=dict(os.environ, OMP_NUM_THREADS=str(threads)))
+                                   env=child_env)
         state.update(status='running', processID=process.pid, command=command)
         timed_out = False
         cancelled = False
@@ -143,6 +144,9 @@ def main():
                  elapsedSeconds=time.monotonic() - start, endedUTC=datetime.now(timezone.utc).isoformat(),
                  inputsStable={path: sha(Path(path)) == digest for path, digest in locked.items()})
     if supervisor_error is not None:state['supervisorError']=supervisor_error
+    if thermal_profile is not None and code==0 and not timed_out and not cancelled:
+        try:state['thermalProfileApplied']=audit_applied(folder,thermal_profile,mesh)
+        except Exception as ex:state['supervisorError']='Thermal input audit failed: '+str(ex);supervisor_error=str(ex)
     state['outputSHA256'] = {file.name: sha(file) for file in sorted(folder.iterdir())
                             if file.is_file() and file != receipt and file.suffix!='.pending' and str(file) not in locked}
     terminal_receipt=save_terminal_receipt(receipt,state)

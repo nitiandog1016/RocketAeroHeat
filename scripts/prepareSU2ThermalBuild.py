@@ -1,0 +1,68 @@
+"""下载固定原生热边界构建依赖，只写项目运行时目录，不修改系统环境。"""
+from pathlib import Path
+import hashlib,json,urllib.request,zipfile,concurrent.futures,subprocess
+
+ROOT=Path(__file__).resolve().parents[1]
+DEST=ROOT/'tools/runtime/su2-thermal-build'
+SOURCES=[
+ ('compiler','https://github.com/skeeto/w64devkit/releases/download/v2.11.0/w64devkit-x64-2.11.0.7z.exe',
+  '54c2bb9962e8a30c8270e34c5efc3d5fee579f53087fa7d435b95fbba2af7b2b',68801240),
+ ('su2','https://github.com/su2code/SU2/archive/7048fd35f56d4bf52e586429d6746a36a10255f8.zip',None,60000000),
+ ('meson','https://github.com/mesonbuild/meson/archive/5a82ea0501736a666ca9cc003ea0774f8219fd65.zip',None,20000000),
+ ('mel','https://github.com/pcarruscag/MEL/archive/46205ab019e5224559091375a6d71aabae6bc5b9.zip',None,5000000),
+ ('eigen','https://gitlab.com/libeigen/eigen/-/archive/d71c30c47858effcbd39967097a2d99ee48db464/eigen-d71c30c47858effcbd39967097a2d99ee48db464.zip',None,10000000)]
+
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def acquire(item):
+    name,url,expected,limit=item;target=DEST/(name+('.7z.exe' if name=='compiler' else '.zip'))
+    receipt=DEST/(name+'_download.json')
+    if receipt.exists():
+        old=json.loads(receipt.read_text(encoding='utf-8'));assert sha(target)==old['sha256']
+        return old
+    if not target.exists():
+        partial=target.with_suffix('.partial');assert not partial.exists(),'未完下载须先核查，不能盲目覆盖'
+        count=0
+        with urllib.request.urlopen(url,timeout=45) as src,partial.open('xb') as dst:
+            while True:
+                data=src.read(1024**2)
+                if not data:break
+                count+=len(data);assert count<=limit;dst.write(data)
+        partial.replace(target)
+    digest=sha(target)
+    if expected:assert digest==expected and target.stat().st_size==limit
+    row=dict(name=name,url=url,sha256=digest,bytes=target.stat().st_size,
+             upstreamAssetDigestVerified=bool(expected),identity='pinned-commit-archive' if not expected else 'official-release-asset')
+    receipt.write_bytes((json.dumps(row,indent=2)+'\n').encode('utf-8'))
+    return row
+
+def extract(name,target):
+    complete=target/'.rah_extracted.json'
+    if complete.exists():
+        assert json.loads(complete.read_text())['archiveSHA256']==sha(DEST/(name+'.zip'))
+        return
+    with zipfile.ZipFile(str(DEST/(name+'.zip'))) as z:
+        items=z.infolist();top=items[0].filename.split('/')[0]
+        assert sum(q.file_size for q in items)<500*1024**2
+        target.mkdir(parents=True,exist_ok=True)
+        for q in items:
+            rel=Path(q.filename).relative_to(top)
+            if str(rel)=='.' or q.is_dir():continue
+            # 不安装构建工具自身的测试夹具，含其专门测试符号链接的样例。
+            if name=='meson' and rel.parts[0] in ('test cases','tests'):continue
+            p=(target/rel).resolve();p.relative_to(target.resolve())
+            assert not (q.external_attr>>16)&0o170000==0o120000
+            p.parent.mkdir(parents=True,exist_ok=True);data=z.read(q)
+            if p.exists():assert p.read_bytes()==data,'已有构建源已改变，拒绝覆盖'
+            else:p.write_bytes(data)
+    complete.write_text(json.dumps(dict(archiveSHA256=sha(DEST/(name+'.zip')))))
+
+def main():
+    DEST.mkdir(parents=True,exist_ok=True)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+        for result in pool.map(acquire,SOURCES):print(json.dumps(result),flush=True)
+    extract('su2',DEST/'source');extract('meson',DEST/'meson')
+    # 上游归档含空子模块目录，因此提取到独立目录后由构建明确引用，避免覆盖已有源。
+    extract('mel',DEST/'mel');extract('eigen',DEST/'eigen')
+    print('Pinned source archives extracted. Compiler extraction and build remain explicit.',flush=True)
+
+if __name__=='__main__':main()

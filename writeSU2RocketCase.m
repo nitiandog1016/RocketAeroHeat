@@ -22,9 +22,14 @@ assert(strcmp(volume.kind,'complete-rocket-three-dimensional-su2-volume') && ~vo
 spec=flight.thermalBoundary;
 if isempty(spec),spec=struct('mode','isothermal','temperature',flight.wallTemperature);end
 thermal=resolveSU2ThermalBoundary(struct('V',volume.sourceVertices,'F',volume.sourceFaces),spec);
-assert(thermal.stockExecutableSupported,'RocketAeroHeat:SU2:SpatialThermalAdapter', ...
-    '空间壁温输入已定义，但当前官方Windows运行包缺少逐节点调用器；禁止用统一壁温代替。');
-if strcmp(thermal.mode,'adiabatic'),thermalLine='MARKER_HEATFLUX= (wall, 0)';
+spatial=strcmp(thermal.mode,'axialTemperature');
+if spatial
+    runtimeFile=fullfile(fileparts(mfilename('fullpath')),'tools','runtime','su2','8.6.0-rah-axial-wall-v1','runtime.json');
+    assert(isfile(runtimeFile),'RocketAeroHeat:SU2:SpatialThermalAdapter', ...
+        '尚未构建原生空间壁温运行时；不能退回官方包的统一壁温。');
+    runtime=jsondecode(fileread(runtimeFile));assert(strcmp(runtime.flavor,thermal.requiredRuntimeFlavor));
+    thermalLine=sprintf('MARKER_ISOTHERMAL= (wall, %.17g)',spec.temperature(1));
+elseif strcmp(thermal.mode,'adiabatic'),thermalLine='MARKER_HEATFLUX= (wall, 0)';
 else,thermalLine=sprintf('MARKER_ISOTHERMAL= (wall, %.17g)',spec.temperature);end
 assert(~exist(folder,'dir'),'RocketAeroHeat:SU2:Existing','不能覆写已有计算目录。');mkdir(folder);
 fid=fopen(fullfile(folder,'mesh.su2'),'w');assert(fid>=0);guard=onCleanup(@()fclose(fid));
@@ -73,6 +78,13 @@ cfg={'SOLVER= NAVIER_STOKES';'KIND_TURB_MODEL= NONE';'MATH_PROBLEM= DIRECT'; ...
     'OUTPUT_FILES= (SURFACE_PARAVIEW_ASCII, RESTART_ASCII)'; ...
     sprintf('OUTPUT_WRT_FREQ= %d',min(flight.iterations,flight.outputEvery));['WRT_RESTART_OVERWRITE= ' overwrite];['WRT_SURFACE_OVERWRITE= ' overwrite]; ...
     'SCREEN_WRT_FREQ_INNER= 50';'VOLUME_OUTPUT= (COORDINATES, SOLUTION, PRIMITIVE)'};
+if spatial
+    cfg{end+1}='MARKER_PYTHON_CUSTOM= (wall)';
+    % 统一标记的默认温度只供上游初始化；实际每个节点必须被表值覆盖并取得回执。
+    fid=fopen(fullfile(folder,'wall_temperature.csv'),'w','n','UTF-8');assert(fid>=0);
+    guard=onCleanup(@()fclose(fid));fprintf(fid,'RAH_AXIAL_WALL_TEMPERATURE_V1,X_m,T_K\n');
+    fprintf(fid,'%.17g,%.17g\n',[spec.x(:),spec.temperature(:)]');clear guard;
+end
 fid=fopen(fullfile(folder,'case.cfg'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',cfg{:});clear guard;
 direction=[-cosd(flight.alpha)*cosd(flight.beta),-sind(flight.beta),sind(flight.alpha)*cosd(flight.beta)];
 info=struct('kind',volume.kind,'flight',flight,'thermalBoundary',thermal,'expectedVelocity',flight.Mach*sqrt(gamma*R*flight.temperature)*direction, ...
@@ -84,5 +96,14 @@ info=struct('kind',volume.kind,'flight',flight,'thermalBoundary',thermal,'expect
     'thermalPropertyMode','caloricallyPerfect; gamma1.4; Sutherland; Pr0.72', ...
     'nativeOrientation','SU2v8.6.0 prism inward triangular ends; boundary normals into fluid domain', ...
     'physicalSolution',false,'productionQualified',false,'fieldProjectionImplemented',true);
+if spatial
+    info.requiredRuntimeFlavor=thermal.requiredRuntimeFlavor;
+    info.thermalProfileSHA256=sha(fullfile(folder,'wall_temperature.csv'));
+end
 fid=fopen(fullfile(folder,'case_manifest.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(info));
+end
+function h=sha(file)
+% 文件身份与实际温度表一起传给监督器，避免边界被改写后继续使用旧清单。
+fid=fopen(file,'rb');assert(fid>=0);guard=onCleanup(@()fclose(fid));md=java.security.MessageDigest.getInstance('SHA-256');
+md.update(fread(fid,inf,'*uint8'));h=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
 end

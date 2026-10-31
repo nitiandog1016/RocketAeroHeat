@@ -1,0 +1,78 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T14:59:10.918224+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v115_validation\\actual01\\official_constant",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 60,
+    "dryRun": false,
+    "jobToken": "f5c06612-bfb1-42f4-bdfe-7c35198d3c6c",
+    "sourceFiles": [
+      "readSU2SurfaceResult.m",
+      "buildSU2WallProjection.m",
+      "mapSU2WallResult.m",
+      "writeSU2RocketCase.m",
+      "embeddedSU2Job.m"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v115_validation\\actual01\\official_constant\\engine_request.json": "b252fdcf9ced2b9aaa0fa25480588ea229877036a4450d6162aeb4e11c181a5a",
+    "E:\\RocketAeroHeat\\outputs\\v115_validation\\actual01\\official_constant\\case.cfg": "66b8a994954abf5610ad65fdee5b36e48b7f5f4181a06033c17edd01f952c0e9",
+    "E:\\RocketAeroHeat\\outputs\\v115_validation\\actual01\\official_constant\\mesh.su2": "ada78e5c3f28261a6f06ec7104e82adf16c63b039c5f75763f0f53fd7e808f07",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "6d96cd5d69e20ba350b64893d6e3bad40598449c66c64602cfa181d48f37625a",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": "c8808eb2abb1ace016904fa72e21eb58e7f71b5f29715b6b1855b02178d77dbf",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "7299e7838b7d1011d413c595c3abe3bcd8cb5bd015f121c996d2ee001730368e",
+    "E:\\RocketAeroHeat\\readSU2SurfaceResult.m": "6754b4de2cd2337c4213766ef7c8e21a7b04d35e091e02a4bc8611c139052d67",
+    "E:\\RocketAeroHeat\\buildSU2WallProjection.m": "e4739eecb3913c57980487425c2880f7d4a9b1554952b645e45390c2845c8d48",
+    "E:\\RocketAeroHeat\\mapSU2WallResult.m": "1d1cbd03e5ce2e9ee8bd296114f414f5f6419c75382a05163659e1572d785676",
+    "E:\\RocketAeroHeat\\writeSU2RocketCase.m": "1c1e6088c71f74e770bb4418dc14bc9bdbf6fa12e01567d36d1a97cd13496df2",
+    "E:\\RocketAeroHeat\\embeddedSU2Job.m": "28ea49918a124d166dec868e9374c6f753764e9fb3c4926c31a5e635b442950b"
+  },
+  "executableVersion": "8.6.0",
+  "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+  "supervisorProcessID": 47308,
+  "physicalSolutionQualified": false,
+  "runtimeFlavor": "official",
+  "processID": 7276,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v115_validation\\actual01\\official_constant\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 4.843000000000757,
+  "progress": {
+    "Inner_Iter": 19.0,
+    "rms[Rho]": -3.823008404,
+    "rms[RhoE]": 2.074593707,
+    "HF": 324832.3948
+  },
+  "exitCode": 0,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T14:59:15.759051+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v115_validation\\actual01\\official_constant\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v115_validation\\actual01\\official_constant\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v115_validation\\actual01\\official_constant\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\readSU2SurfaceResult.m": true,
+    "E:\\RocketAeroHeat\\buildSU2WallProjection.m": true,
+    "E:\\RocketAeroHeat\\mapSU2WallResult.m": true,
+    "E:\\RocketAeroHeat\\writeSU2RocketCase.m": true,
+    "E:\\RocketAeroHeat\\embeddedSU2Job.m": true
+  },
+  "outputSHA256": {
+    "case_manifest.json": "19965a2ed83dfebc1b0bbc82e998ee0e208b5fa417b4c629f32a9b007ab321ff",
+    "engine_stdout.log": "dc9c5dcc7f8f8e70d3ffe631b04bc4cd5cbdfcc66a53f40cca65ced2379567e4",
+    "history.csv": "7fd5d66fa49551f8b85cf94d4b4682218a3738e2970e9e21817b0c33f67eedad",
+    "restart_flow.csv": "c28e1eaf40a2364021d40ecb99224f54d37978874ae3840ca207a5a84a59905a",
+    "surface_flow.vtk": "3a3af5dfc02c339dfc66e73f870a3406f8fb975d8fb5de88b64ea1fc2217f1e1"
+  }
+}

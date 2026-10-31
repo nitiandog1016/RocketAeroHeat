@@ -18,17 +18,18 @@ bad={struct('mode','adiabatic','temperature',300),struct('mode','isothermal','te
     struct('mode','axialTemperature','x',[.1 .2],'temperature',[80 90]), ...
     struct('mode','axialTemperature','x',[0 0 m.totalLength],'temperature',[80 90 100])};
 for j=1:numel(bad),rejected=false;try,resolveSU2ThermalBoundary(s,bad{j});catch,rejected=true;end;assert(rejected);end
-% 必须在建目录前拒绝尚无实际调用器的空间Tw，不能变成等温成功运行。
+% 空间Tw已接原生适配，但不完整的温度覆盖仍须在建目录前拒绝，不能外推成成功。
 dummy=struct('kind','complete-rocket-three-dimensional-su2-volume','physicalSolution',false, ...
     'sourceVertices',s.V,'sourceFaces',s.F);folder=fullfile(out,'unsupported');
-rejected=false;try,writeSU2RocketCase(dummy,folder,struct('thermalBoundary',profile));catch ex,rejected=strcmp(ex.identifier,'RocketAeroHeat:SU2:SpatialThermalAdapter');end
+incomplete=profile;incomplete.x=[.1 .2];
+rejected=false;try,writeSU2RocketCase(dummy,folder,struct('thermalBoundary',incomplete));catch ex,rejected=contains(ex.message,'未覆盖');end
 assert(rejected && ~isfolder(folder));
 % 语法检查只对本次改动文件执行；警告保留但不自动伪称为失败或物理通过。
 files={'buildSchaeferFergusonBody.m','schaeferFergusonCondition.m','resolveSU2ThermalBoundary.m', ...
     'attachSU2ThermalBoundary.m','writeSU2RocketCase.m','createSU2ResearchView.m','rocketAeroHeatWorkbench.m','readSU2TimeoutCheckpoint.m'};
 syntax=struct;for k=1:numel(files),issues=checkcode(files{k},'-id');assert(~any(strcmp({issues.id},'PARSE')));syntax.(matlab.lang.makeValidName(files{k}))=issues;end
 report=struct('geometry',m,'condition',c,'syntax',syntax,'thermalContractPassed',true, ...
-    'missingSpatialAdapterRejectedBeforeWrite',rejected,'solverInvoked',false,'newQualifiedArea',0);
+    'incompleteSpatialTableRejectedBeforeWrite',rejected,'solverInvoked',false,'newQualifiedArea',0);
 save(fullfile(out,'geometry.mat'),'s','m','c','-v7');write(fullfile(out,'report.json'),report);
 fprintf('Classic closed geometry, analytical volume, exact SI conversion and thermal contract passed.\n');
 end

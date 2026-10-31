@@ -2,7 +2,7 @@ function boundary=resolveSU2ThermalBoundary(surface,spec)
 %RESOLVESU2THERMALBOUNDARY 统一等温、绝热和空间壁温的输入身份，不冒充壁体温度解。
 % 模块一：校验全部原节点的温度定义；轴向表不允许静默外推或漏掉鼻/底面。
 % 模块二：逐面温度为原三角节点线性平均，保留输入来源；绝热不产生给定Tw。
-% 模块三：官方Windows可执行文件尚无逐节点热边界调用器，空间模式显式标为不能执行。
+% 模块三：空间模式必须由受控原生适配版本执行，官方包不能静默降级到统一Tw。
 assert(isstruct(spec)&&isscalar(spec)&&isfield(spec,'mode'),'缺少热边界模式。');
 assert(all(ismember(fieldnames(spec),{'mode','temperature','x','source'})),'不支持的热边界字段。');
 mode=validatestring(spec.mode,{'isothermal','adiabatic','axialTemperature'});
@@ -24,11 +24,14 @@ switch mode
         assert(numel(xx)>=2 && all(diff(xx)>0),'X表必须严格递增且至少两点。');
         assert(xx(1)<=min(surface.V(:,1)) && xx(end)>=max(surface.V(:,1)), ...
             '温度表未覆盖全模型；须明确未测鼻端/底部延拓，不能自动外推。');
-        node=interp1(xx,tt,surface.V(:,1),'linear');label='给定空间壁温：节点线性插值；引擎逐节点调用尚未接入';executable=false;
+        node=interp1(xx,tt,surface.V(:,1),'linear');
+        label='给定空间壁温：原生逐节点线性插值；SU2 8.6.0 + RAH轴向热边界适配';executable=false;
 end
 face=mean(node(surface.F),2);
 boundary=struct('mode',mode,'source',source,'method',label,'specification',spec, ...
     'givenTemperatureByNode',node,'givenTemperatureByFace',face,'givenHeatFluxByFace',givenQ, ...
     'heatFluxIsBoundaryInput',strcmp(mode,'adiabatic'),'wallMaterialTemperatureSolved',false, ...
     'stockExecutableSupported',executable,'physicsQualified',false);
+boundary.requiredRuntimeFlavor='official';
+if strcmp(mode,'axialTemperature'),boundary.requiredRuntimeFlavor='rah-axial-wall-v1';end
 end

@@ -19,6 +19,8 @@ thermalMethod='用户给定等温壁面边界';thermalCaption='给定等温壁';
 if isfield(result,'thermalBoundary'),thermalMethod=result.thermalBoundary.method;thermalCaption=result.thermalBoundary.mode;end
 if isAdiabatic
     labels{2}='热流（绝热给定0）';labels{4}='热负荷密度（绝热给定0）';labels{5}='给定壁温（绝热未指定）';
+elseif isfield(result,'thermalBoundary') && strcmp(result.thermalBoundary.mode,'axialTemperature')
+    labels{5}='给定壁温分布（输入）';
 end
 units={'Pa','W/m²','K','W/m²','K','K'};
 select=uidropdown(bar,'Items',labels,'ItemsData',keys,'Value',keys{1});

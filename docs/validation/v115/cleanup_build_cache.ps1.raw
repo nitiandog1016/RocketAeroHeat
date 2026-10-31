@@ -1,0 +1,34 @@
+$ErrorActionPreference='Stop'
+$taskRoot=(Resolve-Path -LiteralPath 'E:\RocketAeroHeat').Path
+$taskBuildRoot=(Resolve-Path -LiteralPath "$taskRoot\tools\runtime\su2-thermal-build").Path
+$taskTargets=@('build','toolchain','eigen','mel','meson') | ForEach-Object { (Resolve-Path -LiteralPath (Join-Path $taskBuildRoot $_)).Path }
+foreach($taskPath in $taskTargets) {
+    if(-not $taskPath.StartsWith($taskBuildRoot+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Target escaped verified build workspace'}
+    if((Get-Item -LiteralPath $taskPath).Attributes -band [IO.FileAttributes]::ReparsePoint){throw 'Unexpected linked target'}
+    if(Get-ChildItem -LiteralPath $taskPath -Recurse -Force | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }){throw 'Unexpected linked child'}
+}
+$taskProcesses=Get-CimInstance Win32_Process | Where-Object { $_.Name -in @('ninja.exe','g++.exe','cc1plus.exe','gcc.exe') -and $_.ExecutablePath -like "$taskBuildRoot\*" }
+if($taskProcesses){throw 'Build process still active'}
+$taskRuntime=Get-Content -LiteralPath "$taskRoot\tools\runtime\su2\8.6.0-rah-axial-wall-v1\runtime.json" -Raw | ConvertFrom-Json
+foreach($taskEntry in $taskRuntime.files) {
+    $taskFile=Join-Path "$taskRoot\tools\runtime\su2\8.6.0-rah-axial-wall-v1" $taskEntry.path
+    if((Get-FileHash -LiteralPath $taskFile -Algorithm SHA256).Hash.ToLower() -ne $taskEntry.sha256){throw 'Installed runtime changed'}
+}
+$taskInventory=@($taskTargets | ForEach-Object {
+    $taskFiles=@(Get-ChildItem -LiteralPath $_ -File -Recurse)
+    [pscustomobject]@{path=$_;files=$taskFiles.Count;fileLengthSum=($taskFiles | Measure-Object Length -Sum).Sum}
+})
+$taskFreeBefore=([IO.DriveInfo]::new('E:\')).AvailableFreeSpace
+foreach($taskPath in $taskTargets){Remove-Item -LiteralPath $taskPath -Recurse -Force}
+$taskFreeAfter=([IO.DriveInfo]::new('E:\')).AvailableFreeSpace
+foreach($taskPath in $taskTargets){if(Test-Path -LiteralPath $taskPath){throw 'Delete incomplete'}}
+foreach($taskEntry in $taskRuntime.files) {
+    $taskFile=Join-Path "$taskRoot\tools\runtime\su2\8.6.0-rah-axial-wall-v1" $taskEntry.path
+    if((Get-FileHash -LiteralPath $taskFile -Algorithm SHA256).Hash.ToLower() -ne $taskEntry.sha256){throw 'Runtime changed after cleanup'}
+}
+[ordered]@{scope='rebuildable v115 compiler/build/duplicate extracted dependencies only';targets=$taskInventory;
+    freeBytesBefore=$taskFreeBefore;freeBytesAfter=$taskFreeAfter;freeSpaceIncrease=$taskFreeAfter-$taskFreeBefore;
+    retained='installed controlled and official runtimes; fixed archives; patched SU2 source; all scientific outputs and shared history';
+    runtimeHashesVerifiedAfter=$true;pathLengthIsNotAllocatedSpace=$true} |
+    ConvertTo-Json -Depth 8 | Set-Content -LiteralPath "$taskRoot\outputs\v115_validation\build_cache_cleanup.json" -Encoding utf8
+Write-Output "Reclaimed disk free bytes: $($taskFreeAfter-$taskFreeBefore)"
