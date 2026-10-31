@@ -49,7 +49,7 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'readTimeoutCheckpoint',@readTimeoutCheckpoint,'useSurfaceForSU2',@useSurfaceForSU2, ...
     'loadNativeFeature',@()loadNative([],[],true),'loadClassic',@loadClassic, ...
     'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh, ...
-    'readVerifiedHEOS',@readVerifiedHEOS);
+    'readVerifiedHEOS',@readVerifiedHEOS,'readSSTStudy',@readSSTStudy);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -329,7 +329,8 @@ renderEditor();sync();showGeometry(true);
                     controls.readResearch=button(grid,3,'重开本程序同工况研究结果',@readResearchDialog);
                     controls.readTimeoutCheckpoint=button(grid,4,'查看同工况超时检查点 · 研究',@readTimeoutDialog);
                     controls.readVerifiedHEOS=button(grid,5,'查看同表面/工况的已有HEOS场',@readVerifiedHEOSDialog);
-                    tip(grid,6,'已有HEOS场须核对原文件、物理条件、EOS与面元；沿用所选场的实际网格/迭代身份。此操作只查看，不继续计算。');
+                    controls.readSSTStudy=button(grid,6,'查看同表面/工况的SST数值对照',@readSSTStudyDialog);
+                    tip(grid,7,'已有场须核对原文件、物理条件、EOS与面元；沿用实际网格/迭代和数值方案。此操作只查看，不继续计算。');
                     controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[10 19];controls.log.Layout.Column=[1 2];
                     sync();return;
                 end
@@ -986,6 +987,25 @@ renderEditor();sync();showGeometry(true);
             state=aeroHeatWorkflowState('completeResearch',state,struct('result',result, ...
                 'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
             message('原HEOS场与当前原面/物理条件一致，已核对EOS及具名步号；只读查看，未重新计算或增加资格。');go(5);
+        catch ex
+            state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            renderEditor();rethrow(ex);
+        end
+    end
+    function readSSTStudyDialog(~,~)
+        folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'查看本程序已审核的SST数值对照');
+        if isequal(folder,0),return;end
+        try,readSSTStudy(folder);catch ex,showError(ex);end
+    end
+    function readSSTStudy(folder)
+        % 保留真实数值方案而复用同一个主结果区；只读操作不启动求解器。
+        result=readSU2VerifiedSSTStudy(folder,state,embeddedVolume);
+        state=aeroHeatWorkflowState('beginSolve',state);
+        try
+            result.sourceRevision=state.revision;result.solveId=state.solveId;
+            state=aeroHeatWorkflowState('completeResearch',state,struct('result',result, ...
+                'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            message('已核对SST原面/物理条件与数值方案，只读查看；没有续算或增加资格。');go(5);
         catch ex
             state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
             renderEditor();rethrow(ex);

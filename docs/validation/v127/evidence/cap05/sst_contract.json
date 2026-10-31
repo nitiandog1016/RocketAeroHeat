@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "model": "SST-2003m",
+  "assumption": "fully-turbulent; transition unknown",
+  "intensity": 0.01,
+  "viscosityRatio": 10.0,
+  "Prt": 0.9,
+  "provenance": "\u5168\u6e4d\u6d41\u53d7\u63a7\u7814\u7a76\u5047\u8bbe\uff1b\u975e\u98de\u884c\u6d4b\u91cf\uff0c\u8f6c\u6369\u672a\u77e5",
+  "kInfinity": 341.35543329143684,
+  "omegaInfinity": 42598.110764383935,
+  "wallTreatment": "resolved smooth wall; no wall function",
+  "thermodynamics": "calorically-perfect ideal gas",
+  "turbulentConvection": "first-order scalar upwind",
+  "compressibilityCorrection": "none",
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1",
+  "initializationSHA256": "b9eb5cc0d360d3dde283fdc784a97ce8f3a5d62e7a188669b9055cfdc113bb7e",
+  "configurationSHA256": "73dc7c11f83c4e2207c22384d045eec9b69b1856df3c877df9d5e665e279c15f",
+  "meshSHA256": "9db7bf9c5aedda3dda43a79820f3e76887b48a12a113ba0370674464395a876f",
+  "numericalStudy": {
+    "studyID": "v127-common-SST49-CFL5-vs-0.5",
+    "variant": "cap05",
+    "numericalChanges": {
+      "CFL_ADAPT_PARAM": {
+        "source": "(0.5, 1.1, 0.05, 5.0)",
+        "target": "(0.5, 1.1, 0.05, 0.5)"
+      }
+    }
+  }
+}

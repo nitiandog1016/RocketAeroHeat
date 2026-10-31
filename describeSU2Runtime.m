@@ -23,6 +23,17 @@ switch info.flavor
                 info.method=[info.method '；仅一次阶段诊断，热状态使用更新流场与输入k；源后验失败，未追溯放行'];
                 info.physicsCaption=[info.physicsCaption ' / 单步阶段诊断'];
             end
+            if isfield(p,'numericalStudy')
+                % 同一物理模型下的推进参数是数值方案，不冒充新增物理方法或已收敛结果。
+                study=p.numericalStudy;assert(strcmp(study.studyID,'v127-common-SST49-CFL5-vs-0.5'));
+                switch study.variant
+                    case 'control',label='CFL上限5控制';
+                    case 'cap05',label='CFL上限0.5候选';
+                    otherwise,error('未知SST数值对照方案。');
+                end
+                info.method=[info.method '；同源数值方案：' label '，伪时间重置'];
+                info.physicsCaption=[info.physicsCaption ' / ' label];
+            end
         end
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';

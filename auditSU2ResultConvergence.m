@@ -186,6 +186,15 @@ try
             assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
             assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
             audit.turbulenceRestart=lineage;
+        elseif strcmp(lineage.kind,'same-mesh-SST-CFL-cap-comparison')
+            % 数值推进对照保留共同初态和显式参数差异，不伪装成原配置普通续算。
+            assert(lineage.sameMesh && lineage.samePhysics && lineage.localIterationStartsAt==0);
+            assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
+            study=receipt.physicsModel.numericalStudy;
+            assert(strcmp(study.studyID,lineage.studyID) && strcmp(study.variant,lineage.variant));
+            assert(isequal(study.numericalChanges,lineage.numericalChanges));
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            audit.numericalStudy=lineage;
         else
             assert(strcmp(lineage.kind,'same-mesh-laminar-to-SST-initial-guess'));
             assert(lineage.newPhysicsLocalIterationStartsAt==0 && ~lineage.samePhysicsAndNumerics);

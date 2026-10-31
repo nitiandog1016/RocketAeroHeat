@@ -93,6 +93,10 @@ def validate_sst_manifest(folder,data,config):
         elif init['kind']=='same-mesh-SST-checkpoint-research':
             from prepareSU2SSTCheckpoint import validate_source
             locked.update(validate_source(folder,c,init))
+        elif init['kind']=='same-mesh-SST-CFL-cap-comparison':
+            from prepareSU2SSTNumericalStudy import validate_source
+            locked.update(validate_source(folder,c,init))
+            assert contract['numericalStudy']=={k:init[k] for k in ['studyID','variant','numericalChanges']}
         else:
             from prepareSU2SSTPhaseProbe import validate_source
             locked.update(validate_source(init,folder,c))

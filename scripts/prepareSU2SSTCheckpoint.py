@@ -16,14 +16,20 @@ def validate_source(folder,c,init):
     """检查原生终态、阶段审核、具名末场和物理/离散配置；字段缺失不能回退。"""
     assert init['kind']==KIND and init['sameMesh'] and init['samePhysicsAndNumerics']
     assert init['localIterationStartsAt']==0 and not init['physicsQualified'] and not init['uninterruptedTrajectoryEquivalent']
+    a=config(Path(init['sourceDirectory']).resolve()/'case.cfg')
+    assert {k:v for k,v in c.items() if k not in OUTPUT_CONTROL}=={k:v for k,v in a.items() if k not in OUTPUT_CONTROL},'SST源与目标的物理/离散配置不一致'
+    return validate_source_artifacts(folder,init)
+
+
+def validate_source_artifacts(folder,init):
+    """核验不可变源场与阶段证据；调用者分别实施严格续算或显式数值对照配置规则。"""
     source=Path(init['sourceDirectory']).resolve();source.relative_to(ROOT/'outputs');assert source!=folder
-    r=read(source/'engine_process.json');a=config(source/'case.cfg');audit=read(source/'sst_state_audit.json')
+    r=read(source/'engine_process.json');audit=read(source/'sst_state_audit.json')
     assert r['status']=='terminal' and r['exitCode']==0 and not r['timedOut'] and not r['cancelled']
     assert all(r['inputsStable'].values()) and r['runtimeFlavor']=='official' and r['physicsModel']['model']=='SST-2003m'
     assert audit['interfacePassed'] and audit['model']==r['physicsModel'] and not audit['physicsQualified']
     assert audit['heatGradientRelativeError']<2e-6 and audit['EOSRelativeError']<2e-6 and audit['yPlusRelativeError']<2e-6
     assert audit['sourceSHA256'][str(source/'engine_process.json')]==sha(source/'engine_process.json')
-    assert {k:v for k,v in c.items() if k not in OUTPUT_CONTROL}=={k:v for k,v in a.items() if k not in OUTPUT_CONTROL},'SST源与目标的物理/离散配置不一致'
     for name in ['mesh.su2','case.cfg','sst_contract.json']:
         assert sha(source/name)==r['inputSHA256'][str(source/name)]
     assert sha(folder/'mesh.su2')==sha(source/'mesh.su2')
