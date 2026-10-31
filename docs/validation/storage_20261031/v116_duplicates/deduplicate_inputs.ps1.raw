@@ -1,0 +1,33 @@
+$ErrorActionPreference = 'Stop'
+# 仅合并已交付v116的两份逐字重复输入，保留原路径与全部科学结果。
+$workspace = (Resolve-Path -LiteralPath 'E:\RocketAeroHeat').Path
+$allowed = Join-Path $workspace 'outputs\v116_validation\study01\control'
+$planFile = Join-Path $workspace 'outputs\v116_validation\duplicate_review.json'
+$plan = Get-Content -LiteralPath $planFile -Raw | ConvertFrom-Json
+$receiptFile = Join-Path $workspace 'outputs\v116_validation\duplicate_cleanup.json'
+if (Test-Path -LiteralPath $receiptFile) { throw 'Already executed' }
+foreach ($item in $plan) {
+    $targetPath = (Resolve-Path -LiteralPath $item.path).Path
+    $retainedPath = (Resolve-Path -LiteralPath $item.retained).Path
+    if ([IO.Path]::GetDirectoryName($targetPath) -ne $allowed) { throw 'Target outside exact scope' }
+    if (-not $retainedPath.StartsWith((Join-Path $workspace 'outputs\'), [StringComparison]::OrdinalIgnoreCase)) { throw 'Retained source outside outputs' }
+    if ($targetPath -eq $retainedPath -or -not $item.equal) { throw 'Invalid replacement' }
+    foreach ($file in @($targetPath,$retainedPath)) {
+        if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant() -ne $item.sha256) { throw 'SHA changed' }
+    }
+}
+$before = ([IO.DriveInfo]::new('E:\')).AvailableFreeSpace
+$results = @()
+foreach ($item in $plan) {
+    $targetPath = (Resolve-Path -LiteralPath $item.path).Path
+    $retainedPath = (Resolve-Path -LiteralPath $item.retained).Path
+    Remove-Item -LiteralPath $targetPath
+    try { New-Item -ItemType HardLink -Path $targetPath -Target $retainedPath | Out-Null }
+    catch { if (-not (Test-Path -LiteralPath $targetPath)) { Copy-Item -LiteralPath $retainedPath -Destination $targetPath }; throw }
+    if ((Get-FileHash -LiteralPath $targetPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $item.sha256) { throw 'Post-write SHA mismatch' }
+    $results += [ordered]@{path=$targetPath;retained=$retainedPath;sha256=$item.sha256;logicalDuplicateBytes=$item.length;originalPathPreserved=$true}
+}
+$after = ([IO.DriveInfo]::new('E:\')).AvailableFreeSpace
+[ordered]@{deliveredCommit='32690e543123976ea7d253fd4eea6fc3f67a3716';beforeFreeBytes=$before;afterFreeBytes=$after;observedFreeIncreaseBytes=($after-$before);files=$results;independentIdentityAuditPending=$true} |
+    ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $receiptFile -Encoding utf8
+Get-Content -LiteralPath $receiptFile -Raw
