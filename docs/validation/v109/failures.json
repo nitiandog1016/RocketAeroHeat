@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "stage": "sections109_01",
+      "actualExitCode": 1,
+      "reason": "The section getter was an anonymous MATLAB closure that captured its initially empty value; the browser had rendered but the test could not retrieve live section state.",
+      "fix": "Use a nested getter reading shared current state. Failed source and original process log retained; only UI replay repeated.",
+      "log": "processes/sections109_01_stdout.log"
+    },
+    {
+      "stage": "independent-node-audit-first-attempt",
+      "reason": "The oracle assumed all tested X positions avoid mesh rings; X=0.21 coincides with actual vertices/edges.",
+      "fix": "Include exact vertices and deduplicate independently computed edge intersections. No production geometry change and no solver rerun."
+    },
+    {
+      "stage": "independent-node-audit-second-attempt",
+      "reason": "MATLAB JSON roundtrip stores browser null as []; the oracle expected only null for unknown values.",
+      "fix": "Accept only null or empty array for unknown, still reject numeric zero; independently verify actual CSV has empty cells and unknown status."
+    },
+    {
+      "stage": "rocket_seed01",
+      "actualExitCode": 1,
+      "timedOut": true,
+      "reason": "The original 720-second budget was reached with energy log residual +1.601373828 at iteration 3921. Startup improved but convergence was not achieved.",
+      "action": "Do not extend or repeat the same run. Preserve the distinct iteration-3750 checkpoint and terminal history for mechanism diagnosis; no physical qualification."
+    }
+  ],
+  "nodeFailureEvidenceLimit": "Original Node errors were observed in tool output; exact failed source versions are retained, no fabricated original stderr files."
+}

@@ -1,9 +1,16 @@
-function view=createAerothermalGeometryView(host,mesh)
+function view=createAerothermalGeometryView(host,mesh,options)
 %CREATEAEROTHERMALGEOMETRYVIEW 在统一工作台创建无物理场的离线几何预览。
 % 模块一：复用调用者的宿主；几何导入和网格检查不打开新的图形窗口。
 % host 可为 uigridlayout、uipanel、uitab 或 uifigure。网格布局中直接嵌入
 % uihtml，其他宿主中创建无边距单元布局。mesh 可省略或为空。
 if nargin<2,mesh=[];end
+if nargin<3,options=struct;end
+assert(isstruct(options)&&isscalar(options)&&all(ismember(fieldnames(options),{'su2Section'})),'未知几何查看选项。');
+page='geometry.html';
+if isfield(options,'su2Section')
+    assert(islogical(options.su2Section)&&isscalar(options.su2Section));
+    if options.su2Section,page='geometry-su2.html';end
+end
 if ~isvalid(host),error('RocketAeroHeat:GeometryView:Host','几何预览宿主无效。');end
 if isa(host,'matlab.ui.container.GridLayout')
     parent=host;
@@ -12,7 +19,7 @@ else
     parent.RowSpacing=0;parent.ColumnSpacing=0;
 end
 html=uihtml(parent,'HTMLSource',fullfile(fileparts(mfilename('fullpath')), ...
-    'web','geometry.html'));
+    'web',page));
 % 模块二：完整负载与网页回执分别保存；不把回执当成新的几何负载。
 html.UserData=struct('payload',[],'ready',false,'rendered',[], ...
     'error',[],'revision',0);

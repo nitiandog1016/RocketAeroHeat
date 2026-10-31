@@ -7,6 +7,13 @@
   let gl,program,positions,colorBuffer,edges,flowPositions,flowColors,sectionPositions,bridge,model=null,vertices=[],lo,hi,initializationError='';
   let modelCenter=[0,0,0],modelExtent=1,flowSegments=0,flowPoints=[],sectionSegmentCount=0;
   let az=-Math.PI/2,el=.35,zoom=1,pan=[0,0],baseScale=1,right,up,direction,sx,sy,frame=0,pendingReport=false,drag;
+  let researchSection=null;
+  const sectionView=$('su2Section')&&window.RocketSU2Section?window.RocketSU2Section.mount($('su2Section'),info=>{
+    researchSection=info;if(!info||!model)return;
+    model.hasSectionOverlay=true;sectionSegmentCount=info.segments.length;
+    if(gl)buffer(sectionPositions,info.segments.flatMap(s=>s.flatMap(p=>p.map((x,j)=>(x-modelCenter[j])/modelExtent))));
+    pendingReport=true;render();
+  },info=>{if(bridge&&model)bridge.Data={kind:'geometry-section-export',revision:model.revision,sectionInfo:info,nonce:Date.now()};}):null;
   // 模块一：独立 WebGL 管线，仅使用几何法向和固定中性色，不接收物理字段。
   try{
     gl=canvas.getContext('webgl',{antialias:true,preserveDrawingBuffer:true});
@@ -63,6 +70,7 @@
       if(gl)buffer(sectionPositions,sections.flatMap(s=>s.flatMap(p=>p.map((x,j)=>(x-modelCenter[j])/modelExtent))));
       if(gl){const ts=[],cs=[],es=[];F.forEach((f,faceIndex)=>{const a=vertices[f[0]],b=vertices[f[1]],c=vertices[f[2]],ab=b.map((x,j)=>x-a[j]),ac=c.map((x,j)=>x-a[j]);let n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];const norm=Math.hypot(...n);n=norm>0?n.map(x=>x/norm):[0,0,0];const light=.65+.22*Math.abs(dot(n,[.3,.4,.8660254])),color=field?(finite(field.values[faceIndex])?fieldColor((field.values[faceIndex]-field.range[0])/(field.range[1]-field.range[0])):[.66,.69,.72]):[.52,.60,.67].map(x=>x*light);f.forEach(i=>{ts.push(...vertices[i]);cs.push(...color);});[0,1,1,2,2,0].forEach(j=>es.push(...vertices[f[j]]));});buffer(positions,ts);buffer(colorBuffer,cs);buffer(edges,es);}
       const legend=$('fieldLegend');if(legend){legend.hidden=!field;if(field){legend.replaceChildren();const label=document.createElement('span'),bar=document.createElement('div');label.textContent=field.name+' / '+field.unit+' · 固定范围 '+fmt(field.range[0])+'—'+fmt(field.range[1])+' · 超范围使用端点色；灰色为未知';bar.className='fieldColorBar';legend.append(label,bar);}}
+      if(sectionView)sectionView.load(data);
       $('caption').textContent=data.caption||'几何预览';$('coordinates').textContent=data.coordinateNote||'SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例';$('wire').checked=Boolean(data.showWire);
       $('summary').textContent=F.length?V.length.toLocaleString()+' 顶点 · '+F.length.toLocaleString()+' 三角面':'等待导入模型';$('empty').hidden=Boolean(F.length);
       $('bounds').textContent=V.length?'几何尺寸 / m：X '+fmt(hi[0]-lo[0])+' · Y '+fmt(hi[1]-lo[1])+' · Z '+fmt(hi[2]-lo[2]):'几何尺寸 / m：—';
@@ -78,7 +86,7 @@
     if(flowSegments){attribute('p',flowPositions);attribute('c',flowColors);gl.drawArrays(gl.LINES,0,flowSegments*2);}
     if(sectionSegmentCount){attribute('p',sectionPositions);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,[.74,.29,.10]);gl.drawArrays(gl.LINES,0,sectionSegmentCount*2);}
     $('axes').replaceChildren();['X','Y','Z'].forEach((t,i)=>{const s=document.createElement('span');s.textContent=t;s.style.left=(32+right[i]*27)+'px';s.style.top=(32-up[i]*27)+'px';s.style.color=['#9c5046','#427357','#466d92'][i];$('axes').append(s);});
-    if(pendingReport&&bridge){pendingReport=false;const pixels=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);let visible=0;for(let i=3;i<pixels.length;i+=64)if(pixels[i])visible++;bridge.Data={kind:'geometry-rendered',revision:model.revision,faces:model.faces.length,vertices:model.vertices.length,visiblePixelSamples:visible,webglError:gl.getError(),width:w,height:h,firstVertex:model.vertices[0]||[],bounds:model.vertices.length?[lo,hi]:[],...(flowSegments?{surfaceFlowSegments:flowSegments,surfaceFlowPointCount:flowPoints.length}:{}),...(model.hasSectionOverlay?{sectionSegments:sectionSegmentCount}:{}),nonce:Date.now()};}
+    if(pendingReport&&bridge){pendingReport=false;const pixels=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);let visible=0;for(let i=3;i<pixels.length;i+=64)if(pixels[i])visible++;bridge.Data={kind:'geometry-rendered',revision:model.revision,faces:model.faces.length,vertices:model.vertices.length,visiblePixelSamples:visible,webglError:gl.getError(),width:w,height:h,firstVertex:model.vertices[0]||[],bounds:model.vertices.length?[lo,hi]:[],...(flowSegments?{surfaceFlowSegments:flowSegments,surfaceFlowPointCount:flowPoints.length}:{}),...(model.hasSectionOverlay?{sectionSegments:sectionSegmentCount}:{}),...(researchSection?{sectionInfo:researchSection}:{}),nonce:Date.now()};}
   }
   // 模块四：旋转/平移/缩放及标准视角；无持续动画或外部资源请求。
   canvas.oncontextmenu=e=>e.preventDefault();canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,pan:e.shiftKey||e.button===2||$('panMode').checked};canvas.setPointerCapture(e.pointerId);};

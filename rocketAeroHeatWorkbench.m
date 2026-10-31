@@ -286,7 +286,7 @@ renderEditor();sync();showGeometry(true);
                     grid=form(12);r=state.researchResult;
                     tip(grid,1,sprintf('输入版本%d · 内嵌NS研究快照\n%d个原面元 · 新增合格面积0',state.resultSourceRevision,size(r.F,1)));
                     tip(grid,4,'压力、物面平均q、流体节点T可拾取；保守热负荷密度另列。给定Tw只作输入；真实壁温未求。');
-                    tip(grid,8,'本分支任意截面曲线与收敛资格审核仍待接入；当前支持云图、固定色标、原面探针及带来源CSV。');
+                    tip(grid,8,'点击三维表面或拖动X滑块查看该截面周向分布；云图与曲线共用色标，可导出带来源CSV。研究值仍须收敛、网格与物理审核。');
                     sync();return;
                 end
                 grid=form(10);d=buildAerothermalViewerData(state.result);

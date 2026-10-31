@@ -1,0 +1,76 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T11:16:04.342075+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 720,
+    "dryRun": false,
+    "jobToken": "v109_seeded_rocket01",
+    "sourceFiles": [
+      "scripts/prepareSU2RocketInitialState.py",
+      "tests/auditSU2RocketInitialState.py",
+      "outputs/v108_validation/normal01/normal_volume.mat",
+      "outputs/v109_validation/rocket_seed01/initialization_manifest.json",
+      "outputs/v109_validation/rocket_seed01/initial_audit.json"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\engine_request.json": "ca2e97782cb22d97bd312d5e1202d5f05cdad619614fc2554a081b4706ab851a",
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\case.cfg": "1d23e87890e86b91be8e35b8fbd8ad6314ba41fa6901f360390f4d5f96f2473c",
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\mesh.su2": "d4c982d8bafd9138d0bfe6361ee36de33c46917598307c56defcb8fd7acf44e9",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "9ebd6186f7086ffe78318b6a7e5900851f3671db6bb9540427aba4730aac2e28",
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2RocketInitialState.py": "ee847875c9779db05c8354d08cec2cace052424cf6a11105a757b33caa384b43",
+    "E:\\RocketAeroHeat\\tests\\auditSU2RocketInitialState.py": "64c8b3d14fc9613cf8fb4e7538818088d56975b7446eaca441a109a64069a2cb",
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\normal01\\normal_volume.mat": "dbcd12f9591bc03f1673fa1dc7cbdaccc4cd954c807a3c6f9c2c890ad53deaf5",
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\initialization_manifest.json": "5b9c88c6c06b0de12e5ccfcd209f2348903ddd9429b7a8d3ffe08cd435dd681e",
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\initial_audit.json": "51dc3188b2d64218736c481d696fa6f5b6c567472c9b443cf6751072b7d3fe72",
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\initial_flow.csv": "ff395c813dd4af21d49179df39e7ad474fb68df31f99c38aa3605aa03220b0d4"
+  },
+  "executableVersion": "8.6.0",
+  "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+  "supervisorProcessID": 48452,
+  "physicalSolutionQualified": false,
+  "processID": 20792,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 720.2040000000015,
+  "progress": {
+    "Inner_Iter": 3921.0,
+    "rms[Rho]": -4.528864791,
+    "rms[RhoE]": 1.601373828,
+    "HF": 24125.39843
+  },
+  "exitCode": 1,
+  "timedOut": true,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T11:28:04.544966+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2RocketInitialState.py": true,
+    "E:\\RocketAeroHeat\\tests\\auditSU2RocketInitialState.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\normal01\\normal_volume.mat": true,
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\initialization_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\initial_audit.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v109_validation\\rocket_seed01\\initial_flow.csv": true
+  },
+  "outputSHA256": {
+    "case_manifest.json": "ff6592173cb6f303cc8c5da8c84b257a51cc47512f38fed3133a3dddf98f8ee6",
+    "engine_stdout.log": "0a4d13e1abb6910ebb791f11749ff080d4404a19dcd12bb0b049dacb530a4334",
+    "history.csv": "07db609909db9b777b827df367eca2ddcff00967e0651579e421b9c5a907eb0c",
+    "restart_flow.csv": "02193e28689cb99d28459cf85afe5055b9af2e2aec984fcd8fb86133f602ad2f",
+    "source_case_manifest.json": "83b972f8a6fefab606a9ab6784df0e5a04ba848c539c9be29dc6da859cf5e259",
+    "surface_flow.vtk": "296d46a129e096a103f82859f56b59d77aca2402aab4e4517f72d2dff976f7f8"
+  }
+}

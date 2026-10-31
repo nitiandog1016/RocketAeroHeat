@@ -16,13 +16,15 @@ apply=uibutton(bar,'Text','应用固定色标','ButtonPushedFcn',@(~,~)render(fa
 auto=uibutton(bar,'Text','按当前值范围','ButtonPushedFcn',@(~,~)render(true));
 export=uibutton(bar,'Text','导出当前CSV','ButtonPushedFcn',@exportDialog);
 panel=uipanel(grid,'BorderType','none');panel.Layout.Row=2;
-geometry=createAerothermalGeometryView(panel,result);
+geometry=createAerothermalGeometryView(panel,result,struct('su2Section',true));
 probe=uitextarea(grid,'Editable','off');probe.Layout.Row=3;
 oldCallback=geometry.html.DataChangedFcn;geometry.html.DataChangedFcn=@receive;
 select.ValueChangedFcn=@(~,~)render(true);
+sliceX=mean([min(result.V(:,1)),max(result.V(:,1))]);selectedFace=1;sectionState=[];
 view=struct('geometry',geometry,'select',select,'low',low,'high',high,'apply',apply, ...
-    'probe',probe,'export',export,'exportTo',@exportTo,'inspectFace',@inspectFace);
-render(true);inspectFace(1);
+    'probe',probe,'export',export,'exportTo',@exportTo,'inspectFace',@inspectFace, ...
+    'setSectionX',@setSectionX,'exportSectionTo',@exportSectionTo,'getSection',@getSection);
+render(true);inspectFace(1,[]);
 
     function render(resetRange)
         key=select.Value;i=find(strcmp(keys,key));n=size(result.F,1);
@@ -41,16 +43,44 @@ render(true);inspectFace(1);
         s=geometry.html.UserData;s.payload.faceField=struct('values',values, ...
             'range',[low.Value high.Value],'name',labels{i},'unit',units{i},'productionQualified',false);
         s.payload.coordinateNote='原三角面 · SI · laminar NS / ideal gas / Sutherland / Pr0.72 · 合格新增面积0';
+        status=1;method=[result.solverMethod '；' result.projectionMethod];
+        if strcmp(key,'wallInput'),status=2;method='用户给定等温壁面边界';
+        elseif strcmp(key,'wallSolved'),status=0;method='尚未求解壁体温度';end
+        s.payload.sectionView=struct('x',sliceX,'faceIndex',selectedFace-1,'fieldKey',key, ...
+            'valueStatus',status,'method',method,'scope','完整原面研究快照；未获网格/物理资格', ...
+            'condition',sprintf('M%.8g alpha%.8g beta%.8g Tw%.8gK',result.flight.Mach,result.flight.alpha,result.flight.beta,result.wallTemperatureInput));
+        sectionState=[];
         geometry.html.UserData=s;geometry.html.Data=s.payload;
     end
     function receive(src,event)
         message=src.Data;
         if isstruct(message) && isfield(message,'kind') && strcmp(message.kind,'geometry-face-probe')
-            if message.revision==src.UserData.revision,inspectFace(message.faceIndex+1);end
-        else,oldCallback(src,event);end
+            if message.revision==src.UserData.revision,inspectFace(message.faceIndex+1,message.position);end
+        elseif isstruct(message) && isfield(message,'kind') && strcmp(message.kind,'geometry-section-export')
+            if acceptSection(message,src)
+                [name,folder]=uiputfile('*.csv','导出当前截面研究值');if ~isequal(name,0),exportSectionTo(fullfile(folder,name));end
+            end
+        else
+            oldCallback(src,event);
+            if isstruct(message) && isfield(message,'kind') && strcmp(message.kind,'geometry-rendered'),acceptSection(message,src);end
+        end
     end
-    function inspectFace(i)
+    function yes=acceptSection(message,src)
+        yes=isfield(message,'revision') && message.revision==src.UserData.revision && isfield(message,'sectionInfo');
+        if ~yes,return;end
+        info=message.sectionInfo;yes=isstruct(info) && info.revision==src.UserData.revision && strcmp(info.fieldKey,select.Value);
+        if ~yes,return;end
+        validateattributes(info.x,{'numeric'},{'scalar','finite','>=',min(result.V(:,1)),'<=',max(result.V(:,1))});
+        sectionState=info;sliceX=info.x;
+    end
+    function inspectFace(i,position)
         validateattributes(i,{'numeric'},{'scalar','integer','>=',1,'<=',size(result.F,1)});
+        selectedFace=i;
+        if nargin<2,position=mean(result.V(result.F(i,:),:),1);end
+        if ~isempty(position)
+            validateattributes(position,{'numeric'},{'numel',3,'finite','real'});
+            sliceX=position(1);render(false);
+        end
         probe.Value={sprintf('原面元 %d · 面积 %.8g m² · %s',i,result.faceArea(i),result.resultStatus); ...
             sprintf('p %.8g Pa；物面平均 q %.8g W/m²；保守热负荷密度 %.8g W/m²（口径不同）', ...
                 result.pressureRaw(i),result.heatFluxRaw(i),result.conservativeHeatLoadDensityRaw(i)); ...
@@ -59,6 +89,23 @@ render(true);inspectFace(1);
             ['算法：' result.solverMethod '；映射：' result.projectionMethod]; ...
             sprintf('全物面原始q积分 %.8g W；原生SU2负荷 %.8g W。进程退出0不等于收敛/精度通过。', ...
                 result.targetHeatPowerRaw,result.conservativeHeatLoadPowerRaw)};
+    end
+    function setSectionX(x)
+        validateattributes(x,{'numeric'},{'scalar','real','finite','>=',min(result.V(:,1)),'<=',max(result.V(:,1))});
+        sliceX=x;render(false);
+    end
+    function s=getSection()
+        % 使用嵌套函数读取实时共享状态；匿名闭包会捕获创建时的空值。
+        s=sectionState;
+    end
+    function exportSectionTo(file)
+        assert(~isempty(sectionState) && sectionState.revision==geometry.html.UserData.revision && ...
+            strcmp(sectionState.fieldKey,select.Value),'请等待当前截面完成绘制后再导出。');
+        fid=fopen(file,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',sectionState.csv);clear guard;
+        meta=struct('x',sectionState.x,'field',sectionState.fieldKey,'revision',sectionState.revision, ...
+            'sourceRevision',result.sourceRevision,'solveId',result.solveId,'flight',result.flight, ...
+            'productionQualified',false,'method',geometry.html.UserData.payload.sectionView.method);
+        fid=fopen([file '.json'],'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(meta));
     end
     function exportDialog(~,~)
         [name,folder]=uiputfile('*.csv','导出当前研究快照');if isequal(name,0),return;end

@@ -1,0 +1,26 @@
+/* 独立检查真实主工作台截面记录的原面值、几何交线和CSV状态；不运行流场。 */
+'use strict';
+const fs=require('fs'),path=require('path'),assert=require('assert'),view=require('../web/su2-section-view.js');
+const folder=process.argv[2];assert(folder);const mesh=JSON.parse(fs.readFileSync(path.join(folder,'case_for_node.json'),'utf8'));
+const records=JSON.parse(fs.readFileSync(path.join(folder,'section_records.json'),'utf8'));let segments=0;
+for(const record of records){
+  for(const s of record.samples){
+    assert(s.a[0]===record.x&&s.b[0]===record.x&&s.angleValid);
+    const triangle=mesh.F[s.face].map(i=>mesh.V[i]);
+    // 独立逐边找交点；包含实际测试X恰与网格环重合的顶点/边，不调用截面核心。
+    const crosses=[],add=p=>{if(!crosses.some(q=>Math.hypot(...q.map((v,j)=>v-p[j]))<1e-12))crosses.push(p);};
+    for(let i=0;i<3;i++){const a=triangle[i],b=triangle[(i+1)%3];if(Math.abs(a[0]-record.x)<1e-12)add(a);if((a[0]-record.x)*(b[0]-record.x)<0){const t=(record.x-a[0])/(b[0]-a[0]);add(a.map((v,j)=>v+t*(b[j]-v)));}}
+    assert(crosses.length===2);for(const p of [s.a,s.b])assert(crosses.some(q=>Math.hypot(...q.map((v,j)=>v-p[j]))<1e-12));
+    const expected=record.fieldKey==='wallSolved'?null:record.fieldKey==='wallInput'?300:mesh[record.fieldKey][s.face];
+    assert.strictEqual(s.value,expected);assert.strictEqual(s.status,expected===null?0:record.fieldKey==='wallInput'?2:1);segments++;
+  }
+  const fields={pressureRaw:mesh.pressureRaw,heatFluxRaw:mesh.heatFluxRaw,fluidNodeTemperatureMeanRaw:mesh.fluidNodeTemperatureMeanRaw,
+    wallInput:mesh.F.map(()=>300),wallSolved:mesh.F.map(()=>null)};
+  const computed=view.compute({vertices:mesh.V,faces:mesh.F,revision:record.revision,caption:'test',
+    faceField:{values:fields[record.fieldKey],name:'value',unit:'SI'},sectionView:{fieldKey:record.fieldKey,
+    valueStatus:record.fieldKey==='wallInput'?2:record.fieldKey==='wallSolved'?0:1,method:'test',scope:'research',condition:'same'}},record.x);
+  assert(computed.samples.length===record.samples.length);
+  assert(record.csv.includes(record.fieldKey==='wallInput'?'给定条件':record.fieldKey==='wallSolved'?'未求解':'研究计算值；未授予物理资格'));
+}
+const report={sections:records.length,independentSegmentsChecked:segments,originalFieldsMatch:true,unknownNotZero:true};
+fs.writeFileSync(path.join(folder,'node_audit.json'),JSON.stringify(report,null,2)+'\n');console.log(report);
