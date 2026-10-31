@@ -221,7 +221,7 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isEmbedded()
-                    grid=form(35);c=state.cfg;
+                    grid=form(38);c=state.cfg;
                     controls.altitude=numberField(grid,1,'高度 / km',c.flight.altitude/1000,[0 86]);
                     controls.mach=numberField(grid,2,'Mach',c.flight.Mach,[1.01 10]);
                     controls.alpha=numberField(grid,3,'攻角 / °',c.flight.alpha,[-89 89]);
@@ -253,12 +253,16 @@ renderEditor();sync();showGeometry(true);
                         tip(grid,27,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
                     end
                     % 初猜不是流场解；显式研究选项只对已核对的混合域和等温壁开放。
-                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究'}, ...
-                        {'freestream','wallEnthalpy'},getOption(c.su2,'initialMode','freestream'));
+                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究'}, ...
+                        {'freestream','wallEnthalpy','checkpoint'},getOption(c.su2,'initialMode','freestream'));
                     controls.initialThickness=numberField(grid,29,'初猜厚度 / mm',1000*getOption(c.su2,'initialThicknessM',.001),[.001 1000]);
                     controls.checkpointLimit=numberField(grid,30,'检查点上限 / MiB',getOption(c.su2,'checkpointLimitMiB',100),[1 1024]);
                     for key={'initialMode','initialThickness','checkpointLimit'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
                     tip(grid,32,'厚度仅用于数值初猜，必须位于完整棱柱层内；不代表已解边界层。保存上限只限制检查点估计，网格/初态另计。');
+                    controls.checkpointSource=textField(grid,33,'源检查点目录',getOption(c.su2,'checkpointSource',''));
+                    controls.checkpointSource.ValueChangedFcn=@boundaryEdited;
+                    controls.chooseCheckpoint=button(grid,34,'选择已完成的同工况任务',@chooseCheckpointInitial);
+                    tip(grid,36,'继续研究须保持原体网格、物理及数值配置并启用具名保存；启动前核对源场。累计迭代不是物理时间。');
                     sync();return;
                 end
                 grid=form(24+12*methodDetailsOpen);c=state.cfg;
@@ -524,6 +528,12 @@ renderEditor();sync();showGeometry(true);
             if ~strcmp(initial,'freestream') || isfield(next.su2,'initialThicknessM'),next.su2.initialThicknessM=thickness;end
             limit=controls.checkpointLimit.Value;
             if limit~=100 || isfield(next.su2,'checkpointLimitMiB'),next.su2.checkpointLimitMiB=limit;end
+            source=controls.checkpointSource.Value;
+            if ~isempty(source) || isfield(next.su2,'checkpointSource'),next.su2.checkpointSource=source;end
+            if strcmp(initial,'checkpoint')
+                assert(isfile(fullfile(source,'engine_process.json')),'请选择具有真实进程记录的源检查点目录。');
+                assert(named,'继续研究须启用具名检查点保存，以保留本段和累计身份。');
+            end
             if strcmp(initial,'wallEnthalpy')
                 assert(strcmp(thermal,'isothermal'),'壁面相容初猜目前只支持给定统一壁温。');
                 assert(~isempty(embeddedVolume) && strcmp(embeddedVolume.sourceKind,'original-triangle-hybrid-volume'),'壁面相容初猜需要原三角混合体网格。');
@@ -747,6 +757,10 @@ renderEditor();sync();showGeometry(true);
             if strcmp(getOption(frozen.cfg.su2,'initialMode','freestream'),'wallEnthalpy')
                 writeSU2HybridInitialState(embeddedVolume,folder,frozen.cfg.su2.initialThicknessM);
                 manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));
+            elseif strcmp(getOption(frozen.cfg.su2,'initialMode','freestream'),'checkpoint')
+                writeSU2CheckpointInitialState(folder,frozen.cfg.su2.checkpointSource, ...
+                    getOption(frozen.cfg.su2,'pythonExecutable','python'));
+                manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));
             end
             projection=buildSU2WallProjection(embeddedVolume,frozen.mesh);
             save(fullfile(folder,'input_snapshot.mat'),'frozen','manifest','projection','budget','-v7');
@@ -815,6 +829,11 @@ renderEditor();sync();showGeometry(true);
     function text=checkpointBudgetText(c)
         if isempty(embeddedVolume),text='生成体网格后估计输出体量。';return;end
         b=checkpointBudget(c);text=sprintf('检查点预计最多 %.1f MiB / 限制%.0f MiB；含基础文件及具名副本。估计不含网格、快照、求解内存；2线程。',b.estimatedBytes/1024^2,b.limitBytes/1024^2);
+    end
+    function chooseCheckpointInitial(~,~)
+        folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择同工况已完成任务');
+        if isequal(folder,0),return;end
+        controls.checkpointSource.Value=folder;boundaryEdited([],[]);
     end
     function readTimeoutDialog(~,~)
         folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择本程序原超时运行目录');

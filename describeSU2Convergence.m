@@ -12,6 +12,10 @@ if isfinite(a.terminalIteration)
 else,terminal='末次监测未知';end
 if a.checkpointIdentityConfirmed
     checkpoint=sprintf('显示检查点 %d 步 · %s',a.checkpointIteration,pass(a.checkpointResidualPassed));
+    if isfield(a,'cumulativeCheckpointIteration')
+        checkpoint=sprintf('显示本段 %d / 累计 %d 步 · %s',a.checkpointIteration,a.cumulativeCheckpointIteration,pass(a.checkpointResidualPassed));
+        terminal=sprintf('末监测本段 %d / 累计 %d 步 · %s',a.terminalIteration,a.cumulativeTerminalIteration,pass(a.terminalResidualPassed));
+    end
 else,checkpoint='显示检查点迭代未确认';end
 detail=a.reason;
 if isfinite(a.threshold)

@@ -1,0 +1,29 @@
+{
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "reportedYPlusAllZero": true,
+  "reason": "fixed source computes nearest-neighbor distance for RANS-family solvers; laminar NS skips it, so native zero is not a mesh certificate",
+  "formula": "h_first * sqrt(rho_wall * norm(Cf)*q_inf) / mu_wall; laminar saved shear only",
+  "firstLayerDistanceRangeM": [
+    1.9999999999852103e-05,
+    2.0000000000155412e-05
+  ],
+  "dynamicPressurePa": 20947.98826292049,
+  "estimatedWallUnitsPercentiles": {
+    "min": 0.008761318233602473,
+    "p50": 0.5761061051601428,
+    "p95": 5.881877509886763,
+    "p99": 6.4646047221868645,
+    "max": 7.156409692135167
+  },
+  "faceMeanEstimateAbove1AreaFraction": 0.33201652495611866,
+  "limitation": "explicit first-normal-point estimate, not native RANS y+, not converged turbulent shear or heat-gradient validation",
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\tests\\auditActualRocketWallSpacing.py": "e3d9a009f4405fc5306e97ebf79a4e8acbc96874a7b6f93f934026eb546e0b8b",
+    "E:\\RocketAeroHeat\\tests\\auditSU2V110.py": "8376f03830b80af36ea8f554e312da4de17ac39d005829f9aee7716c4c1343e0",
+    "E:\\RocketAeroHeat\\outputs\\v118_validation\\actual01\\mesh\\hybrid_volume.mat": "dc3aa2b52d09e8ed7fd7bfa7806f9a2eb26c471c33961ad1241331e7f01efc6b",
+    "E:\\RocketAeroHeat\\outputs\\v119_validation\\continuation01\\surface_flow.vtk": "8a59473da7c2e92bab57a202a4bd816bf89c7eb0e0c6a41c798c902513c636e1",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\Common\\src\\geometry\\CGeometry.cpp": "6c16bc00d2759164ec81ecca0b40bbf563c8c686dd853b26cfcb591c5e6b0454",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\solvers\\CFVMFlowSolverBase.inl": "ef228099073057584c196405b674ff8dbf246a3fa325e636e36eff2a423c4e68"
+  }
+}

@@ -24,6 +24,11 @@ switch lower(action)
         if isfile(fullfile(folder,'input_snapshot.mat'))
             request.sourceFiles{end+1}=fullfile(folder,'input_snapshot.mat');
         end
+        if isfile(fullfile(folder,'continuation.json'))
+            request.sourceFiles=[request.sourceFiles,{fullfile(folder,'continuation.json'), ...
+                fullfile(folder,'case_manifest.json'),'writeSU2CheckpointInitialState.m', ...
+                'scripts/prepareSU2CheckpointContinuation.py'}];
+        end
         path=fullfile(folder,'engine_request.json');assert(~isfile(path),'目录已经使用，不能重复启动。');
         write(path,request);
         script=fullfile(root,'scripts','runEmbeddedSU2.py');

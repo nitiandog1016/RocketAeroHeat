@@ -82,6 +82,21 @@ try
     audit.wallEOSPressureError=max(abs(wall.pressureRaw./pressure(ids)-1));
     audit.wallEOSTemperatureError=max(abs(wall.temperatureRaw./temperature(ids)-1));
     assert(max([audit.wallEOSPressureError audit.wallEOSTemperatureError])<2e-6,'保存壁面与体场不同态。');
+    % 模块四：继续研究使用独立、受进程锁定的谱系；局部步号绝不能冒充累计步号。
+    continuation=fullfile(folder,'continuation.json');
+    if isfile(continuation)
+        path=fullfile(receipt.request.workDirectory,'continuation.json');h=fileSHA(continuation);
+        token=regexp(receiptText,[regexptranslate('escape',jsonencode(path)) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
+        assert(numel(token)==1 && strcmp(h,token{1}{1}),'继续计算身份未被实际进程锁定或已改变。');
+        lineage=jsondecode(fileread(continuation));before=lineage.completedUpdatesBeforeRun;
+        validateattributes(before,{'numeric'},{'scalar','finite','integer','positive'});
+        assert(before==lineage.sourceCumulativeSavedIteration+1 && lineage.samePhysicsAndNumerics && lineage.sameMesh);
+        audit.continuation=lineage;audit.completedUpdatesBeforeRun=before;
+        audit.cumulativeCheckpointIteration=before+audit.checkpointIteration;
+        audit.cumulativeTerminalIteration=before+audit.terminalIteration;
+        audit.successfulEngineSecondsThroughRun=lineage.priorSuccessfulEngineSeconds+receipt.elapsedSeconds;
+        audit.evidenceSHA256.continuation_json=h;
+    end
     audit.checkpointIdentityConfirmed=true;audit.status='checkpoint-and-history-audited';
     audit.reason='保存迭代已绑定且重启动EOS一致；残差通过与物理资格仍分别判断。';
 catch ex
