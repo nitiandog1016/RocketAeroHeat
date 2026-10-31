@@ -41,6 +41,11 @@ switch lower(action)
         job.terminal=logical(job.process.HasExited);
         if job.terminal
             job.supervisorExitCode=double(job.process.ExitCode);
+            % 原回执若持续被占用，监督器另存真实终态；仍保留非零退出，不自动接收结果。
+            fallback=fullfile(job.folder,'engine_terminal_fallback.json');
+            if (isempty(receipt) || ~isfield(receipt,'status') || ~strcmp(receipt.status,'terminal')) && isfile(fallback)
+                receipt=jsondecode(fileread(fallback));
+            end
             if ~isfield(job,'supervisorOutput')
                 job.supervisorOutput=[char(processText(job.process.StandardOutput)) char(processText(job.process.StandardError))];
                 fid=fopen(fullfile(job.folder,'supervisor.log'),'w','n','UTF-8');

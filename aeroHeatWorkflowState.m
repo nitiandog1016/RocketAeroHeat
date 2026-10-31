@@ -196,7 +196,7 @@ switch action
         state.result=result;state.freestream=fs;state.resultSourceRevision=state.revision;
         state.busy=false;state.status='solved';state.currentStep=5;
         state.frozenInputs=[];state.error=struct('identifier','','message','');
-    case 'completeresearch'
+    case {'completeresearch','completecheckpointresearch'}
         % 研究快照独立保存；不能通过普通completeSolve混入工程已计算面积。
         validateSolveToken(state,payload);
         result=required(payload,'result');validateMesh(result,'researchResult');
@@ -208,8 +208,16 @@ switch action
             requireCondition(isnumeric(values) && isvector(values) && numel(values)==size(state.mesh.F,1) && ...
                 all(isfinite(values)),'研究场缺少完整原面元数值。');
         end
-        requireCondition(strcmp(result.receipt.status,'terminal') && result.receipt.exitCode==0 && ...
-            ~result.receipt.timedOut && ~result.receipt.cancelled,'研究快照需要实际成功进程终态。');
+        if strcmp(action,'completecheckpointresearch')
+            % 仅由显式超时重开入口接受；普通成功任务路径仍保持原有严格条件。
+            requireCondition(strcmp(result.receipt.status,'terminal') && result.receipt.timedOut && ...
+                ~result.receipt.cancelled && isfield(result,'explicitTimeoutReview') && ...
+                isfield(result,'convergenceAudit') && result.convergenceAudit.checkpointIdentityConfirmed, ...
+                '超时研究查看需要真实终态和已确认的原检查点身份。');
+        else
+            requireCondition(strcmp(result.receipt.status,'terminal') && result.receipt.exitCode==0 && ...
+                ~result.receipt.timedOut && ~result.receipt.cancelled,'研究快照需要实际成功进程终态。');
+        end
         state.researchResult=result;state.result=[];state.resultSourceRevision=state.revision;
         state.busy=false;state.status='research-ready';state.currentStep=5;state.frozenInputs=[];
         state.error=struct('identifier','','message','');

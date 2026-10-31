@@ -22,6 +22,29 @@ def sha(file):
     return h.hexdigest()
 
 
+def atomic_write_json(path, state, maximum_wait=0.5):
+    """Windows读者短暂占用目标时有限重试，旧回执始终完整，永久错误仍抛出。"""
+    temporary=path.with_suffix('.pending')
+    temporary.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    deadline=time.monotonic()+maximum_wait;retries=0
+    while True:
+        try:
+            os.replace(str(temporary),str(path));return retries
+        except PermissionError:
+            if time.monotonic()>=deadline:raise
+            retries+=1;time.sleep(0.02)
+
+
+def save_terminal_receipt(path, state):
+    """终态记录遇持久占用时另存明确的备用回执，不将运行中原文改写为成功。"""
+    try:
+        atomic_write_json(path,state);return path
+    except OSError as ex:
+        fallback=path.with_name('engine_terminal_fallback.json')
+        state['terminalReceiptFallbackReason']=type(ex).__name__+': '+str(ex)
+        atomic_write_json(fallback,state);return fallback
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--request', required=True)
@@ -75,9 +98,7 @@ def main():
                  physicalSolutionQualified=False)
 
     def save():
-        temporary = receipt.with_suffix('.pending')
-        temporary.write_text(json.dumps(state, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-        os.replace(str(temporary), str(receipt))
+        atomic_write_json(receipt,state)
 
     save()
     command = [str(exe), str(cfg), '--threads', str(threads)]
@@ -89,10 +110,11 @@ def main():
                                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
                                    env=dict(os.environ, OMP_NUM_THREADS=str(threads)))
         state.update(status='running', processID=process.pid, command=command)
-        save()
         timed_out = False
         cancelled = False
+        supervisor_error = None
         try:
+            save()
             while process.poll() is None:
                 elapsed = time.monotonic() - start
                 cancel = folder / 'engine_cancel.json'
@@ -109,20 +131,24 @@ def main():
                 save()
                 time.sleep(0.25)
             code = process.wait()
+        except Exception as ex:
+            supervisor_error=type(ex).__name__+': '+str(ex)
         finally:
             # 包括回执/磁盘异常；只回收本监督器拥有的子进程，绝不按进程名批量杀。
             if process.poll() is None:
                 process.kill()
-                process.wait()
+            code=process.wait()
     state.update(status='terminal', exitCode=code, timedOut=timed_out,
                  cancelled=cancelled, progress=history_progress(folder / 'history.csv'),
                  elapsedSeconds=time.monotonic() - start, endedUTC=datetime.now(timezone.utc).isoformat(),
                  inputsStable={path: sha(Path(path)) == digest for path, digest in locked.items()})
+    if supervisor_error is not None:state['supervisorError']=supervisor_error
     state['outputSHA256'] = {file.name: sha(file) for file in sorted(folder.iterdir())
-                            if file.is_file() and file != receipt and str(file) not in locked}
-    save()
+                            if file.is_file() and file != receipt and file.suffix!='.pending' and str(file) not in locked}
+    terminal_receipt=save_terminal_receipt(receipt,state)
     print(json.dumps(dict(status='terminal', exitCode=code, timedOut=timed_out,
-                         elapsedSeconds=state['elapsedSeconds'], receipt=str(receipt))))
+                         elapsedSeconds=state['elapsedSeconds'], receipt=str(terminal_receipt))))
+    if supervisor_error is not None or terminal_receipt!=receipt:return 1
     return 125 if cancelled else (124 if timed_out else (code if code else (0 if all(state['inputsStable'].values()) else 2)))
 
 

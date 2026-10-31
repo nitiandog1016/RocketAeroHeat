@@ -45,7 +45,8 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'pca',@()pcaOrientation([],[]),'flip',@()flipOrientation([],[]), ...
     'confirmOrientation',@()confirmOrientation([],[]),'generateMesh',@()generate([],[]), ...
     'confirmBoundary',@()confirmBoundary([],[]),'run',@()solveCase([],[]),'getState',@getState, ...
-    'loadNative',@()loadNative([],[]),'cancel',@()cancelEngine([],[]),'readResearch',@readResearch);
+    'loadNative',@()loadNative([],[]),'cancel',@()cancelEngine([],[]),'readResearch',@readResearch, ...
+    'readTimeoutCheckpoint',@readTimeoutCheckpoint);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -208,7 +209,7 @@ renderEditor();sync();showGeometry(true);
                 tip(grid,11,'参数修改即使旧网格和下游结果失效；不改变现有网格方法。质量差面保留真实指标。');
             case 3
                 if isEmbedded()
-                    grid=form(16);c=state.cfg;
+                    grid=form(20);c=state.cfg;
                     controls.altitude=numberField(grid,1,'高度 / km',c.flight.altitude/1000,[0 86]);
                     controls.mach=numberField(grid,2,'Mach',c.flight.Mach,[1.01 10]);
                     controls.alpha=numberField(grid,3,'攻角 / °',c.flight.alpha,[-89 89]);
@@ -216,10 +217,14 @@ renderEditor();sync();showGeometry(true);
                     controls.wall=numberField(grid,5,'给定壁温 / K',c.flight.Twall,[1 10000]);
                     controls.iterations=numberField(grid,6,'最大迭代数',getOption(c.su2,'iterations',1000),[1 30000]);
                     controls.seconds=numberField(grid,7,'时间预算 / s',getOption(c.su2,'maximumSeconds',120),[1 720]);
-                    for key={'altitude','mach','alpha','beta','wall','iterations','seconds'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
-                    controls.confirm=button(grid,8,'确认内嵌引擎边界',@confirmBoundary);
-                    tip(grid,10,'SU2 8.6.0：层流NS、定比热理想气体γ1.4、Sutherland、Pr0.72；等温壁面，无湍流/转捩模型。参数可运行不代表在其范围已验证。');
-                    tip(grid,14,'给定Tw是边界；输出流体节点温度不是真实求解壁温。2线程，每1000步覆盖写检查点。');
+                    mode='overwrite';if getOption(c.su2,'namedCheckpoints',false),mode='indexed';end
+                    controls.checkpointMode=choice(grid,8,'检查点保存',{'覆盖写 · 默认','按迭代保留'}, {'overwrite','indexed'},mode);
+                    controls.outputEvery=numberField(grid,9,'保存间隔 / 步',getOption(c.su2,'outputEvery',1000),[1 30000]);
+                    for key={'altitude','mach','alpha','beta','wall','iterations','seconds','checkpointMode','outputEvery'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
+                    controls.confirm=button(grid,10,'确认内嵌引擎边界',@confirmBoundary);
+                    tip(grid,12,'SU2 8.6.0：层流NS、定比热理想气体γ1.4、Sutherland、Pr0.72；等温壁面，无湍流/转捩模型。参数可运行不代表在其范围已验证。');
+                    controls.storageEstimate=tip(grid,16,checkpointBudgetText(c));
+                    tip(grid,19,'给定Tw是边界；流体节点温度不是真实求解壁温。');
                     sync();return;
                 end
                 grid=form(24+12*methodDetailsOpen);c=state.cfg;
@@ -263,8 +268,9 @@ renderEditor();sync();showGeometry(true);
                     controls.cancel=button(grid,2,'取消当前引擎任务',@cancelEngine);
                     controls.cancel.Enable=onoff(state.busy);
                     controls.readResearch=button(grid,3,'重开本程序同工况研究结果',@readResearchDialog);
-                    tip(grid,4,'实际进程异步运行；残差/迭代号不是完成百分比。退出0仍须独立收敛与物理审核，当前结果不增加合格面积。');
-                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[7 15];controls.log.Layout.Column=[1 2];
+                    controls.readTimeoutCheckpoint=button(grid,4,'查看同工况超时检查点 · 研究',@readTimeoutDialog);
+                    tip(grid,5,'超时不自动接收结果。显式重开须核对原输入、保存迭代及完整场；仍不增加合格面积。');
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[8 15];controls.log.Layout.Column=[1 2];
                     sync();return;
                 end
                 failed=~isempty(state.error.message);offset=6*failed;
@@ -473,6 +479,11 @@ renderEditor();sync();showGeometry(true);
         if isEmbedded()
             next.heating.airThermalModel='caloricallyPerfect';
             next.su2.iterations=controls.iterations.Value;next.su2.maximumSeconds=controls.seconds.Value;
+            named=strcmp(controls.checkpointMode.Value,'indexed');every=controls.outputEvery.Value;
+            % 旧快照未含默认字段时保持结构不变，避免只确认就使同工况复开失效。
+            if named || isfield(next.su2,'namedCheckpoints'),next.su2.namedCheckpoints=named;end
+            if every~=1000 || isfield(next.su2,'outputEvery'),next.su2.outputEvery=every;end
+            validateattributes(every,{'numeric'},{'scalar','integer','positive'});
             validateattributes(next.su2.iterations,{'numeric'},{'scalar','integer','positive'});return;
         end
         next.heating.airThermalModel=controls.air.Value;
@@ -492,6 +503,7 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
+            if isEmbedded() && isfield(controls,'storageEstimate'),controls.storageEstimate.Text=checkpointBudgetText(state.cfg);end
             updateMethodScope();message('边界设置已编辑；请重新确认并显式计算，旧结果不会冒充新工况。');showGeometry(false);
         catch ex,showError(ex);end
     end
@@ -587,14 +599,19 @@ renderEditor();sync();showGeometry(true);
     function startEngine()
         try
             assert(~isempty(embeddedVolume),'请先生成当前原生体网格。');
+            budget=checkpointBudget(state.cfg);
+            assert(budget.withinLimit,'预计检查点%.1f MiB超过100 MiB研究限制；请增大保存间隔或选择覆盖写。',budget.estimatedBytes/1024^2);
             state=aeroHeatWorkflowState('beginSolve',state);
             frozen=state.frozenInputs;fs=frozen.freestream;
             folder=fullfile(fileparts(mfilename('fullpath')),'outputs','embedded_workbench',char(java.util.UUID.randomUUID()));
             flight=struct('Mach',frozen.cfg.flight.Mach,'temperature',fs.temperature,'pressure',fs.pressure, ...
                 'wallTemperature',frozen.cfg.flight.Twall,'alpha',frozen.cfg.flight.alpha,'beta',frozen.cfg.flight.beta, ...
-                'iterations',getOption(frozen.cfg.su2,'iterations',1000));
+                'iterations',getOption(frozen.cfg.su2,'iterations',1000), ...
+                'outputEvery',getOption(frozen.cfg.su2,'outputEvery',1000), ...
+                'namedCheckpoints',getOption(frozen.cfg.su2,'namedCheckpoints',false));
             manifest=writeSU2RocketCase(embeddedVolume,folder,flight);
-            save(fullfile(folder,'input_snapshot.mat'),'frozen','manifest','-v7');
+            projection=buildSU2WallProjection(embeddedVolume,frozen.mesh);
+            save(fullfile(folder,'input_snapshot.mat'),'frozen','manifest','projection','budget','-v7');
             engineJob=embeddedSU2Job('start',folder,struct('threads',2, ...
                 'maximumSeconds',getOption(frozen.cfg.su2,'maximumSeconds',120), ...
                 'pythonExecutable',getOption(frozen.cfg.su2,'pythonExecutable','python')));
@@ -650,6 +667,33 @@ renderEditor();sync();showGeometry(true);
         [file,folder]=uigetfile('mapped_research.mat','重开本程序同几何/边界研究结果');
         if isequal(file,0),return;end
         try,readResearch(fullfile(folder,file));catch ex,showError(ex);end
+    end
+    function budget=checkpointBudget(c)
+        budget=estimateSU2CheckpointStorage(embeddedVolume,getOption(c.su2,'iterations',1000), ...
+            getOption(c.su2,'outputEvery',1000),getOption(c.su2,'namedCheckpoints',false));
+    end
+    function text=checkpointBudgetText(c)
+        if isempty(embeddedVolume),text='生成体网格后估计输出体量。';return;end
+        b=checkpointBudget(c);text=sprintf('检查点预计最多 %.1f MiB / 限制100 MiB；含基础文件及具名副本。估计不含网格、快照、求解内存；2线程。',b.estimatedBytes/1024^2);
+    end
+    function readTimeoutDialog(~,~)
+        folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择本程序原超时运行目录');
+        if isequal(folder,0),return;end
+        try,readTimeoutCheckpoint(folder);catch ex,showError(ex);end
+    end
+    function readTimeoutCheckpoint(folder)
+        assert(isEmbedded() && ~state.busy,'请在当前内嵌工况的计算步骤显式重开。');
+        result=readSU2TimeoutCheckpoint(folder,state,embeddedVolume);
+        state=aeroHeatWorkflowState('beginSolve',state);
+        try
+            result.sourceRevision=state.revision;result.solveId=state.solveId;
+            state=aeroHeatWorkflowState('completeCheckpointResearch',state,struct('result',result, ...
+                'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            message('已显式重开完整超时检查点；原任务仍为超时、结果仍未获物理资格。');go(5);
+        catch ex
+            state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            renderEditor();rethrow(ex);
+        end
     end
     function readResearch(file)
         % 只复用本程序保存的同几何/同边界结果；输入版本不匹配必须拒绝。
