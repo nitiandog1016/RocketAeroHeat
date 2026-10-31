@@ -1,0 +1,183 @@
+{
+  "flavor": "rah-coolprop-v1",
+  "version": "8.6.0+rah-coolprop-v1",
+  "executable": "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\SU2_CFD.exe",
+  "propertyExecutable": "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "sourceCommit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+  "coolPropCommit": "98b3523d5daa98454618d381d2ae53f7471d216b",
+  "coolPropVersion": "7.2.0",
+  "status": "compiled-research-runtime-tests-pending",
+  "physicsQualified": false,
+  "systemDLLs": {
+    "RAH_CoolProp_State.exe": [
+      "KERNEL32.dll",
+      "msvcrt.dll"
+    ],
+    "SU2_CFD.exe": [
+      "KERNEL32.dll",
+      "msvcrt.dll"
+    ]
+  },
+  "buildSourceSHA256": {
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-coolprop-build\\cfd-build\\SU2_CFD\\src\\SU2_CFD.exe": "5fb5e8f0da09a6a8a5ba4f53240bb64952b98530f24cb65825f2f65334793209",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-coolprop-build\\cfd-build\\subprojects\\CoolProp\\libCoolProp.a": "040e0468f5b03210e988c000a562997b751d025c357978408753d8c21876b13d",
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\RAHCoolPropState.cpp": "4f5ea7251514c05e89335da27270085c57f6388504a0767d9d99f0c40663eb5e",
+    "E:\\RocketAeroHeat\\scripts\\installSU2CoolPropRuntime.py": "8ba55fb89a581eaeaeeeb73c86ef31439b402a2740d43edbd328c692f7b13dfa"
+  },
+  "restrictions": [
+    "single-zone steady compressible NS",
+    "CoolProp HEOS Air",
+    "SI dimensional",
+    "ROE or HLLC",
+    "Riemann open boundary",
+    "constant or adiabatic wall only initially"
+  ],
+  "files": [
+    {
+      "path": "AUTHORS.md",
+      "bytes": 3429,
+      "sha256": "bd2b76eada1999265ae26e89cc71759ba347bc69af2260ee588003b543fb9955"
+    },
+    {
+      "path": "axial_wall_source_patch.diff",
+      "bytes": 7531,
+      "sha256": "68de43a50fe3fce2001443c491ebec4c7afcfc4ff65345e69add32bac2a457a2"
+    },
+    {
+      "path": "bin/RAH_CoolProp_State.exe",
+      "bytes": 13126375,
+      "sha256": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b"
+    },
+    {
+      "path": "bin/SU2_CFD.exe",
+      "bytes": 29693997,
+      "sha256": "5fb5e8f0da09a6a8a5ba4f53240bb64952b98530f24cb65825f2f65334793209"
+    },
+    {
+      "path": "build_compatibility.diff",
+      "bytes": 1084,
+      "sha256": "053809d3baa747f4e9ad61fb274c6085a1451e30a9a69b8e1d64be02df3234b8"
+    },
+    {
+      "path": "CLI11_LICENSE",
+      "bytes": 1586,
+      "sha256": "51c69badd1cd4ffb036fb2a2efc4d7db8dd8c89905526e7193d57912968efae1"
+    },
+    {
+      "path": "COPYING",
+      "bytes": 24478,
+      "sha256": "b3aa400aca6d2ba1f0bd03bd98d03d1fe7489a3bbb26969d72016360af8a5c9d"
+    },
+    {
+      "path": "COPYING.MinGW-w64-runtime.txt",
+      "bytes": 15076,
+      "sha256": "ecff91ddb5799c8b79a4bdb576921b9c3e2989783fd1944527e8eb9b41a5ff5f"
+    },
+    {
+      "path": "Eigen_COPYING.MPL2",
+      "bytes": 16726,
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    {
+      "path": "Eigen_COPYING.README",
+      "bytes": 779,
+      "sha256": "c83230b770f17ef1386ea1fd3681271dd98aa93646bdbfb5bff3a1b7050fff9d"
+    },
+    {
+      "path": "LICENSE.md",
+      "bytes": 33393,
+      "sha256": "46ae25afd571da3e3761ff82ace5dc26b0b66cf514243379ac026ce094ba32cf"
+    },
+    {
+      "path": "licenses/CoolPropBibTeXLibrary.bib",
+      "bytes": 134407,
+      "sha256": "84d767376da3313fb59cf593adea07ba7b1c79e41f76835b34b4b4606c21aec6"
+    },
+    {
+      "path": "licenses/dev/fluids/Air.json",
+      "bytes": 14449,
+      "sha256": "c5e0d064d83fc91ed35d7354cea1fa38fea832a09d2e85faf4336e0017c33616"
+    },
+    {
+      "path": "licenses/externals/Eigen/COPYING.APACHE",
+      "bytes": 11362,
+      "sha256": "03379001a7b12a2ec997a25554247d985270b353c10d5bafee9ac8d6519820b7"
+    },
+    {
+      "path": "licenses/externals/Eigen/COPYING.BSD",
+      "bytes": 1517,
+      "sha256": "51928dce36213c5333ba3172e847d735d4c6e9b7ff2722a326c49067155b82eb"
+    },
+    {
+      "path": "licenses/externals/Eigen/COPYING.GPL",
+      "bytes": 35147,
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    },
+    {
+      "path": "licenses/externals/Eigen/COPYING.LGPL",
+      "bytes": 26530,
+      "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551"
+    },
+    {
+      "path": "licenses/externals/Eigen/COPYING.MINPACK",
+      "bytes": 2193,
+      "sha256": "c87b7f8ee88f6195e91743820c00354833583aef091b72e2d4a49c8e28e798a0"
+    },
+    {
+      "path": "licenses/externals/Eigen/COPYING.MPL2",
+      "bytes": 16726,
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    {
+      "path": "licenses/externals/Eigen/COPYING.README",
+      "bytes": 779,
+      "sha256": "c83230b770f17ef1386ea1fd3681271dd98aa93646bdbfb5bff3a1b7050fff9d"
+    },
+    {
+      "path": "licenses/externals/fmtlib/LICENSE",
+      "bytes": 1431,
+      "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8"
+    },
+    {
+      "path": "licenses/externals/IF97/LICENSE",
+      "bytes": 1054,
+      "sha256": "e22c3d30ef8d88ab468d9ea20392ca1df22fa3fd0a92dc3e996d89cf3cfdbd03"
+    },
+    {
+      "path": "licenses/externals/miniz-3.0.2/LICENSE",
+      "bytes": 1162,
+      "sha256": "6f20fa7672b00e2e975c291df737cf227addf3ad32e36fef3fe0f416e4664d3d"
+    },
+    {
+      "path": "licenses/externals/msgpack-c/COPYING",
+      "bytes": 200,
+      "sha256": "664550b43996452a5a2c7471bb0ff77185a58c69ccafa60f983dc4c162e1ee22"
+    },
+    {
+      "path": "licenses/externals/msgpack-c/LICENSE_1_0.txt",
+      "bytes": 1338,
+      "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+    },
+    {
+      "path": "licenses/externals/rapidjson/license.txt",
+      "bytes": 5152,
+      "sha256": "a140e5d46fe734a1c78f1a3c3ef207871dd75648be71fdda8e309b23ab8b1f32"
+    },
+    {
+      "path": "licenses/externals/REFPROP-headers/LICENSE",
+      "bytes": 1068,
+      "sha256": "f21f633c596509e89b2baedfd657c8f1b8018954b06576590971684b210e91f8"
+    },
+    {
+      "path": "licenses/LICENSE",
+      "bytes": 1103,
+      "sha256": "9bf835333ef602af4cb19338b9f9d43671e174fa029b00280e9bdba6ea4719b2"
+    },
+    {
+      "path": "mel_LICENSE",
+      "bytes": 7652,
+      "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+    }
+  ]
+}

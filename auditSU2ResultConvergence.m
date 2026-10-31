@@ -37,7 +37,12 @@ try
     fid=fopen(fullfile(folder,'history.csv'),'r');assert(fid>=0);guard=onCleanup(@()fclose(fid));header=fgetl(fid);clear guard;
     keys=regexp(header,'"([^"]+)"','tokens');keys=cellfun(@(c)strtrim(c{1}),keys,'UniformOutput',false);
     history=readmatrix(fullfile(folder,'history.csv'),'NumHeaderLines',1);assert(size(history,2)==numel(keys));
-    assert(~isempty(history) && all(isfinite(history(:))),'历史含不完整/非有限行。');
+    assert(~isempty(history),'历史为空。');
+    % 固定引擎的二维Buffet诊断可能未定义；它不是收敛量或热负荷，明确单列。
+    % 只允许该诊断的NaN，其他列（尤其残差/HF）及任意Inf仍必须拒绝。
+    unused=strcmp(keys,'Buffet');requiredHistory=history(:,~unused);
+    assert(all(isfinite(requiredHistory(:))) && ~any(isinf(history(:))),'历史含不完整/非有限必要字段。');
+    audit.unavailableDiagnosticFields=keys(any(isnan(history),1));
     iteration=history(:,strcmp(keys,'Inner_Iter'));assert(~isempty(iteration) && iteration(1)==0 && all(diff(iteration)==1),'必须是完整连续历史，不能使用稀疏节选。');
     residual=zeros(size(history,1),numel(selected));
     for j=1:numel(selected),residual(:,j)=history(:,strcmp(keys,columns{strcmp(allowed,selected{j})}));end
@@ -72,9 +77,14 @@ try
     rest=readmatrix(restart,'NumHeaderLines',1);nd=(size(rest,2)-3)/2;assert(ismember(nd,[2 3]));
     assert(all(isfinite(rest(:))) && isequal(rest(:,1),(0:size(rest,1)-1)'),'重启动不完整。');
     rho=rest(:,nd+2);velocity=rest(:,nd+3:2*nd+2)./rho;internal=rest(:,end)./rho-sum(velocity.^2,2)/2;
-    assert(all(rho>0 & internal>0));gamma=number(config,'GAMMA_VALUE');R=number(config,'GAS_CONSTANT');
-    assert(contains(config,'FLUID_MODEL= IDEAL_GAS'),'EOS审核仅支持当前定比热理想气体。');
-    temperature=internal*(gamma-1)/R;pressure=rho.*temperature*R;
+    assert(all(rho>0));
+    if contains(config,'FLUID_MODEL= IDEAL_GAS')
+        assert(all(internal>0));gamma=number(config,'GAMMA_VALUE');R=number(config,'GAS_CONSTANT');
+        temperature=internal*(gamma-1)/R;pressure=rho.*temperature*R;
+    elseif contains(config,'FLUID_MODEL= COOLPROP')
+        [pressure,temperature,thermo]=readSU2CoolPropStateAudit(folder,receipt,rest);
+        audit.thermodynamicModel=thermo.thermodynamicModel;audit.thermodynamicAudit=thermo;
+    else,error('当前EOS未实现独立状态审核，不能套用定比热公式。');end
     wall=readSU2SurfaceResult(fullfile(folder,'surface_flow.vtk'));points=[rest(:,2:nd+1) zeros(size(rest,1),3-nd)];
     ids=zeros(size(wall.vertices,1),1);distance=ids;
     for j=1:numel(ids),[d,ids(j)]=min(sum((points-wall.vertices(j,:)).^2,2));distance(j)=sqrt(d);end

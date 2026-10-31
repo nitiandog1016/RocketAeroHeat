@@ -58,7 +58,7 @@ render(true);inspectFace(1,[]);
         updateAerothermalGeometryView(geometry,result,caption,struct('resetCamera',false));
         s=geometry.html.UserData;s.payload.faceField=struct('values',values, ...
             'range',[low.Value high.Value],'name',labels{i},'unit',units{i},'productionQualified',false);
-        s.payload.coordinateNote='原三角面 · SI · laminar NS / ideal gas / Sutherland / Pr0.72 · 合格新增面积0';
+        s.payload.coordinateNote=['原三角面 · SI · ' runtime.physicsCaption ' · 合格新增面积0'];
         status=1;method=[result.solverMethod '；' runtime.method '；' result.projectionMethod];
         if strcmp(key,'wallInput'),status=2;method=thermalMethod;if isAdiabatic,status=0;end
         elseif strcmp(key,'wallSolved'),status=0;method='尚未求解壁体温度';end

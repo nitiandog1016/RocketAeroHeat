@@ -1,0 +1,112 @@
+{
+  "PTStates": 24,
+  "roundtripMaximumRelativeErrors": {
+    "p_Pa": 8.045279775714675e-09,
+    "T_K": 8.881784197001252e-16,
+    "rho_kg_m3": 0.0,
+    "e_J_kg": 3.730349362740526e-14
+  },
+  "scaledDerivativeErrors": {
+    "dpdrho_e": 6.09165909441009e-11,
+    "dpde_rho": 6.043897523542873e-11,
+    "dTdrho_e": 5.0027052201053116e-11,
+    "dTde_rho": 5.413572368311391e-11
+  },
+  "cpRangeJkgK": [
+    1002.245042630798,
+    1211.0203162592913
+  ],
+  "soundSpeedDerivativeIdentityError": 4.440892098500626e-16,
+  "enthalpyIdentityError": 2.220446049250313e-16,
+  "cpFiniteDifferenceError": 4.490496863240878e-11,
+  "rawPTSoundIdentityError": 2.024174827752745e-09,
+  "rawPTIdentityPassed": false,
+  "nativeStateSequence": "PT -> rho,e -> DE, matching CCoolProp::SetTDState_PT; conservative DE identities use original 1e-10 threshold",
+  "constantCpReferenceJkgK": 1004.685045,
+  "freestreamInternalEnergyJkg": 287757.1682675699,
+  "oldConstantCpFreestreamInternalEnergyJkg": 162550.20632925563,
+  "oldConstantCpStagnationTemperatureK": 1359.0545016679803,
+  "originalVelocityPreservedMps": 1508.5433002103648,
+  "EOSDerivedMach": 4.998034974966865,
+  "originalFreestreamEOSDensity": 0.018410689355392088,
+  "isentropicStagnationTemperatureK": 1272.8709695238333,
+  "isentropicStagnationPressurePa": 699099.3142418875,
+  "totalEnthalpyRelativeError": 7.997259753706813e-14,
+  "entropyRelativeError": 7.16677050831471e-13,
+  "validatedQueryBox": {
+    "temperatureK": [
+      140,
+      1500
+    ],
+    "pressurePa": [
+      100,
+      100000
+    ]
+  },
+  "reference": "CoolProp HEOS Air, Lemmon-JPCRD-2000; algebraic checks only, not independent experimental validation",
+  "transportNote": "helper reports CoolProp transport, solver probe explicitly retains Sutherland viscosity and cp(T,rho)*mu/Pr conductivity",
+  "queries": [
+    {
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\PT_input.csv": "e45e62a70982dca4902023d2da2732ca430ca29c11a7256556978c49c4cec22f",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b",
+        "E:\\RocketAeroHeat\\tests\\auditCoolPropNativeStates.py": "ba09f26012ddd5af10d8707c0b023963e57dbcc53596136967dad7f1d2e186df"
+      },
+      "outputSHA256": "35e359cb87fbb655b9ba6ace2007823c32a9d5ac0c1ab5ad3f3042c8061ed120",
+      "output": "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\PT_output.csv",
+      "reusedCompletedQuery": true
+    },
+    {
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\DE_input.csv": "ec59f2eb7412ce92e514973b0a960811aee8d7edbc2015fe4c3619416502bd15",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b",
+        "E:\\RocketAeroHeat\\tests\\auditCoolPropNativeStates.py": "ba09f26012ddd5af10d8707c0b023963e57dbcc53596136967dad7f1d2e186df"
+      },
+      "outputSHA256": "eefd8e4e5ea4f6f90ee647ea433b95c10234e29a81a5ea2b39e52778da773c77",
+      "output": "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\DE_output.csv",
+      "reusedCompletedQuery": true
+    },
+    {
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\derivatives_input.csv": "b95108e1c944db478d0ef47c0cc258133214c93b33997ab71ca805d00d2eac18",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b",
+        "E:\\RocketAeroHeat\\tests\\auditCoolPropNativeStates.py": "ba09f26012ddd5af10d8707c0b023963e57dbcc53596136967dad7f1d2e186df"
+      },
+      "outputSHA256": "ef8eaa4bac821ae7c9491fee312112587a619df7d3b4ccaa8b504bb4dc12ce57",
+      "output": "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\derivatives_output.csv",
+      "reusedCompletedQuery": false
+    },
+    {
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\freestream_input.csv": "1475eefa84190911695a6632150ccc2abba987c5510c93bfa6060d890d890ae3",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b",
+        "E:\\RocketAeroHeat\\tests\\auditCoolPropNativeStates.py": "ba09f26012ddd5af10d8707c0b023963e57dbcc53596136967dad7f1d2e186df"
+      },
+      "outputSHA256": "13e8e80b97308c916430a8bfc51725ae8e703b4d5d863ce9468ca5f3dd08b155",
+      "output": "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\freestream_output.csv",
+      "reusedCompletedQuery": false
+    },
+    {
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\stagnation_input.csv": "7b16cc95d0ca0438bd7acf61939c31e6c62414d1bab1c9d4174cb62beec48fb4",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b",
+        "E:\\RocketAeroHeat\\tests\\auditCoolPropNativeStates.py": "ba09f26012ddd5af10d8707c0b023963e57dbcc53596136967dad7f1d2e186df"
+      },
+      "outputSHA256": "e151779768e197f41df010e7a2f3125e321f42e8172ea165527b938576537b17",
+      "output": "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\stagnation_output.csv",
+      "reusedCompletedQuery": false
+    },
+    {
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\cp_derivative_input.csv": "68ce5351ce8dcc5514630a139872a48bd6cf2d9fe4404140fc1bb7084be3dcdb",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b",
+        "E:\\RocketAeroHeat\\tests\\auditCoolPropNativeStates.py": "ba09f26012ddd5af10d8707c0b023963e57dbcc53596136967dad7f1d2e186df"
+      },
+      "outputSHA256": "3a7b1dd2b1d6bfc44285559a2f9d35903bdd159ae9f4ea8a3a4c9de8d5f70369",
+      "output": "E:\\RocketAeroHeat\\outputs\\v121_validation\\properties\\cp_derivative_output.csv",
+      "reusedCompletedQuery": false
+    }
+  ],
+  "physicsQualified": false,
+  "newQualifiedArea": 0
+}

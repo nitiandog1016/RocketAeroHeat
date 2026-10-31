@@ -1,0 +1,54 @@
+{
+  "checks": {
+    "old_energy_restart": {
+      "rejected": true,
+      "reason": "\u5f53\u524dCoolProp\u9002\u914d\u4e0d\u63a5\u53d7 RESTART_SOL"
+    },
+    "unsupported_flux": {
+      "rejected": true,
+      "reason": ""
+    },
+    "ordinary_farfield": {
+      "rejected": true,
+      "reason": "\u9700\u8981\u5df2\u9a8c\u8bc1\u7684\u4e00\u822c\u6d41\u4f53\u8fb9\u754c\uff1aMARKER_FAR"
+    },
+    "unadapted_turbulence": {
+      "rejected": true,
+      "reason": "\u5f53\u524dCoolProp\u9002\u914d\u4e0d\u63a5\u53d7 KIND_TURB_MODEL"
+    },
+    "mixed_wall_boundary": {
+      "rejected": true,
+      "reason": ""
+    },
+    "unreviewed_conductivity": {
+      "rejected": true,
+      "reason": "\u5f53\u524dCoolProp\u9002\u914d\u4e0d\u63a5\u53d7 CONDUCTIVITY_MODEL"
+    },
+    "unreviewed_prandtl": {
+      "rejected": true,
+      "reason": "\u5f53\u524d\u5ba1\u6838\u4e0e\u663e\u793a\u4ec5\u652f\u6301\u663e\u5f0fPr0.72"
+    },
+    "eos_2100K": {
+      "rejected": true,
+      "exitCode": 1,
+      "elapsedSeconds": 0.6410000000032596,
+      "executed": true,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe",
+        "E:\\RocketAeroHeat\\outputs\\v121_validation\\contracts\\above_eos_range.csv",
+        "E:\\RocketAeroHeat\\outputs\\v121_validation\\contracts\\rejected_properties.csv"
+      ],
+      "executableSHA256": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b"
+    }
+  },
+  "validNativeConfigAccepted": true,
+  "engineRerun": false,
+  "physicsQualified": false,
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\tests\\testSU2CoolPropContracts.py": "79cd36c43813918ab255d8d6f77da42a12ed20c66abe26893eb3c0b136040aa8",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "3fd597ee9da5033ce37966abd753da83be27c3a304810d7928403e527c28f5f6",
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\thermal20\\case.cfg": "1bf9245c3fd2a04e03447779ea3891e8fa067e9a350274138660b6db2865908a",
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\thermal20\\case_manifest.json": "626d09d3df2d401a41f823419cd5b084b67fb5e05047a2c1efdd0a3de31f2a35",
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\contracts\\above_eos_range.csv": "28cc840baf67e5c546b00aeefe21703dde84b7f38e9bc176f5c34fc6e779e032"
+  }
+}

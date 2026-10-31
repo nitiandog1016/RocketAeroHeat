@@ -1,0 +1,26 @@
+--- meson.build
++++ meson.build
+@@ -362,7 +362,10 @@
+     cmake_opts.set_override_option('warning_level', '0')
+     cmake_opts.add_cmake_defines({
+       'COOLPROP_STATIC_LIBRARY': true,
+-      'CMAKE_MAKE_PROGRAM': join_paths(meson.project_source_root(), 'ninja'),
++      'CMAKE_MAKE_PROGRAM': 'D:/matlab/toolbox/shared/coder/ninja/win64/ninja.exe',
++      'FORCE_BITNESS_64': true,
++      'COOLPROP_NO_EXAMPLES': true,
++      'Python_EXECUTABLE': 'D:/anacondapython/python.exe',
+       'CMAKE_POSITION_INDEPENDENT_CODE': 'ON'
+     })
+     coolprop_subproj = cmake.subproject('CoolProp', options: cmake_opts)
+
+--- subprojects\CoolProp\dev\generate_headers.py
++++ subprojects\CoolProp\dev\generate_headers.py
+@@ -3,7 +3,7 @@
+ CoolProp ready to build.  This includes setting the correct versions in the
+ headers, generating the fluid files, etc.
+ """
+-from __future__ import division, print_function, unicode_literals
++from __future__ import division, print_function, unicode_literals, annotations
+ from datetime import datetime
+ import subprocess
+ import os

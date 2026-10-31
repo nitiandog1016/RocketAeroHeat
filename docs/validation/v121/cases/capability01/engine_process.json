@@ -1,0 +1,71 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T18:31:57.247299+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 60,
+    "dryRun": false,
+    "jobToken": "7638ae86-5b9a-4193-b67e-da235dacff68",
+    "sourceFiles": [
+      "tests\\prepareSU2ControlledPropertyProbe.py",
+      "outputs\\v121_validation\\capability01\\case_manifest.json",
+      "outputs\\v121_validation\\runtime_installed.json"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\engine_request.json": "11721b83e7eaa06ab6629ad93a825bfa1f16b61028ec22079e2f85b633eba6ff",
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\case.cfg": "5a780e039433ff6d5daa47823df3b4a5dfa6e4a5cd238b94f2d93baa4ada271d",
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\mesh.su2": "57ab10799e75c1d2f49dd575087cd7065e9ad0845ec9f83fc3e102b49d85b7c1",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\SU2_CFD.exe": "5fb5e8f0da09a6a8a5ba4f53240bb64952b98530f24cb65825f2f65334793209",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "2057530dbf48c960f52de99af131906e2a5704f0a74ea3598187f5823f4632ce",
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\case_manifest.json": "315b0697aaad834a150c0a79ebc94522cffd8aa41cc56a006a0409092ed44366",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\runtime.json": "333a624c84133361f8e789ee96731d46739c6f10ed477a4be0b247d9845f5498",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "37cb4e9bafd9c783a892dd91b84223da32197df5b815c6bc28ecaedc00a55b66",
+    "E:\\RocketAeroHeat\\tests\\prepareSU2ControlledPropertyProbe.py": "e2a01f7dc23a75b7e23c235d64c26093b8210bff56bda57a895379a6d2d38855",
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\runtime_installed.json": "333a624c84133361f8e789ee96731d46739c6f10ed477a4be0b247d9845f5498"
+  },
+  "executableVersion": "8.6.0+rah-coolprop-v1",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "supervisorProcessID": 2600,
+  "physicalSolutionQualified": false,
+  "runtimeFlavor": "rah-coolprop-v1",
+  "processID": 23556,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 1.7190000000045984,
+  "progress": {
+    "Inner_Iter": 0.0,
+    "rms[Rho]": -17.06931114,
+    "rms[RhoE]": -10.89282783,
+    "HF": 0.0
+  },
+  "exitCode": 0,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T18:31:58.966578+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\runtime.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\tests\\prepareSU2ControlledPropertyProbe.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v121_validation\\runtime_installed.json": true
+  },
+  "outputSHA256": {
+    "engine_stdout.log": "8f2db08f047c69078c37cd2e0b3e5a8bc8ee33302e8fe4ef8efdaa15d4d4106a",
+    "history.csv": "41127d902e6076a18c2d666e58dc7b716428ed4975e492f9229365a48df46b97",
+    "restart_flow.csv": "c7f001262776c8f8f541f9292478b56fc3d27129cbe5d5e4a0d286e3bae68f32",
+    "surface_flow.vtk": "60423256d4990718a1e5c02c9e6df72bbc8342a1b0b04295a22e9a20e04936de"
+  }
+}

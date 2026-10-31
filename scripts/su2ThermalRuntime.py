@@ -5,6 +5,7 @@ import csv,hashlib,json,math,re,bisect
 ROOT=Path(__file__).resolve().parents[1]
 FLAVOR='rah-axial-wall-v1'
 FROZEN_FLAVOR='rah-frozen-energy-v1'
+COOLPROP_FLAVOR='rah-coolprop-v1'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 
@@ -13,7 +14,7 @@ def resolve(folder,config):
     manifest=folder/'case_manifest.json';locked={};profile=None
     data=read(manifest) if manifest.exists() else {}
     flavor=data.get('requiredRuntimeFlavor','official')
-    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR),'未知SU2运行时类型'
+    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,COOLPROP_FLAVOR),'未知SU2运行时类型'
     if flavor!=FROZEN_FLAVOR:assert 'frozenEnergyMode' not in data,'运行时类型与冻结能量选项不匹配'
     runtime_dir=ROOT/'tools/runtime/su2'/('8.6.0' if flavor=='official' else '8.6.0-'+flavor)
     runtime_file=runtime_dir/'runtime.json'
@@ -36,6 +37,10 @@ def resolve(folder,config):
             assert runtime['flavor']==FROZEN_FLAVOR
             validate_frozen_manifest(data,config)
             locked[str(manifest)]=sha(manifest)
+        elif flavor==COOLPROP_FLAVOR:
+            assert runtime['flavor']==COOLPROP_FLAVOR
+            validate_coolprop_manifest(data,config)
+            locked[str(manifest)]=sha(manifest)
         else:
             assert 'frozenEnergyMode' not in data,'官方运行时不能默默忽略冻结能量选项'
     exe=Path(runtime['executable']).resolve();exe.relative_to(runtime_dir.resolve())
@@ -44,6 +49,26 @@ def resolve(folder,config):
         assert sha(p)==item['sha256'],'运行时文件身份变化'
     locked[str(runtime_file)]=sha(runtime_file)
     return exe,runtime,flavor,profile,locked
+
+def validate_coolprop_manifest(data,config):
+    """首阶段只接受已准备的固定Air/单区层流物性任务；旧rhoE或湍流列不能混用。"""
+    settings={}
+    for line in config.splitlines():
+        line=line.split('%',1)[0].strip()
+        if '=' in line:
+            key,value=map(str.strip,line.split('=',1));assert key not in settings;settings[key]=value
+    required={'SOLVER':'NAVIER_STOKES','KIND_TURB_MODEL':'NONE','FLUID_MODEL':'COOLPROP','FLUID_NAME':'Air',
+              'SYSTEM_MEASUREMENTS':'SI','REF_DIMENSIONALIZATION':'DIMENSIONAL','MGLEVEL':'0','RESTART_SOL':'NO',
+              'VISCOSITY_MODEL':'SUTHERLAND','CONDUCTIVITY_MODEL':'CONSTANT_PRANDTL'}
+    for k,v in required.items():assert settings.get(k)==v,'当前CoolProp适配不接受 '+k
+    assert settings.get('CONV_NUM_METHOD_FLOW') in ('ROE','HLLC')
+    assert settings.get('TIME_DOMAIN','NO')=='NO' and 'MARKER_RIEMANN' in settings
+    for k in ('MARKER_FAR','MARKER_INLET','MARKER_OUTLET','CONFIG_LIST','NZONES','MARKER_PYTHON_CUSTOM'):
+        assert k not in settings,'需要已验证的一般流体边界：'+k
+    assert ('MARKER_ISOTHERMAL' in settings)!=('MARKER_HEATFLUX' in settings)
+    assert data.get('thermodynamicModel')=='CoolProp-7.2.0-HEOS-Air'
+    assert float(settings['PRANDTL_LAM'])==.72,'当前审核与显示仅支持显式Pr0.72'
+    return settings
 
 def validate_frozen_manifest(data,config):
     """实验恢复只接受显式选择的固定单区稳态NS；绝不从环境继承或默默降级。"""

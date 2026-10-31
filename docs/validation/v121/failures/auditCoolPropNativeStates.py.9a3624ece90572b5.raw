@@ -1,0 +1,65 @@
+"""用真实同库独立进程验证PT/DE/HS、导数和变比热；属于接口与模型对照，非实验认证。"""
+from pathlib import Path
+import hashlib,json,os,sys,time
+import numpy as np
+ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'outputs/v121_validation'
+sys.path.insert(0,str(ROOT/'scripts'));import buildSU2ThermalRuntime as supervisor
+RUNTIME=ROOT/'tools/runtime/su2/8.6.0-rah-coolprop-v1'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def query(name,rows):
+    folder=OUT/'properties';folder.mkdir(exist_ok=True);src=folder/(name+'_input.csv');dst=folder/(name+'_output.csv')
+    assert not src.exists() and not dst.exists()
+    src.write_text('mode,a,b\n'+''.join('%s,%.17g,%.17g\n'%q for q in rows))
+    supervisor.OUT=folder;exe=RUNTIME/'bin/RAH_CoolProp_State.exe';locks={str(p):sha(p) for p in [src,exe,Path(__file__).resolve()]}
+    supervisor.run(name,[str(exe),str(src),str(dst)],ROOT,dict(os.environ,OMP_NUM_THREADS='1'),120)
+    assert all(sha(Path(p))==h for p,h in locks.items());data=np.atleast_1d(np.genfromtxt(str(dst),names=True,delimiter=','))
+    assert len(data)==len(rows) and np.array_equal(data['row'],np.arange(len(rows)))
+    return data,dict(inputSHA256=locks,outputSHA256=sha(dst),output=str(dst))
+def main():
+    assert not (OUT/'property_audit.json').exists()
+    rows=[('PT',p,T) for p in [100.,1197.0279007383137,5000.,100000.] for T in [140.,226.50908361133003,300.,600.,1000.,1500.]]
+    a,qa=query('PT',rows);b,qb=query('DE',[('DE',d['rho_kg_m3'],d['e_J_kg']) for d in a])
+    errors={k:float(max(abs(b[k]/a[k]-1))) for k in ['p_Pa','T_K','rho_kg_m3','e_J_kg']};assert max(errors.values())<1e-8
+    assert np.all(a['cp_J_kgK']>a['cv_J_kgK']) and min(a['cv_J_kgK'])>0
+    assert min(a['mu_Pa_s'])>0 and min(a['k_W_mK'])>0
+    # 声速必须与原生可压缩Jacobian使用的同一偏导恒等式相容。
+    sound2=a['dpdrho_e']+a['p_Pa']/a['rho_kg_m3']**2*a['dpde_rho']
+    soundError=float(max(abs(sound2/a['a_m_s']**2-1)));assert soundError<1e-10
+    enthalpyError=float(max(abs((a['e_J_kg']+a['p_Pa']/a['rho_kg_m3'])/a['h_J_kg']-1)))
+    assert enthalpyError<1e-10
+    cpRows=[]
+    for d in a:
+        dt=d['T_K']*1e-5;cpRows.extend([('PT',d['p_Pa'],d['T_K']+dt),('PT',d['p_Pa'],d['T_K']-dt)])
+    cpData,qcp=query('cp_derivative',cpRows)
+    cpNumerical=(cpData['h_J_kg'][0::2]-cpData['h_J_kg'][1::2])/(2*a['T_K']*1e-5)
+    cpError=float(max(abs(cpNumerical/a['cp_J_kgK']-1)));assert cpError<1e-7
+    fdrows=[]
+    for d in a:
+        rho=d['rho_kg_m3'];e=d['e_J_kg'];dr=rho*1e-5;de=max(abs(e),100000)*1e-5
+        fdrows.extend([('DE',rho+dr,e),('DE',rho-dr,e),('DE',rho,e+de),('DE',rho,e-de)])
+    f,qf=query('derivatives',fdrows);derr={}
+    for col,output,offset in [('dpdrho_e','p_Pa',0),('dpde_rho','p_Pa',2),('dTdrho_e','T_K',0),('dTde_rho','T_K',2)]:
+        h=a['rho_kg_m3']*1e-5 if offset==0 else np.maximum(abs(a['e_J_kg']),100000)*1e-5
+        numerical=(f[output][offset::4]-f[output][offset+1::4])/(2*h)
+        # 近理想气体的dT/drho接近零，用相应状态尺度而非零分母定义误差。
+        scale=np.maximum(abs(a[col]),a[output]/(a['rho_kg_m3'] if offset==0 else np.maximum(abs(a['e_J_kg']),100000)))
+        derr[col]=float(max(abs(numerical-a[col])/scale));assert derr[col]<1e-5
+    exact,qx=query('freestream',[('PT',1197.0279007383137,226.50908361133003)])
+    f0=exact[0];U=1508.5433002103648
+    total,qt=query('stagnation',[('HS',f0['h_J_kg']+.5*U*U,f0['s_J_kgK'])]);t=total[0]
+    herror=float(abs(t['h_J_kg']-(f0['h_J_kg']+.5*U*U))/abs(t['h_J_kg']));serror=float(abs(t['s_J_kgK']-f0['s_J_kgK'])/max(abs(f0['s_J_kgK']),1))
+    assert herror<1e-8 and serror<1e-8
+    report=dict(PTStates=len(a),roundtripMaximumRelativeErrors=errors,scaledDerivativeErrors=derr,
+      cpRangeJkgK=[float(min(a['cp_J_kgK'])),float(max(a['cp_J_kgK']))],
+      soundSpeedDerivativeIdentityError=soundError,enthalpyIdentityError=enthalpyError,cpFiniteDifferenceError=cpError,
+      constantCpReferenceJkgK=1.4*287.05287/.4,freestreamInternalEnergyJkg=float(f0['e_J_kg']),
+      oldConstantCpFreestreamInternalEnergyJkg=287.05287/.4*float(f0['T_K']),
+      oldConstantCpStagnationTemperatureK=float(f0['T_K'])+U*U/(2*1.4*287.05287/.4),
+      originalVelocityPreservedMps=U,EOSDerivedMach=float(U/f0['a_m_s']),originalFreestreamEOSDensity=float(f0['rho_kg_m3']),
+      isentropicStagnationTemperatureK=float(t['T_K']),isentropicStagnationPressurePa=float(t['p_Pa']),
+      totalEnthalpyRelativeError=herror,entropyRelativeError=serror,validatedQueryBox=dict(temperatureK=[140,1500],pressurePa=[100,100000]),
+      reference='CoolProp HEOS Air, Lemmon-JPCRD-2000; algebraic checks only, not independent experimental validation',
+      transportNote='helper reports CoolProp transport, solver probe explicitly retains Sutherland viscosity and cp(T,rho)*mu/Pr conductivity',
+      queries=[qa,qb,qf,qx,qt,qcp],physicsQualified=False,newQualifiedArea=0)
+    (OUT/'property_audit.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({k:v for k,v in report.items() if k!='queries'},indent=2))
+if __name__=='__main__':main()

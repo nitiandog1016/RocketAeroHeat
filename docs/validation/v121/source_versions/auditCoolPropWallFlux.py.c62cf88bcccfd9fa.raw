@@ -1,0 +1,49 @@
+"""独立复核小型真实可压缩场的EOS/壁面梯度；不把启动场当作平板验证解。"""
+from pathlib import Path
+import hashlib,json,re,sys
+import numpy as np
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'tests'))
+from auditEmbeddedSU2FlatPlate import read_wall
+
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+
+def main():
+    folder=ROOT/'outputs/v121_validation/capability01';target=folder/'wall_audit.json';assert not target.exists()
+    cfg=(folder/'case.cfg').read_text();receipt=json.loads((folder/'engine_process.json').read_text())
+    assert receipt['exitCode']==0 and receipt['status']=='terminal' and all(receipt['inputsStable'].values())
+    for key,value in [('FLUID_MODEL','COOLPROP'),('VISCOSITY_MODEL','SUTHERLAND'),('CONDUCTIVITY_MODEL','CONSTANT_PRANDTL')]:
+        assert re.search(r'^'+key+r'=\s*'+value+r'\s*$',cfg,re.M)
+    def num(key):return float(re.search(r'^'+key+r'=\s*(\S+)',cfg,re.M)[1])
+    tw=float(re.search(r'MARKER_ISOTHERMAL=\s*\(wall,\s*([^\)]+)\)',cfg)[1])
+    rest=np.loadtxt(str(folder/'restart_flow.csv'),delimiter=',',skiprows=1)
+    data=np.genfromtxt(str(folder/'thermodynamics/properties.csv'),names=True,delimiter=',')
+    assert np.array_equal(rest[:,0],data['row'])
+    xyz,wall=read_wall(folder/'surface_flow.vtk');computed=[];oldcp=[];pError=[];tError=[]
+    for i,point in enumerate(xyz):
+        column=np.flatnonzero(abs(rest[:,1]-point[0])<6e-8);column=column[np.argsort(rest[column,2])]
+        iw,ine=column[:2];assert rest[iw,2]==0 and rest[ine,2]>0
+        T=data['T_K'][iw];cp=data['cp_J_kgK'][iw]
+        mu=num('MU_REF')*(T/num('MU_T_REF'))**1.5*(num('MU_T_REF')+num('SUTHERLAND_CONSTANT'))/(T+num('SUTHERLAND_CONSTANT'))
+        gradient=(data['T_K'][ine]-tw)/rest[ine,2]
+        computed.append(mu*cp/num('PRANDTL_LAM')*gradient)
+        oldcp.append(mu*(1.4*287.05287/.4)/num('PRANDTL_LAM')*gradient)
+        pError.append(wall['Pressure'][i]/data['p_Pa'][iw]-1)
+        tError.append(wall['Temperature'][i]/T-1)
+    computed=np.array(computed);mask=-xyz[:,0]>0
+    error=float(max(abs(wall['Heat_Flux'][mask]-computed[mask])/np.maximum(abs(computed[mask]),1)))
+    assert error<2e-6 and max(abs(np.array(pError)))<2e-6 and max(abs(np.array(tError)))<2e-6
+    s=-xyz[:,0];order=np.argsort(s);power=float(np.trapz(wall['Heat_Flux'][order],s[order]))
+    history=np.atleast_1d(np.genfromtxt(str(folder/'history.csv'),delimiter=',',names=True))
+    powerError=abs(power-history['HF'][-1])/max(abs(power),1);assert powerError<2e-6
+    report=dict(nodes=len(xyz),stateRows=len(rest),wallGradientRelativeError=error,
+        wallPressureEOSRelativeError=float(max(abs(np.array(pError)))),wallTemperatureEOSRelativeError=float(max(abs(np.array(tError)))),
+        nativeIntegratedHeatPower=power,nativeHeatPowerRelativeError=float(powerError),
+        usingOldConstantCpRelativeDifference=float(max(abs(np.array(oldcp)[mask]-computed[mask])/np.maximum(abs(computed[mask]),1))),
+        actualTransport='Sutherland mu(T); k=mu*CoolProp cp(T,rho)/Pr, Pr=0.72; not CoolProp transport functions',
+        sign='positive into wall, negative retained; startup values are not physical predictions',
+        prescribedWallTemperatureK=tw,fluidNodeTemperatureRangeK=[float(min(wall['Temperature'])),float(max(wall['Temperature']))],
+        iteration=int(history['Inner_Iter'][-1]),physicsQualified=False,newQualifiedArea=0,
+        sources={str(p.relative_to(ROOT)):sha(p) for p in [Path(__file__).resolve(),folder/'case.cfg',folder/'engine_process.json',folder/'restart_flow.csv',folder/'surface_flow.vtk',folder/'thermodynamics/properties.csv']})
+    target.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({k:v for k,v in report.items() if k!='sources'},indent=2))
+if __name__=='__main__':main()

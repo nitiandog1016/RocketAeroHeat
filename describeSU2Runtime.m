@@ -3,6 +3,7 @@ function info=describeSU2Runtime(receipt)
 % 模块一：旧回执缺失身份时明确未知；新回执展示准确包类型。
 % 模块二：实验恢复与只读诊断分开，任何运行包均不自动赋予物理资格。
 info=struct('version','未记录','flavor','未记录','mode','未记录','physicsQualified',false);
+info.physicsCaption='laminar NS / ideal gas / Sutherland / Pr0.72';
 if isfield(receipt,'executableVersion'),info.version=receipt.executableVersion;end
 if isfield(receipt,'runtimeFlavor'),info.flavor=receipt.runtimeFlavor;end
 switch info.flavor
@@ -10,6 +11,9 @@ switch info.flavor
         info.mode='native';info.method='官方原生更新';
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';
+    case 'rah-coolprop-v1'
+        info.mode='compressible-heos-air';info.method='受控CoolProp 7.2.0 HEOS Air；可压缩变比热；Sutherland黏度与k=μcp/Pr，原生流场更新';
+        info.physicsCaption='层流 NS / HEOS Air / Sutherland / k=μcp(T,ρ)/Pr0.72';
     case 'rah-frozen-energy-v1'
         assert(isfield(receipt,'frozenEnergyMode'),'冻结能量运行时缺少真实模式回执。');
         info.mode=receipt.frozenEnergyMode;
@@ -20,6 +24,7 @@ switch info.flavor
         end
     otherwise
         info.method=['求解器更新身份未核实：' info.flavor];
+        info.physicsCaption='求解物理配置未核实';
 end
 info.caption=['SU2 ' info.version];
 end

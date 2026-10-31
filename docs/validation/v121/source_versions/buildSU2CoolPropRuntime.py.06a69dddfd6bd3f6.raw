@@ -1,0 +1,59 @@
+"""在独立目录构建固定可压缩CoolProp引擎；仅修正构建兼容项，旧运行包不动。"""
+from pathlib import Path
+import hashlib,json,os,sys,subprocess,difflib,shutil
+import buildSU2ThermalRuntime as supervisor
+ROOT=Path(__file__).resolve().parents[1];OLD=ROOT/'tools/runtime/su2-thermal-build'
+BASE=ROOT/'tools/runtime/su2-coolprop-build';SOURCE=OLD/'source';CP=SOURCE/'subprojects/CoolProp'
+OUT=ROOT/'outputs/v121_validation';PIN='98b3523d5daa98454618d381d2ae53f7471d216b'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def main():
+    OUT.mkdir(parents=True,exist_ok=True);supervisor.OUT=OUT
+    assert not (OUT/'build_inputs.json').exists(),'已有构建身份，须核查实际进程后再明确续构建，不能盲目重开'
+    ninja=Path('D:/matlab/toolbox/shared/coder/ninja/win64/ninja.exe');cc=OLD/'toolchain/w64devkit/bin'
+    cmake=BASE/'cmake/bin/cmake.exe';assert cmake.is_file()
+    preparation=json.loads((BASE/'preparation.json').read_text());assert preparation['coolPropCommit']==PIN
+    patchfiles={SOURCE/'meson.build':(SOURCE/'meson.build').read_bytes(),CP/'dev/generate_headers.py':(CP/'dev/generate_headers.py').read_bytes()}
+    patches=[]
+    for path,raw in patchfiles.items():
+        text=raw.decode('utf-8')
+        if path.name=='meson.build':
+            old="'COOLPROP_STATIC_LIBRARY': true,\n      'CMAKE_MAKE_PROGRAM': join_paths(meson.project_source_root(), 'ninja'),"
+            new="'COOLPROP_STATIC_LIBRARY': true,\n      'CMAKE_MAKE_PROGRAM': '"+ninja.as_posix()+"',\n      'FORCE_BITNESS_64': true,\n      'COOLPROP_NO_EXAMPLES': true,\n      'Python_EXECUTABLE': '"+Path(sys.executable).as_posix()+"',"
+        else:
+            old='from __future__ import division, print_function, unicode_literals'
+            new=old+', annotations'
+        assert text.count(old)==1;updated=text.replace(old,new,1)
+        patches.append(''.join(difflib.unified_diff(text.splitlines(True),updated.splitlines(True),fromfile=str(path.relative_to(SOURCE)),tofile=str(path.relative_to(SOURCE)))))
+        original=OUT/(path.name+'.original');assert not original.exists();original.write_bytes(raw);path.write_bytes(updated.encode('utf-8'))
+    (OUT/'build_compatibility.diff').write_text('\n'.join(patches),encoding='utf-8')
+    # 不让嵌套源码树误报外层RocketAeroHeat的提交号；官方生成器从固定文件读取。
+    revision=CP/'dev/gitrevision.txt';assert not revision.exists();revision.write_text(PIN+'\n')
+    env=dict(os.environ,PATH=str(cmake.parent)+os.pathsep+str(cc)+os.pathsep+str(ninja.parent)+os.pathsep+os.environ['PATH'],
+             CC=str(cc/'gcc.exe'),CXX=str(cc/'g++.exe'),GIT_CEILING_DIRECTORIES=str(SOURCE))
+    build=BASE/'cfd-build';assert not build.exists()
+    inputs=[Path(__file__).resolve(),ROOT/'scripts/buildSU2ThermalRuntime.py',ROOT/'scripts/prepareSU2CoolPropBuild.py',
+            ROOT/'docs/validation/v121/PLAN.md',SOURCE/'meson.build',CP/'dev/generate_headers.py',revision,cc/'g++.exe',ninja,cmake]
+    locks={str(p):sha(p) for p in inputs};(OUT/'build_inputs.json').write_text(json.dumps(locks,indent=2)+'\n')
+    try:
+        supervisor.run('generate_headers',[sys.executable,str(CP/'dev/generate_headers.py')],CP,env,120)
+        assert PIN in (CP/'include/gitrevision.h').read_text()
+        supervisor.run('configure',[sys.executable,str(OLD/'meson/meson.py'),'setup',str(build),str(SOURCE),
+            '-Dwith-mpi=disabled','-Dwith-omp=true','-Denable-cgns=false','-Denable-tecio=false',
+            '-Denable-pywrapper=false','-Denable-tests=false','-Dcpu-arch=x86-64','-Denable-coolprop=true','--buildtype=release'],SOURCE,env,120)
+        # 此时上游物性表/Boost已正常生成；所有实际编译输入从此处锁定。
+        tree={str(p):sha(p) for p in SOURCE.rglob('*') if p.is_file() and '__pycache__' not in p.parts}
+        (OUT/'compile_source_tree.json').write_text(json.dumps(tree,indent=2)+'\n')
+        supervisor.run('compile',[str(ninja),'-C',str(build),'-j','2','SU2_CFD/src/SU2_CFD.exe'],SOURCE,env,1200)
+        changed=[p for p,h in tree.items() if sha(Path(p))!=h];assert not changed,changed
+        assert all(sha(Path(p))==h for p,h in locks.items())
+        exe=build/'SU2_CFD/src/SU2_CFD.exe';assert exe.is_file()
+        assert sum(p.stat().st_size for p in BASE.rglob('*') if p.is_file())<3*1024**3
+        state=dict(status='compiled-not-yet-runtime-tested',executable=str(exe),executableSHA256=sha(exe),
+                   coolPropCommit=PIN,sourceStable=True,sourceTreeSHA256=sha(OUT/'compile_source_tree.json'),physicsQualified=False)
+        (OUT/'compiled.json').write_text(json.dumps(state,indent=2)+'\n');print(json.dumps(state),flush=True)
+    finally:
+        # 准确补丁、原文及编译清单留证；归还旧构建树的两个原文件，避免破坏旧审计。
+        for path,raw in patchfiles.items():
+            (OUT/(path.name+'.used')).write_bytes(path.read_bytes());path.write_bytes(raw)
+        (OUT/'source_restore.json').write_text(json.dumps({str(p):sha(p)==hashlib.sha256(raw).hexdigest() for p,raw in patchfiles.items()},indent=2)+'\n')
+if __name__=='__main__':main()
