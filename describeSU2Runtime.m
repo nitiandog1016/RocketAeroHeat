@@ -55,6 +55,15 @@ switch info.flavor
                 info.physicsCaption=[info.physicsCaption ' / ' label];
             end
         end
+    case 'rah-bounded-conservative-v1'
+        % 原生残差和物理源保持；仅本受控包改变有界散度的守恒Jacobian链式换算。
+        p=receipt.physicsModel;assert(strcmp(p.model,'SST-2003m'));
+        study=p.numericalStudy;assert(strcmp(study.studyID,'v131-SST-bounded-conservative-chain-rule') && strcmp(study.variant,'bounded'));
+        info.mode='sst-bounded-conservative';info.physicsModel=p;
+        info.method=sprintf('受控有界标量守恒Jacobian修正；SST-2003m，I=%.4g，μt/μ=%.4g，Prt=%.4g；复用参考初态，伪时间重置；未获物理资格', ...
+            p.intensity,p.viscosityRatio,p.Prt);
+        info.method=[info.method '；p/T/热流为原生流动阶段，保存k/ω为随后湍流更新态，分别审核'];
+        info.physicsCaption=sprintf('RANS / SST-2003m / 定比热 / Sutherland / Prt%.4g；转捩未知 / 受控有界输运',p.Prt);
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';
     case {'rah-coolprop-v1','rah-coolprop-recon-v1','rah-coolprop-recon-v2','rah-coolprop-recon-v3'}

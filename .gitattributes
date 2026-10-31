@@ -186,3 +186,7 @@ docs/validation/v129/** -text -eol -whitespace
 
 # v130保留近壁初猜实际对照、未运行准备及失败证据原字节。
 docs/validation/v130/** -text -eol -whitespace
+# v131构建、受控有界输运及失败记录保留准确输入和证据字节。
+docs/validation/v131/** -text -eol -whitespace
+# 固定补丁SHA及diff的空白上下文行必须按原字节保存。
+third_party/su2_bounded/*.diff -text -eol -whitespace

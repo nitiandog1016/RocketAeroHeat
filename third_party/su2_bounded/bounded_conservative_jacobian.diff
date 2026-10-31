@@ -1,0 +1,33 @@
+--- a/SU2_CFD/include/solvers/CScalarSolver.hpp
++++ b/SU2_CFD/include/solvers/CScalarSolver.hpp
+@@ -250,7 +250,7 @@
+                                        const su2double* velocity, const su2double* normal) {
+     const su2double edgeMassFlux = density * GeometryToolbox::DotProduct(nDim, velocity, normal);
+     LinSysRes.AddBlock(iPoint, nodes->GetSolution(iPoint), -edgeMassFlux);
+-    if (implicit) Jacobian.AddVal2Diag(iPoint, -edgeMassFlux);
++    if (implicit) Jacobian.AddVal2Diag(iPoint, -edgeMassFlux / (Conservative ? density : 1.0));
+     return edgeMassFlux;
+   }
+ 
+--- a/SU2_CFD/include/solvers/CScalarSolver.inl
++++ b/SU2_CFD/include/solvers/CScalarSolver.inl
+@@ -220,8 +220,8 @@
+         LinSysRes.AddBlock(iPoint, nodes->GetSolution(iPoint), -massFlux);
+         LinSysRes.AddBlock(jPoint, nodes->GetSolution(jPoint), massFlux);
+         if (opt.implicit) {
+-          Jacobian.AddVal2Diag(iPoint, -massFlux);
+-          Jacobian.AddVal2Diag(jPoint, massFlux);
++          Jacobian.AddVal2Diag(iPoint, -massFlux / (Conservative ? flowNodes->GetDensity(iPoint) : 1.0));
++          Jacobian.AddVal2Diag(jPoint, massFlux / (Conservative ? flowNodes->GetDensity(jPoint) : 1.0));
+         }
+       }
+     }
+@@ -247,7 +247,7 @@
+           divergence += edgeMassFlux;
+           LinSysRes.AddBlock(iPoint, solution, -edgeMassFlux);
+         }
+-        if (opt.implicit) Jacobian.AddVal2Diag(iPoint, -divergence);
++        if (opt.implicit) Jacobian.AddVal2Diag(iPoint, -divergence / (Conservative ? flowNodes->GetDensity(iPoint) : 1.0));
+       }
+       END_SU2_OMP_FOR
+     }

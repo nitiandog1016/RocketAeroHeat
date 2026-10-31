@@ -1,0 +1,30 @@
+"""受控运行包的配置边界检查，避免有界路径悄悄进入旧默认。"""
+from pathlib import Path
+import copy,sys,tempfile,unittest
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
+from prepareSU2SSTBoundedStudy import validate_runtime,FLAVOR,STUDY,PLAN,sha,config,read
+class BoundedContract(unittest.TestCase):
+    def setUp(self):
+        self.folder=ROOT/'outputs/v126_validation/format01'
+        self.c=config(self.folder/'case.cfg');self.c['ITER']='2'
+        self.data=read(self.folder/'case_manifest.json')
+        self.data['sst']['boundedPackageTest']=dict(studyID=STUDY,variant='compat',planSHA256=sha(PLAN))
+        self.r=dict(flavor=FLAVOR,sourceCommit='7048fd35f56d4bf52e586429d6746a36a10255f8',
+            patchSHA256='59b4a400777c60b823ef8d2206a099a1195533a6805cdd81afbd373026501096',
+            allCFDObjectsRebuilt=True,priorThermalAndFrozenHooksRemoved=True,buildReceipt=dict(exitCode=0,timedOut=False))
+    def test_unchanged_path_compatibility_scope(self):
+        self.assertTrue(validate_runtime(self.folder,self.data,self.c,self.r))
+    def test_only_declared_bounded_change(self):
+        self.data['sst']['boundedPackageTest']['variant']='bounded';self.c['CONV_NUM_METHOD_TURB']='BOUNDED_SCALAR'
+        self.assertTrue(validate_runtime(self.folder,self.data,self.c,self.r))
+        self.c['CFL_NUMBER']='0.01'
+        with self.assertRaises(AssertionError):validate_runtime(self.folder,self.data,self.c,self.r)
+    def test_unknown_patch_or_partial_build_rejected(self):
+        for key,value in [('patchSHA256','0'*64),('allCFDObjectsRebuilt',False),('priorThermalAndFrozenHooksRemoved',False)]:
+            bad=copy.deepcopy(self.r);bad[key]=value
+            with self.assertRaises(AssertionError):validate_runtime(self.folder,self.data,self.c,bad)
+    def test_not_general_sst_or_extended_budget(self):
+        for key,value in [('ITER','3'),('RESTART_SOL','YES'),('FLUID_MODEL','COOLPROP'),('SST_OPTIONS','V1994m')]:
+            bad=dict(self.c);bad[key]=value
+            with self.assertRaises(AssertionError):validate_runtime(self.folder,self.data,bad,self.r)
+if __name__=='__main__':unittest.main()

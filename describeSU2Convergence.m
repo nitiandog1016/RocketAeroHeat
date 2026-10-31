@@ -20,6 +20,10 @@ if a.checkpointIdentityConfirmed
     elseif isfield(a,'numericalStudy')
         checkpoint=sprintf('数值方案 %s：源SST局部 %d → 本段局部 %d · %s；伪时间重置', ...
             a.numericalStudy.variant,a.sourceModelLocalIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));
+        if isfield(a,'referenceRunLocalIteration')
+            checkpoint=sprintf('有界输运：上游 %d / 历史参考终态 %d / 本段 %d · %s；复用参考输入，非终态续算', ...
+                a.sourceModelLocalIteration,a.referenceRunLocalIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));
+        end
     elseif isfield(a,'initializationStudy')
         checkpoint=sprintf('初场对照 %s：源SST局部 %d → 本段局部 %d · %s；非物理闭合修正', ...
             a.initializationStudy.variant,a.sourceModelLocalIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));

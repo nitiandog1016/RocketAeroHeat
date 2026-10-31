@@ -5,6 +5,7 @@ import csv,hashlib,json,math,re,bisect
 ROOT=Path(__file__).resolve().parents[1]
 FLAVOR='rah-axial-wall-v1'
 FROZEN_FLAVOR='rah-frozen-energy-v1'
+BOUNDED_FLAVOR='rah-bounded-conservative-v1'
 COOLPROP_FLAVOR='rah-coolprop-v1'
 COOLPROP_RECON_FLAVOR='rah-coolprop-recon-v1'
 COOLPROP_FLAVORS=(COOLPROP_FLAVOR,COOLPROP_RECON_FLAVOR,'rah-coolprop-recon-v2','rah-coolprop-recon-v3')
@@ -17,9 +18,9 @@ def resolve(folder,config):
     data=read(manifest) if manifest.exists() else {}
     flavor=data.get('requiredRuntimeFlavor','official')
     if re.search(r'^\s*SOLVER\s*=\s*RANS\s*$',config,re.M) or 'sst' in data:
-        assert flavor=='official','SST仅适配官方定比热包，HEOS/空间壁温RANS尚未验证'
+        assert flavor in ('official',BOUNDED_FLAVOR),'SST仅适配显式定比热包，HEOS/空间壁温RANS尚未验证'
         locked.update(validate_sst_manifest(folder,data,config))
-    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,*COOLPROP_FLAVORS),'未知SU2运行时类型'
+    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,BOUNDED_FLAVOR,*COOLPROP_FLAVORS),'未知SU2运行时类型'
     if flavor!=FROZEN_FLAVOR:assert 'frozenEnergyMode' not in data,'运行时类型与冻结能量选项不匹配'
     runtime_dir=ROOT/'tools/runtime/su2'/('8.6.0' if flavor=='official' else '8.6.0-'+flavor)
     runtime_file=runtime_dir/'runtime.json'
@@ -41,6 +42,11 @@ def resolve(folder,config):
         if flavor==FROZEN_FLAVOR:
             assert runtime['flavor']==FROZEN_FLAVOR
             validate_frozen_manifest(data,config)
+            locked[str(manifest)]=sha(manifest)
+        elif flavor==BOUNDED_FLAVOR:
+            from prepareSU2SSTBoundedStudy import validate_runtime
+            from prepareSU2CheckpointContinuation import config as parse_config
+            locked.update(validate_runtime(folder,data,parse_config(folder/'case.cfg'),runtime))
             locked[str(manifest)]=sha(manifest)
         elif flavor in COOLPROP_FLAVORS:
             assert runtime['flavor']==flavor
@@ -72,6 +78,9 @@ def validate_sst_manifest(folder,data,config):
         'VISCOSITY_MODEL':'SUTHERLAND','CONDUCTIVITY_MODEL':'CONSTANT_PRANDTL',
         'TURBULENT_CONDUCTIVITY_MODEL':'CONSTANT_PRANDTL_TURB','CONV_NUM_METHOD_TURB':'SCALAR_UPWIND',
         'MUSCL_TURB':'NO','TIME_DISCRE_TURB':'EULER_IMPLICIT','WRT_RESTART_OVERWRITE':'NO','WRT_SURFACE_OVERWRITE':'NO'}
+    if data.get('requiredRuntimeFlavor')==BOUNDED_FLAVOR:
+        assert c.get('CONV_NUM_METHOD_TURB') in ('SCALAR_UPWIND','BOUNDED_SCALAR')
+        required['CONV_NUM_METHOD_TURB']=c['CONV_NUM_METHOD_TURB']
     for k,v in required.items():assert c.get(k)==v,k
     for k in ('MARKER_WALL_FUNCTIONS','MARKER_PYTHON_CUSTOM','KIND_TRANS_MODEL','CONFIG_LIST','NZONES'):assert k not in c,k
     assert c.get('TIME_DOMAIN','NO')=='NO' and 'MARKER_ISOTHERMAL' in c and 'MARKER_HEATFLUX' not in c
@@ -104,6 +113,11 @@ def validate_sst_manifest(folder,data,config):
             locked.update(validate_source(folder,c,init))
             if contract.get('spatialOutputContract'):
                 assert init.get('diagnosticOnly') is True and init.get('diagnosticPurpose')=='spatial-implicit-RHS-and-pseudotime'
+        elif init['kind']=='same-mesh-SST-bounded-conservative-comparison':
+            from prepareSU2SSTBoundedStudy import validate_source
+            locked.update(validate_source(folder,c,init))
+            assert data.get('requiredRuntimeFlavor')==BOUNDED_FLAVOR and 'initializationStudy' not in contract
+            assert contract['numericalStudy']=={k:init[k] for k in ['studyID','variant','numericalChanges','runtimeChange']}
         elif init['kind']=='same-mesh-SST-CFL-cap-comparison':
             from prepareSU2SSTNumericalStudy import validate_source
             locked.update(validate_source(folder,c,init))

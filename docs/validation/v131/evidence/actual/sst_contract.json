@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "model": "SST-2003m",
+  "assumption": "fully-turbulent; transition unknown",
+  "intensity": 0.01,
+  "viscosityRatio": 10.0,
+  "Prt": 0.9,
+  "provenance": "\u5168\u6e4d\u6d41\u53d7\u63a7\u7814\u7a76\u5047\u8bbe\uff1b\u975e\u98de\u884c\u6d4b\u91cf\uff0c\u8f6c\u6369\u672a\u77e5",
+  "kInfinity": 341.35543329143684,
+  "omegaInfinity": 42598.110764383935,
+  "wallTreatment": "resolved smooth wall; no wall function",
+  "thermodynamics": "calorically-perfect ideal gas",
+  "turbulentConvection": "native bounded scalar; controlled conservative divergence Jacobian /rho",
+  "compressibilityCorrection": "none",
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1",
+  "initializationSHA256": "a7392e52ee103aa8596b22c4aec05b18a70eae2a8f34822e5a1501c8a6d370f2",
+  "configurationSHA256": "310ae17febdb21cfd1b1cbb037bfc1dd9b44b9fe6641f37ff7ef5e43851c0b5d",
+  "meshSHA256": "9db7bf9c5aedda3dda43a79820f3e76887b48a12a113ba0370674464395a876f",
+  "numericalStudy": {
+    "studyID": "v131-SST-bounded-conservative-chain-rule",
+    "variant": "bounded",
+    "numericalChanges": {
+      "CONV_NUM_METHOD_TURB": {
+        "source": "SCALAR_UPWIND",
+        "target": "BOUNDED_SCALAR"
+      }
+    },
+    "runtimeChange": {
+      "source": "official",
+      "target": "rah-bounded-conservative-v1"
+    }
+  }
+}

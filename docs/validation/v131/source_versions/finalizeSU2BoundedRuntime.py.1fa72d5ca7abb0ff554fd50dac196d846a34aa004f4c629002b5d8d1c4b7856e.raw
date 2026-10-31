@@ -1,0 +1,55 @@
+"""只复核并安装v131已完成的唯一编译产物；不重新编译、不执行流场。"""
+from pathlib import Path
+import json,re,subprocess,shutil,os
+from prepareSU2SSTBoundedStudy import ROOT,BASE,FLAVOR,read,sha,write
+def main():
+    out=BASE/'build_final';cache=ROOT/'tools/runtime/su2-thermal-build/build-v117'
+    source=ROOT/'tools/runtime/su2-thermal-build/source';cc=ROOT/'tools/runtime/su2-thermal-build/toolchain/w64devkit/bin'
+    r=read(out/'compile_process.json');assert r['exitCode']==0 and not r['timedOut'] and r['elapsedSeconds']<=720
+    assert all(read(out/'source_restore.json').values())
+    tree=read(out/'source_tree.json');modified={n for n in ['CGeometry.cpp','python_wrapper_structure.cpp','CScalarSolver.hpp','CScalarSolver.inl']}
+    for name,h in tree.items():
+        p=Path(name);used=out/(p.name+'.used') if p.name in modified else p
+        assert sha(used)==h,name
+    locks=read(out/'build_sources.json')
+    for name,h in locks.items():
+        p=Path(name)
+        if p.name=='buildSU2BoundedRuntime.py':p=out/'buildSU2BoundedRuntime.postcheck_failed.py'
+        assert sha(p)==h,name
+    expected=re.findall(r'Compiling C\+\+ object (.*)',(out/'planned.log').read_text())
+    actual=re.findall(r'Compiling C\+\+ object (.*)',(out/'compile.log').read_text(errors='replace'))
+    assert sorted(expected)==sorted(actual) and len(expected)==298
+    graph=(cache/'build.ninja').read_text();members={}
+    for lib in ['Common/src/libSU2Common.a','SU2_CFD/src/libSU2core.a']:
+        native=subprocess.check_output([str(cc/'ar.exe'),'t',str(cache/lib)],cwd=str(cache)).decode().splitlines()
+        wanted=next(l for l in graph.splitlines() if l.startswith('build '+lib+': ')).split(': ',1)[1].split()[1:]
+        canonical=lambda p:str((cache/p).resolve()).lower()
+        assert sorted(map(canonical,native))==sorted(map(canonical,wanted))
+        members[lib]=dict(memberCount=len(native),exactMembers=True)
+    exe=cache/'SU2_CFD/src/SU2_CFD.exe'
+    imports=subprocess.check_output([str(cc/'objdump.exe'),'-p',str(exe)]).decode()
+    dlls=re.findall(r'DLL Name:\s*(\S+)',imports);assert set(n.lower() for n in dlls)=={'kernel32.dll','msvcrt.dll'}
+    old=ROOT/'tools/runtime/su2/8.6.0-rah-axial-wall-v1';previous=read(old/'runtime.json')
+    dest=ROOT/'tools/runtime/su2'/('8.6.0-'+FLAVOR);assert not dest.exists();(dest/'bin').mkdir(parents=True)
+    shutil.copyfile(str(exe),str(dest/'bin/SU2_CFD.exe'))
+    for entry in previous['files']:
+        if entry['path'].endswith('.exe') or entry['path'].endswith('.diff'):continue
+        p=old/entry['path'];assert sha(p)==entry['sha256'];q=dest/entry['path'];q.parent.mkdir(parents=True,exist_ok=True);os.link(str(p),str(q))
+    patch=ROOT/'third_party/su2_bounded/bounded_conservative_jacobian.diff'
+    shutil.copyfile(str(patch),str(dest/patch.name))
+    runtime=dict(flavor=FLAVOR,version='8.6.0+'+FLAVOR,status='compiled-tests-pending',
+        executable=str(dest/'bin/SU2_CFD.exe'),archiveSHA256='c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc',
+        sourceCommit=previous['sourceCommit'],license=previous['license'],physicsQualified=False,systemDLLs=dlls,
+        buildReceipt=r,sourceTreeSHA256=sha(out/'source_tree.json'),buildSourceSHA256=locks,
+        postcheckRecipeSHA256=sha(Path(__file__).resolve()),correction='conservative bounded scalar divergence Jacobian divided by density',
+        patchSHA256=sha(patch),priorThermalAndFrozenHooksRemoved=True,allCFDObjectsRebuilt=True,archiveMembers=members,
+        restrictions=['steady single-zone ideal-gas SST-2003m','SI dimensional','constant isothermal wall','MGLEVEL=0',
+                      'explicit controlled study only','no HEOS or SA qualification'],
+        files=[dict(path=p.relative_to(dest).as_posix(),bytes=p.stat().st_size,sha256=sha(p)) for p in sorted(dest.rglob('*')) if p.is_file()])
+    write(dest/'runtime.json',runtime);write(out/'runtime_installed.json',runtime)
+    write(out/'postcheck.json',dict(passed=True,originalFailure='raw CRCRLF versus normalized LF object-name comparison',
+        expectedObjectCount=298,actualObjectCount=298,archiveMembers=members,sourceRestored=True,
+        additionalCompilations=0,nativeSolverRuns=0,recipeSHA256=sha(Path(__file__).resolve())))
+    print(json.dumps(dict(installed=str(dest),objectsRebuilt=298,additionalCompilations=0)))
+if __name__=='__main__':main()
+

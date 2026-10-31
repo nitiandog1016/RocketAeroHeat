@@ -1,0 +1,34 @@
+"""v131独立构建来源审查；确认新链接仅含本补丁和三个既有包含路径修复。"""
+from pathlib import Path
+import json,zipfile
+from prepareSU2SSTBoundedStudy import ROOT,BASE,FLAVOR,read,sha,write
+def main():
+    out=BASE/'build_review.json';assert not out.exists()
+    b=BASE/'build_final';r=read(b/'runtime_installed.json')
+    assert r['allCFDObjectsRebuilt'] and r['priorThermalAndFrozenHooksRemoved']
+    assert r['buildReceipt']['exitCode']==0 and not r['buildReceipt']['timedOut']
+    assert all(read(b/'source_restore.json').values())
+    tree=read(b/'source_tree.json');source=ROOT/'tools/runtime/su2-thermal-build/source'
+    proof=read(BASE/'preflight/report.json');changes={}
+    with zipfile.ZipFile(str(ROOT/'tools/runtime/su2-thermal-build/su2.zip')) as z:
+        import hashlib
+        for n in z.namelist():
+            if n.endswith('/'):continue
+            rel='/'.join(n.split('/')[1:])
+            native=hashlib.sha256(z.read(n)).hexdigest();used=tree[str(source/rel)]
+            if used!=native:changes[rel]=dict(native=native,used=used)
+    expected={'SU2_CFD/include/solvers/CScalarSolver.hpp','SU2_CFD/include/solvers/CScalarSolver.inl',
+        'SU2_CFD/include/interfaces/cfd/CMixingPlaneInterface.hpp','SU2_CFD/src/interfaces/cfd/CMixingPlaneInterface.cpp',
+        'SU2_CFD/src/interfaces/fsi/CFlowTractionInterface.cpp'}
+    assert set(changes)==expected
+    for row in proof['sourceBindings']:
+        assert changes[row['path']]==dict(native=row['originalSHA256'],used=row['patchedSHA256'])
+    runtime=ROOT/'tools/runtime/su2'/('8.6.0-'+FLAVOR)
+    assert (runtime/'runtime.json').read_bytes()==(b/'runtime_installed.json').read_bytes()
+    for row in r['files']:assert sha(runtime/row['path'])==row['sha256']
+    write(out,dict(passed=True,compiledSourceDifferences=changes,fullCFDObjectsRebuilt=True,sourceRestored=True,
+        constantGasOnly=True,smallCompatibilityStillRequired=True,physicsQualified=False,
+        sourceSHA256={str(p):sha(p) for p in [b/'source_tree.json',b/'compile_process.json',b/'runtime_installed.json',
+            runtime/'bin/SU2_CFD.exe',Path(__file__).resolve()]}))
+    print(json.dumps(dict(passed=True,sourceChanges=len(changes),physicsQualified=False)))
+if __name__=='__main__':main()

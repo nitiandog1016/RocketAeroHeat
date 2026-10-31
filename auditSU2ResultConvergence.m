@@ -195,6 +195,22 @@ try
             assert(isequal(study.numericalChanges,lineage.numericalChanges));
             assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
             audit.numericalStudy=lineage;
+        elseif strcmp(lineage.kind,'same-mesh-SST-bounded-conservative-comparison')
+            % 复用对照任务的输入，不把对照99终态当新初场；原149/参考99/本次99分别保存。
+            assert(lineage.sameMesh && lineage.samePhysics && ~lineage.samePhysicsAndNumerics);
+            assert(lineage.localIterationStartsAt==0 && ~lineage.physicsQualified && nativePrimitive);
+            assert(lineage.reusedReferenceInitialState && ~lineage.uninterruptedTrajectoryEquivalent);
+            assert(lineage.sourceLocalIteration==149 && lineage.referenceRunLocalIteration==99);
+            assert(audit.checkpointIteration==99 && size(history,1)==100);
+            assert(strcmp(receipt.runtimeFlavor,'rah-bounded-conservative-v1'));
+            study=receipt.physicsModel.numericalStudy;
+            assert(strcmp(study.studyID,'v131-SST-bounded-conservative-chain-rule') && strcmp(study.variant,'bounded'));
+            assert(strcmp(study.studyID,lineage.studyID) && strcmp(study.variant,lineage.variant));
+            assert(isequal(study.numericalChanges,lineage.numericalChanges) && isequal(study.runtimeChange,lineage.runtimeChange));
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            assert(strcmp(fileSHA(fullfile(lineage.sourceDirectory,'initial_flow.csv')),lineage.initialStateSHA256));
+            assert(~strcmp(fileSHA(fullfile(lineage.sourceDirectory,'restart_flow.csv')),lineage.initialStateSHA256));
+            audit.numericalStudy=lineage;audit.referenceRunLocalIteration=lineage.referenceRunLocalIteration;
         elseif strcmp(lineage.kind,'same-mesh-SST-omega-pocket-initialization-study')
             % 同源初场对照只改变明确节点的omega；不冒充物理方法或不中断续算。
             assert(lineage.sameMesh && lineage.samePhysicsAndNumerics && lineage.localIterationStartsAt==0);
