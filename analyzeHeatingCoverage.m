@@ -55,6 +55,10 @@ flags.laminarSeparation=false(nf,1);
 flags.laminarCorrelation=false(nf,1);
 flags.thermalProperty=false(nf,1);
 flags.wallTemperature=false(nf,1);
+flags.sidewallReferenceModel=false(nf,1);
+if isfield(h,'kinneyAcreage')
+    flags.sidewallReferenceModel=logical(h.kinneyAcreage.unresolvedFace(:));
+end
 % 显式选择的区域模型保留自身拒绝原因；旧准流线无效不能掩盖其物理域限制。
 flags.regionalNoseRejected=false(nf,1);
 regionalNoseCode=zeros(nf,1,'uint8');regionalNoseNames={};
@@ -104,6 +108,12 @@ names={'已计算','端盖/尾端','特征折角或拓扑问题', ...
     '连续介质假设不适用','疑似湍流分离及下游','Head 积分失败及下游', ...
     '壁温未知或超出热物性范围','上游外缘热力状态未解/域外占位影响'};
 regionalOffset=numel(names)-1;
+sidewallCode=[];
+if isfield(h,'kinneyAcreage')
+    sidewallCode=numel(names);
+    names{end+1}='所选侧壁参考流长/参考性质/对数关联式未通过';
+    regionalOffset=numel(names)-1;
+end
 for j=1:numel(regionalNoseNames)
     names{end+1}=['所选球鼻模型：' regionalNoseNames{j}]; %#ok<AGROW>
 end
@@ -112,6 +122,10 @@ pending=~computed;
 hit=pending & flags.regionalNoseRejected;
 code(hit)=uint8(regionalOffset+double(regionalNoseCode(hit)));
 pending(hit)=false;
+if ~isempty(sidewallCode)
+    hit=pending & flags.sidewallReferenceModel;
+    code(hit)=uint8(sidewallCode);pending(hit)=false;
+end
 masks={flags.endCap,flags.geometry,flags.noseModel, ...
     flags.rarefaction,flags.externalFlow,flags.upstreamExternalState,flags.streamline, ...
     flags.wallTemperature,flags.turbulentSeparation,flags.turbulentNumerical, ...

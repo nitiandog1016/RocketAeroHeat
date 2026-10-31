@@ -20,6 +20,13 @@ function mesh = calcSurfaceHeating(mesh,freestream,cfg)
 
 %% 1. 检查输入，并按当前工况更新外缘状态
 if nargin<3, cfg=struct; end
+sidewallModel='boundaryLayerIntegral';
+if isfield(cfg,'heating') && isfield(cfg.heating,'sidewallModel')
+    sidewallModel=char(cfg.heating.sidewallModel);
+end
+if ~ismember(sidewallModel,{'boundaryLayerIntegral','kinneyAcreage'})
+    error('RocketAeroHeat:Heating:SidewallModel','未知附着侧壁热流方法：%s。',sidewallModel);
+end
 if ~isfield(cfg,'flight') || ~isfield(cfg.flight,'Twall')
     error('RocketAeroHeat:Heating:WallTemperature','需要 cfg.flight.Twall [K]。');
 end
@@ -239,6 +246,7 @@ calculated=allowed|noseFill;
 
 %% 5. 保存分项结果与方法说明，供 GUI、报告和后续模块读取
 h=struct;
+h.sidewallModel=sidewallModel;
 if hasIntegratedLayer
     h.method=['Eckert 参考温度 + 沿流线 Thwaites 型层流积分/' ...
         '湍流积分 + Reynolds 比拟'];
@@ -335,6 +343,10 @@ else
     h.summary.minimumHeatFlux=NaN; h.summary.maximumHeatFlux=NaN;
 end
 mesh.heating=h;
+% 模块五：可选公开参考流长法只替换已审核侧壁热流；不改变鼻区或恢复缺口。
+if strcmp(sidewallModel,'kinneyAcreage')
+    mesh=calcKinneyAcreageHeating(mesh,freestream,cfg);
+end
 if isfield(mesh,'wallThermal'), mesh=rmfield(mesh,'wallThermal'); end
 if isfield(mesh,'aerothermalExposure'), mesh=rmfield(mesh,'aerothermalExposure'); end
 if isfield(mesh,'flightHeatingHistory'), mesh=rmfield(mesh,'flightHeatingHistory'); end

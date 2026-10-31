@@ -1,0 +1,81 @@
+function result=calcWeightedReferenceLength(path,edge,flowValid,incidenceDeg,options)
+%CALCWEIGHTEDREFERENCELENGTH 沿合法准流线积分Kinney背风加权参考流长。
+% 模块一：核对有向前驱图与弧长，不跨断路、无效外缘或未知入口补值。
+% 模块二：按Kinney(2007)第5页积分 I=积分(rho_e*mu_e*U_e ds)，Sw=I/g。
+% 模块三：迎风用几何弧长，背风在指定角宽内平滑切换到Sw。
+% 原文未指定切换函数；本实现采用三次smoothstep，角宽作为显式项目参数。
+% 默认首个有效种子至S=0用局部常状态前缀，单列工程假设。若提供
+% options.rootIntegralByFace，则NaN入口保持未知，不能退回常状态初始化。
+if nargin<5,options=struct;end
+required={'distance','pathCost','predecessorFace','stepLength','connectedFace'};
+assert(all(isfield(path,required)),'RocketAeroHeat:WeightedLength:Path','缺少前驱图字段。');
+s=double(path.distance(:));n=numel(s);
+parent=double(path.predecessorFace(:));cost=double(path.pathCost(:));
+step=double(path.stepLength(:));connected=logical(path.connectedFace(:));
+flowValid=logical(flowValid(:));incidenceDeg=double(incidenceDeg(:));
+assert(all([numel(parent),numel(cost),numel(step),numel(connected), ...
+    numel(flowValid),numel(incidenceDeg)]==n),'RocketAeroHeat:WeightedLength:Size','逐面元长度不一致。');
+assert(all(isfinite(parent) & parent>=0 & parent<=n & parent==fix(parent)), ...
+    'RocketAeroHeat:WeightedLength:Parent','前驱编号无效。');
+assert(all(isfinite(s(connected)) & s(connected)>=0 & isfinite(cost(connected))) && ...
+    all(isfinite(incidenceDeg(connected)) & abs(incidenceDeg(connected))<=90), ...
+    'RocketAeroHeat:WeightedLength:Path','连通路径坐标或入射角无效。');
+width=5;if isfield(options,'leewardBlendDeg'),width=options.leewardBlendDeg;end
+validateattributes(width,{'numeric'},{'real','finite','scalar','positive','<=',45});
+rho=double(edge.density(:));mu=double(edge.dynamicViscosity(:));U=double(edge.speed(:));
+assert(all([numel(rho),numel(mu),numel(U)]==n), ...
+    'RocketAeroHeat:WeightedLength:Size','外缘数组长度不一致。');
+g=rho.*mu.*U;
+valid=connected & flowValid & isfinite(g) & isfinite(rho) & rho>0 & ...
+    isfinite(mu) & mu>0 & isfinite(U) & U>=0;
+specified=isfield(options,'rootIntegralByFace');rootIntegral=nan(n,1);
+if specified
+    rootIntegral=double(options.rootIntegralByFace(:));
+    assert(numel(rootIntegral)==n && all(isnan(rootIntegral) | ...
+        (isfinite(rootIntegral) & rootIntegral>=0)), ...
+        'RocketAeroHeat:WeightedLength:Entry','入口积分须为非负有限值或NaN。');
+    assert(all(isnan(rootIntegral(parent~=0))), ...
+        'RocketAeroHeat:WeightedLength:Entry','入口积分只能指定在无前驱的种子。');
+end
+ids=find(connected);[~,order]=sort(cost(ids));ids=ids(order);
+integral=nan(n,1);prefixAssumed=false(n,1);entryID=zeros(n,1,'uint8');
+for id=ids'
+    p=parent(id);
+    if p>0
+        assert(connected(p) && cost(p)<cost(id) && isfinite(step(id)) && step(id)>0 && ...
+            abs(s(id)-s(p)-step(id))<=1e-9*max(1,s(id)), ...
+            'RocketAeroHeat:WeightedLength:Order','前驱不是同一条上游弧长路径。');
+    end
+    if ~valid(id),continue;end
+    if p==0
+        if specified
+            integral(id)=rootIntegral(id);entryID(id)=3;
+        else
+            integral(id)=g(id)*s(id);
+            prefixAssumed(id)=s(id)>0 && g(id)>0;
+            entryID(id)=1;if s(id)==0,entryID(id)=2;end
+        end
+    elseif isfinite(integral(p))
+        integral(id)=integral(p)+.5*(g(p)+g(id))*step(id);
+        prefixAssumed(id)=prefixAssumed(p);entryID(id)=entryID(p);
+    end
+end
+weighted=nan(n,1);positive=isfinite(integral) & g>0;
+weighted(positive)=integral(positive)./g(positive);
+t=max(0,min(1,-incidenceDeg/width));blend=t.^2.*(3-2*t);
+length=nan(n,1);wind=blend==0 & isfinite(integral);
+length(wind)=s(wind);
+lee=blend>0 & isfinite(weighted);
+length(lee)=(1-blend(lee)).*s(lee)+blend(lee).*weighted(lee);
+result=struct('method','Kinney(2007)积分rho_e*mu_e*U_e的背风加权流长', ...
+    'source','https://ntrs.nasa.gov/citations/20070017947', ...
+    'sourcePages','印刷页4–5，II.I；Sw公式位于第5页', ...
+    'geometricLength',s,'weightedLength',weighted,'selectedLength',length, ...
+    'integrand',g,'integral',integral,'blendWeight',blend,'leewardBlendDeg',width, ...
+    'validFace',valid & isfinite(length) & length>0, ...
+    'prefixAssumedFace',prefixAssumed,'entryMethodID',entryID, ...
+    'entryMethodNames',{{'无有效入口','局部常状态前缀至S=0的工程假设', ...
+        'S=0种子，积分初值为零','显式给定入口积分；NaN保持未知'}}, ...
+    'scope',['共享边图上的梯形积分；不求外流、真实流管宽度或分离/再附；' ...
+        '切换函数/角宽和首段常状态近似属于本项目显式离散选择，不是原软件逐位复现']);
+end

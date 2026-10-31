@@ -164,7 +164,7 @@ renderEditor();sync();showGeometry(true);
                 tip(grid,8,description);
                 tip(grid,11,'参数修改即使旧网格和下游结果失效；不改变现有网格方法。质量差面保留真实指标。');
             case 3
-                grid=form(23+12*methodDetailsOpen);c=state.cfg;
+                grid=form(24+12*methodDetailsOpen);c=state.cfg;
                 controls.altitude=numberField(grid,1,'高度 / km',c.flight.altitude/1000,[0 86]);
                 controls.mach=numberField(grid,2,'Mach（计算需 >1）',c.flight.Mach,[0 30]);
                 controls.alpha=numberField(grid,3,'攻角 / °',c.flight.alpha,[-90 90]);
@@ -188,14 +188,16 @@ renderEditor();sync();showGeometry(true);
                     {'unknown','no','yes'},operation(c.basePressure,'hasGasInjection'));
                 controls.source=textField(grid,16,'操作声明来源',getOption(c.basePressure,'operationSource',''));
                 numeric={'altitude','mach','alpha','beta','wall','noseStep','transition','baseCp','leeCp'};
-                menu={'air','nose','turbulent','base','support','injection'};
+                controls.sidewall=choice(grid,17,'附着侧壁热流',{'边界层积分法','Kinney参考流长对照'}, ...
+                    {'boundaryLayerIntegral','kinneyAcreage'},getOption(c.heating,'sidewallModel','boundaryLayerIntegral'));
+                menu={'air','nose','turbulent','base','support','injection','sidewall'};
                 for j=1:numel(numeric),controls.(numeric{j}).ValueChangedFcn=@boundaryEdited;end
                 for j=1:numel(menu),controls.(menu{j}).ValueChangedFcn=@boundaryEdited;end
                 controls.source.ValueChangedFcn=@boundaryEdited;
-                controls.confirm=button(grid,17,'确认当前边界条件',@confirmBoundary);
-                addMethodScope(grid,18,21,22);
+                controls.confirm=button(grid,18,'确认当前边界条件',@confirmBoundary);
+                addMethodScope(grid,19,22,23);
                 if isfield(c.heating,'wallTemperatureByFace')
-                    tip(grid,22+12*methodDetailsOpen,sprintf('当前保留 %d 个面元壁温输入；修改统一壁温将切换为统一边界。',numel(c.heating.wallTemperatureByFace)));
+                    tip(grid,23+12*methodDetailsOpen,sprintf('当前保留 %d 个面元壁温输入；修改统一壁温将切换为统一边界。',numel(c.heating.wallTemperatureByFace)));
                 end
             case 4
                 failed=~isempty(state.error.message);offset=6*failed;
@@ -394,6 +396,7 @@ renderEditor();sync();showGeometry(true);
         next.flight.Twall=controls.wall.Value;next.heating.airThermalModel=controls.air.Value;
         next.heating.noseModel=controls.nose.Value;next.heating.sphericalNoseAngleStepDeg=controls.noseStep.Value;
         next.heating.turbulentModel=controls.turbulent.Value;next.heating.transitionRe=controls.transition.Value;
+        next.heating.sidewallModel=controls.sidewall.Value;
         next.basePressure.model=controls.base.Value;next.basePressure.operationSource=controls.source.Value;
         next.pressure.aftBaseCp=controls.baseCp.Value;next.pressure.leewardCp=controls.leeCp.Value;
         for key={'hasRearSupport','hasGasInjection'}
@@ -526,6 +529,12 @@ else
 end
 lines=[lines;{'';'附着侧壁与转捩'; ...
     sprintf('层流沿准流线Thwaites型积分，热流用Eckert参考温度与Reynolds比拟；经验转捩Re=%.5g，不能预测真实扰动/粗糙度控制的转捩位置。',getOption(h,'transitionRe',5e5))}];
+if strcmp(getOption(h,'sidewallModel','boundaryLayerIntegral'),'kinneyAcreage')
+    lines=[lines;{'当前侧壁热流选Kinney/CBAero型参考流长对照（2007，II.I，印刷页4–5）。'; ...
+        '原Thwaites/Head仅作入口、转捩和分离审核，热流改用公开Cf/St/参考密度公式；迎风几何流长、背风rho*mu*U加权流长。'; ...
+        'Mangler因子默认层流3/湍流2，背风5°内smoothstep切换；首段局部常状态积分是项目假设，并非完整CBAERO复现或实验验证。'; ...
+        '外缘未知、分离、域外及底面保持原未解；本方法仅验收单时刻，不用于未核验的热历史/壁体耦合。'}];
+end
 if strcmp(getOption(h,'turbulentModel','head'),'head')
     lines=[lines;{'当前湍流方法：Head卷吸 + von Kármán动量积分；H≥2.4为疑似分离，尚无再附模型，下游保留未解。'}];
 else

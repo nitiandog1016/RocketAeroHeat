@@ -372,6 +372,10 @@ cfg.heating.maxContinuumKnudsen = 0.01;
 % 默认 Head 卷吸积分同时推进动量厚度和形状因子 H；H>=2.4 为
 % 疑似准二维分离，其下游不计算附着热流。fixedShape 为旧版对照。
 cfg.heating.turbulentModel = 'head';
+% 附着侧壁默认保留原边界层积分。kinneyAcreage启用Kinney(2007)公开公式
+% 对照，仍沿用现有分离/连续流审核；不补齐外缘未知区，也未验收热历史耦合。
+cfg.heating.sidewallModel = 'boundaryLayerIntegral';
+cfg.heating.kinney = struct('leewardBlendDeg',5,'manglerLaminar',3,'manglerTurbulent',2);
 % 固定/飞行历程壁温默认每步重算沿程热边界；local 保留旧局部幂指数对照。
 % streamline 使用一维厚度导热；飞行历程的自动子步也更新外流工况。
 cfg.heating.wallCoupling = 'streamline';

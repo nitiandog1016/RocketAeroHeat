@@ -1,0 +1,57 @@
+/* 公开查看器资源与真实箭体结果：全部探针身份、统一色标和任意截面导出。 */
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const folder=path.resolve(process.argv[2]);
+const text=fs.readFileSync(path.join(folder,'case-data.js'),'utf8');
+const model=JSON.parse(text.slice(text.indexOf('=')+1).trim().replace(/;$/,''));
+const meaning=require(path.join(folder,'viewer.js')),section=require(path.join(folder,'section.js'));
+const fields=Object.fromEntries(model.fields.map(f=>[f.key,f]));
+assert.ok(fields.heatingReferenceLength&&fields.baselineHeatFlux);
+assert.deepEqual(meaning.comparisonRange(model,'heatFlux'),meaning.comparisonRange(model,'baselineHeatFlux'));
+const range=meaning.comparisonRange(model,'heatFlux');assert.ok(range&&range[0]<range[1]);
+const sum=arr=>arr.reduce((a,b)=>a+b,0);let probes=0,sourceFaces=0;
+for(const field of model.fields){
+  let computed=0,prescribed=0,missing=0;
+  for(let i=0;i<model.faces.length;i++){
+    const state=meaning.state(field,i),method=meaning.method(field,i);probes++;
+    assert.ok([0,1,2].includes(state));assert.ok(typeof method==='string'&&method.length);
+    if(state===1)computed+=model.faceArea[i];else if(state===2)prescribed+=model.faceArea[i];else missing+=model.faceArea[i];
+    if(state===0)assert.ok(meaning.missingReason(model,field,i));
+    if(field.key==='wallInput')assert.equal(state,2);
+    if(field.key==='wallSolved')assert.equal(state,0);
+    if(field.key==='heatFlux'&&state===1&&method.includes('Kinney')){
+      sourceFaces++;assert.match(method,/20070017947/);assert.match(method,/离散起点I=0假设/);
+      assert.equal(meaning.stateLabel(field,state),'工程方法对照');
+      const tr=fields.recoveryTemperature;assert.doesNotMatch(meaning.method(tr,i),/Kinney/);
+      assert.equal(meaning.state(fields.heatingReferenceLength,i),1);
+    }
+  }
+  for(const [value,expected] of [[computed,field.computedAreaFraction],[prescribed,field.prescribedAreaFraction],[missing,field.missingAreaFraction]]){
+    assert.ok(Math.abs(value/model.totalArea-expected)<2e-12);
+  }
+}
+assert.equal(sourceFaces,11880);
+const xs=model.vertices.map(v=>v[0]),lo=Math.min(...xs),hi=Math.max(...xs);
+let exportCount=0,totalRows=0,missingRows=0;const evidence=[];
+for(const x of [lo+.25*(hi-lo),lo+.5*(hi-lo),lo+.75*(hi-lo),-1]){
+  const geometry=section.geometry(model.vertices,model.faces,x);
+  assert.ok(geometry.segments.length>0);
+  for(const f of model.fields){
+    const samples=section.sample(geometry,f);assert.equal(samples.length,geometry.segments.length);
+    for(const sample of samples){
+      const state=meaning.state(f,sample.face);
+      assert.equal(sample.status,state);
+      assert.equal(sample.value,state?f.values[sample.face]:null);
+      if(!state)missingRows++;
+    }
+    const csv=section.csv(geometry,f,'单点工况',model.resultCondition.caption);
+    assert.ok(csv.includes(f.label)&&csv.includes(f.unit));
+    exportCount++;totalRows+=samples.length;
+    if(f.key==='heatFlux')evidence.push({x,rows:samples.length,missing:samples.filter(s=>!s.status).length});
+  }
+}
+const report={status:'passed',faceCount:model.faces.length,fields:model.fields.length,probes,sourceFaces,
+  sectionExports:exportCount,totalRows,missingRows,comparisonRange:range,sections:evidence,
+  rendererAssets:folder,webGLClaimedByNode:false};
+if(process.argv[3])fs.writeFileSync(process.argv[3],JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify(report));

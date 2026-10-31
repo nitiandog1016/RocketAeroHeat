@@ -1,0 +1,13 @@
+RAH_ENGINE_PID=42220
+{在不同结构体之间进行下标赋值。
+
+出错 buildAerothermalViewerData/add (第 229 行)
+        if isempty(data.fields),data.fields=entry;else,data.fields(end+1)=entry;end
+
+出错 buildAerothermalViewerData (第 114 行)
+    add('recoveryTemperature','恢复温度','K',h.recoveryTemperature,state,recoveryMethods, ...
+
+出错 testKinneyAcreageHeating (第 87 行)
+data=buildAerothermalViewerData(current);
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

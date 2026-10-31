@@ -1,0 +1,96 @@
+function mesh=calcKinneyAcreageHeating(mesh,freestream,cfg)
+%CALCKINNEYACREAGEHEATING 用Kinney公开公式替换已通过审核的附着侧壁热流。
+% 模块一：沿用当前外缘、准流线、转捩及分离/连续流审核，不增加未解区资格。
+% 模块二：实现Kinney(2007)第4–5页Cf、St、参考密度及焓差热流公式。
+% 模块三：保留旧方法对照、入口假设和逐面元方法；鼻区与输入壁温保持原身份。
+% 这是在本程序外流链上使用公开公式，不是完整CBAERO或CFD锚定的复刻。
+h=mesh.heating;e=mesh.boundaryLayerEdge;n=numel(h.heatFlux);
+assert(isfield(mesh,'surfaceStreamlines'),'RocketAeroHeat:Kinney:Streamlines','需要当前三维准流线。');
+options=struct;if isfield(cfg.heating,'kinney'),options=cfg.heating.kinney;end
+ml=3;mt=2;
+if isfield(options,'manglerLaminar'),ml=options.manglerLaminar;end
+if isfield(options,'manglerTurbulent'),mt=options.manglerTurbulent;end
+validateattributes(ml,{'numeric'},{'real','finite','scalar','positive'});
+validateattributes(mt,{'numeric'},{'real','finite','scalar','positive'});
+flow=logical(e.algebraicallyValid(:)) & ~h.continuumUnresolvedFace & ...
+    ~h.separationUnresolvedFace & ~h.turbulentSeparationUnresolvedFace & ...
+    ~h.turbulentNumericalUnresolvedFace;
+if isfield(e,'thermalStateValidFace'),flow=flow & e.thermalStateValidFace(:);end
+if isfield(e,'thermalExpansionOutOfRangeFace'),flow=flow & ~e.thermalExpansionOutOfRangeFace(:);end
+length=calcWeightedReferenceLength(mesh.surfaceStreamlines,e,flow, ...
+    mesh.aerothermalRegion.incidenceAngleDeg,options);
+target=logical(h.eligibleFace(:)) & ~logical(h.noseFace(:));
+laminar=target & h.laminarFace;turbulent=target & h.turbulentFace;
+assert(isequal(target,laminar|turbulent),'RocketAeroHeat:Kinney:Family','侧壁流态缺少原始分类。');
+Te=double(e.temperature(:));Tw=double(h.wallTemperatureByFace(:));U=double(e.speed(:));
+TrL=h.recoveryTemperatureLaminar;TrT=h.recoveryTemperatureTurbulent;
+refL=.5*(Te+Tw)+.22*(TrL-Te);refT=.5*(Te+Tw)+.22*(TrT-Te);
+rhoL=e.pressure./(freestream.R*refL);rhoT=e.pressure./(freestream.R*refT);
+muL=1.458e-6*refL.^1.5./(refL+110.4);muT=1.458e-6*refT.^1.5./(refT+110.4);
+reL=rhoL.*U.*length.selectedLength./muL;reT=rhoT.*U.*length.selectedLength./muT;
+base=target & length.validFace & isfinite(Te) & Te>0 & isfinite(Tw) & Tw>0 & U>0;
+goodL=base & isfinite(reL) & reL>0 & isfinite(refL) & refL>0;
+goodT=base & isfinite(reT) & reT/mt>1 & isfinite(refT) & refT>0;
+cfL=nan(n,1);cfT=cfL;
+cfL(goodL)=.664./sqrt(reL(goodL)/ml).*Te(goodL)./refL(goodL);
+cfT(goodT)=.37./log10(reT(goodT)/mt).^2.584.*Te(goodT)./refT(goodT);
+stL=.5*cfL*h.Prandtl^(-2/3);stT=.5*cfT*h.Prandtl^(-2/3);
+filmL=rhoL.*U.*stL;filmT=rhoT.*U.*stT;
+coefL=filmL.*h.effectiveCpLaminar;coefT=filmT.*h.effectiveCpTurbulent;
+qL=coefL.*(TrL-Tw);qT=coefT.*(TrT-Tw);
+acceptedL=laminar & isfinite(qL) & isfinite(coefL) & coefL>0;
+acceptedT=turbulent & isfinite(qT) & isfinite(coefT) & coefT>0;
+accepted=acceptedL|acceptedT;
+% 替换方法说明前保存原算法来源；对照不能把鼻区或脱体分支标成积分法。
+provenance=struct;
+for key={'faceMethodNames','method','validity','boundaryLayerMethod', ...
+        'boundaryLayerValidity','turbulentMethod','turbulentScope', ...
+        'stagnationMethod','noseMethod','noseScope'}
+    if isfield(h,key{1}),provenance.(key{1})=h.(key{1});end
+end
+d=struct('method','Kinney/CBAero型参考焓附着面热流（内部外流与图准流线）', ...
+    'sourceURL','https://ntrs.nasa.gov/citations/20070017947','sourcePages','印刷页4–5，II.I', ...
+    'scope',['仅在原工程链已接受的附着侧壁上作方法对照；保持Thwaites/Head分离与入口审核；' ...
+        '不提供新外缘、波系/熵层接口、底面或再附解，也不把未知区转为已解；' ...
+        '原文采用CEA，本实现为固定组分空气：沿用已选NASA7或定比热焓恢复及常Pr；' ...
+        'Mangler因子为原文简化工程系数，未声称真实三维流管变换或实验精度；' ...
+        '默认沿用既有离散种子的零积分或常状态前缀，尚未独立验证真实驻点/附着线入口'], ...
+    'productionQualified',false,'validationStatus','engineeringComparisonWithAssumedEntry', ...
+    'length',length,'manglerLaminar',ml,'manglerTurbulent',mt, ...
+    'referenceTemperatureLaminar',refL,'referenceTemperatureTurbulent',refT, ...
+    'referenceReynoldsLaminar',reL,'referenceReynoldsTurbulent',reT, ...
+    'skinFrictionLaminar',cfL,'skinFrictionTurbulent',cfT, ...
+    'enthalpyFilmCoefficientLaminar',filmL,'enthalpyFilmCoefficientTurbulent',filmT, ...
+    'baselineHeatFlux',h.heatFlux,'baselineHeatTransferCoefficient',h.heatTransferCoefficient, ...
+    'baselineFaceMethodID',h.faceMethodID,'baselineMethod',h.method, ...
+    'baselineProvenance',provenance, ...
+    'targetFace',target,'acceptedFace',accepted,'unresolvedFace',target & ~accepted);
+% 给定Tw下，q<0或q=0均是有效热边界；不能通过裁零隐藏冷却或绝热状态。
+h.heatFlux(target)=NaN;h.heatTransferCoefficient(target)=NaN;h.recoveryTemperature(target)=NaN;
+h.heatFlux(acceptedL)=qL(acceptedL);h.heatFlux(acceptedT)=qT(acceptedT);
+h.heatTransferCoefficient(acceptedL)=coefL(acceptedL);h.heatTransferCoefficient(acceptedT)=coefT(acceptedT);
+h.recoveryTemperature(acceptedL)=TrL(acceptedL);h.recoveryTemperature(acceptedT)=TrT(acceptedT);
+h.laminarHeatFlux(target)=qL(target);h.turbulentHeatFlux(target)=qT(target);
+h.eligibleFace(target)=accepted(target);h.unresolvedFace=~h.eligibleFace;
+h.laminarFace(target)=acceptedL(target);h.turbulentFace(target)=acceptedT(target);
+h.faceMethodNames=[h.faceMethodNames,{'Kinney/CBAero型参考流长层流热流', ...
+    'Kinney/CBAero型参考流长湍流热流','受限脱体外流 + Kinney型层流', ...
+    '受限脱体外流 + Kinney型湍流'}];
+h.faceMethodID(target)=0;h.faceMethodID(acceptedL)=7;h.faceMethodID(acceptedT)=8;
+h.faceMethodID(acceptedL & h.detachedClosureHeatFace)=9;
+h.faceMethodID(acceptedT & h.detachedClosureHeatFace)=10;
+h.detachedClosureHeatFace=h.detachedClosureHeatFace & h.eligibleFace;
+h.kinneyAcreage=d;h.method=d.method;h.methodReference=[d.sourceURL '；' d.sourcePages];
+h.boundaryLayerMethod='原Thwaites积分仅用于入口/分离/相关式域审核；热流用Kinney公式';
+h.turbulentMethod='原Head/固定H积分仅用于适用性审核；热流Cf用Kinney公开对数公式';
+h.validity=[h.validity '；所选侧壁热流替换为：' d.scope '；' length.scope];
+h.historyCompatible=false;
+h.summary.calculatedFaces=nnz(h.eligibleFace);h.summary.unresolvedFaces=nnz(h.unresolvedFace);
+h.summary.laminarFaces=nnz(h.laminarFace);h.summary.turbulentFaces=nnz(h.turbulentFace);
+h.summary.detachedClosureHeatFaces=nnz(h.detachedClosureHeatFace);
+if any(h.eligibleFace)
+    h.summary.minimumHeatFlux=min(h.heatFlux(h.eligibleFace));
+    h.summary.maximumHeatFlux=max(h.heatFlux(h.eligibleFace));
+else,h.summary.minimumHeatFlux=NaN;h.summary.maximumHeatFlux=NaN;end
+mesh.heating=h;
+end

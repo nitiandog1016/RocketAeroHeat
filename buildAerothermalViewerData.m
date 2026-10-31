@@ -105,12 +105,38 @@ if isfield(mesh,'heating')
     scope=strjoin([{h.validity},detail],'；');
     heatReasons=thermalMissingReasons(mesh,data.missingReason,state,n);
     add('heatFlux','对流热流密度','kW/m²',h.heatFlux/1000,state,methods,scope,{},heatReasons);
+    if isfield(h,'kinneyAcreage')
+        data.fields(end).computedStateLabel='工程方法对照';
+        data.fields(end).stateNote=[data.fields(end).stateNote ...
+            '；Kinney侧壁为离散入口假设下的公式对照，尚未独立验证入口/实验精度，不扩充正式求解面积'];
+    end
     [recoveryMethods,recoveryScopes]=recoveryTemperatureProvenance(mesh,h,n);
     add('recoveryTemperature','恢复温度','K',h.recoveryTemperature,state,recoveryMethods, ...
         '绝热恢复温度；层流、湍流及球鼻使用各自温度模型，不能将热流关联式作为温度来源',recoveryScopes,heatReasons);
     add('wallInput','热流计算所用壁温','K',h.wallTemperatureByFace,2*ones(n,1), ...
         repmat({'热流边界输入（给定或耦合传入的面元温度）'},n,1), ...
         '此字段仅表示当前热流计算所用输入；即使由耦合程序传入，也不据此标为本次单点求解壁温');
+    % 新侧壁方法保留参考流长和原积分法对照，可在现有云图/探针/截面直接查看。
+    if isfield(h,'kinneyAcreage')
+        k=h.kinneyAcreage;length=k.length;lengthState=double(k.acceptedFace);
+        lengthMethods=repmat({[length.method '；' k.sourceURL '；' k.sourcePages]},n,1);
+        lengthScope=[length.scope '；仅对当前侧壁热流已接受面元显示；' ...
+            '默认离散起点零积分或局部常状态前缀是工程假设，未核验真实驻点/附着线入口'];
+        add('heatingReferenceLength','热流所用参考流长','m',length.selectedLength, ...
+            lengthState,lengthMethods,lengthScope);
+        data.fields(end).computedStateLabel='工程参考量';
+        [baselineMethods,baselineScopes]=baselineHeatingProvenance(h,n);
+        add('baselineHeatFlux','原工程方法热流对照','kW/m²',k.baselineHeatFlux/1000, ...
+            double(isfinite(k.baselineHeatFlux)),baselineMethods, ...
+            '同一当前外流、路径和壁温下的原工程方法对照；鼻区与侧壁来源分别保留；不是独立实验或求解壁温',baselineScopes);
+        % 两种方法共享同一范围；切换变量时可保持“对照统一色标”。
+        both=[h.heatFlux(:);k.baselineHeatFlux(:)]/1000;both=both(isfinite(both));
+        if ~isempty(both)
+            limits=[min(0,min(both)),max(0,max(both))];
+            if limits(1)==limits(2),limits=limits+[-1 1];end
+            data.comparisonColorRanges=struct('heatFlux',limits,'baselineHeatFlux',limits);
+        end
+    end
 end
 % 模块三：显式区分输入壁温与壁温解；单一外流/热流工况本身不确定壁温。
 % 尚无材料热响应解时仍允许探针查看“未求解”，不能以输入壁温补齐。
@@ -205,6 +231,7 @@ data.caseNote=[data.resultCondition.caption ...
             'status',state,'methodNames',{names},'methodIndex',ids-1,'scope',scope, ...
             'scopeNames',{scopeNames},'scopeIndex',scopeIDs, ...
             'missingReason',{faceReasons},'stateNote',fieldStateNote(key),'availability','', ...
+            'computedStateLabel','', ...
             'computedAreaFraction',sum(area(state==1))/sum(area), ...
             'prescribedAreaFraction',sum(area(state==2))/sum(area), ...
             'missingAreaFraction',sum(area(state==0))/sum(area),'history',[]);
@@ -341,8 +368,8 @@ else
     formula='恢复温度结果；热物性模式未记录（不推断焓恢复或定比热）';
 end
 for i=1:n
-    if ismember(ids(i),[1 2 4 5])
-        if ismember(ids(i),[1 4]),factor='层流 r=√Pr';else,factor='湍流 r=Pr^(1/3)';end
+    if ismember(ids(i),[1 2 4 5 7 8 9 10])
+        if ismember(ids(i),[1 4 7 9]),factor='层流 r=√Pr';else,factor='湍流 r=Pr^(1/3)';end
         if isfield(h,'Prandtl')
             factor=[factor sprintf('，Pr=%.6g',h.Prandtl)];
         else
@@ -350,7 +377,7 @@ for i=1:n
         end
         names{i}=[formula '；' factor];
         scopes{i}=['附着边界层绝热恢复温度的工程假设；仅输出当前热边界有效面元；' propertyScope];
-        if ismember(ids(i),[4 5])
+        if ismember(ids(i),[4 5 9 10])
             scopes{i}=[scopes{i} '；外缘来自受限前体脱体工程闭合，其压力/速度及恢复温度均为低阶估算'];
         end
     elseif ids(i)==3
@@ -377,6 +404,38 @@ for i=1:n
     end
 end
 end
+function [names,scopes]=baselineHeatingProvenance(h,n)
+% 原方法对照逐面恢复替换前来源。旧草稿缺少完整来源时拒绝，不能猜测。
+k=h.kinneyAcreage;
+assert(isfield(k,'baselineProvenance') && isfield(k,'baselineFaceMethodID'), ...
+    'RocketAeroHeat:Viewer:BaselineProvenance', ...
+    '原方法对照缺少替换前来源，请用原基线重新生成方法对照，不能从新方法推断。');
+original=h;
+for key=fieldnames(k.baselineProvenance)'
+    original.(key{1})=k.baselineProvenance.(key{1});
+end
+original.faceMethodID=k.baselineFaceMethodID;
+ids=double(original.faceMethodID(:));
+assert(numel(ids)==n && all(isfinite(ids) & ids==fix(ids) & ids>=0 & ids<=6), ...
+    'RocketAeroHeat:Viewer:BaselineProvenance','原方法编号必须逐面保存且属于原工程方法。');
+assert(isequal(ids>0,isfinite(k.baselineHeatFlux(:))), ...
+    'RocketAeroHeat:Viewer:BaselineProvenance','原方法编号与热流有值状态不一致。');
+names=heatingMethods(original,n);
+scopes=repmat({'原工程方法未解；不由新的方法或其他面元补齐'},n,1);
+for i=find(ids>0)'
+    if ismember(ids(i),[3 6])
+        scopes{i}=original.noseScope;
+    elseif ismember(ids(i),[1 4])
+        scopes{i}=original.boundaryLayerValidity;
+    else
+        scopes{i}=original.turbulentScope;
+    end
+    if ismember(ids(i),[4 5])
+        scopes{i}=[scopes{i} '；外缘来自受限前体脱体工程闭合，未经完整三维激波层验证'];
+    end
+    scopes{i}=[scopes{i} '；同一工况原算法对照，不是独立实验验证'];
+end
+end
 function names=heatingMethods(h,n)
 % 模块六：展开真实的局部边界层来源，区分 Head 积分和显式平板回退。
 names=methodNames(h,n);
@@ -397,6 +456,15 @@ for i=1:n
         names{i}=[names{i} '；' h.stagnationMethod];
     elseif ids(i)==6
         names{i}=[names{i} '；' h.noseDistribution.heatFluxMethod];
+    elseif ismember(ids(i),[7 8 9 10]) && isfield(h,'kinneyAcreage')
+        k=h.kinneyAcreage;
+        names{i}=[names{i} '；' k.sourceURL '；' k.sourcePages ...
+            '；Eckert参考性质 + Reynolds比拟'];
+        if k.length.prefixAssumedFace(i)
+            names{i}=[names{i} '；入口前缀使用局部常状态工程假设'];
+        elseif k.length.originAssumedFace(i)
+            names{i}=[names{i} '；离散起点I=0假设，真实驻点/附着线入口尚未核验'];
+        end
     end
 end
 end

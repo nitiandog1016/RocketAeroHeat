@@ -1,0 +1,132 @@
+function testKinneyAcreageHeating(out)
+%TESTKINNEYACREAGEHEATING 校验参考流长积分、公开公式及未知区保护。
+% 模块一：解析积分、收敛阶、乱序前驱及未知入口，不依赖实现公式生成真值。
+% 模块二：经典锥柱真实工程链，检查冷/热壁、方法切换和温度来源。
+% 模块三：保存小型数值证据；这是解析/关联式校核，不是实验验证。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);
+if nargin<1,out=fullfile(root,'outputs','v104_validation','tests01');end
+assert(~exist(out,'dir'));mkdir(out);
+s=(0:8)'/8;[path,edge]=chain(s,1+s.^2);valid=true(size(s));
+r=calcWeightedReferenceLength(path,edge,valid,-10*ones(size(s)));
+expectedIntegral=s+s.^3/3+s*(1/8)^2/6;
+assert(max(abs(r.integral-expectedIntegral))<1e-14);
+assert(max(abs(r.weightedLength-expectedIntegral./(1+s.^2)))<1e-14);
+assert(all(r.originAssumedFace) && all(r.entryAssumedFace));
+wind=calcWeightedReferenceLength(path,edge,valid,10*ones(size(s)));
+assert(isequal(wind.selectedLength,s));
+errors=zeros(3,1);steps=[8;16;32];
+for k=1:3
+    x=(0:steps(k))'/steps(k);[p,e]=chain(x,1+x.^2);
+    v=calcWeightedReferenceLength(p,e,true(size(x)),-10*ones(size(x)));
+    errors(k)=v.integral(end)-4/3;
+end
+assert(max(abs(errors(1:2)./errors(2:3)-4))<1e-9);
+% 面元编号与流向排序无关，不能依赖编号顺序进行积分。
+order=numel(s):-1:1;inverse=zeros(size(order));inverse(order)=1:numel(s);
+shuffled=path;
+for key={'distance','pathCost','stepLength','connectedFace'}
+    shuffled.(key{1})=path.(key{1})(order);
+end
+parent=path.predecessorFace(order);keep=parent>0;parent(keep)=inverse(parent(keep));
+shuffled.predecessorFace=parent;
+e=edge;for key={'density','dynamicViscosity','speed'},e.(key{1})=edge.(key{1})(order);end
+permuted=calcWeightedReferenceLength(shuffled,e,valid,-10*ones(size(s)));
+assert(isequaln(permuted.integral(inverse),r.integral));
+bad=valid;bad(3)=false;
+blocked=calcWeightedReferenceLength(path,edge,bad,-10*ones(size(s)));
+assert(all(isnan(blocked.integral(3:end))) && all(~blocked.validFace(3:end)));
+unknown=struct('rootIntegralByFace',nan(size(s)));
+blocked=calcWeightedReferenceLength(path,edge,valid,-10*ones(size(s)),unknown);
+assert(all(isnan(blocked.integral)) && ~any(blocked.validFace));
+badEdge=edge;badEdge.density(3)=-1;badEdge.dynamicViscosity(3)=-1;
+blocked=calcWeightedReferenceLength(path,badEdge,valid,-10*ones(size(s)));
+assert(all(isnan(blocked.integral(3:end))));
+badPath=path;badPath.predecessorFace(3)=4;
+expect(@()calcWeightedReferenceLength(badPath,edge,valid,-10*ones(size(s))), ...
+    'RocketAeroHeat:WeightedLength:Order');
+% 常状态前缀是显式假设；显式未知入口不得自动用此假设补齐。
+[p,e]=chain((1:5)'/5,ones(5,1));
+v=calcWeightedReferenceLength(p,e,true(5,1),-10*ones(5,1));
+assert(max(abs(v.weightedLength-p.distance))<1e-14 && all(v.prefixAssumedFace));
+given=nan(5,1);given(1)=.2;
+w=calcWeightedReferenceLength(p,e,true(5,1),-10*ones(5,1),struct('rootIntegralByFace',given));
+assert(max(abs(w.integral-v.integral))<1e-14 && ~any(w.prefixAssumedFace));
+
+%% 真实经典体积分链：新方法不改变压力、外缘、给定壁温及鼻区。
+evalc('cfg=createCaseConfig();');cfg.output.verbose=false;
+cfg.flight.alpha=10;cfg.flight.Twall=300;
+seed=buildCanonicalBody('coneCylinder',struct('resolution',24));
+evalc('seed=calcFaceGeometry(seed);seed=fixNormalDirection(seed,cfg);seed=buildSurfaceCoordinates(seed,cfg);');
+seed=analyzeLocalGeometry(seed,cfg);
+[baseline,fs]=runAeroHeatSingleCase(seed,cfg);
+cfg.heating.sidewallModel='kinneyAcreage';
+current=calcSurfaceHeating(baseline,fs,cfg);
+h=current.heating;k=h.kinneyAcreage;accepted=k.acceptedFace;
+assert(nnz(accepted)>20);
+assert(isequaln(current.pressure,baseline.pressure) && isequaln(current.boundaryLayerEdge,baseline.boundaryLayerEdge));
+assert(isequal(current.V,baseline.V) && isequal(current.F,baseline.F));
+assert(~any(h.eligibleFace & ~baseline.heating.eligibleFace));
+assert(isequaln(h.heatFlux(h.noseFace),baseline.heating.heatFlux(h.noseFace)));
+assert(isequal(h.wallTemperatureByFace,baseline.heating.wallTemperatureByFace));
+assert(~k.productionQualified && any(k.length.entryAssumedFace(accepted)));
+% 以公开Cf/St和焓差独立重写标量公式，检查参考密度、Te/Tref和Mf都参与。
+for i=find(accepted)'
+    if h.laminarFace(i)
+        Tstar=k.referenceTemperatureLaminar(i);re=k.referenceReynoldsLaminar(i);
+        cf=.664*sqrt(k.manglerLaminar/re)*current.boundaryLayerEdge.temperature(i)/Tstar;
+        cp=h.effectiveCpLaminar(i);tr=h.recoveryTemperatureLaminar(i);
+    else
+        Tstar=k.referenceTemperatureTurbulent(i);re=k.referenceReynoldsTurbulent(i);
+        cf=.37/log10(re/k.manglerTurbulent)^2.584*current.boundaryLayerEdge.temperature(i)/Tstar;
+        cp=h.effectiveCpTurbulent(i);tr=h.recoveryTemperatureTurbulent(i);
+    end
+    rho=current.boundaryLayerEdge.pressure(i)/(fs.R*Tstar);
+    expected=.5*cf*h.Prandtl^(-2/3)*rho*current.boundaryLayerEdge.speed(i)*cp*(tr-300);
+    assert(abs(h.heatFlux(i)-expected)<=3e-13*max(1,abs(expected)));
+end
+data=buildAerothermalViewerData(current);
+assert(any(strcmp({data.fields.key},'heatingReferenceLength')));
+tr=data.fields(strcmp({data.fields.key},'recoveryTemperature'));
+for i=find(accepted)'
+    label=tr.methodNames{tr.methodIndex(i)+1};
+    assert(contains(label,'恢复') && ~contains(label,'Kinney'));
+end
+% 未知根入口阻断所有侧壁后代，新拒绝原因必须进入面积审计。
+badCfg=cfg;badCfg.heating.kinney.rootIntegralByFace=nan(size(seed.F,1),1);
+rejected=calcSurfaceHeating(baseline,fs,badCfg);
+assert(~any(rejected.heating.kinneyAcreage.acceptedFace));
+assert(all(isnan(rejected.heating.heatFlux(k.targetFace))));
+assert(any(rejected.heatingCoverage.flags.sidewallReferenceModel));
+assert(all(rejected.heatingCoverage.reasonCode(k.targetFace)==15));
+badCfg=cfg;badCfg.heating.sidewallModel='unsupported';
+expect(@()calcSurfaceHeating(baseline,fs,badCfg),'RocketAeroHeat:Heating:SidewallModel');
+
+%% 热壁负热流与零热流均需作为有效结果保留。
+hotCfg=cfg;hotCfg.flight.Twall=2200;
+hot=calcSurfaceHeating(baseline,fs,hotCfg);
+assert(any(hot.heating.kinneyAcreage.acceptedFace));
+assert(all(hot.heating.heatFlux(hot.heating.kinneyAcreage.acceptedFace)<0));
+zeroCfg=cfg;tw=300*ones(size(seed.F,1),1);tw(accepted)=h.recoveryTemperature(accepted);
+zeroCfg.heating.wallTemperatureByFace=tw;zero=calcSurfaceHeating(baseline,fs,zeroCfg);
+zerosAccepted=zero.heating.kinneyAcreage.acceptedFace & accepted & zero.heating.heatFlux==0;
+assert(any(zerosAccepted));
+zdata=buildAerothermalViewerData(zero);q=zdata.fields(strcmp({zdata.fields.key},'heatFlux'));
+assert(all(q.status(zerosAccepted)==1 & q.values(zerosAccepted)==0));
+save(fullfile(out,'kinney_tests.mat'),'s','r','steps','errors','baseline','current','hot','zero','-v7');
+summary=struct('status','passed','analyticQuadratureOrder',errors(1:2)./errors(2:3), ...
+    'classicFaces',size(seed.F,1),'acceptedFaces',nnz(accepted), ...
+    'zeroHeatValidFaces',nnz(zerosAccepted),'experimentalValidation',false);
+fid=fopen(fullfile(out,'summary.json'),'w','n','UTF-8');fprintf(fid,'%s\n',jsonencode(summary));fclose(fid);
+fprintf('Kinney tests passed: analytic/quadrature/graph/entry/refusal, %d classic-body faces, %d accepted, %d valid zero heat.\n', ...
+    size(seed.F,1),nnz(accepted),nnz(zerosAccepted));
+end
+
+function [p,e]=chain(s,speed)
+p=struct('distance',s,'pathCost',s,'predecessorFace',(0:numel(s)-1)', ...
+    'stepLength',[NaN;diff(s)],'connectedFace',true(size(s)));
+e=struct('density',ones(size(s)),'dynamicViscosity',ones(size(s)),'speed',speed);
+end
+function expect(action,id)
+try,action();error('Test:UnexpectedSuccess','预期拒绝没有发生。');
+catch ex,assert(strcmp(ex.identifier,id),ex.identifier);end
+end

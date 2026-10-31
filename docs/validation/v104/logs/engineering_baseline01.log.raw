@@ -1,0 +1,14 @@
+RAH_ENGINE_PID=15716
+ENGINEERING_PHASE inputs 0.004s
+{错误使用 deg2rad
+输入必须为单精度值或双精度值。
+
+出错 calcFreestream (第 271 行)
+    deg2rad(alphaDeg);
+
+出错 runAeroHeatSingleCase (第 42 行)
+                freestream=calcFreestream(cfg.flight);
+
+出错 studyEngineeringWholeSurface (第 17 行)
+[current,fs,report]=runAeroHeatSingleCase(mesh,cfg,@progress);
+} 
