@@ -37,7 +37,7 @@ if strcmp(action,'init')
     cfg=optional(payload,'cfg',struct());assertScalarStruct(cfg,'cfg');
     state=struct('schemaVersion',1,'cfg',cfg,'rawMesh',[], ...
         'orientedMesh',[],'mesh',[],'quality',[],'modelSource',struct(), ...
-        'freestream',[],'result',[],'revision',uint64(0), ...
+        'freestream',[],'result',[],'researchResult',[],'revision',uint64(0), ...
         'modelRevision',uint64(0),'meshRevision',uint64(0), ...
         'boundaryRevision',uint64(0),'resultSourceRevision',NaN, ...
         'boundaryConfirmed',false,'currentStep',1,'busy',false, ...
@@ -156,7 +156,7 @@ switch action
             state.freestream=fs;
         end
         state.boundaryConfirmed=true;
-        if isempty(state.result) && ~state.busy,state.status='boundary-ready';end
+        if isempty(state.result) && isempty(state.researchResult) && ~state.busy,state.status='boundary-ready';end
         state.currentStep=3;
 
     %% 模块五：切换页面只读已有状态，不隐式启动计算。
@@ -196,6 +196,23 @@ switch action
         state.result=result;state.freestream=fs;state.resultSourceRevision=state.revision;
         state.busy=false;state.status='solved';state.currentStep=5;
         state.frozenInputs=[];state.error=struct('identifier','','message','');
+    case 'completeresearch'
+        % 研究快照独立保存；不能通过普通completeSolve混入工程已计算面积。
+        validateSolveToken(state,payload);
+        result=required(payload,'result');validateMesh(result,'researchResult');
+        requireCondition(sameGeometry(result,state.mesh),'研究场与当前原面元几何不一致。');
+        requireCondition(isequal(result.productionQualified,false) && ...
+            isequal(result.eligibleForSurfaceCoverage,false),'研究结果不能自授物理资格。');
+        for name={'pressureRaw','heatFluxRaw','fluidNodeTemperatureMeanRaw','conservativeHeatLoadDensityRaw'}
+            values=result.(name{1});
+            requireCondition(isnumeric(values) && isvector(values) && numel(values)==size(state.mesh.F,1) && ...
+                all(isfinite(values)),'研究场缺少完整原面元数值。');
+        end
+        requireCondition(strcmp(result.receipt.status,'terminal') && result.receipt.exitCode==0 && ...
+            ~result.receipt.timedOut && ~result.receipt.cancelled,'研究快照需要实际成功进程终态。');
+        state.researchResult=result;state.result=[];state.resultSourceRevision=state.revision;
+        state.busy=false;state.status='research-ready';state.currentStep=5;state.frozenInputs=[];
+        state.error=struct('identifier','','message','');
     case 'failsolve'
         validateSolveToken(state,payload);
         err=required(payload,'error');
@@ -215,7 +232,9 @@ meshReady=~isempty(state.mesh);
 boundaryReady=meshReady && state.boundaryConfirmed;
 resultReady=~isempty(state.result) && ...
     isequal(state.resultSourceRevision,state.revision) && ~state.busy;
-available=[true modelReady meshReady boundaryReady resultReady];
+researchReady=~isempty(state.researchResult) && ...
+    isequal(state.resultSourceRevision,state.revision) && ~state.busy;
+available=[true modelReady meshReady boundaryReady resultReady||researchReady];
 completed=[modelReady meshReady boundaryReady resultReady resultReady];
 keys={'model','mesh','boundary','solve','results'};
 labels={'输入模型','生成网格','添加边界条件','计算','查看结果'};
@@ -229,6 +248,7 @@ for i=1:5
 end
 if state.busy,state.steps(4).status='busy';end
 if strcmp(state.status,'failed'),state.steps(4).status='failed';end
+if researchReady,state.steps(4).status='research';state.steps(5).status='research';end
 end
 
 %% 模块八：所有输入失效都从同一入口清理，旧求解编号不复用。
@@ -244,7 +264,7 @@ if hadFaceWall && ~strcmp(reason,'边界条件或工程算法改变') && ...
 end
 end
 function state=clearResult(state)
-state.result=[];state.resultSourceRevision=NaN;
+state.result=[];state.researchResult=[];state.resultSourceRevision=NaN;
 end
 function validateSolveToken(state,payload)
 rev=required(payload,'sourceRevision');id=required(payload,'solveId');

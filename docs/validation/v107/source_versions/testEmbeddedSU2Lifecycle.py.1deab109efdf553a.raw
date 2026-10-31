@@ -1,0 +1,62 @@
+"""v107监督器实际失败/超时及历史行解析；不运行收敛物理基准。"""
+from pathlib import Path
+import importlib.util
+import json
+import shutil
+import subprocess
+import sys
+import hashlib
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE = ROOT / 'outputs/embedded_workbench/1a0e56bb-04a6-485a-8f6c-8fee4ce92971'
+
+
+def main():
+    out = ROOT / 'outputs/v107_validation/lifecycle01'
+    out.mkdir(exist_ok=False)
+    script = ROOT / 'scripts/runEmbeddedSU2.py'
+    spec = importlib.util.spec_from_file_location('supervisor', str(script))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    progress = module.history_progress(SOURCE / 'history.csv')
+    assert progress == {'Inner_Iter': 1.0, 'rms[Rho]': -2.919467431,
+                        'rms[RhoE]': 3.063560278, 'HF': -44103.12803}, progress
+    partial = out / 'partial.csv'
+    partial.write_text('"Inner_Iter",   "rms[Rho]"\n1,-3\n2,', encoding='utf8')
+    assert module.history_progress(partial) == {'Inner_Iter': 1.0, 'rms[Rho]': -3.0}
+    results = []
+    for label in ('invalid_config', 'time_limit'):
+        folder = out / label
+        folder.mkdir()
+        shutil.copyfile(str(SOURCE / 'mesh.su2'), str(folder / 'mesh.su2'))
+        cfg = (SOURCE / 'case.cfg').read_text(encoding='utf8').replace('ITER= 2\n', 'ITER= 30000\n')
+        cfg = cfg.replace('OUTPUT_WRT_FREQ= 2\n', 'OUTPUT_WRT_FREQ= 1000\n')
+        if label == 'invalid_config':
+            cfg += 'INTENTIONALLY_INVALID_V107_OPTION= YES\n'
+        (folder / 'case.cfg').write_text(cfg, encoding='utf8')
+        request = dict(workDirectory=str(folder), configFile='case.cfg', meshFile='mesh.su2',
+                       threads=2, maximumSeconds=1 if label == 'time_limit' else 30,
+                       jobToken='actual-owned-v107-' + label)
+        # 错误令牌必须被忽略；时间到达时由真实超时终态结束。
+        (folder / 'engine_cancel.json').write_text(json.dumps(dict(jobToken='wrong-token')), encoding='utf8')
+        path = folder / 'engine_request.json'
+        path.write_text(json.dumps(request), encoding='utf8')
+        completed = subprocess.run([sys.executable, '-X', 'utf8', str(script), '--request', str(path)],
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                   creationflags=subprocess.CREATE_NO_WINDOW)
+        (folder / 'supervisor.log').write_bytes(completed.stdout)
+        state = json.loads((folder / 'engine_process.json').read_text(encoding='utf8'))
+        assert state['status'] == 'terminal' and not state['cancelled'] and all(state['inputsStable'].values())
+        assert state['timedOut'] == (label == 'time_limit')
+        assert completed.returncode == 124 if label == 'time_limit' else completed.returncode != 0
+        results.append(dict(case=label, supervisorExitCode=completed.returncode, terminal=state))
+    report = dict(progress=progress, partialRowIgnored=True, wrongCancellationTokenIgnored=True,
+                  cases=results, physicsQualified=False,
+                  sourceSHA256={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                for p in (script, Path(__file__), SOURCE / 'case.cfg', SOURCE / 'mesh.su2')})
+    (out / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf8')
+    print('Actual failure, timeout, wrong-token refusal and complete-row progress passed.')
+
+
+if __name__ == '__main__':
+    main()

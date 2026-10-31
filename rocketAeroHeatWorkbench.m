@@ -12,8 +12,10 @@ cfg.pressure.leewardCp=getOption(getOption(cfg,'pressure',struct),'leewardCp',0)
 state=aeroHeatWorkflowState('init',[],struct('cfg',cfg));
 preview=[];rotation=eye(3);rotationCenter=[0 0 0];controls=struct;
 webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDetailsOpen=false;
+embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
+fig.CloseRequestFcn=@closeWorkbench;
 frame=uigridlayout(fig,[3 2]);frame.RowHeight={40,'1x',32};
 frame.ColumnWidth={340,'1x'};frame.Padding=[8 6 8 6];frame.RowSpacing=6;
 brand=uilabel(frame,'Text','RocketAeroHeat','FontSize',18,'FontWeight','bold');
@@ -42,7 +44,8 @@ fig.UserData=struct('workflowState',state,'workflowButtons',buttons, ...
 fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ...
     'pca',@()pcaOrientation([],[]),'flip',@()flipOrientation([],[]), ...
     'confirmOrientation',@()confirmOrientation([],[]),'generateMesh',@()generate([],[]), ...
-    'confirmBoundary',@()confirmBoundary([],[]),'run',@()solveCase([],[]),'getState',@getState);
+    'confirmBoundary',@()confirmBoundary([],[]),'run',@()solveCase([],[]),'getState',@getState, ...
+    'loadNative',@()loadNative([],[]),'cancel',@()cancelEngine([],[]),'readResearch',@readResearch);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -65,6 +68,7 @@ renderEditor();sync();showGeometry(true);
             if state.steps(j).completed,tag='已完成';end
             if strcmp(state.steps(j).status,'busy'),tag='计算中';end
             if strcmp(state.steps(j).status,'failed'),tag='失败';end
+            if strcmp(state.steps(j).status,'research'),tag='研究快照';end
             buttons(j).Text=sprintf('%d  %s  · %s',j,state.steps(j).label,tag);
             buttons(j).Enable=onoff(state.steps(j).available && ~state.busy && ~preparing);
             buttons(j).BackgroundColor=[.96 .97 .98];
@@ -77,6 +81,7 @@ renderEditor();sync();showGeometry(true);
         footer.Text=logLines{end};
         fig.UserData.workflowState=state;fig.UserData.controls=controls;
         fig.UserData.webUI=webUI;fig.UserData.caseReport=report;
+        fig.UserData.engineJob=engineJob;fig.UserData.researchUI=researchUI;
         % 工作区也跟随当前有效状态；上游改变后不留下旧场量冒充当前结果。
         assignin('base','cfg',state.cfg);assignin('base','rawMeshOriginal',state.rawMesh);
         assignin('base','rawMesh',state.orientedMesh);assignin('base','quality',state.quality);
@@ -86,6 +91,10 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing
             list=findall(editor);
             for q=1:numel(list),if isprop(list(q),'Enable'),list(q).Enable='off';end,end
+        end
+        % 异步计算期间保留取消按钮；父面板禁用会一并禁用子控件。
+        if state.busy && ~isempty(engineJob) && isfield(controls,'cancel')
+            editor.Enable='on';controls.cancel.Enable=onoff(~engineJob.cancelRequested);
         end
         drawnow limitrate;
     end
@@ -111,7 +120,13 @@ renderEditor();sync();showGeometry(true);
         updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2,'resetCamera',reset));
     end
     function showResults()
+        if ~isempty(state.researchResult)
+            geometryHost.Visible='off';resultHost.Visible='on';
+            delete(resultHost.Children);webUI=[];
+            researchUI=createSU2ResearchView(resultHost,state.researchResult);sync();return;
+        end
         if isempty(state.result),return;end
+        if ~isempty(researchUI),delete(resultHost.Children);researchUI=[];webUI=[];end
         geometryHost.Visible='off';resultHost.Visible='on';
         if isempty(webUI)
             tabs=uitabgroup(resultHost,'Units','normalized','Position',[0 0 1 1]);
@@ -143,9 +158,17 @@ renderEditor();sync();showGeometry(true);
                 controls.confirm=button(grid,12,'确认主轴 X、鼻尖 +X',@confirmOrientation);
                 tip(grid,13,['STL不含单位。默认mm模型转换系数0.001；m模型为1。' newline ...
                     'PCA只识别轴，不能确定鼻向。实际旋转会使网格/结果失效；鼠标操作只改变观察视角。']);
+                controls.native=button(grid,15,'建立原生箭体 · 内嵌SU2研究',@loadNative);
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
+                if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
             case 2
+                if isEmbedded()
+                    grid=form(12);controls.generate=button(grid,1,'生成完整三维体网格',@generate);
+                    tip(grid,3,'原生无突起箭体；保留原三角面。11712单元、8层射线体网格仅供集成研究，近壁精度尚未合格。');
+                    tip(grid,7,'当前不支持任意STL/突起体网格，不自动替换或简化导入模型。工程STL流程保持原重网格算法。');
+                    sync();return;
+                end
                 grid=form(12);c=state.cfg.remesh;
                 controls.hMin=numberField(grid,1,'最小尺寸 / mm',c.hMin*1000,[.01 inf]);
                 controls.hMax=numberField(grid,2,'最大尺寸 / mm',c.hMax*1000,[.01 inf]);
@@ -164,6 +187,21 @@ renderEditor();sync();showGeometry(true);
                 tip(grid,8,description);
                 tip(grid,11,'参数修改即使旧网格和下游结果失效；不改变现有网格方法。质量差面保留真实指标。');
             case 3
+                if isEmbedded()
+                    grid=form(16);c=state.cfg;
+                    controls.altitude=numberField(grid,1,'高度 / km',c.flight.altitude/1000,[0 86]);
+                    controls.mach=numberField(grid,2,'Mach',c.flight.Mach,[1.01 10]);
+                    controls.alpha=numberField(grid,3,'攻角 / °',c.flight.alpha,[-89 89]);
+                    controls.beta=numberField(grid,4,'侧滑角 / °',c.flight.beta,[-89 89]);
+                    controls.wall=numberField(grid,5,'给定壁温 / K',c.flight.Twall,[1 10000]);
+                    controls.iterations=numberField(grid,6,'最大迭代数',getOption(c.su2,'iterations',1000),[1 30000]);
+                    controls.seconds=numberField(grid,7,'时间预算 / s',getOption(c.su2,'maximumSeconds',120),[1 720]);
+                    for key={'altitude','mach','alpha','beta','wall','iterations','seconds'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
+                    controls.confirm=button(grid,8,'确认内嵌引擎边界',@confirmBoundary);
+                    tip(grid,10,'SU2 8.6.0：层流NS、定比热理想气体γ1.4、Sutherland、Pr0.72；等温壁面，无湍流/转捩模型。参数可运行不代表在其范围已验证。');
+                    tip(grid,14,'给定Tw是边界；输出流体节点温度不是真实求解壁温。2线程，每1000步覆盖写检查点。');
+                    sync();return;
+                end
                 grid=form(24+12*methodDetailsOpen);c=state.cfg;
                 controls.altitude=numberField(grid,1,'高度 / km',c.flight.altitude/1000,[0 86]);
                 controls.mach=numberField(grid,2,'Mach（计算需 >1）',c.flight.Mach,[0 30]);
@@ -200,6 +238,15 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,23+12*methodDetailsOpen,sprintf('当前保留 %d 个面元壁温输入；修改统一壁温将切换为统一边界。',numel(c.heating.wallTemperatureByFace)));
                 end
             case 4
+                if isEmbedded()
+                    grid=form(15);controls.run=button(grid,1,'启动内嵌SU2 · 研究计算',@solveCase);
+                    controls.cancel=button(grid,2,'取消当前引擎任务',@cancelEngine);
+                    controls.cancel.Enable=onoff(state.busy);
+                    controls.readResearch=button(grid,3,'重开本程序同工况研究结果',@readResearchDialog);
+                    tip(grid,4,'实际进程异步运行；残差/迭代号不是完成百分比。退出0仍须独立收敛与物理审核，当前结果不增加合格面积。');
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[7 15];controls.log.Layout.Column=[1 2];
+                    sync();return;
+                end
                 failed=~isempty(state.error.message);offset=6*failed;
                 grid=form(19+12*methodDetailsOpen+offset);controls.run=button(grid,1,'计算当前工况',@solveCase);
                 if failed
@@ -215,6 +262,13 @@ renderEditor();sync();showGeometry(true);
                 tip(grid,9+offset,'仅按按钮启动计算。进度为已完成的程序阶段比例，不是面积覆盖率或剩余耗时。');
                 controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[12+offset 19+offset];controls.log.Layout.Column=[1 2];
             case 5
+                if ~isempty(state.researchResult)
+                    grid=form(12);r=state.researchResult;
+                    tip(grid,1,sprintf('输入版本%d · 内嵌NS研究快照\n%d个原面元 · 新增合格面积0',state.resultSourceRevision,size(r.F,1)));
+                    tip(grid,4,'压力、物面平均q、流体节点T可拾取；保守热负荷密度另列。给定Tw只作输入；真实壁温未求。');
+                    tip(grid,8,'本分支任意截面曲线与收敛资格审核仍待接入；当前支持云图、固定色标、原面探针及带来源CSV。');
+                    sync();return;
+                end
                 grid=form(10);d=buildAerothermalViewerData(state.result);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
@@ -290,7 +344,8 @@ renderEditor();sync();showGeometry(true);
     function loadInput(~,~)
         if state.busy || preparing,return;end
         try
-            next=state.cfg;next.geometry.stlFile=controls.file.Value;next.geometry.scale=controls.scale.Value;
+            next=state.cfg;next.computationBackend='engineering';embeddedVolume=[];
+            next.geometry.stlFile=controls.file.Value;next.geometry.scale=controls.scale.Value;
             state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
             preview=[];report=[];preparing=true;message('正在加载模型并核对SI尺度…');
             raw=quietCall(@()loadSTLMesh(next));raw=quietCall(@()calcFaceGeometry(raw));
@@ -357,6 +412,7 @@ renderEditor();sync();showGeometry(true);
     end
     function generate(~,~)
         if state.busy || preparing,return;end
+        if isEmbedded(),generateNative();return;end
         try
             next=meshConfiguration();validateMeshOptions(next.remesh);
             state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
@@ -393,7 +449,13 @@ renderEditor();sync();showGeometry(true);
         if controls.wall.Value~=next.flight.Twall && isfield(next.heating,'wallTemperatureByFace')
             next.heating=rmfield(next.heating,'wallTemperatureByFace');
         end
-        next.flight.Twall=controls.wall.Value;next.heating.airThermalModel=controls.air.Value;
+        next.flight.Twall=controls.wall.Value;
+        if isEmbedded()
+            next.heating.airThermalModel='caloricallyPerfect';
+            next.su2.iterations=controls.iterations.Value;next.su2.maximumSeconds=controls.seconds.Value;
+            validateattributes(next.su2.iterations,{'numeric'},{'scalar','integer','positive'});return;
+        end
+        next.heating.airThermalModel=controls.air.Value;
         next.heating.noseModel=controls.nose.Value;next.heating.sphericalNoseAngleStepDeg=controls.noseStep.Value;
         next.heating.turbulentModel=controls.turbulent.Value;next.heating.transitionRe=controls.transition.Value;
         next.heating.sidewallModel=controls.sidewall.Value;
@@ -420,7 +482,7 @@ renderEditor();sync();showGeometry(true);
             if fs.Mach<=1,error('RocketAeroHeat:Workbench:Mach','当前完整工程链要求M>1。');end
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
             state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',fs));
-            if isempty(state.result)
+            if isempty(state.result) && isempty(state.researchResult)
                 message(sprintf('边界已确认：p∞ %.6gPa、T∞ %.6gK；尚未计算压力或热流。',fs.pressure,fs.temperature));
             else
                 message('边界与当前计算快照一致，结果仍有效；再次计算需明确按计算按钮。');
@@ -432,6 +494,7 @@ renderEditor();sync();showGeometry(true);
 %% 模块十：唯一物理计算入口；输入冻结，阶段失败不接受中间快照。
     function solveCase(~,~)
         if state.busy || preparing,return;end
+        if isEmbedded(),startEngine();return;end
         try
             state=aeroHeatWorkflowState('beginSolve',state);token=state.solveId;revision=state.solveInputRevision;
             renderEditor();message('正在显式计算当前工况；各阶段完成不代表全面积已求解。');
@@ -460,6 +523,132 @@ renderEditor();sync();showGeometry(true);
             exportAerothermalWeb(state.result,fullfile(folder,'RocketAeroHeat_case'));
             message('已导出当前计算快照和逐场量来源；未重算物理。');
         catch ex,showError(ex);end
+    end
+
+%% 模块十一：内嵌引擎在原五步骤中运行；研究结果独立于工程覆盖状态。
+    function yes=isEmbedded()
+        yes=strcmp(getOption(state.cfg,'computationBackend','engineering'),'embeddedSU2Research');
+    end
+    function loadNative(~,~)
+        if state.busy || preparing,return;end
+        try
+            [raw,truth]=buildRocketTestBody(struct('resolution',24,'protrusionEnabled',false));
+            next=state.cfg;next.computationBackend='embeddedSU2Research';
+            next.su2=getOption(next,'su2',struct);next.heating.airThermalModel='caloricallyPerfect';
+            next.geometry.isAligned=true;next.geometry.bodyAxis=[1 0 0];next.geometry.noseDirection=[1 0 0];
+            state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'orientedMesh',raw,'cfg',next, ...
+                'modelSource',struct('kind','native-rocket','units','m','truth',truth)));
+            embeddedVolume=[];preview=raw;report=[];
+            message('原生完整箭体已建立，坐标由参数化生成器明确给定；下一步生成体网格。');go(2);
+        catch ex,showError(ex);end
+    end
+    function generateNative()
+        try
+            preparing=true;message('正在建立完整三维体网格并核对闭合/体积…');
+            candidate=state.orientedMesh;
+            embeddedVolume=buildSU2RocketVolume(candidate,state.modelSource.truth, ...
+                struct('radialLayers',8,'maxWallAngleStepDeg',10,'baseRadialSegments',4));
+            state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));
+            preparing=false;renderEditor();showGeometry(true);
+            message(sprintf('体网格%d单元；原表面%d面未改变。近壁精度未合格，请确认边界。',numel(embeddedVolume.cells),size(candidate.F,1)));
+        catch ex,preparing=false;renderEditor();showError(ex);end
+    end
+    function startEngine()
+        try
+            assert(~isempty(embeddedVolume),'请先生成当前原生体网格。');
+            state=aeroHeatWorkflowState('beginSolve',state);
+            frozen=state.frozenInputs;fs=frozen.freestream;
+            folder=fullfile(fileparts(mfilename('fullpath')),'outputs','embedded_workbench',char(java.util.UUID.randomUUID()));
+            flight=struct('Mach',frozen.cfg.flight.Mach,'temperature',fs.temperature,'pressure',fs.pressure, ...
+                'wallTemperature',frozen.cfg.flight.Twall,'alpha',frozen.cfg.flight.alpha,'beta',frozen.cfg.flight.beta, ...
+                'iterations',getOption(frozen.cfg.su2,'iterations',1000));
+            manifest=writeSU2RocketCase(embeddedVolume,folder,flight);
+            save(fullfile(folder,'input_snapshot.mat'),'frozen','manifest','-v7');
+            engineJob=embeddedSU2Job('start',folder,struct('threads',2, ...
+                'maximumSeconds',getOption(frozen.cfg.su2,'maximumSeconds',120), ...
+                'pythonExecutable',getOption(frozen.cfg.su2,'pythonExecutable','python')));
+            engineTimer=timer('ExecutionMode','fixedSpacing','Period',.5,'BusyMode','drop','TimerFcn',@pollEngine);
+            renderEditor();message('内嵌引擎已启动；等待实际进程回执。');start(engineTimer);
+        catch ex
+            if state.busy,state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));end
+            renderEditor();showError(ex);
+        end
+    end
+    function pollEngine(~,~)
+        if isempty(engineJob),return;end
+        try
+            [engineJob,receipt]=embeddedSU2Job('poll',engineJob);
+            if ~engineJob.terminal
+                if ~isempty(receipt) && isfield(receipt,'elapsedSeconds')
+                    suffix='';if isfield(receipt,'progress'),suffix=jsonencode(receipt.progress);end
+                    if engineJob.cancelRequested,label='取消请求已提交，等待真实终态';else,label='内嵌引擎运行中';end
+                    message(sprintf('%s · %.1fs · %s',label,receipt.elapsedSeconds,suffix));
+                end
+                return;
+            end
+            stopEngineTimer();
+            if closing,delete(fig);return;end
+            assert(engineJob.supervisorExitCode==0 && receipt.exitCode==0 && ~receipt.timedOut && ~receipt.cancelled, ...
+                'RocketAeroHeat:SU2:Terminal','引擎未成功：exit %g / 取消%d / 超时%d。目录：%s',receipt.exitCode,receipt.cancelled,receipt.timedOut,engineJob.folder);
+            stable=struct2cell(receipt.inputsStable);assert(all(cellfun(@(v)isequal(v,true),stable)),'引擎输入身份改变。');
+            data=readSU2SurfaceResult(fullfile(engineJob.folder,'surface_flow.vtk'));
+            projection=buildSU2WallProjection(embeddedVolume,state.mesh);
+            result=mapSU2WallResult(data,projection);result.V=state.mesh.V;result.F=state.mesh.F;
+            result.receipt=receipt;result.flight=state.frozenInputs.cfg.flight;
+            result.wallTemperatureInput=result.flight.Twall;result.sourceRevision=state.revision;result.solveId=state.solveId;
+            result.resultDirectory=engineJob.folder;
+            save(fullfile(engineJob.folder,'mapped_research.mat'),'result','-v7');
+            state=aeroHeatWorkflowState('completeResearch',state,struct('result',result,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            message('实际进程已结束；原面元研究快照已接收，未授予物理资格。');go(5);
+        catch ex
+            if ~isempty(engineJob) && ~engineJob.process.HasExited
+                engineJob=embeddedSU2Job('cancel',engineJob);showError(ex);return;
+            end
+            stopEngineTimer();
+            if closing,delete(fig);return;end
+            if state.busy,state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));end
+            renderEditor();showError(ex);
+        end
+    end
+    function cancelEngine(~,~)
+        if isempty(engineJob) || ~state.busy,return;end
+        engineJob=embeddedSU2Job('cancel',engineJob);message('取消请求已提交；保持窗口响应并等待引擎实际结束。');
+    end
+    function readResearchDialog(~,~)
+        [file,folder]=uigetfile('mapped_research.mat','重开本程序同几何/边界研究结果');
+        if isequal(file,0),return;end
+        try,readResearch(fullfile(folder,file));catch ex,showError(ex);end
+    end
+    function readResearch(file)
+        % 只复用本程序保存的同几何/同边界结果；输入版本不匹配必须拒绝。
+        assert(~state.busy && state.boundaryConfirmed && isEmbedded(),'请先确认当前内嵌引擎工况。');
+        saved=load(file,'result');result=saved.result;
+        assert(isequal(result.V,state.mesh.V) && isequal(result.F,state.mesh.F),'保存结果不是当前原面元几何。');
+        folder=fileparts(file);input=load(fullfile(folder,'input_snapshot.mat'),'frozen');
+        assert(isequaln(input.frozen.mesh,state.mesh) && isequaln(input.frozen.cfg,state.cfg) && ...
+            isequaln(input.frozen.freestream,state.freestream),'保存结果的边界/物性/网格设置与当前工况不同。');
+        receipt=jsondecode(fileread(fullfile(folder,'engine_process.json')));
+        assert(isequaln(receipt,result.receipt),'保存结果与实际进程回执不一致。');
+        origin=struct('sourceRevision',result.sourceRevision,'solveId',result.solveId,'file',file);
+        state=aeroHeatWorkflowState('beginSolve',state);
+        try
+            result.reopenedFrom=origin;result.sourceRevision=state.revision;result.solveId=state.solveId;
+            state=aeroHeatWorkflowState('completeResearch',state,struct('result',result,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            message('已重开本程序同几何/边界研究快照，保留原进程与输入身份；未重新计算。');go(5);
+        catch ex
+            state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            renderEditor();rethrow(ex);
+        end
+    end
+    function stopEngineTimer()
+        if ~isempty(engineTimer) && isvalid(engineTimer),stop(engineTimer);delete(engineTimer);end
+        engineTimer=[];
+    end
+    function closeWorkbench(~,~)
+        if ~isempty(engineJob) && ~engineJob.process.HasExited
+            closing=true;cancelEngine([],[]);return;
+        end
+        stopEngineTimer();delete(fig);
     end
 end
 

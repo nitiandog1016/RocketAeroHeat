@@ -5,7 +5,7 @@ function info=writeSU2RocketCase(volume,folder,flight)
 % 模块三：给定Tw与流体温度分开；几何预处理不授予热流资格。
 if nargin<3,flight=struct;end
 defaults=struct('Mach',4,'temperature',300,'pressure',5000,'wallTemperature',300, ...
-    'alpha',0,'beta',0,'iterations',1);
+    'alpha',0,'beta',0,'iterations',1,'outputEvery',1000);
 assert(all(ismember(fieldnames(flight),fieldnames(defaults))));
 for key=fieldnames(defaults)',k=key{1};if ~isfield(flight,k),flight.(k)=defaults.(k);end,end
 for key={'Mach','temperature','pressure','wallTemperature','iterations'}
@@ -13,6 +13,7 @@ for key={'Mach','temperature','pressure','wallTemperature','iterations'}
 end
 for key={'alpha','beta'},validateattributes(flight.(key{1}),{'numeric'},{'scalar','real','finite','>',-90,'<',90});end
 assert(flight.Mach>1 && flight.iterations==fix(flight.iterations));
+validateattributes(flight.outputEvery,{'numeric'},{'scalar','integer','positive'});
 assert(strcmp(volume.kind,'complete-rocket-three-dimensional-su2-volume') && ~volume.physicalSolution);
 assert(~exist(folder,'dir'),'RocketAeroHeat:SU2:Existing','不能覆写已有计算目录。');mkdir(folder);
 fid=fopen(fullfile(folder,'mesh.su2'),'w');assert(fid>=0);guard=onCleanup(@()fclose(fid));
@@ -52,7 +53,7 @@ cfg={'SOLVER= NAVIER_STOKES';'KIND_TURB_MODEL= NONE';'MATH_PROBLEM= DIRECT'; ...
     'HISTORY_OUTPUT= (ITER, RMS_RES, AERO_COEFF, HEAT)';'CONV_FILENAME= history'; ...
     'SURFACE_FILENAME= surface_flow';'RESTART_FILENAME= restart_flow';'VOLUME_FILENAME= volume_flow'; ...
     'OUTPUT_FILES= (SURFACE_PARAVIEW_ASCII, RESTART_ASCII)'; ...
-    sprintf('OUTPUT_WRT_FREQ= %d',flight.iterations);'WRT_RESTART_OVERWRITE= YES';'WRT_SURFACE_OVERWRITE= YES'; ...
+    sprintf('OUTPUT_WRT_FREQ= %d',min(flight.iterations,flight.outputEvery));'WRT_RESTART_OVERWRITE= YES';'WRT_SURFACE_OVERWRITE= YES'; ...
     'SCREEN_WRT_FREQ_INNER= 50';'VOLUME_OUTPUT= (COORDINATES, SOLUTION, PRIMITIVE)'};
 fid=fopen(fullfile(folder,'case.cfg'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',cfg{:});clear guard;
 direction=[-cosd(flight.alpha)*cosd(flight.beta),-sind(flight.beta),sind(flight.alpha)*cosd(flight.beta)];

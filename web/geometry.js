@@ -55,6 +55,7 @@
       V.forEach(v=>v.forEach((x,j)=>{lo[j]=Math.min(lo[j],x);hi[j]=Math.max(hi[j],x);}));
       if(V.length){const extent=Math.max(...hi.map((x,j)=>x-lo[j]));if(!(extent>0))throw Error('模型尺寸为零。');const center=lo.map((x,j)=>(x+hi[j])/2);modelCenter=center;modelExtent=extent;vertices=V.map(v=>v.map((x,j)=>(x-center[j])/extent));}
       loadFlow(data.surfaceFlowLines);
+      if(field){const note=document.querySelector('footer span:last-child');if(note)note.textContent='逐面研究场 · 未授予物理资格 · 给定/未知温度分列';}
       // 模块用途：仅叠加真实空间截面交线，保持原相机和面元拾取，不把交线当流线。
       const sections=data.sectionSegments||[];
       if(!Array.isArray(sections)||sections.length>100000||sections.some(s=>!Array.isArray(s)||s.length!==2||s.some(p=>!Array.isArray(p)||p.length!==3||p.some(x=>!finite(x)))))throw Error('截面交线坐标无效。');
