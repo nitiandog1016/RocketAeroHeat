@@ -1,0 +1,498 @@
+{
+  "date": "2026-10-31",
+  "reviewType": "static-source-and-existing-evidence-review",
+  "newMatlabRuns": 0,
+  "newPhysicalQualification": false,
+  "v104DeliveryComplete": false,
+  "baseCommit": "7451c718033454e4b6e8a1ce0cce3e62c0f6b3c0",
+  "preReviewStatus": " M analyzeHeatingCoverage.m\n M buildAerothermalViewerData.m\n M calcSurfaceHeating.m\n M createCaseConfig.m\n M rocketAeroHeatWorkbench.m\n M tests/verifyWebSectionExport.py\n M web/section.js\n M web/viewer.js\n?? calcKinneyAcreageHeating.m\n?? calcWeightedReferenceLength.m\n?? docs/PROJECT_GOALS_HISTORY_20261031.md\n?? docs/research/\n?? docs/validation/opencode_feature_retention/\n?? docs/validation/opencode_section_export/\n?? docs/validation/v104/\n?? tests/auditKinneyAcreage.py\n?? tests/studyEngineeringWholeSurface.m\n?? tests/studyKinneyActualRocket.m\n?? tests/testKinneyAcreageHeating.m\n?? tests/testKinneyViewer.js\n?? tests/testKinneyWorkbench.m\n?? tests/testRocketFeatureRetentionMatrix.m\n?? tests/testSectionExportReasons.js\n",
+  "archive": {
+    "path": "docs/PROJECT_GOALS_HISTORY_20261031.md",
+    "bytes": 511501,
+    "sha256": "340895314e883c062d9bf931e976a62b43d7ed6b12bda61a904f1047184f4c50",
+    "byteExact": true
+  },
+  "reviewedSources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "d55644bf2337879a38eea969dcd8728e822e3c3a2066da61a772a9553c4d83ed",
+      "bytes": 13601
+    },
+    {
+      "path": "docs/PROJECT_GOALS.md",
+      "sha256": "340895314e883c062d9bf931e976a62b43d7ed6b12bda61a904f1047184f4c50",
+      "bytes": 511501
+    },
+    {
+      "path": "docs/WORKFLOW_METHOD_SCOPE.md",
+      "sha256": "2ece7d8e2d55183816ab418e8c0bfcce1320173b061a2a6942c9b605fbbe73d2",
+      "bytes": 7935
+    },
+    {
+      "path": "docs/V61_STAGE_REVIEW.md",
+      "sha256": "84e2e31f6d69e6dd12e2b9bda39fb6fb6c86cd409fbe70c65e860d04af751d7c",
+      "bytes": 7711
+    },
+    {
+      "path": "docs/V61_ENERGY_AUDIT.md",
+      "sha256": "cd3584da680122269ca9e86ea8f0fb597b2dd6992d08a08a1975dd05f9c461a3",
+      "bytes": 10606
+    },
+    {
+      "path": "docs/REGIONAL_ALGORITHM_ROADMAP_2026-10-17.md",
+      "sha256": "cfcf23ac1c3d5bafc53d3bde5588da8d2484cf839b079cd0181095bf54e70854",
+      "bytes": 19438
+    },
+    {
+      "path": "docs/SHOCK_FITTED_INTERFACE_V103.md",
+      "sha256": "c28d739807c1d06f3ad6dd45343a261bf9a49aeac0b2bc6a5a5ab44dab0367bb",
+      "bytes": 9860
+    },
+    {
+      "path": "docs/AXISYMMETRIC_GRID_SENSITIVITY.md",
+      "sha256": "e88978d1dd526e584122e489d7f08f21699c0e38fdb5083d5c830e03abc5dfc1",
+      "bytes": 12922
+    },
+    {
+      "path": "runAeroHeatSingleCase.m",
+      "sha256": "cfa7745ac2e934bee3d0358797e74dae48bc17ec8fa3cd74ab40db174298cb68",
+      "bytes": 6369
+    },
+    {
+      "path": "modifiedNewtonianPressure.m",
+      "sha256": "5a7831d8f16e68ed00151ee7424df06f40a10015f8340c3056ea0fa1e518919c",
+      "bytes": 6970
+    },
+    {
+      "path": "solveExternalFlow.m",
+      "sha256": "dd782db549293e725c56ea2968bbe32165c8bcc5c3cb4ffec04bb5b1fc461807",
+      "bytes": 25235
+    },
+    {
+      "path": "traceSurfaceStreamlines.m",
+      "sha256": "9f687bb5a068db92d4a2bed6a1a19f324df190ed582ccf4878851b2c5acf213c",
+      "bytes": 7235
+    },
+    {
+      "path": "calcBoundaryLayerEdgeState.m",
+      "sha256": "b4ca4cc9ff921a23af9f3ae3cdb9900bf0be7ddaa376cb5d1806f84306b27929",
+      "bytes": 4788
+    },
+    {
+      "path": "calcBoundaryLayerState.m",
+      "sha256": "9f57be015880a8da84ca452767e14c8e211d121431d38098e04559a93c2765fe",
+      "bytes": 6514
+    },
+    {
+      "path": "calcSurfaceHeating.m",
+      "sha256": "adb435934121c1adc4baf279984319e5a16526391bd1e6b5b2f5a3985abf1039",
+      "bytes": 17877
+    },
+    {
+      "path": "calcKinneyAcreageHeating.m",
+      "sha256": "9a3b31ac9fd3e299c79a3653780bf3e43ff3b45861f91ab38ef87f72c18adda7",
+      "bytes": 6638
+    },
+    {
+      "path": "calcWeightedReferenceLength.m",
+      "sha256": "d14e6356ec1abb9f8d01015d474a97e427e9fd15df0364c25a5cf46548de043c",
+      "bytes": 5286
+    },
+    {
+      "path": "analyzeHeatingCoverage.m",
+      "sha256": "bb882de8f74de8fb4473412e4e71844bf8ed9a35e23cd00fbe45569dd763ecea",
+      "bytes": 7420
+    },
+    {
+      "path": "buildAerothermalViewerData.m",
+      "sha256": "07334a2751da926707edf82d16ccd2e6de8be0fb2c8fe0de6580a71970899b78",
+      "bytes": 27002
+    },
+    {
+      "path": "aeroHeatWorkflowState.m",
+      "sha256": "bba66cb8a8c17b438efc72baeeb2e2c9e45c63bf2910d575af976480151025ca",
+      "bytes": 21374
+    },
+    {
+      "path": "rocketAeroHeatWorkbench.m",
+      "sha256": "7406700a2eb2e8df10b995ef738aab46d5f89b71eb38051434b23a923d16bfe7",
+      "bytes": 40546
+    },
+    {
+      "path": "autoRemeshSurface.m",
+      "sha256": "32f840212045e0d1e470b4a7d92a8b59bfb7cc3d5546c09b1fd498c7297a9c9a",
+      "bytes": 91902
+    }
+  ],
+  "localEvidence": {
+    "baseline": {
+      "originalLocalPath": "outputs/v104_validation/baseline02/summary.json",
+      "sha256": "ab1e6e22e12ca7805cc30b199d0345e7fa499d3c62ce47bbf2cb4b8aa3ef31e7",
+      "summary": {
+        "status": "completed",
+        "condition": {
+          "altitude": 30000,
+          "Mach": 5,
+          "alpha": 20,
+          "beta": 0,
+          "Twall": 300
+        },
+        "faceCount": 19752,
+        "totalArea": 1.964629256571555,
+        "pressureComputedAreaFraction": 0.502710271897847,
+        "pressurePrescribedAreaFraction": 0.4972897281021527,
+        "pressureMissingAreaFraction": 0,
+        "heatComputedAreaFraction": 0.6656263274240231,
+        "loadsAvailable": true,
+        "scope": "当前工况工程链执行完成；面积审计不是区域求解，仍需检查各变量的未解、给定与模型适用范围。",
+        "elapsedSeconds": 7.2460818,
+        "heatingCoverage": {
+          "totalFaces": 19752,
+          "computedFaces": 13691,
+          "unresolvedFaces": 6061,
+          "totalArea": 1.964629256571555,
+          "computedArea": 1.307708956801513,
+          "unresolvedArea": 0.6569202997700421,
+          "computedAreaFraction": 0.6656263274240231,
+          "unresolvedAreaFraction": 0.33437367257597694
+        },
+        "reasonNames": [
+          "已计算",
+          "端盖/尾端",
+          "特征折角或拓扑问题",
+          "鼻端模型不适用",
+          "外流无有效解",
+          "准流线不连通",
+          "疑似层流分离及下游",
+          "层流相关式范围外",
+          "空气热物性模型范围外",
+          "其他未解限制",
+          "连续介质假设不适用",
+          "疑似湍流分离及下游",
+          "Head 积分失败及下游",
+          "壁温未知或超出热物性范围",
+          "上游外缘热力状态未解/域外占位影响"
+        ],
+        "areaByReason": [
+          1.307708956801513,
+          0.03127456561499915,
+          0.004702613657591935,
+          0.0038196063168188287,
+          0.05001822561099454,
+          0,
+          0.03946092604623699,
+          0.0013385253529173114,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.5263058371704927
+        ],
+        "countByReason": [
+          13691,
+          46,
+          46,
+          115,
+          336,
+          0,
+          360,
+          11,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5147
+        ],
+        "sourceInput": "E:\\RocketAeroHeat\\tests\\data\\shock_layer_entry\\actual_rocket_geometry_and_freestream.mat",
+        "thermalModel": "thermallyPerfect",
+        "heatMethod": "Eckert 参考温度 + 沿流线 Thwaites 型层流积分/湍流积分 + Reynolds 比拟 + 干空气 NASA7/低温振动冻结焓恢复与等效比热",
+        "completePhysicalSolution": false
+      }
+    },
+    "selectedMethod": {
+      "originalLocalPath": "outputs/v104_validation/actual03/summary.json",
+      "sha256": "4f85e68ed2acdcf2c4f17583345107047fa2280477a27413b59e53d8205596cd",
+      "summary": {
+        "status": "completed",
+        "Mach": 5,
+        "alphaDeg": 20,
+        "altitudeM": 30000,
+        "prescribedWallTemperatureK": 300,
+        "faceCount": 19752,
+        "totalArea": 1.964629256571555,
+        "baselineHeatAreaFraction": 0.6656263274240191,
+        "selectedHeatAreaFraction": 0.6656263274240191,
+        "newlyComputedHeatArea": 0,
+        "prefixAssumedArea": 0,
+        "originAssumedArea": 1.2987844295290303,
+        "entryAssumedArea": 1.2987844295290303,
+        "sourceURL": "https://ntrs.nasa.gov/citations/20070017947",
+        "experimentalValidation": false,
+        "completePhysicalSolution": false,
+        "areaWeightedRelativeHeatDifference": 0.452129305091177,
+        "coverage": {
+          "totalFaces": 19752,
+          "computedFaces": 13691,
+          "unresolvedFaces": 6061,
+          "totalArea": 1.964629256571555,
+          "computedArea": 1.307708956801513,
+          "unresolvedArea": 0.6569202997700421,
+          "computedAreaFraction": 0.6656263274240231,
+          "unresolvedAreaFraction": 0.33437367257597694
+        }
+      }
+    },
+    "independentFormulaAudit": {
+      "originalLocalPath": "docs/validation/v104/independent_final_physics_audit.json",
+      "sha256": "9c01c17d387f1b985b5f30bf207254d75548bdfcb15ccd038265610a59d3ae61",
+      "summary": {
+        "status": "passed",
+        "faceCount": 19752,
+        "acceptedSidewallFaces": 11880,
+        "integralConstraintFaces": 12988,
+        "checkedValues": 242140,
+        "defaultHeatAreaFraction": 0.6656263274240186,
+        "selectedHeatAreaFraction": 0.6656263274240186,
+        "newlyComputedHeatArea": 0.0,
+        "blockedStateFaces": 5483,
+        "source": "Kinney 2007 II.I printed pages 4-5; source formulas, graph constraints and snapshot identities",
+        "experimentalValidation": false,
+        "completePhysicalSolution": false,
+        "auditorSHA256": "7fdbfc99bc22ff0b3137a1e86c4350847f6c0109c7b1daf9f8b256fdf89be6d1"
+      }
+    },
+    "nodeViewerContract": {
+      "originalLocalPath": "docs/validation/v104/viewer_contract.json",
+      "sha256": "d9727f0f9c0d920af9d71f1ac36e8576b13fe6b97aaea2ca4ab220598c9916cf",
+      "summary": {
+        "status": "passed",
+        "faceCount": 19752,
+        "fields": 10,
+        "probes": 197520,
+        "sourceFaces": 11880,
+        "sectionExports": 40,
+        "totalRows": 3220,
+        "missingRows": 818,
+        "comparisonRange": [
+          0,
+          382.1112188517973
+        ],
+        "sections": [
+          {
+            "x": -2.1087399677407452,
+            "rows": 92,
+            "missing": 34
+          },
+          {
+            "x": -1.389159981398458,
+            "rows": 46,
+            "missing": 17
+          },
+          {
+            "x": -0.6695799950561709,
+            "rows": 92,
+            "missing": 39
+          },
+          {
+            "x": -1,
+            "rows": 92,
+            "missing": 34
+          }
+        ],
+        "rendererAssets": "E:\\RocketAeroHeat\\outputs\\v104_validation\\published_workbench04",
+        "webGLClaimedByNode": false
+      }
+    },
+    "nativeWorkflow": {
+      "originalLocalPath": "outputs/v104_validation/workflow02/summary.json",
+      "sha256": "fab9217cb6326da25ab8e8660ba5fcebb1fe8361d99fd1ef6cd058842cf121fa",
+      "summary": {
+        "status": "passed",
+        "steps": 5,
+        "faceCount": 19752,
+        "selectedSidewallFaces": 11880,
+        "heatAreaFraction": 0.6656263274240231,
+        "methodsRecomputed": 2,
+        "singleHost": true,
+        "nativeWebGLRenderClaimed": false,
+        "scope": "隐藏宿主验证真实控件回调/计算/数据，实际三维显示另用浏览器核验"
+      }
+    },
+    "interruptedRegression": {
+      "originalLocalPath": "outputs/v104_validation/kinney_regression01_interruption.json",
+      "sha256": "d7baba8a185328511ac7fa583c38df7518302dac7248b707455b9fe841fed105",
+      "summary": {
+        "status": "intentional-current-scope-interruption",
+        "task": "kinney_regression01",
+        "engineProcessID": 11136,
+        "launcherProcessID": 33588,
+        "observedLiveBeforeStop": true,
+        "reason": "旧testSurfaceHeating包含长壁温/飞行热历史；停止后置范围，不作为通过回归。保留原日志与实际退出码，另做单时刻合同核验。",
+        "requestedUTC": "2026-10-31T08:07:25.9736663Z",
+        "claimedPassed": false
+      }
+    }
+  },
+  "processReceipts": [
+    {
+      "path": "outputs/v104_validation/engineering_baseline01_process.json",
+      "sha256": "c3b1b94a9edbaa20c4458a0ccd89a13fef3ec0260b548777371b726142968f17",
+      "status": "terminal",
+      "exitCode": 1,
+      "sourceStableAfter": {
+        "comparedFiles": 1249,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T05:15:58.778442+00:00",
+      "endedUTC": "2026-10-31T05:16:26.893911+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/engineering_baseline02_process.json",
+      "sha256": "456c559bf953045bfa041eb318afe1fc38f854569908a7c12b7f128799395ba6",
+      "status": "terminal",
+      "exitCode": 0,
+      "sourceStableAfter": {
+        "comparedFiles": 1249,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T05:17:58.130618+00:00",
+      "endedUTC": "2026-10-31T05:18:21.958774+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_actual01_process.json",
+      "sha256": "d59696f729aee8137611a4bbd05a82927a655d36ecb77a07eb6e9aaf8022e58c",
+      "status": "terminal",
+      "exitCode": 0,
+      "sourceStableAfter": {
+        "comparedFiles": 1253,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T07:52:50.962798+00:00",
+      "endedUTC": "2026-10-31T07:53:16.866911+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_actual02_process.json",
+      "sha256": "e8543e6efea336a2a61179323710c5347f504cc4975b8c305cffcf8c187ce52e",
+      "status": "terminal",
+      "exitCode": 1,
+      "sourceStableAfter": {
+        "comparedFiles": 1255,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T08:08:29.501978+00:00",
+      "endedUTC": "2026-10-31T08:08:54.220176+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_actual03_process.json",
+      "sha256": "8ae6ee2bde0a1cd2f3ad2ae0c11d5053bff06a753a9ed803e22d1f52992ddb2b",
+      "status": "terminal",
+      "exitCode": 0,
+      "sourceStableAfter": {
+        "comparedFiles": 1255,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T08:11:06.314797+00:00",
+      "endedUTC": "2026-10-31T08:11:34.393253+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_export04_process.json",
+      "sha256": "0ea69354845b8d3083a609d5f2023100beff386934d321401f96c210812d1351",
+      "status": "terminal",
+      "exitCode": 0,
+      "sourceStableAfter": {
+        "comparedFiles": 1255,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T08:13:59.711294+00:00",
+      "endedUTC": "2026-10-31T08:14:16.273902+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_regression01_process.json",
+      "sha256": "a2d3fe702dc7f7583f7df8704b28da94844f9d1866a8dfb46cd26771cc6566bc",
+      "status": "terminal",
+      "exitCode": 4294967295,
+      "sourceStableAfter": {
+        "comparedFiles": 1254,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T07:58:35.201257+00:00",
+      "endedUTC": "2026-10-31T08:07:28.268460+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_tests01_process.json",
+      "sha256": "4802861711256987239a6a78f9be9a69b9667f3332ec946a2806f36ad4741b51",
+      "status": "terminal",
+      "exitCode": 0,
+      "sourceStableAfter": {
+        "comparedFiles": 1252,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T07:52:40.974797+00:00",
+      "endedUTC": "2026-10-31T07:53:00.528332+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_tests02_process.json",
+      "sha256": "2b4830dc23ec138be740f05b9ab2fa1fb0a56a1d6c28bd18e3faf190b4f67697",
+      "status": "terminal",
+      "exitCode": 1,
+      "sourceStableAfter": {
+        "comparedFiles": 1254,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T08:08:19.295161+00:00",
+      "endedUTC": "2026-10-31T08:08:35.448050+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_tests03_process.json",
+      "sha256": "480399f0f6159e1a917ee2abaf3b43c73fef68ae64a0d1fac8dfc4aa8d0aeacd",
+      "status": "terminal",
+      "exitCode": 0,
+      "sourceStableAfter": {
+        "comparedFiles": 1254,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T08:10:56.141100+00:00",
+      "endedUTC": "2026-10-31T08:11:15.234312+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_workbench01_process.json",
+      "sha256": "5b3e3aec688eb2bdf324505e619704de13df91acb217ac8362413ac7d023be81",
+      "status": "terminal",
+      "exitCode": 0,
+      "sourceStableAfter": {
+        "comparedFiles": 1255,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T07:58:23.629935+00:00",
+      "endedUTC": "2026-10-31T07:59:15.024192+00:00"
+    },
+    {
+      "path": "outputs/v104_validation/kinney_workbench02_process.json",
+      "sha256": "1fddae15e39f40e6267a8d7165b06ad79b22df624ea71a94488e9276babf3ea7",
+      "status": "terminal",
+      "exitCode": 0,
+      "sourceStableAfter": {
+        "comparedFiles": 1255,
+        "allStable": true,
+        "unstablePaths": []
+      },
+      "startedUTC": "2026-10-31T08:11:16.709107+00:00",
+      "endedUTC": "2026-10-31T08:11:58.794056+00:00"
+    }
+  ]
+}
