@@ -1,0 +1,98 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T21:06:40.046378+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 30,
+    "dryRun": false,
+    "sourceFiles": [
+      "scripts/prepareSU2SSTOutputProbe.py",
+      "docs/validation/v126/PLAN.md"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\engine_request.json": "c9aeb79fade7d9e48ab160b93bb64a7ee0911493771679b16c1bb506d2371f54",
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\case.cfg": "7f4b8ec5f5a5629ab2037ea00b146394ae4f3c998839581c976f31bd461a685e",
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\mesh.su2": "6da5a82753055fb935872ac656dc8205ba973d4b16127f5297cf88d38fd77472",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "efb8413ce92f6c6d17062b3d98f1c2ca75ea105853b6481998eafd50db5743fb",
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\case_manifest.json": "d0a0825dc4895cecc2a06f9feb32fcb71db03ce171945ccc2392678509b6b662",
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\sst_contract.json": "2db3abafb0bd277f3ae2b532e9cb2c042f72beb03c6553b5fc9cc5ea1cd47e1b",
+    "E:\\RocketAeroHeat\\scripts\\su2SSTInterface.py": "6ada12ac43eabbb6ae0c4247dfd3c1ad38340fe64bcc945c6d5ddc034d2e32b5",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": "c8808eb2abb1ace016904fa72e21eb58e7f71b5f29715b6b1855b02178d77dbf",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "37cde4a161b2b7ca94facee460d15c74bce6be20743ec5879bc12144ddab1266",
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2SSTOutputProbe.py": "b06af9a44bcf63ea84faedb17782340d90cd685851788b119e1f1a370cd7d59b",
+    "E:\\RocketAeroHeat\\docs\\validation\\v126\\PLAN.md": "761ffe85736291367a51482a7c0b3cca831cf48c1136e38d4be101e83e048430"
+  },
+  "executableVersion": "8.6.0",
+  "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+  "supervisorProcessID": 51840,
+  "physicalSolutionQualified": false,
+  "runtimeFlavor": "official",
+  "physicsModel": {
+    "schemaVersion": 1,
+    "model": "SST-2003m",
+    "assumption": "fully-turbulent; transition unknown",
+    "intensity": 0.01,
+    "viscosityRatio": 10.0,
+    "Prt": 0.9,
+    "provenance": "controlled full-turbulent interface assumption; not flight measurement",
+    "kInfinity": 289.34929296,
+    "omegaInfinity": 91007.50909892768,
+    "wallTreatment": "resolved smooth wall; no wall function",
+    "thermodynamics": "calorically-perfect ideal gas",
+    "turbulentConvection": "first-order scalar upwind",
+    "compressibilityCorrection": "none",
+    "physicsQualified": false,
+    "newQualifiedArea": 0,
+    "initialization": "native uniform freestream; wall BC imposed by solver",
+    "configurationSHA256": "7f4b8ec5f5a5629ab2037ea00b146394ae4f3c998839581c976f31bd461a685e",
+    "meshSHA256": "6da5a82753055fb935872ac656dc8205ba973d4b16127f5297cf88d38fd77472",
+    "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1"
+  },
+  "processID": 11052,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 0.28100000000267755,
+  "progress": {
+    "Inner_Iter": 2.0,
+    "rms[Rho]": -3.508507285,
+    "rms[RhoE]": 4.394771302,
+    "HF": 810894.0824
+  },
+  "exitCode": 0,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T21:06:40.321699+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v126_validation\\format01\\sst_contract.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2SSTInterface.py": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2SSTOutputProbe.py": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v126\\PLAN.md": true
+  },
+  "outputSHA256": {
+    "engine_stdout.log": "0dd198a5bd469b1ed96e0550e79aa9efafe191376daf33eb6b8e887a323cec80",
+    "history.csv": "aefa3c0383429467e2134022ecd06c40697ff04cbb1ae1ed5f61f48bdfc27dcb",
+    "restart_flow.csv": "cbd7ac414557306da5258575eb40952fc17557b33e60645988f4a673336562ac",
+    "restart_flow_000001.csv": "436dcd503cca0a3015108584b745e7123ae8f98415198bb8980d7471b546df5e",
+    "restart_flow_000002.csv": "cbd7ac414557306da5258575eb40952fc17557b33e60645988f4a673336562ac",
+    "surface_flow.vtk": "5ffe48f19a8e2e7f8b1d82f406021ad3606f1d642ba6ae5476e17cec66a0d246",
+    "surface_flow_000001.vtk": "16cb7755edb3de4d2b1208d4fe15809662782810234218dbffa093867835d68a",
+    "surface_flow_000002.vtk": "5ffe48f19a8e2e7f8b1d82f406021ad3606f1d642ba6ae5476e17cec66a0d246"
+  }
+}

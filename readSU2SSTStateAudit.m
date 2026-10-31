@@ -19,6 +19,10 @@ if isfield(receipt.physicsModel,'diagnosticOnly') && receipt.physicsModel.diagno
     assert(summary.diagnosticOnly && summary.checkpointLocalIteration==0 && ~summary.originalResidualThresholdPassed);
     assert(strcmp(summary.thermalStatePhase,'updated-flow-with-input-k; single diagnostic update only'));
 end
+if isfield(receipt.physicsModel,'outputStateContract')
+    assert(strcmp(summary.thermalStatePhase,receipt.physicsModel.outputStateContract));
+    assert(summary.fullPrimitiveEOSRelativeError<2e-12 && summary.nativePrecisionHeatGradientError<2e-6);
+end
 summary.auditSHA256=sha(path);
 end
 function h=sha(file)

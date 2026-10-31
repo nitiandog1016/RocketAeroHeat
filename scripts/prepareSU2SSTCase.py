@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse,json,re
 import numpy as np
 from prepareSU2CheckpointContinuation import config,CONTROL,sha,read,ROOT
-from su2SSTInterface import state,wall_geometry
+from su2SSTInterface import state,wall_geometry,PHASE_OUTPUT
 
 
 def set_value(text,key,value):
@@ -32,17 +32,22 @@ def prepare(folder,source=None,intensity=.01,viscosity_ratio=10.,prt=.9,provenan
         intensity=intensity,viscosityRatio=viscosity_ratio,Prt=prt,provenance=provenance,
         kInfinity=kinf,omegaInfinity=omega,wallTreatment='resolved smooth wall; no wall function',
         thermodynamics='calorically-perfect ideal gas',turbulentConvection='first-order scalar upwind',
-        compressibilityCorrection='none',physicsQualified=False,newQualifiedArea=0)
+        compressibilityCorrection='none',physicsQualified=False,newQualifiedArea=0,outputStateContract=PHASE_OUTPUT)
     text=(folder/'case.cfg').read_text(encoding='utf-8-sig')
     changes={'SOLVER':'RANS','KIND_TURB_MODEL':'SST','SST_OPTIONS':'V2003m',
         'FREESTREAM_TURBULENCEINTENSITY':format(intensity,'.17g'),'FREESTREAM_TURB2LAMVISCRATIO':format(viscosity_ratio,'.17g'),
         'TURBULENT_CONDUCTIVITY_MODEL':'CONSTANT_PRANDTL_TURB','PRANDTL_TURB':format(prt,'.17g'),
         'CONV_NUM_METHOD_TURB':'SCALAR_UPWIND','MUSCL_TURB':'NO','TIME_DISCRE_TURB':'EULER_IMPLICIT','CFL_REDUCTION_TURB':'1.0',
         'CONV_FIELD':'(RMS_DENSITY, RMS_ENERGY, RMS_TKE, RMS_DISSIPATION)',
-        'WRT_RESTART_OVERWRITE':'NO','WRT_SURFACE_OVERWRITE':'NO'}
+        'WRT_RESTART_OVERWRITE':'NO','WRT_SURFACE_OVERWRITE':'NO','WRT_RESTART_COMPACT':'NO',
+        'VOLUME_OUTPUT':'(COORDINATES, SOLUTION, PRIMITIVE)'}
     if source is not None:
         source=Path(source).resolve();source.relative_to(ROOT/'outputs');assert source!=folder
         r=read(source/'engine_process.json');a=config(source/'case.cfg')
+        if a.get('SOLVER')=='RANS':
+            from prepareSU2SSTCheckpoint import prepare as prepare_checkpoint
+            for key,value in changes.items():text=set_value(text,key,value)
+            return prepare_checkpoint(folder,source,text,contract,manifest)
         assert r['status']=='terminal' and r['exitCode']==0 and not r['timedOut'] and not r['cancelled']
         assert all(r['inputsStable'].values()) and r['runtimeFlavor']=='official'
         assert {k:v for k,v in a.items() if k not in CONTROL}=={k:v for k,v in b.items() if k not in CONTROL}, '源场与目标的原物理/数值输入不一致'

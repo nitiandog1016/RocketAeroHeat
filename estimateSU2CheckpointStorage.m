@@ -12,8 +12,8 @@ validateattributes(every,{'numeric'},{'scalar','integer','positive'});
 validateattributes(named,{'logical'},{'scalar'});
 every=min(iterations,every);wallNodes=numel(unique([volume.wall{:}]));
 pairBytes=240*size(volume.vertices,1)+600*wallNodes+1024^2;
-% SST新增两列状态及湍流壁面字段，不能沿用层流体量低估保存预算。
-if strcmp(flowModel,'SST-2003m'),pairBytes=296*size(volume.vertices,1)+640*wallNodes+1024^2;end
+% 新SST非紧凑文件同时保留高精度primitive；旧紧凑估计会低估真实保存成本。
+if strcmp(flowModel,'SST-2003m'),pairBytes=640*size(volume.vertices,1)+720*wallNodes+1024^2;end
 indexedPairs=0;if named,indexedPairs=floor((iterations-1)/every)+2;end
 budget=struct('estimatedBytes',(1+indexedPairs)*pairBytes,'estimatedPairBytes',pairBytes, ...
     'maximumIndexedPairs',indexedPairs,'limitBytes',limitMiB*1024^2, ...

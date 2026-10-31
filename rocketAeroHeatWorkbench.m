@@ -257,7 +257,7 @@ renderEditor();sync();showGeometry(true);
                         tip(grid,45,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
                     end
                     % 初猜不是流场解；显式研究选项只对已核对的混合域和等温壁开放。
-                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究','定比热源场转HEOS','层流源场转SST'}, ...
+                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究','定比热源场转HEOS','层流或已审核SST源场'}, ...
                         {'freestream','wallEnthalpy','checkpoint','propertyTransfer','sstTransfer'},getOption(c.su2,'initialMode','freestream'));
                     controls.initialThickness=numberField(grid,29,'初猜厚度 / mm',1000*getOption(c.su2,'initialThicknessM',.001),[.001 1000]);
                     controls.checkpointLimit=numberField(grid,30,'检查点上限 / MiB',getOption(c.su2,'checkpointLimitMiB',100),[1 1024]);
@@ -279,8 +279,11 @@ renderEditor();sync();showGeometry(true);
                     controls.turbulentPrandtl=numberField(grid,50,'湍流 Prt',getOption(c.su2,'turbulentPrandtl',.9),[.01 10]);
                     controls.turbulenceProvenance=textField(grid,51,'湍流参数来源',getOption(c.su2,'turbulenceProvenance','全湍流受控研究假设；非飞行测量，转捩未知'));
                     for key={'turbulenceIntensity','turbulentViscosityRatio','turbulentPrandtl','turbulenceProvenance'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
-                    tip(grid,53,'SST仅定比热/统一给定Tw；使用上方“源检查点目录”的同网格层流场作为新模型初猜。I是比例（0.01=1%），ω/总能量与有效y+独立审核；初态与后验各自有预算。');
+                    tip(grid,53,'SST仅定比热/统一给定Tw。可用同网格层流初猜，或已通过阶段审核的SST源场；后者保留原物理/离散配置。I为比例，p/T热流阶段与更新k/ω分别保存审核。');
                     tip(grid,57,'全湍流是计算假设；没有转捩或壁温解。SST和HEOS不可组合；研究值未通过网格/外域/公开热流验证，不计新增合格面积。');
+                    controls.boundaryLayout=struct('grid',grid,'items',grid.Children, ...
+                        'rows',arrayfun(@(x)x.Layout.Row(1),grid.Children));
+                    layoutEmbeddedBoundary();
                     sync();return;
                 end
                 grid=form(24+12*methodDetailsOpen);c=state.cfg;
@@ -557,8 +560,8 @@ renderEditor();sync();showGeometry(true);
             if ~strcmp(flow,'laminar') || isfield(next.su2,'flowModel'),next.su2.flowModel=flow;end
             if strcmp(flow,'SST-2003m')
                 assert(strcmp(property,'idealGas'),'HEOS RANS尚未适配，请使用定比热SST研究。');
-                assert(strcmp(thermal,'isothermal') && strcmp(initial,'sstTransfer') && named,'SST需要统一壁温、层流转SST初猜及具名保存。');
-                assert(isfile(fullfile(source,'engine_process.json')),'请选择同网格层流源场；启动时核对原始身份。');
+                assert(strcmp(thermal,'isothermal') && strcmp(initial,'sstTransfer') && named,'SST需要统一壁温、有效源场及具名保存。');
+                assert(isfile(fullfile(source,'engine_process.json')),'请选择同网格层流或已审核SST源场；启动时核对原始身份。');
                 next.su2.turbulenceIntensity=controls.turbulenceIntensity.Value;
                 next.su2.turbulentViscosityRatio=controls.turbulentViscosityRatio.Value;
                 next.su2.turbulentPrandtl=controls.turbulentPrandtl.Value;
@@ -631,6 +634,7 @@ renderEditor();sync();showGeometry(true);
     end
     function boundaryEdited(~,~)
         if state.busy || preparing,return;end
+        if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
             if isEmbedded() && isfield(controls,'storageEstimate'),controls.storageEstimate.Text=checkpointBudgetText(state.cfg);end
@@ -639,6 +643,28 @@ renderEditor();sync();showGeometry(true);
         catch ex
             state=aeroHeatWorkflowState('invalidateBoundary',state);report=[];showGeometry(false);showError(ex);
         end
+    end
+    function layoutEmbeddedBoundary()
+        % 模块用途：把物性/流动模型放在顶部，仅显示当前模型需要的来源和参数，去掉空白行。
+        b=controls.boundaryLayout;sst=strcmp(controls.flowModel.Value,'SST-2003m');
+        heos=strcmp(controls.thermodynamics.Value,'HEOS-Air');axial=strcmp(controls.thermalMode.Value,'axialTemperature');
+        initial=controls.initialMode.Value;source=ismember(initial,{'checkpoint','sstTransfer'});
+        order=[1 47 2:6 11 12 28 29 31 32 36 37 48:51 7:10 30 13 14 18 21 24 33 38 41 45 53 57];
+        hidden=[];
+        if ~sst,hidden=[hidden 48:51 53 57];end
+        if ~heos,hidden=[hidden 36:38 41];end
+        if ~axial,hidden=[hidden 12 21];end
+        if ~strcmp(initial,'wallEnthalpy'),hidden=[hidden 29];end
+        if ~source,hidden=[hidden 31:33];end
+        order=order(~ismember(order,hidden) & ismember(order,b.rows));
+        for j=1:numel(b.items)
+            row=find(order==b.rows(j));
+            if isempty(row),b.items(j).Visible='off';b.items(j).Layout.Row=1;
+            else,b.items(j).Visible='on';b.items(j).Layout.Row=row;end
+        end
+        height=repmat({31},1,numel(order));
+        for j=find(ismember(order,[14 18 21 24 33 38 41 45 53 57])),height{j}=90;end
+        b.grid.RowHeight=height;
     end
     function confirmBoundary(~,~)
         if state.busy || preparing,return;end

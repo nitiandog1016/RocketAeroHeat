@@ -5,14 +5,27 @@ import numpy as np
 from scipy.spatial import cKDTree
 
 
-def state(path, turbulent):
-    """按具名列绑定ρE、k/ω；额外未知列也拒绝，避免把ω当能量。"""
+PHASE_OUTPUT='native-noncompact-flow-primitive-before-turbulence-v1'
+
+
+def phase_columns(nd):
+    """固定官方输出注册顺序，二维/三维分开；未知扩展列仍拒绝。"""
+    axes=['x','y','z'][:nd]
+    return ['Pressure','Temperature','Mach','Pressure_Coefficient']+['Velocity_'+s for s in axes]+[
+        'Laminar_Viscosity']+['Skin_Friction_Coefficient_'+s for s in axes]+['Heat_Flux','Y_Plus','Eddy_Viscosity']
+
+
+def state(path, turbulent, phase_output=False):
+    """按具名列绑定ρE、k/ω；只有显式合同才读取同次保存的原生primitive。"""
     with Path(path).open(encoding='utf-8-sig') as f:
         keys=next(csv.reader(f))
     nd=3 if 'z' in keys else 2
     expected=['PointID','x','y']+(['z'] if nd==3 else [])+['Density','Momentum_x','Momentum_y']
     if nd==3:expected+=['Momentum_z']
     expected+=['Energy']+(['Turb_Kin_Energy','Omega'] if turbulent else [])
+    if phase_output:
+        assert turbulent
+        expected+=phase_columns(nd)
     assert keys==expected, '重启动列名/模型不匹配：'+str(keys)
     a=np.loadtxt(str(path),delimiter=',',skiprows=1)
     assert a.ndim==2 and a.shape[1]==len(keys) and np.isfinite(a).all()

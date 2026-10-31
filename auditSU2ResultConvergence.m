@@ -84,6 +84,14 @@ try
         assert(all(ismember({'RMS_DENSITY','RMS_ENERGY','RMS_TKE','RMS_DISSIPATION'},selected)));
         expected=[expected,{'Turb_Kin_Energy','Omega'}];
     end
+    nativePrimitive=sst && isfield(receipt.physicsModel,'outputStateContract');
+    if nativePrimitive
+        assert(strcmp(receipt.physicsModel.outputStateContract,'native-noncompact-flow-primitive-before-turbulence-v1'));
+        axes={'x','y','z'};axes=axes(1:nd);
+        expected=[expected,{'Pressure','Temperature','Mach','Pressure_Coefficient'}, ...
+            strcat('Velocity_',axes),{'Laminar_Viscosity'},strcat('Skin_Friction_Coefficient_',axes), ...
+            {'Heat_Flux','Y_Plus','Eddy_Viscosity'}];
+    end
     assert(isequal(cols,expected),'重启动列名与模型不一致。');
     rest=readmatrix(restart,'NumHeaderLines',1);assert(size(rest,2)==numel(cols));
     assert(all(isfinite(rest(:))) && isequal(rest(:,1),(0:size(rest,1)-1)'),'重启动不完整。');
@@ -97,6 +105,13 @@ try
     if contains(config,'FLUID_MODEL= IDEAL_GAS')
         assert(all(internal>0));gamma=number(config,'GAMMA_VALUE');R=number(config,'GAS_CONSTANT');
         temperature=internal*(gamma-1)/R;pressure=rho.*temperature*R;
+        if nativePrimitive
+            % 更新后的k用于重启动正状态核对，壁热primitive使用同次原生保存的p/T。
+            audit.savedCurrentKTemperatureRangeK=[min(temperature) max(temperature)];
+            temperature=rest(:,strcmp(cols,'Temperature'));pressure=rest(:,strcmp(cols,'Pressure'));
+            assert(all(temperature>0 & pressure>0) && max(abs(pressure./(rho.*R.*temperature)-1))<2e-12);
+            audit.thermalStateAudit=readSU2SSTStateAudit(folder,receipt);
+        end
     elseif contains(config,'FLUID_MODEL= COOLPROP')
         [pressure,temperature,thermo]=readSU2CoolPropStateAudit(folder,receipt,rest);
         audit.thermodynamicModel=thermo.thermodynamicModel;audit.thermodynamicAudit=thermo;
@@ -166,6 +181,11 @@ try
             assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
             audit.thermalStateAudit=readSU2SSTStateAudit(folder,receipt);
             audit.turbulenceDiagnostic=lineage;
+        elseif strcmp(lineage.kind,'same-mesh-SST-checkpoint-research')
+            assert(lineage.sameMesh && lineage.samePhysicsAndNumerics && lineage.localIterationStartsAt==0);
+            assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            audit.turbulenceRestart=lineage;
         else
             assert(strcmp(lineage.kind,'same-mesh-laminar-to-SST-initial-guess'));
             assert(lineage.newPhysicsLocalIterationStartsAt==0 && ~lineage.samePhysicsAndNumerics);

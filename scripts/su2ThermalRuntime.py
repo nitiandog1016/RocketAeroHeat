@@ -59,7 +59,7 @@ def resolve(folder,config):
 
 def validate_sst_manifest(folder,data,config):
     """禁止仅切换RANS后沿用层流能量、标签或残差；所有显式合同由真实进程锁定。"""
-    from su2SSTInterface import state
+    from su2SSTInterface import state,PHASE_OUTPUT
     pairs=re.findall(r'^\s*([A-Z0-9_]+)\s*=\s*([^%\r\n]+)',config,re.M)
     assert len(pairs)==len(dict(pairs));c={k:v.strip() for k,v in pairs}
     path=folder/'sst_contract.json';contract=read(path)
@@ -77,6 +77,9 @@ def validate_sst_manifest(folder,data,config):
     assert c.get('TIME_DOMAIN','NO')=='NO' and 'MARKER_ISOTHERMAL' in c and 'MARKER_HEATFLUX' not in c
     assert set(re.findall(r'RMS_\w+',c['CONV_FIELD']))=={'RMS_DENSITY','RMS_ENERGY','RMS_TKE','RMS_DISSIPATION'}
     assert float(c['CONV_RESIDUAL_MINVAL'])==-8
+    if 'outputStateContract' in contract:
+        assert contract['outputStateContract']==PHASE_OUTPUT and c['WRT_RESTART_COMPACT']=='NO'
+        assert c['VOLUME_OUTPUT']=='(COORDINATES, SOLUTION, PRIMITIVE)'
     for k,q in [('FREESTREAM_TURBULENCEINTENSITY','intensity'),('FREESTREAM_TURB2LAMVISCRATIO','viscosityRatio'),('PRANDTL_TURB','Prt')]:
         assert math.isfinite(contract[q]) and float(c[k])==contract[q] and contract[q]>0
     locked={str(folder/'case_manifest.json'):sha(folder/'case_manifest.json'),str(path):sha(path),
@@ -87,10 +90,14 @@ def validate_sst_manifest(folder,data,config):
         init=read(path);assert init==data['initialization']
         if init['kind']=='same-mesh-laminar-to-SST-initial-guess':
             assert init['sameMesh'] and not init['samePhysicsAndNumerics'] and init['newPhysicsLocalIterationStartsAt']==0
+        elif init['kind']=='same-mesh-SST-checkpoint-research':
+            from prepareSU2SSTCheckpoint import validate_source
+            locked.update(validate_source(folder,c,init))
         else:
             from prepareSU2SSTPhaseProbe import validate_source
             locked.update(validate_source(init,folder,c))
-        assert sha(folder/'initial_flow.csv')==init['initialStateSHA256'];state(folder/'initial_flow.csv',True)
+        assert sha(folder/'initial_flow.csv')==init['initialStateSHA256']
+        state(folder/'initial_flow.csv',True,init.get('sourceStateHasNativePrimitive',False))
         for p,h in init['sourceSHA256'].items():assert sha(Path(p))==h
         locked[str(path)]=sha(path)
     else:assert c['RESTART_SOL']=='NO' and 'initializationSHA256' not in contract

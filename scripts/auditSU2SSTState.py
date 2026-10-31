@@ -6,7 +6,7 @@ from scipy.spatial import cKDTree
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from prepareSU2CheckpointContinuation import sha,read,config
-from su2SSTInterface import wall_geometry
+from su2SSTInterface import wall_geometry,state,PHASE_OUTPUT
 def vtk_tokens(path):
     """只读本项目要求的原生ASCII节点场，不按文件名猜物理含义。"""
     with path.open() as f:
@@ -36,10 +36,8 @@ def audit(folder,actual_surface=False):
         assert sha(folder/name)==r['inputSHA256'][str(folder/name)]
     for name in ('restart_flow.csv','surface_flow.vtk','history.csv'):
         assert sha(folder/name)==r['outputSHA256'][name]
-    with (folder/'restart_flow.csv').open() as f:cols=next(csv.reader(f))
-    a=np.loadtxt(str(folder/'restart_flow.csv'),delimiter=',',skiprows=1)
-    nd=3 if 'z' in cols else 2;assert len(cols)==2*nd+5
-    assert np.isfinite(a).all() and np.array_equal(a[:,0],np.arange(len(a)))
+    extended=r['physicsModel'].get('outputStateContract')==PHASE_OUTPUT
+    a,cols,nd,_,_,_=state(folder/'restart_flow.csv',True,extended)
     rho=a[:,cols.index('Density')];E=a[:,cols.index('Energy')]/rho
     uv=np.column_stack([a[:,cols.index('Momentum_'+v)]/rho for v in ['x','y','z'][:nd]])
     k=a[:,cols.index('Turb_Kin_Energy')];w=a[:,cols.index('Omega')]
@@ -50,7 +48,6 @@ def audit(folder,actual_surface=False):
     if initialization.get('kind')=='same-mesh-SST-single-step-phase-diagnostic':
         # 单步的输入k是已知的上一个耦合阶段。普通稀疏保存的多步结果不能套用此分支。
         from prepareSU2SSTPhaseProbe import validate_source
-        from su2SSTInterface import state
         validate_source(initialization,folder,c)
         for path,h in initialization['sourceSHA256'].items():assert sha(Path(path))==h
         assert sha(folder/'initial_flow.csv')==r['inputSHA256'][str(folder/'initial_flow.csv')]
@@ -60,6 +57,13 @@ def audit(folder,actual_surface=False):
         assert min(stageThermal)>0
         phase='updated-flow-with-input-k; single diagnostic update only'
     T=stageThermal*(gamma-1)/R;p=rho*R*T
+    primitiveEOS=None
+    if extended:
+        assert c['WRT_RESTART_COMPACT']=='NO' and c['VOLUME_OUTPUT']=='(COORDINATES, SOLUTION, PRIMITIVE)'
+        T=a[:,cols.index('Temperature')];p=a[:,cols.index('Pressure')]
+        assert min(T)>0 and min(p)>0
+        primitiveEOS=float(max(abs(p/(rho*R*T)-1)));assert primitiveEOS<2e-12
+        phase=PHASE_OUTPUT
     g=wall_geometry(folder/'mesh.su2');xyz,f=vtk_tokens(folder/'surface_flow.vtk')
     points=np.column_stack([a[:,1:nd+1],np.zeros((len(a),3-nd))]);d,ids=cKDTree(points).query(xyz)
     assert max(d)<1e-6 and set(ids)==set(g['wallIDs']);order={v:i for i,v in enumerate(g['wallIDs'])};ix=np.array([order[j] for j in ids])
@@ -75,6 +79,10 @@ def audit(folder,actual_surface=False):
     cp=gamma*R/(gamma-1)
     q=viscosity*cp/float(c['PRANDTL_LAM'])*(T[g['normalNeighbor'][ix]]-Tw)/g['thermalDistance'][ix]
     heatError=float(max(abs(q-f['Heat_Flux'][:,0])/np.maximum(abs(q),1)));assert heatError<2e-6
+    highPrecisionHeatError=None
+    if extended:
+        nativeq=a[ids,cols.index('Heat_Flux')]
+        highPrecisionHeatError=float(max(abs(q-nativeq)/np.maximum(abs(q),1)));assert highPrecisionHeatError<2e-6
     assert max(abs(q))>1,'必须有非零壁热'
     rhoi=float(c['FREESTREAM_PRESSURE'])/(R*float(c['FREESTREAM_TEMPERATURE']))
     speed=float(c['MACH_NUMBER'])*np.sqrt(gamma*R*float(c['FREESTREAM_TEMPERATURE']))
@@ -95,6 +103,7 @@ def audit(folder,actual_surface=False):
     assert abs(native-hf[-1])/max(1,abs(native))<2e-6
     report=dict(interfacePassed=True,nodes=len(a),wallNodes=len(ids),dimension=nd,model=r['physicsModel'],
         thermalStatePhase=phase,diagnosticOnly=bool(initialization.get('diagnosticOnly',False)),
+        fullPrimitiveEOSRelativeError=primitiveEOS,nativePrecisionHeatGradientError=highPrecisionHeatError,
         savedCurrentKTemperatureRangeK=[float(min(thermal*(gamma-1)/R)),float(max(thermal*(gamma-1)/R))],
         elapsedSeconds=r['elapsedSeconds'],checkpointLocalIteration=step,finalResiduals=residual,
         originalResidualThresholdPassed=all(v<-8 for v in residual) and step>=10,
@@ -104,7 +113,7 @@ def audit(folder,actual_surface=False):
         yPlusPercentiles=dict(zip(['p50','p95','p99','max'],np.percentile(yp,[50,95,99,100]).tolist())),
         omegaBoundaryLagRelativeDifference=omegaLag,wallKRange=[float(min(k[ids])),float(max(k[ids]))],
         nativeWallKFloor=1e-10,wallEddyToLaminarMaximum=eddyFraction,
-        last25HeatPowerRelativeChange=float((hf[-1]-hf[max(0,len(hf)-26)])/max(abs(hf[max(0,len(hf)-26)]),1)),
+        last25HeatPowerRelativeChange=(float((hf[-1]-hf[-26])/max(abs(hf[-26]),1)) if len(hf)>=26 else None),
         nativeHeatPowerW=native,newQualifiedArea=0,physicsQualified=False,
         sourceSHA256={str(p):sha(p) for p in [Path(__file__),ROOT/'scripts/su2SSTInterface.py',folder/'engine_process.json']})
     if actual_surface:
@@ -116,11 +125,14 @@ def audit(folder,actual_surface=False):
         _,vi=cKDTree(V).query(xyz);assert len(set(vi))==len(V)
         nodeq=np.zeros(len(V));nodeq[vi]=f['Heat_Flux'][:,0];face=nodeq[F].mean(axis=1)
         y=np.zeros(len(V));y[vi]=yp;above=float(sum(area[y[F].mean(axis=1)>1])/sum(area))
-        midpath=folder/'surface_flow_000050.vtk'
+        checkpoints=sorted(p for p in folder.glob('surface_flow_*.vtk') if int(p.stem.rsplit('_',1)[1])<step)
+        assert checkpoints or initialization.get('diagnosticOnly',False),'没有较早保存场供本段热流变化核对'
+        midpath=checkpoints[-1] if checkpoints else None
         if initialization.get('diagnosticOnly',False):
             midpath=Path(initialization['sourceDirectory'])/('surface_flow_%06d.vtk'%initialization['sourceLocalIteration'])
             upstream=read(Path(initialization['sourceDirectory'])/'engine_process.json')
             assert sha(midpath)==upstream['outputSHA256'][midpath.name]
+        else:assert sha(midpath)==r['outputSHA256'][midpath.name]
         midxyz,mid=vtk_tokens(midpath);assert np.array_equal(midxyz,xyz)
         nq=np.zeros(len(V));nq[vi]=mid['Heat_Flux'][:,0];mf=nq[F].mean(axis=1)
         l1=float(area@abs(face-mf)/(area@abs(mf)))
@@ -128,7 +140,7 @@ def audit(folder,actual_surface=False):
                       heatComparisonSource=str(midpath),faceMeanYPlusAbove1AreaFraction=above)
         if initialization.get('diagnosticOnly',False):report['diagnosticSourceToOutputHeatRelativeL1Change']=l1
         else:report['withinRunHeatRelativeL1Change']=l1
-        report['screeningGates']=dict(heatL1Below10Percent=l1<.1,last25HeatPowerBelow2Percent=abs(report['last25HeatPowerRelativeChange'])<.02,
+        report['screeningGates']=dict(heatL1Below10Percent=l1<.1,last25HeatPowerBelow2Percent=report['last25HeatPowerRelativeChange'] is not None and abs(report['last25HeatPowerRelativeChange'])<.02,
                                      yPlusP99Below1=report['yPlusPercentiles']['p99']<=1)
         if initialization.get('diagnosticOnly',False):
             # 一个更新没有25步时间窗，不能用0变化自动通过稳定性筛选。
