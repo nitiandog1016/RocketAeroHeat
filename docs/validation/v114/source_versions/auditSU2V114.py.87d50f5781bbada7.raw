@@ -1,0 +1,74 @@
+"""独立核对经典完整几何、绝热原生场、界面导出和原图压力点坐标，不把给定零热流算作验证。"""
+from pathlib import Path
+import hashlib,json,csv,re,sys
+import numpy as np
+from scipy.io import loadmat
+from scipy.spatial import cKDTree
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'tests'))
+from auditSU2V110 import vtk_tokens
+
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
+def mat(p):return loadmat(str(p),squeeze_me=True,struct_as_record=False)
+
+def main():
+    out=ROOT/'outputs/v114_validation';target=out/'independent_audit.json';assert not target.exists()
+    report=read(out/'actual01/report.json');folder=Path(report['engineFolder'])
+    r=mat(out/'actual01/classic_result.mat')['r'];g=mat(out/'unit01/geometry.mat');s=g['s'];V=r.V;F=r.F.astype(int)-1
+    assert np.array_equal(V,s.V) and np.array_equal(F+1,s.F)
+    R=.9*.0254;Ln=3.33*.0254;Lc=8*.0254;Lf=6.24*.0254;L=Ln+Lc+Lf
+    expected=np.where(V[:,0]<=Lf,R+(Lf-V[:,0])*np.tan(np.deg2rad(10)),np.where(V[:,0]<Lf+Lc,R,(L-V[:,0])*R/Ln))
+    # 底面中心是唯一非母线节点；轴尖保持尖锥，未偷偷加鼻钝半径。
+    on_surface=np.arange(len(V)-1);assert np.max(np.abs(np.hypot(V[on_surface,1],V[on_surface,2])-expected[on_surface]))<2e-15
+    assert np.array_equal(V[-1],[0,0,0])
+    av=np.cross(V[F[:,1]]-V[F[:,0]],V[F[:,2]]-V[F[:,0]])/2;area=np.linalg.norm(av,axis=1)
+    volume=float(np.einsum('ij,ij->',V[F[:,0]],av)/3)
+    Rb=R+Lf*np.tan(np.deg2rad(10));smooth=np.pi*R**2*(Ln/3+Lc)+np.pi*Lf*(Rb**2+Rb*R+R**2)/3
+    assert abs(volume/(smooth*np.sin(2*np.pi/32)/(2*np.pi/32))-1)<1e-12
+    edges=np.concatenate([F[:,[0,1]],F[:,[1,2]],F[:,[2,0]]]);_,inverse,count=np.unique(np.sort(edges,axis=1),axis=0,return_inverse=True,return_counts=True)
+    assert (count==2).all() and (np.bincount(inverse,weights=np.sign(edges[:,1]-edges[:,0]))==0).all()
+    x,fields=vtk_tokens(folder/'surface_flow.vtk');distance,ids=cKDTree(V).query(x)
+    assert max(distance)<1e-6 and len(np.unique(ids))==len(V)
+    native=np.zeros((len(V),3));native[ids]=np.column_stack([fields[k][:,0] for k in ('Pressure','Heat_Flux','Temperature')]);mapped=native[F].mean(axis=1)
+    for j,key in enumerate(('pressureRaw','heatFluxRaw','fluidNodeTemperatureMeanRaw')):assert np.allclose(mapped[:,j],getattr(r,key),rtol=1e-12,atol=1e-9)
+    assert (mapped[:,1]==0).all() and bool(r.heatFluxIsBoundaryInput) and np.isnan(r.wallTemperatureInput).all()
+    receipt=read(folder/'engine_process.json');assert receipt['status']=='terminal' and all(receipt['inputsStable'].values())
+    for name,h in receipt['outputSHA256'].items():assert sha(folder/name)==h,name
+    cfg=(folder/'case.cfg').read_text(encoding='utf-8');assert 'MARKER_HEATFLUX= (wall, 0)' in cfg and 'MARKER_ISOTHERMAL' not in cfg
+    mf=read(folder/'case_manifest.json');f=mf['flight'];T0=f['temperature']*(1+.2*f['Mach']**2);mu=1.458e-6*f['temperature']**1.5/(f['temperature']+110.4)
+    rho=f['pressure']/(287.05287*f['temperature']);U=f['Mach']*np.sqrt(1.4*287.05287*f['temperature'])
+    assert abs(T0-710*5/9)<1e-12 and abs(rho*U/mu*.3048-1.6e6)<1e-8
+    rest=np.loadtxt(str(folder/'restart_flow.csv'),delimiter=',',skiprows=1);density=rest[:,4]
+    internal=rest[:,8]/density-.5*np.sum((rest[:,5:8]/density[:,None])**2,axis=1)
+    assert np.isfinite(rest).all() and min(density)>0 and min(internal)>0
+    a=r.convergenceAudit;assert a.checkpointIdentityConfirmed and not a.productionQualified
+    history=np.atleast_1d(np.genfromtxt(str(folder/'history.csv'),delimiter=',',names=True));assert (history['HF']==0).all()
+    # 优先审核最终UI复开版本，避免把较早展示称作最终验收。
+    ui=out/'review01' if (out/'review01/fields.csv').exists() else out/'actual01'
+    table=np.genfromtxt(str(ui/'fields.csv'),delimiter=',',names=True)
+    assert len(table)==len(F) and np.array_equal(table['originalFaceID'],np.arange(1,len(F)+1))
+    assert table['heatFluxIsBoundaryInput'].all() and not table['productionQualified'].any()
+    assert (table['heatFluxRaw_W_m2']==0).all() and np.isnan(table['givenWallTemperature_K']).all() and np.isnan(table['solvedWallTemperature_K']).all()
+    assert np.allclose(table['pressureRaw_Pa'],r.pressureRaw,rtol=1e-12)
+    with (ui/'section.csv').open(encoding='utf-8-sig',newline='') as stream:section=list(csv.DictReader(stream))
+    assert len(section)>0
+    assert all(q['状态']=='给定条件' and float(q['热流（绝热给定0） / W/m²'])==0 for q in section)
+    data=read(ROOT/'tests/data/schaefer_ferguson_1961/pressure_fig8.json');source=ROOT/data['archivedSourceImage'];assert sha(source)==data['sourceImageSHA256']
+    # 原图X轴0在192、10在725，名义尺寸与选中符号在1.5px内，未从理论线生成点。
+    points=[]
+    for p in data['points']:
+        xp=192+(725-192)*(p['station_in']/1.8)/10
+        assert abs(xp-p['pixelX'])<=1.5
+        points.append(dict(id=p['id'],s_m=p['station_in']*.0254,projectX_m=L-p['station_in']*.0254,
+                           Cp=.1+(335-p['pixelY'])*.1/53,digitizationUncertaintyCp=1.5*.1/53))
+    paths=[Path(__file__).resolve(),ROOT/'tests/auditSU2V110.py',out/'unit01/geometry.mat',out/'actual01/classic_result.mat',ui/'fields.csv',ui/'section.csv',ROOT/'tests/data/schaefer_ferguson_1961/pressure_fig8.json',source]
+    paths += [folder/n for n in ('case.cfg','case_manifest.json','engine_process.json','history.csv','surface_flow.vtk','restart_flow.csv')]
+    audit=dict(originalFaces=len(F),originalVertices=len(V),areaM2=float(area.sum()),facetedVolumeM3=volume,
+               engineSeconds=receipt['elapsedSeconds'],terminalIteration=int(a.terminalIteration),checkpointIteration=int(a.checkpointIteration),
+               finalResiduals=list(np.atleast_1d(a.terminalResiduals)),terminalResidualPassed=bool(a.terminalResidualPassed),
+               adiabaticZeroIsPrescribed=True,wallTemperatureNotGiven=True,minimumDensity=float(min(density)),minimumInternalEnergy=float(min(internal)),
+               CSVRows=len(table),sectionRows=len(section),pressurePoints=points,experimentalErrorCalculated=False,
+               newQualifiedArea=0,physicsQualified=False,inputSHA256={p.relative_to(ROOT).as_posix():sha(p) for p in paths})
+    target.write_text(json.dumps(audit,indent=2)+'\n',encoding='utf-8');print(json.dumps({k:audit[k] for k in ('originalFaces','engineSeconds','terminalIteration','finalResiduals','CSVRows','sectionRows','newQualifiedArea')}))
+
+if __name__=='__main__':main()

@@ -10,6 +10,16 @@ bar=uigridlayout(grid,[1 6]);bar.Layout.Row=2;bar.ColumnWidth={'1x',100,100,110,
 bar.Padding=[0 0 0 0];bar.RowHeight={'1x'};
 keys={'pressureRaw','heatFluxRaw','fluidNodeTemperatureMeanRaw','conservativeHeatLoadDensityRaw','wallInput','wallSolved'};
 labels={'压力（研究）','物面平均热流（研究）','流体节点温度（研究）','保守热负荷密度（研究）','给定壁温（输入）','求解壁温（未知）'};
+% 绝热的零热流是边界输入；不能把整面零云图称作自主热流预测。
+isAdiabatic=isfield(result,'heatFluxIsBoundaryInput') && result.heatFluxIsBoundaryInput;
+n=size(result.F,1);wallInput=result.wallTemperatureInput;
+if isscalar(wallInput),wallInput=repmat(wallInput,n,1);end
+assert(isequal(size(wallInput),[n 1]),'给定壁温与原面数量不一致。');
+thermalMethod='用户给定等温壁面边界';thermalCaption='给定等温壁';
+if isfield(result,'thermalBoundary'),thermalMethod=result.thermalBoundary.method;thermalCaption=result.thermalBoundary.mode;end
+if isAdiabatic
+    labels{2}='热流（绝热给定0）';labels{4}='热负荷密度（绝热给定0）';labels{5}='给定壁温（绝热未指定）';
+end
 units={'Pa','W/m²','K','W/m²','K','K'};
 select=uidropdown(bar,'Items',labels,'ItemsData',keys,'Value',keys{1});
 low=uieditfield(bar,'numeric');high=uieditfield(bar,'numeric');
@@ -30,7 +40,7 @@ render(true);inspectFace(1,[]);
 
     function render(resetRange)
         key=select.Value;i=find(strcmp(keys,key));n=size(result.F,1);
-        if strcmp(key,'wallInput'),values=repmat(result.wallTemperatureInput,n,1);
+        if strcmp(key,'wallInput'),values=wallInput;
         elseif strcmp(key,'wallSolved'),values=nan(n,1);
         else,values=result.(key);end
         if resetRange
@@ -46,11 +56,12 @@ render(true);inspectFace(1,[]);
             'range',[low.Value high.Value],'name',labels{i},'unit',units{i},'productionQualified',false);
         s.payload.coordinateNote='原三角面 · SI · laminar NS / ideal gas / Sutherland / Pr0.72 · 合格新增面积0';
         status=1;method=[result.solverMethod '；' result.projectionMethod];
-        if strcmp(key,'wallInput'),status=2;method='用户给定等温壁面边界';
+        if strcmp(key,'wallInput'),status=2;method=thermalMethod;if isAdiabatic,status=0;end
         elseif strcmp(key,'wallSolved'),status=0;method='尚未求解壁体温度';end
+        if isAdiabatic && ismember(key,{'heatFluxRaw','conservativeHeatLoadDensityRaw'}),status=2;method=thermalMethod;end
         s.payload.sectionView=struct('x',sliceX,'faceIndex',selectedFace-1,'fieldKey',key, ...
             'valueStatus',status,'method',method,'scope','完整原面研究快照；未获网格/物理资格', ...
-            'condition',sprintf('M%.8g alpha%.8g beta%.8g Tw%.8gK',result.flight.Mach,result.flight.alpha,result.flight.beta,result.wallTemperatureInput));
+            'condition',sprintf('M%.8g alpha%.8g beta%.8g; %s',result.flight.Mach,result.flight.alpha,result.flight.beta,thermalCaption));
         sectionState=[];
         geometry.html.UserData=s;geometry.html.Data=s.payload;
     end
@@ -83,12 +94,14 @@ render(true);inspectFace(1,[]);
             validateattributes(position,{'numeric'},{'numel',3,'finite','real'});
             sliceX=position(1);render(false);
         end
+        wallText=sprintf('给定Tw %.8g K',wallInput(i));
+        if isnan(wallInput(i)),wallText='给定Tw：未指定（绝热壁）';end
         probe.Value={sprintf('原面元 %d · 面积 %.8g m² · %s',i,result.faceArea(i),result.resultStatus); ...
             sprintf('p %.8g Pa；物面平均 q %.8g W/m²；保守热负荷密度 %.8g W/m²（口径不同）', ...
                 result.pressureRaw(i),result.heatFluxRaw(i),result.conservativeHeatLoadDensityRaw(i)); ...
-            sprintf('流体节点平均T %.8g K；给定Tw %.8g K；求解壁温/Te/Tr 未知或未定义', ...
-                result.fluidNodeTemperatureMeanRaw(i),result.wallTemperatureInput); ...
-            ['算法：' result.solverMethod '；映射：' result.projectionMethod]; ...
+            sprintf('流体节点平均T %.8g K；%s；求解壁温/Te/Tr 未知或未定义', ...
+                result.fluidNodeTemperatureMeanRaw(i),wallText); ...
+            ['算法：' result.solverMethod '；热边界：' thermalMethod '；映射：' result.projectionMethod]; ...
             sprintf('全物面原始q积分 %.8g W；原生SU2负荷 %.8g W。进程退出0不等于收敛/精度通过。', ...
                 result.targetHeatPowerRaw,result.conservativeHeatLoadPowerRaw)};
     end
@@ -118,10 +131,10 @@ render(true);inspectFace(1,[]);
     function exportTo(file)
         n=size(result.F,1);t=table((1:n)',result.faceArea,result.pressureRaw,result.heatFluxRaw, ...
             result.conservativeHeatLoadDensityRaw,result.fluidNodeTemperatureMeanRaw, ...
-            repmat(result.wallTemperatureInput,n,1),nan(n,1),false(n,1), ...
+            wallInput,nan(n,1),false(n,1),repmat(isAdiabatic,n,1), ...
             'VariableNames',{'originalFaceID','area_m2','pressureRaw_Pa','heatFluxRaw_W_m2', ...
             'nativeLoadDensity_W_m2','fluidNodeTemperatureMean_K','givenWallTemperature_K', ...
-            'solvedWallTemperature_K','productionQualified'});
+            'solvedWallTemperature_K','productionQualified','heatFluxIsBoundaryInput'});
         writetable(t,file);meta=rmfield(result,{'V','F','pressureRaw','heatFluxRaw','conservativeHeatLoadDensityRaw', ...
             'fluidNodeTemperatureMeanRaw','faceArea'});
         fid=fopen([file '.json'],'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(meta));

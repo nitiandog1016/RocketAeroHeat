@@ -34,7 +34,9 @@ outer=polyVolume(V,far);body=polyVolume(surface.V,F);total=sum(prism)+sum(tet);
 error=abs(total-(outer-body))/total;assert(error<2e-10,'完整域体积账不闭合。');
 report=jsondecode(fileread(fullfile(folder,'mesh_report.json')));
 assert(abs(outer-report.farfieldVolume)/outer<2e-12 && abs(body-report.bodyVolume)/body<2e-12);
-areas=vecnorm(cross(surface.V(F(:,2),:)-surface.V(F(:,1),:),surface.V(F(:,3),:)-surface.V(F(:,1),:),2),2)/2;
+% 每一行是一个面的面积向量；必须逐行求模，不能对XYZ三列各自求模后相加。
+areas=vecnorm(cross(surface.V(F(:,2),:)-surface.V(F(:,1),:),surface.V(F(:,3),:)-surface.V(F(:,1),:),2),2,2)/2;
+assert(abs(sum(areas)-report.bodyArea)/report.bodyArea<2e-12,'原表面积与独立网格报告不一致。');
 cells=[mat2cell(W,ones(size(W,1),1),6);mat2cell(T,ones(size(T,1),1),4)];wall=mat2cell(F(:,[1 3 2]),ones(size(F,1),1),3);
 topology=struct('triangular',triInfo,'quadrilateral',quadInfo,'maximumVolumeClosureRelative',error, ...
     'declaredBoundaryExactlyMatched',true,'nonManifoldFaces',0);

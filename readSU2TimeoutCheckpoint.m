@@ -15,7 +15,7 @@ for file={snapshot,fullfile(folder,receipt.request.meshFile),fullfile(folder,rec
     token=regexp(raw,[regexptranslate('escape',jsonencode(file{1})) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
     assert(numel(token)==1 && strcmp(sha(file{1}),token{1}{1}),'原输入快照／网格／配置身份不完整或已改变。');
 end
-saved=load(snapshot,'frozen','projection');assert(isfield(saved,'projection'),'旧快照缺少原投影，不能按此入口推定映射。');
+saved=load(snapshot,'frozen','projection','manifest');assert(isfield(saved,'projection'),'旧快照缺少原投影，不能按此入口推定映射。');
 f=saved.frozen;
 assert(isequaln(f.mesh,state.mesh) && isequaln(f.cfg,state.cfg) && isequaln(f.freestream,state.freestream), ...
     '原模型、边界或输出设置与当前已确认工况不一致。');
@@ -24,6 +24,9 @@ assert(isequal(saved.projection.sourceVertices,volume.vertices) && ...
 data=readSU2SurfaceResult(fullfile(folder,'surface_flow.vtk'));
 result=mapSU2WallResult(data,saved.projection);result.V=f.mesh.V;result.F=f.mesh.F;
 result.receipt=receipt;result.flight=f.cfg.flight;result.wallTemperatureInput=f.cfg.flight.Twall;
+if isfield(saved,'manifest') && isfield(saved.manifest,'thermalBoundary')
+    result=attachSU2ThermalBoundary(result,saved.manifest.thermalBoundary);
+end
 result.resultDirectory=folder;result.sourceRevision=state.revision;result.solveId=state.solveId;
 result.convergenceAudit=auditSU2ResultConvergence(folder,result);
 assert(result.convergenceAudit.checkpointIdentityConfirmed, ...

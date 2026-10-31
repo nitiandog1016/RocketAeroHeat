@@ -1,0 +1,26 @@
+{
+  "version": "8.6.0",
+  "license": "LGPL-2.1; see third_party/su2/COPYING",
+  "findings": [
+    "Heat flux output on HEAT_FLUX wall is prescribed; zero is not an independent prediction",
+    "Spatial temperature comes from custom boundary data; MARKER_PYTHON_CUSTOM alone initializes to uniform config Tw",
+    "Official installed win64-omp release archive has no pysu2 or native Python module"
+  ],
+  "snippets": [
+    {
+      "url": "https://github.com/su2code/SU2/blob/v8.6.0/SU2_CFD/src/solvers/CNSSolver.cpp",
+      "firstLine": 714,
+      "text": "    /*--- If it is a customizable or CHT patch, retrieve the specified wall temperature. ---*/\n\n    const su2double There = nodes->GetTemperature(Point_Normal);\n\n    if (cht_mode) {\n      Twall = GetCHTWallTemperature(config, val_marker, iVertex, dist_ij,\n                                    thermal_conductivity, There, Temperature_Ref);\n    } else if (config->GetMarker_All_PyCustom(val_marker)) {\n      Twall = geometry->GetCustomBoundaryTemperature(val_marker, iVertex) / Temperature_Ref;\n    }\n\n    /*--- Compute the normal gradient in temperature using Twall ---*/\n\n    su2double dTdn = -(There - Twall)/dist_ij;\n\n    /*--- Apply a weak boundary condition for the energy equation.\n     Compute the residual due to the prescribed heat flux. ---*/\n\n    su2double Res_Conv = 0.0;\n    su2double Res_Visc = thermal_conductivity * dTdn * Area;\n\n    /*--- Calculate Jacobian for implicit time stepping ---*/"
+    },
+    {
+      "url": "https://github.com/su2code/SU2/blob/v8.6.0/Common/src/geometry/CGeometry.cpp",
+      "firstLine": 2750,
+      "text": "void CGeometry::SetCustomBoundary(CConfig* config) {\n  unsigned short iMarker;\n  unsigned long iVertex;\n  string Marker_Tag;\n\n  /*--- Initialize quantities for customized boundary conditions.\n   * Custom values are initialized with the default values specified in the config (avoiding non physical values) ---*/\n  CustomBoundaryTemperature = new su2double*[nMarker];\n  CustomBoundaryHeatFlux = new su2double*[nMarker];\n\n  for (iMarker = 0; iMarker < nMarker; iMarker++) {\n    Marker_Tag = config->GetMarker_All_TagBound(iMarker);\n    CustomBoundaryHeatFlux[iMarker] = nullptr;\n    CustomBoundaryTemperature[iMarker] = nullptr;\n    if (config->GetMarker_All_PyCustom(iMarker)) {\n      switch (config->GetMarker_All_KindBC(iMarker)) {\n        case HEAT_FLUX:\n          CustomBoundaryHeatFlux[iMarker] = new su2double[nVertex[iMarker]];\n          for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {\n            CustomBoundaryHeatFlux[iMarker][iVertex] = config->GetWall_HeatFlux(Marker_Tag);\n          }\n          break;\n        case ISOTHERMAL:\n          CustomBoundaryTemperature[iMarker] = new su2double[nVertex[iMarker]];\n          for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {\n            CustomBoundaryTemperature[iMarker][iVertex] = config->GetIsothermal_Temperature(Marker_Tag);\n          }\n          break;\n        case INLET_FLOW:\n          // This case is handled in the solver class.\n          break;\n        default:\n          cout << \"WARNING: Marker \" << Marker_Tag << \" is not customizable. Using default behavior.\" << endl;\n          break;\n      }\n    }\n  }"
+    },
+    {
+      "url": "https://github.com/su2code/SU2/blob/v8.6.0/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl",
+      "firstLine": 2648,
+      "text": "        if (KindBC == BC_TYPE::HEAT_FLUX) {\n          HeatFlux[iMarker][iVertex] =\n              py_custom ? -geometry->GetCustomBoundaryHeatFlux(iMarker, iVertex) : Wall_HeatFlux_Value;\n        } else if (KindBC == BC_TYPE::ISOTHERMAL) {\n          const su2double Twall_local =\n              py_custom ? geometry->GetCustomBoundaryTemperature(iMarker, iVertex) / RefTemperature : Twall;\n          const auto iPointNormal = geometry->vertex[iMarker][iVertex]->GetNormal_Neighbor();\n          const su2double* Coord_Normal = geometry->nodes->GetCoord(iPointNormal);\n          const su2double dist_ij = GeometryToolbox::NormalDistance(nDim, UnitNormal, Coord, Coord_Normal);\n          const su2double There = nodes->GetTemperature(iPointNormal);\n          HeatFlux[iMarker][iVertex] = thermal_conductivity * (There - Twall_local) / dist_ij * RefHeatFlux;\n        } else {\n          su2double dTdn = GeometryToolbox::DotProduct(nDim, Grad_Temp, UnitNormal);\n          if (FlowRegime == ENUM_REGIME::INCOMPRESSIBLE && !energy) dTdn = 0.0;\n          HeatFlux[iMarker][iVertex] = thermal_conductivity * dTdn * RefHeatFlux;\n        }"
+    }
+  ]
+}

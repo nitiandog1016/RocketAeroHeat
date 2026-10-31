@@ -14,6 +14,7 @@ switch mode
     case 'hybridTriangles'
         % 原三角形近壁层+Gmsh外域，不要求轴对称母线；仍须逐模型几何审核。
         options=struct;
+        if isfield(cfg.su2,'hybridMesh'),options=cfg.su2.hybridMesh;end
         if isfield(cfg.su2,'pythonExecutable'),options.pythonExecutable=cfg.su2.pythonExecutable;end
     otherwise
         error('RocketAeroHeat:SU2:VolumeMode','不支持的体网格模式：%s',mode);
