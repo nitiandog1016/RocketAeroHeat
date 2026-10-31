@@ -1,0 +1,11 @@
+RAH_ENGINE_PID=9444
+{错误使用 sparse
+下标必须具有相同的数据类型(单精度、双精度或整数)。
+
+出错 buildSU2WallProjection (第 15 行)
+    areaMap=sparse(repmat((1:nf)',3,1),F(:),repmat(areas/3,3,1),nf,nv);
+
+出错 testSU2HybridVolume (第 6 行)
+t=tic;volume=readSU2HybridVolume(meshFolder,s);projection=buildSU2WallProjection(volume,s);
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

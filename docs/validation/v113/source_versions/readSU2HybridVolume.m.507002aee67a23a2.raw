@@ -1,0 +1,68 @@
+function volume=readSU2HybridVolume(folder,surface)
+%READSU2HYBRIDVOLUME 读取本程序混合网格，独立核验原面、正体积和全部边界。
+% 模块一：真实终态及输入/输出SHA绑定，不因存在MAT文件接受失败任务。
+% 模块二：棱柱中心扇形面积积分与四面体行列式独立核对体积和完整域。
+% 模块三：三角/四边形内部面双向共享，边界恰为原墙面及完整远场。
+% 几何通过不代表近壁分辨率、外域独立性、壁热精度或物理解资格。
+receipt=jsondecode(fileread(fullfile(folder,'mesh_process.json')));
+assert(strcmp(receipt.status,'terminal') && receipt.exitCode==0 && ~receipt.timedOut && receipt.inputStable && receipt.sourceStable);
+file=fullfile(folder,'hybrid_volume.mat');assert(strcmp(sha(file),receipt.outputSHA256.hybrid_volume_mat),'体网格输出SHA变化。');
+assert(strcmp(sha(receipt.input),receipt.inputSHA256),'原网格输入已改变。');
+d=load(file);V=d.vertices;W=double(d.wedges);T=double(d.tetrahedra);far=double(d.farfield);F=double(d.sourceFaces);
+assert(isequal(surface.V,d.sourceVertices) && isequal(surface.F,F),'原表面身份不一致。');
+assert(isequal(V(1:size(surface.V,1),:),surface.V),'墙面原节点移动。');
+assert(all(isfinite(V),'all') && all([W(:);T(:);far(:)]>=1) && all([W(:);T(:);far(:)]<=size(V,1)));
+tet=dot(V(T(:,2),:)-V(T(:,1),:),cross(V(T(:,3),:)-V(T(:,1),:),V(T(:,4),:)-V(T(:,1),:),2),2)/6;
+local={ [1 3 2],[4 5 6],[1 2 5 4],[2 3 6 5],[3 1 4 6] };
+ref=zeros(size(W,1),3);for k=1:6,ref=ref+V(W(:,k),:)/6;end
+prism=zeros(size(W,1),1);closure=zeros(size(W,1),3);sumArea=zeros(size(W,1),1);
+for j=1:5
+    ids=W(:,local{j});center=zeros(size(ref));for k=1:size(ids,2),center=center+V(ids(:,k),:)/size(ids,2);end
+    for k=1:size(ids,2)
+        a=V(ids(:,k),:)-ref;b=V(ids(:,mod(k,size(ids,2))+1),:)-ref;c=center-ref;
+        av=cross(b-a,c-a,2)/2;closure=closure+av;sumArea=sumArea+vecnorm(av,2,2);
+        prism=prism+dot(a,av,2)/3;
+    end
+end
+assert(all(tet>0) && all(prism>0),'混合单元出现非正体积。');
+assert(max(vecnorm(closure,2,2)./sumArea)<2e-12,'棱柱向量账不闭合。');
+tri=[W(:,[1 3 2]);W(:,[4 5 6]);T(:,[1 3 2]);T(:,[1 2 4]);T(:,[2 3 4]);T(:,[3 1 4])];
+quad=[W(:,[1 2 5 4]);W(:,[2 3 6 5]);W(:,[3 1 4 6])];
+triInfo=faces(tri,[F(:,[1 3 2]);far]);quadInfo=faces(quad,zeros(0,4));
+outer=polyVolume(V,far);body=polyVolume(surface.V,F);total=sum(prism)+sum(tet);
+error=abs(total-(outer-body))/total;assert(error<2e-10,'完整域体积账不闭合。');
+report=jsondecode(fileread(fullfile(folder,'mesh_report.json')));
+assert(abs(outer-report.farfieldVolume)/outer<2e-12 && abs(body-report.bodyVolume)/body<2e-12);
+areas=vecnorm(cross(surface.V(F(:,2),:)-surface.V(F(:,1),:),surface.V(F(:,3),:)-surface.V(F(:,1),:),2),2)/2;
+cells=[mat2cell(W,ones(size(W,1),1),6);mat2cell(T,ones(size(T,1),1),4)];wall=mat2cell(F(:,[1 3 2]),ones(size(F,1),1),3);
+topology=struct('triangular',triInfo,'quadrilateral',quadInfo,'maximumVolumeClosureRelative',error, ...
+    'declaredBoundaryExactlyMatched',true,'nonManifoldFaces',0);
+volume=struct('kind','complete-rocket-three-dimensional-su2-volume','vertices',V,'cells',{cells}, ...
+    'cellTypes',[13*ones(size(W,1),1);10*ones(size(T,1),1)],'cellVolume',[prism;tet], ...
+    'wall',{wall},'bodyWall',{mat2cell(F,ones(size(F,1),1),3)},'farfield',{mat2cell(far,ones(size(far,1),1),3)}, ...
+    'wallRegion',{repmat({'originalTriangle'},size(F,1),1)},'wallSourceFaceID',(1:size(F,1))', ...
+    'sourceVertices',surface.V,'sourceFaces',surface.F,'meshConstruction',report,'meshReceipt',receipt, ...
+    'bodyArea',sum(areas),'bodyVolume',body,'fluidVolume',total,'minimumSubTetVolume',min(tet), ...
+    'topology',topology,'sourceKind','original-triangle-hybrid-volume', ...
+    'sourceMappingStatus','exact-original-triangle-node-dual','nearWallResolutionValidated',false, ...
+    'farfieldAdequacyValidated',false,'physicalSolution',false,'productionQualified',false,'newQualifiedRocketArea',0);
+volume.meshConstruction.method='original-triangle-normal-prisms-and-gmsh-exterior-tetrahedra';
+end
+function info=faces(F,boundary)
+% 最小顶点的前后邻点确定循环方向，内面计数和方向必须同时闭合。
+[keys,~,g]=unique(sort(F,2),'rows');count=accumarray(g,1);
+[~,k]=min(F,[],2);n=size(F,2);rows=(1:size(F,1))';
+after=F(sub2ind(size(F),rows,mod(k,n)+1));before=F(sub2ind(size(F),rows,mod(k-2,n)+1));
+direction=accumarray(g,sign(after-before));inside=count==2;
+assert(all(count<=2) && all(direction(inside)==0),'内部面共享数或方向错误。');
+assert(isequal(sortrows(keys(count==1,:)),sortrows(sort(boundary,2))),'声明边界与全部体单元边界不符。');
+info=struct('internalFaces',nnz(inside),'boundaryFaces',nnz(count==1),'oppositeInternalOrientation',true);
+end
+function v=polyVolume(V,F)
+v=sum(dot(V(F(:,1),:),cross(V(F(:,2),:),V(F(:,3),:),2),2))/6;
+end
+function h=sha(file)
+fid=fopen(file,'rb');assert(fid>=0);guard=onCleanup(@()fclose(fid));md=java.security.MessageDigest.getInstance('SHA-256');
+while ~feof(fid),md.update(fread(fid,1024*1024,'*uint8'));end
+h=lower(reshape(dec2hex(typecast(md.digest(),'uint8'),2)',1,[]));
+end

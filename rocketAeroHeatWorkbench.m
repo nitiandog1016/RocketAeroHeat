@@ -46,7 +46,8 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'confirmOrientation',@()confirmOrientation([],[]),'generateMesh',@()generate([],[]), ...
     'confirmBoundary',@()confirmBoundary([],[]),'run',@()solveCase([],[]),'getState',@getState, ...
     'loadNative',@()loadNative([],[]),'cancel',@()cancelEngine([],[]),'readResearch',@readResearch, ...
-    'readTimeoutCheckpoint',@readTimeoutCheckpoint);
+    'readTimeoutCheckpoint',@readTimeoutCheckpoint,'useSurfaceForSU2',@useSurfaceForSU2, ...
+    'loadNativeFeature',@()loadNative([],[],true));
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -148,7 +149,7 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
-                grid=form(15);
+                grid=form(16);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
@@ -165,6 +166,7 @@ renderEditor();sync();showGeometry(true);
                 tip(grid,13,['STL不含单位。默认mm模型转换系数0.001；m模型为1。' newline ...
                     'PCA只识别轴，不能确定鼻向。实际旋转会使网格/结果失效；鼠标操作只改变观察视角。']);
                 controls.native=button(grid,15,'建立原生箭体 · 内嵌SU2研究',@loadNative);
+                controls.nativeFeature=button(grid,16,'建立带整流罩箭体 · 内嵌SU2研究',@(~,~)loadNative([],[],true));
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
@@ -172,8 +174,8 @@ renderEditor();sync();showGeometry(true);
                 if isEmbedded()
                     [~,mode]=su2WorkbenchMeshOptions(state.cfg);
                     grid=form(14);
-                    controls.volumeMode=choice(grid,1,'体网格模式',{'法向偏置层 · 研究','射线层 · 历史对照'}, ...
-                        {'normalLayers','starRay'},mode);
+                    controls.volumeMode=choice(grid,1,'体网格模式',{'法向偏置层 · 研究','射线层 · 历史对照','原三角面混合网格 · 研究'}, ...
+                        {'normalLayers','starRay','hybridTriangles'},mode);
                     controls.volumeMode.ValueChangedFcn=@nativeMeshEdited;
                     controls.generate=button(grid,2,'生成完整三维体网格',@generate);
                     description='待生成；保留完整原三角面，网格参数改变后须重新确认边界。';
@@ -182,15 +184,17 @@ renderEditor();sync();showGeometry(true);
                             size(embeddedVolume.vertices,1),numel(embeddedVolume.cells),size(state.mesh.F,1));
                     end
                     controls.volumeSummary=tip(grid,4,description);
-                    if strcmp(mode,'normalLayers')
+                    if strcmp(mode,'hybridTriangles')
+                        tip(grid,7,'保留全部原三角面：6层法向棱柱，首层顶点位移20 µm、增长1.4；Gmsh生成完整四面体外域。此档用于导入研究，尚未验证热流分辨率。');
+                    elseif strcmp(mode,'normalLayers')
                         tip(grid,7,'24层近壁偏置 + 16层外域；首层母线法向距离2 µm，近壁增长率1.25。三维面法向距离略受周向多边形影响，不能据此宣称y+或热流精度通过。');
                     else
                         tip(grid,7,'8层射线体网格，保留旧快照参数，仅作历史集成对照；近壁方向和精度尚未合格。');
                     end
-                    tip(grid,11,'当前仅支持原生无突起箭体，不自动替换任意STL。工程STL流程保持原重网格算法。');
+                    tip(grid,11,'混合模式接受通过闭合/定向/单元审核的原三角表面和光滑整流罩；复杂悬挑/尖翼未验证。旧两种模式仅支持无突起原生箭体。');
                     sync();return;
                 end
-                grid=form(12);c=state.cfg.remesh;
+                grid=form(13);c=state.cfg.remesh;
                 controls.hMin=numberField(grid,1,'最小尺寸 / mm',c.hMin*1000,[.01 inf]);
                 controls.hMax=numberField(grid,2,'最大尺寸 / mm',c.hMax*1000,[.01 inf]);
                 controls.spacing=numberField(grid,3,'初始轴向间距 / mm',c.initialAxialSpacing*1000,[.01 inf]);
@@ -207,6 +211,8 @@ renderEditor();sync();showGeometry(true);
                 end
                 tip(grid,8,description);
                 tip(grid,11,'参数修改即使旧网格和下游结果失效；不改变现有网格方法。质量差面保留真实指标。');
+                controls.useSurfaceForSU2=button(grid,13,'当前表面 → 内嵌SU2混合网格',@(~,~)useSurfaceForSU2());
+                controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isEmbedded()
                     grid=form(20);c=state.cfg;
@@ -561,12 +567,14 @@ renderEditor();sync();showGeometry(true);
     function yes=isEmbedded()
         yes=strcmp(getOption(state.cfg,'computationBackend','engineering'),'embeddedSU2Research');
     end
-    function loadNative(~,~)
+    function loadNative(~,~,featureEnabled)
         if state.busy || preparing,return;end
+        if nargin<3,featureEnabled=false;end
         try
-            [raw,truth]=buildRocketTestBody(struct('resolution',24,'protrusionEnabled',false));
+            [raw,truth]=buildRocketTestBody(struct('resolution',24,'protrusionEnabled',featureEnabled));
             next=state.cfg;next.computationBackend='embeddedSU2Research';
             next.su2=getOption(next,'su2',struct);next.heating.airThermalModel='caloricallyPerfect';
+            if featureEnabled,next.su2.volumeMode='hybridTriangles';end
             next.geometry.isAligned=true;next.geometry.bodyAxis=[1 0 0];next.geometry.noseDirection=[1 0 0];
             state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'orientedMesh',raw,'cfg',next, ...
                 'modelSource',struct('kind','native-rocket','units','m','truth',truth)));
@@ -574,12 +582,30 @@ renderEditor();sync();showGeometry(true);
             message('原生完整箭体已建立，坐标由参数化生成器明确给定；下一步生成体网格。');go(2);
         catch ex,showError(ex);end
     end
+    function useSurfaceForSU2(surface)
+        % 将用户已确认的当前表面原样接入；测试可传入同一原几何，绝不换成原生示例。
+        assert(~state.busy && ~preparing,'当前有任务运行。');
+        if nargin<1,surface=state.mesh;end
+        assert(~isempty(surface),'请先生成并确认当前表面网格。');
+        next=state.cfg;next.computationBackend='embeddedSU2Research';next.su2=getOption(next,'su2',struct);
+        next.su2.volumeMode='hybridTriangles';next.heating.airThermalModel='caloricallyPerfect';
+        state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',surface,'orientedMesh',surface,'cfg',next, ...
+            'modelSource',struct('kind','retained-original-triangles','units','m')));
+        embeddedVolume=[];preview=surface;report=[];go(2);
+        message('已保留当前全部原三角面；下一步生成混合体网格，旧工程结果已失效。');
+    end
     function generateNative()
         try
             preparing=true;message('正在建立完整三维体网格并核对闭合/体积…');
             candidate=state.orientedMesh;
-            options=su2WorkbenchMeshOptions(state.cfg);
-            embeddedVolume=buildSU2RocketVolume(candidate,state.modelSource.truth,options);
+            [options,mode]=su2WorkbenchMeshOptions(state.cfg);
+            if strcmp(mode,'hybridTriangles')
+                folder=fullfile(fileparts(mfilename('fullpath')),'outputs','hybrid_mesh',char(java.util.UUID.randomUUID()));
+                embeddedVolume=buildSU2HybridVolume(candidate,folder,options);
+            else
+                assert(isfield(state.modelSource,'truth'),'当前原表面须使用混合网格，不能替换成轴对称模型。');
+                embeddedVolume=buildSU2RocketVolume(candidate,state.modelSource.truth,options);
+            end
             state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));
             preparing=false;renderEditor();showGeometry(true);
             message(sprintf('体网格%d单元；原表面%d面未改变。近壁精度未合格，请确认边界。',numel(embeddedVolume.cells),size(candidate.F,1)));
