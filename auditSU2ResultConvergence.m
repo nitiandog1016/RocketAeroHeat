@@ -97,6 +97,19 @@ try
         audit.successfulEngineSecondsThroughRun=lineage.priorSuccessfulEngineSeconds+receipt.elapsedSeconds;
         audit.evidenceSHA256.continuation_json=h;
     end
+    % 改网格初态只记录来源，不能把新网格局部步号接成同网格累计步号。
+    transfer=fullfile(folder,'initial_flow.transfer.json');
+    if isfile(transfer)
+        assert(~isfile(continuation),'改网格迁移与同网格续算身份冲突。');
+        path=fullfile(receipt.request.workDirectory,'initial_flow.transfer.json');h=fileSHA(transfer);
+        token=regexp(receiptText,[regexptranslate('escape',jsonencode(path)) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
+        assert(numel(token)==1 && strcmp(h,token{1}{1}),'迁移说明未被真实进程锁定。');
+        lineage=jsondecode(fileread(transfer));
+        assert(strcmp(lineage.kind,'normal-column-state-transfer') && ~lineage.sameMesh && lineage.initialGuessOnly);
+        assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.outputSHA256),'迁移初态已改变。');
+        audit.meshTransfer=lineage;audit.sourceCumulativeIteration=lineage.sourceCumulativeIteration;
+        audit.evidenceSHA256.initial_flow_transfer_json=h;
+    end
     audit.checkpointIdentityConfirmed=true;audit.status='checkpoint-and-history-audited';
     audit.reason='保存迭代已绑定且重启动EOS一致；残差通过与物理资格仍分别判断。';
 catch ex

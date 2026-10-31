@@ -1,0 +1,117 @@
+{
+  "evidenceChecksPassed": true,
+  "records": {
+    "control": {
+      "engineSeconds": 205.32800000000134,
+      "nodes": 210914,
+      "originalFaces": 19752,
+      "areaM2": 1.9646292565715642,
+      "localCheckpointIteration": 199,
+      "cumulativeCheckpointIteration": 799,
+      "sourceCumulativeIteration": 599,
+      "finalResiduals": [
+        -5.034621543,
+        1.142235362
+      ],
+      "originalResidualThresholdPassed": false,
+      "withinRunHeatRelativeL1Change": 0.01804626969858511,
+      "withinRunPressureRelativeL1Change": 0.002288828358605109,
+      "last50PowerRelativeChange": -0.002887580373946487,
+      "minimumDensity": 0.0001687030523498011,
+      "minimumInternalEnergy": 106210.99429111951,
+      "temperatureRangeK": [
+        148.00199599623514,
+        1382.0746446584676
+      ],
+      "nativeHeatPowerW": 46863.97379752667,
+      "originalFaceHeatPowerW": 47027.562304510044,
+      "wallEOSRelativeError": 4.971855560587102e-07,
+      "nativeGradientMaximumRelativeError": 4.964180563204688e-07,
+      "firstNormalDistanceRangeM": [
+        1.9999999999852103e-05,
+        2.0000000000155412e-05
+      ],
+      "estimatedWallUnitsPercentiles": {
+        "p50": 0.608278184366841,
+        "p95": 5.758519980568152,
+        "p99": 6.399009001067124,
+        "max": 6.999614712215048
+      },
+      "faceMeanWallUnitAbove1AreaFraction": 0.336823598453415,
+      "nativeYPlusAllZero": true,
+      "finalReconstructionWarnings": 1182,
+      "sectionRows": 92,
+      "physicsQualified": false,
+      "newQualifiedArea": 0
+    },
+    "candidate": {
+      "engineSeconds": 334.07800000000134,
+      "nodes": 349206,
+      "originalFaces": 19752,
+      "areaM2": 1.9646292565715642,
+      "localCheckpointIteration": 199,
+      "cumulativeCheckpointIteration": null,
+      "sourceCumulativeIteration": 599,
+      "finalResiduals": [
+        -4.039846949,
+        2.09998847
+      ],
+      "originalResidualThresholdPassed": false,
+      "withinRunHeatRelativeL1Change": 0.0697429619055849,
+      "withinRunPressureRelativeL1Change": 0.0033317679953311237,
+      "last50PowerRelativeChange": -0.052146095650255735,
+      "minimumDensity": 0.0001876988758051394,
+      "minimumInternalEnergy": 102421.04893350811,
+      "temperatureRangeK": [
+        142.720815065891,
+        1394.3521303379603
+      ],
+      "nativeHeatPowerW": 52412.11002697704,
+      "originalFaceHeatPowerW": 52599.099327438686,
+      "wallEOSRelativeError": 4.893245683090797e-07,
+      "nativeGradientMaximumRelativeError": 4.897865031237374e-07,
+      "firstNormalDistanceRangeM": [
+        1.9999999998586445e-06,
+        2.0000000001840034e-06
+      ],
+      "estimatedWallUnitsPercentiles": {
+        "p50": 0.05890695494228506,
+        "p95": 0.7496711244164433,
+        "p99": 0.836304283297941,
+        "max": 0.9683612190878222
+      },
+      "faceMeanWallUnitAbove1AreaFraction": 0.0,
+      "nativeYPlusAllZero": true,
+      "finalReconstructionWarnings": 2631,
+      "sectionRows": 92,
+      "physicsQualified": false,
+      "newQualifiedArea": 0
+    }
+  },
+  "pairedFinalHeatRelativeL1": 0.23659879954952026,
+  "pairedFinalPressureRelativeL1": 0.012444612290410087,
+  "predeclaredScreeningGates": {
+    "geometryPositiveStateProvenanceOriginalArea": true,
+    "candidateWallUnitP99Below1": true,
+    "candidateEnergyLogNoMoreThanControlPlus03": false,
+    "candidateWithinRunHeatL1Below10Percent": true,
+    "pairedFinalHeatL1Below10Percent": false
+  },
+  "allScreeningGatesPassed": false,
+  "productionDefaultPromoted": false,
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "wallUnitEstimateMeaning": "unconverged laminar wall shear and actual first normal distance; not validated turbulent y+",
+  "meshComparisonMeaning": "two unconverged fields; not grid independence or discretization error",
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\tests\\auditActualRocketNearWallStudy.py": "6afa8df7193450697f762059da84a2dcd7147f44680561ca4b152b8f09abf48e",
+    "E:\\RocketAeroHeat\\tests\\auditSU2V110.py": "8376f03830b80af36ea8f554e312da4de17ac39d005829f9aee7716c4c1343e0",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\initial_audit.json": "de64b12ea888849c3af3e157685739349994f812442eb1f602b309794817726b",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\study01\\control\\engine_process.json": "418ac4951080dc4d81aa6f6bfe9e50a6bddd25c5fb5e82097b4cc69ea1210c70",
+    "E:\\RocketAeroHeat\\outputs\\v118_validation\\actual01\\mesh\\hybrid_volume.mat": "dc3aa2b52d09e8ed7fd7bfa7806f9a2eb26c471c33961ad1241331e7f01efc6b",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\review01\\control_result.mat": "4ec321b6ff2829d974dbc7235194cc1dc2ba28910ad049dbec28674dd102d463",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\study01\\candidate\\engine_process.json": "bc1e84926440d33de228a967d6dac054702ff31b86e56e8843395bd82c7899bd",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\mesh32\\hybrid_volume.mat": "dcd41e50233877885bb93ee90d6dcbd629764695541ea257e17852e2c3e85167",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\review01\\candidate_result.mat": "5358443178cb6df22b18eb3f2dde101bbeabfd5742a9c774169dc72b9756603d"
+  }
+}
