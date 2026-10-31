@@ -206,6 +206,17 @@ try
             assert(lineage.sourceLocalIteration==149 && audit.checkpointIteration==9 && size(history,1)==10);
             assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
             audit.initializationStudy=lineage;
+        elseif strcmp(lineage.kind,'same-mesh-SST-wall-column-initialization-study')
+            % 近壁初态显式补偿rhoE以保持热内能；不是新的物理热源或普通续算。
+            assert(lineage.sameMesh && lineage.samePhysicsAndNumerics && lineage.localIterationStartsAt==0);
+            assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
+            study=receipt.physicsModel.initializationStudy;
+            assert(strcmp(study.studyID,'v130-near-wall-diffusion-destruction-initial-guess'));
+            assert(strcmp(study.studyID,lineage.studyID) && strcmp(study.variant,lineage.variant));
+            assert(strcmp(study.changedField,lineage.changedField) && ismember(study.variant,{'control','column'}));
+            assert(lineage.sourceLocalIteration==149 && audit.checkpointIteration==99 && size(history,1)==100);
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            audit.initializationStudy=lineage;
         else
             assert(strcmp(lineage.kind,'same-mesh-laminar-to-SST-initial-guess'));
             assert(lineage.newPhysicsLocalIterationStartsAt==0 && ~lineage.samePhysicsAndNumerics);

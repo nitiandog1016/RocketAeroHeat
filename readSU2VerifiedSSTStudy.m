@@ -20,7 +20,8 @@ end
 manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));f=manifest.flight;init=manifest.initialization;
 assert(strcmp(manifest.thermalBoundary.mode,'isothermal'));
 if isNumerical,assert(strcmp(init.kind,'same-mesh-SST-CFL-cap-comparison'));
-else,assert(strcmp(init.kind,'same-mesh-SST-omega-pocket-initialization-study'));end
+else,assert(ismember(init.kind,{'same-mesh-SST-omega-pocket-initialization-study', ...
+        'same-mesh-SST-wall-column-initialization-study'}));end
 assert(isequaln(manifest.sst,receipt.physicsModel));
 assert(~isfield(state.cfg.su2,'wallThermalMode') || strcmp(state.cfg.su2.wallThermalMode,'isothermal'),'当前热边界不同。');
 actual=[f.Mach,f.alpha,f.beta,f.temperature,f.pressure,f.wallTemperature];

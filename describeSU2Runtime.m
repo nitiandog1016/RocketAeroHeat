@@ -36,11 +36,20 @@ switch info.flavor
             end
             if isfield(p,'initializationStudy')
                 % 启发式初猜只改变迭代起点，不称为新的湍流物理模型或合格解。
-                study=p.initializationStudy;assert(strcmp(study.studyID,'v128-base-omega-floor-logharmonic-initial-guess'));
-                switch study.variant
-                    case 'control',label='原始初场控制';
-                    case 'repaired',label='尾缘146点ω正值调和初猜';
-                    otherwise,error('未知SST初场对照。');
+                study=p.initializationStudy;
+                if strcmp(study.studyID,'v128-base-omega-floor-logharmonic-initial-guess')
+                    switch study.variant
+                        case 'control',label='原始初场控制';
+                        case 'repaired',label='尾缘146点ω正值调和初猜';
+                        otherwise,error('未知SST初场对照。');
+                    end
+                else
+                    assert(strcmp(study.studyID,'v130-near-wall-diffusion-destruction-initial-guess'));
+                    switch study.variant
+                        case 'control',label='原始初场控制';
+                        case 'column',label='近壁k/ω扩散耗散初猜，rhoE补偿保持热内能';
+                        otherwise,error('未知SST近壁初场对照。');
+                    end
                 end
                 info.method=[info.method '；初场对照：' label '，物理/数值参数不改，伪时间重置；不代表物理闭合'];
                 info.physicsCaption=[info.physicsCaption ' / ' label];

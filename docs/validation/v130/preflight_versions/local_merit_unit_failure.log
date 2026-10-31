@@ -1,0 +1,15 @@
+..F.
+======================================================================
+FAIL: test_native_floor_complementarity (__main__.ColumnTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tests/testSU2SSTColumnInitialization.py", line 34, in test_native_floor_complementarity
+    k,w,ew,ek,it=column_solution(y,.01,1e-10,1e-10,1e12,1e7,1e-10)
+  File "E:\RocketAeroHeat\scripts\prepareSU2SSTColumnStudy.py", line 41, in column_solution
+    assert step>=2**-30,'正值Newton未找到下降步'
+AssertionError: 正值Newton未找到下降步
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.004s
+
+FAILED (failures=1)

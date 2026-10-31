@@ -112,6 +112,10 @@ def validate_sst_manifest(folder,data,config):
             from prepareSU2SSTPocketStudy import validate_source
             locked.update(validate_source(folder,c,init))
             assert contract['initializationStudy']=={k:init[k] for k in ['studyID','variant','changedField']}
+        elif init['kind']=='same-mesh-SST-wall-column-initialization-study':
+            from prepareSU2SSTColumnStudy import validate_source
+            locked.update(validate_source(folder,c,init))
+            assert contract['initializationStudy']=={k:init[k] for k in ['studyID','variant','changedField']}
         else:
             from prepareSU2SSTPhaseProbe import validate_source
             locked.update(validate_source(init,folder,c))
