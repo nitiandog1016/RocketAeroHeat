@@ -1,0 +1,340 @@
+
+-------------------------------------------------------------------------
+|    ___ _   _ ___                                                      |
+|   / __| | | |_  )   Release 8.6.0 "Harrier"                           |
+|   \__ \ |_| |/ /                                                      |
+|   |___/\___//___|   Suite (Computational Fluid Dynamics Code)         |
+|                                                                       |
+-------------------------------------------------------------------------
+| SU2 Project Website: https://su2code.github.io                        |
+|                                                                       |
+| The SU2 Project is maintained by the SU2 Foundation                   |
+| (http://su2foundation.org)                                            |
+-------------------------------------------------------------------------
+| Copyright 2012-2026, SU2 Contributors                                 |
+|                                                                       |
+| SU2 is free software; you can redistribute it and/or                  |
+| modify it under the terms of the GNU Lesser General Public            |
+| License as published by the Free Software Foundation; either          |
+| version 2.1 of the License, or (at your option) any later version.    |
+|                                                                       |
+| SU2 is distributed in the hope that it will be useful,                |
+| but WITHOUT ANY WARRANTY; without even the implied warranty of        |
+| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |
+| Lesser General Public License for more details.                       |
+|                                                                       |
+| You should have received a copy of the GNU Lesser General Public      |
+| License along with SU2. If not, see <http://www.gnu.org/licenses/>.   |
+-------------------------------------------------------------------------
+
+Parsing config file for zone 0
+
+----------------- Physical Case Definition ( Zone 0 ) -------------------
+Compressible Laminar Navier-Stokes' equations.
+Mach number: 4.
+Angle of attack (AoA): 180 deg, and angle of sideslip (AoS): -0 deg.
+Reynolds number: 0. Reference length 1.
+No restart solution, use the values at infinity (freestream).
+Dimensional simulation.
+The reference area is 0.0452389 m^2.
+The semi-span will be computed using the max y(3D) value.
+The reference length is 1 m.
+Reference origin for moment evaluation is (0, 0, 0).
+Surface(s) where the force coefficients are evaluated: wall.
+
+Surface(s) plotted in the output file: wall.
+Input mesh file name: mesh.su2
+
+--------------- Space Numerical Integration ( Zone 0 ) ------------------
+AUSM solver for the flow inviscid terms.
+Standard Roe without low-dissipation function.
+Second order integration in space, with slope limiter.
+Venkatakrishnan-Wang slope-limiting method, with constant: 0.05.
+Average of gradients with correction (viscous flow terms).
+Gradient for upwind reconstruction: inverse-distance weighted Least-Squares.
+Gradient for viscous and source terms: inverse-distance weighted Least-Squares.
+
+--------------- Time Numerical Integration  ( Zone 0 ) ------------------
+Local time stepping (steady state simulation).
+Euler implicit method for the flow equations.
+BCGSTAB is used for solving the linear system.
+Using LU-SGS preconditioning.
+Convergence criteria of the linear solver: 1e-05.
+Max number of linear iterations: 10.
+CFL adaptation. Factor down: 0.5, factor up: 1.1,
+                lower limit: 0.05, upper limit: 5,
+                acceptable linear residual: 0.001'
+                starting iteration: 0.
+Courant-Friedrichs-Lewy number:      0.1
+
+------------------ Convergence Criteria  ( Zone 0 ) ---------------------
+Maximum number of solver subiterations: 1.
+Begin convergence monitoring at iteration 10.
+Residual minimum value: 1e-8.
+Cauchy series min. value: 1e-10.
+Number of Cauchy elements: 100.
+Begin windowed time average at iteration 0.
+
+-------------------- Output Information ( Zone 0 ) ----------------------
+File writing frequency: 
++------------------------------------+
+|                     File| Frequency|
++------------------------------------+
+|   SURFACE_PARAVIEW_ASCII|         1|
+|            RESTART_ASCII|         1|
++------------------------------------+
+Writing the convergence history file every 1 inner iterations.
+Writing the screen convergence history every 50 inner iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: surface_flow.
+Volume file name: volume_flow.
+Restart file name: restart_flow.
+
+------------- Config File Boundary Information ( Zone 0 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|                          Far-field|                           farfield|
++-----------------------------------------------------------------------+
+|                    Isothermal wall|                               wall|
++-----------------------------------------------------------------------+
+
+-------------------- Output Preprocessing ( Zone 0 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: INNER_ITER, RMS_DENSITY, RMS_MOMENTUM-X, RMS_MOMENTUM-Y, RMS_ENERGY
+History output group(s): ITER, RMS_RES, AERO_COEFF, HEAT
+Convergence field(s): RMS_DENSITY, RMS_ENERGY
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE
+
+-------------------------- Using Dummy Geometry -------------------------
+Computing wall distances.
+
+-------------------- Solver Preprocessing ( Zone 0 ) --------------------
+Viscous flow: Computing pressure using the ideal gas law
+based on the free-stream temperature and a density computed
+from the Reynolds number.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|               SUTHERLAND|          CONSTANT_PRANDTL|                IDEAL_GAS|
++------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|        Ref. Viscosity|   1.71608e-05|             1|   N.s/m^2|   1.71608e-05|
+|      Sutherland Temp.|        273.15|             1|         K|        273.15|
+|     Sutherland Const.|         110.4|             1|         K|         110.4|
++------------------------------------------------------------------------------+
+|        Prandtl (Lam.)|             -|             -|         -|          0.72|
+|       Prandtl (Turb.)|             -|             -|         -|           0.9|
++------------------------------------------------------------------------------+
+|          Gas Constant|       287.053|             1|  N.m/kg.K|       287.053|
+|      Spec. Heat Ratio|             -|             -|         -|           1.4|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|          5000|             1|        Pa|          5000|
+|               Density|     0.0580613|             1|    kg/m^3|     0.0580613|
+|           Temperature|           300|             1|         K|           300|
+|          Total Energy|   1.17979e+06|             1|   m^2/s^2|   1.17979e+06|
+|            Velocity-X|      -1388.88|             1|       m/s|      -1388.88|
+|            Velocity-Y|            -0|             1|       m/s|            -0|
+|            Velocity-Z|   1.70083e-13|             1|       m/s|   1.70083e-13|
+|    Velocity Magnitude|       1388.88|             1|       m/s|       1388.88|
++------------------------------------------------------------------------------+
+|             Viscosity|     1.846e-05|             1|   N.s/m^2|     1.846e-05|
+|          Conductivity|             -|             1|   W/m^2.K|             -|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|             4|
+|       Reynolds Number|             -|             -|         -|   4.36838e+06|
++------------------------------------------------------------------------------+
+All ranks use edge coloring.
+Among the ranks that use edge coloring,
+      the minimum efficiency is 1,
+      the maximum number of colors is 4294967295,
+      the minimum edge color group size is 1.
+Initialize Jacobian structure (Navier-Stokes). MG level: 0.
+
+------------------- Numerics Preprocessing ( Zone 0 ) -------------------
+
+----------------- Integration Preprocessing ( Zone 0 ) ------------------
+
+------------------- Iteration Preprocessing ( Zone 0 ) ------------------
+Euler/Navier-Stokes/RANS fluid iteration.
+
+------------------------------ Begin Solver -----------------------------
+
+--------------------------------------------
+No solver started. DRY_RUN option enabled. 
+--------------------------------------------
+Available volume output fields for the current configuration in Zone 0 (Comp. Fluid):
+Note: COORDINATES are always included, and so is SOLUTION unless you add the keyword COMPACT to the list of fields.
++--------------------------------------------------------------------------------------------+
+|Name               |Group Name           |Description                                       |
++--------------------------------------------------------------------------------------------+
+|COORD-X            |COORDINATES          |x-component of the coordinate vector              |
+|COORD-Y            |COORDINATES          |y-component of the coordinate vector              |
+|COORD-Z            |COORDINATES          |z-component of the coordinate vector              |
+|DENSITY            |SOLUTION             |Density                                           |
+|MOMENTUM-X         |SOLUTION             |x-component of the momentum vector                |
+|MOMENTUM-Y         |SOLUTION             |y-component of the momentum vector                |
+|MOMENTUM-Z         |SOLUTION             |z-component of the momentum vector                |
+|ENERGY             |SOLUTION             |Energy                                            |
+|PRESSURE           |PRIMITIVE            |Pressure                                          |
+|TEMPERATURE        |PRIMITIVE            |Temperature                                       |
+|MACH               |PRIMITIVE            |Mach number                                       |
+|PRESSURE_COEFF     |PRIMITIVE            |Pressure coefficient                              |
+|VELOCITY-X         |PRIMITIVE            |x-component of the velocity vector                |
+|VELOCITY-Y         |PRIMITIVE            |y-component of the velocity vector                |
+|VELOCITY-Z         |PRIMITIVE            |z-component of the velocity vector                |
+|LAMINAR_VISCOSITY  |PRIMITIVE            |Laminar viscosity                                 |
+|SKIN_FRICTION-X    |PRIMITIVE            |x-component of the skin friction vector           |
+|SKIN_FRICTION-Y    |PRIMITIVE            |y-component of the skin friction vector           |
+|SKIN_FRICTION-Z    |PRIMITIVE            |z-component of the skin friction vector           |
+|HEAT_FLUX          |PRIMITIVE            |Heat-flux                                         |
+|Y_PLUS             |PRIMITIVE            |Non-dim. wall distance (Y-Plus)                   |
+|RES_DENSITY        |RESIDUAL             |Residual of the density                           |
+|RES_MOMENTUM-X     |RESIDUAL             |Residual of the x-momentum component              |
+|RES_MOMENTUM-Y     |RESIDUAL             |Residual of the y-momentum component              |
+|RES_MOMENTUM-Z     |RESIDUAL             |Residual of the z-momentum component              |
+|RES_ENERGY         |RESIDUAL             |Residual of the energy                            |
+|LIMITER_TEMPERATURE|LIMITER              |Limiter value of the temperature                  |
+|LIMITER_VELOCITY-X |LIMITER              |Limiter value of the x-velocity                   |
+|LIMITER_VELOCITY-Y |LIMITER              |Limiter value of the y-velocity                   |
+|LIMITER_VELOCITY-Z |LIMITER              |Limiter value of the z-velocity                   |
+|LIMITER_PRESSURE   |LIMITER              |Limiter value of the pressure                     |
+|LIMITER_DENSITY    |LIMITER              |Limiter value of the density                      |
+|LIMITER_ENTHALPY   |LIMITER              |Limiter value of the enthalpy                     |
+|VORTICITY_X        |VORTEX_IDENTIFICATION|x-component of the vorticity vector               |
+|VORTICITY_Y        |VORTEX_IDENTIFICATION|y-component of the vorticity vector               |
+|VORTICITY_Z        |VORTEX_IDENTIFICATION|z-component of the vorticity vector               |
+|Q_CRITERION        |VORTEX_IDENTIFICATION|Value of the Q-Criterion                          |
+|DELTA_TIME         |TIMESTEP             |Value of the local timestep for the flow variables|
+|CFL                |TIMESTEP             |Value of the local CFL for the flow variables     |
+|ORTHOGONALITY      |MESH_QUALITY         |Orthogonality Angle (deg.)                        |
+|ASPECT_RATIO       |MESH_QUALITY         |CV Face Area Aspect Ratio                         |
+|VOLUME_RATIO       |MESH_QUALITY         |CV Sub-Volume Ratio                               |
+|RANK               |MPI                  |Rank of the MPI-partition                         |
++--------------------------------------------------------------------------------------------+
+Available screen/history output fields for the current configuration in Zone 0 (Comp. Fluid):
++---------------------------------------------------------------------------------------------------------------------------+
+|Name                       |Group Name        |Type |Description                                                           |
++---------------------------------------------------------------------------------------------------------------------------+
+|TIME_ITER                  |ITER              |D    |Time iteration index                                                  |
+|OUTER_ITER                 |ITER              |D    |Outer iteration index                                                 |
+|INNER_ITER                 |ITER              |D    |Inner iteration index                                                 |
+|CUR_TIME                   |TIME_DOMAIN       |D    |Current physical time (s)                                             |
+|TIME_STEP                  |TIME_DOMAIN       |D    |Current time step (s)                                                 |
+|ITER_TIME                  |WALL_TIME         |D    |Time per iteration (s)                                                |
+|WALL_TIME                  |WALL_TIME         |D    |Average wall-clock time since the start of inner iterations.          |
+|NONPHYSICAL_POINTS         |NONPHYSICAL_POINTS|D    |The number of non-physical points in the solution                     |
+|RMS_DENSITY                |RMS_RES           |R    |Root-mean square residual of the density.                             |
+|RMS_MOMENTUM-X             |RMS_RES           |R    |Root-mean square residual of the momentum x-component.                |
+|RMS_MOMENTUM-Y             |RMS_RES           |R    |Root-mean square residual of the momentum y-component.                |
+|RMS_MOMENTUM-Z             |RMS_RES           |R    |Root-mean square residual of the momentum z-component.                |
+|RMS_ENERGY                 |RMS_RES           |R    |Root-mean square residual of the energy.                              |
+|MAX_DENSITY                |MAX_RES           |R    |Maximum square residual of the density.                               |
+|MAX_MOMENTUM-X             |MAX_RES           |R    |Maximum square residual of the momentum x-component.                  |
+|MAX_MOMENTUM-Y             |MAX_RES           |R    |Maximum square residual of the momentum y-component.                  |
+|MAX_MOMENTUM-Z             |MAX_RES           |R    |Maximum residual of the z-component.                                  |
+|MAX_ENERGY                 |MAX_RES           |R    |Maximum residual of the energy.                                       |
+|BGS_DENSITY                |BGS_RES           |R    |BGS residual of the density.                                          |
+|BGS_MOMENTUM-X             |BGS_RES           |R    |BGS residual of the momentum x-component.                             |
+|BGS_MOMENTUM-Y             |BGS_RES           |R    |BGS residual of the momentum y-component.                             |
+|BGS_MOMENTUM-Z             |BGS_RES           |R    |BGS residual of the z-component.                                      |
+|BGS_ENERGY                 |BGS_RES           |R    |BGS residual of the energy.                                           |
+|LINSOL_ITER                |LINSOL            |D    |Number of iterations of the linear solver.                            |
+|LINSOL_RESIDUAL            |LINSOL            |D    |Residual of the linear solver.                                        |
+|MIN_DELTA_TIME             |CFL_NUMBER        |D    |Current minimum local time step                                       |
+|MAX_DELTA_TIME             |CFL_NUMBER        |D    |Current maximum local time step                                       |
+|MIN_CFL                    |CFL_NUMBER        |D    |Current minimum of the local CFL numbers                              |
+|MAX_CFL                    |CFL_NUMBER        |D    |Current maximum of the local CFL numbers                              |
+|AVG_CFL                    |CFL_NUMBER        |D    |Current average of the local CFL numbers                              |
+|SURFACE_MASSFLOW           |FLOW_COEFF        |C    |Total average mass flow on all markers set in MARKER_ANALYZE          |
+|SURFACE_MACH               |FLOW_COEFF        |C    |Total average mach number on all markers set in MARKER_ANALYZE        |
+|SURFACE_STATIC_TEMPERATURE |FLOW_COEFF        |C    |Total average temperature on all markers set in MARKER_ANALYZE        |
+|SURFACE_STATIC_PRESSURE    |FLOW_COEFF        |C    |Total average pressure on all markers set in MARKER_ANALYZE           |
+|AVG_DENSITY                |FLOW_COEFF        |C    |Total average density on all markers set in MARKER_ANALYZE            |
+|AVG_ENTHALPY               |FLOW_COEFF        |C    |Total average enthalpy on all markers set in MARKER_ANALYZE           |
+|AVG_NORMALVEL              |FLOW_COEFF        |C    |Total average normal velocity on all markers set in MARKER_ANALYZE    |
+|SURFACE_UNIFORMITY         |FLOW_COEFF        |C    |Total flow uniformity on all markers set in MARKER_ANALYZE            |
+|SURFACE_SECONDARY          |FLOW_COEFF        |C    |Total secondary strength on all markers set in MARKER_ANALYZE         |
+|SURFACE_MOM_DISTORTION     |FLOW_COEFF        |C    |Total momentum distortion on all markers set in MARKER_ANALYZE        |
+|SURFACE_SECOND_OVER_UNIFORM|FLOW_COEFF        |C    |Total secondary over uniformity on all markers set in MARKER_ANALYZE  |
+|SURFACE_TOTAL_TEMPERATURE  |FLOW_COEFF        |C    |Total average total temperature all markers set in MARKER_ANALYZE     |
+|SURFACE_TOTAL_PRESSURE     |FLOW_COEFF        |C    |Total average total pressure on all markers set in MARKER_ANALYZE     |
+|REFERENCE_FORCE            |AERO_COEFF        |C    |Reference force used to compute aerodynamic coefficients              |
+|DRAG                       |AERO_COEFF        |C    |Total drag coefficient on all surfaces set with MARKER_MONITORING     |
+|LIFT                       |AERO_COEFF        |C    |Total lift coefficient on all surfaces set with MARKER_MONITORING     |
+|SIDEFORCE                  |AERO_COEFF        |C    |Total sideforce coefficient on all surfaces set with MARKER_MONITORING|
+|MOMENT_X                   |AERO_COEFF        |C    |Total momentum x-component on all surfaces set with MARKER_MONITORING |
+|MOMENT_Y                   |AERO_COEFF        |C    |Total momentum y-component on all surfaces set with MARKER_MONITORING |
+|MOMENT_Z                   |AERO_COEFF        |C    |Total momentum z-component on all surfaces set with MARKER_MONITORING |
+|FORCE_X                    |AERO_COEFF        |C    |Total force x-component on all surfaces set with MARKER_MONITORING    |
+|FORCE_Y                    |AERO_COEFF        |C    |Total force y-component on all surfaces set with MARKER_MONITORING    |
+|FORCE_Z                    |AERO_COEFF        |C    |Total force z-component on all surfaces set with MARKER_MONITORING    |
+|EFFICIENCY                 |AERO_COEFF        |C    |Total lift-to-drag ratio on all surfaces set with MARKER_MONITORING   |
+|AOA                        |AOA               |D    |Angle of attack                                                       |
+|COMBO                      |COMBO             |C    |Combined obj. function value.                                         |
+|BUFFET                     |AERO_COEFF        |C    |Buffet sensor                                                         |
+|TOTAL_HEATFLUX             |HEAT              |C    |Total heatflux on all surfaces set with MARKER_MONITORING.            |
+|MAXIMUM_HEATFLUX           |HEAT              |C    |Maximum heatflux across all surfaces set with MARKER_MONITORING.      |
+|FIGURE_OF_MERIT            |ROTATING_FRAME    |C    |Thrust over torque                                                    |
+|THRUST                     |ROTATING_FRAME    |C    |Thrust coefficient                                                    |
+|TORQUE                     |ROTATING_FRAME    |C    |Torque coefficient                                                    |
+|INVERSE_DESIGN_PRESSURE    |CP_DIFF           |C    |Cp difference for inverse design                                      |
+|EQUIVALENT_AREA            |EQUIVALENT_AREA   |C    |Equivalent area                                                       |
+|DRAG_ON_SURFACE            |AERO_COEFF_SURF   |C    |                                                                      |
+|LIFT_ON_SURFACE            |AERO_COEFF_SURF   |C    |                                                                      |
+|SIDEFORCE_ON_SURFACE       |AERO_COEFF_SURF   |C    |                                                                      |
+|MOMENT-X_ON_SURFACE        |AERO_COEFF_SURF   |C    |                                                                      |
+|MOMENT-Y_ON_SURFACE        |AERO_COEFF_SURF   |C    |                                                                      |
+|MOMENT-Z_ON_SURFACE        |AERO_COEFF_SURF   |C    |                                                                      |
+|FORCE-X_ON_SURFACE         |AERO_COEFF_SURF   |C    |                                                                      |
+|FORCE-Y_ON_SURFACE         |AERO_COEFF_SURF   |C    |                                                                      |
+|FORCE-Z_ON_SURFACE         |AERO_COEFF_SURF   |C    |                                                                      |
+|EFFICIENCY_ON_SURFACE      |AERO_COEFF_SURF   |C    |                                                                      |
+|TOTAL_HEATFLUX_ON_SURFACE  |HEAT_SURF         |C    |                                                                      |
+|MAXIMUM_HEATFLUX_ON_SURFACE|HEAT_SURF         |C    |                                                                      |
++---------------------------------------------------------------------------------------------------------------------------+
+Type legend: Default (D), Residual (R), Coefficient (C)
+Generated screen/history fields (only first field of every group is shown):
++---------------------------------------------------------------------------------------------------------------------------+
+|Name                       |Group Name        |Type |Description                                                           |
++---------------------------------------------------------------------------------------------------------------------------+
+|REL_RMS_DENSITY            |REL_RMS_RES       |AR   |Relative residual.                                                    |
+|REL_MAX_DENSITY            |REL_MAX_RES       |AR   |Relative residual.                                                    |
+|REL_BGS_DENSITY            |REL_BGS_RES       |AR   |Relative residual.                                                    |
+|AVG_BGS_RES                |AVG_BGS_RES       |AR   |Average residual over all solution variables.                         |
+|AVG_MAX_RES                |AVG_MAX_RES       |AR   |Average residual over all solution variables.                         |
+|AVG_RMS_RES                |AVG_RMS_RES       |AR   |Average residual over all solution variables.                         |
++---------------------------------------------------------------------------------------------------------------------------+
+
+--------------------------- Finalizing Solver ---------------------------
+Deleted CNumerics container.
+Deleted CIntegration container.
+Deleted CSolver container.
+Deleted CIteration container.
+Deleted CInterface container.
+Deleted CGeometry container.
+Deleted CFreeFormDefBox class.
+Deleted CSurfaceMovement class.
+Deleted CVolumetricMovement class.
+Deleted CConfig container.
+Deleted nInst container.
+Deleted COutput class.
+-------------------------------------------------------------------------
+
+------------------------- Exit Success (SU2_CFD) ------------------------
+

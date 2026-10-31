@@ -1,0 +1,80 @@
+{
+  "case": "outputs\\v106_validation\\plate_outer01",
+  "evidenceClass": "numerical-boundary-layer-comparison; not-experiment",
+  "units": {
+    "x": "m",
+    "pressure": "Pa",
+    "temperature": "K",
+    "heatFlux": "W/m^2"
+  },
+  "signConvention": "positive-into-wall; upstream-source-and-restart-gradient-confirmed-for-this-case",
+  "wallTemperatureIdentity": "prescribed-isothermal-boundary; exported-Temperature-is-fluid-node-state",
+  "prescribedWallTemperature": 300,
+  "fluidNodeMinusPrescribedTemperatureMax": 260.091,
+  "fluidNodeMinusPrescribedTemperatureInteriorMax": 0.05169999999998254,
+  "temperatureEOSMaxRelativeError": 1.6652054934951366e-07,
+  "nodes": 65,
+  "residualConverged": true,
+  "lastHistoryFields": {
+    "Time_Iter": 0.0,
+    "Outer_Iter": 0.0,
+    "Inner_Iter": 15147.0,
+    "rmsRho": -13.76090673,
+    "rmsRhoU": -11.02528818,
+    "rmsRhoV": -12.40837927,
+    "rmsRhoE": -8.000415356,
+    "RefForce": 11200.0,
+    "CD": 0.001192029876,
+    "CL": 0.001759114902,
+    "CSF": 0.0,
+    "CMx": 0.0,
+    "CMy": 0.0,
+    "CMz": 0.0001213392001,
+    "CFx": -0.001192029876,
+    "CFy": -0.001759114902,
+    "CFz": 0.0,
+    "CEff": 1.475730549,
+    "Buffet": null,
+    "HF": 11150.83423,
+    "maxHF": 5910477.735
+  },
+  "heatFluxGradientMaxRelativeError": 3.350611146834054e-07,
+  "pressureEOSMaxRelativeError": 9.826556623959704e-08,
+  "reference": {
+    "qSqrtX": 12264.843223508966,
+    "etaMax": 16,
+    "nodes": 526,
+    "maxResidual": 4.288190440836279e-08,
+    "wallEnthalpyDerivative": 0.25569177962858136
+  },
+  "referenceExtended": {
+    "qSqrtX": 12264.843223887689,
+    "etaMax": 24,
+    "nodes": 531,
+    "maxResidual": 9.994745115453474e-08,
+    "wallEnthalpyDerivative": 0.25569177963647677
+  },
+  "comparisonInterval": [
+    0.04000000000000001,
+    0.16000000000000003
+  ],
+  "boundaryLayerRelativeDifferenceMin": -0.04706138040685248,
+  "boundaryLayerRelativeDifferenceMax": -0.017999504105820074,
+  "boundaryLayerRelativeDifferenceRMS": 0.029711055336334495,
+  "leadingEdge": {
+    "pressure": 7092.614,
+    "temperature": 560.091,
+    "heatFlux": 5910478.0,
+    "excludedFromSimilarityComparison": true
+  },
+  "fullNavierStokesVerified": false,
+  "productionQualified": false,
+  "inputSHA256": {
+    "case_manifest.json": "c57f264f737538e95617542836ff516446a45f0bcdfc386da57ee729ecad441d",
+    "surface_flow.vtk": "2e548ed88d7bdea7c12ac13d9fffc75938420c545ac646197f8f47c0f1364146",
+    "restart_flow.csv": "f2622f9e56cb8fbd9d076843af4d872b83f02732b8a963b3f0ccc792490c0b7a",
+    "history.csv": "2dba2f40ad0eb3cd5a831c8a44026465395a123a5a60f9f7a7a59e831cf92c42",
+    "engine_stdout.log": "a05e2cbd2faf8dee806a6c52ffd38e4e1f7275cebca60541161ec143aa9ca912"
+  },
+  "auditSHA256": "32c0d70089bf4d2a78d1fecb117fccf47b15044444c6356d3c5afbab68ec2c9b"
+}

@@ -71,7 +71,8 @@ def similarity(options, eta_max):
 
 
 def audit(folder):
-    options = json.loads((folder / 'case_manifest.json').read_text(encoding='utf-8'))['options']
+    manifest = json.loads((folder / 'case_manifest.json').read_text(encoding='utf-8'))
+    options = manifest['options']
     xyz, wall = read_wall(folder / 'surface_flow.vtk')
     rest = np.genfromtxt(str(folder / 'restart_flow.csv'), delimiter=',', skip_header=1)
     R, gamma, Pr = 287.05287, 1.4, .72
@@ -84,7 +85,7 @@ def audit(folder):
     for i, point in enumerate(xyz):
         column = np.flatnonzero(np.abs(rest[:, 1] - point[0]) < 6e-8)
         column = column[np.argsort(rest[column, 2])]
-        assert len(column) == options['ny']+1 and rest[column[0], 2] == 0
+        assert len(column) == manifest.get('wallNormalCells',options['ny'])+1 and rest[column[0], 2] == 0
         iw, ine = column[:2]
         mu = 1.458e-6*T[iw]**1.5/(T[iw]+110.4)
         reconstructed.append(mu*cp/Pr*(T[ine]-options['wallTemperature'])/rest[ine, 2])

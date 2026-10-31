@@ -1,0 +1,27 @@
+function startSU2RocketVolume(source,out,pythonExecutable)
+%STARTSU2ROCKETVOLUME 对已保存的真实三维体网格执行单步启动检查。
+% 模块一：复用几何，不重建旧外域；dryrun只使用虚拟网格，不能代替本检查。
+% 模块二：实际加载完整11712单元并执行一步，读取真实3D壁面输出。
+% 模块三：一步初始场只验证接口，不算收敛物理结果或新增求解面积。
+if nargin<3,pythonExecutable='python';end
+assert(~exist(out,'dir'));mkdir(out);saved=load(source,'volume');volume=saved.volume;
+angles=[0 0;20 5];receipts=cell(2,1);data=cell(2,1);info=cell(2,1);
+for k=1:2
+    folder=fullfile(out,sprintf('angle%02d',k));
+    info{k}=writeSU2RocketCase(volume,folder,struct('alpha',angles(k,1),'beta',angles(k,2),'iterations',1));
+    receipts{k}=runEmbeddedSU2Case(folder,struct('pythonExecutable',pythonExecutable,'threads',2,'maximumSeconds',120));
+    log=fileread(fullfile(folder,'engine_stdout.log'));
+    assert(~contains(log,'Using Dummy Geometry') && contains(log,'Begin Solver'));
+    letters='XYZ';
+    for j=1:3
+        pattern=sprintf('Velocity-%s\|\s*([^|]+)\|',letters(j));
+        match=regexp(log,pattern,'tokens','once');assert(~isempty(match));
+        actual=str2double(strtrim(match{1}));expected=info{k}.expectedVelocity(j);
+        assert(abs(actual-expected)<max(.01,abs(expected)*1e-5),'来流坐标约定不一致。');
+    end
+    data{k}=readSU2SurfaceResult(fullfile(folder,'surface_flow.vtk'));
+    assert(~data{k}.productionQualified && all(isfinite(data{k}.heatFluxRaw)));
+end
+save(fullfile(out,'startup_only.mat'),'data','info','receipts','-v7');
+fprintf('Two actual 3D NS single-step startup checks completed; correct velocity components and wall p/T/q, NOT converged physics.\n');
+end

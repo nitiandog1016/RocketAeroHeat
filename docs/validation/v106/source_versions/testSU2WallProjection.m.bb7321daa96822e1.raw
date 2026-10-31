@@ -1,0 +1,31 @@
+function testSU2WallProjection(source,actualVTK,out)
+%TESTSU2WALLPROJECTION 全原面保守映射及实际3D输出绑定检查，不启动流动求解。
+% 模块一：全部六区与原面面积闭合、常数保持、有符号非均匀场积分守恒。
+% 模块二：真实SU2已保存单步场逐节点/连接匹配，未收敛身份保持。
+assert(~exist(out,'dir'));mkdir(out);s=load(source,'volume','surface');
+projection=buildSU2WallProjection(s.volume,s.surface);ids=projection.wallVertexIDs;
+one=zeros(size(s.volume.vertices,1),1);one(ids)=1;constant=projection.weights*one;
+assert(max(abs(constant-1))<2e-8);
+f=zeros(size(one));f(ids)=sin((1:numel(ids))')-0.3;
+mapped=projection.weights*f;scale=sum(projection.sourceNodeArea.*abs(f));
+assert(abs(projection.targetFaceArea'*mapped-projection.sourceNodeArea'*f)<2e-8*scale);
+assert(min(mapped)>=min(f(ids))-1e-8 && max(mapped)<=max(f(ids))+1e-8);
+data=readSU2SurfaceResult(actualVTK);result=mapSU2WallResult(data,projection);
+% 读取原引擎历史HF，验证节点向量面积口径；不把守恒热负荷改名为原始q。
+history=readtable(fullfile(fileparts(actualVTK),'history.csv'),'VariableNamingRule','preserve');
+names=strtrim(history.Properties.VariableNames);hf=find(strcmp(names,'HF'));assert(isscalar(hf));
+engineHF=history{end,hf};enginePowerError=abs(result.reconstructedEngineHeatPowerRaw-engineHF)/max(abs(engineHF),1);
+assert(enginePowerError<2e-6 && result.heatFluxAndHeatLoadAreDistinct && result.heatLoadRelativeClosure<2e-8);
+assert(numel(result.heatFluxRaw)==size(s.surface.F,1) && ~result.eligibleForSurfaceCoverage);
+save(fullfile(out,'projection_and_result.mat'),'projection','result','-v7');
+report=struct('originalFaceCount',size(s.surface.F,1),'sourceWallNodes',numel(ids), ...
+    'maximumConstantError',max(abs(constant-1)),'maximumTargetAreaRelativeError',projection.maximumTargetAreaRelativeError, ...
+    'maximumSourceAreaRelativeError',projection.maximumSourceAreaRelativeError, ...
+    'actualHeatPowerRelativeClosure',result.heatPowerRelativeClosure, ...
+    'actualHeatLoadRelativeClosure',result.heatLoadRelativeClosure,'enginePowerReconstructionRelativeError',enginePowerError, ...
+    'physicalAreaHeatPowerRaw',result.targetHeatPowerRaw,'engineHeatPowerRaw',engineHF, ...
+    'heatFluxAndHeatLoadAreDistinct',true, ...
+    'actualMaxNodeMatchingDistance',result.maxNodeMatchingDistance,'productionQualified',false);
+fid=fopen(fullfile(out,'report.json'),'w','n','UTF-8');guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(report));
+fprintf('All %d original faces conservatively mapped, including base; actual 3D single-step field remains unqualified.\n',size(s.surface.F,1));
+end

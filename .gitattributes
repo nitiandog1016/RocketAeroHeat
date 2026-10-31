@@ -86,3 +86,9 @@ docs/validation/v105/upstream/** -whitespace
 # SU2原始日志和VTK行尾空白属于已散列的上游输出，不格式化证据。
 docs/validation/v105/**/*.log -whitespace
 docs/validation/v105/**/*.vtk -whitespace
+# v106实际三维启动、外域和映射证据保留原字节。
+docs/validation/v106/** -text -eol
+docs/validation/v106/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v106/**/*.raw -whitespace
+docs/validation/v106/**/*.log -whitespace
+docs/validation/v106/**/*.vtk -whitespace
