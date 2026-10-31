@@ -18,14 +18,21 @@ assert(strcmp(volume.kind,'complete-rocket-three-dimensional-su2-volume') && ~vo
 assert(~exist(folder,'dir'),'RocketAeroHeat:SU2:Existing','不能覆写已有计算目录。');mkdir(folder);
 fid=fopen(fullfile(folder,'mesh.su2'),'w');assert(fid>=0);guard=onCleanup(@()fclose(fid));
 fprintf(fid,'NDIME= 3\nNELEM= %d\n',numel(volume.cells));
-for k=1:numel(volume.cells),fprintf(fid,'%d',volume.cellTypes(k));fprintf(fid,' %d',volume.cells{k}-1);fprintf(fid,'\n');end
+for k=1:numel(volume.cells)
+    cellNodes=volume.cells{k};
+    % SU2棱柱端面次序与本项目正四面体分解相反，显式转换而非依赖自动调序。
+    if volume.cellTypes(k)==13,cellNodes=cellNodes([2 1 3 5 4 6]);end
+    fprintf(fid,'%d',volume.cellTypes(k));fprintf(fid,' %d',cellNodes-1);fprintf(fid,'\n');
+end
 fprintf(fid,'NPOIN= %d\n',size(volume.vertices,1));
 fprintf(fid,'%.17g %.17g %.17g %d\n',[volume.vertices,(0:size(volume.vertices,1)-1)']');
 fprintf(fid,'NMARK= 2\n');markers={volume.wall,volume.farfield};names={'wall','farfield'};
 for j=1:2
     faces=markers{j};fprintf(fid,'MARKER_TAG= %s\nMARKER_ELEMS= %d\n',names{j},numel(faces));
     for k=1:numel(faces)
-        f=faces{k};if numel(f)==3,type=5;elseif numel(f)==4,type=9;else,error('无效边界面。');end
+        % SU2原生边界法向指向流体域内部；几何体积审计中的外向面保持不变。
+        f=faces{k};f=f([1 end:-1:2]);
+        if numel(f)==3,type=5;elseif numel(f)==4,type=9;else,error('无效边界面。');end
         fprintf(fid,'%d',type);fprintf(fid,' %d',f-1);fprintf(fid,'\n');
     end
 end
@@ -64,6 +71,7 @@ info=struct('kind',volume.kind,'flight',flight,'expectedVelocity',flight.Mach*sq
     'regions',{unique(volume.wallRegion)},'referenceArea',refArea,'originalSurfaceFaceCount',size(volume.sourceFaces,1), ...
     'coordinateConvention','X-axis; nose +X; zero-incidence flow -X; positive alpha flow +Z; SI', ...
     'thermalPropertyMode','caloricallyPerfect; gamma1.4; Sutherland; Pr0.72', ...
-    'physicalSolution',false,'productionQualified',false,'fieldProjectionImplemented',false);
+    'nativeOrientation','SU2v8.6.0 prism inward triangular ends; boundary normals into fluid domain', ...
+    'physicalSolution',false,'productionQualified',false,'fieldProjectionImplemented',true);
 fid=fopen(fullfile(folder,'case_manifest.json'),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(info));
 end

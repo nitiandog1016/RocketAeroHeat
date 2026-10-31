@@ -1,0 +1,49 @@
+{
+  "status": "converged-two-grid-interior-screen; not-grid-independence",
+  "interval": [
+    0.04,
+    0.16
+  ],
+  "comparisonNodes": 34,
+  "changes": {
+    "Pressure": {
+      "maxAbsoluteRelative": 0.00047197923807718034,
+      "minimumRelative": 0.00010071338648764971,
+      "maximumRelative": 0.00047197923807718034
+    },
+    "Heat_Flux": {
+      "maxAbsoluteRelative": 0.013822713410941878,
+      "minimumRelative": 0.006651120535424937,
+      "maximumRelative": 0.013822713410941878
+    }
+  },
+  "thresholds": {
+    "pressure": 0.01,
+    "heatFlux": 0.05
+  },
+  "pressureScreenPassed": true,
+  "heatFluxScreenPassed": true,
+  "sampleRule": "coarse interior nodes; linear fine-grid interpolation; no extrapolation",
+  "boundaryLayerRelativeDifferenceRange": [
+    -0.033889182969997766,
+    -0.011583343053224393
+  ],
+  "leadingEdgeExcludedFromComparisonOnly": true,
+  "gridIndependenceQualified": false,
+  "experimentCompared": false,
+  "newQualifiedRocketArea": 0,
+  "inputSHA256": {
+    "tests/auditSU2WarmConvergence.py": "8f30d49d1137354b423e8cbd7e32d1397fca0a71fe625ebf8801623f13ab932e",
+    "outputs/v105_validation/plate03/history.csv": "cb34f67804362757a7fd3ab8f53e2c7c3751cdf3585da0dd583906a921dbed6a",
+    "outputs/v105_validation/plate03/surface_flow.vtk": "efadbe9bec1a0d1ba59ae2ab031d3becb805e89aa5da71b51f12b6699fe04b68",
+    "outputs/v105_validation/plate03/engine_stdout.log": "cf7a8a8f5658e5232cb8dfbe9e3d311203d728bb8ffabbafdf488a81f94d5281",
+    "outputs/v105_validation/plate03/engine_process.json": "605ac428c70756ec82f43ebc58d549176b5e5814ba2cb2d88902202f8aeba39c",
+    "outputs/v105_validation/plate03/case.cfg": "66ef26f29452f68f8d60efe7f5dfed8b9662015cddb1329b15f4f8641a4d16c9",
+    "outputs/v108_validation/plate_warm01/history.csv": "1648f22f0bd847125896bf463d45141e864230f87cd24e0500a9052daebe32ea",
+    "outputs/v108_validation/plate_warm01/surface_flow.vtk": "0d81ce568de58457de00d632722bf28892ac76f2e21ecce9fd901538fe6e2b82",
+    "outputs/v108_validation/plate_warm01/engine_stdout.log": "c9432d684e4fb53a9233ac81f91782c587c733160054f870427980cb8c1d854d",
+    "outputs/v108_validation/plate_warm01/engine_process.json": "0b61e765fb9f9ef34ad0a01b2d9fc4d6fe39f1e20309ee5c6a4024ca3d11859f",
+    "outputs/v108_validation/plate_warm01/case.cfg": "1e632de0c44bbc97662562b7fb27ce06548ebf7abe33606b7ddc2604f18e79a8",
+    "outputs/v108_validation/plate_warm01/physical_audit.json": "45ef01c8c9345e8a39931c2db7ebc3e31db44252b2a8883db4827c76d74e8d86"
+  }
+}

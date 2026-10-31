@@ -1,0 +1,85 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T10:48:11.893610+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 720,
+    "dryRun": false,
+    "jobToken": "v108_internal_warm_start01",
+    "sourceFiles": [
+      "scripts/prepareSU2FlatPlateWarmStart.py",
+      "tests/auditSU2WarmStart.py",
+      "buildSU2FlatPlateCase.m",
+      "outputs/v105_validation/plate03/restart_flow.csv",
+      "outputs/v105_validation/plate03/case_manifest.json",
+      "outputs/v105_validation/plate03/engine_process.json",
+      "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\warm_start_manifest.json",
+      "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\initial_audit.json"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\engine_request.json": "25744d49381212f68ce23713fe51dc6c39e0f39f6714b16e948b3e4c2bcea5f3",
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\case.cfg": "1e632de0c44bbc97662562b7fb27ce06548ebf7abe33606b7ddc2604f18e79a8",
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\mesh.su2": "6f26d149e630c9af895aaff1000b6f9b9d9163e7fdbbe150ca9822d4a50cf4b7",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "9ebd6186f7086ffe78318b6a7e5900851f3671db6bb9540427aba4730aac2e28",
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2FlatPlateWarmStart.py": "4865173ac312030691ab71596f5041d5b126c4e1191dca44d2b3f39c2dbd5192",
+    "E:\\RocketAeroHeat\\tests\\auditSU2WarmStart.py": "4cbcd29c91db1a75ed02976ba855a5c533c4ad3fd962db863c19443986e4fb64",
+    "E:\\RocketAeroHeat\\buildSU2FlatPlateCase.m": "d74a6df73f05b96b2760f2f7aa1976e179fd2653167dc116433c258445a18f88",
+    "E:\\RocketAeroHeat\\outputs\\v105_validation\\plate03\\restart_flow.csv": "5c8b3bab7c1bb7ef16d7ed317b7d589d6f9f1272e7febab65a9605959ae6b13c",
+    "E:\\RocketAeroHeat\\outputs\\v105_validation\\plate03\\case_manifest.json": "abadc37c984f13ace1188fa99bb2e810bfcb54f9de2ab699192b10914cdd5988",
+    "E:\\RocketAeroHeat\\outputs\\v105_validation\\plate03\\engine_process.json": "605ac428c70756ec82f43ebc58d549176b5e5814ba2cb2d88902202f8aeba39c",
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\warm_start_manifest.json": "de5117f3af97f9442cb129d6a106183c3c1563ef94e4168643b5e7ce44834d81",
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\initial_audit.json": "0271f39fcec2c401d2c8ea50d2be4f10ed27ba1d34e97bfe504cb31043581c19",
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\initial_flow.csv": "987fabd684b55dddc0c9261e98afddc9b120db2df2ef68ffc1237e1782cf0f70"
+  },
+  "executableVersion": "8.6.0",
+  "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+  "supervisorProcessID": 31192,
+  "physicalSolutionQualified": false,
+  "processID": 18924,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 562.9840000000004,
+  "progress": {
+    "Inner_Iter": 23477.0,
+    "rms[Rho]": -13.63134544,
+    "rms[RhoE]": -8.000124765,
+    "HF": 11142.00098
+  },
+  "exitCode": 0,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T10:57:34.891732+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2FlatPlateWarmStart.py": true,
+    "E:\\RocketAeroHeat\\tests\\auditSU2WarmStart.py": true,
+    "E:\\RocketAeroHeat\\buildSU2FlatPlateCase.m": true,
+    "E:\\RocketAeroHeat\\outputs\\v105_validation\\plate03\\restart_flow.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v105_validation\\plate03\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v105_validation\\plate03\\engine_process.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\warm_start_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\initial_audit.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v108_validation\\plate_warm01\\initial_flow.csv": true
+  },
+  "outputSHA256": {
+    "case_before_warm_start.cfg": "e9dbb309efdc6a2129e6b70817fbc8bdb69019cfa009df4d8be61c844a5df9bc",
+    "case_manifest.json": "ffcf334772fd203afa7cf5dee7e28a48302b6f6c93ba3c75d166c2b7676d9f2a",
+    "engine_stdout.log": "c9432d684e4fb53a9233ac81f91782c587c733160054f870427980cb8c1d854d",
+    "history.csv": "1648f22f0bd847125896bf463d45141e864230f87cd24e0500a9052daebe32ea",
+    "restart_flow.csv": "036889d9a1db8165b7b11bd598f82c011e0586fa26bd0885092c335794ef8c1a",
+    "surface_flow.vtk": "0d81ce568de58457de00d632722bf28892ac76f2e21ecce9fd901538fe6e2b82"
+  }
+}

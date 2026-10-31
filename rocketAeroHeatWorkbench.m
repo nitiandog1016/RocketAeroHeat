@@ -82,6 +82,11 @@ renderEditor();sync();showGeometry(true);
         fig.UserData.workflowState=state;fig.UserData.controls=controls;
         fig.UserData.webUI=webUI;fig.UserData.caseReport=report;
         fig.UserData.engineJob=engineJob;fig.UserData.researchUI=researchUI;
+        fig.UserData.volumeInfo=[];
+        if ~isempty(embeddedVolume)
+            fig.UserData.volumeInfo=struct('nodes',size(embeddedVolume.vertices,1), ...
+                'cells',numel(embeddedVolume.cells),'construction',embeddedVolume.meshConstruction);
+        end
         % 工作区也跟随当前有效状态；上游改变后不留下旧场量冒充当前结果。
         assignin('base','cfg',state.cfg);assignin('base','rawMeshOriginal',state.rawMesh);
         assignin('base','rawMesh',state.orientedMesh);assignin('base','quality',state.quality);
@@ -164,9 +169,24 @@ renderEditor();sync();showGeometry(true);
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
             case 2
                 if isEmbedded()
-                    grid=form(12);controls.generate=button(grid,1,'生成完整三维体网格',@generate);
-                    tip(grid,3,'原生无突起箭体；保留原三角面。11712单元、8层射线体网格仅供集成研究，近壁精度尚未合格。');
-                    tip(grid,7,'当前不支持任意STL/突起体网格，不自动替换或简化导入模型。工程STL流程保持原重网格算法。');
+                    [~,mode]=su2WorkbenchMeshOptions(state.cfg);
+                    grid=form(14);
+                    controls.volumeMode=choice(grid,1,'体网格模式',{'法向偏置层 · 研究','射线层 · 历史对照'}, ...
+                        {'normalLayers','starRay'},mode);
+                    controls.volumeMode.ValueChangedFcn=@nativeMeshEdited;
+                    controls.generate=button(grid,2,'生成完整三维体网格',@generate);
+                    description='待生成；保留完整原三角面，网格参数改变后须重新确认边界。';
+                    if ~isempty(embeddedVolume)
+                        description=sprintf('已生成 %d 节点 / %d 体单元\n原表面 %d 面，近壁精度尚未合格。', ...
+                            size(embeddedVolume.vertices,1),numel(embeddedVolume.cells),size(state.mesh.F,1));
+                    end
+                    controls.volumeSummary=tip(grid,4,description);
+                    if strcmp(mode,'normalLayers')
+                        tip(grid,7,'24层近壁偏置 + 16层外域；首层母线法向距离2 µm，近壁增长率1.25。三维面法向距离略受周向多边形影响，不能据此宣称y+或热流精度通过。');
+                    else
+                        tip(grid,7,'8层射线体网格，保留旧快照参数，仅作历史集成对照；近壁方向和精度尚未合格。');
+                    end
+                    tip(grid,11,'当前仅支持原生无突起箭体，不自动替换任意STL。工程STL流程保持原重网格算法。');
                     sync();return;
                 end
                 grid=form(12);c=state.cfg.remesh;
@@ -299,7 +319,7 @@ renderEditor();sync();showGeometry(true);
     function x=button(grid,row,text,callback)
         x=uibutton(grid,'Text',text,'ButtonPushedFcn',callback);x.Layout.Row=row;x.Layout.Column=[1 2];
     end
-    function tip(grid,row,text)
+    function x=tip(grid,row,text)
         x=uilabel(grid,'Text',text,'WordWrap','on','VerticalAlignment','top');
         x.Layout.Row=[row min(row+2,size(grid.RowHeight,2))];x.Layout.Column=[1 2];
     end
@@ -546,12 +566,23 @@ renderEditor();sync();showGeometry(true);
         try
             preparing=true;message('正在建立完整三维体网格并核对闭合/体积…');
             candidate=state.orientedMesh;
-            embeddedVolume=buildSU2RocketVolume(candidate,state.modelSource.truth, ...
-                struct('radialLayers',8,'maxWallAngleStepDeg',10,'baseRadialSegments',4));
+            options=su2WorkbenchMeshOptions(state.cfg);
+            embeddedVolume=buildSU2RocketVolume(candidate,state.modelSource.truth,options);
             state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));
             preparing=false;renderEditor();showGeometry(true);
             message(sprintf('体网格%d单元；原表面%d面未改变。近壁精度未合格，请确认边界。',numel(embeddedVolume.cells),size(candidate.F,1)));
         catch ex,preparing=false;renderEditor();showError(ex);end
+    end
+    function nativeMeshEdited(~,~)
+        % 模式属于求解输入；清除旧体网格、边界确认和研究结果，禁止混用。
+        if state.busy || preparing,return;end
+        try
+            next=state.cfg;next.su2.volumeMode=controls.volumeMode.Value;
+            if isequaln(next,state.cfg),return;end
+            state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
+            embeddedVolume=[];researchUI=[];webUI=[];report=[];delete(resultHost.Children);
+            renderEditor();showGeometry(false);message('体网格模式已改变；请重新生成网格并确认边界。');
+        catch ex,showError(ex);end
     end
     function startEngine()
         try

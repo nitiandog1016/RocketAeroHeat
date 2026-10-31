@@ -1,0 +1,80 @@
+{
+  "case": "outputs\\v108_validation\\plate_warm01",
+  "evidenceClass": "numerical-boundary-layer-comparison; not-experiment",
+  "units": {
+    "x": "m",
+    "pressure": "Pa",
+    "temperature": "K",
+    "heatFlux": "W/m^2"
+  },
+  "signConvention": "positive-into-wall; upstream-source-and-restart-gradient-confirmed-for-this-case",
+  "wallTemperatureIdentity": "prescribed-isothermal-boundary; exported-Temperature-is-fluid-node-state",
+  "prescribedWallTemperature": 300,
+  "fluidNodeMinusPrescribedTemperatureMax": 216.81240000000003,
+  "fluidNodeMinusPrescribedTemperatureInteriorMax": 0.013500000000021828,
+  "temperatureEOSMaxRelativeError": 1.6660733814788387e-07,
+  "nodes": 97,
+  "residualConverged": true,
+  "lastHistoryFields": {
+    "Time_Iter": 0.0,
+    "Outer_Iter": 0.0,
+    "Inner_Iter": 23477.0,
+    "rmsRho": -13.63134544,
+    "rmsRhoU": -11.07697087,
+    "rmsRhoV": -12.51686839,
+    "rmsRhoE": -8.000124765,
+    "RefForce": 11200.0,
+    "CD": 0.001227803291,
+    "CL": 0.001784385594,
+    "CSF": 0.0,
+    "CMx": 0.0,
+    "CMy": 0.0,
+    "CMz": 0.0001228761605,
+    "CFx": -0.001227803291,
+    "CFy": -0.001784385594,
+    "CFz": 0.0,
+    "CEff": 1.453315533,
+    "Buffet": 0.0002657887075,
+    "HF": 11142.00098,
+    "maxHF": 9202916.33
+  },
+  "heatFluxGradientMaxRelativeError": 3.944751687444383e-07,
+  "pressureEOSMaxRelativeError": 9.878864259960096e-08,
+  "reference": {
+    "qSqrtX": 12264.843223508966,
+    "etaMax": 16,
+    "nodes": 526,
+    "maxResidual": 4.288190440836279e-08,
+    "wallEnthalpyDerivative": 0.25569177962858136
+  },
+  "referenceExtended": {
+    "qSqrtX": 12264.843223887689,
+    "etaMax": 24,
+    "nodes": 531,
+    "maxResidual": 9.994745115453474e-08,
+    "wallEnthalpyDerivative": 0.25569177963647677
+  },
+  "comparisonInterval": [
+    0.04000000000000001,
+    0.16000000000000003
+  ],
+  "boundaryLayerRelativeDifferenceMin": -0.033889182969997766,
+  "boundaryLayerRelativeDifferenceMax": -0.011583343053224393,
+  "boundaryLayerRelativeDifferenceRMS": 0.02040305260448156,
+  "leadingEdge": {
+    "pressure": 7366.234,
+    "temperature": 516.8124,
+    "heatFlux": 9202916.0,
+    "excludedFromSimilarityComparison": true
+  },
+  "fullNavierStokesVerified": false,
+  "productionQualified": false,
+  "inputSHA256": {
+    "case_manifest.json": "ffcf334772fd203afa7cf5dee7e28a48302b6f6c93ba3c75d166c2b7676d9f2a",
+    "surface_flow.vtk": "0d81ce568de58457de00d632722bf28892ac76f2e21ecce9fd901538fe6e2b82",
+    "restart_flow.csv": "036889d9a1db8165b7b11bd598f82c011e0586fa26bd0885092c335794ef8c1a",
+    "history.csv": "1648f22f0bd847125896bf463d45141e864230f87cd24e0500a9052daebe32ea",
+    "engine_stdout.log": "c9432d684e4fb53a9233ac81f91782c587c733160054f870427980cb8c1d854d"
+  },
+  "auditSHA256": "32c0d70089bf4d2a78d1fecb117fccf47b15044444c6356d3c5afbab68ec2c9b"
+}

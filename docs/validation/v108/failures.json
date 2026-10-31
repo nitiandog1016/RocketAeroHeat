@@ -1,0 +1,27 @@
+{
+  "status": "failures-retained; no-flow-rerun-for-report-or-assertion-fixes",
+  "items": [
+    {
+      "stage": "warm-start-preparation-before-solver",
+      "source": "source_versions/prepareSU2FlatPlateWarmStart.py.a91ebed55f210e8a.raw",
+      "reason": "Literal configuration comparison rejected numerically equal REF_AREA spellings 0.2 and 0.20000000000000001.",
+      "fix": "Normalize scalar numeric config values to double before equality checks; physical/discretization equality remains required.",
+      "solverStartedForFailure": false,
+      "evidenceLimit": "Preparation failure was observed in tool output; no independent stderr file was recorded. Preserved source and explanation are not a fabricated original log."
+    },
+    {
+      "stage": "checks108_01",
+      "reason": "UI test used isequal on unchanged rawMesh structures containing preserved NaNs; it reported a false mismatch.",
+      "fix": "Use isequaln; rerun only UI generation/mode/invalidation test. Actual native import/mapping succeeded before this assertion and was reused.",
+      "actualProcessExitCode": 1,
+      "log": "processes/checks108_01_stdout.log"
+    },
+    {
+      "stage": "evidence-binding-only",
+      "reason": "Installed Python 3.7 gzip.compress does not accept the mtime keyword. Actual failure: TypeError: compress() got an unexpected keyword argument 'mtime'.",
+      "fix": "Use GzipFile with BytesIO and mtime=0; verify decompressed bytes exactly match. Reuse all existing terminal results.",
+      "solverStartedForFailure": false,
+      "evidenceLimit": "Original traceback observed in tool output; failed binder source preserved in source_versions, no separate original stderr file."
+    }
+  ]
+}

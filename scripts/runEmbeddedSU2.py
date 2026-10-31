@@ -56,8 +56,15 @@ def main():
     if re.search(r'^\s*RESTART_SOL\s*=\s*YES', config_text, re.M):
         match = re.search(r'^\s*SOLUTION_FILENAME\s*=\s*([^\s%]+)', config_text, re.M)
         assert match, '重启动必须显式指定SOLUTION_FILENAME'
-        initial = (folder / match.group(1)).resolve()
+        # SU2 GetFilename为稳态ASCII输入添加.csv；v107按字面文件名锁定并未实测重启动。
+        assert re.search(r'^\s*READ_BINARY_RESTART\s*=\s*NO', config_text, re.M), '当前重启动只支持稳态ASCII'
+        assert not re.search(r'^\s*TIME_DOMAIN\s*=\s*YES', config_text, re.M), '非定常重启动尚未实现'
+        stem = match.group(1)
+        assert Path(stem).suffix == '', 'SOLUTION_FILENAME须用无扩展名的文件基名'
+        initial = (folder / (stem + '.csv')).resolve()
         assert initial.parent == folder and initial.is_file()
+        target = re.search(r'^\s*RESTART_FILENAME\s*=\s*([^\s%]+)', config_text, re.M)
+        assert target and target.group(1) != stem, '检查点不得覆写初始场'
         locked[str(initial)] = sha(initial)
     # 独占创建防止两个监督器同时启动；回执采用原子替换，UI不会读到半份JSON。
     with receipt.open('x', encoding='utf-8') as stream:
