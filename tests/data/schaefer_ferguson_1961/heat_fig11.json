@@ -1,0 +1,814 @@
+{
+  "schemaVersion": 1,
+  "status": "draft-manual-paired-digitization-not-experimental-validation",
+  "sourceURL": "https://ntrs.nasa.gov/api/citations/20150019680/downloads/20150019680.pdf",
+  "sourcePDFSHA256": "7a714bef5b3222c5c3d8585966edbf29a7e50ebd07cbc1c0d19c9c8ac9bdf88f",
+  "figure": 11,
+  "pdfPage": 30,
+  "archivedSourceImage": "docs/validation/v116/source_heat_transfer.png",
+  "sourceImageSHA256": "6ea119837899a412214fda87dd60d0e5a09cd584fc954aa940eeb439b02bd6f2",
+  "sourceImageSize": [
+    835,
+    1154
+  ],
+  "pixelCoordinateConvention": "zero-based image x right, y down; centers may be half-pixel",
+  "condition": {
+    "Mach": 4.98,
+    "totalTemperature_R": 710,
+    "unitReynolds_per_ft": 1600000,
+    "diameter_in": 1.8,
+    "diameterReynolds": 240000,
+    "flareAngle_deg": 10
+  },
+  "calibration": {
+    "upperX": [
+      172,
+      725
+    ],
+    "lowerX": [
+      170,
+      725
+    ],
+    "xOverD": [
+      0,
+      10
+    ],
+    "temperatureY": [
+      478,
+      201
+    ],
+    "temperatureRatio": [
+      0,
+      1
+    ],
+    "heatY": [
+      921,
+      714,
+      509
+    ],
+    "heatStSqrtRe": [
+      0.1,
+      1,
+      10
+    ],
+    "heatRule": "least-squares straight line in pixelY versus log10(St*sqrt(ReD)); no linear-y interpretation"
+  },
+  "manualCenterUncertainty_pixels": 1.5,
+  "stationTolerance_pixels": 1.5,
+  "brokenSymbolHeatUncertainty": "larger than report nominal 20 percent; no numeric bound assigned",
+  "normalHeatMeasurementRelativeUncertainty": 0.2,
+  "temperatureMeasurementUncertainty_R": {
+    "adiabatic": 2,
+    "wallLow": 4,
+    "wallHigh": 2,
+    "stagnation": 2
+  },
+  "notes": [
+    "Tw circles/squares are paired only with matching heat symbol series; diamonds are measured adiabatic wall temperature.",
+    "No figure-theory curves digitized. Missing paired symbols at 14.37in and 15.01in kept as missing.",
+    "Overlaps and nominal-station mismatches require review; retained records are not removed to improve acceptance.",
+    "Report pure-laminar separation does not certify entire flare laminar.",
+    "No nose/base extension, no q conversion without declared freestream properties, no experimental error calculated."
+  ],
+  "points": [
+    {
+      "id": "circle_1.45in",
+      "series": "circle",
+      "station_in": 1.45,
+      "wallPixel": [
+        215.5,
+        388
+      ],
+      "adiabaticPixel": [
+        214.5,
+        236.5
+      ],
+      "heatPixel": [
+        215.5,
+        678
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_1.45in",
+      "series": "square",
+      "station_in": 1.45,
+      "wallPixel": [
+        215.5,
+        334
+      ],
+      "adiabaticPixel": [
+        214.5,
+        236.5
+      ],
+      "heatPixel": [
+        215,
+        670.5
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_4.27in",
+      "series": "circle",
+      "station_in": 4.27,
+      "wallPixel": [
+        301,
+        416
+      ],
+      "adiabaticPixel": [
+        300.5,
+        240.5
+      ],
+      "heatPixel": [
+        299.5,
+        800.5
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_4.27in",
+      "series": "square",
+      "station_in": 4.27,
+      "wallPixel": [
+        302,
+        389.5
+      ],
+      "adiabaticPixel": [
+        300.5,
+        240.5
+      ],
+      "heatPixel": [
+        299.5,
+        791
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_5.27in",
+      "series": "circle",
+      "station_in": 5.27,
+      "wallPixel": [
+        331.5,
+        421.5
+      ],
+      "adiabaticPixel": [
+        331.5,
+        240.5
+      ],
+      "heatPixel": [
+        330.5,
+        836
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_5.27in",
+      "series": "square",
+      "station_in": 5.27,
+      "wallPixel": [
+        332.5,
+        399.5
+      ],
+      "adiabaticPixel": [
+        331.5,
+        240.5
+      ],
+      "heatPixel": [
+        330,
+        821.5
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_6.27in",
+      "series": "circle",
+      "station_in": 6.27,
+      "wallPixel": [
+        363,
+        421
+      ],
+      "adiabaticPixel": [
+        362.5,
+        241
+      ],
+      "heatPixel": [
+        361,
+        840
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_6.27in",
+      "series": "square",
+      "station_in": 6.27,
+      "wallPixel": [
+        362.5,
+        402.5
+      ],
+      "adiabaticPixel": [
+        362.5,
+        241
+      ],
+      "heatPixel": [
+        361,
+        829
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_7.27in",
+      "series": "circle",
+      "station_in": 7.27,
+      "wallPixel": [
+        393.5,
+        419.5
+      ],
+      "adiabaticPixel": [
+        393.5,
+        239.5
+      ],
+      "heatPixel": [
+        391,
+        837
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_7.27in",
+      "series": "square",
+      "station_in": 7.27,
+      "wallPixel": [
+        393.5,
+        402.5
+      ],
+      "adiabaticPixel": [
+        393.5,
+        239.5
+      ],
+      "heatPixel": [
+        391,
+        837
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_8.27in",
+      "series": "circle",
+      "station_in": 8.27,
+      "wallPixel": [
+        423.5,
+        425.5
+      ],
+      "adiabaticPixel": [
+        423.5,
+        238.5
+      ],
+      "heatPixel": [
+        421.5,
+        847
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_8.27in",
+      "series": "square",
+      "station_in": 8.27,
+      "wallPixel": [
+        423.5,
+        407.5
+      ],
+      "adiabaticPixel": [
+        423.5,
+        238.5
+      ],
+      "heatPixel": [
+        421.5,
+        853.5
+      ],
+      "symbolStatus": "broken-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_9.27in",
+      "series": "circle",
+      "station_in": 9.27,
+      "wallPixel": [
+        454.5,
+        422
+      ],
+      "adiabaticPixel": [
+        454.5,
+        235.5
+      ],
+      "heatPixel": [
+        452,
+        857
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_9.27in",
+      "series": "square",
+      "station_in": 9.27,
+      "wallPixel": [
+        454,
+        406.5
+      ],
+      "adiabaticPixel": [
+        454.5,
+        235.5
+      ],
+      "heatPixel": [
+        452,
+        863
+      ],
+      "symbolStatus": "broken-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_10.27in",
+      "series": "circle",
+      "station_in": 10.27,
+      "wallPixel": [
+        484.5,
+        424
+      ],
+      "adiabaticPixel": [
+        484.5,
+        234.5
+      ],
+      "heatPixel": [
+        482,
+        869
+      ],
+      "symbolStatus": "distinct-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_10.27in",
+      "series": "square",
+      "station_in": 10.27,
+      "wallPixel": [
+        484,
+        409
+      ],
+      "adiabaticPixel": [
+        484.5,
+        234.5
+      ],
+      "heatPixel": [
+        482,
+        857.5
+      ],
+      "symbolStatus": "broken-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_10.83in",
+      "series": "circle",
+      "station_in": 10.83,
+      "wallPixel": [
+        502,
+        420.5
+      ],
+      "adiabaticPixel": [
+        502,
+        233.5
+      ],
+      "heatPixel": [
+        500.5,
+        819
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_10.83in",
+      "series": "square",
+      "station_in": 10.83,
+      "wallPixel": [
+        502,
+        401
+      ],
+      "adiabaticPixel": [
+        502,
+        233.5
+      ],
+      "heatPixel": [
+        500.5,
+        845.5
+      ],
+      "symbolStatus": "broken-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_11.15in",
+      "series": "circle",
+      "station_in": 11.15,
+      "wallPixel": [
+        512,
+        423
+      ],
+      "adiabaticPixel": [
+        512,
+        232.5
+      ],
+      "heatPixel": [
+        511.5,
+        813.5
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_11.15in",
+      "series": "square",
+      "station_in": 11.15,
+      "wallPixel": [
+        512,
+        397
+      ],
+      "adiabaticPixel": [
+        512,
+        232.5
+      ],
+      "heatPixel": [
+        511.5,
+        826
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_11.39in",
+      "series": "circle",
+      "station_in": 11.39,
+      "wallPixel": [
+        520,
+        421
+      ],
+      "adiabaticPixel": [
+        519.5,
+        231.5
+      ],
+      "heatPixel": [
+        517.5,
+        800
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_11.39in",
+      "series": "square",
+      "station_in": 11.39,
+      "wallPixel": [
+        520,
+        393.5
+      ],
+      "adiabaticPixel": [
+        519.5,
+        231.5
+      ],
+      "heatPixel": [
+        519.5,
+        814
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_11.88in",
+      "series": "circle",
+      "station_in": 11.88,
+      "wallPixel": [
+        534,
+        420
+      ],
+      "adiabaticPixel": [
+        534.5,
+        230.5
+      ],
+      "heatPixel": [
+        532.5,
+        790
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_11.88in",
+      "series": "square",
+      "station_in": 11.88,
+      "wallPixel": [
+        532.5,
+        392
+      ],
+      "adiabaticPixel": [
+        534.5,
+        230.5
+      ],
+      "heatPixel": [
+        532.5,
+        805.5
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_12.38in",
+      "series": "circle",
+      "station_in": 12.38,
+      "wallPixel": [
+        550,
+        414.5
+      ],
+      "adiabaticPixel": [
+        551.5,
+        228
+      ],
+      "heatPixel": [
+        548,
+        773.5
+      ],
+      "symbolStatus": "distinct-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_12.38in",
+      "series": "square",
+      "station_in": 12.38,
+      "wallPixel": [
+        549.5,
+        383.5
+      ],
+      "adiabaticPixel": [
+        551.5,
+        228
+      ],
+      "heatPixel": [
+        548.5,
+        790.5
+      ],
+      "symbolStatus": "distinct-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_13.04in",
+      "series": "circle",
+      "station_in": 13.04,
+      "wallPixel": [
+        570.5,
+        410
+      ],
+      "adiabaticPixel": [
+        572.5,
+        226.5
+      ],
+      "heatPixel": [
+        567.5,
+        762
+      ],
+      "symbolStatus": "distinct-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_13.04in",
+      "series": "square",
+      "station_in": 13.04,
+      "wallPixel": [
+        571.5,
+        378.5
+      ],
+      "adiabaticPixel": [
+        572.5,
+        226.5
+      ],
+      "heatPixel": [
+        568.5,
+        777
+      ],
+      "symbolStatus": "distinct-symbol",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_13.69in",
+      "series": "circle",
+      "station_in": 13.69,
+      "wallPixel": [
+        591,
+        402
+      ],
+      "adiabaticPixel": [
+        591.5,
+        223.5
+      ],
+      "heatPixel": [
+        588.5,
+        755
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_13.69in",
+      "series": "square",
+      "station_in": 13.69,
+      "wallPixel": [
+        590.5,
+        370.5
+      ],
+      "adiabaticPixel": [
+        591.5,
+        223.5
+      ],
+      "heatPixel": [
+        588.5,
+        764
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_14.37in",
+      "series": "circle",
+      "station_in": 14.37,
+      "wallPixel": null,
+      "adiabaticPixel": [
+        613.5,
+        221.5
+      ],
+      "heatPixel": null,
+      "symbolStatus": "missing",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_14.37in",
+      "series": "square",
+      "station_in": 14.37,
+      "wallPixel": null,
+      "adiabaticPixel": [
+        613.5,
+        221.5
+      ],
+      "heatPixel": null,
+      "symbolStatus": "missing",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_15.01in",
+      "series": "circle",
+      "station_in": 15.01,
+      "wallPixel": null,
+      "adiabaticPixel": [
+        633,
+        220.5
+      ],
+      "heatPixel": null,
+      "symbolStatus": "missing",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_15.01in",
+      "series": "square",
+      "station_in": 15.01,
+      "wallPixel": null,
+      "adiabaticPixel": [
+        633,
+        220.5
+      ],
+      "heatPixel": null,
+      "symbolStatus": "missing",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_15.68in",
+      "series": "circle",
+      "station_in": 15.68,
+      "wallPixel": [
+        653,
+        405
+      ],
+      "adiabaticPixel": [
+        654,
+        219.5
+      ],
+      "heatPixel": [
+        650.5,
+        722
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_15.68in",
+      "series": "square",
+      "station_in": 15.68,
+      "wallPixel": [
+        652,
+        364.5
+      ],
+      "adiabaticPixel": [
+        654,
+        219.5
+      ],
+      "heatPixel": [
+        650.5,
+        741
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_16.34in",
+      "series": "circle",
+      "station_in": 16.34,
+      "wallPixel": [
+        673.5,
+        397.5
+      ],
+      "adiabaticPixel": [
+        676.5,
+        220.5
+      ],
+      "heatPixel": [
+        671.5,
+        721
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_16.34in",
+      "series": "square",
+      "station_in": 16.34,
+      "wallPixel": [
+        673.5,
+        356
+      ],
+      "adiabaticPixel": [
+        676.5,
+        220.5
+      ],
+      "heatPixel": [
+        672,
+        733.5
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "circle_16.99in",
+      "series": "circle",
+      "station_in": 16.99,
+      "wallPixel": [
+        694,
+        393
+      ],
+      "adiabaticPixel": [
+        695.5,
+        218.5
+      ],
+      "heatPixel": [
+        691.5,
+        708.5
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    },
+    {
+      "id": "square_16.99in",
+      "series": "square",
+      "station_in": 16.99,
+      "wallPixel": [
+        694.5,
+        352
+      ],
+      "adiabaticPixel": [
+        695.5,
+        218.5
+      ],
+      "heatPixel": [
+        691.5,
+        726.5
+      ],
+      "symbolStatus": "overlapping-symbol-or-line",
+      "nominalStationAssignment": "candidate from figure1; validate against independent panel x coordinates"
+    }
+  ],
+  "experimentalComparisonPerformed": false,
+  "qualificationThresholdDefined": false,
+  "physicsQualified": false
+}

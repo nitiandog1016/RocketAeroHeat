@@ -1,0 +1,81 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T15:32:32.616988+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 720,
+    "dryRun": false,
+    "jobToken": "f0cb381d-59b2-48db-90dc-79c04e77e50b",
+    "sourceFiles": [
+      "scripts/transferSU2HybridState.py",
+      "tests/prepareSchaeferCollarStudy.m",
+      "tests/auditSchaeferCollarPreparation.py",
+      "outputs/v116_validation/study01/preflight_audit.json",
+      "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\projection.mat"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\engine_request.json": "db22310d00a7935d494cfb2688032eede6b018727d28b3d32479d9ab224b4962",
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\case.cfg": "9808ebf6bfa9253dca1b0e8ecaaf5860ce2a3c763bd5329ec7dfaefcb08e37e3",
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\mesh.su2": "06390c7b527423512a587efc60c26cccae5ff02bfb5216896afa914b7aaee1dc",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "6d96cd5d69e20ba350b64893d6e3bad40598449c66c64602cfa181d48f37625a",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": "c8808eb2abb1ace016904fa72e21eb58e7f71b5f29715b6b1855b02178d77dbf",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "7299e7838b7d1011d413c595c3abe3bcd8cb5bd015f121c996d2ee001730368e",
+    "E:\\RocketAeroHeat\\scripts\\transferSU2HybridState.py": "1ffff4463d6a56b0d1a36f329791bb3936fbf93506357d699f65f128ac86b5f5",
+    "E:\\RocketAeroHeat\\tests\\prepareSchaeferCollarStudy.m": "f2713c290a13f37e4455310eb9bb4e447d6424275a219ab65dcbaafbc0a2ba96",
+    "E:\\RocketAeroHeat\\tests\\auditSchaeferCollarPreparation.py": "14be0ad26094a5b2a58d9b29eda83672474742f20b6b38e625e32a83fedf5b88",
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\preflight_audit.json": "55ad3958d1a8fd6475a7748dfae704b7a7576fed86c9c6eda43ad925bd7a5779",
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\projection.mat": "f255ed072eda50f5a1b0838d6120fa6d964a3916cf5aed29fb00a105475277e7",
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\initial.csv": "4eb5fa963de11facfb585620c615bf3997cf78cd859bbe8ad1ef22ebb2ea3f48"
+  },
+  "executableVersion": "8.6.0",
+  "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+  "supervisorProcessID": 43912,
+  "physicalSolutionQualified": false,
+  "runtimeFlavor": "official",
+  "processID": 2944,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 137.04699999999866,
+  "progress": {
+    "Inner_Iter": 599.0,
+    "rms[Rho]": -4.076036251,
+    "rms[RhoE]": 1.519264623,
+    "HF": 0.0
+  },
+  "exitCode": 0,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T15:34:49.666869+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\scripts\\transferSU2HybridState.py": true,
+    "E:\\RocketAeroHeat\\tests\\prepareSchaeferCollarStudy.m": true,
+    "E:\\RocketAeroHeat\\tests\\auditSchaeferCollarPreparation.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\preflight_audit.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\projection.mat": true,
+    "E:\\RocketAeroHeat\\outputs\\v116_validation\\study01\\candidate\\initial.csv": true
+  },
+  "outputSHA256": {
+    "case_manifest.json": "730b9264f10b55fccbaa1831fe5adc71a60e0d331ad71ece3ada34ae7db8f462",
+    "engine_stdout.log": "51f1fb85e4ab3eb50f50a7ee74b33e2810538e7c7362b4edac52c86ee2a2646e",
+    "history.csv": "47c859b04f68cc7956a70c0d3754a3a767ccd1137848e177a48c941461187dd8",
+    "initial.transfer.json": "6b55f6a8dccad35371c90ced07228c6f9da3a3dc9ec1545180dc26737e944c3e",
+    "restart_flow.csv": "84436031a54c3f03525a9e19a4d0310ec222f9cc15510c4167361858822518ca",
+    "surface_flow.vtk": "5691ac4a5a2112a04a0fc752fe1c4ba4068a649bccb400cdf1547c1f376538e9"
+  }
+}
