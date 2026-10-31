@@ -56,7 +56,7 @@ def main():
     cfg = folder / request['configFile']
     mesh = folder / request['meshFile']
     assert cfg.parent == folder and mesh.parent == folder
-    from su2ThermalRuntime import resolve, audit_applied
+    from su2ThermalRuntime import resolve, audit_applied, FROZEN_FLAVOR, read
     config_text = cfg.read_text(encoding='utf-8-sig')
     exe,runtime,runtime_flavor,thermal_profile,thermal_locks=resolve(folder,config_text)
     timeout = float(request['maximumSeconds'])
@@ -105,6 +105,10 @@ def main():
     start = time.monotonic()
     # 明确清除继承的温度表环境变量，只允许本次冻结输入指定其绝对路径。
     child_env=dict(os.environ,OMP_NUM_THREADS=str(threads));child_env.pop('RAH_WALL_TEMPERATURE_FILE',None)
+    child_env.pop('RAH_FROZEN_ENERGY_MODE',None)
+    if runtime_flavor==FROZEN_FLAVOR:
+        state['frozenEnergyMode']=read(folder/'case_manifest.json')['frozenEnergyMode']
+        child_env['RAH_FROZEN_ENERGY_MODE']=state['frozenEnergyMode']
     if thermal_profile is not None:child_env['RAH_WALL_TEMPERATURE_FILE']=str(thermal_profile)
     with (folder / 'engine_stdout.log').open('wb') as stream:
         process = subprocess.Popen(command, cwd=str(folder), stdout=stream, stderr=subprocess.STDOUT,

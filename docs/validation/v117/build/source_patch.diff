@@ -1,0 +1,58 @@
+--- a/SU2_CFD/src/solvers/CEulerSolver.cpp
++++ b/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -1,3 +1,6 @@
++#include <cstdlib>
++#include "RAHFrozenEnergyDiagnostics.hpp"
++static rah::FrozenEnergyLog& rah_frozen_log() { static rah::FrozenEnergyLog logger; return logger; }
+ /*!
+  * \file CEulerSolver.cpp
+  * \brief Main subroutines for solving Finite-Volume Euler flow problems.
+@@ -2546,6 +2549,14 @@
+ 
+   const su2double allowableRatio = config->GetMaxUpdateFractionFlow();
+ 
++
++  const char* rah_mode=std::getenv("RAH_FROZEN_ENERGY_MODE");
++  const bool rah_enabled=rah_mode && *rah_mode;
++  const bool rah_apply=rah_enabled && std::string(rah_mode)=="apply";
++  if (rah_enabled && !rah_apply && std::string(rah_mode)!="diagnostic")
++    SU2_MPI::Error("Unknown frozen-energy mode",CURRENT_FUNCTION);
++  unsigned long rah_checked=0,rah_frozen=0,rah_eligible=0,rah_applied=0;
++
+   SU2_OMP_FOR_STAT(omp_chunk_size)
+   for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+     su2double ratio = fabs(LinSysSol(iPoint, 0)) / max(nodes->GetSolution(iPoint, 0), EPS);
+@@ -2569,9 +2580,33 @@
+ 
+     if (localUnderRelaxation < 1e-10) localUnderRelaxation = 0.0;
+ 
++    // 原生alpha为0时才评估恢复；诊断模式只记录，默认环境未指定时完全不执行。
++    ++rah_checked;
++    if (rah_enabled && localUnderRelaxation == 0.0) {
++      ++rah_frozen;
++      std::array<double,5> q{}, delta{};
++      for (unsigned j=0;j<nVar;++j) {
++        q[j]=SU2_TYPE::GetValue(nodes->GetSolution(iPoint,j));
++        delta[j]=SU2_TYPE::GetValue(LinSysSol(iPoint,j));
++      }
++      const auto d=rah::frozenEnergyRecovery(q,delta,nDim,0.0,SU2_TYPE::GetValue(allowableRatio));
++      if (d.eligible) ++rah_eligible;
++      if (rah_apply && d.eligible) {localUnderRelaxation=d.relaxation;++rah_applied;}
++      SU2_OMP_CRITICAL {
++        static rah::FrozenEnergyLog& log=rah_frozen_log();
++        log.record(config->GetInnerIter(),iPoint,nDim,0.0,SU2_TYPE::GetValue(allowableRatio),q,delta,d,
++                   SU2_TYPE::GetValue(localUnderRelaxation));
++      } END_SU2_OMP_CRITICAL
++    }
++
+     nodes->SetUnderRelaxation(iPoint, localUnderRelaxation);
+   }
+   END_SU2_OMP_FOR
++  if (rah_enabled) {
++    SU2_OMP_CRITICAL {
++      rah_frozen_log().count(config->GetInnerIter(),rah_checked,rah_frozen,rah_eligible,rah_applied);
++    } END_SU2_OMP_CRITICAL
++  }
+ }
+ 
+ void CEulerSolver::IdentifySolutionOutliers(const CConfig *config, unsigned long iter) {

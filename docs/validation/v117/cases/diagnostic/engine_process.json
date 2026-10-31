@@ -1,0 +1,87 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T16:12:55.181753+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 720,
+    "dryRun": false,
+    "jobToken": "5f0418f7-9b68-443a-831c-1a2b231ac075",
+    "sourceFiles": [
+      "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\projection.mat",
+      "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\case_manifest.json",
+      "scripts/prepareSU2FrozenEnergyStudy.py",
+      "third_party/su2_thermal/RAHFrozenEnergyRecovery.hpp",
+      "third_party/su2_thermal/RAHFrozenEnergyDiagnostics.hpp",
+      "third_party/su2_thermal/FrozenEnergyHook.cpp.inc"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\engine_request.json": "06bd7e228298e0cccd4397bae8481cd6661ab2cbcc85e7bd211acfcc55539bd5",
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\case.cfg": "30be316cc709bc028ebc89522f20ad65e3401ac71268be78ca9c472e32b9eb1d",
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\mesh.su2": "ada78e5c3f28261a6f06ec7104e82adf16c63b039c5f75763f0f53fd7e808f07",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-frozen-energy-v1\\bin\\SU2_CFD.exe": "61efcab394bac3a344fcf4736f9936d8a3ec8945d922a3e6e9e38d5d321d0f3f",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "2057530dbf48c960f52de99af131906e2a5704f0a74ea3598187f5823f4632ce",
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\case_manifest.json": "901b2f45bbc25ebddc32ec339829bc59913cd0a3f0063be3849ab31222f052d8",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-frozen-energy-v1\\runtime.json": "6883975d8bc727e0930d55bb56dcda03e2d878364090d2d2530f81ecf2bec2de",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "5506c2cd219b744c1463dd2b08d75934c760755f137cfc00e41819e1de7ec213",
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\projection.mat": "4cbb2e86480e3dd33ed6d07c334764820656214d088d871e66080b74c635063f",
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2FrozenEnergyStudy.py": "b36eaa636fec87c7b1c3c98784b84f845405892566fe8b1fc3786b6e3c794315",
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\RAHFrozenEnergyRecovery.hpp": "ddb7d976e13dd14c57d32e9a3ff8c5ec6b0deeeebd9192c582cc52bfd1d3856a",
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\RAHFrozenEnergyDiagnostics.hpp": "837a3c0557eca4d8982e73694b737889d0065a7087739037ef9499360ea4e8d0",
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\FrozenEnergyHook.cpp.inc": "a8c9b465eade961f361e11d758784d5f12ed6ffcb5f7cc28792f53f21d007b3e",
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\initial.csv": "77ac3d8d4ea77f2ea8f7b6e49e355f49fb195b782cbc6dd1ef1ae94f534dab15"
+  },
+  "executableVersion": "8.6.0+rah-frozen-energy-v1",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "supervisorProcessID": 55056,
+  "physicalSolutionQualified": false,
+  "runtimeFlavor": "rah-frozen-energy-v1",
+  "frozenEnergyMode": "diagnostic",
+  "processID": 56676,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-frozen-energy-v1\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 5.235000000000582,
+  "progress": {
+    "Inner_Iter": 1.0,
+    "rms[Rho]": -5.013952326,
+    "rms[RhoE]": 0.5565588862,
+    "HF": 0.0
+  },
+  "exitCode": 0,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T16:13:00.408773+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-frozen-energy-v1\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-frozen-energy-v1\\runtime.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\projection.mat": true,
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2FrozenEnergyStudy.py": true,
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\RAHFrozenEnergyRecovery.hpp": true,
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\RAHFrozenEnergyDiagnostics.hpp": true,
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\FrozenEnergyHook.cpp.inc": true,
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\diagnostic\\initial.csv": true
+  },
+  "outputSHA256": {
+    "engine_stdout.log": "109fcc1d9b850ea51311ea8485b6b53593a50ec7539d507f38265679771085c9",
+    "history.csv": "45199a3a70221eeffd31c152e0bb0244df684dcf4c31fc1749efc7a1e132be1c",
+    "rah_frozen_counts.csv": "a0d082766a4d5b33cd0ee62687ac27c2302d3a56de043d7506c66679292da2c2",
+    "rah_frozen_directions.csv": "d6847074de4e40aa308ab1c09cf6985fe21bbef1313ff4011f8f833640956d2e",
+    "restart_flow.csv": "f91ee2a0c2711d4e0c30f3ff5dcb0a2d16968fb80f5eff527b1f6edee4888120",
+    "restart_flow_000001.csv": "f91ee2a0c2711d4e0c30f3ff5dcb0a2d16968fb80f5eff527b1f6edee4888120",
+    "surface_flow.vtk": "2c1c4efa67bb6a56f83f72bb7a377e428ee6a25a1656bac2f26019f7540fafdb",
+    "surface_flow_000001.vtk": "2c1c4efa67bb6a56f83f72bb7a377e428ee6a25a1656bac2f26019f7540fafdb"
+  }
+}

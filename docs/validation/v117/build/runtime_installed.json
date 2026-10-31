@@ -1,0 +1,114 @@
+{
+  "flavor": "rah-frozen-energy-v1",
+  "version": "8.6.0+rah-frozen-energy-v1",
+  "status": "experimental-not-physics-qualified",
+  "executable": "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-frozen-energy-v1\\bin\\SU2_CFD.exe",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "sourceCommit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+  "systemDLLs": [
+    "KERNEL32.dll",
+    "msvcrt.dll"
+  ],
+  "buildSourceSHA256": {
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\solvers\\CEulerSolver.cpp": "55615aabc636d75172f4aab01a81789bf12700ceab4d60c38e047f179cf29290",
+    "E:\\RocketAeroHeat\\scripts\\buildSU2FrozenEnergyRuntime.py": "69a554078529fe8b43f83cb6a1bab78f70d8e7222a882385d4efc1af94d6f2c4",
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\FrozenEnergyHook.cpp.inc": "a8c9b465eade961f361e11d758784d5f12ed6ffcb5f7cc28792f53f21d007b3e",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\Common\\src\\geometry\\CGeometry.cpp": "6c16bc00d2759164ec81ecca0b40bbf563c8c686dd853b26cfcb591c5e6b0454",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\python_wrapper_structure.cpp": "29e2dc83851adda19274918487e79a3519c0d5f9e229c9cd900903d4b8bfcd0b",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\interfaces\\fsi\\CFlowTractionInterface.cpp": "64ed5c940f62f8dc1af05f4f83036dc2e1d919ebf6b0139774281c3e78c76b9e",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\interfaces\\cfd\\CMixingPlaneInterface.hpp": "16315086fed2368589c5e98e3ffa25d08a33c8915933e3da75f4553b151473ad",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\interfaces\\cfd\\CMixingPlaneInterface.cpp": "f46a493186d6ae4ad45cf4c076d4bbfa63a5f0a63a3306dbf9e436c156cc55e1",
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\RAHFrozenEnergyRecovery.hpp": "ddb7d976e13dd14c57d32e9a3ff8c5ec6b0deeeebd9192c582cc52bfd1d3856a",
+    "E:\\RocketAeroHeat\\third_party\\su2_thermal\\RAHFrozenEnergyDiagnostics.hpp": "837a3c0557eca4d8982e73694b737889d0065a7087739037ef9499360ea4e8d0",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe": "315c23bc298aba9eaf2aece174fa7fcb0e404247176663e6a4c7707a60f8e444",
+    "D:\\matlab\\toolbox\\shared\\coder\\ninja\\win64\\ninja.exe": "e74d3fd03b34afcb59714bd89ab8e73b0cefc32f7e58847e71795de5cc912e68",
+    "E:\\RocketAeroHeat\\tests\\testSU2FrozenEnergyRecovery.cpp": "ea38bf6780b00a3b65b9426ea542ec5e8c21f2f87edb2f6ed32f1a088d04a7f6",
+    "E:\\RocketAeroHeat\\outputs\\v117_validation\\source_tree.json": "b44e9b0d9aa9b5c7fdd9fbbec67cb0cbc8643850417009a8d2856fa83aa048aa"
+  },
+  "buildReceipt": {
+    "command": [
+      "D:\\matlab\\toolbox\\shared\\coder\\ninja\\win64\\ninja.exe",
+      "-C",
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117",
+      "-j",
+      "2",
+      "SU2_CFD/src/SU2_CFD.exe"
+    ],
+    "cwd": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source",
+    "status": "terminal",
+    "maximumSeconds": 720,
+    "processID": 51980,
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedSeconds": 463.1399999999994
+  },
+  "compilerVersion": "g++.exe (GCC) 16.2.0\r\nCopyright (C) 2026 Free Software Foundation, Inc.\r\nThis is free software; see the source for copying conditions.  There is NO\r\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\r\n\r\n",
+  "license": "LGPL-2.1-or-later; local binary, source changes and rebuild recipe published",
+  "physicsQualified": false,
+  "restrictions": [
+    "explicit diagnostic/apply only",
+    "steady single-zone ideal-gas NS",
+    "SI dimensional",
+    "MGLEVEL=0",
+    "serial-MPI OpenMP",
+    "adiabatic or constant isothermal",
+    "experimental relaxation, no qualification"
+  ],
+  "files": [
+    {
+      "path": "AUTHORS.md",
+      "sha256": "bd2b76eada1999265ae26e89cc71759ba347bc69af2260ee588003b543fb9955",
+      "bytes": 3429
+    },
+    {
+      "path": "bin/SU2_CFD.exe",
+      "sha256": "61efcab394bac3a344fcf4736f9936d8a3ec8945d922a3e6e9e38d5d321d0f3f",
+      "bytes": 19474141
+    },
+    {
+      "path": "CLI11_LICENSE",
+      "sha256": "51c69badd1cd4ffb036fb2a2efc4d7db8dd8c89905526e7193d57912968efae1",
+      "bytes": 1586
+    },
+    {
+      "path": "COPYING",
+      "sha256": "b3aa400aca6d2ba1f0bd03bd98d03d1fe7489a3bbb26969d72016360af8a5c9d",
+      "bytes": 24478
+    },
+    {
+      "path": "COPYING.MinGW-w64-runtime.txt",
+      "sha256": "ecff91ddb5799c8b79a4bdb576921b9c3e2989783fd1944527e8eb9b41a5ff5f",
+      "bytes": 15076
+    },
+    {
+      "path": "Eigen_COPYING.MPL2",
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85",
+      "bytes": 16726
+    },
+    {
+      "path": "Eigen_COPYING.README",
+      "sha256": "c83230b770f17ef1386ea1fd3681271dd98aa93646bdbfb5bff3a1b7050fff9d",
+      "bytes": 779
+    },
+    {
+      "path": "LICENSE.md",
+      "sha256": "46ae25afd571da3e3761ff82ace5dc26b0b66cf514243379ac026ce094ba32cf",
+      "bytes": 33393
+    },
+    {
+      "path": "mel_LICENSE",
+      "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
+      "bytes": 7652
+    },
+    {
+      "path": "source_patch.diff",
+      "sha256": "f447c74b191b5247154e02a72c0171ebca3e85744c0ab12ed318d5461650bbf7",
+      "bytes": 2469
+    },
+    {
+      "path": "thermal_source_patch.diff",
+      "sha256": "68de43a50fe3fce2001443c491ebec4c7afcfc4ff65345e69add32bac2a457a2",
+      "bytes": 7531
+    }
+  ]
+}

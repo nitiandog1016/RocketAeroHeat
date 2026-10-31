@@ -4,6 +4,7 @@ import csv,hashlib,json,math,re,bisect
 
 ROOT=Path(__file__).resolve().parents[1]
 FLAVOR='rah-axial-wall-v1'
+FROZEN_FLAVOR='rah-frozen-energy-v1'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 
@@ -12,12 +13,13 @@ def resolve(folder,config):
     manifest=folder/'case_manifest.json';locked={};profile=None
     data=read(manifest) if manifest.exists() else {}
     flavor=data.get('requiredRuntimeFlavor','official')
-    assert flavor in ('official',FLAVOR),'未知SU2运行时类型'
-    runtime_dir=ROOT/'tools/runtime/su2'/('8.6.0' if flavor=='official' else '8.6.0-rah-axial-wall-v1')
+    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR),'未知SU2运行时类型'
+    if flavor!=FROZEN_FLAVOR:assert 'frozenEnergyMode' not in data,'运行时类型与冻结能量选项不匹配'
+    runtime_dir=ROOT/'tools/runtime/su2'/('8.6.0' if flavor=='official' else '8.6.0-'+flavor)
     runtime_file=runtime_dir/'runtime.json'
     assert runtime_file.is_file(),'空间壁温受控运行时尚未构建，不能退回官方标量壁温'
     runtime=read(runtime_file)
-    if flavor!= 'official':
+    if flavor==FLAVOR:
         assert runtime['flavor']==FLAVOR and data['thermalBoundary']['mode']=='axialTemperature'
         assert re.search(r'^\s*MARKER_PYTHON_CUSTOM\s*=\s*\(\s*wall\s*\)',config,re.M)
         assert re.search(r'^\s*MARKER_ISOTHERMAL\s*=\s*\(\s*wall\s*,',config,re.M)
@@ -30,12 +32,41 @@ def resolve(folder,config):
         locked.update({str(manifest):sha(manifest),str(profile):sha(profile)})
     else:
         assert not (folder/'wall_temperature.csv').exists(),'有温度表却未声明受控运行时'
+        if flavor==FROZEN_FLAVOR:
+            assert runtime['flavor']==FROZEN_FLAVOR
+            validate_frozen_manifest(data,config)
+            locked[str(manifest)]=sha(manifest)
+        else:
+            assert 'frozenEnergyMode' not in data,'官方运行时不能默默忽略冻结能量选项'
     exe=Path(runtime['executable']).resolve();exe.relative_to(runtime_dir.resolve())
     for item in runtime['files']:
         p=(runtime_dir/item['path']).resolve();p.relative_to(runtime_dir.resolve())
         assert sha(p)==item['sha256'],'运行时文件身份变化'
     locked[str(runtime_file)]=sha(runtime_file)
     return exe,runtime,flavor,profile,locked
+
+def validate_frozen_manifest(data,config):
+    """实验恢复只接受显式选择的固定单区稳态NS；绝不从环境继承或默默降级。"""
+    assert data.get('frozenEnergyMode') in ('diagnostic','apply'),'须明确选择诊断或恢复'
+    assert data.get('thermalBoundary',{}).get('mode') in ('adiabatic','isothermal')
+    required={'SOLVER':'NAVIER_STOKES','KIND_TURB_MODEL':'NONE','MATH_PROBLEM':'DIRECT',
+              'SYSTEM_MEASUREMENTS':'SI','REF_DIMENSIONALIZATION':'DIMENSIONAL','FLUID_MODEL':'IDEAL_GAS',
+              'MGLEVEL':'0','TIME_DISCRE_FLOW':'EULER_IMPLICIT'}
+    settings={}
+    for line in config.splitlines():
+        line=line.split('%',1)[0].strip()
+        if '=' in line:
+            key,value=map(str.strip,line.split('=',1));assert key not in settings,'重复配置键';settings[key]=value
+    for key,value in required.items():assert settings.get(key)==value,'实验恢复不支持配置 '+key
+    for key in ('CONFIG_LIST','MARKER_PYTHON_CUSTOM','NZONES'):assert key not in settings
+    assert settings.get('TIME_DOMAIN','NO')=='NO'
+    assert ('MARKER_HEATFLUX' in settings)!=('MARKER_ISOTHERMAL' in settings)
+    if data['thermalBoundary']['mode']=='adiabatic':
+        assert re.fullmatch(r'\(\s*wall\s*,\s*0(?:\.0*)?\s*\)',settings.get('MARKER_HEATFLUX',''))
+    else:
+        match=re.fullmatch(r'\(\s*wall\s*,\s*([\d.eE+-]+)\s*\)',settings.get('MARKER_ISOTHERMAL',''))
+        assert match and math.isfinite(float(match.group(1))) and float(match.group(1))>0
+    return data['frozenEnergyMode']
 
 def audit_applied(folder,profile,mesh):
     """从原网格节点/墙面集合和表重新计算，审核C++实际写入的逐节点值。"""

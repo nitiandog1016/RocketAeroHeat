@@ -3,6 +3,8 @@ function view=createSU2ResearchView(host,result)
 % 模块一：保留原面元、原始q及独立保守热负荷，不将有限值算入合格面积。
 % 模块二：固定色标可编辑；拾取同时给出p/q/温度角色和方法。
 % 模块三：导出当前快照CSV和身份JSON，不重算且不给未知壁温补零。
+% 模块五：受控求解器及实际恢复/诊断模式贯穿云图、探针、截面与导出。
+runtime=describeSU2Runtime(result.receipt);
 grid=uigridlayout(host,[4 1]);grid.RowHeight={67,38,'1x',130};grid.Padding=[0 0 0 0];
 % 模块四：固定显示当前场的保存时刻和真实终态，不能用末次历史冒充云图时刻。
 auditText=uilabel(grid,'Text',strjoin(describeSU2Convergence(result),newline),'FontSize',11,'WordWrap','on');auditText.Layout.Row=1;
@@ -51,13 +53,13 @@ render(true);inspectFace(1,[]);
             low.Value=range(1);high.Value=range(2);
         end
         if low.Value>=high.Value,probe.Value={'色标上限必须大于下限。'};return;end
-        caption=sprintf('SU2 8.6.0 · M %.4g / α %.4g° / β %.4g° · 研究快照，未获物理资格', ...
-            result.flight.Mach,result.flight.alpha,result.flight.beta);
+        caption=sprintf('%s · M %.4g / α %.4g° / β %.4g° · 研究快照，未获物理资格', ...
+            runtime.caption,result.flight.Mach,result.flight.alpha,result.flight.beta);
         updateAerothermalGeometryView(geometry,result,caption,struct('resetCamera',false));
         s=geometry.html.UserData;s.payload.faceField=struct('values',values, ...
             'range',[low.Value high.Value],'name',labels{i},'unit',units{i},'productionQualified',false);
         s.payload.coordinateNote='原三角面 · SI · laminar NS / ideal gas / Sutherland / Pr0.72 · 合格新增面积0';
-        status=1;method=[result.solverMethod '；' result.projectionMethod];
+        status=1;method=[result.solverMethod '；' runtime.method '；' result.projectionMethod];
         if strcmp(key,'wallInput'),status=2;method=thermalMethod;if isAdiabatic,status=0;end
         elseif strcmp(key,'wallSolved'),status=0;method='尚未求解壁体温度';end
         if isAdiabatic && ismember(key,{'heatFluxRaw','conservativeHeatLoadDensityRaw'}),status=2;method=thermalMethod;end
@@ -103,7 +105,7 @@ render(true);inspectFace(1,[]);
                 result.pressureRaw(i),result.heatFluxRaw(i),result.conservativeHeatLoadDensityRaw(i)); ...
             sprintf('流体节点平均T %.8g K；%s；求解壁温/Te/Tr 未知或未定义', ...
                 result.fluidNodeTemperatureMeanRaw(i),wallText); ...
-            ['算法：' result.solverMethod '；热边界：' thermalMethod '；映射：' result.projectionMethod]; ...
+            ['算法：' result.solverMethod '；' runtime.method '；热边界：' thermalMethod '；映射：' result.projectionMethod]; ...
             sprintf('全物面原始q积分 %.8g W；原生SU2负荷 %.8g W。进程退出0不等于收敛/精度通过。', ...
                 result.targetHeatPowerRaw,result.conservativeHeatLoadPowerRaw)};
     end
@@ -121,7 +123,7 @@ render(true);inspectFace(1,[]);
         fid=fopen(file,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',sectionState.csv);clear guard;
         meta=struct('x',sectionState.x,'field',sectionState.fieldKey,'revision',sectionState.revision, ...
             'sourceRevision',result.sourceRevision,'solveId',result.solveId,'flight',result.flight, ...
-            'productionQualified',false,'method',geometry.html.UserData.payload.sectionView.method);
+            'productionQualified',false,'method',geometry.html.UserData.payload.sectionView.method,'algorithmRuntime',runtime);
         if isfield(result,'convergenceAudit'),meta.convergenceAudit=result.convergenceAudit;end
         meta.processStatus=struct('exitCode',result.receipt.exitCode,'timedOut',result.receipt.timedOut,'cancelled',result.receipt.cancelled);
         fid=fopen([file '.json'],'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(meta));
@@ -139,6 +141,7 @@ render(true);inspectFace(1,[]);
             'solvedWallTemperature_K','productionQualified','heatFluxIsBoundaryInput'});
         writetable(t,file);meta=rmfield(result,{'V','F','pressureRaw','heatFluxRaw','conservativeHeatLoadDensityRaw', ...
             'fluidNodeTemperatureMeanRaw','faceArea'});
+        meta.algorithmRuntime=runtime;
         fid=fopen([file '.json'],'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(meta));
     end
 end
