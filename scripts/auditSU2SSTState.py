@@ -44,7 +44,22 @@ def audit(folder,actual_surface=False):
     uv=np.column_stack([a[:,cols.index('Momentum_'+v)]/rho for v in ['x','y','z'][:nd]])
     k=a[:,cols.index('Turb_Kin_Energy')];w=a[:,cols.index('Omega')]
     thermal=E-np.sum(uv**2,axis=1)/2-k;assert min(rho)>0 and min(thermal)>0 and min(k)>=0 and min(w)>0
-    gamma=float(c['GAMMA_VALUE']);R=float(c['GAS_CONSTANT']);T=thermal*(gamma-1)/R;p=rho*R*T
+    gamma=float(c['GAMMA_VALUE']);R=float(c['GAS_CONSTANT'])
+    phase='saved-current-k';stageThermal=thermal
+    initialization=read(folder/'sst_initialization.json') if (folder/'sst_initialization.json').exists() else {}
+    if initialization.get('kind')=='same-mesh-SST-single-step-phase-diagnostic':
+        # 单步的输入k是已知的上一个耦合阶段。普通稀疏保存的多步结果不能套用此分支。
+        from prepareSU2SSTPhaseProbe import validate_source
+        from su2SSTInterface import state
+        validate_source(initialization,folder,c)
+        for path,h in initialization['sourceSHA256'].items():assert sha(Path(path))==h
+        assert sha(folder/'initial_flow.csv')==r['inputSHA256'][str(folder/'initial_flow.csv')]
+        initial,oldcols,oldnd,_,_,_=state(folder/'initial_flow.csv',True)
+        assert oldcols==cols and oldnd==nd and np.array_equal(initial[:,:nd+1],a[:,:nd+1])
+        stageThermal=thermal+k-initial[:,cols.index('Turb_Kin_Energy')]
+        assert min(stageThermal)>0
+        phase='updated-flow-with-input-k; single diagnostic update only'
+    T=stageThermal*(gamma-1)/R;p=rho*R*T
     g=wall_geometry(folder/'mesh.su2');xyz,f=vtk_tokens(folder/'surface_flow.vtk')
     points=np.column_stack([a[:,1:nd+1],np.zeros((len(a),3-nd))]);d,ids=cKDTree(points).query(xyz)
     assert max(d)<1e-6 and set(ids)==set(g['wallIDs']);order={v:i for i,v in enumerate(g['wallIDs'])};ix=np.array([order[j] for j in ids])
@@ -79,6 +94,8 @@ def audit(folder,actual_surface=False):
     hf=hist[:,keys.index('HF')];native=float(g['nodeArea'][ix]@f['Heat_Flux'][:,0])
     assert abs(native-hf[-1])/max(1,abs(native))<2e-6
     report=dict(interfacePassed=True,nodes=len(a),wallNodes=len(ids),dimension=nd,model=r['physicsModel'],
+        thermalStatePhase=phase,diagnosticOnly=bool(initialization.get('diagnosticOnly',False)),
+        savedCurrentKTemperatureRangeK=[float(min(thermal*(gamma-1)/R)),float(max(thermal*(gamma-1)/R))],
         elapsedSeconds=r['elapsedSeconds'],checkpointLocalIteration=step,finalResiduals=residual,
         originalResidualThresholdPassed=all(v<-8 for v in residual) and step>=10,
         minimumDensity=float(min(rho)),minimumThermalInternalEnergy=float(min(thermal)),kRange=[float(min(k)),float(max(k))],
@@ -99,13 +116,24 @@ def audit(folder,actual_surface=False):
         _,vi=cKDTree(V).query(xyz);assert len(set(vi))==len(V)
         nodeq=np.zeros(len(V));nodeq[vi]=f['Heat_Flux'][:,0];face=nodeq[F].mean(axis=1)
         y=np.zeros(len(V));y[vi]=yp;above=float(sum(area[y[F].mean(axis=1)>1])/sum(area))
-        midxyz,mid=vtk_tokens(folder/'surface_flow_000050.vtk');assert np.array_equal(midxyz,xyz)
+        midpath=folder/'surface_flow_000050.vtk'
+        if initialization.get('diagnosticOnly',False):
+            midpath=Path(initialization['sourceDirectory'])/('surface_flow_%06d.vtk'%initialization['sourceLocalIteration'])
+            upstream=read(Path(initialization['sourceDirectory'])/'engine_process.json')
+            assert sha(midpath)==upstream['outputSHA256'][midpath.name]
+        midxyz,mid=vtk_tokens(midpath);assert np.array_equal(midxyz,xyz)
         nq=np.zeros(len(V));nq[vi]=mid['Heat_Flux'][:,0];mf=nq[F].mean(axis=1)
         l1=float(area@abs(face-mf)/(area@abs(mf)))
         report.update(originalFaces=len(F),originalAreaM2=float(sum(area)),originalFaceHeatPowerW=float(area@face),
-                      withinRunHeatRelativeL1Change=l1,faceMeanYPlusAbove1AreaFraction=above)
+                      heatComparisonSource=str(midpath),faceMeanYPlusAbove1AreaFraction=above)
+        if initialization.get('diagnosticOnly',False):report['diagnosticSourceToOutputHeatRelativeL1Change']=l1
+        else:report['withinRunHeatRelativeL1Change']=l1
         report['screeningGates']=dict(heatL1Below10Percent=l1<.1,last25HeatPowerBelow2Percent=abs(report['last25HeatPowerRelativeChange'])<.02,
                                      yPlusP99Below1=report['yPlusPercentiles']['p99']<=1)
+        if initialization.get('diagnosticOnly',False):
+            # 一个更新没有25步时间窗，不能用0变化自动通过稳定性筛选。
+            report['last25HeatPowerRelativeChange']=None
+            report['screeningGates']['last25HeatPowerBelow2Percent']=False
     return report
 
 

@@ -157,8 +157,21 @@ try
         token=regexp(receiptText,[regexptranslate('escape',jsonencode(path)) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
         assert(numel(token)==1 && strcmp(h,token{1}{1}),'SST初态来源未绑定实际进程。');
         assert(~isfile(continuation) && ~isfile(transfer) && ~isfile(propertyTransfer));
-        lineage=jsondecode(fileread(path));assert(lineage.newPhysicsLocalIterationStartsAt==0 && ~lineage.samePhysicsAndNumerics);
-        audit.turbulenceTransfer=lineage;audit.sourceModelLocalIteration=lineage.sourceLocalIteration;
+        lineage=jsondecode(fileread(path));
+        if strcmp(lineage.kind,'same-mesh-SST-single-step-phase-diagnostic')
+            % 一次SST更新是阶段诊断；源失败、局部0和伪时间重置不能标成层流转换/累计续算。
+            assert(lineage.diagnosticOnly && lineage.sameMesh && lineage.samePhysicsAndNumerics);
+            assert(lineage.localIterationStartsAt==0 && lineage.requestedUpdates==1 && audit.checkpointIteration==0 && size(history,1)==1);
+            assert(lineage.sourceNativeSucceeded && ~lineage.sourcePostAuditPassed && ~lineage.physicsQualified);
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            audit.thermalStateAudit=readSU2SSTStateAudit(folder,receipt);
+            audit.turbulenceDiagnostic=lineage;
+        else
+            assert(strcmp(lineage.kind,'same-mesh-laminar-to-SST-initial-guess'));
+            assert(lineage.newPhysicsLocalIterationStartsAt==0 && ~lineage.samePhysicsAndNumerics);
+            audit.turbulenceTransfer=lineage;
+        end
+        audit.sourceModelLocalIteration=lineage.sourceLocalIteration;
     end
     audit.checkpointIdentityConfirmed=true;audit.status='checkpoint-and-history-audited';
     audit.reason='保存迭代已绑定且重启动EOS一致；残差通过与物理资格仍分别判断。';

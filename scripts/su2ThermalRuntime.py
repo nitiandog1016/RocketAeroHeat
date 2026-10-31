@@ -84,8 +84,12 @@ def validate_sst_manifest(folder,data,config):
     if c['RESTART_SOL']=='YES':
         assert c['SOLUTION_FILENAME']=='initial_flow' and c['READ_BINARY_RESTART']=='NO'
         path=folder/'sst_initialization.json';assert sha(path)==contract['initializationSHA256']
-        init=read(path);assert init==data['initialization'] and init['kind']=='same-mesh-laminar-to-SST-initial-guess'
-        assert init['sameMesh'] and not init['samePhysicsAndNumerics'] and init['newPhysicsLocalIterationStartsAt']==0
+        init=read(path);assert init==data['initialization']
+        if init['kind']=='same-mesh-laminar-to-SST-initial-guess':
+            assert init['sameMesh'] and not init['samePhysicsAndNumerics'] and init['newPhysicsLocalIterationStartsAt']==0
+        else:
+            from prepareSU2SSTPhaseProbe import validate_source
+            locked.update(validate_source(init,folder,c))
         assert sha(folder/'initial_flow.csv')==init['initialStateSHA256'];state(folder/'initial_flow.csv',True)
         for p,h in init['sourceSHA256'].items():assert sha(Path(p))==h
         locked[str(path)]=sha(path)

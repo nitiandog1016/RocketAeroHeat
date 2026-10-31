@@ -900,6 +900,9 @@ renderEditor();sync();showGeometry(true);
             result=attachSU2ThermalBoundary(result,manifest.thermalBoundary);
             result.resultDirectory=engineJob.folder;
             result.convergenceAudit=auditSU2ResultConvergence(engineJob.folder,result);
+            if isfield(receipt,'physicsModel')
+                result.thermalStateAudit=readSU2SSTStateAudit(engineJob.folder,receipt);
+            end
             if isfield(engineJob,'pipelineReceipt')
                 assert(result.convergenceAudit.checkpointIdentityConfirmed,result.convergenceAudit.reason);
             end
@@ -999,6 +1002,10 @@ renderEditor();sync();showGeometry(true);
             if isequaln(original,receipt),auditFolder=result.resultDirectory;end
         end
         result.convergenceAudit=auditSU2ResultConvergence(auditFolder,result);
+        if isfield(receipt,'physicsModel')
+            assert(result.convergenceAudit.checkpointIdentityConfirmed,result.convergenceAudit.reason);
+            result.thermalStateAudit=readSU2SSTStateAudit(auditFolder,receipt);
+        end
         origin=struct('sourceRevision',result.sourceRevision,'solveId',result.solveId,'file',file);
         state=aeroHeatWorkflowState('beginSolve',state);
         try

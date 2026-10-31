@@ -1,0 +1,62 @@
+function report=testSU2SSTPhaseView(out,capture)
+%TESTSU2SSTPHASEVIEW 只读已核验的一次SST诊断，映射原19752面并验证科研查看组件。
+% 模块一：原生回执/阶段审核/原面身份，源99和新局部0分列；不调用SU2。
+% 模块二：WebGL、压力/热流/温度、探针与92段周向曲线及CSV。
+% 模块三：给定Tw和未知壁温区分，诊断身份进入所有导出；不冒充主流程启动验收。
+if nargin<2,capture=false;end
+assert(~isfolder(out));mkdir(out);folder=fullfile(pwd,'outputs','v125_validation','phase01');
+s=load('outputs/v118_validation/actual01/surface.mat','s');surface=s.s;
+volume=readSU2HybridVolume('outputs/v120_validation/mesh32',surface);
+data=readSU2SurfaceResult(fullfile(folder,'surface_flow.vtk'));
+projection=buildSU2WallProjection(volume,surface);r=mapSU2WallResult(data,projection);
+r.V=surface.V;r.F=surface.F;r.receipt=jsondecode(fileread(fullfile(folder,'engine_process.json')));
+manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));r.flight=manifest.flight;
+r.sourceRevision=0;r.solveId=0;r.resultDirectory=folder;r.wallTemperatureInput=300;
+r=attachSU2ThermalBoundary(r,manifest.thermalBoundary);
+r.thermalStateAudit=readSU2SSTStateAudit(folder,r.receipt);
+r.convergenceAudit=auditSU2ResultConvergence(folder,r);a=r.convergenceAudit;
+assert(a.checkpointIdentityConfirmed,a.reason);assert(a.checkpointIteration==0 && a.sourceModelLocalIteration==99);
+assert(isfield(a,'turbulenceDiagnostic') && ~isfield(a,'turbulenceTransfer') && ~isfield(a,'cumulativeCheckpointIteration'));
+assert(~a.checkpointResidualPassed && numel(a.checkpointResiduals)==4);
+r.resultStatus='single-step-SST-phase-diagnostic; unqualified';
+assert(numel(r.heatFluxRaw)==19752 && abs(sum(r.faceArea)-1.9646292565715553)<1e-12 && ~r.productionQualified);
+fig=uifigure('Name','RocketAeroHeat · SST同阶段研究场','Position',[80 60 1440 900]);g=onCleanup(@()closeFigure(fig));
+ui=createSU2ResearchView(fig,r);ui.setSectionX(-1.5);waitGL(ui);
+ui.inspectFace(12000,[]);assert(contains(strjoin(ui.probe.Value,newline),'阶段诊断') && contains(strjoin(ui.probe.Value,newline),'SST-2003m'));
+for key={'pressureRaw','fluidNodeTemperatureMeanRaw','heatFluxRaw'}
+    ui.select.Value=key{1};ui.select.ValueChangedFcn(ui.select,[]);waitGL(ui);
+    assert(isequal(ui.geometry.html.UserData.payload.faceField.values,r.(key{1})));
+end
+ui.exportTo(fullfile(out,'fields.csv'));ui.exportSectionTo(fullfile(out,'section.csv'));section=ui.getSection();
+assert(size(section.segments,1)==92);ui.select.Value='wallSolved';ui.select.ValueChangedFcn(ui.select,[]);waitGL(ui);
+assert(all(isnan(ui.geometry.html.UserData.payload.faceField.values)));
+ui.select.Value='heatFluxRaw';ui.select.ValueChangedFcn(ui.select,[]);waitGL(ui);
+if capture
+    write(fullfile(out,'ready_for_capture.json'),struct('figureName',fig.Name,'timeLimitSeconds',180));
+    t=tic;while ~isfile(fullfile(out,'capture_done.json')) && toc(t)<180,drawnow;pause(.1);end
+end
+save(fullfile(out,'result.mat'),'r','-v7');
+oldFolder=fullfile(pwd,'outputs','embedded_workbench','9f4da240-35c5-4fe5-a3ac-5d46e1800a63');
+oldReceipt=jsondecode(fileread(fullfile(oldFolder,'engine_process.json')));rejected=false;
+try,readSU2SSTStateAudit(oldFolder,oldReceipt);catch,rejected=true;end
+assert(rejected,'v124缺少阶段证据的失败场不能被追溯放行。');
+report=struct('nativeSolverRuns',0,'originalFaces',19752,'sectionSegments',92,'originalAreaM2',sum(r.faceArea), ...
+    'componentWebGL',ui.geometry.html.UserData.rendered,'probeMethodAndDiagnosticIdentity',true, ...
+    'unknownSolvedWallTemperature',true,'oldFailedFieldStillRejected',rejected, ...
+    'mainFiveStepStartTested',false,'physicsQualified',false,'newQualifiedArea',0);
+write(fullfile(out,'report.json'),report);
+end
+function waitGL(ui)
+t=tic;while toc(t)<40
+    drawnow;s=ui.geometry.html.UserData;
+    if ~isempty(s.rendered) && s.rendered.revision==s.revision && ~isempty(ui.getSection()),break;end
+    pause(.1);
+end
+assert(~isempty(s.rendered) && s.rendered.revision==s.revision && s.rendered.faces==19752 && s.rendered.webglError==0 && ~isempty(ui.getSection()));
+end
+function closeFigure(fig)
+if isgraphics(fig),close(fig);end
+end
+function write(path,data)
+fid=fopen(path,'w','n','UTF-8');assert(fid>=0);g=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(data));
+end
