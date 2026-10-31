@@ -1,0 +1,13 @@
+RAH_ENGINE_PID=52984
+{错误使用 assert
+原墙面/顺序与当前原三角面不同。
+
+出错 readSU2VerifiedHEOSCase (第 37 行)
+assert(isequal(wall(:,[2 4 3])+1,double(state.mesh.F)) && isequal(volume.sourceVertices,state.mesh.V),'原墙面/顺序与当前原三角面不同。');
+
+出错 rocketAeroHeatWorkbench/readVerifiedHEOS (第 909 行)
+        result=readSU2VerifiedHEOSCase(folder,state,embeddedVolume);
+
+出错 testSU2HEOSWorkbench (第 64 行)
+fig.UserData.actions.selectStep(4);fig.UserData.actions.readVerifiedHEOS(fullfile(pwd,'outputs','v122_validation','actual04'));
+} 

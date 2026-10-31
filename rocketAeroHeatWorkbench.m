@@ -48,7 +48,8 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'loadNative',@()loadNative([],[]),'cancel',@()cancelEngine([],[]),'readResearch',@readResearch, ...
     'readTimeoutCheckpoint',@readTimeoutCheckpoint,'useSurfaceForSU2',@useSurfaceForSU2, ...
     'loadNativeFeature',@()loadNative([],[],true),'loadClassic',@loadClassic, ...
-    'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh);
+    'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh, ...
+    'readVerifiedHEOS',@readVerifiedHEOS);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -221,25 +222,28 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isEmbedded()
-                    grid=form(38);c=state.cfg;
-                    controls.altitude=numberField(grid,1,'高度 / km',c.flight.altitude/1000,[0 86]);
-                    controls.mach=numberField(grid,2,'Mach',c.flight.Mach,[1.01 10]);
-                    controls.alpha=numberField(grid,3,'攻角 / °',c.flight.alpha,[-89 89]);
-                    controls.beta=numberField(grid,4,'侧滑角 / °',c.flight.beta,[-89 89]);
-                    controls.wall=numberField(grid,5,'给定壁温 / K',c.flight.Twall,[1 10000]);
-                    controls.iterations=numberField(grid,6,'最大迭代数',getOption(c.su2,'iterations',1000),[1 30000]);
-                    controls.seconds=numberField(grid,7,'时间预算 / s',getOption(c.su2,'maximumSeconds',120),[1 720]);
+                    grid=form(48);c=state.cfg;
+                    controls.altitude=numberField(grid,2,'高度 / km',c.flight.altitude/1000,[0 86]);
+                    controls.mach=numberField(grid,3,'参考Mach',c.flight.Mach,[1.01 10]);
+                    controls.alpha=numberField(grid,4,'攻角 / °',c.flight.alpha,[-89 89]);
+                    controls.beta=numberField(grid,5,'侧滑角 / °',c.flight.beta,[-89 89]);
+                    controls.wall=numberField(grid,6,'给定壁温 / K',c.flight.Twall,[1 10000]);
+                    controls.iterations=numberField(grid,7,'最大迭代数',getOption(c.su2,'iterations',1000),[1 30000]);
+                    controls.seconds=numberField(grid,8,'时间预算 / s',getOption(c.su2,'maximumSeconds',120),[1 720]);
                     mode='overwrite';if getOption(c.su2,'namedCheckpoints',false),mode='indexed';end
-                    controls.checkpointMode=choice(grid,8,'检查点保存',{'覆盖写 · 默认','按迭代保留'}, {'overwrite','indexed'},mode);
-                    controls.outputEvery=numberField(grid,9,'保存间隔 / 步',getOption(c.su2,'outputEvery',1000),[1 30000]);
+                    controls.checkpointMode=choice(grid,9,'检查点保存',{'覆盖写 · 默认','按迭代保留'}, {'overwrite','indexed'},mode);
+                    controls.outputEvery=numberField(grid,10,'保存间隔 / 步',getOption(c.su2,'outputEvery',1000),[1 30000]);
                     thermal=getOption(c.su2,'wallThermalMode','isothermal');
-                    controls.thermalMode=choice(grid,10,'壁面热边界',{'给定统一壁温','绝热 · 给定热流0','沿X变化的壁温'}, ...
+                    controls.thermalMode=choice(grid,11,'壁面热边界',{'给定统一壁温','绝热 · 给定热流0','沿X变化的壁温'}, ...
                         {'isothermal','adiabatic','axialTemperature'},thermal);
                     controls.wall.Enable=onoff(strcmp(thermal,'isothermal'));
                     for key={'altitude','mach','alpha','beta','wall','iterations','seconds','checkpointMode','outputEvery','thermalMode'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
-                    controls.wallProfile=button(grid,11,'导入X—壁温分布表',@importWallTemperatureProfile);
-                    controls.confirm=button(grid,12,'确认内嵌引擎边界',@confirmBoundary);
-                    tip(grid,14,'SU2 8.6.0：层流NS、定比热理想气体γ1.4、Sutherland、Pr0.72；无湍流/转捩模型。空间壁温使用原生输入适配版本。');
+                    controls.wallProfile=button(grid,12,'导入X—壁温分布表',@importWallTemperatureProfile);
+                    controls.thermodynamics=choice(grid,1,'热力学模型',{'定比热 · 默认','HEOS Air · 研究'}, ...
+                        {'idealGas','HEOS-Air'},getOption(c.su2,'thermodynamicModel','idealGas'));
+                    controls.thermodynamics.ValueChangedFcn=@thermodynamicsEdited;
+                    controls.confirm=button(grid,13,'确认内嵌引擎边界',@confirmBoundary);
+                    controls.propertySummary=tip(grid,14,propertySummaryText(c));
                     controls.storageEstimate=tip(grid,18,checkpointBudgetText(c));
                     text='CSV两列：X_m、T_K；覆盖整个模型，温度为给定条件，节点间线性变化。';
                     if isfield(c.su2,'wallTemperatureProfile')
@@ -250,19 +254,23 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,24,'绝热q=0属于给定边界；流体节点温度不等于材料壁温解。输入变化后须重新确认与计算。');
                     if isfield(c.flight,'atmosphere') && ~isfield(c.flight.atmosphere,'geometricAltitude')
                         controls.altitude.Enable='off';
-                        tip(grid,27,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
+                        tip(grid,45,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
                     end
                     % 初猜不是流场解；显式研究选项只对已核对的混合域和等温壁开放。
-                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究'}, ...
-                        {'freestream','wallEnthalpy','checkpoint'},getOption(c.su2,'initialMode','freestream'));
+                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究','定比热源场转HEOS'}, ...
+                        {'freestream','wallEnthalpy','checkpoint','propertyTransfer'},getOption(c.su2,'initialMode','freestream'));
                     controls.initialThickness=numberField(grid,29,'初猜厚度 / mm',1000*getOption(c.su2,'initialThicknessM',.001),[.001 1000]);
                     controls.checkpointLimit=numberField(grid,30,'检查点上限 / MiB',getOption(c.su2,'checkpointLimitMiB',100),[1 1024]);
                     for key={'initialMode','initialThickness','checkpointLimit'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
-                    tip(grid,32,'厚度仅用于数值初猜，必须位于完整棱柱层内；不代表已解边界层。保存上限只限制检查点估计，网格/初态另计。');
-                    controls.checkpointSource=textField(grid,33,'源检查点目录',getOption(c.su2,'checkpointSource',''));
+                    controls.checkpointSource=textField(grid,31,'源检查点目录',getOption(c.su2,'checkpointSource',''));
                     controls.checkpointSource.ValueChangedFcn=@boundaryEdited;
-                    controls.chooseCheckpoint=button(grid,34,'选择已完成的同工况任务',@chooseCheckpointInitial);
-                    tip(grid,36,'继续研究须保持原体网格、物理及数值配置并启用具名保存；启动前核对源场。累计迭代不是物理时间。');
+                    controls.chooseCheckpoint=button(grid,32,'选择已完成的同工况任务',@chooseCheckpointInitial);
+                    tip(grid,33,'继续研究须保持原体网格、物理及数值配置并启用具名保存。初猜厚度须在完整棱柱层内，不代表已解边界层。保存上限只限制检查点估计。');
+                    controls.heosSource=textField(grid,36,'定比热源目录',getOption(c.su2,'heosSource',''));
+                    controls.heosSource.ValueChangedFcn=@boundaryEdited;
+                    controls.chooseHEOS=button(grid,37,'选择HEOS转换的定比热源场',@chooseHEOSSource);
+                    tip(grid,38,'HEOS固定原p/T/速度，Mach栏为定比热速度参考；新EOS Mach另列。统一Tw、具名保存；源步号不累加。');
+                    tip(grid,41,'初态转换≤180s，EOS审核≤120s，与流场预算分别计时。当前仍为层流研究，无RANS/转捩或材料壁温解；低温输运/网格/收敛未合格。');
                     sync();return;
                 end
                 grid=form(24+12*methodDetailsOpen);c=state.cfg;
@@ -302,13 +310,14 @@ renderEditor();sync();showGeometry(true);
                 end
             case 4
                 if isEmbedded()
-                    grid=form(15);controls.run=button(grid,1,'启动内嵌SU2 · 研究计算',@solveCase);
+                    grid=form(19);controls.run=button(grid,1,'启动内嵌SU2 · 研究计算',@solveCase);
                     controls.cancel=button(grid,2,'取消当前引擎任务',@cancelEngine);
                     controls.cancel.Enable=onoff(state.busy);
                     controls.readResearch=button(grid,3,'重开本程序同工况研究结果',@readResearchDialog);
                     controls.readTimeoutCheckpoint=button(grid,4,'查看同工况超时检查点 · 研究',@readTimeoutDialog);
-                    tip(grid,5,'超时不自动接收结果。显式重开须核对原输入、保存迭代及完整场；仍不增加合格面积。');
-                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[8 15];controls.log.Layout.Column=[1 2];
+                    controls.readVerifiedHEOS=button(grid,5,'查看同表面/工况的已有HEOS场',@readVerifiedHEOSDialog);
+                    tip(grid,6,'已有HEOS场须核对原文件、物理条件、EOS与面元；沿用所选场的实际网格/迭代身份。此操作只查看，不继续计算。');
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[10 19];controls.log.Layout.Column=[1 2];
                     sync();return;
                 end
                 failed=~isempty(state.error.message);offset=6*failed;
@@ -516,6 +525,8 @@ renderEditor();sync();showGeometry(true);
         next.flight.Twall=controls.wall.Value;
         if isEmbedded()
             next.heating.airThermalModel='caloricallyPerfect';
+            property=controls.thermodynamics.Value;
+            if ~strcmp(property,'idealGas') || isfield(next.su2,'thermodynamicModel'),next.su2.thermodynamicModel=property;end
             thermal=controls.thermalMode.Value;
             if ~strcmp(thermal,'isothermal') || isfield(next.su2,'wallThermalMode'),next.su2.wallThermalMode=thermal;end
             next.su2.iterations=controls.iterations.Value;next.su2.maximumSeconds=controls.seconds.Value;
@@ -530,6 +541,16 @@ renderEditor();sync();showGeometry(true);
             if limit~=100 || isfield(next.su2,'checkpointLimitMiB'),next.su2.checkpointLimitMiB=limit;end
             source=controls.checkpointSource.Value;
             if ~isempty(source) || isfield(next.su2,'checkpointSource'),next.su2.checkpointSource=source;end
+            heosSource=controls.heosSource.Value;
+            if ~isempty(heosSource) || isfield(next.su2,'heosSource'),next.su2.heosSource=heosSource;end
+            if strcmp(property,'HEOS-Air')
+                assert(strcmp(initial,'propertyTransfer'),'HEOS必须选择“定比热源场转HEOS”，不能直接使用旧能量或自由流。');
+                assert(strcmp(thermal,'isothermal'),'HEOS工作台目前只支持给定统一壁温。');
+                assert(named,'HEOS研究须启用具名检查点保存。');
+                assert(isfile(fullfile(heosSource,'engine_process.json')),'请选择已完成的定比热源场；启动时核对全部网格与状态。');
+            else
+                assert(~strcmp(initial,'propertyTransfer'),'定比热模型不能使用HEOS转换初态。');
+            end
             if strcmp(initial,'checkpoint')
                 assert(isfile(fullfile(source,'engine_process.json')),'请选择具有真实进程记录的源检查点目录。');
                 assert(named,'继续研究须启用具名检查点保存，以保留本段和累计身份。');
@@ -557,6 +578,23 @@ renderEditor();sync();showGeometry(true);
             else,next.basePressure.(key{1})=strcmp(control.Value,'yes');end
         end
     end
+    function thermodynamicsEdited(~,~)
+        % 用户显式选物性后设置唯一相容初态；不自动启动或改变已有源文件。
+        if strcmp(controls.thermodynamics.Value,'HEOS-Air')
+            controls.initialMode.Value='propertyTransfer';controls.checkpointMode.Value='indexed';
+        elseif strcmp(controls.initialMode.Value,'propertyTransfer')
+            controls.initialMode.Value='freestream';
+        end
+        display=state.cfg;display.su2.thermodynamicModel=controls.thermodynamics.Value;
+        controls.propertySummary.Text=propertySummaryText(display);boundaryEdited([],[]);
+    end
+    function text=propertySummaryText(c)
+        if strcmp(getOption(c.su2,'thermodynamicModel','idealGas'),'HEOS-Air')
+            text='SU2 8.6.0 / CoolProp 7.2 HEOS Air：层流、ROE/特征远场；输运仍为Sutherland、μcp/Pr0.72。M输入是原速度参考；EOS审核通过后才能查看。';
+        else
+            text='SU2 8.6.0：层流NS、定比热理想气体γ1.4、Sutherland、Pr0.72；无湍流/转捩模型。空间壁温使用原生输入适配版本。';
+        end
+    end
     function boundaryEdited(~,~)
         if state.busy || preparing,return;end
         try
@@ -564,7 +602,9 @@ renderEditor();sync();showGeometry(true);
             if isEmbedded() && isfield(controls,'storageEstimate'),controls.storageEstimate.Text=checkpointBudgetText(state.cfg);end
             if isEmbedded(),controls.wall.Enable=onoff(strcmp(controls.thermalMode.Value,'isothermal'));end
             updateMethodScope();message('边界设置已编辑；请重新确认并显式计算，旧结果不会冒充新工况。');showGeometry(false);
-        catch ex,showError(ex);end
+        catch ex
+            state=aeroHeatWorkflowState('invalidateBoundary',state);report=[];showGeometry(false);showError(ex);
+        end
     end
     function confirmBoundary(~,~)
         if state.busy || preparing,return;end
@@ -583,7 +623,9 @@ renderEditor();sync();showGeometry(true);
                 message('边界与当前计算快照一致，结果仍有效；再次计算需明确按计算按钮。');
             end
             go(4);
-        catch ex,showError(ex);end
+        catch ex
+            state=aeroHeatWorkflowState('invalidateBoundary',state);report=[];showGeometry(false);showError(ex);
+        end
     end
 
     function importWallTemperatureProfile(~,~)
@@ -764,9 +806,14 @@ renderEditor();sync();showGeometry(true);
             end
             projection=buildSU2WallProjection(embeddedVolume,frozen.mesh);
             save(fullfile(folder,'input_snapshot.mat'),'frozen','manifest','projection','budget','-v7');
-            engineJob=embeddedSU2Job('start',folder,struct('threads',2, ...
+            jobOptions=struct('threads',2, ...
                 'maximumSeconds',getOption(frozen.cfg.su2,'maximumSeconds',120), ...
-                'pythonExecutable',getOption(frozen.cfg.su2,'pythonExecutable','python')));
+                'pythonExecutable',getOption(frozen.cfg.su2,'pythonExecutable','python'));
+            if strcmp(getOption(frozen.cfg.su2,'thermodynamicModel','idealGas'),'HEOS-Air')
+                jobOptions.propertyInitialization=struct('model','HEOS-Air','runtimeFlavor','rah-coolprop-recon-v3', ...
+                    'sourceDirectory',char(java.io.File(frozen.cfg.su2.heosSource).getCanonicalPath()));
+            end
+            engineJob=embeddedSU2Job('start',folder,jobOptions);
             engineTimer=timer('ExecutionMode','fixedSpacing','Period',.5,'BusyMode','drop','TimerFcn',@pollEngine);
             renderEditor();message('内嵌引擎已启动；等待实际进程回执。');start(engineTimer);
         catch ex
@@ -779,7 +826,11 @@ renderEditor();sync();showGeometry(true);
         try
             [engineJob,receipt]=embeddedSU2Job('poll',engineJob);
             if ~engineJob.terminal
-                if ~isempty(receipt) && isfield(receipt,'elapsedSeconds')
+                if isfield(engineJob,'pipelineReceipt')
+                    p=engineJob.pipelineReceipt;labels=struct('preparation','初态物性转换','solver','原生流场求解','eosAudit','保存场EOS审核');
+                    label=p.stage;if isfield(labels,label),label=labels.(label);end
+                    message(sprintf('%s · 本阶段%.1fs / %.0fs · 总%.1fs · 取消%d',label,p.phaseElapsedSeconds,p.phaseBudgetSeconds,p.elapsedSeconds,engineJob.cancelRequested));
+                elseif ~isempty(receipt) && isfield(receipt,'elapsedSeconds')
                     suffix='';if isfield(receipt,'progress'),suffix=jsonencode(receipt.progress);end
                     if engineJob.cancelRequested,label='取消请求已提交，等待真实终态';else,label='内嵌引擎运行中';end
                     message(sprintf('%s · %.1fs · %s',label,receipt.elapsedSeconds,suffix));
@@ -788,6 +839,11 @@ renderEditor();sync();showGeometry(true);
             end
             stopEngineTimer();
             if closing,delete(fig);return;end
+            if isfield(engineJob,'pipelineReceipt')
+                p=engineJob.pipelineReceipt;
+                assert(p.exitCode==0 && ~p.cancelled && ~p.timedOut, ...
+                    '变物性流程在%s未完成：%s；原生求解器已启动%d。目录：%s',p.stage,getOption(p,'error','详见阶段回执'),p.engineStarted,engineJob.folder);
+            end
             assert(engineJob.supervisorExitCode==0 && receipt.exitCode==0 && ~receipt.timedOut && ~receipt.cancelled, ...
                 'RocketAeroHeat:SU2:Terminal','引擎未成功：exit %g / 取消%d / 超时%d。目录：%s',receipt.exitCode,receipt.cancelled,receipt.timedOut,engineJob.folder);
             stable=struct2cell(receipt.inputsStable);assert(all(cellfun(@(v)isequal(v,true),stable)),'引擎输入身份改变。');
@@ -796,10 +852,17 @@ renderEditor();sync();showGeometry(true);
             result=mapSU2WallResult(data,projection);result.V=state.mesh.V;result.F=state.mesh.F;
             result.receipt=receipt;result.flight=state.frozenInputs.cfg.flight;
             result.wallTemperatureInput=result.flight.Twall;result.sourceRevision=state.revision;result.solveId=state.solveId;
-            input=load(fullfile(engineJob.folder,'input_snapshot.mat'),'manifest');
-            result=attachSU2ThermalBoundary(result,input.manifest.thermalBoundary);
+            % 后台转换会更新真实运行清单，冻结UI快照仍保留原参考Mach；不可用旧清单覆盖EOS身份。
+            manifest=jsondecode(fileread(fullfile(engineJob.folder,'case_manifest.json')));
+            if isfield(engineJob,'pipelineReceipt')
+                result.flight=manifest.flight;result.workflowReceipt=engineJob.pipelineReceipt;
+            end
+            result=attachSU2ThermalBoundary(result,manifest.thermalBoundary);
             result.resultDirectory=engineJob.folder;
             result.convergenceAudit=auditSU2ResultConvergence(engineJob.folder,result);
+            if isfield(engineJob,'pipelineReceipt')
+                assert(result.convergenceAudit.checkpointIdentityConfirmed,result.convergenceAudit.reason);
+            end
             save(fullfile(engineJob.folder,'mapped_research.mat'),'result','-v7');
             state=aeroHeatWorkflowState('completeResearch',state,struct('result',result,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
             message('实际进程已结束；原面元研究快照已接收，未授予物理资格。');go(5);
@@ -834,6 +897,30 @@ renderEditor();sync();showGeometry(true);
         folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择同工况已完成任务');
         if isequal(folder,0),return;end
         controls.checkpointSource.Value=folder;boundaryEdited([],[]);
+    end
+    function chooseHEOSSource(~,~)
+        folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择同原p/T/速度与统一Tw的定比热源场');
+        if isequal(folder,0),return;end
+        controls.heosSource.Value=folder;boundaryEdited([],[]);
+    end
+    function readVerifiedHEOSDialog(~,~)
+        folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'查看本程序已完成并有EOS审核的HEOS场');
+        if isequal(folder,0),return;end
+        try,readVerifiedHEOS(folder);catch ex,showError(ex);end
+    end
+    function readVerifiedHEOS(folder)
+        % 研究入口读取原运行证据；不伪造历史UI冻结输入，不要求重新求解。
+        result=readSU2VerifiedHEOSCase(folder,state,embeddedVolume);
+        state=aeroHeatWorkflowState('beginSolve',state);
+        try
+            result.sourceRevision=state.revision;result.solveId=state.solveId;
+            state=aeroHeatWorkflowState('completeResearch',state,struct('result',result, ...
+                'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            message('原HEOS场与当前原面/物理条件一致，已核对EOS及具名步号；只读查看，未重新计算或增加资格。');go(5);
+        catch ex
+            state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
+            renderEditor();rethrow(ex);
+        end
     end
     function readTimeoutDialog(~,~)
         folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择本程序原超时运行目录');

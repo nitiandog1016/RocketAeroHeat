@@ -55,6 +55,10 @@ render(true);inspectFace(1,[]);
         if low.Value>=high.Value,probe.Value={'色标上限必须大于下限。'};return;end
         caption=sprintf('%s · M %.4g / α %.4g° / β %.4g° · 研究快照，未获物理资格', ...
             runtime.caption,result.flight.Mach,result.flight.alpha,result.flight.beta);
+        if isfield(result.flight,'referenceMach')
+            caption=sprintf('%s · EOS M %.8g（原速度参考M %.8g） · α %.4g° / β %.4g° · 未获物理资格', ...
+                runtime.caption,result.flight.Mach,result.flight.referenceMach,result.flight.alpha,result.flight.beta);
+        end
         updateAerothermalGeometryView(geometry,result,caption,struct('resetCamera',false));
         s=geometry.html.UserData;s.payload.faceField=struct('values',values, ...
             'range',[low.Value high.Value],'name',labels{i},'unit',units{i},'productionQualified',false);

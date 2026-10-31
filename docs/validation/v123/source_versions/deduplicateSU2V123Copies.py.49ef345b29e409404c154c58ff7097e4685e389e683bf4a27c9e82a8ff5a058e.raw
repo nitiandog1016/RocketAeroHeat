@@ -1,0 +1,52 @@
+"""仅合并本轮已终态目录的逐字相同大文件；保留路径、独有结果及失败记录。"""
+from pathlib import Path
+import hashlib,json,os,shutil
+ROOT=Path(__file__).resolve().parents[1];BASE=ROOT/'outputs/v123_validation'
+def sha(p):
+    h=hashlib.sha256()
+    with p.open('rb') as s:
+        for b in iter(lambda:s.read(8*1024**2),b''):h.update(b)
+    return h.hexdigest()
+def main():
+    target=BASE/'deduplication.json';assert not target.exists()
+    audit=json.loads((BASE/'independent_audit.json').read_text());assert audit['passed']
+    roots=[Path(r['folder']).resolve() for r in audit['pipelines']]
+    for folder in roots:
+        folder.relative_to(ROOT/'outputs/embedded_workbench')
+        p=json.loads((folder/'workflow/pipeline_process.json').read_text());assert p['status']=='terminal'
+    for p in BASE.glob('heos_ui*_process.json'):
+        r=json.loads(p.read_text());assert r['status']=='terminal' and all(r['sourceStableAfter'].values())
+    files=sorted(p for root in roots+[BASE] for p in root.rglob('*') if p.is_file())
+    identities={str(p):(sha(p),p.stat().st_size,p.stat().st_ino) for p in files}
+    # 只读已声明旧场作为替代副本，不扫描共享历史对象库。
+    old=[ROOT/'outputs/v122_validation/actual04',ROOT/'outputs/v120_validation/study01/control']
+    existing={}
+    for root in old:
+        for p in sorted(root.rglob('*')):
+            if p.is_file() and p.stat().st_size>=1024**2:existing.setdefault(sha(p),p)
+    plan=[]
+    for p in files:
+        h,length,inode=identities[str(p)]
+        if length<1024**2:continue
+        if h not in existing:existing[h]=p;continue
+        source=existing[h].resolve();p=p.resolve();source.relative_to(ROOT/'outputs');p.relative_to(ROOT/'outputs')
+        assert any(p.is_relative_to(root) for root in roots+[BASE]) and source!=p
+        plan.append(dict(source=str(source),destination=str(p),sha256=h,bytes=length,alreadyLinked=os.path.samefile(source,p)))
+    free=shutil.disk_usage(ROOT).free
+    for row in plan:
+        if row['alreadyLinked']:continue
+        source=Path(row['source']);dest=Path(row['destination']);temp=dest.with_name(dest.name+'.rah-link-temp')
+        assert not temp.exists() and sha(source)==sha(dest)==row['sha256']
+        os.link(source,temp);os.replace(temp,dest)
+        assert os.path.samefile(source,dest)
+    for name,(h,length,inode) in identities.items():assert Path(name).is_file() and sha(Path(name))==h
+    after=shutil.disk_usage(ROOT).free;seen=set();unique=0
+    for p in files:
+        stat=p.stat();key=(stat.st_dev,stat.st_ino)
+        if key not in seen:seen.add(key);unique+=stat.st_size
+    result=dict(plan=plan,allPathsAndSHA256Preserved=True,checkedFiles=len(files),uniqueResultsDeleted=0,
+        replacedCopyBytes=sum(r['bytes'] for r in plan if not r['alreadyLinked']),diskFreeBefore=free,diskFreeAfter=after,
+        diskFreeIncreaseBytes=after-free,localStudyDistinctFileLength=unique,physicalDiskUsageClaimed=False,
+        originalFileSHA256={k:v[0] for k,v in identities.items()},largeResultsBackedUpToGitHub=False)
+    target.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:v for k,v in result.items() if k not in ['plan','originalFileSHA256']},indent=2))
+if __name__=='__main__':main()

@@ -21,6 +21,13 @@ switch lower(action)
             'threads',threads,'maximumSeconds',seconds,'dryRun',false,'jobToken',token);
         request.sourceFiles={'readSU2SurfaceResult.m','buildSU2WallProjection.m','mapSU2WallResult.m', ...
             'writeSU2RocketCase.m','embeddedSU2Job.m'};
+        pipeline=isfield(options,'propertyInitialization');
+        if pipeline
+            request.propertyInitialization=options.propertyInitialization;
+            request.sourceFiles=[request.sourceFiles,{'scripts/runSU2WorkbenchPipeline.py', ...
+                'scripts/prepareSU2CoolPropCase.py','scripts/auditSU2CoolPropState.py', ...
+                'readSU2CoolPropStateAudit.m','auditSU2ResultConvergence.m'}];
+        end
         if isfile(fullfile(folder,'input_snapshot.mat'))
             request.sourceFiles{end+1}=fullfile(folder,'input_snapshot.mat');
         end
@@ -32,6 +39,7 @@ switch lower(action)
         path=fullfile(folder,'engine_request.json');assert(~isfile(path),'目录已经使用，不能重复启动。');
         write(path,request);
         script=fullfile(root,'scripts','runEmbeddedSU2.py');
+        if pipeline,script=fullfile(root,'scripts','runSU2WorkbenchPipeline.py');end
         assert(~any(ismember([char(python) script path],char([34 10 13]))));
         process=System.Diagnostics.Process();process.StartInfo.FileName=python;
         process.StartInfo.Arguments=sprintf('-X utf8 "%s" --request "%s"',script,path);
@@ -39,10 +47,14 @@ switch lower(action)
         process.StartInfo.RedirectStandardOutput=true;process.StartInfo.RedirectStandardError=true;
         process.StartInfo.WorkingDirectory=root;
         assert(process.Start(),'无法启动引擎监督器。');
-        job=struct('process',process,'folder',folder,'jobToken',token,'terminal',false,'cancelRequested',false);
+        job=struct('process',process,'folder',folder,'jobToken',token,'terminal',false,'cancelRequested',false,'pipeline',pipeline);
     case 'poll'
         file=fullfile(job.folder,'engine_process.json');
         if isfile(file),receipt=jsondecode(fileread(file));end
+        if option(job,'pipeline',false)
+            phase=fullfile(job.folder,'workflow','pipeline_process.json');
+            if isfile(phase),job.pipelineReceipt=jsondecode(fileread(phase));end
+        end
         job.terminal=logical(job.process.HasExited);
         if job.terminal
             job.supervisorExitCode=double(job.process.ExitCode);
@@ -55,6 +67,12 @@ switch lower(action)
                 job.supervisorOutput=[char(processText(job.process.StandardOutput)) char(processText(job.process.StandardError))];
                 fid=fopen(fullfile(job.folder,'supervisor.log'),'w','n','UTF-8');
                 if fid>=0,fprintf(fid,'%s',job.supervisorOutput);fclose(fid);end
+            end
+            if option(job,'pipeline',false)
+                assert(isfield(job,'pipelineReceipt') && strcmp(job.pipelineReceipt.status,'terminal'), ...
+                    '变物性后台流程缺少真实终态：%s',job.supervisorOutput);
+                % 准备阶段失败时尚未调用SU2，只返回流程失败，不编造引擎回执。
+                if job.pipelineReceipt.exitCode~=0,return;end
             end
             if isempty(receipt) || ~isfield(receipt,'status') || ~strcmp(receipt.status,'terminal')
                 error('RocketAeroHeat:SU2:Supervisor','监督器已退出但缺少引擎终态，不能接受结果：%s',job.supervisorOutput);

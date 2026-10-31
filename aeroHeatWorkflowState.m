@@ -134,6 +134,12 @@ switch action
         end
 
     %% 模块四：应用边界配置和审核；给定壁温只存于输入配置。
+    case 'invalidateboundary'
+        % 界面正在编辑但验证失败时也须撤销旧确认，防止以旧边界悄悄运行。
+        requireCondition(~state.busy && ~isempty(state.mesh),'只能使当前空闲网格的边界失效。');
+        state=invalidate(state,'边界编辑未通过验证，须修正并重新确认');
+        state.revision=state.revision+1;state.boundaryRevision=state.boundaryRevision+1;
+        state.currentStep=3;state.status='mesh-ready';
     case 'setboundary'
         requireCondition(~isempty(state.mesh),'请先生成网格。');
         cfg=required(payload,'cfg');assertScalarStruct(cfg,'cfg');

@@ -8,7 +8,7 @@ RUNTIME=ROOT/'tools/runtime/su2/8.6.0-rah-coolprop-v1'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 def setting(text,key):return re.search(r'^\s*'+key+r'\s*=\s*([^%\r\n]+)',text,re.M)[1].strip()
-def prepare(folder,source,runtime_flavor='rah-coolprop-recon-v3'):
+def prepare(folder,source,runtime_flavor='rah-coolprop-recon-v3',process_runner=None):
     assert runtime_flavor in ['rah-coolprop-v1','rah-coolprop-recon-v3']
     RUNTIME=ROOT/'tools/runtime/su2'/('8.6.0-'+runtime_flavor)
     folder=Path(folder).resolve();source=Path(source).resolve()
@@ -38,7 +38,9 @@ def prepare(folder,source,runtime_flavor='rah-coolprop-recon-v3'):
     with src.open('w') as f:
         f.write('mode,a,b\n');f.writelines('PT,%.17g,%.17g\n'%q for q in zip(p,T));f.write('PT,%.17g,%.17g\n'%(pInf,TInf))
     locked={str(q):sha(q) for q in [Path(__file__).resolve(),source/'case.cfg',source/'engine_process.json',source/'restart_flow.csv',folder/'mesh.su2',RUNTIME/'runtime.json',exe,src]}
-    supervisor.OUT=out;supervisor.run('PT',[str(exe),str(src),str(dest)],ROOT,dict(os.environ,OMP_NUM_THREADS='1'),120)
+    supervisor.OUT=out
+    run=supervisor.run if process_runner is None else lambda *a:process_runner(out,*a)
+    run('PT',[str(exe),str(src),str(dest)],ROOT,dict(os.environ,OMP_NUM_THREADS='1'),120)
     data=np.genfromtxt(str(dest),names=True,delimiter=',');assert np.array_equal(data['row'],np.arange(len(values)+1))
     local=data[:-1];freestream=data[-1];newrho=local['rho_kg_m3'];newe=local['e_J_kg']
     new=np.column_stack([values[:,:4],newrho,newrho[:,None]*u,newrho*(newe+np.sum(u*u,axis=1)/2)])
@@ -50,7 +52,7 @@ def prepare(folder,source,runtime_flavor='rah-coolprop-recon-v3'):
     written=np.loadtxt(str(initial),delimiter=',',skiprows=1);uu=written[:,5:8]/written[:,4,None]
     ee=written[:,8]/written[:,4]-.5*np.sum(uu*uu,axis=1)
     de.write_text('mode,a,b\n'+''.join('DE,%.17g,%.17g\n'%q for q in zip(written[:,4],ee)))
-    supervisor.run('DE',[str(exe),str(de),str(deout)],ROOT,dict(os.environ,OMP_NUM_THREADS='1'),120)
+    run('DE',[str(exe),str(de),str(deout)],ROOT,dict(os.environ,OMP_NUM_THREADS='1'),120)
     check=np.genfromtxt(str(deout),names=True,delimiter=',')
     errors=dict(pressure=float(max(abs(check['p_Pa']/p-1))),temperature=float(max(abs(check['T_K']/T-1))),
         velocity=float(np.max(abs(uu-u)/np.maximum(abs(u),1))))
