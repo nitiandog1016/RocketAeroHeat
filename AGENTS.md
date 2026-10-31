@@ -1,5 +1,7 @@
 # RocketAeroHeat 项目执行约定
 
+v103界面方法对照与当前帧科研工作台已测试，8项MATLAB实际任务全部终态，来源、数值、导出及浏览器证据见 `docs/SHOCK_FITTED_INTERFACE_V103.md` 和 `docs/validation/v103/`。球鼻候选仍未合格、新增正式热流面积0，不重跑旧任务或靠增加径向层数/时间冒充闭合。下一起点以目标文档末尾最新记录为准；真实20°大面积工程区域与科研UI继续优先，Euler研究不是前置条件。
+
 2026-10-31最新存储维护：20份 `outputs/retained_line_results_20261031/` 旧结果已无损去重至 `outputs/mat_history_store_20261031/`，全部数值按原字节保留，独立重构迁存前MAT的完整SHA后删除原容器。原15.24GB由约7.01GB对象与清单替代，磁盘空闲实增约8.20GB；当前88项依赖、Q41/Q25、v94—v103 MAT及其他28,304个原文件保持；仅本地README用途说明更新，原文另存。旧路径旁 `EVIDENCE_ARCHIVED_20261031.json` 指向清单，旧审计须先按说明恢复到新目录，不能直接加载对象库或删除其中共享对象；精确容器SHA恢复使用记录的zlib1.2.11。该SHA仅属于上一轮剥离矩阵后的保留MAT，不是最初v83含矩阵容器。全目录去重并计入压缩的数据长度本轮实测约49.56GB；大型对象库仍未上传GitHub。详见 `docs/validation/storage_20261031/output_review/`。本轮不运行MATLAB、不改变区域资格，不混入未交付v103或OpenCode修改。
 
 ## 当前目标与优先级

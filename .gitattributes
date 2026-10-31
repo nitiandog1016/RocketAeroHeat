@@ -65,3 +65,8 @@ docs/validation/v102/**/*.raw -whitespace
 tests/data/shock_fitted_dynamics/** -text -eol
 # 浏览器AX原始记录保留显示标签的尾随空格，不把证据当源码格式化。
 docs/validation/v102/browser/*.txt -whitespace
+# v103实际进程、界面导出及原生CSV下载绑定原字节SHA。
+docs/validation/v103/** -text -eol
+docs/validation/v103/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v103/**/*.raw -whitespace
+tests/data/shock_fitted_interface/** -text -eol

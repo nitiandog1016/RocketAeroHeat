@@ -2,10 +2,10 @@
 'use strict';
 (function(){
  const data=window.ALE_STUDY,q=new URLSearchParams(location.search),caseIndex=Number(q.get('case')),frameIndex=Number(q.get('frame')),revision=Number(q.get('revision')),view=q.get('view'),field=q.get('field');
- if(!data||!['shock-fitted-kernel-study-v101','shock-fitted-dynamics-study-v102'].includes(data.kind)||!Number.isSafeInteger(caseIndex)||!data.cases[caseIndex]||!Number.isSafeInteger(frameIndex)||!data.cases[caseIndex].frames[frameIndex]||!Number.isSafeInteger(revision)||revision<1)throw Error('研究来源或帧身份无效。');
+ if(!data||!['shock-fitted-kernel-study-v101','shock-fitted-dynamics-study-v102','shock-fitted-interface-study-v103'].includes(data.kind)||!Number.isSafeInteger(caseIndex)||!data.cases[caseIndex]||!Number.isSafeInteger(frameIndex)||!data.cases[caseIndex].frames[frameIndex]||!Number.isSafeInteger(revision)||revision<1)throw Error('研究来源或帧身份无效。');
  const study=data.cases[caseIndex],frame=study.frames[frameIndex],pressureRange=study.pressureRangePa||data.pressureRangePa,fields={pressurePa:['流体压力','Pa',pressureRange],temperatureK:['流体温度（不是壁温）','K',data.temperatureRangeK],speedMS:['速度幅值','m/s',[0,2000]],wallPressurePa:['Riemann壁压','Pa',pressureRange],heatFluxWm2:['热流（未求）','W/m²',[0,1000000]],wallTemperatureK:['求解壁温（未求）','K',[80,2000]],edgeTemperatureK:['外缘Te（未求）','K',[80,2000]],recoveryTemperatureK:['恢复Tr（未求）','K',[80,2000]],inputWallTemperatureK:['给定壁温（未设置）','K',[80,2000]]};
  if(!fields[field]||!['all','wall','outer','rocket'].includes(view))throw Error('场量或范围无效。');
- const indices=study.faces.map((_,i)=>i).filter(i=>view!=='wall'&&view!=='outer'||study.boundaryKind[i]===(view==='wall'?2:3));
+ const indices=study.faces.map((_,i)=>i).filter(i=>view==='wall'?study.boundaryKind[i]===2:view==='outer'?[3,5].includes(study.boundaryKind[i]):true);
  let vertices=frame.position,faces=indices.map(i=>study.faces[i]),values=indices.map(i=>q.get('layer')==='1'&&Array.isArray(frame[field])?frame[field][i]:null);
  if(view==='rocket'){vertices=data.originalGeometry.vertices;faces=data.originalGeometry.faces;values=faces.map(()=>null);}
  // 只向绘图器传递当前面集合真正使用的顶点；壁面范围不能被未显示的外壳节点扩大。

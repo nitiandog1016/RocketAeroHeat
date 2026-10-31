@@ -22,8 +22,8 @@ if ~isempty(inside),includeWaves(inside,Q(next,:));end
 boundaryWavesIncluded=~isempty(boundary);
 if boundaryWavesIncluded
     assert(isequal(size(boundary.kind),[numel(mesh.boundaryFaces) 1])&& ...
-        all(ismember(boundary.kind,[1 2 3 4])),'ShockFit:Boundary','CFL需要完整明确的边界类型。');
-    for kind=1:4
+        all(ismember(boundary.kind,[1 2 3 4 5])),'ShockFit:Boundary','CFL需要完整明确的边界类型。');
+    for kind=1:5
         pick=find(boundary.kind==kind);if isempty(pick),continue;end
         ids=mesh.boundaryFaces(pick);right=Q(owner(ids),:);
         if kind==1
@@ -32,7 +32,7 @@ if boundaryWavesIncluded
             state=s.velocity(owner(ids),:);relative=sum(state.*g.normal(ids,:),2)-D(ids);
             mirror=shockFittedState3D([s.density(owner(ids)),state-2*relative.*g.normal(ids,:), ...
                 s.temperature(owner(ids))],gas,'primitive');right=mirror.Q;
-        elseif kind==3
+        elseif kind==3||kind==5
             up=shockFittedState3D([boundary.upstream.density boundary.upstream.velocityVector' ...
                 boundary.upstream.temperature],gas,'primitive');right=repmat(up.Q,numel(ids),1);
         end

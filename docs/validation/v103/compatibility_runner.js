@@ -1,0 +1,20 @@
+/* 模块用途：旧v102真实数据配合当前界面资源回归，不复制历史数据或修改冻结视图。 */
+'use strict';
+const fs=require('fs'),path=require('path'),crypto=require('crypto');
+const root=path.resolve(__dirname,'../../..');
+const source=path.join(root,'tests/testShockFittedDynamicsStudy.js');
+let code=fs.readFileSync(source,'utf8');
+for(const name of ['ale-study.js','geometry/ale-study-geometry.js']){
+ const needle="path.join(folder,'"+name+"')";
+ if(code.split(needle).length!==2)throw Error('旧测试资源读取位置已变化');
+ code=code.replace(needle,JSON.stringify(path.join(root,'web',path.basename(name))));
+}
+const folder=path.join(root,'outputs/v102_validation/view01/workbench');
+const target=path.join(root,'docs/validation/v103/legacy_compatibility');
+process.argv=[process.execPath,source,folder,target];
+fs.writeFileSync(path.join(__dirname,'compatibility_source_binding.json'),JSON.stringify({
+ originalTestSHA256:crypto.createHash('sha256').update(fs.readFileSync(source)).digest('hex'),
+ modifiedHarnessSHA256:crypto.createHash('sha256').update(code).digest('hex'),
+ modification:'Only the two JS asset paths point to current source; data and numerical expectations unchanged.'
+},null,2)+'\n');
+new Function('require',code)(require);

@@ -4,7 +4,8 @@ function report=studyShockFittedCap(folder,sourceFile,maximumSteps,endTimeS,spec
 % 模块二：不读取原箭体已算压力/热流，激波与内部场由三维相容推进。
 % 模块三：任何未稳态/出口/热物性问题保留真实结果与检查点，不提升生产资格。
 root=fileparts(fileparts(mfilename('fullpath')));addpath(root);setupShockFittedFlow;
-defaults=struct('radiusM',.05,'thetaMaxDeg',60,'rings',4,'azimuths',12,'gapM',.008,'layers',3,'CFL',.18,'resumeFile','');
+defaults=struct('radiusM',.05,'thetaMaxDeg',60,'rings',4,'azimuths',12,'gapM',.008,'layers',3,'CFL',.18, ...
+    'resumeFile','','motionMethod','face-riemann-L2','shockFluxMethod','RH');
 if nargin<5,spec=struct;end
 assert(isstruct(spec)&&isscalar(spec)&&all(ismember(fieldnames(spec),fieldnames(defaults))), ...
     'ShockFit:CapStudyOptions','未知的球鼻网格/推进选项。');
@@ -17,7 +18,8 @@ up=struct('pressure',double(fs.pressure),'temperature',double(fs.temperature),'d
 gas=createSurfaceFlowGas('caloricallyPerfect',double(fs.R),1.4);
 cap=buildShockFittedSphericalCap(spec.radiusM,spec.thetaMaxDeg,spec.rings,spec.azimuths,spec.gapM,spec.layers);
 options=struct('maximumSteps',maximumSteps,'endTimeS',endTimeS,'CFL',spec.CFL, ...
-    'resumeFile',spec.resumeFile,'checkpointFile',fullfile(folder,'current_checkpoint.mat'));
+    'resumeFile',spec.resumeFile,'checkpointFile',fullfile(folder,'current_checkpoint.mat'), ...
+    'motionMethod',spec.motionMethod,'shockFluxMethod',spec.shockFluxMethod);
 study=solveShockFittedCap3D(up,gas,cap,options);
 report=struct('status','executed-candidate-three-dimensional-curved-shock-fitted-region', ...
     'sourceAlphaDeg',double(fs.alpha),'benchmarkAlphaDeg',0,'sourceMach',double(fs.Mach), ...
