@@ -2,7 +2,7 @@ function [pressure,temperature,summary]=readSU2CoolPropStateAudit(folder,receipt
 %READSU2COOLPROPSTATEAUDIT 只读同库独立EOS审核，不在浏览结果时启动计算。
 % 模块一：绑定原生守恒场、真实查询终态和精确物性输出SHA。
 % 模块二：每行必须对应原节点；比内能零点由EOS定义，不套定比热正值假设。
-assert(strcmp(receipt.runtimeFlavor,'rah-coolprop-v1'),'结果未声明受控物性运行包。');
+assert(ismember(receipt.runtimeFlavor,{'rah-coolprop-v1','rah-coolprop-recon-v1','rah-coolprop-recon-v2','rah-coolprop-recon-v3'}),'结果未声明受控物性运行包。');
 path=fullfile(folder,'thermodynamics');summary=jsondecode(fileread(fullfile(path,'audit.json')));
 assert(strcmp(summary.thermodynamicModel,'CoolProp-7.2.0-HEOS-Air') && summary.sourceStable);
 assert(strcmp(sha(fullfile(folder,'restart_flow.csv')),summary.sourceStateSHA256));

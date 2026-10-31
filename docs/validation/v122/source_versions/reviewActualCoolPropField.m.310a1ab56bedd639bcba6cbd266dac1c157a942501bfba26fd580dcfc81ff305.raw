@@ -1,0 +1,46 @@
+function report=reviewActualCoolPropField(out)
+%REVIEWACTUALCOOLPROPFIELD 复用真实变物性场检查原面、来源和科研组件，不重跑引擎。
+% 模块一：原19752面与HEOS审核关联，局部19步不可累加到旧物性799步。
+% 模块二：云图、探针、截面、CSV共同保留运行包、物性与温度身份。
+% 模块三：旧定比热快照仍可读取；所有结果保持研究状态。
+assert(~isfolder(out));mkdir(out);old=load('outputs/v119_validation/review01/result.mat','r');
+folder='outputs/v122_validation/actual04';receipt=jsondecode(fileread(fullfile(folder,'engine_process.json')));
+assert(strcmp(receipt.status,'terminal') && receipt.exitCode==0 && ~receipt.timedOut);
+lineage=writeSU2CoolPropInitialState(folder,'outputs/v120_validation/study01/control','D:/anacondapython/python.exe',true);
+assert(lineage.sourceCumulativeIteration==799 && lineage.nodeCount==210914);
+p=load(fullfile(folder,'projection.mat'),'projection');manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));
+r=mapSU2WallResult(readSU2SurfaceResult(fullfile(folder,'surface_flow.vtk')),p.projection);
+r.V=old.r.V;r.F=old.r.F;r.receipt=receipt;r.flight=manifest.flight;
+r.sourceRevision='v122-real-domain-heos-startup';r.solveId=receipt.request.jobToken;
+r=attachSU2ThermalBoundary(r,old.r.thermalBoundary);r.convergenceAudit=auditSU2ResultConvergence(folder,r);
+a=r.convergenceAudit;assert(a.checkpointIdentityConfirmed,a.reason);
+assert(a.checkpointIteration==19 && a.sourceCumulativeIteration==799 && ~isfield(a,'cumulativeCheckpointIteration'));
+assert(isfield(a,'propertyTransfer') && ~a.checkpointResidualPassed && ~r.productionQualified);
+assert(numel(r.heatFluxRaw)==19752 && all(r.wallTemperatureInput==300));
+info=describeSU2Runtime(receipt);assert(strcmp(info.flavor,'rah-coolprop-recon-v3') && contains(info.method,'已核验'));
+fig=uifigure('Name','RocketAeroHeat · 真实箭体HEOS研究','Position',[30 30 1460 850]);g=onCleanup(@()close(fig));
+ui=createSU2ResearchView(uipanel(fig,'Units','normalized','Position',[0 0 1 1]),r);
+assert(contains(ui.auditText.Text,'新物性局部 19'));
+ui.select.Value='heatFluxRaw';ui.select.ValueChangedFcn(ui.select,[]);ui.setSectionX(-1.5);
+t=tic;while toc(t)<40
+    drawnow;s=ui.geometry.html.UserData;
+    if ~isempty(s.rendered)&&s.rendered.revision==s.revision&&~isempty(ui.getSection()),break;end
+    pause(.1);
+end
+assert(s.rendered.webglError==0 && s.rendered.revision==s.revision && ~isempty(ui.getSection()));
+ui.inspectFace(12000,[]);ui.exportTo(fullfile(out,'fields.csv'));ui.exportSectionTo(fullfile(out,'section.csv'));
+assert(contains(strjoin(ui.probe.Value,newline),'CoolProp'));
+for name={'fields.csv.json','section.csv.json'}
+    meta=jsondecode(fileread(fullfile(out,name{1})));
+    assert(isequaln(meta.convergenceAudit,jsondecode(jsonencode(a))) && strcmp(meta.algorithmRuntime.flavor,info.flavor));
+end
+ui.select.Value='wallSolved';ui.select.ValueChangedFcn(ui.select,[]);
+assert(all(isnan(ui.geometry.html.UserData.payload.faceField.values)));
+lines=describeSU2Convergence(old.r);assert(contains(lines{2},'累计 599'));
+save(fullfile(out,'result.mat'),'r','-v7');section=ui.getSection();
+report=struct('audit',a,'originalFaces',19752,'fullArea',sum(r.faceArea),'componentWebGLPassed',true, ...
+    'sectionRows',size(section.segments,1),'runtime',info,'legacySnapshotPreserved',true, ...
+    'unknownSolvedWallTemperaturePreserved',true,'matlabInitializationReadOnlyAdapterExecuted',true, ...
+    'freshConversionRepeated',false,'mainEndToEndLaunchClaimed',false,'physicsQualified',false,'newQualifiedArea',0);
+fid=fopen(fullfile(out,'report.json'),'w','n','UTF-8');assert(fid>=0);g2=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(report));
+end

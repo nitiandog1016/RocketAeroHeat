@@ -1,0 +1,53 @@
+"""唯一正常路径等价对照和一次有依据的真实域重试；所有旧失败/运行包保持不变。"""
+from pathlib import Path
+import argparse,hashlib,json,os,sys,uuid
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
+from su2ThermalRuntime import resolve,COOLPROP_RECON_FLAVOR
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('case',choices=['control','actual']);parser.add_argument('--format-fix',action='store_true');parser.add_argument('--linked-fix',action='store_true');args=parser.parse_args()
+    if args.linked_fix:args.format_fix=True
+    actual=args.case=='actual'
+    old=ROOT/('outputs/v122_validation/actual01' if actual else 'outputs/v121_validation/thermal20')
+    control='format_control' if args.format_fix else 'guard_control'
+    if args.linked_fix:control='linked_control'
+    actualName='actual04' if args.linked_fix else ('actual03' if args.format_fix else 'actual02')
+    out=ROOT/'outputs/v122_validation'/(actualName if actual else control);assert not out.exists()
+    if actual:
+        test=read(ROOT/'outputs/v122_validation'/control/'equivalence.json');assert test['passed']
+        previous=read(old/'engine_process.json');assert previous['exitCode']==3221225501 and previous['status']=='terminal'
+    flavor='rah-coolprop-recon-v2' if args.format_fix else COOLPROP_RECON_FLAVOR
+    if args.linked_fix:flavor='rah-coolprop-recon-v3'
+    out.mkdir();manifest=read(old/'case_manifest.json');manifest['requiredRuntimeFlavor']=flavor
+    runtime=ROOT/'tools/runtime/su2'/('8.6.0-'+flavor)/'runtime.json';newrt=read(runtime)
+    oldrt=ROOT/'tools/runtime/su2/8.6.0-rah-coolprop-v1/runtime.json'
+    if args.format_fix:
+        assert newrt['originalRuntimeSHA256']==sha(oldrt)
+        proof=ROOT/'outputs/v122_validation'/('linked_property_equivalence' if args.linked_fix else 'format_property_equivalence')/'report.json';equiv=read(proof)
+        assert equiv['allOriginalPTDEBytesEqual'] and equiv['newRuntimeSHA256']==sha(runtime)
+    else:
+        assert newrt['parentRuntimeSHA256']==sha(oldrt)
+        assert next(q['sha256'] for q in newrt['files'] if q['path']=='bin/RAH_CoolProp_State.exe')==next(q['sha256'] for q in read(oldrt)['files'] if q['path']=='bin/RAH_CoolProp_State.exe')
+    names=['case.cfg','mesh.su2']
+    if actual:names+=['initial_flow.csv','projection.mat','farfield_audit.json']
+    for name in names:os.link(str(old/name),str(out/name))
+    if actual:
+        (out/'initial_thermodynamics').mkdir()
+        for p in (old/'initial_thermodynamics').iterdir():
+            if p.is_file():os.link(str(p),str(out/'initial_thermodynamics'/p.name))
+        initial=read(old/'coolprop_initialization.json');assert initial==manifest['initialization']
+        initial['originalConversionRuntimeSHA256']=initial['runtimeSHA256'];initial['runtimeSHA256']=sha(runtime)
+        initial['runtimeRebinding']=dict(sourceCertificateSHA256=sha(old/'coolprop_initialization.json'),sourceCertificate=str(old/'coolprop_initialization.json'),
+            reason='same immutable property helper and CoolProp library; only reconstructed-state exception fallback changed',propertyHelperUnchanged=True)
+        if args.format_fix:
+            initial['runtimeRebinding'].update(reason='only CoolProp diagnostic formatting changed; full original PT/DE outputs byte equal',
+                propertyHelperUnchanged=False,propertyEquivalenceReportSHA256=sha(proof),propertyEquivalenceReport=str(proof))
+        (out/'coolprop_initialization.json').write_text(json.dumps(initial,indent=2)+'\n');manifest['initialization']=initial
+        manifest['coolPropInitializationSHA256']=sha(out/'coolprop_initialization.json')
+    (out/'case_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    resolve(out,(out/'case.cfg').read_text())
+    request=dict(workDirectory=str(out),configFile='case.cfg',meshFile='mesh.su2',threads=2,maximumSeconds=600 if actual else 60,dryRun=False,jobToken=str(uuid.uuid4()),
+        sourceFiles=[str(p.relative_to(ROOT)) for p in [Path(__file__).resolve(),out/'case_manifest.json',ROOT/'docs/validation/v122/PLAN.md']])
+    (out/'engine_request.json').write_text(json.dumps(request,indent=2)+'\n');print(str(out))
+if __name__=='__main__':main()

@@ -1,0 +1,25 @@
+"""一次有界调试诊断真实异常位置，不改物理、不修改原失败目录或重开长任务。"""
+from pathlib import Path
+import hashlib,json,os,sys,argparse
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
+import buildSU2ThermalRuntime as supervisor
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--guarded',action='store_true');args=parser.parse_args()
+    old=ROOT/'outputs/v122_validation'/('actual02' if args.guarded else 'actual01')
+    out=ROOT/'outputs/v122_validation'/('exception_diagnostic03' if args.guarded else 'exception_diagnostic02')
+    assert not out.exists();out.mkdir()
+    r=json.loads((old/'engine_process.json').read_text());assert r['status']=='terminal' and r['exitCode']==3221225501
+    for name in ['mesh.su2','initial_flow.csv','case.cfg']:os.link(str(old/name),str(out/name))
+    exe=ROOT/'tools/runtime/su2'/('8.6.0-rah-coolprop-recon-v1' if args.guarded else '8.6.0-rah-coolprop-v1')/'bin/SU2_CFD.exe'
+    gdb=ROOT/'tools/runtime/su2-thermal-build/toolchain/w64devkit/bin/gdb.exe'
+    commands=out/'commands.gdb'
+    # Windows调试堆让大量网格分配在90秒内不能结束；关闭调试堆，不改求解程序。
+    # CoolPropBaseError的m_err在vptr及ErrCode之后（+16），不把错误码当字符串。
+    commands.write_text('set pagination off\nset confirm off\nset print thread-events off\nset environment _NO_DEBUG_HEAP 1\nbreak __cxa_throw\ncommands\nsilent\nprintf "\\nRAH_EXCEPTION\\n"\nx/s *(char**)($rdx+8)\nbt 8\nx/s *(char**)($rcx+16)\ncontinue\nend\nrun\nthread apply all bt 12\nquit\n')
+    locks={str(p):sha(p) for p in [Path(__file__).resolve(),exe,gdb,commands,old/'engine_process.json',out/'case.cfg',out/'mesh.su2',out/'initial_flow.csv']}
+    (out/'input_hashes.json').write_text(json.dumps(locks,indent=2)+'\n')
+    supervisor.OUT=out;supervisor.run('debugger',[str(gdb),'-batch','-x',str(commands),'--args',str(exe),str(out/'case.cfg'),'--threads','2'],out,dict(os.environ,OMP_NUM_THREADS='2'),90)
+    assert all(sha(Path(p))==h for p,h in locks.items())
+    (out/'source_stability.json').write_text(json.dumps(dict(stable=True,physicsQualified=False))+'\n')
+if __name__=='__main__':main()

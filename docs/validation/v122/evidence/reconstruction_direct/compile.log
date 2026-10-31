@@ -1,0 +1,400 @@
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:44[m[K,
+                 from [01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:29[m[K,
+                 from [01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CEulerSolver.hpp:30[m[K,
+                 from [01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:28[m[K:
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:[m[K In member function '[01m[Kvoid CSysVector<ScalarType>::[01;32m[KPassiveCopy[m[K(const CSysVector<T>&)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:197:41:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  197 | #define SU2_OMP_SAFE_GLOBAL_ACCESS(...) [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K{__VA_ARGS__} END_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |                                         [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:386:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  386 |     [01;36m[KSU2_OMP_SAFE_GLOBAL_ACCESS[m[K(
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:[m[K In member function '[01m[KScalarType CSysVector<ScalarType>::[01;32m[Kdot[m[K(const VecExpr::CVecExpr<U, Scalar_t>&) const[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:557:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  557 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:[m[K In member function '[01m[Kvoid CSysSolve<ScalarType>::[01;32m[KHandleTemporariesIn[m[K(const CSysVector<T>&, CSysVector<T>&, bool)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:291:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  291 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:303:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  303 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:[m[K In member function '[01m[Kvoid CSysSolve<ScalarType>::[01;32m[KHandleTemporariesOut[m[K(CSysVector<T>&, bool)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:323:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  323 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:333:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  333 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/limiters/CLimiterDetails.hpp:[m[K In member function '[01m[Kvoid CLimiterDetails<LIMITER::VENKATAKRISHNAN_WANG>::[01;32m[Kpreprocess[m[K(CGeometry&, const CConfig&, size_t, size_t, const FieldType&)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/limiters/CLimiterDetails.hpp:356:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  356 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/limiters/CLimiterDetails.hpp:390:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  390 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CSolver.hpp:[m[K In member function '[01m[Kvoid CSolver::[01;32m[KSetResToZero[m[K()[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CSolver.hpp:4489:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 4489 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:[m[K In static member function '[01m[Kstatic void CFVMFlowSolverBase<VariableType, FlowRegime>::[01;32m[KompMasterAssignBarrier[m[K(Ts&& ...)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:197:41:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  197 | #define SU2_OMP_SAFE_GLOBAL_ACCESS(...) [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K{__VA_ARGS__} END_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |                                         [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:66:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+   66 |     [01;36m[KSU2_OMP_SAFE_GLOBAL_ACCESS[m[K(recursiveAssign(lhsRhsPairs...);)
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:[m[K In member function '[01m[Kvoid CFVMFlowSolverBase<VariableType, FlowRegime>::[01;32m[KFinalizeResidualComputation[m[K(const CGeometry*, bool, long unsigned int, CConfig*)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:319:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  319 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:[m[K In member function '[01m[Kvoid CFVMFlowSolverBase<VariableType, FlowRegime>::[01;32m[KSetTime_Step_impl[m[K(const SoundSpeedFunc&, const LambdaViscFunc&, CGeometry*, CSolver**, CConfig*, short unsigned int, long unsigned int)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:584:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  584 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:602:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  602 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/../../include/solvers/CFVMFlowSolverBase.hpp:642:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  642 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:[m[K In member function '[01m[Kvirtual void CEulerSolver::[01;32m[KInstantiateEdgeNumerics[m[K(const CSolver* const*, const CConfig*)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:377:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  377 |   [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:[m[K In member function '[01m[Kvoid CEulerSolver::[01;32m[KCommonPreprocessing[m[K(CGeometry*, CSolver**, CConfig*, short unsigned int, short unsigned int, short unsigned int, bool)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:1636:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 1636 |   [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:[m[K In member function '[01m[Kvirtual void CEulerSolver::[01;32m[KUpwind_Residual[m[K(CGeometry*, CSolver**, CNumerics**, CConfig*, short unsigned int)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:1857:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+ 1857 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:[m[K In member function '[01m[Kvirtual void CEulerSolver::[01;32m[KIdentifySolutionOutliers[m[K(const CConfig*, long unsigned int)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:2642:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+ 2642 |     [01;36m[KSU2_OMP_MASTER[m[K
+      |     [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:2654:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 2654 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:2663:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+ 2663 |     [01;36m[KSU2_OMP_MASTER[m[K
+      |     [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:2675:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 2675 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:2684:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+ 2684 |     [01;36m[KSU2_OMP_MASTER[m[K
+      |     [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:2702:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 2702 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:[m[K In member function '[01m[Kvirtual void CEulerSolver::[01;32m[KPreprocessBC_Giles[m[K(CGeometry*, CConfig*, CNumerics*, short unsigned int)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:6277:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+ 6277 |       [01;36m[KSU2_OMP_MASTER[m[K
+      |       [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:6366:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 6366 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:[m[K In member function '[01m[Kvirtual void CEulerSolver::[01;32m[KBC_Giles[m[K(CGeometry*, CSolver**, CNumerics*, CNumerics*, CConfig*, short unsigned int)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../../su2-thermal-build/source/SU2_CFD/src/solvers/CEulerSolver.cpp:6546:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 6546 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K

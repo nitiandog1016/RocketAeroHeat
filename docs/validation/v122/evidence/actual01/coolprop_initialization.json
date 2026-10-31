@@ -1,0 +1,67 @@
+{
+  "kind": "same-mesh-primitive-to-HEOS-Air-initial-guess",
+  "thermodynamicModel": "CoolProp-7.2.0-HEOS-Air",
+  "sourceDirectory": "E:\\RocketAeroHeat\\outputs\\v120_validation\\study01\\control",
+  "sourceLocalIteration": 199,
+  "sourceCumulativeIteration": 799,
+  "samePhysicsAndNumerics": false,
+  "sameMesh": true,
+  "strictlyConservativeRemap": false,
+  "newPhysicsLocalIterationStartsAt": 0,
+  "preserves": [
+    "p",
+    "T",
+    "velocity vector",
+    "mesh",
+    "wall boundary"
+  ],
+  "changes": [
+    "EOS density",
+    "EOS internal-energy reference",
+    "total conservative energy",
+    "convective flux",
+    "open boundary implementation"
+  ],
+  "nodeCount": 210914,
+  "errors": {
+    "pressure": 1.4022116801015727e-13,
+    "temperature": 1.4011014570769476e-13,
+    "velocity": 2.1991513030952781e-16
+  },
+  "sourceTemperatureRangeK": [
+    148.0019959962351,
+    1382.0746446584672
+  ],
+  "originalVelocityMps": 1508.5433002103648,
+  "originalReferenceMach": 5.0,
+  "EOSMach": 4.998034974966865,
+  "expectedVelocity": [
+    -1417.5670073437009,
+    -0.0,
+    515.9521957509265
+  ],
+  "thermodynamicQuerySHA256": {
+    "PT_input.csv": "dcda3536702f63f40663e5d4679f787c579be8604fd4345259910b787e797db5",
+    "PT_output.csv": "ad065cfb9cf81c5bf4a3f24de16eb026e92f32f461c7bfa90ff5029db99796c4",
+    "DE_input.csv": "9e303c545e8dd7e8db49c88f2953223d6e57acc591b4c505852a78834f5b1005",
+    "DE_output.csv": "e6d7f022bfc59994507fce4bd56e7b0169e09abd7b1cf63fafc481bb06952a11",
+    "PT_process.json": "057baf2b573a001599eb7413f53464d5ceeb0e1eebb10b855e4b33e6bcb94012",
+    "DE_process.json": "335c723cfc17ade1d999a18f10d2c0c02dfdcbfa24c34ef2d9c01db8cac82b63"
+  },
+  "runtimeSHA256": "333a624c84133361f8e789ee96731d46739c6f10ed477a4be0b247d9845f5498",
+  "initialStateSHA256": "a8cda19ac3b6339bb93f483c9d09373d55b3d5e3fc32bd2e7bf9d9468b1bcc29",
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2CoolPropCase.py": "20329f6c7cee39d03aee54ccd1e9cdad5d8f52702ed2c303650a405a65f1a558",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\study01\\control\\case.cfg": "23c5aa035fc580de91badf570ea607e65961a6dcf6aafb38bd3e7d0061f5de6f",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\study01\\control\\engine_process.json": "418ac4951080dc4d81aa6f6bfe9e50a6bddd25c5fb5e82097b4cc69ea1210c70",
+    "E:\\RocketAeroHeat\\outputs\\v120_validation\\study01\\control\\restart_flow.csv": "f01fd4f31e08b8465803ede639fc41eccd4a216758818c910277b17c24e38ed4",
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\actual01\\mesh.su2": "0a3e7ff9506729e25764285eea637d156edeb5d0687bce5bf8d6af9fe560680e",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\runtime.json": "333a624c84133361f8e789ee96731d46739c6f10ed477a4be0b247d9845f5498",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-v1\\bin\\RAH_CoolProp_State.exe": "13d60bf79b39aecd9cc163f256f86c957a0afefd27493fecd6c6aa27cc8d603b",
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\actual01\\initial_thermodynamics\\PT_input.csv": "dcda3536702f63f40663e5d4679f787c579be8604fd4345259910b787e797db5"
+  },
+  "sourceStable": true,
+  "maximumRelativeDensityChange": 0.0001345274506081573,
+  "maximumInternalEnergyDifferenceJkg": 231670.35709666763,
+  "physicsQualified": false
+}

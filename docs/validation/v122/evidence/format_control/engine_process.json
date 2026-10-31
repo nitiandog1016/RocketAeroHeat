@@ -1,0 +1,75 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-10-31T19:08:39.357472+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 60,
+    "dryRun": false,
+    "jobToken": "8218fa6a-b025-45cc-8ecd-3ae86369c170",
+    "sourceFiles": [
+      "tests\\prepareCoolPropGuardRuns.py",
+      "outputs\\v122_validation\\format_control\\case_manifest.json",
+      "docs\\validation\\v122\\PLAN.md"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\engine_request.json": "820efc22fe00ecbefd542d11ca1d31dc643b35300e6e0fdaf9d048d88ea9da23",
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\case.cfg": "1bf9245c3fd2a04e03447779ea3891e8fa067e9a350274138660b6db2865908a",
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\mesh.su2": "57ab10799e75c1d2f49dd575087cd7065e9ad0845ec9f83fc3e102b49d85b7c1",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-recon-v2\\bin\\SU2_CFD.exe": "988c55fb93218a9229301ec72173619e9adcd2fe5c02b2defce6c6d9236530c6",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "2057530dbf48c960f52de99af131906e2a5704f0a74ea3598187f5823f4632ce",
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\case_manifest.json": "0f0c4ef6d845425318a389c618b4a77c17080fce930226eba26908ff257d8eca",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-recon-v2\\runtime.json": "e050aade1d36caf6f586e2d7c0400002794736e22881a16c8294cc8a2736a99f",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "e4629588dae5f8c9d43bb7f4d746670fbb0361fe4f48d9d2e7f2df1698eb9099",
+    "E:\\RocketAeroHeat\\tests\\prepareCoolPropGuardRuns.py": "68e7f79e1451ef1f36b51cc63e85fd01dd01ee8789c02bf18e2568c959e00bff",
+    "E:\\RocketAeroHeat\\docs\\validation\\v122\\PLAN.md": "15fd88670275e0a5aa2f5f1086a497da5bd84890d7fb3a421de01e7f4574440e"
+  },
+  "executableVersion": "8.6.0+rah-coolprop-recon-v2",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "supervisorProcessID": 35692,
+  "physicalSolutionQualified": false,
+  "runtimeFlavor": "rah-coolprop-recon-v2",
+  "processID": 52836,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-recon-v2\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "elapsedSeconds": 8.56300000000192,
+  "progress": {
+    "Inner_Iter": 19.0,
+    "rms[Rho]": -2.473071241,
+    "rms[RhoE]": 3.997997129,
+    "HF": 4341469.241
+  },
+  "exitCode": 0,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-10-31T19:08:47.916937+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-recon-v2\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v122_validation\\format_control\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-coolprop-recon-v2\\runtime.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\tests\\prepareCoolPropGuardRuns.py": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v122\\PLAN.md": true
+  },
+  "outputSHA256": {
+    "engine_stdout.log": "d35c7411329573067ff885b1d40f7e567f127cd9d6fb0825b0f09c33ca38be6b",
+    "history.csv": "056a15ccc80cc143820a2b7fb18675da1fde83ec179ad7f0db445e4677a381d8",
+    "restart_flow.csv": "26127c860bfd55dfc821c1279179188e22abf76eca6718d7b339516a5dc0c5f0",
+    "restart_flow_000010.csv": "04536a5ce0e053d5739d67d51891fe087482d3c7977f8c5b58fca7b71a16571e",
+    "restart_flow_000019.csv": "26127c860bfd55dfc821c1279179188e22abf76eca6718d7b339516a5dc0c5f0",
+    "surface_flow.vtk": "3fe47f7e83da5540a2d0595c74fa3eab16b85659e8c0ae96fe760ecdc453ad46",
+    "surface_flow_000010.vtk": "99f5440a77abbadd0a3e2d4363696b51092d421cae72ac4f40922d0edfcd1dd8",
+    "surface_flow_000019.vtk": "3fe47f7e83da5540a2d0595c74fa3eab16b85659e8c0ae96fe760ecdc453ad46"
+  }
+}

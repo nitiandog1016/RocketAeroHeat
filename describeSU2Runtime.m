@@ -11,9 +11,15 @@ switch info.flavor
         info.mode='native';info.method='官方原生更新';
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';
-    case 'rah-coolprop-v1'
+    case {'rah-coolprop-v1','rah-coolprop-recon-v1','rah-coolprop-recon-v2','rah-coolprop-recon-v3'}
         info.mode='compressible-heos-air';info.method='受控CoolProp 7.2.0 HEOS Air；可压缩变比热；Sutherland黏度与k=μcp/Pr，原生流场更新';
         info.physicsCaption='层流 NS / HEOS Air / Sutherland / k=μcp(T,ρ)/Pr0.72';
+        if startsWith(info.flavor,'rah-coolprop-recon-')
+            info.method='受控CoolProp 7.2.0 HEOS Air；局部重构EOS异常进入原生回退；Sutherland黏度与k=μcp/Pr';
+            info.physicsCaption=[info.physicsCaption ' / 重构异常局部回退'];
+        end
+        if strcmp(info.flavor,'rah-coolprop-recon-v2'),info.method=[info.method '；上游消息修正未实际链接，等同v1二进制'];end
+        if strcmp(info.flavor,'rah-coolprop-recon-v3'),info.method=[info.method '；已核验上游超域消息缺参修正'];end
     case 'rah-frozen-energy-v1'
         assert(isfield(receipt,'frozenEnergyMode'),'冻结能量运行时缺少真实模式回执。');
         info.mode=receipt.frozenEnergyMode;

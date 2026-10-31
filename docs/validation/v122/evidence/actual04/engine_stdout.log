@@ -1,0 +1,352 @@
+
+-------------------------------------------------------------------------
+|    ___ _   _ ___                                                      |
+|   / __| | | |_  )   Release 8.6.0 "Harrier"                           |
+|   \__ \ |_| |/ /                                                      |
+|   |___/\___//___|   Suite (Computational Fluid Dynamics Code)         |
+|                                                                       |
+-------------------------------------------------------------------------
+| SU2 Project Website: https://su2code.github.io                        |
+|                                                                       |
+| The SU2 Project is maintained by the SU2 Foundation                   |
+| (http://su2foundation.org)                                            |
+-------------------------------------------------------------------------
+| Copyright 2012-2026, SU2 Contributors                                 |
+|                                                                       |
+| SU2 is free software; you can redistribute it and/or                  |
+| modify it under the terms of the GNU Lesser General Public            |
+| License as published by the Free Software Foundation; either          |
+| version 2.1 of the License, or (at your option) any later version.    |
+|                                                                       |
+| SU2 is distributed in the hope that it will be useful,                |
+| but WITHOUT ANY WARRANTY; without even the implied warranty of        |
+| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |
+| Lesser General Public License for more details.                       |
+|                                                                       |
+| You should have received a copy of the GNU Lesser General Public      |
+| License along with SU2. If not, see <http://www.gnu.org/licenses/>.   |
+-------------------------------------------------------------------------
+
+Parsing config file for zone 0
+
+----------------- Physical Case Definition ( Zone 0 ) -------------------
+Compressible Laminar Navier-Stokes' equations.
+Mach number: 4.99803.
+Angle of attack (AoA): 160 deg, and angle of sideslip (AoS): -0 deg.
+Reynolds number: 0. Reference length 1.
+Reading and writing ASCII SU2 native restart files.
+Read flow solution from: initial_flow.
+Dimensional simulation.
+The reference area is 0.0721045 m^2.
+The semi-span will be computed using the max y(3D) value.
+The reference length is 1 m.
+Reference origin for moment evaluation is (0, 0, 0).
+Surface(s) where the force coefficients are evaluated: wall.
+
+Surface(s) plotted in the output file: wall.
+Input mesh file name: mesh.su2
+
+--------------- Space Numerical Integration ( Zone 0 ) ------------------
+Roe (with entropy fix = 0.001) solver for the flow inviscid terms.
+Standard Roe without low-dissipation function.
+Second order integration in space, with slope limiter.
+Venkatakrishnan-Wang slope-limiting method, with constant: 0.05.
+Average of gradients with correction (viscous flow terms).
+Gradient for upwind reconstruction: inverse-distance weighted Least-Squares.
+Gradient for viscous and source terms: inverse-distance weighted Least-Squares.
+
+--------------- Time Numerical Integration  ( Zone 0 ) ------------------
+Local time stepping (steady state simulation).
+Euler implicit method for the flow equations.
+BCGSTAB is used for solving the linear system.
+Using LU-SGS preconditioning.
+Convergence criteria of the linear solver: 1e-05.
+Max number of linear iterations: 10.
+CFL adaptation. Factor down: 0.5, factor up: 1.1,
+                lower limit: 0.05, upper limit: 5,
+                acceptable linear residual: 0.001'
+                starting iteration: 0.
+Courant-Friedrichs-Lewy number:      0.1
+
+------------------ Convergence Criteria  ( Zone 0 ) ---------------------
+Maximum number of solver subiterations: 20.
+Begin convergence monitoring at iteration 10.
+Residual minimum value: 1e-8.
+Cauchy series min. value: 1e-10.
+Number of Cauchy elements: 100.
+Begin windowed time average at iteration 0.
+
+-------------------- Output Information ( Zone 0 ) ----------------------
+File writing frequency: 
++------------------------------------+
+|                     File| Frequency|
++------------------------------------+
+|   SURFACE_PARAVIEW_ASCII|        10|
+|            RESTART_ASCII|        10|
++------------------------------------+
+Writing the convergence history file every 1 inner iterations.
+Writing the screen convergence history every 50 inner iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: surface_flow.
+Volume file name: volume_flow.
+Restart file name: restart_flow.
+
+------------- Config File Boundary Information ( Zone 0 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|                   Riemann boundary|                           farfield|
++-----------------------------------------------------------------------+
+|                    Isothermal wall|                               wall|
++-----------------------------------------------------------------------+
+
+-------------------- Output Preprocessing ( Zone 0 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: INNER_ITER, RMS_DENSITY, RMS_MOMENTUM-X, RMS_MOMENTUM-Y, RMS_ENERGY
+History output group(s): ITER, RMS_RES, AERO_COEFF, HEAT
+Convergence field(s): RMS_DENSITY, RMS_ENERGY
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE
+
+------------------- Geometry Preprocessing ( Zone 0 ) -------------------
+Three dimensional problem.
+210914 grid points.
+520114 volume elements.
+2 surface markers.
+19752 boundary elements in index 0 (Marker = wall).
+6572 boundary elements in index 1 (Marker = farfield).
+164578 tetrahedra.
+355536 prisms.
+Setting point connectivity.
+Renumbering points (Reverse Cuthill McKee Ordering).
+Recomputing point connectivity.
+Setting element connectivity.
+Checking the numerical grid orientation.
+All volume elements are correctly oriented.
+All surface elements are correctly oriented.
+Identifying edges and vertices.
+Setting the control volume structure.
+Volume of the computational grid: 381.435.
+Searching for the closest normal neighbors to the surfaces.
+Storing a mapping from global to local point index.
+Compute the surface curvature.
+Max K: 664.941. Mean K: 38.7194. Standard deviation K: 42.0129.
+Computing mesh quality statistics for the dual control volumes.
++--------------------------------------------------------------+
+|           Mesh Quality Metric|        Minimum|        Maximum|
++--------------------------------------------------------------+
+|    Orthogonality Angle (deg.)|        30.7975|        89.9458|
+|     CV Face Area Aspect Ratio|         1.1588|         131158|
+|           CV Sub-Volume Ratio|              1|        5842.46|
+|                     CV Volume|    5.62871e-12|       0.106165|
++--------------------------------------------------------------+
+Finding max control volume width.
+Semi-span length = 0.151498 m.
+Wetted area = 1.95529 m^2.
+Area projection in the x-plane = 0.0718916 m^2, y-plane = 0.603548 m^2, z-plane = 0.602949 m^2.
+Max. coordinate in the x-direction = 0.05 m, y-direction = 0.151498 m, z-direction = 0.151338 m.
+Min. coordinate in the x-direction = -2.82832 m, y-direction = -0.151473 m, z-direction = -0.151317 m.
+Computing wall distances.
+
+-------------------- Solver Preprocessing ( Zone 0 ) --------------------
+Viscous flow: Computing pressure using the ideal gas law
+based on the free-stream temperature and a density computed
+from the Reynolds number.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|               SUTHERLAND|          CONSTANT_PRANDTL|         CoolProp library|
++------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|        Ref. Viscosity|   1.71608e-05|             1|   N.s/m^2|   1.71608e-05|
+|      Sutherland Temp.|        273.15|             1|         K|        273.15|
+|     Sutherland Const.|         110.4|             1|         K|         110.4|
++------------------------------------------------------------------------------+
+|        Prandtl (Lam.)|             -|             -|         -|          0.72|
+|       Prandtl (Turb.)|             -|             -|         -|           0.9|
++------------------------------------------------------------------------------+
+|          Gas Constant|       287.049|             1|  N.m/kg.K|       287.049|
+|      Spec. Heat Ratio|             -|             -|         -|             -|
+|     Critical Pressure|     3.786e+06|             1|          |     3.786e+06|
+|  Critical Temperature|       132.531|             1|         K|       132.531|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|       1197.03|             1|        Pa|       1197.03|
+|               Density|     0.0184107|             1|    kg/m^3|     0.0184107|
+|           Temperature|       226.509|             1|         K|       226.509|
+|          Total Energy|   1.42561e+06|             1|   m^2/s^2|   1.42561e+06|
+|            Velocity-X|      -1417.57|             1|       m/s|      -1417.57|
+|            Velocity-Y|            -0|             1|       m/s|            -0|
+|            Velocity-Z|       515.952|             1|       m/s|       515.952|
+|    Velocity Magnitude|       1508.54|             1|       m/s|       1508.54|
++------------------------------------------------------------------------------+
+|             Viscosity|   1.47528e-05|             1|   N.s/m^2|   1.47528e-05|
+|          Conductivity|             -|             1|   W/m^2.K|             -|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|       4.99803|
+|       Reynolds Number|             -|             -|         -|   1.88258e+06|
++------------------------------------------------------------------------------+
+All ranks use edge coloring.
+Among the ranks that use edge coloring,
+      the minimum efficiency is 0.999276,
+      the maximum number of colors is 20,
+      the minimum edge color group size is 512.
+Initialize Jacobian structure (Navier-Stokes). MG level: 0.
+
+------------------- Numerics Preprocessing ( Zone 0 ) -------------------
+
+----------------- Integration Preprocessing ( Zone 0 ) ------------------
+
+------------------- Iteration Preprocessing ( Zone 0 ) ------------------
+Euler/Navier-Stokes/RANS fluid iteration.
+
+------------------------------ Begin Solver -----------------------------
+
+Simulation Run using the Single-zone Driver
+RAH_EOS_RECON_FIRST inner=0 thread=0 edge=22104 i=5282 j=6690 reason=D < DLtriple 4342.96 4879.38
+RAH_EOS_RECON_FIRST inner=0 thread=1 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=0 thread=0 edges=609
+RAH_EOS_RECON_COUNT inner=0 thread=1 edges=912
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|           0|   -3.356518|   -0.270269|   -1.041243|    2.854666|
+RAH_EOS_RECON_FIRST inner=1 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4347.95 4879.38
+RAH_EOS_RECON_FIRST inner=1 thread=0 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=1 thread=1 edges=642
+RAH_EOS_RECON_COUNT inner=1 thread=0 edges=881
+RAH_EOS_RECON_FIRST inner=2 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4353.95 4879.38
+RAH_EOS_RECON_FIRST inner=2 thread=0 edge=890369 i=202569 j=203173 reason=The molar density of -0.099065 mol/m3 is below the minimum of 0.000000 mol/m3
+RAH_EOS_RECON_COUNT inner=2 thread=1 edges=853
+RAH_EOS_RECON_COUNT inner=2 thread=0 edges=669
+RAH_EOS_RECON_FIRST inner=3 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4361.07 4879.38
+RAH_EOS_RECON_FIRST inner=3 thread=0 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=3 thread=0 edges=725
+RAH_EOS_RECON_COUNT inner=3 thread=1 edges=803
+RAH_EOS_RECON_FIRST inner=4 thread=0 edge=22104 i=5282 j=6690 reason=D < DLtriple 4369.42 4879.38
+RAH_EOS_RECON_FIRST inner=4 thread=1 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=4 thread=0 edges=687
+RAH_EOS_RECON_COUNT inner=4 thread=1 edges=845
+RAH_EOS_RECON_FIRST inner=5 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4379.11 4879.38
+RAH_EOS_RECON_FIRST inner=5 thread=0 edge=431866 i=107027 j=115127 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=5 thread=0 edges=644
+RAH_EOS_RECON_COUNT inner=5 thread=1 edges=892
+RAH_EOS_RECON_FIRST inner=6 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4390.21 4879.38
+RAH_EOS_RECON_FIRST inner=6 thread=0 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=6 thread=0 edges=749
+RAH_EOS_RECON_COUNT inner=6 thread=1 edges=789
+RAH_EOS_RECON_FIRST inner=7 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4402.78 4879.38
+RAH_EOS_RECON_FIRST inner=7 thread=0 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=7 thread=0 edges=705
+RAH_EOS_RECON_COUNT inner=7 thread=1 edges=828
+RAH_EOS_RECON_FIRST inner=8 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4416.84 4879.38
+RAH_EOS_RECON_FIRST inner=8 thread=0 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=8 thread=1 edges=852
+RAH_EOS_RECON_COUNT inner=8 thread=0 edges=682
+RAH_EOS_RECON_FIRST inner=9 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4432.37 4879.38
+RAH_EOS_RECON_FIRST inner=9 thread=0 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=9 thread=1 edges=661
+RAH_EOS_RECON_COUNT inner=9 thread=0 edges=872
+RAH_EOS_RECON_FIRST inner=10 thread=0 edge=22104 i=5282 j=6690 reason=D < DLtriple 4449.29 4879.38
+RAH_EOS_RECON_FIRST inner=10 thread=1 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=10 thread=0 edges=797
+RAH_EOS_RECON_COUNT inner=10 thread=1 edges=737
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|Paraview ASCII surface             |surface_flow.vtk                   |
+|Paraview ASCII surface + iter      |surface_flow_000010.vtk            |
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000010.csv            |
++-----------------------------------------------------------------------+
+RAH_EOS_RECON_FIRST inner=11 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4467.48 4879.38
+RAH_EOS_RECON_FIRST inner=11 thread=0 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=11 thread=1 edges=903
+RAH_EOS_RECON_COUNT inner=11 thread=0 edges=633
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+RAH_EOS_RECON_FIRST inner=12 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4486.73 4879.38
+RAH_EOS_RECON_FIRST inner=12 thread=0 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=12 thread=1 edges=642
+RAH_EOS_RECON_COUNT inner=12 thread=0 edges=891
+RAH_EOS_RECON_FIRST inner=13 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4506.78 4879.38
+RAH_EOS_RECON_FIRST inner=13 thread=0 edge=71715 i=17507 j=17508 reason=DP yielded T > 1.5Tmax w/ T (38992.9) K
+RAH_EOS_RECON_COUNT inner=13 thread=1 edges=830
+RAH_EOS_RECON_COUNT inner=13 thread=0 edges=707
+RAH_EOS_RECON_FIRST inner=14 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4527.25 4879.38
+RAH_EOS_RECON_FIRST inner=14 thread=0 edge=36642 i=8830 j=8831 reason=The molar density of -0.060029 mol/m3 is below the minimum of 0.000000 mol/m3
+RAH_EOS_RECON_COUNT inner=14 thread=1 edges=667
+RAH_EOS_RECON_COUNT inner=14 thread=0 edges=872
+RAH_EOS_RECON_FIRST inner=15 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4547.73 4879.37
+RAH_EOS_RECON_FIRST inner=15 thread=0 edge=335388 i=83131 j=91196 reason=D < DLtriple 4493.02 4880.07
+RAH_EOS_RECON_COUNT inner=15 thread=1 edges=668
+RAH_EOS_RECON_COUNT inner=15 thread=0 edges=886
+RAH_EOS_RECON_FIRST inner=16 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4567.7 4879.37
+RAH_EOS_RECON_FIRST inner=16 thread=0 edge=71715 i=17507 j=17508 reason=DP yielded T > 1.5Tmax w/ T (4746.33) K
+RAH_EOS_RECON_COUNT inner=16 thread=1 edges=718
+RAH_EOS_RECON_COUNT inner=16 thread=0 edges=837
+RAH_EOS_RECON_FIRST inner=17 thread=1 edge=22104 i=5282 j=6690 reason=D < DLtriple 4586.56 4879.37
+RAH_EOS_RECON_FIRST inner=17 thread=0 edge=431620 i=106974 j=115126 reason=D < DLtriple 4787.38 4880.12
+RAH_EOS_RECON_COUNT inner=17 thread=1 edges=807
+RAH_EOS_RECON_COUNT inner=17 thread=0 edges=744
+RAH_EOS_RECON_FIRST inner=18 thread=0 edge=22104 i=5282 j=6690 reason=D < DLtriple 4603.61 4879.37
+RAH_EOS_RECON_FIRST inner=18 thread=1 edge=71715 i=17507 j=17508 reason=DP yielded T > 1.5Tmax w/ T (3005.9) K
+RAH_EOS_RECON_COUNT inner=18 thread=0 edges=593
+RAH_EOS_RECON_COUNT inner=18 thread=1 edges=965
+RAH_EOS_RECON_FIRST inner=19 thread=0 edge=22104 i=5282 j=6690 reason=D < DLtriple 4618.35 4879.37
+RAH_EOS_RECON_FIRST inner=19 thread=1 edge=71725 i=17509 j=17511 reason=Starting value of T0 is not valid in DP_flash
+RAH_EOS_RECON_COUNT inner=19 thread=1 edges=840
+RAH_EOS_RECON_COUNT inner=19 thread=0 edges=724
+|          19|   -3.668573|   -0.556431|   -1.286168|    2.431613|
+
+----------------------------- Solver Exit -------------------------------
+
+Maximum number of iterations reached (ITER = 20) before convergence.
++-----------------------------------------------------------------------+
+|      Convergence Field     |     Value    |   Criterion  |  Converged |
++-----------------------------------------------------------------------+
+|                    rms[Rho]|      -3.66857|          < -8|          No|
+|                   rms[RhoE]|       2.43161|          < -8|          No|
++-----------------------------------------------------------------------+
+-------------------------------------------------------------------------
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|Paraview ASCII surface             |surface_flow.vtk                   |
+|Paraview ASCII surface + iter      |surface_flow_000019.vtk            |
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000019.csv            |
++-----------------------------------------------------------------------+
+Warning: 1727 reconstructed states for upwinding are non-physical.
+
+--------------------------- Finalizing Solver ---------------------------
+Deleted CNumerics container.
+Deleted CIntegration container.
+Deleted CSolver container.
+Deleted CIteration container.
+Deleted CInterface container.
+Deleted CGeometry container.
+Deleted CFreeFormDefBox class.
+Deleted CSurfaceMovement class.
+Deleted CVolumetricMovement class.
+Deleted CConfig container.
+Deleted nInst container.
+Deleted COutput class.
+-------------------------------------------------------------------------
+
+------------------------- Exit Success (SU2_CFD) ------------------------
+

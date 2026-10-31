@@ -1,0 +1,20 @@
+"""错误消息修复后，用全部真实初态PT/DE查询证明数值输出逐字节保持。"""
+from pathlib import Path
+import hashlib,json,os,sys
+ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
+import buildSU2ThermalRuntime as supervisor
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def main():
+    old=ROOT/'outputs/v122_validation/actual01/initial_thermodynamics';out=ROOT/'outputs/v122_validation/format_property_equivalence'
+    assert not out.exists();out.mkdir();supervisor.OUT=out
+    runtime=ROOT/'tools/runtime/su2/8.6.0-rah-coolprop-recon-v2/runtime.json';r=json.loads(runtime.read_text());exe=Path(r['propertyExecutable'])
+    locks={str(p):sha(p) for p in [Path(__file__).resolve(),runtime,exe]+list(old.glob('*_input.csv'))+list(old.glob('*_output.csv'))}
+    results={}
+    for name in ['PT','DE']:
+        dest=out/(name+'_output.csv');supervisor.run(name,[str(exe),str(old/(name+'_input.csv')),str(dest)],ROOT,dict(os.environ,OMP_NUM_THREADS='1'),120)
+        results[name]=dict(bytes=dest.stat().st_size,sha256=sha(dest),originalSHA256=sha(old/(name+'_output.csv')))
+        assert results[name]['sha256']==results[name]['originalSHA256']
+    assert all(sha(Path(p))==h for p,h in locks.items())
+    report=dict(allOriginalPTDEBytesEqual=True,newRuntimeSHA256=sha(runtime),sources=locks,results=results,physicsQualified=False)
+    (out/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(results))
+if __name__=='__main__':main()

@@ -1,0 +1,11 @@
+--- a/src/Backends/Helmholtz/FlashRoutines.cpp
++++ b/src/Backends/Helmholtz/FlashRoutines.cpp
+@@ -224,7 +224,7 @@
+             // Update the state for conditions where the state was guessed
+             HEOS.recalculate_singlephase_phase();
+             if (!get_config_bool(DONT_CHECK_PROPERTY_LIMITS) && HEOS._T > 1.5 * HEOS.Tmax()) {
+-                throw CoolProp::OutOfRangeError(format("DP yielded T > 1.5Tmax w/ T (%g) K").c_str());
++                throw CoolProp::OutOfRangeError(format("DP yielded T > 1.5Tmax w/ T (%g) K", HEOS._T).c_str());
+             }
+         } else {
+             // Nothing to do here; phase determination has handled this already

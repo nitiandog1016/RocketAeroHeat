@@ -120,6 +120,21 @@ try
         audit.meshTransfer=lineage;audit.sourceCumulativeIteration=lineage.sourceCumulativeIteration;
         audit.evidenceSHA256.initial_flow_transfer_json=h;
     end
+    % 新物性初猜不属于同物理续算；守恒能量零点改变后必须从局部步号记录。
+    propertyTransfer=fullfile(folder,'coolprop_initialization.json');
+    if isfile(propertyTransfer)
+        assert(~isfile(continuation) && ~isfile(transfer),'物性转换与其他续算身份冲突。');
+        path=fullfile(receipt.request.workDirectory,'coolprop_initialization.json');h=fileSHA(propertyTransfer);
+        token=regexp(receiptText,[regexptranslate('escape',jsonencode(path)) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
+        assert(numel(token)==1 && strcmp(h,token{1}{1}),'物性转换未绑定真实进程。');
+        lineage=jsondecode(fileread(propertyTransfer));
+        assert(strcmp(lineage.kind,'same-mesh-primitive-to-HEOS-Air-initial-guess'));
+        assert(lineage.sameMesh && ~lineage.samePhysicsAndNumerics && ~lineage.strictlyConservativeRemap);
+        assert(lineage.newPhysicsLocalIterationStartsAt==0 && max(cell2mat(struct2cell(lineage.errors)))<1e-8);
+        assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+        audit.propertyTransfer=lineage;audit.sourceCumulativeIteration=lineage.sourceCumulativeIteration;
+        audit.evidenceSHA256.coolprop_initialization_json=h;
+    end
     audit.checkpointIdentityConfirmed=true;audit.status='checkpoint-and-history-audited';
     audit.reason='保存迭代已绑定且重启动EOS一致；残差通过与物理资格仍分别判断。';
 catch ex

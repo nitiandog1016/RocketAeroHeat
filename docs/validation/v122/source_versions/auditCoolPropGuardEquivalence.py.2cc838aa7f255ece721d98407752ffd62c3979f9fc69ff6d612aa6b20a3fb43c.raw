@@ -1,0 +1,19 @@
+"""对比真实20步正常重构路径：新守护未触发时全部保存场保持原值。"""
+from pathlib import Path
+import hashlib,json,argparse
+import numpy as np
+ROOT=Path(__file__).resolve().parents[1]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--format-fix',action='store_true');args=parser.parse_args()
+    old=ROOT/'outputs/v121_validation/thermal20';new=ROOT/'outputs/v122_validation'/('format_control' if args.format_fix else 'guard_control')
+    r=json.loads((new/'engine_process.json').read_text());assert r['status']=='terminal' and r['exitCode']==0 and all(r['inputsStable'].values())
+    log=(new/'solver.log').read_text() if (new/'solver.log').exists() else (new/'engine_stdout.log').read_text()
+    assert 'RAH_EOS_RECON_' not in log
+    checks={}
+    for name in ['case.cfg','mesh.su2','restart_flow.csv','surface_flow.vtk']:
+        checks[name]=dict(identical=sha(old/name)==sha(new/name),oldSHA256=sha(old/name),newSHA256=sha(new/name));assert checks[name]['identical'],name
+    report=dict(passed=True,guardTriggered=False,checks=checks,realRun=True,physicsQualified=False,
+        sources={str(p):sha(p) for p in [Path(__file__).resolve(),old/'engine_process.json',new/'engine_process.json']})
+    (new/'equivalence.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
+if __name__=='__main__':main()

@@ -1,0 +1,77 @@
+--- a/SU2_CFD/src/solvers/CEulerSolver.cpp
++++ b/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -34,6 +34,9 @@
+ #include "../../include/fluid/CPengRobinson.hpp"
+ #include "../../include/fluid/CDataDrivenFluid.hpp"
+ #include "../../include/fluid/CCoolProp.hpp"
++#ifdef USE_COOLPROP
++#include "Exceptions.h"
++#endif
+ #include "../../include/numerics_simd/CNumericsSIMD.hpp"
+ #include "../../include/limiters/CLimiterDetails.hpp"
+ #include "../../include/output/COutput.hpp"
+@@ -1850,6 +1853,7 @@
+ 
+   /*--- Non-physical counter. ---*/
+   unsigned long counter_local = 0;
++  unsigned long rah_eos_recon_local = 0;
+   SU2_OMP_MASTER
+   ErrorCounter = 0;
+   END_SU2_OMP_MASTER
+@@ -1949,9 +1953,33 @@
+ 
+       /*--- Recompute the reconstructed quantities in a thermodynamically consistent way. ---*/
+ 
++      // RocketAeroHeat: only an invalid reconstructed EOS state falls back.
++      // Cell values, energy zero point and every successful EOS evaluation stay unchanged.
++      bool eos_recon_failed = false;
+       if (!ideal_gas || low_mach_corr) {
+-        ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i);
+-        ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j);
++#ifdef USE_COOLPROP
++        try {
++#endif
++          ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i);
++          ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j);
++#ifdef USE_COOLPROP
++        } catch (const CoolProp::CoolPropBaseError& error) {
++          eos_recon_failed = true;
++          ++rah_eos_recon_local;
++          // No stale partial reconstruction reaches the Roe validity check.
++          std::copy_n(V_i, nPrimVar, Primitive_i);
++          std::copy_n(V_j, nPrimVar, Primitive_j);
++          if (S_i) std::copy_n(S_i, nSecondaryVar, Secondary_i);
++          if (S_j) std::copy_n(S_j, nSecondaryVar, Secondary_j);
++          if (rah_eos_recon_local == 1) {
++#pragma omp critical(rah_eos_reconstruction_log)
++            std::cout << "RAH_EOS_RECON_FIRST inner=" << config->GetInnerIter()
++                      << " thread=" << omp_get_thread_num() << " edge=" << iEdge
++                      << " i=" << iPoint << " j=" << jPoint
++                      << " reason=" << error.what() << std::endl;
++          }
++        }
++#endif
+       }
+ 
+       /*--- Low-Mach number correction. ---*/
+@@ -1977,7 +2005,7 @@
+       su2double RoeEnthalpy = (R * Primitive_j[prim_idx.Enthalpy()] + Primitive_i[prim_idx.Enthalpy()]) / (R+1);
+ 
+       const bool neg_sound_speed = ((Gamma-1)*(RoeEnthalpy-0.5*sq_vel) < 0.0);
+-      bool bad_recon = neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;
++      bool bad_recon = eos_recon_failed || neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;
+       bad_recon = nodes->UpdateNonPhysicalEdgeCounter(iEdge, bad_recon);
+       counter_local += bad_recon;
+ 
+@@ -2032,6 +2060,11 @@
+   END_SU2_OMP_FOR
+   } // end color loop
+ 
++  if (rah_eos_recon_local) {
++#pragma omp critical(rah_eos_reconstruction_log)
++    std::cout << "RAH_EOS_RECON_COUNT inner=" << config->GetInnerIter()
++              << " thread=" << omp_get_thread_num() << " edges=" << rah_eos_recon_local << std::endl;
++  }
+   FinalizeResidualComputation(geometry, pausePreacc, counter_local, config);
+ }
+ 

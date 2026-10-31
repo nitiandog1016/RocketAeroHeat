@@ -6,6 +6,8 @@ ROOT=Path(__file__).resolve().parents[1]
 FLAVOR='rah-axial-wall-v1'
 FROZEN_FLAVOR='rah-frozen-energy-v1'
 COOLPROP_FLAVOR='rah-coolprop-v1'
+COOLPROP_RECON_FLAVOR='rah-coolprop-recon-v1'
+COOLPROP_FLAVORS=(COOLPROP_FLAVOR,COOLPROP_RECON_FLAVOR,'rah-coolprop-recon-v2','rah-coolprop-recon-v3')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 
@@ -14,7 +16,7 @@ def resolve(folder,config):
     manifest=folder/'case_manifest.json';locked={};profile=None
     data=read(manifest) if manifest.exists() else {}
     flavor=data.get('requiredRuntimeFlavor','official')
-    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,COOLPROP_FLAVOR),'未知SU2运行时类型'
+    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,*COOLPROP_FLAVORS),'未知SU2运行时类型'
     if flavor!=FROZEN_FLAVOR:assert 'frozenEnergyMode' not in data,'运行时类型与冻结能量选项不匹配'
     runtime_dir=ROOT/'tools/runtime/su2'/('8.6.0' if flavor=='official' else '8.6.0-'+flavor)
     runtime_file=runtime_dir/'runtime.json'
@@ -37,10 +39,12 @@ def resolve(folder,config):
             assert runtime['flavor']==FROZEN_FLAVOR
             validate_frozen_manifest(data,config)
             locked[str(manifest)]=sha(manifest)
-        elif flavor==COOLPROP_FLAVOR:
-            assert runtime['flavor']==COOLPROP_FLAVOR
-            validate_coolprop_manifest(data,config)
+        elif flavor in COOLPROP_FLAVORS:
+            assert runtime['flavor']==flavor
+            settings=validate_coolprop_manifest(data,config)
             locked[str(manifest)]=sha(manifest)
+            if settings['RESTART_SOL']=='YES':
+                locked.update(validate_coolprop_initialization(folder,data,runtime_file))
         else:
             assert 'frozenEnergyMode' not in data,'官方运行时不能默默忽略冻结能量选项'
     exe=Path(runtime['executable']).resolve();exe.relative_to(runtime_dir.resolve())
@@ -58,7 +62,7 @@ def validate_coolprop_manifest(data,config):
         if '=' in line:
             key,value=map(str.strip,line.split('=',1));assert key not in settings;settings[key]=value
     required={'SOLVER':'NAVIER_STOKES','KIND_TURB_MODEL':'NONE','FLUID_MODEL':'COOLPROP','FLUID_NAME':'Air',
-              'SYSTEM_MEASUREMENTS':'SI','REF_DIMENSIONALIZATION':'DIMENSIONAL','MGLEVEL':'0','RESTART_SOL':'NO',
+              'SYSTEM_MEASUREMENTS':'SI','REF_DIMENSIONALIZATION':'DIMENSIONAL','MGLEVEL':'0',
               'VISCOSITY_MODEL':'SUTHERLAND','CONDUCTIVITY_MODEL':'CONSTANT_PRANDTL'}
     for k,v in required.items():assert settings.get(k)==v,'当前CoolProp适配不接受 '+k
     assert settings.get('CONV_NUM_METHOD_FLOW') in ('ROE','HLLC')
@@ -68,7 +72,39 @@ def validate_coolprop_manifest(data,config):
     assert ('MARKER_ISOTHERMAL' in settings)!=('MARKER_HEATFLUX' in settings)
     assert data.get('thermodynamicModel')=='CoolProp-7.2.0-HEOS-Air'
     assert float(settings['PRANDTL_LAM'])==.72,'当前审核与显示仅支持显式Pr0.72'
+    assert settings.get('RESTART_SOL') in ('NO','YES')
+    if settings['RESTART_SOL']=='YES':
+        init=data.get('initialization',{})
+        assert init.get('kind')=='same-mesh-primitive-to-HEOS-Air-initial-guess','旧定比热能量不能直接重启动'
+        assert settings.get('SOLUTION_FILENAME')=='initial_flow' and settings.get('READ_BINARY_RESTART')=='NO'
     return settings
+
+def validate_coolprop_initialization(folder,data,runtime_file):
+    """转换初猜必须绑定真实同库PT/DE校核，不能只写一个标签放行旧rhoE。"""
+    path=folder/'coolprop_initialization.json';assert sha(path)==data['coolPropInitializationSHA256']
+    init=read(path);assert init==data['initialization']
+    assert init['sourceStable'] and init['sameMesh'] and not init['samePhysicsAndNumerics']
+    assert not init['strictlyConservativeRemap'] and init['newPhysicsLocalIterationStartsAt']==0
+    assert max(init['errors'].values())<1e-8 and sha(runtime_file)==init['runtimeSHA256']
+    state=folder/'initial_flow.csv';assert sha(state)==init['initialStateSHA256']
+    locked={str(path):sha(path),str(state):sha(state)}
+    for name,h in init['thermodynamicQuerySHA256'].items():
+        p=(folder/'initial_thermodynamics'/name).resolve();assert p.parent==(folder/'initial_thermodynamics').resolve()
+        assert sha(p)==h;locked[str(p)]=h
+    for name in ['PT','DE']:
+        r=read(folder/'initial_thermodynamics'/(name+'_process.json'))
+        assert r['status']=='terminal' and r['exitCode']==0 and not r['timedOut']
+    rebind=init.get('runtimeRebinding',{})
+    if rebind.get('propertyHelperUnchanged') is False:
+        proof=Path(rebind['propertyEquivalenceReport']).resolve();proof.relative_to(ROOT/'outputs')
+        assert sha(proof)==rebind['propertyEquivalenceReportSHA256']
+        equivalence=read(proof)
+        assert equivalence['allOriginalPTDEBytesEqual'] and equivalence['newRuntimeSHA256']==sha(runtime_file)
+        for name in ['PT','DE']:
+            row=equivalence['results'][name]
+            assert row['sha256']==row['originalSHA256']==init['thermodynamicQuerySHA256'][name+'_output.csv']
+        locked[str(proof)]=sha(proof)
+    return locked
 
 def validate_frozen_manifest(data,config):
     """实验恢复只接受显式选择的固定单区稳态NS；绝不从环境继承或默默降级。"""

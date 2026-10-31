@@ -15,6 +15,8 @@ if a.checkpointIdentityConfirmed
     if isfield(a,'cumulativeCheckpointIteration')
         checkpoint=sprintf('显示本段 %d / 累计 %d 步 · %s',a.checkpointIteration,a.cumulativeCheckpointIteration,pass(a.checkpointResidualPassed));
         terminal=sprintf('末监测本段 %d / 累计 %d 步 · %s',a.terminalIteration,a.cumulativeTerminalIteration,pass(a.terminalResidualPassed));
+    elseif isfield(a,'propertyTransfer')
+        checkpoint=sprintf('源物性累计 %d → 新物性局部 %d 步 · %s',a.sourceCumulativeIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));
     elseif isfield(a,'meshTransfer')
         checkpoint=sprintf('源网格累计 %d → 新网格局部 %d 步 · %s',a.sourceCumulativeIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));
     end

@@ -3,15 +3,16 @@ from pathlib import Path
 import argparse,csv,hashlib,json,os
 import numpy as np
 import buildSU2ThermalRuntime as supervisor
+from su2ThermalRuntime import COOLPROP_FLAVORS
 ROOT=Path(__file__).resolve().parents[1]
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--folder',type=Path,required=True);args=parser.parse_args();folder=args.folder.resolve();folder.relative_to(ROOT/'outputs')
-    engine=read(folder/'engine_process.json');assert engine['status']=='terminal' and engine['exitCode']==0 and engine['runtimeFlavor']=='rah-coolprop-v1'
+    engine=read(folder/'engine_process.json');assert engine['status']=='terminal' and engine['exitCode']==0 and engine['runtimeFlavor'] in COOLPROP_FLAVORS
     assert all(engine['inputsStable'].values()) and not engine['timedOut']
     restart=folder/'restart_flow.csv';assert sha(restart)==engine['outputSHA256'][restart.name]
-    runtimeFile=ROOT/'tools/runtime/su2/8.6.0-rah-coolprop-v1/runtime.json';runtime=read(runtimeFile)
+    runtimeFile=ROOT/'tools/runtime/su2'/('8.6.0-'+engine['runtimeFlavor'])/'runtime.json';runtime=read(runtimeFile)
     assert sha(runtimeFile)==engine['inputSHA256'][str(runtimeFile)]
     helper=Path(runtime['propertyExecutable']);assert sha(helper)==next(q['sha256'] for q in runtime['files'] if q['path']=='bin/RAH_CoolProp_State.exe')
     state=np.loadtxt(str(restart),delimiter=',',skiprows=1);nd=(state.shape[1]-3)//2

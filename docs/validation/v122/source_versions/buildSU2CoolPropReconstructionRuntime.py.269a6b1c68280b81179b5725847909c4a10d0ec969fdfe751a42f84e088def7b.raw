@@ -1,0 +1,114 @@
+"""只保护已定位的重构EOS异常；复用编译缓存，独立安装，不覆盖历史运行包。"""
+from pathlib import Path
+import hashlib,json,os,shutil,difflib,subprocess,re
+import buildSU2ThermalRuntime as supervisor
+ROOT=Path(__file__).resolve().parents[1]
+OLD=ROOT/'tools/runtime/su2-thermal-build';SOURCE=OLD/'source'
+BASE=ROOT/'tools/runtime/su2-coolprop-build';OUT=ROOT/'outputs/v122_validation/reconstruction_direct'
+FLAVOR='rah-coolprop-recon-v1'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def main():
+    assert not OUT.exists();OUT.mkdir();supervisor.OUT=OUT
+    cpp=SOURCE/'SU2_CFD/src/solvers/CEulerSolver.cpp'
+    patchfiles=[cpp,SOURCE/'meson.build',SOURCE/'subprojects/CoolProp/dev/generate_headers.py']
+    original={p:p.read_bytes() for p in patchfiles}
+    text=original[cpp].decode('utf-8');old='''      if (!ideal_gas || low_mach_corr) {
+        ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i);
+        ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j);
+      }'''
+    new='''      // RocketAeroHeat: only an invalid reconstructed EOS state falls back.
+      // Cell values, energy zero point and every successful EOS evaluation stay unchanged.
+      bool eos_recon_failed = false;
+      if (!ideal_gas || low_mach_corr) {
+#ifdef USE_COOLPROP
+        try {
+#endif
+          ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i);
+          ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j);
+#ifdef USE_COOLPROP
+        } catch (const CoolProp::CoolPropBaseError& error) {
+          eos_recon_failed = true;
+          ++rah_eos_recon_local;
+          // No stale partial reconstruction reaches the Roe validity check.
+          std::copy_n(V_i, nPrimVar, Primitive_i);
+          std::copy_n(V_j, nPrimVar, Primitive_j);
+          if (S_i) std::copy_n(S_i, nSecondaryVar, Secondary_i);
+          if (S_j) std::copy_n(S_j, nSecondaryVar, Secondary_j);
+          if (rah_eos_recon_local == 1) {
+#pragma omp critical(rah_eos_reconstruction_log)
+            std::cout << "RAH_EOS_RECON_FIRST inner=" << config->GetInnerIter()
+                      << " thread=" << omp_get_thread_num() << " edge=" << iEdge
+                      << " i=" << iPoint << " j=" << jPoint
+                      << " reason=" << error.what() << std::endl;
+          }
+        }
+#endif
+      }'''
+    assert text.count(old)==1;text=text.replace(old,new)
+    old='bool bad_recon = neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;'
+    assert text.count(old)==1;text=text.replace(old,'bool bad_recon = eos_recon_failed || neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;')
+    start=text.index('void CEulerSolver::Upwind_Residual(');end=text.index('void CEulerSolver::ComputeConsistentExtrapolation',start)
+    body=text[start:end];assert body.count('unsigned long counter_local = 0;')==1
+    body=body.replace('unsigned long counter_local = 0;','unsigned long counter_local = 0;\n  unsigned long rah_eos_recon_local = 0;')
+    anchor='  FinalizeResidualComputation(geometry, pausePreacc, counter_local, config);'
+    assert body.count(anchor)==1;body=body.replace(anchor,'''  if (rah_eos_recon_local) {
+#pragma omp critical(rah_eos_reconstruction_log)
+    std::cout << "RAH_EOS_RECON_COUNT inner=" << config->GetInnerIter()
+              << " thread=" << omp_get_thread_num() << " edges=" << rah_eos_recon_local << std::endl;
+  }
+'''+anchor)
+    text=text[:start]+body+text[end:]
+    anchor='#include "../../include/fluid/CCoolProp.hpp"';assert text.count(anchor)==1
+    text=text.replace(anchor,anchor+'\n#ifdef USE_COOLPROP\n#include "Exceptions.h"\n#endif')
+    for p,raw in original.items():(OUT/(p.name+'.original')).write_bytes(raw)
+    cpp.write_bytes(text.encode())
+    for p in patchfiles[1:]:p.write_bytes((ROOT/'outputs/v121_validation'/(p.name+'.used')).read_bytes())
+    diff=''.join(difflib.unified_diff(original[cpp].decode().splitlines(True),text.splitlines(True),fromfile='a/SU2_CFD/src/solvers/CEulerSolver.cpp',tofile='b/SU2_CFD/src/solvers/CEulerSolver.cpp'))
+    (OUT/'reconstruction_guard.diff').write_text(diff,encoding='utf-8')
+    cc=OLD/'toolchain/w64devkit/bin';ninja=Path('D:/matlab/toolbox/shared/coder/ninja/win64/ninja.exe')
+    cmake=BASE/'cmake/bin';build=BASE/'cfd-build';oldruntime=ROOT/'tools/runtime/su2/8.6.0-rah-coolprop-v1'
+    manifest=json.loads((oldruntime/'runtime.json').read_text())
+    library=build/'subprojects/CoolProp/libCoolProp.a';libhash=sha(library)
+    assert libhash==manifest['buildSourceSHA256'][str(library)]
+    env=dict(os.environ,PATH=str(cmake)+os.pathsep+str(cc)+os.pathsep+str(ninja.parent)+os.pathsep+os.environ['PATH'],CC=str(cc/'gcc.exe'),CXX=str(cc/'g++.exe'),GIT_CEILING_DIRECTORIES=str(SOURCE))
+    tree={str(p):sha(p) for p in SOURCE.rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.name not in ['.fluiddepcache','.incompdepcache']}
+    (OUT/'compile_source_tree.json').write_text(json.dumps(tree,indent=2)+'\n')
+    try:
+        # 首次ninja因Meson再生成而计划重编351项，已主动结束并保留终态。
+        # 此处仅执行同一构建图的一个翻译单元、原薄归档索引和链接；不再触发再生成。
+        previous=json.loads((ROOT/'outputs/v122_validation/reconstruction_build/compile_process.json').read_text())
+        assert previous['status']=='terminal' and previous['exitCode']!=0
+        def command(target):
+            line=subprocess.check_output([str(ninja),'-C',str(build),'-t','commands',target],env=env).decode().splitlines()[-1]
+            assert '\\"' not in line
+            return [v[1:-1] if v.startswith('"') else v for v in re.findall(r'"[^"]*"|\S+',line)]
+        obj='SU2_CFD/src/libSU2core.a.p/solvers_CEulerSolver.cpp.obj'
+        inputs={str(p):sha(p) for p in build.rglob('*') if p.is_file() and p.suffix in ['.obj','.a']}
+        (OUT/'link_inputs_before.json').write_text(json.dumps(inputs,indent=2)+'\n')
+        supervisor.run('compile',command(obj),build,env,480)
+        supervisor.run('archive_index',[str(cc/'ar.exe'),'s','SU2_CFD/src/libSU2core.a'],build,env,30)
+        supervisor.run('link',command('SU2_CFD/src/SU2_CFD.exe'),build,env,120)
+        permitted={str(build/obj),str(build/'SU2_CFD/src/libSU2core.a')}
+        assert all(p in permitted or sha(Path(p))==h for p,h in inputs.items())
+        (OUT/'link_inputs_after.json').write_text(json.dumps({p:sha(Path(p)) for p in inputs},indent=2)+'\n')
+        assert all(sha(Path(p))==h for p,h in tree.items()),'编译源码变化'
+        assert sha(library)==libhash,'物性库发生变化，不能沿用状态查询器'
+        dest=ROOT/'tools/runtime/su2'/('8.6.0-'+FLAVOR);assert not dest.exists()
+        for entry in manifest['files']:
+            p=oldruntime/entry['path'];assert sha(p)==entry['sha256'];q=dest/entry['path'];q.parent.mkdir(parents=True,exist_ok=True)
+            if entry['path']=='bin/SU2_CFD.exe':shutil.copyfile(str(build/'SU2_CFD/src/SU2_CFD.exe'),str(q))
+            else:os.link(str(p),str(q))
+        shutil.copyfile(str(OUT/'reconstruction_guard.diff'),str(dest/'reconstruction_guard.diff'))
+        dll=subprocess.check_output([str(cc/'objdump.exe'),'-p',str(dest/'bin/SU2_CFD.exe')]).decode()
+        names=re.findall(r'DLL Name:\s*(\S+)',dll);assert set(n.lower() for n in names)=={'kernel32.dll','msvcrt.dll'}
+        manifest.update(flavor=FLAVOR,version='8.6.0+'+FLAVOR,executable=str(dest/'bin/SU2_CFD.exe'),propertyExecutable=str(dest/'bin/RAH_CoolProp_State.exe'),
+            parentRuntimeSHA256=sha(oldruntime/'runtime.json'),reconstructionPolicy='CoolProp reconstruction exceptions enter native cell-value fallback; no cell-state clipping',
+            buildEvidenceSHA256={str(p):sha(p) for p in [Path(__file__).resolve(),OUT/'compile_process.json',OUT/'compile_source_tree.json',OUT/'reconstruction_guard.diff',library]})
+        manifest['status']='compiled-reconstruction-guard-tests-pending'
+        manifest['files']=[dict(path=p.relative_to(dest).as_posix(),bytes=p.stat().st_size,sha256=sha(p)) for p in sorted(dest.rglob('*')) if p.is_file()]
+        (dest/'runtime.json').write_text(json.dumps(manifest,indent=2)+'\n');(OUT/'runtime_installed.json').write_bytes((dest/'runtime.json').read_bytes())
+        print(json.dumps(dict(installed=str(dest),sourceStable=True,propertyLibraryUnchanged=True,physicsQualified=False)))
+    finally:
+        for p,raw in original.items():(OUT/(p.name+'.used')).write_bytes(p.read_bytes());p.write_bytes(raw)
+        (OUT/'source_restore.json').write_text(json.dumps({str(p):sha(p)==hashlib.sha256(raw).hexdigest() for p,raw in original.items()},indent=2)+'\n')
+if __name__=='__main__':main()

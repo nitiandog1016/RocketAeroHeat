@@ -1,0 +1,572 @@
+Breakpoint 1 at 0x140ed1c37
+
+-------------------------------------------------------------------------
+|    ___ _   _ ___                                                      |
+|   / __| | | |_  )   Release 8.6.0 "Harrier"                           |
+|   \__ \ |_| |/ /                                                      |
+|   |___/\___//___|   Suite (Computational Fluid Dynamics Code)         |
+|                                                                       |
+-------------------------------------------------------------------------
+| SU2 Project Website: https://su2code.github.io                        |
+|                                                                       |
+| The SU2 Project is maintained by the SU2 Foundation                   |
+| (http://su2foundation.org)                                            |
+-------------------------------------------------------------------------
+| Copyright 2012-2026, SU2 Contributors                                 |
+|                                                                       |
+| SU2 is free software; you can redistribute it and/or                  |
+| modify it under the terms of the GNU Lesser General Public            |
+| License as published by the Free Software Foundation; either          |
+| version 2.1 of the License, or (at your option) any later version.    |
+|                                                                       |
+| SU2 is distributed in the hope that it will be useful,                |
+| but WITHOUT ANY WARRANTY; without even the implied warranty of        |
+| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |
+| Lesser General Public License for more details.                       |
+|                                                                       |
+| You should have received a copy of the GNU Lesser General Public      |
+| License along with SU2. If not, see <http://www.gnu.org/licenses/>.   |
+-------------------------------------------------------------------------
+
+Parsing config file for zone 0
+
+----------------- Physical Case Definition ( Zone 0 ) -------------------
+Compressible Laminar Navier-Stokes' equations.
+Mach number: 4.99803.
+Angle of attack (AoA): 160 deg, and angle of sideslip (AoS): -0 deg.
+Reynolds number: 0. Reference length 1.
+Reading and writing ASCII SU2 native restart files.
+Read flow solution from: initial_flow.
+Dimensional simulation.
+The reference area is 0.0721045 m^2.
+The semi-span will be computed using the max y(3D) value.
+The reference length is 1 m.
+Reference origin for moment evaluation is (0, 0, 0).
+Surface(s) where the force coefficients are evaluated: wall.
+
+Surface(s) plotted in the output file: wall.
+Input mesh file name: mesh.su2
+
+--------------- Space Numerical Integration ( Zone 0 ) ------------------
+Roe (with entropy fix = 0.001) solver for the flow inviscid terms.
+Standard Roe without low-dissipation function.
+Second order integration in space, with slope limiter.
+Venkatakrishnan-Wang slope-limiting method, with constant: 0.05.
+Average of gradients with correction (viscous flow terms).
+Gradient for upwind reconstruction: inverse-distance weighted Least-Squares.
+Gradient for viscous and source terms: inverse-distance weighted Least-Squares.
+
+--------------- Time Numerical Integration  ( Zone 0 ) ------------------
+Local time stepping (steady state simulation).
+Euler implicit method for the flow equations.
+BCGSTAB is used for solving the linear system.
+Using LU-SGS preconditioning.
+Convergence criteria of the linear solver: 1e-05.
+Max number of linear iterations: 10.
+CFL adaptation. Factor down: 0.5, factor up: 1.1,
+                lower limit: 0.05, upper limit: 5,
+                acceptable linear residual: 0.001'
+                starting iteration: 0.
+Courant-Friedrichs-Lewy number:      0.1
+
+------------------ Convergence Criteria  ( Zone 0 ) ---------------------
+Maximum number of solver subiterations: 20.
+Begin convergence monitoring at iteration 10.
+Residual minimum value: 1e-8.
+Cauchy series min. value: 1e-10.
+Number of Cauchy elements: 100.
+Begin windowed time average at iteration 0.
+
+-------------------- Output Information ( Zone 0 ) ----------------------
+File writing frequency: 
++------------------------------------+
+|                     File| Frequency|
++------------------------------------+
+|   SURFACE_PARAVIEW_ASCII|        10|
+|            RESTART_ASCII|        10|
++------------------------------------+
+Writing the convergence history file every 1 inner iterations.
+Writing the screen convergence history every 50 inner iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: surface_flow.
+Volume file name: volume_flow.
+Restart file name: restart_flow.
+
+------------- Config File Boundary Information ( Zone 0 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|                   Riemann boundary|                           farfield|
++-----------------------------------------------------------------------+
+|                    Isothermal wall|                               wall|
++-----------------------------------------------------------------------+
+
+-------------------- Output Preprocessing ( Zone 0 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: INNER_ITER, RMS_DENSITY, RMS_MOMENTUM-X, RMS_MOMENTUM-Y, RMS_ENERGY
+History output group(s): ITER, RMS_RES, AERO_COEFF, HEAT
+Convergence field(s): RMS_DENSITY, RMS_ENERGY
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE
+
+------------------- Geometry Preprocessing ( Zone 0 ) -------------------
+Three dimensional problem.
+210914 grid points.
+520114 volume elements.
+2 surface markers.
+19752 boundary elements in index 0 (Marker = wall).
+6572 boundary elements in index 1 (Marker = farfield).
+164578 tetrahedra.
+355536 prisms.
+Setting point connectivity.
+Renumbering points (Reverse Cuthill McKee Ordering).
+Recomputing point connectivity.
+Setting element connectivity.
+Checking the numerical grid orientation.
+All volume elements are correctly oriented.
+All surface elements are correctly oriented.
+Identifying edges and vertices.
+Setting the control volume structure.
+Volume of the computational grid: 381.435.
+Searching for the closest normal neighbors to the surfaces.
+Storing a mapping from global to local point index.
+Compute the surface curvature.
+Max K: 664.941. Mean K: 38.7194. Standard deviation K: 42.0129.
+Computing mesh quality statistics for the dual control volumes.
++--------------------------------------------------------------+
+|           Mesh Quality Metric|        Minimum|        Maximum|
++--------------------------------------------------------------+
+|    Orthogonality Angle (deg.)|        30.7975|        89.9458|
+|     CV Face Area Aspect Ratio|         1.1588|         131158|
+|           CV Sub-Volume Ratio|              1|        5842.46|
+|                     CV Volume|    5.62871e-12|       0.106165|
++--------------------------------------------------------------+
+Finding max control volume width.
+Semi-span length = 0.151498 m.
+Wetted area = 1.95529 m^2.
+Area projection in the x-plane = 0.0718916 m^2, y-plane = 0.603548 m^2, z-plane = 0.602949 m^2.
+Max. coordinate in the x-direction = 0.05 m, y-direction = 0.151498 m, z-direction = 0.151338 m.
+Min. coordinate in the x-direction = -2.82832 m, y-direction = -0.151473 m, z-direction = -0.151317 m.
+Computing wall distances.
+
+-------------------- Solver Preprocessing ( Zone 0 ) --------------------
+Viscous flow: Computing pressure using the ideal gas law
+based on the free-stream temperature and a density computed
+from the Reynolds number.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|               SUTHERLAND|          CONSTANT_PRANDTL|         CoolProp library|
++------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|        Ref. Viscosity|   1.71608e-05|             1|   N.s/m^2|   1.71608e-05|
+|      Sutherland Temp.|        273.15|             1|         K|        273.15|
+|     Sutherland Const.|         110.4|             1|         K|         110.4|
++------------------------------------------------------------------------------+
+|        Prandtl (Lam.)|             -|             -|         -|          0.72|
+|       Prandtl (Turb.)|             -|             -|         -|           0.9|
++------------------------------------------------------------------------------+
+|          Gas Constant|       287.049|             1|  N.m/kg.K|       287.049|
+|      Spec. Heat Ratio|             -|             -|         -|             -|
+|     Critical Pressure|     3.786e+06|             1|          |     3.786e+06|
+|  Critical Temperature|       132.531|             1|         K|       132.531|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|       1197.03|             1|        Pa|       1197.03|
+|               Density|     0.0184107|             1|    kg/m^3|     0.0184107|
+|           Temperature|       226.509|             1|         K|       226.509|
+|          Total Energy|   1.42561e+06|             1|   m^2/s^2|   1.42561e+06|
+|            Velocity-X|      -1417.57|             1|       m/s|      -1417.57|
+|            Velocity-Y|            -0|             1|       m/s|            -0|
+|            Velocity-Z|       515.952|             1|       m/s|       515.952|
+|    Velocity Magnitude|       1508.54|             1|       m/s|       1508.54|
++------------------------------------------------------------------------------+
+|             Viscosity|   1.47528e-05|             1|   N.s/m^2|   1.47528e-05|
+|          Conductivity|             -|             1|   W/m^2.K|             -|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|       4.99803|
+|       Reynolds Number|             -|             -|         -|   1.88258e+06|
++------------------------------------------------------------------------------+
+All ranks use edge coloring.
+Among the ranks that use edge coloring,
+      the minimum efficiency is 0.999276,
+      the maximum number of colors is 20,
+      the minimum edge color group size is 512.
+Initialize Jacobian structure (Navier-Stokes). MG level: 0.
+
+------------------- Numerics Preprocessing ( Zone 0 ) -------------------
+
+----------------- Integration Preprocessing ( Zone 0 ) ------------------
+
+------------------- Iteration Preprocessing ( Zone 0 ) ------------------
+Euler/Navier-Stokes/RANS fluid iteration.
+
+------------------------------ Begin Solver -----------------------------
+
+Simulation Run using the Single-zone Driver
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24ac46f in CoolProp::FlashRoutines::HSU_D_flash(CoolProp::HelmholtzEOSMixtureBackend&, CoolProp::parameters) ()
+#2  0x00007ff6f231333a in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ace30 in CCoolProp::SetTDState_rhoe(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed90 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+0x11fa4e90:	"D < DLtriple 4342.96 4879.38"
+RAH_EOS_RECON_FIRST inner=0 thread=0 edge=22104 i=5282 j=6690 reason=D < DLtriple 4342.96 4879.38
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24ac46f in CoolProp::FlashRoutines::HSU_D_flash(CoolProp::HelmholtzEOSMixtureBackend&, CoolProp::parameters) ()
+#2  0x00007ff6f231333a in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ace30 in CCoolProp::SetTDState_rhoe(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed90 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+0x11fa4ec0:	"D < DLtriple 4358.72 4879.34"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24a9136 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#2  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed90 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+0x162973f0:	"Starting value of T0 is not valid in DP_flash"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9f640:	"The molar density of -0.059266 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9e8c0:	"The molar density of -0.011792 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9fb80:	"The molar density of -0.037520 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9f160:	"The molar density of -0.092394 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9efe0:	"The molar density of -0.091027 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9e800:	"The molar density of -0.040993 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9f580:	"The molar density of -0.085920 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9ebc0:	"The molar density of -0.027998 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9ffa0:	"The molar density of -0.115101 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9ec20:	"The molar density of -0.061919 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9f6a0:	"The molar density of -0.038128 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9ec80:	"The molar density of -0.058298 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9fb80:	"The molar density of -0.089958 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9f460:	"The molar density of -0.115359 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9ef20:	"The molar density of -0.067751 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9ee60:	"The molar density of -0.098919 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f2306bdd in CoolProp::HelmholtzEOSMixtureBackend::update_DmolarT_direct(double, double) ()
+#2  0x00007ff6f29e59a0 in CoolProp::solver_DP_resid::call(double) ()
+#3  0x00007ff6f2495e8e in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#4  0x00007ff6f24a8fe4 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#5  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#6  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#7  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+0x11f9e860:	"The molar density of -0.045662 mol/m3 is below the minimum of 0.000000 mol/m3"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24ac46f in CoolProp::FlashRoutines::HSU_D_flash(CoolProp::HelmholtzEOSMixtureBackend&, CoolProp::parameters) ()
+#2  0x00007ff6f231333a in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ace30 in CCoolProp::SetTDState_rhoe(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed61 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+0x11fa4e90:	"D < DLtriple 4492.66 4879.4"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24ac46f in CoolProp::FlashRoutines::HSU_D_flash(CoolProp::HelmholtzEOSMixtureBackend&, CoolProp::parameters) ()
+#2  0x00007ff6f231333a in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ace30 in CCoolProp::SetTDState_rhoe(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed61 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+0x11fa53a0:	"D < DLtriple 4642.21 4879.33"
+[Switching to thread 3 (Thread 47980.0xd634)]
+
+Thread 3 (Thread 47980.0xd634):
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24a9136 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#2  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed90 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#8  0x00007ff6f1da9bb2 in CMultiGridIntegration::MultiGrid_Cycle(CGeometry****, CSolver*****, CNumerics******, CConfig**, unsigned short, unsigned short, unsigned short, unsigned short, unsigned short) ()
+#9  0x00007ff6f1daae60 in CMultiGridIntegration::MultiGrid_Iteration(CGeometry****, CSolver*****, CNumerics******, CConfig**, unsigned short, unsigned short, unsigned short) [clone ._omp_fn.0] ()
+#10 0x00007ff6f2723741 in gomp_thread_start ()
+#11 0x00007ff6f2754acd in pthread_create_wrapper ()
+
+Thread 2 (Thread 47980.0x75d0):
+#0  0x00007ffb2e665a24 in ntdll!ZwWaitForWorkViaWorkerFactory () from C:/WINDOWS/SYSTEM32/ntdll.dll
+#1  0x00007ffb2e524d0e in ntdll!TpCallbackMayRunLong () from C:/WINDOWS/SYSTEM32/ntdll.dll
+#2  0x00007ffb2d7cdda7 in KERNEL32!BaseThreadInitThunk () from C:/WINDOWS/System32/kernel32.dll
+#3  0x00007ffb2e57ee4c in ntdll!RtlUserThreadStart () from C:/WINDOWS/SYSTEM32/ntdll.dll
+#4  0x0000000000000000 in ?? ()
+
+Thread 1 (Thread 47980.0x6100):
+#0  0x00007ff6f274f9dc in log ()
+#1  0x00007ff6f225f0ee in CoolProp::IdealHelmholtzPlanckEinsteinGeneralized::all(double const&, double const&, CoolProp::HelmholtzDerivatives&) ()
+#2  0x00007ff6f2a0a006 in CoolProp::IdealHelmholtzContainer::all(double, double, bool) ()
+#3  0x00007ff6f2303aa9 in CoolProp::HelmholtzEOSMixtureBackend::calc_alpha0_deriv_nocache(int, int, std::vector<double, std::allocator<double> > const&, double const&, double const&, double const&, double const&) ()
+#4  0x00007ff6f23044f2 in CoolProp::HelmholtzEOSMixtureBackend::calc_d3alpha0_dTau3() ()
+#5  0x00007ff6f29d047e in CoolProp::AbstractState::d3alpha0_dTau3() ()
+#6  0x00007ff6f220de46 in CoolProp::get_dT_drho_second_derivatives(CoolProp::AbstractState&, int, double&, double&, double&) ()
+#7  0x00007ff6f220f8ff in CoolProp::AbstractState::calc_second_partial_deriv(CoolProp::parameters, CoolProp::parameters, CoolProp::parameters, CoolProp::parameters, CoolProp::parameters) ()
+#8  0x00007ff6f2499722 in CoolProp::FlashRoutines::HSU_D_flash(CoolProp::HelmholtzEOSMixtureBackend&, CoolProp::parameters)::solver_resid::second_deriv(double) ()
+#9  0x00007ff6f2495eb1 in CoolProp::Halley(CoolProp::FuncWrapper1DWithTwoDerivs*, double, double, int, double) ()
+#10 0x00007ff6f24ab366 in CoolProp::FlashRoutines::HSU_D_flash(CoolProp::HelmholtzEOSMixtureBackend&, CoolProp::parameters) ()
+#11 0x00007ff6f231333a in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24a9136 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#2  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed90 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+0x122a9500:	"Starting value of T0 is not valid in DP_flash"
+RAH_EOS_RECON_FIRST inner=0 thread=1 edge=71715 i=17507 j=17508 reason=Starting value of T0 is not valid in DP_flash
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24a9136 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#2  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed90 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+0x122a9040:	"Starting value of T0 is not valid in DP_flash"
+
+RAH_EXCEPTION
+0x7ff6f316dd20 <_ZTSN8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE>:	"N8CoolProp13CoolPropErrorILNS_17CoolPropBaseError7ErrCodeE4EEE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f24a9136 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#2  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#3  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+#4  0x00007ff6f1f3d510 in CEulerSolver::ComputeConsistentExtrapolation(CFluidModel*, unsigned short, double*, double*) ()
+#5  0x00007ff6f1f3ed90 in CEulerSolver::Upwind_Residual(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short) ()
+#6  0x00007ff6f2198d2c in CIntegration::Space_Integration(CGeometry*, CSolver**, CNumerics**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+#7  0x00007ff6f1da9584 in CMultiGridIntegration::PreSmoothing(unsigned short, CGeometry****, CSolver*****, CConfig**, CSolver*, CNumerics**, CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short) ()
+0x122a9700:	"Starting value of T0 is not valid in DP_flash"
+
+RAH_EXCEPTION
+0x7ff6f316c060 <_ZTSN3fmt3v1212format_errorE>:	"N3fmt3v1212format_errorE"
+#0  0x00007ff6f2c31c37 in __cxa_throw ()
+#1  0x00007ff6f295cc91 in fmt::v12::report_error(char const*) ()
+#2  0x00007ff6f2967966 in void fmt::v12::detail::vprintf<char, fmt::v12::basic_printf_context<char> >(fmt::v12::detail::buffer<char>&, fmt::v12::basic_string_view<char>, fmt::v12::basic_format_args<fmt::v12::basic_printf_context<char> >) ()
+#3  0x00007ff6f296c819 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > fmt::v12::vsprintf<char>(fmt::v12::basic_string_view<char>, fmt::v12::vprintf_args<char>::type) ()
+#4  0x00007ff6f277154c in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > format<>(char const*) ()
+#5  0x00007ff6f24a9357 in CoolProp::FlashRoutines::DP_flash(CoolProp::HelmholtzEOSMixtureBackend&) ()
+#6  0x00007ff6f23130d8 in CoolProp::HelmholtzEOSMixtureBackend::update(CoolProp::input_pairs, double, double) ()
+#7  0x00007ff6f21ad5ca in CCoolProp::SetTDState_Prho(double, double) ()
+0x16261be8:	"\v\272-0 \223\001\210>\235\036³{\027É@èO³Ô\376+MÀ¹\031²¥èZk\277\036\2317B2ŸD¿˜\0237C\376\370Ÿ¾{ÆŽ\314\vXV\276\024=cG\346-\344=öº0'n†Œ={]\230\0237C’½{]\230\0237C\236=\vEÏØ‘y\213=\024Šž\261#", <incomplete sequence \275>
+
+Thread 3 received signal SIGILL, Illegal instruction.
+0x00007ff6f2c82280 in __gnu_cxx::__trap_terminate_handler() ()
