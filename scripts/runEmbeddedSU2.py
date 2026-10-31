@@ -94,6 +94,8 @@ def main():
                  request=request, inputSHA256=locked, executableVersion=runtime['version'],
                  archiveSHA256=runtime['archiveSHA256'], supervisorProcessID=os.getpid(),
                  physicalSolutionQualified=False,runtimeFlavor=runtime_flavor)
+    if (folder/'sst_contract.json').exists():
+        state['physicsModel']=read(folder/'sst_contract.json')
 
     def save():
         atomic_write_json(receipt,state)

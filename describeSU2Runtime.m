@@ -9,6 +9,13 @@ if isfield(receipt,'runtimeFlavor'),info.flavor=receipt.runtimeFlavor;end
 switch info.flavor
     case 'official'
         info.mode='native';info.method='官方原生更新';
+        if isfield(receipt,'physicsModel')
+            p=receipt.physicsModel;assert(strcmp(p.model,'SST-2003m'),'未知的官方湍流合同。');
+            info.mode='sst-2003m';info.physicsModel=p;
+            info.method=sprintf('官方SST-2003m；全湍流研究假设，I=%.4g，μt/μ=%.4g，Prt=%.4g；%s', ...
+                p.intensity,p.viscosityRatio,p.Prt,p.provenance);
+            info.physicsCaption=sprintf('RANS / SST-2003m / 定比热 / Sutherland / Prt%.4g；转捩未知',p.Prt);
+        end
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';
     case {'rah-coolprop-v1','rah-coolprop-recon-v1','rah-coolprop-recon-v2','rah-coolprop-recon-v3'}

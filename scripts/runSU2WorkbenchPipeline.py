@@ -16,8 +16,11 @@ class Pipeline:
         self.folder = Path(self.request['workDirectory']).resolve()
         self.folder.relative_to(ROOT / 'outputs')
         assert self.request_path.parent == self.folder and self.request['jobToken']
-        self.spec = self.request['propertyInitialization']
-        assert self.spec['model'] == 'HEOS-Air' and self.spec['runtimeFlavor'] == 'rah-coolprop-recon-v3'
+        assert ('propertyInitialization' in self.request)!=('turbulenceInitialization' in self.request)
+        self.sst='turbulenceInitialization' in self.request
+        self.spec = self.request['turbulenceInitialization' if self.sst else 'propertyInitialization']
+        if self.sst:assert self.spec['model']=='SST-2003m'
+        else:assert self.spec['model'] == 'HEOS-Air' and self.spec['runtimeFlavor'] == 'rah-coolprop-recon-v3'
         self.out = self.folder / 'workflow'
         self.out.mkdir(exist_ok=False)
         self.file = self.out / 'pipeline_process.json'
@@ -25,6 +28,8 @@ class Pipeline:
         paths = [self.request_path, Path(__file__).resolve()]
         paths += [ROOT / n for n in ('scripts/prepareSU2CoolPropCase.py', 'scripts/auditSU2CoolPropState.py',
                                     'scripts/runEmbeddedSU2.py', 'scripts/su2ThermalRuntime.py')]
+        if self.sst:
+            paths += [ROOT/n for n in ('scripts/prepareSU2SSTCase.py','scripts/su2SSTInterface.py','scripts/auditSU2SSTState.py')]
         self.locks = {str(p): sha(p) for p in paths}
         self.state = dict(status='starting', stage='preparation', supervisorProcessID=os.getpid(),
                           jobToken=self.request['jobToken'], startedUTC=datetime.now(timezone.utc).isoformat(),
@@ -123,12 +128,24 @@ class Pipeline:
         from auditSU2CoolPropState import audit
         code=1
         try:
-            self.phase('preparation',180,lambda:prepare(self.folder,self.spec['sourceDirectory'],
-                                                       self.spec['runtimeFlavor'],self.run_property))
+            if self.sst:
+                command=[sys.executable,'-X','utf8',str(ROOT/'scripts/prepareSU2SSTCase.py'),
+                         '--folder',str(self.folder),'--source',self.spec['sourceDirectory'],
+                         '--intensity',str(self.spec['intensity']),'--viscosity-ratio',str(self.spec['viscosityRatio']),
+                         '--prt',str(self.spec['Prt']),'--provenance',self.spec['provenance']]
+                self.phase('preparation',180,lambda:self.run_property(self.out,'sst_preparation',command,ROOT,dict(os.environ),180))
+            else:
+                self.phase('preparation',180,lambda:prepare(self.folder,self.spec['sourceDirectory'],
+                                                           self.spec['runtimeFlavor'],self.run_property))
             # 原生预算由旧监督器严格执行；额外30秒仅供启动/清场，不增加SU2预算。
             self.phase('solver',float(self.request['maximumSeconds'])+30,self.run_engine)
-            self.phase('eosAudit',120,lambda:audit(self.folder,self.run_property))
-            self.state['auditSHA256']=sha(self.folder/'thermodynamics/audit.json')
+            if self.sst:
+                target=self.folder/'sst_state_audit.json'
+                command=[sys.executable,'-X','utf8',str(ROOT/'scripts/auditSU2SSTState.py'),'--folder',str(self.folder),'--output',str(target)]
+                self.phase('eosAudit',120,lambda:self.run_property(self.out,'sst_audit',command,ROOT,dict(os.environ),120))
+            else:
+                self.phase('eosAudit',120,lambda:audit(self.folder,self.run_property));target=self.folder/'thermodynamics/audit.json'
+            self.state['auditSHA256']=sha(target)
             code=0
         except Exception as ex:
             self.state['error']=type(ex).__name__+': '+str(ex)

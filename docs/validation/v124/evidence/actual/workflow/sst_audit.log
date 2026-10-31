@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\auditSU2SSTState.py", line 114, in <module>
+    target=Path(a.output);assert not target.exists();r=audit(a.folder,a.actual_surface)
+  File "E:\RocketAeroHeat\scripts\auditSU2SSTState.py", line 62, in audit
+    heatError=float(max(abs(q-f['Heat_Flux'][:,0])/np.maximum(abs(q),1)));assert heatError<2e-6
+AssertionError

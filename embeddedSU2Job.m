@@ -21,12 +21,19 @@ switch lower(action)
             'threads',threads,'maximumSeconds',seconds,'dryRun',false,'jobToken',token);
         request.sourceFiles={'readSU2SurfaceResult.m','buildSU2WallProjection.m','mapSU2WallResult.m', ...
             'writeSU2RocketCase.m','embeddedSU2Job.m'};
-        pipeline=isfield(options,'propertyInitialization');
-        if pipeline
+        pipeline=isfield(options,'propertyInitialization') || isfield(options,'turbulenceInitialization');
+        assert(~(isfield(options,'propertyInitialization') && isfield(options,'turbulenceInitialization')),'HEOS SST尚未适配。');
+        if isfield(options,'propertyInitialization')
             request.propertyInitialization=options.propertyInitialization;
             request.sourceFiles=[request.sourceFiles,{'scripts/runSU2WorkbenchPipeline.py', ...
                 'scripts/prepareSU2CoolPropCase.py','scripts/auditSU2CoolPropState.py', ...
                 'readSU2CoolPropStateAudit.m','auditSU2ResultConvergence.m'}];
+        end
+        if isfield(options,'turbulenceInitialization')
+            request.turbulenceInitialization=options.turbulenceInitialization;
+            request.sourceFiles=[request.sourceFiles,{'scripts/runSU2WorkbenchPipeline.py', ...
+                'scripts/prepareSU2SSTCase.py','scripts/su2SSTInterface.py','scripts/auditSU2SSTState.py', ...
+                'auditSU2ResultConvergence.m','describeSU2Runtime.m'}];
         end
         if isfile(fullfile(folder,'input_snapshot.mat'))
             request.sourceFiles{end+1}=fullfile(folder,'input_snapshot.mat');

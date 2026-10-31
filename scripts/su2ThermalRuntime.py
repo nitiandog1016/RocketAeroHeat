@@ -16,6 +16,9 @@ def resolve(folder,config):
     manifest=folder/'case_manifest.json';locked={};profile=None
     data=read(manifest) if manifest.exists() else {}
     flavor=data.get('requiredRuntimeFlavor','official')
+    if re.search(r'^\s*SOLVER\s*=\s*RANS\s*$',config,re.M) or 'sst' in data:
+        assert flavor=='official','SST仅适配官方定比热包，HEOS/空间壁温RANS尚未验证'
+        locked.update(validate_sst_manifest(folder,data,config))
     assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,*COOLPROP_FLAVORS),'未知SU2运行时类型'
     if flavor!=FROZEN_FLAVOR:assert 'frozenEnergyMode' not in data,'运行时类型与冻结能量选项不匹配'
     runtime_dir=ROOT/'tools/runtime/su2'/('8.6.0' if flavor=='official' else '8.6.0-'+flavor)
@@ -53,6 +56,41 @@ def resolve(folder,config):
         assert sha(p)==item['sha256'],'运行时文件身份变化'
     locked[str(runtime_file)]=sha(runtime_file)
     return exe,runtime,flavor,profile,locked
+
+def validate_sst_manifest(folder,data,config):
+    """禁止仅切换RANS后沿用层流能量、标签或残差；所有显式合同由真实进程锁定。"""
+    from su2SSTInterface import state
+    pairs=re.findall(r'^\s*([A-Z0-9_]+)\s*=\s*([^%\r\n]+)',config,re.M)
+    assert len(pairs)==len(dict(pairs));c={k:v.strip() for k,v in pairs}
+    path=folder/'sst_contract.json';contract=read(path)
+    assert contract==data['sst'] and sha(path)==data['sstContractSHA256']
+    assert contract['model']=='SST-2003m' and contract['provenance'].strip()
+    assert not contract['physicsQualified'] and contract['newQualifiedArea']==0
+    assert sha(folder/'case.cfg')==contract['configurationSHA256'] and sha(folder/'mesh.su2')==contract['meshSHA256']
+    required={'SOLVER':'RANS','KIND_TURB_MODEL':'SST','SST_OPTIONS':'V2003m','FLUID_MODEL':'IDEAL_GAS',
+        'SYSTEM_MEASUREMENTS':'SI','REF_DIMENSIONALIZATION':'DIMENSIONAL','MGLEVEL':'0',
+        'VISCOSITY_MODEL':'SUTHERLAND','CONDUCTIVITY_MODEL':'CONSTANT_PRANDTL',
+        'TURBULENT_CONDUCTIVITY_MODEL':'CONSTANT_PRANDTL_TURB','CONV_NUM_METHOD_TURB':'SCALAR_UPWIND',
+        'MUSCL_TURB':'NO','TIME_DISCRE_TURB':'EULER_IMPLICIT','WRT_RESTART_OVERWRITE':'NO','WRT_SURFACE_OVERWRITE':'NO'}
+    for k,v in required.items():assert c.get(k)==v,k
+    for k in ('MARKER_WALL_FUNCTIONS','MARKER_PYTHON_CUSTOM','KIND_TRANS_MODEL','CONFIG_LIST','NZONES'):assert k not in c,k
+    assert c.get('TIME_DOMAIN','NO')=='NO' and 'MARKER_ISOTHERMAL' in c and 'MARKER_HEATFLUX' not in c
+    assert set(re.findall(r'RMS_\w+',c['CONV_FIELD']))=={'RMS_DENSITY','RMS_ENERGY','RMS_TKE','RMS_DISSIPATION'}
+    assert float(c['CONV_RESIDUAL_MINVAL'])==-8
+    for k,q in [('FREESTREAM_TURBULENCEINTENSITY','intensity'),('FREESTREAM_TURB2LAMVISCRATIO','viscosityRatio'),('PRANDTL_TURB','Prt')]:
+        assert math.isfinite(contract[q]) and float(c[k])==contract[q] and contract[q]>0
+    locked={str(folder/'case_manifest.json'):sha(folder/'case_manifest.json'),str(path):sha(path),
+        str(Path(__file__).with_name('su2SSTInterface.py')):sha(Path(__file__).with_name('su2SSTInterface.py'))}
+    if c['RESTART_SOL']=='YES':
+        assert c['SOLUTION_FILENAME']=='initial_flow' and c['READ_BINARY_RESTART']=='NO'
+        path=folder/'sst_initialization.json';assert sha(path)==contract['initializationSHA256']
+        init=read(path);assert init==data['initialization'] and init['kind']=='same-mesh-laminar-to-SST-initial-guess'
+        assert init['sameMesh'] and not init['samePhysicsAndNumerics'] and init['newPhysicsLocalIterationStartsAt']==0
+        assert sha(folder/'initial_flow.csv')==init['initialStateSHA256'];state(folder/'initial_flow.csv',True)
+        for p,h in init['sourceSHA256'].items():assert sha(Path(p))==h
+        locked[str(path)]=sha(path)
+    else:assert c['RESTART_SOL']=='NO' and 'initializationSHA256' not in contract
+    return locked
 
 def validate_coolprop_manifest(data,config):
     """首阶段只接受已准备的固定Air/单区层流物性任务；旧rhoE或湍流列不能混用。"""

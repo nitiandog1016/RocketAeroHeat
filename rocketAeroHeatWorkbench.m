@@ -222,7 +222,7 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isEmbedded()
-                    grid=form(48);c=state.cfg;
+                    grid=form(61);c=state.cfg;
                     controls.altitude=numberField(grid,2,'高度 / km',c.flight.altitude/1000,[0 86]);
                     controls.mach=numberField(grid,3,'参考Mach',c.flight.Mach,[1.01 10]);
                     controls.alpha=numberField(grid,4,'攻角 / °',c.flight.alpha,[-89 89]);
@@ -257,8 +257,8 @@ renderEditor();sync();showGeometry(true);
                         tip(grid,45,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
                     end
                     % 初猜不是流场解；显式研究选项只对已核对的混合域和等温壁开放。
-                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究','定比热源场转HEOS'}, ...
-                        {'freestream','wallEnthalpy','checkpoint','propertyTransfer'},getOption(c.su2,'initialMode','freestream'));
+                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究','定比热源场转HEOS','层流源场转SST'}, ...
+                        {'freestream','wallEnthalpy','checkpoint','propertyTransfer','sstTransfer'},getOption(c.su2,'initialMode','freestream'));
                     controls.initialThickness=numberField(grid,29,'初猜厚度 / mm',1000*getOption(c.su2,'initialThicknessM',.001),[.001 1000]);
                     controls.checkpointLimit=numberField(grid,30,'检查点上限 / MiB',getOption(c.su2,'checkpointLimitMiB',100),[1 1024]);
                     for key={'initialMode','initialThickness','checkpointLimit'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
@@ -270,7 +270,17 @@ renderEditor();sync();showGeometry(true);
                     controls.heosSource.ValueChangedFcn=@boundaryEdited;
                     controls.chooseHEOS=button(grid,37,'选择HEOS转换的定比热源场',@chooseHEOSSource);
                     tip(grid,38,'HEOS固定原p/T/速度，Mach栏为定比热速度参考；新EOS Mach另列。统一Tw、具名保存；源步号不累加。');
-                    tip(grid,41,'初态转换≤180s，EOS审核≤120s，与流场预算分别计时。当前仍为层流研究，无RANS/转捩或材料壁温解；低温输运/网格/收敛未合格。');
+                    tip(grid,41,'HEOS仅层流；初态转换≤180s，状态审核≤120s，与流场预算分别计时。没有材料壁温解；低温输运/网格/收敛未合格。SST设置见下方。');
+                    controls.flowModel=choice(grid,47,'黏性流动模型',{'层流 · 默认','SST-2003m · 研究'}, ...
+                        {'laminar','SST-2003m'},getOption(c.su2,'flowModel','laminar'));
+                    controls.flowModel.ValueChangedFcn=@flowModelEdited;
+                    controls.turbulenceIntensity=numberField(grid,48,'入口湍流强度 I',getOption(c.su2,'turbulenceIntensity',.01),[1e-6 .5]);
+                    controls.turbulentViscosityRatio=numberField(grid,49,'入口 μt/μ',getOption(c.su2,'turbulentViscosityRatio',10),[1e-6 1e4]);
+                    controls.turbulentPrandtl=numberField(grid,50,'湍流 Prt',getOption(c.su2,'turbulentPrandtl',.9),[.01 10]);
+                    controls.turbulenceProvenance=textField(grid,51,'湍流参数来源',getOption(c.su2,'turbulenceProvenance','全湍流受控研究假设；非飞行测量，转捩未知'));
+                    for key={'turbulenceIntensity','turbulentViscosityRatio','turbulentPrandtl','turbulenceProvenance'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
+                    tip(grid,53,'SST仅定比热/统一给定Tw；使用上方“源检查点目录”的同网格层流场作为新模型初猜。I是比例（0.01=1%），ω/总能量与有效y+独立审核；初态与后验各自有预算。');
+                    tip(grid,57,'全湍流是计算假设；没有转捩或壁温解。SST和HEOS不可组合；研究值未通过网格/外域/公开热流验证，不计新增合格面积。');
                     sync();return;
                 end
                 grid=form(24+12*methodDetailsOpen);c=state.cfg;
@@ -543,6 +553,20 @@ renderEditor();sync();showGeometry(true);
             if ~isempty(source) || isfield(next.su2,'checkpointSource'),next.su2.checkpointSource=source;end
             heosSource=controls.heosSource.Value;
             if ~isempty(heosSource) || isfield(next.su2,'heosSource'),next.su2.heosSource=heosSource;end
+            flow=controls.flowModel.Value;
+            if ~strcmp(flow,'laminar') || isfield(next.su2,'flowModel'),next.su2.flowModel=flow;end
+            if strcmp(flow,'SST-2003m')
+                assert(strcmp(property,'idealGas'),'HEOS RANS尚未适配，请使用定比热SST研究。');
+                assert(strcmp(thermal,'isothermal') && strcmp(initial,'sstTransfer') && named,'SST需要统一壁温、层流转SST初猜及具名保存。');
+                assert(isfile(fullfile(source,'engine_process.json')),'请选择同网格层流源场；启动时核对原始身份。');
+                next.su2.turbulenceIntensity=controls.turbulenceIntensity.Value;
+                next.su2.turbulentViscosityRatio=controls.turbulentViscosityRatio.Value;
+                next.su2.turbulentPrandtl=controls.turbulentPrandtl.Value;
+                next.su2.turbulenceProvenance=controls.turbulenceProvenance.Value;
+                assert(~isempty(strtrim(next.su2.turbulenceProvenance)),'请说明湍流参数的来源或假设。');
+            else
+                assert(~strcmp(initial,'sstTransfer'),'层流模型不能使用SST初态。');
+            end
             if strcmp(property,'HEOS-Air')
                 assert(strcmp(initial,'propertyTransfer'),'HEOS必须选择“定比热源场转HEOS”，不能直接使用旧能量或自由流。');
                 assert(strcmp(thermal,'isothermal'),'HEOS工作台目前只支持给定统一壁温。');
@@ -588,9 +612,19 @@ renderEditor();sync();showGeometry(true);
         display=state.cfg;display.su2.thermodynamicModel=controls.thermodynamics.Value;
         controls.propertySummary.Text=propertySummaryText(display);boundaryEdited([],[]);
     end
+    function flowModelEdited(~,~)
+        % 显式切换模型才选择新物理初猜；HEOS冲突保留为拒绝，不能静默降级物性。
+        if strcmp(controls.flowModel.Value,'SST-2003m')
+            controls.initialMode.Value='sstTransfer';controls.checkpointMode.Value='indexed';
+        elseif strcmp(controls.initialMode.Value,'sstTransfer'),controls.initialMode.Value='freestream';end
+        display=state.cfg;display.su2.flowModel=controls.flowModel.Value;
+        controls.propertySummary.Text=propertySummaryText(display);boundaryEdited([],[]);
+    end
     function text=propertySummaryText(c)
         if strcmp(getOption(c.su2,'thermodynamicModel','idealGas'),'HEOS-Air')
             text='SU2 8.6.0 / CoolProp 7.2 HEOS Air：层流、ROE/特征远场；输运仍为Sutherland、μcp/Pr0.72。M输入是原速度参考；EOS审核通过后才能查看。';
+        elseif strcmp(getOption(c.su2,'flowModel','laminar'),'SST-2003m')
+            text='SU2 8.6.0 / SST-2003m全湍流研究；定比热/Sutherland/Pr0.72。入口I、μt/μ与Prt显式给定；新增k/ω和能量约定独立审核，未通过物理资格。';
         else
             text='SU2 8.6.0：层流NS、定比热理想气体γ1.4、Sutherland、Pr0.72；无湍流/转捩模型。空间壁温使用原生输入适配版本。';
         end
@@ -812,6 +846,12 @@ renderEditor();sync();showGeometry(true);
             if strcmp(getOption(frozen.cfg.su2,'thermodynamicModel','idealGas'),'HEOS-Air')
                 jobOptions.propertyInitialization=struct('model','HEOS-Air','runtimeFlavor','rah-coolprop-recon-v3', ...
                     'sourceDirectory',char(java.io.File(frozen.cfg.su2.heosSource).getCanonicalPath()));
+            elseif strcmp(getOption(frozen.cfg.su2,'flowModel','laminar'),'SST-2003m')
+                c=frozen.cfg.su2;
+                jobOptions.turbulenceInitialization=struct('model','SST-2003m', ...
+                    'sourceDirectory',char(java.io.File(c.checkpointSource).getCanonicalPath()), ...
+                    'intensity',c.turbulenceIntensity,'viscosityRatio',c.turbulentViscosityRatio, ...
+                    'Prt',c.turbulentPrandtl,'provenance',c.turbulenceProvenance);
             end
             engineJob=embeddedSU2Job('start',folder,jobOptions);
             engineTimer=timer('ExecutionMode','fixedSpacing','Period',.5,'BusyMode','drop','TimerFcn',@pollEngine);
@@ -887,7 +927,7 @@ renderEditor();sync();showGeometry(true);
     end
     function budget=checkpointBudget(c)
         budget=estimateSU2CheckpointStorage(embeddedVolume,getOption(c.su2,'iterations',1000), ...
-            getOption(c.su2,'outputEvery',1000),getOption(c.su2,'namedCheckpoints',false),getOption(c.su2,'checkpointLimitMiB',100));
+            getOption(c.su2,'outputEvery',1000),getOption(c.su2,'namedCheckpoints',false),getOption(c.su2,'checkpointLimitMiB',100),getOption(c.su2,'flowModel','laminar'));
     end
     function text=checkpointBudgetText(c)
         if isempty(embeddedVolume),text='生成体网格后估计输出体量。';return;end

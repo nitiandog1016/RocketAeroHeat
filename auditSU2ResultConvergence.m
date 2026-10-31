@@ -31,8 +31,8 @@ try
     cadence=number(config,'OUTPUT_WRT_FREQ');assert(cadence>=1 && cadence==fix(cadence));
     names=regexp(config,'(?m)^\s*CONV_FIELD\s*=\s*\(([^)]*)\)','tokens','once');assert(~isempty(names));
     selected=strtrim(strsplit(names{1},','));
-    allowed={'RMS_DENSITY','RMS_MOMENTUM-X','RMS_MOMENTUM-Y','RMS_MOMENTUM-Z','RMS_ENERGY'};
-    columns={'rms[Rho]','rms[RhoU]','rms[RhoV]','rms[RhoW]','rms[RhoE]'};
+    allowed={'RMS_DENSITY','RMS_MOMENTUM-X','RMS_MOMENTUM-Y','RMS_MOMENTUM-Z','RMS_ENERGY','RMS_TKE','RMS_DISSIPATION'};
+    columns={'rms[Rho]','rms[RhoU]','rms[RhoV]','rms[RhoW]','rms[RhoE]','rms[k]','rms[w]'};
     assert(all(ismember(selected,allowed)),'包含尚未支持的非残差收敛条件。');
     fid=fopen(fullfile(folder,'history.csv'),'r');assert(fid>=0);guard=onCleanup(@()fclose(fid));header=fgetl(fid);clear guard;
     keys=regexp(header,'"([^"]+)"','tokens');keys=cellfun(@(c)strtrim(c{1}),keys,'UniformOutput',false);
@@ -74,9 +74,25 @@ try
     if ~isfile(restart),audit.reason='负荷唯一关联，但缺少重启动文件，未确认场身份。';return;end
     h=fileSHA(restart);assert(strcmp(h,receipt.outputSHA256.restart_flow_csv),'重启动SHA不匹配。');
     audit.evidenceSHA256.restart_flow_csv=h;
-    rest=readmatrix(restart,'NumHeaderLines',1);nd=(size(rest,2)-3)/2;assert(ismember(nd,[2 3]));
+    fid=fopen(restart,'r');assert(fid>=0);guard=onCleanup(@()fclose(fid));header=fgetl(fid);clear guard;
+    cols=regexp(header,'"([^"]+)"','tokens');cols=cellfun(@(x)x{1},cols,'UniformOutput',false);
+    nd=2+any(strcmp(cols,'z'));expected={'PointID','x','y'};if nd==3,expected{end+1}='z';end
+    expected=[expected,{'Density','Momentum_x','Momentum_y'}];if nd==3,expected{end+1}='Momentum_z';end
+    expected{end+1}='Energy';sst=~isempty(regexp(config,'(?m)^\s*SOLVER\s*=\s*RANS\s*$','once'));
+    if sst
+        assert(isfield(receipt,'physicsModel') && strcmp(receipt.physicsModel.model,'SST-2003m'),'RANS缺少实际模型合同。');
+        assert(all(ismember({'RMS_DENSITY','RMS_ENERGY','RMS_TKE','RMS_DISSIPATION'},selected)));
+        expected=[expected,{'Turb_Kin_Energy','Omega'}];
+    end
+    assert(isequal(cols,expected),'重启动列名与模型不一致。');
+    rest=readmatrix(restart,'NumHeaderLines',1);assert(size(rest,2)==numel(cols));
     assert(all(isfinite(rest(:))) && isequal(rest(:,1),(0:size(rest,1)-1)'),'重启动不完整。');
-    rho=rest(:,nd+2);velocity=rest(:,nd+3:2*nd+2)./rho;internal=rest(:,end)./rho-sum(velocity.^2,2)/2;
+    rho=rest(:,nd+2);velocity=rest(:,nd+3:2*nd+2)./rho;internal=rest(:,strcmp(cols,'Energy'))./rho-sum(velocity.^2,2)/2;
+    if sst
+        k=rest(:,strcmp(cols,'Turb_Kin_Energy'));w=rest(:,strcmp(cols,'Omega'));
+        assert(all(k>=0) && all(w>0),'湍流状态不满足k非负/ω正。');internal=internal-k;
+        audit.physicsModel=receipt.physicsModel;audit.turbulentKRange=[min(k) max(k)];audit.omegaRange=[min(w) max(w)];
+    end
     assert(all(rho>0));
     if contains(config,'FLUID_MODEL= IDEAL_GAS')
         assert(all(internal>0));gamma=number(config,'GAMMA_VALUE');R=number(config,'GAS_CONSTANT');
@@ -134,6 +150,15 @@ try
         assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
         audit.propertyTransfer=lineage;audit.sourceCumulativeIteration=lineage.sourceCumulativeIteration;
         audit.evidenceSHA256.coolprop_initialization_json=h;
+    end
+    % SST转换只记录源模型的步号，绝不能把层流步号加到新模型历史。
+    if sst && isfile(fullfile(folder,'sst_initialization.json'))
+        path=fullfile(receipt.request.workDirectory,'sst_initialization.json');h=fileSHA(path);
+        token=regexp(receiptText,[regexptranslate('escape',jsonencode(path)) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
+        assert(numel(token)==1 && strcmp(h,token{1}{1}),'SST初态来源未绑定实际进程。');
+        assert(~isfile(continuation) && ~isfile(transfer) && ~isfile(propertyTransfer));
+        lineage=jsondecode(fileread(path));assert(lineage.newPhysicsLocalIterationStartsAt==0 && ~lineage.samePhysicsAndNumerics);
+        audit.turbulenceTransfer=lineage;audit.sourceModelLocalIteration=lineage.sourceLocalIteration;
     end
     audit.checkpointIdentityConfirmed=true;audit.status='checkpoint-and-history-audited';
     audit.reason='保存迭代已绑定且重启动EOS一致；残差通过与物理资格仍分别判断。';

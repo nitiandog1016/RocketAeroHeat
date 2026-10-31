@@ -5,8 +5,9 @@ from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 from runSU2WorkbenchPipeline import Pipeline
 from runEmbeddedSU2 import atomic_write_json
-def main():
-    out=ROOT/'outputs/v123_validation/supervision_contracts';out.mkdir(exist_ok=False)
+def main(out=None):
+    out=ROOT/'outputs/v123_validation/supervision_contracts' if out is None else Path(out).resolve()
+    out.relative_to(ROOT/'outputs');out.mkdir(exist_ok=False)
     checks=[]
     for mode in ['timeout','cancel','wrongToken']:
         folder=out/mode;folder.mkdir();request=folder/'engine_request.json'
@@ -33,4 +34,6 @@ def main():
         checks.append(dict(mode=mode,pipelineExit=code,childExit=q['exitCode'],cancelled=q['cancelled'],timedOut=q['timedOut']))
     report=dict(passed=True,checks=checks,realSyntheticChildren=3,actualSU2Runs=0,numericalSolverClaimed=False)
     (out/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
-if __name__=='__main__':main()
+if __name__=='__main__':
+    import argparse
+    p=argparse.ArgumentParser();p.add_argument('--output');a=p.parse_args();main(a.output)
