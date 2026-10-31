@@ -1,0 +1,16 @@
+function studyEmbeddedSU2FlatPlate(out,meshOptions,pythonExecutable)
+%STUDYEMBEDDEDSU2FLATPLATE 验证MATLAB自动生成、调用和读取内嵌引擎的真实链路。
+% 模块一：由本程序生成输入，不读取外部CFD解或预制重启动场。
+% 模块二：记录实际SU2终态、壁面输出字段；物理比较单独实施。
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);
+if nargin<2,meshOptions=struct;end
+if nargin<3,pythonExecutable='python';end
+info=buildSU2FlatPlateCase(out,meshOptions);
+receipt=runEmbeddedSU2Case(out,struct('pythonExecutable',pythonExecutable, ...
+    'threads',2,'maximumSeconds',720));
+files=dir(fullfile(out,'surface_flow*.vtk'));assert(numel(files)==1,'需要唯一实际壁面输出。');
+data=readSU2SurfaceResult(fullfile(files(1).folder,files(1).name));
+assert(size(data.vertices,1)>20);
+save(fullfile(out,'matlab_receipt.mat'),'info','receipt','data','-v7');
+fprintf('MATLAB-to-SU2-to-MATLAB completed: %d wall rows, p/T/q exported. Physics qualification remains separate.\n',size(data.vertices,1));
+end

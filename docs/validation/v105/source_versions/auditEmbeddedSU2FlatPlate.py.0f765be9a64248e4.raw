@@ -1,0 +1,150 @@
+"""独立检查SU2平板单位/热流方向，并与可压缩平板相似边界层作数值比较。
+
+参考为零压梯度、定比热、Sutherland黏性、常Pr的Levy-Lees方程；
+它忽略前缘黏性相互作用，不是实验数据，不授予完整NS或真实箭体资格。
+"""
+from pathlib import Path
+import argparse
+import hashlib
+import json
+import re
+import numpy as np
+from scipy.integrate import solve_bvp
+
+
+def digest(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def read_wall(path):
+    text = path.read_text(encoding='ascii')
+    assert '\nASCII\nDATASET UNSTRUCTURED_GRID' in text
+    block = re.search(r'POINTS (\d+) \w+\s+(.*?)\s+CELLS', text, re.S)
+    count = int(block[1])
+    xyz = np.fromstring(block[2], sep=' ').reshape(count, 3)
+    fields = {}
+    for name in ['Pressure', 'Temperature', 'Heat_Flux', 'Y_Plus']:
+        block = re.search(r'SCALARS ' + name + r' \w+ 1\s+LOOKUP_TABLE default\s+(.*?)(?=\n[A-Z_]+|\Z)', text, re.S)
+        fields[name] = np.fromstring(block[1], sep=' ')
+        assert fields[name].shape == (count,)
+    return xyz, fields
+
+
+def similarity(options, eta_max):
+    R, gamma, Pr = 287.05287, 1.4, .72
+    cp = gamma * R / (gamma - 1)
+    Te, Tw, p, Mach = [options[k] for k in ('temperature', 'wallTemperature', 'pressure', 'Mach')]
+    U = Mach * np.sqrt(gamma * R * Te)
+    H0, rho = cp * Te + U * U / 2, p / (R * Te)
+    mu = lambda T: 1.458e-6 * T**1.5 / (T + 110.4)
+    gw = cp * Tw / H0
+
+    def ode(eta, y):
+        f, F, m, g, n = y
+        T = (H0 * g - U * U * F * F / 2) / cp
+        # 不裁温度补出解；试迭代若进入非物理状态，明确拒绝。
+        if np.any(T <= 0):
+            raise ValueError('BVP attempted nonpositive temperature')
+        ell = (Te / T) * mu(T) / mu(Te)
+        Fp = m / ell
+        omega = (1 - 1 / Pr) * U * U / H0 * F * m
+        gp = Pr * (n - omega) / ell
+        return np.vstack((F, Fp, -f * Fp, gp, -f * gp))
+
+    def bc(a, b):
+        return np.array([a[0], a[1], a[3] - gw, b[1] - 1, b[3] - 1])
+
+    eta = np.linspace(0, eta_max, 401)
+    F = np.tanh(eta / 2)
+    g = gw + (1 - gw) * (1 - np.exp(-eta))
+    guess = np.vstack((2 * np.log(np.cosh(eta / 2)), F,
+                       .5 / np.cosh(eta / 2)**2, g, (1 - gw) * np.exp(-eta) / Pr))
+    solution = solve_bvp(ode, bc, eta, guess, tol=1e-7, max_nodes=10000)
+    assert solution.success, solution.message
+    wall = solution.sol(0)
+    ell_w = (Te / Tw) * mu(Tw) / mu(Te)
+    gp = Pr * wall[4] / ell_w
+    # q(x)=coefficient/sqrt(x)，正值表示进入冷壁。
+    coefficient = ell_w * mu(Te) * H0 / Pr * gp * np.sqrt(rho * U / (2 * mu(Te)))
+    return dict(qSqrtX=float(coefficient), etaMax=eta_max, nodes=int(solution.x.size),
+                maxResidual=float(max(solution.rms_residuals)), wallEnthalpyDerivative=float(gp))
+
+
+def audit(folder):
+    options = json.loads((folder / 'case_manifest.json').read_text(encoding='utf-8'))['options']
+    xyz, wall = read_wall(folder / 'surface_flow.vtk')
+    rest = np.genfromtxt(str(folder / 'restart_flow.csv'), delimiter=',', skip_header=1)
+    R, gamma, Pr = 287.05287, 1.4, .72
+    cp = gamma * R / (gamma - 1)
+    rho, u, v = rest[:, 3], rest[:, 4] / rest[:, 3], rest[:, 5] / rest[:, 3]
+    T = (rest[:, 6] / rho - (u*u+v*v)/2) * (gamma-1)/R
+    reconstructed = []
+    p_relative = []
+    temperature_relative = []
+    for i, point in enumerate(xyz):
+        column = np.flatnonzero(np.abs(rest[:, 1] - point[0]) < 6e-8)
+        column = column[np.argsort(rest[column, 2])]
+        assert len(column) == options['ny']+1 and rest[column[0], 2] == 0
+        iw, ine = column[:2]
+        mu = 1.458e-6*T[iw]**1.5/(T[iw]+110.4)
+        reconstructed.append(mu*cp/Pr*(T[ine]-options['wallTemperature'])/rest[ine, 2])
+        p_relative.append(wall['Pressure'][i]/(rho[iw]*R*T[iw])-1)
+        temperature_relative.append(wall['Temperature'][i]/T[iw]-1)
+    reconstructed = np.array(reconstructed)
+    # 前缘是等温/对称共享节点，单列；比较区间在查看结果前固定为0.2L至0.8L。
+    s = -xyz[:, 0]
+    interior = (s >= .2*options['length']) & (s <= .8*options['length'])
+    non_leading = s > 0
+    ref = similarity(options, 16)
+    extended = similarity(options, 24)
+    q_ref = np.full_like(s, np.nan)
+    q_ref[non_leading] = ref['qSqrtX']/np.sqrt(s[non_leading])
+    error = (wall['Heat_Flux'][interior]/q_ref[interior]-1)
+    q_scale = np.maximum(np.abs(reconstructed[non_leading]), 1)
+    closure = float(max(abs(wall['Heat_Flux'][non_leading]-reconstructed[non_leading])/q_scale))
+    # 读取一致性门槛根据VTK六位小数科学计数法精度设置，非物理精度门槛。
+    assert closure < 2e-6
+    assert max(abs(np.array(p_relative))) < 2e-6
+    # SU2等温条件通过邻点热通量施加；导出的是节点流体温度，并非强制Tw。
+    assert max(abs(np.array(temperature_relative))) < 2e-6
+    assert all(wall['Heat_Flux'][non_leading] > 0)
+    assert abs(extended['qSqrtX']/ref['qSqrtX']-1) < 1e-6
+    hist = np.genfromtxt(str(folder/'history.csv'), delimiter=',', names=True)
+    log = (folder/'engine_stdout.log').read_text(encoding='utf-8', errors='replace')
+    report = dict(case=str(folder), evidenceClass='numerical-boundary-layer-comparison; not-experiment',
+                  units=dict(x='m', pressure='Pa', temperature='K', heatFlux='W/m^2'),
+                  signConvention='positive-into-wall; upstream-source-and-restart-gradient-confirmed-for-this-case',
+                  wallTemperatureIdentity='prescribed-isothermal-boundary; exported-Temperature-is-fluid-node-state',
+                  prescribedWallTemperature=options['wallTemperature'],
+                  fluidNodeMinusPrescribedTemperatureMax=float(max(abs(wall['Temperature']-options['wallTemperature']))),
+                  fluidNodeMinusPrescribedTemperatureInteriorMax=float(max(abs(wall['Temperature'][interior]-options['wallTemperature']))),
+                  temperatureEOSMaxRelativeError=float(max(abs(np.array(temperature_relative)))),
+                  nodes=len(s), residualConverged='Maximum number of iterations reached' not in log,
+                  lastResiduals={k:float(hist[k][-1]) for k in hist.dtype.names},
+                  heatFluxGradientMaxRelativeError=closure,
+                  pressureEOSMaxRelativeError=float(max(abs(np.array(p_relative)))),
+                  reference=ref, referenceExtended=extended,
+                  comparisonInterval=[.2*options['length'], .8*options['length']],
+                  boundaryLayerRelativeDifferenceMin=float(min(error)),
+                  boundaryLayerRelativeDifferenceMax=float(max(error)),
+                  boundaryLayerRelativeDifferenceRMS=float(np.sqrt(np.mean(error**2))),
+                  leadingEdge=dict(pressure=float(wall['Pressure'][0]), temperature=float(wall['Temperature'][0]),
+                                   heatFlux=float(wall['Heat_Flux'][0]), excludedFromSimilarityComparison=True),
+                  fullNavierStokesVerified=False, productionQualified=False,
+                  inputSHA256={p.name:digest(p) for p in [folder/'case_manifest.json',folder/'surface_flow.vtk',
+                      folder/'restart_flow.csv',folder/'history.csv',folder/'engine_stdout.log']},
+                  auditSHA256=digest(__file__))
+    return report, np.column_stack((s,wall['Pressure'],wall['Temperature'],wall['Heat_Flux'],reconstructed,q_ref))
+
+
+if __name__ == '__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('folder', type=Path)
+    parser.add_argument('--report', type=Path, required=True)
+    args=parser.parse_args()
+    assert not args.report.exists(), '不覆盖历史审核'
+    report, rows=audit(args.folder)
+    args.report.parent.mkdir(parents=True,exist_ok=True)
+    args.report.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    np.savetxt(str(args.report.with_suffix('.csv')),rows,delimiter=',',header='s_m,p_Pa,Twall_K,q_SU2_W_m2,q_gradient_W_m2,q_BL_W_m2',comments='')
+    print(json.dumps(report,ensure_ascii=False,indent=2))

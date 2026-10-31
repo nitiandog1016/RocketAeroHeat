@@ -78,3 +78,11 @@ docs/validation/v104/** -text -eol
 docs/validation/v104/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/validation/v104/**/*.raw -whitespace
 docs/validation/v104/browser/*.txt -whitespace
+# v105实际引擎、参考解及准确源版本按原字节保存。
+docs/validation/v105/** -text -eol
+docs/validation/v105/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v105/**/*.raw -whitespace
+docs/validation/v105/upstream/** -whitespace
+# SU2原始日志和VTK行尾空白属于已散列的上游输出，不格式化证据。
+docs/validation/v105/**/*.log -whitespace
+docs/validation/v105/**/*.vtk -whitespace

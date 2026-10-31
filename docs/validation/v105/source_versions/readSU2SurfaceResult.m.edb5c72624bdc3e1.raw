@@ -1,0 +1,38 @@
+function result=readSU2SurfaceResult(filename)
+%READSU2SURFACERESULT 读取SU2 ASCII VTU壁面量，保留节点、连接及原始热流。
+% 模块一：仅接受显式ASCII数组，拒绝静默解析二进制或缺失压力/温度/热流。
+% 模块二：热流符号和单位由调用者的物性/输出合同核验，本函数不猜测。
+% 模块三：给定等温壁的节点温度是边界条件，不作为独立壁体温度解。
+document=xmlread(filename);arrays=document.getElementsByTagName('DataArray');
+values=struct;
+for j=0:arrays.getLength-1
+    node=arrays.item(j);format=char(node.getAttribute('format'));
+    assert(strcmpi(format,'ascii'),'RocketAeroHeat:SU2:VTU','仅支持明确ASCII格式的VTU。');
+    name=char(node.getAttribute('Name'));
+    if isempty(name),name=char(node.getParentNode.getNodeName);end
+    components=str2double(char(node.getAttribute('NumberOfComponents')));
+    if isnan(components),components=1;end
+    data=sscanf(char(node.getTextContent),'%f');
+    assert(mod(numel(data),components)==0);
+    key=matlab.lang.makeValidName(name);
+    assert(~isfield(values,key),'RocketAeroHeat:SU2:VTU','重复数组名：%s。',name);
+    values.(key)=reshape(data,components,[])';
+end
+assert(all(isfield(values,{'Pressure','Temperature','Heat_Flux','connectivity','offsets','types'})), ...
+    'RocketAeroHeat:SU2:Fields','壁面输出缺少p/T/q或连接，不能用保守量代替热流。');
+if isfield(values,'Points'),V=values.Points;
+elseif isfield(values,'Coordinates'),V=values.Coordinates;
+else,error('RocketAeroHeat:SU2:Fields','缺少坐标。');end
+assert(size(V,2)==3 && all(isfinite(V(:))));
+n=size(V,1);
+assert(all([numel(values.Pressure),numel(values.Temperature),numel(values.Heat_Flux)]==n));
+assert(all(isfinite(values.Pressure) & values.Pressure>0 & ...
+    isfinite(values.Temperature) & values.Temperature>0 & isfinite(values.Heat_Flux)));
+assert(all(values.connectivity>=0 & values.connectivity<n & values.connectivity==fix(values.connectivity)));
+assert(all(diff([0;values.offsets])>0) && values.offsets(end)==numel(values.connectivity));
+result=struct('vertices',V,'pressureRaw',values.Pressure,'temperatureRaw',values.Temperature, ...
+    'heatFluxRaw',values.Heat_Flux,'arrays',values,'sourceFile',filename, ...
+    'method','SU2 8.6.0 compressible Navier-Stokes wall output', ...
+    'temperatureIdentity','isothermal-boundary-state; not-an-independent-wall-thermal-solution', ...
+    'unitConversionApplied',false,'heatFluxSignConfirmed',false,'productionQualified',false);
+end

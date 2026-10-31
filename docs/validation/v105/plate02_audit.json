@@ -1,0 +1,66 @@
+{
+  "case": "outputs\\v105_validation\\plate02",
+  "evidenceClass": "numerical-boundary-layer-comparison; not-experiment",
+  "units": {
+    "x": "m",
+    "pressure": "Pa",
+    "temperature": "K",
+    "heatFlux": "W/m^2"
+  },
+  "signConvention": "positive-into-wall; upstream-source-and-restart-gradient-confirmed-for-this-case",
+  "wallTemperatureIdentity": "prescribed-isothermal-boundary; exported-Temperature-is-fluid-node-state",
+  "prescribedWallTemperature": 300,
+  "fluidNodeMinusPrescribedTemperatureMax": 260.091,
+  "fluidNodeMinusPrescribedTemperatureInteriorMax": 0.05169999999998254,
+  "temperatureEOSMaxRelativeError": 1.6649631295884149e-07,
+  "nodes": 65,
+  "residualConverged": false,
+  "lastResiduals": {
+    "Time_Iter": 0.0,
+    "Outer_Iter": 0.0,
+    "Inner_Iter": 11999.0,
+    "rmsRho": -12.13085927,
+    "rmsRhoU": -9.366375957,
+    "rmsRhoV": -10.77754853,
+    "rmsRhoE": -6.34969755
+  },
+  "heatFluxGradientMaxRelativeError": 3.3507299662262296e-07,
+  "pressureEOSMaxRelativeError": 9.593145844366546e-08,
+  "reference": {
+    "qSqrtX": 12264.843223508966,
+    "etaMax": 16,
+    "nodes": 526,
+    "maxResidual": 4.288190440836279e-08,
+    "wallEnthalpyDerivative": 0.25569177962858136
+  },
+  "referenceExtended": {
+    "qSqrtX": 12264.843223887689,
+    "etaMax": 24,
+    "nodes": 531,
+    "maxResidual": 9.994745115453474e-08,
+    "wallEnthalpyDerivative": 0.25569177963647677
+  },
+  "comparisonInterval": [
+    0.04000000000000001,
+    0.16000000000000003
+  ],
+  "boundaryLayerRelativeDifferenceMin": -0.04706138040685248,
+  "boundaryLayerRelativeDifferenceMax": -0.017999504105820074,
+  "boundaryLayerRelativeDifferenceRMS": 0.029711049500163365,
+  "leadingEdge": {
+    "pressure": 7092.614,
+    "temperature": 560.091,
+    "heatFlux": 5910478.0,
+    "excludedFromSimilarityComparison": true
+  },
+  "fullNavierStokesVerified": false,
+  "productionQualified": false,
+  "inputSHA256": {
+    "case_manifest.json": "316deb13aa0223b6865769c8f7c6cf6de730afd856421357e8416d5eefcd2eda",
+    "surface_flow.vtk": "77631df91ac1d545c1183adb3ceaa9df98a99854245ee44b82a1114452cd1e36",
+    "restart_flow.csv": "5f6ed057156dd73dc88111d564997ce93912035618a71cd5f8b2a72e773072b5",
+    "history.csv": "6083442277a789799dc5ed3dfc192105841295f3b59e90f11edc07994f5958a4",
+    "engine_stdout.log": "2134ca2aeb82c847d289331bee59d9a63a070ce024c8f27a1ea056e32e2e8a98"
+  },
+  "auditSHA256": "0f765be9a64248e4658fc8c63461ca7d8a41d67e7698b19527380081f8e89bcd"
+}
