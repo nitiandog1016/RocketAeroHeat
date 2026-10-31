@@ -1,0 +1,45 @@
+"""同一完整箭体的低阶诊断/有限启动/恢复高阶输入；只读输入使用硬链接。"""
+from pathlib import Path
+import argparse
+import hashlib
+import json
+import os
+import re
+
+ROOT=Path(__file__).resolve().parents[1]
+
+
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def main():
+    ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--mode',choices=['probe','warmup','restore','control','cfl'],required=True)
+    ap.add_argument('--source',required=True);ap.add_argument('--out',required=True);a=ap.parse_args()
+    source=(ROOT/a.source).resolve();out=(ROOT/a.out).resolve();out.relative_to(ROOT/'outputs');assert not out.exists()
+    receipt=json.loads((source/'engine_process.json').read_text());assert receipt['status']=='terminal' and all(receipt['inputsStable'].values())
+    assert sha(source/'restart_flow.csv')==receipt['outputSHA256']['restart_flow.csv']
+    if a.mode in ('probe','warmup','control','cfl'):
+        original=ROOT/'outputs/v109_validation/rocket_seed01/restart_flow.csv';assert sha(source/'restart_flow.csv')==sha(original)
+    baseline=ROOT/'outputs/v110_validation/probe02/case.cfg';text=baseline.read_text()
+    iterations={'probe':1,'warmup':200,'restore':600,'control':600,'cfl':600}[a.mode];seconds={'probe':60,'warmup':120,'restore':360,'control':240,'cfl':240}[a.mode]
+    changes={'ITER':str(iterations),'OUTPUT_WRT_FREQ':str(iterations),
+             'MUSCL_FLOW':'YES' if a.mode in ('restore','control','cfl') else 'NO','WRT_RESTART_OVERWRITE':'NO','WRT_SURFACE_OVERWRITE':'NO'}
+    if a.mode=='cfl':changes['CFL_ADAPT_PARAM']='(0.5, 1.1, 0.05, 50.0)'
+    if a.mode!='probe':changes.update(OUTPUT_FILES='(SURFACE_PARAVIEW_ASCII, RESTART_ASCII)',VOLUME_OUTPUT='(COORDINATES, SOLUTION, PRIMITIVE)',SCREEN_WRT_FREQ_INNER='50')
+    for key,value in changes.items():
+        text,n=re.subn(r'^'+key+r'\s*=.*$',key+'= '+value,text,flags=re.M);assert n==1
+    out.mkdir(parents=True)
+    # 这些输入只读且监督器锁定；输出使用不同文件名，不得原位改写硬链接。
+    for old,new in [('mesh.su2','mesh.su2'),('restart_flow.csv','initial_flow.csv')]:os.link(str(source/old),str(out/new))
+    (out/'case.cfg').write_bytes(text.encode('ascii'))
+    sources=[source/'engine_process.json',source/'restart_flow.csv',source/'mesh.su2',baseline,Path(__file__).resolve(),ROOT/'docs/validation/v111/PLAN.md']
+    manifest=dict(mode=a.mode,sourceDirectory=source.relative_to(ROOT).as_posix(),sourceStateIsOriginal3750=a.mode!='restore',
+                  changes=changes,originalSurfaceUnchanged=True,inputFilesAreImmutableHardlinks=True,
+                  inputSHA256={p.relative_to(ROOT).as_posix():sha(p) for p in sources})
+    (out/'study_manifest.json').write_bytes((json.dumps(manifest,indent=2)+'\n').encode('utf8'))
+    request=dict(workDirectory=str(out),configFile='case.cfg',meshFile='mesh.su2',threads=2,maximumSeconds=seconds,
+                 sourceFiles=['scripts/prepareSU2ReconstructionStudy.py',(out/'study_manifest.json').relative_to(ROOT).as_posix()])
+    (out/'engine_request.json').write_bytes((json.dumps(request,indent=2)+'\n').encode('utf8'));print(str(out/'engine_request.json'))
+
+
+if __name__=='__main__':main()

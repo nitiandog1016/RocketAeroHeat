@@ -1,0 +1,159 @@
+{
+  "analyticCubeAndPrismPassed": true,
+  "geometry": {
+    "maxCellVolumeRelativeDifference": 4.6179282620073536e-11,
+    "domainVolume": 319.4573151189312,
+    "minimumSubVolume": 4.3442873962173324e-13
+  },
+  "firstOrderToOriginalNormRatios": {
+    "integratedSquare": [
+      414.9218641480347,
+      413.70944222321725,
+      409.02199995885127,
+      389.2048734548685,
+      422.63549422014495
+    ],
+    "localRateSquare": [
+      1.0039935128458652,
+      10.413303506533426,
+      6.515330254149013,
+      4.875241438914486,
+      1.163196519800709
+    ],
+    "volumeWeightedRateSquare": [
+      2.614071588199499,
+      53.560053562624184,
+      22.75449199054796,
+      31.558836287156012,
+      14.992532656611942
+    ]
+  },
+  "originalReconstructionWarningCount": 269,
+  "firstOrderWarmupRejected": true,
+  "farfieldInitialCharacteristicCounts": {
+    "nodes": 1442,
+    "minNormalMach": -4.999929832270706,
+    "maxNormalMach": 5.507529666831517,
+    "supersonicOut": 693,
+    "subsonicOut": 39,
+    "subsonicIn": 41,
+    "supersonicIn": 669
+  },
+  "runs": {
+    "first_probe01": {
+      "elapsedSeconds": 3.3439999999973224,
+      "iterations": 1,
+      "nativeCheckpointLocalIteration": 0,
+      "residuals": {
+        "rmsRho": -1.873041974,
+        "rmsRhoU": 1.298604202,
+        "rmsRhoV": 0.4300773756,
+        "rmsRhoW": 0.8342940867,
+        "rmsRhoE": 4.263282678
+      },
+      "nativeHeatLoad": 24642.567936694388,
+      "physicalAreaHeatPower": 24866.219715692892,
+      "nonphysicalReconstructionWarningCount": 0,
+      "minimumDensity": 0.0004210627007677222,
+      "minimumInternalEnergy": 124766.58808303485,
+      "finalCFL": {
+        "minimum": 0.1,
+        "maximum": 0.11,
+        "average": 0.1099996617
+      },
+      "originalMappedFaces": 2448,
+      "physicsQualified": false
+    },
+    "control01": {
+      "elapsedSeconds": 105.5940000000046,
+      "iterations": 600,
+      "nativeCheckpointLocalIteration": 599,
+      "residuals": {
+        "rmsRho": -4.539499227,
+        "rmsRhoU": -1.375523369,
+        "rmsRhoV": -2.199361119,
+        "rmsRhoW": -1.817426881,
+        "rmsRhoE": 1.583923094
+      },
+      "nativeHeatLoad": 22394.582864856646,
+      "physicalAreaHeatPower": 22601.24510074765,
+      "nonphysicalReconstructionWarningCount": 317,
+      "minimumDensity": 0.0003006766920458546,
+      "minimumInternalEnergy": 122686.98970967135,
+      "finalCFL": {
+        "minimum": 0.2088624085,
+        "maximum": 0.2088624085,
+        "average": 0.2088624085
+      },
+      "originalMappedFaces": 2448,
+      "physicsQualified": false
+    },
+    "cfl01": {
+      "elapsedSeconds": 139.67199999999866,
+      "iterations": 600,
+      "nativeCheckpointLocalIteration": 599,
+      "residuals": {
+        "rmsRho": -3.27846649,
+        "rmsRhoU": -0.1203320012,
+        "rmsRhoV": -1.172228622,
+        "rmsRhoW": -0.6258739042,
+        "rmsRhoE": 2.848123322
+      },
+      "nativeHeatLoad": 18398.903415775654,
+      "physicalAreaHeatPower": 18583.294383760407,
+      "nonphysicalReconstructionWarningCount": 718,
+      "minimumDensity": 1.382926449385734e-06,
+      "minimumInternalEnergy": 124637.32691031648,
+      "finalCFL": {
+        "minimum": 0.05,
+        "maximum": 0.05,
+        "average": 0.05
+      },
+      "originalMappedFaces": 2448,
+      "physicsQualified": false
+    }
+  },
+  "cflCap50ImprovementLog10": {
+    "rmsRho": -1.2610327370000003,
+    "rmsRhoE": -1.2642002280000002
+  },
+  "cflCap50ScreenPassed": false,
+  "cflCap50OriginalFaceDifferences": {
+    "pressure": {
+      "areaWeightedRelativeL1": 0.03257115123961969,
+      "maximumAbsolute": 767.7688874672422
+    },
+    "heatFlux": {
+      "areaWeightedRelativeL1": 0.285126578829615,
+      "maximumAbsolute": 62908.54745432793
+    },
+    "fluidNodeTemperature": {
+      "areaWeightedRelativeL1": 0.00017697849594318577,
+      "maximumAbsolute": 2.9778975629267848
+    }
+  },
+  "defaultCFLChanged": false,
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "inputSHA256": {
+    "tests/auditSU2V111.py": "647dd36f1aeca9379047933dfc62f35137b583652482cffa5c888e245d5566a7",
+    "scripts/analyzeSU2DualVolumes.py": "817f0a5adb85636c77a23f2254608631d82fe1e24af3dd09f6c3cd619db5137a",
+    "outputs/v111_validation/dual_volume.npy": "98f1268d86d533a8ec1f3672df51bc2cda7019a73d54fcee6080d8075404f945",
+    "outputs/v109_validation/rocket_seed01/restart_flow.csv": "02193e28689cb99d28459cf85afe5055b9af2e2aec984fcd8fb86133f602ad2f",
+    "outputs/v111_validation/first_probe01/engine_process.json": "f7d16b042bff6710416b58d07fb69236f8ee6a1a511f371b19ea48ef8fcac6c4",
+    "outputs/v111_validation/first_probe01/case.cfg": "f2ca9f6d1683d8b51ee29f5805c79207e277785901d5bb69b2f1bf74861156ff",
+    "outputs/v111_validation/first_probe01/history.csv": "0a6d6e9108e239d3c33ed1eb149087dc3a8637b79a6ffcb72350d7765d5d8bcb",
+    "outputs/v111_validation/first_probe01/surface_flow.vtk": "0ac1aa32ef8e52e1b3dedb07be880d026664c49e61fad1699ef4a8df25f7d160",
+    "outputs/v111_validation/first_probe01/restart_flow.csv": "9bba271673971d269909e1506c61dde6d294422583d2ce0d02d2abb9e5dd65bc",
+    "outputs/v111_validation/control01/engine_process.json": "2ef4acfb972f9fb5a45279ce55c0d1bb0f291be6c3c5a7001a6ee3bacb9f50ad",
+    "outputs/v111_validation/control01/case.cfg": "32d8dcaeea2cf66d5a097559c9647e8710eb9836abb360ceda819cf90ebbea6b",
+    "outputs/v111_validation/control01/history.csv": "b1a7431113b4be229c98b04dba51e8d1c783e7dec5d3e1bc755ffc3018e99a9d",
+    "outputs/v111_validation/control01/surface_flow.vtk": "d79333d43c278dcddb69bd5904b1c61db0ff86981c4e7dbed7a246cb9e618e23",
+    "outputs/v111_validation/control01/restart_flow.csv": "644562c87938187819632c1edcec1e489ef54bc9c4935723aff74c51c0c7ab34",
+    "outputs/v111_validation/cfl01/engine_process.json": "9c4aef932e6f478075a0a6e4a2705f4cca5ea8a66edb3648a1a555ae15518a2e",
+    "outputs/v111_validation/cfl01/case.cfg": "4345707c241ee562681ec36d892cae307f3590d17c88a2c540f6e45d39570fe2",
+    "outputs/v111_validation/cfl01/history.csv": "92845f6b5b696245e6e372c532049106c12e1736adfce918cec55a91ec7257ea",
+    "outputs/v111_validation/cfl01/surface_flow.vtk": "d0504cff98b3330e04998b0595f21b3527c7fca3588d46ed11de3eaba44a2909",
+    "outputs/v111_validation/cfl01/restart_flow.csv": "3aac3d70f26396107fde35a794bb41666d3ec5a2946495dfea27d4e3b24944dd"
+  }
+}

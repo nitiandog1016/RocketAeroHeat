@@ -51,8 +51,17 @@ try
     relative=abs(hf(candidates)-result.reconstructedEngineHeatPowerRaw)/max(abs(result.reconstructedEngineHeatPowerRaw),1);
     matches=candidates(relative<2e-6);audit.heatLoadCandidateCount=numel(matches);
     audit.status='history-audited-checkpoint-unconfirmed';audit.reason='保存负荷无法唯一对应输出时刻；显示迭代保持未知。';
-    if numel(matches)~=1,return;end
-    k=matches(1);audit.checkpointIteration=iteration(k);audit.checkpointResiduals=residual(k,:);
+    native=identifySU2NativeCheckpoint(folder,receipt,config);audit.nativeCheckpointIdentity=native;
+    if native.enabled
+        if ~native.confirmed,audit.reason=native.reason;return;end
+        k=find(iteration==native.localIteration);assert(isscalar(k),'具名迭代不在完整历史中。');
+        assert(abs(hf(k)-result.reconstructedEngineHeatPowerRaw)/max(abs(hf(k)),1)<2e-6,'具名场与同迭代热负荷不一致。');
+        audit.checkpointIdentityMethod='native-indexed-pair-SHA-and-EOS';
+    else
+        if numel(matches)~=1,return;end
+        k=matches(1);audit.checkpointIdentityMethod='unique-native-heat-load-and-EOS';
+    end
+    audit.checkpointIteration=iteration(k);audit.checkpointResiduals=residual(k,:);
     audit.checkpointResidualPassed=iteration(k)>=start && all(residual(k,:)<threshold);
     audit.heatLoadMatchRelativeError=abs(hf(k)-result.reconstructedEngineHeatPowerRaw)/max(abs(hf(k)),1);
     % 热负荷相近不够：保存的体场和壁面文件须同态；二维/三维均用实际列数处理。
@@ -74,7 +83,7 @@ try
     audit.wallEOSTemperatureError=max(abs(wall.temperatureRaw./temperature(ids)-1));
     assert(max([audit.wallEOSPressureError audit.wallEOSTemperatureError])<2e-6,'保存壁面与体场不同态。');
     audit.checkpointIdentityConfirmed=true;audit.status='checkpoint-and-history-audited';
-    audit.reason='唯一原生负荷匹配及重启动EOS一致；残差通过与物理资格仍分别判断。';
+    audit.reason='保存迭代已绑定且重启动EOS一致；残差通过与物理资格仍分别判断。';
 catch ex
     audit.status='evidence-rejected';audit.reason=ex.message;
     audit.checkpointIdentityConfirmed=false;audit.checkpointResidualPassed=false;audit.terminalResidualPassed=false;

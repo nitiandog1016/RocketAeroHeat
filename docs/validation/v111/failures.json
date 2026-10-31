@@ -1,0 +1,15 @@
+{
+  "engineProcessFailures": [],
+  "matlabProcessFailures": [],
+  "rejectedNumericalCandidates": [
+    {"name":"first_probe01","exitCode":0,"reason":"MUSCL disabled removes reconstruction warnings but increases energy integrated norm by 422.635494 and volume-weighted rate norm by 14.992533.","decision":"No warmup/restore jobs executed; retain original high-order method."},
+    {"name":"cfl01","exitCode":0,"reason":"CFL cap 50 worsens final density and energy log residuals by 1.261033 and 1.264200 against paired cap-5 control.","decision":"Fails predeclared 0.3-log improvement screen; keep cap 5, review mechanism before further numerical trials."}
+  ],
+  "python": [
+    {"name":"analytic geometry test","reason":"dual_volumes stacked an empty cell-type selection on single-type cube/prism fixtures.","resolution":"Skip empty cell types; actual mixed rocket geometry report remains bound to original source.","source":"source_versions/analyzeSU2DualVolumes.py.72452eae559d8a69.raw"},
+    {"name":"comparison report","reason":"NumPy structured CSV header exposes Min_CFL/Max_CFL/Avg_CFL rather than MinCFL/MaxCFL/AvgCFL.","resolution":"Correct field lookup and reuse existing actual results.","source":"source_versions/auditSU2V111.py.e65fc9e5cfdda6c1.raw"}
+  ],
+  "numericalFieldsAlteredToPassTests": false,
+  "physicsQualified": false,
+  "newQualifiedArea": 0
+}
