@@ -21,7 +21,7 @@ def validate_source(folder,c,init):
     return validate_source_artifacts(folder,init)
 
 
-def validate_source_artifacts(folder,init):
+def validate_source_artifacts(folder,init,initial_state_validator=None):
     """核验不可变源场与阶段证据；调用者分别实施严格续算或显式数值对照配置规则。"""
     source=Path(init['sourceDirectory']).resolve();source.relative_to(ROOT/'outputs');assert source!=folder
     r=read(source/'engine_process.json');audit=read(source/'sst_state_audit.json')
@@ -39,7 +39,12 @@ def validate_source_artifacts(folder,init):
     for stem,ext in [('restart_flow','csv'),('surface_flow','vtk')]:
         name=stem+'_%06d.'%step+ext
         assert sha(source/name)==r['outputSHA256'][name]==r['outputSHA256'][stem+'.'+ext]
-    assert sha(folder/'initial_flow.csv')==sha(source/'restart_flow.csv')==init['initialStateSHA256']
+    assert sha(folder/'initial_flow.csv')==init['initialStateSHA256']
+    if initial_state_validator is None:
+        assert sha(folder/'initial_flow.csv')==sha(source/'restart_flow.csv')
+    else:
+        # 显式初场研究必须另外逐字段核对；普通同配置续算仍要求原字节相等。
+        initial_state_validator(folder,source,init)
     extended=r['physicsModel'].get('outputStateContract')==PHASE_OUTPUT
     assert init['sourceStateHasNativePrimitive']==extended
     state(folder/'initial_flow.csv',True,extended)

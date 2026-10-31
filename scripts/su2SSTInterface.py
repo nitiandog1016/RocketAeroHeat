@@ -6,6 +6,13 @@ from scipy.spatial import cKDTree
 
 
 PHASE_OUTPUT='native-noncompact-flow-primitive-before-turbulence-v1'
+SPATIAL_OUTPUT='native-implicit-rhs-and-local-pseudotime-v1'
+
+
+def spatial_columns(nd):
+    """原生积分右端/本次局部步长及下一次CFL；绝不能称作同阶段物理误差。"""
+    return ['Residual_Density']+['Residual_Momentum_'+s for s in ['x','y','z'][:nd]]+[
+        'Residual_Energy','Residual_TKE','Residual_Omega','Delta_Time','CFL','Turb_Delta_Time','Turb_CFL']
 
 
 def phase_columns(nd):
@@ -15,7 +22,7 @@ def phase_columns(nd):
         'Laminar_Viscosity']+['Skin_Friction_Coefficient_'+s for s in axes]+['Heat_Flux','Y_Plus','Eddy_Viscosity']
 
 
-def state(path, turbulent, phase_output=False):
+def state(path, turbulent, phase_output=False, spatial_output=False):
     """按具名列绑定ρE、k/ω；只有显式合同才读取同次保存的原生primitive。"""
     with Path(path).open(encoding='utf-8-sig') as f:
         keys=next(csv.reader(f))
@@ -26,6 +33,9 @@ def state(path, turbulent, phase_output=False):
     if phase_output:
         assert turbulent
         expected+=phase_columns(nd)
+    if spatial_output:
+        assert turbulent and phase_output
+        expected+=spatial_columns(nd)
     assert keys==expected, '重启动列名/模型不匹配：'+str(keys)
     a=np.loadtxt(str(path),delimiter=',',skiprows=1)
     assert a.ndim==2 and a.shape[1]==len(keys) and np.isfinite(a).all()

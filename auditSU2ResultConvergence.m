@@ -195,6 +195,17 @@ try
             assert(isequal(study.numericalChanges,lineage.numericalChanges));
             assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
             audit.numericalStudy=lineage;
+        elseif strcmp(lineage.kind,'same-mesh-SST-omega-pocket-initialization-study')
+            % 同源初场对照只改变明确节点的omega；不冒充物理方法或不中断续算。
+            assert(lineage.sameMesh && lineage.samePhysicsAndNumerics && lineage.localIterationStartsAt==0);
+            assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
+            study=receipt.physicsModel.initializationStudy;
+            assert(strcmp(study.studyID,'v128-base-omega-floor-logharmonic-initial-guess'));
+            assert(strcmp(study.studyID,lineage.studyID) && strcmp(study.variant,lineage.variant));
+            assert(strcmp(study.changedField,lineage.changedField) && ismember(study.variant,{'control','repaired'}));
+            assert(lineage.sourceLocalIteration==149 && audit.checkpointIteration==9 && size(history,1)==10);
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            audit.initializationStudy=lineage;
         else
             assert(strcmp(lineage.kind,'same-mesh-laminar-to-SST-initial-guess'));
             assert(lineage.newPhysicsLocalIterationStartsAt==0 && ~lineage.samePhysicsAndNumerics);

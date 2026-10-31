@@ -6,7 +6,7 @@ from scipy.spatial import cKDTree
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from prepareSU2CheckpointContinuation import sha,read,config
-from su2SSTInterface import wall_geometry,state,PHASE_OUTPUT
+from su2SSTInterface import wall_geometry,state,PHASE_OUTPUT,SPATIAL_OUTPUT
 def vtk_tokens(path):
     """只读本项目要求的原生ASCII节点场，不按文件名猜物理含义。"""
     with path.open() as f:
@@ -37,7 +37,9 @@ def audit(folder,actual_surface=False):
     for name in ('restart_flow.csv','surface_flow.vtk','history.csv'):
         assert sha(folder/name)==r['outputSHA256'][name]
     extended=r['physicsModel'].get('outputStateContract')==PHASE_OUTPUT
-    a,cols,nd,_,_,_=state(folder/'restart_flow.csv',True,extended)
+    spatial=r['physicsModel'].get('spatialOutputContract')
+    assert spatial in (None,SPATIAL_OUTPUT)
+    a,cols,nd,_,_,_=state(folder/'restart_flow.csv',True,extended,spatial is not None)
     rho=a[:,cols.index('Density')];E=a[:,cols.index('Energy')]/rho
     uv=np.column_stack([a[:,cols.index('Momentum_'+v)]/rho for v in ['x','y','z'][:nd]])
     k=a[:,cols.index('Turb_Kin_Energy')];w=a[:,cols.index('Omega')]
@@ -59,7 +61,8 @@ def audit(folder,actual_surface=False):
     T=stageThermal*(gamma-1)/R;p=rho*R*T
     primitiveEOS=None
     if extended:
-        assert c['WRT_RESTART_COMPACT']=='NO' and c['VOLUME_OUTPUT']=='(COORDINATES, SOLUTION, PRIMITIVE)'
+        expectedOutput='(COORDINATES, SOLUTION, PRIMITIVE, RESIDUAL, TIMESTEP)' if spatial else '(COORDINATES, SOLUTION, PRIMITIVE)'
+        assert c['WRT_RESTART_COMPACT']=='NO' and c['VOLUME_OUTPUT']==expectedOutput
         T=a[:,cols.index('Temperature')];p=a[:,cols.index('Pressure')]
         assert min(T)>0 and min(p)>0
         primitiveEOS=float(max(abs(p/(rho*R*T)-1)));assert primitiveEOS<2e-12

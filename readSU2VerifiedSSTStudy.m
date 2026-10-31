@@ -11,13 +11,16 @@ assert(startsWith(lower(folder),lower([fullfile(root,'outputs') filesep])),'请�
 raw=fileread(fullfile(folder,'engine_process.json'));receipt=jsondecode(raw);
 assert(strcmp(receipt.status,'terminal') && receipt.exitCode==0 && ~receipt.timedOut && ~receipt.cancelled,'原引擎未成功结束。');
 assert(strcmpi(folder,char(java.io.File(receipt.request.workDirectory).getCanonicalPath())),'必须从原运行目录查看。');
-assert(strcmp(receipt.runtimeFlavor,'official') && isfield(receipt.physicsModel,'numericalStudy'),'缺少实际数值对照身份。');
+isNumerical=isfield(receipt.physicsModel,'numericalStudy');isInitial=isfield(receipt.physicsModel,'initializationStudy');
+assert(strcmp(receipt.runtimeFlavor,'official') && xor(isNumerical,isInitial),'缺少唯一实际数值/初场对照身份。');
 for name={'case.cfg','mesh.su2','case_manifest.json','sst_initialization.json','sst_contract.json'}
     file=fullfile(folder,name{1});token=regexp(raw,[regexptranslate('escape',jsonencode(file)) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
     assert(numel(token)==1 && strcmp(sha(file),token{1}{1}),'原输入身份缺失或改变：%s',name{1});
 end
 manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));f=manifest.flight;init=manifest.initialization;
-assert(strcmp(manifest.thermalBoundary.mode,'isothermal') && strcmp(init.kind,'same-mesh-SST-CFL-cap-comparison'));
+assert(strcmp(manifest.thermalBoundary.mode,'isothermal'));
+if isNumerical,assert(strcmp(init.kind,'same-mesh-SST-CFL-cap-comparison'));
+else,assert(strcmp(init.kind,'same-mesh-SST-omega-pocket-initialization-study'));end
 assert(isequaln(manifest.sst,receipt.physicsModel));
 assert(~isfield(state.cfg.su2,'wallThermalMode') || strcmp(state.cfg.su2.wallThermalMode,'isothermal'),'当前热边界不同。');
 actual=[f.Mach,f.alpha,f.beta,f.temperature,f.pressure,f.wallTemperature];
@@ -48,7 +51,8 @@ result=attachSU2ThermalBoundary(result,manifest.thermalBoundary);
 result.thermalStateAudit=readSU2SSTStateAudit(folder,receipt);
 result.convergenceAudit=auditSU2ResultConvergence(folder,result);
 assert(result.convergenceAudit.checkpointIdentityConfirmed,result.convergenceAudit.reason);
-assert(isfield(result.convergenceAudit,'numericalStudy'),'未审核的数值方案不能进入查看器。');
+assert(isfield(result.convergenceAudit,'numericalStudy') || isfield(result.convergenceAudit,'initializationStudy'), ...
+    '未审核的数值/初场方案不能进入查看器。');
 % 旧源清单可能保留源任务输出设置；实际步数/频率仅从已锁定的当前配置读取。
 configuration=fileread(fullfile(folder,'case.cfg'));runControls=struct;
 for item={'ITER','OUTPUT_WRT_FREQ'}

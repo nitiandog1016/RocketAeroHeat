@@ -34,6 +34,17 @@ switch info.flavor
                 info.method=[info.method '；同源数值方案：' label '，伪时间重置'];
                 info.physicsCaption=[info.physicsCaption ' / ' label];
             end
+            if isfield(p,'initializationStudy')
+                % 启发式初猜只改变迭代起点，不称为新的湍流物理模型或合格解。
+                study=p.initializationStudy;assert(strcmp(study.studyID,'v128-base-omega-floor-logharmonic-initial-guess'));
+                switch study.variant
+                    case 'control',label='原始初场控制';
+                    case 'repaired',label='尾缘146点ω正值调和初猜';
+                    otherwise,error('未知SST初场对照。');
+                end
+                info.method=[info.method '；初场对照：' label '，物理/数值参数不改，伪时间重置；不代表物理闭合'];
+                info.physicsCaption=[info.physicsCaption ' / ' label];
+            end
         end
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';

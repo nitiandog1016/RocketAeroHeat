@@ -1,0 +1,96 @@
+{
+  "interfacePassed": true,
+  "nodes": 349206,
+  "wallNodes": 9878,
+  "dimension": 3,
+  "model": {
+    "schemaVersion": 1,
+    "model": "SST-2003m",
+    "assumption": "fully-turbulent; transition unknown",
+    "intensity": 0.01,
+    "viscosityRatio": 10.0,
+    "Prt": 0.9,
+    "provenance": "全湍流受控研究假设；非飞行测量，转捩未知",
+    "kInfinity": 341.35543329143684,
+    "omegaInfinity": 42598.110764383935,
+    "wallTreatment": "resolved smooth wall; no wall function",
+    "thermodynamics": "calorically-perfect ideal gas",
+    "turbulentConvection": "first-order scalar upwind",
+    "compressibilityCorrection": "none",
+    "physicsQualified": false,
+    "newQualifiedArea": 0,
+    "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1",
+    "initializationSHA256": "cdc63640edbc7cf4708a79709eab67f861b0365b313ec0fb9d0d4e06d2584aae",
+    "configurationSHA256": "b4c2f008a26db3ad668e57f6b432b04be77ddc881741875b9bec2f9c974c2c51",
+    "meshSHA256": "9db7bf9c5aedda3dda43a79820f3e76887b48a12a113ba0370674464395a876f",
+    "spatialOutputContract": "native-implicit-rhs-and-local-pseudotime-v1",
+    "spatialDiagnosticOnly": true
+  },
+  "thermalStatePhase": "native-noncompact-flow-primitive-before-turbulence-v1",
+  "diagnosticOnly": true,
+  "fullPrimitiveEOSRelativeError": 1.3322676295501878e-15,
+  "nativePrecisionHeatGradientError": 1.1467977099946673e-10,
+  "savedCurrentKTemperatureRangeK": [
+    178.4439858708516,
+    1440.002919718799
+  ],
+  "elapsedSeconds": 68.68700000000536,
+  "checkpointLocalIteration": 0,
+  "finalResiduals": [
+    -5.071266725,
+    1.041821233,
+    -1.681414302,
+    6.734049288
+  ],
+  "originalResidualThresholdPassed": false,
+  "minimumDensity": 0.0002083383932676774,
+  "minimumThermalInternalEnergy": 128057.14569616853,
+  "kRange": [
+    1e-10,
+    29728.98976475341
+  ],
+  "omegaRange": [
+    0.0001,
+    2992253987353.226
+  ],
+  "temperatureRangeK": [
+    178.444201851167,
+    1440.003332417886
+  ],
+  "EOSRelativeError": 4.820698785712452e-07,
+  "heatGradientRelativeError": 4.966956911664679e-07,
+  "yPlusRelativeError": 6.153632192022463e-07,
+  "yPlusPercentiles": {
+    "p50": 0.06823115642938216,
+    "p95": 0.7476303169483199,
+    "p99": 0.8221244677636506,
+    "max": 0.9621424649593838
+  },
+  "omegaBoundaryLagRelativeDifference": 1.5525247754055727e-11,
+  "wallKRange": [
+    1e-10,
+    1e-10
+  ],
+  "nativeWallKFloor": 1e-10,
+  "wallEddyToLaminarMaximum": 4.0229089387390225e-16,
+  "last25HeatPowerRelativeChange": null,
+  "nativeHeatPowerW": 64337.56568225065,
+  "newQualifiedArea": 0,
+  "physicsQualified": false,
+  "sourceSHA256": {
+    "scripts\\auditSU2SSTState.py": "28d2a56335423698f60804da724c099f59a369f62e8f0c8df85d3630894f60a5",
+    "E:\\RocketAeroHeat\\scripts\\su2SSTInterface.py": "6a931bbc7384ea485c81f69da5475d103592b79d79feff455ee2c9c39333c49f",
+    "E:\\RocketAeroHeat\\outputs\\v128_validation\\spatial01\\engine_process.json": "71bafb8c1faf7fe172fd81196ffe4760a82d001dd5821e27c4ec4b9de5ede989"
+  },
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715642,
+  "originalFaceHeatPowerW": 64560.26787201725,
+  "heatComparisonSource": "E:\\RocketAeroHeat\\outputs\\v127_validation\\control\\surface_flow_000149.vtk",
+  "faceMeanYPlusAbove1AreaFraction": 0.0,
+  "diagnosticSourceToOutputHeatRelativeL1Change": 4.757496467180943e-05,
+  "screeningGates": {
+    "heatL1Below10Percent": true,
+    "last25HeatPowerBelow2Percent": false,
+    "yPlusP99Below1": true
+  }
+}
