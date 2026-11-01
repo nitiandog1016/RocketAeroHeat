@@ -1,0 +1,80 @@
+{
+  "version": "5.8.0",
+  "flavor": "fixed-boundary-keep-seeds",
+  "executable": "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-seeds\\local_tetra_optimize.exe",
+  "executableSHA256": "5f433144188c3ffdefd91fef77e5a89b378693881bcca3fb493eebd5fb223380",
+  "upstreamLibrary": "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\lib\\libmmg3d.a",
+  "upstreamLibrarySHA256": "80ddfff097b6d78e359799212cdb0678b6595b976e27601a6ae242fe2bc75158",
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\lib\\libmmg3d.a": "80ddfff097b6d78e359799212cdb0678b6595b976e27601a6ae242fe2bc75158",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe": "315c23bc298aba9eaf2aece174fa7fcb0e404247176663e6a4c7707a60f8e444",
+    "E:\\RocketAeroHeat\\third_party\\mmg\\local_tetra_remesh.cpp": "e837268615ddefe41c483057689c07d09705f754507738c3984f9fde1c1a86a8",
+    "E:\\RocketAeroHeat\\scripts\\buildMMGSeedRuntime.py": "627bf120f0d0ea44c6e4148273d1016d54e50dc96feea019c5ebabb80761d573",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\runtime.json": "52acae833211857ba6ea0b7801f6a97360e398731627268a2917b0656ce69cbb",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\git_log_mmg.h": "db26c83a9d368d449df5ed8798b36fa1e8190ec00be6012edee0ee8fa1d11d54",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\libmmgtypes.h": "5a551dd62573e2e170d022eadb75eeb00543f25adfdca21d00e16a092b26a405",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgcmakedefines.h": "88345246dca6f9e9a174dbec327c11b114caeb3735a7b0257967de054c0c1aa6",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgcmakedefinesf.h": "12ee6e37191f1f13e007a9c78ccd432543bba4d5e4e80292ecac091582d67dd6",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgversion.h": "de71ef5a6f560c98b2dbf972965971c33b08f71b54bb0ed00c93f35b456f421d",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmg_export.h": "e7f1bd4d812dc7ddfacc1580780672e753e50d6ce2c98a8fa21c58609fe80eb4",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\mmg3d\\libmmg3d.h": "4fc5bb3251cafbdb66b2bf33c641e1530514e1fb9d94cd26c0a1c4ed20685443",
+    "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\mmg3d\\mmg3d_export.h": "b2bb5ce344f0755e504c9d3183be983b0220bc3498433925adc05691c3e625ea"
+  },
+  "build": {
+    "command": [
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe",
+      "-std=c++17",
+      "-O2",
+      "-static",
+      "-DRAH_MMG_KEEP_SEEDS=1",
+      "-IE:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include",
+      "E:\\RocketAeroHeat\\third_party\\mmg\\local_tetra_remesh.cpp",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\lib\\libmmg3d.a",
+      "-o",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-seeds\\local_tetra_optimize.exe"
+    ],
+    "exitCode": 0,
+    "seconds": 0.8910000000032596,
+    "peakFamilyRSSBytes": 76816384,
+    "stopReason": null,
+    "sourceSHA256": {
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\lib\\libmmg3d.a": "80ddfff097b6d78e359799212cdb0678b6595b976e27601a6ae242fe2bc75158",
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe": "315c23bc298aba9eaf2aece174fa7fcb0e404247176663e6a4c7707a60f8e444",
+      "E:\\RocketAeroHeat\\third_party\\mmg\\local_tetra_remesh.cpp": "e837268615ddefe41c483057689c07d09705f754507738c3984f9fde1c1a86a8",
+      "E:\\RocketAeroHeat\\scripts\\buildMMGSeedRuntime.py": "627bf120f0d0ea44c6e4148273d1016d54e50dc96feea019c5ebabb80761d573",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\runtime.json": "52acae833211857ba6ea0b7801f6a97360e398731627268a2917b0656ce69cbb",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\git_log_mmg.h": "db26c83a9d368d449df5ed8798b36fa1e8190ec00be6012edee0ee8fa1d11d54",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\libmmgtypes.h": "5a551dd62573e2e170d022eadb75eeb00543f25adfdca21d00e16a092b26a405",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgcmakedefines.h": "88345246dca6f9e9a174dbec327c11b114caeb3735a7b0257967de054c0c1aa6",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgcmakedefinesf.h": "12ee6e37191f1f13e007a9c78ccd432543bba4d5e4e80292ecac091582d67dd6",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgversion.h": "de71ef5a6f560c98b2dbf972965971c33b08f71b54bb0ed00c93f35b456f421d",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmg_export.h": "e7f1bd4d812dc7ddfacc1580780672e753e50d6ce2c98a8fa21c58609fe80eb4",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\mmg3d\\libmmg3d.h": "4fc5bb3251cafbdb66b2bf33c641e1530514e1fb9d94cd26c0a1c4ed20685443",
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\mmg3d\\mmg3d_export.h": "b2bb5ce344f0755e504c9d3183be983b0220bc3498433925adc05691c3e625ea"
+    },
+    "sourceStableAfter": {
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\lib\\libmmg3d.a": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe": true,
+      "E:\\RocketAeroHeat\\third_party\\mmg\\local_tetra_remesh.cpp": true,
+      "E:\\RocketAeroHeat\\scripts\\buildMMGSeedRuntime.py": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\runtime.json": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\git_log_mmg.h": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\libmmgtypes.h": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgcmakedefines.h": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgcmakedefinesf.h": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmgversion.h": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\common\\mmg_export.h": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\mmg3d\\libmmg3d.h": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\mmg\\5.8.0-local\\build\\include\\mmg\\mmg3d\\mmg3d_export.h": true
+    },
+    "outputSHA256": {
+      "stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "status": "terminal"
+  },
+  "noinsert": true,
+  "nomove": false,
+  "noswap": false,
+  "physicsQualified": false,
+  "fileLengthBytes": 3660430
+}

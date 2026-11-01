@@ -1,5 +1,6 @@
 """MMG原始连接输入/输出与固定区域恢复；仅按显式reference匹配，不做最近邻补值。"""
 import json
+from pathlib import Path
 import numpy as np
 from cgalTetrahedralContract import faces_and_neighbors
 from prepareCGALRemeshingRuntime import ROOT,sha
@@ -45,11 +46,13 @@ def restore(P,T,F,selected,fixed,raw):
         originalRequiredTets=int(sum(~selected)),nativeRequiredTets=int(sum(req)),
         nativeNodes=len(Q),nativeTets=len(U),freeOutputNodes=len(free),physicsQualified=False,newQualifiedArea=0)
 
-def execute(folder,P,T,selected,timeout,sourcePaths):
+def execute(folder,P,T,selected,timeout,sourcePaths,runtimePath=None):
     folder.mkdir(parents=True,exist_ok=False);inp=folder/'input.dat';F,fixed,refs=write_input(inp,P,T,selected)
-    runtime=json.loads((DEST/'runtime.json').read_text());exe=DEST/'local_tetra_remesh.exe'
+    runtimePath=DEST/'runtime.json' if runtimePath is None else runtimePath
+    runtimePath=Path(runtimePath)
+    runtime=json.loads(runtimePath.read_text());exe=Path(runtime['executable'])
     assert sha(exe)==runtime['executableSHA256']
-    paths=sourcePaths+[inp,exe,DEST/'runtime.json',ROOT/'scripts/mmgLocalInterface.py',ROOT/'scripts/buildCGALRemeshingRuntime.py',
+    paths=sourcePaths+[inp,exe,runtimePath,ROOT/'scripts/mmgLocalInterface.py',ROOT/'scripts/buildCGALRemeshingRuntime.py',
         ROOT/'scripts/cgalTetrahedralContract.py',ROOT/'third_party/mmg/local_tetra_remesh.cpp']
     locked={p.resolve().as_posix():sha(p) for p in paths}
     receipt=run([str(exe),str(inp),str(folder/'native')],folder/'process',timeout,locked)

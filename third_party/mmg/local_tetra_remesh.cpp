@@ -59,6 +59,10 @@ int main(int argc,char** argv) {
     ok(MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_angle,0));
     ok(MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_nofem,1));
     ok(MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_optim,1));
+#ifdef RAH_MMG_KEEP_SEEDS
+    // 新研究入口保留预先构造的内部点，只允许移动/翻边；旧入口编译默认行为不变。
+    ok(MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_noinsert,1));
+#endif
     save(mesh,std::string(argv[2])+"_import.dat");
     int result=MMG3D_mmg3dlib(mesh,met);
     std::cout<<"MMG_NATIVE_STATUS "<<result<<'\n';
