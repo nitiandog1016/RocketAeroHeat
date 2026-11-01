@@ -1,0 +1,35 @@
+{
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe",
+    "-std=c++17",
+    "-O1",
+    "-frounding-math",
+    "-DCGAL_DISABLE_GMP=1",
+    "-static",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\cgal\\6.0.1-native\\cgal\\include",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\cgal\\6.0.1-native\\boost",
+    "E:\\RocketAeroHeat\\third_party\\cgal\\local_tetra_remesh.cpp",
+    "-o",
+    "E:\\RocketAeroHeat\\tools\\runtime\\cgal\\6.0.1-native\\local_tetra_remesh.exe"
+  ],
+  "exitCode": 0,
+  "seconds": 18.139999999999418,
+  "peakFamilyRSSBytes": 1745383424,
+  "stopReason": null,
+  "sourceSHA256": {
+    "third_party/cgal/local_tetra_remesh.cpp": "053265f48fb82c426ef54fce92b82cdab8cf22a8327ea88c07138f9a2a372062",
+    "scripts/buildCGALRemeshingRuntime.py": "610fa1a581f4e1fc654e9a2a14c4c5809d461e39b195da4b925cf727e9241840",
+    "tools/runtime/su2-thermal-build/toolchain/w64devkit/bin/g++.exe": "315c23bc298aba9eaf2aece174fa7fcb0e404247176663e6a4c7707a60f8e444",
+    "tools/runtime/cgal/6.0.1-native/headers.json": "7c5fb7e68f26d97ded84e92615cd41a05fa1c2c3fdde70ec17472090528ec2c1"
+  },
+  "sourceStableAfter": {
+    "third_party/cgal/local_tetra_remesh.cpp": true,
+    "scripts/buildCGALRemeshingRuntime.py": true,
+    "tools/runtime/su2-thermal-build/toolchain/w64devkit/bin/g++.exe": true,
+    "tools/runtime/cgal/6.0.1-native/headers.json": true
+  },
+  "outputSHA256": {
+    "stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "status": "terminal"
+}

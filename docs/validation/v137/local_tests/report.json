@@ -1,0 +1,123 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "convex_interior",
+      "passed": true,
+      "exactConnectivityImport": true,
+      "fixedBoundaryExact": true,
+      "frozenSubdomainExact": true,
+      "before": {
+        "nodes": 5,
+        "tets": 4,
+        "boundaryTriangles": 4,
+        "components": 1,
+        "tetVolume": 0.11785113019775792,
+        "convexHullVolume": 0.1178511301977579,
+        "relativeConvexHullGap": 1.1775693440128314e-16,
+        "directImportNecessaryConditions": true,
+        "scope": "necessary only; not a sufficient intersection/topology/quality/physics test"
+      },
+      "after": {
+        "nodes": 4,
+        "tets": 1,
+        "boundaryTriangles": 4,
+        "components": 1,
+        "tetVolume": 0.1178511301977579,
+        "convexHullVolume": 0.1178511301977579,
+        "relativeConvexHullGap": 0.0,
+        "directImportNecessaryConditions": true,
+        "scope": "necessary only; not a sufficient intersection/topology/quality/physics test"
+      },
+      "minimumSICNBefore": 0.002575300889578234,
+      "minimumSICNAfter": 1.0,
+      "nativeSeconds": 0.40600000000267755,
+      "filesSHA256": {
+        "input.mesh": "94dc268ea96c5314298032b3174b58baac3027765ce0cae4c760850193b18bd5",
+        "native_import.txt": "e3a1de4a2744c105449c0b37992a175c4a23c4ca9bb6762d9935131eaefa6b80",
+        "native_result.txt": "e452cba5aeab3ed0a23bdcf984aa645c8a26d73002a4558bb383a618d3a4a47e",
+        "process/process.json": "182e5602ec0e57128c6c28d85514f7bdc0d97769818c9697a94fd5c3cdc0f96a",
+        "process/stdout.log": "42c4cd8a2c242971ca74823e4a725d9473eea6372d8f2eb317c1b6507f33383c"
+      }
+    },
+    {
+      "case": "selected_subdomain",
+      "passed": true,
+      "exactConnectivityImport": true,
+      "fixedBoundaryExact": true,
+      "frozenSubdomainExact": true,
+      "before": {
+        "nodes": 6,
+        "tets": 5,
+        "boundaryTriangles": 6,
+        "components": 1,
+        "tetVolume": 0.23570226039551584,
+        "convexHullVolume": 0.23570226039551584,
+        "relativeConvexHullGap": 0.0,
+        "directImportNecessaryConditions": true,
+        "scope": "necessary only; not a sufficient intersection/topology/quality/physics test"
+      },
+      "after": {
+        "nodes": 5,
+        "tets": 2,
+        "boundaryTriangles": 6,
+        "components": 1,
+        "tetVolume": 0.2357022603955158,
+        "convexHullVolume": 0.23570226039551584,
+        "relativeConvexHullGap": 1.1775693440128312e-16,
+        "directImportNecessaryConditions": true,
+        "scope": "necessary only; not a sufficient intersection/topology/quality/physics test"
+      },
+      "minimumSICNBefore": 0.002575300889578234,
+      "minimumSICNAfter": 1.0,
+      "nativeSeconds": 0.21899999999732245,
+      "filesSHA256": {
+        "input.mesh": "c8baf9fb8d8371a1fafde17b3bc051c86bcf6a31ef690c47a1440684c62c5e5e",
+        "native_import.txt": "873a3107a421da55221963726a1f3ec0ba966abe73852f3af84e8a25b1ea5187",
+        "native_result.txt": "fd6708db348dc62cfab9331cd562f794790d4be975e0c13adc60e7d45a3327f9",
+        "process/process.json": "0511171ccc015844c983048674600067a58de252e4aa65fa2513472a93b1e8c2",
+        "process/stdout.log": "85f7eacc399141e67b23a0c115f0eff593e82d9ade56203a9148c3d20033feb2"
+      }
+    },
+    {
+      "case": "hollow_cube",
+      "passed": true,
+      "expectedVolume": 26,
+      "expectedHullVolume": 27,
+      "preflightRejected": true,
+      "nativeInvoked": false,
+      "report": {
+        "nodes": 64,
+        "tets": 156,
+        "boundaryTriangles": 120,
+        "components": 1,
+        "tetVolume": 26.000000000000046,
+        "convexHullVolume": 27.0,
+        "relativeConvexHullGap": 0.03703703703703533,
+        "directImportNecessaryConditions": false,
+        "scope": "necessary only; not a sufficient intersection/topology/quality/physics test"
+      },
+      "inputSHA256": "4e0fa810f3ee4674cb3a5038e0a66dcf4aafab7e0d7ae3b488f2cbb92e21ff4a"
+    }
+  ],
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "lockedSourceSHA256": {
+    "tests/testCGALLocalRemeshing.py": "2c4540b30d37e0e651822792a777bae3e5bdf311bc93d14ec0ad1c517ea521e4",
+    "scripts/cgalTetrahedralContract.py": "2b57de057ccbde0c61904f029da1af02e625ef923e3e0ed6c4612277b129f2f8",
+    "scripts/reviewSU2ExplicitQuality.py": "34cff292a6a8ba8198772a9c82107ee6b5d3cc46d32dbe32f969305ed912b422",
+    "scripts/buildCGALRemeshingRuntime.py": "610fa1a581f4e1fc654e9a2a14c4c5809d461e39b195da4b925cf727e9241840",
+    "third_party/cgal/local_tetra_remesh.cpp": "053265f48fb82c426ef54fce92b82cdab8cf22a8327ea88c07138f9a2a372062",
+    "tools/runtime/cgal/6.0.1-native/local_tetra_remesh.exe": "1da91f8596c332d37acd0e2b65ba35558ccda45d76d4e35be22ddb9342570f17",
+    "tools/runtime/cgal/6.0.1-native/runtime.json": "146e8678c1335bdacdbfd90f719818367affda5f119b44667f3e3b57bbb0d5f3"
+  },
+  "sourceStableAfter": {
+    "tests/testCGALLocalRemeshing.py": true,
+    "scripts/cgalTetrahedralContract.py": true,
+    "scripts/reviewSU2ExplicitQuality.py": true,
+    "scripts/buildCGALRemeshingRuntime.py": true,
+    "third_party/cgal/local_tetra_remesh.cpp": true,
+    "tools/runtime/cgal/6.0.1-native/local_tetra_remesh.exe": true,
+    "tools/runtime/cgal/6.0.1-native/runtime.json": true
+  }
+}
