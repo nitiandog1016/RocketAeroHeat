@@ -1,0 +1,96 @@
+Info    : Meshing 1D...
+Info    : Done meshing 1D (Wall 0.000255823s, CPU 0s)
+Info    : Meshing 2D...
+Info    : Done meshing 2D (Wall 0.000182867s, CPU 0s)
+Info    : Meshing 3D...
+Info    : 3D Meshing 1 volume with 1 connected component
+Info    : Input mesh hash f7d1e71b4597b3bf
+Info    : Creating an empty mesh with 14362 vertices
+Info    : Initialization of tet. mesh
+Info    : Delaunay of      14358 points on   2 threads - mesh.nvert: 4         
+Info    : Recovering 2356 missing facet(s)
+Info    : Recover Delaunay
+Info    : Steiner(s) point(s) were inserted
+Info    : 1 out of 2 volumes will be refined
+Info    : All volumes of the BRep were found and colorized accordingly
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Delaunay of      33608 points on   2 threads - mesh.nvert: 14368     
+Info    :           -      29895 points filtered
+Info    :           =       3713 points added
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Delaunay of      38596 points on   2 threads - mesh.nvert: 18081     
+Info    :           -      28925 points filtered
+Info    :           =       9671 points added
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Delaunay of      52070 points on   2 threads - mesh.nvert: 27752     
+Info    :           -      36470 points filtered
+Info    :           =      15600 points added
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Delaunay of      29509 points on   2 threads - mesh.nvert: 43352     
+Info    :           -      19550 points filtered
+Info    :           =       9959 points added
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Delaunay of       4823 points on   2 threads - mesh.nvert: 53311     
+Info    :           -       2333 points filtered
+Info    :           =       2490 points added
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Delaunay of        408 points on   1 threads - mesh.nvert: 55801     
+Info    :           -        111 points filtered
+Info    :           =        297 points added
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Delaunay of         26 points on   1 threads - mesh.nvert: 56098     
+Info    :           -          5 points filtered
+Info    :           =         21 points added
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Delaunay of          2 points on   1 threads - mesh.nvert: 56119     
+Info    :           -          1 points filtered
+Info    :           =          1 points added
+Info    : Computing interpolated mesh sizes...
+Info    : Done computing interpolated mesh sizes
+Info    : Improving      18182 tet. on   2 thrd (S & ER)
+Info    : Improving       5619 tet. on   2 thrd (S & ER)
+Info    : Improving       5076 tet. on   2 thrd (S & ER)
+Info    : Improving       4976 tet. on   2 thrd (S & ER)
+Info    : Improving       4935 tet. on   2 thrd (S & ER)
+Info    : Improving       4932 tet. on   2 thrd (S & ER)
+Info    : Improving       4926 tet. on   2 thrd (GSC)
+Info    : Improving       4679 tet. on   2 thrd (S & ER)
+Info    : Improving       4613 tet. on   2 thrd (S & ER)
+Info    : Improving       4602 tet. on   2 thrd (S & ER)
+Info    : Improving       4597 tet. on   2 thrd (S & ER)
+Info    : Improving       4596 tet. on   2 thrd (S & ER)
+Info    : Improving       4595 tet. on   2 thrd (GSC)
+Info    : Improving       4569 tet. on   2 thrd (S & ER)
+Info    : Improving       4560 tet. on   2 thrd (S & ER)
+Info    : Improving       4555 tet. on   2 thrd (S & ER)
+Info    : Improving       4555 tet. on   2 thrd (GSC)
+Info    : Improving       4552 tet. on   2 thrd (S & ER)
+Info    : Improving       4550 tet. on   2 thrd (S & ER)
+Info    : Improving       4550 tet. on   2 thrd (GSC)
+Info    : Improving       4549 tet. on   2 thrd (S & ER)
+Info    :  	Final tet. mesh contains 347554 tetrahedra
+Info    :  	Final tet. mesh contains 56120 vertices
+Info    : tEmptyMesh  	 = 	    0.040
+Info    : tVerifyBnd  	 = 	    0.008
+Info    : tBndRecovery	 = 	    0.075
+Info    : tConvertMesh	 = 	    0.008
+Info    : tRefine     	 = 	    0.230
+Info    : tOptimize   	 = 	    4.476
+Info    : Done meshing 3D (Wall 4.88297s, CPU 7.42188s)
+Info    : 56114 nodes 333706 elements
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\meshSU2ExplicitTransition.py", line 135, in <module>
+    if __name__=='__main__':main()
+  File "E:\RocketAeroHeat\scripts\meshSU2ExplicitTransition.py", line 112, in main
+    if args.worker:build(folder,prepared);return
+  File "E:\RocketAeroHeat\scripts\meshSU2ExplicitTransition.py", line 105, in build
+    assert len(used)<=400000 and len(W)+len(Q)+len(T)<=900000
+AssertionError

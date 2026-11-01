@@ -1,0 +1,111 @@
+"""先审核显式金字塔与闭合三角接口，再由固定Gmsh填充纯四面体外域。"""
+from pathlib import Path
+import argparse,json,os,subprocess,sys,time
+import numpy as np
+from scipy.io import savemat
+from meshSU2HybridTransition import prepare
+from meshSU2HybridVolume import RUNTIME,wedge_jacobian_min
+from su2PyramidGeometry import pyramid_geometry
+from auditSU2HybridTopology import audit,polyvolume
+from optimizeSU2FanExterior import sicn
+from runCGALSurfaceAudit import audit_surface
+from prepareSU2CheckpointContinuation import ROOT,sha,read
+
+def write(p,v):p.write_text(json.dumps(v,indent=2)+'\n',encoding='utf8')
+
+def explicit_pyramids(P,inwardQuads):
+    """四边基底保持原连接；顶点沿外法向固定移动0.5*sqrt(面心扇面积)，不搜索参数。"""
+    base=inwardQuads[:,[0,3,2,1]];q=P[base];center=q.mean(axis=1);av=np.zeros_like(center);area=np.zeros(len(base))
+    for j in range(4):
+        piece=np.cross(q[:,(j+1)%4]-q[:,j],center-q[:,j])/2;av+=piece;area+=np.linalg.norm(piece,axis=1)
+    normal=av/np.linalg.norm(av,axis=1)[:,None];height=.5*np.sqrt(area);apex=center+height[:,None]*normal
+    ids=np.arange(len(P),len(P)+len(base));Q=np.c_[base,ids];P=np.r_[P,apex]
+    volume,geometry=pyramid_geometry(P,Q)
+    return P,Q,dict(geometry=geometry,apexHeightM=height.tolist(),totalVolumeM3=float(sum(volume)),
+        heightRule='0.5*sqrt(face-center-fan-area)',minimumHeightM=float(min(height)),maximumHeightM=float(max(height)))
+
+def build(folder):
+    source=ROOT/'outputs/v133_validation/fan_workbench';shells=read(ROOT/'outputs/v136_validation/shells/report.json')
+    assert shells['allSelfIntersectionFree'] and all(shells['sourceStableAfter'].values())
+    P,W,V,F,far,inner,quads,report,opts,keep=prepare(source,False);originalP=P
+    P,Q,pyramid=explicit_pyramids(P,quads)
+    # 内空腔方向指向保留棱柱/金字塔；四边基底由两个体单元真实共享。
+    sides=np.concatenate([Q[:,[0,4,1]],Q[:,[1,4,2]],Q[:,[2,4,3]],Q[:,[3,4,0]]]);inner=np.r_[inner,sides]
+    shell=dict(vertices=P,wedges=W+1,pyramids=Q+1,tetrahedra=np.empty((0,4),int),farfield=inner[:,[0,2,1]]+1,sourceVertices=V,sourceFaces=F+1)
+    shellAudit=audit(shell)
+    savemat(str(folder/'prepared_transition.mat'),dict(shell,exteriorFarfield=far+1,exteriorInnerFaces=inner+1),do_compression=True)
+    write(folder/'preparation.json',dict(pyramid=pyramid,shellAudit=shellAudit,sourcePrisms=len(W),sourceQuads=len(quads),
+        originalWallExactlyPreserved=True,retainedPrismsExactlyPreserved=True))
+    intersection=audit_surface(P,inner,folder/'boundary_audit',dict(source='prepared_transition.mat',sha256=sha(folder/'prepared_transition.mat')))
+    assert intersection['selfIntersectionFree'],'显式过渡边界自交，不生成外域'
+    savemat(str(folder/'mesh_input.mat'),dict(V=V,F=F+1,optionsJSON=json.dumps(opts)),do_compression=True)
+    ids=np.unique(np.r_[inner.ravel(),far.ravel()]);innerIDs=np.unique(inner);farIDs=np.unique(far)
+    sys.path.insert(0,str(RUNTIME));import gmsh
+    assert gmsh.__version__=='4.15.2';gmsh.initialize();gmsh.option.setNumber('General.NumThreads',2)
+    try:
+        gmsh.model.add('RocketAeroHeat-explicit-pyramid')
+        for tag,nodes,faces in [(1,innerIDs,inner),(2,farIDs,far)]:
+            gmsh.model.addDiscreteEntity(2,tag);gmsh.model.mesh.addNodes(2,tag,nodes+1,P[nodes].ravel());gmsh.model.mesh.addElementsByType(tag,2,[],(faces+1).ravel())
+        lo=gmsh.model.geo.addSurfaceLoop([1]);hi=gmsh.model.geo.addSurfaceLoop([2]);vol=gmsh.model.geo.addVolume([hi,lo]);gmsh.model.geo.synchronize()
+        for key,val in [('Mesh.MeshOnlyEmpty',1),('Mesh.Algorithm3D',1),('Mesh.Renumber',0),('Mesh.Optimize',1),
+            ('Mesh.MeshSizeMin',opts['outerMinSize']),('Mesh.MeshSizeMax',opts['farSize']),('Mesh.MeshSizeExtendFromBoundary',1)]:gmsh.option.setNumber(key,val)
+        gmsh.model.mesh.generate(3);tags,xyz,_=gmsh.model.mesh.getNodes();xyz=xyz.reshape(-1,3);types,_,conn=gmsh.model.mesh.getElements(3,vol)
+        raw=dict(nodeTags=tags,vertices=xyz,elementTypes=types)
+        for kind,nodes in zip(types,conn):raw['elements'+str(kind)]=nodes
+        savemat(str(folder/'gmsh_raw.mat'),raw,do_compression=True)
+        assert list(types)==[4],'显式过渡外域必须只有四面体'
+        pos={int(tag):i for i,tag in enumerate(tags)};assert np.array_equal(xyz[[pos[int(i+1)] for i in ids]],P[ids])
+        for entity,original in [(1,inner),(2,far)]:
+            typ,_,con=gmsh.model.mesh.getElements(2,entity);assert list(typ)==[2]
+            actual=con[0].reshape(-1,3)-1
+            assert np.array_equal(np.unique(np.sort(actual,axis=1),axis=0),np.unique(np.sort(original,axis=1),axis=0))
+        new=~np.isin(tags,ids+1);allP=np.r_[P,xyz[new]];mapping=np.full(int(max(tags))+1,-1,int)
+        mapping[ids+1]=ids;mapping[tags[new]]=np.arange(len(P),len(allP));T=mapping[conn[0].reshape(-1,4)];assert T.min()>=0
+    finally:gmsh.finalize()
+    used=np.unique(np.r_[W.ravel(),Q.ravel(),T.ravel(),far.ravel()]);remap=np.full(len(allP),-1,int);remap[used]=np.arange(len(used))
+    assert np.array_equal(used[:len(V)],np.arange(len(V)))
+    data=dict(vertices=allP[used],wedges=remap[W]+1,pyramids=remap[Q]+1,tetrahedra=remap[T]+1,farfield=remap[far]+1,sourceVertices=V,sourceFaces=F+1)
+    savemat(str(folder/'hybrid_volume.mat'),data,do_compression=True)
+    quality=sicn(allP,T);diagnosis=dict(nodes=len(used),prisms=len(W),pyramids=len(Q),tetrahedra=len(T),
+        minimumTetSICN=float(min(quality)),tetsBelowSICN01=int(sum(quality<.1)),qualityGatePassed=bool(min(quality)>=.1),
+        originalFacesUnchanged=True,interfaceExactlyPreserved=True,originalWallNodesExactlyPreserved=True,retainedPrismCoordinatesExactlyPreserved=True,
+        boundarySelfIntersectionFree=True,automaticPyramidsGenerated=False,physicsQualified=False,newQualifiedArea=0)
+    write(folder/'candidate_report.json',diagnosis)
+    try:geometry=audit(data)
+    except Exception as error:
+        write(folder/'geometry_failure.json',dict(error=repr(error),geometryPassed=False));raise
+    write(folder/'geometry_audit.json',geometry)
+    oldRegular=report['originalPrisms'];report['originalPrisms']=int(sum(keep[:oldRegular]))
+    for name in ['sideNodeIDs','baseNodeIDs']:report[name]=remap[np.array(report[name])].tolist();assert np.min(report[name])>=0
+    areas=np.linalg.norm(np.cross(V[F[:,1]]-V[F[:,0]],V[F[:,2]]-V[F[:,0]]),axis=1)/2
+    report.update(diagnosis,gmshVersion='4.15.2',minimumTetVolume=geometry['minimumTetVolume'],
+        minimumPrismJacobian=float(min(wedge_jacobian_min(allP[W]))),bodyArea=float(sum(areas)),bodyVolume=polyvolume(V,F),farfieldVolume=polyvolume(allP,far),
+        originalFaces=len(F),originalVertices=len(V),outerBoundaryFaces=len(far),constructionOperation='closed-convex-rim-explicit-pyramid-transition',
+        explicitPyramidGeometry=pyramid,nearWallResolutionValidated=False,farfieldAdequacyValidated=False,exteriorTetrahedraExactlyPreserved=False)
+    write(folder/'mesh_report.json',report)
+    assert len(used)<=400000 and len(W)+len(Q)+len(T)<=900000
+    assert diagnosis['qualityGatePassed'],'所有新四面体统一SICN未过，不采纳'
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--target',type=Path,required=True);parser.add_argument('--worker',action='store_true');args=parser.parse_args()
+    folder=args.target.resolve();folder.relative_to(ROOT/'outputs')
+    if args.worker:build(folder);return
+    assert not folder.exists();folder.mkdir(parents=True)
+    names=['scripts/meshSU2ExplicitTransition.py','scripts/meshSU2HybridTransition.py','scripts/meshSU2HybridVolume.py','scripts/su2PyramidGeometry.py',
+        'scripts/auditSU2HybridTopology.py','scripts/optimizeSU2FanExterior.py','scripts/runCGALSurfaceAudit.py','scripts/cgalSurfaceIntersections.py',
+        'docs/validation/v136/PLAN.md','outputs/v136_validation/shells/report.json','tools/runtime/cgal/6.0.1-py311/runtime.json']
+    files=[ROOT/n for n in names]+[ROOT/'outputs/v133_validation/fan_workbench'/n for n in ['hybrid_volume.mat','mesh_input.mat','mesh_report.json','mesh_process.json']]+[RUNTIME/n for n in ['gmsh.py','gmsh-4.15.dll','runtime.json']]
+    before={str(p):sha(p) for p in files};receipt=dict(status='running',maximumSeconds=180,sourceHashes=before,supervisorPID=os.getpid());path=folder/'mesh_process.json'
+    write(path,receipt);start=time.monotonic();timed=False
+    with (folder/'gmsh.log').open('wb') as log:
+        p=subprocess.Popen([sys.executable,str(Path(__file__).resolve()),'--worker','--target',str(folder)],stdout=log,stderr=subprocess.STDOUT,
+            creationflags=subprocess.CREATE_NO_WINDOW,env=dict(os.environ,OMP_NUM_THREADS='2',OPENBLAS_NUM_THREADS='1',PYTHONIOENCODING='utf8'))
+        receipt['processID']=p.pid;write(path,receipt)
+        try:code=p.wait(timeout=180)
+        except subprocess.TimeoutExpired:timed=True;p.kill();code=p.wait()
+    stable={name:sha(Path(name))==h for name,h in before.items()}
+    receipt.update(status='terminal',exitCode=code,timedOut=timed,elapsedSeconds=time.monotonic()-start,sourceStableAfter=stable,sourceStable=all(stable.values()),inputStable=all(stable.values()),
+        input=str(folder/'mesh_input.mat'),inputSHA256=sha(folder/'mesh_input.mat') if (folder/'mesh_input.mat').exists() else None,
+        outputSHA256={p.name:sha(p) for p in folder.iterdir() if p.is_file() and p!=path})
+    write(path,receipt);print(json.dumps({k:receipt[k] for k in ['exitCode','elapsedSeconds','sourceStable']}));raise SystemExit(124 if timed else code)
+if __name__=='__main__':main()

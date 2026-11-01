@@ -13,7 +13,7 @@ state=aeroHeatWorkflowState('init',[],struct('cfg',cfg));
 preview=[];rotation=eye(3);rotationCenter=[0 0 0];controls=struct;
 webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDetailsOpen=false;
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
-creasePreview=false;qualityPreview=false;
+creasePreview=false;qualityPreview=false;candidatePreview=[];
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
 fig.CloseRequestFcn=@closeWorkbench;
@@ -52,7 +52,8 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'readTimeoutCheckpoint',@readTimeoutCheckpoint,'useSurfaceForSU2',@useSurfaceForSU2, ...
     'loadNativeFeature',@()loadNative([],[],true),'loadClassic',@loadClassic, ...
     'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh, ...
-    'readVerifiedHEOS',@readVerifiedHEOS,'readSSTStudy',@readSSTStudy,'probeMeshQuality',@probeMeshQuality);
+    'readVerifiedHEOS',@readVerifiedHEOS,'readSSTStudy',@readSSTStudy,'probeMeshQuality',@probeMeshQuality, ...
+    'inspectMeshCandidate',@inspectMeshCandidate);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -67,6 +68,7 @@ renderEditor();sync();showGeometry(true);
     function s=getState(),s=state;end
     function sync()
         if ~isgraphics(fig),return;end
+        if ~isempty(candidatePreview) && candidatePreview.revision~=state.revision,candidatePreview=[];qualityPreview=false;end
         % 父面板也必须恢复；仅重建子控件不会解除父面板的禁用状态。
         if isprop(editor,'Enable'),editor.Enable=onoff(~state.busy && ~preparing);end
         for j=1:5
@@ -122,10 +124,15 @@ renderEditor();sync();showGeometry(true);
         if ~isgraphics(fig),return;end
         resultHost.Visible='off';geometryHost.Visible='on';
         fig.UserData.meshQuality=[];
-        if qualityPreview && state.currentStep==2 && ~isempty(embeddedVolume)
+        if qualityPreview && state.currentStep==2 && (~isempty(embeddedVolume) || ~isempty(candidatePreview))
             % 网格质量来自真实四面体；灰色原壁面只用于空间定位。
-            [m,info]=buildSU2MeshQualityPreview(embeddedVolume);
-            caption=sprintf('低质量体单元 %d 个 · 最小SICN %.5g · 仅网格诊断',info.lowQualityCells,info.minimumSICN);
+            if isempty(candidatePreview)
+                [m,info]=buildSU2MeshQualityPreview(embeddedVolume);
+                caption=sprintf('低质量体单元 %d 个 · 最小SICN %.5g · 仅网格诊断',info.lowQualityCells,info.minimumSICN);
+            else
+                m=candidatePreview.mesh;info=candidatePreview.info;
+                caption=sprintf('失败候选 · %s · %d个低质四面体 · 最小SICN %.5g · 只读，未接入计算',info.exteriorAlgorithm,info.lowQualityCells,info.minimumSICN);
+            end
             updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',true,'resetCamera',reset));
             s=geometryView.html.UserData;s.revision=s.revision+1;s.payload.revision=s.revision;s.rendered=[];
             s.payload.faceField=struct('name','四面体SICN','unit','1', ...
@@ -199,7 +206,7 @@ renderEditor();sync();showGeometry(true);
             case 2
                 if isEmbedded()
                     [~,mode]=su2WorkbenchMeshOptions(state.cfg);
-                    grid=form(18);
+                    grid=form(22);
                     controls.volumeMode=choice(grid,1,'体网格模式',{'法向偏置层 · 研究','射线层 · 历史对照','原三角面混合网格 · 研究'}, ...
                         {'normalLayers','starRay','hybridTriangles'},mode);
                     controls.volumeMode.ValueChangedFcn=@nativeMeshEdited;
@@ -215,11 +222,13 @@ renderEditor();sync();showGeometry(true);
                     if strcmp(mode,'hybridTriangles')
                         opts=getOption(state.cfg.su2,'hybridMesh',struct);
                         heights=getOption(opts,'layerHeights',[0 cumsum(2e-5*1.4.^(0:5))]);
-                        if ~isempty(embeddedVolume) && embeddedVolume.meshConstruction.tetsBelowSICN01>0
+                        if (~isempty(embeddedVolume) && embeddedVolume.meshConstruction.tetsBelowSICN01>0) || ~isempty(candidatePreview)
                             label='定位低质量体单元';if qualityPreview,label='返回整箭表面';end
                             controls.meshQuality=button(grid,14,label,@toggleMeshQuality);
                             controls.meshQualityProbe=tip(grid,15,'点选有色单元：查看体编号、SICN及坐标。灰色为原壁面定位参考。');
                         end
+                        controls.inspectCandidate=button(grid,18,'检查质量未通过的网格 · 只读',@inspectMeshCandidateDialog);
+                        tip(grid,19,'只显示已完成且拓扑通过的失败候选，保持当前模型、计算网格和边界状态。失败候选不能用于求解。');
                         fan=~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'constructionOperation') && ...
                             startsWith(embeddedVolume.meshConstruction.constructionOperation,'closed-convex-rim-');
                         transition=~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'noseRetainedLayers');
@@ -892,11 +901,25 @@ renderEditor();sync();showGeometry(true);
     end
     function toggleCreasePreview(~,~)
         assert(~state.busy && ~isempty(embeddedVolume) && state.currentStep==2);
+        candidatePreview=[];
         creasePreview=~creasePreview;qualityPreview=false;renderEditor();sync();showGeometry(true);
     end
     function toggleMeshQuality(~,~)
-        assert(~state.busy && ~isempty(embeddedVolume) && state.currentStep==2);
+        assert(~state.busy && (~isempty(embeddedVolume) || ~isempty(candidatePreview)) && state.currentStep==2);
+        if ~isempty(candidatePreview),candidatePreview=[];qualityPreview=true;end
         qualityPreview=~qualityPreview;creasePreview=false;renderEditor();sync();showGeometry(true);
+    end
+    function inspectMeshCandidateDialog(~,~)
+        folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择已终态且质量未过的网格');
+        if isequal(folder,0),return;end
+        try,inspectMeshCandidate(folder);catch ex,showError(ex);end
+    end
+    function inspectMeshCandidate(folder)
+        % 只读支路不赋值embeddedVolume，不修改网格、边界确认或下游计算资格。
+        assert(~state.busy && ~preparing && isEmbedded() && state.currentStep==2 && ~isempty(state.orientedMesh));
+        [m,info]=inspectSU2MeshCandidate(folder,state.orientedMesh);
+        candidatePreview=struct('mesh',m,'info',info,'revision',state.revision);qualityPreview=true;creasePreview=false;
+        renderEditor();sync();showGeometry(true);message('已定位失败候选；当前计算输入保持，候选未被接收。');
     end
     function geometryMessage(src,event)
         message=src.Data;geometryReceiver(src,event);
