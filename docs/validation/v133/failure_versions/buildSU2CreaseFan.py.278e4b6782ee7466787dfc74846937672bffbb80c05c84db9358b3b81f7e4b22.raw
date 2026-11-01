@@ -1,0 +1,141 @@
+"""保留原壁面的闭合凸棱边棱柱扇；两侧法向展开后在原外壳合并。"""
+from pathlib import Path
+import argparse,json,os,subprocess,sys,time
+import numpy as np
+from scipy.io import loadmat,savemat
+from meshSU2HybridVolume import wedge_jacobian_min
+from prepareSU2CheckpointContinuation import ROOT,read,sha
+
+def normals(V,F):
+    """原面顶角加权，仅在各自面组内计算法向，不平滑跨越棱边。"""
+    p=V[F];av=np.cross(p[:,1]-p[:,0],p[:,2]-p[:,0]);unit=av/np.linalg.norm(av,axis=1)[:,None]
+    N=np.zeros_like(V)
+    for c in range(3):
+        a=p[:,(c+1)%3]-p[:,c];b=p[:,(c+2)%3]-p[:,c]
+        weight=np.arctan2(np.linalg.norm(np.cross(a,b),axis=1),np.sum(a*b,axis=1))
+        np.add.at(N,F[:,c],weight[:,None]*unit)
+    length=np.linalg.norm(N,axis=1);valid=length>0;N[valid]/=length[valid,None]
+    return N
+
+def interface_edges(F,base):
+    """找到唯一面组交界；要求闭环且每点度为2，拒绝交叉/开放棱边。"""
+    edges=np.concatenate([F[:,[0,1]],F[:,[1,2]],F[:,[2,0]]]);owner=np.tile(np.arange(len(F)),3)
+    keys=np.sort(edges,axis=1);order=np.lexsort((keys[:,1],keys[:,0]))
+    pair=edges[order].reshape(-1,2,2);ids=owner[order].reshape(-1,2)
+    assert np.all(np.sort(pair[:,0],axis=1)==np.sort(pair[:,1],axis=1))
+    mask=base[ids[:,0]]!=base[ids[:,1]];pair=pair[mask];ids=ids[mask]
+    assert len(pair)>2
+    E=pair[np.arange(len(pair)),base[ids[:,0]].astype(int)] # 取非base面的有向边
+    ids,counts=np.unique(E,return_counts=True);assert np.all(counts==2)
+    # 不接受两个不相连的环被同一选择器混合。
+    graph={int(i):set() for i in ids}
+    for a,b in E:graph[int(a)].add(int(b));graph[int(b)].add(int(a))
+    visited=set();stack=[int(ids[0])]
+    while stack:
+        i=stack.pop()
+        if i in visited:continue
+        visited.add(i);stack.extend(graph[i]-visited)
+    assert len(visited)==len(ids) and all(len(v)==2 for v in graph.values())
+    return E,ids
+
+def construct(old,heights,base):
+    """添加棱柱扇，保持旧外层/外域编号与坐标；不裁剪负体积。"""
+    V=old['sourceVertices'];F=old['sourceFaces'].astype(int)-1
+    P=old['vertices'].copy();W=old['wedges'].astype(int)-1;T=old['tetrahedra'].astype(int)-1
+    nv=len(V);h=np.asarray(heights,float);layers=len(h)-1
+    expected=np.concatenate([np.concatenate([F+j*nv,F+(j+1)*nv],axis=1) for j in range(layers)])
+    assert np.array_equal(W,expected) and np.all(h[1:]>h[:-1]) and h[0]==0
+    E,rim=interface_edges(F,base)
+    ns=normals(V,F[~base]);nb=normals(V,F[base])
+    oldN=(P[layers*nv+rim]-V[rim])/h[-1]
+    assert np.all(np.sum(ns[rim]*nb[rim],axis=1)>-.1) # 本次只支持约90度凸角
+    sid=np.arange((layers+1)*nv).reshape(layers+1,nv)
+    bid=sid.copy();extra=[]
+    for j in range(1,layers):
+        blend=(1-h[j]/h[-1])**2
+        # 线性组合保留各侧实际法向投影，不强制单位化导致外壳半径漂移。
+        P[sid[j,rim]]=V[rim]+h[j]*(oldN+blend*(ns[rim]-oldN))
+        extra.append(V[rim]+h[j]*(oldN+blend*(nb[rim]-oldN)))
+        bid[j,rim]=len(P)+(j-1)*len(rim)+np.arange(len(rim))
+    P=np.concatenate([P,*extra]);pieces=[]
+    for j in range(layers):
+        low=sid[j,F].copy();high=sid[j+1,F].copy()
+        low[base]=bid[j,F[base]];high[base]=bid[j+1,F[base]]
+        pieces.append(np.concatenate([low,high],axis=1))
+    add=[]
+    for a,b in E:
+        add.append([sid[0,a],sid[1,a],bid[1,a],sid[0,b],sid[1,b],bid[1,b]])
+        for j in range(1,layers-1):
+            add.append([sid[j,a],sid[j+1,a],bid[j+1,a],sid[j,b],sid[j+1,b],bid[j+1,b]])
+            add.append([sid[j,a],bid[j+1,a],bid[j,a],sid[j,b],bid[j+1,b],bid[j,b]])
+        add.append([sid[-2,a],sid[-1,a],bid[-2,a],sid[-2,b],sid[-1,b],bid[-2,b]])
+    add=np.array(add,int)
+    # 单元方向规范化允许一致翻转，几何折叠仍由全参考域Jacobian拒绝。
+    q=P[add];s=np.einsum('ij,ij->i',np.cross(q[:,1]-q[:,0],q[:,2]-q[:,0]),q[:,3]-q[:,0])
+    flip=s<0;add[flip]=add[flip][:,[0,2,1,3,5,4]]
+    out=np.concatenate(pieces+[add]);jac=wedge_jacobian_min(P[out])
+    assert min(jac)>0, '棱柱扇或邻接原面棱柱翻转，不裁剪/删除单元'
+    assert np.array_equal(P[:nv],V)
+    assert np.array_equal(P[layers*nv:len(old['vertices'])],old['vertices'][layers*nv:])
+    sideDelta=P[sid[1,rim]]-V[rim];baseDelta=P[bid[1,rim]]-V[rim]
+    report=dict(rimNodeIDs=rim.tolist(),rimEdges=E.tolist(),baseFaceIDs=np.flatnonzero(base).tolist(),
+        originalNodes=len(old['vertices']),nodes=len(P),addedNodes=len(P)-len(old['vertices']),
+        originalPrisms=len(W),prisms=len(out),addedPrisms=len(add),
+        minimumPrismJacobian=float(min(jac)),sideFirstNormalAlignment=float(np.min(np.sum(sideDelta*ns[rim],axis=1)/np.linalg.norm(sideDelta,axis=1))),
+        baseFirstNormalAlignment=float(np.min(np.sum(baseDelta*nb[rim],axis=1)/np.linalg.norm(baseDelta,axis=1))),
+        sideFirstNormalProjectionOverHeight=float(np.min(np.sum(sideDelta*ns[rim],axis=1)/h[1])),
+        baseFirstNormalProjectionOverHeight=float(np.min(np.sum(baseDelta*nb[rim],axis=1)/h[1])),
+        sideNodeIDs=sid[:,rim].tolist(),baseNodeIDs=bid[:,rim].tolist(),
+        originalFacesUnchanged=True,interfaceExactlyPreserved=True,exteriorTetrahedraExactlyPreserved=True,
+        constructionOperation='closed-convex-rim-two-normal-prism-fan',gmshRunThisTask=False,
+        physicalQualification=False,newQualifiedArea=0)
+    data=dict(vertices=P,wedges=out+1,tetrahedra=T+1,farfield=old['farfield'],sourceVertices=V,sourceFaces=F+1)
+    return data,report
+
+def build(source,folder):
+    process=read(source/'mesh_process.json');prior=read(source/'mesh_report.json')
+    assert process['status']=='terminal' and process['exitCode']==0 and process['inputStable'] and process['sourceStable']
+    for n in ['hybrid_volume.mat','mesh_report.json']:assert sha(source/n)==process['outputSHA256'][n]
+    old=loadmat(str(source/'hybrid_volume.mat'));V=old['sourceVertices'];F=old['sourceFaces'].astype(int)-1
+    p=V[F];n=np.cross(p[:,1]-p[:,0],p[:,2]-p[:,0]);base=n[:,0]/np.linalg.norm(n,axis=1)<-.99
+    assert len(V)==9878 and len(F)==19752 and sum(base)==46
+    data,detail=construct(old,prior['normalHeightsM'],base)
+    assert data['vertices'].shape[0]<=400000 and len(data['wedges'])+len(data['tetrahedra'])<=900000
+    report=dict(prior);report.update(detail);report['sourceMeshDirectory']=str(source)
+    report['physicsQualified']=False;report['nearWallResolutionValidated']=False
+    report['farfieldAdequacyValidated']=False;report['outerLowQualityTetsStillPresent']=prior['tetsBelowSICN01']
+    savemat(str(folder/'hybrid_volume.mat'),data,do_compression=True)
+    savemat(str(folder/'mesh_input.mat'),dict(V=V,F=F+1,sourceMeshSHA256=sha(source/'hybrid_volume.mat'),
+        layerHeights=prior['normalHeightsM'],baseFaceIDs=np.flatnonzero(base)+1),do_compression=True)
+    (folder/'mesh_report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--target',type=Path,required=True)
+    p.add_argument('--worker',action='store_true');a=p.parse_args();source=a.source.resolve();folder=a.target.resolve()
+    source.relative_to(ROOT/'outputs');folder.relative_to(ROOT/'outputs')
+    if a.worker:build(source,folder);return
+    assert not folder.exists();folder.mkdir(parents=True)
+    files=[source/n for n in ['mesh_process.json','mesh_report.json','hybrid_volume.mat']]+[
+        Path(__file__).resolve(),ROOT/'scripts/meshSU2HybridVolume.py',ROOT/'docs/validation/v133/PLAN.md']
+    locked={str(p):sha(p) for p in files};start=time.monotonic()
+    record=dict(status='running',operation='closed-convex-rim-two-normal-prism-fan',maximumSeconds=180,
+        sourceHashes=locked,sourceMeshDirectory=str(source),gmshRun=False,supervisorPID=os.getpid())
+    receipt=folder/'mesh_process.json'
+    def save():receipt.write_text(json.dumps(record,indent=2)+'\n',encoding='utf-8')
+    save()
+    with (folder/'crease_fan.log').open('wb') as log:
+        proc=subprocess.Popen([sys.executable,str(Path(__file__).resolve()),'--worker','--source',str(source),'--target',str(folder)],
+            stdout=log,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW,
+            env=dict(os.environ,OMP_NUM_THREADS='2',OPENBLAS_NUM_THREADS='1'))
+        record['processID']=proc.pid;save();timed=False
+        try:code=proc.wait(timeout=180)
+        except subprocess.TimeoutExpired:timed=True;proc.kill();code=proc.wait()
+    stable={p:sha(Path(p))==h for p,h in locked.items()}
+    record.update(status='terminal',exitCode=code,timedOut=timed,elapsedSeconds=time.monotonic()-start,
+        sourceStableAfter=stable,sourceStable=all(stable.values()),inputStable=all(stable.values()),
+        input=str(folder/'mesh_input.mat'),inputSHA256=sha(folder/'mesh_input.mat') if code==0 else None)
+    record['outputSHA256']={p.name:sha(p) for p in folder.iterdir() if p.is_file() and p!=receipt};save()
+    print(json.dumps({k:record[k] for k in ['status','exitCode','timedOut','elapsedSeconds']}))
+    raise SystemExit(124 if timed else code)
+
+if __name__=='__main__':main()

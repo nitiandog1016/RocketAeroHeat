@@ -1,0 +1,37 @@
+"""解析闭合凸角模型检查棱柱扇：保留原壁面、正体积、连接与边界。"""
+from pathlib import Path
+import sys,unittest
+import numpy as np
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
+from meshSU2HybridVolume import prepare_layers
+from buildSU2CreaseFan import construct
+from auditSU2HybridTopology import audit
+
+def fixture():
+    n=8;theta=np.arange(n)*2*np.pi/n
+    ring=np.column_stack([np.zeros(n),np.cos(theta),np.sin(theta)])
+    upper=ring.copy();upper[:,0]=1
+    V=np.concatenate([ring,upper,[[0,0,0],[1,0,0]]]);F=[]
+    for i in range(n):
+        j=(i+1)%n
+        F.extend([[i,j,i+n],[j,j+n,i+n],[2*n,j,i],[2*n+1,i+n,j+n]])
+    F=np.array(F,int);heights=[0.,.01,.025,.06,.12]
+    P,W,_,_,_,_=prepare_layers(V,F,dict(layerHeights=heights))
+    old=dict(vertices=P,wedges=W+1,tetrahedra=np.empty((0,4),int),farfield=F+4*len(V)+1,sourceVertices=V,sourceFaces=F+1)
+    return old,heights,np.arange(len(F))%4==2
+
+class CreaseFan(unittest.TestCase):
+    def test_closed_convex_corner(self):
+        old,h,base=fixture();new,r=construct(old,h,base)
+        result=audit(new)
+        self.assertTrue(result['passed']);self.assertEqual(r['addedNodes'],24);self.assertEqual(r['addedPrisms'],48)
+        np.testing.assert_array_equal(new['sourceFaces'],old['sourceFaces'])
+        nv=len(old['sourceVertices']);originalDirection=(old['vertices'][nv]-old['vertices'][0])/h[1]
+        self.assertGreater(r['sideFirstNormalAlignment'],originalDirection[1])
+        self.assertGreater(r['baseFirstNormalAlignment'],-originalDirection[0])
+        nv=len(old['sourceVertices']);np.testing.assert_array_equal(new['vertices'][4*nv:5*nv],old['vertices'][4*nv:5*nv])
+    def test_empty_interface_rejected(self):
+        old,h,base=fixture();base[:]=False
+        with self.assertRaises(AssertionError):construct(old,h,base)
+
+if __name__=='__main__':unittest.main()

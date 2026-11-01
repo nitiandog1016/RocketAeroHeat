@@ -50,6 +50,12 @@ volume=struct('kind','complete-rocket-three-dimensional-su2-volume','vertices',V
     'sourceMappingStatus','exact-original-triangle-node-dual','nearWallResolutionValidated',false, ...
     'farfieldAdequacyValidated',false,'physicalSolution',false,'productionQualified',false,'newQualifiedRocketArea',0);
 volume.meshConstruction.method='original-triangle-normal-prisms-and-gmsh-exterior-tetrahedra';
+if isfield(report,'constructionOperation') && startsWith(report.constructionOperation,'closed-convex-rim-')
+    % 棱柱扇改变内部连接，原壁面和独立拓扑审核仍使用上方同一要求。
+    assert(isfield(report,'sideNodeIDs') && isfield(report,'baseNodeIDs') && report.prisms==size(W,1));
+    ids=[report.sideNodeIDs(:);report.baseNodeIDs(:)];assert(all(ids>=0 & ids<size(V,1)));
+    volume.meshConstruction.method='original-triangle-crease-fan-and-gmsh-exterior-tetrahedra';
+end
 end
 function info=faces(F,boundary)
 % 最小顶点的前后邻点确定循环方向，内面计数和方向必须同时闭合。

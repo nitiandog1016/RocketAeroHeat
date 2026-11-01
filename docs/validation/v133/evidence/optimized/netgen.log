@@ -1,0 +1,113 @@
+Warning : Optimization of specified model entities is not interfaced yet
+Info    : Optimizing mesh (Netgen)...
+Info    : Optimizing volume 1
+Info    : CalcLocalH: 33110 Points 164578 Elements 26324 Surface Elements 
+Info    : Remove Illegal Elements 
+Info    : 868 illegal tets 
+Info    : SplitImprove 
+Info    : badmax = 42781.8 
+Info    : 140 splits performed 
+Info    : SwapImprove  
+Info    : 191 swaps performed 
+Info    : SwapImprove2  
+Info    : 4 swaps performed 
+Info    : 461 illegal tets 
+Info    : SplitImprove 
+Info    : badmax = 26900.4 
+Info    : 127 splits performed 
+Info    : SwapImprove  
+Info    : 43 swaps performed 
+Info    : SwapImprove2  
+Info    : 7 swaps performed 
+Info    : 88 illegal tets 
+Info    : SplitImprove 
+Info    : badmax = 26900.4 
+Info    : 23 splits performed 
+Info    : SwapImprove  
+Info    : 7 swaps performed 
+Info    : SwapImprove2  
+Info    : 0 swaps performed 
+Info    : 24 illegal tets 
+Info    : SplitImprove 
+Info    : badmax = 26900.4 
+Info    : 7 splits performed 
+Info    : SwapImprove  
+Info    : 0 swaps performed 
+Info    : SwapImprove2  
+Info    : 0 swaps performed 
+Info    : 3 illegal tets 
+Info    : SplitImprove 
+Info    : badmax = 26900.4 
+Info    : 1 splits performed 
+Info    : SwapImprove  
+Info    : 0 swaps performed 
+Info    : SwapImprove2  
+Info    : 0 swaps performed 
+Info    : 0 illegal tets 
+Info    : Volume Optimization 
+Info    : CombineImprove 
+Info    : 1269 elements combined 
+Info    : ImproveMesh 
+Info    : Total badness = 247985 
+Info    : Total badness = 230800 
+Info    : SplitImprove 
+Info    : badmax = 299.844 
+Info    : 2 splits performed 
+Info    : ImproveMesh 
+Info    : Total badness = 230811 
+Info    : Total badness = 227928 
+Info    : SwapImprove  
+Info    : 9750 swaps performed 
+Info    : SwapImprove2  
+Info    : 0 swaps performed 
+Info    : ImproveMesh 
+Info    : Total badness = 209830 
+Info    : Total badness = 204686 
+Info    : CombineImprove 
+Info    : 244 elements combined 
+Info    : ImproveMesh 
+Info    : Total badness = 202481 
+Info    : Total badness = 201851 
+Info    : SplitImprove 
+Info    : badmax = 189.577 
+Info    : 0 splits performed 
+Info    : ImproveMesh 
+Info    : Total badness = 201851 
+Info    : Total badness = 201733 
+Info    : SwapImprove  
+Info    : 1681 swaps performed 
+Info    : SwapImprove2  
+Info    : 2 swaps performed 
+Info    : ImproveMesh 
+Info    : Total badness = 200358 
+Info    : Total badness = 199238 
+Info    : CombineImprove 
+Info    : 52 elements combined 
+Info    : ImproveMesh 
+Info    : Total badness = 198791 
+Info    : Total badness = 198661 
+Info    : SplitImprove 
+Info    : badmax = 186.074 
+Info    : 0 splits performed 
+Info    : ImproveMesh 
+Info    : Total badness = 198661 
+Info    : Total badness = 198632 
+Info    : SwapImprove  
+Info    : 643 swaps performed 
+Info    : SwapImprove2  
+Info    : 0 swaps performed 
+Info    : ImproveMesh 
+Info    : Total badness = 198238 
+Info    : Total badness = 197820 
+Info    : Done optimizing mesh (Wall 7.37691s, CPU 7.15625s)
+Error   : Unknown element 190903
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\optimizeSU2FanExterior.py", line 110, in <module>
+    if __name__=='__main__':main()
+  File "E:\RocketAeroHeat\scripts\optimizeSU2FanExterior.py", line 83, in main
+    if a.worker:build(source,folder);return
+  File "E:\RocketAeroHeat\scripts\optimizeSU2FanExterior.py", line 45, in build
+    quality=gmsh.model.mesh.getElementQualities(et[0],'minSICN')
+  File "E:\RocketAeroHeat\tools\runtime\gmsh\4.15.2\gmsh.py", line 3228, in getElementQualities
+    raise Exception(logger.getLastError())
+Exception: Unknown element 190903

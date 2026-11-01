@@ -1,0 +1,110 @@
+"""固定Gmsh/Netgen一次优化真实外域，原壁面、棱柱和内外边界不动。"""
+from pathlib import Path
+import argparse,json,os,subprocess,sys,time
+import numpy as np
+from scipy.io import loadmat,savemat
+from prepareSU2CheckpointContinuation import ROOT,read,sha
+RUNTIME=ROOT/'tools/runtime/gmsh/4.15.2'
+
+def build(source,folder):
+    sys.path.insert(0,str(RUNTIME));import gmsh
+    assert gmsh.__version__=='4.15.2'
+    prior=read(source/'mesh_report.json');receipt=read(source/'mesh_process.json');ga=read(source/'geometry_audit.json')
+    assert receipt['exitCode']==0 and receipt['sourceStable'] and ga['passed']
+    for n in ['hybrid_volume.mat','mesh_report.json']:assert sha(source/n)==receipt['outputSHA256'][n]
+    d=loadmat(str(source/'hybrid_volume.mat'));P=d['vertices'];W=d['wedges'].astype(int)-1;T=d['tetrahedra'].astype(int)-1
+    F=d['sourceFaces'].astype(int)-1;far=d['farfield'].astype(int)-1;nv=len(d['sourceVertices']);nl=prior['normalLayers']
+    inner=F[:,[0,2,1]]+nl*nv;outerids=np.unique(T)
+    originalTag=np.full(len(P),-1,int);originalTag[outerids]=np.arange(1,len(outerids)+1)
+    itag=originalTag[inner];ftag=originalTag[far];ttag=originalTag[T]
+    assert np.all(itag>0) and np.all(ftag>0)
+    ii=np.unique(inner);ff=np.unique(far);interior=np.setdiff1d(outerids,np.r_[ii,ff])
+    gmsh.initialize();gmsh.option.setNumber('General.NumThreads',2)
+    try:
+        gmsh.model.add('RocketAeroHeat-fan-exterior')
+        gmsh.model.addDiscreteEntity(2,1);gmsh.model.addDiscreteEntity(2,2);gmsh.model.addDiscreteEntity(3,1,[1,2])
+        for dim,tag,ids in [(2,1,ii),(2,2,ff),(3,1,interior)]:gmsh.model.mesh.addNodes(dim,tag,originalTag[ids],P[ids].ravel())
+        gmsh.model.mesh.addElementsByType(1,2,np.arange(1,len(inner)+1),itag.ravel())
+        gmsh.model.mesh.addElementsByType(2,2,np.arange(len(inner)+1,len(inner)+len(far)+1),ftag.ravel())
+        elementTags=np.arange(len(inner)+len(far)+1,len(inner)+len(far)+len(T)+1)
+        gmsh.model.mesh.addElementsByType(1,4,elementTags,ttag.ravel())
+        q0=gmsh.model.mesh.getElementQualities(elementTags,'minSICN')
+        assert int(sum(q0<.1))==17 and abs(min(q0)-prior['minimumTetSICN'])<1e-12
+        gmsh.option.setNumber('Mesh.Renumber',0);gmsh.option.setNumber('Mesh.OptimizeThreshold',.1)
+        gmsh.model.mesh.optimize('Netgen',force=True,niter=1,dimTags=[(3,1)])
+        nt,xyz,_=gmsh.model.mesh.getNodes();xyz=xyz.reshape(-1,3)
+        mapped={int(tag):i for i,tag in enumerate(nt)}
+        boundary=np.r_[ii,ff]
+        assert all(int(originalTag[i]) in mapped for i in boundary)
+        actual=np.array([xyz[mapped[int(originalTag[i])]] for i in boundary])
+        assert np.array_equal(actual,P[boundary]),'Netgen移动边界，不能接收'
+        for tag,oldtri in [(1,itag),(2,ftag)]:
+            types,_,nodes=gmsh.model.mesh.getElements(2,tag);assert list(types)==[2]
+            assert np.array_equal(np.unique(np.sort(nodes[0].reshape(-1,3),axis=1),axis=0),np.unique(np.sort(oldtri,axis=1),axis=0))
+        types,et,conn=gmsh.model.mesh.getElements(3,1);assert list(types)==[4]
+        quality=gmsh.model.mesh.getElementQualities(et[0],'minSICN')
+        output=P.copy();new=[];mapping=np.full(int(max(nt))+1,-1,int)
+        for tag,point in zip(nt,xyz):
+            tag=int(tag)
+            if tag<=len(outerids):idx=int(outerids[tag-1]);output[idx]=point
+            else:idx=len(P)+len(new);new.append(point)
+            mapping[tag]=idx
+        if new:output=np.concatenate([output,np.array(new)])
+        newT=mapping[conn[0].reshape(-1,4)];assert np.all(newT>=0)
+        used=np.unique(np.r_[W.ravel(),newT.ravel(),far.ravel()]);remap=np.full(len(output),-1,int);remap[used]=np.arange(len(used))
+        newP=output[used];newW=remap[W];newT=remap[newT];newFar=remap[far]
+        assert np.array_equal(newP[newW],P[W]) and np.array_equal(newP[newFar],P[far])
+        q=newP[newT];det=np.einsum('ij,ij->i',q[:,1]-q[:,0],np.cross(q[:,2]-q[:,0],q[:,3]-q[:,0]))
+        assert min(det)>0
+        assert len(newP)<=400000 and len(newW)+len(newT)<=900000
+        result=dict(vertices=newP,wedges=newW+1,tetrahedra=newT+1,farfield=newFar+1,
+            sourceVertices=d['sourceVertices'],sourceFaces=d['sourceFaces'])
+        report=dict(prior)
+        report.update(nodes=len(newP),tetrahedra=len(newT),minimumTetVolume=float(min(det)/6),minimumTetSICN=float(min(quality)),
+            tetsBelowSICN01=int(sum(quality<.1)),constructionOperation='closed-convex-rim-prism-fan-netgen-exterior',
+            outerOptimization=dict(method='Netgen',iterations=1,forceDiscrete=True,threshold=.1,
+                originalMinimumSICN=float(min(q0)),originalBelow01=int(sum(q0<.1)),
+                finalMinimumSICN=float(min(quality)),finalBelow01=int(sum(quality<.1)),
+                boundaryNodesExactlyPreserved=True,boundaryTrianglesExactlyPreserved=True,prismGeometryExactlyPreserved=True,
+                qualityGatePassed=bool(min(quality)>=.1 and not np.any(quality<.1))),
+            exteriorTetrahedraExactlyPreserved=False,sourceMeshDirectory=str(source),gmshRunThisTask=True,
+            outerLowQualityTetsStillPresent=int(sum(quality<.1)),
+            sideNodeIDs=remap[np.array(prior['sideNodeIDs'])].tolist(),baseNodeIDs=remap[np.array(prior['baseNodeIDs'])].tolist())
+        savemat(str(folder/'hybrid_volume.mat'),result,do_compression=True)
+        savemat(str(folder/'mesh_input.mat'),dict(sourceMeshSHA256=sha(source/'hybrid_volume.mat'),method='Netgen',iterations=1),do_compression=True)
+        (folder/'mesh_report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+        print(json.dumps(report['outerOptimization'],indent=2))
+    finally:gmsh.finalize()
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--target',type=Path,required=True)
+    p.add_argument('--worker',action='store_true');a=p.parse_args();source=a.source.resolve();folder=a.target.resolve()
+    source.relative_to(ROOT/'outputs');folder.relative_to(ROOT/'outputs')
+    if a.worker:build(source,folder);return
+    assert not folder.exists();folder.mkdir(parents=True)
+    rt=read(RUNTIME/'runtime.json')
+    for item in rt['files']:assert sha(RUNTIME/item['path'])==item['sha256']
+    files=[source/n for n in ['mesh_process.json','geometry_audit.json','mesh_report.json','hybrid_volume.mat']]+[
+        RUNTIME/'runtime.json',RUNTIME/'gmsh.py',RUNTIME/'gmsh-4.15.dll',Path(__file__).resolve(),ROOT/'docs/validation/v133/OUTER_PREFLIGHT.md']
+    locked={str(p):sha(p) for p in files};start=time.monotonic()
+    record=dict(status='running',operation='Netgen-fixed-boundary-exterior',maximumSeconds=120,
+        sourceHashes=locked,sourceMeshDirectory=str(source),gmshRun=True,supervisorPID=os.getpid())
+    receipt=folder/'mesh_process.json'
+    def save():receipt.write_text(json.dumps(record,indent=2)+'\n',encoding='utf-8')
+    save()
+    with (folder/'netgen.log').open('wb') as log:
+        proc=subprocess.Popen([sys.executable,str(Path(__file__).resolve()),'--worker','--source',str(source),'--target',str(folder)],
+            stdout=log,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW,
+            env=dict(os.environ,OMP_NUM_THREADS='2',OPENBLAS_NUM_THREADS='1'))
+        record['processID']=proc.pid;save();timed=False
+        try:code=proc.wait(timeout=120)
+        except subprocess.TimeoutExpired:timed=True;proc.kill();code=proc.wait()
+    stable={p:sha(Path(p))==h for p,h in locked.items()}
+    record.update(status='terminal',exitCode=code,timedOut=timed,elapsedSeconds=time.monotonic()-start,
+        sourceStableAfter=stable,sourceStable=all(stable.values()),inputStable=all(stable.values()),
+        input=str(folder/'mesh_input.mat'),inputSHA256=sha(folder/'mesh_input.mat') if code==0 else None)
+    record['outputSHA256']={p.name:sha(p) for p in folder.iterdir() if p.is_file() and p!=receipt};save()
+    print(json.dumps({k:record[k] for k in ['status','exitCode','timedOut','elapsedSeconds']}))
+    raise SystemExit(124 if timed else code)
+
+if __name__=='__main__':main()

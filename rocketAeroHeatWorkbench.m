@@ -13,6 +13,7 @@ state=aeroHeatWorkflowState('init',[],struct('cfg',cfg));
 preview=[];rotation=eye(3);rotationCenter=[0 0 0];controls=struct;
 webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDetailsOpen=false;
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
+creasePreview=false;
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
 fig.CloseRequestFcn=@closeWorkbench;
@@ -118,6 +119,14 @@ renderEditor();sync();showGeometry(true);
     function showGeometry(reset)
         if ~isgraphics(fig),return;end
         resultHost.Visible='off';geometryHost.Visible='on';
+        if creasePreview && state.currentStep==2 && ~isempty(embeddedVolume)
+            % 从已审核的真实体连接显示一列棱柱扇；切页仍保留原壁面与工况。
+            [section,info]=buildSU2CreaseFanSlice(embeddedVolume);
+            caption=sprintf('尾缘棱柱扇截面 · 原壁点%d · 仅几何，尚无压力/热流/温度解',info.sourceVertexID);
+            updateAerothermalGeometryView(geometryView,section,caption,struct('showWire',true,'resetCamera',reset));
+            fig.UserData.creaseSlice=info;return;
+        end
+        fig.UserData.creaseSlice=[];
         m=preview;
         if state.currentStep>=2
             m=state.orientedMesh;if ~isempty(state.mesh),m=state.mesh;end
@@ -192,7 +201,18 @@ renderEditor();sync();showGeometry(true);
                     if strcmp(mode,'hybridTriangles')
                         opts=getOption(state.cfg.su2,'hybridMesh',struct);
                         heights=getOption(opts,'layerHeights',[0 cumsum(2e-5*1.4.^(0:5))]);
-                        tip(grid,7,sprintf('保留全部原三角面：%d层法向棱柱，首层顶点位移%.5g µm；Gmsh四面体外域。热流分辨率尚未验证。',numel(heights)-1,1e6*(heights(2)-heights(1))));
+                        fan=~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'constructionOperation') && ...
+                            startsWith(embeddedVolume.meshConstruction.constructionOperation,'closed-convex-rim-');
+                        if fan
+                            controls.generate.Text='重新生成常规体网格';
+                            controls.meshMethod=tip(grid,7,sprintf('已复用尾缘双法向棱柱扇；%d层，参考首层距%.5g µm。外域仍有%d个SICN<0.1单元；未获物理资格。', ...
+                                numel(heights)-1,1e6*(heights(2)-heights(1)),embeddedVolume.meshConstruction.tetsBelowSICN01));
+                            label='查看尾缘体网格截面';if creasePreview,label='返回整箭表面';end
+                            controls.creasePreview=button(grid,10,label,@toggleCreasePreview);
+                        else
+                            creasePreview=false;
+                            tip(grid,7,sprintf('保留全部原三角面：%d层法向棱柱，首层顶点位移%.5g µm；Gmsh四面体外域。热流分辨率尚未验证。',numel(heights)-1,1e6*(heights(2)-heights(1))));
+                        end
                     elseif strcmp(mode,'normalLayers')
                         tip(grid,7,'24层近壁偏置 + 16层外域；首层母线法向距离2 µm，近壁增长率1.25。三维面法向距离略受周向多边形影响，不能据此宣称y+或热流精度通过。');
                     else
@@ -834,9 +854,14 @@ renderEditor();sync();showGeometry(true);
         next.su2.hybridMesh.layerHeights=next.su2.hybridMesh.layerHeights(:)';
         state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
         embeddedVolume=candidate;state=aeroHeatWorkflowState('setMesh',state,struct('mesh',state.orientedMesh));
+        creasePreview=false;
         researchUI=[];webUI=[];report=[];delete(resultHost.Children);
         renderEditor();showGeometry(true);
         message(sprintf('已核对并复用%d体单元，原表面不变；加载原网格参数，请重新确认边界。',numel(candidate.cells)));
+    end
+    function toggleCreasePreview(~,~)
+        assert(~state.busy && ~isempty(embeddedVolume) && state.currentStep==2);
+        creasePreview=~creasePreview;renderEditor();sync();showGeometry(true);
     end
     function startEngine()
         try

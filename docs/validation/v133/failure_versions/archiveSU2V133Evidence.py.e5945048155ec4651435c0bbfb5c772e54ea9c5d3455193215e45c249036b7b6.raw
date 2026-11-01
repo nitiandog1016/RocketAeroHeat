@@ -1,0 +1,119 @@
+"""归档v133小型证据与准确执行源；不运行网格、MATLAB或流场，不删除文件。"""
+from pathlib import Path
+import hashlib,json,shutil,subprocess
+
+ROOT=Path(__file__).resolve().parents[1]
+BASE=ROOT/'outputs/v133_validation'
+DEST=ROOT/'docs/validation/v133'
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8-sig'))
+
+def write(path,value):
+    assert not path.exists(),str(path)
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+def main():
+    assert not (DEST/'delivery_manifest.json').exists()
+    matlab=read(BASE/'crease_fan_workbench01_process.json')
+    assert matlab['status']=='terminal' and matlab['exitCode']==0
+    assert all(matlab['sourceStableAfter'].values())
+    current={name:sha(ROOT/name)==value for name,value in matlab['sourceSHA256'].items()}
+    assert all(current.values()),[k for k,v in current.items() if not v]
+
+    # 仅本轮目录按Windows文件身份去重，不将文件长度说成磁盘分配。
+    groups={};inventory=[]
+    for path in sorted(BASE.rglob('*')):
+        if not path.is_file():continue
+        stat=path.stat();key=(stat.st_dev,stat.st_ino)
+        assert stat.st_ino!=0
+        groups.setdefault(key,[]).append(path)
+        inventory.append(dict(path=path.relative_to(ROOT).as_posix(),bytes=stat.st_size,
+            device=stat.st_dev,fileID=stat.st_ino,linkCount=stat.st_nlink,sha256=sha(path)))
+    storage=dict(scope='outputs/v133_validation only; before archival',files=inventory,
+        pathCount=len(inventory),uniqueFileIDs=len(groups),pathLengthBytes=sum(row['bytes'] for row in inventory),
+        distinctFileLengthBytes=sum(paths[0].stat().st_size for paths in groups.values()),
+        hardlinkedGroups=[[p.relative_to(ROOT).as_posix() for p in paths] for paths in groups.values() if len(paths)>1],
+        isAllocatedDiskUsage=False,historicalOutputScan=False,deletedFiles=0,
+        uniqueResultsDeleted=0,largeResultsBackedUpToGitHub=False)
+    write(DEST/'storage_inventory.json',storage)
+
+    copied=[]
+    def copy(source,target):
+        target.parent.mkdir(parents=True,exist_ok=True)
+        assert not target.exists(),str(target)
+        shutil.copyfile(source,target);assert sha(source)==sha(target)
+        copied.append(dict(source=source.relative_to(ROOT).as_posix(),archived=target.relative_to(ROOT).as_posix(),
+            bytes=target.stat().st_size,sha256=sha(target)))
+    for path in sorted(BASE.rglob('*')):
+        if not path.is_file():continue
+        if path.suffix in ('.json','.log','.png') or (path.suffix=='.mat' and path.stat().st_size<=256*1024):
+            copy(path,DEST/'evidence'/path.relative_to(BASE))
+    # 小型原面/参数输入可复用；完整上游体网格仍只存本地，不声称GitHub可独立逐字重放。
+    for name in ['mesh_input.mat','mesh_process.json','mesh_report.json']:
+        copy(ROOT/'outputs/v120_validation/mesh32'/name,DEST/'inputs/v120_mesh32'/name)
+
+    owned=['scripts/buildSU2CreaseFan.py','scripts/auditSU2HybridTopology.py','scripts/auditSU2CreaseFan.py',
+        'scripts/optimizeSU2FanExterior.py','scripts/finalizeSU2CreaseFan.py','tests/testSU2CreaseFan.py',
+        'tests/testSU2CreaseFanWorkbench.m','tests/verifySU2CreaseFanSlice.py',
+        'buildSU2CreaseFanSlice.m','readSU2HybridVolume.m','rocketAeroHeatWorkbench.m']
+    dependencies=['scripts/meshSU2HybridVolume.py','scripts/prepareSU2CheckpointContinuation.py',
+        'scripts/reviewSU2SSTLocalDiffusion.py','scripts/runMatlabResearch.py',
+        'aeroHeatWorkflowState.m','createAerothermalGeometryView.m','updateAerothermalGeometryView.m',
+        'web/geometry.html','web/geometry.js','web/geometry.css']
+    bindings=[]
+    for name in owned+dependencies+[Path(__file__).relative_to(ROOT).as_posix()]:
+        path=ROOT/name;h=sha(path)
+        target=DEST/'source_versions'/(path.name+'.'+h+'.raw')
+        copy(path,target)
+        bindings.append(dict(path=name,sha256=h,archived=target.relative_to(ROOT).as_posix(),
+            inMatlabLock=name in matlab['sourceSHA256'],
+            matchesMatlabLock=matlab['sourceSHA256'].get(name)==h))
+
+    # 关键执行回执中的所有版本都必须存在，旧源由failure_versions保留，绝不用当前源替代。
+    receipts=[]
+    for rel in ['fan/mesh_process.json','fan/geometry_audit.json','optimized/mesh_process.json',
+                'optimized_recovered/mesh_process.json','fan_workbench/mesh_process.json','outer_result.json','slice_check.json']:
+        d=read(BASE/rel);locks=d.get('sourceHashes',d.get('sourceSHA256',{}));rows=[]
+        for name,h in locks.items():
+            path=Path(name)
+            if path.is_file() and sha(path)==h:
+                version=path
+            else:
+                found=[p for p in (DEST/'failure_versions').glob('*.'+h+'.raw') if sha(p)==h]
+                assert len(found)==1,(rel,name,h)
+                version=found[0]
+            rows.append(dict(path=name,sha256=h,verifiedVersion=version.relative_to(ROOT).as_posix()))
+        # 若回执保存了产物SHA，逐个验证，包括仍只存本地的大型MAT。
+        for name,h in d.get('outputSHA256',{}).items():assert sha((BASE/rel).parent/name)==h
+        receipts.append(dict(receipt=rel,bindings=rows))
+
+    unmerged=[dict(path=name,taskSHA256=matlab['sourceSHA256'][name],committedByThisVersion=False)
+        for name in ['web/viewer.js','web/section.js','tests/verifyWebSectionExport.py']]
+    metadata=dict(baseCommit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        files=copied,sourceBindings=bindings,executionBindings=receipts,matlabLockedFilesVerified=len(current),
+        matlabExitCode=0,nativeFlowRuns=0,nativeOptimizationCalls=2,nativeOptimizationExitCodes=[1,1],
+        geometryRecomputedForWorkbench=False,finalBuilderMetadataChangeNotRerunEndToEnd=True,
+        sliceVerifierExecutedAfterMatlab=True,unmergedWorkbenchResources=unmerged,
+        localOnlyRequiredForExactReplay=['outputs/v120_validation/mesh32/hybrid_volume.mat',
+            'outputs/v118_validation/actual01/surface.mat','outputs/v56_validation/state_validity/state_validity_actual_rocket.mat'],
+        additionalReadDependency=dict(path='outputs/v56_validation/state_validity/state_validity_actual_rocket.mat',
+            sha256AtDelivery=sha(ROOT/'outputs/v56_validation/state_validity/state_validity_actual_rocket.mat'),
+            explicitMatlabInputLock=False),
+        largeResultsBackedUpToGitHub=False,physicsQualified=False,newQualifiedArea=0,defaultChanged=False,
+        fixtureTestRecord='Two tests passed in prior tool execution (0.015s); no separate persisted success stdout; failure version retained')
+    # 清单列出所有已有小证据文件，不包含自身，便于对Git blob逐字核对。
+    listed={row['archived'] for row in copied}
+    for path in sorted(DEST.rglob('*')):
+        if path.is_file() and path.relative_to(ROOT).as_posix() not in listed:
+            copied.append(dict(archived=path.relative_to(ROOT).as_posix(),bytes=path.stat().st_size,sha256=sha(path)))
+    metadata['evidenceBytesBeforeManifest']=sum(row['bytes'] for row in copied)
+    write(DEST/'delivery_manifest.json',metadata)
+    print(json.dumps(dict(archivedFiles=len(copied),evidenceBytes=metadata['evidenceBytesBeforeManifest'],
+        pathLengthBytes=storage['pathLengthBytes'],distinctFileLengthBytes=storage['distinctFileLengthBytes'],
+        verifiedMatlabLocks=len(current)),indent=2))
+
+if __name__=='__main__':main()
