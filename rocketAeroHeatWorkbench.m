@@ -222,16 +222,25 @@ renderEditor();sync();showGeometry(true);
                         end
                         fan=~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'constructionOperation') && ...
                             startsWith(embeddedVolume.meshConstruction.constructionOperation,'closed-convex-rim-');
-                        if fan
+                        transition=~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'noseRetainedLayers');
+                        if transition
+                            % 局部终止网格不再全表面等层；直接展示实际计数，不能沿用统一层数说明。
+                            construction=embeddedVolume.meshConstruction;
+                            controls.generate.Text='重新生成常规体网格';
+                            controls.meshMethod=tip(grid,7,sprintf('已复用局部棱柱终止网格：%d棱柱 / %d金字塔 / %d四面体。鼻部保留%d层（%.5g mm），其余%d层。SICN<0.1：%d；未获物理资格。', ...
+                                construction.prisms,construction.pyramids,construction.tetrahedra,construction.noseRetainedLayers, ...
+                                1e3*construction.noseRetainedHeightM,construction.normalLayers,construction.tetsBelowSICN01));
+                        elseif fan
                             controls.generate.Text='重新生成常规体网格';
                             controls.meshMethod=tip(grid,7,sprintf('已复用尾缘双法向棱柱扇；%d层，参考首层距%.5g µm。外域仍有%d个SICN<0.1单元；未获物理资格。', ...
                                 numel(heights)-1,1e6*(heights(2)-heights(1)),embeddedVolume.meshConstruction.tetsBelowSICN01));
-                            label='查看尾缘体网格截面';if creasePreview,label='返回整箭表面';end
-                            controls.creasePreview=button(grid,10,label,@toggleCreasePreview);
                         else
-                            creasePreview=false;
                             tip(grid,7,sprintf('保留全部原三角面：%d层法向棱柱，首层顶点位移%.5g µm；Gmsh四面体外域。热流分辨率尚未验证。',numel(heights)-1,1e6*(heights(2)-heights(1))));
                         end
+                        if fan
+                            label='查看尾缘体网格截面';if creasePreview,label='返回整箭表面';end
+                            controls.creasePreview=button(grid,10,label,@toggleCreasePreview);
+                        else,creasePreview=false;end
                     elseif strcmp(mode,'normalLayers')
                         tip(grid,7,'24层近壁偏置 + 16层外域；首层母线法向距离2 µm，近壁增长率1.25。三维面法向距离略受周向多边形影响，不能据此宣称y+或热流精度通过。');
                     else
@@ -625,6 +634,8 @@ renderEditor();sync();showGeometry(true);
             if strcmp(initial,'wallEnthalpy')
                 assert(strcmp(thermal,'isothermal'),'壁面相容初猜目前只支持给定统一壁温。');
                 assert(~isempty(embeddedVolume) && strcmp(embeddedVolume.sourceKind,'original-triangle-hybrid-volume'),'壁面相容初猜需要原三角混合体网格。');
+                assert(~isfield(embeddedVolume.meshConstruction,'noseRetainedLayers') && ~isfield(embeddedVolume.meshConstruction,'sideNodeIDs'), ...
+                    '局部终止或尾缘扇网格尚未适配该初猜；不能使用等层编号推算近壁厚度。');
                 nv=size(embeddedVolume.sourceVertices,1);nl=embeddedVolume.meshConstruction.prisms/size(state.mesh.F,1);
                 height=vecnorm(embeddedVolume.vertices(nl*nv+(1:nv),:)-embeddedVolume.sourceVertices,2,2);
                 assert(all(height>=thickness),'初猜厚度超出完整棱柱区，请调整网格或厚度。');

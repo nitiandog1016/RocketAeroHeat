@@ -50,7 +50,7 @@ def state(path, turbulent, phase_output=False, spatial_output=False):
 
 
 def mesh(path):
-    """只读SU2原网格，保留编号；棱柱/四面体/六面体和二维四边形支持。"""
+    """只读SU2原网格，保留编号；棱柱/金字塔/四面体/六面体和二维四边形支持。"""
     with Path(path).open() as f:
         assert f.readline().startswith('NDIME=');f.seek(0)
         nd=int(f.readline().split('=')[1]);nc=int(f.readline().split('=')[1])
@@ -88,6 +88,7 @@ def wall_geometry(path):
     edges={5:((0,1),(1,2),(2,0)),9:((0,1),(1,2),(2,3),(3,0)),
            10:((0,1),(0,2),(0,3),(1,2),(1,3),(2,3)),
            13:((0,1),(1,2),(2,0),(3,4),(4,5),(5,3),(0,3),(1,4),(2,5)),
+           14:((0,1),(1,2),(2,3),(3,0),(0,4),(1,4),(2,4),(3,4)),
            12:((0,1),(1,2),(2,3),(3,0),(4,5),(5,6),(6,7),(7,4),(0,4),(1,5),(2,6),(3,7))}
     for row in cells:
         typ=row[0];v=row[1:];assert typ in edges

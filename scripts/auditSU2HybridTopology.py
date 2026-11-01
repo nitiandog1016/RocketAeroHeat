@@ -1,5 +1,6 @@
 """独立积分棱柱多面体与面配对，检查完整域；不把拓扑合格当作物理验证。"""
 import numpy as np
+from su2PyramidGeometry import pyramid_geometry
 
 def polyvolume(P,F):
     return float(np.sum(np.einsum('ij,ij->i',P[F[:,0]],np.cross(P[F[:,1]],P[F[:,2]])))/6)
@@ -17,6 +18,8 @@ def paired(faces,boundary):
 
 def audit(data):
     P=data['vertices'];W=data['wedges'].astype(int)-1;T=data['tetrahedra'].astype(int)-1
+    Q=data.get('pyramids',np.empty((0,5),int)).astype(int)-1
+    pv,pyramid=pyramid_geometry(P,Q)
     F=data['sourceFaces'].astype(int)-1;far=data['farfield'].astype(int)-1
     V=data['sourceVertices'];assert np.array_equal(P[:len(V)],V)
     ref=P[W].mean(axis=1);volume=np.zeros(len(W));closure=np.zeros_like(ref);scale=np.zeros(len(W))
@@ -30,12 +33,13 @@ def audit(data):
     closureError=float(max(np.linalg.norm(closure,axis=1)/scale));assert closureError<2e-12
     q=P[T];tv=np.einsum('ij,ij->i',q[:,1]-q[:,0],np.cross(q[:,2]-q[:,0],q[:,3]-q[:,0]))/6
     assert np.all(tv>0)
-    tri=np.concatenate([W[:,[0,2,1]],W[:,[3,4,5]],T[:,[0,2,1]],T[:,[0,1,3]],T[:,[1,2,3]],T[:,[2,0,3]]])
-    quad=np.concatenate([W[:,[0,1,4,3]],W[:,[1,2,5,4]],W[:,[2,0,3,5]]])
+    tri=np.concatenate([W[:,[0,2,1]],W[:,[3,4,5]],T[:,[0,2,1]],T[:,[0,1,3]],T[:,[1,2,3]],T[:,[2,0,3]],
+        Q[:,[0,1,4]],Q[:,[1,2,4]],Q[:,[2,3,4]],Q[:,[3,0,4]]])
+    quad=np.concatenate([W[:,[0,1,4,3]],W[:,[1,2,5,4]],W[:,[2,0,3,5]],Q[:,[0,3,2,1]]])
     tr=paired(tri,np.concatenate([F[:,[0,2,1]],far]));qr=paired(quad,np.empty((0,4),int))
-    outer=polyvolume(P,far);body=polyvolume(V,F);total=float(sum(volume)+sum(tv))
+    outer=polyvolume(P,far);body=polyvolume(V,F);total=float(sum(volume)+sum(tv)+sum(pv))
     relative=abs(total-(outer-body))/total;assert relative<2e-10
-    return dict(passed=True,prisms=len(W),tetrahedra=len(T),nodes=len(P),originalFaces=len(F),
+    return dict(passed=True,prisms=len(W),pyramids=len(Q),pyramidGeometry=pyramid,tetrahedra=len(T),nodes=len(P),originalFaces=len(F),
         minimumPrismVolume=float(min(volume)),minimumTetVolume=float(min(tv)) if len(tv) else None,
         maximumPrismClosureRelative=closureError,totalFluidVolume=total,outerVolume=outer,bodyVolume=body,
         fluidVolumeClosureRelative=relative,triangular=tr,quadrilateral=qr,physicsQualified=False,newQualifiedArea=0)

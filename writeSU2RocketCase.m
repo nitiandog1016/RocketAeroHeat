@@ -1,6 +1,6 @@
 function info=writeSU2RocketCase(volume,folder,flight)
 %WRITESU2ROCKETCASE 导出完整三维网格与明确物性的SU2配置，不启动求解。
-% 模块一：保留棱柱/六面体/四面体及真实墙面、完整远场，输入须已通过几何审核。
+% 模块一：保留棱柱/金字塔/六面体/四面体及真实墙面、完整远场，输入须已通过几何审核。
 % 模块二：项目来流[-cosαcosβ,-sinβ,+sinαcosβ]转换到SU2的攻角/侧滑。
 % 模块三：给定Tw与流体温度分开；几何预处理不授予热流资格。
 if nargin<3,flight=struct;end
@@ -18,6 +18,7 @@ validateattributes(flight.namedCheckpoints,{'logical'},{'scalar'});
 % 具名检查点会保留多个时刻，须由调用方显式启用并限定输出预算；默认不扩大存储。
 overwrite='YES';if flight.namedCheckpoints,overwrite='NO';end
 assert(strcmp(volume.kind,'complete-rocket-three-dimensional-su2-volume') && ~volume.physicalSolution);
+assert(all(ismember(volume.cellTypes,[10 12 13 14])),'未支持的体单元类型。');
 % 热边界在写目录前验证。空间Tw必须先有实际调用器，禁止静默降级为统一Tw。
 spec=flight.thermalBoundary;
 if isempty(spec),spec=struct('mode','isothermal','temperature',flight.wallTemperature);end
@@ -89,7 +90,7 @@ fid=fopen(fullfile(folder,'case.cfg'),'w','n','UTF-8');assert(fid>=0);guard=onCl
 direction=[-cosd(flight.alpha)*cosd(flight.beta),-sind(flight.beta),sind(flight.alpha)*cosd(flight.beta)];
 info=struct('kind',volume.kind,'flight',flight,'thermalBoundary',thermal,'expectedVelocity',flight.Mach*sqrt(gamma*R*flight.temperature)*direction, ...
     'nodes',size(volume.vertices,1),'cells',numel(volume.cells),'hexes',sum(volume.cellTypes==12), ...
-    'wedges',sum(volume.cellTypes==13),'tetrahedra',sum(volume.cellTypes==10),'wallFaces',numel(volume.wall),'wallArea',volume.bodyArea, ...
+    'wedges',sum(volume.cellTypes==13),'pyramids',sum(volume.cellTypes==14),'tetrahedra',sum(volume.cellTypes==10),'wallFaces',numel(volume.wall),'wallArea',volume.bodyArea, ...
     'bodyVolume',volume.bodyVolume,'fluidVolume',volume.fluidVolume,'minimumSubTetVolume',volume.minimumSubTetVolume, ...
     'regions',{unique(volume.wallRegion)},'referenceArea',refArea,'originalSurfaceFaceCount',size(volume.sourceFaces,1), ...
     'coordinateConvention','X-axis; nose +X; zero-incidence flow -X; positive alpha flow +Z; SI', ...
