@@ -62,14 +62,14 @@
       V.forEach(v=>v.forEach((x,j)=>{lo[j]=Math.min(lo[j],x);hi[j]=Math.max(hi[j],x);}));
       if(V.length){const extent=Math.max(...hi.map((x,j)=>x-lo[j]));if(!(extent>0))throw Error('模型尺寸为零。');const center=lo.map((x,j)=>(x+hi[j])/2);modelCenter=center;modelExtent=extent;vertices=V.map(v=>v.map((x,j)=>(x-center[j])/extent));}
       loadFlow(data.surfaceFlowLines);
-      if(field){const note=document.querySelector('footer span:last-child');if(note)note.textContent='逐面研究场 · 未授予物理资格 · 给定/未知温度分列';}
+      {const note=document.querySelector('footer span:last-child');if(note)note.textContent=field?(field.context==='mesh-quality'?'网格质量 · 灰色原壁面用于定位 · 不代表物理求解':'逐面研究场 · 未授予物理资格 · 给定/未知温度分列'):'几何预览 · 尚未计算物理场量';}
       // 模块用途：仅叠加真实空间截面交线，保持原相机和面元拾取，不把交线当流线。
       const sections=data.sectionSegments||[];
       if(!Array.isArray(sections)||sections.length>100000||sections.some(s=>!Array.isArray(s)||s.length!==2||s.some(p=>!Array.isArray(p)||p.length!==3||p.some(x=>!finite(x)))))throw Error('截面交线坐标无效。');
       sectionSegmentCount=sections.length;
       if(gl)buffer(sectionPositions,sections.flatMap(s=>s.flatMap(p=>p.map((x,j)=>(x-modelCenter[j])/modelExtent))));
       if(gl){const ts=[],cs=[],es=[];F.forEach((f,faceIndex)=>{const a=vertices[f[0]],b=vertices[f[1]],c=vertices[f[2]],ab=b.map((x,j)=>x-a[j]),ac=c.map((x,j)=>x-a[j]);let n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];const norm=Math.hypot(...n);n=norm>0?n.map(x=>x/norm):[0,0,0];const light=.65+.22*Math.abs(dot(n,[.3,.4,.8660254])),color=field?(finite(field.values[faceIndex])?fieldColor((field.values[faceIndex]-field.range[0])/(field.range[1]-field.range[0])):[.66,.69,.72]):[.52,.60,.67].map(x=>x*light);f.forEach(i=>{ts.push(...vertices[i]);cs.push(...color);});[0,1,1,2,2,0].forEach(j=>es.push(...vertices[f[j]]));});buffer(positions,ts);buffer(colorBuffer,cs);buffer(edges,es);}
-      const legend=$('fieldLegend');if(legend){legend.hidden=!field;if(field){legend.replaceChildren();const label=document.createElement('span'),bar=document.createElement('div');label.textContent=field.name+' / '+field.unit+' · 固定范围 '+fmt(field.range[0])+'—'+fmt(field.range[1])+' · 超范围使用端点色；灰色为未知';bar.className='fieldColorBar';legend.append(label,bar);}}
+      const legend=$('fieldLegend');if(legend){legend.hidden=!field;if(field){legend.replaceChildren();const label=document.createElement('span'),bar=document.createElement('div');label.textContent=field.name+' / '+field.unit+' · 固定范围 '+fmt(field.range[0])+'—'+fmt(field.range[1])+(field.context==='mesh-quality'?' · 灰色为原壁面定位参考':' · 超范围使用端点色；灰色为未知');bar.className='fieldColorBar';legend.append(label,bar);}}
       if(sectionView)sectionView.load(data);
       $('caption').textContent=data.caption||'几何预览';$('coordinates').textContent=data.coordinateNote||'SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例';$('wire').checked=Boolean(data.showWire);
       $('summary').textContent=F.length?V.length.toLocaleString()+' 顶点 · '+F.length.toLocaleString()+' 三角面':'等待导入模型';$('empty').hidden=Boolean(F.length);

@@ -1,0 +1,11 @@
+Warning : Optimization of specified model entities is not interfaced yet
+Info    : Optimizing mesh (Relocate2D)...
+Info    : Done optimizing mesh (Wall 0.0114958s, CPU 0s)
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\relaxSU2NoseEnvelope.py", line 106, in <module>
+    if __name__=='__main__':main()
+  File "E:\RocketAeroHeat\scripts\relaxSU2NoseEnvelope.py", line 84, in main
+    if a.worker:build(source,folder);return
+  File "E:\RocketAeroHeat\scripts\relaxSU2NoseEnvelope.py", line 65, in build
+    assert detail['maximumDisplacementM']<=.002+1e-12,'外壳位移超2mm，保留原始结果'
+AssertionError: 外壳位移超2mm，保留原始结果

@@ -13,7 +13,7 @@ state=aeroHeatWorkflowState('init',[],struct('cfg',cfg));
 preview=[];rotation=eye(3);rotationCenter=[0 0 0];controls=struct;
 webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDetailsOpen=false;
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
-creasePreview=false;
+creasePreview=false;qualityPreview=false;
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
 fig.CloseRequestFcn=@closeWorkbench;
@@ -38,6 +38,8 @@ centerGrid=uigridlayout(center,[1 1]);centerGrid.Padding=[0 0 0 0];
 geometryHost=uipanel(centerGrid,'BorderType','none');geometryHost.Layout.Row=1;geometryHost.Layout.Column=1;
 resultHost=uipanel(centerGrid,'BorderType','none','Visible','off');resultHost.Layout.Row=1;resultHost.Layout.Column=1;
 geometryView=createAerothermalGeometryView(geometryHost,[]);
+geometryReceiver=geometryView.html.DataChangedFcn;
+geometryView.html.DataChangedFcn=@geometryMessage;
 footer=uilabel(frame,'WordWrap','on');footer.Layout.Row=3;footer.Layout.Column=[1 2];
 fig.UserData=struct('workflowState',state,'workflowButtons',buttons, ...
     'workflowSidebar',sidebar,'geometryView',geometryView,'resultHost',resultHost, ...
@@ -50,7 +52,7 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'readTimeoutCheckpoint',@readTimeoutCheckpoint,'useSurfaceForSU2',@useSurfaceForSU2, ...
     'loadNativeFeature',@()loadNative([],[],true),'loadClassic',@loadClassic, ...
     'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh, ...
-    'readVerifiedHEOS',@readVerifiedHEOS,'readSSTStudy',@readSSTStudy);
+    'readVerifiedHEOS',@readVerifiedHEOS,'readSSTStudy',@readSSTStudy,'probeMeshQuality',@probeMeshQuality);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -119,6 +121,18 @@ renderEditor();sync();showGeometry(true);
     function showGeometry(reset)
         if ~isgraphics(fig),return;end
         resultHost.Visible='off';geometryHost.Visible='on';
+        fig.UserData.meshQuality=[];
+        if qualityPreview && state.currentStep==2 && ~isempty(embeddedVolume)
+            % 网格质量来自真实四面体；灰色原壁面只用于空间定位。
+            [m,info]=buildSU2MeshQualityPreview(embeddedVolume);
+            caption=sprintf('低质量体单元 %d 个 · 最小SICN %.5g · 仅网格诊断',info.lowQualityCells,info.minimumSICN);
+            updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',true,'resetCamera',reset));
+            s=geometryView.html.UserData;s.revision=s.revision+1;s.payload.revision=s.revision;s.rendered=[];
+            s.payload.faceField=struct('name','四面体SICN','unit','1', ...
+                'values',info.displayValues,'range',[0 .1],'productionQualified',false,'context','mesh-quality');
+            geometryView.html.UserData=s;geometryView.html.Data=s.payload;
+            fig.UserData.meshQuality=info;fig.UserData.creaseSlice=[];return;
+        end
         if creasePreview && state.currentStep==2 && ~isempty(embeddedVolume)
             % 从已审核的真实体连接显示一列棱柱扇；切页仍保留原壁面与工况。
             [section,info]=buildSU2CreaseFanSlice(embeddedVolume);
@@ -185,7 +199,7 @@ renderEditor();sync();showGeometry(true);
             case 2
                 if isEmbedded()
                     [~,mode]=su2WorkbenchMeshOptions(state.cfg);
-                    grid=form(14);
+                    grid=form(18);
                     controls.volumeMode=choice(grid,1,'体网格模式',{'法向偏置层 · 研究','射线层 · 历史对照','原三角面混合网格 · 研究'}, ...
                         {'normalLayers','starRay','hybridTriangles'},mode);
                     controls.volumeMode.ValueChangedFcn=@nativeMeshEdited;
@@ -201,6 +215,11 @@ renderEditor();sync();showGeometry(true);
                     if strcmp(mode,'hybridTriangles')
                         opts=getOption(state.cfg.su2,'hybridMesh',struct);
                         heights=getOption(opts,'layerHeights',[0 cumsum(2e-5*1.4.^(0:5))]);
+                        if ~isempty(embeddedVolume) && embeddedVolume.meshConstruction.tetsBelowSICN01>0
+                            label='定位低质量体单元';if qualityPreview,label='返回整箭表面';end
+                            controls.meshQuality=button(grid,14,label,@toggleMeshQuality);
+                            controls.meshQualityProbe=tip(grid,15,'点选有色单元：查看体编号、SICN及坐标。灰色为原壁面定位参考。');
+                        end
                         fan=~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'constructionOperation') && ...
                             startsWith(embeddedVolume.meshConstruction.constructionOperation,'closed-convex-rim-');
                         if fan
@@ -823,6 +842,7 @@ renderEditor();sync();showGeometry(true);
                 assert(isfield(state.modelSource,'truth'),'当前原表面须使用混合网格，不能替换成轴对称模型。');
                 embeddedVolume=buildSU2RocketVolume(candidate,state.modelSource.truth,options);
             end
+            creasePreview=false;qualityPreview=false;
             state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));
             preparing=false;renderEditor();showGeometry(true);
             message(sprintf('体网格%d单元；原表面%d面未改变。近壁精度未合格，请确认边界。',numel(embeddedVolume.cells),size(candidate.F,1)));
@@ -835,7 +855,7 @@ renderEditor();sync();showGeometry(true);
             next=state.cfg;next.su2.volumeMode=controls.volumeMode.Value;
             if isequaln(next,state.cfg),return;end
             state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
-            embeddedVolume=[];researchUI=[];webUI=[];report=[];delete(resultHost.Children);
+            embeddedVolume=[];creasePreview=false;qualityPreview=false;researchUI=[];webUI=[];report=[];delete(resultHost.Children);
             renderEditor();showGeometry(false);message('体网格模式已改变；请重新生成网格并确认边界。');
         catch ex,showError(ex);end
     end
@@ -854,14 +874,38 @@ renderEditor();sync();showGeometry(true);
         next.su2.hybridMesh.layerHeights=next.su2.hybridMesh.layerHeights(:)';
         state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
         embeddedVolume=candidate;state=aeroHeatWorkflowState('setMesh',state,struct('mesh',state.orientedMesh));
-        creasePreview=false;
+        creasePreview=false;qualityPreview=false;
         researchUI=[];webUI=[];report=[];delete(resultHost.Children);
         renderEditor();showGeometry(true);
         message(sprintf('已核对并复用%d体单元，原表面不变；加载原网格参数，请重新确认边界。',numel(candidate.cells)));
     end
     function toggleCreasePreview(~,~)
         assert(~state.busy && ~isempty(embeddedVolume) && state.currentStep==2);
-        creasePreview=~creasePreview;renderEditor();sync();showGeometry(true);
+        creasePreview=~creasePreview;qualityPreview=false;renderEditor();sync();showGeometry(true);
+    end
+    function toggleMeshQuality(~,~)
+        assert(~state.busy && ~isempty(embeddedVolume) && state.currentStep==2);
+        qualityPreview=~qualityPreview;creasePreview=false;renderEditor();sync();showGeometry(true);
+    end
+    function geometryMessage(src,event)
+        message=src.Data;geometryReceiver(src,event);
+        if isstruct(message) && isfield(message,'kind') && strcmp(message.kind,'geometry-face-probe')
+            probeMeshQuality(message);
+        end
+    end
+    function probeMeshQuality(message)
+        % 只接受当前显示版本的真实面索引；切页、旧帧与背景面不能读作体单元。
+        if ~qualityPreview || state.currentStep~=2 || isempty(fig.UserData.meshQuality),return;end
+        current=geometryView.html.UserData;
+        if ~isfield(message,'revision') || message.revision~=current.revision || ~isfield(message,'faceIndex'),return;end
+        i=double(message.faceIndex)+1;info=fig.UserData.meshQuality;
+        if ~isscalar(i) || ~isfinite(i) || i~=fix(i) || i<1 || i>numel(info.displaySourceCellIDs),return;end
+        id=info.displaySourceCellIDs(i);
+        if id==0,controls.meshQualityProbe.Text='原壁面定位参考；这里没有体单元SICN或物理求解值。';return;end
+        row=find(info.sourceCellIDs==id,1);xyz=info.cellCenters(row,:);
+        controls.meshQualityProbe.Text=sprintf('体单元 %d · SICN %.6g\n中心 X/Y/Z = %.6g / %.6g / %.6g m\n等边参考Jacobian；网格指标，不是物理解。', ...
+            id,info.cellSICN(row),xyz);
+        fig.UserData.meshQualityProbe=struct('cellID',id,'SICN',info.cellSICN(row),'center',xyz,'geometryOnly',true);
     end
     function startEngine()
         try
