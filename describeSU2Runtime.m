@@ -25,11 +25,21 @@ switch info.flavor
             end
             if isfield(p,'numericalStudy')
                 % 同一物理模型下的推进参数是数值方案，不冒充新增物理方法或已收敛结果。
-                study=p.numericalStudy;assert(strcmp(study.studyID,'v127-common-SST49-CFL5-vs-0.5'));
-                switch study.variant
-                    case 'control',label='CFL上限5控制';
-                    case 'cap05',label='CFL上限0.5候选';
-                    otherwise,error('未知SST数值对照方案。');
+                study=p.numericalStudy;
+                if strcmp(study.studyID,'v132-tail-rim-viscous-gradient')
+                    % 黏性/源项梯度同时影响流动与湍流，不能标成SST单项修复。
+                    switch study.variant
+                        case 'wls',label='WLS黏性/源项梯度控制；对流重构WLS';
+                        case 'gg',label='Green–Gauss黏性/源项梯度候选；流动与SST共同改变，对流重构WLS';
+                        otherwise,error('未知梯度对照方案。');
+                    end
+                else
+                    assert(strcmp(study.studyID,'v127-common-SST49-CFL5-vs-0.5'));
+                    switch study.variant
+                        case 'control',label='CFL上限5控制';
+                        case 'cap05',label='CFL上限0.5候选';
+                        otherwise,error('未知SST数值对照方案。');
+                    end
                 end
                 info.method=[info.method '；同源数值方案：' label '，伪时间重置'];
                 info.physicsCaption=[info.physicsCaption ' / ' label];
