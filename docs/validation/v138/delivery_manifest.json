@@ -1,0 +1,311 @@
+{
+  "status": "tested-ready-for-git-delivery",
+  "sourceSHA256": {
+    "scripts/prepareMMGLocalRuntime.py": "2a6a6fb9e51cd5e5490b4dc907aea95c9f05148a875fe46ad87925b5995696af",
+    "scripts/buildMMGLocalRuntime.py": "ce7d1a82a5cdc973c0a2e0ec057178695828e4d500a314faffb306a8daaa97b4",
+    "scripts/repairMMGLocalWrapper.py": "bcee988577157db8adaba6689f3c6b370a111be6206ff59ee15e73cb92a6a370",
+    "scripts/mmgLocalInterface.py": "8d7c801e5bfc81e9aa872fa8424f3cd7f6bf27694b7d5b13799becdc0824faf8",
+    "scripts/remeshSU2WithMMG.py": "708c04d5f31259a883d3f57c41fd09b91fe48b8d1875eb98f08c76eed3892ffe",
+    "scripts/reviewMMGLocalCandidate.py": "25509f209f861d0eed5d6ea12b52e55124e37b99a066b7e75421117d3dff5304",
+    "scripts/reviewMMGInteriorSeeds.py": "65b2a5d8cfbdccf868bbb009ad71f1e007f2b9537a31142b397db590ba641bbf",
+    "scripts/archiveMMGV138Evidence.py": "9b49421ce673b368662d159b82505a03b2138b525a12ba305b0b27859b0e98a2",
+    "tests/testMMGLocalRemeshing.py": "7cc68da0c4349923b78995f99568f022d069c914ba491c52f9b110c64d33f7cb",
+    "third_party/mmg/local_tetra_remesh.cpp": "ae184c26a19e7fb18d4d38fac647ebc782010b3cd7814b88c2b22460292c7fc1",
+    "scripts/buildCGALRemeshingRuntime.py": "610fa1a581f4e1fc654e9a2a14c4c5809d461e39b195da4b925cf727e9241840",
+    "scripts/prepareCGALRemeshingRuntime.py": "1b3bcaa1435e6038f3df7e1873f124c446cfd37ce6497f66e26ad88199b38fab",
+    "scripts/cgalTetrahedralContract.py": "2b57de057ccbde0c61904f029da1af02e625ef923e3e0ed6c4612277b129f2f8",
+    "tests/testCGALLocalRemeshing.py": "2c4540b30d37e0e651822792a777bae3e5bdf311bc93d14ec0ad1c517ea521e4",
+    "scripts/reviewSU2ExplicitQuality.py": "34cff292a6a8ba8198772a9c82107ee6b5d3cc46d32dbe32f969305ed912b422",
+    "scripts/optimizeSU2FanExterior.py": "1166c9d1a23415be0e13db2a008f03a51635baaae9b7ad310a97b61311632e02",
+    "scripts/meshSU2HybridVolume.py": "99653ba4abeecfddacd15bc8d4575c30bfafc48bd1c8ee5034b2514b9014608b",
+    "scripts/auditSU2HybridTopology.py": "de8eead339f3cc10c747b481b895739e11690c2f4952752b135b1caa8d11051e",
+    "scripts/su2PyramidGeometry.py": "13ae3047ad813b67ab723750c0fb94117ea38a359cf1b6643e6126df92e13a12"
+  },
+  "documentSHA256": {
+    "AGENTS.md": "eacb30e669a013409efc29a1d0042afa066c909ed64534c27609a9cdee43a8d9",
+    "docs/PROJECT_GOALS.md": "1dd673127e6b06f5da48f25b06cd0e508f78886b09e6d4fd9358a4c39313b86f",
+    "docs/MMG_LOCAL_REMESH_V138.md": "42d53d8d5044b1f8410f8c1f9151845461b0284494ec224bca7d1564ab54c064",
+    "third_party/mmg/README.md": "c8c8fed84ac5c047a3b2c9ee5462d43f528eaa787ccec9344eb3d89253f9d508",
+    ".gitignore": "eb6da55309fcef1edcff48d1c3790bcf5b4bffc0258c5c60080a44fe5d4bcc9a",
+    ".gitattributes": "0e06034fb74f255a8e6211f6819ca29283e20f840f779105c30d8744d6ecf773"
+  },
+  "files": {
+    "failures_and_correction.json": {
+      "sha256": "3d2395b34da18561144d00be8b1de40b426cf09dbfa8dd009f48aa235a972673",
+      "bytes": 1273
+    },
+    "plan.md": {
+      "sha256": "030776230b88920f1c6ab1e9ef034813e0bc0c885043fb442aa0400132e0441f",
+      "bytes": 3036
+    },
+    "storage_and_sources.json": {
+      "sha256": "673ab39be5e7fa054e8c6284f8844ec481ef50bafb1f37a33b7a40873b5478d2",
+      "bytes": 4800
+    },
+    "actual/candidate_report.json": {
+      "sha256": "b975cc209be5ddc8c7f7624f3287abf00090793fc6713d8a993fefb51501cb54",
+      "bytes": 29329
+    },
+    "actual/failure.log": {
+      "sha256": "56132792f22e11953b19a4091e3e461b271f1c51c4bdaeaa44708f695b2ec09f",
+      "bytes": 254
+    },
+    "actual/geometry_audit.json": {
+      "sha256": "58c791e9432afcdc62facc1c8b1d30d610dad0db4af9712ceb80bc29e58a868e",
+      "bytes": 1006
+    },
+    "actual/independent_review.json": {
+      "sha256": "85f17d38d7d2b9f218de1d56b79d03925ef568f3a8055e531508ed255c16f8b2",
+      "bytes": 1787
+    },
+    "actual/independent_review02.json": {
+      "sha256": "5d671fc0908493baf8ba12d821f1e74556458a92a6215421d2f224bec86074a2",
+      "bytes": 1787
+    },
+    "actual/interior_seed_review.json": {
+      "sha256": "f6181db8c14aed23ac4b873ecc5d4c2b38f0e930b600363c2436eb54bbd901b2",
+      "bytes": 63387
+    },
+    "actual/mesh_process.json": {
+      "sha256": "414935fd6c6988e007df8f0e5150785776989ea9c4493a431cd27005eeadc9fa",
+      "bytes": 3095
+    },
+    "actual/mesh_report.json": {
+      "sha256": "d80fe09fc1769c931b213883e85d3db66107d313e8a5e6aa6e827dab65916b97",
+      "bytes": 99104
+    },
+    "actual/native/interface.json": {
+      "sha256": "253b63de71ddd38f24de15e0154d85529612ca92925af2e14ec941a48b678884",
+      "bytes": 536
+    },
+    "actual/native/process/process.json": {
+      "sha256": "49830c5b9e5f1f397f0355e18dab80c61f5ffb0e9398a59659698db4f4e10404",
+      "bytes": 4103
+    },
+    "actual/native/process/stdout.log": {
+      "sha256": "743abebe56f16153b0c98319689f0d33183bef905778b5031cd0461cd6f46bc7",
+      "bytes": 1131
+    },
+    "hollow_test/input.dat": {
+      "sha256": "97ca5ba4b4420215f7ea66a329d2e81fd66bf78bf75d2700b72c7dd852d771a6",
+      "bytes": 4284
+    },
+    "hollow_test/process/process.json": {
+      "sha256": "aeb2232127cfe959127680805d74d5d9b64ea98c312fab39954d7cf0c6c752d3",
+      "bytes": 2773
+    },
+    "hollow_test/process/stdout.log": {
+      "sha256": "aa749b440f19c323ac262720073c16dcaae885cd0e19d04b913ca2d8bca0647d",
+      "bytes": 89
+    },
+    "hollow_test02/input.dat": {
+      "sha256": "97ca5ba4b4420215f7ea66a329d2e81fd66bf78bf75d2700b72c7dd852d771a6",
+      "bytes": 4284
+    },
+    "hollow_test02/interface.json": {
+      "sha256": "ad90d1282797f68d38a313788b705024cd2b2e04d9523f25e0adec779eb793da",
+      "bytes": 502
+    },
+    "hollow_test02/native_import.dat": {
+      "sha256": "1ba82de729566bddbc57170eb33c4e2be3b6bbca1300f57ada4e0625a562b40f",
+      "bytes": 4764
+    },
+    "hollow_test02/native_result.dat": {
+      "sha256": "f5ca5c3d60bae40147b06c6a8b4403b5a8411e846ae5f83522910a9264b5e7b5",
+      "bytes": 4671
+    },
+    "hollow_test02/report.json": {
+      "sha256": "68d17132ba32fba3446d2b8a93ad01f3c2280d437e72e4819c96b7aa18774aef",
+      "bytes": 1386
+    },
+    "hollow_test02/process/process.json": {
+      "sha256": "89c33c99518f0d74904776ead51981deb532026a53e0a8e69a606eeae29f8d8d",
+      "bytes": 2782
+    },
+    "hollow_test02/process/stdout.log": {
+      "sha256": "39c2496ef19290080e08f65bb68ce91d9cfae8da51940d990e03f4a7bc89fa7a",
+      "bytes": 1220
+    },
+    "official/CMakeLists.txt": {
+      "sha256": "cfb5623289883adbacaafa52857090d385c762df0e3b092a89886220494baac0",
+      "bytes": 11642
+    },
+    "official/COPYING": {
+      "sha256": "e7ff0fa81da220d46fb436142c7fb38ba4e5b3656c24caab4d34135ce98a0f07",
+      "bytes": 35150
+    },
+    "official/COPYING.LESSER": {
+      "sha256": "97628afebc60f026f5c2b25d7491c46a5c4ee61f693e7cfa07fbd2c03605979b",
+      "bytes": 7652
+    },
+    "official/src/mmg3d/API_functions_3d.c": {
+      "sha256": "e21e590060fdf01a4fc6d28f32df1e6a5d029200ad1ee7cccec6ae80e8c32a3a",
+      "bytes": 70529
+    },
+    "official/src/mmg3d/isosiz_3d.c": {
+      "sha256": "765aa882ee333a92d123a7a7c1be6dee605e9689d01c0ca3df7e88de234d08ef",
+      "bytes": 38531
+    },
+    "official/src/mmg3d/libmmg3d.c": {
+      "sha256": "96b502e3324592f73e5de1b639a254fae6c8d1d52bceabc44da5ecb4d0e4c5d2",
+      "bytes": 49521
+    },
+    "official/src/mmg3d/libmmg3d.h": {
+      "sha256": "4fc5bb3251cafbdb66b2bf33c641e1530514e1fb9d94cd26c0a1c4ed20685443",
+      "bytes": 134816
+    },
+    "official/src/mmg3d/mmg3d1.c": {
+      "sha256": "b250a9ad6a6ca496c7db47bf3cb0ab1e99e59b80ddd7d86ac592b950638a5e7d",
+      "bytes": 101888
+    },
+    "runtime/build_before_path_fix.py": {
+      "sha256": "83f3a9f6a7dabd72efd95e0fa5ad44f6738e90a1c823c36185d9f205f6ad4a8e",
+      "bytes": 3633
+    },
+    "runtime/runtime.json": {
+      "sha256": "52acae833211857ba6ea0b7801f6a97360e398731627268a2917b0656ce69cbb",
+      "bytes": 546104
+    },
+    "runtime/runtime_before_interface_fix.json": {
+      "sha256": "e446320781bda96a550f5f78cd82151f38a2052c0128bc39a4c8de7208fd5fee",
+      "bytes": 478723
+    },
+    "runtime/source.json": {
+      "sha256": "36a1b5d90ad0fe271f0c6dfb367908dae2e3666b0337464f80431ac2e5ba5ffb",
+      "bytes": 64810
+    },
+    "runtime/windows_build.patch": {
+      "sha256": "b237f69d7cc63372279524ce30b5232d941bff941d85f74d5dc0b6a721c14739",
+      "bytes": 533
+    },
+    "runtime/compile/process.json": {
+      "sha256": "f7aa52f12c825d6d5a534d57acf341a39f5cd1c455039bd32b3a90281e974a59",
+      "bytes": 106686
+    },
+    "runtime/compile/stdout.log": {
+      "sha256": "5e56a45e4df36419f2c97a593a16a7d7a2271d2095c005af9c5d9aa1eef833d6",
+      "bytes": 6646
+    },
+    "runtime/configure/process.json": {
+      "sha256": "1679055c65b8081c1d4c522126b8e9c72548f2ebbabbb6ad24b9089d6f1beab7",
+      "bytes": 107278
+    },
+    "runtime/configure/stdout.log": {
+      "sha256": "90b6ad88a27674d01ab6b09a76823ae6c99b7efd552e49d2da7966a11dbfb2b5",
+      "bytes": 1353
+    },
+    "runtime/wrapper/process.json": {
+      "sha256": "1e70fb3b33ddbcd18c80878a6de4a22d898396682aea44dad0eaa5c931deb9c4",
+      "bytes": 106925
+    },
+    "runtime/wrapper/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "runtime/wrapper02/process.json": {
+      "sha256": "67c1030ee591ab6ed079827defce79615a55d058b3bae8e13cdcf39219206a60",
+      "bytes": 1684
+    },
+    "runtime/wrapper02/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "source_versions/before_edge_index_fix/reviewMMGInteriorSeeds.py": {
+      "sha256": "4f0fce632e4b1f2f0c65b02fc8b51c458a992bdad8a82b3b2bfaa56dc0648618",
+      "bytes": 2848
+    },
+    "source_versions/before_edge_index_fix/reviewMMGLocalCandidate.py": {
+      "sha256": "67f68156b276c3e5f0d981ccff326a99ead566860d1e94de772a57618d3055be",
+      "bytes": 3826
+    },
+    "source_versions/before_interface_fix/local_tetra_remesh.cpp": {
+      "sha256": "8d0b14203dccc999ba13b2d986bfd8bb945f9ba16cc3df574d7956a34b025ef5",
+      "bytes": 3480
+    },
+    "source_versions/before_interface_fix/testMMGLocalRemeshing.py": {
+      "sha256": "ec1f5d77c2ba882015f0e89ffe03302664c7b33f314e14b3f17854b62e6eb3eb",
+      "bytes": 1987
+    },
+    "source_versions/final/scripts/archiveMMGV138Evidence.py": {
+      "sha256": "9b49421ce673b368662d159b82505a03b2138b525a12ba305b0b27859b0e98a2",
+      "bytes": 6159
+    },
+    "source_versions/final/scripts/auditSU2HybridTopology.py": {
+      "sha256": "de8eead339f3cc10c747b481b895739e11690c2f4952752b135b1caa8d11051e",
+      "bytes": 3027
+    },
+    "source_versions/final/scripts/buildCGALRemeshingRuntime.py": {
+      "sha256": "610fa1a581f4e1fc654e9a2a14c4c5809d461e39b195da4b925cf727e9241840",
+      "bytes": 2841
+    },
+    "source_versions/final/scripts/buildMMGLocalRuntime.py": {
+      "sha256": "ce7d1a82a5cdc973c0a2e0ec057178695828e4d500a314faffb306a8daaa97b4",
+      "bytes": 4123
+    },
+    "source_versions/final/scripts/cgalTetrahedralContract.py": {
+      "sha256": "2b57de057ccbde0c61904f029da1af02e625ef923e3e0ed6c4612277b129f2f8",
+      "bytes": 1513
+    },
+    "source_versions/final/scripts/meshSU2HybridVolume.py": {
+      "sha256": "99653ba4abeecfddacd15bc8d4575c30bfafc48bd1c8ee5034b2514b9014608b",
+      "bytes": 10587
+    },
+    "source_versions/final/scripts/mmgLocalInterface.py": {
+      "sha256": "8d7c801e5bfc81e9aa872fa8424f3cd7f6bf27694b7d5b13799becdc0824faf8",
+      "bytes": 4192
+    },
+    "source_versions/final/scripts/optimizeSU2FanExterior.py": {
+      "sha256": "1166c9d1a23415be0e13db2a008f03a51635baaae9b7ad310a97b61311632e02",
+      "bytes": 9270
+    },
+    "source_versions/final/scripts/prepareCGALRemeshingRuntime.py": {
+      "sha256": "1b3bcaa1435e6038f3df7e1873f124c446cfd37ce6497f66e26ad88199b38fab",
+      "bytes": 3487
+    },
+    "source_versions/final/scripts/prepareMMGLocalRuntime.py": {
+      "sha256": "2a6a6fb9e51cd5e5490b4dc907aea95c9f05148a875fe46ad87925b5995696af",
+      "bytes": 2071
+    },
+    "source_versions/final/scripts/remeshSU2WithMMG.py": {
+      "sha256": "708c04d5f31259a883d3f57c41fd09b91fe48b8d1875eb98f08c76eed3892ffe",
+      "bytes": 5695
+    },
+    "source_versions/final/scripts/repairMMGLocalWrapper.py": {
+      "sha256": "bcee988577157db8adaba6689f3c6b370a111be6206ff59ee15e73cb92a6a370",
+      "bytes": 1780
+    },
+    "source_versions/final/scripts/reviewMMGInteriorSeeds.py": {
+      "sha256": "65b2a5d8cfbdccf868bbb009ad71f1e007f2b9537a31142b397db590ba641bbf",
+      "bytes": 2865
+    },
+    "source_versions/final/scripts/reviewMMGLocalCandidate.py": {
+      "sha256": "25509f209f861d0eed5d6ea12b52e55124e37b99a066b7e75421117d3dff5304",
+      "bytes": 3862
+    },
+    "source_versions/final/scripts/reviewSU2ExplicitQuality.py": {
+      "sha256": "34cff292a6a8ba8198772a9c82107ee6b5d3cc46d32dbe32f969305ed912b422",
+      "bytes": 3444
+    },
+    "source_versions/final/scripts/su2PyramidGeometry.py": {
+      "sha256": "13ae3047ad813b67ab723750c0fb94117ea38a359cf1b6643e6126df92e13a12",
+      "bytes": 1612
+    },
+    "source_versions/final/tests/testCGALLocalRemeshing.py": {
+      "sha256": "2c4540b30d37e0e651822792a777bae3e5bdf311bc93d14ec0ad1c517ea521e4",
+      "bytes": 5363
+    },
+    "source_versions/final/tests/testMMGLocalRemeshing.py": {
+      "sha256": "7cc68da0c4349923b78995f99568f022d069c914ba491c52f9b110c64d33f7cb",
+      "bytes": 1989
+    },
+    "source_versions/final/third_party/mmg/local_tetra_remesh.cpp": {
+      "sha256": "ae184c26a19e7fb18d4d38fac647ebc782010b3cd7814b88c2b22460292c7fc1",
+      "bytes": 3525
+    }
+  },
+  "evidenceFileCount": 68,
+  "evidenceFileLengthBytes": 2205033,
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "runtimeAndLargeMATUploaded": false
+}
