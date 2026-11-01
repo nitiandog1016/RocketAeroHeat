@@ -1,0 +1,127 @@
+FIXED_SWITCHES pY1q2/5O2/7S30000zVC
+  Initializing memorypools.
+  tetrahedron per block: 8188.
+  Size of a point: 128 bytes.
+  Size of a tetrahedron: 96 (96) bytes.
+  Size of a shellface: 192 (192) bytes.
+  Initializing robust predicates.
+  sizeof(double) =  8
+  machine epsilon =   2.22045e-16 [IEEE 754 64-bit macheps]
+Delaunizing vertices...
+  Permuting vertices.
+  Sorting vertices.
+  Incrementally inserting vertices.
+Delaunay seconds:  0.001
+  Point sorting seconds:  0
+Creating surface mesh ...
+  120 (180) subfaces (segments).
+Surface mesh seconds:  0.001
+Recovering boundaries...
+  Recovering segments.
+  180 (0) segments are recovered (missing).
+  Recovering facets.
+  120 (0) subfaces are recovered (missing).
+Boundary recovery seconds:  0
+  Segment recovery seconds:  0
+  Facet recovery seconds:  0
+Removing exterior tetrahedra ...
+Exterior tets removal seconds:  0
+Recovering Delaunayness...
+  Initial obj = 5976
+Delaunay recovery seconds:  0
+Refining mesh...
+  Min radius-edge ratio = 2.
+  Min dihedral   angle  = 5.
+  Splitting bad quality tets.
+  Added 0 (0,0,0) Steiner points.
+Refinement seconds:  0
+Optimizing mesh...
+  Optimization level  = 2.
+  Optimization scheme = 7.
+  Number of iteration = 3.
+  Min_Max dihed angle = 165.
+Optimization seconds:  0
+
+Writing nodes.
+Writing elements.
+Writing faces.
+Writing edges.
+
+Output seconds:  0
+Total running seconds:  0.002
+  Checking consistency of mesh...
+  In my studied opinion, the mesh appears to be consistent.
+  Checking consistency of the mesh boundary...
+  Mesh boundaries connected correctly.
+  Checking tet->seg connections...
+  Checking seg->tet connections...
+  Checking seg->seg connections...
+  Segments are connected properly.
+
+Statistics:
+
+  Input points: 64
+  Input facets: 120
+  Input segments: 180
+  Input holes: 1
+  Input regions: 0
+
+  Mesh points: 64
+  Mesh tetrahedra: 156
+  Mesh faces: 372
+  Mesh faces on exterior boundary: 120
+  Mesh faces on input facets: 120
+  Mesh edges on input segments: 180
+
+Mesh quality statistics:
+
+  Smallest volume:          0.16667   |  Largest volume:          0.16667
+  Shortest edge:                  1   |  Longest edge:             1.7321
+  Smallest asp.ratio:        2.4495   |  Largest asp.ratio:        2.4495
+  Smallest facangle:         35.264   |  Largest facangle:       90
+  Smallest dihedral:             45   |  Largest dihedral:       90
+
+  Aspect ratio histogram:
+         < 1.5       :         0      |      6 - 10         :         0
+     1.5 - 2         :         0      |     10 - 15         :         0
+       2 - 2.5       :       156      |     15 - 25         :         0
+     2.5 - 3         :         0      |     25 - 50         :         0
+       3 - 4         :         0      |     50 - 100        :         0
+       4 - 6         :         0      |    100 -            :         0
+  (A tetrahedron's aspect ratio is its longest edge length divided by its
+    smallest side height)
+
+  Face angle histogram:
+      0 -  10 degrees:         0      |     90 - 100 degrees:       308
+     10 -  20 degrees:         0      |    100 - 110 degrees:         0
+     20 -  30 degrees:         0      |    110 - 120 degrees:         0
+     30 -  40 degrees:       156      |    120 - 130 degrees:         0
+     40 -  50 degrees:       432      |    130 - 140 degrees:         0
+     50 -  60 degrees:       156      |    140 - 150 degrees:         0
+     60 -  70 degrees:         0      |    150 - 160 degrees:         0
+     70 -  80 degrees:         0      |    160 - 170 degrees:         0
+     80 -  90 degrees:        64      |    170 - 180 degrees:         0
+
+  Dihedral angle histogram:
+       0 -  5 degrees:         0      |     80 - 110 degrees:       468
+       5 - 10 degrees:         0      |    110 - 120 degrees:         0
+      10 - 20 degrees:         0      |    120 - 130 degrees:         0
+      20 - 30 degrees:         0      |    130 - 140 degrees:         0
+      30 - 40 degrees:         0      |    140 - 150 degrees:         0
+      40 - 50 degrees:       312      |    150 - 160 degrees:         0
+      50 - 60 degrees:         0      |    160 - 170 degrees:         0
+      60 - 70 degrees:       156      |    170 - 175 degrees:         0
+      70 - 80 degrees:         0      |    175 - 180 degrees:         0
+  Minimum input dihedral angle is 90 (degree).
+
+
+Memory usage statistics:
+
+  Maximum number of tetrahedra:  283
+  Maximum number of tet blocks (blocksize = 8188):  1
+  Approximate memory for tetrahedral mesh (bytes):  127,520
+  Approximate memory for extra pointers (bytes):  20,832
+  Approximate memory for algorithms (bytes):  146,848
+  Approximate memory for working arrays (bytes):  2,496
+  Approximate total used memory (bytes):  297,696
+
