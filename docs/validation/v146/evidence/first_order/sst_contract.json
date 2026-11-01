@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "model": "SST-2003m",
+  "assumption": "fully-turbulent; transition unknown",
+  "intensity": 0.01,
+  "viscosityRatio": 10.0,
+  "Prt": 0.9,
+  "provenance": "v145 explicit fully turbulent startup assumption; not measured transition",
+  "kInfinity": 341.35543329143684,
+  "omegaInfinity": 42598.110764383935,
+  "wallTreatment": "resolved smooth wall; no wall function",
+  "thermodynamics": "calorically-perfect ideal gas",
+  "turbulentConvection": "first-order scalar upwind",
+  "compressibilityCorrection": "none",
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1",
+  "configurationSHA256": "dc7cc6ea6e2fd9f8b6e96ac0ce7a725f29db8d3665fef7ad465ac2d7462d3c6a",
+  "meshSHA256": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+  "initializationSHA256": "f7fbaeb475b80a9e9e28eb4285fd9376cd79d65fe3a959fca0abdce90a035c50",
+  "numericalStudy": {
+    "studyID": "v146-common-SST149-first-order-startup",
+    "variant": "first_order",
+    "numericalChanges": {
+      "MUSCL_FLOW": {
+        "source": "YES",
+        "target": "NO"
+      }
+    },
+    "flowSpatialOrder": 1
+  }
+}

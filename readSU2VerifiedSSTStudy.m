@@ -21,7 +21,7 @@ manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));f=manifest.
 assert(strcmp(manifest.thermalBoundary.mode,'isothermal'));
 if isNumerical
     assert(ismember(init.kind,{'same-mesh-SST-CFL-cap-comparison','same-mesh-SST-bounded-conservative-comparison', ...
-        'same-mesh-SST-gradient-comparison'}));
+        'same-mesh-SST-gradient-comparison','same-mesh-SST-reconstruction-startup-comparison'}));
     isBounded=strcmp(init.kind,'same-mesh-SST-bounded-conservative-comparison');
     assert(isBounded==strcmp(receipt.runtimeFlavor,'rah-bounded-conservative-v1'),'方案与实际运行包身份不同。');
 else,assert(ismember(init.kind,{'same-mesh-SST-omega-pocket-initialization-study', ...

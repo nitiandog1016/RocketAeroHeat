@@ -121,6 +121,11 @@ def validate_sst_manifest(folder,data,config):
             locked.update(validate_source(folder,c,init))
             assert data.get('requiredRuntimeFlavor')==BOUNDED_FLAVOR and 'initializationStudy' not in contract
             assert contract['numericalStudy']=={k:init[k] for k in ['studyID','variant','numericalChanges','runtimeChange']}
+        elif init['kind']=='same-mesh-SST-reconstruction-startup-comparison':
+            from prepareSU2SSTStartupStudy import validate_source
+            locked.update(validate_source(folder,c,init))
+            assert data.get('requiredRuntimeFlavor','official')=='official' and 'initializationStudy' not in contract
+            assert contract['numericalStudy']=={k:init[k] for k in ['studyID','variant','numericalChanges','flowSpatialOrder']}
         elif init['kind']=='same-mesh-SST-gradient-comparison':
             from prepareSU2SSTGradientStudy import validate_source
             locked.update(validate_source(folder,c,init))

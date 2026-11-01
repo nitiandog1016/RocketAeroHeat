@@ -26,7 +26,15 @@ switch info.flavor
             if isfield(p,'numericalStudy')
                 % 同一物理模型下的推进参数是数值方案，不冒充新增物理方法或已收敛结果。
                 study=p.numericalStudy;
-                if strcmp(study.studyID,'v132-tail-rim-viscous-gradient')
+                if strcmp(study.studyID,'v146-common-SST149-first-order-startup')
+                    % 实际流动阶数进入探针与导出，不能把一阶启动场标成二阶热环境。
+                    switch study.variant
+                        case 'control',label='二阶流动重构控制';assert(study.flowSpatialOrder==2);
+                        case 'first_order',label='一阶流动启动候选；仅作启动研究';assert(study.flowSpatialOrder==1);
+                        case 'restore_second_order',label='恢复二阶流动重构；仍待物理验证';assert(study.flowSpatialOrder==2);
+                        otherwise,error('未知SST启动对照方案。');
+                    end
+                elseif strcmp(study.studyID,'v132-tail-rim-viscous-gradient')
                     % 黏性/源项梯度同时影响流动与湍流，不能标成SST单项修复。
                     switch study.variant
                         case 'wls',label='WLS黏性/源项梯度控制；对流重构WLS';

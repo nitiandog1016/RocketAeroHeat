@@ -192,6 +192,25 @@ try
             assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
             assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
             audit.turbulenceRestart=lineage;
+        elseif strcmp(lineage.kind,'same-mesh-SST-reconstruction-startup-comparison')
+            % 一阶仅为启动候选；源149/本段99分列，恢复二阶须有事前筛选证据。
+            assert(lineage.sameMesh && lineage.samePhysics && lineage.localIterationStartsAt==0);
+            assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
+            study=receipt.physicsModel.numericalStudy;
+            assert(strcmp(study.studyID,'v146-common-SST149-first-order-startup'));
+            assert(ismember(study.variant,{'control','first_order','restore_second_order'}));
+            assert(strcmp(study.studyID,lineage.studyID) && strcmp(study.variant,lineage.variant));
+            assert(isequal(study.numericalChanges,lineage.numericalChanges) && study.flowSpatialOrder==lineage.flowSpatialOrder);
+            assert(audit.checkpointIteration==99 && size(history,1)==100 && strcmp(receipt.runtimeFlavor,'official'));
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            order=regexp(fileread(fullfile(folder,'case.cfg')),'(?m)^MUSCL_FLOW=\s*(YES|NO)\s*$','tokens','once');
+            assert(~isempty(order) && (strcmp(order{1},'NO')==(study.flowSpatialOrder==1)));
+            if strcmp(study.variant,'restore_second_order')
+                assert(lineage.sourceLocalIteration==99 && study.flowSpatialOrder==2);
+                gateFile=fullfile(fileparts(folder),'startup_comparison.json');gate=jsondecode(fileread(gateFile));
+                assert(gate.restoreAllowed && strcmp(fileSHA(gateFile),lineage.restorationDecisionSHA256));
+            else,assert(lineage.sourceLocalIteration==149);end
+            audit.numericalStudy=lineage;
         elseif strcmp(lineage.kind,'same-mesh-SST-gradient-comparison')
             % 梯度对照显示源99和本段9，保持原面与物理边界，不冒充不中断续算。
             assert(lineage.sameMesh && lineage.samePhysics && lineage.localIterationStartsAt==0);
