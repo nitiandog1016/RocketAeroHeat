@@ -1,0 +1,42 @@
+{
+  "sourceSHA256": "1e45543da34449d493b90900bdcc199e0213aca1309dd25a1620ad7be2b55273",
+  "version": "1.5.1",
+  "excerpts": [
+    {
+      "label": "reconstruct_input",
+      "firstLine": 23336,
+      "lastLine": 23360,
+      "text": "  unuverts = in->numberofpoints; // All vertices are unused yet.\n  //for (i = 0; i < in->numberofpoints + 1; i++) {\n  for (i = in->firstnumber; i < in->numberofpoints + in->firstnumber; i++) {\n    ver2tetarray[i] = NULL;\n  }\n\n  // Create the tetrahedra and connect those that share a common face.\n  for (i = 0; i < in->numberoftetrahedra; i++) {\n    // Get the four vertices.\n    idx = i * in->numberofcorners;\n    for (j = 0; j < 4; j++) {\n      p[j] = idx2verlist[in->tetrahedronlist[idx++]];\n      if (pointtype(p[j]) == UNUSEDVERTEX) {\n        setpointtype(p[j], VOLVERTEX); // initial type.\n        unuverts--;\n      }\n    }\n    // Check the orientation.\n    ori = orient3d(p[0], p[1], p[2], p[3]);\n    if (ori > 0.0) {\n      // Swap the first two vertices.\n      q[0] = p[0]; p[0] = p[1]; p[1] = q[0];\n    } else if (ori == 0.0) {\n      if (!b->quiet) {\n        printf(\"Warning:  Tet #%d is degenerate.\\n\", i + in->firstnumber);"
+    },
+    {
+      "label": "Y_disables_input_free_classification",
+      "firstLine": 23841,
+      "lastLine": 23865,
+      "text": "  if (!b->nobisect || checkconstraints) {\n    // Mark Steiner points on segments and facets.\n    //   - all vertices which remaining type FEACTVERTEX become\n    //     Steiner points in facets (= FREEFACERVERTEX).\n    //   - vertices on segment need to be checked.\n    face* segperverlist;\n    int* idx2seglist;\n    face parentseg, nextseg;\n    verttype vt;\n    REAL area, len, l1, l2;\n    int fmarker;\n\n    makepoint2submap(subsegs, idx2seglist, segperverlist);\n\n    points->traversalinit();\n    point ptloop = pointtraverse();\n    while (ptloop != NULL) {\n      vt = pointtype(ptloop);\n      if (vt == VOLVERTEX) {\n        setpointtype(ptloop, FREEVOLVERTEX);\n        st_volref_count++;\n      } else if (vt == FACETVERTEX) {\n        setpointtype(ptloop, FREEFACETVERTEX);\n        st_facref_count++;\n      } else if (vt == RIDGEVERTEX) {"
+    },
+    {
+      "label": "smoothing_requires_free_vertex",
+      "firstLine": 27440,
+      "lastLine": 27453,
+      "text": "          //   operation may have moved the vertices of this tet.\n          ppt = (point *) & (bface->tt.tet[4]);\n          tetalldihedral(ppt[0], ppt[1], ppt[2], ppt[3], bface->cent, \n                         &bface->key, NULL);\n          if (bface->key < cossmtdihed) { // if (maxdd < cosslidihed) {\n            // It is a sliver. Try to smooth its vertices.\n            smtflag = 0;\n            opm->initval = bface->key + 1.0; \n            for (i = 0; (i < 4) && !smtflag; i++) {\n              if (pointtype(ppt[i]) == FREEVOLVERTEX) {\n                getvertexstar(1, ppt[i], cavetetlist, NULL, NULL);\n                opm->searchstep = 0.001; // Search step size\n                smtflag = smoothpoint(ppt[i], cavetetlist, 1, opm);\n                if (smtflag) {"
+    },
+    {
+      "label": "original_point_markers",
+      "firstLine": 29815,
+      "lastLine": 29835,
+      "text": "  while (pointloop != (point) NULL) {\n    if (bmark) {\n      // Default the vertex has a zero marker.\n      marker = 0;\n      // Is it an input vertex?\n      if (index < in->numberofpoints) {\n        // Input point's marker is directly copied to output.\n        marker = in->pointmarkerlist[index];       \n      } else {\n        if ((pointtype(pointloop) == FREESEGVERTEX) ||\n            (pointtype(pointloop) == FREEFACETVERTEX)) {\n          sdecode(point2sh(pointloop), parentsh);\n          if (parentsh.sh != NULL) {\n            marker = shellmark(parentsh);\n          }\n        } // if (pointtype(...))\n      }\n    }\n    if (out == (tetgenio *) NULL) {\n      // Point number, x, y and z coordinates.\n      fprintf(outfile, \"%4d    %.17g  %.17g  %.17g\", pointnumber,"
+    },
+    {
+      "label": "PLC_recover_and_carve",
+      "firstLine": 32210,
+      "lastLine": 32250,
+      "text": "\n  tv[4] = clock();\n\n  if (b->plc && !b->refine) { // -p\n    if (b->nobisect) { // -Y\n      m.recoverboundary(ts[0]);\n    } else {\n      m.constraineddelaunay(ts[0]);\n    }\n\n    ts[1] = clock();\n\n    if (!b->quiet) {\n      if (b->nobisect) {\n        printf(\"Boundary recovery \");\n      } else {\n        printf(\"Constrained Delaunay \");\n      }\n      printf(\"seconds:  %g\\n\", ((REAL)(ts[1] - tv[4])) / cps);\n      if (b->verbose) {\n        printf(\"  Segment recovery seconds:  %g\\n\",((REAL)(ts[0]-tv[4]))/ cps);\n        printf(\"  Facet recovery seconds:  %g\\n\", ((REAL)(ts[1]-ts[0])) / cps);\n      }\n    }\n\n    m.carveholes();\n\n    ts[2] = clock();\n\n    if (!b->quiet) {\n      printf(\"Exterior tets removal seconds:  %g\\n\",((REAL)(ts[2]-ts[1]))/cps);\n    }\n\n    if (b->nobisect) { // -Y\n      if (m.subvertstack->objects > 0l) {\n        m.suppresssteinerpoints();\n\n        ts[3] = clock();\n\n        if (!b->quiet) {\n          printf(\"Steiner suppression seconds:  %g\\n\","
+    },
+    {
+      "label": "explicit_hole_seed",
+      "firstLine": 22537,
+      "lastLine": 22555,
+      "text": "  if (in->numberofholes > 0) {\n    // Mark as infected any tets inside volume holes.\n    for (i = 0; i < 3 * in->numberofholes; i += 3) {\n      // Search a tet containing the i-th hole point.\n      neightet.tet = NULL;\n      randomsample(&(in->holelist[i]), &neightet);\n      if (locate(&(in->holelist[i]), &neightet) != OUTSIDE) {\n        // The tet 'neightet' contain this point.\n        if (!infected(neightet)) {\n          infect(neightet);\n          tetarray->newindex((void **) &parytet);\n          *parytet = neightet;\n          // Add its adjacent tet if it is not protected.\n          if (!issubface(neightet)) {\n            decode(neightet.tet[neightet.ver & 3], tetloop);\n            if (!infected(tetloop)) {\n              infect(tetloop);\n              if (ishulltet(tetloop)) {\n                hullarray->newindex((void **) &parytet);"
+    }
+  ]
+}

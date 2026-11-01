@@ -1,0 +1,104 @@
+FIXED_SWITCHES rY1q2/5O2/7S10000zVC
+  Initializing memorypools.
+  tetrahedron per block: 8188.
+  Size of a point: 128 bytes.
+  Size of a tetrahedron: 96 (96) bytes.
+  Size of a shellface: 192 (192) bytes.
+  Initializing robust predicates.
+  sizeof(double) =  8
+  machine epsilon =   2.22045e-16 [IEEE 754 64-bit macheps]
+Reconstructing mesh ...
+Mesh reconstruction seconds:  0
+Refining mesh...
+  Min radius-edge ratio = 2.
+  Min dihedral   angle  = 5.
+  Splitting bad quality tets.
+  Added 0 (0,0,0) Steiner points.
+Refinement seconds:  0
+Optimizing mesh...
+  Optimization level  = 2.
+  Optimization scheme = 7.
+  Number of iteration = 3.
+  Min_Max dihed angle = 165.
+Optimization seconds:  0
+
+Writing nodes.
+Writing elements.
+Writing faces.
+Writing edges.
+
+Output seconds:  0
+Total running seconds:  0
+  Checking consistency of mesh...
+  In my studied opinion, the mesh appears to be consistent.
+  Checking consistency of the mesh boundary...
+  Mesh boundaries connected correctly.
+  Checking tet->seg connections...
+  Checking seg->tet connections...
+  Checking seg->seg connections...
+  Segments are connected properly.
+
+Statistics:
+
+  Input points: 65
+  Input tetrahedra: 159
+  Input triangles: 120
+
+  Mesh points: 65
+  Mesh tetrahedra: 159
+  Mesh faces: 378
+  Mesh faces on exterior boundary: 120
+  Mesh faces on input facets: 120
+  Mesh edges on input segments: 48
+
+Mesh quality statistics:
+
+  Smallest volume:       0.00016667   |  Largest volume:          0.16667
+  Shortest edge:            0.47164   |  Longest edge:             1.7321
+  Smallest asp.ratio:        2.4495   |  Largest asp.ratio:        1414.2
+  Smallest facangle:         18.401   |  Largest facangle:       143.1641
+  Smallest dihedral:        0.17154   |  Largest dihedral:       179.7570
+
+  Aspect ratio histogram:
+         < 1.5       :         0      |      6 - 10         :         2
+     1.5 - 2         :         0      |     10 - 15         :         0
+       2 - 2.5       :       155      |     15 - 25         :         0
+     2.5 - 3         :         0      |     25 - 50         :         0
+       3 - 4         :         0      |     50 - 100        :         0
+       4 - 6         :         1      |    100 -            :         1
+  (A tetrahedron's aspect ratio is its longest edge length divided by its
+    smallest side height)
+
+  Face angle histogram:
+      0 -  10 degrees:         0      |     90 - 100 degrees:       295
+     10 -  20 degrees:         3      |    100 - 110 degrees:         3
+     20 -  30 degrees:         3      |    110 - 120 degrees:         1
+     30 -  40 degrees:       158      |    120 - 130 degrees:         0
+     40 -  50 degrees:       434      |    130 - 140 degrees:         0
+     50 -  60 degrees:       158      |    140 - 150 degrees:         1
+     60 -  70 degrees:         0      |    150 - 160 degrees:         0
+     70 -  80 degrees:         0      |    160 - 170 degrees:         0
+     80 -  90 degrees:        78      |    170 - 180 degrees:         0
+
+  Dihedral angle histogram:
+       0 -  5 degrees:         3      |     80 - 110 degrees:       470
+       5 - 10 degrees:         0      |    110 - 120 degrees:         2
+      10 - 20 degrees:         1      |    120 - 130 degrees:         1
+      20 - 30 degrees:         2      |    130 - 140 degrees:         1
+      30 - 40 degrees:         2      |    140 - 150 degrees:         0
+      40 - 50 degrees:       311      |    150 - 160 degrees:         0
+      50 - 60 degrees:         2      |    160 - 170 degrees:         0
+      60 - 70 degrees:       156      |    170 - 175 degrees:         0
+      70 - 80 degrees:         0      |    175 - 180 degrees:         3
+
+
+Memory usage statistics:
+
+  Maximum number of tetrahedra:  279
+  Maximum number of tet blocks (blocksize = 8188):  1
+  Approximate memory for tetrahedral mesh (bytes):  67,488
+  Approximate memory for extra pointers (bytes):  14,592
+  Approximate memory for algorithms (bytes):  202,752
+  Approximate memory for working arrays (bytes):  2,544
+  Approximate total used memory (bytes):  287,376
+
