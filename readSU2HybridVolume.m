@@ -62,6 +62,18 @@ end
 if isfield(report,'noseRetainedLayers')
     volume.meshConstruction.method='original-triangle-prism-termination-pyramid-tetrahedra';
 end
+if isfield(report,'method') && strcmp(report.method,'original-triangle-general-prisms-and-tetgen-plc-exterior')
+    % 一般列以实际坐标为准；保留参考高度和切向偏移，绝不推成prisms/nface整层。
+    assert(report.geometryAccepted && report.hasTangentialOffsets && report.tetsBelowSICN01==0);
+    assert(report.nodes==size(V,1) && report.prisms==size(W,1) && report.tetrahedra==size(T,1));
+    assert(strcmp(d.columnCoordinateMode,'reference-normal-height-plus-tangential-offset'));
+    ids=double(d.baseColumnNodeIDsOneBased(:));assert(all(ids>=1 & ids<=size(V,1)));
+    assert(size(d.baseColumnTangentialOffsetsM,1)==numel(ids) && all(isfinite(d.baseColumnTangentialOffsetsM),'all'));
+    volume.columnGeometry=struct('referenceNormalHeights',d.normalHeightsByColumnM, ...
+        'tangentialNodeIDs',ids,'tangentialOffsets',d.baseColumnTangentialOffsetsM, ...
+        'coordinateMode',d.columnCoordinateMode,'sourcePreparedNodeIDs',d.sourcePreparedNodeIDsOneBased);
+    volume.meshConstruction.method=report.method;
+end
 end
 function info=faces(F,boundary)
 % 最小顶点的前后邻点确定循环方向，内面计数和方向必须同时闭合。

@@ -173,7 +173,13 @@ try
         assert(numel(token)==1 && strcmp(h,token{1}{1}),'SST初态来源未绑定实际进程。');
         assert(~isfile(continuation) && ~isfile(transfer) && ~isfile(propertyTransfer));
         lineage=jsondecode(fileread(path));
-        if strcmp(lineage.kind,'same-mesh-SST-single-step-phase-diagnostic')
+        if strcmp(lineage.kind,'general-mesh-SST-wall-distance-initial-guess')
+            % 独立壁距初场没有旧流场步号；只记录本次实际局部历史。
+            assert(lineage.initialGuessOnly && ~lineage.oldFlowInterpolated && ~lineage.physicsQualified);
+            assert(lineage.localIterationStartsAt==0 && isempty(lineage.sourceLocalIteration) && nativePrimitive);
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            audit.independentInitialization=lineage;
+        elseif strcmp(lineage.kind,'same-mesh-SST-single-step-phase-diagnostic')
             % 一次SST更新是阶段诊断；源失败、局部0和伪时间重置不能标成层流转换/累计续算。
             assert(lineage.diagnosticOnly && lineage.sameMesh && lineage.samePhysicsAndNumerics);
             assert(lineage.localIterationStartsAt==0 && lineage.requestedUpdates==1 && audit.checkpointIteration==0 && size(history,1)==1);
@@ -251,7 +257,7 @@ try
             assert(lineage.newPhysicsLocalIterationStartsAt==0 && ~lineage.samePhysicsAndNumerics);
             audit.turbulenceTransfer=lineage;
         end
-        audit.sourceModelLocalIteration=lineage.sourceLocalIteration;
+        if ~isempty(lineage.sourceLocalIteration),audit.sourceModelLocalIteration=lineage.sourceLocalIteration;end
     end
     audit.checkpointIdentityConfirmed=true;audit.status='checkpoint-and-history-audited';
     audit.reason='保存迭代已绑定且重启动EOS一致；残差通过与物理资格仍分别判断。';

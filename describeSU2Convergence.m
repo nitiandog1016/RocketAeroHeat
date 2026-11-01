@@ -15,6 +15,8 @@ if a.checkpointIdentityConfirmed
     if isfield(a,'cumulativeCheckpointIteration')
         checkpoint=sprintf('显示本段 %d / 累计 %d 步 · %s',a.checkpointIteration,a.cumulativeCheckpointIteration,pass(a.checkpointResidualPassed));
         terminal=sprintf('末监测本段 %d / 累计 %d 步 · %s',a.terminalIteration,a.cumulativeTerminalIteration,pass(a.terminalResidualPassed));
+    elseif isfield(a,'independentInitialization')
+        checkpoint=sprintf('独立壁距初场 → 本段局部 %d 步 · %s；未复用旧流场',a.checkpointIteration,pass(a.checkpointResidualPassed));
     elseif isfield(a,'turbulenceDiagnostic')
         checkpoint=sprintf('源SST局部 %d → 单步诊断局部 %d · %s；非不中断续算',a.sourceModelLocalIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));
     elseif isfield(a,'numericalStudy')

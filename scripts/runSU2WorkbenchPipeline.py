@@ -30,6 +30,7 @@ class Pipeline:
                                     'scripts/runEmbeddedSU2.py', 'scripts/su2ThermalRuntime.py')]
         if self.sst:
             paths += [ROOT/n for n in ('scripts/prepareSU2SSTCase.py','scripts/su2SSTInterface.py','scripts/auditSU2SSTState.py')]
+            if self.spec.get('mode')=='wallDistance':paths.append(ROOT/'scripts/prepareSU2WallDistanceState.py')
         self.locks = {str(p): sha(p) for p in paths}
         self.state = dict(status='starting', stage='preparation', supervisorProcessID=os.getpid(),
                           jobToken=self.request['jobToken'], startedUTC=datetime.now(timezone.utc).isoformat(),
@@ -129,11 +130,15 @@ class Pipeline:
         code=1
         try:
             if self.sst:
-                command=[sys.executable,'-X','utf8',str(ROOT/'scripts/prepareSU2SSTCase.py'),
-                         '--folder',str(self.folder),'--source',self.spec['sourceDirectory'],
+                general=self.spec.get('mode')=='wallDistance'
+                script='prepareSU2WallDistanceState.py' if general else 'prepareSU2SSTCase.py'
+                command=[sys.executable,'-X','utf8',str(ROOT/'scripts'/script),
+                         '--folder',str(self.folder),
                          '--intensity',str(self.spec['intensity']),'--viscosity-ratio',str(self.spec['viscosityRatio']),
                          '--prt',str(self.spec['Prt']),'--provenance',self.spec['provenance']]
-                self.phase('preparation',180,lambda:self.run_property(self.out,'sst_preparation',command,ROOT,dict(os.environ),180))
+                command += ['--thickness',str(self.spec['thicknessM'])] if general else ['--source',self.spec['sourceDirectory']]
+                env=dict(os.environ,OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
+                self.phase('preparation',180,lambda:self.run_property(self.out,'sst_preparation',command,ROOT,env,180))
             else:
                 self.phase('preparation',180,lambda:prepare(self.folder,self.spec['sourceDirectory'],
                                                            self.spec['runtimeFlavor'],self.run_property))

@@ -232,7 +232,11 @@ renderEditor();sync();showGeometry(true);
                         fan=~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'constructionOperation') && ...
                             startsWith(embeddedVolume.meshConstruction.constructionOperation,'closed-convex-rim-');
                         transition=~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'noseRetainedLayers');
-                        if transition
+                        if ~isempty(embeddedVolume) && isfield(embeddedVolume.meshConstruction,'hasTangentialOffsets')
+                            construction=embeddedVolume.meshConstruction;controls.generate.Text='重新生成常规体网格';
+                            controls.meshMethod=tip(grid,7,sprintf('一般混合网格：%d棱柱 / %d四面体；保留原壁面及尾缘扇，外层含切向偏移。几何审核通过，最小SICN %.5g；流场精度未验证。', ...
+                                construction.prisms,construction.tetrahedra,construction.minimumTetSICN));
+                        elseif transition
                             % 局部终止网格不再全表面等层；直接展示实际计数，不能沿用统一层数说明。
                             construction=embeddedVolume.meshConstruction;
                             controls.generate.Text='重新生成常规体网格';
@@ -314,8 +318,8 @@ renderEditor();sync();showGeometry(true);
                         tip(grid,45,sprintf('指定静态来流：T %.6g K，p %.6g Pa；高度栏不参与此工况。',c.flight.atmosphere.temperature,c.flight.atmosphere.pressure));
                     end
                     % 初猜不是流场解；显式研究选项只对已核对的混合域和等温壁开放。
-                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究','定比热源场转HEOS','层流或已审核SST源场'}, ...
-                        {'freestream','wallEnthalpy','checkpoint','propertyTransfer','sstTransfer'},getOption(c.su2,'initialMode','freestream'));
+                    controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究','定比热源场转HEOS','层流或已审核SST源场','实际壁距独立初场 · SST研究'}, ...
+                        {'freestream','wallEnthalpy','checkpoint','propertyTransfer','sstTransfer','sstWallDistance'},getOption(c.su2,'initialMode','freestream'));
                     controls.initialThickness=numberField(grid,29,'初猜厚度 / mm',1000*getOption(c.su2,'initialThicknessM',.001),[.001 1000]);
                     controls.checkpointLimit=numberField(grid,30,'检查点上限 / MiB',getOption(c.su2,'checkpointLimitMiB',100),[1 1024]);
                     for key={'initialMode','initialThickness','checkpointLimit'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
@@ -618,15 +622,21 @@ renderEditor();sync();showGeometry(true);
             if ~strcmp(flow,'laminar') || isfield(next.su2,'flowModel'),next.su2.flowModel=flow;end
             if strcmp(flow,'SST-2003m')
                 assert(strcmp(property,'idealGas'),'HEOS RANS尚未适配，请使用定比热SST研究。');
-                assert(strcmp(thermal,'isothermal') && strcmp(initial,'sstTransfer') && named,'SST需要统一壁温、有效源场及具名保存。');
-                assert(isfile(fullfile(source,'engine_process.json')),'请选择同网格层流或已审核SST源场；启动时核对原始身份。');
+                assert(strcmp(thermal,'isothermal') && ismember(initial,{'sstTransfer','sstWallDistance'}) && named,'SST需要统一壁温、明确初场及具名保存。');
+                if strcmp(initial,'sstTransfer')
+                    assert(isfile(fullfile(source,'engine_process.json')),'请选择同网格层流或已审核SST源场；启动时核对原始身份。');
+                else
+                    assert(~isempty(embeddedVolume) && strcmp(embeddedVolume.sourceKind,'original-triangle-hybrid-volume'));
+                    assert(embeddedVolume.meshConstruction.tetsBelowSICN01==0,'完整域质量未通过，不能使用新壁距初场。');
+                    validateattributes(thickness,{'numeric'},{'scalar','finite','positive'});next.su2.initialThicknessM=thickness;
+                end
                 next.su2.turbulenceIntensity=controls.turbulenceIntensity.Value;
                 next.su2.turbulentViscosityRatio=controls.turbulentViscosityRatio.Value;
                 next.su2.turbulentPrandtl=controls.turbulentPrandtl.Value;
                 next.su2.turbulenceProvenance=controls.turbulenceProvenance.Value;
                 assert(~isempty(strtrim(next.su2.turbulenceProvenance)),'请说明湍流参数的来源或假设。');
             else
-                assert(~strcmp(initial,'sstTransfer'),'层流模型不能使用SST初态。');
+                assert(~ismember(initial,{'sstTransfer','sstWallDistance'}),'层流模型不能使用SST初态。');
             end
             if strcmp(property,'HEOS-Air')
                 assert(strcmp(initial,'propertyTransfer'),'HEOS必须选择“定比热源场转HEOS”，不能直接使用旧能量或自由流。');
@@ -714,7 +724,7 @@ renderEditor();sync();showGeometry(true);
         if ~sst,hidden=[hidden 48:51 53 57];end
         if ~heos,hidden=[hidden 36:38 41];end
         if ~axial,hidden=[hidden 12 21];end
-        if ~strcmp(initial,'wallEnthalpy'),hidden=[hidden 29];end
+        if ~ismember(initial,{'wallEnthalpy','sstWallDistance'}),hidden=[hidden 29];end
         if ~source,hidden=[hidden 31:33];end
         order=order(~ismember(order,hidden) & ismember(order,b.rows));
         for j=1:numel(b.items)
@@ -979,9 +989,14 @@ renderEditor();sync();showGeometry(true);
             elseif strcmp(getOption(frozen.cfg.su2,'flowModel','laminar'),'SST-2003m')
                 c=frozen.cfg.su2;
                 jobOptions.turbulenceInitialization=struct('model','SST-2003m', ...
-                    'sourceDirectory',char(java.io.File(c.checkpointSource).getCanonicalPath()), ...
+                    'sourceDirectory',char(java.io.File(getOption(c,'checkpointSource','')).getCanonicalPath()), ...
                     'intensity',c.turbulenceIntensity,'viscosityRatio',c.turbulentViscosityRatio, ...
                     'Prt',c.turbulentPrandtl,'provenance',c.turbulenceProvenance);
+                if strcmp(getOption(c,'initialMode','sstTransfer'),'sstWallDistance')
+                    jobOptions.turbulenceInitialization=rmfield(jobOptions.turbulenceInitialization,'sourceDirectory');
+                    jobOptions.turbulenceInitialization.mode='wallDistance';
+                    jobOptions.turbulenceInitialization.thicknessM=c.initialThicknessM;
+                end
             end
             engineJob=embeddedSU2Job('start',folder,jobOptions);
             engineTimer=timer('ExecutionMode','fixedSpacing','Period',.5,'BusyMode','drop','TimerFcn',@pollEngine);

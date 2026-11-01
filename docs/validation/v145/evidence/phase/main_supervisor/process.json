@@ -1,0 +1,40 @@
+{
+  "command": [
+    "D:\\anacondapython\\python.exe",
+    "-X",
+    "utf8",
+    "scripts/runMatlabResearch.py",
+    "main01",
+    "addpath(pwd); addpath('tests'); testSU2GeneralMeshWorkbench('outputs/v145_validation/main01','run');",
+    "--folder",
+    "outputs/v145_validation",
+    "--input",
+    "outputs/v145_validation/mesh/hybrid_volume.mat",
+    "--input",
+    "outputs/v145_validation/mesh/mesh_process.json",
+    "--input",
+    "outputs/v145_validation/mesh/mesh_report.json",
+    "--input",
+    "docs/validation/v145/PLAN.md"
+  ],
+  "exitCode": 0,
+  "seconds": 556.6089999999995,
+  "peakFamilyRSSBytes": 3944845312,
+  "stopReason": null,
+  "sourceSHA256": {
+    "scripts/runMatlabResearch.py": "3199f97bdca1ce8500f4f2d63c6d8c25a261189c793365cd0d7eb3c87a612005",
+    "tests/testSU2GeneralMeshWorkbench.m": "9a44b6a117b98ab0d77e852aa0f4e4fdd50e974c39f82dc31062b2400b6724f8",
+    "docs/validation/v145/PLAN.md": "87409265ee5e24996bf119be21b1dad4cd1f95cf9d04a7520aa645b3411750c2",
+    "outputs/v145_validation/fixture02/report.json": "71e664a3a4de4de06c24f6678001b7183b84a40bdf522f49800c2d37a5115a08"
+  },
+  "sourceStableAfter": {
+    "scripts/runMatlabResearch.py": true,
+    "tests/testSU2GeneralMeshWorkbench.m": true,
+    "docs/validation/v145/PLAN.md": true,
+    "outputs/v145_validation/fixture02/report.json": true
+  },
+  "outputSHA256": {
+    "stdout.log": "fa090dc366e576634e000c4b5a72afb47b4f8ee3ce19be99fd6d064fea21f3ba"
+  },
+  "status": "terminal"
+}

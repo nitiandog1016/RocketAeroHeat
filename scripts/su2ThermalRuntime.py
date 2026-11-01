@@ -106,7 +106,10 @@ def validate_sst_manifest(folder,data,config):
         init=read(path);assert init==data['initialization']
         if contract.get('spatialOutputContract'):
             assert init['kind']=='same-mesh-SST-checkpoint-research'
-        if init['kind']=='same-mesh-laminar-to-SST-initial-guess':
+        if init['kind']=='general-mesh-SST-wall-distance-initial-guess':
+            from prepareSU2WallDistanceState import validate_source
+            locked.update(validate_source(folder,c,init))
+        elif init['kind']=='same-mesh-laminar-to-SST-initial-guess':
             assert init['sameMesh'] and not init['samePhysicsAndNumerics'] and init['newPhysicsLocalIterationStartsAt']==0
         elif init['kind']=='same-mesh-SST-checkpoint-research':
             from prepareSU2SSTCheckpoint import validate_source

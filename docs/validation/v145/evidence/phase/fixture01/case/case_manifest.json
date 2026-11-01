@@ -1,0 +1,142 @@
+{
+  "kind": "complete-rocket-three-dimensional-su2-volume",
+  "flight": {
+    "Mach": 5,
+    "temperature": 226.5,
+    "pressure": 1171.8,
+    "alpha": 20,
+    "beta": 0,
+    "wallTemperature": 300,
+    "iterations": 2,
+    "outputEvery": 1,
+    "namedCheckpoints": true,
+    "thermalBoundary": []
+  },
+  "thermalBoundary": {
+    "mode": "isothermal",
+    "source": "\u7528\u6237\u8f93\u5165",
+    "method": "\u7ed9\u5b9a\u7b49\u6e29\u58c1\u9762\u8fb9\u754c",
+    "specification": {
+      "mode": "isothermal",
+      "temperature": 300
+    },
+    "givenTemperatureByNode": [
+      300,
+      300,
+      300,
+      300,
+      300,
+      300
+    ],
+    "givenTemperatureByFace": [
+      300,
+      300,
+      300,
+      300,
+      300,
+      300,
+      300,
+      300
+    ],
+    "givenHeatFluxByFace": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "heatFluxIsBoundaryInput": false,
+    "wallMaterialTemperatureSolved": false,
+    "stockExecutableSupported": true,
+    "physicsQualified": false,
+    "requiredRuntimeFlavor": "official"
+  },
+  "expectedVelocity": [
+    -1417.5385829718768,
+    0,
+    515.9418501256546
+  ],
+  "nodes": 38,
+  "cells": 92,
+  "hexes": 0,
+  "wedges": 16,
+  "pyramids": 8,
+  "tetrahedra": 68,
+  "wallFaces": 8,
+  "wallArea": 6.928203230275508,
+  "bodyVolume": 1.3333333333333333,
+  "fluidVolume": 62.66666666666665,
+  "minimumSubTetVolume": 0.01514019698659553,
+  "regions": [
+    "originalTriangle"
+  ],
+  "referenceArea": 3.141592653589793,
+  "originalSurfaceFaceCount": 8,
+  "coordinateConvention": "X-axis; nose +X; zero-incidence flow -X; positive alpha flow +Z; SI",
+  "thermalPropertyMode": "caloricallyPerfect; gamma1.4; Sutherland; Pr0.72",
+  "nativeOrientation": "SU2v8.6.0 prism inward triangular ends; boundary normals into fluid domain",
+  "physicalSolution": false,
+  "productionQualified": false,
+  "fieldProjectionImplemented": true,
+  "sst": {
+    "schemaVersion": 1,
+    "model": "SST-2003m",
+    "assumption": "fully-turbulent; transition unknown",
+    "intensity": 0.01,
+    "viscosityRatio": 10.0,
+    "Prt": 0.9,
+    "provenance": "v145 explicit fully turbulent startup assumption; not measured transition",
+    "kInfinity": 341.34174403875,
+    "omegaInfinity": 41701.720634077275,
+    "wallTreatment": "resolved smooth wall; no wall function",
+    "thermodynamics": "calorically-perfect ideal gas",
+    "turbulentConvection": "first-order scalar upwind",
+    "compressibilityCorrection": "none",
+    "physicsQualified": false,
+    "newQualifiedArea": 0,
+    "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1",
+    "configurationSHA256": "bfbd0a5b29d60fb3fa60b9d0c96ca97b2c714fc08f122fc69f15ef8e15231a97",
+    "meshSHA256": "51e8f6719af7c45e0b7ffd9c56df9649bf9ec2f5c8499d0f4df9f5d104ebdb4f",
+    "initializationSHA256": "4e58c9ba255053ba25cd069197615fa50089d05a666dd44ad116327dce10f9c8"
+  },
+  "sstContractSHA256": "25352b1bbffc07a7191440dc0fd56e61a99193fdeb2b423516426b5595e21ef4",
+  "initialization": {
+    "kind": "general-mesh-SST-wall-distance-initial-guess",
+    "method": "exact triangular wall distance; C1 velocity/total enthalpy; positive SST initial guess",
+    "thicknessM": 0.001,
+    "nodes": 38,
+    "wallNodes": 6,
+    "localIterationStartsAt": 0,
+    "sourceLocalIteration": null,
+    "sourceDirectory": null,
+    "initialGuessOnly": true,
+    "oldFlowInterpolated": false,
+    "physicsQualified": false,
+    "initialStateSHA256": "7f067c7cffe7f00a196a60703f58eb4fb46200d3ea59b5ecb3b0bf94a287216c",
+    "sourceStateHasNativePrimitive": false,
+    "thermalEnergyRelativeError": 1.254821608406358e-16,
+    "distanceTrianglePairs": 112,
+    "temperatureRangeK": [
+      226.5,
+      300.0
+    ],
+    "nearestWallDistanceRangeM": [
+      0.10000000000000009,
+      0.10000000000000009
+    ],
+    "exactFarfield": true,
+    "wallNoSlip": true,
+    "givenWallTemperatureK": 300.0,
+    "preparationSeconds": 0.06300000000010186,
+    "sourceSHA256": {
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2WallDistanceState.py": "5d1e82f1441c2dbcadf3785710a6016fa112865967650beced33118a284d728a",
+      "E:\\RocketAeroHeat\\scripts\\su2SSTInterface.py": "7295cfa8b8b076602d73212bb201b055127e4f82203a9b83cae49befa978fde9",
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2SSTCase.py": "52a698bc490ad58e7b11a122a638fd2d76bc6da52e4e9cc441e4037ed00c578c",
+      "E:\\RocketAeroHeat\\outputs\\v145_validation\\fixture01\\case\\mesh.su2": "51e8f6719af7c45e0b7ffd9c56df9649bf9ec2f5c8499d0f4df9f5d104ebdb4f",
+      "E:\\RocketAeroHeat\\outputs\\v145_validation\\fixture01\\case\\wall_distance_initialization.npz": "5a5d37eb452be4ac48856f87ca9b726bf7bed8ef539dfe16ccc257dc90de0a2e"
+    }
+  }
+}
