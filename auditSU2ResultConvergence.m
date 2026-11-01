@@ -205,6 +205,21 @@ try
                 assert(audit.checkpointIteration==0 && size(history,1)==1);
                 audit.updateTrace=readSU2UpdateTraceAudit(folder,receipt);
             end
+        elseif strcmp(lineage.kind,'same-mesh-SST-flow-flux-comparison')
+            % 同源50更新只比较流动通量；原源99与新局部49不累加。
+            assert(lineage.sameMesh && lineage.samePhysics && lineage.localIterationStartsAt==0);
+            assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
+            study=receipt.physicsModel.numericalStudy;
+            assert(strcmp(study.studyID,'v148-common-SST99-AUSM-vs-AUSMPLUSUP2'));
+            assert(ismember(study.variant,{'control','up2'}) && strcmp(study.variant,lineage.variant));
+            assert(strcmp(study.studyID,lineage.studyID) && strcmp(study.flowFlux,lineage.flowFlux));
+            assert(isequal(study.numericalChanges,lineage.numericalChanges) && ~study.accurateFluxJacobianEnabled);
+            assert(lineage.sourceLocalIteration==99 && audit.checkpointIteration==49 && size(history,1)==50);
+            assert(strcmp(receipt.runtimeFlavor,'official'));
+            assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
+            flux=regexp(config,'(?m)^CONV_NUM_METHOD_FLOW=\s*(\w+)\s*$','tokens','once');
+            assert(~isempty(flux) && strcmp(flux{1},study.flowFlux));
+            audit.numericalStudy=lineage;
         elseif strcmp(lineage.kind,'same-mesh-SST-reconstruction-startup-comparison')
             % 一阶仅为启动候选；源149/本段99分列，恢复二阶须有事前筛选证据。
             assert(lineage.sameMesh && lineage.samePhysics && lineage.localIterationStartsAt==0);

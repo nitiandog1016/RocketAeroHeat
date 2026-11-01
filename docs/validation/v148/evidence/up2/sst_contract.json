@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "model": "SST-2003m",
+  "assumption": "fully-turbulent; transition unknown",
+  "intensity": 0.01,
+  "viscosityRatio": 10.0,
+  "Prt": 0.9,
+  "provenance": "v145 explicit fully turbulent startup assumption; not measured transition",
+  "kInfinity": 341.35543329143684,
+  "omegaInfinity": 42598.110764383935,
+  "wallTreatment": "resolved smooth wall; no wall function",
+  "thermodynamics": "calorically-perfect ideal gas",
+  "turbulentConvection": "first-order scalar upwind",
+  "compressibilityCorrection": "none",
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1",
+  "configurationSHA256": "f744176f28d964b113e64667fde25af493905e92409b839ccc801004eb1369ab",
+  "meshSHA256": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+  "initializationSHA256": "d52a62bfd1f4c0c9c61a3bb679d068e5d44e0713b3c0d00093c3673261091b01",
+  "numericalStudy": {
+    "studyID": "v148-common-SST99-AUSM-vs-AUSMPLUSUP2",
+    "variant": "up2",
+    "numericalChanges": {
+      "CONV_NUM_METHOD_FLOW": {
+        "source": "AUSM",
+        "target": "AUSMPLUSUP2"
+      }
+    },
+    "flowFlux": "AUSMPLUSUP2",
+    "accurateFluxJacobianEnabled": false
+  }
+}

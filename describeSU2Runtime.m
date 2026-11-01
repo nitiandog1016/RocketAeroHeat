@@ -26,7 +26,15 @@ switch info.flavor
             if isfield(p,'numericalStudy')
                 % 同一物理模型下的推进参数是数值方案，不冒充新增物理方法或已收敛结果。
                 study=p.numericalStudy;
-                if strcmp(study.studyID,'v146-common-SST149-first-order-startup')
+                if strcmp(study.studyID,'v148-common-SST99-AUSM-vs-AUSMPLUSUP2')
+                    % 区分实际数值通量与SST物理模型；不把低耗散名称当成精度认证。
+                    assert(~study.accurateFluxJacobianEnabled);
+                    switch study.variant
+                        case 'control',label='AUSM原通量控制；二阶重构';assert(strcmp(study.flowFlux,'AUSM'));
+                        case 'up2',label='AUSM+-up2流动通量候选；二阶重构，默认近似Jacobian';assert(strcmp(study.flowFlux,'AUSMPLUSUP2'));
+                        otherwise,error('未知SST通量对照方案。');
+                    end
+                elseif strcmp(study.studyID,'v146-common-SST149-first-order-startup')
                     % 实际流动阶数进入探针与导出，不能把一阶启动场标成二阶热环境。
                     switch study.variant
                         case 'control',label='二阶流动重构控制';assert(study.flowSpatialOrder==2);

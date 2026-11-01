@@ -1,0 +1,25 @@
+{
+  "command": [
+    "D:/anacondapython/python.exe",
+    "-X",
+    "utf8",
+    "scripts/runMatlabResearch.py",
+    "workbench01",
+    "addpath(pwd); addpath('tests'); testSU2SSTFluxWorkbench('outputs/v148_validation/workbench01');",
+    "--folder",
+    "outputs\\v148_validation",
+    "--input",
+    "outputs/v145_validation/mesh/hybrid_volume.mat",
+    "--input",
+    "outputs/v148_validation/control/engine_process.json",
+    "--input",
+    "outputs/v148_validation/up2/engine_process.json"
+  ],
+  "maximumSeconds": 600,
+  "maximumRSSBytes": 8589934592,
+  "sources": [
+    "scripts/runMatlabResearch.py",
+    "tests/testSU2SSTFluxWorkbench.m"
+  ],
+  "receiptFolder": "outputs\\v148_validation\\workbench01_supervisor"
+}
