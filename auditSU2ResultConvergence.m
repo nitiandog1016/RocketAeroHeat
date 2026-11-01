@@ -91,6 +91,13 @@ try
         expected=[expected,{'Pressure','Temperature','Mach','Pressure_Coefficient'}, ...
             strcat('Velocity_',axes),{'Laminar_Viscosity'},strcat('Skin_Friction_Coefficient_',axes), ...
             {'Heat_Flux','Y_Plus','Eddy_Viscosity'}];
+        if isfield(receipt.physicsModel,'spatialOutputContract')
+            % 空间诊断附带积分RHS及局部伪时间；只接受原生具名字段，不放宽一般列检查。
+            assert(strcmp(receipt.physicsModel.spatialOutputContract,'native-implicit-rhs-and-local-pseudotime-v1'));
+            assert(receipt.physicsModel.spatialDiagnosticOnly && audit.checkpointIteration==0 && size(history,1)==1);
+            expected=[expected,{'Residual_Density'},strcat('Residual_Momentum_',axes), ...
+                {'Residual_Energy','Residual_TKE','Residual_Omega','Delta_Time','CFL','Turb_Delta_Time','Turb_CFL'}];
+        end
     end
     assert(isequal(cols,expected),'重启动列名与模型不一致。');
     rest=readmatrix(restart,'NumHeaderLines',1);assert(size(rest,2)==numel(cols));
@@ -192,6 +199,12 @@ try
             assert(~lineage.physicsQualified && ~lineage.uninterruptedTrajectoryEquivalent && nativePrimitive);
             assert(strcmp(fileSHA(fullfile(folder,'initial_flow.csv')),lineage.initialStateSHA256));
             audit.turbulenceRestart=lineage;
+            if isfield(receipt.physicsModel,'updateTraceStudy')
+                % 同一原生方程的一次观测，源99与局部0分列，必须有全局编号及增量重放证据。
+                assert(lineage.diagnosticOnly && lineage.runtimeObservationOnly && lineage.sourceLocalIteration==99);
+                assert(audit.checkpointIteration==0 && size(history,1)==1);
+                audit.updateTrace=readSU2UpdateTraceAudit(folder,receipt);
+            end
         elseif strcmp(lineage.kind,'same-mesh-SST-reconstruction-startup-comparison')
             % 一阶仅为启动候选；源149/本段99分列，恢复二阶须有事前筛选证据。
             assert(lineage.sameMesh && lineage.samePhysics && lineage.localIterationStartsAt==0);

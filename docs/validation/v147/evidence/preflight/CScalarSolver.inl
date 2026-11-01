@@ -1,0 +1,897 @@
+/*!
+ * \file CScalarSolver.inl
+ * \brief Main subroutines of CScalarSolver class
+ * \version 8.6.0 "Harrier"
+ *
+ * SU2 Project Website: https://su2code.github.io
+ *
+ * The SU2 Project is maintained by the SU2 Foundation
+ * (http://su2foundation.org)
+ *
+ * Copyright 2012-2026, SU2 Contributors (cf. AUTHORS.md)
+ *
+ * SU2 is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * SU2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "../../../Common/include/parallelization/omp_structure.hpp"
+#include "../../../Common/include/toolboxes/geometry_toolbox.hpp"
+#include "../../include/solvers/CScalarSolver.hpp"
+#include "../../include/variables/CFlowVariable.hpp"
+
+template <class VariableType>
+CScalarSolver<VariableType>::CScalarSolver(CGeometry* geometry, CConfig* config, const CSolver* flow_solver,
+                                           bool conservative, bool bounded_scalar,
+                                           LINEAR_SOLVER_MODE linear_solver_mode)
+    : CSolver(linear_solver_mode), Conservative(conservative), BoundedScalar(bounded_scalar),
+      prim_idx(config->GetKind_Regime() == ENUM_REGIME::INCOMPRESSIBLE,
+               config->GetNEMOProblem(), geometry->GetnDim(), config->GetnSpecies()) {
+  SU2_ZONE_SCOPED
+
+  nDim = geometry->GetnDim();
+  nMarker = config->GetnMarker_All();
+
+  /*--- Store the number of vertices on each marker for deallocation later ---*/
+  nVertex.resize(nMarker);
+  for (unsigned long iMarker = 0; iMarker < nMarker; iMarker++) nVertex[iMarker] = geometry->nVertex[iMarker];
+
+  /* A grid is defined as dynamic if there's rigid grid movement or grid deformation AND the problem is time domain */
+  dynamic_grid = config->GetDynamic_Grid();
+
+#ifdef HAVE_OMP
+  /*--- Get the edge coloring, see notes in CEulerSolver's constructor. ---*/
+  su2double parallelEff = 1.0;
+#ifdef CODI_REVERSE_TYPE
+  /*--- For the discrete adjoint, the reducer strategy is costly. Prefer coloring, possibly with reduced edge color
+   *    group size. Find the maximum edge color group size that yields an efficient coloring. Also, allow larger numbers
+   *    of colors. ---*/
+  const bool relax =  config->GetEdgeColoringRelaxDiscAdj();
+  const auto& coloring = geometry->GetEdgeColoring(&parallelEff, relax);
+#else
+  const auto& coloring = geometry->GetEdgeColoring(&parallelEff);
+#endif
+
+  ReducerStrategy = parallelEff < COLORING_EFF_THRESH;
+
+  if (ReducerStrategy && (coloring.getOuterSize() > 1)) geometry->SetNaturalEdgeColoring();
+
+  if (!coloring.empty()) {
+    auto groupSize = static_cast<su2uint>(ReducerStrategy ? 1ul : geometry->GetEdgeColorGroupSize());
+    auto nColor = coloring.getOuterSize();
+    EdgeColoring.reserve(nColor);
+
+    for (auto iColor = 0ul; iColor < nColor; ++iColor)
+      EdgeColoring.emplace_back(coloring.innerIdx(iColor), coloring.getNumNonZeros(iColor), groupSize);
+  }
+
+  nPoint = geometry->GetnPoint();
+  omp_chunk_size = computeStaticChunkSize(nPoint, omp_get_max_threads(), OMP_MAX_SIZE);
+#else
+  EdgeColoring[0] = DummyGridColor<>(geometry->GetnEdge());
+#endif
+
+  /*--- Initialize lower and upper limits for solution clipping. Solvers might overwrite these values. ---*/
+  for (unsigned int iVar = 0; iVar < MAXNVAR; iVar++) {
+    lowerlimit[iVar] = std::numeric_limits<su2double>::lowest();
+    upperlimit[iVar] = std::numeric_limits<su2double>::max();
+  }
+
+  /*--- Ghost flow states and the per-vertex buffers the boundaries share, sized to the largest
+   * marker (see BoundaryFluxResidual) and to the primitive layout of the flow solver. Built here,
+   * where only one thread is running: the boundaries are reached inside a parallel region, and
+   * allocating there would mean a master region, which a CVariable constructor may not run in
+   * (CFlowVariable seeds the BGS solution with an OpenMP work-sharing loop, whose barrier would
+   * take an arrival of the team barrier the other threads are waiting on). ---*/
+  if (flow_solver != nullptr) {
+    unsigned long maxMarkerVertices = 0;
+    for (auto iMarker = 0u; iMarker < nMarker; ++iMarker) maxMarkerVertices = max(maxMarkerVertices, nVertex[iMarker]);
+
+    ghostFlowNodes = make_unique<CGhostFlowVariable>(maxMarkerVertices, nDim, flow_solver->GetnVar(),
+                                                     flow_solver->GetnPrimVar(), flow_solver->GetnPrimVarGrad(),
+                                                     config);
+    ghostNormal.resize(maxMarkerVertices, nDim);
+    ghostCoord.resize(maxMarkerVertices, nDim);
+    ghostSkip.resize(maxMarkerVertices);
+  }
+}
+
+template <class VariableType>
+CScalarSolver<VariableType>::~CScalarSolver() {
+  delete nodes;
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::CommonPreprocessing(CGeometry *geometry, const CConfig *config, const bool Output) {
+  SU2_ZONE_SCOPED
+
+  /*--- Define booleans that are solver specific through CConfig's GlobalParams which have to be set in CFluidIteration
+   * before calling these solver functions. ---*/
+  const bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+  const bool muscl = config->GetMUSCL();
+  const bool limiter = (config->GetKind_SlopeLimit() != LIMITER::NONE) &&
+                       (config->GetInnerIter() <= config->GetLimiterIter());
+
+  /*--- Clear residual and system matrix, not needed for
+   * reducer strategy as we write over the entire matrix. ---*/
+  if (!ReducerStrategy && !Output) {
+    LinSysRes.SetValZero();
+    if (implicit) {
+      Jacobian.SetValDiagonalZero();
+    } else {
+      SU2_OMP_BARRIER
+    }
+  }
+
+  /*--- Upwind second order reconstruction and gradients ---*/
+
+  if (config->GetReconstructionGradientRequired()) {
+    switch(config->GetKind_Gradient_Method_Recon()) {
+      case GREEN_GAUSS: SetSolution_Gradient_GG(geometry, config, -1, true); break;
+      case LEAST_SQUARES: SetSolution_Gradient_LS(geometry, config, -1, true); break;
+      case WEIGHTED_LEAST_SQUARES: SetSolution_Gradient_LS(geometry, config, -1, true); break;
+    }
+  }
+
+  switch(config->GetKind_Gradient_Method()) {
+    case GREEN_GAUSS: SetSolution_Gradient_GG(geometry, config, -1); break;
+    case WEIGHTED_LEAST_SQUARES: SetSolution_Gradient_LS(geometry, config, -1); break;
+  }
+
+  if (limiter && muscl) SetSolution_Limiter(geometry, config);
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::SumEdgeFluxes(const CGeometry* geometry) {
+  SU2_ZONE_SCOPED
+
+  /*--- EdgeFluxes and EdgeFluxesDiff hold the two row contributions of an edge directly,
+   * flux_i and flux_j, so each point simply accumulates its own side of every incident edge. ---*/
+  SU2_OMP_FOR_STAT(omp_chunk_size)
+  for (unsigned long iPoint = 0; iPoint < nPoint; ++iPoint) {
+    LinSysRes.SetBlock_Zero(iPoint);
+
+    for (auto iEdge : geometry->nodes->GetEdges(iPoint)) {
+      if (iPoint == geometry->edges->GetNode(iEdge, 0)) {
+        LinSysRes.AddBlock(iPoint, EdgeFluxes.GetBlock(iEdge));
+      } else {
+        LinSysRes.AddBlock(iPoint, EdgeFluxesDiff.GetBlock(iEdge));
+      }
+    }
+  }
+  END_SU2_OMP_FOR
+}
+
+template <class VariableType>
+template <class Scheme>
+void CScalarSolver<VariableType>::EdgeFluxResidual(const CGeometry* geometry, CSolver** solver_container,
+                                                    const CConfig* config, const ScalarFluxOptions& opt) {
+  SU2_ZONE_SCOPED
+
+  using Double = typename Scheme::Double;
+  constexpr int nDim = Scheme::nDim;
+
+  const Scheme flux(*config);
+
+  /*--- Null for solid heat transfer, which has no flow solver to mirror (see EdgeSide). ---*/
+  auto* flowSolver = solver_container[FLOW_SOL];
+  auto* flowNodes = flowSolver ? su2staticcast_p<CFlowVariable*>(flowSolver->GetNodes()) : nullptr;
+  const auto* edgeMassFluxes = flowSolver ? flowSolver->GetEdgeMassFluxes() : nullptr;
+
+  const EdgeSide<VariableType> side{*nodes, flowNodes, CMatrixView<const su2double>(geometry->nodes->GetCoord()),
+                                    dynamic_grid ? CMatrixView<const su2double>(geometry->nodes->GetGridVel())
+                                                 : CMatrixView<const su2double>()};
+
+  const auto updateType = ReducerStrategy ? UpdateType::REDUCTION : UpdateType::COLORING;
+  auto& target = ReducerStrategy ? EdgeFluxes : LinSysRes;
+
+  /*--- Under the reducer the edges of a thread are not disjoint in their points, so
+   * preaccumulation is paused; under coloring they are, and the faster adjoint evaluation
+   * mode applies. ---*/
+  bool pausePreacc = false;
+  if (ReducerStrategy) pausePreacc = AD::PausePreaccumulation();
+  else AD::StartNoSharedReading();
+
+  for (auto color : EdgeColoring) {
+    SU2_OMP_FOR_DYN(nextMultiple(OMP_MIN_SIZE, color.groupSize))
+    for (auto k = 0ul; k < color.size; ++k) {
+      const unsigned long iEdge = color.indices[k];
+      const auto iPoint = geometry->edges->GetNode(iEdge, 0);
+      const auto jPoint = geometry->edges->GetNode(iEdge, 1);
+      const auto normal = gatherVariables<nDim>(iEdge, geometry->edges->GetNormal());
+
+      const Double massFlux = opt.boundedScalar ? gatherVariables(iEdge, *edgeMassFluxes) : Double(0.0);
+
+      flux.ComputeFlux(opt, iEdge, iPoint, side, jPoint, side, normal, massFlux, updateType, 1.0, target,
+                       EdgeFluxesDiff, Jacobian);
+
+      /*--- Bounded scalar divergence correction, per edge; the ReducerStrategy equivalent runs
+       * in a per-point pass below, where the diagonal is not written from the edge loop. ---*/
+      if (opt.boundedScalar && !ReducerStrategy) {
+        LinSysRes.AddBlock(iPoint, nodes->GetSolution(iPoint), -massFlux);
+        LinSysRes.AddBlock(jPoint, nodes->GetSolution(jPoint), massFlux);
+        if (opt.implicit) {
+          Jacobian.AddVal2Diag(iPoint, -massFlux);
+          Jacobian.AddVal2Diag(jPoint, massFlux);
+        }
+      }
+    }
+    END_SU2_OMP_FOR
+  }
+
+  AD::ResumePreaccumulation(pausePreacc);
+  if (!ReducerStrategy) AD::EndNoSharedReading();
+
+  if (ReducerStrategy) {
+    SumEdgeFluxes(geometry);
+    if (opt.implicit) Jacobian.SetDiagonalAsColumnSum();
+
+    if (opt.boundedScalar) {
+      SU2_OMP_FOR_STAT(omp_chunk_size)
+      for (unsigned long iPoint = 0; iPoint < nPoint; ++iPoint) {
+        const auto* solution = nodes->GetSolution(iPoint);
+        su2double divergence = 0;
+
+        for (auto iEdge : geometry->nodes->GetEdges(iPoint)) {
+          const auto sign = (iPoint == geometry->edges->GetNode(iEdge, 0)) ? 1 : -1;
+          const su2double edgeMassFlux = sign * (*edgeMassFluxes)[iEdge];
+          divergence += edgeMassFlux;
+          LinSysRes.AddBlock(iPoint, solution, -edgeMassFlux);
+        }
+        if (opt.implicit) Jacobian.AddVal2Diag(iPoint, -divergence);
+      }
+      END_SU2_OMP_FOR
+    }
+  }
+}
+
+template <class VariableType>
+template <class Scheme>
+void CScalarSolver<VariableType>::BoundaryFluxResidual(const CGeometry* geometry, CSolver** solver_container,
+                                                       const CConfig* config, const ScalarFluxOptions& opt,
+                                                       unsigned short val_marker) {
+  using Double = typename Scheme::Double;
+  constexpr int nDim = Scheme::nDim;
+
+  const Scheme flux(*config);
+
+  auto* flowNodes = su2staticcast_p<CFlowVariable*>(solver_container[FLOW_SOL]->GetNodes());
+
+  const EdgeSide<VariableType> side_i{*nodes, flowNodes, CMatrixView<const su2double>(geometry->nodes->GetCoord()),
+                                      dynamic_grid ? CMatrixView<const su2double>(geometry->nodes->GetGridVel())
+                                                   : CMatrixView<const su2double>()};
+
+  const EdgeSide<VariableType> side_j{*ghostNodes, ghostFlowNodes.get(), CMatrixView<const su2double>(ghostCoord),
+                                      side_i.gridVel};
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (unsigned long iVertex = 0; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+    const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+    if (!geometry->nodes->GetDomain(iPoint) || ghostSkip[iVertex]) continue;
+
+    const auto normal = gatherVariables<nDim>(iVertex, ghostNormal);
+
+    Double massFlux = 0.0;
+    if (opt.boundedScalar) {
+      massFlux = BoundedScalarBCFlux(iPoint, opt.implicit, flowNodes->GetDensity(iPoint),
+                                     &ghostFlowNodes->GetPrimitive(iVertex)[prim_idx.Velocity()], normal.data());
+    }
+
+    const auto res = flux.ComputeFlux(opt, iPoint, side_i, iVertex, side_j, normal, massFlux);
+
+    /*--- The ghost point has no row, only the contribution to i is assembled. ---*/
+    for (auto iVar = 0ul; iVar < res.nVar; ++iVar) LinSysRes(iPoint, iVar) += res.flux_i(iVar);
+    if (opt.implicit) Jacobian.AddBlock2Diag(iPoint, res.jac_ii);
+  }
+  END_SU2_OMP_FOR
+}
+
+template <class VariableType>
+template <class Scheme, class GhostFunc>
+void CScalarSolver<VariableType>::FluidInterfaceFluxResidual(const CGeometry* geometry, CSolver** solver_container,
+                                                             const CConfig* config, const ScalarFluxOptions& optConv,
+                                                             const ScalarFluxOptions& optVisc,
+                                                             const GhostFunc& fillGhostExtras) {
+  constexpr int nDim = Scheme::nDim;
+
+  const Scheme flux(*config);
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+  auto* flowNodes = su2staticcast_p<CFlowVariable*>(flowSolver->GetNodes());
+  const auto nPrimVar = flowSolver->GetnPrimVar();
+
+  const EdgeSide<VariableType> side_i{*nodes, flowNodes, CMatrixView<const su2double>(geometry->nodes->GetCoord()),
+                                      dynamic_grid ? CMatrixView<const su2double>(geometry->nodes->GetGridVel())
+                                                   : CMatrixView<const su2double>()};
+  const EdgeSide<VariableType> side_j{*ghostNodes, ghostFlowNodes.get(), CMatrixView<const su2double>(ghostCoord),
+                                      side_i.gridVel};
+
+  su2activevector PrimVar_j(nPrimVar);
+
+  for (auto iMarker = 0u; iMarker < config->GetnMarker_All(); iMarker++) {
+    if (config->GetMarker_All_KindBC(iMarker) != FLUID_INTERFACE) continue;
+
+    SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+    for (unsigned long iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+      const auto iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+      if (!geometry->nodes->GetDomain(iPoint)) continue;
+
+      const auto Point_Normal = geometry->vertex[iMarker][iVertex]->GetNormal_Neighbor();
+      const auto nDonorVertex = GetnSlidingStates(iMarker, iVertex);
+
+      SetGhostGeometry(geometry, iMarker, iVertex);
+      const auto normal = gatherVariables<nDim>(iVertex, ghostNormal);
+
+      /*--- Loop over the donors and accumulate the weighted-average convective residual. ---*/
+      for (auto jVertex = 0; jVertex < nDonorVertex; jVertex++) {
+        for (auto iVar = 0u; iVar < nPrimVar; iVar++)
+          PrimVar_j[iVar] = flowSolver->GetSlidingState(iMarker, iVertex, iVar, jVertex);
+
+        /*--- Weight computed by the interpolator for this donor vertex. ---*/
+        const su2double weight = flowSolver->GetSlidingState(iMarker, iVertex, nPrimVar, jVertex);
+
+        for (auto iVar = 0u; iVar < nVar; iVar++)
+          ghostNodes->SetSolution(iVertex, iVar, GetSlidingState(iMarker, iVertex, iVar, jVertex));
+
+        SetGhostPrimitives(iVertex, PrimVar_j.data());
+
+        su2double massFlux = 0.0;
+        if (optConv.boundedScalar) {
+          massFlux = BoundedScalarBCFlux(iPoint, optConv.implicit, flowNodes->GetDensity(iPoint),
+                                         &PrimVar_j[prim_idx.Velocity()], normal.data());
+        }
+
+        const auto res = flux.ComputeFlux(optConv, iPoint, side_i, iVertex, side_j, normal, massFlux);
+
+        for (auto iVar = 0ul; iVar < res.nVar; ++iVar) LinSysRes(iPoint, iVar) += weight * res.flux_i(iVar);
+        if (optConv.implicit) Jacobian.AddBlock2Diag(iPoint, res.jac_ii, weight);
+      }
+
+      /*--- Diffusive term, computed once from the ghost state the last donor left behind. ---*/
+      SetGhostDiffusionState(geometry, iVertex, iPoint, Point_Normal);
+      fillGhostExtras(iVertex, iPoint);
+
+      const auto res = flux.ComputeFlux(optVisc, iPoint, side_i, iVertex, side_j, normal, su2double(0.0));
+      for (auto iVar = 0ul; iVar < res.nVar; ++iVar) LinSysRes(iPoint, iVar) += res.flux_i(iVar);
+      if (optVisc.implicit) Jacobian.AddBlock2Diag(iPoint, res.jac_ii);
+    }
+    END_SU2_OMP_FOR
+  }
+}
+
+template<class VariableType>
+void CScalarSolver<VariableType>::BC_Riemann(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics, CNumerics *visc_numerics, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  string Marker_Tag         = config->GetMarker_All_TagBound(val_marker);
+
+  switch(config->GetKind_Data_Riemann(Marker_Tag))
+  {
+  case TOTAL_CONDITIONS_PT: case STATIC_SUPERSONIC_INFLOW_PT: case STATIC_SUPERSONIC_INFLOW_PD: case DENSITY_VELOCITY:
+    BC_Inlet(geometry, solver_container, conv_numerics, visc_numerics, config, val_marker);
+    break;
+  case STATIC_PRESSURE:
+    BC_Outlet(geometry, solver_container, conv_numerics, visc_numerics, config, val_marker);
+    break;
+  }
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::BC_Periodic(CGeometry* geometry, CSolver** solver_container, CNumerics* numerics,
+                                              CConfig* config) {
+  SU2_ZONE_SCOPED
+  /*--- Complete residuals for periodic boundary conditions. We loop over
+   the periodic BCs in matching pairs so that, in the event that there are
+   adjacent periodic markers, the repeated points will have their residuals
+   accumulated corectly during the communications. For implicit calculations
+   the Jacobians and linear system are also correctly adjusted here. ---*/
+
+  for (unsigned short iPeriodic = 1; iPeriodic <= config->GetnMarker_Periodic() / 2; iPeriodic++) {
+    InitiatePeriodicComms(geometry, config, iPeriodic, PERIODIC_RESIDUAL);
+    CompletePeriodicComms(geometry, config, iPeriodic, PERIODIC_RESIDUAL);
+  }
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::BC_Far_Field(CGeometry* geometry, CSolver** solver_container,
+                                               CNumerics* conv_numerics, CNumerics*, CConfig *config,
+                                               unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+  const bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+
+    const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+
+    /*--- Check if the node belongs to the domain (i.e, not a halo node) ---*/
+
+    if (geometry->nodes->GetDomain(iPoint)) {
+
+      /*--- Allocate the value at the infinity ---*/
+
+      auto V_infty = solver_container[FLOW_SOL]->GetCharacPrimVar(val_marker, iVertex);
+
+      /*--- Retrieve solution at the farfield boundary node ---*/
+
+      auto V_domain = solver_container[FLOW_SOL]->GetNodes()->GetPrimitive(iPoint);
+
+      /*--- Grid Movement ---*/
+
+      if (dynamic_grid)
+        conv_numerics->SetGridVel(geometry->nodes->GetGridVel(iPoint), geometry->nodes->GetGridVel(iPoint));
+
+      conv_numerics->SetPrimitive(V_domain, V_infty);
+
+      /*--- Set turbulent variable at the wall, and at infinity ---*/
+
+      conv_numerics->SetScalarVar(nodes->GetSolution(iPoint), Solution_Inf);
+
+      /*--- Set Normal (it is necessary to change the sign) ---*/
+
+      su2double Normal[MAXNDIM] = {0.0};
+      for (auto iDim = 0u; iDim < nDim; iDim++)
+        Normal[iDim] = -geometry->vertex[val_marker][iVertex]->GetNormal(iDim);
+      conv_numerics->SetNormal(Normal);
+
+      if (conv_numerics->GetBoundedScalar()) {
+        const su2double* velocity = &V_infty[prim_idx.Velocity()];
+        const su2double density = solver_container[FLOW_SOL]->GetNodes()->GetDensity(iPoint);
+        conv_numerics->SetMassFlux(BoundedScalarBCFlux(iPoint, implicit, density, velocity, Normal));
+      }
+
+      /*--- Compute residuals and Jacobians ---*/
+
+      auto residual = conv_numerics->ComputeResidual(config);
+
+      /*--- Add residuals and Jacobians ---*/
+
+      LinSysRes.AddBlock(iPoint, residual);
+      if (implicit) Jacobian.AddBlock2Diag(iPoint, residual.jacobian_i);
+    }
+  }
+  END_SU2_OMP_FOR
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::SetTime_Step(CGeometry *geometry, CSolver **solver_container, CConfig *config,
+                                               unsigned short iMesh, unsigned long Iteration) {
+  SU2_ZONE_SCOPED
+
+  const auto flowNodes = solver_container[FLOW_SOL]->GetNodes();
+
+  SU2_OMP_FOR_STAT(omp_chunk_size)
+  for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    su2double dt = nodes->GetLocalCFL(iPoint) / flowNodes->GetLocalCFL(iPoint) * flowNodes->GetDelta_Time(iPoint);
+    nodes->SetDelta_Time(iPoint, dt);
+  }
+  END_SU2_OMP_FOR
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::PrepareImplicitIteration(CGeometry* geometry, CSolver** solver_container,
+                                                           CConfig* config) {
+  SU2_ZONE_SCOPED
+
+  /*--- Set shared residual variables to 0 and declare
+   *    local ones for current thread to work on. ---*/
+
+  SetResToZero();
+
+  su2double resMax[MAXNVAR] = {0.0}, resRMS[MAXNVAR] = {0.0};
+  unsigned long idxMax[MAXNVAR] = {0};
+
+  /*--- Build implicit system ---*/
+
+  SU2_OMP_FOR_(schedule(static, omp_chunk_size) SU2_NOWAIT)
+  for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    /*--- Modify matrix diagonal to improve diagonal dominance. ---*/
+    const su2double dt = nodes->GetDelta_Time(iPoint);
+
+    if (dt != 0.0) {
+      su2double Vol = geometry->nodes->GetVolume(iPoint) + geometry->nodes->GetPeriodicVolume(iPoint);
+      Jacobian.AddVal2Diag(iPoint, Vol / dt);
+    } else {
+      Jacobian.SetVal2Diag(iPoint, 1.0);
+      LinSysRes.SetBlock_Zero(iPoint);
+    }
+
+    /*--- Right hand side of the system (-Residual) and initial guess (x = 0) ---*/
+
+    for (unsigned short iVar = 0; iVar < nVar; iVar++) {
+      LinSysRes(iPoint, iVar) = -LinSysRes(iPoint, iVar);
+      LinSysSol(iPoint, iVar) = 0.0;
+
+      /*--- "Add" residual at (iPoint,iVar) to local residual variables. ---*/
+      ResidualReductions_PerThread(iPoint, iVar, LinSysRes(iPoint, iVar), resRMS, resMax, idxMax);
+    }
+  }
+  END_SU2_OMP_FOR
+
+  /*--- "Add" residuals from all threads to global residual variables. ---*/
+  ResidualReductions_FromAllThreads(geometry, config, resRMS, resMax, idxMax);
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::CompleteImplicitIteration(CGeometry* geometry, CSolver** solver_container,
+                                                            CConfig* config) {
+  SU2_ZONE_SCOPED
+
+  ComputeUnderRelaxationFactor(solver_container, config);
+
+  /*--- Update solution (system written in terms of increments) ---*/
+
+  if (!adjoint) {
+    /*--- Update the scalar solution. For transport equations, where Solution is not equivalent with the transported
+     * quantity, multiply the respective factor.  ---*/
+    if (Conservative) {
+      const auto flowNodes = solver_container[FLOW_SOL]->GetNodes();
+
+      SU2_OMP_FOR_STAT(omp_chunk_size)
+      for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+        /*--- Multiply the Solution var with density to get the conservative transported quantity, if necessary. ---*/
+        /* Note that for consistency with residual and jacobian calaulcations, use of current density for conservative variables
+        * of the old solution is used. see pull request https://github.com/su2code/SU2/pull/2458*/
+        const su2double density = flowNodes->GetDensity(iPoint);
+
+        for (unsigned short iVar = 0; iVar < nVar; iVar++) {
+          nodes->AddClippedSolution(iPoint, iVar, nodes->GetUnderRelaxation(iPoint) * LinSysSol(iPoint, iVar),
+                                    lowerlimit[iVar], upperlimit[iVar], density, density);
+        }
+      }
+      END_SU2_OMP_FOR
+    } else {
+      SU2_OMP_FOR_STAT(omp_chunk_size)
+      for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+        for (unsigned short iVar = 0; iVar < nVar; iVar++) {
+          nodes->AddClippedSolution(iPoint, iVar, nodes->GetUnderRelaxation(iPoint) * LinSysSol(iPoint, iVar),
+                                    lowerlimit[iVar], upperlimit[iVar]);
+        }
+      }
+      END_SU2_OMP_FOR
+    }
+  }
+
+  for (unsigned short iPeriodic = 1; iPeriodic <= config->GetnMarker_Periodic() / 2; iPeriodic++) {
+    InitiatePeriodicComms(geometry, config, iPeriodic, PERIODIC_IMPLICIT);
+    CompletePeriodicComms(geometry, config, iPeriodic, PERIODIC_IMPLICIT);
+  }
+
+  InitiateComms(geometry, config, MPI_QUANTITIES::SOLUTION);
+  CompleteComms(geometry, config, MPI_QUANTITIES::SOLUTION);
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::ImplicitEuler_Iteration(CGeometry* geometry, CSolver** solver_container,
+                                                          CConfig* config) {
+  SU2_ZONE_SCOPED
+
+  PrepareImplicitIteration(geometry, solver_container, config);
+
+  /*--- Solve or smooth the linear system. ---*/
+
+  SU2_OMP_FOR_(schedule(static, OMP_MIN_SIZE) SU2_NOWAIT)
+  for (unsigned long iPoint = nPointDomain; iPoint < nPoint; iPoint++) {
+    LinSysRes.SetBlock_Zero(iPoint);
+    LinSysSol.SetBlock_Zero(iPoint);
+  }
+  END_SU2_OMP_FOR
+
+  auto iter = System.Solve(Jacobian, LinSysRes, LinSysSol, geometry, config);
+
+  BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+    SetIterLinSolver(iter);
+    SetResLinSolver(System.GetResidual());
+  }
+  END_SU2_OMP_SAFE_GLOBAL_ACCESS
+
+  CompleteImplicitIteration(geometry, solver_container, config);
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::ExplicitEuler_Iteration(CGeometry* geometry, CSolver** solver_container,
+                                                          CConfig* config) {
+  SU2_ZONE_SCOPED
+
+  /*--- Local residual variables for current thread ---*/
+  su2double resMax[MAXNVAR] = {0.0}, resRMS[MAXNVAR] = {0.0};
+  unsigned long idxMax[MAXNVAR] = {0};
+
+  SU2_OMP_FOR_STAT(omp_chunk_size)
+  for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+    const su2double dt = nodes->GetDelta_Time(iPoint);
+    const su2double Vol = geometry->nodes->GetVolume(iPoint) + geometry->nodes->GetPeriodicVolume(iPoint);
+
+    for (auto iVar = 0u; iVar < nVar; iVar++) {
+      /*--- "Add" residual at (iPoint,iVar) to local residual variables. ---*/
+      ResidualReductions_PerThread(iPoint, iVar, LinSysRes(iPoint, iVar), resRMS, resMax, idxMax);
+      /*--- Explicit Euler step: ---*/
+      LinSysSol(iPoint, iVar) = -dt / Vol * LinSysRes(iPoint, iVar);
+    }
+  }
+  END_SU2_OMP_FOR
+
+  /*--- "Add" residuals from all threads to global residual variables. ---*/
+  ResidualReductions_FromAllThreads(geometry, config, resRMS, resMax, idxMax);
+
+  /*--- Use LinSysSol for solution update. ---*/
+  CompleteImplicitIteration(geometry, solver_container, config);
+}
+
+template <class VariableType>
+void CScalarSolver<VariableType>::SetResidual_DualTime(CGeometry* geometry, CSolver** solver_container, CConfig* config,
+                                                       unsigned short iRKStep, unsigned short iMesh,
+                                                       unsigned short RunTime_EqSystem) {
+  SU2_ZONE_SCOPED
+
+  const bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+  const bool first_order = (config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_1ST);
+  const bool second_order = (config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_2ND);
+
+  const bool bounded_scalar = BoundedScalar;
+
+  /*--- Flow solution, needed to get density. ---*/
+  auto* flowNodes = su2staticcast_p<CFlowVariable*>(solver_container[FLOW_SOL]->GetNodes());
+
+  /*--- Store the physical time step ---*/
+
+  const su2double TimeStep = config->GetDelta_UnstTimeND();
+
+  /*--- Local variables ---*/
+
+  unsigned short iVar, iMarker, iDim, iNeigh;
+  unsigned long iPoint, jPoint, iVertex, iEdge;
+
+  su2double *U_time_nM1 = nullptr, *U_time_n = nullptr, *U_time_nP1 = nullptr;
+  /*--- For non-Conservative scalars (e.g. SA), multiply the Primitives with 1.0 instead of Density. ---*/
+  su2double Density_nM1 = 1.0, Density_n = 1.0, Density_nP1 = 1.0;
+  su2double Volume_nM1, Volume_nP1;
+  const su2double *Normal = nullptr, *GridVel_i = nullptr, *GridVel_j = nullptr;
+  su2double Residual_GCL;
+
+  /*--- Compute the dual time-stepping source term for static meshes ---*/
+
+  if (!dynamic_grid) {
+    /*--- Loop over all nodes (excluding halos) ---*/
+
+    AD::StartNoSharedReading();
+
+    SU2_OMP_FOR_STAT(omp_chunk_size)
+    for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+      if (Conservative) {
+        Density_nM1 = flowNodes->GetDensity_time_n1(iPoint);
+        Density_n = flowNodes->GetDensity_time_n(iPoint);
+        Density_nP1 = flowNodes->GetDensity(iPoint);
+      }
+
+      /*--- Retrieve the solution at time levels n-1, n, and n+1. Note that
+       we are currently iterating on U^n+1 and that U^n & U^n-1 are fixed,
+       previous solutions that are stored in memory. ---*/
+
+      U_time_nM1 = nodes->GetSolution_time_n1(iPoint);
+      U_time_n = nodes->GetSolution_time_n(iPoint);
+      U_time_nP1 = nodes->GetSolution(iPoint);
+
+      /*--- CV volume at time n+1. As we are on a static mesh, the volume
+       of the CV will remained fixed for all time steps. ---*/
+
+      Volume_nP1 = geometry->nodes->GetVolume(iPoint);
+
+      /*--- Compute the dual time-stepping source term based on the chosen
+       time discretization scheme (1st- or 2nd-order).---*/
+
+      for (iVar = 0; iVar < nVar; iVar++) {
+        su2double unsteady_term = 0.0;
+        if (first_order)
+          unsteady_term = (Density_nP1 * U_time_nP1[iVar] - Density_n * U_time_n[iVar]) * Volume_nP1 / TimeStep;
+        if (second_order)
+          unsteady_term = (3.0 * Density_nP1 * U_time_nP1[iVar] - 4.0 * Density_n * U_time_n[iVar] +
+                                      1.0 * Density_nM1 * U_time_nM1[iVar]) *
+                                     Volume_nP1 / (2.0 * TimeStep);
+
+        if (bounded_scalar) {
+          if (first_order) unsteady_term -= U_time_nP1[iVar] * (Density_nP1 - Density_n) * Volume_nP1 / TimeStep;
+          if (second_order) unsteady_term -= U_time_nP1[iVar] * (3.0 * Density_nP1 - 4.0 * Density_n + 1.0 * Density_nM1) * Volume_nP1 / (2.0 * TimeStep);
+        }
+
+        LinSysRes(iPoint, iVar) += unsteady_term;
+      }
+
+      /*--- Compute the Jacobian contribution due to the dual time source term. ---*/
+      if (implicit) {
+        if (first_order) Jacobian.AddVal2Diag(iPoint, Volume_nP1 / TimeStep);
+        if (second_order) Jacobian.AddVal2Diag(iPoint, (Volume_nP1 * 3.0) / (2.0 * TimeStep));
+      }
+    }
+    END_SU2_OMP_FOR
+
+    AD::EndNoSharedReading();
+
+  } else {
+    /*--- For unsteady flows on dynamic meshes (rigidly transforming or
+     dynamically deforming), the Geometric Conservation Law (GCL) should be
+     satisfied in conjunction with the ALE formulation of the governing
+     equations. The GCL prevents accuracy issues caused by grid motion, i.e.
+     a uniform free-stream should be preserved through a moving grid. First,
+     we will loop over the edges and boundaries to compute the GCL component
+     of the dual time source term that depends on grid velocities. ---*/
+
+    SU2_OMP_FOR_STAT(omp_chunk_size)
+    for (iPoint = 0; iPoint < nPointDomain; ++iPoint) {
+      GridVel_i = geometry->nodes->GetGridVel(iPoint);
+      U_time_n = nodes->GetSolution_time_n(iPoint);
+
+      if (Conservative) {
+        Density_n = flowNodes->GetDensity_time_n(iPoint);
+      }
+
+      for (iNeigh = 0; iNeigh < geometry->nodes->GetnPoint(iPoint); iNeigh++) {
+        iEdge = geometry->nodes->GetEdge(iPoint, iNeigh);
+        Normal = geometry->edges->GetNormal(iEdge);
+
+        jPoint = geometry->nodes->GetPoint(iPoint, iNeigh);
+        GridVel_j = geometry->nodes->GetGridVel(jPoint);
+
+        /*--- Determine whether to consider the normal outward or inward. ---*/
+        su2double dir = (iPoint < jPoint) ? 0.5 : -0.5;
+
+        Residual_GCL = 0.0;
+        for (iDim = 0; iDim < nDim; iDim++) Residual_GCL += dir * (GridVel_i[iDim] + GridVel_j[iDim]) * Normal[iDim];
+
+        Residual_GCL *= Density_n;
+
+        for (iVar = 0; iVar < nVar; iVar++) LinSysRes(iPoint, iVar) += U_time_n[iVar] * Residual_GCL;
+      }
+    }
+    END_SU2_OMP_FOR
+
+    /*--- Loop over the boundary edges ---*/
+
+    for (iMarker = 0; iMarker < geometry->GetnMarker(); iMarker++) {
+      if ((config->GetMarker_All_KindBC(iMarker) != INTERNAL_BOUNDARY) &&
+          (config->GetMarker_All_KindBC(iMarker) != NEARFIELD_BOUNDARY) &&
+          (config->GetMarker_All_KindBC(iMarker) != PERIODIC_BOUNDARY)) {
+        SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+        for (iVertex = 0; iVertex < geometry->GetnVertex(iMarker); iVertex++) {
+          /*--- Get the index for node i plus the boundary face normal ---*/
+
+          iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+          Normal = geometry->vertex[iMarker][iVertex]->GetNormal();
+
+          /*--- Grid velocities stored at boundary node i ---*/
+
+          GridVel_i = geometry->nodes->GetGridVel(iPoint);
+
+          /*--- Compute the GCL term by dotting the grid velocity with the face
+           normal. The normal is negated to match the boundary convention. ---*/
+
+          Residual_GCL = 0.0;
+          for (iDim = 0; iDim < nDim; iDim++) Residual_GCL -= 0.5 * (GridVel_i[iDim] + GridVel_i[iDim]) * Normal[iDim];
+
+          /*--- Compute the GCL component of the source term for node i ---*/
+
+          U_time_n = nodes->GetSolution_time_n(iPoint);
+
+          /*--- Multiply by density at node i for the SST model ---*/
+
+          if (Conservative) {
+            Density_n = flowNodes->GetDensity_time_n(iPoint);
+          }
+
+          for (iVar = 0; iVar < nVar; iVar++) LinSysRes(iPoint, iVar) += Density_n * U_time_n[iVar] * Residual_GCL;
+        }
+        END_SU2_OMP_FOR
+      }
+    }
+
+    /*--- Loop over all nodes (excluding halos) to compute the remainder
+     of the dual time-stepping source term. ---*/
+
+    AD::EndNoSharedReading();
+
+    SU2_OMP_FOR_STAT(omp_chunk_size)
+    for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
+      /*--- Retrieve the solution at time levels n-1, n, and n+1. Note that
+       we are currently iterating on U^n+1 and that U^n & U^n-1 are fixed,
+       previous solutions that are stored in memory. ---*/
+
+      U_time_nM1 = nodes->GetSolution_time_n1(iPoint);
+      U_time_n = nodes->GetSolution_time_n(iPoint);
+      U_time_nP1 = nodes->GetSolution(iPoint);
+
+      /*--- CV volume at time n-1 and n+1. In the case of dynamically deforming
+       grids, the volumes will change. On rigidly transforming grids, the
+       volumes will remain constant. ---*/
+
+      Volume_nM1 = geometry->nodes->GetVolume_nM1(iPoint);
+      Volume_nP1 = geometry->nodes->GetVolume(iPoint);
+
+      /*--- Compute the dual time-stepping source residual. Due to the
+       introduction of the GCL term above, the remainder of the source residual
+       due to the time discretization has a new form.---*/
+
+      if (Conservative) {
+        /*--- Get density at different time levels via virtual methods ---*/
+        Density_nM1 = flowNodes->GetDensity_time_n1(iPoint);
+        Density_n = flowNodes->GetDensity_time_n(iPoint);
+        Density_nP1 = flowNodes->GetDensity(iPoint);
+      }
+
+      for (iVar = 0; iVar < nVar; iVar++) {
+        su2double unsteady_term = 0.0;
+        if (first_order)
+          unsteady_term = (Density_nP1 * U_time_nP1[iVar] - Density_n * U_time_n[iVar]) * (Volume_nP1 / TimeStep);
+        if (second_order)
+          unsteady_term = (Density_nP1 * U_time_nP1[iVar] - Density_n * U_time_n[iVar]) * (3.0 * Volume_nP1 / (2.0 * TimeStep)) +
+              (Density_nM1 * U_time_nM1[iVar] - Density_n * U_time_n[iVar]) * (Volume_nM1 / (2.0 * TimeStep));
+
+        if (bounded_scalar) {
+          if (first_order) unsteady_term -= U_time_nP1[iVar] * (Density_nP1 - Density_n) * (Volume_nP1 / TimeStep);
+          if (second_order) unsteady_term -= U_time_nP1[iVar] * ((Density_nP1 - Density_n) * (3.0 * Volume_nP1 / (2.0 * TimeStep)) +
+                                                                 (Density_nM1 - Density_n) * (Volume_nM1 / (2.0 * TimeStep)));
+        }
+
+        LinSysRes(iPoint, iVar) += unsteady_term;
+      }
+
+      /*--- Compute the Jacobian contribution due to the dual time source term. ---*/
+      if (implicit) {
+        su2double diag_factor = 1.0;
+        if (Conservative) {
+          if (bounded_scalar) {
+            if (first_order)  diag_factor = Density_n;
+            if (second_order) diag_factor = (4.0 * Density_n - Density_nM1) / 3.0;
+          } else {
+            diag_factor = Density_nP1;
+          }
+        }
+        if (first_order)  Jacobian.AddVal2Diag(iPoint, diag_factor * Volume_nP1 / TimeStep);
+        if (second_order) Jacobian.AddVal2Diag(iPoint, diag_factor * 3.0 * Volume_nP1 / (2.0 * TimeStep));
+      }
+    }
+    END_SU2_OMP_FOR
+
+    AD::EndNoSharedReading();
+
+  }  // end dynamic grid
+}
+
+
+template <class VariableType>
+void CScalarSolver<VariableType>::PushSolutionBackInTime(unsigned long TimeIter, bool
+                                                         restart,CSolver*** solver_container,
+                                                         CGeometry** geometry, CConfig* config) {
+  SU2_ZONE_SCOPED
+  const bool dual_time = config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_1ST ||
+                         config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_2ND;
+  const bool isRestartIter = restart && TimeIter == config->GetRestart_Iter();
+
+  /*--- The value of the solution for the first iteration of the dual time. ---*/
+
+  if (dual_time && (TimeIter == 0 || isRestartIter)) {
+    /*--- Push back the initial condition to previous solution containers
+     for a 1st-order restart or when simply initializing to freestream. ---*/
+
+    nodes->Set_Solution_time_n();
+    nodes->Set_Solution_time_n1();
+
+    if (isRestartIter && config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_2ND) {
+      /*--- Load an additional restart file for a 2nd-order restart ---*/
+
+      LoadRestart(geometry, solver_container, config, SU2_TYPE::Int(config->GetRestart_Iter()-1), true);
+
+      /*--- Push back this new solution to time level N. ---*/
+
+      nodes->Set_Solution_time_n();
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "flavor": "rah-update-trace-v1",
+  "version": "8.6.0+rah-update-trace-v1",
+  "status": "compiled-tests-pending",
+  "executable": "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-update-trace-v1\\bin\\SU2_CFD.exe",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "sourceCommit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+  "license": "LGPL-2.1-or-later; local binary, source changes and rebuild recipe published",
+  "physicsQualified": false,
+  "systemDLLs": [
+    "KERNEL32.dll",
+    "msvcrt.dll"
+  ],
+  "buildReceipt": {
+    "command": [
+      "D:\\matlab\\toolbox\\shared\\coder\\ninja\\win64\\ninja.exe",
+      "-C",
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117",
+      "-f",
+      "update-trace-v147.ninja",
+      "-j",
+      "2",
+      "SU2_CFD/src/SU2_CFD.exe"
+    ],
+    "cwd": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source",
+    "status": "terminal",
+    "maximumSeconds": 720,
+    "processID": 7352,
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedSeconds": 410.0630000000001
+  },
+  "sourceTreeSHA256": "b1e7acb14cf2cd43be64486a1a6da5504b4bdcfcbc7dde43bdf692c9e3736a00",
+  "buildSourceSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\buildSU2UpdateTraceRuntime.py": "34e2a7876a11071e5ef22fd100f4ca6d95e90496298ce2250181357aecc9ef65",
+    "D:\\matlab\\toolbox\\shared\\coder\\ninja\\win64\\ninja.exe": "e74d3fd03b34afcb59714bd89ab8e73b0cefc32f7e58847e71795de5cc912e68",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe": "315c23bc298aba9eaf2aece174fa7fcb0e404247176663e6a4c7707a60f8e444",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\update-trace-v147.ninja": "34f5097c36bac5fc99532e3bc2e321a8e1a33128d868ba283dd589ff6c438fd1",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\build.ninja": "469fa3e0dc34ae2956e157fd8d7b0f684e879907cf83b66a4ecf674341a66ade",
+    "E:\\RocketAeroHeat\\third_party\\su2_update_trace\\update_trace.diff": "fd94959c901185f2f31c6f30d82b0c5e4785206c7b7f56f072d26e819889e804",
+    "E:\\RocketAeroHeat\\docs\\validation\\v147\\PLAN.md": "86ce2f1d4d04499f48f8cce936ff57ee1269407807e8588264932297307716d5",
+    "E:\\RocketAeroHeat\\third_party\\su2_update_trace\\RAHUpdateTrace.hpp": "07b5d9aedf52ce8e06dfc96fb851b77a300882c2d2f752d5b8316c90bee035d5"
+  },
+  "correction": "read-only native implicit-update tracing; equations and updates unchanged",
+  "patchSHA256": "fd94959c901185f2f31c6f30d82b0c5e4785206c7b7f56f072d26e819889e804",
+  "priorThermalAndFrozenHooksRemoved": true,
+  "allCFDObjectsRebuilt": true,
+  "archiveMembers": {
+    "Common/src/libSU2Common.a": {
+      "memberCount": 113,
+      "exactMembers": true
+    },
+    "SU2_CFD/src/libSU2core.a": {
+      "memberCount": 184,
+      "exactMembers": true
+    }
+  },
+  "restrictions": [
+    "steady single-zone ideal-gas SST-2003m",
+    "SI dimensional",
+    "constant isothermal wall",
+    "MGLEVEL=0",
+    "one update only, tracing opt-in",
+    "no HEOS or SA qualification"
+  ],
+  "files": [
+    {
+      "path": "AUTHORS.md",
+      "bytes": 3429,
+      "sha256": "bd2b76eada1999265ae26e89cc71759ba347bc69af2260ee588003b543fb9955"
+    },
+    {
+      "path": "bin/SU2_CFD.exe",
+      "bytes": 19541425,
+      "sha256": "c5a4920a4f6367109c05a6d8f82ea031a3409a678283174127865a884872a07d"
+    },
+    {
+      "path": "CLI11_LICENSE",
+      "bytes": 1586,
+      "sha256": "51c69badd1cd4ffb036fb2a2efc4d7db8dd8c89905526e7193d57912968efae1"
+    },
+    {
+      "path": "COPYING",
+      "bytes": 24478,
+      "sha256": "b3aa400aca6d2ba1f0bd03bd98d03d1fe7489a3bbb26969d72016360af8a5c9d"
+    },
+    {
+      "path": "COPYING.MinGW-w64-runtime.txt",
+      "bytes": 15076,
+      "sha256": "ecff91ddb5799c8b79a4bdb576921b9c3e2989783fd1944527e8eb9b41a5ff5f"
+    },
+    {
+      "path": "Eigen_COPYING.MPL2",
+      "bytes": 16726,
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    {
+      "path": "Eigen_COPYING.README",
+      "bytes": 779,
+      "sha256": "c83230b770f17ef1386ea1fd3681271dd98aa93646bdbfb5bff3a1b7050fff9d"
+    },
+    {
+      "path": "LICENSE.md",
+      "bytes": 33393,
+      "sha256": "46ae25afd571da3e3761ff82ace5dc26b0b66cf514243379ac026ce094ba32cf"
+    },
+    {
+      "path": "mel_LICENSE",
+      "bytes": 7652,
+      "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+    },
+    {
+      "path": "RAHUpdateTrace.hpp",
+      "bytes": 1997,
+      "sha256": "07b5d9aedf52ce8e06dfc96fb851b77a300882c2d2f752d5b8316c90bee035d5"
+    },
+    {
+      "path": "update_trace.diff",
+      "bytes": 3325,
+      "sha256": "fd94959c901185f2f31c6f30d82b0c5e4785206c7b7f56f072d26e819889e804"
+    }
+  ]
+}

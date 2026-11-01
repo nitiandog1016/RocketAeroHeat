@@ -213,3 +213,9 @@ docs/validation/v143/** -text -eol -whitespace
 docs/validation/v144/** -text -eol -whitespace
 docs/validation/v145/** -text -eol -whitespace
 docs/validation/v146/** -text -eol -whitespace
+# v147原生增量、构建失败与实际执行证据保留准确字节。
+docs/validation/v147/** -text -eol -whitespace
+third_party/su2_update_trace/*.diff -text -eol -whitespace
+third_party/su2_update_trace/*.hpp -text -eol
+# 构建器已绑定原生来源清单，保持执行时的Windows文本字节。
+scripts/buildSU2UpdateTraceRuntime.py -text -eol whitespace=cr-at-eol

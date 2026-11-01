@@ -6,6 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 FLAVOR='rah-axial-wall-v1'
 FROZEN_FLAVOR='rah-frozen-energy-v1'
 BOUNDED_FLAVOR='rah-bounded-conservative-v1'
+UPDATE_TRACE_FLAVOR='rah-update-trace-v2'
 COOLPROP_FLAVOR='rah-coolprop-v1'
 COOLPROP_RECON_FLAVOR='rah-coolprop-recon-v1'
 COOLPROP_FLAVORS=(COOLPROP_FLAVOR,COOLPROP_RECON_FLAVOR,'rah-coolprop-recon-v2','rah-coolprop-recon-v3')
@@ -18,9 +19,9 @@ def resolve(folder,config):
     data=read(manifest) if manifest.exists() else {}
     flavor=data.get('requiredRuntimeFlavor','official')
     if re.search(r'^\s*SOLVER\s*=\s*RANS\s*$',config,re.M) or 'sst' in data:
-        assert flavor in ('official',BOUNDED_FLAVOR),'SST仅适配显式定比热包，HEOS/空间壁温RANS尚未验证'
+        assert flavor in ('official',BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR),'SST仅适配显式定比热包，HEOS/空间壁温RANS尚未验证'
         locked.update(validate_sst_manifest(folder,data,config))
-    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,BOUNDED_FLAVOR,*COOLPROP_FLAVORS),'未知SU2运行时类型'
+    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR,*COOLPROP_FLAVORS),'未知SU2运行时类型'
     if flavor!=FROZEN_FLAVOR:assert 'frozenEnergyMode' not in data,'运行时类型与冻结能量选项不匹配'
     runtime_dir=ROOT/'tools/runtime/su2'/('8.6.0' if flavor=='official' else '8.6.0-'+flavor)
     runtime_file=runtime_dir/'runtime.json'
@@ -45,6 +46,11 @@ def resolve(folder,config):
             locked[str(manifest)]=sha(manifest)
         elif flavor==BOUNDED_FLAVOR:
             from prepareSU2SSTBoundedStudy import validate_runtime
+            from prepareSU2CheckpointContinuation import config as parse_config
+            locked.update(validate_runtime(folder,data,parse_config(folder/'case.cfg'),runtime))
+            locked[str(manifest)]=sha(manifest)
+        elif flavor==UPDATE_TRACE_FLAVOR:
+            from prepareSU2UpdateTraceCase import validate_runtime
             from prepareSU2CheckpointContinuation import config as parse_config
             locked.update(validate_runtime(folder,data,parse_config(folder/'case.cfg'),runtime))
             locked[str(manifest)]=sha(manifest)
@@ -151,6 +157,9 @@ def validate_sst_manifest(folder,data,config):
         for p,h in init['sourceSHA256'].items():assert sha(Path(p))==h
         locked[str(path)]=sha(path)
     else:assert c['RESTART_SOL']=='NO' and 'initializationSHA256' not in contract
+    if 'updateTraceStudy' in contract:
+        from prepareSU2UpdateTraceCase import validate_case
+        locked.update(validate_case(folder,data,c))
     return locked
 
 def validate_coolprop_manifest(data,config):

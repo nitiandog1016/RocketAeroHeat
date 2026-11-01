@@ -12,14 +12,19 @@ raw=fileread(fullfile(folder,'engine_process.json'));receipt=jsondecode(raw);
 assert(strcmp(receipt.status,'terminal') && receipt.exitCode==0 && ~receipt.timedOut && ~receipt.cancelled,'原引擎未成功结束。');
 assert(strcmpi(folder,char(java.io.File(receipt.request.workDirectory).getCanonicalPath())),'必须从原运行目录查看。');
 isNumerical=isfield(receipt.physicsModel,'numericalStudy');isInitial=isfield(receipt.physicsModel,'initializationStudy');
-assert(ismember(receipt.runtimeFlavor,{'official','rah-bounded-conservative-v1'}) && xor(isNumerical,isInitial),'缺少唯一实际数值/初场对照身份。');
+isTrace=isfield(receipt.physicsModel,'updateTraceStudy');
+assert(ismember(receipt.runtimeFlavor,{'official','rah-bounded-conservative-v1','rah-update-trace-v2'}) && ...
+    sum([isNumerical isInitial isTrace])==1,'缺少唯一实际数值/初场/更新观测身份。');
 for name={'case.cfg','mesh.su2','case_manifest.json','sst_initialization.json','sst_contract.json'}
     file=fullfile(folder,name{1});token=regexp(raw,[regexptranslate('escape',jsonencode(file)) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
     assert(numel(token)==1 && strcmp(sha(file),token{1}{1}),'原输入身份缺失或改变：%s',name{1});
 end
 manifest=jsondecode(fileread(fullfile(folder,'case_manifest.json')));f=manifest.flight;init=manifest.initialization;
 assert(strcmp(manifest.thermalBoundary.mode,'isothermal'));
-if isNumerical
+if isTrace
+    assert(strcmp(init.kind,'same-mesh-SST-checkpoint-research') && init.diagnosticOnly && init.runtimeObservationOnly);
+    assert(strcmp(receipt.runtimeFlavor,'rah-update-trace-v2'));
+elseif isNumerical
     assert(ismember(init.kind,{'same-mesh-SST-CFL-cap-comparison','same-mesh-SST-bounded-conservative-comparison', ...
         'same-mesh-SST-gradient-comparison','same-mesh-SST-reconstruction-startup-comparison'}));
     isBounded=strcmp(init.kind,'same-mesh-SST-bounded-conservative-comparison');
@@ -56,7 +61,7 @@ result=attachSU2ThermalBoundary(result,manifest.thermalBoundary);
 result.thermalStateAudit=readSU2SSTStateAudit(folder,receipt);
 result.convergenceAudit=auditSU2ResultConvergence(folder,result);
 assert(result.convergenceAudit.checkpointIdentityConfirmed,result.convergenceAudit.reason);
-assert(isfield(result.convergenceAudit,'numericalStudy') || isfield(result.convergenceAudit,'initializationStudy'), ...
+assert(isfield(result.convergenceAudit,'numericalStudy') || isfield(result.convergenceAudit,'initializationStudy') || isfield(result.convergenceAudit,'updateTrace'), ...
     '未审核的数值/初场方案不能进入查看器。');
 % 旧源清单可能保留源任务输出设置；实际步数/频率仅从已锁定的当前配置读取。
 configuration=fileread(fullfile(folder,'case.cfg'));runControls=struct;

@@ -108,6 +108,10 @@ def main():
     # 明确清除继承的温度表环境变量，只允许本次冻结输入指定其绝对路径。
     child_env=dict(os.environ,OMP_NUM_THREADS=str(threads));child_env.pop('RAH_WALL_TEMPERATURE_FILE',None)
     child_env.pop('RAH_FROZEN_ENERGY_MODE',None)
+    # 记录开关只能由本次受控合同显式开启，不能从用户环境继承。
+    child_env.pop('RAH_SST_UPDATE_TRACE',None)
+    if runtime_flavor=='rah-update-trace-v2' and read(folder/'sst_contract.json')['updateTraceStudy']['enabled']:
+        child_env['RAH_SST_UPDATE_TRACE']='1'
     if runtime_flavor==FROZEN_FLAVOR:
         state['frozenEnergyMode']=read(folder/'case_manifest.json')['frozenEnergyMode']
         child_env['RAH_FROZEN_ENERGY_MODE']=state['frozenEnergyMode']

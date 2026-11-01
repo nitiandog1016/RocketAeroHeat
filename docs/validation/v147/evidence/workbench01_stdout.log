@@ -1,0 +1,14 @@
+RAH_ENGINE_PID=47456
+{错误使用 assert
+重启动列名与模型不一致。
+
+出错 readSU2VerifiedSSTStudy (第 63 行)
+assert(result.convergenceAudit.checkpointIdentityConfirmed,result.convergenceAudit.reason);
+
+出错 rocketAeroHeatWorkbench/readSSTStudy (第 1120 行)
+        result=readSU2VerifiedSSTStudy(folder,state,embeddedVolume);
+
+出错 testSU2UpdateTraceWorkbench (第 19 行)
+    fig.UserData.actions.selectStep(4);fig.UserData.actions.readSSTStudy(folder);
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

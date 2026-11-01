@@ -73,6 +73,16 @@ switch info.flavor
                 info.physicsCaption=[info.physicsCaption ' / ' label];
             end
         end
+    case 'rah-update-trace-v2'
+        % 观测只读记录实际隐式增量，不能将诊断运行包标成新增物理模型。
+        p=receipt.physicsModel;assert(strcmp(p.model,'SST-2003m'));
+        study=p.updateTraceStudy;
+        assert(strcmp(study.studyID,'v147-native-implicit-update-observation') && study.enabled);
+        info.mode='sst-native-update-observation';info.physicsModel=p;
+        info.method=sprintf('SST-2003m原生方程；只读更新诊断，全局原节点编号；I=%.4g，μt/μ=%.4g，Prt=%.4g；单次更新、伪时间重置，未获物理资格', ...
+            p.intensity,p.viscosityRatio,p.Prt);
+        info.method=[info.method '；p/T/热流为流动阶段，k/ω为随后湍流阶段；未分解各源项'];
+        info.physicsCaption=sprintf('RANS / SST-2003m / 定比热 / Sutherland / Prt%.4g；转捩未知 / 只读更新诊断',p.Prt);
     case 'rah-bounded-conservative-v1'
         % 原生残差和物理源保持；仅本受控包改变有界散度的守恒Jacobian链式换算。
         p=receipt.physicsModel;assert(strcmp(p.model,'SST-2003m'));

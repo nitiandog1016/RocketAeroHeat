@@ -1,0 +1,27 @@
+{
+  "command": [
+    "D:/anacondapython/python.exe",
+    "-X",
+    "utf8",
+    "scripts/runMatlabResearch.py",
+    "workbench01",
+    "addpath(pwd); addpath('tests'); testSU2UpdateTraceWorkbench('outputs/v147_validation/workbench01');",
+    "--folder",
+    "outputs\\v147_validation",
+    "--input",
+    "outputs/v145_validation/mesh/hybrid_volume.mat",
+    "--input",
+    "outputs/v147_validation/actual/engine_process.json",
+    "--input",
+    "outputs/v147_validation/actual/sst_state_audit.json",
+    "--input",
+    "outputs/v147_validation/native_update_analysis.json"
+  ],
+  "maximumSeconds": 600,
+  "maximumRSSBytes": 8589934592,
+  "sources": [
+    "scripts/runMatlabResearch.py",
+    "tests/testSU2UpdateTraceWorkbench.m"
+  ],
+  "receiptFolder": "outputs\\v147_validation\\workbench01_supervisor"
+}

@@ -1,0 +1,88 @@
+--- a/SU2_CFD/include/solvers/CScalarSolver.inl
++++ b/SU2_CFD/include/solvers/CScalarSolver.inl
+@@ -28,6 +28,7 @@
+ #include "../../../Common/include/toolboxes/geometry_toolbox.hpp"
+ #include "../../include/solvers/CScalarSolver.hpp"
+ #include "../../include/variables/CFlowVariable.hpp"
++#include "RAHUpdateTrace.hpp"
+ 
+ template <class VariableType>
+ CScalarSolver<VariableType>::CScalarSolver(CGeometry* geometry, CConfig* config, const CSolver* flow_solver,
+@@ -528,6 +529,16 @@
+ 
+   ComputeUnderRelaxationFactor(solver_container, config);
+ 
++
++  // RAH：全线程同步后只读记录，不写Solution、Jacobian或控制参数。
++  BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
++    if (Conservative && nVar == 2) {
++      RAHWriteUpdateTrace("sst", false, nPointDomain, nVar, nodes, LinSysSol,
++                          [&](unsigned long i) { return solver_container[FLOW_SOL]->GetNodes()->GetDensity(i); });
++    }
++  }
++  END_SU2_OMP_SAFE_GLOBAL_ACCESS
++
+   /*--- Update solution (system written in terms of increments) ---*/
+ 
+   if (!adjoint) {
+@@ -560,6 +571,16 @@
+       END_SU2_OMP_FOR
+     }
+   }
++
++
++  // RAH：全线程同步后只读记录，不写Solution、Jacobian或控制参数。
++  BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
++    if (Conservative && nVar == 2) {
++      RAHWriteUpdateTrace("sst", true, nPointDomain, nVar, nodes, LinSysSol,
++                          [&](unsigned long i) { return solver_container[FLOW_SOL]->GetNodes()->GetDensity(i); });
++    }
++  }
++  END_SU2_OMP_SAFE_GLOBAL_ACCESS
+ 
+   for (unsigned short iPeriodic = 1; iPeriodic <= config->GetnMarker_Periodic() / 2; iPeriodic++) {
+     InitiatePeriodicComms(geometry, config, iPeriodic, PERIODIC_IMPLICIT);
+--- a/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl
++++ b/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl
+@@ -31,6 +31,7 @@
+ #include "../limiters/computeLimiters.hpp"
+ #include "../numerics_simd/CNumericsSIMD.hpp"
+ #include "CFVMFlowSolverBase.hpp"
++#include "RAHUpdateTrace.hpp"
+ 
+ template <class V, ENUM_REGIME R>
+ void CFVMFlowSolverBase<V, R>::AeroCoeffsArray::allocate(int size) {
+@@ -590,6 +591,16 @@
+ 
+   if constexpr (R == ENUM_REGIME::COMPRESSIBLE) ComputeUnderRelaxationFactor(config);
+ 
++
++  // RAH：全线程同步后只读记录，不写Solution、Jacobian或控制参数。
++  BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
++    if constexpr (R == ENUM_REGIME::COMPRESSIBLE) {
++      RAHWriteUpdateTrace("flow", false, nPointDomain, nVar, nodes, LinSysSol,
++                          [&](unsigned long i) { return nodes->GetDensity(i); });
++    }
++  }
++  END_SU2_OMP_SAFE_GLOBAL_ACCESS
++
+   /*--- Update solution with under-relaxation and communicate it. ---*/
+ 
+   if (!config->GetContinuous_Adjoint()) {
+@@ -601,6 +612,16 @@
+     }
+     END_SU2_OMP_FOR
+   }
++
++
++  // RAH：全线程同步后只读记录，不写Solution、Jacobian或控制参数。
++  BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
++    if constexpr (R == ENUM_REGIME::COMPRESSIBLE) {
++      RAHWriteUpdateTrace("flow", true, nPointDomain, nVar, nodes, LinSysSol,
++                          [&](unsigned long i) { return nodes->GetDensity(i); });
++    }
++  }
++  END_SU2_OMP_SAFE_GLOBAL_ACCESS
+ 
+   for (unsigned short iPeriodic = 1; iPeriodic <= config->GetnMarker_Periodic()/2; iPeriodic++) {
+     InitiatePeriodicComms(geometry, config, iPeriodic, PERIODIC_IMPLICIT);

@@ -29,6 +29,9 @@ if a.checkpointIdentityConfirmed
     elseif isfield(a,'initializationStudy')
         checkpoint=sprintf('初场对照 %s：源SST局部 %d → 本段局部 %d · %s；非物理闭合修正', ...
             a.initializationStudy.variant,a.sourceModelLocalIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));
+    elseif isfield(a,'updateTrace')
+        checkpoint=sprintf('原生更新诊断：源SST局部 %d → 本段局部 %d · %s；单次观测、伪时间重置', ...
+            a.sourceModelLocalIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));
     elseif isfield(a,'turbulenceRestart')
         checkpoint=sprintf('源SST局部 %d → 本段局部 %d 步 · %s；伪时间重置',a.sourceModelLocalIteration,a.checkpointIteration,pass(a.checkpointResidualPassed));
     elseif isfield(a,'turbulenceTransfer')
