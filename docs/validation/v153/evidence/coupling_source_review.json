@@ -1,0 +1,131 @@
+{
+  "upstreamCommit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "files": {
+    "SU2_CFD/include/fluid/CFluidModel.hpp": {
+      "localSHA256": "5fa8afb11e0baf83b309740772b30c947cfc21608cf884c5727cfe64a30e9869",
+      "excerpts": [
+        {
+          "start": 166,
+          "end": 185,
+          "text": "   */\n  inline virtual su2double GetLaminarViscosity() {\n    LaminarViscosity->SetViscosity(Temperature, Density);\n    Mu = LaminarViscosity->GetViscosity();\n    dmudrho_T = LaminarViscosity->Getdmudrho_T();\n    dmudT_rho = LaminarViscosity->GetdmudT_rho();\n    return Mu;\n  }\n\n  /*!\n   * \\brief Get fluid thermal conductivity.\n   */\n  inline virtual su2double GetThermalConductivity() {\n    ThermalConductivity->SetConductivity(Temperature, Density, Mu, Mu_Turb, Cp, dmudrho_T, dmudT_rho);\n    Kt = ThermalConductivity->GetConductivity();\n    dktdrho_T = ThermalConductivity->Getdktdrho_T();\n    dktdT_rho = ThermalConductivity->GetdktdT_rho();\n    return Kt;\n  }\n"
+        },
+        {
+          "start": 319,
+          "end": 390,
+          "text": "  virtual void SetThermalConductivityModel(const CConfig* config);\n\n  /*!\n   * \\brief Set mass diffusivity model.\n   */\n  virtual void SetMassDiffusivityModel(const CConfig* config);\n\n  /*!\n   * \\brief virtual member that would be different for each gas model implemented\n   * \\param[in] InputSpec - Input pair for FLP calls (\"e, rho\").\n   * \\param[in] rho - first thermodynamic variable.\n   * \\param[in] e - second thermodynamic variable.\n   */\n  virtual void SetTDState_rhoe(su2double rho, su2double e) {}\n\n  /*!\n   * \\brief virtual member that would be different for each gas model implemented\n   * \\param[in] InputSpec - Input pair for FLP calls (\"PT\").\n   * \\param[in] th1 - first thermodynamic variable (P).\n   * \\param[in] th2 - second thermodynamic variable (T).\n   */\n  virtual void SetTDState_PT(su2double P, su2double T) {}\n\n  /*!\n   * \\brief virtual member that would be different for each gas model implemented\n   * \\param[in] InputSpec - Input pair for FLP calls (\"Pv\").\n   * \\param[in] th1 - first thermodynamic variable (P).\n   * \\param[in] th2 - second thermodynamic variable (v).\n   */\n  virtual void SetTDState_Prho(su2double P, su2double rho) {}\n\n  /*!\n   * \\brief virtual member that would be different for each gas model implemented\n   * \\param[in] InputSpec - Input pair for FLP calls (\"Pv\").\n   * \\param[in] th1 - first thermodynamic variable (P).\n   * \\param[in] th2 - second thermodynamic variable (v).\n   *\n   */\n  virtual void SetEnergy_Prho(su2double P, su2double rho) {}\n\n  /*!\n   * \\brief virtual member that would be different for each gas model implemented\n   * \\param[in] InputSpec - Input pair for FLP calls (\"hs\").\n   * \\param[in] th1 - first thermodynamic variable (h).\n   * \\param[in] th2 - second thermodynamic variable (s).\n   *\n   */\n  virtual void SetTDState_hs(su2double h, su2double s) {}\n\n  /*!\n   * \\brief virtual member that would be different for each gas model implemented\n   * \\param[in] InputSpec - Input pair for FLP calls (\"rhoT\").\n   * \\param[in] th1 - first thermodynamic variable (rho).\n   * \\param[in] th2 - second thermodynamic variable (T).\n   *\n   */\n  virtual void SetTDState_rhoT(su2double rho, su2double T) {}\n\n  /*!\n   * \\brief virtual member that would be different for each gas model implemented\n   * \\param[in] InputSpec - Input pair for FLP calls (\"Pv\").\n   * \\param[in] th1 - first thermodynamic variable (P).\n   * \\param[in] th2 - second thermodynamic variable (s).\n   */\n  virtual void SetTDState_Ps(su2double P, su2double s) {}\n\n  /*!\n   * \\brief virtual member that would be different for each gas model implemented\n   * \\param[in] InputSpec - Input pair for FLP calls (\"Pv\").\n   * \\param[in] th1 - first thermodynamic variable (P).\n   * \\param[in] th2 - second thermodynamic variable (v).\n   */"
+        }
+      ]
+    },
+    "SU2_CFD/include/fluid/CConstantPrandtl.hpp": {
+      "localSHA256": "2d70109b7e7e3bf2db1a7f9295cd9862bf61c973e9ebe5abc6c27ae47a0614e9",
+      "excerpts": [
+        {
+          "start": 48,
+          "end": 65,
+          "text": "                       su2double dmudrho_t, su2double dmudt_rho) override {\n    kt_ = mu_lam * cp / pr_lam_;\n    dktdrho_t_ = dmudrho_t * cp / pr_lam_;\n    dktdt_rho_ = dmudt_rho * cp / pr_lam_;\n  }\n\n private:\n  const su2double pr_lam_{0.0};    /*!< \\brief Laminar Prandtl number. */\n};"
+        }
+      ]
+    },
+    "SU2_CFD/include/fluid/CConstantPrandtlRANS.hpp": {
+      "localSHA256": "06508dd894c1ca0f775a86de9a10e43d883d4b45baaa3dead42421f35c855e73",
+      "excerpts": [
+        {
+          "start": 48,
+          "end": 65,
+          "text": "                       su2double, su2double) override {\n    kt_ = cp * ((mu_lam / pr_lam_) + (mu_turb / pr_turb_));\n  }\n\n private:\n  const su2double pr_lam_{0.0};    /*!< \\brief Laminar Prandtl number. */\n  const su2double pr_turb_{0.0};   /*!< \\brief Turbulent Prandtl number. */\n};"
+        }
+      ]
+    },
+    "SU2_CFD/src/solvers/CEulerSolver.cpp": {
+      "localSHA256": "a02047d187aeb4dcd5dffadbce9c21243ace41df79f806e58091b99b3465dc20",
+      "excerpts": [
+        {
+          "start": 869,
+          "end": 916,
+          "text": "  switch (config->GetKind_FluidModel()) {\n\n    case STANDARD_AIR:\n\n      switch (config->GetSystemMeasurements()) {\n        case SI: config->SetGas_Constant(287.058); break;\n        case US: config->SetGas_Constant(1716.49); break;\n      }\n\n      auxFluidModel = new CIdealGas(1.4, config->GetGas_Constant());\n\n      if (free_stream_temp && aeroelastic) {\n        Temperature_FreeStream = TgammaR / (config->GetGas_Constant()*1.4);\n        config->SetTemperature_FreeStream(Temperature_FreeStream);\n      }\n      break;\n\n    case IDEAL_GAS:\n\n      auxFluidModel = new CIdealGas(Gamma, config->GetGas_Constant());\n      break;\n\n    case VW_GAS:\n\n      auxFluidModel = new CVanDerWaalsGas(Gamma, config->GetGas_Constant(),\n                 config->GetPressure_Critical(), config->GetTemperature_Critical());\n      break;\n\n    case PR_GAS:\n\n      auxFluidModel = new CPengRobinson(Gamma, config->GetGas_Constant(), config->GetPressure_Critical(),\n                                        config->GetTemperature_Critical(), config->GetAcentric_Factor());\n      break;\n\n    case DATADRIVEN_FLUID:\n\n      auxFluidModel = new CDataDrivenFluid(config);\n\n      break;\n    case COOLPROP:\n\n      auxFluidModel = new CCoolProp(config->GetFluid_Name());\n      break;\n\n    default:\n      SU2_MPI::Error(\"Unknown fluid model.\", CURRENT_FUNCTION);\n      break;\n  }"
+        },
+        {
+          "start": 1123,
+          "end": 1190,
+          "text": "   *    GetFluidModel() should be used to automatically access the \"right\" object of each thread. ---*/\n\n  assert(FluidModel.empty() && \"Potential memory leak!\");\n  FluidModel.resize(omp_get_max_threads());\n\n  SU2_OMP_PARALLEL\n  {\n    const int thread = omp_get_thread_num();\n\n    switch (config->GetKind_FluidModel()) {\n\n      case STANDARD_AIR:\n        FluidModel[thread] = new CIdealGas(1.4, Gas_ConstantND);\n        break;\n\n      case IDEAL_GAS:\n        FluidModel[thread] = new CIdealGas(Gamma, Gas_ConstantND);\n        break;\n\n      case VW_GAS:\n        FluidModel[thread] = new CVanDerWaalsGas(Gamma, Gas_ConstantND,\n                                                 config->GetPressure_Critical() / config->GetPressure_Ref(),\n                                                 config->GetTemperature_Critical() / config->GetTemperature_Ref());\n        break;\n\n      case PR_GAS:\n        FluidModel[thread] = new CPengRobinson(Gamma, Gas_ConstantND,\n                                               config->GetPressure_Critical() / config->GetPressure_Ref(),\n                                               config->GetTemperature_Critical() / config->GetTemperature_Ref(),\n                                               config->GetAcentric_Factor());\n        break;\n\n      case DATADRIVEN_FLUID:\n        FluidModel[thread] = new CDataDrivenFluid(config, false);\n        break;\n\n      case COOLPROP:\n        FluidModel[thread] = new CCoolProp(config->GetFluid_Name());\n        break;\n    }\n\n    GetFluidModel()->SetEnergy_Prho(Pressure_FreeStreamND, Density_FreeStreamND);\n    if (viscous) {\n      GetFluidModel()->SetLaminarViscosityModel(config);\n      GetFluidModel()->SetThermalConductivityModel(config);\n      GetFluidModel()->SetMassDiffusivityModel(config);\n    }\n\n  }\n  END_SU2_OMP_PARALLEL\n\n  Energy_FreeStreamND = GetFluidModel()->GetStaticEnergy() + 0.5*ModVel_FreeStreamND*ModVel_FreeStreamND;\n\n  if (tkeNeeded) Energy_FreeStreamND += Tke_FreeStreamND;\n\n  config->SetEnergy_FreeStreamND(Energy_FreeStreamND);\n\n  Energy_Ref = Energy_FreeStream/Energy_FreeStreamND; config->SetEnergy_Ref(Energy_Ref);\n\n  Total_UnstTimeND = config->GetTotal_UnstTime() / Time_Ref;    config->SetTotal_UnstTimeND(Total_UnstTimeND);\n  Delta_UnstTimeND = config->GetDelta_UnstTime() / Time_Ref;    config->SetDelta_UnstTimeND(Delta_UnstTimeND);\n\n  /*--- Write output to the console if this is the master node and first domain ---*/\n\n  if ((rank == MASTER_NODE) && (MGLevel == MESH_0)) {\n\n    cout.precision(6);\n"
+        },
+        {
+          "start": 5260,
+          "end": 5340,
+          "text": "                              CConfig *config, unsigned short val_marker) {\n  SU2_ZONE_SCOPED\n\n  const string Marker_Tag = config->GetMarker_All_TagBound(val_marker);\n  const bool viscous      = config->GetViscous(),\n             implicit     = config->GetKind_TimeIntScheme() == EULER_IMPLICIT,\n             gravity      = config->GetGravityForce(),\n             tkeNeeded    = config->GetKind_Turb_Model() == TURB_MODEL::SST,\n             ideal_gas    = config->GetKind_FluidModel() == STANDARD_AIR ||\n                            config->GetKind_FluidModel() == IDEAL_GAS;\n\n  su2double **P_Tensor = new su2double*[nVar],\n            **invP_Tensor = new su2double*[nVar];\n  for (auto iVar = 0u; iVar < nVar; iVar++){\n    P_Tensor[iVar] = new su2double[nVar];\n    invP_Tensor[iVar] = new su2double[nVar];\n  }\n\n  /*--- Loop over all the vertices on this boundary marker ---*/\n\n  SU2_OMP_FOR_DYN(OMP_MIN_SIZE)\n  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {\n\n    auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();\n\n    /*--- Check if the node belongs to the domain (i.e., not a halo node) ---*/\n    if (geometry->nodes->GetDomain(iPoint)) {\n\n      /*--- Index of the closest interior node ---*/\n      const auto Point_Normal = geometry->vertex[val_marker][iVertex]->GetNormal_Neighbor();\n\n      /*--- Normal vector for this vertex (negate for outward convention) ---*/\n      su2double Normal[MAXNDIM] = {0};\n      geometry->vertex[val_marker][iVertex]->GetNormal(Normal);\n      for (auto iDim = 0u; iDim < nDim; iDim++) Normal[iDim] = -Normal[iDim];\n      conv_numerics->SetNormal(Normal);\n\n      const auto Area = GeometryToolbox::Norm(nDim, Normal);\n\n      su2double UnitNormal[MAXNDIM] = {0};\n      for (auto iDim = 0u; iDim < nDim; iDim++) UnitNormal[iDim] = Normal[iDim]/Area;\n\n      /*--- Retrieve solution at this boundary node ---*/\n      const auto V_domain = nodes->GetPrimitive(iPoint);\n\n      /*--- Compute the internal state u_i ---*/\n      su2double Velocity_i[MAXNDIM]={0};\n      for (auto iDim=0u; iDim < nDim; iDim++)\n        Velocity_i[iDim] = nodes->GetVelocity(iPoint,iDim);\n\n      const auto Velocity2_i = GeometryToolbox::SquaredNorm(nDim, Velocity_i);\n\n      const auto Density_i = nodes->GetDensity(iPoint);\n\n      const auto Energy_i = nodes->GetEnergy(iPoint);\n      const su2double StaticEnergy_i = Energy_i - 0.5*Velocity2_i;\n\n      GetFluidModel()->SetTDState_rhoe(Density_i, StaticEnergy_i);\n\n      const auto Pressure_i = GetFluidModel()->GetPressure();\n      const su2double Enthalpy_i = Energy_i + Pressure_i/Density_i;\n\n      const auto SoundSpeed_i = GetFluidModel()->GetSoundSpeed();\n\n      const su2double Kappa_i = GetFluidModel()->GetdPde_rho() / Density_i;\n      const su2double Chi_i = GetFluidModel()->GetdPdrho_e() - Kappa_i * StaticEnergy_i;\n\n      /*--- Build the external state u_e from boundary data and internal node ---*/\n      su2double T_static{0}, P_static{0}, Pressure_e{0}, Density_static{0}, Enthalpy_e{0}, Energy_e{0}, Entropy_e{0},\n                T_Total{0},  P_Total{0},  Density_e{0}, StaticEnthalpy_e{0}, StaticEnergy_e{0};\n\n      su2double Velocity2_e{0}, NormalVelocity{0}, TangVelocity{0}, VelMag_e{0};\n      su2double Velocity_e[MAXNDIM] = {0};\n      const su2double * Flow_Dir, * Mach;\n      switch(config->GetKind_Data_Riemann(Marker_Tag))\n      {\n      case TOTAL_CONDITIONS_PT:\n\n        /*--- Retrieve the specified total conditions for this boundary. ---*/\n        if (gravity) P_Total = config->GetRiemann_Var1(Marker_Tag) - geometry->nodes->GetCoord(iPoint, nDim-1)*STANDARD_GRAVITY;/// check in which case is true (only freesurface?)\n        else P_Total  = config->GetRiemann_Var1(Marker_Tag);"
+        }
+      ]
+    },
+    "SU2_CFD/src/variables/CNSVariable.cpp": {
+      "localSHA256": "462de86dd4d1e04a3b5fd29ae73b31047a7075f171c0bde319b17026fc5e71f3",
+      "excerpts": [
+        {
+          "start": 138,
+          "end": 241,
+          "text": "\nbool CNSVariable::SetPrimVar(unsigned long iPoint, su2double eddy_visc, su2double turb_ke, CFluidModel *FluidModel) {\n\n  bool RightVol = true;\n\n  SetVelocity(iPoint); // Computes velocity and velocity^2\n  su2double density      = GetDensity(iPoint);\n  su2double staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;\n\n  /*--- Check will be moved inside fluid model plus error description strings ---*/\n\n  FluidModel->SetTDState_rhoe(density, staticEnergy);\n\n  bool check_dens  = SetDensity(iPoint);\n  bool check_press = SetPressure(iPoint, FluidModel->GetPressure());\n  bool check_sos   = SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());\n  bool check_temp  = SetTemperature(iPoint, FluidModel->GetTemperature());\n\n  /*--- Check that the solution has a physical meaning ---*/\n\n  if (check_dens || check_press || check_sos  || check_temp) {\n\n    /*--- Copy the old solution ---*/\n\n    for (unsigned long iVar = 0; iVar < nVar; iVar++)\n      Solution(iPoint,iVar) = Solution_Old(iPoint,iVar);\n\n    /*--- Recompute the primitive variables ---*/\n\n    SetVelocity(iPoint); // Computes velocity and velocity^2\n    density      = GetDensity(iPoint);\n    staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;\n\n    /*--- Check will be moved inside fluid model plus error description strings ---*/\n\n    FluidModel->SetTDState_rhoe(density, staticEnergy);\n\n    SetDensity(iPoint);\n    SetPressure(iPoint, FluidModel->GetPressure());\n    SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());\n    SetTemperature(iPoint, FluidModel->GetTemperature());\n\n    RightVol = false;\n\n  }\n\n  /*--- Set enthalpy ---*/\n\n  SetEnthalpy(iPoint); // Requires pressure computation.\n\n  /*--- Set laminar viscosity ---*/\n\n  SetLaminarViscosity(iPoint, FluidModel->GetLaminarViscosity());\n\n  /*--- Set eddy viscosity ---*/\n\n  SetEddyViscosity(iPoint, eddy_visc);\n\n  /*--- Set thermal conductivity ---*/\n\n  SetThermalConductivity(iPoint, FluidModel->GetThermalConductivity());\n\n  /*--- Set specific heat ---*/\n\n  SetSpecificHeatCp(iPoint, FluidModel->GetCp());\n\n  /*--- Set look-up variables in case of data-driven fluid model ---*/\n  if (DataDrivenFluid) {\n    SetDataExtrapolation(iPoint, FluidModel->GetExtrapolation());\n    SetEntropy(iPoint, FluidModel->GetEntropy());\n  }\n\n  return RightVol;\n}\n\nvoid CNSVariable::SetSecondaryVar(unsigned long iPoint, CFluidModel *FluidModel) {\n  if (nSecondaryVar == 0) return;\n\n  /*--- Compute secondary thermodynamic properties (partial derivatives...) ---*/\n\n  SetdPdrho_e( iPoint, FluidModel->GetdPdrho_e() );\n  SetdPde_rho( iPoint, FluidModel->GetdPde_rho() );\n\n  SetdTdrho_e( iPoint, FluidModel->GetdTdrho_e() );\n  SetdTde_rho( iPoint, FluidModel->GetdTde_rho() );\n\n  /*--- Compute secondary thermo-physical properties (partial derivatives...) ---*/\n\n  Setdmudrho_T( iPoint, FluidModel->Getdmudrho_T() );\n  SetdmudT_rho( iPoint, FluidModel->GetdmudT_rho() );\n\n  Setdktdrho_T( iPoint, FluidModel->Getdktdrho_T() );\n  SetdktdT_rho( iPoint, FluidModel->GetdktdT_rho() );\n\n}"
+        }
+      ]
+    },
+    "SU2_CFD/src/drivers/CDriver.cpp": {
+      "localSHA256": "a384328e069d9c62fe7ba860be5cf52be63b7032f75b4df26081827fb5a63e64",
+      "excerpts": [
+        {
+          "start": 1665,
+          "end": 1685,
+          "text": "        break;\n      case SPACE_UPWIND :\n        if (compressible) {\n          /*--- Compressible flow ---*/\n          switch (config->GetKind_Upwind_Flow()) {\n            case UPWIND::ROE:\n              if (ideal_gas) {\n\n                for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {\n                  numerics[iMGlevel][FLOW_SOL][conv_term] = new CUpwRoe_Flow(nDim, nVar_Flow, config, roe_low_dissipation);\n                  numerics[iMGlevel][FLOW_SOL][conv_bound_term] = new CUpwRoe_Flow(nDim, nVar_Flow, config, false);\n                }\n              } else {\n\n                for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {\n                  numerics[iMGlevel][FLOW_SOL][conv_term] = new CUpwGeneralRoe_Flow(nDim, nVar_Flow, config);\n                  numerics[iMGlevel][FLOW_SOL][conv_bound_term] = new CUpwGeneralRoe_Flow(nDim, nVar_Flow, config);\n                }\n              }\n              break;\n"
+        },
+        {
+          "start": 1741,
+          "end": 1757,
+          "text": "            case UPWIND::HLLC:\n              if (ideal_gas) {\n                for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {\n                  numerics[iMGlevel][FLOW_SOL][conv_term] = new CUpwHLLC_Flow(nDim, nVar_Flow, config);\n                  numerics[iMGlevel][FLOW_SOL][conv_bound_term] = new CUpwHLLC_Flow(nDim, nVar_Flow, config);\n                }\n              }\n              else {\n                for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {\n                  numerics[iMGlevel][FLOW_SOL][conv_term] = new CUpwGeneralHLLC_Flow(nDim, nVar_Flow, config);\n                  numerics[iMGlevel][FLOW_SOL][conv_bound_term] = new CUpwGeneralHLLC_Flow(nDim, nVar_Flow, config);\n                }\n              }\n              break;\n\n            case UPWIND::MSW:\n              for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {"
+        },
+        {
+          "start": 1807,
+          "end": 1829,
+          "text": "      if (ideal_gas) {\n\n        /*--- Compressible flow Ideal gas ---*/\n        numerics[MESH_0][FLOW_SOL][visc_term] = new CAvgGrad_Flow(nDim, nVar_Flow, true, config);\n        for (iMGlevel = 1; iMGlevel <= config->GetnMGLevels(); iMGlevel++)\n          numerics[iMGlevel][FLOW_SOL][visc_term] = new CAvgGrad_Flow(nDim, nVar_Flow, false, config);\n\n        /*--- Definition of the boundary condition method ---*/\n        for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++)\n          numerics[iMGlevel][FLOW_SOL][visc_bound_term] = new CAvgGrad_Flow(nDim, nVar_Flow, false, config);\n\n      } else {\n\n        /*--- Compressible flow Real gas ---*/\n        numerics[MESH_0][FLOW_SOL][visc_term] = new CGeneralAvgGrad_Flow(nDim, nVar_Flow, true, config);\n        for (iMGlevel = 1; iMGlevel <= config->GetnMGLevels(); iMGlevel++)\n          numerics[iMGlevel][FLOW_SOL][visc_term] = new CGeneralAvgGrad_Flow(nDim, nVar_Flow, false, config);\n\n        /*--- Definition of the boundary condition method ---*/\n        for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++)\n          numerics[iMGlevel][FLOW_SOL][visc_bound_term] = new CGeneralAvgGrad_Flow(nDim, nVar_Flow, false, config);\n\n      }"
+        }
+      ]
+    },
+    "SU2_CFD/src/numerics/flow/convection/hllc.cpp": {
+      "localSHA256": "7c389cbbf8c48f31e7d45d5cc56a19f0d2e58c98e0cef9fe8b531dbb67e4f1eb",
+      "excerpts": [
+        {
+          "start": 622,
+          "end": 641,
+          "text": "    sq_vel_j += Velocity_j[iDim] * Velocity_j[iDim];\n  }\n\n  Energy_i         = Enthalpy_i - Pressure_i / Density_i;\n  StaticEnthalpy_i = Enthalpy_i - 0.5 * sq_vel_i;\n  StaticEnergy_i   = Energy_i - 0.5 * sq_vel_i;\n\n  Kappa_i = S_i[1] / Density_i;\n  Chi_i   = S_i[0] - Kappa_i * StaticEnergy_i;\n  SoundSpeed_i = sqrt(Chi_i + StaticEnthalpy_i * Kappa_i);\n\n\n  Energy_j         = Enthalpy_j - Pressure_j / Density_j;\n  StaticEnthalpy_j = Enthalpy_j - 0.5 * sq_vel_j;\n  StaticEnergy_j   = Energy_j - 0.5 * sq_vel_j;\n\n  Kappa_j = S_j[1] / Density_j;\n  Chi_j   = S_j[0] - Kappa_j * StaticEnergy_j;\n  SoundSpeed_j = sqrt(Chi_j + StaticEnthalpy_j * Kappa_j);\n"
+        },
+        {
+          "start": 784,
+          "end": 809,
+          "text": "          Jacobian_j[iVar][jVar] = 0;\n\n\n      GetInviscidProjJac(Velocity_i, &Enthalpy_i, &Chi_i, &Kappa_i, UnitNormal, 1.0, Jacobian_i);\n\n    }\n    else {\n      /*--- Compute Jacobian based on Left Star State ---*/\n\n      EStar = IntermediateState[nVar-1];\n      Omega = 1/(sL-sM);\n      OmegaSM = Omega * sM;\n\n\n      /*--------- Left Jacobian ---------*/\n\n\n      /*--- Computing pressure derivatives d/dU_L (PI) ---*/\n\n      dPI_dU[0] = Chi_i - 0.5 * Kappa_i * sq_vel_i;\n      for (iDim = 0; iDim < nDim; iDim++)\n        dPI_dU[iDim+1] = - Kappa_i * Velocity_i[iDim];\n      dPI_dU[nVar-1] = Kappa_i;\n\n\n      /*--- Computing d/dU_L (Sm) ---*/"
+        }
+      ]
+    },
+    "SU2_CFD/src/solvers/CNSSolver.cpp": {
+      "localSHA256": "a31a41c17b6e4897f55b7f47d63c7c9492f18c7d68fd6d53364980d1099bef1b",
+      "excerpts": [
+        {
+          "start": 694,
+          "end": 711,
+          "text": "      nodes->SetVelocity_Old(iPoint, geometry->nodes->GetGridVel(iPoint));\n    } else {\n      su2double zero[MAXNDIM] = {0.0};\n      nodes->SetVelocity_Old(iPoint, zero);\n    }\n\n    for (auto iDim = 0u; iDim < nDim; iDim++) LinSysRes(iPoint, iDim+1) = 0.0;\n    nodes->SetVel_ResTruncError_Zero(iPoint);\n\n    /*--- Get transport coefficients ---*/\n\n    su2double Cp = nodes->GetSpecificHeatCp(iPoint);\n    su2double eddy_viscosity       = nodes->GetEddyViscosity(iPoint);\n    su2double thermal_conductivity = nodes->GetThermalConductivity(iPoint) + Cp * eddy_viscosity / Prandtl_Turb;\n\n    // work in progress on real-gases...\n    //thermal_conductivity = nodes->GetThermalConductivity(iPoint);\n    //Cp = nodes->GetSpecificHeatCp(iPoint);"
+        },
+        {
+          "start": 798,
+          "end": 816,
+          "text": "\nvoid CNSSolver::SetTau_Wall_WF(CGeometry *geometry, CSolver **solver_container, const CConfig *config) {\n  SU2_ZONE_SCOPED\n  /*---\n   The wall function implemented herein is based on Nichols and Nelson, AIAA J. v32 n6 2004.\n   ---*/\n\n  unsigned long notConvergedCounter = 0;  /*--- counts the number of wall cells that are not converged ---*/\n  unsigned long smallYPlusCounter = 0;    /*--- counts the number of wall cells where y+ < 5 ---*/\n\n  const su2double Gas_Constant = config->GetGas_ConstantND();\n  const su2double Cp = (Gamma / Gamma_Minus_One) * Gas_Constant;\n  const unsigned short max_iter = config->GetwallModel_MaxIter();\n  const su2double relax = config->GetwallModel_RelFac();\n\n  /*--- Compute the recovery factor\n   * use Molecular (Laminar) Prandtl number (see Nichols & Nelson, nomenclature ) ---*/\n\n  const su2double Recovery = pow(config->GetPrandtl_Lam(), (1.0/3.0));"
+        }
+      ]
+    },
+    "Common/src/CConfig.cpp": {
+      "localSHA256": "17cbab1350fe9d5f24cb61e8084d9a21fd7f749b5c1cc6776f148a17bf4ad1bf",
+      "excerpts": [
+        {
+          "start": 3793,
+          "end": 3797,
+          "text": "  /*--- Check if CoolProp is used with non-dimensionalization. ---*/\n  if (Kind_FluidModel == COOLPROP && Ref_NonDim != DIMENSIONAL) {\n    SU2_MPI::Error(\"CoolProp can not be used with non-dimensionalization.\", CURRENT_FUNCTION);\n  }\n"
+        }
+      ]
+    }
+  }
+}
