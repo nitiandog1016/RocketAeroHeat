@@ -57,9 +57,10 @@ def main():
     mesh = folder / request['meshFile']
     assert cfg.parent == folder and mesh.parent == folder
     from su2ThermalRuntime import resolve, audit_applied, FROZEN_FLAVOR, read
+    from su2IdealAirInterface import PHASE_FLAVORS
     config_text = cfg.read_text(encoding='utf-8-sig')
     exe,runtime,runtime_flavor,thermal_profile,thermal_locks=resolve(folder,config_text)
-    if runtime_flavor == 'rah-ideal-air-phase-v2':
+    if runtime_flavor in PHASE_FLAVORS:
         assert not request.get('dryRun', False), '稀疏保存合同要求实际更新'
     timeout = float(request['maximumSeconds'])
     threads = int(request['threads'])
@@ -101,7 +102,7 @@ def main():
     if (folder/'ideal_air_contract.json').exists():
         state['thermodynamicModel']=read(folder/'ideal_air_contract.json')
     output_budget = None
-    if runtime_flavor == 'rah-ideal-air-phase-v2':
+    if runtime_flavor in PHASE_FLAVORS:
         from su2IdealAirCheckpoints import output_length, inventory
         output_budget = state['thermodynamicModel']['checkpointContract']['maximumOutputBytes']
 

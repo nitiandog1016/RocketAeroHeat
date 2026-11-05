@@ -113,12 +113,12 @@ def fields(path, spatial=True):
     return value
 
 
-def boundary_balance(points, cells, markers, f, conditions):
+def boundary_balance(points, cells, markers, f, conditions, specific_heat=None):
     """独立物理边界积分，包含轴对称应力、开放边界导热与静止壁面热流。"""
     rho = f['Density']
     u = f['velocity']
     temperature = f['Temperature']
-    cp = conditions['gamma']*conditions['gasConstant']/(conditions['gamma']-1)
+    cp = conditions['gamma']*conditions['gasConstant']/(conditions['gamma']-1) if specific_heat is None else specific_heat
     grad = wls_gradient(points, cells, np.column_stack((u, temperature)))
     divergence = grad[:, 0, 0]+grad[:, 1, 1]+u[:, 1]/points[:, 1]
     effective_mu = f['Laminar_Viscosity']+f['Eddy_Viscosity']
@@ -147,15 +147,17 @@ def boundary_balance(points, cells, markers, f, conditions):
                 definition='independent WLS physical flux; exact signed linear-edge integration v2')
 
 
-def residual_scales(points, cells, f, conditions):
+def residual_scales(points, cells, f, conditions, total_enthalpy=None):
     """原生二维积分RHS除以控制面积与来流尺度，RMS按旋转体积加权。"""
     area, volume = median_volumes(points, cells)
     c = conditions
     speed = c['speedMS']
     rho = c['densityKgM3']
-    cp = c['gamma']*c['gasConstant']/(c['gamma']-1)
-    k = 1.5*(speed*c['turbulenceIntensity'])**2
-    h0 = cp*c['temperatureK']+.5*speed**2+k
+    h0 = total_enthalpy
+    if h0 is None:
+        cp = c['gamma']*c['gasConstant']/(c['gamma']-1)
+        k = 1.5*(speed*c['turbulenceIntensity'])**2
+        h0 = cp*c['temperatureK']+.5*speed**2+k
     normalized = {}
     raw = {}
     for name, factor in (('Density', rho*speed), ('Energy', rho*speed*h0)):

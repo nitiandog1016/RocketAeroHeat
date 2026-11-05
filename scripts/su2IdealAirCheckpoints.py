@@ -11,23 +11,27 @@ from su2ThermalRuntime import read
 STAGE = 'captured-primitive-k-and-post-turbulence-conservative-state-v1'
 
 
-def output_plan(nodes, wall_nodes, wall_faces, iterations, every, maximum_bytes):
+def output_plan(nodes, wall_nodes, wall_faces, iterations, every, maximum_bytes, extra_columns=0):
     """模块一。按最长ASCII数值、末次强制场和别名估计文件长度上界。"""
     for value in (nodes, wall_nodes, wall_faces, iterations, every, maximum_bytes):
         assert isinstance(value, int) and not isinstance(value, bool) and value > 0
     assert every <= iterations and wall_nodes <= nodes
+    assert type(extra_columns) is int and 0 <= extra_columns <= 16
     # 3D SST含阶段列共27列，每标量预留32字节。表面向量包含三个分量。
-    volume = nodes*32*27+4096
-    surface = wall_nodes*32*27+wall_faces*128+8192
+    volume = nodes*32*(27+extra_columns)+4096
+    surface = wall_nodes*32*(27+extra_columns)+wall_faces*128+8192
     samples = min(iterations, 2+(iterations-1)//every)
     upper = (samples+1)*(volume+surface)+iterations*4096+1024**2
     assert upper <= maximum_bytes, '稀疏输出估计超过本次容量预算'
-    return dict(schemaVersion=1, stage=STAGE, every=every, maximumUpdates=iterations,
+    result = dict(schemaVersion=1, stage=STAGE, every=every, maximumUpdates=iterations,
         firstLocalIteration=0, firstSuccessfulUpdate=1, maximumNamedPairs=samples,
         estimatedVolumeBytes=volume, estimatedSurfaceBytes=surface,
         estimatedMaximumBytes=upper, maximumOutputBytes=maximum_bytes,
         units='file lengths including final aliases; physical allocation unknown',
         monitor='poll at 0.25 seconds; a write in progress can exceed the stop threshold')
+    if extra_columns:
+        result.update(schemaVersion=2, extraColumns=extra_columns)
+    return result
 
 
 def output_length(folder, input_paths):
@@ -73,13 +77,16 @@ def inventory(folder, receipt):
             assert all(index in history for index in range(step+1)), '检查点前历史更新不连续'
             for path in paths:
                 assert path.is_file() and sha(path) == names[path.name], '文件缺失或身份变化'
-            data, fields, nd = load_state(paths[0], True, captured=True)
+            spatial = manifest['requiredRuntimeFlavor'] == 'rah-ideal-air-axisymmetric-v1'
+            data, fields, nd = load_state(paths[0], True, captured=True, spatial=spatial)
             assert data.shape[0] == len(points) and nd == points.shape[1]
             assert np.allclose(data[:, 1:nd+1], points, rtol=2e-14, atol=1e-14)
             xyz, surface = vtk_tokens(paths[1])
             required = {'Density', 'Momentum', 'Energy', 'Turb_Kin_Energy', 'Omega', 'Pressure',
                 'Temperature', 'Mach', 'Pressure_Coefficient', 'Velocity', 'Laminar_Viscosity',
                 'Skin_Friction_Coefficient', 'Heat_Flux', 'Y_Plus', 'Eddy_Viscosity', 'Flow_Primitive_K'}
+            if spatial:
+                required.update(('Residual_Density', 'Residual_Momentum', 'Residual_Energy', 'Residual_TKE', 'Residual_Omega'))
             assert set(surface) == required, '表面字段缺失或未经声明'
             assert len(xyz) == len(wall_ids) and np.isfinite(xyz).all()
             assert all(np.isfinite(value).all() for value in surface.values())

@@ -1,0 +1,46 @@
+--- a/SU2_CFD/src/solvers/CEulerSolver.cpp
++++ b/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -7690,6 +7690,15 @@
+ 
+     const su2double Velocity2 = GeometryToolbox::SquaredNorm(int(MAXNDIM), Velocity);
+     su2double Energy = Pressure / (Density * Gamma_Minus_One) + 0.5 * Velocity2;
++    // 变比热入口以同一PT状态构造热内能及一般EOS导数，SST k由下方原逻辑加入。
++    const bool variable_air = config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP;
++    su2double Secondary_inlet[2] = {0.0, 0.0};
++    if (variable_air) {
++      GetFluidModel()->SetTDState_PT(Pressure, Temperature);
++      Energy = GetFluidModel()->GetStaticEnergy() + 0.5 * Velocity2;
++      Secondary_inlet[0] = GetFluidModel()->GetdPdrho_e();
++      Secondary_inlet[1] = GetFluidModel()->GetdPde_rho();
++    }
+     if (tkeNeeded) {
+       const su2double* Turb_Properties = config->GetInlet_TurbVal(Marker_Tag);
+       const su2double Intensity = Turb_Properties[0];
+@@ -7721,6 +7730,8 @@
+ 
+     conv_numerics->SetNormal(Normal);
+     conv_numerics->SetPrimitive(V_domain, V_inlet);
++    if (variable_air)
++      conv_numerics->SetSecondary(nodes->GetSecondary(iPoint), Secondary_inlet);
+ 
+     if (dynamic_grid)
+       conv_numerics->SetGridVel(geometry->nodes->GetGridVel(iPoint),
+@@ -7802,6 +7813,9 @@
+ 
+       conv_numerics->SetNormal(Normal);
+       conv_numerics->SetPrimitive(V_domain, V_outlet);
++      // 外推边界两侧使用当前内部状态的一般EOS导数。
++      if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)
++        conv_numerics->SetSecondary(nodes->GetSecondary(iPoint), nodes->GetSecondary(iPoint));
+ 
+       if (dynamic_grid)
+         conv_numerics->SetGridVel(geometry->nodes->GetGridVel(iPoint),
+@@ -7839,6 +7853,8 @@
+        /*--- Primitive variables, and gradient ---*/
+ 
+        visc_numerics->SetPrimitive(V_domain, V_domain);
++       if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)
++         visc_numerics->SetSecondary(nodes->GetSecondary(iPoint), nodes->GetSecondary(iPoint));
+        visc_numerics->SetPrimVarGradient(nodes->GetGradient_Primitive(iPoint), nodes->GetGradient_Primitive(iPoint));
+ 
+        /*--- Turbulent kinetic energy ---*/

@@ -1,0 +1,297 @@
+{
+  "passed": true,
+  "completedUpdates": 1200,
+  "completePairs": 13,
+  "errors": {
+    "wall_p": 0.0,
+    "wall_q": 0.0,
+    "wall_fluidT": 0.0,
+    "wall_yplus": 0.0,
+    "rms[Rho]": 6.983036371366325e-11,
+    "rms[RhoE]": 1.0100364988829824e-11,
+    "revolvedPower": 0.0,
+    "pressureRMS": 1.1102230246251565e-16,
+    "heatRMS": 1.1102230246251565e-16,
+    "upstreamVelocity": 0.0
+  },
+  "sourceRebinding": [
+    {
+      "original": "E:\\RocketAeroHeat\\scripts\\auditSU2AxisymmetricAir.py",
+      "exactSnapshot": "E:\\RocketAeroHeat\\outputs\\v159_validation\\final_review\\before_auditSU2AxisymmetricAir.py",
+      "sha256": "a82213414ea64fd6ca46041dfef76f789305581625ae8fc4848035b5801c2068"
+    },
+    {
+      "original": "E:\\RocketAeroHeat\\scripts\\su2BenchmarkAcceptance.py",
+      "exactSnapshot": "E:\\RocketAeroHeat\\outputs\\v159_validation\\public01\\executed_sources\\scripts\\su2BenchmarkAcceptance.py",
+      "sha256": "a5909bcf8545b59dad36f781326ea691c54031ee41a413ecea5f200c2897f141"
+    }
+  ],
+  "originalReportSHA256": "1fa7d41865d0179a382989e4ab869bb37fcf17bd8eb2ba699333143c6b93f90c",
+  "acceptanceWithSpecificPendingReason": {
+    "gates": [
+      {
+        "name": "native successful terminal",
+        "value": 0.0,
+        "limit": 0.0,
+        "comparison": "<=",
+        "passed": true,
+        "reason": null
+      },
+      {
+        "name": "saved field matches final history",
+        "value": 0.0,
+        "limit": 0.0,
+        "comparison": "<=",
+        "passed": true,
+        "reason": null
+      },
+      {
+        "name": "rms[Rho]",
+        "value": -3.23200447,
+        "limit": -8.0,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "rms[RhoE]",
+        "value": 2.766031731,
+        "limit": -8.0,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "rms[k]",
+        "value": -1.305741446,
+        "limit": -8.0,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "rms[w]",
+        "value": 5.8965134,
+        "limit": -8.0,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "same-stage EOS",
+        "value": 1.1102230246251565e-15,
+        "limit": 2e-12,
+        "comparison": "<",
+        "passed": true,
+        "reason": null
+      },
+      {
+        "name": "wall heat gradient",
+        "value": 1.3258423123760946e-11,
+        "limit": 2e-06,
+        "comparison": "<",
+        "passed": true,
+        "reason": null
+      },
+      {
+        "name": "normalized density residual",
+        "value": 37.28821005293085,
+        "limit": 1e-05,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "normalized energy residual",
+        "value": 32.94789806538858,
+        "limit": 1e-05,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "mass balance",
+        "value": 0.09900092304021846,
+        "limit": 0.01,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "energy balance",
+        "value": 0.09462123905223523,
+        "limit": 0.01,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "y+ 99th percentile",
+        "value": 1.003701201986006,
+        "limit": 1.0,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "pressure station RMS",
+        "value": 0.6367274116780176,
+        "limit": 0.1,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "pressure station maximum",
+        "value": 0.9237445190370167,
+        "limit": 0.2,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "heat station RMS",
+        "value": 0.9992222392576018,
+        "limit": 0.2,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "heat station maximum",
+        "value": 1.9030244470396296,
+        "limit": 0.3,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "heat peak magnitude",
+        "value": 1.564138305227719,
+        "limit": 0.2,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "heat peak position m",
+        "value": 0.03,
+        "limit": 0.01,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "upstream velocity profile",
+        "value": 0.3932611569884328,
+        "limit": 0.05,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "upstream total temperature profile",
+        "value": null,
+        "limit": 0.03,
+        "comparison": "<=",
+        "passed": null,
+        "reason": "experimental total-temperature denominator unresolved"
+      },
+      {
+        "name": "upstream pressure reference",
+        "value": 0.07238045853029418,
+        "limit": 0.05,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "upstream heat reference",
+        "value": 0.9957406840413007,
+        "limit": 0.2,
+        "comparison": "<=",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "pressure stability",
+        "value": 0.7265147720247217,
+        "limit": 0.01,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "heat stability",
+        "value": 1.801833436948986,
+        "limit": 0.02,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      },
+      {
+        "name": "revolved power stability",
+        "value": 0.9921152958916939,
+        "limit": 0.02,
+        "comparison": "<",
+        "passed": false,
+        "reason": null
+      }
+    ],
+    "passed": false,
+    "pending": [
+      "upstream total temperature profile"
+    ],
+    "failed": [
+      "rms[Rho]",
+      "rms[RhoE]",
+      "rms[k]",
+      "rms[w]",
+      "normalized density residual",
+      "normalized energy residual",
+      "mass balance",
+      "energy balance",
+      "y+ 99th percentile",
+      "pressure station RMS",
+      "pressure station maximum",
+      "heat station RMS",
+      "heat station maximum",
+      "heat peak magnitude",
+      "heat peak position m",
+      "upstream velocity profile",
+      "upstream pressure reference",
+      "upstream heat reference",
+      "pressure stability",
+      "heat stability",
+      "revolved power stability"
+    ],
+    "furtherQualificationRequired": [
+      "grid sensitivity",
+      "outer-domain sensitivity",
+      "model and material-property applicability"
+    ]
+  },
+  "legacyDefaultAnalysisFunctions": 2,
+  "nextRealDomainCapacity": {
+    "schemaVersion": 1,
+    "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+    "every": 75,
+    "maximumUpdates": 150,
+    "firstLocalIteration": 0,
+    "firstSuccessfulUpdate": 1,
+    "maximumNamedPairs": 3,
+    "estimatedVolumeBytes": 290071360,
+    "estimatedSurfaceBytes": 11071040,
+    "estimatedMaximumBytes": 1206232576,
+    "maximumOutputBytes": 1610612736,
+    "units": "file lengths including final aliases; physical allocation unknown",
+    "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold"
+  },
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\auditSU2AxisymmetricAir.py": "fc3aa74517e3edc94a5af173f4618601c5d4ee89c9d7779c514cfdfad6ce1c2d",
+    "E:\\RocketAeroHeat\\scripts\\su2BenchmarkAcceptance.py": "a7386375dd482c3e62aef8c8c488957695a9621db9b7ea544b8b93349a4140b0",
+    "E:\\RocketAeroHeat\\scripts\\su2AxisymmetricAnalysis.py": "bb8beb81a08e36ef28afe192358535b6728158038d0ba29d72704f4e84273da9"
+  }
+}

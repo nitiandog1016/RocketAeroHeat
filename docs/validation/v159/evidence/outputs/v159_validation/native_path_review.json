@@ -1,0 +1,44 @@
+{
+  "files": [
+    {
+      "source": "SU2_CFD/src/drivers/CDriver.cpp",
+      "exactPath": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\drivers\\CDriver.cpp",
+      "sha256": "a384328e069d9c62fe7ba860be5cf52be63b7032f75b4df26081827fb5a63e64"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "exactPath": "E:\\RocketAeroHeat\\outputs\\v159_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CEulerSolver.cpp",
+      "sha256": "f1bce8dee0e3c15ddc775af4ef68a47324891b131006d129dd4af5bb0ecf8b8d"
+    },
+    {
+      "source": "SU2_CFD/src/numerics/flow/flow_sources.cpp",
+      "exactPath": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\numerics\\flow\\flow_sources.cpp",
+      "sha256": "cbe7d2ad66b335659307ad75bc3a0ffb0724370aa4e6193a65decb6cdb8a84d7"
+    },
+    {
+      "source": "SU2_CFD/include/numerics/turbulent/turb_sources.hpp",
+      "exactPath": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\numerics\\turbulent\\turb_sources.hpp",
+      "sha256": "5cc51065a7b7e6faf35af2ec35ecf6f30febb5bd372cb98851bf84225043af51"
+    },
+    {
+      "source": "SU2_CFD/include/solvers/CScalarSolver.inl",
+      "exactPath": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\solvers\\CScalarSolver.inl",
+      "sha256": "828fb7f64ef58a14d0a0d21011787d082de2d3827a1bba06c753ec367079fb58"
+    },
+    {
+      "source": "SU2_CFD/src/numerics/flow/flow_diffusion.cpp",
+      "exactPath": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\numerics\\flow\\flow_diffusion.cpp",
+      "sha256": "fa305896da11bf487a89cfb897a6cb16f02c4e6ac366e946589abca8e9636639"
+    }
+  ],
+  "flowSource": "CDriver selects CSourceGeneralAxisymmetric_Flow; node primitive and secondary values passed by CEulerSolver::Source_Residual",
+  "sstSource": "SST ResidualAxisymmetricConvectionDiffusion with radial velocity and gradients",
+  "boundaries": "patched native prescribed exterior PT inlet/top; native extrapolation outlet; both pass general EOS secondary values",
+  "transport": "native mean stress omits isotropic k; conductivity uses cp(T) with molecular and eddy terms",
+  "limits": [
+    "source path review is distinct from convergence and experimental validation",
+    "native approximate axisymmetric Jacobian retained",
+    "positive radius domain; axis-limit branch not exercised"
+  ],
+  "physicsQualified": false
+}

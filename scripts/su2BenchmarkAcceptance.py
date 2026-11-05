@@ -27,7 +27,7 @@ def stability(frames, final_iteration, wall_area):
                 maximumPowerChange=power)
 
 
-def acceptance(current, residuals, steady, run_succeeded, field_is_final):
+def acceptance(current, residuals, steady, run_succeeded, field_is_final, missing_reasons=None):
     """把事前计划的数值与实验门槛逐项展开，网格/外域资格另行保留。"""
     gates = []
 
@@ -36,7 +36,7 @@ def acceptance(current, residuals, steady, run_succeeded, field_is_final):
         passed = bool(value < limit if strict else value <= limit) if available else None
         gates.append(dict(name=name, value=value, limit=limit,
                           comparison='<' if strict else '<=', passed=passed,
-                          reason=None if available else missing))
+                          reason=None if available else (missing_reasons or {}).get(name, missing)))
 
     gate('native successful terminal', 0. if run_succeeded else 1., 0.)
     gate('saved field matches final history', 0. if field_is_final else None, 0.)

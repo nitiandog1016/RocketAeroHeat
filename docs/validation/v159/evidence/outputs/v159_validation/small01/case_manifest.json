@@ -1,0 +1,167 @@
+{
+  "requiredRuntimeFlavor": "rah-ideal-air-axisymmetric-v1",
+  "nodes": 81,
+  "elements": 64,
+  "expectedVelocity": [
+    -1294.9971831431333,
+    0,
+    0
+  ],
+  "flight": {
+    "iterations": 4,
+    "outputEvery": 1
+  },
+  "thermalBoundary": {
+    "mode": "isothermal",
+    "wallTemperature": 311
+  },
+  "initialization": {
+    "kind": "axisymmetric-ideal-air-SST-Vm-wall-distance-v1",
+    "initialGuessOnly": true,
+    "priorSuccessfulUpdates": 0,
+    "localIterationStartsAt": 0,
+    "sourceLocalIteration": null,
+    "initialStateSHA256": "f1e0fa1592506f8433ae89d72274514b1e9777373ad2ee94542b03686526fe00",
+    "sourceSHA256": {
+      "E:\\RocketAeroHeat\\tests\\data\\tmr_mach7\\contract.json": "121b83d627f2ac573ea38dbcb155e177e321d2319c4f379474f4698d92935b19",
+      "E:\\RocketAeroHeat\\tests\\data\\tmr_mach7\\source_manifest.json": "55606c2eb77eaf1e83f051bed47a639aba3d0f18abb171e3bc2705d49970352d",
+      "E:\\RocketAeroHeat\\tests\\data\\tmr_mach7\\raw\\case.html": "df49faea87ec1bddac37a6d42a39eb896973f58223a7374834048dbf6e704852",
+      "E:\\RocketAeroHeat\\tests\\data\\tmr_mach7\\raw\\grids.html": "331cd3daaed0ffa04c77401d09b41f6ddc74343831e34f59e3c5b61b1b5fee6d",
+      "E:\\RocketAeroHeat\\tests\\data\\tmr_mach7\\raw\\sstvm.html": "74443d9016b75a48fd20aa866fc6c55e7ad0103a179e5381cc96ab309a86c630",
+      "E:\\RocketAeroHeat\\tests\\data\\tmr_mach7\\raw\\wind_sstvm.inp": "d3843b1e9b3a19d50bac36d5659fad501bde93e0f84192a57a22a067277170ce",
+      "E:\\RocketAeroHeat\\tests\\data\\tmr_mach7\\raw\\Axiswblim7_grids.zip": "6d12b620b0e1fff13c0567a9ad4f18c88133ed9d87ee332be8c9d775c7cdc4aa",
+      "E:\\RocketAeroHeat\\tests\\data\\tmr_mach7\\raw\\wind_freestream.html": "96748c1e288e6d7ec0eaa7542266edc4e2e02039f9812334267314f5c80b2440",
+      "E:\\RocketAeroHeat\\outputs\\v152_validation\\acc_sbli01\\mesh.su2": "8d935054d8e8babeb884cd750e967694cd062ed81ec66c1593c68e0fda4a61b9",
+      "E:\\RocketAeroHeat\\outputs\\v152_validation\\review01\\report.json": "27adc5844772d94f2a46b2e5b39939a545fbe9d6f9b190120df759a4b79dc0c5",
+      "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAir.hpp": "62a880ed2e1ec76c5bc8c9a832ec7787b5b3f01494f31ed6a3ebf7bfb972969b",
+      "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAirBatch.cpp": "5dbff0d52bd141a63a90e708ddf381115ab30cdbc1d61e2cdd1475325f930270",
+      "E:\\RocketAeroHeat\\scripts\\buildIdealAirBatch.py": "9a46a6a48311827aa41a060236bf3372300290e8c764fc383b31335a722e95ee",
+      "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\runtime.json": "04c7800d328f5395e73a782560ba0545aac2cab5232e85d93fb2494f5e6fd45d",
+      "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\idealAirBatch.dll": "03514d6657245cd7fa38b7e6bc074666a96320bf170fbc77302a01141a3c135a",
+      "E:\\RocketAeroHeat\\scripts\\idealAirProperties.py": "7d63ba9c250dfd7ecad3912b6ab1daaba0784aae43af7d22307d4d17ea659234",
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2PublicValidation.py": "32d0713ed34914bcfe91e900fda319d2627c192679f196fb4ecabde0a3d904b4",
+      "E:\\RocketAeroHeat\\scripts\\idealAirFreestream.py": "6b9ff0962aa602a9ffb39255c9b7c7bbb3371577f0177a454d8b0e2ef4dc39d0",
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2AxisymmetricBenchmark.py": "2a4a0664b8b509f05d6d4d8b10cd064892767d3e32320ef35a40ae32505a840f",
+      "E:\\RocketAeroHeat\\scripts\\su2SSTInterface.py": "7295cfa8b8b076602d73212bb201b055127e4f82203a9b83cae49befa978fde9",
+      "E:\\RocketAeroHeat\\outputs\\v158_validation\\prepare01_source\\scripts\\su2IdealAirInterface.py": "ec7233b0eb65387090691fc7389f0dd605b0b6748cebb66e667bed7091fbad55",
+      "E:\\RocketAeroHeat\\outputs\\v158_validation\\preparation01\\preparation.json": "7ff740ac728d97fd764e111f07214080bd5e8666809e95267de0ddefda4541e7",
+      "E:\\RocketAeroHeat\\outputs\\v158_validation\\preparation01\\mesh.su2": "9604690a12a6059fd9766762e55a45d88e4a65f9c4a39038d9a63e9291d8c1d9",
+      "E:\\RocketAeroHeat\\outputs\\v158_validation\\preparation01\\profile_locations.csv": "9de0ae6ececa6c474de029af4e7ef1b5d0d15da225a3b17b8175125785b140b1",
+      "E:\\RocketAeroHeat\\outputs\\v152_validation\\acc_sbli01\\case.cfg": "987a0d302eeafa5c13f53ebc3b7df6639781de4687dbd143b33f9ef9eb7c23e8",
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2AxisymmetricAir.py": "4a09537d82dda5db86d96fcfc5ec04065e14498b6f312ba592be565b363cf816",
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2AxisymmetricInitialState.py": "e1e629c02e14899f1302197b86a581f3ba92f576af2d3d4730a6a73d742f76a1",
+      "E:\\RocketAeroHeat\\scripts\\su2IdealAirCheckpoints.py": "6690a1a5b5b7f8e320f3b55b22ce80b3a94959c07d3141f3aef1f50cdc4b4a3f",
+      "E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py": "166d082b649a7d29062030490b863b0fe84f4825ddeb6b1724bc34a8bab305e7",
+      "E:\\RocketAeroHeat\\scripts\\su2AxisymmetricAnalysis.py": "a2d412c259a7cb28d8d448c271b0da4b2404ba099d91ca864c56ea6f5aaab530"
+    },
+    "historicalSourceRebinding": [
+      {
+        "original": "E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py",
+        "exactSnapshot": "E:\\RocketAeroHeat\\outputs\\v158_validation\\prepare01_source\\scripts\\su2IdealAirInterface.py",
+        "sha256": "ec7233b0eb65387090691fc7389f0dd605b0b6748cebb66e667bed7091fbad55"
+      }
+    ],
+    "maximumThicknessM": 0.0018645160148202595,
+    "totalEnthalpyRelativeError": 6.661338147750939e-16,
+    "temperatureRangeK": [
+      82.46842829025613,
+      414.3486302795452
+    ],
+    "method": "exact wall-segment distance; C1 velocity/total enthalpy; OTH h inverse; positive SST",
+    "boundaryPriority": "wall initial state at shared inlet/outlet nodes",
+    "physicsQualified": false,
+    "newQualifiedArea": 0
+  },
+  "idealAir": {
+    "schemaVersion": 4,
+    "thermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+    "gasConstant": 287.0491267875601,
+    "temperatureRangeK": [
+      60,
+      2000
+    ],
+    "energyEntropyReference": "OTH",
+    "initialization": "axisymmetric-ideal-air-SST-Vm-wall-distance-v1",
+    "initializationSHA256": "7a29a6b2bfc0e4100fbac3d88e021e5b6dc524c5da79c6d309ae6492c3eb23c5",
+    "turbulent": true,
+    "freestreamSpeed": 1294.9971831431333,
+    "freestreamSoundSpeed": 182.1374378541678,
+    "freestreamCp": 1002.2128032056639,
+    "checkpointContract": {
+      "schemaVersion": 2,
+      "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+      "every": 1,
+      "maximumUpdates": 4,
+      "firstLocalIteration": 0,
+      "firstSuccessfulUpdate": 1,
+      "maximumNamedPairs": 4,
+      "estimatedVolumeBytes": 92224,
+      "estimatedSurfaceBytes": 19008,
+      "estimatedMaximumBytes": 1621120,
+      "maximumOutputBytes": 33554432,
+      "units": "file lengths including final aliases; physical allocation unknown",
+      "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold",
+      "extraColumns": 7
+    },
+    "configurationSHA256": "38058287f2db967b5e6b9dff7472efc635a2ae4f404acce1ef600e2c5e6e7a1d",
+    "meshSHA256": "819e891b70435e2132a003d5a6ffb952216b5672d0b4934de250501f538966c2",
+    "boundaryMethod": "native prescribed supersonic exterior inlet/top and extrapolated outlet; variable-cp PT energy and EOS derivatives",
+    "physicsQualified": false,
+    "newQualifiedArea": 0
+  },
+  "idealAirContractSHA256": "5f05ab7536d740ddc0c49b138d0c8c904c419882687564c3b93c922f2a6292a7",
+  "sst": {
+    "schemaVersion": 1,
+    "model": "SST-Vm",
+    "thermodynamics": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+    "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1",
+    "intensity": 0.00021,
+    "viscosityRatio": 0.001,
+    "Prt": 0.9,
+    "kInfinity": 0.1109347211426632,
+    "omegaInfinity": 442279.28479224356,
+    "provenance": "NASA TMR WIND SST-Vm prescribed computational inflow",
+    "assumption": "fully turbulent model; measured transition history unresolved",
+    "physicsQualified": false,
+    "newQualifiedArea": 0
+  },
+  "sstContractSHA256": "b349a81996569fc3cc42fc6952eb880c753c279fb34f45edc27846afad89fef1",
+  "publicBenchmark": {
+    "preparation": "E:\\RocketAeroHeat\\outputs\\v158_validation\\preparation01\\preparation.json",
+    "conditions": {
+      "T": 82.46842829025617,
+      "rho": 0.02257028282160966,
+      "p": 534.2948018006599,
+      "e": 184735.01648578397,
+      "h": 208407.50681404452,
+      "cp": 1002.2128032056639,
+      "sound": 182.1374378541678,
+      "mach": 7.11,
+      "speed": 1294.9971831431333,
+      "totalTemperature": 888.8888888888889,
+      "totalPressure": 2515207.4605476866,
+      "totalEnthalpy": 1046916.3589883642,
+      "entropyIntegral": 2427.5509551929267,
+      "entropyQuadratureError": 2.3137774309969013e-09,
+      "gasConstant": 287.0491267875601,
+      "wallTemperature": 311,
+      "turbulenceIntensity": 0.00021,
+      "eddyToLaminarRatio": 0.001,
+      "viscosity": 5.661192185617417e-06,
+      "unitReynolds": 5162950.085140179,
+      "k": 0.1109347211426632,
+      "omega": 442279.28479224356,
+      "conservativeSpecificEnergy": 1023243.9795948301,
+      "velocity": [
+        -1294.9971831431333,
+        0,
+        0
+      ],
+      "totalStateDefinition": "mean-flow thermodynamic total state; SST k added separately"
+    },
+    "fixture": true,
+    "scope": "attached axisymmetric cylinder-flare; zero incidence; prescribed Tw",
+    "directTotalTemperatureReferenceStatus": "pending-reference"
+  },
+  "physicsQualified": false
+}

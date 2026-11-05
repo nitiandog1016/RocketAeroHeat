@@ -11,11 +11,11 @@ from scipy.spatial import cKDTree
 from validateIdealAir import ROOT, run, save, sha, write_rows, read_rows, relative
 from su2IdealAirInterface import FLAVOR, PHASE_FLAVORS, R, settings
 from su2ThermalRuntime import read
-from su2SSTInterface import wall_geometry, phase_columns
+from su2SSTInterface import wall_geometry, phase_columns, spatial_columns
 from auditSU2SSTState import vtk_tokens
 
 
-def load_state(path, turbulent, captured=False):
+def load_state(path, turbulent, captured=False, spatial=False):
     """按实际具名列读取，绝对内能按OTH参考解释。"""
     with path.open(encoding='utf-8-sig') as stream:
         columns = next(csv.reader(stream))
@@ -27,7 +27,9 @@ def load_state(path, turbulent, captured=False):
         expected += ['Turb_Kin_Energy', 'Omega']
     else:
         primitive = primitive[:-1]
-    assert columns == expected+primitive+(['Flow_Primitive_K'] if captured else []), columns
+    assert not spatial or (turbulent and captured and nd == 2)
+    assert columns == expected+primitive+(spatial_columns(nd)[:nd+4] if spatial else [])+(
+        ['Flow_Primitive_K'] if captured else []), columns
     data = np.loadtxt(str(path), delimiter=',', skiprows=1)
     assert np.isfinite(data).all() and np.array_equal(data[:, 0], np.arange(len(data)))
     values = {name: data[:, index] for index, name in enumerate(columns)}
@@ -57,7 +59,7 @@ def publish_review(folder, audit_directory):
         thermoSHA256=sha(directory/'oracle.csv'), receiptSHA256=sha(folder/'engine_process.json')))
 
 
-def audit(folder, output=None, reuse_properties=None, checkpoint=None):
+def audit(folder, output=None, reuse_properties=None, checkpoint=None, recheck_checkpoints=False):
     """分开验证流动阶段、后更新k、给定Tw和高精度热流，保留真实资格边界。"""
     folder = Path(folder).resolve()
     folder.relative_to(ROOT/'outputs')
@@ -84,8 +86,14 @@ def audit(folder, output=None, reuse_properties=None, checkpoint=None):
     step = int(steps[-1]) if checkpoint is None else checkpoint
     assert isinstance(step, int) and 0 <= step < len(history)
     assert np.isfinite(history[step]).all()
+    checked_inventory = None
+    if recheck_checkpoints:
+        assert captured and checkpoint is not None, '只读复核必须显式指定具名帧'
+        from su2IdealAirCheckpoints import inventory
+        checked_inventory = inventory(folder, receipt)
     if captured:
-        entry = next(row for row in receipt['checkpoints']['complete'] if row['localIteration'] == step)
+        selected_inventory = checked_inventory if recheck_checkpoints else receipt['checkpoints']
+        entry = next(row for row in selected_inventory['complete'] if row['localIteration'] == step)
         volume_path, surface_path = folder/entry['volume'], folder/entry['surface']
         assert sha(volume_path) == entry['volumeSHA256'] == receipt['outputSHA256'][volume_path.name]
         assert sha(surface_path) == entry['surfaceSHA256'] == receipt['outputSHA256'][surface_path.name]
@@ -94,7 +102,8 @@ def audit(folder, output=None, reuse_properties=None, checkpoint=None):
             named = '%s_%06d.%s' % (stem, step, extension)
             assert sha(folder/named) == receipt['outputSHA256'][named] == sha(folder/(stem+'.'+extension))
         volume_path, surface_path = folder/'restart_flow.csv', folder/'surface_flow.vtk'
-    data, values, nd = load_state(volume_path, turbulent, captured)
+    spatial = receipt['runtimeFlavor'] == 'rah-ideal-air-axisymmetric-v1'
+    data, values, nd = load_state(volume_path, turbulent, captured, spatial)
     axes = ['x', 'y', 'z'][:nd]
     rho = values['Density']
     velocity = np.column_stack([values['Momentum_'+axis]/rho for axis in axes])
@@ -113,6 +122,9 @@ def audit(folder, output=None, reuse_properties=None, checkpoint=None):
     out = Path(output).resolve() if output else folder/'ideal_air_audit'
     out.relative_to(folder)
     out.mkdir(exist_ok=False)
+    if checked_inventory is not None:
+        save(out/'rechecked_inventory.json', dict(originalReceiptSHA256=sha(folder/'engine_process.json'),
+            originalSupervisorError=receipt.get('supervisorError'), checkpoints=checked_inventory))
     # 独立程序使用固定CoolProp的umass_idealgas/cp0mass，核对完整保存阶段。
     helper = ROOT/'outputs/v153_validation/native03/idealAirProbe.exe'
     upstream = read(ROOT/'outputs/v153_validation/native03/runtime.json')
@@ -192,6 +204,7 @@ def audit(folder, output=None, reuse_properties=None, checkpoint=None):
         wallNodes=len(ids), checkpointLocalIteration=step, successfulUpdates=step+1,
         seriesSuccessfulUpdates=(read(folder/'case_manifest.json')['initialization']['priorSuccessfulUpdates']+step+1) if captured else step+1,
         nativeNormalTerminal=normal,
+        checkpointInventoryRechecked=recheck_checkpoints,
         elapsedSeconds=receipt['elapsedSeconds'], errors=errors, inputSHA256=lock, inputsStable=stable,
         nativeHeatPower=power, nativeHeatPowerUnit='W/m' if nd == 2 else 'W',
         wallHeatRangeWm2=[float(min(q)), float(max(q))], givenWallTemperatureK=wall_temperature,
@@ -223,6 +236,7 @@ if __name__ == '__main__':
     parser.add_argument('--output')
     parser.add_argument('--reuse-properties')
     parser.add_argument('--checkpoint', type=int)
+    parser.add_argument('--recheck-checkpoints', action='store_true')
     args = parser.parse_args()
-    result = audit(args.folder, args.output, args.reuse_properties, args.checkpoint)
+    result = audit(args.folder, args.output, args.reuse_properties, args.checkpoint, args.recheck_checkpoints)
     print(json.dumps({k: v for k, v in result.items() if k not in ('inputSHA256', 'inputsStable')}, indent=2))

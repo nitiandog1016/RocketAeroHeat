@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "scripts/auditSU2AxisymmetricAir.py", line 148, in <module>
+    report = audit(parser.parse_args().folder)
+  File "scripts/auditSU2AxisymmetricAir.py", line 114, in audit
+    current = assess(folder, entry, model, conditions, geometry, points, cells, markers, contract, locations)
+  File "scripts/auditSU2AxisymmetricAir.py", line 46, in assess
+    assert eos_error < 2e-12 and phase_error < 2e-10 and heat_error < 2e-10
+AssertionError

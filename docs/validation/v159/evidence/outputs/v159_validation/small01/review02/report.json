@@ -1,0 +1,124 @@
+{
+  "interfacePassed": true,
+  "thermodynamicModel": {
+    "schemaVersion": 4,
+    "thermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+    "gasConstant": 287.0491267875601,
+    "temperatureRangeK": [
+      60,
+      2000
+    ],
+    "energyEntropyReference": "OTH",
+    "initialization": "axisymmetric-ideal-air-SST-Vm-wall-distance-v1",
+    "initializationSHA256": "7a29a6b2bfc0e4100fbac3d88e021e5b6dc524c5da79c6d309ae6492c3eb23c5",
+    "turbulent": true,
+    "freestreamSpeed": 1294.9971831431333,
+    "freestreamSoundSpeed": 182.1374378541678,
+    "freestreamCp": 1002.2128032056639,
+    "checkpointContract": {
+      "schemaVersion": 2,
+      "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+      "every": 1,
+      "maximumUpdates": 4,
+      "firstLocalIteration": 0,
+      "firstSuccessfulUpdate": 1,
+      "maximumNamedPairs": 4,
+      "estimatedVolumeBytes": 92224,
+      "estimatedSurfaceBytes": 19008,
+      "estimatedMaximumBytes": 1621120,
+      "maximumOutputBytes": 33554432,
+      "units": "file lengths including final aliases; physical allocation unknown",
+      "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold",
+      "extraColumns": 7
+    },
+    "configurationSHA256": "38058287f2db967b5e6b9dff7472efc635a2ae4f404acce1ef600e2c5e6e7a1d",
+    "meshSHA256": "819e891b70435e2132a003d5a6ffb952216b5672d0b4934de250501f538966c2",
+    "boundaryMethod": "native prescribed supersonic exterior inlet/top and extrapolated outlet; variable-cp PT energy and EOS derivatives",
+    "physicsQualified": false,
+    "newQualifiedArea": 0
+  },
+  "dimension": 2,
+  "nodes": 81,
+  "wallNodes": 9,
+  "checkpointLocalIteration": 3,
+  "successfulUpdates": 4,
+  "seriesSuccessfulUpdates": 4,
+  "nativeNormalTerminal": false,
+  "checkpointInventoryRechecked": true,
+  "elapsedSeconds": 0.8910000000032596,
+  "errors": {
+    "phaseEnergy": 2.6782422525355886e-15,
+    "EOS": 4.2462081037416835e-16,
+    "velocity": 6.737706270444981e-16,
+    "viscosity": 1.6940658945086007e-20,
+    "heatGradient": 1.026890269552771e-11,
+    "surfacePressure": 6.231832766578994e-08,
+    "surfaceTemperature": 1.5820229096255032e-07,
+    "surfaceHeat": 1.346649332159297e-07,
+    "yPlus": 1.1102230246251565e-16,
+    "power": 2.0353300786141418e-10
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\auditSU2IdealAirState.py": "2cb88f9dd93f3fc5379097b9cda45ce148393143e5ffa1f6f36a762e1e136ee5",
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py": "166d082b649a7d29062030490b863b0fe84f4825ddeb6b1724bc34a8bab305e7",
+    "E:\\RocketAeroHeat\\scripts\\su2SSTInterface.py": "7295cfa8b8b076602d73212bb201b055127e4f82203a9b83cae49befa978fde9",
+    "E:\\RocketAeroHeat\\scripts\\auditSU2SSTState.py": "28d2a56335423698f60804da724c099f59a369f62e8f0c8df85d3630894f60a5",
+    "E:\\RocketAeroHeat\\scripts\\validateIdealAir.py": "606a47e8fb0f4f1a4d8236a3dbfeea20fe971d915dd043fdb5ba3cfec33b01d3",
+    "E:\\RocketAeroHeat\\outputs\\v153_validation\\native03\\idealAirProbe.exe": "a66611cfd23ebb4de2c6a3db41ccc21d5aaf041cebabeca9624956bc0c6970ce",
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\restart_flow_000003.csv": "5f87aaa138548a6950e02094527d1a4c59a2150c09e5253d2033ded93c71bc46",
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\surface_flow_000003.vtk": "757bf385efb4450d2eeee842d13a96549c4a5bcb4fc9e17b89ca744bd621072a",
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\engine_process.json": "cade5628fb4a1081bc6654b46f8d4fed045d62299de7ab14a9f60135e52846ab",
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\review02\\oracle_input.csv": "42d1244f1489332ea7d372e9e0456002dc14ba8941e4c4f83d9d47b15d653922",
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\review02\\current_input.csv": "bfe5c1247c70d01702d320e2914a59d7c26f0062b2489ff11c96a7fd572bd4b9"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\scripts\\auditSU2IdealAirState.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2SSTInterface.py": true,
+    "E:\\RocketAeroHeat\\scripts\\auditSU2SSTState.py": true,
+    "E:\\RocketAeroHeat\\scripts\\validateIdealAir.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v153_validation\\native03\\idealAirProbe.exe": true,
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\restart_flow_000003.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\surface_flow_000003.vtk": true,
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\engine_process.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\review02\\oracle_input.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v159_validation\\small01\\review02\\current_input.csv": true
+  },
+  "nativeHeatPower": -16903.705496559538,
+  "nativeHeatPowerUnit": "W/m",
+  "wallHeatRangeWm2": [
+    -1058031.965352142,
+    932.6518293806771
+  ],
+  "givenWallTemperatureK": 311.0,
+  "wallFluidTemperatureRangeK": [
+    311.0000467968248,
+    349.0653762939966
+  ],
+  "temperatureRangeK": [
+    71.07760960030305,
+    416.4362840133698
+  ],
+  "currentKTemperatureRangeK": [
+    71.07761174081706,
+    416.4362850466648
+  ],
+  "currentKvsFlowPhaseTemperatureDifferenceK": 2.909292571473543e-05,
+  "flowPrimitivePhase": "captured SetPrimVar k input",
+  "turbulencePhase": "subsequent turbulence update",
+  "previousKCheckpoint": null,
+  "wallEddyToMolecularMaximum": 4.9742951411388695e-20,
+  "finalResiduals": [
+    -2.359399696,
+    4.210228299,
+    -2.236713727,
+    10.25587752
+  ],
+  "originalResidualThresholdPassed": false,
+  "yPlusP99": 0.7551910514978503,
+  "nativeYPlusAvailable": true,
+  "reusedPropertiesFrom": null,
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "wallCSV_SHA256": "437f4b6f94d518612699c732c5f54d4ff2a395f40a0ec9487b634b9943948613"
+}
