@@ -1,0 +1,30 @@
+{
+  "receiptFolder": "outputs/v151_validation/workbench02_supervisor",
+  "maximumSeconds": 300,
+  "maximumRSSBytes": 4294967296,
+  "command": [
+    "D:/anacondapython/python.exe",
+    "-X",
+    "utf8",
+    "scripts/runMatlabResearch.py",
+    "workbench02",
+    "addpath(pwd); addpath('tests'); testSU2BenchmarkAcceptanceReview('outputs/v151_validation/workbench02','outputs/v151_validation/review01/report.json');",
+    "--folder",
+    "outputs/v151_validation",
+    "--input",
+    "outputs/v151_validation/review01/report.json",
+    "--input",
+    "outputs/v151_validation/review01/convergence.png",
+    "--input",
+    "outputs/v151_validation/acc_sbli01/engine_process.json"
+  ],
+  "sources": [
+    "scripts/runMatlabResearch.py",
+    "tests/testSU2BenchmarkAcceptanceReview.m",
+    "readSU2BenchmarkReview.m",
+    "createSU2BenchmarkReview.m",
+    "rocketAeroHeatWorkbench.m",
+    "docs/validation/v151/PLAN.md",
+    "docs/validation/v151/UI_CORRECTION.md"
+  ]
+}

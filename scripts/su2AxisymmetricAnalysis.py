@@ -66,21 +66,29 @@ def wls_gradient(points, cells, values):
     return np.linalg.solve(matrix, rhs).transpose(0, 2, 1)
 
 
+def signed_segment_integral(radius, flux):
+    """线性半径与线性通量在过零点精确分段，分别累计流入和流出。"""
+    r0 = radius[:, 0]
+    dr = radius[:, 1]-r0
+    f0 = flux[:, 0]
+    df = flux[:, 1]-f0
+    zero = np.ones(len(flux))
+    crosses = f0*flux[:, 1] < 0
+    np.divide(-f0, df, out=zero, where=crosses)
+    at_zero = 2*np.pi*(r0*f0*zero+(r0*df+dr*f0)*zero**2/2+dr*df*zero**3/3)
+    whole = 2*np.pi*(r0*f0+(r0*df+dr*f0)/2+dr*df/3)
+    parts = np.concatenate((at_zero, whole-at_zero))
+    return dict(net=float(sum(whole)), incoming=float(sum(np.maximum(-parts, 0))),
+                outgoing=float(sum(np.maximum(parts, 0))))
+
+
 def integrate_vector(points, segments, nodal_flux):
-    """对分段线性的物理通量做精确整周积分，同时保存流入/流出绝对量。"""
+    """对原有向边界的法向通量与半径作整周积分。"""
     p = points[segments]
     d = p[:, 1]-p[:, 0]
     outward = np.column_stack((d[:, 1], -d[:, 0]))
-    f = nodal_flux[segments]
-    total = incoming = outgoing = 0.
-    for s in ((1-1/np.sqrt(3))/2, (1+1/np.sqrt(3))/2):
-        radius = (1-s)*p[:, 0, 1]+s*p[:, 1, 1]
-        normal_flux = np.sum(((1-s)*f[:, 0]+s*f[:, 1])*outward, axis=1)
-        contribution = np.pi*radius*normal_flux
-        total += float(np.sum(contribution))
-        incoming += float(np.sum(np.maximum(-contribution, 0)))
-        outgoing += float(np.sum(np.maximum(contribution, 0)))
-    return dict(net=total, incoming=incoming, outgoing=outgoing)
+    normal_flux = np.sum(nodal_flux[segments]*outward[:, None], axis=2)
+    return signed_segment_integral(p[:, :, 1], normal_flux)
 
 
 def integrate_scalar(points, segments, values):
@@ -125,8 +133,9 @@ def boundary_balance(points, cells, markers, f, conditions):
         m = integrate_vector(points, segments, mass)
         e = integrate_vector(points, segments, energy)
         if name == 'wall':
-            power = integrate_scalar(points, segments, f['Heat_Flux'])
-            e = dict(net=power, incoming=max(-power, 0), outgoing=max(power, 0))
+            wall_points = points[segments]
+            length = np.linalg.norm(wall_points[:, 1]-wall_points[:, 0], axis=1)
+            e = signed_segment_integral(wall_points[:, :, 1], f['Heat_Flux'][segments]*length[:, None])
         by_marker[name] = dict(massKgS=m, energyW=e)
     mass_in = sum(row['massKgS']['incoming'] for row in by_marker.values())
     energy_in = sum(row['energyW']['incoming'] for row in by_marker.values())
@@ -135,7 +144,7 @@ def boundary_balance(points, cells, markers, f, conditions):
     return dict(markers=by_marker, massNetKgS=mass_net, energyNetW=energy_net,
                 massRelativeImbalance=abs(mass_net)/max(mass_in, 1e-30),
                 energyRelativeImbalance=abs(energy_net)/max(energy_in, 1e-30),
-                definition='independent nodal physical flux quadrature with WLS viscous fluxes')
+                definition='independent WLS physical flux; exact signed linear-edge integration v2')
 
 
 def residual_scales(points, cells, f, conditions):

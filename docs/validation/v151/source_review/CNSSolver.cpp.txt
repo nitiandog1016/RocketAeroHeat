@@ -1,0 +1,96 @@
+680     /*--- Compute closest normal neighbor ---*/
+681 
+682     const auto Point_Normal = geometry->vertex[val_marker][iVertex]->GetNormal_Neighbor();
+683 
+684     /*--- Get coordinates of i & nearest normal and compute distance ---*/
+685 
+686     const auto Coord_i = geometry->nodes->GetCoord(iPoint);
+687     const auto Coord_j = geometry->nodes->GetCoord(Point_Normal);
+688     const su2double dist_ij = GeometryToolbox::NormalDistance(nDim, UnitNormal, Coord_i, Coord_j);
+689 
+690     /*--- Store the corrected velocity at the wall which will
+691      be zero (v = 0), unless there is grid motion (v = u_wall)---*/
+692 
+693     if (dynamic_grid) {
+694       nodes->SetVelocity_Old(iPoint, geometry->nodes->GetGridVel(iPoint));
+695     } else {
+696       su2double zero[MAXNDIM] = {0.0};
+697       nodes->SetVelocity_Old(iPoint, zero);
+698     }
+699 
+700     for (auto iDim = 0u; iDim < nDim; iDim++) LinSysRes(iPoint, iDim+1) = 0.0;
+701     nodes->SetVel_ResTruncError_Zero(iPoint);
+702 
+703     /*--- Get transport coefficients ---*/
+704 
+705     su2double Cp = nodes->GetSpecificHeatCp(iPoint);
+706     su2double eddy_viscosity       = nodes->GetEddyViscosity(iPoint);
+707     su2double thermal_conductivity = nodes->GetThermalConductivity(iPoint) + Cp * eddy_viscosity / Prandtl_Turb;
+708 
+709     // work in progress on real-gases...
+710     //thermal_conductivity = nodes->GetThermalConductivity(iPoint);
+711     //Cp = nodes->GetSpecificHeatCp(iPoint);
+712     //thermal_conductivity += Cp*eddy_viscosity/Prandtl_Turb;
+713 
+714     /*--- If it is a customizable or CHT patch, retrieve the specified wall temperature. ---*/
+715 
+716     const su2double There = nodes->GetTemperature(Point_Normal);
+717 
+718     if (cht_mode) {
+719       Twall = GetCHTWallTemperature(config, val_marker, iVertex, dist_ij,
+720                                     thermal_conductivity, There, Temperature_Ref);
+721     } else if (config->GetMarker_All_PyCustom(val_marker)) {
+722       Twall = geometry->GetCustomBoundaryTemperature(val_marker, iVertex) / Temperature_Ref;
+723     }
+724 
+725     /*--- Compute the normal gradient in temperature using Twall ---*/
+726 
+727     su2double dTdn = -(There - Twall)/dist_ij;
+728 
+729     /*--- Apply a weak boundary condition for the energy equation.
+730      Compute the residual due to the prescribed heat flux. ---*/
+731 
+732     su2double Res_Conv = 0.0;
+733     su2double Res_Visc = thermal_conductivity * dTdn * Area;
+734 
+735     /*--- Calculate Jacobian for implicit time stepping ---*/
+736 
+737     if (implicit) {
+738 
+739       /*--- Add contributions to the Jacobian from the weak enforcement of the energy equations. ---*/
+740 
+741       su2double Density = nodes->GetDensity(iPoint);
+742       su2double Vel2 = GeometryToolbox::SquaredNorm(nDim, &nodes->GetPrimitive(iPoint)[prim_idx.Velocity()]);
+743       su2double dTdrho = 1.0/Density * ( -Twall + (Gamma-1.0)/Gas_Constant*(Vel2/2.0) );
+744 
+745       Jacobian_i[nDim+1][0] = thermal_conductivity/dist_ij * dTdrho * Area;
+746 
+747       for (auto jDim = 0u; jDim < nDim; jDim++)
+748         Jacobian_i[nDim+1][jDim+1] = 0.0;
+749 
+750       Jacobian_i[nDim+1][nDim+1] = thermal_conductivity/dist_ij * (Gamma-1.0)/(Gas_Constant*Density) * Area;
+751     }
+752 
+753     /*--- If the wall is moving, there are additional residual contributions
+754      due to pressure (p v_wall.n) and shear stress (tau.v_wall.n). ---*/
+755 
+756     if (dynamic_grid) {
+757       AddDynamicGridResidualContribution(iPoint, Point_Normal, geometry, UnitNormal,
+758                                          Area, geometry->nodes->GetGridVel(iPoint),
+759                                          Jacobian_i, Res_Conv, Res_Visc);
+760     }
+761 
+762     /*--- Convective and viscous contributions to the residual at the wall ---*/
+763 
+764     LinSysRes(iPoint, nDim+1) += Res_Conv - Res_Visc;
+765 
+766     /*--- Enforce the no-slip boundary condition in a strong way by
+767      modifying the velocity-rows of the Jacobian (1 on the diagonal).
+768      And add the contributions to the Jacobian due to energy. ---*/
+769 
+770     if (implicit) {
+771       Jacobian.AddBlock2Diag(iPoint, Jacobian_i);
+772 
+773       for (auto iVar = 1u; iVar <= nDim; iVar++) {
+774         Jacobian.DeleteValsRowi(iPoint, iVar);
+775       }

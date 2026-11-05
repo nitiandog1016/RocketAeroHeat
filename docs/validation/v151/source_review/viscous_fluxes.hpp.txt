@@ -1,0 +1,44 @@
+140 
+141     auto dist2_ij = squaredNorm(vector_ij);
+142     Double mask = dist2_ij < EPS*EPS;
+143     dist2_ij += mask / (EPS*EPS);
+144 
+145     /*--- Compute the corrected mean gradient. ---*/
+146 
+147     auto avgGrad = averageGradient<nPrimVarGrad,nDim>(iPoint, jPoint, gradient);
+148     if(correct) correctGradient(V, vector_ij, dist2_ij, avgGrad);
+149 
+150     /*--- Stress and heat flux tensors. ---*/
+151 
+152     const Double eddyVisc = uq? Double(0.0) : avgV.eddyVisc();
+153     auto tau = stressTensor(avgV.laminarVisc() + eddyVisc, avgGrad);
+154     if(useSA_QCR) addQCR(avgGrad, tau, eddyVisc / (avgV.laminarVisc() + eddyVisc));
+155     if(uq) {
+156       Double turb_ke = 0.5*(gatherVariables(iPoint, turbVars->GetSolution()) +
+157                             gatherVariables(jPoint, turbVars->GetSolution()));
+158       addPerturbedRSM(avgV, avgGrad, turb_ke, tau,
+159                       uq_eigval_comp, uq_permute, uq_delta_b, uq_urlx);
+160     }
+161 
+162     if(wallFun) addTauWall(iPoint, jPoint, solution.GetTau_Wall(), unitNormal, tau);
+163 
+164     Double cond = derived->thermalConductivity(avgV);
+165     VectorDbl<nDim> heatFlux;
+166     for (size_t iDim = 0; iDim < nDim; ++iDim) {
+167       heatFlux(iDim) = cond * avgGrad(0,iDim);
+168     }
+169 
+170     /*--- Projected flux. ---*/
+171 
+172     auto viscFlux = viscousFlux<nVar>(avgV, tau, heatFlux, unitNormal);
+173     for (size_t iVar = 0; iVar < nVar; ++iVar) {
+174       viscFlux(iVar) *= area;
+175       flux(iVar) -= viscFlux(iVar);
+176     }
+177 
+178     if (!implicit) return;
+179 
+180     /*--- Flux Jacobians. ---*/
+181 
+182     Double dist_ij = sqrt(dist2_ij);
+183     auto dtau = stressTensorJacobian<nVar>(avgV, unitNormal, dist_ij);

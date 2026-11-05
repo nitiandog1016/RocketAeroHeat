@@ -16,7 +16,11 @@ assert(strcmp(receipt.status,'terminal') && review.exitCode==receipt.exitCode);
 assert(all(structfun(@(x)logical(x),receipt.inputsStable)) && review.inputsStable);
 assert(strcmp(manifest.kind,'NASA-ACC-SBLI-M7-axisymmetric-convergence-v1'));
 assert(strcmp(review.model,manifest.benchmark.model) && isequaln(review.conditions,manifest.benchmark.conditions));
-assert(review.sourceLocalIteration==manifest.sourceLocalIteration);
+assert(isequaln(review.sourceLocalIteration,manifest.sourceLocalIteration));
+if isempty(review.sourceLocalIteration)
+    assert(isfield(manifest,'independentInitialization') && ...
+        isequaln(review.independentInitialization,manifest.independentInitialization));
+end
 for name={'history.csv','engine.log'}
     assert(strcmp(sha(fullfile(folder,name{1})),receipt.outputSHA256.(matlab.lang.makeValidName(name{1}))));
 end
@@ -33,6 +37,21 @@ else
         strcmp(sha(fullfile(folder,name)),receipt.outputSHA256.(matlab.lang.makeValidName(name))));
 end
 assert(~review.physicsQualified && review.newQualifiedArea==0);
+if isfield(review,'acceptance')
+    gates=review.acceptance.gates;
+    expected=true;
+    for i=1:numel(gates)
+        g=gates(i);
+        if isempty(g.value)
+            assert(isempty(g.passed));expected=false;
+        else
+            if strcmp(g.comparison,'<'),passed=g.value<g.limit;
+            else,assert(strcmp(g.comparison,'<='));passed=g.value<=g.limit;end
+            assert(isequal(passed,g.passed),'验收状态与数值门槛不同。');expected=expected && passed;
+        end
+    end
+    assert(review.validationPassed==expected && review.acceptance.passed==expected);
+end
 if receipt.exitCode~=0,assert(~review.validationPassed && ~review.runSucceeded);end
 imageFile=char(java.io.File(review.historyPlot.path).getCanonicalPath());
 assert(startsWith(lower(imageFile),lower([fileparts(file) filesep])) && ...

@@ -14,6 +14,7 @@ from prepareSU2AxisymmetricBenchmark import ROOT, sha, save_json
 from su2AxisymmetricAnalysis import (mesh_data, fields, boundary_balance, residual_scales,
                                      wall_values, sample_stations, upstream_profile, integrate_scalar)
 from su2SSTInterface import wall_geometry
+from su2BenchmarkAcceptance import acceptance, stability
 
 
 def assessment(path, mesh_path, conditions, contract, spatial):
@@ -27,7 +28,8 @@ def assessment(path, mesh_path, conditions, contract, spatial):
     g = wall_geometry(mesh_path)
     ids = g['wallIDs']
     cp = conditions['gamma']*conditions['gasConstant']/(conditions['gamma']-1)
-    q = f['Laminar_Viscosity'][ids]*cp/.72*(t[g['normalNeighbor']]-311)/g['thermalDistance']
+    tw = conditions['wallTemperatureK']
+    q = f['Laminar_Viscosity'][ids]*cp/.72*(t[g['normalNeighbor']]-tw)/g['thermalDistance']
     heat_error = float(np.max(abs(q-f['Heat_Flux'][ids])/np.maximum(abs(q), 1)))
     assert heat_error < 2e-6
     wall = wall_values(p, markers, f)
@@ -46,7 +48,7 @@ def assessment(path, mesh_path, conditions, contract, spatial):
         crossing.append(dict(S_m=float(s), kind='separation' if wall['cf'][i] > 0 else 'reattachment'))
     return dict(EOSRelativeError=eos, heatGradientRelativeError=heat_error,
                 savedWallFluidTemperatureRangeK=[float(min(t[ids])), float(max(t[ids]))],
-                maximumWallFluidTemperatureDifferenceK=float(max(abs(t[ids]-311))),
+                maximumWallFluidTemperatureDifferenceK=float(max(abs(t[ids]-tw))),
                 wall=wall, stations=stations, profile=profile, boundaryBalance=balance,
                 residuals=residual_scales(p, cells, f, conditions) if spatial else None,
                 revolvedHeatPowerW=flux, localReference=reference,
@@ -127,45 +129,62 @@ def audit(folder, target):
     files = sorted(folder.glob('restart_flow_*.csv'))
     current = None
     step = None
+    current_error = None
     if files:
         checkpoint = files[-1]
         step = int(re.fullmatch(r'restart_flow_(\d+)\.csv', checkpoint.name)[1])
         assert checkpoint.name in receipt['outputSHA256'] and step <= recorded
-        current = assessment(checkpoint, folder/'mesh.su2', c, contract, True)
+        try:
+            current = assessment(checkpoint, folder/'mesh.su2', c, contract, True)
+        except (AssertionError, ValueError, KeyError) as error:
+            current_error = type(error).__name__+': '+str(error)
     # 源场单独命名。原任务早期失败时，源场帮助复核处理链并保持其真实时刻。
-    source = assessment(folder/'initial_flow.csv', folder/'mesh.su2', c, contract, False)
+    independent = manifest.get('independentInitialization')
+    source = None if independent else assessment(folder/'initial_flow.csv', folder/'mesh.su2', c, contract, False)
     residual_names = ['rms[Rho]', 'rms[RhoE]', 'rms[k]', 'rms[w]']
     residuals = {n: float(history[-1, labels.index(n)]) for n in residual_names}
-    # 当前实现交付诊断量。跨帧稳定性和预设门槛的完整执行器仍待实现。
-    # 即使存在新的检查点，也必须保留这些待验项，避免空清单被误读为全部通过。
-    missing_checks = [
-        '1000-update p/q/power stability',
-        'complete preregistered convergence/experiment acceptance',
-        'grid and outer-domain sensitivity']
-    if current is None:
-        missing_checks += [
-            'saved-current-state EOS/heat gradient', 'current mass/energy balance',
-            'normalized residual', 'current experimental p/q/profile errors', 'current y+']
+    frames = []
+    frame_errors = []
+    p, _, markers = mesh_data(folder/'mesh.su2')
+    for saved in files:
+        iteration = int(re.fullmatch(r'restart_flow_(\d+)\.csv', saved.name)[1])
+        if iteration < recorded-1100:
+            continue
+        try:
+            f = fields(saved, True)
+            stations = sample_stations(wall_values(p, markers, f), contract)
+            frames.append(dict(iteration=iteration, p=stations['pressure']['predicted'],
+                               q=stations['heat']['predicted'],
+                               power=integrate_scalar(p, markers['wall'], f['Heat_Flux'])))
+        except (AssertionError, ValueError, KeyError) as error:
+            frame_errors.append(dict(iteration=iteration, error=type(error).__name__+': '+str(error)))
+    steady = stability(frames, recorded, manifest['benchmark']['geometry']['revolvedWallAreaM2'])
+    succeeded = receipt['exitCode'] == 0 and receipt['stopReason'] is None
+    decision = acceptance(current, residuals, steady, succeeded, step == recorded and current is not None)
     report = dict(schema='RocketAeroHeat.axisymmetric-study-review.v1', auditCompleted=True,
-                  reviewScope='diagnostic quantities and terminal identity',
-                  convergenceAcceptanceImplemented=False,
+                  reviewScope='preregistered numerical and station acceptance; domain qualification separate',
+                  convergenceAcceptanceImplemented=True,
                   directory=str(folder), model=manifest['benchmark']['model'], conditions=c,
                   exitCode=receipt['exitCode'], stopReason=receipt['stopReason'],
                   elapsedSeconds=receipt['elapsedSeconds'], lastRecordedIteration=recorded,
                   sourceLocalIteration=manifest['sourceLocalIteration'], savedLocalIteration=step,
-                  runSucceeded=receipt['exitCode'] == 0 and receipt['stopReason'] is None,
-                  hasSavedNewField=current is not None, validationPassed=False,
+                  runSucceeded=succeeded,
+                  hasSavedNewField=bool(files), validationPassed=decision['passed'],
                   physicsQualified=False, newQualifiedArea=0,
                   finalRecordedResiduals=residuals,
                   originalResidualThresholdPassed=all(v < -8 for v in residuals.values()),
                   currentFieldAssessment=current,
+                  currentFieldError=current_error, checkpointFrameErrors=frame_errors,
+                  acceptance=decision, temporalStability=steady,
                   sourceInitialFieldAssessment=source,
+                  independentInitialization=independent,
                   sourceOriginalStartupPassed=manifest['sourceOriginalStartupPassed'],
-                  missingCurrentChecks=missing_checks,
+                  missingCurrentChecks=decision['pending']+decision['furtherQualificationRequired'],
                   numericalFailure='NaN detected' if 'NaN detected' in (folder/'engine.log').read_text() else None,
                   inputsStable=True,
                   sourceSHA256={str(p): sha(p) for p in (Path(__file__).resolve(),
                       ROOT/'scripts/su2AxisymmetricAnalysis.py', ROOT/'scripts/su2SSTInterface.py',
+                      ROOT/'scripts/su2BenchmarkAcceptance.py',
                       folder/'engine_process.json', folder/'study_manifest.json', contract_path)})
     plot_history(history, labels, report, target/'convergence.png')
     report['historyPlot'] = dict(path=str(target/'convergence.png'), sha256=sha(target/'convergence.png'))
