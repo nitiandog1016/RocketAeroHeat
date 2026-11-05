@@ -1,0 +1,43 @@
+{
+  "files": [
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\Common\\include\\linear_algebra\\CSysSolve.hpp",
+      "sha256": "99b63f1619f3e54a7db4aab6684975d67fcffdcebea5be839bc32c3ec57ac521",
+      "recordedSourceSHA256": "99b63f1619f3e54a7db4aab6684975d67fcffdcebea5be839bc32c3ec57ac521",
+      "sourceIdentityMatched": true
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\Common\\src\\linear_algebra\\CSysSolve.cpp",
+      "sha256": "c99cd7f7a37fa0fd9ab1784b36ce0a9de0cdd6e9c663e863cace78bf670df707",
+      "recordedSourceSHA256": "c99cd7f7a37fa0fd9ab1784b36ce0a9de0cdd6e9c663e863cace78bf670df707",
+      "sourceIdentityMatched": true
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\config_template.cfg",
+      "sha256": "2c9b545c644bf59b7045869086ce3011d4a606081d1bd1da50ade3bc936321d2",
+      "recordedSourceSHA256": "2c9b545c644bf59b7045869086ce3011d4a606081d1bd1da50ade3bc936321d2",
+      "sourceIdentityMatched": true
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v156_validation\\build02\\executed_sources\\SU2_CFD\\src\\solvers\\CNSSolver.cpp",
+      "sha256": "2f7b1364d66388b4e34e91f65d62fecaa8324e9462aa64d8c96b33a32299a66c",
+      "identity": "phase-v2 exact executed snapshot"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v156_validation\\build02\\executed_sources\\SU2_CFD\\src\\output\\CFlowCompOutput.cpp",
+      "sha256": "41d279e0e78837e54731069d8dfd0f6756a8d87518f7ae3feb0a8404ef5f171e",
+      "identity": "phase-v2 exact executed snapshot"
+    }
+  ],
+  "wallBoundary": "native weak energy boundary uses prescribed Tw in normal conductive flux; wall conservative energy is not overwritten to Tw",
+  "linearConfiguration": {
+    "solver": "BCGSTAB",
+    "preconditioner": "LU_SGS",
+    "iterations": 10,
+    "tolerance": 1e-05
+  },
+  "missingEvidence": "actual per-update flow/turbulence linear iteration counts and attained linear residuals are absent from v160 history",
+  "availableMatureCandidate": "FGMRES and ILU(0) are native options; no candidate run yet",
+  "decision": "no temperature overwrite; stop public reruns; bounded conditional native linear-solver comparison next",
+  "physicsQualified": false
+}

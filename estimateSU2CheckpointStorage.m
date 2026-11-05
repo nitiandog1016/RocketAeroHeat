@@ -7,7 +7,7 @@ if nargin<5,limitMiB=100;end
 if nargin<6,flowModel='laminar';end
 if nargin<7,thermodynamicModel='idealGas';end
 assert(ismember(flowModel,{'laminar','SST-2003m'}));
-validateattributes(limitMiB,{'numeric'},{'scalar','real','finite','>=',1,'<=',1024});
+validateattributes(limitMiB,{'numeric'},{'scalar','real','finite','>=',1,'<=',1536});
 validateattributes(iterations,{'numeric'},{'scalar','integer','positive'});
 validateattributes(every,{'numeric'},{'scalar','integer','positive'});
 validateattributes(named,{'logical'},{'scalar'});

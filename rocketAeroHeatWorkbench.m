@@ -330,7 +330,7 @@ renderEditor();sync();showGeometry(true);
                     controls.initialMode=choice(grid,28,'初始场',{'自由流 · 默认','壁面相容总焓 · 研究','同工况检查点 · 继续研究','定比热源场转HEOS','层流或已审核SST源场','实际壁距独立初场 · SST研究'}, ...
                         {'freestream','wallEnthalpy','checkpoint','propertyTransfer','sstTransfer','sstWallDistance'},getOption(c.su2,'initialMode','freestream'));
                     controls.initialThickness=numberField(grid,29,'初猜厚度 / mm',1000*getOption(c.su2,'initialThicknessM',.001),[.001 1000]);
-                    controls.checkpointLimit=numberField(grid,30,'检查点上限 / MiB',getOption(c.su2,'checkpointLimitMiB',100),[1 1024]);
+                    controls.checkpointLimit=numberField(grid,30,'检查点上限 / MiB',getOption(c.su2,'checkpointLimitMiB',100),[1 1536]);
                     for key={'initialMode','initialThickness','checkpointLimit'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
                     controls.checkpointSource=textField(grid,31,'源检查点目录',getOption(c.su2,'checkpointSource',''));
                     controls.checkpointSource.ValueChangedFcn=@boundaryEdited;

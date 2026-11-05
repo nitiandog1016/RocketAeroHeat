@@ -1,0 +1,101 @@
+{"name": "oracle", "exitCode": 0, "elapsedSeconds": 6.0310000000026776}
+{"name": "current", "exitCode": 0, "elapsedSeconds": 6.078000000008615}
+{
+  "interfacePassed": true,
+  "thermodynamicModel": {
+    "schemaVersion": 3,
+    "thermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+    "gasConstant": 287.0491267875601,
+    "temperatureRangeK": [
+      60,
+      2000
+    ],
+    "energyEntropyReference": "OTH",
+    "initialization": "same-mesh-ideal-air-state-v1",
+    "turbulent": true,
+    "flowFlux": "general-EOS Roe",
+    "conductivity": "molecular mu*cp(T)/Pr; native eddy term once",
+    "freestreamSpeed": 1509.141366647612,
+    "freestreamSoundSpeed": 301.8282733295224,
+    "freestreamCp": 1002.652940545915,
+    "provenance": "v155 explicit fully turbulent wall-distance initial guess; transition unknown",
+    "physicsQualified": false,
+    "newQualifiedArea": 0,
+    "initializationSHA256": "55622c86ccd8c96c6008435260a680ec35db98687cf4ee4822b70e79ec794421",
+    "configurationSHA256": "3f459cdfeeb69628dc66fb71ccc54ca9b9c44325fbb226cbedf8ab18a2fdeaa6",
+    "meshSHA256": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+    "checkpointContract": {
+      "schemaVersion": 1,
+      "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+      "every": 75,
+      "maximumUpdates": 150,
+      "firstLocalIteration": 0,
+      "firstSuccessfulUpdate": 1,
+      "maximumNamedPairs": 3,
+      "estimatedVolumeBytes": 290071360,
+      "estimatedSurfaceBytes": 11071040,
+      "estimatedMaximumBytes": 1206232576,
+      "maximumOutputBytes": 1610612736,
+      "units": "file lengths including final aliases; physical allocation unknown",
+      "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold"
+    }
+  },
+  "dimension": 3,
+  "nodes": 335726,
+  "wallNodes": 9878,
+  "checkpointLocalIteration": 149,
+  "successfulUpdates": 150,
+  "seriesSuccessfulUpdates": 150,
+  "nativeNormalTerminal": true,
+  "checkpointInventoryRechecked": false,
+  "elapsedSeconds": 373.8280000000086,
+  "errors": {
+    "phaseEnergy": 2.012493857786702e-13,
+    "EOS": 1.2957056160840845e-15,
+    "velocity": 1.3886056970990357e-15,
+    "viscosity": 4.0657581468206416e-20,
+    "heatGradient": 8.545994730150742e-12,
+    "surfacePressure": 4.947800624435179e-07,
+    "surfaceTemperature": 1.6746862995406218e-07,
+    "surfaceHeat": 4.7384156559461414e-07,
+    "yPlus": 7.819997256170125e-12,
+    "power": 3.2001648056156194e-10
+  },
+  "nativeHeatPower": 1453160.1775349649,
+  "nativeHeatPowerUnit": "W",
+  "wallHeatRangeWm2": [
+    -98770.56399507377,
+    3880057.988512033
+  ],
+  "givenWallTemperatureK": 300.0,
+  "wallFluidTemperatureRangeK": [
+    270.6731670427936,
+    382.1547967757774
+  ],
+  "temperatureRangeK": [
+    89.80712198360627,
+    1678.719057166015
+  ],
+  "currentKTemperatureRangeK": [
+    89.7975324890064,
+    1678.7057100721734
+  ],
+  "currentKvsFlowPhaseTemperatureDifferenceK": 1.9294223880135064,
+  "flowPrimitivePhase": "captured SetPrimVar k input",
+  "turbulencePhase": "subsequent turbulence update",
+  "previousKCheckpoint": null,
+  "wallEddyToMolecularMaximum": 2.42998179126712e-16,
+  "finalResiduals": [
+    -2.984212148,
+    3.203222895,
+    -1.142902511,
+    5.975169768
+  ],
+  "originalResidualThresholdPassed": false,
+  "yPlusP99": 2.0713183480801183,
+  "nativeYPlusAvailable": true,
+  "reusedPropertiesFrom": null,
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "wallCSV_SHA256": "f85aaa5f2f593d1a60cdd7473858cb4cbc30bd42945227bdb46cff61572ff4fb"
+}
