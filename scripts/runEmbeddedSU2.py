@@ -96,6 +96,8 @@ def main():
                  physicalSolutionQualified=False,runtimeFlavor=runtime_flavor)
     if (folder/'sst_contract.json').exists():
         state['physicsModel']=read(folder/'sst_contract.json')
+    if (folder/'ideal_air_contract.json').exists():
+        state['thermodynamicModel']=read(folder/'ideal_air_contract.json')
 
     def save():
         atomic_write_json(receipt,state)

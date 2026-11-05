@@ -53,7 +53,8 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'loadNativeFeature',@()loadNative([],[],true),'loadClassic',@loadClassic, ...
     'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh, ...
     'readVerifiedHEOS',@readVerifiedHEOS,'readSSTStudy',@readSSTStudy,'probeMeshQuality',@probeMeshQuality, ...
-    'inspectMeshCandidate',@inspectMeshCandidate,'readBenchmarkReview',@readBenchmarkReview);
+    'inspectMeshCandidate',@inspectMeshCandidate,'readBenchmarkReview',@readBenchmarkReview, ...
+    'readIdealAirReview',@readIdealAirReview);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -124,6 +125,7 @@ renderEditor();sync();showGeometry(true);
         if ~isgraphics(fig),return;end
         resultHost.Visible='off';geometryHost.Visible='on';
         fig.UserData.benchmarkReview=[];
+        fig.UserData.idealAirReview=[];
         fig.UserData.meshQuality=[];
         if qualityPreview && state.currentStep==2 && (~isempty(embeddedVolume) || ~isempty(candidatePreview))
             % 网格质量来自真实四面体；灰色原壁面只用于空间定位。
@@ -182,7 +184,7 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
-                grid=form(18);
+                grid=form(19);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
@@ -202,6 +204,7 @@ renderEditor();sync();showGeometry(true);
                 controls.nativeFeature=button(grid,16,'建立带整流罩箭体 · 内嵌SU2研究',@(~,~)loadNative([],[],true));
                 controls.classic=button(grid,17,'经典锥柱扩张体 · 绝热研究',@(~,~)loadClassic());
                 controls.readBenchmarkReview=button(grid,18,'公开算例验证记录',@readBenchmarkDialog);
+                controls.readIdealAirReview=button(grid,19,'变比热热流接口记录',@readIdealAirDialog);
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
@@ -395,7 +398,8 @@ renderEditor();sync();showGeometry(true);
                     controls.readSSTStudy=button(grid,6,'查看同表面/工况的SST数值对照',@readSSTStudyDialog);
                     tip(grid,7,'已有场须核对原文件、物理条件、EOS与面元；沿用实际网格/迭代和数值方案。此操作只查看，不继续计算。');
                     controls.readBenchmarkReview=button(grid,10,'公开算例验证记录',@readBenchmarkDialog);
-                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[11 20];controls.log.Layout.Column=[1 2];
+                    controls.readIdealAirReview=button(grid,11,'变比热热流接口记录',@readIdealAirDialog);
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[12 20];controls.log.Layout.Column=[1 2];
                     sync();return;
                 end
                 failed=~isempty(state.error.message);offset=6*failed;
@@ -1126,6 +1130,21 @@ renderEditor();sync();showGeometry(true);
         geometryHost.Visible='off';resultHost.Visible='on';
         view=createSU2BenchmarkReview(resultHost,review);
         sync();title.Text='公开算例验证记录';fig.UserData.benchmarkReview=view;
+    end
+    function readIdealAirDialog(~,~)
+        folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'查看已审核的变比热热流算例');
+        if isequal(folder,0),return;end
+        try,readIdealAirReview(folder);catch ex,showError(ex);end
+    end
+    function readIdealAirReview(folder)
+        % 独立热物性接口记录在主中央区显示，当前箭体输入继续由工作流管理。
+        assert(~state.busy && ~preparing,'请等待当前任务结束。');
+        receipt=jsondecode(fileread(fullfile(folder,'engine_process.json')));
+        readSU2IdealAirStateAudit(folder,receipt);
+        delete(resultHost.Children);webUI=[];researchUI=[];
+        geometryHost.Visible='off';resultHost.Visible='on';
+        view=createSU2IdealAirReview(resultHost,folder);
+        sync();title.Text='变比热热流接口记录';fig.UserData.idealAirReview=view;
     end
     function readSSTStudyDialog(~,~)
         folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'查看本程序已审核的SST数值对照');

@@ -100,6 +100,23 @@ switch info.flavor
             p.intensity,p.viscosityRatio,p.Prt);
         info.method=[info.method '；p/T/热流为原生流动阶段，保存k/ω为随后湍流更新态，分别审核'];
         info.physicsCaption=sprintf('RANS / SST-2003m / 定比热 / Sutherland / Prt%.4g；转捩未知 / 受控有界输运',p.Prt);
+    case 'rah-ideal-air-v1'
+        % 模块三。固定组分变比热模型、参考态和湍流假设随实际回执显示。
+        p=receipt.thermodynamicModel;
+        assert(strcmp(p.thermodynamicModel,'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'));
+        assert(isequal(p.temperatureRangeK(:),[60;2000]) && strcmp(p.energyEntropyReference,'OTH'));
+        info.mode='ideal-air-variable-cp';info.thermodynamicModel=p;
+        info.method='Lemmon 2000 空气理想项 / CoolProp 7.2.0 OTH参考；一般EOS Roe；Sutherland；λ=μcp(T)/Pr';
+        info.physicsCaption='层流 NS / 固定组分变比热空气 / 60–2000 K';
+        if p.turbulent
+            t=receipt.physicsModel;assert(strcmp(t.model,'SST-2003m'));
+            assert(strcmp(t.thermodynamics,p.thermodynamicModel));
+            info.physicsModel=t;
+            info.physicsCaption=sprintf('RANS / SST-2003m / 变比热空气 / 60–2000 K / Prt %.4g',t.Prt);
+            info.method=[info.method sprintf('；SST-2003m，I %.4g，μt/μ %.4g，Prt %.4g；转捩未知；湍流导热计入一次', ...
+                t.intensity,t.viscosityRatio,t.Prt)];
+        end
+        info.method=[info.method '；小型热流接口已测，收敛、实验及三维区域资格待验'];
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';
     case {'rah-coolprop-v1','rah-coolprop-recon-v1','rah-coolprop-recon-v2','rah-coolprop-recon-v3'}

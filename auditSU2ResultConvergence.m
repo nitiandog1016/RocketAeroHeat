@@ -84,14 +84,16 @@ try
         assert(all(ismember({'RMS_DENSITY','RMS_ENERGY','RMS_TKE','RMS_DISSIPATION'},selected)));
         expected=[expected,{'Turb_Kin_Energy','Omega'}];
     end
-    nativePrimitive=sst && isfield(receipt.physicsModel,'outputStateContract');
+    variableAir=isfield(receipt,'runtimeFlavor') && strcmp(receipt.runtimeFlavor,'rah-ideal-air-v1');
+    nativePrimitive=variableAir || (sst && isfield(receipt.physicsModel,'outputStateContract'));
     if nativePrimitive
-        assert(strcmp(receipt.physicsModel.outputStateContract,'native-noncompact-flow-primitive-before-turbulence-v1'));
+        if sst,assert(strcmp(receipt.physicsModel.outputStateContract,'native-noncompact-flow-primitive-before-turbulence-v1'));end
         axes={'x','y','z'};axes=axes(1:nd);
         expected=[expected,{'Pressure','Temperature','Mach','Pressure_Coefficient'}, ...
             strcat('Velocity_',axes),{'Laminar_Viscosity'},strcat('Skin_Friction_Coefficient_',axes), ...
-            {'Heat_Flux','Y_Plus','Eddy_Viscosity'}];
-        if isfield(receipt.physicsModel,'spatialOutputContract')
+            {'Heat_Flux','Y_Plus'}];
+        if sst,expected{end+1}='Eddy_Viscosity';end
+        if sst && isfield(receipt.physicsModel,'spatialOutputContract')
             % 空间诊断附带积分RHS及局部伪时间；只接受原生具名字段，不放宽一般列检查。
             assert(strcmp(receipt.physicsModel.spatialOutputContract,'native-implicit-rhs-and-local-pseudotime-v1'));
             assert(receipt.physicsModel.spatialDiagnosticOnly && audit.checkpointIteration==0 && size(history,1)==1);
@@ -119,6 +121,10 @@ try
             assert(all(temperature>0 & pressure>0) && max(abs(pressure./(rho.*R.*temperature)-1))<2e-12);
             audit.thermalStateAudit=readSU2SSTStateAudit(folder,receipt);
         end
+    elseif variableAir
+        [pressure,temperature,thermo]=readSU2IdealAirStateAudit(folder,receipt,rest);
+        audit.thermodynamicModel=thermo.thermodynamicModel.thermodynamicModel;
+        audit.thermalStateAudit=thermo;
     elseif contains(config,'FLUID_MODEL= COOLPROP')
         [pressure,temperature,thermo]=readSU2CoolPropStateAudit(folder,receipt,rest);
         audit.thermodynamicModel=thermo.thermodynamicModel;audit.thermodynamicAudit=thermo;

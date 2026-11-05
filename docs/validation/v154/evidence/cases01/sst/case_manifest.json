@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "sourceGeometry": "E:\\RocketAeroHeat\\outputs\\v121_validation\\capability01\\mesh.su2",
+  "sourceMeshSHA256": "57ab10799e75c1d2f49dd575087cd7065e9ad0845ec9f83fc3e102b49d85b7c1",
+  "physicsQualified": false,
+  "sst": {
+    "schemaVersion": 1,
+    "model": "SST-2003m",
+    "thermodynamics": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+    "outputStateContract": "native-noncompact-flow-primitive-before-turbulence-v1",
+    "intensity": 0.01,
+    "viscosityRatio": 10.0,
+    "Prt": 0.9,
+    "kInfinity": 289.33352366360566,
+    "omegaInfinity": 91003.73596754436,
+    "assumption": "fully turbulent; transition unknown",
+    "provenance": "v154 finite nonzero-wall-heat interface check; assumed turbulence parameters",
+    "physicsQualified": false,
+    "newQualifiedArea": 0
+  },
+  "sstContractSHA256": "a22aca645589ba9fa01467801417f7f1d2fe2ad3fca5c2765929d75afb4bca00",
+  "requiredRuntimeFlavor": "rah-ideal-air-v1",
+  "idealAir": {
+    "schemaVersion": 1,
+    "thermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+    "gasConstant": 287.0491267875601,
+    "temperatureRangeK": [
+      60,
+      2000
+    ],
+    "energyEntropyReference": "OTH",
+    "initialization": "native-uniform-freestream",
+    "turbulent": true,
+    "flowFlux": "general-EOS Roe",
+    "conductivity": "molecular mu*cp(T)/Pr; native eddy term once",
+    "freestreamSpeed": 1388.844900540507,
+    "freestreamSoundSpeed": 347.21122513512677,
+    "freestreamCp": 1004.7760920138285,
+    "provenance": "v154 finite nonzero-wall-heat interface check; assumed turbulence parameters",
+    "physicsQualified": false,
+    "newQualifiedArea": 0,
+    "configurationSHA256": "1c5152cbfb0e8ac077834c03b88229b69f6ee29bc9395ff7e5981ebc8c590f3c",
+    "meshSHA256": "57ab10799e75c1d2f49dd575087cd7065e9ad0845ec9f83fc3e102b49d85b7c1"
+  },
+  "idealAirContractSHA256": "037a75fe73a1ca44c523b85b7af902b9c61e710ac4775680e4d2a423d2c5eaf6"
+}

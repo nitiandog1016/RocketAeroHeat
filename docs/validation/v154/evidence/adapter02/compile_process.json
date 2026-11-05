@@ -1,0 +1,28 @@
+{
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe",
+    "-std=c++17",
+    "-O2",
+    "-fopenmp",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\Common\\src",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\externals\\eigen",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\externals\\mel",
+    "-IE:\\RocketAeroHeat\\outputs\\v154_validation\\adapter02",
+    "E:\\RocketAeroHeat\\tests\\testSU2IdealAirAdapter.cpp",
+    "-Wl,--start-group",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\SU2_CFD\\src\\libSU2core.a",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\Common\\src\\libSU2Common.a",
+    "-Wl,--end-group",
+    "-o",
+    "E:\\RocketAeroHeat\\outputs\\v154_validation\\adapter02\\adapter.exe"
+  ],
+  "maximumSeconds": 120,
+  "maximumMemoryBytes": 4294967296,
+  "status": "terminal",
+  "processID": 41864,
+  "exitCode": 0,
+  "elapsedSeconds": 2.8439999999973224,
+  "sampledPeakMemoryBytes": 438710272,
+  "stoppedByBudget": null
+}
