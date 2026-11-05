@@ -48,48 +48,51 @@ def reference_data():
     return sources
 
 
-def source_blocks():
+def source_blocks(level=2):
     """PLOT3D 的 i 索引最快，单位由厘米转换成米，X 取源 x 的负值。"""
+    assert type(level) is int and 0 <= level <= 4, '公开网格层级应为0至4整数'
     archive = DATA / 'raw/Axiswblim7_grids.zip'
     with zipfile.ZipFile(str(archive)) as z:
-        member = next(n for n in z.namelist() if n.endswith('kussoy_2zn_2levdn.p2dfmt.gz'))
+        member = next(n for n in z.namelist() if n.endswith('kussoy_2zn_%dlevdn.p2dfmt.gz' % level))
         raw = gzip.decompress(z.read(member))
     numbers = np.fromstring(raw.decode('ascii'), sep=' ')
-    assert np.array_equal(numbers[:5], [2, 81, 101, 81, 101])
-    n = 81 * 101
+    ni, nj = 320 // 2**level + 1, 400 // 2**level + 1
+    assert np.array_equal(numbers[:5], [2, ni, nj, ni, nj])
+    n = ni * nj
     assert len(numbers) == 5 + 4 * n
     blocks = []
     for b in range(2):
         start = 5 + 2 * b * n
-        x = numbers[start:start+n].reshape(101, 81)
-        r = numbers[start+n:start+2*n].reshape(101, 81)
+        x = numbers[start:start+n].reshape(nj, ni)
+        r = numbers[start+n:start+2*n].reshape(nj, ni)
         blocks.append(np.stack((-x, r), axis=2) * .01)
     return blocks, dict(archive=str(archive.relative_to(ROOT)), archiveSHA256=sha(archive),
                        member=member, decompressedSHA256=hashlib.sha256(raw).hexdigest())
 
 
-def write_mesh(folder):
+def write_mesh(folder, level=2):
     """只合并两块共有接口，并按反射后的正向顺序写出四边形和四类边界。"""
-    blocks, source = source_blocks()
+    blocks, source = source_blocks(level)
+    nj, ni = blocks[0].shape[:2]
     mismatch = float(np.max(np.abs(blocks[0][:, -1] - blocks[1][:, 0])))
     assert mismatch < 2e-14
     points = list(blocks[0].reshape(-1, 2))
-    index0 = np.arange(81 * 101).reshape(101, 81)
-    index1 = np.empty((101, 81), dtype=int)
+    index0 = np.arange(ni * nj).reshape(nj, ni)
+    index1 = np.empty((nj, ni), dtype=int)
     index1[:, 0] = index0[:, -1]
-    index1[:, 1:] = np.arange(len(points), len(points) + 80 * 101).reshape(101, 80)
+    index1[:, 1:] = np.arange(len(points), len(points) + (ni-1) * nj).reshape(nj, ni-1)
     points.extend(blocks[1][:, 1:].reshape(-1, 2))
     points = np.array(points)
     cells = []
     labels = {}
     for b, ix in enumerate((index0, index1)):
-        for j in range(100):
-            for i in range(80):
+        for j in range(nj-1):
+            for i in range(ni-1):
                 cells.append([ix[j, i], ix[j+1, i], ix[j+1, i+1], ix[j, i+1]])
-        for i in range(80):
+        for i in range(ni-1):
             labels[tuple(sorted([ix[0, i], ix[0, i+1]]))] = 'wall'
             labels[tuple(sorted([ix[-1, i], ix[-1, i+1]]))] = 'top'
-        for j in range(100):
+        for j in range(nj-1):
             col, tag = (0, 'inlet') if b == 0 else (-1, 'outlet')
             labels[tuple(sorted([ix[j, col], ix[j+1, col]]))] = tag
     edges = {}
@@ -115,12 +118,12 @@ def write_mesh(folder):
             f.write('MARKER_TAG= %s\nMARKER_ELEMS= %d\n' % (tag, len(segments)))
             for a, b in segments:
                 f.write('3 %d %d\n' % (a, b))
-    source.update(interfaceMismatchM=mismatch, mergedInterfaceNodes=101,
+    source.update(interfaceMismatchM=mismatch, mergedInterfaceNodes=nj,
                   sourceRadiusM=float(blocks[0][0, 0, 1]), nominalRadiusM=.1015)
     return source
 
 
-def audit_geometry(path):
+def audit_geometry(path, expected_nodes=16261, expected_cells=16000):
     """独立读回全部网格，核对局部正性、边配对和旋转体积及壁面面积。"""
     with Path(path).open() as f:
         assert f.readline().strip() == 'NDIME= 2'
@@ -141,7 +144,7 @@ def audit_geometry(path):
             assert np.all(e[:, 0] == 3) and tag not in boundary
             boundary[tag] = e[:, 1:]
         assert not f.read().strip()
-    assert nc == 16000 and npnt == 16261 and np.all(pts[:, 1] > 0)
+    assert nc == expected_cells and npnt == expected_nodes and np.all(pts[:, 1] > 0)
     assert set(boundary) == {'wall', 'inlet', 'top', 'outlet'}
     polygon = pts[cells]
     nextp = np.roll(polygon, -1, axis=1)
