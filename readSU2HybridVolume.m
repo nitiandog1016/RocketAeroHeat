@@ -53,6 +53,9 @@ volume=struct('kind','complete-rocket-three-dimensional-su2-volume','vertices',V
     'sourceMappingStatus','exact-original-triangle-node-dual','nearWallResolutionValidated',false, ...
     'farfieldAdequacyValidated',false,'physicalSolution',false,'productionQualified',false,'newQualifiedRocketArea',0);
 volume.meshConstruction.method='original-triangle-normal-prisms-and-gmsh-exterior-tetrahedra';
+if isfield(report,'method') && strcmp(report.method,'analytic-octahedron-prisms-and-staircase-tetrahedra')
+    volume.meshConstruction.method=report.method;
+end
 if isfield(report,'constructionOperation') && startsWith(report.constructionOperation,'closed-convex-rim-')
     % 棱柱扇改变内部连接，原壁面和独立拓扑审核仍使用上方同一要求。
     assert(isfield(report,'sideNodeIDs') && isfield(report,'baseNodeIDs') && report.prisms==size(W,1));

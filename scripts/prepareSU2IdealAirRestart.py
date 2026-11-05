@@ -91,11 +91,22 @@ def source_state(source, checkpoint, snapshot):
     return manifest, contract, data, columns, nd, prior, locks, rebinding, selected
 
 
-def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, snapshot=None):
+def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, snapshot=None, exported_folder=False):
     """模块二。独占新目录发布配置，初始场和失败记录均不会覆盖历史文件。"""
     folder = Path(folder).resolve()
     folder.relative_to(ROOT/'outputs')
-    folder.mkdir(parents=True, exist_ok=False)
+    if exported_folder:
+        # 主工作台已导出网格/冻结快照。只接受尚未发布物性、与子目录原导出逐字相等的输入。
+        source = Path(source).resolve()
+        assert checkpoint is None and folder.is_dir()
+        assert source.parent == folder and source.name == 'ideal_air_initial_state'
+        for name in ('case.cfg', 'case_manifest.json'):
+            assert sha(folder/name) == sha(source/'ideal_air_original_inputs'/name)
+        assert sha(folder/'mesh.su2') == sha(source/'mesh.su2')
+        for name in ('ideal_air_restart_preparation.json', 'ideal_air_contract.json', 'engine_process.json'):
+            assert not (folder/name).exists(), '主任务已使用或部分发布'
+    else:
+        folder.mkdir(parents=True, exist_ok=False)
     marker = folder/'ideal_air_restart_preparation.json'
     record = dict(status='preparing', exitCode=None)
     atomic_write_json(marker, record)
@@ -116,7 +127,8 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
                 VOLUME_OUTPUT='(COORDINATES, SOLUTION, PRIMITIVE, FLOW_PHASE)').items():
             text = set_value(text, key, value)
         assert settings(text)['RESTART_SOL'] == 'YES' and 'RESTART_ITER' not in settings(text)
-        os.link(str(source/'mesh.su2'), str(folder/'mesh.su2'))
+        if not exported_folder:
+            os.link(str(source/'mesh.su2'), str(folder/'mesh.su2'))
         if checkpoint is None:
             (folder/'initial_flow.csv').write_bytes(selected.read_bytes())
         else:

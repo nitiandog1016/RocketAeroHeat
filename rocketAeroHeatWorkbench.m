@@ -241,6 +241,10 @@ renderEditor();sync();showGeometry(true);
                             construction=embeddedVolume.meshConstruction;controls.generate.Text='重新生成常规体网格';
                             controls.meshMethod=tip(grid,7,sprintf('一般混合网格：%d棱柱 / %d四面体；保留原壁面及尾缘扇，外层含切向偏移。几何审核通过，最小SICN %.5g；流场精度未验证。', ...
                                 construction.prisms,construction.tetrahedra,construction.minimumTetSICN));
+                        elseif ~isempty(embeddedVolume) && strcmp(embeddedVolume.meshConstruction.method,'analytic-octahedron-prisms-and-staircase-tetrahedra')
+                            construction=embeddedVolume.meshConstruction;
+                            controls.meshMethod=tip(grid,7,sprintf('解析八面体接口网格 · %d棱柱 / %d四面体 · 最小SICN %.5g · 热流精度待验', ...
+                                construction.prisms,construction.tetrahedra,construction.minimumTetSICN));
                         elseif transition
                             % 局部终止网格不再全表面等层；直接展示实际计数，不能沿用统一层数说明。
                             construction=embeddedVolume.meshConstruction;
@@ -305,8 +309,8 @@ renderEditor();sync();showGeometry(true);
                     controls.wall.Enable=onoff(strcmp(thermal,'isothermal'));
                     for key={'altitude','mach','alpha','beta','wall','iterations','seconds','checkpointMode','outputEvery','thermalMode'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
                     controls.wallProfile=button(grid,12,'导入X—壁温分布表',@importWallTemperatureProfile);
-                    controls.thermodynamics=choice(grid,1,'热力学模型',{'定比热 · 默认','HEOS Air · 研究'}, ...
-                        {'idealGas','HEOS-Air'},getOption(c.su2,'thermodynamicModel','idealGas'));
+                    controls.thermodynamics=choice(grid,1,'热力学模型',{'定比热 · 默认','变比热理想空气 · SST研究','HEOS Air · 研究'}, ...
+                        {'idealGas','idealAir','HEOS-Air'},getOption(c.su2,'thermodynamicModel','idealGas'));
                     controls.thermodynamics.ValueChangedFcn=@thermodynamicsEdited;
                     controls.confirm=button(grid,13,'确认内嵌引擎边界',@confirmBoundary);
                     controls.propertySummary=tip(grid,14,propertySummaryText(c));
@@ -345,7 +349,7 @@ renderEditor();sync();showGeometry(true);
                     controls.turbulentPrandtl=numberField(grid,50,'湍流 Prt',getOption(c.su2,'turbulentPrandtl',.9),[.01 10]);
                     controls.turbulenceProvenance=textField(grid,51,'湍流参数来源',getOption(c.su2,'turbulenceProvenance','全湍流受控研究假设；非飞行测量，转捩未知'));
                     for key={'turbulenceIntensity','turbulentViscosityRatio','turbulentPrandtl','turbulenceProvenance'},controls.(key{1}).ValueChangedFcn=@boundaryEdited;end
-                    tip(grid,53,'SST仅定比热/统一给定Tw。可用同网格层流初猜，或已通过阶段审核的SST源场；后者保留原物理/离散配置。I为比例，p/T热流阶段与更新k/ω分别保存审核。');
+                    tip(grid,53,'SST采用统一给定Tw。变比热空气使用实际壁距初场及独立阶段保存；定比热还支持已有源场。I为比例，p/T热流阶段与更新k/ω分别审核。');
                     tip(grid,57,'全湍流是计算假设；没有转捩或壁温解。SST和HEOS不可组合；研究值未通过网格/外域/公开热流验证，不计新增合格面积。');
                     controls.boundaryLayout=struct('grid',grid,'items',grid.Children, ...
                         'rows',arrayfun(@(x)x.Layout.Row(1),grid.Children));
@@ -628,7 +632,7 @@ renderEditor();sync();showGeometry(true);
             flow=controls.flowModel.Value;
             if ~strcmp(flow,'laminar') || isfield(next.su2,'flowModel'),next.su2.flowModel=flow;end
             if strcmp(flow,'SST-2003m')
-                assert(strcmp(property,'idealGas'),'HEOS RANS尚未适配，请使用定比热SST研究。');
+                assert(ismember(property,{'idealGas','idealAir'}),'HEOS RANS尚未适配，请选择定比热或变比热理想空气SST。');
                 assert(strcmp(thermal,'isothermal') && ismember(initial,{'sstTransfer','sstWallDistance'}) && named,'SST需要统一壁温、明确初场及具名保存。');
                 if strcmp(initial,'sstTransfer')
                     assert(isfile(fullfile(source,'engine_process.json')),'请选择同网格层流或已审核SST源场；启动时核对原始身份。');
@@ -651,7 +655,12 @@ renderEditor();sync();showGeometry(true);
                 assert(named,'HEOS研究须启用具名检查点保存。');
                 assert(isfile(fullfile(heosSource,'engine_process.json')),'请选择已完成的定比热源场；启动时核对全部网格与状态。');
             else
-                assert(~strcmp(initial,'propertyTransfer'),'定比热模型不能使用HEOS转换初态。');
+                assert(~strcmp(initial,'propertyTransfer'),'当前物性入口需要自身相容初态。');
+            end
+            if strcmp(property,'idealAir')
+                assert(strcmp(flow,'SST-2003m') && strcmp(initial,'sstWallDistance') && strcmp(thermal,'isothermal') && named, ...
+                    '变比热主入口需要SST、实际壁距初场、统一给定Tw与具名保存。');
+                validateattributes(next.flight.Twall,{'numeric'},{'scalar','finite','>=',60,'<=',2000});
             end
             if strcmp(initial,'checkpoint')
                 assert(isfile(fullfile(source,'engine_process.json')),'请选择具有真实进程记录的源检查点目录。');
@@ -686,6 +695,8 @@ renderEditor();sync();showGeometry(true);
         % 用户显式选物性后设置唯一相容初态；不自动启动或改变已有源文件。
         if strcmp(controls.thermodynamics.Value,'HEOS-Air')
             controls.initialMode.Value='propertyTransfer';controls.checkpointMode.Value='indexed';
+        elseif strcmp(controls.thermodynamics.Value,'idealAir')
+            controls.flowModel.Value='SST-2003m';controls.initialMode.Value='sstWallDistance';controls.checkpointMode.Value='indexed';
         elseif strcmp(controls.initialMode.Value,'propertyTransfer')
             controls.initialMode.Value='freestream';
         end
@@ -696,12 +707,15 @@ renderEditor();sync();showGeometry(true);
         % 显式切换模型才选择新物理初猜；HEOS冲突保留为拒绝，不能静默降级物性。
         if strcmp(controls.flowModel.Value,'SST-2003m')
             controls.initialMode.Value='sstTransfer';controls.checkpointMode.Value='indexed';
-        elseif strcmp(controls.initialMode.Value,'sstTransfer'),controls.initialMode.Value='freestream';end
+            if strcmp(controls.thermodynamics.Value,'idealAir'),controls.initialMode.Value='sstWallDistance';end
+        elseif ismember(controls.initialMode.Value,{'sstTransfer','sstWallDistance'}),controls.initialMode.Value='freestream';end
         display=state.cfg;display.su2.flowModel=controls.flowModel.Value;
         controls.propertySummary.Text=propertySummaryText(display);boundaryEdited([],[]);
     end
     function text=propertySummaryText(c)
-        if strcmp(getOption(c.su2,'thermodynamicModel','idealGas'),'HEOS-Air')
+        if strcmp(getOption(c.su2,'thermodynamicModel','idealGas'),'idealAir')
+            text='SU2 / 变比热理想空气 / SST-2003m；Lemmon 2000，OTH参考，60–2000 K。保持输入Mach、静温/静压与流向，使用新声速与实际速度；一般EOS Roe，同阶段审核。';
+        elseif strcmp(getOption(c.su2,'thermodynamicModel','idealGas'),'HEOS-Air')
             text='SU2 8.6.0 / CoolProp 7.2 HEOS Air：层流、ROE/特征远场；输运仍为Sutherland、μcp/Pr0.72。M输入是原速度参考；EOS审核通过后才能查看。';
         elseif strcmp(getOption(c.su2,'flowModel','laminar'),'SST-2003m')
             text='SU2 8.6.0 / SST-2003m全湍流研究；定比热/Sutherland/Pr0.72。入口I、μt/μ与Prt显式给定；新增k/ω和能量约定独立审核，未通过物理资格。';
@@ -746,7 +760,8 @@ renderEditor();sync();showGeometry(true);
     function confirmBoundary(~,~)
         if state.busy || preparing,return;end
         try
-            next=boundaryConfiguration();fs=calcFreestream(next.flight);
+            next=boundaryConfiguration();
+            if isEmbedded(),fs=calcSU2Freestream(next);else,fs=calcFreestream(next.flight);end
             if isEmbedded() && strcmp(getOption(next.su2,'wallThermalMode','isothermal'),'axialTemperature')
                 assert(isfield(next.su2,'wallTemperatureProfile'),'请先导入覆盖整个模型的X—壁温表。');
                 resolveSU2ThermalBoundary(state.mesh,next.su2.wallTemperatureProfile);
@@ -755,7 +770,7 @@ renderEditor();sync();showGeometry(true);
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
             state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',fs));
             if isempty(state.result) && isempty(state.researchResult)
-                message(sprintf('边界已确认：p∞ %.6gPa、T∞ %.6gK；尚未计算压力或热流。',fs.pressure,fs.temperature));
+                message(sprintf('边界已确认 · p∞ %.6g Pa · T∞ %.6g K · M %.6g · 速度 %.6g m/s',fs.pressure,fs.temperature,fs.Mach,fs.speed));
             else
                 message('边界与当前计算快照一致，结果仍有效；再次计算需明确按计算按钮。');
             end
@@ -990,7 +1005,13 @@ renderEditor();sync();showGeometry(true);
             jobOptions=struct('threads',2, ...
                 'maximumSeconds',getOption(frozen.cfg.su2,'maximumSeconds',120), ...
                 'pythonExecutable',getOption(frozen.cfg.su2,'pythonExecutable','python'));
-            if strcmp(getOption(frozen.cfg.su2,'thermodynamicModel','idealGas'),'HEOS-Air')
+            if strcmp(getOption(frozen.cfg.su2,'thermodynamicModel','idealGas'),'idealAir')
+                c=frozen.cfg.su2;
+                jobOptions.idealAirInitialization=struct('model','ideal-air-SST','mode','wallDistance', ...
+                    'thicknessM',c.initialThicknessM,'intensity',c.turbulenceIntensity, ...
+                    'viscosityRatio',c.turbulentViscosityRatio,'Prt',c.turbulentPrandtl, ...
+                    'provenance',c.turbulenceProvenance,'maximumOutputBytes',budget.limitBytes);
+            elseif strcmp(getOption(frozen.cfg.su2,'thermodynamicModel','idealGas'),'HEOS-Air')
                 jobOptions.propertyInitialization=struct('model','HEOS-Air','runtimeFlavor','rah-coolprop-recon-v3', ...
                     'sourceDirectory',char(java.io.File(frozen.cfg.su2.heosSource).getCanonicalPath()));
             elseif strcmp(getOption(frozen.cfg.su2,'flowModel','laminar'),'SST-2003m')
@@ -1052,7 +1073,12 @@ renderEditor();sync();showGeometry(true);
             result=attachSU2ThermalBoundary(result,manifest.thermalBoundary);
             result.resultDirectory=engineJob.folder;
             result.convergenceAudit=auditSU2ResultConvergence(engineJob.folder,result);
-            if isfield(receipt,'physicsModel')
+            if isfield(receipt,'thermodynamicModel')
+                [~,~,result.thermalStateAudit]=readSU2IdealAirStateAudit(engineJob.folder,receipt);
+                result.actualFreestreamSpeed=receipt.thermodynamicModel.freestreamSpeed;
+                assert(norm(manifest.expectedVelocity(:)-state.frozenInputs.freestream.flowVelocityVector(:))<2e-10, ...
+                    '物性参考速度与已确认来流不一致。');
+            elseif isfield(receipt,'physicsModel')
                 result.thermalStateAudit=readSU2SSTStateAudit(engineJob.folder,receipt);
             end
             if isfield(engineJob,'pipelineReceipt')
@@ -1082,7 +1108,8 @@ renderEditor();sync();showGeometry(true);
     end
     function budget=checkpointBudget(c)
         budget=estimateSU2CheckpointStorage(embeddedVolume,getOption(c.su2,'iterations',1000), ...
-            getOption(c.su2,'outputEvery',1000),getOption(c.su2,'namedCheckpoints',false),getOption(c.su2,'checkpointLimitMiB',100),getOption(c.su2,'flowModel','laminar'));
+            getOption(c.su2,'outputEvery',1000),getOption(c.su2,'namedCheckpoints',false),getOption(c.su2,'checkpointLimitMiB',100), ...
+            getOption(c.su2,'flowModel','laminar'),getOption(c.su2,'thermodynamicModel','idealGas'));
     end
     function text=checkpointBudgetText(c)
         if isempty(embeddedVolume),text='生成体网格后估计输出体量。';return;end
@@ -1202,7 +1229,10 @@ renderEditor();sync();showGeometry(true);
             if isequaln(original,receipt),auditFolder=result.resultDirectory;end
         end
         result.convergenceAudit=auditSU2ResultConvergence(auditFolder,result);
-        if isfield(receipt,'physicsModel')
+        if isfield(receipt,'thermodynamicModel')
+            assert(result.convergenceAudit.checkpointIdentityConfirmed,result.convergenceAudit.reason);
+            [~,~,result.thermalStateAudit]=readSU2IdealAirStateAudit(auditFolder,receipt);
+        elseif isfield(receipt,'physicsModel')
             assert(result.convergenceAudit.checkpointIdentityConfirmed,result.convergenceAudit.reason);
             result.thermalStateAudit=readSU2SSTStateAudit(auditFolder,receipt);
         end

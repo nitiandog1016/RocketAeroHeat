@@ -2,7 +2,8 @@ function [pressure,temperature,summary]=readSU2IdealAirStateAudit(folder,receipt
 %READSU2IDEALAIRSTATEAUDIT 绑定真实回执、独立物性和同阶段热梯度的只读入口。
 % 模块一。原文件SHA及明确模型合同防止旧参考能量混入新模型。
 % 模块二。读取原生流动阶段p/T；后更新k温度、给定Tw和资格单列。
-assert(strcmp(receipt.runtimeFlavor,'rah-ideal-air-v1'));
+assert(ismember(receipt.runtimeFlavor,{'rah-ideal-air-v1','rah-ideal-air-phase-v2'}));
+captured=strcmp(receipt.runtimeFlavor,'rah-ideal-air-phase-v2');
 index=jsondecode(fileread(fullfile(folder,'ideal_air_review.json')));
 assert(strcmp(sha(fullfile(folder,'engine_process.json')),index.receiptSHA256));
 base=char(java.io.File(folder).getCanonicalPath());
@@ -19,7 +20,13 @@ assert(strcmp(summary.wallCSV_SHA256,index.wallSHA256));
 for name={'restart_flow.csv','surface_flow.vtk','history.csv'}
     assert(strcmp(sha(fullfile(folder,name{1})),receipt.outputSHA256.(matlab.lang.makeValidName(name{1}))));
 end
-for name={'engine_process.json','restart_flow.csv'}
+stateFile='restart_flow.csv';
+if captured
+    stateFile=sprintf('restart_flow_%06d.csv',summary.checkpointLocalIteration);
+    assert(strcmp(sha(fullfile(folder,stateFile)),sha(fullfile(folder,'restart_flow.csv'))));
+    assert(summary.nativeNormalTerminal && strcmp(summary.flowPrimitivePhase,'captured SetPrimVar k input'));
+end
+for name={'engine_process.json',stateFile}
     original=fullfile(receipt.request.workDirectory,name{1});
     token=regexp(text,[regexptranslate('escape',jsonencode(original)) '\s*:\s*"([0-9a-f]{64})"'],'tokens');
     assert(numel(token)==1 && strcmp(sha(fullfile(folder,name{1})),token{1}{1}));
@@ -36,6 +43,14 @@ assert(all(oracle.accepted==1) && isequal(oracle.row,rest(:,1)));
 assert(max(abs(oracle.p-pressure)./max(1,abs(pressure)))<2e-11);
 assert(max(abs(oracle.T-temperature))<2e-10);
 assert(max(abs(pressure./(rho*receipt.thermodynamicModel.gasConstant.*temperature)-1))<2e-11);
+if captured
+    % 独立物性表与实际阶段输入核对能量，拒绝仅改标签或混用后更新k。
+    axes={'x','y','z'};nd=2+any(strcmp(columns,'z'));velocity=zeros(size(rest,1),nd);
+    for j=1:nd,velocity(:,j)=rest(:,strcmp(columns,['Momentum_' axes{j}]))./rho;end
+    phaseK=rest(:,strcmp(columns,'Flow_Primitive_K'));assert(isequal(size(phaseK),size(rho)) && all(phaseK>=0));
+    energy=rest(:,strcmp(columns,'Energy'))./rho-sum(velocity.^2,2)/2-phaseK;
+    assert(max(abs(energy-oracle.e)./max(1,abs(oracle.e)))<2e-10);
+end
 summary.auditSHA256=index.auditSHA256;
 end
 function h=sha(file)

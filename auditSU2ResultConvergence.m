@@ -84,7 +84,8 @@ try
         assert(all(ismember({'RMS_DENSITY','RMS_ENERGY','RMS_TKE','RMS_DISSIPATION'},selected)));
         expected=[expected,{'Turb_Kin_Energy','Omega'}];
     end
-    variableAir=isfield(receipt,'runtimeFlavor') && strcmp(receipt.runtimeFlavor,'rah-ideal-air-v1');
+    variableAir=isfield(receipt,'runtimeFlavor') && ismember(receipt.runtimeFlavor,{'rah-ideal-air-v1','rah-ideal-air-phase-v2'});
+    captured=variableAir && strcmp(receipt.runtimeFlavor,'rah-ideal-air-phase-v2');
     nativePrimitive=variableAir || (sst && isfield(receipt.physicsModel,'outputStateContract'));
     if nativePrimitive
         if sst,assert(strcmp(receipt.physicsModel.outputStateContract,'native-noncompact-flow-primitive-before-turbulence-v1'));end
@@ -93,6 +94,7 @@ try
             strcat('Velocity_',axes),{'Laminar_Viscosity'},strcat('Skin_Friction_Coefficient_',axes), ...
             {'Heat_Flux','Y_Plus'}];
         if sst,expected{end+1}='Eddy_Viscosity';end
+        if captured,expected{end+1}='Flow_Primitive_K';end
         if sst && isfield(receipt.physicsModel,'spatialOutputContract')
             % 空间诊断附带积分RHS及局部伪时间；只接受原生具名字段，不放宽一般列检查。
             assert(strcmp(receipt.physicsModel.spatialOutputContract,'native-implicit-rhs-and-local-pseudotime-v1'));
@@ -125,6 +127,12 @@ try
         [pressure,temperature,thermo]=readSU2IdealAirStateAudit(folder,receipt,rest);
         audit.thermodynamicModel=thermo.thermodynamicModel.thermodynamicModel;
         audit.thermalStateAudit=thermo;
+        if captured
+            audit.completedUpdatesBeforeRun=thermo.seriesSuccessfulUpdates-thermo.successfulUpdates;
+            audit.cumulativeCheckpointIteration=thermo.seriesSuccessfulUpdates-1;
+            audit.cumulativeTerminalIteration=audit.completedUpdatesBeforeRun+audit.terminalIteration;
+            audit.coldRestartSemantics='original conservative state; rebuild primitives and adaptive histories';
+        end
     elseif contains(config,'FLUID_MODEL= COOLPROP')
         [pressure,temperature,thermo]=readSU2CoolPropStateAudit(folder,receipt,rest);
         audit.thermodynamicModel=thermo.thermodynamicModel;audit.thermodynamicAudit=thermo;

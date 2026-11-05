@@ -1,0 +1,9 @@
+# v157 启动前恢复记录
+
+首次解析网格构造0.063秒通过，最小SICN0.29092387、解析体积差1.78e−15。main01在导入时因小例optionsJSON缺layerHeights而结束，尚未创建原生任务。准确执行源和原始输入保留在outputs/v157_validation/executed_sources01及fixture。
+
+修正构造器输出元数据。已有几何在fixture_workbench逐字复用，只补optionsJSON及对应输入身份，几何计算和原生运行均未重复。main02沿用原计划的唯一4更新任务与一次取消任务。新源码再次单独锁定，首次失败及原输入SHA保留。
+
+main02在准备阶段遇到MATLAB JSON容量使用指数形式的问题，Python读为float，被output_plan严格整数条件拒绝。原生启动数为0，已准备小型初场及部分阶段发布记录保留。入口先验证正、有限、整数值，再转换为Python整数。main03在新目录重走正常主流程，原4更新与取消预算继续有效，真实完整域运行0。
+
+main03正常4更新及实际取消通过，数值任务已终态。review01只读旧模型和正常保存结果，实际鼠标观察已完成。独立CSV复核首版多余数组维度触发IndexError，准确脚本保存为outputs/v157_validation/verifySU2V157Delivery_failed01.py，修正后只读通过，数值运行数0。

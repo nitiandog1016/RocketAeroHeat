@@ -12,7 +12,11 @@ if isfinite(a.terminalIteration)
 else,terminal='末次监测未知';end
 if a.checkpointIdentityConfirmed
     checkpoint=sprintf('显示检查点 %d 步 · %s',a.checkpointIteration,pass(a.checkpointResidualPassed));
-    if isfield(a,'cumulativeCheckpointIteration')
+    if isfield(a,'coldRestartSemantics')
+        checkpoint=sprintf('显示局部索引 %d · 本段完成 %d / 累计 %d 次更新 · %s', ...
+            a.checkpointIteration,a.checkpointIteration+1,a.cumulativeCheckpointIteration+1,pass(a.checkpointResidualPassed));
+        terminal=sprintf('末监测局部索引 %d · %s',a.terminalIteration,pass(a.terminalResidualPassed));
+    elseif isfield(a,'cumulativeCheckpointIteration')
         checkpoint=sprintf('显示本段 %d / 累计 %d 步 · %s',a.checkpointIteration,a.cumulativeCheckpointIteration,pass(a.checkpointResidualPassed));
         terminal=sprintf('末监测本段 %d / 累计 %d 步 · %s',a.terminalIteration,a.cumulativeTerminalIteration,pass(a.terminalResidualPassed));
     elseif isfield(a,'independentInitialization')

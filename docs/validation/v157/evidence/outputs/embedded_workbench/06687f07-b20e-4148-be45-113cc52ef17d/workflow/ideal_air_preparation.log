@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\prepareSU2WorkbenchIdealAir.py", line 38, in <module>
+    prepare(request['workDirectory'], request['idealAirInitialization'])
+  File "E:\RocketAeroHeat\scripts\prepareSU2WorkbenchIdealAir.py", line 28, in prepare
+    min(int(flight['outputEvery']), int(flight['iterations'])), spec['maximumOutputBytes'], exported_folder=True)
+  File "E:\RocketAeroHeat\scripts\prepareSU2IdealAirRestart.py", line 124, in prepare
+    len(wall), iterations, every, maximum_bytes)
+  File "E:\RocketAeroHeat\scripts\su2IdealAirCheckpoints.py", line 17, in output_plan
+    assert isinstance(value, int) and not isinstance(value, bool) and value > 0
+AssertionError

@@ -21,8 +21,17 @@ switch lower(action)
             'threads',threads,'maximumSeconds',seconds,'dryRun',false,'jobToken',token);
         request.sourceFiles={'readSU2SurfaceResult.m','buildSU2WallProjection.m','mapSU2WallResult.m', ...
             'writeSU2RocketCase.m','embeddedSU2Job.m'};
-        pipeline=isfield(options,'propertyInitialization') || isfield(options,'turbulenceInitialization');
-        assert(~(isfield(options,'propertyInitialization') && isfield(options,'turbulenceInitialization')),'HEOS SST尚未适配。');
+        initializationKeys={'propertyInitialization','turbulenceInitialization','idealAirInitialization'};
+        selected=cellfun(@(key)isfield(options,key),initializationKeys);pipeline=any(selected);
+        assert(sum(selected)<=1,'每次任务只能指定一个物性与初场流程。');
+        if isfield(options,'idealAirInitialization')
+            request.idealAirInitialization=options.idealAirInitialization;
+            request.sourceFiles=[request.sourceFiles,{'scripts/runSU2WorkbenchPipeline.py', ...
+                'scripts/prepareSU2WorkbenchIdealAir.py','scripts/prepareSU2IdealAirRestart.py', ...
+                'scripts/prepareSU2IdealAirCase.py','scripts/prepareSU2IdealAirWallDistance.py', ...
+                'scripts/su2IdealAirInterface.py','scripts/su2IdealAirCheckpoints.py','scripts/auditSU2IdealAirState.py', ...
+                'readSU2IdealAirStateAudit.m','auditSU2ResultConvergence.m','describeSU2Runtime.m','calcSU2Freestream.m'}];
+        end
         if isfield(options,'propertyInitialization')
             request.propertyInitialization=options.propertyInitialization;
             request.sourceFiles=[request.sourceFiles,{'scripts/runSU2WorkbenchPipeline.py', ...

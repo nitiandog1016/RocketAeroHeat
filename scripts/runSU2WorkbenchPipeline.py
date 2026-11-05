@@ -16,10 +16,14 @@ class Pipeline:
         self.folder = Path(self.request['workDirectory']).resolve()
         self.folder.relative_to(ROOT / 'outputs')
         assert self.request_path.parent == self.folder and self.request['jobToken']
-        assert ('propertyInitialization' in self.request)!=('turbulenceInitialization' in self.request)
+        assert sum(key in self.request for key in ('propertyInitialization','turbulenceInitialization','idealAirInitialization')) == 1
+        self.ideal_air = 'idealAirInitialization' in self.request
         self.sst='turbulenceInitialization' in self.request
-        self.spec = self.request['turbulenceInitialization' if self.sst else 'propertyInitialization']
-        if self.sst:assert self.spec['model']=='SST-2003m'
+        key = 'idealAirInitialization' if self.ideal_air else ('turbulenceInitialization' if self.sst else 'propertyInitialization')
+        self.spec = self.request[key]
+        if self.ideal_air:
+            assert self.spec['model'] == 'ideal-air-SST' and self.spec['mode'] == 'wallDistance'
+        elif self.sst:assert self.spec['model']=='SST-2003m'
         else:assert self.spec['model'] == 'HEOS-Air' and self.spec['runtimeFlavor'] == 'rah-coolprop-recon-v3'
         self.out = self.folder / 'workflow'
         self.out.mkdir(exist_ok=False)
@@ -31,6 +35,10 @@ class Pipeline:
         if self.sst:
             paths += [ROOT/n for n in ('scripts/prepareSU2SSTCase.py','scripts/su2SSTInterface.py','scripts/auditSU2SSTState.py')]
             if self.spec.get('mode')=='wallDistance':paths.append(ROOT/'scripts/prepareSU2WallDistanceState.py')
+        if self.ideal_air:
+            paths += [ROOT/'scripts'/name for name in ('prepareSU2WorkbenchIdealAir.py','prepareSU2IdealAirCase.py',
+                'prepareSU2IdealAirWallDistance.py','prepareSU2IdealAirRestart.py','idealAirProperties.py',
+                'su2IdealAirCheckpoints.py','su2IdealAirInterface.py','auditSU2IdealAirState.py')]
         self.locks = {str(p): sha(p) for p in paths}
         self.state = dict(status='starting', stage='preparation', supervisorProcessID=os.getpid(),
                           jobToken=self.request['jobToken'], startedUTC=datetime.now(timezone.utc).isoformat(),
@@ -57,7 +65,7 @@ class Pipeline:
             raise PipelineStopped('工作台阶段取消' if self.state['cancelled'] else '工作台阶段超过独立预算')
 
     def run_property(self, out, name, command, cwd, env, seconds):
-        """物性程序为直接子进程；只结束本次拥有的进程，保存每项真实退出码。"""
+        """准备/审核可启动物性子程序；取消时回收本次活进程树并保存实际退出码。"""
         self.check()
         receipt=out/(name+'_process.json');assert not receipt.exists()
         start=time.monotonic();limit=min(float(seconds),self.deadline-start)
@@ -74,7 +82,9 @@ class Pipeline:
                         self.state['timedOut']=True;raise PipelineStopped('物性查询超时')
                     self.save();time.sleep(.1)
             finally:
-                if proc.poll() is None:proc.kill()
+                if proc.poll() is None:
+                    subprocess.run(['taskkill','/PID',str(proc.pid),'/T','/F'],stdout=log,stderr=log,
+                                   creationflags=subprocess.CREATE_NO_WINDOW,check=False)
                 code=proc.wait()
                 state.update(status='terminal',exitCode=code,cancelled=self.state['cancelled'],
                              timedOut=self.state['timedOut'],elapsedSeconds=time.monotonic()-start)
@@ -129,7 +139,12 @@ class Pipeline:
         from auditSU2CoolPropState import audit
         code=1
         try:
-            if self.sst:
+            if self.ideal_air:
+                command=[sys.executable,'-X','utf8',str(ROOT/'scripts/prepareSU2WorkbenchIdealAir.py'),
+                         '--request',str(self.request_path)]
+                env=dict(os.environ,OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
+                self.phase('preparation',180,lambda:self.run_property(self.out,'ideal_air_preparation',command,ROOT,env,180))
+            elif self.sst:
                 general=self.spec.get('mode')=='wallDistance'
                 script='prepareSU2WallDistanceState.py' if general else 'prepareSU2SSTCase.py'
                 command=[sys.executable,'-X','utf8',str(ROOT/'scripts'/script),
@@ -144,7 +159,11 @@ class Pipeline:
                                                            self.spec['runtimeFlavor'],self.run_property))
             # 原生预算由旧监督器严格执行；额外30秒仅供启动/清场，不增加SU2预算。
             self.phase('solver',float(self.request['maximumSeconds'])+30,self.run_engine)
-            if self.sst:
+            if self.ideal_air:
+                command=[sys.executable,'-X','utf8',str(ROOT/'scripts/auditSU2IdealAirState.py'),'--folder',str(self.folder)]
+                self.phase('eosAudit',120,lambda:self.run_property(self.out,'ideal_air_audit',command,ROOT,dict(os.environ),120))
+                target=self.folder/'ideal_air_review.json'
+            elif self.sst:
                 target=self.folder/'sst_state_audit.json'
                 command=[sys.executable,'-X','utf8',str(ROOT/'scripts/auditSU2SSTState.py'),'--folder',str(self.folder),'--output',str(target)]
                 self.phase('eosAudit',120,lambda:self.run_property(self.out,'sst_audit',command,ROOT,dict(os.environ),120))
