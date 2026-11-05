@@ -8,6 +8,10 @@ if review.hasSavedNewField,frame=sprintf('新保存场局部 %d',review.savedLoc
 else,frame='本次尚无新保存场';end
 if isempty(review.sourceLocalIteration),source='独立相容初场';
 else,source=sprintf('源场局部 %d',review.sourceLocalIteration);end
+if isfield(review,'continuation') && ~isempty(review.continuation)
+    source=sprintf('%s · 本段 %d 次 · 系列 %d / %d 次更新',source, ...
+        review.completedUpdatesThisRun,review.completedUpdatesInSeries,review.continuation.maximumSeriesUpdates);
+end
 heading=uilabel(grid,'FontSize',14,'FontWeight','bold','WordWrap','on', ...
     'Text',sprintf('NASA ACC-SBLI · M %.4g · %s\n%s · 退出码 %d', ...
     review.conditions.mach,review.model,status,review.exitCode));heading.Layout.Row=1;
@@ -75,6 +79,12 @@ view=struct('heading',heading,'summary',summary,'picture',picture,'export',butto
                     {'Quantity','S_m','Predicted','Measured','Unit','Method','SavedIteration','ValidationPassed'});
             end
             output=vertcat(parts{:});
+            % 续算导出保留源编号与累计次数，局部号继续表示本次原生保存索引。
+            if isfield(review,'continuation') && ~isempty(review.continuation)
+                output.SourceLocalIteration=repmat(review.sourceLocalIteration,height(output),1);
+                output.CompletedUpdatesInSeries=repmat(review.completedUpdatesInSeries,height(output),1);
+                output.StabilitySampling=repmat({review.temporalStability.sampling},height(output),1);
+            end
             writetable(output,[file '.stations.csv']);
         end
     end

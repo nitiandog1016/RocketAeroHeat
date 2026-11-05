@@ -77,6 +77,7 @@ def run(folder, manifest):
     started = time.monotonic()
     peak_rss, peak_bytes = 0, 0
     reason = None
+    checked_states = {}
     with (folder/'engine.log').open('wb') as log:
         process = subprocess.Popen(command, cwd=str(folder), stdout=log, stderr=subprocess.STDOUT,
                                    env=dict(os.environ, OMP_NUM_THREADS='2'),
@@ -98,18 +99,44 @@ def run(folder, manifest):
                 reason = 'family memory budget'
             if size > manifest['maximumOutputBytes']:
                 reason = 'output file length budget'
+            if manifest.get('validateSavedState'):
+                # 下一百步表面已落盘时，较早体场的writer已经结束，避免读取半写文件。
+                surfaces = [int(p.stem.split('_')[-1]) for p in folder.glob('surface_flow_*.vtk')]
+                latest_surface = max(surfaces) if surfaces else -1
+                for saved in folder.glob('restart_flow_*.csv'):
+                    step = int(saved.stem.split('_')[-1])
+                    if step >= latest_surface or saved.name in checked_states:
+                        continue
+                    try:
+                        state(saved, True, True, True)
+                        checked_states[saved.name] = True
+                    except (AssertionError, ValueError) as error:
+                        checked_states[saved.name] = str(error)
+                        reason = 'invalid saved conservative state'
             if reason and process.poll() is None:
                 subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],
                                stdout=log, stderr=log, creationflags=subprocess.CREATE_NO_WINDOW)
                 break
             time.sleep(.25)
         code = process.wait()
+    if manifest.get('validateSavedState'):
+        # 进程终态后检查末帧和所有尚未检查的场，原生退出码与审核原因分别保留。
+        for saved in folder.glob('restart_flow_*.csv'):
+            if saved.name in checked_states:
+                continue
+            try:
+                state(saved, True, True, True)
+                checked_states[saved.name] = True
+            except (AssertionError, ValueError) as error:
+                checked_states[saved.name] = str(error)
+                reason = reason or 'invalid saved conservative state'
     outputs = {p.name: sha(p) for p in folder.iterdir()
                if p.name in ('engine.log', 'history.csv') or p.name.startswith(('restart_flow', 'surface_flow'))}
     result = dict(status='terminal', exitCode=code, stopReason=reason,
                   elapsedSeconds=time.monotonic()-started, peakFamilyRSSBytes=peak_rss,
                   peakOutputFileBytes=peak_bytes, command=command, sourceSHA256=locked,
-                  inputsStable={p: sha(p) == h for p, h in locked.items()}, outputSHA256=outputs)
+                  inputsStable={p: sha(p) == h for p, h in locked.items()}, outputSHA256=outputs,
+                  savedStateChecks=checked_states)
     save_json(target, result)
     print(json.dumps({k: result[k] for k in ('status', 'exitCode', 'stopReason', 'elapsedSeconds',
                                             'peakFamilyRSSBytes', 'peakOutputFileBytes')}), flush=True)

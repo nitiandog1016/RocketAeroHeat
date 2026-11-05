@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "tests/testSU2AxisymmetricContinuation.py", line 57, in <module>
+    print(json.dumps(verify()))
+  File "tests/testSU2AxisymmetricContinuation.py", line 22, in verify
+    frame = surface_frame(surface, p, markers, contract)
+  File "E:\RocketAeroHeat\scripts\su2AxisymmetricSurface.py", line 18, in surface_frame
+    assert max(distance) <= 6e-8 and np.all(xyz[:, 2] == 0)
+AssertionError

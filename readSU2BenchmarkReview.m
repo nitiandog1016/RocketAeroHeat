@@ -21,6 +21,18 @@ if isempty(review.sourceLocalIteration)
     assert(isfield(manifest,'independentInitialization') && ...
         isequaln(review.independentInitialization,manifest.independentInitialization));
 end
+% 模块四：续算的源局部号、本段次数和系列累计次数分别核验。
+if isfield(manifest,'continuation')
+    assert(isfield(review,'continuation') && isequaln(review.continuation,manifest.continuation));
+    line=manifest.continuation;
+    assert(review.sourceLocalIteration==line.sourceSavedLocalIteration);
+    assert(strcmp(sha(fullfile(folder,'initial_flow.csv')),line.sourceStateSHA256));
+    assert(review.completedUpdatesThisRun==review.lastRecordedIteration+1);
+    assert(review.completedUpdatesInSeries==line.completedUpdatesBeforeRun+review.completedUpdatesThisRun);
+    assert(review.completedUpdatesThisRun<=line.requestedUpdates && ...
+        review.completedUpdatesInSeries<=line.maximumSeriesUpdates);
+    assert(strcmp(review.temporalStability.sampling,'native surface every 100 local indices'));
+end
 for name={'history.csv','engine.log'}
     assert(strcmp(sha(fullfile(folder,name{1})),receipt.outputSHA256.(matlab.lang.makeValidName(name{1}))));
 end
