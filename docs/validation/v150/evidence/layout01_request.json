@@ -1,0 +1,31 @@
+{
+  "command": [
+    "D:/anacondapython/python.exe",
+    "-X",
+    "utf8",
+    "scripts/runMatlabResearch.py",
+    "layout01",
+    "addpath(pwd); f=rocketAeroHeatWorkbench(); f.UserData.actions.readBenchmarkReview('outputs/v150_validation/review01/report.json'); drawnow; fid=fopen('outputs/v150_validation/layout_ready.json','w'); fprintf(fid,'{}'); fclose(fid); t=tic; while ~isfile('outputs/v150_validation/layout_done.json') && toc(t)<180, drawnow; pause(.2); end; close(f);",
+    "--folder",
+    "outputs/v150_validation",
+    "--input",
+    "outputs/v150_validation/review01/report.json",
+    "--input",
+    "outputs/v150_validation/review01/convergence.png",
+    "--input",
+    "outputs/v150_validation/acc_sbli01/engine_process.json",
+    "--input",
+    "outputs/v150_validation/acc_sbli01/history.csv"
+  ],
+  "maximumSeconds": 300,
+  "maximumRSSBytes": 4294967296,
+  "sources": [
+    "scripts/runMatlabResearch.py",
+    "tests/testSU2BenchmarkReview.m",
+    "readSU2BenchmarkReview.m",
+    "createSU2BenchmarkReview.m",
+    "rocketAeroHeatWorkbench.m",
+    "docs/validation/v150/UI_PLAN.md"
+  ],
+  "receiptFolder": "outputs/v150_validation/layout01_supervisor"
+}

@@ -53,7 +53,7 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'loadNativeFeature',@()loadNative([],[],true),'loadClassic',@loadClassic, ...
     'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh, ...
     'readVerifiedHEOS',@readVerifiedHEOS,'readSSTStudy',@readSSTStudy,'probeMeshQuality',@probeMeshQuality, ...
-    'inspectMeshCandidate',@inspectMeshCandidate);
+    'inspectMeshCandidate',@inspectMeshCandidate,'readBenchmarkReview',@readBenchmarkReview);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -123,6 +123,7 @@ renderEditor();sync();showGeometry(true);
     function showGeometry(reset)
         if ~isgraphics(fig),return;end
         resultHost.Visible='off';geometryHost.Visible='on';
+        fig.UserData.benchmarkReview=[];
         fig.UserData.meshQuality=[];
         if qualityPreview && state.currentStep==2 && (~isempty(embeddedVolume) || ~isempty(candidatePreview))
             % 网格质量来自真实四面体；灰色原壁面只用于空间定位。
@@ -181,7 +182,7 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
-                grid=form(17);
+                grid=form(18);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
@@ -200,6 +201,7 @@ renderEditor();sync();showGeometry(true);
                 controls.native=button(grid,15,'建立原生箭体 · 内嵌SU2研究',@loadNative);
                 controls.nativeFeature=button(grid,16,'建立带整流罩箭体 · 内嵌SU2研究',@(~,~)loadNative([],[],true));
                 controls.classic=button(grid,17,'经典锥柱扩张体 · 绝热研究',@(~,~)loadClassic());
+                controls.readBenchmarkReview=button(grid,18,'公开算例验证记录',@readBenchmarkDialog);
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
@@ -384,7 +386,7 @@ renderEditor();sync();showGeometry(true);
                 end
             case 4
                 if isEmbedded()
-                    grid=form(19);controls.run=button(grid,1,'启动内嵌SU2 · 研究计算',@solveCase);
+                    grid=form(20);controls.run=button(grid,1,'启动内嵌SU2 · 研究计算',@solveCase);
                     controls.cancel=button(grid,2,'取消当前引擎任务',@cancelEngine);
                     controls.cancel.Enable=onoff(state.busy);
                     controls.readResearch=button(grid,3,'重开本程序同工况研究结果',@readResearchDialog);
@@ -392,7 +394,8 @@ renderEditor();sync();showGeometry(true);
                     controls.readVerifiedHEOS=button(grid,5,'查看同表面/工况的已有HEOS场',@readVerifiedHEOSDialog);
                     controls.readSSTStudy=button(grid,6,'查看同表面/工况的SST数值对照',@readSSTStudyDialog);
                     tip(grid,7,'已有场须核对原文件、物理条件、EOS与面元；沿用实际网格/迭代和数值方案。此操作只查看，不继续计算。');
-                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[10 19];controls.log.Layout.Column=[1 2];
+                    controls.readBenchmarkReview=button(grid,10,'公开算例验证记录',@readBenchmarkDialog);
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[11 20];controls.log.Layout.Column=[1 2];
                     sync();return;
                 end
                 failed=~isempty(state.error.message);offset=6*failed;
@@ -1109,6 +1112,20 @@ renderEditor();sync();showGeometry(true);
             state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',state.solveId,'sourceRevision',state.solveInputRevision));
             renderEditor();rethrow(ex);
         end
+    end
+    function readBenchmarkDialog(~,~)
+        [name,folder]=uigetfile('*.json','查看公开算例审核',fullfile(fileparts(mfilename('fullpath')),'outputs'));
+        if isequal(name,0),return;end
+        try,readBenchmarkReview(fullfile(folder,name));catch ex,showError(ex);end
+    end
+    function readBenchmarkReview(file)
+        % 公开基准是独立验证记录，按原终态显示并保留当前五步骤输入。
+        assert(~state.busy && ~preparing,'请等待当前任务结束后查看公开验证记录。');
+        review=readSU2BenchmarkReview(file);
+        delete(resultHost.Children);webUI=[];researchUI=[];
+        geometryHost.Visible='off';resultHost.Visible='on';
+        view=createSU2BenchmarkReview(resultHost,review);
+        sync();title.Text='公开算例验证记录';fig.UserData.benchmarkReview=view;
     end
     function readSSTStudyDialog(~,~)
         folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'查看本程序已审核的SST数值对照');

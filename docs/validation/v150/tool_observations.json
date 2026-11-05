@@ -1,0 +1,33 @@
+{
+  "analyticTest": {
+    "command": "D:/anacondapython/python.exe -X utf8 tests/testSU2AxisymmetricConservation.py",
+    "exitCode": 0,
+    "elapsedSeconds": 0.946,
+    "source": "previous tool observation in this task",
+    "rawProcessReceiptAvailable": false,
+    "revolvedVolumeM3": 0.7539822368615504,
+    "uniformNet": -8.881784197001252e-16,
+    "linearConductionNetW": -17.592918860102845
+  },
+  "postReviewAudit": {
+    "exitCode": 0,
+    "elapsedSeconds": 2.5831573,
+    "output": "outputs/v150_validation/review02/report.json",
+    "scope": "read-only audit after explicit pending-check metadata correction"
+  },
+  "readOnlyFailures": [
+    {
+      "action": "compact receipt summary",
+      "error": "TypeError: object of type bool has no len()",
+      "resolution": "distinguish scalar and dictionary flags"
+    },
+    {
+      "action": "independent delivery verification v1",
+      "error": "KeyError: rms[Rho]",
+      "resolution": "strip native CSV header padding",
+      "exactSource": "failures/verify_delivery_v1.py"
+    }
+  ],
+  "nativeWindowVisualVerificationCompleted": false,
+  "scientificPNGVisuallyChecked": true
+}

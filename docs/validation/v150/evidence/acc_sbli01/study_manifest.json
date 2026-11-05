@@ -1,0 +1,116 @@
+{
+  "kind": "NASA-ACC-SBLI-M7-axisymmetric-convergence-v1",
+  "benchmark": {
+    "kind": "NASA-ACC-SBLI-M7-axisymmetric-startup-v1",
+    "model": "SST-Vm (V1994m,VORTICITY)",
+    "conditions": {
+      "mach": 7.11,
+      "gasConstant": 287.058,
+      "gamma": 1.4,
+      "totalTemperatureK": 888.8888888888889,
+      "totalPressurePa": 2515207.4605476866,
+      "temperatureK": 80.00497630952647,
+      "pressurePa": 550.1956399001671,
+      "densityKgM3": 0.023956892759101175,
+      "speedMS": 1274.902422634943,
+      "wallTemperatureK": 311.0,
+      "turbulenceIntensity": 0.00021,
+      "eddyToLaminarRatio": 0.001,
+      "unitReynoldsPerM": 5574074.450526554,
+      "figureUnitReynoldsPerM": 5706000.0,
+      "unitReynoldsRelativeDifference": -0.02312049587687448
+    },
+    "geometry": {
+      "passed": true,
+      "nodes": 16261,
+      "quadrilaterals": 16000,
+      "boundaryCounts": {
+        "wall": 160,
+        "inlet": 100,
+        "top": 160,
+        "outlet": 100
+      },
+      "minimumPlanarAreaM2": 9.394750224363019e-09,
+      "minimumCornerCrossM2": 9.294758853569948e-09,
+      "revolvedVolumeM3": 0.7372892389067335,
+      "volumeRelativeError": 0.0,
+      "revolvedWallAreaM2": 0.7265222893082404
+    },
+    "source": {
+      "archive": "tests\\data\\tmr_mach7\\raw\\Axiswblim7_grids.zip",
+      "archiveSHA256": "6d12b620b0e1fff13c0567a9ad4f18c88133ed9d87ee332be8c9d775c7cdc4aa",
+      "member": "u/piyer/nasa_tmr/gitlab/turbmodels/Axiswblim7_grids/kussoy_2zn_2levdn.p2dfmt.gz",
+      "decompressedSHA256": "6caf17da534593f853dac58ad6a5b8db8c6bcd82a03077818a85cbc2cb54fcde",
+      "interfaceMismatchM": 0.0,
+      "mergedInterfaceNodes": 101,
+      "sourceRadiusM": 0.10150094,
+      "nominalRadiusM": 0.1015
+    },
+    "references": [
+      {
+        "url": "https://tmbwg.github.io/turbmodels/Axiswblim7_validation/axiswblim7_wind_inflow_sstv.dat",
+        "path": "raw/axiswblim7_wind_inflow_sstv.dat",
+        "bytes": 9941,
+        "sha256": "36eb7208dd7275667f41edc71947d841d58f306217a4d5906109cc93fde553bd"
+      },
+      {
+        "url": "https://tmbwg.github.io/turbmodels/Axiswblim7_validation/axiswblim7_wind_wall_sstv.dat",
+        "path": "raw/axiswblim7_wind_wall_sstv.dat",
+        "bytes": 8025,
+        "sha256": "15ddfb1f7ba581d421f2b5de00bcb3b6ab390362d5f223e050504294b0ba77f1"
+      }
+    ],
+    "boundarySource": "NASA NMF and WIND SST-Vm sample",
+    "limitations": [
+      "two updates only",
+      "calorically perfect numerical gas",
+      "20 degree flare at zero incidence",
+      "no physical qualification"
+    ],
+    "inputSHA256": {
+      "case.cfg": "04e835f7e277264804db6fc82b555bda8f3f23cb6f36bd3c3830784adb5538df",
+      "mesh.su2": "8d935054d8e8babeb884cd750e967694cd062ed81ec66c1593c68e0fda4a61b9"
+    },
+    "sourceSHA256": {
+      "scripts\\prepareSU2AxisymmetricBenchmark.py": "b88a505e8490f6f471fe8e37310979d09ad90a5363d25a590260da8abb6fd605",
+      "tests\\data\\tmr_mach7\\raw\\wind_sstvm.inp": "d3843b1e9b3a19d50bac36d5659fad501bde93e0f84192a57a22a067277170ce",
+      "tests\\data\\tmr_mach7\\raw\\sstvm.html": "74443d9016b75a48fd20aa866fc6c55e7ad0103a179e5381cc96ab309a86c630",
+      "tests\\data\\tmr_mach7\\raw\\kussoy_2zn_4levdn.nmf": "959512bfe46c12645b4efa9f8922aface048cd48ad72ab411a66b7a9838172a4",
+      "tests\\data\\tmr_mach7_su2\\source_manifest.json": "4aa5577ae6b880255331eb65d8e4b770b93b02b8db34c964e1c2fd75a32b9e92"
+    }
+  },
+  "sourceDirectory": "E:\\RocketAeroHeat\\outputs\\v149_validation\\acc_sbli02",
+  "sourceLocalIteration": 1,
+  "sourceOriginalStartupPassed": false,
+  "sourceSavedWallFluidTemperatureRangeK": [
+    1212.027579368337,
+    1214.639205081422
+  ],
+  "controlsChanged": {
+    "RESTART_SOL": "YES",
+    "SOLUTION_FILENAME": "initial_flow",
+    "READ_BINARY_RESTART": "NO",
+    "ITER": "12000",
+    "OUTPUT_WRT_FREQ": "1000, 3000",
+    "WRT_RESTART_OVERWRITE": "NO",
+    "WRT_SURFACE_OVERWRITE": "NO",
+    "SCREEN_WRT_FREQ_INNER": "500",
+    "VOLUME_OUTPUT": "(COORDINATES, SOLUTION, PRIMITIVE, RESIDUAL, TIMESTEP)"
+  },
+  "samePhysicsAndNumerics": true,
+  "maximumSeconds": 720,
+  "maximumRSSBytes": 4294967296,
+  "maximumOutputBytes": 125829120,
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v149_validation\\acc_sbli02\\engine_process.json": "c3f6e57465193a571a1352690b7540118061e6e25ccd2695bb2d17a086fed81b",
+    "E:\\RocketAeroHeat\\outputs\\v149_validation\\acc_sbli02\\benchmark_manifest.json": "d846e30bc353612e6d9b43cffaef53862d6d9c0aa442d63acf8d55415f97d4af",
+    "E:\\RocketAeroHeat\\outputs\\v149_validation\\acc_sbli02\\audit02.json": "3367c3d7632b815ecc8845ffe785238f45aac2aeb05694b0b6e9fa287e09bfd8",
+    "E:\\RocketAeroHeat\\outputs\\v149_validation\\acc_sbli02\\mesh.su2": "8d935054d8e8babeb884cd750e967694cd062ed81ec66c1593c68e0fda4a61b9",
+    "E:\\RocketAeroHeat\\outputs\\v149_validation\\acc_sbli02\\restart_flow.csv": "45b8d3275cc15d1889378a6e1eb88c488dede4d40581cfdb2a2fbfa96b725fa6",
+    "E:\\RocketAeroHeat\\outputs\\v149_validation\\acc_sbli02\\case.cfg": "04e835f7e277264804db6fc82b555bda8f3f23cb6f36bd3c3830784adb5538df"
+  },
+  "plan": "E:\\RocketAeroHeat\\docs\\validation\\v150\\PLAN.md",
+  "planSHA256": "5b4952a0991f414fff83ca46db7c6f58bbc7e3204fbe5cef0d67ea2da8fd2f8d",
+  "physicsQualified": false,
+  "newQualifiedArea": 0
+}
