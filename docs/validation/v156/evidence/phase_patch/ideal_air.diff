@@ -1,0 +1,327 @@
+--- a/Common/include/option_structure.hpp
++++ b/Common/include/option_structure.hpp
+@@ -659,6 +659,7 @@
+   COOLPROP = 10,          /*!< \brief Thermodynamics library. */
+   FLUID_FLAMELET = 11,    /*!< \brief lookup table (LUT) method for premixed flamelets. */
+   DATADRIVEN_FLUID = 12,  /*!< \brief multi-layer perceptron driven fluid model. */
++  IDEAL_AIR_VARIABLE_CP = 14, // RocketAeroHeat固定组分变比热空气
+   FLUID_CANTERA = 13,     /*!< \brief Reacting flows model. */
+ };
+ static const MapType<std::string, ENUM_FLUIDMODEL> FluidModel_Map = {
+@@ -672,6 +673,7 @@
+   MakePair("MUTATIONPP", MUTATIONPP)
+   MakePair("SU2_NONEQ", SU2_NONEQ)
+   MakePair("FLUID_MIXTURE", FLUID_MIXTURE)
++  MakePair("IDEAL_AIR_VARIABLE_CP", IDEAL_AIR_VARIABLE_CP)
+   MakePair("COOLPROP", COOLPROP)
+   MakePair("DATADRIVEN_FLUID", DATADRIVEN_FLUID)
+   MakePair("FLUID_FLAMELET", FLUID_FLAMELET)
+--- a/Common/src/CConfig.cpp
++++ b/Common/src/CConfig.cpp
+@@ -3790,6 +3790,20 @@
+   }
+ #endif
+ 
++  // 模块用途。只接受已明确接入的直接SI一般EOS路径。
++  if (Kind_FluidModel == IDEAL_AIR_VARIABLE_CP) {
++    if (SystemMeasurements != SI || Ref_NonDim != DIMENSIONAL || Time_Domain ||
++        Multizone_Problem || DiscreteAdjoint || ContinuousAdjoint ||
++        (Kind_Solver != MAIN_SOLVER::NAVIER_STOKES && Kind_Solver != MAIN_SOLVER::RANS) ||
++        (Kind_Turb_Model != TURB_MODEL::NONE && Kind_Turb_Model != TURB_MODEL::SST) ||
++        Kind_Upwind_Flow != UPWIND::ROE || nMarker_WallFunctions != 0 ||
++        Low_Mach_Corr || nMarker_Giles != 0 || GetDynamic_Grid())
++      SU2_MPI::Error("IDEAL_AIR_VARIABLE_CP requires direct SI steady single-zone NS/SST, ROE, resolved wall", CURRENT_FUNCTION);
++    for (unsigned short i=0; i<nMarker_Riemann; ++i)
++      if (Kind_Data_Riemann[i] != STATIC_SUPERSONIC_INFLOW_PT && Kind_Data_Riemann[i] != STATIC_PRESSURE)
++        SU2_MPI::Error("IDEAL_AIR_VARIABLE_CP supports Riemann static PT inlet and static pressure outlet", CURRENT_FUNCTION);
++  }
++
+   /*--- Check if CoolProp is used with non-dimensionalization. ---*/
+   if (Kind_FluidModel == COOLPROP && Ref_NonDim != DIMENSIONAL) {
+     SU2_MPI::Error("CoolProp can not be used with non-dimensionalization.", CURRENT_FUNCTION);
+--- a/SU2_CFD/src/solvers/CEulerSolver.cpp
++++ b/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -34,6 +34,8 @@
+ #include "../../include/fluid/CPengRobinson.hpp"
+ #include "../../include/fluid/CDataDrivenFluid.hpp"
+ #include "../../include/fluid/CCoolProp.hpp"
++#include "../../include/fluid/CSU2IdealAir.hpp"
++#include "../../include/fluid/SU2EnergyState.hpp"
+ #include "../../include/numerics_simd/CNumericsSIMD.hpp"
+ #include "../../include/limiters/CLimiterDetails.hpp"
+ #include "../../include/output/COutput.hpp"
+@@ -905,6 +907,11 @@
+       auxFluidModel = new CDataDrivenFluid(config);
+ 
+       break;
++    case IDEAL_AIR_VARIABLE_CP:
++      config->SetGas_Constant(rah_air::gas_constant);
++      auxFluidModel = new CSU2IdealAir();
++      break;
++
+     case COOLPROP:
+ 
+       auxFluidModel = new CCoolProp(config->GetFluid_Name());
+@@ -1154,6 +1161,10 @@
+ 
+       case DATADRIVEN_FLUID:
+         FluidModel[thread] = new CDataDrivenFluid(config, false);
++        break;
++
++      case IDEAL_AIR_VARIABLE_CP:
++        FluidModel[thread] = new CSU2IdealAir();
+         break;
+ 
+       case COOLPROP:
+@@ -1313,7 +1324,7 @@
+     Unit.str("");
+     if      (config->GetSystemMeasurements() == SI) Unit << "N.m/kg.K";
+     else if (config->GetSystemMeasurements() == US) Unit << "lbf.ft/slug.R";
+-    if (config->GetKind_FluidModel() == COOLPROP) {
++    if (config->GetKind_FluidModel() == COOLPROP || config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) {
+       NonDimTable << "Spec. Heat Ratio" << "-" << "-" << "-" << "-";
+     }
+     else {
+@@ -1333,6 +1344,9 @@
+       break;
+     case PR_GAS:
+       ModelTable << "PR_GAS";
++      break;
++    case IDEAL_AIR_VARIABLE_CP:
++      ModelTable << "IDEAL_AIR_VARIABLE_CP Lemmon2000 OTH 60..2000K";
+       break;
+     case COOLPROP:
+       ModelTable << "CoolProp library";
+@@ -1949,9 +1963,22 @@
+ 
+       /*--- Recompute the reconstructed quantities in a thermodynamically consistent way. ---*/
+ 
++      bool rah_invalid_reconstruction = false;
+       if (!ideal_gas || low_mach_corr) {
+-        ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i);
+-        ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j);
++        const bool variable_air = config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP;
++        const bool with_k = variable_air && config->GetKind_Turb_Model() == TURB_MODEL::SST;
++        const su2double k_i = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
++        const su2double k_j = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(jPoint,0) : 0.0;
++        try {
++          ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i, k_i);
++          ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j, k_j);
++        } catch (const std::domain_error&) {
++          if (!variable_air) throw;
++          // 拒绝超温域重构，复用原生单元值降阶路径，避免半更新状态。
++          rah_invalid_reconstruction = true;
++          std::copy_n(V_i,nPrimVar,Primitive_i); std::copy_n(V_j,nPrimVar,Primitive_j);
++          std::copy_n(S_i,nSecondaryVar,Secondary_i); std::copy_n(S_j,nSecondaryVar,Secondary_j);
++        }
+       }
+ 
+       /*--- Low-Mach number correction. ---*/
+@@ -1977,7 +2004,7 @@
+       su2double RoeEnthalpy = (R * Primitive_j[prim_idx.Enthalpy()] + Primitive_i[prim_idx.Enthalpy()]) / (R+1);
+ 
+       const bool neg_sound_speed = ((Gamma-1)*(RoeEnthalpy-0.5*sq_vel) < 0.0);
+-      bool bad_recon = neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;
++      bool bad_recon = rah_invalid_reconstruction || neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;
+       bad_recon = nodes->UpdateNonPhysicalEdgeCounter(iEdge, bad_recon);
+       counter_local += bad_recon;
+ 
+@@ -2036,7 +2063,7 @@
+ }
+ 
+ void CEulerSolver::ComputeConsistentExtrapolation(CFluidModel *fluidModel, unsigned short nDim,
+-                                                  su2double *primitive, su2double *secondary) {
++                                                  su2double *primitive, su2double *secondary, su2double turbulent_k) {
+   SU2_ZONE_SCOPED
+   const CEulerVariable::CIndices<unsigned short> prim_idx(nDim, 0);
+   const su2double density = primitive[prim_idx.Density()];
+@@ -2046,7 +2073,7 @@
+   fluidModel->SetTDState_Prho(pressure, density);
+ 
+   primitive[prim_idx.Temperature()] = fluidModel->GetTemperature();
+-  primitive[prim_idx.Enthalpy()] = fluidModel->GetStaticEnergy() + pressure / density + 0.5*velocity2;
++  primitive[prim_idx.Enthalpy()] = fluidModel->GetStaticEnergy() + pressure / density + 0.5*velocity2 + turbulent_k;
+   primitive[prim_idx.SoundSpeed()] = fluidModel->GetSoundSpeed();
+   secondary[0] = fluidModel->GetdPdrho_e();
+   secondary[1] = fluidModel->GetdPde_rho();
+@@ -5312,7 +5339,9 @@
+       const auto Density_i = nodes->GetDensity(iPoint);
+ 
+       const auto Energy_i = nodes->GetEnergy(iPoint);
+-      const su2double StaticEnergy_i = Energy_i - 0.5*Velocity2_i;
++      const bool variable_air = config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP;
++      const su2double k_i = variable_air && tkeNeeded ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
++      const su2double StaticEnergy_i = rah_air::thermal_energy(Energy_i,Velocity2_i,k_i);
+ 
+       GetFluidModel()->SetTDState_rhoe(Density_i, StaticEnergy_i);
+ 
+@@ -5322,7 +5351,7 @@
+       const auto SoundSpeed_i = GetFluidModel()->GetSoundSpeed();
+ 
+       const su2double Kappa_i = GetFluidModel()->GetdPde_rho() / Density_i;
+-      const su2double Chi_i = GetFluidModel()->GetdPdrho_e() - Kappa_i * StaticEnergy_i;
++      const su2double Chi_i = GetFluidModel()->GetdPdrho_e() - Kappa_i * (StaticEnergy_i+k_i);
+ 
+       /*--- Build the external state u_e from boundary data and internal node ---*/
+       su2double T_static{0}, P_static{0}, Pressure_e{0}, Density_static{0}, Enthalpy_e{0}, Energy_e{0}, Entropy_e{0},
+@@ -5451,7 +5480,7 @@
+           Velocity_e[iDim] = Velocity_i[iDim];
+ 
+         Velocity2_e = GeometryToolbox::SquaredNorm(nDim, Velocity_e);
+-        Energy_e = GetFluidModel()->GetStaticEnergy() + 0.5*Velocity2_e;
++        Energy_e = GetFluidModel()->GetStaticEnergy() + 0.5*Velocity2_e + k_i;
+         break;
+ 
+       default:
+@@ -5512,7 +5541,10 @@
+       const auto Velocity2_b = GeometryToolbox::SquaredNorm(nDim, Velocity_b);
+ 
+       const su2double Energy_b = u_b[nVar-1]/Density_b;
+-      const su2double StaticEnergy_b = Energy_b - 0.5*Velocity2_b;
++      const bool outgoing = GeometryToolbox::DotProduct(nDim,Velocity_b,UnitNormal) >= 0;
++      const bool pressure_boundary = config->GetKind_Data_Riemann(Marker_Tag) == STATIC_PRESSURE;
++      const su2double k_b = variable_air && tkeNeeded ? ((outgoing || pressure_boundary) ? k_i : GetTke_Inf()) : 0.0;
++      const su2double StaticEnergy_b = rah_air::thermal_energy(Energy_b,Velocity2_b,k_b);
+       GetFluidModel()->SetTDState_rhoe(Density_b, StaticEnergy_b);
+ 
+       /*--- Store number of Newton iterations at BC ---*/
+@@ -5523,7 +5555,7 @@
+       const auto Temperature_b = GetFluidModel()->GetTemperature();
+       const su2double Enthalpy_b = Energy_b + Pressure_b/Density_b;
+       const su2double Kappa_b = GetFluidModel()->GetdPde_rho() / Density_b;
+-      const su2double Chi_b = GetFluidModel()->GetdPdrho_e() - Kappa_b * StaticEnergy_b;
++      const su2double Chi_b = GetFluidModel()->GetdPdrho_e() - Kappa_b * (StaticEnergy_b+k_b);
+ 
+       /*--- Compute the residuals ---*/
+       su2double Residual[MAXNVAR] = {0};
+--- a/SU2_CFD/include/solvers/CEulerSolver.hpp
++++ b/SU2_CFD/include/solvers/CEulerSolver.hpp
+@@ -423,7 +423,7 @@
+   static void ComputeConsistentExtrapolation(CFluidModel *fluidModel,
+                                              unsigned short nDim,
+                                              su2double *primitive,
+-                                             su2double *secondary);
++                                             su2double *secondary, su2double turbulent_k = 0.0);
+ 
+   /*!
+    * \brief Apply low Mach number correction to the primitives at two points,
+--- a/SU2_CFD/src/solvers/CNSSolver.cpp
++++ b/SU2_CFD/src/solvers/CNSSolver.cpp
+@@ -741,13 +741,20 @@
+       su2double Density = nodes->GetDensity(iPoint);
+       su2double Vel2 = GeometryToolbox::SquaredNorm(nDim, &nodes->GetPrimitive(iPoint)[prim_idx.Velocity()]);
+       su2double dTdrho = 1.0/Density * ( -Twall + (Gamma-1.0)/Gas_Constant*(Vel2/2.0) );
++      su2double dTdrhoE = (Gamma-1.0)/(Gas_Constant*Density);
++      if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) {
++        // 原生弱壁面近似对角预条件，采用同阶段实际状态和冻结k的热力学链式导数。
++        const su2double* secondary = nodes->GetSecondary(iPoint);
++        dTdrho = secondary[2] + secondary[3]*(Vel2-nodes->GetEnergy(iPoint))/Density;
++        dTdrhoE = secondary[3]/Density;
++      }
+ 
+       Jacobian_i[nDim+1][0] = thermal_conductivity/dist_ij * dTdrho * Area;
+ 
+       for (auto jDim = 0u; jDim < nDim; jDim++)
+         Jacobian_i[nDim+1][jDim+1] = 0.0;
+ 
+-      Jacobian_i[nDim+1][nDim+1] = thermal_conductivity/dist_ij * (Gamma-1.0)/(Gas_Constant*Density) * Area;
++      Jacobian_i[nDim+1][nDim+1] = thermal_conductivity/dist_ij * dTdrhoE * Area;
+     }
+ 
+     /*--- If the wall is moving, there are additional residual contributions
+--- a/SU2_CFD/include/variables/CNSVariable.hpp
++++ b/SU2_CFD/include/variables/CNSVariable.hpp
+@@ -39,6 +39,8 @@
+ private:
+   su2double inv_TimeScale;   /*!< \brief Inverse of the reference time scale. */
+ 
++  VectorType FlowPrimitiveK; /*!< 对应最近一次原始热状态计算的独立k输入。 */
++
+   VectorType Tau_Wall;        /*!< \brief Magnitude of the wall shear stress from a wall function. */
+   VectorType DES_LengthScale; /*!< \brief DES Length Scale. */
+   VectorType lesMode;        /*!< \brief Sensor for local simulation mode (0=RANS, 1=LES).*/
+@@ -46,6 +48,8 @@
+   VectorType Vortex_Tilting;  /*!< \brief Value of the vortex tilting variable for DES length scale computation. */
+ 
+ public:
++  su2double GetFlowPrimitiveK(unsigned long iPoint) const { return FlowPrimitiveK(iPoint); }
++
+   /*!
+    * \brief Constructor of the class.
+    * \param[in] density - Value of the flow density (initialization value).
+--- a/SU2_CFD/src/variables/CNSVariable.cpp
++++ b/SU2_CFD/src/variables/CNSVariable.cpp
+@@ -37,6 +37,7 @@
+ 
+   Vorticity.resize(nPoint,3) = su2double(0.0);
+   StrainMag.resize(nPoint) = su2double(0.0);
++  FlowPrimitiveK.resize(nPoint) = su2double(0.0);
+   Tau_Wall.resize(nPoint) = su2double(-1.0);
+   DES_LengthScale.resize(nPoint) = su2double(0.0);
+   lesMode.resize(nPoint) = su2double(0.0);
+@@ -138,6 +139,9 @@
+ 
+ bool CNSVariable::SetPrimVar(unsigned long iPoint, su2double eddy_visc, su2double turb_ke, CFluidModel *FluidModel) {
+ 
++  // 直接捕获热状态计算输入，包含原生回退后的同一次调用。
++  FlowPrimitiveK(iPoint) = turb_ke;
++
+   bool RightVol = true;
+ 
+   SetVelocity(iPoint); // Computes velocity and velocity^2
+--- a/SU2_CFD/src/output/CFlowCompOutput.cpp
++++ b/SU2_CFD/src/output/CFlowCompOutput.cpp
+@@ -29,6 +29,7 @@
+ 
+ #include "../../../Common/include/geometry/CGeometry.hpp"
+ #include "../../include/solvers/CSolver.hpp"
++#include "../../include/variables/CNSVariable.hpp"
+ 
+ CFlowCompOutput::CFlowCompOutput(const CConfig *config, unsigned short nDim) : CFlowOutput(config, nDim, false) {
+ 
+@@ -305,6 +306,9 @@
+     AddVolumeOutput("ROE_DISSIPATION", "Roe_Dissipation", "ROE_DISSIPATION", "Value of the Roe dissipation");
+   }
+ 
++  if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)
++    AddVolumeOutput("FLOW_PRIMITIVE_K", "Flow_Primitive_K", "FLOW_PHASE", "Independent k used by saved flow primitive state");
++
+   AddCommonFVMOutputs(config);
+ 
+   if (config->GetTime_Domain()) {
+@@ -318,6 +322,9 @@
+   const CVariable* Node_Turb = nullptr;
+   if (config->GetKind_Turb_Model() != TURB_MODEL::NONE) Node_Turb = solver[TURB_SOL]->GetNodes();
+   auto* Node_Geo  = geometry->nodes;
++
++  if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)
++    SetVolumeOutputValue("FLOW_PRIMITIVE_K", iPoint, static_cast<const CNSVariable*>(Node_Flow)->GetFlowPrimitiveK(iPoint));
+ 
+   LoadCoordinates(Node_Geo->GetCoord(iPoint), iPoint);
+ 
+--- a/SU2_CFD/src/output/COutput.cpp
++++ b/SU2_CFD/src/output/COutput.cpp
+@@ -2172,7 +2172,9 @@
+ 
+     return ((Iter % config->GetVolumeOutputFrequency(iFile) == 0)) || force_writing;
+   }
+-      return ((Iter > 0) && (Iter % config->GetVolumeOutputFrequency(iFile) == 0)) || force_writing;
++      // 新模型首个完成更新也保存，后续沿用原生局部索引和强制末次规则。
++      return (((Iter > 0 || config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) &&
++                (Iter % config->GetVolumeOutputFrequency(iFile) == 0))) || force_writing;
+ 
+ }
+ 
+--- a/SU2_CFD/src/output/CFlowOutput.cpp
++++ b/SU2_CFD/src/output/CFlowOutput.cpp
+@@ -4134,7 +4134,9 @@
+     }
+   } else {
+     if (config->GetFixed_CL_Mode() && config->GetFinite_Difference_Mode()) return false;
+-    return ((Iter > 0) && Iter % config->GetVolumeOutputFrequency(iFile) == 0) || force_writing;
++    // 新变比热包保存第一次完成更新，稳态局部0对应第1次更新。
++    return ((Iter > 0 || config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) &&
++            Iter % config->GetVolumeOutputFrequency(iFile) == 0) || force_writing;
+   }
+ 
+   return force_writing;

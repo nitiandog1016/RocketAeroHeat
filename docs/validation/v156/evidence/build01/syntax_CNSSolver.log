@@ -1,0 +1,452 @@
+In file included from E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:44,
+                 from E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp:29,
+                 from E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CEulerSolver.hpp:30,
+                 from E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CNSSolver.hpp:30,
+                 from E:\RocketAeroHeat\tools\runtime\su2-thermal-build\source\SU2_CFD\src\solvers\CNSSolver.cpp:28:
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp: In member function 'void CSysVector<ScalarType>::PassiveCopy(const CSysVector<T>&)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:197:41: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  197 | #define SU2_OMP_SAFE_GLOBAL_ACCESS(...) BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS{__VA_ARGS__} END_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:386:5: note: in expansion of macro 'SU2_OMP_SAFE_GLOBAL_ACCESS'
+  386 |     SU2_OMP_SAFE_GLOBAL_ACCESS(
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp: In member function 'ScalarType CSysVector<ScalarType>::dot(const VecExpr::CVecExpr<U, Scalar_t>&) const':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:557:5: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  557 |     BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp: In member function 'void CSysSolve<ScalarType>::HandleTemporariesIn(const CSysVector<T>&, CSysVector<T>&, bool)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:291:7: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  291 |       BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:303:7: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  303 |       BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp: In member function 'void CSysSolve<ScalarType>::HandleTemporariesOut(CSysVector<T>&, bool)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:323:7: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  323 |       BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:333:7: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  333 |       BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/limiters/CLimiterDetails.hpp: In member function 'void CLimiterDetails<LIMITER::VENKATAKRISHNAN_WANG>::preprocess(CGeometry&, const CConfig&, size_t, size_t, const FieldType&)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/limiters/CLimiterDetails.hpp:356:5: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  356 |     BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/limiters/CLimiterDetails.hpp:390:5: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  390 |     BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CSolver.hpp: In member function 'void CSolver::SetResToZero()':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CSolver.hpp:4489:5: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 4489 |     BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp: In static member function 'static void CFVMFlowSolverBase<VariableType, FlowRegime>::ompMasterAssignBarrier(Ts&& ...)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:197:41: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  197 | #define SU2_OMP_SAFE_GLOBAL_ACCESS(...) BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS{__VA_ARGS__} END_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp:66:5: note: in expansion of macro 'SU2_OMP_SAFE_GLOBAL_ACCESS'
+   66 |     SU2_OMP_SAFE_GLOBAL_ACCESS(recursiveAssign(lhsRhsPairs...);)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::FinalizeResidualComputation(const CGeometry*, bool, long unsigned int, CConfig*)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp:319:7: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  319 |       BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::SetTime_Step_impl(const SoundSpeedFunc&, const LambdaViscFunc&, CGeometry*, CSolver**, CConfig*, short unsigned int, long unsigned int)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp:584:5: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  584 |     BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp:602:7: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  602 |       BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp:642:7: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  642 |       BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::ComputeVerificationError(CGeometry*, CConfig*)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:541:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  541 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::ImplicitEuler_Iteration(CGeometry*, CSolver**, CConfig*)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:634:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  634 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::ComputeVorticityAndStrainMag(const CConfig&, const CGeometry*, short unsigned int)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:714:5: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  714 |     BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::LoadRestart_impl(CGeometry**, CSolver***, CConfig*, int, bool, su2double*, short unsigned int)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:865:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  865 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:1031:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 1031 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::EdgeFluxResidual(const CGeometry*, const CSolver* const*, CConfig*)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:197:41: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  197 | #define SU2_OMP_SAFE_GLOBAL_ACCESS(...) BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS{__VA_ARGS__} END_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:1578:7: note: in expansion of macro 'SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 1578 |       SU2_OMP_SAFE_GLOBAL_ACCESS(nPrimVarGrad = std::min<unsigned short>(nDim + 2, nPrimVarGrad);)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:1584:3: note: in expansion of macro 'SU2_OMP_MASTER'
+ 1584 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::Pressure_Forces(const CGeometry*, const CConfig*)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:2182:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 2182 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:2320:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 2320 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::Momentum_Forces(const CGeometry*, const CConfig*)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:197:41: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+  197 | #define SU2_OMP_SAFE_GLOBAL_ACCESS(...) BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS{__VA_ARGS__} END_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:2350:3: note: in expansion of macro 'SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 2350 |   SU2_OMP_SAFE_GLOBAL_ACCESS(AllBoundMntCoeff.setZero();)
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:2445:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 2445 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl: In member function 'void CFVMFlowSolverBase<VariableType, FlowRegime>::Friction_Forces(const CGeometry*, const CConfig*)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:2482:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 2482 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/SU2_CFD/include/solvers/CFVMFlowSolverBase.inl:2779:3: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 2779 |   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:\RocketAeroHeat\tools\runtime\su2-thermal-build\source\SU2_CFD\src\solvers\CNSSolver.cpp: In member function 'void CNSSolver::SetTau_Wall_WF(CGeometry*, CSolver**, const CConfig*)':
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21: warning: 'master' construct deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+   36 | #define PRAGMIZE(X) _Pragma(#X)
+      |                     ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23: note: in expansion of macro 'PRAGMIZE'
+   59 | #define SU2_OMP(ARGS) PRAGMIZE(omp ARGS)
+      |                       ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24: note: in expansion of macro 'SU2_OMP'
+  141 | #define SU2_OMP_MASTER SU2_OMP(master)
+      |                        ^~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3: note: in expansion of macro 'SU2_OMP_MASTER'
+  190 |   SU2_OMP_MASTER
+      |   ^~~~~~~~~~~~~~
+E:\RocketAeroHeat\tools\runtime\su2-thermal-build\source\SU2_CFD\src\solvers\CNSSolver.cpp:1049:5: note: in expansion of macro 'BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS'
+ 1049 |     BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

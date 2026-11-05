@@ -9,13 +9,13 @@ import numpy as np
 from scipy.spatial import cKDTree
 
 from validateIdealAir import ROOT, run, save, sha, write_rows, read_rows, relative
-from su2IdealAirInterface import FLAVOR, R, settings
+from su2IdealAirInterface import FLAVOR, PHASE_FLAVORS, R, settings
 from su2ThermalRuntime import read
 from su2SSTInterface import wall_geometry, phase_columns
 from auditSU2SSTState import vtk_tokens
 
 
-def load_state(path, turbulent):
+def load_state(path, turbulent, captured=False):
     """按实际具名列读取，绝对内能按OTH参考解释。"""
     with path.open(encoding='utf-8-sig') as stream:
         columns = next(csv.reader(stream))
@@ -27,7 +27,7 @@ def load_state(path, turbulent):
         expected += ['Turb_Kin_Energy', 'Omega']
     else:
         primitive = primitive[:-1]
-    assert columns == expected+primitive, columns
+    assert columns == expected+primitive+(['Flow_Primitive_K'] if captured else []), columns
     data = np.loadtxt(str(path), delimiter=',', skiprows=1)
     assert np.isfinite(data).all() and np.array_equal(data[:, 0], np.arange(len(data)))
     values = {name: data[:, index] for index, name in enumerate(columns)}
@@ -35,6 +35,8 @@ def load_state(path, turbulent):
     assert np.all((values['Temperature'] >= 60) & (values['Temperature'] <= 2000))
     if turbulent:
         assert min(values['Turb_Kin_Energy']) >= 0 and min(values['Omega']) > 0
+    if captured:
+        assert min(values['Flow_Primitive_K']) >= 0
     return data, values, nd
 
 
@@ -55,42 +57,58 @@ def publish_review(folder, audit_directory):
         thermoSHA256=sha(directory/'oracle.csv'), receiptSHA256=sha(folder/'engine_process.json')))
 
 
-def audit(folder, output=None, reuse_properties=None):
+def audit(folder, output=None, reuse_properties=None, checkpoint=None):
     """分开验证流动阶段、后更新k、给定Tw和高精度热流，保留真实资格边界。"""
     folder = Path(folder).resolve()
     folder.relative_to(ROOT/'outputs')
     receipt = read(folder/'engine_process.json')
-    assert receipt['status'] == 'terminal' and receipt['exitCode'] == 0
-    assert not receipt['timedOut'] and not receipt['cancelled'] and all(receipt['inputsStable'].values())
-    assert receipt['runtimeFlavor'] == FLAVOR
+    assert receipt['status'] == 'terminal' and all(receipt['inputsStable'].values())
+    captured = receipt['runtimeFlavor'] in PHASE_FLAVORS
+    assert receipt['runtimeFlavor'] in (FLAVOR, *PHASE_FLAVORS)
+    normal = receipt['exitCode'] == 0 and not any(receipt.get(key, False)
+        for key in ('timedOut', 'cancelled', 'outputBudgetExceeded', 'supervisorError'))
+    assert normal or (captured and checkpoint is not None), '异常终态须显式选择已完整保存的检查点'
     contract = receipt['thermodynamicModel']
     turbulent = contract['turbulent']
     config = settings((folder/'case.cfg').read_text(encoding='utf8'))
     for name in ('case.cfg', 'mesh.su2', 'ideal_air_contract.json', 'case_manifest.json'):
         assert sha(folder/name) == receipt['inputSHA256'][str(folder/name)]
-    for name in ('restart_flow.csv', 'surface_flow.vtk', 'history.csv'):
+    for name in (('history.csv',) if captured else ('restart_flow.csv', 'surface_flow.vtk', 'history.csv')):
         assert sha(folder/name) == receipt['outputSHA256'][name]
     with (folder/'history.csv').open() as stream:
         rows = list(csv.reader(stream, skipinitialspace=True))
     keys = [key.strip() for key in rows[0]]
     history = np.array(rows[1:], float)
     steps = history[:, keys.index('Inner_Iter')]
-    assert np.array_equal(steps, np.arange(len(history))) and len(history) >= 2
-    step = int(steps[-1])
-    for stem, extension in (('restart_flow', 'csv'), ('surface_flow', 'vtk')):
-        named = '%s_%06d.%s' % (stem, step, extension)
-        assert sha(folder/named) == receipt['outputSHA256'][named] == sha(folder/(stem+'.'+extension))
-    data, values, nd = load_state(folder/'restart_flow.csv', turbulent)
+    assert np.array_equal(steps, np.arange(len(history))) and len(history) >= (1 if captured else 2)
+    step = int(steps[-1]) if checkpoint is None else checkpoint
+    assert isinstance(step, int) and 0 <= step < len(history)
+    assert np.isfinite(history[step]).all()
+    if captured:
+        entry = next(row for row in receipt['checkpoints']['complete'] if row['localIteration'] == step)
+        volume_path, surface_path = folder/entry['volume'], folder/entry['surface']
+        assert sha(volume_path) == entry['volumeSHA256'] == receipt['outputSHA256'][volume_path.name]
+        assert sha(surface_path) == entry['surfaceSHA256'] == receipt['outputSHA256'][surface_path.name]
+    else:
+        for stem, extension in (('restart_flow', 'csv'), ('surface_flow', 'vtk')):
+            named = '%s_%06d.%s' % (stem, step, extension)
+            assert sha(folder/named) == receipt['outputSHA256'][named] == sha(folder/(stem+'.'+extension))
+        volume_path, surface_path = folder/'restart_flow.csv', folder/'surface_flow.vtk'
+    data, values, nd = load_state(volume_path, turbulent, captured)
     axes = ['x', 'y', 'z'][:nd]
     rho = values['Density']
     velocity = np.column_stack([values['Momentum_'+axis]/rho for axis in axes])
     flow_velocity = np.column_stack([values['Velocity_'+axis] for axis in axes])
     kinetic = values['Turb_Kin_Energy'] if turbulent else np.zeros(len(data))
-    previous_path = folder/('restart_flow_%06d.csv' % (step-1))
-    assert sha(previous_path) == receipt['outputSHA256'][previous_path.name]
-    previous, previous_values, previous_nd = load_state(previous_path, turbulent)
-    assert previous_nd == nd and np.array_equal(previous[:, :nd+1], data[:, :nd+1])
-    old_k = previous_values['Turb_Kin_Energy'] if turbulent else kinetic
+    if captured:
+        previous_path = volume_path
+        old_k = values['Flow_Primitive_K']
+    else:
+        previous_path = folder/('restart_flow_%06d.csv' % (step-1))
+        assert sha(previous_path) == receipt['outputSHA256'][previous_path.name]
+        previous, previous_values, previous_nd = load_state(previous_path, turbulent)
+        assert previous_nd == nd and np.array_equal(previous[:, :nd+1], data[:, :nd+1])
+        old_k = previous_values['Turb_Kin_Energy'] if turbulent else kinetic
     energy_without_k = values['Energy']/rho-.5*np.sum(velocity*velocity, axis=1)
     out = Path(output).resolve() if output else folder/'ideal_air_audit'
     out.relative_to(folder)
@@ -103,7 +121,7 @@ def audit(folder, output=None, reuse_properties=None):
     write_rows(out/'current_input.csv', [('rhoe', float(r), float(e)) for r, e in zip(rho, energy_without_k-kinetic)])
     inputs = [Path(__file__).resolve(), ROOT/'scripts/su2IdealAirInterface.py', ROOT/'scripts/su2SSTInterface.py',
               ROOT/'scripts/auditSU2SSTState.py', ROOT/'scripts/validateIdealAir.py', helper, previous_path,
-              folder/'restart_flow.csv', folder/'surface_flow.vtk', folder/'engine_process.json',
+              volume_path, surface_path, folder/'engine_process.json',
               out/'oracle_input.csv', out/'current_input.csv']
     lock = {str(path): sha(path) for path in inputs}
     save(out/'input_locks.json', lock)
@@ -113,7 +131,7 @@ def audit(folder, output=None, reuse_properties=None):
             old = Path(reuse_properties).resolve()
             old.relative_to(folder)
             old_locks = read(old/'input_locks.json')
-            for path in (helper, folder/'restart_flow.csv', previous_path):
+            for path in (helper, volume_path, previous_path):
                 assert sha(path) == old_locks[str(path)]
             assert sha(out/(mode+'_input.csv')) == sha(old/(mode+'_input.csv'))
             process = read(old/(mode+'_process.json'))
@@ -130,7 +148,7 @@ def audit(folder, output=None, reuse_properties=None):
     assert errors['phaseEnergy'] < 2e-10 and errors['EOS'] < 2e-11 and errors['velocity'] < 2e-11, errors
     g = wall_geometry(folder/'mesh.su2')
     points = np.column_stack([data[:, 1:nd+1], np.zeros((len(data), 3-nd))])
-    xyz, surface = vtk_tokens(folder/'surface_flow.vtk')
+    xyz, surface = vtk_tokens(surface_path)
     distances, ids = cKDTree(points).query(xyz)
     assert max(distances) < 1e-6 and set(ids) == set(g['wallIDs'])
     order = {int(v): i for i, v in enumerate(g['wallIDs'])}
@@ -164,14 +182,16 @@ def audit(folder, output=None, reuse_properties=None):
         # 原生层流路径未构造湍流壁距，Y_Plus保存为0；另列独立剪切尺度。
         assert np.all(values['Y_Plus'][ids] == 0)
     power = float(g['nodeArea'][ix]@q)
-    errors['power'] = relative(np.array([history[-1, keys.index('HF')]]), np.array([power]))
+    errors['power'] = relative(np.array([history[step, keys.index('HF')]]), np.array([power]))
     assert errors['power'] < 2e-6
     residual_names = ['rms[Rho]', 'rms[RhoE]']+(['rms[k]', 'rms[w]'] if turbulent else [])
-    residuals = [float(history[-1, keys.index(name)]) for name in residual_names]
+    residuals = [float(history[step, keys.index(name)]) for name in residual_names]
     stable = {path: sha(Path(path)) == expected for path, expected in lock.items()}
     assert all(stable.values())
     report = dict(interfacePassed=True, thermodynamicModel=contract, dimension=nd, nodes=len(data),
-        wallNodes=len(ids), checkpointLocalIteration=step, successfulUpdates=len(history),
+        wallNodes=len(ids), checkpointLocalIteration=step, successfulUpdates=step+1,
+        seriesSuccessfulUpdates=(read(folder/'case_manifest.json')['initialization']['priorSuccessfulUpdates']+step+1) if captured else step+1,
+        nativeNormalTerminal=normal,
         elapsedSeconds=receipt['elapsedSeconds'], errors=errors, inputSHA256=lock, inputsStable=stable,
         nativeHeatPower=power, nativeHeatPowerUnit='W/m' if nd == 2 else 'W',
         wallHeatRangeWm2=[float(min(q)), float(max(q))], givenWallTemperatureK=wall_temperature,
@@ -179,8 +199,9 @@ def audit(folder, output=None, reuse_properties=None):
         temperatureRangeK=[float(min(temperature)), float(max(temperature))],
         currentKTemperatureRangeK=[float(min(current['T'])), float(max(current['T']))],
         currentKvsFlowPhaseTemperatureDifferenceK=float(max(abs(current['T']-temperature))),
-        flowPrimitivePhase='flow update with previous saved k', turbulencePhase='subsequent turbulence update',
-        previousKCheckpoint=step-1, wallEddyToMolecularMaximum=eddy_fraction,
+        flowPrimitivePhase='captured SetPrimVar k input' if captured else 'flow update with previous saved k',
+        turbulencePhase='subsequent turbulence update',
+        previousKCheckpoint=None if captured else step-1, wallEddyToMolecularMaximum=eddy_fraction,
         finalResiduals=residuals, originalResidualThresholdPassed=step >= 10 and all(v < -8 for v in residuals),
         yPlusP99=float(np.percentile(yplus, 99)), nativeYPlusAvailable=bool(turbulent),
         reusedPropertiesFrom=str(reuse_properties) if reuse_properties else None,
@@ -191,7 +212,8 @@ def audit(folder, output=None, reuse_properties=None):
         header='nodeID,x_m,y_m,z_m,p_Pa,q_W_m2,fluid_T_K,given_Tw_K,yPlus')
     report['wallCSV_SHA256'] = sha(out/'wall.csv')
     save(out/'report.json', report)
-    publish_review(folder, out)
+    if normal and checkpoint is None:
+        publish_review(folder, out)
     return report
 
 
@@ -200,6 +222,7 @@ if __name__ == '__main__':
     parser.add_argument('--folder', required=True)
     parser.add_argument('--output')
     parser.add_argument('--reuse-properties')
+    parser.add_argument('--checkpoint', type=int)
     args = parser.parse_args()
-    result = audit(args.folder, args.output, args.reuse_properties)
+    result = audit(args.folder, args.output, args.reuse_properties, args.checkpoint)
     print(json.dumps({k: v for k, v in result.items() if k not in ('inputSHA256', 'inputsStable')}, indent=2))

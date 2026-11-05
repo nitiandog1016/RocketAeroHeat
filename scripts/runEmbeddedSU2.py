@@ -59,6 +59,8 @@ def main():
     from su2ThermalRuntime import resolve, audit_applied, FROZEN_FLAVOR, read
     config_text = cfg.read_text(encoding='utf-8-sig')
     exe,runtime,runtime_flavor,thermal_profile,thermal_locks=resolve(folder,config_text)
+    if runtime_flavor == 'rah-ideal-air-phase-v2':
+        assert not request.get('dryRun', False), '稀疏保存合同要求实际更新'
     timeout = float(request['maximumSeconds'])
     threads = int(request['threads'])
     assert 1 <= threads <= 8 and 1 <= timeout <= 720
@@ -98,6 +100,10 @@ def main():
         state['physicsModel']=read(folder/'sst_contract.json')
     if (folder/'ideal_air_contract.json').exists():
         state['thermodynamicModel']=read(folder/'ideal_air_contract.json')
+    output_budget = None
+    if runtime_flavor == 'rah-ideal-air-phase-v2':
+        from su2IdealAirCheckpoints import output_length, inventory
+        output_budget = state['thermodynamicModel']['checkpointContract']['maximumOutputBytes']
 
     def save():
         atomic_write_json(receipt,state)
@@ -125,6 +131,7 @@ def main():
         state.update(status='running', processID=process.pid, command=command)
         timed_out = False
         cancelled = False
+        output_exceeded = False
         supervisor_error = None
         try:
             save()
@@ -137,7 +144,10 @@ def main():
                     except (ValueError, OSError):
                         pass
                 timed_out = elapsed >= timeout
-                if timed_out or cancelled:
+                if output_budget is not None:
+                    state['generatedOutputBytes'] = output_length(folder, locked)
+                    output_exceeded = state['generatedOutputBytes'] > output_budget
+                if timed_out or cancelled or output_exceeded:
                     process.kill()
                     break
                 state.update(elapsedSeconds=elapsed, progress=history_progress(folder / 'history.csv'))
@@ -161,10 +171,22 @@ def main():
         except Exception as ex:state['supervisorError']='Thermal input audit failed: '+str(ex);supervisor_error=str(ex)
     state['outputSHA256'] = {file.name: sha(file) for file in sorted(folder.iterdir())
                             if file.is_file() and file != receipt and file.suffix!='.pending' and str(file) not in locked}
+    if output_budget is not None:
+        state['generatedOutputBytes'] = output_length(folder, locked)
+        state['outputBudgetExceeded'] = output_exceeded or state['generatedOutputBytes'] > output_budget
+        try:
+            state['checkpoints'] = inventory(folder, state)
+            if code == 0 and not timed_out and not cancelled:
+                assert state['checkpoints']['normalFinalPairPresent'] and state['checkpoints']['normalScheduleComplete'], '正常终态缺少首帧、计划检查点或最后完整场'
+        except Exception as ex:
+            state['supervisorError'] = 'Checkpoint audit failed: '+type(ex).__name__+': '+str(ex)
+            supervisor_error = state['supervisorError']
     terminal_receipt=save_terminal_receipt(receipt,state)
     print(json.dumps(dict(status='terminal', exitCode=code, timedOut=timed_out,
                          elapsedSeconds=state['elapsedSeconds'], receipt=str(terminal_receipt))))
     if supervisor_error is not None or terminal_receipt!=receipt:return 1
+    if output_budget is not None and state['outputBudgetExceeded']:
+        return 126
     return 125 if cancelled else (124 if timed_out else (code if code else (0 if all(state['inputsStable'].values()) else 2)))
 
 

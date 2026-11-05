@@ -27,7 +27,11 @@ def save(path,value):
     path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf8')
 
 
-def main():
+def build(output=OUT, patch_directory=PATCH, flavor=FLAVOR,
+          plan=ROOT/'docs/validation/v154/PLAN.md',
+          patch_script=ROOT/'scripts/prepareSU2IdealAirPatch.py', extra_syntax=()):
+    """模块用途。为具名运行包执行同一来源审核、全量构建和共享源码恢复流程。"""
+    OUT, PATCH, FLAVOR = Path(output), Path(patch_directory), flavor
     assert not OUT.exists(); OUT.mkdir(parents=True)
     proof=json.loads((ROOT/'outputs/v154_validation/adapter02/report.json').read_text())
     assert proof['passed']
@@ -90,12 +94,12 @@ def main():
         for index,line in enumerate(lines):
             if re.match(r'build .*: cpp_COMPILER ',line):
                 assert ' |' not in line
-                lines[index]=line.rstrip()+' | RAH_FORCE_IDEAL_AIR_V154\n'
-        custom=BUILD/'ideal-air-v154.ninja'; assert not custom.exists()
-        custom.write_text(''.join(lines)+'\nbuild RAH_FORCE_IDEAL_AIR_V154: phony\n',encoding='utf8')
+                lines[index]=line.rstrip()+' | RAH_FORCE_IDEAL_AIR\n'
+        custom=BUILD/(FLAVOR+'.ninja'); assert not custom.exists()
+        custom.write_text(''.join(lines)+'\nbuild RAH_FORCE_IDEAL_AIR: phony\n',encoding='utf8')
         shutil.copyfile(str(custom),str(OUT/custom.name))
-        inputs=[Path(__file__).resolve(),ROOT/'scripts/prepareSU2IdealAirPatch.py',ROOT/'scripts/validateIdealAir.py',
-            ROOT/'docs/validation/v154/PLAN.md',compiler,ninja,graph,custom]+[ROOT/'third_party/ideal_air'/name for name in headers]
+        inputs=[Path(__file__).resolve(),patch_script,ROOT/'scripts/prepareSU2IdealAirPatch.py',ROOT/'scripts/validateIdealAir.py',
+            plan,compiler,ninja,graph,custom]+[ROOT/'third_party/ideal_air'/name for name in headers]
         lock={str(path):sha(path) for path in inputs}
         tree={str(path):sha(path) for path in SOURCE.rglob('*') if path.is_file()}
         save(OUT/'source_tree.json',tree); save(OUT/'build_sources.json',lock)
@@ -103,7 +107,7 @@ def main():
         flags=['-std=c++17','-O3','-fopenmp','-ffast-math','-fno-finite-math-only','-fsyntax-only',
             '-I'+str(BUILD/'Common/src'),'-I'+str(SOURCE/'externals/eigen'),
             '-I'+str(SOURCE/'externals/mel'),'-I'+str(SOURCE/'externals/CLI11')]
-        for name in ('Common/src/CConfig.cpp','SU2_CFD/src/solvers/CEulerSolver.cpp','SU2_CFD/src/solvers/CNSSolver.cpp'):
+        for name in ('Common/src/CConfig.cpp','SU2_CFD/src/solvers/CEulerSolver.cpp','SU2_CFD/src/solvers/CNSSolver.cpp', *extra_syntax):
             run(OUT,'syntax_'+Path(name).stem,[str(compiler)]+flags+[str(SOURCE/name)],120)
         command=[str(ninja),'-C',str(BUILD),'-f',custom.name,'-j','2','SU2_CFD/src/SU2_CFD.exe']
         env=dict(os.environ,PATH=str(compiler.parent)+os.pathsep+os.environ['PATH'])
@@ -164,4 +168,4 @@ def main():
 
 
 if __name__=='__main__':
-    main()
+    build()

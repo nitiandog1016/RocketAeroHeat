@@ -1,0 +1,13 @@
+--- a/SU2_CFD/src/output/CFlowOutput.cpp
++++ b/SU2_CFD/src/output/CFlowOutput.cpp
+@@ -4134,7 +4134,9 @@
+     }
+   } else {
+     if (config->GetFixed_CL_Mode() && config->GetFinite_Difference_Mode()) return false;
+-    return ((Iter > 0) && Iter % config->GetVolumeOutputFrequency(iFile) == 0) || force_writing;
++    // 新变比热包保存第一次完成更新，稳态局部0对应第1次更新。
++    return ((Iter > 0 || config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) &&
++            Iter % config->GetVolumeOutputFrequency(iFile) == 0) || force_writing;
+   }
+ 
+   return force_writing;

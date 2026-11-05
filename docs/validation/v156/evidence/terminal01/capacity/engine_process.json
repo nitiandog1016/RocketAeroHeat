@@ -1,0 +1,159 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-11-05T20:17:17.984633+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "threads": 2,
+    "maximumSeconds": 5,
+    "jobToken": "fixture-token",
+    "sourceFiles": [
+      "tests/testSU2IdealAirCheckpointTerminals.py",
+      "scripts/su2IdealAirCheckpoints.py"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\engine_request.json": "776e2f29e7576cb4dbc9a4a611f750cf7aa34ab811ddbcd232566ae1db40cd76",
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\case.cfg": "412f2a075e45d89dd87cded64c3a671d09efe7905804bb981b63e4cfba78226a",
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\mesh.su2": "3534885a5a0724e87f0a75f048f7b2edf074369408def1ab78422fe99a67ac0e",
+    "D:\\anacondapython\\python.exe": "f273ad5ad9d559c31c8a3d514a71fb64d61a9bb1bcb262a1f2d13844fce7fb67",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "347d8fc27c4348002be882e9a0d8ab765aabd2fdc35016968cf62d86ecf69e58",
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\case_manifest.json": "de615a65eaf2e2209556812ad7a9a4040437d205fae1630aa3e191c78c90fc7f",
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\ideal_air_contract.json": "fd27971128fce172b1d1daabe8fd1e8af26ba3dba6e2d3298abd49eda994f8d8",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "ce5ba485afa29926064dfc661024149bf10db3d4590044d267a5d384b67e34d6",
+    "E:\\RocketAeroHeat\\tests\\testSU2IdealAirCheckpointTerminals.py": "a6cbf21a8e106747f9d86626819c723d959dde0a40f99cd67217e5c783fe8104",
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirCheckpoints.py": "d001282a8c7ce677f5a752043b577f020f580fc93883d22cd8f2c9af32950e71"
+  },
+  "executableVersion": "TEST-FIXTURE-NOT-A-FLOW-SOLVER",
+  "archiveSHA256": "test-only",
+  "supervisorProcessID": 38332,
+  "physicalSolutionQualified": false,
+  "runtimeFlavor": "rah-ideal-air-phase-v2",
+  "thermodynamicModel": {
+    "schemaVersion": 3,
+    "thermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+    "gasConstant": 287.0491267875601,
+    "temperatureRangeK": [
+      60,
+      2000
+    ],
+    "energyEntropyReference": "OTH",
+    "initialization": "same-mesh-ideal-air-state-v1",
+    "turbulent": true,
+    "flowFlux": "general-EOS Roe",
+    "conductivity": "molecular mu*cp(T)/Pr; native eddy term once",
+    "freestreamSpeed": 1509.1111415535954,
+    "freestreamSoundSpeed": 301.8222283107191,
+    "freestreamCp": 1002.6528230037077,
+    "provenance": "v155 explicit fully turbulent wall-distance initial guess; transition unknown",
+    "physicsQualified": false,
+    "newQualifiedArea": 0,
+    "initializationSHA256": "0842e222db957b83408482a6af310cf27901e38ee2bbb22274c4ca75ed33d65d",
+    "configurationSHA256": "dac1a6facedfd3c1e26ed111217e9a5414a783ab23b1d022dbab7b43e1ddaae4",
+    "meshSHA256": "3534885a5a0724e87f0a75f048f7b2edf074369408def1ab78422fe99a67ac0e",
+    "checkpointContract": {
+      "schemaVersion": 1,
+      "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+      "every": 2,
+      "maximumUpdates": 6,
+      "firstLocalIteration": 0,
+      "firstSuccessfulUpdate": 1,
+      "maximumNamedPairs": 4,
+      "estimatedVolumeBytes": 36928,
+      "estimatedSurfaceBytes": 14400,
+      "estimatedMaximumBytes": 1329792,
+      "maximumOutputBytes": 1024,
+      "units": "file lengths including final aliases; physical allocation unknown",
+      "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold"
+    }
+  },
+  "processID": 7704,
+  "command": [
+    "D:\\anacondapython\\python.exe",
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\case.cfg",
+    "--threads",
+    "2"
+  ],
+  "generatedOutputBytes": 27244,
+  "elapsedSeconds": 0.26600000000325963,
+  "progress": {
+    "Inner_Iter": 2.0,
+    "rms[Rho]": 1.332611694,
+    "rms[RhoE]": 7.502078906,
+    "HF": 4649850.967
+  },
+  "exitCode": 1,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-11-05T20:17:18.251733+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\mesh.su2": true,
+    "D:\\anacondapython\\python.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v156_validation\\terminal01\\capacity\\ideal_air_contract.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\tests\\testSU2IdealAirCheckpointTerminals.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirCheckpoints.py": true
+  },
+  "outputSHA256": {
+    "engine_stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "history.csv": "34df2b02a5aaeb80d9df9fb6b8ff0333229f5ac9cc6b1735f2191100cda31195",
+    "restart_flow_000000.csv": "fe1f63901b282191845ccadb0bbf75220ddda194a348504a205db11a145eb8d6",
+    "restart_flow_000002.csv": "2ec4482ef93b0f5c310a9237f5b29cba5c9d3292af0a01a0bbf9a97e927c6ae1",
+    "surface_flow_000000.vtk": "13901c92683f9d34f7c622c571e27b9555055128bb692a8b65c411d3bc6bf623"
+  },
+  "outputBudgetExceeded": true,
+  "checkpoints": {
+    "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+    "complete": [
+      {
+        "localIteration": 0,
+        "successfulUpdates": 1,
+        "seriesSuccessfulUpdates": 1,
+        "volume": "restart_flow_000000.csv",
+        "surface": "surface_flow_000000.vtk",
+        "volumeSHA256": "fe1f63901b282191845ccadb0bbf75220ddda194a348504a205db11a145eb8d6",
+        "surfaceSHA256": "13901c92683f9d34f7c622c571e27b9555055128bb692a8b65c411d3bc6bf623",
+        "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+        "physicalQualified": false
+      }
+    ],
+    "rejected": [
+      {
+        "localIteration": 2,
+        "reason": "AssertionError: 文件缺失或身份变化"
+      }
+    ],
+    "lastComplete": {
+      "localIteration": 0,
+      "successfulUpdates": 1,
+      "seriesSuccessfulUpdates": 1,
+      "volume": "restart_flow_000000.csv",
+      "surface": "surface_flow_000000.vtk",
+      "volumeSHA256": "fe1f63901b282191845ccadb0bbf75220ddda194a348504a205db11a145eb8d6",
+      "surfaceSHA256": "13901c92683f9d34f7c622c571e27b9555055128bb692a8b65c411d3bc6bf623",
+      "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+      "physicalQualified": false
+    },
+    "lastFiniteHistoryLocalIteration": 2,
+    "historyRows": 3,
+    "historyContiguous": true,
+    "seriesUpdatesAtLastFiniteHistory": 3,
+    "normalTerminal": false,
+    "normalFinalPairPresent": false,
+    "expectedLocalIterations": [
+      0,
+      2
+    ],
+    "missingScheduledLocalIterations": [
+      2
+    ],
+    "normalScheduleComplete": false,
+    "abnormalInstantStateAvailable": false,
+    "physicsQualified": false
+  }
+}

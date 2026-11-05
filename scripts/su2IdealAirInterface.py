@@ -7,6 +7,8 @@ from su2ThermalRuntime import read, sha
 from su2SSTInterface import PHASE_OUTPUT
 
 FLAVOR = 'rah-ideal-air-v1'
+PHASE_FLAVOR = 'rah-ideal-air-phase-v2'
+PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR)
 MODEL = 'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'
 R = 8.31451 / .02896546
 
@@ -22,13 +24,18 @@ def validate(folder, manifest, text, runtime):
     c = settings(text)
     path = folder / 'ideal_air_contract.json'
     contract = read(path)
-    assert runtime['flavor'] == manifest['requiredRuntimeFlavor'] == FLAVOR
+    flavor = manifest['requiredRuntimeFlavor']
+    assert runtime['flavor'] == flavor and flavor in (FLAVOR, PHASE_FLAVOR)
     assert runtime['thermodynamicModel'] == contract['thermodynamicModel'] == MODEL
     assert contract == manifest['idealAir'] and sha(path) == manifest['idealAirContractSHA256']
     assert contract['temperatureRangeK'] == [60, 2000] and contract['gasConstant'] == R
     assert contract['energyEntropyReference'] == 'OTH'
     general = contract['initialization'] == 'general-mesh-ideal-air-SST-wall-distance-v1'
-    assert general or contract['initialization'] == 'native-uniform-freestream'
+    sparse = flavor == PHASE_FLAVOR
+    assert general or contract['initialization'] == 'native-uniform-freestream' or sparse
+    if sparse:
+        assert contract['initialization'] == 'same-mesh-ideal-air-state-v1'
+        assert contract['schemaVersion'] == 3 and contract['turbulent']
     if general:
         assert contract['schemaVersion'] == 2 and contract['turbulent']
     assert contract['physicsQualified'] is False and contract['newQualifiedArea'] == 0
@@ -36,11 +43,12 @@ def validate(folder, manifest, text, runtime):
     assert sha(folder/'mesh.su2') == contract['meshSHA256']
     required = dict(FLUID_MODEL='IDEAL_AIR_VARIABLE_CP', MATH_PROBLEM='DIRECT',
         SYSTEM_MEASUREMENTS='SI', REF_DIMENSIONALIZATION='DIMENSIONAL',
-        INIT_OPTION='TD_CONDITIONS', RESTART_SOL='YES' if general else 'NO', MGLEVEL='0',
+        INIT_OPTION='TD_CONDITIONS', RESTART_SOL='YES' if general or sparse else 'NO', MGLEVEL='0',
         VISCOSITY_MODEL='SUTHERLAND', CONDUCTIVITY_MODEL='CONSTANT_PRANDTL',
         CONV_NUM_METHOD_FLOW='ROE', WRT_RESTART_COMPACT='NO',
         WRT_RESTART_OVERWRITE='NO', WRT_SURFACE_OVERWRITE='NO',
-        VOLUME_OUTPUT='(COORDINATES, SOLUTION, PRIMITIVE)', OUTPUT_WRT_FREQ='1')
+        VOLUME_OUTPUT='(COORDINATES, SOLUTION, PRIMITIVE, FLOW_PHASE)' if sparse else '(COORDINATES, SOLUTION, PRIMITIVE)',
+        OUTPUT_WRT_FREQ=str(contract['checkpointContract']['every']) if sparse else '1')
     for key, value in required.items():
         assert c.get(key) == value, key
     if general:
@@ -92,5 +100,8 @@ def validate(folder, manifest, text, runtime):
         assert not (folder/'sst_contract.json').exists()
     if general:
         from prepareSU2IdealAirWallDistance import validate_source
+        locks.update(validate_source(folder, c, manifest, contract))
+    if sparse:
+        from prepareSU2IdealAirRestart import validate_source
         locks.update(validate_source(folder, c, manifest, contract))
     return locks

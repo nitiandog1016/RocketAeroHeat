@@ -11,6 +11,7 @@ COOLPROP_FLAVOR='rah-coolprop-v1'
 COOLPROP_RECON_FLAVOR='rah-coolprop-recon-v1'
 COOLPROP_FLAVORS=(COOLPROP_FLAVOR,COOLPROP_RECON_FLAVOR,'rah-coolprop-recon-v2','rah-coolprop-recon-v3')
 IDEAL_AIR_FLAVOR='rah-ideal-air-v1'
+IDEAL_AIR_FLAVORS=(IDEAL_AIR_FLAVOR,'rah-ideal-air-phase-v2')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 
@@ -25,12 +26,12 @@ def resolve(folder,config):
         prepared=read(preparation)
         assert prepared['status']=='terminal' and prepared['exitCode']==0,'变比热初场准备尚未成功'
         assert flavor==IDEAL_AIR_FLAVOR and 'initialization' in data,'变比热初场清单发布不完整'
-    if flavor!=IDEAL_AIR_FLAVOR and (re.search(r'^\s*SOLVER\s*=\s*RANS\s*$',config,re.M) or 'sst' in data):
+    if flavor not in IDEAL_AIR_FLAVORS and (re.search(r'^\s*SOLVER\s*=\s*RANS\s*$',config,re.M) or 'sst' in data):
         assert flavor in ('official',BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR),'SST仅适配显式定比热包，HEOS/空间壁温RANS尚未验证'
         locked.update(validate_sst_manifest(folder,data,config))
-    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR,IDEAL_AIR_FLAVOR,*COOLPROP_FLAVORS),'未知SU2运行时类型'
+    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR,*IDEAL_AIR_FLAVORS,*COOLPROP_FLAVORS),'未知SU2运行时类型'
     if re.search(r'^\s*FLUID_MODEL\s*=\s*IDEAL_AIR_VARIABLE_CP\s*$',config,re.M):
-        assert flavor==IDEAL_AIR_FLAVOR,'变比热空气须显式选择相容运行包'
+        assert flavor in IDEAL_AIR_FLAVORS,'变比热空气须显式选择相容运行包'
     if flavor!=FROZEN_FLAVOR:assert 'frozenEnergyMode' not in data,'运行时类型与冻结能量选项不匹配'
     runtime_dir=ROOT/'tools/runtime/su2'/('8.6.0' if flavor=='official' else '8.6.0-'+flavor)
     runtime_file=runtime_dir/'runtime.json'
@@ -63,7 +64,7 @@ def resolve(folder,config):
             from prepareSU2CheckpointContinuation import config as parse_config
             locked.update(validate_runtime(folder,data,parse_config(folder/'case.cfg'),runtime))
             locked[str(manifest)]=sha(manifest)
-        elif flavor==IDEAL_AIR_FLAVOR:
+        elif flavor in IDEAL_AIR_FLAVORS:
             from su2IdealAirInterface import validate
             locked.update(validate(folder,data,config,runtime))
         elif flavor in COOLPROP_FLAVORS:
