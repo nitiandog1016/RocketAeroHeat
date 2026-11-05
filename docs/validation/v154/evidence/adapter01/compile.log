@@ -1,0 +1,19 @@
+In file included from E:\RocketAeroHeat\tests\testSU2IdealAirAdapter.cpp:4:
+E:\RocketAeroHeat\outputs\v154_validation\adapter01/NativeGeneralJacobian.hpp:3:27: error: redefinition of 'bool AD::BeginPassive()'
+    3 | namespace AD {inline bool BeginPassive(){return false;} inline void EndPassive(bool){}}
+      |                           ^~~~~~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/basic_types/datatype_structure.hpp:35,
+                 from E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/mpi_structure.hpp:37,
+                 from E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/CConfig.hpp:31,
+                 from E:\RocketAeroHeat\tools\runtime\su2-thermal-build\source\SU2_CFD\include\fluid/CFluidModel.hpp:33,
+                 from E:/RocketAeroHeat/third_party/ideal_air/CSU2IdealAir.hpp:4,
+                 from E:\RocketAeroHeat\tests\testSU2IdealAirAdapter.cpp:2:
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/basic_types/ad_structure.hpp:381:13: note: 'bool AD::BeginPassive()' previously defined here
+  381 | inline bool BeginPassive() { return false; }
+      |             ^~~~~~~~~~~~
+E:\RocketAeroHeat\outputs\v154_validation\adapter01/NativeGeneralJacobian.hpp:3:69: error: redefinition of 'void AD::EndPassive(bool)'
+    3 | namespace AD {inline bool BeginPassive(){return false;} inline void EndPassive(bool){}}
+      |                                                                     ^~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/basic_types/ad_structure.hpp:387:13: note: 'void AD::EndPassive(bool)' previously defined here
+  387 | inline void EndPassive(bool wasActive) {}
+      |             ^~~~~~~~~~
