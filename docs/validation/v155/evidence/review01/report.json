@@ -1,0 +1,109 @@
+{
+  "initializationPassed": true,
+  "nativeFullInterfacePassed": false,
+  "initialStates": {
+    "small": {
+      "passed": true,
+      "nodes": 38,
+      "originalFaces": 8,
+      "independentSampleCount": 38,
+      "errors": {
+        "thermalEnergy": 3.4198279501809063e-16,
+        "pressure": 0.0
+      },
+      "temperatureRangeK": [
+        226.5,
+        300.01270154757447
+      ],
+      "expectedVelocity": [
+        -1418.100603663712,
+        -0.0,
+        516.1464089285245
+      ],
+      "inputMach": 5,
+      "preparationSeconds": 0.07899999999790452,
+      "initialStateSHA256": "3c704aff36ccb71caf7e0e211325e7b7fafba52aa5443f4d9393ba73a6e8c25f",
+      "physicsQualified": false,
+      "newQualifiedArea": 0
+    },
+    "real": {
+      "passed": true,
+      "nodes": 335726,
+      "originalFaces": 19752,
+      "independentSampleCount": 117,
+      "errors": {
+        "thermalEnergy": 1.4540273029116296e-15,
+        "pressure": 1.8994851774381408e-16
+      },
+      "temperatureRangeK": [
+        226.50908361133003,
+        544.5199254312906
+      ],
+      "expectedVelocity": [
+        -1418.129005961522,
+        -0.0,
+        516.156746519512
+      ],
+      "inputMach": 5,
+      "preparationSeconds": 16.031000000002678,
+      "initialStateSHA256": "c90609f947c697d9f3a04c4ec6e42cdfcab248662a6eba4c24d7eaa383391f63",
+      "physicsQualified": false,
+      "newQualifiedArea": 0
+    }
+  },
+  "maximumIndependentInitialEnergyError": 1.4540273029116296e-15,
+  "nativeSmall": {
+    "successfulUpdates": 2,
+    "localIteration": 1,
+    "elapsedSeconds": 0.6399999999994179,
+    "exitCode": 0,
+    "errors": {
+      "EOS": 7.828430141252411e-16,
+      "molecularViscosity": 1.0164395367051604e-20,
+      "heatGradient": 4.4586609558878796e-14,
+      "surfaceHeat": 3.0982006348951947e-07,
+      "power": 1.776275203976159e-11
+    },
+    "finalResiduals": {
+      "rms[Rho]": 1.341613946,
+      "rms[RhoE]": 7.509278864,
+      "rms[k]": 4.990411954,
+      "rms[w]": 18.56210017
+    },
+    "originalResidualThresholdPassed": false,
+    "givenWallTemperatureK": 300.0,
+    "wallFluidTemperatureRangeK": [
+      300.004919914079,
+      301.0245537693828
+    ],
+    "heatFluxRangeWm2": [
+      16481.892799274006,
+      1807722.082043991
+    ],
+    "heatPowerW": 3786293.583067255,
+    "phaseEnergyIndependentCheck": "pending: native steady output omits iteration zero",
+    "interfacePassed": false,
+    "physicsQualified": false,
+    "newQualifiedArea": 0
+  },
+  "fullDomainSolverRuns": 0,
+  "matlabSourceCount": 1702,
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\scripts\\validateSU2IdealAirInitialization.py": true,
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2IdealAirCase.py": true,
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2IdealAirWallDistance.py": true,
+    "E:\\RocketAeroHeat\\scripts\\idealAirProperties.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\scripts\\auditSU2IdealAirState.py": true,
+    "E:\\RocketAeroHeat\\tests\\testSU2IdealAirInitialState.py": true,
+    "E:\\RocketAeroHeat\\tests\\testSU2IdealAirInitialExport.m": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v155\\PLAN.md": true
+  },
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\tests\\verifySU2V155Delivery.py": "cd91cffff690e7cec9fc6ee8beb090b832e24cc86f1cd402098e69bcfad065ea"
+  },
+  "physicsQualified": false,
+  "newQualifiedArea": 0
+}

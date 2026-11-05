@@ -26,19 +26,26 @@ def validate(folder, manifest, text, runtime):
     assert runtime['thermodynamicModel'] == contract['thermodynamicModel'] == MODEL
     assert contract == manifest['idealAir'] and sha(path) == manifest['idealAirContractSHA256']
     assert contract['temperatureRangeK'] == [60, 2000] and contract['gasConstant'] == R
-    assert contract['energyEntropyReference'] == 'OTH' and contract['initialization'] == 'native-uniform-freestream'
+    assert contract['energyEntropyReference'] == 'OTH'
+    general = contract['initialization'] == 'general-mesh-ideal-air-SST-wall-distance-v1'
+    assert general or contract['initialization'] == 'native-uniform-freestream'
+    if general:
+        assert contract['schemaVersion'] == 2 and contract['turbulent']
     assert contract['physicsQualified'] is False and contract['newQualifiedArea'] == 0
     assert sha(folder/'case.cfg') == contract['configurationSHA256']
     assert sha(folder/'mesh.su2') == contract['meshSHA256']
     required = dict(FLUID_MODEL='IDEAL_AIR_VARIABLE_CP', MATH_PROBLEM='DIRECT',
         SYSTEM_MEASUREMENTS='SI', REF_DIMENSIONALIZATION='DIMENSIONAL',
-        INIT_OPTION='TD_CONDITIONS', RESTART_SOL='NO', MGLEVEL='0',
+        INIT_OPTION='TD_CONDITIONS', RESTART_SOL='YES' if general else 'NO', MGLEVEL='0',
         VISCOSITY_MODEL='SUTHERLAND', CONDUCTIVITY_MODEL='CONSTANT_PRANDTL',
         CONV_NUM_METHOD_FLOW='ROE', WRT_RESTART_COMPACT='NO',
         WRT_RESTART_OVERWRITE='NO', WRT_SURFACE_OVERWRITE='NO',
         VOLUME_OUTPUT='(COORDINATES, SOLUTION, PRIMITIVE)', OUTPUT_WRT_FREQ='1')
     for key, value in required.items():
         assert c.get(key) == value, key
+    if general:
+        assert c.get('SOLUTION_FILENAME') == 'initial_flow' and c.get('READ_BINARY_RESTART') == 'NO'
+        assert 'RESTART_ITER' not in c and 'continuation' not in manifest
     assert c.get('TIME_DOMAIN', 'NO') == 'NO' and c.get('LOW_MACH_CORR', 'NO') == 'NO'
     assert float(c['GAS_CONSTANT']) == R and float(c['CONV_RESIDUAL_MINVAL']) == -8
     for key in ('MARKER_WALL_FUNCTIONS', 'MARKER_PYTHON_CUSTOM', 'KIND_TRANS_MODEL', 'CONFIG_LIST',
@@ -83,4 +90,7 @@ def validate(folder, manifest, text, runtime):
     else:
         assert c['KIND_TURB_MODEL'] == 'NONE' and 'sst' not in manifest
         assert not (folder/'sst_contract.json').exists()
+    if general:
+        from prepareSU2IdealAirWallDistance import validate_source
+        locks.update(validate_source(folder, c, manifest, contract))
     return locks

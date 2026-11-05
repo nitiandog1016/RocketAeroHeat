@@ -1,0 +1,11 @@
+{
+  "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\output\\COutput.cpp",
+  "sha256": "adb4ab29db8cc72f9263721499de28511ca8cd827d3c847afb54efb439ef9053",
+  "matchesV154BuildSource": true,
+  "startLine": 2169,
+  "function": "bool COutput::WriteVolumeOutput(CConfig *config, unsigned long Iter, bool force_writing, unsigned short iFile){\n\n  if (config->GetTime_Domain()){\n\n    return ((Iter % config->GetVolumeOutputFrequency(iFile) == 0)) || force_writing;\n  }\n      return ((Iter > 0) && (Iter % config->GetVolumeOutputFrequency(iFile) == 0)) || force_writing;\n\n}\n",
+  "observation": "steady regular output requires Iter > 0; forced output is a separate branch",
+  "nativeObservedSavedIterations": [
+    1
+  ]
+}

@@ -19,6 +19,12 @@ def resolve(folder,config):
     manifest=folder/'case_manifest.json';locked={};profile=None
     data=read(manifest) if manifest.exists() else {}
     flavor=data.get('requiredRuntimeFlavor','official')
+    # 新初场准备独占目录；失败或半发布时在创建求解进程前拒绝。
+    preparation=folder/'ideal_air_preparation.json'
+    if preparation.exists():
+        prepared=read(preparation)
+        assert prepared['status']=='terminal' and prepared['exitCode']==0,'变比热初场准备尚未成功'
+        assert flavor==IDEAL_AIR_FLAVOR and 'initialization' in data,'变比热初场清单发布不完整'
     if flavor!=IDEAL_AIR_FLAVOR and (re.search(r'^\s*SOLVER\s*=\s*RANS\s*$',config,re.M) or 'sst' in data):
         assert flavor in ('official',BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR),'SST仅适配显式定比热包，HEOS/空间壁温RANS尚未验证'
         locked.update(validate_sst_manifest(folder,data,config))
