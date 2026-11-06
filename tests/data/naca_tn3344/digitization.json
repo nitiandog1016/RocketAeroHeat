@@ -1,0 +1,35 @@
+{
+  "schema": "RocketAeroHeat.manual-figure-digitization.v1",
+  "source": "NACA TN 3344, Figures 3(a) and 4(b), highest heat-transfer run Re_D=2.28e6",
+  "selection": "Human visual selection of symbol centers; approximate digitization, not original tabulated measurements",
+  "heat": {
+    "renderedImage": "raw/figure4b.png",
+    "pdfPage": 49,
+    "printedPage": 48,
+    "selectedSymbol": "circle with center dot; Re_D=2.28e6",
+    "pixelCalibration": [[280, 982, 0, 0], [1640, 987, 1.3, 0], [280, 155, 0, 0.8]],
+    "pixels": [[336, 301], [390, 230], [447, 363], [498, 386], [557, 369], [609, 414], [664, 423], [720, 385], [775, 362], [829, 386], [884, 389], [939, 414], [991, 449], [1048, 516], [1103, 541], [1155, 558], [1217, 584], [1273, 598], [1325, 631], [1376, 669]],
+    "independentAxisCheck": [909, 466, 0.6, 0.5],
+    "abscissa": "meridional arc length s / diameter D",
+    "ordinate": "local Nu_s / sqrt(Re_s); not freestream Re_D and not heat flux W/m2",
+    "readingUncertainty_s_over_D": 0.004,
+    "readingUncertainty_parameter": 0.005,
+    "experimentalNusseltProbableRelativeError": 0.15,
+    "experimentalReynoldsProbableRelativeError": 0.01
+  },
+  "wallTemperature": {
+    "renderedImage": "raw/figure3a.png",
+    "pdfPage": 46,
+    "printedPage": 45,
+    "selectedSymbol": "upper heated-body triangles; Re_D=2.28e6; exclude lower unheated-body data",
+    "pixelCalibration": [[409, 1784, 0, 0.9], [1611, 1790, 1.6, 0.9], [428, 278, 0, 1.1]],
+    "pixels": [[422, 593], [460, 593], [497, 586], [542, 579], [582, 570], [623, 573], [666, 574], [703, 570], [740, 565], [779, 566], [820, 565], [856, 565], [895, 581], [939, 600], [976, 617], [1014, 618], [1049, 620], [1093, 607], [1135, 605], [1175, 607], [1209, 615], [1249, 637]],
+    "independentAxisCheck": [1026, 583, 0.8, 1.06],
+    "abscissa": "meridional arc length s / diameter D",
+    "ordinate": "heated surface temperature / freestream total temperature",
+    "readingUncertainty_s_over_D": 0.006,
+    "readingUncertainty_ratio": 0.0015,
+    "nearZeroCoordinateRule": "The nose symbol is centered on the y-axis; set first s/D to exactly zero and retain raw pixel coordinate separately",
+    "experimentalTemperatureProbableRelativeError": 0.005
+  }
+}

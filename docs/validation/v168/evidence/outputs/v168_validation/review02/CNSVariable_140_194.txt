@@ -1,0 +1,55 @@
+140: bool CNSVariable::SetPrimVar(unsigned long iPoint, su2double eddy_visc, su2double turb_ke, CFluidModel *FluidModel) {
+141: 
+142:   // 直接捕获热状态计算输入，包含原生回退后的同一次调用。
+143:   FlowPrimitiveK(iPoint) = turb_ke;
+144: 
+145:   bool RightVol = true;
+146: 
+147:   SetVelocity(iPoint); // Computes velocity and velocity^2
+148:   su2double density      = GetDensity(iPoint);
+149:   su2double staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;
+150: 
+151:   /*--- Check will be moved inside fluid model plus error description strings ---*/
+152: 
+153:   FluidModel->SetTDState_rhoe(density, staticEnergy);
+154: 
+155:   bool check_dens  = SetDensity(iPoint);
+156:   bool check_press = SetPressure(iPoint, FluidModel->GetPressure());
+157:   bool check_sos   = SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+158:   bool check_temp  = SetTemperature(iPoint, FluidModel->GetTemperature());
+159: 
+160:   /*--- Check that the solution has a physical meaning ---*/
+161: 
+162:   if (check_dens || check_press || check_sos  || check_temp) {
+163: 
+164:     /*--- Copy the old solution ---*/
+165: 
+166:     for (unsigned long iVar = 0; iVar < nVar; iVar++)
+167:       Solution(iPoint,iVar) = Solution_Old(iPoint,iVar);
+168: 
+169:     /*--- Recompute the primitive variables ---*/
+170: 
+171:     SetVelocity(iPoint); // Computes velocity and velocity^2
+172:     density      = GetDensity(iPoint);
+173:     staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;
+174: 
+175:     /*--- Check will be moved inside fluid model plus error description strings ---*/
+176: 
+177:     FluidModel->SetTDState_rhoe(density, staticEnergy);
+178: 
+179:     SetDensity(iPoint);
+180:     SetPressure(iPoint, FluidModel->GetPressure());
+181:     SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+182:     SetTemperature(iPoint, FluidModel->GetTemperature());
+183: 
+184:     RightVol = false;
+185: 
+186:   }
+187: 
+188:   /*--- Set enthalpy ---*/
+189: 
+190:   SetEnthalpy(iPoint); // Requires pressure computation.
+191: 
+192:   /*--- Set laminar viscosity ---*/
+193: 
+194:   SetLaminarViscosity(iPoint, FluidModel->GetLaminarViscosity());

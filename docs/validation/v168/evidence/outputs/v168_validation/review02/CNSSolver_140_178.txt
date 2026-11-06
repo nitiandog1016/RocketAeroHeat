@@ -1,0 +1,39 @@
+140:   const bool tkeNeeded = (turb_model == TURB_MODEL::SST);
+141: 
+142:   AD::StartNoSharedReading();
+143: 
+144:   SU2_OMP_FOR_STAT(omp_chunk_size)
+145:   for (unsigned long iPoint = 0; iPoint < nPoint; iPoint ++) {
+146: 
+147:     /*--- Retrieve the value of the kinetic energy (if needed). ---*/
+148: 
+149:     su2double eddy_visc = 0.0, turb_ke = 0.0;
+150: 
+151:     if (turb_model != TURB_MODEL::NONE && solver_container[TURB_SOL] != nullptr) {
+152:       eddy_visc = solver_container[TURB_SOL]->GetNodes()->GetmuT(iPoint);
+153:       if (tkeNeeded) turb_ke = solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0);
+154: 
+155:       if (config->GetKind_HybridRANSLES() != NO_HYBRIDRANSLES) {
+156:         su2double DES_LengthScale = solver_container[TURB_SOL]->GetNodes()->GetDES_LengthScale(iPoint);
+157:         nodes->SetDES_LengthScale(iPoint, DES_LengthScale);
+158:         su2double LES_Mode = solver_container[TURB_SOL]->GetNodes()->GetLES_Mode(iPoint);
+159:         nodes->SetLES_Mode(iPoint, LES_Mode);
+160:       }
+161:     }
+162: 
+163:     /*--- Compressible flow, primitive variables nDim+5, (T, vx, vy, vz, P, rho, h, c, lamMu, eddyMu, ThCond, Cp) ---*/
+164: 
+165:     auto* ns_nodes = static_cast<CNSVariable*>(nodes);
+166:     bool physical = ns_nodes->SetPrimVar(iPoint, eddy_visc, turb_ke, GetFluidModel());
+167:     ns_nodes->SetSecondaryVar(iPoint, GetFluidModel());
+168: 
+169:     /*--- Check for non-realizable states for reporting. ---*/
+170: 
+171:     nonPhysicalPoints += !physical;
+172: 
+173:   }
+174:   END_SU2_OMP_FOR
+175: 
+176:   AD::EndNoSharedReading();
+177: 
+178:   return nonPhysicalPoints;

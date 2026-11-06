@@ -1,0 +1,86 @@
+70:    steady or an unsteady simulation */
+71: 
+72:   const auto InnerIter = config[val_iZone]->GetInnerIter();
+73:   const auto TimeIter = config[val_iZone]->GetTimeIter();
+74: 
+75:   /*--- Update global parameters ---*/
+76: 
+77:   const auto main_solver = config[val_iZone]->GetKind_Solver();
+78:   config[val_iZone]->SetGlobalParam(main_solver, RUNTIME_FLOW_SYS);
+79: 
+80:   /*--- Solve the Euler, Navier-Stokes or Reynolds-averaged Navier-Stokes (RANS) equations (one iteration) ---*/
+81: 
+82:   integration[val_iZone][val_iInst][FLOW_SOL]->MultiGrid_Iteration(geometry, solver, numerics, config, RUNTIME_FLOW_SYS,
+83:                                                                    val_iZone, val_iInst);
+84: 
+85:   /*--- Whether the Full-MG startup is still ramping the finest grid's CFL. ---*/
+86: 
+87:   const bool fmg_cfl_ramp = integration[val_iZone][val_iInst][FLOW_SOL]->GetFullMG_CFLRamp();
+88: 
+89:   /*--- If the flow integration is not fully coupled, run the various single grid integrations. ---*/
+90:   CommonAuxiliarySolvers(integration, geometry, solver, numerics, config, val_iZone, val_iInst, main_solver, frozen_visc);
+91: 
+92:   /*--- Adapt the CFL number using an exponential progression with under-relaxation approach.
+93:         The Full-MG startup owns the CFL while it ramps, so leave it alone until then. ---*/
+94:   SU2_OMP_PARALLEL
+95:   if (!disc_adj && config[val_iZone]->GetFinestMesh() == MESH_0 && !fmg_cfl_ramp) {
+96:     solver[val_iZone][val_iInst][MESH_0][FLOW_SOL]->AdaptCFLNumber(geometry[val_iZone][val_iInst],
+97:                                                                    solver[val_iZone][val_iInst], config[val_iZone]);
+98:     solver[val_iZone][val_iInst][MESH_0][FLOW_SOL]->IdentifySolutionOutliers(config[val_iZone], InnerIter);
+99:   }
+100:   END_SU2_OMP_PARALLEL
+101: 
+102:   /*--- Call Dynamic mesh update if AEROELASTIC motion was specified ---*/
+103: 
+104:   if ((config[val_iZone]->GetGrid_Movement()) && (config[val_iZone]->GetAeroelastic_Simulation()) && unsteady) {
+105:     SetGrid_Movement(geometry[val_iZone][val_iInst], surface_movement[val_iZone], grid_movement[val_iZone][val_iInst],
+106:                      solver[val_iZone][val_iInst], config[val_iZone], InnerIter, TimeIter);
+107: 
+108:     /*--- Apply a Wind Gust ---*/
+109: 
+110:     if (config[val_iZone]->GetWind_Gust()) {
+111:       if (InnerIter % config[val_iZone]->GetAeroelasticIter() == 0 && InnerIter != 0)
+112:         SetWind_GustField(config[val_iZone], geometry[val_iZone][val_iInst], solver[val_iZone][val_iInst]);
+113:     }
+114:   }
+115: }
+116: 
+117: void CFluidIteration::CommonAuxiliarySolvers(CIntegration**** integration, CGeometry**** geometry,
+118:                               CSolver***** solver, CNumerics****** numerics, CConfig** config,
+119:                               unsigned short val_iZone, unsigned short val_iInst, MAIN_SOLVER main_solver, bool frozen_visc) {
+120: 
+121: 
+122:   if (config[val_iZone]->GetKind_Turb_Model() != TURB_MODEL::NONE && !frozen_visc) {
+123: 
+124:     /*--- Solve transition model ---*/
+125: 
+126:     if (config[val_iZone]->GetKind_Trans_Model() == TURB_TRANS_MODEL::LM) {
+127:       config[val_iZone]->SetGlobalParam(main_solver, RUNTIME_TRANS_SYS);
+128:       integration[val_iZone][val_iInst][TRANS_SOL]->SingleGrid_Iteration(geometry, solver, numerics, config,
+129:                                                                          RUNTIME_TRANS_SYS, val_iZone, val_iInst);
+130:     }
+131: 
+132:     /*--- Solve the turbulence model ---*/
+133: 
+134:     config[val_iZone]->SetGlobalParam(main_solver, RUNTIME_TURB_SYS);
+135:     integration[val_iZone][val_iInst][TURB_SOL]->SingleGrid_Iteration(geometry, solver, numerics, config,
+136:                                                                       RUNTIME_TURB_SYS, val_iZone, val_iInst);
+137:   }
+138: 
+139:   if (config[val_iZone]->GetKind_Species_Model() != SPECIES_MODEL::NONE) {
+140:     config[val_iZone]->SetGlobalParam(main_solver, RUNTIME_SPECIES_SYS);
+141:     integration[val_iZone][val_iInst][SPECIES_SOL]->SingleGrid_Iteration(geometry, solver, numerics, config,
+142:                                                                          RUNTIME_SPECIES_SYS, val_iZone, val_iInst);
+143: 
+144:     // This only applies if mixture properties are used. But this also doesn't hurt if done w/out mixture properties.
+145:     // In case of turbulence, the Turb-Post computes the correct eddy viscosity based on mixture-density and
+146:     // mixture lam-visc. In order to get the correct mixture properties, based on the just updated mass-fractions, the
+147:     // Flow-Pre has to be called upfront. The updated eddy-visc are copied into the flow-solver Primitive in another
+148:     // Flow-Pre call which is done at the start of the next iteration.
+149:     if (config[val_iZone]->GetKind_Turb_Model() != TURB_MODEL::NONE) {
+150:       solver[val_iZone][val_iInst][MESH_0][FLOW_SOL]->Preprocessing(geometry[val_iZone][val_iInst][MESH_0], solver[val_iZone][val_iInst][MESH_0], config[val_iZone], MESH_0, NO_RK_ITER, RUNTIME_FLOW_SYS, true);
+151:       solver[val_iZone][val_iInst][MESH_0][TURB_SOL]->Postprocessing(geometry[val_iZone][val_iInst][MESH_0], solver[val_iZone][val_iInst][MESH_0], config[val_iZone], MESH_0);
+152:     }
+153:   }
+154: 
+155:   if (config[val_iZone]->GetWeakly_Coupled_Heat()) {
