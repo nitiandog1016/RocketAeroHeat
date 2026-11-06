@@ -1,0 +1,143 @@
+{
+  "flavor": "rah-ideal-air-step-v1",
+  "version": "8.6.0+rah-ideal-air-step-v1",
+  "status": "compiled-tests-pending",
+  "executable": "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-step-v1\\bin\\SU2_CFD.exe",
+  "sourceCommit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "thermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+  "temperatureRangeK": [
+    60,
+    2000
+  ],
+  "gasConstant": 287.0491267875601,
+  "physicsQualified": false,
+  "systemDLLs": [
+    "KERNEL32.dll",
+    "msvcrt.dll"
+  ],
+  "allCFDObjectsRebuilt": 0,
+  "archiveMembers": {
+    "Common/src/libSU2Common.a": 113,
+    "SU2_CFD/src/libSU2core.a": 184
+  },
+  "buildSourceSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\buildSU2ConservativeStepRuntime.py": "4f591803edce009849ac14f38a83c526664a29cc8ced31e96e8ff93b7aab2d82",
+    "E:\\RocketAeroHeat\\outputs\\v165_validation\\build01\\executed_builder.py": "4f591803edce009849ac14f38a83c526664a29cc8ced31e96e8ff93b7aab2d82",
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2ConservativeStepPatch.py": "f667ab6c1bad7d70b607a75d03a6672fb45b3abede1b543959beaef0b597180b",
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\ConservativeStepTrace.hpp": "89b2a7a58a8658ddda299058561a9eb14d317434110ddd3a5b150b43f7a5adc6",
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\ConservativeStep.inc": "7567ffaff947848595ae59e9cf51272dc0573b71ad992e4632554b882990795d",
+    "E:\\RocketAeroHeat\\docs\\validation\\v165\\PLAN.md": "46648873fd8b2aa20c8998ebc51c6b5960767fd2387e84ab1b013d2141947800",
+    "E:\\RocketAeroHeat\\outputs\\v165_validation\\build01\\commands.json": "be1635949b857b2fc2bbdcb82b8049382500f15f0b21f60e08ad26075f33f189",
+    "E:\\RocketAeroHeat\\outputs\\v165_validation\\build01\\objects_before.json": "29391449a8155dcea12e71d177acc02378b8a05a11869cf0445d9be8b3794789",
+    "E:\\RocketAeroHeat\\outputs\\v165_validation\\build01\\source_tree.json": "093098238a221937e20d320b78fc48d10aa086cb22b58e30a3cbfc038c7528d5"
+  },
+  "sourceTreeSHA256": "093098238a221937e20d320b78fc48d10aa086cb22b58e30a3cbfc038c7528d5",
+  "buildReceipt": {
+    "command": [
+      "D:\\anacondapython\\python.exe",
+      "E:\\RocketAeroHeat\\scripts\\buildSU2ConservativeStepRuntime.py",
+      "--worker",
+      "link"
+    ],
+    "maximumSeconds": 30,
+    "maximumMemoryBytes": 4294967296,
+    "status": "terminal",
+    "processID": 45864,
+    "exitCode": 0,
+    "elapsedSeconds": 1.8279999999940628,
+    "sampledPeakMemoryBytes": 387432448,
+    "stoppedByBudget": null
+  },
+  "restrictions": [
+    "direct SI steady single-zone NS/SST",
+    "general Roe",
+    "resolved wall",
+    "static PT Riemann inlet and pressure outlet",
+    "research interface until validated"
+  ],
+  "files": [
+    {
+      "path": "AUTHORS.md",
+      "bytes": 3429,
+      "sha256": "bd2b76eada1999265ae26e89cc71759ba347bc69af2260ee588003b543fb9955"
+    },
+    {
+      "path": "bin/SU2_CFD.exe",
+      "bytes": 19504566,
+      "sha256": "4bf04e7c894593acb9206c935bdf03a27570db74bf12010406610af22326e764"
+    },
+    {
+      "path": "CLI11_LICENSE",
+      "bytes": 1586,
+      "sha256": "51c69badd1cd4ffb036fb2a2efc4d7db8dd8c89905526e7193d57912968efae1"
+    },
+    {
+      "path": "COPYING",
+      "bytes": 24478,
+      "sha256": "b3aa400aca6d2ba1f0bd03bd98d03d1fe7489a3bbb26969d72016360af8a5c9d"
+    },
+    {
+      "path": "COPYING.MinGW-w64-runtime.txt",
+      "bytes": 15076,
+      "sha256": "ecff91ddb5799c8b79a4bdb576921b9c3e2989783fd1944527e8eb9b41a5ff5f"
+    },
+    {
+      "path": "Eigen_COPYING.MPL2",
+      "bytes": 16726,
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    {
+      "path": "Eigen_COPYING.README",
+      "bytes": 779,
+      "sha256": "c83230b770f17ef1386ea1fd3681271dd98aa93646bdbfb5bff3a1b7050fff9d"
+    },
+    {
+      "path": "ideal_air.diff",
+      "bytes": 36728,
+      "sha256": "45c8740f1f83fc0d9438ca92798c6adca5ee2544377a6473dca99a9a5be4e6e0"
+    },
+    {
+      "path": "LICENSE.CoolProp",
+      "bytes": 1103,
+      "sha256": "9bf835333ef602af4cb19338b9f9d43671e174fa029b00280e9bdba6ea4719b2"
+    },
+    {
+      "path": "LICENSE.md",
+      "bytes": 33393,
+      "sha256": "46ae25afd571da3e3761ff82ace5dc26b0b66cf514243379ac026ce094ba32cf"
+    },
+    {
+      "path": "mel_LICENSE",
+      "bytes": 7652,
+      "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+    }
+  ],
+  "parentRuntimeSHA256": "f4268abfba4e6abd7189d15f31d3961d08a259abacd54c5a2af0044da96e42fa",
+  "incrementalObjectsRebuilt": 2,
+  "inheritedVerifiedObjects": 296,
+  "numericalBaselineFlavor": "rah-ideal-air-step-v1",
+  "asciiSignificantDigits": 17,
+  "terminationObservation": "cpp-current-exception-windows-stack-delegate-v1",
+  "mainCompileAttempts": 3,
+  "restoredEulerObjectSHA256": "3f04ab3a459cd0d9d9c545a4d2466dfa4ec1bd1be4f6fa9c6d955379393610a1",
+  "numericalParentFlavor": "rah-ideal-air-admissible-v1",
+  "samePhysicsAndNumerics": false,
+  "conservativeStep": {
+    "model": "IDEAL_AIR_VARIABLE_CP",
+    "candidateRejection": "domain_error-before-primitive-read",
+    "direction": "Solution_Old-to-trial-all-flow-conservative-components",
+    "currentK": "actual-SetPrimVar-turb_ke",
+    "stepRule": "first-EOS-valid-dyadic-step",
+    "maximumHalvings": 32,
+    "noPositiveStep": "restore-old-and-record-theta-zero",
+    "invalidOldState": "record-and-rethrow",
+    "traceFile": "conservative_steps.csv",
+    "maximumTraceEvents": 4096,
+    "pointNumbering": "native-global-plus-local-RCM",
+    "changesNumerics": true,
+    "temperatureClipping": false,
+    "kineticEnergyReset": false,
+    "globalConservationProven": false
+  }
+}

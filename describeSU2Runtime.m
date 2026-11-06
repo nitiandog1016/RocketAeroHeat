@@ -100,7 +100,7 @@ switch info.flavor
             p.intensity,p.viscosityRatio,p.Prt);
         info.method=[info.method '；p/T/热流为原生流动阶段，保存k/ω为随后湍流更新态，分别审核'];
         info.physicsCaption=sprintf('RANS / SST-2003m / 定比热 / Sutherland / Prt%.4g；转捩未知 / 受控有界输运',p.Prt);
-    case {'rah-ideal-air-v1','rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1'}
+    case {'rah-ideal-air-v1','rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1'}
         % 模块三。固定组分变比热模型、参考态和湍流假设随实际回执显示。
         p=receipt.thermodynamicModel;
         assert(strcmp(p.thermodynamicModel,'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'));
@@ -117,7 +117,7 @@ switch info.flavor
                 t.intensity,t.viscosityRatio,t.Prt)];
         end
         info.method=[info.method '；小型热流接口已测，收敛、实验及三维区域资格待验'];
-        if ismember(info.flavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1'})
+        if ismember(info.flavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1'})
             info.method=[info.method '；独立流动阶段k与后更新k/ω；具名稀疏保存'];
         end
         if strcmp(info.flavor,'rah-ideal-air-observed-v1')
@@ -127,6 +127,10 @@ switch info.flavor
         if strcmp(info.flavor,'rah-ideal-air-admissible-v1')
             % 模块用途。回退改变实际数值更新，须与父包的纯观察身份明确区分。
             info.method=[info.method '；物性越域恢复旧守恒态并按当前k重算；旧态仍非法则终止；未裁温或清k；17位有效数字ASCII'];
+        end
+        if strcmp(info.flavor,'rah-ideal-air-step-v1')
+            % 模块用途。逐变量展示实际限步方法；合法状态不动，区域资格另行验收。
+            info.method=[info.method '；物性越域沿旧态至候选的共同守恒方向有限半步；按当前k重算；最多32次；旧态非法则终止；未裁温或清k；限步不证明全局守恒；17位有效数字ASCII'];
         end
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';

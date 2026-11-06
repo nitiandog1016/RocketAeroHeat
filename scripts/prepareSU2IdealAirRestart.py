@@ -12,7 +12,7 @@ from idealAirProperties import IdealAir
 from prepareSU2SSTCase import set_value
 from runEmbeddedSU2 import atomic_write_json
 from su2IdealAirInterface import (MODEL, PHASE_FLAVOR, OBSERVED_FLAVOR, OBSERVATION,
-    ADMISSIBLE_FLAVOR, ADMISSIBILITY, settings)
+    ADMISSIBLE_FLAVOR, ADMISSIBILITY, STEP_FLAVOR, CONSERVATIVE_STEP, STEP_CHANGE, settings)
 from su2IdealAirCheckpoints import output_plan, STAGE
 from su2SSTInterface import mesh, state
 from su2ThermalRuntime import ROOT, read, sha
@@ -95,7 +95,7 @@ def source_state(source, checkpoint, snapshot):
 def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, snapshot=None, exported_folder=False,
             linear_history=False, runtime_flavor=PHASE_FLAVOR):
     """模块二。独占新目录发布配置，初始场和失败记录均不会覆盖历史文件。"""
-    assert runtime_flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR), '未声明的三维重启运行包'
+    assert runtime_flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR), '未声明的三维重启运行包'
     folder = Path(folder).resolve()
     folder.relative_to(ROOT/'outputs')
     if exported_folder:
@@ -166,6 +166,11 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
             init['runtimeChange'] = 'ideal-air domain rejection restores Solution_Old with current k; invalid old state terminates'
             init['numericalChange'] = dict(ADMISSIBILITY)
             manifest['runtimeAdmissibility'] = dict(ADMISSIBILITY)
+        if runtime_flavor == STEP_FLAVOR:
+            init['samePhysicsAndNumerics'] = False
+            init['runtimeChange'] = STEP_CHANGE
+            init['numericalChange'] = dict(CONSERVATIVE_STEP)
+            manifest['runtimeConservativeStep'] = dict(CONSERVATIVE_STEP)
         atomic_write_json(folder/'ideal_air_restart.json', init)
         (folder/'case.cfg').write_text(text, encoding='utf8')
         contract = copy.deepcopy(old_contract)
@@ -206,6 +211,9 @@ def validate_source(folder, c, manifest, contract):
         assert manifest['runtimeAdmissibility'] == init['numericalChange'] == ADMISSIBILITY
         assert init['samePhysicsAndNumerics'] is False
         assert init['runtimeChange'] == 'ideal-air domain rejection restores Solution_Old with current k; invalid old state terminates'
+    elif manifest['requiredRuntimeFlavor'] == STEP_FLAVOR:
+        assert manifest['runtimeConservativeStep'] == init['numericalChange'] == CONSERVATIVE_STEP
+        assert init['samePhysicsAndNumerics'] is False and init['runtimeChange'] == STEP_CHANGE
     else:
         assert init['samePhysicsAndNumerics'] is True and 'numericalChange' not in init
     assert init['localIterationStartsAt'] == 0 and not init['physicsQualified']
@@ -274,7 +282,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint', type=int)
     parser.add_argument('--source-snapshot')
     parser.add_argument('--linear-history', action='store_true')
-    parser.add_argument('--runtime-flavor', choices=(PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR), default=PHASE_FLAVOR)
+    parser.add_argument('--runtime-flavor', choices=(PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR), default=PHASE_FLAVOR)
     args = parser.parse_args()
     prepare(args.source, args.folder, args.iterations, args.every, args.maximum_mib*1024**2,
             args.checkpoint, args.source_snapshot, linear_history=args.linear_history, runtime_flavor=args.runtime_flavor)

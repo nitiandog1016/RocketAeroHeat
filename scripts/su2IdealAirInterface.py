@@ -10,6 +10,17 @@ FLAVOR = 'rah-ideal-air-v1'
 PHASE_FLAVOR = 'rah-ideal-air-phase-v2'
 OBSERVED_FLAVOR = 'rah-ideal-air-observed-v1'
 ADMISSIBLE_FLAVOR = 'rah-ideal-air-admissible-v1'
+STEP_FLAVOR = 'rah-ideal-air-step-v1'
+CONSERVATIVE_STEP = dict(model='IDEAL_AIR_VARIABLE_CP',
+    candidateRejection='domain_error-before-primitive-read',
+    direction='Solution_Old-to-trial-all-flow-conservative-components',
+    currentK='actual-SetPrimVar-turb_ke', stepRule='first-EOS-valid-dyadic-step',
+    maximumHalvings=32, noPositiveStep='restore-old-and-record-theta-zero',
+    invalidOldState='record-and-rethrow', traceFile='conservative_steps.csv',
+    maximumTraceEvents=4096, pointNumbering='native-global-plus-local-RCM',
+    changesNumerics=True, temperatureClipping=False, kineticEnergyReset=False,
+    globalConservationProven=False)
+STEP_CHANGE = 'ideal-air domain rejection halves the old-to-trial conservative segment with current k; invalid old state terminates'
 ADMISSIBILITY = dict(model='IDEAL_AIR_VARIABLE_CP',
     candidateRejection='domain_error-before-primitive-read',
     fallback='Solution_Old-with-current-turb_ke', invalidOldState='record-and-rethrow',
@@ -18,7 +29,7 @@ ADMISSIBILITY = dict(model='IDEAL_AIR_VARIABLE_CP',
 OBSERVATION = dict(numericalBaselineFlavor=PHASE_FLAVOR, asciiSignificantDigits=17,
                    terminationObservation='cpp-current-exception-windows-stack-delegate-v1')
 AXISYMMETRIC_FLAVOR = 'rah-ideal-air-axisymmetric-v1'
-PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, AXISYMMETRIC_FLAVOR)
+PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, AXISYMMETRIC_FLAVOR)
 MODEL = 'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'
 R = 8.31451 / .02896546
 
@@ -35,7 +46,7 @@ def validate(folder, manifest, text, runtime):
     path = folder / 'ideal_air_contract.json'
     contract = read(path)
     flavor = manifest['requiredRuntimeFlavor']
-    assert runtime['flavor'] == flavor and flavor in (FLAVOR, PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, AXISYMMETRIC_FLAVOR)
+    assert runtime['flavor'] == flavor and flavor in (FLAVOR, PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, AXISYMMETRIC_FLAVOR)
     if flavor == OBSERVED_FLAVOR:
         # 模块用途。诊断和文本精度单独具名，阻止数值基线或运行包身份被静默替换。
         assert manifest['runtimeObservation'] == OBSERVATION
@@ -52,13 +63,23 @@ def validate(folder, manifest, text, runtime):
             assert runtime[key] == OBSERVATION[key]
     else:
         assert 'runtimeAdmissibility' not in manifest
+    if flavor == STEP_FLAVOR:
+        # 模块用途。限步独立具名，不把共同方向、有限事件记录误称为全局守恒证明。
+        assert manifest['runtimeConservativeStep'] == runtime['conservativeStep'] == CONSERVATIVE_STEP
+        assert runtime['samePhysicsAndNumerics'] is False
+        assert runtime['numericalBaselineFlavor'] == STEP_FLAVOR
+        assert runtime['numericalParentFlavor'] == ADMISSIBLE_FLAVOR
+        for key in ('asciiSignificantDigits', 'terminationObservation'):
+            assert runtime[key] == OBSERVATION[key]
+    else:
+        assert 'runtimeConservativeStep' not in manifest
     assert runtime['thermodynamicModel'] == contract['thermodynamicModel'] == MODEL
     assert contract == manifest['idealAir'] and sha(path) == manifest['idealAirContractSHA256']
     assert contract['temperatureRangeK'] == [60, 2000] and contract['gasConstant'] == R
     assert contract['energyEntropyReference'] == 'OTH'
     general = contract['initialization'] == 'general-mesh-ideal-air-SST-wall-distance-v1'
     axisymmetric = flavor == AXISYMMETRIC_FLAVOR
-    sparse = flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, AXISYMMETRIC_FLAVOR)
+    sparse = flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, AXISYMMETRIC_FLAVOR)
     assert general or contract['initialization'] == 'native-uniform-freestream' or sparse
     if axisymmetric:
         assert contract['initialization'] == 'axisymmetric-ideal-air-SST-Vm-wall-distance-v1'
