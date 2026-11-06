@@ -278,3 +278,9 @@ docs/validation/v174/storage_receipt.json -text -eol -whitespace
 docs/validation/v175/evidence/** -text -eol -whitespace
 # v176保留真实断言失败、准确执行源和原面/独立复核小回执字节。
 docs/validation/v176/evidence/** -text -eol -whitespace
+# v177环境回执保留原始字节；WSL脚本保持Linux换行，Windows安装脚本保留BOM。
+docs/validation/v177/environment/** -text -eol -whitespace
+scripts/checkEilmerRuntime.sh text eol=lf
+scripts/setupEilmerLinuxHost.sh text eol=lf
+scripts/setupEilmerRuntime.sh text eol=lf
+scripts/installWslRuntime.ps1 -text -eol
