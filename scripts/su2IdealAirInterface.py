@@ -11,6 +11,16 @@ PHASE_FLAVOR = 'rah-ideal-air-phase-v2'
 OBSERVED_FLAVOR = 'rah-ideal-air-observed-v1'
 ADMISSIBLE_FLAVOR = 'rah-ideal-air-admissible-v1'
 STEP_FLAVOR = 'rah-ideal-air-step-v1'
+SST_ENERGY_FLAVOR = 'rah-sst-energy-v1'
+SST_ENERGY = dict(model='IDEAL_AIR_VARIABLE_CP', stage='after-native-SST-shared-relaxation',
+    update='clip((Solution_Old*rho_current+alpha*LinSysSol)/rho_current)',
+    variables=['k','omega'], flowConservativeUnchanged=True, temperatureRangeK=[60,2000],
+    roundingInset='32*eps*(abs(E)+velocity2/2+emax+abs(old_k)); anchored at legal zero step',
+    maximumBisections=64, tinyAlphaThreshold=1e-10, invalidZeroStep='record-and-rethrow',
+    traceFile='sst_energy_updates.csv', maximumTraceEvents=65536, pointNumbering='local-RCM',
+    changesNumerics=True, temperatureClipping=False, kineticEnergyReset=False,
+    globalConservationProven=False)
+SST_ENERGY_CHANGE = 'SST shared k/omega relaxation constrained by current conserved thermal energy; admissible-v1 flow fallback retained'
 CONSERVATIVE_STEP = dict(model='IDEAL_AIR_VARIABLE_CP',
     candidateRejection='domain_error-before-primitive-read',
     direction='Solution_Old-to-trial-all-flow-conservative-components',
@@ -29,7 +39,7 @@ ADMISSIBILITY = dict(model='IDEAL_AIR_VARIABLE_CP',
 OBSERVATION = dict(numericalBaselineFlavor=PHASE_FLAVOR, asciiSignificantDigits=17,
                    terminationObservation='cpp-current-exception-windows-stack-delegate-v1')
 AXISYMMETRIC_FLAVOR = 'rah-ideal-air-axisymmetric-v1'
-PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, AXISYMMETRIC_FLAVOR)
+PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, SST_ENERGY_FLAVOR, AXISYMMETRIC_FLAVOR)
 MODEL = 'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'
 R = 8.31451 / .02896546
 
@@ -46,19 +56,19 @@ def validate(folder, manifest, text, runtime):
     path = folder / 'ideal_air_contract.json'
     contract = read(path)
     flavor = manifest['requiredRuntimeFlavor']
-    assert runtime['flavor'] == flavor and flavor in (FLAVOR, PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, AXISYMMETRIC_FLAVOR)
+    assert runtime['flavor'] == flavor and flavor in (FLAVOR, PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, SST_ENERGY_FLAVOR, AXISYMMETRIC_FLAVOR)
     if flavor == OBSERVED_FLAVOR:
         # 模块用途。诊断和文本精度单独具名，阻止数值基线或运行包身份被静默替换。
         assert manifest['runtimeObservation'] == OBSERVATION
         assert all(runtime[key] == value for key, value in OBSERVATION.items())
     else:
         assert 'runtimeObservation' not in manifest
-    if flavor == ADMISSIBLE_FLAVOR:
+    if flavor in (ADMISSIBLE_FLAVOR, SST_ENERGY_FLAVOR):
         # 新数值身份仅允许已登记的原态回退，禁止伪称数值相同或静默放宽温区。
         assert manifest['runtimeAdmissibility'] == runtime['admissibility'] == ADMISSIBILITY
         assert runtime['samePhysicsAndNumerics'] is False
-        assert runtime['numericalBaselineFlavor'] == ADMISSIBLE_FLAVOR
-        assert runtime['numericalParentFlavor'] == OBSERVED_FLAVOR
+        assert runtime['numericalBaselineFlavor'] == flavor
+        assert runtime['numericalParentFlavor'] == (OBSERVED_FLAVOR if flavor == ADMISSIBLE_FLAVOR else ADMISSIBLE_FLAVOR)
         for key in ('asciiSignificantDigits', 'terminationObservation'):
             assert runtime[key] == OBSERVATION[key]
     else:
@@ -73,13 +83,17 @@ def validate(folder, manifest, text, runtime):
             assert runtime[key] == OBSERVATION[key]
     else:
         assert 'runtimeConservativeStep' not in manifest
+    if flavor == SST_ENERGY_FLAVOR:
+        assert manifest['runtimeSSTEnergy'] == runtime['sstEnergy'] == SST_ENERGY
+    else:
+        assert 'runtimeSSTEnergy' not in manifest
     assert runtime['thermodynamicModel'] == contract['thermodynamicModel'] == MODEL
     assert contract == manifest['idealAir'] and sha(path) == manifest['idealAirContractSHA256']
     assert contract['temperatureRangeK'] == [60, 2000] and contract['gasConstant'] == R
     assert contract['energyEntropyReference'] == 'OTH'
     general = contract['initialization'] == 'general-mesh-ideal-air-SST-wall-distance-v1'
     axisymmetric = flavor == AXISYMMETRIC_FLAVOR
-    sparse = flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, AXISYMMETRIC_FLAVOR)
+    sparse = flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, SST_ENERGY_FLAVOR, AXISYMMETRIC_FLAVOR)
     assert general or contract['initialization'] == 'native-uniform-freestream' or sparse
     if axisymmetric:
         assert contract['initialization'] == 'axisymmetric-ideal-air-SST-Vm-wall-distance-v1'

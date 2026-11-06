@@ -12,7 +12,8 @@ from idealAirProperties import IdealAir
 from prepareSU2SSTCase import set_value
 from runEmbeddedSU2 import atomic_write_json
 from su2IdealAirInterface import (MODEL, PHASE_FLAVOR, OBSERVED_FLAVOR, OBSERVATION,
-    ADMISSIBLE_FLAVOR, ADMISSIBILITY, STEP_FLAVOR, CONSERVATIVE_STEP, STEP_CHANGE, settings)
+    ADMISSIBLE_FLAVOR, ADMISSIBILITY, STEP_FLAVOR, CONSERVATIVE_STEP, STEP_CHANGE,
+    SST_ENERGY_FLAVOR, SST_ENERGY, SST_ENERGY_CHANGE, settings)
 from su2IdealAirCheckpoints import output_plan, STAGE
 from su2SSTInterface import mesh, state
 from su2ThermalRuntime import ROOT, read, sha
@@ -153,7 +154,7 @@ def source_state(source, checkpoint, snapshot):
 def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, snapshot=None, exported_folder=False,
             linear_history=False, runtime_flavor=PHASE_FLAVOR):
     """模块二。独占新目录发布配置，初始场和失败记录均不会覆盖历史文件。"""
-    assert runtime_flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR), '未声明的三维重启运行包'
+    assert runtime_flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, SST_ENERGY_FLAVOR), '未声明的三维重启运行包'
     folder = Path(folder).resolve()
     folder.relative_to(ROOT/'outputs')
     if exported_folder:
@@ -177,7 +178,9 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
         manifest, old_contract, data, columns, nd, prior, locks, rebinding, selected = source_state(source, checkpoint, snapshot)
         same_admissible = checkpoint is not None and manifest['requiredRuntimeFlavor'] == ADMISSIBLE_FLAVOR
         if same_admissible:
-            assert runtime_flavor == ADMISSIBLE_FLAVOR, '已审核的回退包来源只允许同包接续'
+            assert runtime_flavor in (ADMISSIBLE_FLAVOR, SST_ENERGY_FLAVOR), '来源只允许同包或显式SST能量候选'
+        if runtime_flavor == SST_ENERGY_FLAVOR:
+            assert same_admissible, 'SST能量候选只接受已审核admissible末帧'
         assert nd == 3, '当前相容重启动合同限三维SST'
         manifest = copy.deepcopy(manifest)
         core = IdealAir()
@@ -236,6 +239,14 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
             init['runtimeChange'] = STEP_CHANGE
             init['numericalChange'] = dict(CONSERVATIVE_STEP)
             manifest['runtimeConservativeStep'] = dict(CONSERVATIVE_STEP)
+        if runtime_flavor == SST_ENERGY_FLAVOR:
+            init['samePhysicsAndNumerics'] = False
+            init['runtimeChange'] = SST_ENERGY_CHANGE
+            init['numericalChange'] = dict(SST_ENERGY)
+            init['sourceCheckpointIdentity'], _ = admissible_checkpoint_identity(
+                source, manifest, read(source/'engine_process.json'), checkpoint)
+            manifest['runtimeAdmissibility'] = dict(ADMISSIBILITY)
+            manifest['runtimeSSTEnergy'] = dict(SST_ENERGY)
         atomic_write_json(folder/'ideal_air_restart.json', init)
         (folder/'case.cfg').write_text(text, encoding='utf8')
         contract = copy.deepcopy(old_contract)
@@ -289,6 +300,16 @@ def validate_source(folder, c, manifest, contract):
     elif manifest['requiredRuntimeFlavor'] == STEP_FLAVOR:
         assert manifest['runtimeConservativeStep'] == init['numericalChange'] == CONSERVATIVE_STEP
         assert init['samePhysicsAndNumerics'] is False and init['runtimeChange'] == STEP_CHANGE
+    elif manifest['requiredRuntimeFlavor'] == SST_ENERGY_FLAVOR:
+        assert manifest['runtimeSSTEnergy'] == init['numericalChange'] == SST_ENERGY
+        assert manifest['runtimeAdmissibility'] == ADMISSIBILITY
+        assert init['samePhysicsAndNumerics'] is False and init['runtimeChange'] == SST_ENERGY_CHANGE
+        assert init['coldRestart'] == COLD_RESTART and 'runTransition' not in init
+        source = Path(init['sourceDirectory'])
+        identity, source_locks = admissible_checkpoint_identity(source, read(source/'case_manifest.json'),
+            read(source/'engine_process.json'), init['sourceLocalIteration'])
+        assert init['sourceCheckpointIdentity'] == identity and init['sourceRuntimeFlavor'] == ADMISSIBLE_FLAVOR
+        assert all(init['sourceSHA256'].get(k) == v for k, v in source_locks.items())
     else:
         assert init['samePhysicsAndNumerics'] is True and 'numericalChange' not in init
     assert init['localIterationStartsAt'] == 0 and not init['physicsQualified']
@@ -308,7 +329,8 @@ def validate_source(folder, c, manifest, contract):
     assert {k: v for k, v in c.items() if k not in OUTPUT_KEYS} == {k: v for k, v in expected.items() if k not in OUTPUT_KEYS}
     old_manifest = read(source/'case_manifest.json')
     if old_manifest['requiredRuntimeFlavor'] == ADMISSIBLE_FLAVOR:
-        assert manifest['requiredRuntimeFlavor'] == ADMISSIBLE_FLAVOR and 'runTransition' in init
+        assert (manifest['requiredRuntimeFlavor'] == ADMISSIBLE_FLAVOR and 'runTransition' in init) or (
+            manifest['requiredRuntimeFlavor'] == SST_ENERGY_FLAVOR and 'sourceCheckpointIdentity' in init and 'runTransition' not in init)
     else:
         assert 'runTransition' not in init
     changed_contract_keys = {'schemaVersion', 'initialization', 'initializationSHA256',

@@ -1,0 +1,101 @@
+#pragma once
+// 模块用途。在原SST共同松弛之后约束热内能，保持流动守恒量和原k/omega裁限公式。
+#include "IdealAir.hpp"
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdio>
+#include <limits>
+#include <mutex>
+#include <stdexcept>
+
+namespace rah_sst_energy {
+struct Input {
+  unsigned dimension=3;
+  std::array<double,5> flow{}; // rho,rhou,rhov,rhow,rhoE；二维w=0。
+  std::array<double,2> old{}, increment{}, lower{}, upper{};
+  double native_alpha=1.;
+};
+struct Result {
+  double alpha=0., k=0., omega=0., energy=0.;
+  unsigned refinements=0;
+  bool limited=false;
+};
+inline std::array<double,2> limits() {
+  static const std::array<double,2> values{{
+    rah_air::from_pressure_temperature(101325.,rah_air::minimum_temperature).energy,
+    rah_air::from_pressure_temperature(101325.,rah_air::maximum_temperature).energy}};
+  return values;
+}
+inline double native_update(double old, double increment, double alpha, double rho, double low, double high) {
+  // 与CVariable::AddClippedSolution的运算顺序相同，旧量和除数均用当前密度。
+  return std::min(std::max((old*rho+alpha*increment)/rho,low),high);
+}
+inline Result constrain(const Input& in) {
+  auto require=[](bool yes,const char* why) {if(!yes) throw std::domain_error(why);};
+  require(in.dimension==2 || in.dimension==3,"SST energy: invalid dimension");
+  for(double u:in.flow) require(std::isfinite(u),"SST energy: nonfinite flow");
+  require(in.flow[0]>0.,"SST energy: nonpositive density");
+  require(std::isfinite(in.native_alpha) && in.native_alpha>=0. && in.native_alpha<=1.,"SST energy: invalid native alpha");
+  for(unsigned j=0;j<2;++j) {
+    require(std::isfinite(in.old[j]) && std::isfinite(in.increment[j]),"SST energy: nonfinite turbulence");
+    require(std::isfinite(in.lower[j]) && std::isfinite(in.upper[j]) && in.lower[j]>=0. && in.upper[j]>in.lower[j],"SST energy: invalid scalar bounds");
+  }
+  const double rho=in.flow[0];
+  double velocity2=0.;
+  for(unsigned j=1;j<=in.dimension;++j) { const double v=in.flow[j]/rho; velocity2+=v*v; }
+  const double e0=in.flow[4]/rho-.5*velocity2;
+  const auto domain=limits();
+  auto at=[&](double alpha) {
+    Result out;out.alpha=alpha;
+    out.k=native_update(in.old[0],in.increment[0],alpha,rho,in.lower[0],in.upper[0]);
+    out.omega=native_update(in.old[1],in.increment[1],alpha,rho,in.lower[1],in.upper[1]);
+    out.energy=e0-out.k;return out;
+  };
+  auto valid=[&](const Result& out) {
+    return std::isfinite(out.k) && std::isfinite(out.omega) && std::isfinite(out.energy) &&
+      out.energy>=domain[0] && out.energy<=domain[1];
+  };
+  // 模块一。先证实实际零步合法；原生完整步合法时保留alpha的原始位模式。
+  Result zero=at(0.);require(valid(zero),"SST energy: invalid zero-step state");
+  Result full=at(in.native_alpha);
+  if(valid(full)) return full;
+  // 模块二。线性区间给出上界，用实际裁限后的浮点式审核；仅在舍入等情况下有限二分。
+  const double dk=in.increment[0]/rho;
+  double upper=in.native_alpha;
+  if(dk>0.) upper=std::min(upper,std::max(0.,(e0-domain[0]-in.old[0])/dk));
+  if(dk<0.) upper=std::min(upper,std::max(0.,(e0-domain[1]-in.old[0])/dk));
+  Result best=at(upper);
+  unsigned refinements=0;
+  if(!valid(best)) {
+    double lo=0.,hi=upper;best=zero;
+    for(;refinements<64;++refinements) {
+      const double middle=lo+.5*(hi-lo);
+      if(middle==lo || middle==hi) break;
+      Result trial=at(middle);
+      if(valid(trial)) {lo=middle;best=trial;} else hi=middle;
+    }
+  }
+  if(best.alpha<1e-10) best=zero;
+  require(valid(best),"SST energy: accepted state invalid");
+  best.limited=true;best.refinements=refinements;return best;
+}
+
+inline void record(unsigned long point,const Input& in,const Result& out,const char* status) {
+  // 模块三。仅记录受限或失败的实际更新，局部编号不伪装成全局节点，超限明确终止。
+  struct Trace {std::mutex mutex;std::FILE* file=nullptr;unsigned long count=0;~Trace(){if(file)std::fclose(file);}};
+  static Trace trace;const std::lock_guard<std::mutex> guard(trace.mutex);
+  if(!trace.file) {
+    trace.file=std::fopen("sst_energy_updates.csv","wb");
+    if(!trace.file) throw std::runtime_error("cannot create SST energy trace");
+    std::fprintf(trace.file,"event,local_point,dimension,status,rho,rhou,rhov,rhow,rhoE,old_k,old_omega,increment_rhok,increment_rhoomega,lower_k,lower_omega,upper_k,upper_omega,native_alpha,alpha,k,omega,e,refinements\n");
+  }
+  if(trace.count>=65536) throw std::runtime_error("SST energy trace limit reached after 65536 events");
+  ++trace.count;
+  int written=std::fprintf(trace.file,"%lu,%lu,%u,%s,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%u\n",
+    trace.count,point,in.dimension,status,in.flow[0],in.flow[1],in.flow[2],in.flow[3],in.flow[4],
+    in.old[0],in.old[1],in.increment[0],in.increment[1],in.lower[0],in.lower[1],in.upper[0],in.upper[1],
+    in.native_alpha,out.alpha,out.k,out.omega,out.energy,out.refinements);
+  if(written<0 || std::fflush(trace.file)!=0) throw std::runtime_error("cannot flush SST energy trace");
+}
+} // namespace rah_sst_energy

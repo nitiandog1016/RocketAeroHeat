@@ -2,8 +2,8 @@ function [pressure,temperature,summary]=readSU2IdealAirStateAudit(folder,receipt
 %READSU2IDEALAIRSTATEAUDIT 绑定真实回执、独立物性和同阶段热梯度的只读入口。
 % 模块一。原文件SHA及明确模型合同防止旧参考能量混入新模型。
 % 模块二。读取原生流动阶段p/T；后更新k温度、给定Tw和资格单列。
-assert(ismember(receipt.runtimeFlavor,{'rah-ideal-air-v1','rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1'}));
-captured=ismember(receipt.runtimeFlavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1'});
+assert(ismember(receipt.runtimeFlavor,{'rah-ideal-air-v1','rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1','rah-sst-energy-v1'}));
+captured=ismember(receipt.runtimeFlavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1','rah-sst-energy-v1'});
 index=jsondecode(fileread(fullfile(folder,'ideal_air_review.json')));
 assert(strcmp(sha(fullfile(folder,'engine_process.json')),index.receiptSHA256));
 base=char(java.io.File(folder).getCanonicalPath());

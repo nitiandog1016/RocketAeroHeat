@@ -27,4 +27,6 @@ const auto transport = rah_air::transport(state, 0.0);
 
 来源为CoolProp7.2.0提交`98b3523d5daa98454618d381d2ae53f7471d216b`的Air.json，原文件SHA256为`c5e0d064d83fc91ed35d7354cea1fa38fea832a09d2e85faf4336e0017c33616`。附原CoolProp许可。理想项源于Lemmon等2000，式18、式24和Table12。物性范围内仍需核对固定组分、气相与理想气体假设，实际压力效应及化学反应另行建模。[原论文](https://doi.org/10.1063/1.1285884)
 
-本模块已通过v153代数、原生库对照和MATLAB入口检查，完整引擎接入待完成。测试记录和性能口径见项目文档`docs/FAST_IDEAL_AIR_V153.md`。
+本模块已通过v153代数、原生库对照和MATLAB入口检查；完整引擎接口、三维初场及同阶段保存由v154—v157实现。原始物性测试记录与性能口径见`docs/FAST_IDEAL_AIR_V153.md`，流场可运行不等于物理资格。
+
+`SSTEnergyUpdate.hpp`是v167独立研究包的共同更新约束，保留流动守恒量与原SST裁限，热内能接受区间包含明确的向内舍入余量。完整整箭200更新正常，但残差收益筛选未通过，默认运行包不变，不从该候选续算。方法、失败小检查和限制见`docs/SST_ENERGY_CONSTRAINT_V167.md`。

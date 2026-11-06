@@ -46,17 +46,24 @@ def save_terminal_receipt(path, state):
 
 
 def validate_resource_budget(request, manifest):
-    """模块用途。普通任务保留720秒；事前登记的v166单任务才允许900秒。"""
+    """模块用途。普通任务保留720秒；事前登记的有限发展任务才允许900秒。"""
     timeout, threads = float(request['maximumSeconds']), int(request['threads'])
     profile = request.get('resourceProfile')
     if profile is None:
         assert 1 <= threads <= 8 and 1 <= timeout <= 720
     else:
-        assert profile == 'v166-single-development'
-        assert manifest['requiredRuntimeFlavor'] == 'rah-ideal-air-admissible-v1'
+        assert profile in ('v166-single-development','v167-single-sst-energy')
         init = manifest['initialization']; plan = manifest['idealAir']['checkpointContract']
-        assert init['runTransition']['kind'] == 'same-admissible-runtime-cold-restart-v1'
-        assert init['samePhysicsAndNumerics'] and not init['runTransition']['uninterruptedTrajectoryEquivalent']
+        if profile == 'v166-single-development':
+            assert manifest['requiredRuntimeFlavor'] == 'rah-ideal-air-admissible-v1'
+            assert init['runTransition']['kind'] == 'same-admissible-runtime-cold-restart-v1'
+            assert init['samePhysicsAndNumerics'] and not init['runTransition']['uninterruptedTrajectoryEquivalent']
+        else:
+            from su2IdealAirInterface import SST_ENERGY
+            assert manifest['requiredRuntimeFlavor'] == 'rah-sst-energy-v1'
+            assert init['numericalChange'] == SST_ENERGY and not init['samePhysicsAndNumerics']
+            assert init['sourceCheckpointIdentity']['kind'] == 'same-admissible-runtime-cold-restart-v1'
+            assert not init['sourceCheckpointIdentity']['uninterruptedTrajectoryEquivalent']
         assert init['priorSuccessfulUpdates'] == 200 and init['sourceLocalIteration'] == 49
         assert plan['maximumUpdates'] == 200 and plan['every'] == 100
         assert plan['maximumOutputBytes'] <= 1536*1024**2

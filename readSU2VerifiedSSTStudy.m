@@ -17,7 +17,7 @@ isNumerical=isfield(receipt.physicsModel,'numericalStudy');isInitial=isfield(rec
 isTrace=isfield(receipt.physicsModel,'updateTraceStudy');
 inputs={'case.cfg','mesh.su2','case_manifest.json','sst_contract.json'};
 if variableAir
-    assert(ismember(receipt.runtimeFlavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1'}) && isfield(receipt,'thermodynamicModel'), ...
+    assert(ismember(receipt.runtimeFlavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1','rah-sst-energy-v1'}) && isfield(receipt,'thermodynamicModel'), ...
         '变比热结果需要实际同阶段运行合同。');
     inputs=[inputs,{'ideal_air_restart.json','ideal_air_contract.json','ideal_air_restart_preparation.json','initial_flow.csv'}];
 else
@@ -49,6 +49,23 @@ if variableAir
             strcmp(a.invalidOldState,'record-and-rethrow') && ...
             strcmp(a.traceFile,'admissibility.csv') && strcmp(a.pointNumbering,'local-RCM') && ...
             a.maximumTraceEvents==4096 && ~a.temperatureClipping && ~a.kineticEnergyReset);
+    elseif strcmp(receipt.runtimeFlavor,'rah-sst-energy-v1')
+        % 模块用途。新候选具有不同数值算子，来源证明只证明原admissible末帧。
+        a=manifest.runtimeSSTEnergy;
+        assert(~init.samePhysicsAndNumerics && isequaln(a,init.numericalChange) && ~isfield(init,'runTransition'));
+        assert(strcmp(init.sourceRuntimeFlavor,'rah-ideal-air-admissible-v1'));
+        assert(strcmp(a.model,'IDEAL_AIR_VARIABLE_CP') && a.changesNumerics && ...
+            strcmp(a.stage,'after-native-SST-shared-relaxation') && ...
+            strcmp(a.update,'clip((Solution_Old*rho_current+alpha*LinSysSol)/rho_current)') && ...
+            isequal(a.temperatureRangeK(:),[60;2000]) && a.flowConservativeUnchanged && ...
+            a.maximumBisections==64 && a.tinyAlphaThreshold==1e-10 && a.maximumTraceEvents==65536 && ...
+            strcmp(a.invalidZeroStep,'record-and-rethrow') && strcmp(a.traceFile,'sst_energy_updates.csv') && ...
+            strcmp(a.pointNumbering,'local-RCM') && ~a.temperatureClipping && ~a.kineticEnergyReset && ~a.globalConservationProven);
+        assert(strcmp(init.runtimeChange, ...
+            'SST shared k/omega relaxation constrained by current conserved thermal energy; admissible-v1 flow fallback retained'));
+        b=manifest.runtimeAdmissibility;assert(b.maximumTraceEvents==4096 && ...
+            strcmp(b.fallback,'Solution_Old-with-current-turb_ke') && strcmp(b.invalidOldState,'record-and-rethrow'));
+        validateAdmissibleSource(init.sourceCheckpointIdentity,init);
     elseif strcmp(receipt.runtimeFlavor,'rah-ideal-air-step-v1')
         % 模块用途。共同守恒限步只标数值适配；明确没有全局守恒或物理资格证明。
         a=manifest.runtimeConservativeStep;
@@ -149,6 +166,11 @@ if isfield(init,'runTransition')
     result.solverMethod=[result.solverMethod sprintf('；同包冷重启：源局部%d，已完成%d次；重建CFL及求解历史，非无中断等价', ...
         init.sourceLocalIteration,init.priorSuccessfulUpdates)];
 end
+if isfield(init,'sourceCheckpointIdentity')
+    result.sourceCheckpointIdentity=init.sourceCheckpointIdentity;
+    result.solverMethod=[result.solverMethod sprintf('；SST约束候选冷重启：源局部%d，已完成%d次；算子改变、非无中断等价', ...
+        init.sourceLocalIteration,init.priorSuccessfulUpdates)];
+end
 
 end
 
@@ -162,11 +184,18 @@ assert(strcmp(t.kind,'same-admissible-runtime-cold-restart-v1') && t.unchangedOp
 assert(strcmp(init.runtimeChange,'same admissible-v1 operator and executable; cold restart resets solver histories'));
 assert(strcmp(init.coldRestart, ...
     'conservative rho/rhoU/rhoE and post-update k/omega; rebuild primitives and eddy viscosity; reset adaptive CFL and solver histories'));
+validateAdmissibleSource(t,init);
+end
+
+function validateAdmissibleSource(t,init)
+% 模块六。来源末帧的正常终态/热审核/准确引擎身份；不宣称新候选算子相同。
+assert(strcmp(t.kind,'same-admissible-runtime-cold-restart-v1') && t.unchangedOperator && ...
+    ~t.uninterruptedTrajectoryEquivalent && t.adaptiveCFLReset && t.solverHistoryReset);
 assert(strcmp(sha(t.runtimeManifestPath),t.runtimeManifestSHA256) && strcmp(sha(t.executablePath),t.executableSHA256));
 sourceReceipt=fullfile(init.sourceDirectory,'engine_process.json');
 assert(strcmp(sha(sourceReceipt),t.sourceReceiptSHA256) && strcmp(sha(t.sourceAuditPath),t.sourceAuditSHA256));
 s=jsondecode(fileread(sourceReceipt));a=jsondecode(fileread(t.sourceAuditPath));
-assert(strcmp(s.status,'terminal') && s.exitCode==0 && strcmp(s.runtimeFlavor,flavor));
+assert(strcmp(s.status,'terminal') && s.exitCode==0 && strcmp(s.runtimeFlavor,'rah-ideal-air-admissible-v1'));
 assert(s.checkpoints.normalScheduleComplete && s.checkpoints.lastComplete.localIteration==init.sourceLocalIteration);
 assert(a.interfacePassed && a.nativeNormalTerminal && a.checkpointLocalIteration==init.sourceLocalIteration);
 assert(a.seriesSuccessfulUpdates==init.priorSuccessfulUpdates && ...
