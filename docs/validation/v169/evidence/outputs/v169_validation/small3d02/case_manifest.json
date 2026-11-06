@@ -1,0 +1,109 @@
+{
+  "caseKind": "naca-tn3344-quarter-3d-laminar-v1",
+  "requiredRuntimeFlavor": "rah-ideal-air-observed-v1",
+  "runtimeObservation": {
+    "numericalBaselineFlavor": "rah-ideal-air-phase-v2",
+    "asciiSignificantDigits": 17,
+    "terminationObservation": "cpp-current-exception-windows-stack-delegate-v1"
+  },
+  "runtimeUse": "existing-general-3d-NS-with-axisymmetric-source-disabled",
+  "idealAir": {
+    "schemaVersion": 5,
+    "initialization": "naca-tn3344-quarter-3d-laminar-v1",
+    "thermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+    "gasConstant": 287.0491267875601,
+    "temperatureRangeK": [
+      60,
+      2000
+    ],
+    "energyEntropyReference": "OTH",
+    "turbulent": false,
+    "physicsQualified": false,
+    "newQualifiedArea": 0,
+    "configurationSHA256": "ce6af92aa9f5177c204758ddb2984be1b5f71d8251c14099b0397978a6cd09b5",
+    "meshSHA256": "24114965c22bd4abb0cc25ad16f3ca003774bed874ca4712f930f90d375b5207",
+    "geometrySHA256": "30748369524c83169fa1d4521cf22b258bab1af151d4f8c72d897fea573e5e6f",
+    "checkpointContract": {
+      "schemaVersion": 1,
+      "stage": "same-flow-update-laminar-conservative-and-primitive-v1",
+      "every": 1,
+      "maximumUpdates": 3,
+      "firstLocalIteration": 0,
+      "firstSuccessfulUpdate": 1,
+      "maximumNamedPairs": 3,
+      "estimatedVolumeBytes": 478432,
+      "estimatedSurfaceBytes": 67040,
+      "estimatedMaximumBytes": 3242752,
+      "maximumOutputBytes": 33554432,
+      "units": "file lengths including final aliases; physical allocation unknown",
+      "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold"
+    }
+  },
+  "idealAirContractSHA256": "e05a6986a36273d3b8a90bb3c9fe07ccb45441db6a8fdf64623d4c6da951e870",
+  "initialization": {
+    "kind": "naca-tn3344-quarter-3d-laminar-v1",
+    "priorSuccessfulUpdates": 0,
+    "sourceSHA256": {
+      "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAir.hpp": "62a880ed2e1ec76c5bc8c9a832ec7787b5b3f01494f31ed6a3ebf7bfb972969b",
+      "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAirBatch.cpp": "5dbff0d52bd141a63a90e708ddf381115ab30cdbc1d61e2cdd1475325f930270",
+      "E:\\RocketAeroHeat\\scripts\\buildIdealAirBatch.py": "9a46a6a48311827aa41a060236bf3372300290e8c764fc383b31335a722e95ee",
+      "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\runtime.json": "04c7800d328f5395e73a782560ba0545aac2cab5232e85d93fb2494f5e6fd45d",
+      "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\idealAirBatch.dll": "03514d6657245cd7fa38b7e6bc074666a96320bf170fbc77302a01141a3c135a",
+      "E:\\RocketAeroHeat\\scripts\\idealAirProperties.py": "7d63ba9c250dfd7ecad3912b6ab1daaba0784aae43af7d22307d4d17ea659234",
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2NACALaminar.py": "b67fb5a838683dd151b7e13c23741dea5d90fed79614f815213664b982838b98",
+      "E:\\RocketAeroHeat\\scripts\\naca3344Model.py": "783d4e0cce6dbe376786bd19c1aa31e12fb89e64ef8b0801ca742d2c7beca944",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\contract.json": "3290691fead2d185f2be232889c9e5e6803c222b2494538cc8203369bac4eeba",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\source_manifest.json": "74000d7d71e1cf1563eef2e5436ab4bcb3d337900cfb795d13d17d35bdc36c5f",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\wall_temperature.csv": "9213b9c8ce0b9410e4156cf658efc8fe2dc5db57cfe790eebca6de5409096a62",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\heat_parameter.csv": "63685ad834b6c57d89095d652814cca9f4095a099fcd796ad9754e8067a56361"
+    },
+    "initialStateSHA256": "f2797f00614007b1c294726133c79b73a025db5547867d7b6f0a8bfe88a8344b",
+    "temperatureRangeK": [
+      178.10757433068954,
+      336.31371878795676
+    ],
+    "boundaryLayerSolved": false,
+    "initialBlendThickness_m": 0.001
+  },
+  "nodes": 549,
+  "elements": 384,
+  "publicBenchmark": {
+    "fixture": true,
+    "conditions": {
+      "Mach": 1.97,
+      "ReynoldsBasedOnDiameter": 2280000.0,
+      "totalTemperature_R": 570.0,
+      "totalTemperature_K": 316.6666666666667,
+      "source": "Table I heat-transfer distribution, wind tunnel 1, final row",
+      "independentInputs": [
+        "Mach",
+        "Re_D",
+        "T0",
+        "D",
+        "gas/viscosity model"
+      ],
+      "uniformUpstreamFlow": true,
+      "prescribedIncomingBoundaryLayer": false,
+      "gas": "dry air, laminar; do not enable SST to match this experiment",
+      "model": "Lemmon2000 ideal Air OTH, Sutherland 1.716e-5/273.15/110.4, Pr=0.72 proposed",
+      "staticTemperature_K": 178.1075743306896,
+      "pressure_Pa": 26135.37495648134,
+      "density_kg_m3": 0.5111991418835654,
+      "speed_m_s": 527.2964534538137,
+      "viscosity_Pas": 1.2011682036676242e-05,
+      "totalEnthalpy_OTH_Jkg": 443281.1266472082,
+      "perfectGasGamma14Temperature_K": 178.28523385392623,
+      "derivedStateIsMeasured": false,
+      "propertyChoiceRequiresDeclaredComparison": true
+    },
+    "newPhysicalQualification": false,
+    "comparisonReady": false,
+    "normalization": "local-Nu-over-sqrt-Re-not-dimensional-experiment"
+  },
+  "expectedVelocity": [
+    -527.2964534538137,
+    0,
+    0
+  ],
+  "physicalQualified": false
+}

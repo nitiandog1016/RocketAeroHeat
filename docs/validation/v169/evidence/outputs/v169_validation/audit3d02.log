@@ -1,0 +1,7 @@
+{'interfacePassed': False, 'frames': 3}
+Traceback (most recent call last):
+  File "scripts/auditNACALaminar.py", line 85, in <module>
+    args=parser.parse_args();audit(Path(args.folder).resolve(),Path(args.output).resolve())
+  File "scripts/auditNACALaminar.py", line 79, in audit
+    assert passed,'原严格接口门槛失败，保留原报告，不重算CFD'
+AssertionError: 原严格接口门槛失败，保留原报告，不重算CFD

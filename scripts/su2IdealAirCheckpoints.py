@@ -47,6 +47,10 @@ def inventory(folder, receipt):
     from su2SSTInterface import mesh
 
     manifest = read(folder/'case_manifest.json')
+    if manifest.get('caseKind') == 'naca-tn3344-quarter-3d-laminar-v1':
+        # 三维层流没有SST阶段；多壁温marker由专用清单审核，不冒用旧wall字段。
+        from su2NACALaminarInterface import inventory as naca_inventory
+        return naca_inventory(folder, receipt)
     contract = manifest['idealAir']['checkpointContract']
     points, _, wall = mesh(folder/'mesh.su2')
     wall_ids = np.unique([index for face in wall for index in face[1:]])

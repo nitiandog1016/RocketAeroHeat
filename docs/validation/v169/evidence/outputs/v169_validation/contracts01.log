@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "tests/verifyNACAContractsV169.py", line 65, in <module>
+    args=p.parse_args();main(Path(args.output).resolve())
+  File "tests/verifyNACAContractsV169.py", line 53, in main
+    exe,runtime,flavor,profile,binding=resolve(folder,(folder/'case.cfg').read_text())
+  File "E:\RocketAeroHeat\scripts\su2ThermalRuntime.py", line 69, in resolve
+    locked.update(validate(folder,data,config,runtime))
+  File "E:\RocketAeroHeat\scripts\su2IdealAirInterface.py", line 176, in validate
+    locks.update(validate_source(folder, c, manifest, contract))
+  File "E:\RocketAeroHeat\scripts\prepareSU2AxisymmetricAir.py", line 225, in validate_source
+    assert all(sha(Path(path)) == digest for path, digest in locks.items())
+AssertionError

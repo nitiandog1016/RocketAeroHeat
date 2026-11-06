@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "scripts/auditNACALaminar.py", line 85, in <module>
+    args=parser.parse_args();audit(Path(args.folder).resolve(),Path(args.output).resolve())
+  File "scripts/auditNACALaminar.py", line 54, in audit
+    native_power=float(history[pair['localIteration']]['HF'].strip())
+KeyError: 'HF'

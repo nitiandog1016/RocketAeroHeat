@@ -53,6 +53,10 @@ def settings(text):
 def validate(folder, manifest, text, runtime):
     """创建进程前核对模型、参考态、边界、SST阶段和逐字输入身份。"""
     c = settings(text)
+    if manifest.get('caseKind') == 'naca-tn3344-quarter-3d-laminar-v1':
+        # 具名层流小例单独严格核验；旧正半径SST合同和运行包身份保持。
+        from su2NACALaminarInterface import validate as validate_naca
+        return validate_naca(folder, manifest, text, runtime)
     path = folder / 'ideal_air_contract.json'
     contract = read(path)
     flavor = manifest['requiredRuntimeFlavor']
