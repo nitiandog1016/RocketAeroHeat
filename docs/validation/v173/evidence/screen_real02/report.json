@@ -1,0 +1,317 @@
+{
+  "screeningCompleted": true,
+  "developmentScreeningPassed": false,
+  "candidateAdopted": false,
+  "adoptionScope": "仅本次事前发展筛选；默认配置不由本脚本修改",
+  "candidateDecision": "not-adopted",
+  "failedCriteria": [
+    "normalTermination",
+    "normalCompleteSchedule",
+    "densityResidualDevelopment",
+    "energyResidualDevelopment"
+  ],
+  "pendingCriteria": [
+    "terminalWallTemperature",
+    "terminalIndependentYPlus",
+    "lastTwoPressureAreaL1",
+    "lastTwoHeatAreaL1"
+  ],
+  "criteria": {
+    "normalTermination": {
+      "status": "failed",
+      "value": {
+        "exitCode": 134,
+        "flags": {
+          "timedOut": false,
+          "cancelled": false,
+          "outputBudgetExceeded": false,
+          "memoryBudgetExceeded": false,
+          "supervisorError": false
+        }
+      },
+      "threshold": "exitCode=0且无终止标志",
+      "evidence": "engine_process.json",
+      "reason": "实际任务未正常完成；退出码不自动解释为某种具体异常"
+    },
+    "stableNativeInputs": {
+      "status": "passed",
+      "value": {
+        "count": 85,
+        "allStable": true
+      },
+      "threshold": "非空逐项输入稳定回执",
+      "evidence": "engine_process.json.inputsStable",
+      "reason": null
+    },
+    "reportEvidenceBinding": {
+      "status": "passed",
+      "value": {
+        "errors": [],
+        "missing": []
+      },
+      "threshold": "三份报告绑定同一回执/热审核且来源稳定",
+      "evidence": {
+        "audit": "E:\\RocketAeroHeat\\outputs\\v173_validation\\audit_real01\\report.json",
+        "development": "E:\\RocketAeroHeat\\outputs\\v173_validation\\development_real01\\report.json",
+        "verification": "E:\\RocketAeroHeat\\outputs\\v173_validation\\verify_real01\\report.json"
+      },
+      "reason": null
+    },
+    "sourceAndRunVerification": {
+      "status": "passed",
+      "value": {
+        "reviewCompleted": true,
+        "passed": true
+      },
+      "threshold": "只读来源/运行合同复核通过；不等于求解正常",
+      "evidence": "verification.report",
+      "reason": null
+    },
+    "nativeOutputCapacity": {
+      "status": "passed",
+      "value": {
+        "nativeMetadataPresent": true,
+        "generatedOutputBytes": 245313841,
+        "enforcementPathRecorded": true,
+        "overCapacityStopDemonstrated": false
+      },
+      "threshold": {
+        "maximumOutputBytes": 1073741824,
+        "outputBudgetExceeded": false
+      },
+      "evidence": "engine_process.json + verification.report",
+      "reason": "检查事中监督路径及终态容量；不要求本次故意超容量，也不宣称超容量停止已实测"
+    },
+    "nativeCheckpointRecord": {
+      "status": "passed",
+      "value": {
+        "nativePresent": true,
+        "completeLocalIterations": [
+          0
+        ]
+      },
+      "threshold": "原生完整帧清点与独立复核相同",
+      "evidence": "engine_process.json.checkpoints + verification.report",
+      "reason": null
+    },
+    "normalCompleteSchedule": {
+      "status": "failed",
+      "value": {
+        "normalFinalPairPresent": false,
+        "normalScheduleComplete": false,
+        "expected": [
+          0
+        ],
+        "missing": []
+      },
+      "threshold": "正常终态及应有保存完整",
+      "evidence": "engine_process.json.checkpoints",
+      "reason": null
+    },
+    "allSavedStrictThermalAudit": {
+      "status": "passed",
+      "value": [
+        {
+          "localIteration": 0,
+          "passed": true,
+          "checks": {
+            "energyMaximumRelativeError": true,
+            "eosMaximumRelativeError": true,
+            "paperCpMaximumRelativeError": true,
+            "viscosityMaximumRelativeError": true,
+            "nativeHeatMaximumScaledError": true,
+            "powerScaledDifference": true
+          },
+          "values": {
+            "energyMaximumRelativeError": 2.004084856234397e-13,
+            "eosMaximumRelativeError": 2.220446049250313e-16,
+            "paperCpMaximumRelativeError": 6.536307939342123e-09,
+            "viscosityMaximumRelativeError": 8.881784197001252e-16,
+            "nativeHeatMaximumScaledError": 8.13156830332687e-16,
+            "powerScaledDifference": 2.228317349694e-10
+          }
+        }
+      ],
+      "threshold": {
+        "energyMaximumRelativeError": 2e-11,
+        "eosMaximumRelativeError": 2e-11,
+        "paperCpMaximumRelativeError": 2e-08,
+        "viscosityMaximumRelativeError": 2e-11,
+        "nativeHeatMaximumScaledError": 2e-10,
+        "powerScaledDifference": 2e-09
+      },
+      "evidence": "audit.report.frames",
+      "reason": null
+    },
+    "densityResidualDevelopment": {
+      "status": "failed",
+      "value": {
+        "first20MeanLog": -3.23115659205,
+        "last20MeanLog": -3.0254570747500003,
+        "lastMinusFirst": 0.2056995172999998
+      },
+      "threshold": {
+        "lastMinusFirstMaximum": -0.25
+      },
+      "evidence": "development.report.history.windows",
+      "reason": null
+    },
+    "energyResidualDevelopment": {
+      "status": "failed",
+      "value": {
+        "first20MeanLog": 2.5640294796,
+        "last20MeanLog": 2.747413709,
+        "lastMinusFirst": 0.1833842294000001
+      },
+      "threshold": {
+        "lastMinusFirstMaximum": -0.25
+      },
+      "evidence": "development.report.history.windows",
+      "reason": null
+    },
+    "terminalWallTemperature": {
+      "status": "pending",
+      "value": {
+        "localIteration": null,
+        "value": null
+      },
+      "threshold": {
+        "operator": "<",
+        "value": 19.9253
+      },
+      "evidence": "development.report.frames",
+      "reason": "缺正常终态完整场；保存首帧不代表最终壁流体状态"
+    },
+    "terminalIndependentYPlus": {
+      "status": "pending",
+      "value": {
+        "localIteration": null,
+        "value": null
+      },
+      "threshold": {
+        "operator": "<=",
+        "value": 1.0
+      },
+      "evidence": "development.report.frames",
+      "reason": "缺正常终态完整场；保存首帧不代表最终壁流体状态"
+    },
+    "lastTwoPressureAreaL1": {
+      "status": "pending",
+      "value": {
+        "fromLocalIteration": null,
+        "toLocalIteration": 0,
+        "relativeL1": null
+      },
+      "threshold": {
+        "maximum": 0.05
+      },
+      "evidence": "development.report.consecutiveSurfaceChanges",
+      "reason": "缺最近两份完整场或非零参照积分；不能用同一首帧自比较"
+    },
+    "lastTwoHeatAreaL1": {
+      "status": "pending",
+      "value": {
+        "fromLocalIteration": null,
+        "toLocalIteration": 0,
+        "relativeL1": null
+      },
+      "threshold": {
+        "maximum": 0.1
+      },
+      "evidence": "development.report.consecutiveSurfaceChanges",
+      "reason": "缺最近两份完整场或非零参照积分；不能用同一首帧自比较"
+    },
+    "noInvalidOldState": {
+      "status": "passed",
+      "value": {
+        "invalidOldEvents": 0
+      },
+      "threshold": "独立核验事件中非法旧态为0",
+      "evidence": "verification.report.conservativeStepEvents",
+      "reason": null
+    },
+    "noZeroStepInLast20": {
+      "status": "passed",
+      "value": {
+        "firstLocalIteration": 37,
+        "lastLocalIteration": 56,
+        "zeroStepEvents": 0,
+        "unknownEventTimes": 0,
+        "eventsAfterLastFiniteUpdate": 0,
+        "zeroStepEventIDs": []
+      },
+      "threshold": "真实末20更新无零步",
+      "evidence": "verification.report + step_event_summary.json",
+      "reason": "完整事件按实际innerIteration核对，末20无零步"
+    },
+    "screeningInputsStable": {
+      "status": "passed",
+      "value": {
+        "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\engine_process.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\case_manifest.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v173_validation\\audit_real01\\report.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v173_validation\\development_real01\\report.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v173_validation\\verify_real01\\report.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v173_validation\\verify_real01\\step_event_summary.json": true,
+        "E:\\RocketAeroHeat\\scripts\\screenNACASpatialStepV173.py": true
+      },
+      "threshold": "本次实际读取的小报告逐项SHA保持",
+      "evidence": "screen.inputSHA256",
+      "reason": null
+    }
+  },
+  "nativeExitCode": 134,
+  "normalRunCompleted": false,
+  "completeSavedLocalIterations": [
+    0
+  ],
+  "lastCompleteLocalIteration": 0,
+  "lastCompleteSeriesSuccessfulUpdates": 1502,
+  "lastFiniteHistoryLocalIteration": 56,
+  "lastFiniteHistorySeriesSuccessfulUpdates": 1558,
+  "terminalCompleteFieldAvailable": false,
+  "abnormalInstantStateAvailable": false,
+  "finalTerminationCause": "未由本筛选推断；退出码、恢复事件均不单独证明最后终止原因",
+  "originalDensityEnergyMinus8Passed": false,
+  "temperatureIdentities": {
+    "givenTw": "已给定空间壁温输入",
+    "wallFluidTemperature": "仅实际完整保存场中的流体温度；最终场缺失则未知",
+    "solvedSolidWallTemperature": false
+  },
+  "fieldMappingNotes": [
+    "audit.frames.givenTwMaximumFluidDifferenceK与development.frames.wallTemperatureMaximumDifferenceK均指给定Tw和壁流体T之差；终态仅取准确末场。",
+    "independentFirstNeighborYPlus99为独立首邻诊断，不使用层流原生Y_Plus=0作为通过证据。",
+    "history meanLogResidual为已取log的残差均值；末减首<=-0.25，不再取log。",
+    "p/q面积L1取最近两份不同完整场，以较早场绝对面积积分为分母；分母为0则待验。",
+    "checkpoint阶段标签与热审核阶段标签不同，不能按字符串相等合并。",
+    "事件innerIteration属于原生求解阶段；未知或末有限历史之后事件不补入已完成窗口。",
+    "nativeOutputCapacityEnforcementDemonstrated=false表示未实测超容量停止，不等于事中路径未启用。"
+  ],
+  "physicalQualified": false,
+  "experimentalQualification": false,
+  "newQualifiedArea_m2": 0,
+  "fullRocket20DegreeQualified": false,
+  "defaultsChanged": false,
+  "automaticContinuation": false,
+  "newCFDTasks": 0,
+  "largeFieldReads": 0,
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\engine_process.json": "0e7e4e29e2b5e671b09f459a22e81d941d3851fa9628cd0e31ec9667712cebd4",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\case_manifest.json": "a87db2162cd74ca5c6c2cb85d74237a10bd3e1851af67e4e17ebc494c69f904b",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\audit_real01\\report.json": "b8ae9b4371a8ec489ad2d2195a75be6ed43d27c69f05a47cc5321938ebc58717",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\development_real01\\report.json": "7a41e706be417eed71118af36fd19fe5bdc74155cba871442355d6d662b07f32",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\verify_real01\\report.json": "effadfe46ad592969a4ceac3c51aaa32ae2fb5751e9fe52956fdedd674156d38",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\verify_real01\\step_event_summary.json": "94924b85f0dc9420560df0de999e4efdcebd5877c4973c85fe673bec1f433544",
+    "E:\\RocketAeroHeat\\scripts\\screenNACASpatialStepV173.py": "fe337ac2d4ad8e076f6c5c3ece681e98ba55f3c66f313f5a3eba6af0e6dea78b"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\engine_process.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\audit_real01\\report.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\development_real01\\report.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\verify_real01\\report.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\verify_real01\\step_event_summary.json": true,
+    "E:\\RocketAeroHeat\\scripts\\screenNACASpatialStepV173.py": true
+  },
+  "elapsedSeconds": 0.04700000000593718
+}

@@ -119,6 +119,9 @@ def audit(folder,out,saved_frames_only=False):
               ROOT/'scripts/su2IdealAirCheckpoints.py']
     if manifest['caseKind']=='naca-tn3344-adaptive-cold-restart-v1':
         files += [ROOT/'scripts/prepareNACAAdaptiveContinuation.py',ROOT/'scripts/su2NACAAdaptiveInterface.py']
+    if manifest['caseKind']=='naca-tn3344-spatial-step-cold-restart-v1':
+        files += [ROOT/'scripts/prepareNACASpatialStep.py',ROOT/'scripts/su2NACASpatialStepInterface.py',
+                  ROOT/'scripts/prepareNACAAdaptiveContinuation.py']
     locks={str(path):sha(path) for path in files}
     for path in files:
         if path.suffix=='.py':(out/('executed_'+path.name)).write_bytes(path.read_bytes())

@@ -1,0 +1,982 @@
+--- a/Common/include/option_structure.hpp
++++ b/Common/include/option_structure.hpp
+@@ -659,6 +659,7 @@
+   COOLPROP = 10,          /*!< \brief Thermodynamics library. */
+   FLUID_FLAMELET = 11,    /*!< \brief lookup table (LUT) method for premixed flamelets. */
+   DATADRIVEN_FLUID = 12,  /*!< \brief multi-layer perceptron driven fluid model. */
++  IDEAL_AIR_VARIABLE_CP = 14, // RocketAeroHeat固定组分变比热空气
+   FLUID_CANTERA = 13,     /*!< \brief Reacting flows model. */
+ };
+ static const MapType<std::string, ENUM_FLUIDMODEL> FluidModel_Map = {
+@@ -672,6 +673,7 @@
+   MakePair("MUTATIONPP", MUTATIONPP)
+   MakePair("SU2_NONEQ", SU2_NONEQ)
+   MakePair("FLUID_MIXTURE", FLUID_MIXTURE)
++  MakePair("IDEAL_AIR_VARIABLE_CP", IDEAL_AIR_VARIABLE_CP)
+   MakePair("COOLPROP", COOLPROP)
+   MakePair("DATADRIVEN_FLUID", DATADRIVEN_FLUID)
+   MakePair("FLUID_FLAMELET", FLUID_FLAMELET)
+--- a/Common/src/CConfig.cpp
++++ b/Common/src/CConfig.cpp
+@@ -3790,6 +3790,20 @@
+   }
+ #endif
+ 
++  // 模块用途。只接受已明确接入的直接SI一般EOS路径。
++  if (Kind_FluidModel == IDEAL_AIR_VARIABLE_CP) {
++    if (SystemMeasurements != SI || Ref_NonDim != DIMENSIONAL || Time_Domain ||
++        Multizone_Problem || DiscreteAdjoint || ContinuousAdjoint ||
++        (Kind_Solver != MAIN_SOLVER::NAVIER_STOKES && Kind_Solver != MAIN_SOLVER::RANS) ||
++        (Kind_Turb_Model != TURB_MODEL::NONE && Kind_Turb_Model != TURB_MODEL::SST) ||
++        Kind_Upwind_Flow != UPWIND::ROE || nMarker_WallFunctions != 0 ||
++        Low_Mach_Corr || nMarker_Giles != 0 || GetDynamic_Grid())
++      SU2_MPI::Error("IDEAL_AIR_VARIABLE_CP requires direct SI steady single-zone NS/SST, ROE, resolved wall", CURRENT_FUNCTION);
++    for (unsigned short i=0; i<nMarker_Riemann; ++i)
++      if (Kind_Data_Riemann[i] != STATIC_SUPERSONIC_INFLOW_PT && Kind_Data_Riemann[i] != STATIC_PRESSURE)
++        SU2_MPI::Error("IDEAL_AIR_VARIABLE_CP supports Riemann static PT inlet and static pressure outlet", CURRENT_FUNCTION);
++  }
++
+   /*--- Check if CoolProp is used with non-dimensionalization. ---*/
+   if (Kind_FluidModel == COOLPROP && Ref_NonDim != DIMENSIONAL) {
+     SU2_MPI::Error("CoolProp can not be used with non-dimensionalization.", CURRENT_FUNCTION);
+--- a/SU2_CFD/src/solvers/CEulerSolver.cpp
++++ b/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -34,6 +34,8 @@
+ #include "../../include/fluid/CPengRobinson.hpp"
+ #include "../../include/fluid/CDataDrivenFluid.hpp"
+ #include "../../include/fluid/CCoolProp.hpp"
++#include "../../include/fluid/CSU2IdealAir.hpp"
++#include "../../include/fluid/SU2EnergyState.hpp"
+ #include "../../include/numerics_simd/CNumericsSIMD.hpp"
+ #include "../../include/limiters/CLimiterDetails.hpp"
+ #include "../../include/output/COutput.hpp"
+@@ -905,6 +907,11 @@
+       auxFluidModel = new CDataDrivenFluid(config);
+ 
+       break;
++    case IDEAL_AIR_VARIABLE_CP:
++      config->SetGas_Constant(rah_air::gas_constant);
++      auxFluidModel = new CSU2IdealAir();
++      break;
++
+     case COOLPROP:
+ 
+       auxFluidModel = new CCoolProp(config->GetFluid_Name());
+@@ -1154,6 +1161,10 @@
+ 
+       case DATADRIVEN_FLUID:
+         FluidModel[thread] = new CDataDrivenFluid(config, false);
++        break;
++
++      case IDEAL_AIR_VARIABLE_CP:
++        FluidModel[thread] = new CSU2IdealAir();
+         break;
+ 
+       case COOLPROP:
+@@ -1313,7 +1324,7 @@
+     Unit.str("");
+     if      (config->GetSystemMeasurements() == SI) Unit << "N.m/kg.K";
+     else if (config->GetSystemMeasurements() == US) Unit << "lbf.ft/slug.R";
+-    if (config->GetKind_FluidModel() == COOLPROP) {
++    if (config->GetKind_FluidModel() == COOLPROP || config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) {
+       NonDimTable << "Spec. Heat Ratio" << "-" << "-" << "-" << "-";
+     }
+     else {
+@@ -1333,6 +1344,9 @@
+       break;
+     case PR_GAS:
+       ModelTable << "PR_GAS";
++      break;
++    case IDEAL_AIR_VARIABLE_CP:
++      ModelTable << "IDEAL_AIR_VARIABLE_CP Lemmon2000 OTH 60..2000K";
+       break;
+     case COOLPROP:
+       ModelTable << "CoolProp library";
+@@ -1949,9 +1963,22 @@
+ 
+       /*--- Recompute the reconstructed quantities in a thermodynamically consistent way. ---*/
+ 
++      bool rah_invalid_reconstruction = false;
+       if (!ideal_gas || low_mach_corr) {
+-        ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i);
+-        ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j);
++        const bool variable_air = config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP;
++        const bool with_k = variable_air && config->GetKind_Turb_Model() == TURB_MODEL::SST;
++        const su2double k_i = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
++        const su2double k_j = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(jPoint,0) : 0.0;
++        try {
++          ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i, k_i);
++          ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j, k_j);
++        } catch (const std::domain_error&) {
++          if (!variable_air) throw;
++          // 拒绝超温域重构，复用原生单元值降阶路径，避免半更新状态。
++          rah_invalid_reconstruction = true;
++          std::copy_n(V_i,nPrimVar,Primitive_i); std::copy_n(V_j,nPrimVar,Primitive_j);
++          std::copy_n(S_i,nSecondaryVar,Secondary_i); std::copy_n(S_j,nSecondaryVar,Secondary_j);
++        }
+       }
+ 
+       /*--- Low-Mach number correction. ---*/
+@@ -1977,7 +2004,7 @@
+       su2double RoeEnthalpy = (R * Primitive_j[prim_idx.Enthalpy()] + Primitive_i[prim_idx.Enthalpy()]) / (R+1);
+ 
+       const bool neg_sound_speed = ((Gamma-1)*(RoeEnthalpy-0.5*sq_vel) < 0.0);
+-      bool bad_recon = neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;
++      bool bad_recon = rah_invalid_reconstruction || neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;
+       bad_recon = nodes->UpdateNonPhysicalEdgeCounter(iEdge, bad_recon);
+       counter_local += bad_recon;
+ 
+@@ -2036,7 +2063,7 @@
+ }
+ 
+ void CEulerSolver::ComputeConsistentExtrapolation(CFluidModel *fluidModel, unsigned short nDim,
+-                                                  su2double *primitive, su2double *secondary) {
++                                                  su2double *primitive, su2double *secondary, su2double turbulent_k) {
+   SU2_ZONE_SCOPED
+   const CEulerVariable::CIndices<unsigned short> prim_idx(nDim, 0);
+   const su2double density = primitive[prim_idx.Density()];
+@@ -2046,7 +2073,7 @@
+   fluidModel->SetTDState_Prho(pressure, density);
+ 
+   primitive[prim_idx.Temperature()] = fluidModel->GetTemperature();
+-  primitive[prim_idx.Enthalpy()] = fluidModel->GetStaticEnergy() + pressure / density + 0.5*velocity2;
++  primitive[prim_idx.Enthalpy()] = fluidModel->GetStaticEnergy() + pressure / density + 0.5*velocity2 + turbulent_k;
+   primitive[prim_idx.SoundSpeed()] = fluidModel->GetSoundSpeed();
+   secondary[0] = fluidModel->GetdPdrho_e();
+   secondary[1] = fluidModel->GetdPde_rho();
+@@ -5312,7 +5339,9 @@
+       const auto Density_i = nodes->GetDensity(iPoint);
+ 
+       const auto Energy_i = nodes->GetEnergy(iPoint);
+-      const su2double StaticEnergy_i = Energy_i - 0.5*Velocity2_i;
++      const bool variable_air = config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP;
++      const su2double k_i = variable_air && tkeNeeded ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
++      const su2double StaticEnergy_i = rah_air::thermal_energy(Energy_i,Velocity2_i,k_i);
+ 
+       GetFluidModel()->SetTDState_rhoe(Density_i, StaticEnergy_i);
+ 
+@@ -5322,7 +5351,7 @@
+       const auto SoundSpeed_i = GetFluidModel()->GetSoundSpeed();
+ 
+       const su2double Kappa_i = GetFluidModel()->GetdPde_rho() / Density_i;
+-      const su2double Chi_i = GetFluidModel()->GetdPdrho_e() - Kappa_i * StaticEnergy_i;
++      const su2double Chi_i = GetFluidModel()->GetdPdrho_e() - Kappa_i * (StaticEnergy_i+k_i);
+ 
+       /*--- Build the external state u_e from boundary data and internal node ---*/
+       su2double T_static{0}, P_static{0}, Pressure_e{0}, Density_static{0}, Enthalpy_e{0}, Energy_e{0}, Entropy_e{0},
+@@ -5451,7 +5480,7 @@
+           Velocity_e[iDim] = Velocity_i[iDim];
+ 
+         Velocity2_e = GeometryToolbox::SquaredNorm(nDim, Velocity_e);
+-        Energy_e = GetFluidModel()->GetStaticEnergy() + 0.5*Velocity2_e;
++        Energy_e = GetFluidModel()->GetStaticEnergy() + 0.5*Velocity2_e + k_i;
+         break;
+ 
+       default:
+@@ -5512,7 +5541,10 @@
+       const auto Velocity2_b = GeometryToolbox::SquaredNorm(nDim, Velocity_b);
+ 
+       const su2double Energy_b = u_b[nVar-1]/Density_b;
+-      const su2double StaticEnergy_b = Energy_b - 0.5*Velocity2_b;
++      const bool outgoing = GeometryToolbox::DotProduct(nDim,Velocity_b,UnitNormal) >= 0;
++      const bool pressure_boundary = config->GetKind_Data_Riemann(Marker_Tag) == STATIC_PRESSURE;
++      const su2double k_b = variable_air && tkeNeeded ? ((outgoing || pressure_boundary) ? k_i : GetTke_Inf()) : 0.0;
++      const su2double StaticEnergy_b = rah_air::thermal_energy(Energy_b,Velocity2_b,k_b);
+       GetFluidModel()->SetTDState_rhoe(Density_b, StaticEnergy_b);
+ 
+       /*--- Store number of Newton iterations at BC ---*/
+@@ -5523,7 +5555,7 @@
+       const auto Temperature_b = GetFluidModel()->GetTemperature();
+       const su2double Enthalpy_b = Energy_b + Pressure_b/Density_b;
+       const su2double Kappa_b = GetFluidModel()->GetdPde_rho() / Density_b;
+-      const su2double Chi_b = GetFluidModel()->GetdPdrho_e() - Kappa_b * StaticEnergy_b;
++      const su2double Chi_b = GetFluidModel()->GetdPdrho_e() - Kappa_b * (StaticEnergy_b+k_b);
+ 
+       /*--- Compute the residuals ---*/
+       su2double Residual[MAXNVAR] = {0};
+--- a/SU2_CFD/include/solvers/CEulerSolver.hpp
++++ b/SU2_CFD/include/solvers/CEulerSolver.hpp
+@@ -423,7 +423,7 @@
+   static void ComputeConsistentExtrapolation(CFluidModel *fluidModel,
+                                              unsigned short nDim,
+                                              su2double *primitive,
+-                                             su2double *secondary);
++                                             su2double *secondary, su2double turbulent_k = 0.0);
+ 
+   /*!
+    * \brief Apply low Mach number correction to the primitives at two points,
+--- a/SU2_CFD/src/solvers/CNSSolver.cpp
++++ b/SU2_CFD/src/solvers/CNSSolver.cpp
+@@ -741,13 +741,20 @@
+       su2double Density = nodes->GetDensity(iPoint);
+       su2double Vel2 = GeometryToolbox::SquaredNorm(nDim, &nodes->GetPrimitive(iPoint)[prim_idx.Velocity()]);
+       su2double dTdrho = 1.0/Density * ( -Twall + (Gamma-1.0)/Gas_Constant*(Vel2/2.0) );
++      su2double dTdrhoE = (Gamma-1.0)/(Gas_Constant*Density);
++      if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) {
++        // 原生弱壁面近似对角预条件，采用同阶段实际状态和冻结k的热力学链式导数。
++        const su2double* secondary = nodes->GetSecondary(iPoint);
++        dTdrho = secondary[2] + secondary[3]*(Vel2-nodes->GetEnergy(iPoint))/Density;
++        dTdrhoE = secondary[3]/Density;
++      }
+ 
+       Jacobian_i[nDim+1][0] = thermal_conductivity/dist_ij * dTdrho * Area;
+ 
+       for (auto jDim = 0u; jDim < nDim; jDim++)
+         Jacobian_i[nDim+1][jDim+1] = 0.0;
+ 
+-      Jacobian_i[nDim+1][nDim+1] = thermal_conductivity/dist_ij * (Gamma-1.0)/(Gas_Constant*Density) * Area;
++      Jacobian_i[nDim+1][nDim+1] = thermal_conductivity/dist_ij * dTdrhoE * Area;
+     }
+ 
+     /*--- If the wall is moving, there are additional residual contributions
+--- a/SU2_CFD/include/variables/CNSVariable.hpp
++++ b/SU2_CFD/include/variables/CNSVariable.hpp
+@@ -39,6 +39,8 @@
+ private:
+   su2double inv_TimeScale;   /*!< \brief Inverse of the reference time scale. */
+ 
++  VectorType FlowPrimitiveK; /*!< 对应最近一次原始热状态计算的独立k输入。 */
++
+   VectorType Tau_Wall;        /*!< \brief Magnitude of the wall shear stress from a wall function. */
+   VectorType DES_LengthScale; /*!< \brief DES Length Scale. */
+   VectorType lesMode;        /*!< \brief Sensor for local simulation mode (0=RANS, 1=LES).*/
+@@ -46,6 +48,8 @@
+   VectorType Vortex_Tilting;  /*!< \brief Value of the vortex tilting variable for DES length scale computation. */
+ 
+ public:
++  su2double GetFlowPrimitiveK(unsigned long iPoint) const { return FlowPrimitiveK(iPoint); }
++
+   /*!
+    * \brief Constructor of the class.
+    * \param[in] density - Value of the flow density (initialization value).
+--- a/SU2_CFD/src/variables/CNSVariable.cpp
++++ b/SU2_CFD/src/variables/CNSVariable.cpp
+@@ -37,6 +37,7 @@
+ 
+   Vorticity.resize(nPoint,3) = su2double(0.0);
+   StrainMag.resize(nPoint) = su2double(0.0);
++  FlowPrimitiveK.resize(nPoint) = su2double(0.0);
+   Tau_Wall.resize(nPoint) = su2double(-1.0);
+   DES_LengthScale.resize(nPoint) = su2double(0.0);
+   lesMode.resize(nPoint) = su2double(0.0);
+@@ -138,6 +139,9 @@
+ 
+ bool CNSVariable::SetPrimVar(unsigned long iPoint, su2double eddy_visc, su2double turb_ke, CFluidModel *FluidModel) {
+ 
++  // 直接捕获热状态计算输入，包含原生回退后的同一次调用。
++  FlowPrimitiveK(iPoint) = turb_ke;
++
+   bool RightVol = true;
+ 
+   SetVelocity(iPoint); // Computes velocity and velocity^2
+--- a/SU2_CFD/src/output/CFlowCompOutput.cpp
++++ b/SU2_CFD/src/output/CFlowCompOutput.cpp
+@@ -29,6 +29,7 @@
+ 
+ #include "../../../Common/include/geometry/CGeometry.hpp"
+ #include "../../include/solvers/CSolver.hpp"
++#include "../../include/variables/CNSVariable.hpp"
+ 
+ CFlowCompOutput::CFlowCompOutput(const CConfig *config, unsigned short nDim) : CFlowOutput(config, nDim, false) {
+ 
+@@ -305,6 +306,9 @@
+     AddVolumeOutput("ROE_DISSIPATION", "Roe_Dissipation", "ROE_DISSIPATION", "Value of the Roe dissipation");
+   }
+ 
++  if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)
++    AddVolumeOutput("FLOW_PRIMITIVE_K", "Flow_Primitive_K", "FLOW_PHASE", "Independent k used by saved flow primitive state");
++
+   AddCommonFVMOutputs(config);
+ 
+   if (config->GetTime_Domain()) {
+@@ -318,6 +322,9 @@
+   const CVariable* Node_Turb = nullptr;
+   if (config->GetKind_Turb_Model() != TURB_MODEL::NONE) Node_Turb = solver[TURB_SOL]->GetNodes();
+   auto* Node_Geo  = geometry->nodes;
++
++  if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)
++    SetVolumeOutputValue("FLOW_PRIMITIVE_K", iPoint, static_cast<const CNSVariable*>(Node_Flow)->GetFlowPrimitiveK(iPoint));
+ 
+   LoadCoordinates(Node_Geo->GetCoord(iPoint), iPoint);
+ 
+--- a/SU2_CFD/src/output/COutput.cpp
++++ b/SU2_CFD/src/output/COutput.cpp
+@@ -2172,7 +2172,9 @@
+ 
+     return ((Iter % config->GetVolumeOutputFrequency(iFile) == 0)) || force_writing;
+   }
+-      return ((Iter > 0) && (Iter % config->GetVolumeOutputFrequency(iFile) == 0)) || force_writing;
++      // 新模型首个完成更新也保存，后续沿用原生局部索引和强制末次规则。
++      return (((Iter > 0 || config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) &&
++                (Iter % config->GetVolumeOutputFrequency(iFile) == 0))) || force_writing;
+ 
+ }
+ 
+--- a/SU2_CFD/src/output/CFlowOutput.cpp
++++ b/SU2_CFD/src/output/CFlowOutput.cpp
+@@ -4134,7 +4134,9 @@
+     }
+   } else {
+     if (config->GetFixed_CL_Mode() && config->GetFinite_Difference_Mode()) return false;
+-    return ((Iter > 0) && Iter % config->GetVolumeOutputFrequency(iFile) == 0) || force_writing;
++    // 新变比热包保存第一次完成更新，稳态局部0对应第1次更新。
++    return ((Iter > 0 || config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) &&
++            Iter % config->GetVolumeOutputFrequency(iFile) == 0) || force_writing;
+   }
+ 
+   return force_writing;
+--- a/SU2_CFD/src/SU2_CFD.cpp
++++ b/SU2_CFD/src/SU2_CFD.cpp
+@@ -28,6 +28,8 @@
+ #include "../include/SU2_CFD.hpp"
+ #include "../../Common/include/tracy_structure.hpp"
+ #include "Eigen/src/Core/products/Parallelizer.h"
++#define WIN32_LEAN_AND_MEAN
++#include "../include/NativeTermination.hpp"
+ 
+ /* Include file, needed for the runtime NaN catching. You also have to include feenableexcept(...) below. */
+ //#include <fenv.h>
+@@ -35,6 +37,8 @@
+ using namespace std;
+ 
+ int main(int argc, char *argv[]) {
++  // 仅观察异常并保留原终止行为。
++  rah_termination::install();
+ 
+   char config_file_name[MAX_STRING_SIZE];
+   bool dry_run = false;
+--- a/SU2_CFD/src/output/filewriter/CSU2FileWriter.cpp
++++ b/SU2_CFD/src/output/filewriter/CSU2FileWriter.cpp
+@@ -26,6 +26,7 @@
+  */
+ 
+ #include "../../../include/output/filewriter/CSU2FileWriter.hpp"
++#include <limits>
+ 
+ const string CSU2FileWriter::fileExt = ".csv";
+ 
+@@ -50,7 +51,8 @@
+    to the file at the same time, one after the other in rank order. ---*/
+ 
+   ostringstream data;
+-  data.precision(15);
++  // scientific的precision统计小数位，17位有效数字采用max_digits10减一。
++  data.precision(std::numeric_limits<double>::max_digits10 - 1);
+ 
+   for (auto iPoint = 0ul; iPoint < dataSorter->GetnPoints(); iPoint++) {
+ 
+--- a/SU2_CFD/include/NativeTermination.hpp
++++ b/SU2_CFD/include/NativeTermination.hpp
+@@ -0,0 +1,59 @@
++#pragma once
++
++// 模块用途。记录未处理的C++异常及Windows调用地址，随后保留原终止行为。
++#ifndef NOMINMAX
++#define NOMINMAX
++#endif
++#include <windows.h>
++#include <cstdio>
++#include <cstdlib>
++#include <exception>
++#include <typeinfo>
++
++namespace rah_termination {
++inline std::terminate_handler previous_handler = nullptr;
++inline volatile LONG recording = 0;
++
++[[noreturn]] inline void record_and_terminate() noexcept {
++  // 并发或递归终止时立即退出，避免异常处理再次进入求解器。
++  if (InterlockedCompareExchange(&recording, 1, 0) != 0) std::_Exit(134);
++  std::fprintf(stderr, "\nRAH_NATIVE_TERMINATION_BEGIN\nthread=%lu\n",
++               static_cast<unsigned long>(GetCurrentThreadId()));
++  const auto current = std::current_exception();
++  if (current) {
++    try {
++      std::rethrow_exception(current);
++    } catch (const std::exception& error) {
++      std::fprintf(stderr, "exception_type=%s\nwhat=%s\n", typeid(error).name(), error.what());
++    } catch (...) {
++      std::fprintf(stderr, "exception_type=non-std\n");
++    }
++  } else {
++    std::fprintf(stderr, "exception_type=none-current\n");
++  }
++
++  // 每帧同时给出模块基址和相对地址，供固定二进制符号表离线复核。
++  void* frames[64] = {};
++  const USHORT count = CaptureStackBackTrace(0, 64, frames, nullptr);
++  for (USHORT index = 0; index < count; ++index) {
++    HMODULE module = nullptr;
++    char name[MAX_PATH] = {};
++    const bool found = GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
++        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
++        reinterpret_cast<LPCSTR>(frames[index]), &module) != 0;
++    if (found) GetModuleFileNameA(module, name, MAX_PATH);
++    const auto offset = reinterpret_cast<ULONG_PTR>(frames[index]) - reinterpret_cast<ULONG_PTR>(module);
++    std::fprintf(stderr, "frame=%u address=%p module=%s base=%p offset=0x%llx\n",
++                 static_cast<unsigned>(index), frames[index], name,
++                 reinterpret_cast<void*>(module), static_cast<unsigned long long>(offset));
++  }
++  std::fprintf(stderr, "exit_action=delegate-original-terminate\nRAH_NATIVE_TERMINATION_END\n");
++  std::fflush(stderr);
++  if (previous_handler && previous_handler != record_and_terminate) previous_handler();
++  std::abort();
++}
++
++inline void install() noexcept {
++  previous_handler = std::set_terminate(record_and_terminate);
++}
++}  // namespace rah_termination
+--- a/Common/src/geometry/CGeometry.cpp
++++ b/Common/src/geometry/CGeometry.cpp
+@@ -26,6 +26,7 @@
+  */
+ 
+ #include <unordered_set>
++#include "RAHAxialWallTemperature.hpp"
+ 
+ #include "../../include/geometry/CGeometry.hpp"
+ #include "../../include/geometry/elements/CElement.hpp"
+@@ -2747,44 +2748,73 @@
+   geometry_container[MESH_0]->ComputeSurfaceAreaCfgFile(config);
+ }
+ 
++// 此函数由官方v8.6.0原实现最小扩展；仅接入SI温度表及真实输入回执。
+ void CGeometry::SetCustomBoundary(CConfig* config) {
+-  unsigned short iMarker;
+-  unsigned long iVertex;
+-  string Marker_Tag;
+-
+-  /*--- Initialize quantities for customized boundary conditions.
+-   * Custom values are initialized with the default values specified in the config (avoiding non physical values) ---*/
+-  CustomBoundaryTemperature = new su2double*[nMarker];
+-  CustomBoundaryHeatFlux = new su2double*[nMarker];
+-
+-  for (iMarker = 0; iMarker < nMarker; iMarker++) {
+-    Marker_Tag = config->GetMarker_All_TagBound(iMarker);
+-    CustomBoundaryHeatFlux[iMarker] = nullptr;
+-    CustomBoundaryTemperature[iMarker] = nullptr;
+-    if (config->GetMarker_All_PyCustom(iMarker)) {
++  try {
++    RAHAxialWallTemperature rah;
++    std::ofstream applied;
++    unsigned long written = 0;
++    unsigned short thermalMarkers = 0;
++    if (rah.Active()) {
++      if (size != 1 || config->GetnZone() != 1 || config->GetnMGLevels() != 0 ||
++          config->GetGrid_Movement() || config->GetTime_Domain() || config->GetSystemMeasurements() != SI)
++        throw std::runtime_error("RAH spatial wall requires serial-MPI, one zone, fixed SI mesh and MGLEVEL=0");
++      applied.open("rah_wall_temperature_applied.csv", std::ios::out | std::ios::trunc);
++      applied.imbue(std::locale::classic());
++      if (!applied) throw std::runtime_error("Cannot write RAH wall-input receipt");
++      applied << "globalNodeID,X_m,Y_m,Z_m,givenTemperature_K\n" << std::setprecision(17);
++    }
++    CustomBoundaryTemperature = new su2double*[nMarker];
++    CustomBoundaryHeatFlux = new su2double*[nMarker];
++    for (auto iMarker = 0u; iMarker < nMarker; iMarker++) {
++      const std::string Marker_Tag = config->GetMarker_All_TagBound(iMarker);
++      CustomBoundaryHeatFlux[iMarker] = nullptr;
++      CustomBoundaryTemperature[iMarker] = nullptr;
++      if (!config->GetMarker_All_PyCustom(iMarker)) continue;
++      if (rah.Active() && (Marker_Tag != "wall" || config->GetMarker_All_KindBC(iMarker) != ISOTHERMAL))
++        throw std::runtime_error("RAH spatial wall requires one custom ISOTHERMAL marker named wall");
+       switch (config->GetMarker_All_KindBC(iMarker)) {
+         case HEAT_FLUX:
+           CustomBoundaryHeatFlux[iMarker] = new su2double[nVertex[iMarker]];
+-          for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
++          for (auto iVertex = 0ul; iVertex < nVertex[iMarker]; iVertex++)
+             CustomBoundaryHeatFlux[iMarker][iVertex] = config->GetWall_HeatFlux(Marker_Tag);
+-          }
+           break;
+         case ISOTHERMAL:
++          ++thermalMarkers;
+           CustomBoundaryTemperature[iMarker] = new su2double[nVertex[iMarker]];
+-          for (iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
++          for (auto iVertex = 0ul; iVertex < nVertex[iMarker]; iVertex++) {
+             CustomBoundaryTemperature[iMarker][iVertex] = config->GetIsothermal_Temperature(Marker_Tag);
++            if (rah.Active()) {
++              const auto iPoint = vertex[iMarker][iVertex]->GetNode();
++              const double x = SU2_TYPE::GetValue(nodes->GetCoord(iPoint,0));
++              const double y = SU2_TYPE::GetValue(nodes->GetCoord(iPoint,1));
++              const double z = nDim==3 ? SU2_TYPE::GetValue(nodes->GetCoord(iPoint,2)) : 0.0;
++              const double value = rah.At(x);
++              CustomBoundaryTemperature[iMarker][iVertex] = value;
++              applied << nodes->GetGlobalIndex(iPoint) << ',' << x << ',' << y << ',' << z << ',' << value << '\n';
++              ++written;
++            }
+           }
+           break;
+         case INLET_FLOW:
+-          // This case is handled in the solver class.
+           break;
+         default:
+-          cout << "WARNING: Marker " << Marker_Tag << " is not customizable. Using default behavior." << endl;
++          std::cout << "WARNING: Marker " << Marker_Tag << " is not customizable. Using default behavior." << std::endl;
+           break;
+       }
+     }
+-  }
+-}
++    if (rah.Active()) {
++      if (thermalMarkers != 1 || written == 0)
++        throw std::runtime_error("RAH temperature table was not applied to exactly one nonempty wall");
++      applied.close();
++      if (!applied) throw std::runtime_error("RAH wall-input receipt write failed");
++      std::cout << "RAH_AXIAL_WALL_V1 applied " << written << " wall nodes; given SI temperatures, not solved material T." << std::endl;
++    }
++  } catch (const std::exception& ex) {
++    SU2_MPI::Error(ex.what(), CURRENT_FUNCTION);
++  }
++}
++
+ 
+ void CGeometry::UpdateCustomBoundaryConditions(CGeometry** geometry_container, CConfig* config) {
+   for (auto iMGlevel = 1u; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {
+--- a/SU2_CFD/src/python_wrapper_structure.cpp
++++ b/SU2_CFD/src/python_wrapper_structure.cpp
+@@ -1,3 +1,4 @@
++#include <cstdlib>
+ /*!
+  * \file python_wrapper_structure.cpp
+  * \brief Driver subroutines that are used by the Python wrapper. Those routines are usually called from an external Python environment.
+@@ -30,6 +31,10 @@
+ #include "../include/drivers/CSinglezoneDriver.hpp"
+ 
+ void CDriver::PreprocessPythonInterface(CConfig** config, CGeometry**** geometry, CSolver***** solver) {
++  const char* rah_file = std::getenv("RAH_WALL_TEMPERATURE_FILE");
++  if (rah_file && *rah_file && (nZone != 1 || config[0]->GetnMarker_PyCustom() != 1))
++    SU2_MPI::Error("RAH wall table requires exactly one custom wall marker in one zone", CURRENT_FUNCTION);
++
+   int rank = MASTER_NODE;
+   SU2_MPI::Comm_rank(SU2_MPI::GetComm(), &rank);
+ 
+--- a/Common/src/geometry/RAHAxialWallTemperature.hpp
++++ b/Common/src/geometry/RAHAxialWallTemperature.hpp
+@@ -0,0 +1,67 @@
++// RocketAeroHeat 原生热边界适配器；LGPL-2.1-or-later，与SU2同许可证。
++// 仅负责读取/校验SI温度表和记录实际输入；不修改任何流动或热流离散公式。
++#ifndef RAH_AXIAL_WALL_TEMPERATURE_HPP
++#define RAH_AXIAL_WALL_TEMPERATURE_HPP
++#include <algorithm>
++#include <cmath>
++#include <cstdlib>
++#include <fstream>
++#include <iomanip>
++#include <locale>
++#include <sstream>
++#include <stdexcept>
++#include <string>
++#include <vector>
++
++class RAHAxialWallTemperature {
++ public:
++  // 模块一：没有显式文件时保持官方行为；有文件时任何错误都不能回退到标量。
++  RAHAxialWallTemperature() {
++    const char* file = std::getenv("RAH_WALL_TEMPERATURE_FILE");
++    if (file && *file) Load(file);
++  }
++  explicit RAHAxialWallTemperature(const std::string& file) { Load(file); }
++  bool Active() const { return !x_.empty(); }
++
++  // 模块二：线性插值、全节点覆盖和端点严格检查，不外推、不裁剪温度。
++  double At(double x) const {
++    if (!Active() || !std::isfinite(x) || x < x_.front() || x > x_.back())
++      throw std::runtime_error("RAH thermal table does not cover wall node X");
++    const auto it = std::lower_bound(x_.begin(), x_.end(), x);
++    if (it == x_.begin()) return t_.front();
++    if (it == x_.end()) return t_.back();
++    const auto j = static_cast<std::size_t>(it - x_.begin());
++    const double w = (x - x_[j-1]) / (x_[j] - x_[j-1]);
++    return (1-w)*t_[j-1] + w*t_[j];
++  }
++
++ private:
++  std::vector<double> x_, t_;
++  static double Number(const std::string& token) {
++    std::istringstream in(token);in.imbue(std::locale::classic());double value;
++    if (!(in >> value) || !std::isfinite(value))
++      throw std::runtime_error("RAH thermal table requires finite numeric data");
++    in >> std::ws;
++    if (!in.eof()) throw std::runtime_error("RAH thermal table has trailing data");
++    return value;
++  }
++  void Load(const std::string& file) {
++    std::ifstream in(file);std::string line;
++    if (!in || !std::getline(in,line)) throw std::runtime_error("RAH thermal table cannot be read");
++    if (!line.empty() && line.back()=='\r') line.pop_back();
++    if (line != "RAH_AXIAL_WALL_TEMPERATURE_V1,X_m,T_K")
++      throw std::runtime_error("RAH thermal table schema or SI units mismatch");
++    while (std::getline(in,line)) {
++      if (!line.empty() && line.back()=='\r') line.pop_back();
++      const auto comma=line.find(',');
++      if (line.size()>4096 || comma==std::string::npos || line.find(',',comma+1)!=std::string::npos)
++        throw std::runtime_error("RAH thermal table requires exactly two columns");
++      const double x=Number(line.substr(0,comma)),t=Number(line.substr(comma+1));
++      if (t<=0 || (!x_.empty() && x<=x_.back()) || x_.size()>=10000)
++        throw std::runtime_error("RAH thermal table must have increasing X and positive T");
++      x_.push_back(x);t_.push_back(t);
++    }
++    if (!in.eof() || x_.size()<2) throw std::runtime_error("RAH thermal table is incomplete");
++  }
++};
++#endif
+--- a/SU2_CFD/src/variables/CNSVariable.cpp
++++ b/SU2_CFD/src/variables/CNSVariable.cpp
+@@ -28,6 +28,8 @@
+ #include "../../include/variables/CNSVariable.hpp"
+ #include "../../../Common/include/parallelization/omp_structure.hpp"
+ #include "../../include/fluid/CFluidModel.hpp"
++#include "../../include/fluid/CSU2IdealAir.hpp"
++#include "../../include/variables/ConservativeStepTrace.hpp"
+ 
+ CNSVariable::CNSVariable(su2double density, const su2double *velocity, su2double energy,
+                          unsigned long npoint, unsigned long ndim, unsigned long nvar, const CConfig *config) :
+@@ -138,51 +140,88 @@
+ }
+ 
+ bool CNSVariable::SetPrimVar(unsigned long iPoint, su2double eddy_visc, su2double turb_ke, CFluidModel *FluidModel) {
+-
+-  // 直接捕获热状态计算输入，包含原生回退后的同一次调用。
+-  FlowPrimitiveK(iPoint) = turb_ke;
+-
+-  bool RightVol = true;
+-
+-  SetVelocity(iPoint); // Computes velocity and velocity^2
+-  su2double density      = GetDensity(iPoint);
+-  su2double staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;
+-
+-  /*--- Check will be moved inside fluid model plus error description strings ---*/
+-
+-  FluidModel->SetTDState_rhoe(density, staticEnergy);
+-
+-  bool check_dens  = SetDensity(iPoint);
+-  bool check_press = SetPressure(iPoint, FluidModel->GetPressure());
+-  bool check_sos   = SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+-  bool check_temp  = SetTemperature(iPoint, FluidModel->GetTemperature());
+-
+-  /*--- Check that the solution has a physical meaning ---*/
+-
+-  if (check_dens || check_press || check_sos  || check_temp) {
+-
+-    /*--- Copy the old solution ---*/
+-
+-    for (unsigned long iVar = 0; iVar < nVar; iVar++)
+-      Solution(iPoint,iVar) = Solution_Old(iPoint,iVar);
+-
+-    /*--- Recompute the primitive variables ---*/
+-
+-    SetVelocity(iPoint); // Computes velocity and velocity^2
+-    density      = GetDensity(iPoint);
+-    staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;
+-
+-    /*--- Check will be moved inside fluid model plus error description strings ---*/
+-
+-    FluidModel->SetTDState_rhoe(density, staticEnergy);
+-
++  // 模块用途：仅定位本次节点查询。局部编号不是全局编号；退出后恢复线程上下文。
++  rah_query::Context query_context;
++  query_context.phase="node.trial"; query_context.localKnown=true; query_context.local=iPoint;
++  rah_query::Guard query_guard(query_context);
++
++  // 模块一。使用本次实际SST k计算热状态；合法候选不改任何守恒量。
++  FlowPrimitiveK(iPoint)=turb_ke;
++  bool RightVol=true;
++  su2double density=0, staticEnergy=0;
++  auto query=[&]() {
++    SetVelocity(iPoint);
++    density=GetDensity(iPoint);
++    staticEnergy=GetEnergy(iPoint)-0.5*Velocity2(iPoint)-turb_ke;
++    FluidModel->SetTDState_rhoe(density,staticEnergy);
++  };
++  try {
++    query();
++  } catch(const std::domain_error& error) {
++    if(dynamic_cast<CSU2IdealAir*>(FluidModel)==nullptr) throw;
++    const std::string reason=error.what();
++    const double trial_energy=staticEnergy;
++    rah_step::State trial{},old{},accepted{};
++    for(unsigned long j=0;j<nVar;++j) {
++      const unsigned long column=(j==nVar-1)?4:j;
++      trial[column]=Solution(iPoint,j);
++      old[column]=Solution_Old(iPoint,j);
++      Solution(iPoint,j)=Solution_Old(iPoint,j);
++    }
++    // 模块二。旧态也必须在当前k下合法；不得裁温、清k或使用陈旧缓存。
++    query_guard.phase("node.old");
++    try {
++      query();
++    } catch(const std::domain_error& old_error) {
++      rah_step::record(iPoint,nDim,trial,old,old,trial_energy,staticEnergy,staticEnergy,
++                       turb_ke,0,0,false,old_error.what());
++      throw;
++    }
++    const double old_energy=staticEnergy;
++    double theta=1.0;
++    unsigned attempts=0;
++    bool found=false;
++    // 模块三。整组守恒分量共用一个有限半步，真实EOS同时审核上下温界。
++    query_guard.phase("node.backtrack");
++    for(unsigned attempt=1;attempt<=32;++attempt) {
++      theta*=0.5;
++      attempts=attempt;
++      for(unsigned long j=0;j<nVar;++j) {
++        const unsigned long column=(j==nVar-1)?4:j;
++        Solution(iPoint,j)=old[column]+theta*(trial[column]-old[column]);
++      }
++      try {
++        query();
++        found=true;
++        break;
++      } catch(const std::domain_error&) {}
++    }
++    if(!found) {
++      query_guard.phase("node.zero-step");
++      theta=0;
++      for(unsigned long j=0;j<nVar;++j) Solution(iPoint,j)=Solution_Old(iPoint,j);
++      query();
++    }
++    for(unsigned long j=0;j<nVar;++j) accepted[(j==nVar-1)?4:j]=Solution(iPoint,j);
++    rah_step::record(iPoint,nDim,trial,old,accepted,trial_energy,old_energy,staticEnergy,
++                     turb_ke,theta,attempts,true,reason.c_str());
++    RightVol=false;
++  }
++
++  // 模块四。保留其他模型原有的非物理状态检查与恢复路径。
++  bool check_dens=SetDensity(iPoint);
++  bool check_press=SetPressure(iPoint,FluidModel->GetPressure());
++  bool check_sos=SetSoundSpeed(iPoint,FluidModel->GetSoundSpeed2());
++  bool check_temp=SetTemperature(iPoint,FluidModel->GetTemperature());
++  if(check_dens || check_press || check_sos || check_temp) {
++    query_guard.phase("node.legacy-recovery");
++    for(unsigned long j=0;j<nVar;++j) Solution(iPoint,j)=Solution_Old(iPoint,j);
++    query();
+     SetDensity(iPoint);
+-    SetPressure(iPoint, FluidModel->GetPressure());
+-    SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+-    SetTemperature(iPoint, FluidModel->GetTemperature());
+-
+-    RightVol = false;
+-
++    SetPressure(iPoint,FluidModel->GetPressure());
++    SetSoundSpeed(iPoint,FluidModel->GetSoundSpeed2());
++    SetTemperature(iPoint,FluidModel->GetTemperature());
++    RightVol=false;
+   }
+ 
+   /*--- Set enthalpy ---*/
+--- a/SU2_CFD/src/solvers/CNSSolver.cpp
++++ b/SU2_CFD/src/solvers/CNSSolver.cpp
+@@ -27,6 +27,7 @@
+ 
+ #include "../../include/solvers/CNSSolver.hpp"
+ #include "../../include/variables/CNSVariable.hpp"
++#include "../../include/variables/ConservativeStepTrace.hpp"
+ #include "../../../Common/include/toolboxes/printing_toolbox.hpp"
+ #include "../../../Common/include/toolboxes/geometry_toolbox.hpp"
+ #include "../../include/solvers/CFVMFlowSolverBase.inl"
+@@ -78,6 +79,23 @@
+   const bool limiter = (config->GetKind_SlopeLimit_Flow() != LIMITER::NONE) && (InnerIter <= config->GetLimiterIter());
+   const bool van_albada = (config->GetKind_SlopeLimit_Flow() == LIMITER::VAN_ALBADA_EDGE);
+   const bool wall_functions = config->GetWall_Functions();
++
++  // 模块用途。只在事件发生时读真实几何/调用阶段/现存线性量，不改变更新。
++  rah_step::ContextGuard step_context([&, this](unsigned long point) {
++    rah_step::Context c;
++    c.known=true; c.domain=point<nPointDomain; c.output=Output;
++    c.global=geometry->nodes->GetGlobalIndex(point);
++    c.inner=config->GetInnerIter(); c.time=config->GetTimeIter(); c.mesh=iMesh; c.rk=iRKStep;
++    c.volume=geometry->nodes->GetVolume(point);
++    c.alpha=nodes->GetUnderRelaxation(point);
++    for(unsigned long j=0;j<nDim;++j) c.coordinates[j]=geometry->nodes->GetCoord(point,j);
++    for(unsigned long j=0;j<nVar;++j) {
++      const auto column=(j==nVar-1)?4:j;
++      c.linear[column]=LinSysSol(point,j);
++      c.residual[column]=LinSysRes(point,j);
++    }
++    return c;
++  });
+ 
+   /*--- Common preprocessing steps (implemented by CEulerSolver) ---*/
+ 
+--- a/SU2_CFD/src/solvers/CEulerSolver.cpp
++++ b/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -5308,6 +5308,15 @@
+   for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+ 
+     auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
++    // 模块用途：异常时记录真实边界、局部/全局节点与查询阶段；合法计算不变。
++    rah_query::Context query_context;
++    query_context.phase="riemann.internal";
++    query_context.localKnown=true; query_context.local=iPoint;
++    query_context.globalKnown=true; query_context.global=geometry->nodes->GetGlobalIndex(iPoint);
++    query_context.markerKnown=true; query_context.marker=val_marker;
++    query_context.innerKnown=true; query_context.inner=config->GetInnerIter();
++    rah_query::Guard query_guard(query_context);
++
+ 
+     /*--- Check if the node belongs to the domain (i.e., not a halo node) ---*/
+     if (geometry->nodes->GetDomain(iPoint)) {
+@@ -5344,6 +5353,7 @@
+       const su2double StaticEnergy_i = rah_air::thermal_energy(Energy_i,Velocity2_i,k_i);
+ 
+       GetFluidModel()->SetTDState_rhoe(Density_i, StaticEnergy_i);
++      query_guard.phase("riemann.exterior");
+ 
+       const auto Pressure_i = GetFluidModel()->GetPressure();
+       const su2double Enthalpy_i = Energy_i + Pressure_i/Density_i;
+@@ -5545,6 +5555,7 @@
+       const bool pressure_boundary = config->GetKind_Data_Riemann(Marker_Tag) == STATIC_PRESSURE;
+       const su2double k_b = variable_air && tkeNeeded ? ((outgoing || pressure_boundary) ? k_i : GetTke_Inf()) : 0.0;
+       const su2double StaticEnergy_b = rah_air::thermal_energy(Energy_b,Velocity2_b,k_b);
++      query_guard.phase("riemann.mixed");
+       GetFluidModel()->SetTDState_rhoe(Density_b, StaticEnergy_b);
+ 
+       /*--- Store number of Newton iterations at BC ---*/
+--- a/SU2_CFD/include/fluid/CSU2IdealAir.hpp
++++ b/SU2_CFD/include/fluid/CSU2IdealAir.hpp
+@@ -4,6 +4,7 @@
+ #include "CFluidModel.hpp"
+ #include "CSutherland.hpp"
+ #include "IdealAir.hpp"
++#include "PropertyQueryContext.hpp"
+ #include <type_traits>
+ 
+ class CSU2IdealAir final : public CFluidModel {
+@@ -31,12 +32,12 @@
+   }
+ 
+   // 模块二。保留原生虚接口，避免调用者读到未赋值的导数或旧Cp。
+-  void SetTDState_rhoe(su2double rho,su2double e) override { assign(rah_air::state("rhoe",rho,e)); }
+-  void SetTDState_PT(su2double p,su2double t) override { assign(rah_air::state("PT",p,t)); }
+-  void SetTDState_Prho(su2double p,su2double rho) override { assign(rah_air::state("Prho",p,rho)); }
+-  void SetTDState_rhoT(su2double rho,su2double t) override { assign(rah_air::state("rhoT",rho,t)); }
+-  void SetTDState_hs(su2double h,su2double s) override { assign(rah_air::state("hs",h,s)); }
+-  void SetTDState_Ps(su2double p,su2double s) override { assign(rah_air::state("Ps",p,s)); }
++  void SetTDState_rhoe(su2double rho,su2double e) override { assign(rah_query::evaluate("rhoe",rho,e)); }
++  void SetTDState_PT(su2double p,su2double t) override { assign(rah_query::evaluate("PT",p,t)); }
++  void SetTDState_Prho(su2double p,su2double rho) override { assign(rah_query::evaluate("Prho",p,rho)); }
++  void SetTDState_rhoT(su2double rho,su2double t) override { assign(rah_query::evaluate("rhoT",rho,t)); }
++  void SetTDState_hs(su2double h,su2double s) override { assign(rah_query::evaluate("hs",h,s)); }
++  void SetTDState_Ps(su2double p,su2double s) override { assign(rah_query::evaluate("Ps",p,s)); }
+   void SetEnergy_Prho(su2double p,su2double rho) override { SetTDState_Prho(p,rho); }
+   void ComputeDerivativeNRBC_Prho(su2double p,su2double rho) override { SetTDState_Prho(p,rho); }
+ 
+--- a/SU2_CFD/include/variables/ConservativeStepTrace.hpp
++++ b/SU2_CFD/include/variables/ConservativeStepTrace.hpp
+@@ -0,0 +1,66 @@
++#pragma once
++// 模块用途。记录有限守恒限步及真实调用上下文，不修改流场或几何。
++#include <array>
++#include <cstdio>
++#include <functional>
++#include <mutex>
++#include <stdexcept>
++#include <utility>
++
++namespace rah_step {
++using State = std::array<double,5>;
++struct Context {
++  bool known=false, domain=false, output=false;
++  unsigned long global=0, inner=0, time=0, mesh=0, rk=0;
++  std::array<double,3> coordinates{};
++  double volume=0, alpha=0;
++  State linear{}, residual{};
++};
++// 每个OpenMP线程只读取其本次预处理的几何与求解器；退出作用域后恢复。
++inline std::function<Context(unsigned long)>& provider() {
++  static thread_local std::function<Context(unsigned long)> current;
++  return current;
++}
++struct ContextGuard {
++  std::function<Context(unsigned long)> previous;
++  explicit ContextGuard(std::function<Context(unsigned long)> current):previous(std::move(provider())) {
++    provider()=std::move(current);
++  }
++  ~ContextGuard() { provider()=std::move(previous); }
++};
++
++inline void record(unsigned long local, unsigned long dimension, const State& trial,
++                   const State& old, const State& accepted, double trial_e, double old_e,
++                   double accepted_e, double k, double theta, unsigned attempts,
++                   bool old_valid, const char* reason) {
++  const Context context=provider() ? provider()(local) : Context{};
++  struct Trace {
++    std::mutex mutex;
++    std::FILE* file=nullptr;
++    unsigned long count=0;
++    ~Trace() { if(file) std::fclose(file); }
++  };
++  static Trace trace;
++  const std::lock_guard<std::mutex> lock(trace.mutex);
++  if(!trace.file) {
++    trace.file=std::fopen("conservative_steps.csv","wb");
++    if(!trace.file) throw std::runtime_error("cannot create conservative_steps.csv");
++    std::fprintf(trace.file,"event,local_point,dimension,old_valid,theta,attempts,k,context_known,global_point,domain,inner_iter,time_iter,mesh,rk,output,x,y,z,volume,alpha");
++    for(const char* prefix:{"trial","old","accepted","linear","stored_residual"})
++      for(const char* name:{"rho","rhou","rhov","rhow","rhoE"})
++        std::fprintf(trace.file,",%s_%s",prefix,name);
++    std::fprintf(trace.file,",trial_e,old_e,accepted_e,reason\n");
++  }
++  if(trace.count>=4096) throw std::runtime_error("conservative step trace limit reached after 4096 events");
++  ++trace.count;
++  std::fprintf(trace.file,"%lu,%lu,%lu,%u,%.17g,%u,%.17g,%u,%lu,%u,%lu,%lu,%lu,%lu,%u,%.17g,%.17g,%.17g,%.17g,%.17g",
++    trace.count,local,dimension,old_valid?1u:0u,theta,attempts,k,context.known?1u:0u,
++    context.global,context.domain?1u:0u,context.inner,context.time,context.mesh,context.rk,
++    context.output?1u:0u,context.coordinates[0],context.coordinates[1],context.coordinates[2],context.volume,context.alpha);
++  for(const State* state:{&trial,&old,&accepted,&context.linear,&context.residual})
++    for(double value:*state) std::fprintf(trace.file,",%.17g",value);
++  std::fprintf(trace.file,",%.17g,%.17g,%.17g,\"%s\"\n",trial_e,old_e,accepted_e,reason);
++  if(std::ferror(trace.file) || std::fflush(trace.file)!=0)
++    throw std::runtime_error("cannot flush conservative step record");
++}
++} // namespace rah_step
+--- a/SU2_CFD/include/fluid/PropertyQueryContext.hpp
++++ b/SU2_CFD/include/fluid/PropertyQueryContext.hpp
+@@ -0,0 +1,47 @@
++#pragma once
++// 模块用途：只给本理想空气模型的物性域拒绝附上查询身份，不改变合法状态或异常恢复规则。
++#include "IdealAir.hpp"
++#include <iomanip>
++#include <locale>
++#include <sstream>
++#include <stdexcept>
++#include <string>
++
++namespace rah_query {
++// 模块一：线程局部作用域。局部RCM编号与全局编号分开，未知编号不得冒充0号节点。
++struct Context {
++  const char* phase="unscoped";
++  bool localKnown=false, globalKnown=false, markerKnown=false, innerKnown=false;
++  unsigned long local=0, global=0, marker=0, inner=0;
++};
++inline Context& context() {
++  static thread_local Context current;
++  return current;
++}
++struct Guard {
++  Context previous;
++  explicit Guard(const Context& value):previous(context()) { context()=value; }
++  Guard(const Guard&)=delete;
++  Guard& operator=(const Guard&)=delete;
++  ~Guard() { context()=previous; }
++  void phase(const char* value) { context().phase=value; }
++};
++
++// 模块二：成功路径直接返回同一内核结果；仅domain_error加说明，其余异常原样传播。
++// 不打印每个可恢复试探，不产生无限日志；调用者原有的回退/终止继续决定后续行为。
++inline rah_air::State evaluate(const std::string& mode,double first,double second) {
++  try {
++    return rah_air::state(mode,first,second);
++  } catch(const std::domain_error& error) {
++    const auto& c=context();
++    std::ostringstream message;
++    message.imbue(std::locale::classic());
++    message<<std::setprecision(17)<<"RAH_PROPERTY_QUERY mode="<<mode<<" phase="<<c.phase
++      <<" localKnown="<<c.localKnown<<" local="<<c.local
++      <<" globalKnown="<<c.globalKnown<<" global="<<c.global
++      <<" markerKnown="<<c.markerKnown<<" marker="<<c.marker<<" innerKnown="<<c.innerKnown<<" inner="<<c.inner
++      <<" input1="<<first<<" input2="<<second<<" reason="<<error.what();
++    throw std::domain_error(message.str());
++  }
++}
++} // namespace rah_query

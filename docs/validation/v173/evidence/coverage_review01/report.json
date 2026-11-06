@@ -1,0 +1,358 @@
+{
+  "passed": true,
+  "reviewKind": "finite-static-exact-source-query-coverage",
+  "runtimeFlavor": "rah-ideal-air-spatial-wall-v1",
+  "sourceCommit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+  "runtimeSHA256": "3309e77ed0fdfdb465e6d774f2157b7ef8d2cb2252a3d4abbfab7ee49fd7a217",
+  "sourceTreeSHA256": "c600dc43dc777e40a344f253b1adf89e7c51aa95caa98c6a58f57db1c65f0ee8",
+  "sourceBindings": [
+    {
+      "relativePath": "Common/src/CConfig.cpp",
+      "selectedSource": "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\Common\\src\\CConfig.cpp",
+      "sha256": "bb137ca80063b9c9d775c8ff576b155ff3a0ad48bb8998572fd34afb3b54ec47",
+      "sharedSourceMatches": false
+    },
+    {
+      "relativePath": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "selectedSource": "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CEulerSolver.cpp",
+      "sha256": "199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67",
+      "sharedSourceMatches": false
+    },
+    {
+      "relativePath": "SU2_CFD/src/variables/CNSVariable.cpp",
+      "selectedSource": "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\variables\\CNSVariable.cpp",
+      "sha256": "3134abd33e753821a96386d19e9317d9f3d72afa216b31356c7af906284703c3",
+      "sharedSourceMatches": false
+    },
+    {
+      "relativePath": "SU2_CFD/src/solvers/CNSSolver.cpp",
+      "selectedSource": "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CNSSolver.cpp",
+      "sha256": "2f7b1364d66388b4e34e91f65d62fecaa8324e9462aa64d8c96b33a32299a66c",
+      "sharedSourceMatches": false
+    },
+    {
+      "relativePath": "SU2_CFD/include/solvers/CFVMFlowSolverBase.inl",
+      "selectedSource": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\solvers\\CFVMFlowSolverBase.inl",
+      "sha256": "ef228099073057584c196405b674ff8dbf246a3fa325e636e36eff2a423c4e68",
+      "sharedSourceMatches": true
+    },
+    {
+      "relativePath": "SU2_CFD/src/numerics/flow/convection/roe.cpp",
+      "selectedSource": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\numerics\\flow\\convection\\roe.cpp",
+      "sha256": "c559dc9a76ee10e607917a42aba810ddaac0b3897277ac974723e4e9f4d20f22",
+      "sharedSourceMatches": true
+    },
+    {
+      "relativePath": "SU2_CFD/src/drivers/CDriver.cpp",
+      "selectedSource": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\drivers\\CDriver.cpp",
+      "sha256": "a384328e069d9c62fe7ba860be5cf52be63b7032f75b4df26081827fb5a63e64",
+      "sharedSourceMatches": true
+    },
+    {
+      "relativePath": "SU2_CFD/include/fluid/CSU2IdealAir.hpp",
+      "selectedSource": "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\CSU2IdealAir.hpp",
+      "sha256": "39b1de945124aaf8e7283262e499d20fd026e7ebd498dbb2b0db84b3c7c84cf8",
+      "sharedSourceMatches": false
+    },
+    {
+      "relativePath": "SU2_CFD/include/fluid/IdealAir.hpp",
+      "selectedSource": "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\IdealAir.hpp",
+      "sha256": "62a880ed2e1ec76c5bc8c9a832ec7787b5b3f01494f31ed6a3ebf7bfb972969b",
+      "sharedSourceMatches": false
+    },
+    {
+      "relativePath": "SU2_CFD/src/output/CFlowCompOutput.cpp",
+      "selectedSource": "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\output\\CFlowCompOutput.cpp",
+      "sha256": "41d279e0e78837e54731069d8dfd0f6756a8d87518f7ae3feb0a8404ef5f171e",
+      "sharedSourceMatches": false
+    }
+  ],
+  "actualConfiguration": {
+    "SOLVER": "NAVIER_STOKES",
+    "KIND_TURB_MODEL": "NONE",
+    "AXISYMMETRIC": "NO",
+    "MATH_PROBLEM": "DIRECT",
+    "RESTART_SOL": "YES",
+    "MESH_FILENAME": "mesh.su2",
+    "MESH_FORMAT": "SU2",
+    "SYSTEM_MEASUREMENTS": "SI",
+    "REF_DIMENSIONALIZATION": "DIMENSIONAL",
+    "FLUID_MODEL": "IDEAL_AIR_VARIABLE_CP",
+    "GAS_CONSTANT": "287.04912678756011",
+    "INIT_OPTION": "TD_CONDITIONS",
+    "MACH_NUMBER": "1.97",
+    "AOA": "180",
+    "SIDESLIP_ANGLE": "0",
+    "FREESTREAM_TEMPERATURE": "178.1075743306896",
+    "FREESTREAM_PRESSURE": "26135.374956481341",
+    "VISCOSITY_MODEL": "SUTHERLAND",
+    "MU_REF": "1.716e-5",
+    "MU_T_REF": "273.15",
+    "SUTHERLAND_CONSTANT": "110.4",
+    "CONDUCTIVITY_MODEL": "CONSTANT_PRANDTL",
+    "PRANDTL_LAM": "0.72",
+    "MARKER_ISOTHERMAL": "(wall, 335)",
+    "MARKER_SYM": "(sym_y, sym_z)",
+    "MARKER_PLOTTING": "(wall)",
+    "MARKER_MONITORING": "(wall)",
+    "REF_AREA": "0.0020268299163899908",
+    "NUM_METHOD_GRAD": "WEIGHTED_LEAST_SQUARES",
+    "CONV_NUM_METHOD_FLOW": "ROE",
+    "MUSCL_FLOW": "YES",
+    "SLOPE_LIMITER_FLOW": "VENKATAKRISHNAN_WANG",
+    "VENKAT_LIMITER_COEFF": "0.05",
+    "TIME_DISCRE_FLOW": "EULER_IMPLICIT",
+    "LINEAR_SOLVER": "BCGSTAB",
+    "LINEAR_SOLVER_PREC": "LU_SGS",
+    "LINEAR_SOLVER_ERROR": "1E-5",
+    "LINEAR_SOLVER_ITER": "10",
+    "MGLEVEL": "0",
+    "CFL_NUMBER": "0.4",
+    "CFL_ADAPT": "YES",
+    "ITER": "1000",
+    "CONV_FIELD": "(RMS_DENSITY, RMS_ENERGY)",
+    "CONV_RESIDUAL_MINVAL": "-8",
+    "CONV_STARTITER": "10",
+    "TABULAR_FORMAT": "CSV",
+    "HISTORY_OUTPUT": "(ITER, RMS_RES, AERO_COEFF, HEAT, CFL_NUMBER, LINSOL)",
+    "CONV_FILENAME": "history",
+    "SURFACE_FILENAME": "surface_flow",
+    "RESTART_FILENAME": "restart_flow",
+    "VOLUME_FILENAME": "volume_flow",
+    "OUTPUT_FILES": "(SURFACE_PARAVIEW_ASCII, RESTART_ASCII)",
+    "OUTPUT_WRT_FREQ": "250",
+    "WRT_RESTART_OVERWRITE": "NO",
+    "WRT_SURFACE_OVERWRITE": "NO",
+    "WRT_RESTART_COMPACT": "NO",
+    "SCREEN_WRT_FREQ_INNER": "100",
+    "VOLUME_OUTPUT": "(COORDINATES, SOLUTION, PRIMITIVE, RESIDUAL)",
+    "SOLUTION_FILENAME": "initial_flow",
+    "READ_BINARY_RESTART": "NO",
+    "MARKER_RIEMANN": "(outer, STATIC_SUPERSONIC_INFLOW_PT, 26135.374956481341, 178.1075743306896, -1.97, 0, 0, outlet, STATIC_PRESSURE, 26135.374956481341, 0, 0, 0, 0)",
+    "MARKER_PYTHON_CUSTOM": "(wall)",
+    "CFL_ADAPT_PARAM": "(0.1, 1.2, 0.4, 100, 0.001, 0)"
+  },
+  "queries": [
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 321,
+      "mode": "rhoe",
+      "active": true,
+      "role": "构造期节点检查",
+      "currentProtection": "物性域严格拒绝，无本地回退",
+      "exactStatement": "GetFluidModel()->SetTDState_rhoe(Density, StaticEnergy);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 926,
+      "mode": "PT",
+      "active": true,
+      "role": "给定来流初始化",
+      "currentProtection": "固定输入，物性域严格拒绝",
+      "exactStatement": "auxFluidModel->SetTDState_PT(Pressure_FreeStream, Temperature_FreeStream);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 931,
+      "mode": "Prho",
+      "active": false,
+      "role": "密度形式来流初始化",
+      "currentProtection": "当前TEMPERATURE_FS未走此分支",
+      "exactStatement": "auxFluidModel->SetTDState_Prho(Pressure_FreeStream, Density_FreeStream );"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 989,
+      "mode": "rhoT",
+      "active": false,
+      "role": "Reynolds形式初始化",
+      "currentProtection": "当前TD_CONDITIONS未走此分支",
+      "exactStatement": "auxFluidModel->SetTDState_rhoT(Density_FreeStream, Temperature_FreeStream);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 1175,
+      "mode": "Prho",
+      "active": true,
+      "role": "无量纲参考态能量",
+      "currentProtection": "SetEnergy_Prho转发Prho；当前SI量纲保持",
+      "exactStatement": "GetFluidModel()->SetEnergy_Prho(Pressure_FreeStreamND, Density_FreeStreamND);"
+    },
+    {
+      "source": "SU2_CFD/src/variables/CNSVariable.cpp",
+      "line": 153,
+      "mode": "rhoe",
+      "active": true,
+      "role": "更新后当前单元状态",
+      "currentProtection": "域拒绝先于原生check/旧态回退；无catch",
+      "exactStatement": "FluidModel->SetTDState_rhoe(density, staticEnergy);"
+    },
+    {
+      "source": "SU2_CFD/src/variables/CNSVariable.cpp",
+      "line": 177,
+      "mode": "rhoe",
+      "active": true,
+      "role": "原生非法状态回退后的旧态",
+      "currentProtection": "仅其他检查能先到此处；旧态再次严格拒绝",
+      "exactStatement": "FluidModel->SetTDState_rhoe(density, staticEnergy);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 2073,
+      "mode": "Prho",
+      "active": true,
+      "role": "MUSCL两侧重构一致性",
+      "currentProtection": "当前模型domain_error触发两侧原始primitive+secondary配对回退",
+      "exactStatement": "fluidModel->SetTDState_Prho(pressure, density);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 2114,
+      "mode": "Prho",
+      "active": false,
+      "role": "LowMach修正左侧能量",
+      "currentProtection": "当前模型配置门禁止Low_Mach_Corr",
+      "exactStatement": "fluidModel->SetEnergy_Prho(primitive_i[nDim+1], primitive_i[nDim+2]);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 2117,
+      "mode": "Prho",
+      "active": false,
+      "role": "LowMach修正右侧能量",
+      "currentProtection": "当前模型配置门禁止Low_Mach_Corr",
+      "exactStatement": "fluidModel->SetEnergy_Prho(primitive_j[nDim+1], primitive_j[nDim+2]);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 5346,
+      "mode": "rhoe",
+      "active": true,
+      "role": "RIEMANN内部单元",
+      "currentProtection": "无本地保护；合法接受单元可间接保护同U",
+      "exactStatement": "GetFluidModel()->SetTDState_rhoe(Density_i, StaticEnergy_i);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 5378,
+      "mode": "PT",
+      "active": false,
+      "role": "RIEMANN总态输入",
+      "currentProtection": "当前模型配置门禁止TOTAL_CONDITIONS_PT",
+      "exactStatement": "GetFluidModel()->SetTDState_PT(P_Total, T_Total);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 5394,
+      "mode": "hs",
+      "active": false,
+      "role": "RIEMANN总态到静焓熵",
+      "currentProtection": "当前模型配置门禁止TOTAL_CONDITIONS_PT",
+      "exactStatement": "GetFluidModel()->SetTDState_hs(StaticEnthalpy_e, Entropy_e);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 5414,
+      "mode": "PT",
+      "active": true,
+      "role": "RIEMANN固定静PT外场",
+      "currentProtection": "固定输入严格拒绝，无边界回退",
+      "exactStatement": "GetFluidModel()->SetTDState_PT(P_static, T_static);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 5441,
+      "mode": "Prho",
+      "active": false,
+      "role": "RIEMANN固定静p-rho外场",
+      "currentProtection": "当前模型配置门禁止STATIC_SUPERSONIC_INFLOW_PD",
+      "exactStatement": "GetFluidModel()->SetTDState_Prho(P_static, Density_static);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 5478,
+      "mode": "Prho",
+      "active": true,
+      "role": "RIEMANN给定p与内部rho组合",
+      "currentProtection": "不由合法单元U保证；严格拒绝，保持给定压力",
+      "exactStatement": "GetFluidModel()->SetTDState_Prho(Pressure_e, Density_e);"
+    },
+    {
+      "source": "SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "line": 5548,
+      "mode": "rhoe",
+      "active": true,
+      "role": "RIEMANN特征混合边界U",
+      "currentProtection": "两侧分别合法不保证混合合法；无本地保护",
+      "exactStatement": "GetFluidModel()->SetTDState_rhoe(Density_b, StaticEnergy_b);"
+    }
+  ],
+  "activeQueryModes": [
+    "PT",
+    "Prho",
+    "rhoe"
+  ],
+  "activeHsOrPsIdentified": false,
+  "queryFreeReviewedBodies": [
+    "spatialIsothermalWall",
+    "symmetry",
+    "generalRoe",
+    "primitiveOutput"
+  ],
+  "existingMusclPairedFallbackVerified": true,
+  "cellDomainExceptionPreemptsNativeFallback": true,
+  "boundaryPressureDensityCombinationProtected": false,
+  "characteristicMixedStateProtected": false,
+  "oldStateMayBeModifiedByNativeNoSlipOrSymmetry": true,
+  "selectedCombination": {
+    "cellPath": "same-conservative-direction admissible step or strict rejection",
+    "reconstruction": "retain exact paired fallback",
+    "boundary": "strict rejection with context; prescribed pressure unchanged",
+    "queryContext": "mode and two inputs; phase and correctly identified node if available",
+    "completeAdmissibilityCoverage": false,
+    "finitePossiblyRejectingCandidateSupported": true
+  },
+  "previousV172ExceptionActualCallerRecovered": false,
+  "allProgramPathsFormallyProven": false,
+  "staleModelFieldsMayBeUsedAfterFailedQuery": false,
+  "sourceSHA256": "ac1f4aa2760f56c69419e221c68ad20e69887065f8cc4280ad8d4e5992a49cbf",
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-spatial-wall-v1\\runtime.json": "e794985c282f73913c679eb72ad1818c9d56e97371813270ec7364865bfa3b3d",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\source_tree.json": "c600dc43dc777e40a344f253b1adf89e7c51aa95caa98c6a58f57db1c65f0ee8",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-spatial-wall-v1\\bin\\SU2_CFD.exe": "3309e77ed0fdfdb465e6d774f2157b7ef8d2cb2252a3d4abbfab7ee49fd7a217",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\case.cfg": "9b68d2e1610a00ec7ca1c34afc1b185f69e07a8202e1ce8ce8f962c4fcc7b571",
+    "E:\\RocketAeroHeat\\scripts\\reviewNACAAdmissibilityCoverage.py": "ac1f4aa2760f56c69419e221c68ad20e69887065f8cc4280ad8d4e5992a49cbf",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\Common\\src\\CConfig.cpp": "bb137ca80063b9c9d775c8ff576b155ff3a0ad48bb8998572fd34afb3b54ec47",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CEulerSolver.cpp": "199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\variables\\CNSVariable.cpp": "3134abd33e753821a96386d19e9317d9f3d72afa216b31356c7af906284703c3",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CNSSolver.cpp": "2f7b1364d66388b4e34e91f65d62fecaa8324e9462aa64d8c96b33a32299a66c",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\solvers\\CFVMFlowSolverBase.inl": "ef228099073057584c196405b674ff8dbf246a3fa325e636e36eff2a423c4e68",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\numerics\\flow\\convection\\roe.cpp": "c559dc9a76ee10e607917a42aba810ddaac0b3897277ac974723e4e9f4d20f22",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\drivers\\CDriver.cpp": "a384328e069d9c62fe7ba860be5cf52be63b7032f75b4df26081827fb5a63e64",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\CSU2IdealAir.hpp": "39b1de945124aaf8e7283262e499d20fd026e7ebd498dbb2b0db84b3c7c84cf8",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\IdealAir.hpp": "62a880ed2e1ec76c5bc8c9a832ec7787b5b3f01494f31ed6a3ebf7bfb972969b",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\output\\CFlowCompOutput.cpp": "41d279e0e78837e54731069d8dfd0f6756a8d87518f7ae3feb0a8404ef5f171e"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-spatial-wall-v1\\runtime.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\source_tree.json": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-spatial-wall-v1\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\case.cfg": true,
+    "E:\\RocketAeroHeat\\scripts\\reviewNACAAdmissibilityCoverage.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\Common\\src\\CConfig.cpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CEulerSolver.cpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\variables\\CNSVariable.cpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CNSSolver.cpp": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\solvers\\CFVMFlowSolverBase.inl": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\numerics\\flow\\convection\\roe.cpp": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\drivers\\CDriver.cpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\CSU2IdealAir.hpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\IdealAir.hpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\executed_sources\\SU2_CFD\\src\\output\\CFlowCompOutput.cpp": true
+  },
+  "nativeCFDRuns": 0,
+  "builds": 0,
+  "sharedSourceMutations": 0,
+  "newPhysicalQualification": false,
+  "elapsedSeconds": 0.07800000000861473
+}

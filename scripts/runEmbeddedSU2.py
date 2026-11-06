@@ -47,6 +47,9 @@ def save_terminal_receipt(path, state):
 
 def validate_resource_budget(request, manifest):
     """模块用途。普通任务保留720秒；事前登记的有限发展任务才允许900秒。"""
+    if manifest.get('caseKind') == 'naca-tn3344-spatial-step-cold-restart-v1':
+        from su2NACASpatialStepInterface import resource_budget
+        return resource_budget(request, manifest)
     if manifest.get('caseKind') == 'naca-tn3344-adaptive-cold-restart-v1':
         from su2NACAAdaptiveInterface import resource_budget
         return resource_budget(request, manifest)

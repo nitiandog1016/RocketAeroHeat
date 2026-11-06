@@ -13,7 +13,8 @@ COOLPROP_FLAVORS=(COOLPROP_FLAVOR,COOLPROP_RECON_FLAVOR,'rah-coolprop-recon-v2',
 IDEAL_AIR_FLAVOR='rah-ideal-air-v1'
 IDEAL_AIR_FLAVORS=(IDEAL_AIR_FLAVOR,'rah-ideal-air-phase-v2','rah-ideal-air-axisymmetric-v1','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1','rah-sst-energy-v1')
 SPATIAL_AIR_FLAVOR='rah-ideal-air-spatial-wall-v1'
-IDEAL_AIR_FLAVORS=IDEAL_AIR_FLAVORS+(SPATIAL_AIR_FLAVOR,)
+SPATIAL_STEP_FLAVOR='rah-ideal-air-spatial-step-v1'
+IDEAL_AIR_FLAVORS=IDEAL_AIR_FLAVORS+(SPATIAL_AIR_FLAVOR,SPATIAL_STEP_FLAVOR)
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 
@@ -50,7 +51,7 @@ def resolve(folder,config):
         profile=folder/'wall_temperature.csv';assert profile.is_file()
         assert sha(profile)==data['thermalProfileSHA256'],'温度表与输入清单不符'
         locked.update({str(manifest):sha(manifest),str(profile):sha(profile)})
-    elif flavor==SPATIAL_AIR_FLAVOR:
+    elif flavor in (SPATIAL_AIR_FLAVOR,SPATIAL_STEP_FLAVOR):
         # 新具名层流组合保持旧表禁用规则；有表/无表都由严格新合同核对。
         from su2IdealAirInterface import validate
         locked.update(validate(folder,data,config,runtime))

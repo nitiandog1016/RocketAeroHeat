@@ -1,0 +1,24 @@
+{
+  "compile": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe",
+    "-std=c++17",
+    "-O3",
+    "-fopenmp",
+    "-ffast-math",
+    "-fno-finite-math-only",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\Common\\src",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\externals\\eigen",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\externals\\mel",
+    "E:\\RocketAeroHeat\\tests\\testSU2SpatialStep.cpp",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\variables\\CNSVariable.cpp",
+    "-Wl,--start-group",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\SU2_CFD\\src\\libSU2core.a",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\Common\\src\\libSU2Common.a",
+    "-Wl,--end-group",
+    "-o",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\fixture01\\fixture.exe"
+  ],
+  "configPath": "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_profile01\\case.cfg",
+  "configSHA256": "f4a1bc64011affe3d04266d4830195b6c493b38d4c7e6a96001fddbffa89935e"
+}

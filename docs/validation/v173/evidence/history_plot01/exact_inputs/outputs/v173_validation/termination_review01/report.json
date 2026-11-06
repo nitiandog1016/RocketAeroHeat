@@ -1,0 +1,192 @@
+{
+  "passed": true,
+  "scope": "small-log-and-recorded-event-termination-evidence-only",
+  "runtimeFlavor": "rah-ideal-air-spatial-step-v1",
+  "executableSHA256": "1a01ec77ee52e7e837abbd9d833d54f961be12a7c7c28781024ad98e5f7eae5c",
+  "sourceTreeSHA256": "5e60fbaaccd412ced994f2831c9785ca9a7e246900101177996b2dfbaed6ada8",
+  "exactSources": {
+    "SU2_CFD/src/SU2_CFD.cpp": {
+      "path": "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\src\\SU2_CFD.cpp",
+      "sha256": "6b9eddbed633aabbf5e62b5c6b7372902d5763046a92cf6b4982223766869d5e",
+      "unchangedFromSpatialWallParent": true
+    },
+    "SU2_CFD/include/NativeTermination.hpp": {
+      "path": "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\NativeTermination.hpp",
+      "sha256": "c6f3c18da3b396054ba7101b3b7626a097f07e431832a9a9a1140c3b5894146f",
+      "unchangedFromSpatialWallParent": true
+    },
+    "SU2_CFD/include/variables/ConservativeStepTrace.hpp": {
+      "path": "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\variables\\ConservativeStepTrace.hpp",
+      "sha256": "89b2a7a58a8658ddda299058561a9eb14d317434110ddd3a5b150b43f7a5adc6",
+      "unchangedFromSpatialWallParent": false
+    },
+    "SU2_CFD/include/fluid/PropertyQueryContext.hpp": {
+      "path": "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\PropertyQueryContext.hpp",
+      "sha256": "7a638df209ca8d136d83ceb00ab31256a656fc8b33bb9eddf64add6ee9e17f4d",
+      "unchangedFromSpatialWallParent": false
+    }
+  },
+  "inheritedMainObject": {
+    "path": "SU2_CFD\\src\\SU2_CFD.exe.p\\SU2_CFD.cpp.obj",
+    "sha256": "7f5786d58fcd5b66b14428eff95eb2bb9f8c72e057392d47c538776c3c718254",
+    "parentSHA256": "7f5786d58fcd5b66b14428eff95eb2bb9f8c72e057392d47c538776c3c718254"
+  },
+  "logByteReviews": [
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\engine_stdout.log",
+      "bytes": 12791,
+      "nulBytes": 0,
+      "nonASCIIBytes": 0,
+      "markerCounts": {
+        "RAH_NATIVE_TERMINATION": 0,
+        "RAH_TERMINATION": 0,
+        "RAH_PROPERTY_QUERY": 0,
+        "exception_type=": 0,
+        "domain_error": 0,
+        "inverse target outside temperature range": 0
+      },
+      "last256BytesHex": "746f6d697a656420626f756e6461727920636f6e646974696f6e7320666f72207a6f6e6520300d0a5241485f415849414c5f57414c4c5f5631206170706c69656420333232362077616c6c206e6f6465733b20676976656e2053492074656d7065726174757265732c206e6f7420736f6c766564206d6174657269616c20542e0d0a0d0a2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d20426567696e20536f6c766572202d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d0d0a0d0a53696d756c6174696f6e2052756e207573696e67207468652053696e676c652d7a6f6e65204472697665720d0a0d0a",
+      "last256BytesText": "tomized boundary conditions for zone 0\r\nRAH_AXIAL_WALL_V1 applied 3226 wall nodes; given SI temperatures, not solved material T.\r\n\r\n------------------------------ Begin Solver -----------------------------\r\n\r\nSimulation Run using the Single-zone Driver\r\n\r\n",
+      "endsWithNewline": true
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v173_validation\\native_real01.log",
+      "bytes": 185,
+      "nulBytes": 0,
+      "nonASCIIBytes": 0,
+      "markerCounts": {
+        "RAH_NATIVE_TERMINATION": 0,
+        "RAH_TERMINATION": 0,
+        "RAH_PROPERTY_QUERY": 0,
+        "exception_type=": 0,
+        "domain_error": 0,
+        "inverse target outside temperature range": 0
+      },
+      "last256BytesHex": "7b22737461747573223a20227465726d696e616c222c202265786974436f6465223a203133342c202274696d65644f7574223a2066616c73652c2022656c61707365645365636f6e6473223a2039312e32383130303030303030303236382c202272656365697074223a2022453a5c5c526f636b65744165726f486561745c5c6f7574707574735c5c763137335f76616c69646174696f6e5c5c7265616c30315c5c656e67696e655f70726f636573732e6a736f6e227d0d0a",
+      "last256BytesText": "{\"status\": \"terminal\", \"exitCode\": 134, \"timedOut\": false, \"elapsedSeconds\": 91.28100000000268, \"receipt\": \"E:\\\\RocketAeroHeat\\\\outputs\\\\v173_validation\\\\real01\\\\engine_process.json\"}\r\n",
+      "endsWithNewline": true
+    }
+  ],
+  "caseDirectoryAlternativeTextLogFound": false,
+  "stderrMergedIntoStdout": true,
+  "terminationMessagePresent": false,
+  "terminationActualCauseKnown": false,
+  "terminalExceptionTypeKnown": false,
+  "terminalQueryModeKnown": false,
+  "terminalNodeKnown": false,
+  "terminalTemperatureDirectionKnown": false,
+  "operatingSystemEventLogsReviewed": false,
+  "recordedRecoveredNodeEvents": [
+    {
+      "event": "1",
+      "local_point": "144912",
+      "global_point": "109073",
+      "inner_iter": "46",
+      "output": "1",
+      "old_valid": "1",
+      "theta": "0.5",
+      "attempts": "1",
+      "trial_e": "164136.49700628809",
+      "old_e": "231065.49694059783",
+      "accepted_e": "202578.02996142837",
+      "reason": "RAH_PROPERTY_QUERY mode=rhoe phase=node.trial localKnown=1 local=144912 globalKnown=0 global=0 markerKnown=0 marker=0 innerKnown=0 inner=0 input1=0.50307167238891393 input2=164136.49700628809 reason=inverse target outside temperature range"
+    },
+    {
+      "event": "2",
+      "local_point": "156595",
+      "global_point": "125787",
+      "inner_iter": "56",
+      "output": "1",
+      "old_valid": "1",
+      "theta": "0.5",
+      "attempts": "1",
+      "trial_e": "1829781.5845469527",
+      "old_e": "1495604.6775347218",
+      "accepted_e": "1644698.261723408",
+      "reason": "RAH_PROPERTY_QUERY mode=rhoe phase=node.trial localKnown=1 local=156595 globalKnown=0 global=0 markerKnown=0 marker=0 innerKnown=0 inner=0 input1=0.043046463564713311 input2=1829781.5845469527 reason=inverse target outside temperature range"
+    },
+    {
+      "event": "3",
+      "local_point": "166050",
+      "global_point": "125805",
+      "inner_iter": "56",
+      "output": "1",
+      "old_valid": "1",
+      "theta": "0.5",
+      "attempts": "1",
+      "trial_e": "1857901.9562822264",
+      "old_e": "1537567.7520659415",
+      "accepted_e": "1683321.6896666212",
+      "reason": "RAH_PROPERTY_QUERY mode=rhoe phase=node.trial localKnown=1 local=166050 globalKnown=0 global=0 markerKnown=0 marker=0 innerKnown=0 inner=0 input1=0.043103555699380097 input2=1857901.9562822264 reason=inverse target outside temperature range"
+    },
+    {
+      "event": "4",
+      "local_point": "172143",
+      "global_point": "125773",
+      "inner_iter": "56",
+      "output": "1",
+      "old_valid": "1",
+      "theta": "0.5",
+      "attempts": "1",
+      "trial_e": "1831179.5540234656",
+      "old_e": "1475349.6155190321",
+      "accepted_e": "1634609.3161641648",
+      "reason": "RAH_PROPERTY_QUERY mode=rhoe phase=node.trial localKnown=1 local=172143 globalKnown=0 global=0 markerKnown=0 marker=0 innerKnown=0 inner=0 input1=0.045102142398648265 input2=1831179.5540234656 reason=inverse target outside temperature range"
+    }
+  ],
+  "recoveredEventsIdentifyFinalFailure": false,
+  "handlerLimitations": {
+    "cppTerminateOnly": true,
+    "concurrentOrRecursiveEntryCanExit134BeforeWrite": true,
+    "concurrentOrRecursiveEntryProven": false,
+    "stderrFlushOnlyAfterFullExceptionAndStackText": true,
+    "allTerminationPathsGuaranteedToFlush": false,
+    "exit134IdentifiesDomainError": false,
+    "nativeTraceExplicitlyFlushesEachEvent": true
+  },
+  "nativeExitCode": 134,
+  "nativeElapsedSeconds": 91.28100000000268,
+  "generatedOutputBytes": 245313841,
+  "largeFieldsRead": 0,
+  "CFDLaunches": 0,
+  "builds": 0,
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\reviewNACASpatialStepTermination.py": "9cfd10a4e78624e7597b7058f169a154ead786e6308364de1403af9bd2a63252",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\engine_process.json": "0e7e4e29e2b5e671b09f459a22e81d941d3851fa9628cd0e31ec9667712cebd4",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-spatial-step-v1\\runtime.json": "0d764d47769e591a02be22d1013958843e0423ec8f78bfc289ad390406652c03",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\source_tree.json": "5e60fbaaccd412ced994f2831c9785ca9a7e246900101177996b2dfbaed6ada8",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\source_tree.json": "c600dc43dc777e40a344f253b1adf89e7c51aa95caa98c6a58f57db1c65f0ee8",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\objects_after.json": "04c88cbb23e1c9d51090ad154e0b8be4f9131e36e502ae6a0a739bb25dfebb2e",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\objects_after.json": "56904a4c83263d5eaed66219b9d425c52b5425f3211c010ba29a8b0851fd0ecb",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\native_real01_process.json": "ad4ac2092f7bdfd47b81484a4ba54e214232b91da15dd8d6833cada101cc0930",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-spatial-step-v1\\bin\\SU2_CFD.exe": "1a01ec77ee52e7e837abbd9d833d54f961be12a7c7c28781024ad98e5f7eae5c",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\src\\SU2_CFD.cpp": "6b9eddbed633aabbf5e62b5c6b7372902d5763046a92cf6b4982223766869d5e",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\NativeTermination.hpp": "c6f3c18da3b396054ba7101b3b7626a097f07e431832a9a9a1140c3b5894146f",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\variables\\ConservativeStepTrace.hpp": "89b2a7a58a8658ddda299058561a9eb14d317434110ddd3a5b150b43f7a5adc6",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\PropertyQueryContext.hpp": "7a638df209ca8d136d83ceb00ab31256a656fc8b33bb9eddf64add6ee9e17f4d",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "44c783afd5f4996a4893d282226bec1892394bc0dcb5c629885c5f555d7e6f95",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\engine_stdout.log": "570cfccf7913899b6f93bef5bf4871de105406ca76f7ac34d44117f29eb0099e",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\native_real01.log": "9985f02c8f568a4d88099965eef4629f3532e4a54ba0e0df4b909f056a9738c6",
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\conservative_steps.csv": "a20ac64effe22f7561f57fed0a3cc37c3a635073d03ba311989764df8d8450bf"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\scripts\\reviewNACASpatialStepTermination.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\engine_process.json": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-spatial-step-v1\\runtime.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\source_tree.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\source_tree.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\objects_after.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\objects_after.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\native_real01_process.json": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-spatial-step-v1\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\src\\SU2_CFD.cpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\NativeTermination.hpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\variables\\ConservativeStepTrace.hpp": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\build01\\executed_sources\\SU2_CFD\\include\\fluid\\PropertyQueryContext.hpp": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\engine_stdout.log": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\native_real01.log": true,
+    "E:\\RocketAeroHeat\\outputs\\v173_validation\\real01\\conservative_steps.csv": true
+  },
+  "elapsedSeconds": 0.07799999999406282
+}
