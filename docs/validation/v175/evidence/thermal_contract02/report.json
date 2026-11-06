@@ -1,0 +1,113 @@
+{
+  "passed": true,
+  "newCFDTasks": 0,
+  "builds": 0,
+  "largeFieldsRead": false,
+  "physicalQualified": false,
+  "experimentalQualification": false,
+  "v174FailureReclassified": false,
+  "oldTemperatureGuardChanged": false,
+  "originalCauseEstablished": false,
+  "algebraicPositiveOutOfDevelopmentDomain": {
+    "rho": 1.0,
+    "velocity": 0.0,
+    "pressure": 129172.10705440203,
+    "temperature": 450.0
+  },
+  "independentPositiveStateRefusals": [
+    "zero-density",
+    "negative-density",
+    "zero-internal-energy",
+    "negative-internal-energy"
+  ],
+  "conservativeConvexInterpolation": {
+    "endpointTemperaturesK": [
+      300.0,
+      300.0
+    ],
+    "endpointVelocitiesMS": [
+      0.0,
+      1000.0
+    ],
+    "mixture": {
+      "rho": 1.0,
+      "velocity": 500.0,
+      "pressure": 136114.738036268,
+      "temperature": 474.18621181524827
+    },
+    "exactExpectedTemperatureK": 474.18621181524827,
+    "positivityPreserved": true,
+    "endpointTemperatureMaximumPrinciple": false,
+    "actualNACAInterpolationClaim": false
+  },
+  "weakWallIdentity": {
+    "givenTwK": 340.0,
+    "neighbourTemperatureK": 320.0,
+    "conductivityFixedForAlgebraOnly": 0.02,
+    "normalDistanceM": 0.0001,
+    "qIntoWallWm2": -4000.0,
+    "replacingGivenTwWithFluid450ProducesWrongFluxWm2": -26000.0,
+    "fullConductivityMayDependOnFluidState": true,
+    "productionBoundaryVerified": false
+  },
+  "characteristicCounterexample": {
+    "dimensionless": true,
+    "outwardNormal": 1,
+    "interior": {
+      "rho": 1.0,
+      "velocity": 0.2,
+      "pressure": 0.7142857142857143,
+      "temperature": 0.7142857142857143
+    },
+    "external": {
+      "rho": 1.0,
+      "velocity": 0.1,
+      "pressure": 0.5785714285714286,
+      "temperature": 0.5785714285714286
+    },
+    "localConservativeProjection": {
+      "rho": 0.9831428571428571,
+      "velocity": 0.21714617843650103,
+      "pressure": 0.6973707643126998,
+      "temperature": 0.7093280078740044
+    },
+    "nonlinearFarfieldReconstruction": {
+      "rho": 0.8153726976,
+      "velocity": 0.4,
+      "pressure": 0.5367481986486857,
+      "temperature": 0.6582857142857143
+    },
+    "differentPositiveReconstructedStates": true,
+    "independentMatrixError": 1.0408340855860843e-17,
+    "sameStateIdentityPassed": true,
+    "supersonicIncomingIdentityPassed": true,
+    "maximumIndependentMatrixError": 1.6653345369377348e-16,
+    "nativeSolverExecuted": false,
+    "finalUpwindFluxCompared": false,
+    "provesNACACause": false
+  },
+  "evidenceScope": "independent-exact-rational-algebra-and-bounded-read-only-source-binding",
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\tests\\verifyThermalStateContractsV175.py": "da463e982a066232888d5ab02e42d12ed87c3f75b2d40e920777b05371dc8c81",
+    "E:\\RocketAeroHeat\\docs\\validation\\v175\\PLAN.md": "a2612d7aec23884e320b6ec4e16e5bc3afd4ba19b8352fcf0346f2bd81361a5d",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CEulerSolver.cpp": "199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67",
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\engines\\warm\\case.cfg": "1e632de0c44bbc97662562b7fb27ce06548ebf7abe33606b7ddc2604f18e79a8",
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\engines\\warm\\engine_process.json": "0b61e765fb9f9ef34ad0a01b2d9fc4d6fe39f1e20309ee5c6a4024ca3d11859f",
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\checks\\plate_warm01\\warm_start_manifest.json": "de5117f3af97f9442cb129d6a106183c3c1563ef94e4168643b5e7ce44834d81",
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\checks\\plate_warm01\\physical_audit.json": "45ef01c8c9345e8a39931c2db7ebc3e31db44252b2a8883db4827c76d74e8d86",
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\source_versions\\prepareSU2FlatPlateWarmStart.py.4865173ac3120306.raw": "4865173ac312030691ab71596f5041d5b126c4e1191dca44d2b3f39c2dbd5192",
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\source_versions\\auditSU2WarmConvergence.py.8f30d49d1137354b.raw": "8f30d49d1137354b423e8cbd7e32d1397fca0a71fe625ebf8801623f13ab932e"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\tests\\verifyThermalStateContractsV175.py": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v175\\PLAN.md": true,
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\executed_sources\\SU2_CFD\\src\\solvers\\CEulerSolver.cpp": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\engines\\warm\\case.cfg": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\engines\\warm\\engine_process.json": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\checks\\plate_warm01\\warm_start_manifest.json": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\checks\\plate_warm01\\physical_audit.json": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\source_versions\\prepareSU2FlatPlateWarmStart.py.4865173ac3120306.raw": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v108\\source_versions\\auditSU2WarmConvergence.py.8f30d49d1137354b.raw": true
+  },
+  "elapsedSeconds": 0.01600000000325963
+}

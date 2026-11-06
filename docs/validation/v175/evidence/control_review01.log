@@ -1,0 +1,13 @@
+{"passed": false, "inputs": 1, "elapsedSeconds": 0.0}
+Traceback (most recent call last):
+  File "scripts/reviewConvergedThermalControlsV175.py", line 163, in <module>
+    if __name__=='__main__':main()
+  File "scripts/reviewConvergedThermalControlsV175.py", line 42, in main
+    load(Path(__file__),as_json=False);load(PLAN,as_json=False)
+  File "scripts/reviewConvergedThermalControlsV175.py", line 39, in load
+    text=path.read_text(encoding='utf8-sig')
+  File "D:\anacondapython\lib\pathlib.py", line 1216, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+  File "D:\anacondapython\lib\pathlib.py", line 1203, in open
+    opener=self._opener)
+LookupError: unknown encoding: utf8-sig
