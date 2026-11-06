@@ -84,8 +84,8 @@ try
         assert(all(ismember({'RMS_DENSITY','RMS_ENERGY','RMS_TKE','RMS_DISSIPATION'},selected)));
         expected=[expected,{'Turb_Kin_Energy','Omega'}];
     end
-    variableAir=isfield(receipt,'runtimeFlavor') && ismember(receipt.runtimeFlavor,{'rah-ideal-air-v1','rah-ideal-air-phase-v2','rah-ideal-air-observed-v1'});
-    captured=variableAir && ismember(receipt.runtimeFlavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1'});
+    variableAir=isfield(receipt,'runtimeFlavor') && ismember(receipt.runtimeFlavor,{'rah-ideal-air-v1','rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1'});
+    captured=variableAir && ismember(receipt.runtimeFlavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1'});
     nativePrimitive=variableAir || (sst && isfield(receipt.physicsModel,'outputStateContract'));
     if nativePrimitive
         if sst,assert(strcmp(receipt.physicsModel.outputStateContract,'native-noncompact-flow-primitive-before-turbulence-v1'));end

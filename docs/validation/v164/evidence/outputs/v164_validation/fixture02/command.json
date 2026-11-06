@@ -1,0 +1,23 @@
+{
+  "compile": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe",
+    "-std=c++17",
+    "-O3",
+    "-fopenmp",
+    "-ffast-math",
+    "-fno-finite-math-only",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\Common\\src",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\externals\\eigen",
+    "-IE:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\externals\\mel",
+    "E:\\RocketAeroHeat\\tests\\testSU2AdmissibleState.cpp",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\variables\\CNSVariable.cpp",
+    "-Wl,--start-group",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\SU2_CFD\\src\\libSU2core.a",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\Common\\src\\libSU2Common.a",
+    "-Wl,--end-group",
+    "-o",
+    "E:\\RocketAeroHeat\\outputs\\v164_validation\\fixture02\\fixture.exe"
+  ],
+  "configSHA256": "c523fc47eee343fc5299201721f9a663393e713bc5764dbf5515e306f83a460b"
+}

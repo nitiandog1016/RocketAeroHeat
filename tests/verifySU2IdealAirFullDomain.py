@@ -14,10 +14,11 @@ from auditSU2SSTState import vtk_tokens
 from su2ThermalRuntime import read, sha
 
 
-def main():
+def main(base=None, view_name='main02', checkpoint=149, prior_updates=0, method_required=('OTH',)):
     """按原节点和三角形逐项复算，输出身份/未知温度/物理资格一起核对。"""
-    base = ROOT/'outputs/v160_validation'
-    view, case = base/'main02', base/'real01'
+    base = ROOT/'outputs/v160_validation' if base is None else Path(base).resolve()
+    base.relative_to(ROOT/'outputs')
+    view, case = base/view_name, base/'real01'
     s = loadmat(str(ROOT/'outputs/v118_validation/actual01/surface.mat'), squeeze_me=True, struct_as_record=False)['s']
     V, F = s.V, s.F.astype(int)-1
     av = np.cross(V[F[:, 1]]-V[F[:, 0]], V[F[:, 2]]-V[F[:, 0]])/2
@@ -76,9 +77,10 @@ def main():
     for name in ('fields.csv.json', 'section.csv.json'):
         metadata = read(view/name)
         audit = metadata['convergenceAudit']
-        assert audit['checkpointIdentityConfirmed'] and audit['checkpointIteration'] == 149
-        assert audit['completedUpdatesBeforeRun'] == 0 and audit['cumulativeCheckpointIteration'] == 149
-        assert 'OTH' in metadata['algorithmRuntime']['method'] and not metadata['productionQualified']
+        assert audit['checkpointIdentityConfirmed'] and audit['checkpointIteration'] == checkpoint
+        assert audit['completedUpdatesBeforeRun'] == prior_updates and audit['cumulativeCheckpointIteration'] == prior_updates+checkpoint
+        assert all(word in metadata['algorithmRuntime']['method'] for word in method_required)
+        assert not metadata['productionQualified']
     report = dict(passed=True, originalFaces=len(F), originalAreaM2=float(sum(area)), sectionSegments=92,
         rawFieldRelativeErrors=errors, sectionHeatRelativeError=heat_error, maximumEndpointTriangleDistanceM=endpoint_error,
         physicalSurfaceHeatPowerW=float(area@column('heatFluxRaw_W_m2')),

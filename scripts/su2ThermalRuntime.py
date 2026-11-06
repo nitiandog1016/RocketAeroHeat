@@ -11,7 +11,7 @@ COOLPROP_FLAVOR='rah-coolprop-v1'
 COOLPROP_RECON_FLAVOR='rah-coolprop-recon-v1'
 COOLPROP_FLAVORS=(COOLPROP_FLAVOR,COOLPROP_RECON_FLAVOR,'rah-coolprop-recon-v2','rah-coolprop-recon-v3')
 IDEAL_AIR_FLAVOR='rah-ideal-air-v1'
-IDEAL_AIR_FLAVORS=(IDEAL_AIR_FLAVOR,'rah-ideal-air-phase-v2','rah-ideal-air-axisymmetric-v1','rah-ideal-air-observed-v1')
+IDEAL_AIR_FLAVORS=(IDEAL_AIR_FLAVOR,'rah-ideal-air-phase-v2','rah-ideal-air-axisymmetric-v1','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 

@@ -1,0 +1,114 @@
+--- a/SU2_CFD/src/variables/CNSVariable.cpp
++++ b/SU2_CFD/src/variables/CNSVariable.cpp
+@@ -28,6 +28,10 @@
+ #include "../../include/variables/CNSVariable.hpp"
+ #include "../../../Common/include/parallelization/omp_structure.hpp"
+ #include "../../include/fluid/CFluidModel.hpp"
++#include "../../include/fluid/CSU2IdealAir.hpp"
++#include "../../include/variables/AdmissibilityTrace.hpp"
++#include <array>
++#include <string>
+ 
+ CNSVariable::CNSVariable(su2double density, const su2double *velocity, su2double energy,
+                          unsigned long npoint, unsigned long ndim, unsigned long nvar, const CConfig *config) :
+@@ -150,16 +154,37 @@
+ 
+   /*--- Check will be moved inside fluid model plus error description strings ---*/
+ 
+-  FluidModel->SetTDState_rhoe(density, staticEnergy);
+-
+-  bool check_dens  = SetDensity(iPoint);
+-  bool check_press = SetPressure(iPoint, FluidModel->GetPressure());
+-  bool check_sos   = SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+-  bool check_temp  = SetTemperature(iPoint, FluidModel->GetTemperature());
++  // 模块一。新物性拒绝候选态时，进入原生旧态恢复，避免读取旧物性字段。
++  bool air_state_rejected = false;
++  std::string rejected_reason;
++  try {
++    FluidModel->SetTDState_rhoe(density, staticEnergy);
++  } catch (const std::domain_error& error) {
++    if (dynamic_cast<CSU2IdealAir*>(FluidModel) == nullptr) throw;
++    air_state_rejected = true;
++    rejected_reason = error.what();
++  }
++
++  bool check_dens  = air_state_rejected || SetDensity(iPoint);
++  bool check_press = air_state_rejected || SetPressure(iPoint, FluidModel->GetPressure());
++  bool check_sos   = air_state_rejected || SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
++  bool check_temp  = air_state_rejected || SetTemperature(iPoint, FluidModel->GetTemperature());
+ 
+   /*--- Check that the solution has a physical meaning ---*/
+ 
+   if (check_dens || check_press || check_sos  || check_temp) {
++
++    // 模块二。失败证据使用明确的局部编号，保留原始全部守恒量与当前k。
++    std::array<double, 5> trial{}, restored{};
++    for (unsigned long iVar = 0; iVar < nVar; ++iVar) {
++      trial[iVar] = Solution(iPoint,iVar);
++      restored[iVar] = Solution_Old(iPoint,iVar);
++    }
++    if (nDim == 2) {
++      trial[4] = trial[3]; trial[3] = 0.0;
++      restored[4] = restored[3]; restored[3] = 0.0;
++    }
++    const double trial_energy = staticEnergy;
+ 
+     /*--- Copy the old solution ---*/
+ 
+@@ -174,7 +199,18 @@
+ 
+     /*--- Check will be moved inside fluid model plus error description strings ---*/
+ 
+-    FluidModel->SetTDState_rhoe(density, staticEnergy);
++    // 模块三。旧守恒态必须与本次实际k共同通过完整物性查询，否则明确终止。
++    try {
++      FluidModel->SetTDState_rhoe(density, staticEnergy);
++    } catch (const std::domain_error& error) {
++      if (dynamic_cast<CSU2IdealAir*>(FluidModel) != nullptr)
++        rah_admissibility::record(iPoint, nDim, trial.data(), restored.data(),
++                                  trial_energy, staticEnergy, turb_ke, false, error.what());
++      throw;
++    }
++    if (air_state_rejected)
++      rah_admissibility::record(iPoint, nDim, trial.data(), restored.data(),
++                                trial_energy, staticEnergy, turb_ke, true, rejected_reason.c_str());
+ 
+     SetDensity(iPoint);
+     SetPressure(iPoint, FluidModel->GetPressure());
+--- a/SU2_CFD/include/variables/AdmissibilityTrace.hpp
++++ b/SU2_CFD/include/variables/AdmissibilityTrace.hpp
+@@ -0,0 +1,34 @@
++#pragma once
++// 模块用途。对实际物性回退保存有限、线程安全的守恒态证据。
++#include <cstdio>
++#include <mutex>
++#include <stdexcept>
++
++namespace rah_admissibility {
++inline void record(unsigned long local_point, unsigned long dimension, const double* trial,
++                   const double* restored, double trial_energy, double restored_energy,
++                   double kinetic, bool recovered, const char* reason) {
++  struct Trace {
++    std::mutex mutex;
++    std::FILE* file = nullptr;
++    unsigned long count = 0;
++    ~Trace() { if (file) std::fclose(file); }
++  };
++  static Trace trace;
++  const std::lock_guard<std::mutex> guard(trace.mutex);
++  if (!trace.file) {
++    trace.file = std::fopen("admissibility.csv", "wb");
++    if (!trace.file) throw std::runtime_error("cannot create admissibility.csv");
++    std::fprintf(trace.file, "event,local_point,dimension,recovered,k,trial_rho,trial_rhou,trial_rhov,trial_rhow,trial_rhoE,trial_e,old_rho,old_rhou,old_rhov,old_rhow,old_rhoE,old_e,reason\n");
++  }
++  if (trace.count >= 4096) throw std::runtime_error("admissibility trace limit reached after 4096 events");
++  ++trace.count;
++  const int written = std::fprintf(trace.file,
++      "%lu,%lu,%lu,%u,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,\"%s\"\n",
++      trace.count, local_point, dimension, recovered ? 1u : 0u, kinetic,
++      trial[0], trial[1], trial[2], trial[3], trial[4], trial_energy,
++      restored[0], restored[1], restored[2], restored[3], restored[4], restored_energy, reason);
++  if (written < 0 || std::fflush(trace.file) != 0)
++    throw std::runtime_error("cannot flush admissibility state record");
++}
++}  // namespace rah_admissibility
