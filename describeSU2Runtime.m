@@ -100,7 +100,7 @@ switch info.flavor
             p.intensity,p.viscosityRatio,p.Prt);
         info.method=[info.method '；p/T/热流为原生流动阶段，保存k/ω为随后湍流更新态，分别审核'];
         info.physicsCaption=sprintf('RANS / SST-2003m / 定比热 / Sutherland / Prt%.4g；转捩未知 / 受控有界输运',p.Prt);
-    case {'rah-ideal-air-v1','rah-ideal-air-phase-v2'}
+    case {'rah-ideal-air-v1','rah-ideal-air-phase-v2','rah-ideal-air-observed-v1'}
         % 模块三。固定组分变比热模型、参考态和湍流假设随实际回执显示。
         p=receipt.thermodynamicModel;
         assert(strcmp(p.thermodynamicModel,'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'));
@@ -117,8 +117,12 @@ switch info.flavor
                 t.intensity,t.viscosityRatio,t.Prt)];
         end
         info.method=[info.method '；小型热流接口已测，收敛、实验及三维区域资格待验'];
-        if strcmp(info.flavor,'rah-ideal-air-phase-v2')
+        if ismember(info.flavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1'})
             info.method=[info.method '；独立流动阶段k与后更新k/ω；具名稀疏保存'];
+        end
+        if strcmp(info.flavor,'rah-ideal-air-observed-v1')
+            % 模块用途。显式标明本包的诊断与保存精度，便于回溯实际计算方法。
+            info.method=[info.method '；phase-v2数值基线；C++异常终止记录；17位有效数字ASCII'];
         end
     case 'rah-axial-wall-v1'
         info.mode='axial-wall-temperature';info.method='受控逐节点空间壁温；原生流场更新';

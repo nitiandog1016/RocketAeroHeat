@@ -17,7 +17,7 @@ isNumerical=isfield(receipt.physicsModel,'numericalStudy');isInitial=isfield(rec
 isTrace=isfield(receipt.physicsModel,'updateTraceStudy');
 inputs={'case.cfg','mesh.su2','case_manifest.json','sst_contract.json'};
 if variableAir
-    assert(strcmp(receipt.runtimeFlavor,'rah-ideal-air-phase-v2') && isfield(receipt,'thermodynamicModel'), ...
+    assert(ismember(receipt.runtimeFlavor,{'rah-ideal-air-phase-v2','rah-ideal-air-observed-v1'}) && isfield(receipt,'thermodynamicModel'), ...
         '变比热结果需要实际同阶段运行合同。');
     inputs=[inputs,{'ideal_air_restart.json','ideal_air_contract.json','ideal_air_restart_preparation.json','initial_flow.csv'}];
 else

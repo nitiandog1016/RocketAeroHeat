@@ -1,0 +1,202 @@
+{
+  "exceptionType": "St12domain_error",
+  "exceptionWhat": "inverse target outside temperature range",
+  "stack": [
+    {
+      "frame": 0,
+      "moduleRelativeAddress": "889095",
+      "preferredAddress": "0x140889095",
+      "symbol": "rah_termination::record_and_terminate()",
+      "symbolOffset": 213
+    },
+    {
+      "frame": 1,
+      "moduleRelativeAddress": "75ab86",
+      "preferredAddress": "0x14075ab86",
+      "symbol": "__cxxabiv1::__terminate(void (*)())",
+      "symbolOffset": 6
+    },
+    {
+      "frame": 2,
+      "moduleRelativeAddress": "b54dde",
+      "preferredAddress": "0x140b54dde",
+      "symbol": "__cxa_call_terminate",
+      "symbolOffset": 46
+    },
+    {
+      "frame": 3,
+      "moduleRelativeAddress": "75b098",
+      "preferredAddress": "0x14075b098",
+      "symbol": "__cxxabiv1::__gxx_personality_imp(int, int, unsigned long long, _Unwind_Exception*, _Unwind_Context*)",
+      "symbolOffset": 728
+    },
+    {
+      "frame": 4,
+      "moduleRelativeAddress": "71b7d8",
+      "preferredAddress": "0x14071b7d8",
+      "symbol": "_GCC_specific_handler",
+      "symbolOffset": 488
+    },
+    {
+      "frame": 5,
+      "moduleRelativeAddress": "b125a5",
+      "preferredAddress": "0x140b125a5",
+      "symbol": "__gxx_personality_seh0",
+      "symbolOffset": 21
+    },
+    {
+      "frame": 10,
+      "moduleRelativeAddress": "71b8b1",
+      "preferredAddress": "0x14071b8b1",
+      "symbol": "_Unwind_RaiseException",
+      "symbolOffset": 49
+    },
+    {
+      "frame": 11,
+      "moduleRelativeAddress": "b1241f",
+      "preferredAddress": "0x140b1241f",
+      "symbol": "__cxa_throw",
+      "symbolOffset": 111
+    },
+    {
+      "frame": 12,
+      "moduleRelativeAddress": "95f1f1",
+      "preferredAddress": "0x14095f1f1",
+      "symbol": "rah_air::temperature_from(double, rah_air::InverseQuantity, double)",
+      "symbolOffset": 577
+    },
+    {
+      "frame": 13,
+      "moduleRelativeAddress": "9607c4",
+      "preferredAddress": "0x1409607c4",
+      "symbol": "rah_air::state(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, double, double)",
+      "symbolOffset": 612
+    },
+    {
+      "frame": 14,
+      "moduleRelativeAddress": "7851a3",
+      "preferredAddress": "0x1407851a3",
+      "symbol": "CSU2IdealAir::SetTDState_rhoe(double, double)",
+      "symbolOffset": 67
+    },
+    {
+      "frame": 15,
+      "moduleRelativeAddress": "4804a3",
+      "preferredAddress": "0x1404804a3",
+      "symbol": "CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)",
+      "symbolOffset": 1283
+    },
+    {
+      "frame": 16,
+      "moduleRelativeAddress": "312dd5",
+      "preferredAddress": "0x140312dd5",
+      "symbol": "CNSSolver::SetPrimitive_Variables(CSolver**, CConfig const*)",
+      "symbolOffset": 437
+    },
+    {
+      "frame": 17,
+      "moduleRelativeAddress": "20b062",
+      "preferredAddress": "0x14020b062",
+      "symbol": "CEulerSolver::CommonPreprocessing(CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short, bool)",
+      "symbolOffset": 722
+    },
+    {
+      "frame": 18,
+      "moduleRelativeAddress": "3128d0",
+      "preferredAddress": "0x1403128d0",
+      "symbol": "CNSSolver::Preprocessing(CGeometry*, CSolver**, CConfig*, unsigned short, unsigned short, unsigned short, bool)",
+      "symbolOffset": 192
+    },
+    {
+      "frame": 19,
+      "moduleRelativeAddress": "4b318",
+      "preferredAddress": "0x14004b318",
+      "symbol": "CMultiGridIntegration::MultiGrid_Iteration(CGeometry****, CSolver*****, CNumerics******, CConfig**, unsigned short, unsigned short, unsigned short) [clone ._omp_fn.0]",
+      "symbolOffset": 2024
+    },
+    {
+      "frame": 20,
+      "moduleRelativeAddress": "6ff941",
+      "preferredAddress": "0x1406ff941",
+      "symbol": "gomp_thread_start",
+      "symbolOffset": 449
+    },
+    {
+      "frame": 21,
+      "moduleRelativeAddress": "72fe0d",
+      "preferredAddress": "0x14072fe0d",
+      "symbol": ".tl_start",
+      "symbolOffset": 35
+    }
+  ],
+  "nativeExitCode": 3221225501,
+  "nativeSeconds": 69.28200000000652,
+  "inputsStable": true,
+  "lockedInputs": 33,
+  "checkpoints": {
+    "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+    "complete": [
+      {
+        "localIteration": 0,
+        "successfulUpdates": 1,
+        "seriesSuccessfulUpdates": 151,
+        "volume": "restart_flow_000000.csv",
+        "surface": "surface_flow_000000.vtk",
+        "volumeSHA256": "22d4b9bb67e180f5d1bfe7b7c1c76a6522141e018049955a021c53c84570f2fe",
+        "surfaceSHA256": "a2eee382f5c64e25d4aaa9986b18b10e8a2fd1e09241cee5d44d307651a9351c",
+        "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+        "physicalQualified": false
+      }
+    ],
+    "rejected": [],
+    "lastComplete": {
+      "localIteration": 0,
+      "successfulUpdates": 1,
+      "seriesSuccessfulUpdates": 151,
+      "volume": "restart_flow_000000.csv",
+      "surface": "surface_flow_000000.vtk",
+      "volumeSHA256": "22d4b9bb67e180f5d1bfe7b7c1c76a6522141e018049955a021c53c84570f2fe",
+      "surfaceSHA256": "a2eee382f5c64e25d4aaa9986b18b10e8a2fd1e09241cee5d44d307651a9351c",
+      "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+      "physicalQualified": false
+    },
+    "lastFiniteHistoryLocalIteration": 16,
+    "historyRows": 17,
+    "historyContiguous": true,
+    "seriesUpdatesAtLastFiniteHistory": 167,
+    "normalTerminal": false,
+    "normalFinalPairPresent": false,
+    "expectedLocalIterations": [
+      0,
+      16
+    ],
+    "missingScheduledLocalIterations": [
+      16
+    ],
+    "normalScheduleComplete": false,
+    "abnormalInstantStateAvailable": false,
+    "physicsQualified": false
+  },
+  "firstFrameRelativeDifference": 5.721136170854191e-16,
+  "symbolCommand": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\nm.exe",
+    "-n",
+    "-C",
+    "--defined-only",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-observed-v1\\bin\\SU2_CFD.exe"
+  ],
+  "preferredImageBase": "0x140000000",
+  "physicalCauseQualified": false,
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-ideal-air-observed-v1\\bin\\SU2_CFD.exe": "0bd085012a15a78bb9a8abb5eed871087515abe06db9454bdc4c9f9b76391679",
+    "E:\\RocketAeroHeat\\outputs\\v163_validation\\real02\\engine_process.json": "1bbe6d039e9b5894450e11b9cfda7123e8368f12ea9b996cba594e1a14323c35",
+    "E:\\RocketAeroHeat\\outputs\\v163_validation\\real02\\engine_stdout.log": "489dfed7b09d9692b5f7f4f55b6918d3b0cff953987b777377edae097852d8c9",
+    "E:\\RocketAeroHeat\\outputs\\v161_validation\\control\\restart_flow_000000.csv": "a59b08e03ec913eb5d770c72df088562f50b920dfaad41ff5ab186a30b1dc2de",
+    "E:\\RocketAeroHeat\\outputs\\v163_validation\\real02\\restart_flow_000000.csv": "22d4b9bb67e180f5d1bfe7b7c1c76a6522141e018049955a021c53c84570f2fe",
+    "E:\\RocketAeroHeat\\tests\\verifySU2NativeObservation.py": "4200c1c4f63dfed9b68e44dd8bd5737f845a3deaf0c594f0aeff44653f4d044c",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\nm.exe": "0d8e47d239031ed6f5af96af631eb3da9cf1498f1d52bb44b9810f5bdb113e5b",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\objdump.exe": "9eec4ba892e15cfc1d85800f486af53e4334a97c17a3b344bb63566737d1f13e"
+  }
+}

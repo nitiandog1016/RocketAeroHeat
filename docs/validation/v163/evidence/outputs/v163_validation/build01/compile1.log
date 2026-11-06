@@ -1,0 +1,591 @@
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/basic_types/datatype_structure.hpp:34[m[K,
+                 from [01m[K../source/SU2_CFD/src/../include/../../Common/include/parallelization/mpi_structure.hpp:37[m[K,
+                 from [01m[K../source/SU2_CFD/src/../include/SU2_CFD.hpp:30[m[K,
+                 from [01m[K../source/SU2_CFD/src/SU2_CFD.cpp:28[m[K:
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:[m[K In member function '[01m[Kvoid CSysVector<ScalarType>::[01;32m[KPassiveCopy[m[K(const CSysVector<T>&)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:197:41:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  197 | #define SU2_OMP_SAFE_GLOBAL_ACCESS(...) [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K{__VA_ARGS__} END_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |                                         [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:386:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  386 |     [01;36m[KSU2_OMP_SAFE_GLOBAL_ACCESS[m[K(
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:[m[K In member function '[01m[KScalarType CSysVector<ScalarType>::[01;32m[Kdot[m[K(const VecExpr::CVecExpr<U, Scalar_t>&) const[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysVector.hpp:557:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  557 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:[m[K In member function '[01m[Kvoid CSysSolve<ScalarType>::[01;32m[KHandleTemporariesIn[m[K(const CSysVector<T>&, CSysVector<T>&, bool)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:291:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  291 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:303:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  303 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:[m[K In member function '[01m[Kvoid CSysSolve<ScalarType>::[01;32m[KHandleTemporariesOut[m[K(CSysVector<T>&, bool)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:323:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  323 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/linear_algebra/CSysSolve.hpp:333:7:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  333 |       [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../source/SU2_CFD/src/../include/drivers/../integration/../solvers/../limiters/CLimiterDetails.hpp:[m[K In member function '[01m[Kvoid CLimiterDetails<LIMITER::VENKATAKRISHNAN_WANG>::[01;32m[Kpreprocess[m[K(CGeometry&, const CConfig&, size_t, size_t, const FieldType&)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../source/SU2_CFD/src/../include/drivers/../integration/../solvers/../limiters/CLimiterDetails.hpp:356:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  356 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../source/SU2_CFD/src/../include/drivers/../integration/../solvers/../limiters/CLimiterDetails.hpp:390:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  390 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../source/SU2_CFD/src/../include/drivers/../integration/../solvers/CSolver.hpp:[m[K In member function '[01m[Kvoid CSolver::[01;32m[KSetResToZero[m[K()[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../source/SU2_CFD/src/../include/drivers/../integration/../solvers/CSolver.hpp:4489:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 4489 |     [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:8[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/winscard.h:10[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/windows.h:97[m[K,
+                 from [01m[K../source/SU2_CFD/src/../include/NativeTermination.hpp:7[m[K,
+                 from [01m[K../source/SU2_CFD/src/SU2_CFD.cpp:29[m[K:
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:[m[K At global scope:
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:94:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+   94 |   typedef [01;31m[Kbyte[m[K cs_byte;
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/memory_resource.h:40[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/string:83[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/locale_classes.h:43[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ios_base.h:43[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ios:46[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ostream.h:43[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ostream:42[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/iostream:43[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/basic_types/datatype_structure.hpp:30[m[K:
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:432:170:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+  432 |   typedef void (__RPC_API *CS_TYPE_TO_NETCS_ROUTINE)(RPC_BINDING_HANDLE hBinding,unsigned __LONG32 ulNetworkCodeSet,void *pLocalData,unsigned __LONG32 ulLocalDataLength,[01;31m[Kbyte[m[K *pNetworkData,unsigned __LONG32 *pulNetworkDataLength,error_status_t *pStatus);
+      |                                                                                                                                                                          [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:432:170:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+  432 |   typedef void (__RPC_API *CS_TYPE_TO_NETCS_ROUTINE)(RPC_BINDING_HANDLE hBinding,unsigned __LONG32 ulNetworkCodeSet,void *pLocalData,unsigned __LONG32 ulLocalDataLength,[01;31m[Kbyte[m[K *pNetworkData,unsigned __LONG32 *pulNetworkDataLength,error_status_t *pStatus);
+      |                                                                                                                                                                          [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:433:119:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+  433 |   typedef void (__RPC_API *CS_TYPE_FROM_NETCS_ROUTINE)(RPC_BINDING_HANDLE hBinding,unsigned __LONG32 ulNetworkCodeSet,[01;31m[Kbyte[m[K *pNetworkData,unsigned __LONG32 ulNetworkDataLength,unsigned __LONG32 ulLocalBufferSize,void *pLocalData,unsigned __LONG32 *pulLocalDataLength,error_status_t *pStatus);
+      |                                                                                                                       [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:433:119:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+  433 |   typedef void (__RPC_API *CS_TYPE_FROM_NETCS_ROUTINE)(RPC_BINDING_HANDLE hBinding,unsigned __LONG32 ulNetworkCodeSet,[01;31m[Kbyte[m[K *pNetworkData,unsigned __LONG32 ulNetworkDataLength,unsigned __LONG32 ulLocalBufferSize,void *pLocalData,unsigned __LONG32 *pulLocalDataLength,error_status_t *pStatus);
+      |                                                                                                                       [01;31m[K^~~~[m[K
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/combaseapi.h:153[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objbase.h:14[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/ole2.h:17[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:13[m[K:
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypesbase.h:319:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+  319 |     [01;31m[Kbyte[m[K abData[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypesbase.h:341:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+  341 |     [01;31m[Kbyte[m[K abData[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypesbase.h:356:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+  356 |     [01;31m[Kbyte[m[K *pData;
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/combaseapi.h:155[m[K:
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidlbase.h:1993:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 1993 |     [01;31m[Kbyte[m[K *pv,
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidlbase.h:1993:5:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 1993 |     [01;31m[Kbyte[m[K *pv,
+      |     [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidlbase.h:2003:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 2003 |     const [01;31m[Kbyte[m[K *pv,
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidlbase.h:2018:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 2018 |     [01;31m[Kbyte[m[K *pv,
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidlbase.h:2018:5:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 2018 |     [01;31m[Kbyte[m[K *pv,
+      |     [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidlbase.h:2028:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 2028 |     const [01;31m[Kbyte[m[K *pv,
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/unknwn.h:47[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:759[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objbase.h:66[m[K:
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:46:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+   46 |     [01;31m[Kbyte[m[K data[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:54:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+   54 |     [01;31m[Kbyte[m[K data[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:59:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+   59 |     [01;31m[Kbyte[m[K data[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:63:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+   63 |     [01;31m[Kbyte[m[K data[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:68:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+   68 |     [01;31m[Kbyte[m[K data[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:73:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+   73 |     [01;31m[Kbyte[m[K data[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/wtypes.h:299:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+  299 |     [01;31m[Kbyte[m[K pBuffer[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:8445:9:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 8445 |         [01;31m[Kbyte[m[K *pbData,
+      |         [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:8445:9:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 8445 |         [01;31m[Kbyte[m[K *pbData,
+      |         [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:8953:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 8953 |     [01;31m[Kbyte[m[K *reserved1,
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:8953:5:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 8953 |     [01;31m[Kbyte[m[K *reserved1,
+      |     [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:8977:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 8977 |     [01;31m[Kbyte[m[K *reserved2,
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:8977:5:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 8977 |     [01;31m[Kbyte[m[K *reserved2,
+      |     [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:8996:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 8996 |     [01;31m[Kbyte[m[K *reserved1,
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:8996:5:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 8996 |     [01;31m[Kbyte[m[K *reserved1,
+      |     [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9022:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 9022 |     [01;31m[Kbyte[m[K *reserved2,
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9022:5:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 9022 |     [01;31m[Kbyte[m[K *reserved2,
+      |     [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9477:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 9477 |     [01;31m[Kbyte[m[K *pv,
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9477:5:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 9477 |     [01;31m[Kbyte[m[K *pv,
+      |     [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9488:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 9488 |     const [01;31m[Kbyte[m[K *pv,
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9505:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 9505 |     [01;31m[Kbyte[m[K *pv,
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9505:5:[m[K [01;31m[Kerror: [m[K'[01m[Kbyte[m[K' has not been declared
+ 9505 |     [01;31m[Kbyte[m[K *pv,
+      |     [01;31m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9517:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 9517 |     const [01;31m[Kbyte[m[K *pv,
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:9925:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+ 9925 |     [01;31m[Kbyte[m[K data[1];
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:11390:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+11390 |     const [01;31m[Kbyte[m[K *pv,
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:11401:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+11401 |     const [01;31m[Kbyte[m[K *pv,
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:11416:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+11416 |     const [01;31m[Kbyte[m[K *pv,
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objidl.h:11428:11:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+11428 |     const [01;31m[Kbyte[m[K *pv,
+      |           [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/msxml.h:303[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/urlmon.h:450[m[K,
+                 from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/objbase.h:163[m[K:
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/oaidl.h:579:5:[m[K [01;31m[Kerror: [m[Kreference to '[01m[Kbyte[m[K' is ambiguous
+  579 |     [01;31m[Kbyte[m[K *pRecord;
+      |     [01;31m[K^~~~[m[K
+  • there are 2 candidates
+    • candidate 1: '[01m[Kenum class std::byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstddef:75:14:[m[K
+         75 |   enum class [01;36m[Kbyte[m[K : unsigned char {};
+            |              [01;36m[K^~~~[m[K
+    • candidate 2: '[01m[Ktypedef unsigned char byte[m[K'
+      [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/include/rpcndr.h:93:25:[m[K
+         93 |   typedef unsigned char [01;36m[Kbyte[m[K;
+            |                         [01;36m[K^~~~[m[K

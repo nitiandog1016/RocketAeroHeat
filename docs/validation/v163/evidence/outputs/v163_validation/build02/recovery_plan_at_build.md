@@ -1,0 +1,5 @@
+# v163 main头文件次序恢复
+
+独立原生夹具四项通过。首次引擎构建中CEulerSolver编译12.000秒exit0，main编译4.297秒exit1，原因是SU2头文件引入全局using namespace std后，Windows RPC头的byte与std::byte发生歧义。writer和链接尚未执行，共享源已完整恢复，准确失败源和日志保存在build01。
+
+将NativeTermination.hpp放在SU2_CFD.hpp前，与已通过夹具的包含次序一致。复核CEulerSolver对象已逐字恢复phase-v2，其余297对象仍为phase-v2。build02仅编译尚未成功的main及writer，沿用原编译总120秒减去已用16.297秒，链接仍仅一次30秒。三个独立翻译单元的范围保持，记录main实际编译尝试两次。不得重新编译CEulerSolver或全引擎，不改变数值源码。

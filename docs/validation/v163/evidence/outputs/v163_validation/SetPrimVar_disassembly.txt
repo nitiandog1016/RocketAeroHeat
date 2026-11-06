@@ -1,0 +1,398 @@
+
+E:\RocketAeroHeat\tools\runtime\su2\8.6.0-rah-ideal-air-observed-v1\bin\SU2_CFD.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+000000014047ffa0 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)>:
+   14047ffa0:	41 57                	push   %r15
+   14047ffa2:	41 56                	push   %r14
+   14047ffa4:	41 55                	push   %r13
+   14047ffa6:	41 54                	push   %r12
+   14047ffa8:	55                   	push   %rbp
+   14047ffa9:	57                   	push   %rdi
+   14047ffaa:	56                   	push   %rsi
+   14047ffab:	53                   	push   %rbx
+   14047ffac:	48 81 ec 98 00 00 00 	sub    $0x98,%rsp
+   14047ffb3:	0f 29 b4 24 80 00 00 	movaps %xmm6,0x80(%rsp)
+   14047ffba:	00 
+   14047ffbb:	48 8b b4 24 00 01 00 	mov    0x100(%rsp),%rsi
+   14047ffc2:	00 
+   14047ffc3:	48 89 cb             	mov    %rcx,%rbx
+   14047ffc6:	89 d1                	mov    %edx,%ecx
+   14047ffc8:	66 0f 28 f2          	movapd %xmm2,%xmm6
+   14047ffcc:	44 8b 63 0c          	mov    0xc(%rbx),%r12d
+   14047ffd0:	48 8b 53 10          	mov    0x10(%rbx),%rdx
+   14047ffd4:	48 89 4c 24 68       	mov    %rcx,0x68(%rsp)
+   14047ffd9:	48 89 cf             	mov    %rcx,%rdi
+   14047ffdc:	48 8b 83 78 03 00 00 	mov    0x378(%rbx),%rax
+   14047ffe3:	4c 8b 83 a0 02 00 00 	mov    0x2a0(%rbx),%r8
+   14047ffea:	4c 8d 0c cd 00 00 00 	lea    0x0(,%rcx,8),%r9
+   14047fff1:	00 
+   14047fff2:	44 0f af e1          	imul   %ecx,%r12d
+   14047fff6:	8b ab 24 02 00 00    	mov    0x224(%rbx),%ebp
+   14047fffc:	f2 0f 11 1c c8       	movsd  %xmm3,(%rax,%rcx,8)
+   140480001:	4d 01 c8             	add    %r9,%r8
+   140480004:	49 c7 00 00 00 00 00 	movq   $0x0,(%r8)
+   14048000b:	44 89 e0             	mov    %r12d,%eax
+   14048000e:	48 8d 0c c2          	lea    (%rdx,%rax,8),%rcx
+   140480012:	85 ed                	test   %ebp,%ebp
+   140480014:	0f 84 6e 05 00 00    	je     140480588 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x5e8>
+   14048001a:	44 8b 93 44 02 00 00 	mov    0x244(%rbx),%r10d
+   140480021:	41 8d 44 24 01       	lea    0x1(%r12),%eax
+   140480026:	46 8d 5c 25 01       	lea    0x1(%rbp,%r12,1),%r11d
+   14048002b:	4c 8b ab 48 02 00 00 	mov    0x248(%rbx),%r13
+   140480032:	44 0f af d7          	imul   %edi,%r10d
+   140480036:	45 29 e2             	sub    %r12d,%r10d
+   140480039:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+   140480040:	41 89 c6             	mov    %eax,%r14d
+   140480043:	f2 42 0f 10 04 f2    	movsd  (%rdx,%r14,8),%xmm0
+   140480049:	45 8d 34 02          	lea    (%r10,%rax,1),%r14d
+   14048004d:	f2 0f 5e 01          	divsd  (%rcx),%xmm0
+   140480051:	83 c0 01             	add    $0x1,%eax
+   140480054:	f2 43 0f 11 44 f5 00 	movsd  %xmm0,0x0(%r13,%r14,8)
+   14048005b:	f2 0f 59 c0          	mulsd  %xmm0,%xmm0
+   14048005f:	f2 41 0f 58 00       	addsd  (%r8),%xmm0
+   140480064:	f2 41 0f 11 00       	movsd  %xmm0,(%r8)
+   140480069:	44 39 d8             	cmp    %r11d,%eax
+   14048006c:	75 d2                	jne    140480040 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0xa0>
+   14048006e:	f2 0f 59 05 72 d5 73 	mulsd  0x73d572(%rip),%xmm0        # 140bbd5e8 <.rdata+0x18>
+   140480075:	00 
+   140480076:	f2 0f 58 c3          	addsd  %xmm3,%xmm0
+   14048007a:	4c 8b 2e             	mov    (%rsi),%r13
+   14048007d:	4c 8d 3d 6c b5 2d 00 	lea    0x2db56c(%rip),%r15        # 14075b5f0 <CFluidModel::SetTDState_rhoe(double, double)>
+   140480084:	f2 0f 10 09          	movsd  (%rcx),%xmm1
+   140480088:	4c 89 7c 24 60       	mov    %r15,0x60(%rsp)
+   14048008d:	49 8b 85 90 00 00 00 	mov    0x90(%r13),%rax
+   140480094:	4c 39 f8             	cmp    %r15,%rax
+   140480097:	0f 85 db 03 00 00    	jne    140480478 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x4d8>
+   14048009d:	44 8b 9b 44 02 00 00 	mov    0x244(%rbx),%r11d
+   1404800a4:	8b 83 f8 02 00 00    	mov    0x2f8(%rbx),%eax
+   1404800aa:	66 0f ef d2          	pxor   %xmm2,%xmm2
+   1404800ae:	4c 8b 83 48 02 00 00 	mov    0x248(%rbx),%r8
+   1404800b5:	44 0f af df          	imul   %edi,%r11d
+   1404800b9:	89 44 24 40          	mov    %eax,0x40(%rsp)
+   1404800bd:	42 8d 44 18 02       	lea    0x2(%rax,%r11,1),%eax
+   1404800c2:	49 8d 04 c0          	lea    (%r8,%rax,8),%rax
+   1404800c6:	f2 0f 11 08          	movsd  %xmm1,(%rax)
+   1404800ca:	f2 0f 10 66 28       	movsd  0x28(%rsi),%xmm4
+   1404800cf:	48 89 44 24 50       	mov    %rax,0x50(%rsp)
+   1404800d4:	41 8d 44 2b 01       	lea    0x1(%r11,%rbp,1),%eax
+   1404800d9:	49 8d 04 c0          	lea    (%r8,%rax,8),%rax
+   1404800dd:	f2 0f 11 20          	movsd  %xmm4,(%rax)
+   1404800e1:	f2 0f 10 46 30       	movsd  0x30(%rsi),%xmm0
+   1404800e6:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+   1404800eb:	44 89 d8             	mov    %r11d,%eax
+   1404800ee:	48 c1 e0 03          	shl    $0x3,%rax
+   1404800f2:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+   1404800f7:	4c 01 c0             	add    %r8,%rax
+   1404800fa:	66 0f 2f d0          	comisd %xmm0,%xmm2
+   1404800fe:	77 38                	ja     140480138 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x198>
+   140480100:	f2 0f 51 c0          	sqrtsd %xmm0,%xmm0
+   140480104:	66 0f 2f d4          	comisd %xmm4,%xmm2
+   140480108:	45 8d 54 2b 04       	lea    0x4(%r11,%rbp,1),%r10d
+   14048010d:	f2 43 0f 11 04 d0    	movsd  %xmm0,(%r8,%r10,8)
+   140480113:	f2 0f 10 46 38       	movsd  0x38(%rsi),%xmm0
+   140480118:	f2 0f 11 00          	movsd  %xmm0,(%rax)
+   14048011c:	73 23                	jae    140480141 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x1a1>
+   14048011e:	66 0f 2f d1          	comisd %xmm1,%xmm2
+   140480122:	73 1d                	jae    140480141 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x1a1>
+   140480124:	66 0f 2f d0          	comisd %xmm0,%xmm2
+   140480128:	73 17                	jae    140480141 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x1a1>
+   14048012a:	bd 01 00 00 00       	mov    $0x1,%ebp
+   14048012f:	e9 62 01 00 00       	jmp    140480296 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x2f6>
+   140480134:	0f 1f 40 00          	nopl   0x0(%rax)
+   140480138:	f2 0f 10 46 38       	movsd  0x38(%rsi),%xmm0
+   14048013d:	f2 0f 11 00          	movsd  %xmm0,(%rax)
+   140480141:	44 8b 93 28 02 00 00 	mov    0x228(%rbx),%r10d
+   140480148:	44 89 54 24 7c       	mov    %r10d,0x7c(%rsp)
+   14048014d:	45 85 d2             	test   %r10d,%r10d
+   140480150:	74 4e                	je     1404801a0 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x200>
+   140480152:	8b 43 1c             	mov    0x1c(%rbx),%eax
+   140480155:	4c 8b 7b 20          	mov    0x20(%rbx),%r15
+   140480159:	4c 89 44 24 70       	mov    %r8,0x70(%rsp)
+   14048015e:	0f af c7             	imul   %edi,%eax
+   140480161:	46 8d 34 10          	lea    (%rax,%r10,1),%r14d
+   140480165:	45 89 e2             	mov    %r12d,%r10d
+   140480168:	41 29 c2             	sub    %eax,%r10d
+   14048016b:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+   140480172:	00 00 00 
+   140480175:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+   14048017c:	00 00 00 00 
+   140480180:	41 89 c0             	mov    %eax,%r8d
+   140480183:	f2 43 0f 10 04 c7    	movsd  (%r15,%r8,8),%xmm0
+   140480189:	45 8d 04 02          	lea    (%r10,%rax,1),%r8d
+   14048018d:	83 c0 01             	add    $0x1,%eax
+   140480190:	f2 42 0f 11 04 c2    	movsd  %xmm0,(%rdx,%r8,8)
+   140480196:	44 39 f0             	cmp    %r14d,%eax
+   140480199:	75 e5                	jne    140480180 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x1e0>
+   14048019b:	4c 8b 44 24 70       	mov    0x70(%rsp),%r8
+   1404801a0:	4c 03 8b a0 02 00 00 	add    0x2a0(%rbx),%r9
+   1404801a7:	49 c7 01 00 00 00 00 	movq   $0x0,(%r9)
+   1404801ae:	85 ed                	test   %ebp,%ebp
+   1404801b0:	0f 84 83 00 00 00    	je     140480239 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x299>
+   1404801b6:	45 89 de             	mov    %r11d,%r14d
+   1404801b9:	41 8d 44 24 01       	lea    0x1(%r12),%eax
+   1404801be:	46 8d 7c 25 01       	lea    0x1(%rbp,%r12,1),%r15d
+   1404801c3:	45 29 e6             	sub    %r12d,%r14d
+   1404801c6:	0f 1f 00             	nopl   (%rax)
+   1404801c9:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+   1404801d0:	00 00 00 00 
+   1404801d4:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+   1404801db:	00 00 00 00 
+   1404801df:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+   1404801e6:	00 00 00 00 
+   1404801ea:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+   1404801f1:	00 00 00 00 
+   1404801f5:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+   1404801fc:	00 00 00 00 
+   140480200:	41 89 c2             	mov    %eax,%r10d
+   140480203:	f2 42 0f 10 04 d2    	movsd  (%rdx,%r10,8),%xmm0
+   140480209:	45 8d 14 06          	lea    (%r14,%rax,1),%r10d
+   14048020d:	f2 0f 5e 01          	divsd  (%rcx),%xmm0
+   140480211:	83 c0 01             	add    $0x1,%eax
+   140480214:	f2 43 0f 11 04 d0    	movsd  %xmm0,(%r8,%r10,8)
+   14048021a:	f2 0f 59 c0          	mulsd  %xmm0,%xmm0
+   14048021e:	f2 41 0f 58 01       	addsd  (%r9),%xmm0
+   140480223:	f2 41 0f 11 01       	movsd  %xmm0,(%r9)
+   140480228:	44 39 f8             	cmp    %r15d,%eax
+   14048022b:	75 d3                	jne    140480200 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x260>
+   14048022d:	f2 0f 59 05 b3 d3 73 	mulsd  0x73d3b3(%rip),%xmm0        # 140bbd5e8 <.rdata+0x18>
+   140480234:	00 
+   140480235:	f2 0f 58 d8          	addsd  %xmm0,%xmm3
+   140480239:	f2 0f 10 09          	movsd  (%rcx),%xmm1
+   14048023d:	49 8b 85 90 00 00 00 	mov    0x90(%r13),%rax
+   140480244:	48 3b 44 24 60       	cmp    0x60(%rsp),%rax
+   140480249:	0f 85 b1 02 00 00    	jne    140480500 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x560>
+   14048024f:	48 8b 44 24 50       	mov    0x50(%rsp),%rax
+   140480254:	f2 0f 11 08          	movsd  %xmm1,(%rax)
+   140480258:	48 8b 44 24 48       	mov    0x48(%rsp),%rax
+   14048025d:	f2 0f 10 46 28       	movsd  0x28(%rsi),%xmm0
+   140480262:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   140480266:	f2 0f 11 00          	movsd  %xmm0,(%rax)
+   14048026a:	f2 0f 10 46 30       	movsd  0x30(%rsi),%xmm0
+   14048026f:	66 0f 2f c8          	comisd %xmm0,%xmm1
+   140480273:	77 0f                	ja     140480284 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x2e4>
+   140480275:	f2 0f 51 c0          	sqrtsd %xmm0,%xmm0
+   140480279:	41 8d 44 2b 04       	lea    0x4(%r11,%rbp,1),%eax
+   14048027e:	f2 41 0f 11 04 c0    	movsd  %xmm0,(%r8,%rax,8)
+   140480284:	f2 0f 10 46 38       	movsd  0x38(%rsi),%xmm0
+   140480289:	48 8b 44 24 58       	mov    0x58(%rsp),%rax
+   14048028e:	31 ed                	xor    %ebp,%ebp
+   140480290:	f2 41 0f 11 04 00    	movsd  %xmm0,(%r8,%rax,1)
+   140480296:	8b 44 24 40          	mov    0x40(%rsp),%eax
+   14048029a:	44 8b 8b 28 02 00 00 	mov    0x228(%rbx),%r9d
+   1404802a1:	41 01 c3             	add    %eax,%r11d
+   1404802a4:	47 8d 54 0c ff       	lea    -0x1(%r12,%r9,1),%r10d
+   1404802a9:	41 8d 43 03          	lea    0x3(%r11),%eax
+   1404802ad:	45 8d 4b 01          	lea    0x1(%r11),%r9d
+   1404802b1:	f2 42 0f 10 04 d2    	movsd  (%rdx,%r10,8),%xmm0
+   1404802b7:	f2 43 0f 58 04 c8    	addsd  (%r8,%r9,8),%xmm0
+   1404802bd:	f2 0f 5e 01          	divsd  (%rcx),%xmm0
+   1404802c1:	f2 41 0f 11 04 c0    	movsd  %xmm0,(%r8,%rax,8)
+   1404802c7:	49 8b 45 20          	mov    0x20(%r13),%rax
+   1404802cb:	48 8d 15 8e b3 2d 00 	lea    0x2db38e(%rip),%rdx        # 14075b660 <CFluidModel::GetLaminarViscosity()>
+   1404802d2:	48 39 d0             	cmp    %rdx,%rax
+   1404802d5:	0f 85 05 02 00 00    	jne    1404804e0 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x540>
+   1404802db:	48 8b 8e d0 00 00 00 	mov    0xd0(%rsi),%rcx
+   1404802e2:	f2 0f 10 4e 38       	movsd  0x38(%rsi),%xmm1
+   1404802e7:	f2 0f 10 56 20       	movsd  0x20(%rsi),%xmm2
+   1404802ec:	48 8b 01             	mov    (%rcx),%rax
+   1404802ef:	ff 50 10             	call   *0x10(%rax)
+   1404802f2:	48 8b 86 d0 00 00 00 	mov    0xd0(%rsi),%rax
+   1404802f9:	f2 0f 10 40 08       	movsd  0x8(%rax),%xmm0
+   1404802fe:	f2 0f 11 86 90 00 00 	movsd  %xmm0,0x90(%rsi)
+   140480305:	00 
+   140480306:	66 0f 10 48 10       	movupd 0x10(%rax),%xmm1
+   14048030b:	0f 11 8e a0 00 00 00 	movups %xmm1,0xa0(%rsi)
+   140480312:	8b 93 44 02 00 00    	mov    0x244(%rbx),%edx
+   140480318:	8b 8b f8 02 00 00    	mov    0x2f8(%rbx),%ecx
+   14048031e:	48 8b 83 48 02 00 00 	mov    0x248(%rbx),%rax
+   140480325:	0f af d7             	imul   %edi,%edx
+   140480328:	44 8d 44 11 05       	lea    0x5(%rcx,%rdx,1),%r8d
+   14048032d:	8d 54 11 06          	lea    0x6(%rcx,%rdx,1),%edx
+   140480331:	f2 42 0f 11 04 c0    	movsd  %xmm0,(%rax,%r8,8)
+   140480337:	f2 0f 11 34 d0       	movsd  %xmm6,(%rax,%rdx,8)
+   14048033c:	48 8b 06             	mov    (%rsi),%rax
+   14048033f:	48 8d 15 8a b3 2d 00 	lea    0x2db38a(%rip),%rdx        # 14075b6d0 <CFluidModel::GetThermalConductivity()>
+   140480346:	48 8b 40 28          	mov    0x28(%rax),%rax
+   14048034a:	48 39 d0             	cmp    %rdx,%rax
+   14048034d:	0f 85 15 01 00 00    	jne    140480468 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x4c8>
+   140480353:	48 8b 8e d8 00 00 00 	mov    0xd8(%rsi),%rcx
+   14048035a:	f2 0f 10 86 a8 00 00 	movsd  0xa8(%rsi),%xmm0
+   140480361:	00 
+   140480362:	48 8b 01             	mov    (%rcx),%rax
+   140480365:	f2 0f 11 44 24 38    	movsd  %xmm0,0x38(%rsp)
+   14048036b:	f2 0f 10 86 a0 00 00 	movsd  0xa0(%rsi),%xmm0
+   140480372:	00 
+   140480373:	f2 0f 11 44 24 30    	movsd  %xmm0,0x30(%rsp)
+   140480379:	f2 0f 10 86 80 00 00 	movsd  0x80(%rsi),%xmm0
+   140480380:	00 
+   140480381:	f2 0f 11 44 24 28    	movsd  %xmm0,0x28(%rsp)
+   140480387:	f2 0f 10 86 98 00 00 	movsd  0x98(%rsi),%xmm0
+   14048038e:	00 
+   14048038f:	f2 0f 11 44 24 20    	movsd  %xmm0,0x20(%rsp)
+   140480395:	f2 0f 10 4e 38       	movsd  0x38(%rsi),%xmm1
+   14048039a:	f2 0f 10 56 20       	movsd  0x20(%rsi),%xmm2
+   14048039f:	f2 0f 10 9e 90 00 00 	movsd  0x90(%rsi),%xmm3
+   1404803a6:	00 
+   1404803a7:	ff 50 10             	call   *0x10(%rax)
+   1404803aa:	48 8b 86 d8 00 00 00 	mov    0xd8(%rsi),%rax
+   1404803b1:	66 0f 10 48 08       	movupd 0x8(%rax),%xmm1
+   1404803b6:	f2 0f 10 40 08       	movsd  0x8(%rax),%xmm0
+   1404803bb:	0f 11 8e b0 00 00 00 	movups %xmm1,0xb0(%rsi)
+   1404803c2:	f2 0f 10 48 18       	movsd  0x18(%rax),%xmm1
+   1404803c7:	f2 0f 11 8e c0 00 00 	movsd  %xmm1,0xc0(%rsi)
+   1404803ce:	00 
+   1404803cf:	0f af bb 44 02 00 00 	imul   0x244(%rbx),%edi
+   1404803d6:	8b 93 f8 02 00 00    	mov    0x2f8(%rbx),%edx
+   1404803dc:	48 8b 83 48 02 00 00 	mov    0x248(%rbx),%rax
+   1404803e3:	8d 4c 3a 07          	lea    0x7(%rdx,%rdi,1),%ecx
+   1404803e7:	8d 54 3a 08          	lea    0x8(%rdx,%rdi,1),%edx
+   1404803eb:	f2 0f 11 04 c8       	movsd  %xmm0,(%rax,%rcx,8)
+   1404803f0:	f2 0f 10 86 80 00 00 	movsd  0x80(%rsi),%xmm0
+   1404803f7:	00 
+   1404803f8:	f2 0f 11 04 d0       	movsd  %xmm0,(%rax,%rdx,8)
+   1404803fd:	80 bb 20 03 00 00 00 	cmpb   $0x0,0x320(%rbx)
+   140480404:	74 3d                	je     140480443 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x4a3>
+   140480406:	48 8b 06             	mov    (%rsi),%rax
+   140480409:	48 8d 0d 90 3a 4f 00 	lea    0x4f3a90(%rip),%rcx        # 140973ea0 <CFluidModel::GetExtrapolation() const>
+   140480410:	48 8b 90 e8 00 00 00 	mov    0xe8(%rax),%rdx
+   140480417:	31 c0                	xor    %eax,%eax
+   140480419:	48 39 ca             	cmp    %rcx,%rdx
+   14048041c:	0f 85 ce 00 00 00    	jne    1404804f0 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x550>
+   140480422:	48 8b 93 30 03 00 00 	mov    0x330(%rbx),%rdx
+   140480429:	48 8b 7c 24 68       	mov    0x68(%rsp),%rdi
+   14048042e:	f2 0f 10 46 18       	movsd  0x18(%rsi),%xmm0
+   140480433:	66 89 04 7a          	mov    %ax,(%rdx,%rdi,2)
+   140480437:	48 8b 83 50 03 00 00 	mov    0x350(%rbx),%rax
+   14048043e:	f2 0f 11 04 f8       	movsd  %xmm0,(%rax,%rdi,8)
+   140480443:	0f 28 b4 24 80 00 00 	movaps 0x80(%rsp),%xmm6
+   14048044a:	00 
+   14048044b:	89 e8                	mov    %ebp,%eax
+   14048044d:	48 81 c4 98 00 00 00 	add    $0x98,%rsp
+   140480454:	5b                   	pop    %rbx
+   140480455:	5e                   	pop    %rsi
+   140480456:	5f                   	pop    %rdi
+   140480457:	5d                   	pop    %rbp
+   140480458:	41 5c                	pop    %r12
+   14048045a:	41 5d                	pop    %r13
+   14048045c:	41 5e                	pop    %r14
+   14048045e:	41 5f                	pop    %r15
+   140480460:	c3                   	ret
+   140480461:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+   140480468:	48 89 f1             	mov    %rsi,%rcx
+   14048046b:	ff d0                	call   *%rax
+   14048046d:	e9 5d ff ff ff       	jmp    1404803cf <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x42f>
+   140480472:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+   140480478:	8b 8b 28 02 00 00    	mov    0x228(%rbx),%ecx
+   14048047e:	4c 89 4c 24 40       	mov    %r9,0x40(%rsp)
+   140480483:	f2 0f 11 9c 24 f8 00 	movsd  %xmm3,0xf8(%rsp)
+   14048048a:	00 00 
+   14048048c:	41 8d 4c 0c ff       	lea    -0x1(%r12,%rcx,1),%ecx
+   140480491:	f2 0f 10 14 ca       	movsd  (%rdx,%rcx,8),%xmm2
+   140480496:	48 89 f1             	mov    %rsi,%rcx
+   140480499:	f2 0f 5e d1          	divsd  %xmm1,%xmm2
+   14048049d:	f2 0f 5c d0          	subsd  %xmm0,%xmm2
+   1404804a1:	ff d0                	call   *%rax
+   1404804a3:	44 8b 63 0c          	mov    0xc(%rbx),%r12d
+   1404804a7:	48 8b 53 10          	mov    0x10(%rbx),%rdx
+   1404804ab:	8b ab 24 02 00 00    	mov    0x224(%rbx),%ebp
+   1404804b1:	4c 8b 2e             	mov    (%rsi),%r13
+   1404804b4:	44 0f af e7          	imul   %edi,%r12d
+   1404804b8:	4c 8b 4c 24 40       	mov    0x40(%rsp),%r9
+   1404804bd:	f2 0f 10 9c 24 f8 00 	movsd  0xf8(%rsp),%xmm3
+   1404804c4:	00 00 
+   1404804c6:	44 89 e0             	mov    %r12d,%eax
+   1404804c9:	48 8d 0c c2          	lea    (%rdx,%rax,8),%rcx
+   1404804cd:	f2 0f 10 09          	movsd  (%rcx),%xmm1
+   1404804d1:	e9 c7 fb ff ff       	jmp    14048009d <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0xfd>
+   1404804d6:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+   1404804dd:	00 00 00 
+   1404804e0:	48 89 f1             	mov    %rsi,%rcx
+   1404804e3:	ff d0                	call   *%rax
+   1404804e5:	e9 28 fe ff ff       	jmp    140480312 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x372>
+   1404804ea:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+   1404804f0:	48 89 f1             	mov    %rsi,%rcx
+   1404804f3:	ff d2                	call   *%rdx
+   1404804f5:	e9 28 ff ff ff       	jmp    140480422 <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x482>
+   1404804fa:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+   140480500:	8b 4c 24 7c          	mov    0x7c(%rsp),%ecx
+   140480504:	42 8d 4c 21 ff       	lea    -0x1(%rcx,%r12,1),%ecx
+   140480509:	f2 0f 10 14 ca       	movsd  (%rdx,%rcx,8),%xmm2
+   14048050e:	48 89 f1             	mov    %rsi,%rcx
+   140480511:	f2 0f 5e d1          	divsd  %xmm1,%xmm2
+   140480515:	f2 0f 5c d3          	subsd  %xmm3,%xmm2
+   140480519:	ff d0                	call   *%rax
+   14048051b:	44 8b 9b 44 02 00 00 	mov    0x244(%rbx),%r11d
+   140480522:	44 8b 63 0c          	mov    0xc(%rbx),%r12d
+   140480526:	8b ab 24 02 00 00    	mov    0x224(%rbx),%ebp
+   14048052c:	4c 8b 83 48 02 00 00 	mov    0x248(%rbx),%r8
+   140480533:	44 0f af df          	imul   %edi,%r11d
+   140480537:	48 8b 53 10          	mov    0x10(%rbx),%rdx
+   14048053b:	4c 8b 2e             	mov    (%rsi),%r13
+   14048053e:	44 0f af e7          	imul   %edi,%r12d
+   140480542:	44 89 d8             	mov    %r11d,%eax
+   140480545:	48 c1 e0 03          	shl    $0x3,%rax
+   140480549:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+   14048054e:	41 8d 44 2b 01       	lea    0x1(%r11,%rbp,1),%eax
+   140480553:	49 8d 04 c0          	lea    (%r8,%rax,8),%rax
+   140480557:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+   14048055c:	44 89 e0             	mov    %r12d,%eax
+   14048055f:	48 8d 0c c2          	lea    (%rdx,%rax,8),%rcx
+   140480563:	8b 83 f8 02 00 00    	mov    0x2f8(%rbx),%eax
+   140480569:	f2 0f 10 09          	movsd  (%rcx),%xmm1
+   14048056d:	89 44 24 40          	mov    %eax,0x40(%rsp)
+   140480571:	42 8d 44 18 02       	lea    0x2(%rax,%r11,1),%eax
+   140480576:	49 8d 04 c0          	lea    (%r8,%rax,8),%rax
+   14048057a:	48 89 44 24 50       	mov    %rax,0x50(%rsp)
+   14048057f:	e9 cb fc ff ff       	jmp    14048024f <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0x2af>
+   140480584:	0f 1f 40 00          	nopl   0x0(%rax)
+   140480588:	66 0f 28 c3          	movapd %xmm3,%xmm0
+   14048058c:	e9 e9 fa ff ff       	jmp    14048007a <CNSVariable::SetPrimVar(unsigned long, double, double, CFluidModel*)+0xda>
+   140480591:	90                   	nop
+   140480592:	0f 1f 00             	nopl   (%rax)
+   140480595:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+   14048059c:	00 00 00 00 
+
+00000001404805a0 <CNSVariable::CNSVariable(double, double const*, double, unsigned long, unsigned long, unsigned long, CConfig const*)>:
+   1404805a0:	55                   	push   %rbp
+   1404805a1:	57                   	push   %rdi
+   1404805a2:	56                   	push   %rsi
+   1404805a3:	53                   	push   %rbx
+   1404805a4:	48 83 ec 48          	sub    $0x48,%rsp
+   1404805a8:	8b 84 24 a0 00 00 00 	mov    0xa0(%rsp),%eax
+   1404805af:	48 8b b4 24 a8 00 00 	mov    0xa8(%rsp),%rsi
+   1404805b6:	00 
+   1404805b7:	89 44 24 30          	mov    %eax,0x30(%rsp)
+   1404805bb:	8b 84 24 98 00 00 00 	mov    0x98(%rsp),%eax
+   1404805c2:	48 89 cb             	mov    %rcx,%rbx
+   1404805c5:	48 89 74 24 38       	mov    %rsi,0x38(%rsp)
+   1404805ca:	89 44 24 28          	mov    %eax,0x28(%rsp)
+   1404805ce:	8b 84 24 90 00 00 00 	mov    0x90(%rsp),%eax
+   1404805d5:	89 44 24 20          	mov    %eax,0x20(%rsp)
+   1404805d9:	e8 62 33 00 00       	call   140483940 <CEulerVariable::CEulerVariable(double, double const*, double, unsigned long, unsigned long, unsigned long, CConfig const*)>
+   1404805de:	8b ab 20 02 00 00    	mov    0x220(%rbx),%ebp
+   1404805e4:	f2 0f 10 86 40 16 00 	movsd  0x1640(%rsi),%xmm0
+   1404805eb:	00 
+   1404805ec:	48 8d 05 4d 86 78 00 	lea    0x78864d(%rip),%rax        # 140c08c40 <vtable for CNSVariable+0x10>
+   1404805f3:	f2 0f 5e 86 20 12 00 	divsd  0x1220(%rsi),%xmm0
+   1404805fa:	00 
+   1404805fb:	48 89 03             	mov    %rax,(%rbx)
+   1404805fe:	8d 74 6d 00          	lea    0x0(%rbp,%rbp,2),%esi
+   140480602:	48 c7 83 78 03 00 00 	movq   $0x0,0x378(%rbx)
+   140480609:	00 00 00 00 
+   14048060d:	c7 83 70 03 00 00 00 	movl   $0x0,0x370(%rbx)
+   140480614:	00 00 00 
+   140480617:	48 89 f7             	mov    %rsi,%rdi
+   14048061a:	48 c7 83 88 03 00 00 	movq   $0x0,0x388(%rbx)
+   140480621:	00 00 00 00 
+   140480625:	c7 83 80 03 00 00 00 	movl   $0x0,0x380(%rbx)
+   14048062c:	00 00 00 
+   14048062f:	48 c7 83 98 03 00 00 	movq   $0x0,0x398(%rbx)
+   140480636:	00 00 00 00 
+   14048063a:	c7 83 90 03 00 00 00 	movl   $0x0,0x390(%rbx)
+   140480641:	00 00 00 
+   140480644:	48 c7 83 a8 03 00 00 	movq   $0x0,0x3a8(%rbx)
+   14048064b:	00 00 00 00 
+   14048064f:	c7                   	.byte 0xc7

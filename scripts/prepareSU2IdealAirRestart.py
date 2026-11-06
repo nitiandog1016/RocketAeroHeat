@@ -11,7 +11,7 @@ import numpy as np
 from idealAirProperties import IdealAir
 from prepareSU2SSTCase import set_value
 from runEmbeddedSU2 import atomic_write_json
-from su2IdealAirInterface import MODEL, PHASE_FLAVOR, settings
+from su2IdealAirInterface import MODEL, PHASE_FLAVOR, OBSERVED_FLAVOR, OBSERVATION, settings
 from su2IdealAirCheckpoints import output_plan, STAGE
 from su2SSTInterface import mesh, state
 from su2ThermalRuntime import ROOT, read, sha
@@ -92,8 +92,9 @@ def source_state(source, checkpoint, snapshot):
 
 
 def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, snapshot=None, exported_folder=False,
-            linear_history=False):
+            linear_history=False, runtime_flavor=PHASE_FLAVOR):
     """模块二。独占新目录发布配置，初始场和失败记录均不会覆盖历史文件。"""
+    assert runtime_flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR), '未声明的三维重启运行包'
     folder = Path(folder).resolve()
     folder.relative_to(ROOT/'outputs')
     if exported_folder:
@@ -156,6 +157,9 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
             initialStateSHA256=sha(folder/'initial_flow.csv'), physicsQualified=False, newQualifiedArea=0)
         if linear_history:
             init['historyDiagnostics'] = dict(addedGroup='LINSOL', changesNumerics=False)
+        if runtime_flavor == OBSERVED_FLAVOR:
+            init['runtimeChange'] = 'phase-v2 numerics; C++ termination observation and 17-digit ASCII output'
+            manifest['runtimeObservation'] = dict(OBSERVATION)
         atomic_write_json(folder/'ideal_air_restart.json', init)
         (folder/'case.cfg').write_text(text, encoding='utf8')
         contract = copy.deepcopy(old_contract)
@@ -163,7 +167,7 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
                         checkpointContract=plan, configurationSHA256=sha(folder/'case.cfg'), meshSHA256=sha(folder/'mesh.su2'))
         atomic_write_json(folder/'sst_contract.json', manifest['sst'])
         atomic_write_json(folder/'ideal_air_contract.json', contract)
-        manifest.update(initialization=init, idealAir=contract, requiredRuntimeFlavor=PHASE_FLAVOR,
+        manifest.update(initialization=init, idealAir=contract, requiredRuntimeFlavor=runtime_flavor,
             idealAirContractSHA256=sha(folder/'ideal_air_contract.json'), sstContractSHA256=sha(folder/'sst_contract.json'))
         manifest['flight'].update(iterations=iterations, outputEvery=every)
         atomic_write_json(folder/'case_manifest.json', manifest)
@@ -189,6 +193,9 @@ def validate_source(folder, c, manifest, contract):
     assert sha(init_path) == contract['initializationSHA256'] == prepared['initializationSHA256']
     init = read(init_path)
     assert init == manifest['initialization'] and init['kind'] == KIND
+    if manifest['requiredRuntimeFlavor'] == OBSERVED_FLAVOR:
+        assert manifest['runtimeObservation'] == OBSERVATION
+        assert init['runtimeChange'] == 'phase-v2 numerics; C++ termination observation and 17-digit ASCII output'
     assert init['localIterationStartsAt'] == 0 and init['samePhysicsAndNumerics'] and not init['physicsQualified']
     assert c['SOLUTION_FILENAME'] == 'initial_flow' and c['READ_BINARY_RESTART'] == 'NO'
     assert 'RESTART_ITER' not in c and 'continuation' not in manifest
@@ -255,6 +262,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint', type=int)
     parser.add_argument('--source-snapshot')
     parser.add_argument('--linear-history', action='store_true')
+    parser.add_argument('--runtime-flavor', choices=(PHASE_FLAVOR, OBSERVED_FLAVOR), default=PHASE_FLAVOR)
     args = parser.parse_args()
     prepare(args.source, args.folder, args.iterations, args.every, args.maximum_mib*1024**2,
-            args.checkpoint, args.source_snapshot, linear_history=args.linear_history)
+            args.checkpoint, args.source_snapshot, linear_history=args.linear_history, runtime_flavor=args.runtime_flavor)

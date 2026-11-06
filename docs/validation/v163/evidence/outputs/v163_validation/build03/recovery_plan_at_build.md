@@ -1,0 +1,9 @@
+# v163 main头文件次序恢复
+
+独立原生夹具四项通过。首次引擎构建中CEulerSolver编译12.000秒exit0，main编译4.297秒exit1，原因是SU2头文件引入全局using namespace std后，Windows RPC头的byte与std::byte发生歧义。writer和链接尚未执行，共享源已完整恢复，准确失败源和日志保存在build01。
+
+将NativeTermination.hpp放在SU2_CFD.hpp前，与已通过夹具的包含次序一致。复核CEulerSolver对象已逐字恢复phase-v2，其余297对象仍为phase-v2。build02仅编译尚未成功的main及writer，沿用原编译总120秒减去已用16.297秒，链接仍仅一次30秒。三个独立翻译单元的范围保持，记录main实际编译尝试两次。不得重新编译CEulerSolver或全引擎，不改变数值源码。
+
+## build02实际失败及最终包含边界
+
+build02的main编译4.141秒exit1。Windows宏DIFFERENCE、RELATIVE、ABSOLUTE和interface污染后续SU2头文件，准确源及恢复记录保留。build03将观察头放在全部SU2、Tracy和Eigen头之后，并在该处定义WIN32_LEAN_AND_MEAN以排除未使用的RPC/COM头，消除byte歧义。观察器函数体沿用已通过的同一夹具。只再编译main和writer，累计编译预算扣除20.438秒，仍只链接一次。若再遇集成失败则停止本轮构建支线。

@@ -8,8 +8,11 @@ from su2SSTInterface import PHASE_OUTPUT
 
 FLAVOR = 'rah-ideal-air-v1'
 PHASE_FLAVOR = 'rah-ideal-air-phase-v2'
+OBSERVED_FLAVOR = 'rah-ideal-air-observed-v1'
+OBSERVATION = dict(numericalBaselineFlavor=PHASE_FLAVOR, asciiSignificantDigits=17,
+                   terminationObservation='cpp-current-exception-windows-stack-delegate-v1')
 AXISYMMETRIC_FLAVOR = 'rah-ideal-air-axisymmetric-v1'
-PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR, AXISYMMETRIC_FLAVOR)
+PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR, OBSERVED_FLAVOR, AXISYMMETRIC_FLAVOR)
 MODEL = 'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'
 R = 8.31451 / .02896546
 
@@ -26,14 +29,20 @@ def validate(folder, manifest, text, runtime):
     path = folder / 'ideal_air_contract.json'
     contract = read(path)
     flavor = manifest['requiredRuntimeFlavor']
-    assert runtime['flavor'] == flavor and flavor in (FLAVOR, PHASE_FLAVOR, AXISYMMETRIC_FLAVOR)
+    assert runtime['flavor'] == flavor and flavor in (FLAVOR, PHASE_FLAVOR, OBSERVED_FLAVOR, AXISYMMETRIC_FLAVOR)
+    if flavor == OBSERVED_FLAVOR:
+        # 模块用途。诊断和文本精度单独具名，阻止数值基线或运行包身份被静默替换。
+        assert manifest['runtimeObservation'] == OBSERVATION
+        assert all(runtime[key] == value for key, value in OBSERVATION.items())
+    else:
+        assert 'runtimeObservation' not in manifest
     assert runtime['thermodynamicModel'] == contract['thermodynamicModel'] == MODEL
     assert contract == manifest['idealAir'] and sha(path) == manifest['idealAirContractSHA256']
     assert contract['temperatureRangeK'] == [60, 2000] and contract['gasConstant'] == R
     assert contract['energyEntropyReference'] == 'OTH'
     general = contract['initialization'] == 'general-mesh-ideal-air-SST-wall-distance-v1'
     axisymmetric = flavor == AXISYMMETRIC_FLAVOR
-    sparse = flavor in (PHASE_FLAVOR, AXISYMMETRIC_FLAVOR)
+    sparse = flavor in (PHASE_FLAVOR, OBSERVED_FLAVOR, AXISYMMETRIC_FLAVOR)
     assert general or contract['initialization'] == 'native-uniform-freestream' or sparse
     if axisymmetric:
         assert contract['initialization'] == 'axisymmetric-ideal-air-SST-Vm-wall-distance-v1'
