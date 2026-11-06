@@ -8,7 +8,11 @@ payload=buildAerothermalViewerData(mesh);
 html.UserData=struct('payload',payload,'selectedFace',[],'ready',false,'rendered',[]);
 html.DataChangedFcn=@receive;
 html.Data=payload;
-ui=struct('tab',tab,'html',html);
+% 模块三：区域证据页与原云图共用冻结原面数据；不改变旧0/1/2和导出。
+evidenceTab=uitab(tabs,'Title','区域结果与验证');
+evidenceView=createAerothermalEvidenceView(evidenceTab,payload);
+tabs.SelectedTab=tab;
+ui=struct('tab',tab,'html',html,'evidenceTab',evidenceTab,'evidenceView',evidenceView);
     function receive(src,~)
         % 模块二：只处理白名单事件，避免点击消息覆盖完整模型。
         message=src.Data; state=src.UserData;

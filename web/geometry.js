@@ -4,7 +4,8 @@
   const $=id=>document.getElementById(id),canvas=$('scene'),finite=x=>typeof x==='number'&&Number.isFinite(x);
   const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],fmt=x=>Number(x.toPrecision(5)).toString();
   const fieldColor=t=>{const stops=[[.94,.97,.99],[.67,.82,.90],[.28,.60,.75],[.08,.35,.56],[.025,.15,.31]],x=Math.max(0,Math.min(1,t))*4,i=Math.min(3,Math.floor(x)),f=x-i;return stops[i].map((v,j)=>v+(stops[i+1][j]-v)*f);};
-  let gl,program,positions,colorBuffer,edges,flowPositions,flowColors,sectionPositions,bridge,model=null,vertices=[],lo,hi,initializationError='';
+  let gl,program,positions,colorBuffer,edges,flowPositions,flowColors,sectionPositions,selectionPositions,probePositions,bridge,model=null,vertices=[],lo,hi,initializationError='';
+  let selectionCount=0,probeCount=0,selectedFaceIDs=[],inspectedFace=-1;
   let modelCenter=[0,0,0],modelExtent=1,flowSegments=0,flowPoints=[],sectionSegmentCount=0;
   let az=-Math.PI/2,el=.35,zoom=1,pan=[0,0],baseScale=1,right,up,direction,sx,sy,frame=0,pendingReport=false,drag;
   let researchSection=null;
@@ -23,7 +24,7 @@
     gl.attachShader(program,shader(gl.VERTEX_SHADER,'attribute vec3 p,c;uniform vec3 r,u,d;uniform vec2 scale,pan;varying vec3 color;void main(){gl_Position=vec4(dot(p,r)*scale.x+pan.x,dot(p,u)*scale.y+pan.y,-dot(p,d)*0.45,1.0);color=c;}'));
     gl.attachShader(program,shader(gl.FRAGMENT_SHADER,'precision mediump float;varying vec3 color;void main(){gl_FragColor=vec4(color,1.0);}'));
     gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
-    positions=gl.createBuffer();colorBuffer=gl.createBuffer();edges=gl.createBuffer();flowPositions=gl.createBuffer();flowColors=gl.createBuffer();sectionPositions=gl.createBuffer();gl.enable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
+    positions=gl.createBuffer();colorBuffer=gl.createBuffer();edges=gl.createBuffer();flowPositions=gl.createBuffer();flowColors=gl.createBuffer();sectionPositions=gl.createBuffer();selectionPositions=gl.createBuffer();probePositions=gl.createBuffer();gl.enable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
   }catch(e){initializationError=e.message;problem(e.message);}
   function problem(text){$('error').hidden=false;$('error').textContent=text;if(bridge)bridge.Data={kind:'geometry-error',revision:model?model.revision:0,message:text,nonce:Date.now()};}
   const buffer=(b,v)=>{gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW);};
@@ -71,6 +72,7 @@
       if(gl){const ts=[],cs=[],es=[];F.forEach((f,faceIndex)=>{const a=vertices[f[0]],b=vertices[f[1]],c=vertices[f[2]],ab=b.map((x,j)=>x-a[j]),ac=c.map((x,j)=>x-a[j]);let n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];const norm=Math.hypot(...n);n=norm>0?n.map(x=>x/norm):[0,0,0];const light=.65+.22*Math.abs(dot(n,[.3,.4,.8660254])),color=field?(finite(field.values[faceIndex])?fieldColor((field.values[faceIndex]-field.range[0])/(field.range[1]-field.range[0])):[.66,.69,.72]):[.52,.60,.67].map(x=>x*light);f.forEach(i=>{ts.push(...vertices[i]);cs.push(...color);});[0,1,1,2,2,0].forEach(j=>es.push(...vertices[f[j]]));});buffer(positions,ts);buffer(colorBuffer,cs);buffer(edges,es);}
       const legend=$('fieldLegend');if(legend){legend.hidden=!field;if(field){legend.replaceChildren();const label=document.createElement('span'),bar=document.createElement('div');label.textContent=field.name+' / '+field.unit+' · 固定范围 '+fmt(field.range[0])+'—'+fmt(field.range[1])+(field.context==='mesh-quality'?' · 灰色为原壁面定位参考':' · 超范围使用端点色；灰色为未知');bar.className='fieldColorBar';legend.append(label,bar);}}
       if(sectionView)sectionView.load(data);
+      selectFaces(data.selectedFaceIDs||[],Number.isInteger(data.inspectedFace)?data.inspectedFace:-1);
       $('caption').textContent=data.caption||'几何预览';$('coordinates').textContent=data.coordinateNote||'SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例';$('wire').checked=Boolean(data.showWire);
       $('summary').textContent=F.length?V.length.toLocaleString()+' 顶点 · '+F.length.toLocaleString()+' 三角面':'等待导入模型';$('empty').hidden=Boolean(F.length);
       $('bounds').textContent=V.length?'几何尺寸 / m：X '+fmt(hi[0]-lo[0])+' · Y '+fmt(hi[1]-lo[1])+' · Z '+fmt(hi[2]-lo[2]):'几何尺寸 / m：—';
@@ -85,8 +87,10 @@
     if($('wire').checked){attribute('p',edges);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,[.17,.23,.29]);gl.drawArrays(gl.LINES,0,model.faces.length*6);}
     if(flowSegments){attribute('p',flowPositions);attribute('c',flowColors);gl.drawArrays(gl.LINES,0,flowSegments*2);}
     if(sectionSegmentCount){attribute('p',sectionPositions);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,[.74,.29,.10]);gl.drawArrays(gl.LINES,0,sectionSegmentCount*2);}
+    // 模块六：选择只增加原三角面轮廓；不遮掉其他区域、不改原值或色标。
+    [[selectionPositions,selectionCount,[.53,.31,.08]],[probePositions,probeCount,[.05,.06,.08]]].forEach(([b,count,color])=>{if(count){attribute('p',b);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,color);gl.drawArrays(gl.LINES,0,count);}});
     $('axes').replaceChildren();['X','Y','Z'].forEach((t,i)=>{const s=document.createElement('span');s.textContent=t;s.style.left=(32+right[i]*27)+'px';s.style.top=(32-up[i]*27)+'px';s.style.color=['#9c5046','#427357','#466d92'][i];$('axes').append(s);});
-    if(pendingReport&&bridge){pendingReport=false;const pixels=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);let visible=0;for(let i=3;i<pixels.length;i+=64)if(pixels[i])visible++;bridge.Data={kind:'geometry-rendered',revision:model.revision,faces:model.faces.length,vertices:model.vertices.length,visiblePixelSamples:visible,webglError:gl.getError(),width:w,height:h,firstVertex:model.vertices[0]||[],bounds:model.vertices.length?[lo,hi]:[],...(flowSegments?{surfaceFlowSegments:flowSegments,surfaceFlowPointCount:flowPoints.length}:{}),...(model.hasSectionOverlay?{sectionSegments:sectionSegmentCount}:{}),...(researchSection?{sectionInfo:researchSection}:{}),nonce:Date.now()};}
+    if(pendingReport&&bridge){pendingReport=false;const pixels=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);let visible=0;for(let i=3;i<pixels.length;i+=64)if(pixels[i])visible++;bridge.Data={kind:'geometry-rendered',revision:model.revision,faces:model.faces.length,vertices:model.vertices.length,visiblePixelSamples:visible,webglError:gl.getError(),width:w,height:h,firstVertex:model.vertices[0]||[],bounds:model.vertices.length?[lo,hi]:[],selectedFaceCount:selectedFaceIDs.length,inspectedFace,fieldRange:model.faceField?[...model.faceField.range]:[],...(flowSegments?{surfaceFlowSegments:flowSegments,surfaceFlowPointCount:flowPoints.length}:{}),...(model.hasSectionOverlay?{sectionSegments:sectionSegmentCount}:{}),...(researchSection?{sectionInfo:researchSection}:{}),nonce:Date.now()};}
   }
   // 模块四：旋转/平移/缩放及标准视角；无持续动画或外部资源请求。
   canvas.oncontextmenu=e=>e.preventDefault();canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,pan:e.shiftKey||e.button===2||$('panMode').checked};canvas.setPointerCapture(e.pointerId);};
@@ -102,6 +106,21 @@
   };canvas.onpointercancel=()=>{drag=null;};canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.05,Math.min(30,zoom*Math.exp(-e.deltaY*.001)));render();},{passive:false});
   $('wire').onchange=render;$('reset').onclick=()=>{fit();render();};document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{const v=b.dataset.view;az=v==='nose'?0:v==='iso'?-1.0:-Math.PI/2;el=v==='nose'||v==='side'?0:.5;fit();render();});
   const observer=new ResizeObserver(()=>{fit();render();});observer.observe(canvas);
+  function selectFaces(ids,face){
+    if(!model)return;const valid=i=>Number.isInteger(i)&&i>=0&&i<model.faces.length;
+    if(!Array.isArray(ids)||ids.some(i=>!valid(i))||(face!==-1&&!valid(face)))throw Error('选择必须引用原三角面编号。');
+    selectedFaceIDs=[...new Set(ids)];inspectedFace=face;
+    const lines=list=>list.flatMap(i=>[0,1,1,2,2,0].flatMap(j=>vertices[model.faces[i][j]]));
+    selectionCount=selectedFaceIDs.length*6;probeCount=face<0?0:6;
+    if(gl){buffer(selectionPositions,lines(selectedFaceIDs));buffer(probePositions,face<0?[]:lines([face]));}pendingReport=true;render();
+  }
+  function setSectionSegments(segments){
+    if(!model)return;if(!Array.isArray(segments)||segments.some(s=>!Array.isArray(s)||s.length!==2||s.some(p=>!Array.isArray(p)||p.length!==3||p.some(x=>!finite(x)))))throw Error('截面交线坐标无效。');
+    model.hasSectionOverlay=true;sectionSegmentCount=segments.length;
+    if(gl)buffer(sectionPositions,segments.flatMap(s=>s.flatMap(p=>p.map((x,j)=>(x-modelCenter[j])/modelExtent))));pendingReport=true;render();
+  }
+  // 独立科研页仅复用显示管线；旧 uihtml 协议和普通几何页保持兼容。
+  window.RocketGeometry={load,selectFaces,setSectionSegments,getState:()=>({revision:model?model.revision:0,selectedFaceIDs:[...selectedFaceIDs],inspectedFace,range:model&&model.faceField?[...model.faceField.range]:null})};
   // 模块五：MATLAB uihtml 双向白名单桥接；收到确认事件不重复加载几何。
   window.setup=function(component){bridge=component;component.addEventListener('DataChanged',()=>{if(component.Data&&component.Data.kind==='aerothermal-geometry')load(component.Data);});component.Data={kind:'ready',nonce:Date.now()};};
 })();

@@ -5,7 +5,14 @@ function view=createSU2ResearchView(host,result)
 % 模块三：导出当前快照CSV和身份JSON，不重算且不给未知壁温补零。
 % 模块五：受控求解器及实际恢复/诊断模式贯穿云图、探针、截面与导出。
 runtime=describeSU2Runtime(result.receipt);
-grid=uigridlayout(host,[4 1]);grid.RowHeight={67,38,'1x',130};grid.Padding=[0 0 0 0];
+% 模块六：原研究云图与区域证据在同一结果宿主内分标签，不另弹窗口。
+tabHost=uigridlayout(host,[1 1]);tabHost.Padding=[0 0 0 0];
+resultTabs=uitabgroup(tabHost);fieldTab=uitab(resultTabs,'Title','三维研究结果');
+evidenceTab=uitab(resultTabs,'Title','区域结果与验证');
+evidenceData=buildSU2EvidenceViewerData(result);
+evidenceView=createAerothermalEvidenceView(evidenceTab,evidenceData);
+resultTabs.SelectedTab=fieldTab;
+grid=uigridlayout(fieldTab,[4 1]);grid.RowHeight={67,38,'1x',130};grid.Padding=[0 0 0 0];
 % 模块四：固定显示当前场的保存时刻和真实终态，不能用末次历史冒充云图时刻。
 auditText=uilabel(grid,'Text',strjoin(describeSU2Convergence(result),newline),'FontSize',11,'WordWrap','on');auditText.Layout.Row=1;
 bar=uigridlayout(grid,[1 6]);bar.Layout.Row=2;bar.ColumnWidth={'1x',100,100,110,110,110};
@@ -39,7 +46,8 @@ select.ValueChangedFcn=@(~,~)render(true);
 sliceX=mean([min(result.V(:,1)),max(result.V(:,1))]);selectedFace=1;sectionState=[];
 view=struct('geometry',geometry,'select',select,'low',low,'high',high,'apply',apply, ...
     'probe',probe,'export',export,'exportTo',@exportTo,'inspectFace',@inspectFace, ...
-    'setSectionX',@setSectionX,'exportSectionTo',@exportSectionTo,'getSection',@getSection,'auditText',auditText);
+    'setSectionX',@setSectionX,'exportSectionTo',@exportSectionTo,'getSection',@getSection,'auditText',auditText, ...
+    'tabs',resultTabs,'fieldTab',fieldTab,'evidenceTab',evidenceTab,'evidenceView',evidenceView);
 render(true);inspectFace(1,[]);
 
     function render(resetRange)

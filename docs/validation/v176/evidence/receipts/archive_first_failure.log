@@ -1,0 +1,6 @@
+首次归档在逐页链接检查处exit1：README引用的delivery_review.json尚未生成，断言失败。
+Traceback (most recent call last):
+  File "outputs/v176_validation/archive_delivery.py", line 52, in <module>
+    assert (page.parent/path.split('#')[0]).exists(),(page,path)
+AssertionError: (WindowsPath('E:/RocketAeroHeat/docs/validation/v176/README.md'), 'delivery_review.json')
+归档复制已完成，未影响数值/UI测试。恢复只核对已有同SHA文件，不覆盖差异文件；末尾生成该回执再核其存在。

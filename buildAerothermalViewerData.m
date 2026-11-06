@@ -177,6 +177,9 @@ data.regions=rows; data.totalArea=sum(area);
 data.resultCondition=snapshotCondition(mesh);
 data.caseNote=[data.resultCondition.caption ...
     '。单点基准快照与热响应实际时间站分别列示；给定壁温不是求解壁温。'];
+% 仅传递明确保存的来源/证据；旧快照不凭方法名自动获得物理资格。
+if isfield(mesh,'evidenceIdentity'),data.evidenceIdentity=mesh.evidenceIdentity;end
+if isfield(mesh,'evidenceRecords'),data.evidenceRecords=mesh.evidenceRecords;end
     function add(key,label,unit,values,state,methods,scope,faceScopes,faceReasons)
         if nargin<8,faceScopes={};end
         if nargin<9,faceReasons={};end

@@ -165,7 +165,14 @@ renderEditor();sync();showGeometry(true);
         if ~isempty(state.researchResult)
             geometryHost.Visible='off';resultHost.Visible='on';
             delete(resultHost.Children);webUI=[];
-            researchUI=createSU2ResearchView(resultHost,state.researchResult);sync();return;
+            % 只携带当前同一V/F原面的已有几何标签，不把工程流场资格移给研究场。
+            displayResult=state.researchResult;
+            if isfield(state.mesh,'localGeometry') && isfield(state.mesh.localGeometry,'region') && ...
+                    isequal(displayResult.V,state.mesh.V) && isequal(displayResult.F,state.mesh.F)
+                displayResult.geometryRegion=state.mesh.localGeometry.region;
+                displayResult.geometryRegionSource='同一原V/F表面的已有几何标签；不代表流动区域资格';
+            end
+            researchUI=createSU2ResearchView(resultHost,displayResult);sync();return;
         end
         if isempty(state.result),return;end
         if ~isempty(researchUI),delete(resultHost.Children);researchUI=[];webUI=[];end
