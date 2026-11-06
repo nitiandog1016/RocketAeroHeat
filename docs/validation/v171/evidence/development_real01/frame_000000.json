@@ -1,0 +1,264 @@
+{
+  "localIteration": 0,
+  "successfulUpdates": 1,
+  "strictThermalAuditPassed": true,
+  "auditStatus": "bound-to-existing-report",
+  "wallFluidTemperatureRangeK": [
+    333.4092293553235,
+    336.3544373702045
+  ],
+  "givenTwRangeK": [
+    333.40922942424004,
+    336.35443376865095
+  ],
+  "wallTemperatureMaximumDifferenceK": 8.968223710326129e-06,
+  "wallTemperatureProjectedAreaRMSDifferenceK": 3.2498531327913416e-06,
+  "pressureNodeRangePa": [
+    26135.37494080176,
+    26135.377161572913
+  ],
+  "signedHeatNodeRangeWm2": [
+    -1.6252669893991847,
+    1.3604752960037774
+  ],
+  "positiveIntoWallProjectedAreaFraction": 0.16512441390369967,
+  "negativeIntoWallProjectedAreaFraction": 0.8348755860963003,
+  "nativeProjectedAreaSectorM2": 0.010126541313315118,
+  "nativeNodalPowerIntoWallSectorW": -0.01017279612467151,
+  "domainTemperatureRangeK": [
+    178.09439789016017,
+    336.3544373702045
+  ],
+  "maximumWallSpeedMS": 0.0,
+  "independentFirstNeighborYPlus99": 0.004728751313038962,
+  "independentFirstNeighborYPlusMaximum": 0.004728751313041587,
+  "actualYPlusThresholdPassed": true,
+  "nativeYPlusUsedForQualification": false,
+  "physicalBoundaryDiagnostic": {
+    "byMarker": {
+      "outer": {
+        "massNetKgS": -13.648727827738146,
+        "massGrossKgS": 13.648727827738146,
+        "energyNetW": -6050223.44878087,
+        "energyGrossW": 6050223.44878087,
+        "flowDiagnostic": {
+          "faces": 3096,
+          "projectedFaceAreaM2": 0.13169445884722145,
+          "normalMachRange": [
+            -1.9698587031490944,
+            8.807898638162137e-18
+          ],
+          "areaMeanNormalMach": -0.757435979769334,
+          "subsonicNormalAreaFraction": 0.615460285518405,
+          "incomingAreaFraction": 0.7691852575451837,
+          "outgoingAreaFraction": 0.0,
+          "neutralAreaFraction": 0.2308147424548162,
+          "directionMachTolerance": 1e-12,
+          "faceMeanPressureRangePa": [
+            26135.374956481428,
+            26135.37495648145
+          ],
+          "areaMeanFacePressurePa": 26135.374956481417,
+          "referencePressurePa": 26135.37495648134,
+          "areaMeanRelativePressureDeparture": 3.933639264503946e-15,
+          "maximumAbsoluteRelativePressureDeparture": 4.175924944428081e-15,
+          "definition": "Mn=arithmetic-mean nodal velocity dot outward unit net-face-area-vector / arithmetic-mean nodal sound speed",
+          "areaConvention": "magnitude of summed center-fan area vectors for each face; projected geometric face area",
+          "subsonicDefinition": "abs(face-mean normal Mach)<1; includes near-tangential supersonic flow",
+          "directionDefinition": "incoming Mn<-1e-12; outgoing Mn>1e-12; neutral otherwise; outlet incoming means reverse flow",
+          "pressureDefinition": "arithmetic-mean nodal pressure per face; departure=(face pressure-p_inf)/abs(p_inf)",
+          "outletIndependenceProven": false,
+          "physicalQualified": false
+        }
+      },
+      "outlet": {
+        "massNetKgS": 13.089581490155732,
+        "massGrossKgS": 13.089581490155732,
+        "energyNetW": 5802394.890755481,
+        "energyGrossW": 5802394.890755481,
+        "flowDiagnostic": {
+          "faces": 1392,
+          "projectedFaceAreaM2": 0.048609196247945206,
+          "normalMachRange": [
+            2.2390696498624835e-06,
+            1.9700008114903902
+          ],
+          "areaMeanNormalMach": 1.9681687548833546,
+          "subsonicNormalAreaFraction": 0.0009359346690908997,
+          "incomingAreaFraction": 0.0,
+          "outgoingAreaFraction": 1.0,
+          "neutralAreaFraction": 0.0,
+          "directionMachTolerance": 1e-12,
+          "faceMeanPressureRangePa": [
+            26135.294020766978,
+            26135.88977044806
+          ],
+          "areaMeanFacePressurePa": 26135.375300539443,
+          "referencePressurePa": 26135.37495648134,
+          "areaMeanRelativePressureDeparture": 1.3164460190793315e-08,
+          "maximumAbsoluteRelativePressureDeparture": 1.9697975161071736e-05,
+          "definition": "Mn=arithmetic-mean nodal velocity dot outward unit net-face-area-vector / arithmetic-mean nodal sound speed",
+          "areaConvention": "magnitude of summed center-fan area vectors for each face; projected geometric face area",
+          "subsonicDefinition": "abs(face-mean normal Mach)<1; includes near-tangential supersonic flow",
+          "directionDefinition": "incoming Mn<-1e-12; outgoing Mn>1e-12; neutral otherwise; outlet incoming means reverse flow",
+          "pressureDefinition": "arithmetic-mean nodal pressure per face; departure=(face pressure-p_inf)/abs(p_inf)",
+          "outletIndependenceProven": false,
+          "physicalQualified": false
+        }
+      },
+      "sym_y": {
+        "massNetKgS": 2.0252199321417536e-17,
+        "massGrossKgS": 2.0252199321417536e-17,
+        "energyNetW": -0.005396428364316644,
+        "energyGrossW": 0.00540517843983743,
+        "flowDiagnostic": {
+          "faces": 7482,
+          "projectedFaceAreaM2": 0.0641226121558742,
+          "normalMachRange": [
+            0.0,
+            5.528426962560937e-17
+          ],
+          "areaMeanNormalMach": 2.3166422212680787e-18,
+          "subsonicNormalAreaFraction": 1.0,
+          "incomingAreaFraction": 0.0,
+          "outgoingAreaFraction": 0.0,
+          "neutralAreaFraction": 1.0,
+          "directionMachTolerance": 1e-12,
+          "faceMeanPressureRangePa": [
+            26132.482900263207,
+            27010.581081238375
+          ],
+          "areaMeanFacePressurePa": 26135.82312059029,
+          "referencePressurePa": 26135.37495648134,
+          "areaMeanRelativePressureDeparture": 1.7147797178748787e-05,
+          "maximumAbsoluteRelativePressureDeparture": 0.033487414135605936,
+          "definition": "Mn=arithmetic-mean nodal velocity dot outward unit net-face-area-vector / arithmetic-mean nodal sound speed",
+          "areaConvention": "magnitude of summed center-fan area vectors for each face; projected geometric face area",
+          "subsonicDefinition": "abs(face-mean normal Mach)<1; includes near-tangential supersonic flow",
+          "directionDefinition": "incoming Mn<-1e-12; outgoing Mn>1e-12; neutral otherwise; outlet incoming means reverse flow",
+          "pressureDefinition": "arithmetic-mean nodal pressure per face; departure=(face pressure-p_inf)/abs(p_inf)",
+          "outletIndependenceProven": false,
+          "physicalQualified": false
+        }
+      },
+      "sym_z": {
+        "massNetKgS": 0.0,
+        "massGrossKgS": 0.0,
+        "energyNetW": -0.005396428374804291,
+        "energyGrossW": 0.005405178424066173,
+        "flowDiagnostic": {
+          "faces": 7482,
+          "projectedFaceAreaM2": 0.0641226121558742,
+          "normalMachRange": [
+            0.0,
+            0.0
+          ],
+          "areaMeanNormalMach": 0.0,
+          "subsonicNormalAreaFraction": 1.0,
+          "incomingAreaFraction": 0.0,
+          "outgoingAreaFraction": 0.0,
+          "neutralAreaFraction": 1.0,
+          "directionMachTolerance": 1e-12,
+          "faceMeanPressureRangePa": [
+            26132.48290027985,
+            27010.581084473997
+          ],
+          "areaMeanFacePressurePa": 26135.823120593715,
+          "referencePressurePa": 26135.37495648134,
+          "areaMeanRelativePressureDeparture": 1.7147797309870995e-05,
+          "maximumAbsoluteRelativePressureDeparture": 0.03348741425940833,
+          "definition": "Mn=arithmetic-mean nodal velocity dot outward unit net-face-area-vector / arithmetic-mean nodal sound speed",
+          "areaConvention": "magnitude of summed center-fan area vectors for each face; projected geometric face area",
+          "subsonicDefinition": "abs(face-mean normal Mach)<1; includes near-tangential supersonic flow",
+          "directionDefinition": "incoming Mn<-1e-12; outgoing Mn>1e-12; neutral otherwise; outlet incoming means reverse flow",
+          "pressureDefinition": "arithmetic-mean nodal pressure per face; departure=(face pressure-p_inf)/abs(p_inf)",
+          "outletIndependenceProven": false,
+          "physicalQualified": false
+        }
+      }
+    },
+    "massNetKgS": -0.5591463375824137,
+    "massIncomingKgS": 13.648727827738146,
+    "massRelativeImbalance": 0.04096691974808578,
+    "exteriorEnergyNetW": -247828.5688182479,
+    "wallPowerOutOfFluidW": -0.01017279612467151,
+    "energyNetW": -247828.57899104402,
+    "energyIncomingW": 6050223.459582479,
+    "energyRelativeImbalance": 0.0409618885395923,
+    "method": "independent cell-edge WLS; laminar Newtonian stress, Pr=.72 conduction; face-center linear flux quadrature",
+    "allExteriorMarkersIncluded": true,
+    "symmetryLeakageReported": true,
+    "energyReference": "OTH rhoE+p; no SST k or eddy viscosity",
+    "wallTerm": "native weak-wall qIntoWall times native projected nodal area; impermeable wall assumed",
+    "nativeDiscreteBoundaryFluxAvailable": false,
+    "nativeConservationProven": false,
+    "physicalQualified": false
+  },
+  "regions": [
+    {
+      "boundsM": [
+        0.0,
+        0.07979645340118074
+      ],
+      "powerIntoWallSectorW": -0.0008231999886445299,
+      "symmetryScaledPowerIntoWallFullW": -0.0032927999545781196,
+      "discreteGeometricAreaSectorM2": 0.004051897449826945,
+      "nativeProjectedAreaSectorM2": 0.004050256248100072,
+      "meanQByDiscreteGeometricAreaWm2": -0.20316407284189494,
+      "meanQByNativeProjectedAreaWm2": -0.203246396825061,
+      "fullyIncludedSubtriangles": 13776,
+      "intersectedSubtriangles": 0,
+      "sectorRadians": 1.5707963267948966,
+      "fullRevolutionScale": 4.0,
+      "method": "nodal-flux-vector-projected-median-subtriangle-clipping-v1",
+      "symmetryScalingIsExperimentalEvidence": false,
+      "physicalQualified": false,
+      "name": "hemisphere",
+      "wallNodesIncludingSharedEndpoints": 1801,
+      "pressureNodeRangePa": [
+        26135.37494080176,
+        26135.377161572913
+      ],
+      "signedHeatNodeRangeWm2": [
+        -1.5656814952073115,
+        1.3604752960037774
+      ],
+      "givenTwFluidMaximumDifferenceK": 8.968223710326129e-06,
+      "independentFirstNeighborYPlus99": 0.004714885617179772
+    },
+    {
+      "boundsM": [
+        0.07979645340118074,
+        0.15599645340118073
+      ],
+      "powerIntoWallSectorW": -0.00934959613602698,
+      "symmetryScaledPowerIntoWallFullW": -0.03739838454410792,
+      "discreteGeometricAreaSectorM2": 0.006079404520309564,
+      "nativeProjectedAreaSectorM2": 0.006076285065215047,
+      "meanQByDiscreteGeometricAreaWm2": -1.5379131467222875,
+      "meanQByNativeProjectedAreaWm2": -1.5387026835772866,
+      "fullyIncludedSubtriangles": 10944,
+      "intersectedSubtriangles": 0,
+      "sectorRadians": 1.5707963267948966,
+      "fullRevolutionScale": 4.0,
+      "method": "nodal-flux-vector-projected-median-subtriangle-clipping-v1",
+      "symmetryScalingIsExperimentalEvidence": false,
+      "physicalQualified": false,
+      "name": "cylinder",
+      "wallNodesIncludingSharedEndpoints": 1450,
+      "pressureNodeRangePa": [
+        26135.37494080176,
+        26135.374947472625
+      ],
+      "signedHeatNodeRangeWm2": [
+        -1.6252669893991847,
+        -1.5007723745005364
+      ],
+      "givenTwFluidMaximumDifferenceK": 9.037609061124385e-08,
+      "independentFirstNeighborYPlus99": 0.0047287513130415855
+    }
+  ],
+  "measuredSegmentStatisticsAvailable": true,
+  "physicalQualified": false,
+  "newQualifiedAreaM2": 0
+}

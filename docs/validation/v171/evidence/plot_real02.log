@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "scripts/plotNACASpatialReview.py", line 90, in <module>
+    a=parser.parse_args();plot(Path(a.folder).resolve(),Path(a.audit).resolve(),Path(a.output).resolve(),a.iteration)
+  File "scripts/plotNACASpatialReview.py", line 52, in plot
+    collection=Poly3DCollection(xyz,facecolors=plt.get_cmap(cmap)(norm(value)),edgecolors='face',linewidths=.05,antialiased=False,rasterized=True)
+  File "D:\anacondapython\lib\site-packages\mpl_toolkits\mplot3d\art3d.py", line 716, in __init__
+    super().__init__(verts, *args, **kwargs)
+  File "D:\anacondapython\lib\site-packages\matplotlib\collections.py", line 1186, in __init__
+    super().__init__(**kwargs)
+  File "D:\anacondapython\lib\site-packages\matplotlib\collections.py", line 175, in __init__
+    self.set_edgecolor(edgecolors)
+  File "D:\anacondapython\lib\site-packages\mpl_toolkits\mplot3d\art3d.py", line 867, in set_edgecolor
+    self._edgecolor3d = PolyCollection.get_edgecolor(self)
+  File "D:\anacondapython\lib\site-packages\matplotlib\collections.py", line 776, in get_edgecolor
+    return self.get_facecolor()
+  File "D:\anacondapython\lib\site-packages\mpl_toolkits\mplot3d\art3d.py", line 885, in get_facecolor
+    return self._facecolors2d
+AttributeError: 'Poly3DCollection' object has no attribute '_facecolors2d'

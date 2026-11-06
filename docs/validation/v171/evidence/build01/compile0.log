@@ -1,0 +1,94 @@
+In file included from [01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/basic_types/datatype_structure.hpp:34[m[K,
+                 from [01m[K../source/Common/src/geometry/../../include/geometry/../parallelization/mpi_structure.hpp:37[m[K,
+                 from [01m[K../source/Common/src/geometry/../../include/geometry/CGeometry.hpp:32[m[K,
+                 from [01m[K../source/Common/src/geometry/CGeometry.cpp:31[m[K:
+[01m[K../source/Common/src/geometry/CGeometry.cpp:[m[K In member function '[01m[Kvoid CGeometry::[01;32m[KAllocateP2PComms[m[K(short unsigned int)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:354:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  354 |   [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |   [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:[m[K In member function '[01m[Kvoid CGeometry::[01;32m[KPostP2PRecvs[m[K(CGeometry*, const CConfig*, COMM_TYPE, short unsigned int, bool) const[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:387:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  387 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:[m[K In member function '[01m[Kvoid CGeometry::[01;32m[KPostP2PSends[m[K(CGeometry*, const CConfig*, COMM_TYPE, short unsigned int, int, bool) const[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:506:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  506 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:[m[K In member function '[01m[Kvoid CGeometry::[01;32m[KCompleteComms[m[K(CGeometry*, const CConfig*, MPI_QUANTITIES)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:197:41:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  197 | #define SU2_OMP_SAFE_GLOBAL_ACCESS(...) [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K{__VA_ARGS__} END_SU2_OMP_SAFE_GLOBAL_ACCESS
+      |                                         [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:770:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+  770 |     [01;36m[KSU2_OMP_SAFE_GLOBAL_ACCESS[m[K(SU2_MPI::Waitany(nP2PRecv, req_P2PRecv, &ind, &status);)
+      |     [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:[m[K In member function '[01m[Kvoid CGeometry::[01;32m[KAllocatePeriodicComms[m[K(short unsigned int)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:190:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+  190 |   [01;36m[KSU2_OMP_MASTER[m[K
+      |   [01;36m[K^~~~~~~~~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:1505:3:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K'
+ 1505 |   [01;36m[KBEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS[m[K {
+      |   [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:[m[K In member function '[01m[Kvoid CGeometry::[01;32m[KComputeSurfaceAreaCfgFile[m[K(const CConfig*)[m[K':
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/code_config.hpp:36:21:[m[K [01;35m[Kwarning: [m[K'[01m[Kmaster[m[K' construct deprecated since OpenMP 5.1, use '[01m[Kmasked[m[K' [[01;35m[K-Wdeprecated-openmp[m[K]
+   36 | #define PRAGMIZE(X) [01;35m[K_Pragma[m[K(#X)
+      |                     [01;35m[K^~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:59:23:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KPRAGMIZE[m[K'
+   59 | #define SU2_OMP(ARGS) [01;36m[KPRAGMIZE[m[K(omp ARGS)
+      |                       [01;36m[K^~~~~~~~[m[K
+[01m[KE:/RocketAeroHeat/tools/runtime/su2-thermal-build/source/Common/include/parallelization/omp_structure.hpp:141:24:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP[m[K'
+  141 | #define SU2_OMP_MASTER [01;36m[KSU2_OMP[m[K(master)
+      |                        [01;36m[K^~~~~~~[m[K
+[01m[K../source/Common/src/geometry/CGeometry.cpp:2840:5:[m[K [01;36m[Knote: [m[Kin expansion of macro '[01m[KSU2_OMP_MASTER[m[K'
+ 2840 |     [01;36m[KSU2_OMP_MASTER[m[K{const auto nMarker_Global = config->GetnMarker_CfgFile();
+      |     [01;36m[K^~~~~~~~~~~~~~[m[K

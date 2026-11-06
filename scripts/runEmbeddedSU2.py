@@ -47,6 +47,9 @@ def save_terminal_receipt(path, state):
 
 def validate_resource_budget(request, manifest):
     """模块用途。普通任务保留720秒；事前登记的有限发展任务才允许900秒。"""
+    if manifest.get('caseKind') == 'naca-tn3344-spatial-wall-laminar-v1':
+        from su2NACASpatialInterface import resource_budget
+        return resource_budget(request, manifest)
     timeout, threads = float(request['maximumSeconds']), int(request['threads'])
     profile = request.get('resourceProfile')
     if profile is None:
@@ -89,7 +92,7 @@ def main():
     if runtime_flavor in PHASE_FLAVORS:
         assert not request.get('dryRun', False), '稀疏保存合同要求实际更新'
     timeout, threads = validate_resource_budget(request, read(folder/'case_manifest.json') if
-        request.get('resourceProfile') is not None else {})
+        (folder/'case_manifest.json').exists() else {})
     receipt = folder / 'engine_process.json'
     assert not receipt.exists(), '已有真实进程记录，禁止覆盖或盲目重启'
     locked = {str(file): sha(file) for file in (request_path, cfg, mesh, exe, Path(__file__).resolve())}

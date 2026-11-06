@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "tests/compareNACASpatialRunsV171.py", line 50, in <module>
+    args=parser.parse_args();compare(Path(args.base).resolve(),Path(args.output).resolve())
+  File "tests/compareNACASpatialRunsV171.py", line 40, in compare
+    assert rows[2]['appliedTemperatureCheck']['maximumTemperatureDifferenceK']<1e-10
+KeyError: 'maximumTemperatureDifferenceK'

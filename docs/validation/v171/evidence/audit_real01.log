@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "scripts/analyzeNACASpatialHeat.py", line 207, in <module>
+    args=parser.parse_args();audit(args.folder,args.output,args.saved_frames_only)
+  File "scripts/analyzeNACASpatialHeat.py", line 114, in audit
+    checkpoints,identity=select_saved_frames(folder,receipt,saved_frames_only)
+  File "E:\RocketAeroHeat\scripts\nacaSavedFrameStudy.py", line 32, in select_saved_frames
+    assert len(expected) == 1 and sha(folder / name) == expected[0], '网格或清点合同偏离运行来源: ' + name
+AssertionError: 网格或清点合同偏离运行来源: mesh.su2

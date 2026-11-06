@@ -47,6 +47,9 @@ def inventory(folder, receipt):
     from su2SSTInterface import mesh
 
     manifest = read(folder/'case_manifest.json')
+    if manifest.get('caseKind') == 'naca-tn3344-spatial-wall-laminar-v1':
+        from su2NACASpatialInterface import inventory as spatial_naca_inventory
+        return spatial_naca_inventory(folder, receipt)
     if manifest.get('caseKind') == 'naca-tn3344-quarter-3d-laminar-v1':
         # 三维层流没有SST阶段；多壁温marker由专用清单审核，不冒用旧wall字段。
         from su2NACALaminarInterface import inventory as naca_inventory

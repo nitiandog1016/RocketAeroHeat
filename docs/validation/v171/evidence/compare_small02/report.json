@@ -1,0 +1,111 @@
+{
+  "passed": true,
+  "variants": [
+    {
+      "variant": "observed_scalar01",
+      "nativeSeconds": 0.34399999999732245,
+      "wallHeatMaximumScaledError": 6.47157476517083e-16,
+      "energyMaximumRelativeError": 3.511444312792068e-15,
+      "eosMaximumRelativeError": 2.220446049250313e-16,
+      "powerMaximumScaledError": 1.5931522494172753e-10,
+      "appliedTemperatureCheck": null
+    },
+    {
+      "variant": "spatial_scalar01",
+      "nativeSeconds": 0.8280000000086147,
+      "wallHeatMaximumScaledError": 6.47157476517083e-16,
+      "energyMaximumRelativeError": 3.511444312792068e-15,
+      "eosMaximumRelativeError": 2.220446049250313e-16,
+      "powerMaximumScaledError": 1.5931522494172753e-10,
+      "appliedTemperatureCheck": null
+    },
+    {
+      "variant": "spatial_constant01",
+      "nativeSeconds": 0.26600000000325963,
+      "wallHeatMaximumScaledError": 6.47157476517083e-16,
+      "energyMaximumRelativeError": 3.511444312792068e-15,
+      "eosMaximumRelativeError": 2.220446049250313e-16,
+      "powerMaximumScaledError": 1.5931522494172753e-10,
+      "appliedTemperatureCheck": {
+        "nodes": 61,
+        "maximumCoordinateDifferenceM": 0.0,
+        "maximumGivenTwDifferenceK": 0.0
+      }
+    },
+    {
+      "variant": "spatial_profile01",
+      "nativeSeconds": 0.2649999999994179,
+      "wallHeatMaximumScaledError": 6.819567314544793e-16,
+      "energyMaximumRelativeError": 3.840984220528734e-15,
+      "eosMaximumRelativeError": 2.220446049250313e-16,
+      "powerMaximumScaledError": 2.7884062383357807e-10,
+      "appliedTemperatureCheck": {
+        "nodes": 61,
+        "maximumCoordinateDifferenceM": 0.0,
+        "maximumGivenTwDifferenceK": 0.0
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "target": "spatial_scalar01",
+      "localIteration": 0,
+      "maximumScaledDifference": 0.0,
+      "byteEqual": true
+    },
+    {
+      "target": "spatial_scalar01",
+      "localIteration": 2,
+      "maximumScaledDifference": 0.0,
+      "byteEqual": true
+    },
+    {
+      "target": "spatial_scalar01",
+      "localIteration": 3,
+      "maximumScaledDifference": 0.0,
+      "byteEqual": true
+    },
+    {
+      "target": "spatial_constant01",
+      "localIteration": 0,
+      "maximumScaledDifference": 0.0,
+      "byteEqual": true
+    },
+    {
+      "target": "spatial_constant01",
+      "localIteration": 2,
+      "maximumScaledDifference": 0.0,
+      "byteEqual": true
+    },
+    {
+      "target": "spatial_constant01",
+      "localIteration": 3,
+      "maximumScaledDifference": 0.0,
+      "byteEqual": true
+    }
+  ],
+  "spatialProfileActualFieldDifference": 22524.68308571319,
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\tests\\compareNACASpatialRunsV171.py": "b00151cc6b4de0e0be9630c3c61e645d55649665d45a5c5c24ae806f6279df76",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\observed_scalar01\\engine_process.json": "f79a5a82d718a7f5d1887b1b53b597f04e4cbf153c960fa0eb45cdc63e76308a",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\audit_small01\\report.json": "9d13f964e2f9456945d992da769508dec5bc1bfaca078aa90ed3dce58727e79e",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\engine_process.json": "10a0a1bd766dc7f94f412546376547ea1536d8d9cb029665d81b5c2385058999",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\audit_small02\\report.json": "8e8e094c1459dacbe47ee2b7286b72f023915101bf26c67c5a2ceb28e062155a",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_constant01\\engine_process.json": "6709a132c8b40f902597acbfd4db4c79399abfd3507d39c9c2e1047b7afe6161",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\audit_small03\\report.json": "a2544421615c2ce876779bdb734ef28a4716299e6f286b6c1e2c5fba57cdfd00",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_profile01\\engine_process.json": "0606f9c1ee0f5860017b2a811081c6a5470ac63c45b71e88f9d706c6cfd509af",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\audit_small04\\report.json": "ff8661fdb74da5033670cea528d35643d3807f889e473d9b52c3eae4023a6ab8",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\observed_scalar01\\restart_flow_000000.csv": "02bba545786faaa8c9f3ce726b21796ef1dc0760c35f3656366837670c993ae2",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000000.csv": "02bba545786faaa8c9f3ce726b21796ef1dc0760c35f3656366837670c993ae2",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\observed_scalar01\\restart_flow_000002.csv": "89746f4574a78f620994adadbdf8e000611df8210727206625d181901ae7e3f2",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000002.csv": "89746f4574a78f620994adadbdf8e000611df8210727206625d181901ae7e3f2",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\observed_scalar01\\restart_flow_000003.csv": "4a39e3d231828125c4b479b591efd95a14276953943ca45ed8fbf4944851c71f",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000003.csv": "4a39e3d231828125c4b479b591efd95a14276953943ca45ed8fbf4944851c71f",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_constant01\\restart_flow_000000.csv": "02bba545786faaa8c9f3ce726b21796ef1dc0760c35f3656366837670c993ae2",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_constant01\\restart_flow_000002.csv": "89746f4574a78f620994adadbdf8e000611df8210727206625d181901ae7e3f2",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_constant01\\restart_flow_000003.csv": "4a39e3d231828125c4b479b591efd95a14276953943ca45ed8fbf4944851c71f"
+  },
+  "inputsStable": true,
+  "physicalQualified": false,
+  "readyForRegisteredValidationCandidate": true
+}

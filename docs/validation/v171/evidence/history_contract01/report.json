@@ -1,0 +1,162 @@
+{
+  "passed": true,
+  "tests": [
+    {
+      "name": "normal-complete",
+      "passed": true,
+      "normalScheduleComplete": true,
+      "expectedLocalIterations": [
+        0,
+        2,
+        3
+      ],
+      "missing": [],
+      "historyContiguous": true,
+      "lastFiniteHistoryLocalIteration": 3,
+      "lastCompleteLocalIteration": 3
+    },
+    {
+      "name": "abnormal-last-history-without-pair",
+      "passed": true,
+      "normalScheduleComplete": false,
+      "expectedLocalIterations": [
+        0,
+        2
+      ],
+      "missing": [],
+      "historyContiguous": true,
+      "lastFiniteHistoryLocalIteration": 3,
+      "lastCompleteLocalIteration": 2
+    },
+    {
+      "name": "normal-missing-final",
+      "passed": true,
+      "normalScheduleComplete": false,
+      "expectedLocalIterations": [
+        0,
+        2,
+        3
+      ],
+      "missing": [
+        3
+      ],
+      "historyContiguous": true,
+      "lastFiniteHistoryLocalIteration": 3,
+      "lastCompleteLocalIteration": 2
+    },
+    {
+      "name": "normal-missing-periodic",
+      "passed": true,
+      "normalScheduleComplete": false,
+      "expectedLocalIterations": [
+        0,
+        2,
+        3
+      ],
+      "missing": [
+        2
+      ],
+      "historyContiguous": true,
+      "lastFiniteHistoryLocalIteration": 3,
+      "lastCompleteLocalIteration": 3
+    },
+    {
+      "name": "missing-history-row",
+      "passed": true,
+      "normalScheduleComplete": false,
+      "expectedLocalIterations": [
+        0,
+        2,
+        3
+      ],
+      "missing": [
+        2,
+        3
+      ],
+      "historyContiguous": false,
+      "lastFiniteHistoryLocalIteration": 3,
+      "lastCompleteLocalIteration": 0
+    },
+    {
+      "name": "negative-history-step",
+      "passed": true,
+      "raised": "AssertionError",
+      "reason": "",
+      "wrongStep": -1
+    },
+    {
+      "name": "over-budget-history-step",
+      "passed": true,
+      "raised": "AssertionError",
+      "reason": "",
+      "wrongStep": 4
+    }
+  ],
+  "legacy": {
+    "case": "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03",
+    "fullHistoricalCaseRequalified": false,
+    "resolveAccepted": true,
+    "runtimeFlavor": "rah-ideal-air-observed-v1",
+    "thermalProfileReturned": false,
+    "validatedLocks": 18,
+    "fullInputContractReadOnlyValidated": true,
+    "relaxedResidualRejected": true,
+    "relaxedResidualReason": "AssertionError: \u4e13\u7528\u5c0f\u4f8b\u914d\u7f6e\u53d8\u5316\uff0c\u4e0d\u80fd\u5957\u7528\u6b64\u5408\u540c",
+    "relaxedResidualTraceback": "Traceback (most recent call last):\n  File \"tests/verifyNACASpatialHistoryV171.py\", line 117, in check\n    try:resolve(legacy,altered)\n  File \"E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py\", line 76, in resolve\n    locked.update(validate(folder,data,config,runtime))\n  File \"E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py\", line 63, in validate\n    return validate_naca(folder, manifest, text, runtime)\n  File \"E:\\RocketAeroHeat\\scripts\\su2NACALaminarInterface.py\", line 75, in validate\n    assert text==config_text(c,meta,3,1,precise), '\u4e13\u7528\u5c0f\u4f8b\u914d\u7f6e\u53d8\u5316\uff0c\u4e0d\u80fd\u5957\u7528\u6b64\u5408\u540c'\nAssertionError: \u4e13\u7528\u5c0f\u4f8b\u914d\u7f6e\u53d8\u5316\uff0c\u4e0d\u80fd\u5957\u7528\u6b64\u5408\u540c\n",
+    "configFileModified": false
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\engine_process.json": "10a0a1bd766dc7f94f412546376547ea1536d8d9cb029665d81b5c2385058999",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\case_manifest.json": "f6b6af5abd0e79ad85fe743721e199bdf0bb18546b659c8effb1680a7691b3f8",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\mesh.su2": "8a8396f242cef6e4bc847c2c059a61faae1aa7696ab11eb44eb8ebbd5dca2c7b",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\history.csv": "aa023c02747e896760b61e611881c10e09ac5e72c3c49495e091d7800a00898c",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000000.csv": "02bba545786faaa8c9f3ce726b21796ef1dc0760c35f3656366837670c993ae2",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\surface_flow_000000.vtk": "c06e80a0af213990812d8a91f55e0ed49a7e3bd93de200daa7a35cf5a6ec8632",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000002.csv": "89746f4574a78f620994adadbdf8e000611df8210727206625d181901ae7e3f2",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\surface_flow_000002.vtk": "b0d049c44d6144e4194d80b3398cf2cdc994856b4662acb7f78395cdb1ab178f",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000003.csv": "4a39e3d231828125c4b479b591efd95a14276953943ca45ed8fbf4944851c71f",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\surface_flow_000003.vtk": "dba0a535acd9281f36e28798abc03a088974b95a26ba99d2d8e3b9512b63e7f4",
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\case.cfg": "fcabd043431d617e9c90e6614e7765f22c16a7c41f0ad30f6f9700d0c320544b",
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\case_manifest.json": "bbdc2d3b35f7a04e11af9dfc3632f7b5b80225b1c4fcc26d3cf001b43a6cb44d",
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\ideal_air_contract.json": "5471a8936c569093ff2c5beae95d29fdb48d52b35caa73754a1fd1cc00afc3d8",
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\mesh.su2": "24114965c22bd4abb0cc25ad16f3ca003774bed874ca4712f930f90d375b5207",
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\geometry.json": "30748369524c83169fa1d4521cf22b258bab1af151d4f8c72d897fea573e5e6f",
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\initial_flow.csv": "f2797f00614007b1c294726133c79b73a025db5547867d7b6f0a8bfe88a8344b",
+    "E:\\RocketAeroHeat\\scripts\\su2NACASpatialInterface.py": "631de20632d45385fe78ec9648154040498df1786af68be923fe295ab99be4a0",
+    "E:\\RocketAeroHeat\\scripts\\prepareNACASpatialCase.py": "0844e1a7fadced997b4080b508934238224bf7b3b838d852a4d612ad120e1129",
+    "E:\\RocketAeroHeat\\scripts\\su2NACALaminarInterface.py": "bd64913200678f726f9a1f258d98c694037e31e206f7652fd797625e041ddf16",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "e254f224f5acecac1320ce576500310c549dfc4a927447b35a85b8faa9a30961",
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py": "ccafbe6da7fd3e38fa6b584fd13a09af0caa3bee72a4143784df867faf57ee7a",
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirCheckpoints.py": "d35dd005f550c9ac8867cefe5b8f371dfba148bc02f62aacf6f2eeec78c5cfa1",
+    "E:\\RocketAeroHeat\\tests\\verifyNACASpatialHistoryV171.py": "f4dfadfe52216ab16f7e8762140dbc0508a375aa28de98243e09ee7e246cdd14"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\engine_process.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\history.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000000.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\surface_flow_000000.vtk": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000002.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\surface_flow_000002.vtk": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\restart_flow_000003.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\spatial_scalar01\\surface_flow_000003.vtk": true,
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\ideal_air_contract.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\geometry.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03\\initial_flow.csv": true,
+    "E:\\RocketAeroHeat\\scripts\\su2NACASpatialInterface.py": true,
+    "E:\\RocketAeroHeat\\scripts\\prepareNACASpatialCase.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2NACALaminarInterface.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2IdealAirCheckpoints.py": true,
+    "E:\\RocketAeroHeat\\tests\\verifyNACASpatialHistoryV171.py": true
+  },
+  "sourceTasksModified": false,
+  "newCFDTasks": 0,
+  "newPhysicalQualification": false,
+  "elapsedSeconds": 0.3909999999887077
+}

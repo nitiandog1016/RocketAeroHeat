@@ -1,0 +1,140 @@
+{
+  "maximumTotalSeconds": 180,
+  "startedMonotonic": 120908.437,
+  "stages": [
+    "audit_real01",
+    "development_real01",
+    "plot_real01"
+  ],
+  "finishedMonotonic": 121231.359,
+  "elapsedWallSeconds": 322.9219999999914,
+  "processElapsedTotalSeconds": 92.15600000000268,
+  "wallBudgetSatisfied": false,
+  "reason": "identity-guard correction, independent review waits and figure font/layout repair; original timeout unchanged; no CFD rerun",
+  "processes": [
+    {
+      "name": "audit_real01",
+      "command": [
+        "D:\\anacondapython\\python.exe",
+        "scripts/analyzeNACASpatialHeat.py",
+        "--folder",
+        "outputs\\v171_validation\\real01",
+        "--output",
+        "outputs\\v171_validation\\audit_real01",
+        "--saved-frames-only"
+      ],
+      "maximumSeconds": 120,
+      "maximumMemoryBytes": 4294967296,
+      "status": "terminal",
+      "processID": 640,
+      "exitCode": 1,
+      "elapsedSeconds": 0.7649999999994179,
+      "sampledPeakMemoryBytes": 59437056,
+      "stoppedByBudget": null
+    },
+    {
+      "name": "audit_real02",
+      "command": [
+        "D:\\anacondapython\\python.exe",
+        "scripts/analyzeNACASpatialHeat.py",
+        "--folder",
+        "outputs\\v171_validation\\real01",
+        "--output",
+        "outputs\\v171_validation\\audit_real02",
+        "--saved-frames-only"
+      ],
+      "maximumSeconds": 55.26600000000326,
+      "maximumMemoryBytes": 4294967296,
+      "status": "terminal",
+      "processID": 45912,
+      "exitCode": 0,
+      "elapsedSeconds": 50.296999999991385,
+      "sampledPeakMemoryBytes": 381001728,
+      "stoppedByBudget": null
+    },
+    {
+      "name": "development_real01",
+      "command": [
+        "D:/anacondapython/python.exe",
+        "scripts/reviewNACASpatialDevelopment.py",
+        "--folder",
+        "outputs/v171_validation/real01",
+        "--audit",
+        "outputs/v171_validation/audit_real02",
+        "--output",
+        "outputs/v171_validation/development_real01"
+      ],
+      "maximumSeconds": 45,
+      "maximumMemoryBytes": 4294967296,
+      "status": "terminal",
+      "processID": 50296,
+      "exitCode": 0,
+      "elapsedSeconds": 21.813000000009197,
+      "sampledPeakMemoryBytes": 382980096,
+      "stoppedByBudget": null
+    },
+    {
+      "name": "plot_real01",
+      "command": [
+        "D:\\anacondapython\\python.exe",
+        "scripts/plotNACASpatialReview.py",
+        "--folder",
+        "outputs\\v171_validation\\real01",
+        "--audit",
+        "outputs\\v171_validation\\audit_real02",
+        "--output",
+        "outputs\\v171_validation\\plot_real01"
+      ],
+      "maximumSeconds": 30,
+      "maximumMemoryBytes": 4294967296,
+      "status": "terminal",
+      "processID": 43116,
+      "exitCode": 0,
+      "elapsedSeconds": 7.4060000000026776,
+      "sampledPeakMemoryBytes": 386682880,
+      "stoppedByBudget": null
+    },
+    {
+      "name": "plot_real02",
+      "command": [
+        "D:\\anacondapython\\python.exe",
+        "scripts/plotNACASpatialReview.py",
+        "--folder",
+        "outputs\\v171_validation\\real01",
+        "--audit",
+        "outputs\\v171_validation\\audit_real02",
+        "--output",
+        "outputs\\v171_validation\\plot_real02"
+      ],
+      "maximumSeconds": 30,
+      "maximumMemoryBytes": 4294967296,
+      "status": "terminal",
+      "processID": 15908,
+      "exitCode": 1,
+      "elapsedSeconds": 5.485000000000582,
+      "sampledPeakMemoryBytes": 340131840,
+      "stoppedByBudget": null
+    },
+    {
+      "name": "plot_real03",
+      "command": [
+        "D:\\anacondapython\\python.exe",
+        "scripts/plotNACASpatialReview.py",
+        "--folder",
+        "outputs\\v171_validation\\real01",
+        "--audit",
+        "outputs\\v171_validation\\audit_real02",
+        "--output",
+        "outputs\\v171_validation\\plot_real03"
+      ],
+      "maximumSeconds": 30,
+      "maximumMemoryBytes": 4294967296,
+      "status": "terminal",
+      "processID": 41212,
+      "exitCode": 0,
+      "elapsedSeconds": 6.389999999999418,
+      "sampledPeakMemoryBytes": 344047616,
+      "stoppedByBudget": null
+    }
+  ]
+}

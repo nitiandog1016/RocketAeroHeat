@@ -1,0 +1,13 @@
+{
+  "case": "E:\\RocketAeroHeat\\outputs\\v169_validation\\small3d03",
+  "fullHistoricalCaseRequalified": false,
+  "resolveAccepted": true,
+  "runtimeFlavor": "rah-ideal-air-observed-v1",
+  "thermalProfileReturned": false,
+  "validatedLocks": 18,
+  "fullInputContractReadOnlyValidated": true,
+  "relaxedResidualRejected": true,
+  "relaxedResidualReason": "AssertionError: \u4e13\u7528\u5c0f\u4f8b\u914d\u7f6e\u53d8\u5316\uff0c\u4e0d\u80fd\u5957\u7528\u6b64\u5408\u540c",
+  "relaxedResidualTraceback": "Traceback (most recent call last):\n  File \"tests/verifyNACASpatialHistoryV171.py\", line 117, in check\n    try:resolve(legacy,altered)\n  File \"E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py\", line 76, in resolve\n    locked.update(validate(folder,data,config,runtime))\n  File \"E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py\", line 63, in validate\n    return validate_naca(folder, manifest, text, runtime)\n  File \"E:\\RocketAeroHeat\\scripts\\su2NACALaminarInterface.py\", line 75, in validate\n    assert text==config_text(c,meta,3,1,precise), '\u4e13\u7528\u5c0f\u4f8b\u914d\u7f6e\u53d8\u5316\uff0c\u4e0d\u80fd\u5957\u7528\u6b64\u5408\u540c'\nAssertionError: \u4e13\u7528\u5c0f\u4f8b\u914d\u7f6e\u53d8\u5316\uff0c\u4e0d\u80fd\u5957\u7528\u6b64\u5408\u540c\n",
+  "configFileModified": false
+}

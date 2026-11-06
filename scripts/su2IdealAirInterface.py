@@ -40,6 +40,7 @@ OBSERVATION = dict(numericalBaselineFlavor=PHASE_FLAVOR, asciiSignificantDigits=
                    terminationObservation='cpp-current-exception-windows-stack-delegate-v1')
 AXISYMMETRIC_FLAVOR = 'rah-ideal-air-axisymmetric-v1'
 PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, SST_ENERGY_FLAVOR, AXISYMMETRIC_FLAVOR)
+PHASE_FLAVORS = PHASE_FLAVORS + ('rah-ideal-air-spatial-wall-v1',)
 MODEL = 'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'
 R = 8.31451 / .02896546
 
@@ -53,6 +54,9 @@ def settings(text):
 def validate(folder, manifest, text, runtime):
     """创建进程前核对模型、参考态、边界、SST阶段和逐字输入身份。"""
     c = settings(text)
+    if manifest.get('caseKind') == 'naca-tn3344-spatial-wall-laminar-v1':
+        from su2NACASpatialInterface import validate as validate_spatial_naca
+        return validate_spatial_naca(folder, manifest, text, runtime)
     if manifest.get('caseKind') == 'naca-tn3344-quarter-3d-laminar-v1':
         # 具名层流小例单独严格核验；旧正半径SST合同和运行包身份保持。
         from su2NACALaminarInterface import validate as validate_naca
