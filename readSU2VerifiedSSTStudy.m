@@ -101,6 +101,16 @@ result.verifiedCaseReview=struct('sourceDirectory',folder,'manifestSHA256',sha(f
     'outputSettingsIgnoredForReadOnlyView',true,'currentVolumeUsedOnlyForSurfaceProjection',true, ...
     'historicalUIInputSnapshotCreated',false,'solverRerun',false,'physicsQualified',false);
 
+% 模块四。线性方法从原任务配置读取，进入探针与导出方法说明。
+result.linearSolver=struct;
+for item={'LINEAR_SOLVER','LINEAR_SOLVER_PREC','LINEAR_SOLVER_ITER','LINEAR_SOLVER_ERROR'}
+    token=regexp(configuration,['(?m)^' item{1} '=\s*([^\r\n%]+)'],'tokens','once');assert(~isempty(token));
+    result.linearSolver.(item{1})=strtrim(token{1});
+end
+result.solverMethod=[result.solverMethod sprintf('；线性 %s / %s，最多%s，目标%s', ...
+    result.linearSolver.LINEAR_SOLVER,result.linearSolver.LINEAR_SOLVER_PREC, ...
+    result.linearSolver.LINEAR_SOLVER_ITER,result.linearSolver.LINEAR_SOLVER_ERROR)];
+
 end
 function h=sha(file)
 fid=fopen(file,'rb');assert(fid>=0);g=onCleanup(@()fclose(fid));md=java.security.MessageDigest.getInstance('SHA-256');

@@ -91,7 +91,8 @@ def source_state(source, checkpoint, snapshot):
     return manifest, contract, data, columns, nd, prior, locks, rebinding, selected
 
 
-def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, snapshot=None, exported_folder=False):
+def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, snapshot=None, exported_folder=False,
+            linear_history=False):
     """模块二。独占新目录发布配置，初始场和失败记录均不会覆盖历史文件。"""
     folder = Path(folder).resolve()
     folder.relative_to(ROOT/'outputs')
@@ -126,6 +127,10 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
         for key, value in dict(ITER=str(iterations), OUTPUT_WRT_FREQ=str(every),
                 VOLUME_OUTPUT='(COORDINATES, SOLUTION, PRIMITIVE, FLOW_PHASE)').items():
             text = set_value(text, key, value)
+        if linear_history:
+            assert checkpoint is not None and not exported_folder
+            assert settings(text)['HISTORY_OUTPUT'] == '(ITER, RMS_RES, AERO_COEFF, HEAT)'
+            text = set_value(text, 'HISTORY_OUTPUT', '(ITER, RMS_RES, AERO_COEFF, HEAT, LINSOL)')
         assert settings(text)['RESTART_SOL'] == 'YES' and 'RESTART_ITER' not in settings(text)
         if not exported_folder:
             os.link(str(source/'mesh.su2'), str(folder/'mesh.su2'))
@@ -149,6 +154,8 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
             restartTemperatureRangeK=[float(min(recovered['T'])), float(max(recovered['T']))],
             sourceSHA256=locks, historicalSourceRebinding=rebinding,
             initialStateSHA256=sha(folder/'initial_flow.csv'), physicsQualified=False, newQualifiedArea=0)
+        if linear_history:
+            init['historyDiagnostics'] = dict(addedGroup='LINSOL', changesNumerics=False)
         atomic_write_json(folder/'ideal_air_restart.json', init)
         (folder/'case.cfg').write_text(text, encoding='utf8')
         contract = copy.deepcopy(old_contract)
@@ -190,7 +197,13 @@ def validate_source(folder, c, manifest, contract):
         assert sha(Path(name)) == digest, name
     source = Path(init['sourceDirectory'])
     old = settings((source/'case.cfg').read_text(encoding='utf8'))
-    assert {k: v for k, v in c.items() if k not in OUTPUT_KEYS} == {k: v for k, v in old.items() if k not in OUTPUT_KEYS}
+    expected = dict(old)
+    if 'historyDiagnostics' in init:
+        assert init['historyDiagnostics'] == dict(addedGroup='LINSOL', changesNumerics=False)
+        assert init['sourceLocalIteration'] is not None
+        assert old['HISTORY_OUTPUT'] == '(ITER, RMS_RES, AERO_COEFF, HEAT)'
+        expected['HISTORY_OUTPUT'] = '(ITER, RMS_RES, AERO_COEFF, HEAT, LINSOL)'
+    assert {k: v for k, v in c.items() if k not in OUTPUT_KEYS} == {k: v for k, v in expected.items() if k not in OUTPUT_KEYS}
     old_manifest = read(source/'case_manifest.json')
     changed_contract_keys = {'schemaVersion', 'initialization', 'initializationSHA256',
                              'configurationSHA256', 'checkpointContract'}
@@ -241,6 +254,7 @@ if __name__ == '__main__':
     parser.add_argument('--maximum-mib', required=True, type=int)
     parser.add_argument('--checkpoint', type=int)
     parser.add_argument('--source-snapshot')
+    parser.add_argument('--linear-history', action='store_true')
     args = parser.parse_args()
     prepare(args.source, args.folder, args.iterations, args.every, args.maximum_mib*1024**2,
-            args.checkpoint, args.source_snapshot)
+            args.checkpoint, args.source_snapshot, linear_history=args.linear_history)
