@@ -35,7 +35,7 @@ def select_saved_frames(folder, receipt, saved_frames_only=False):
         expected = exact or [value for path, value in input_hashes.items() if Path(path).name == name]
         assert expected and len(set(expected)) == 1 and sha(target) == expected[0], '网格或清点合同偏离运行来源: ' + name
     flags = {}
-    for key in ('timedOut', 'cancelled', 'outputBudgetExceeded'):
+    for key in ('timedOut', 'cancelled', 'outputBudgetExceeded', 'modelDomainExceeded'):
         value = receipt.get(key, False)
         assert isinstance(value, bool), '终态标记不是布尔量: ' + key
         flags[key] = value

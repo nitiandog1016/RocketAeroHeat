@@ -1,0 +1,635 @@
+{
+  "passed": true,
+  "reviewCompleted": true,
+  "CFDLaunches": 0,
+  "builds": 0,
+  "largeFieldsRead": 0,
+  "physicalQualified": false,
+  "experimentalQualified": false,
+  "maximumSeconds": 40,
+  "model": {
+    "Mach": 1.97,
+    "ReynoldsBasedOnDiameter": 2280000.0,
+    "totalTemperature_K": 316.6666666666667,
+    "diameter_m": 0.1016,
+    "staticTemperature_K": 178.28523385392626,
+    "pressure_Pa": 26183.7986721104,
+    "density_kg_m3": 0.511635944608275,
+    "speed_m_s": 527.3100474745006,
+    "soundSpeed_m_s": 267.67007486015257,
+    "viscosity_Pas": 1.202225555389944e-05,
+    "conductivity_WmK": 0.01677558729954591,
+    "staticEnergy_Jkg": 127941.55174221373,
+    "staticEnthalpy_Jkg": 179118.17243909923,
+    "totalEnergy_Jkg": 266969.4948259938,
+    "totalEnthalpy_Jkg": 318146.1155228792,
+    "derivedStateIsMeasured": false,
+    "model": "SU2-IDEAL_GAS-gamma1.4-Sutherland-Pr0.72-NACA-v1",
+    "gamma": 1.4,
+    "gasConstant_JkgK": 287.0491267875601,
+    "cp_JkgK": 1004.6719437564606,
+    "cv_JkgK": 717.6228169689005,
+    "Prandtl": 0.72,
+    "sutherland": {
+      "muRef_Pas": 1.716e-05,
+      "temperatureRef_K": 273.15,
+      "S_K": 110.4
+    },
+    "energyReference": "e=cv*T and h=cp*T; zero at T=0 by caloric model, no OTH offset",
+    "qualificationRange": {
+      "comparisonTemperatureRangeK": [
+        178.1075743306896,
+        336.35443376865095
+      ],
+      "developmentTemperatureRangeK": [
+        150.0,
+        360.0
+      ],
+      "physicalQualified": false,
+      "experimentalQualified": false,
+      "meaning": "predeclared comparison and development applicability checks; not a solved-field envelope"
+    },
+    "physicalQualified": false,
+    "wallTemperatureRangeK": [
+      333.40922942424004,
+      336.35443376865095
+    ],
+    "sourceSHA256": {
+      "E:\\RocketAeroHeat\\scripts\\nacaConstantCpModel.py": "a29ae12bcc96540be2a106490c72349b081fb653b81498a72cce5653475377f8",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\contract.json": "3290691fead2d185f2be232889c9e5e6803c222b2494538cc8203369bac4eeba",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\source_manifest.json": "74000d7d71e1cf1563eef2e5436ab4bcb3d337900cfb795d13d17d35bdc36c5f",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\wall_temperature.csv": "9213b9c8ce0b9410e4156cf658efc8fe2dc5db57cfe790eebca6de5409096a62",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\heat_parameter.csv": "63685ad834b6c57d89095d652814cca9f4095a099fcd796ad9754e8067a56361"
+    }
+  },
+  "newModelEvaluation": "Python SI transcription of bound official CIdealGas/Sutherland/Pr formulas; no C++ build or execution",
+  "referenceModelEvaluation": "existing independently bound IdealAir batch DLL; original OTH reference retained",
+  "originalAnchors": {
+    "Mach": 1.97,
+    "Re_D": 2280000.0,
+    "T0_K": 316.6666666666667,
+    "D_m": 0.1016,
+    "wallPoints": 22,
+    "heatParameters": 20
+  },
+  "rebuiltOriginalIdealAir": {
+    "staticTemperature_K": 178.10757433068943,
+    "density_kg_m3": 0.5111991418835653,
+    "pressure_Pa": 26135.374956481304,
+    "speed_m_s": 527.2964534538133,
+    "viscosity_Pas": 1.2011682036676231e-05,
+    "totalEnthalpy_OTH_Jkg": 443281.1266472082
+  },
+  "originalInputRelativeReconstructionDifferences": {
+    "staticTemperature_K": -9.992007221626409e-16,
+    "density_kg_m3": -2.220446049250313e-16,
+    "pressure_Pa": -1.4432899320127035e-15,
+    "speed_m_s": -6.661338147750939e-16,
+    "viscosity_Pas": -8.881784197001252e-16,
+    "totalEnthalpy_OTH_Jkg": 0.0
+  },
+  "newToOriginalDerivedInputRelativeDifferences": {
+    "staticTemperature_K": 0.0009974843793389976,
+    "density_kg_m3": 0.000854466858258407,
+    "pressure_Pa": 0.0018528035549414401,
+    "speed_m_s": 2.578060329860854e-05,
+    "viscosity_Pas": 0.000880269490228347
+  },
+  "newAnchorClosure": {
+    "Mach": 2.220446049250313e-16,
+    "Reynolds": 0.0,
+    "totalEnthalpy": 4.440892098500626e-16
+  },
+  "PT_rhoe_roundtripMaximumRelativeError": 0.0,
+  "comparisonTemperatureRangeK": [
+    178.10757433068943,
+    336.35443376865095
+  ],
+  "developmentTemperatureRangeK": [
+    150.0,
+    360.0
+  ],
+  "primaryComparison": {
+    "sampleCount": 1049,
+    "temperatureRangeK": [
+      178.10757433068943,
+      336.35443376865095
+    ],
+    "samePressurePa": 30000.0,
+    "metrics": {
+      "rho": {
+        "maximumAbsoluteRelativeDifference": 0.0,
+        "signedRelativeDifferenceAtMaximum": 0.0,
+        "temperatureAtMaximumK": 178.10757433068943,
+        "referenceRange": [
+          0.3107190409775704,
+          0.5867899076268578
+        ],
+        "constantRange": [
+          0.3107190409775704,
+          0.5867899076268578
+        ]
+      },
+      "cp": {
+        "maximumAbsoluteRelativeDifference": 0.0023624497635204023,
+        "signedRelativeDifferenceAtMaximum": 0.0023624497635204023,
+        "temperatureAtMaximumK": 178.10757433068943,
+        "referenceRange": [
+          1002.3040507886992,
+          1007.0117798987121
+        ],
+        "constantRange": [
+          1004.6719437564606,
+          1004.6719437564606
+        ]
+      },
+      "cv": {
+        "maximumAbsoluteRelativeDifference": 0.0033105580797896383,
+        "signedRelativeDifferenceAtMaximum": 0.0033105580797896383,
+        "temperatureAtMaximumK": 178.10757433068943,
+        "referenceRange": [
+          715.2549240011391,
+          719.962653111152
+        ],
+        "constantRange": [
+          717.6228169689005,
+          717.6228169689005
+        ]
+      },
+      "gamma": {
+        "maximumAbsoluteRelativeDifference": 0.0009449799054082053,
+        "signedRelativeDifferenceAtMaximum": -0.0009449799054082053,
+        "temperatureAtMaximumK": 178.1075743306896,
+        "referenceRange": [
+          1.398700023601424,
+          1.4013242232319159
+        ],
+        "constantRange": [
+          1.4,
+          1.4
+        ]
+      },
+      "sound": {
+        "maximumAbsoluteRelativeDifference": 0.00047260162885409684,
+        "signedRelativeDifferenceAtMaximum": -0.00047260162885409684,
+        "temperatureAtMaximumK": 178.1075743306896,
+        "referenceRange": [
+          267.6631743420372,
+          367.48446506546264
+        ],
+        "constantRange": [
+          267.536676289859,
+          367.6551986660622
+        ]
+      },
+      "mu": {
+        "maximumAbsoluteRelativeDifference": 0.0,
+        "signedRelativeDifferenceAtMaximum": 0.0,
+        "temperatureAtMaximumK": 178.10757433068943,
+        "referenceRange": [
+          1.2011682036676231e-05,
+          2.0130952647709513e-05
+        ],
+        "constantRange": [
+          1.2011682036676231e-05,
+          2.0130952647709513e-05
+        ]
+      },
+      "conductivity": {
+        "maximumAbsoluteRelativeDifference": 0.0023624497635206243,
+        "signedRelativeDifferenceAtMaximum": 0.0023624497635206243,
+        "temperatureAtMaximumK": 178.1075743306896,
+        "referenceRange": [
+          0.016721329947425614,
+          0.028155703412259234
+        ],
+        "constantRange": [
+          0.016760833249405655,
+          0.02809028239756053
+        ]
+      },
+      "deltaH": {
+        "maximumAbsoluteRelativeDifference": 0.0023624497635204023,
+        "signedRelativeDifferenceAtMaximum": 0.0023624497635204023,
+        "temperatureAtMaximumK": 178.10757433068943,
+        "commonReferenceTemperatureK": 178.1075743306896,
+        "derivativeLimitRows": 2,
+        "zeroIncrementPolicy": "abs(T-Tref)<=1e-9 K: cp_constant/cp_reference(Tref)-1; no 0/0",
+        "rawAbsoluteEnthalpyCompared": false
+      }
+    },
+    "continuousIntervalErrorBoundProven": false
+  },
+  "developmentComparison": {
+    "sampleCount": 1890,
+    "temperatureRangeK": [
+      150.0,
+      360.0
+    ],
+    "samePressurePa": 30000.0,
+    "metrics": {
+      "rho": {
+        "maximumAbsoluteRelativeDifference": 0.0,
+        "signedRelativeDifferenceAtMaximum": 0.0,
+        "temperatureAtMaximumK": 150.0,
+        "referenceRange": [
+          0.29031035302541375,
+          0.6967448472609931
+        ],
+        "constantRange": [
+          0.29031035302541375,
+          0.6967448472609931
+        ]
+      },
+      "cp": {
+        "maximumAbsoluteRelativeDifference": 0.0042787066556987385,
+        "signedRelativeDifferenceAtMaximum": -0.0042787066556987385,
+        "temperatureAtMaximumK": 360.0,
+        "referenceRange": [
+          1002.2448969651034,
+          1008.9891121862996
+        ],
+        "constantRange": [
+          1004.6719437564606,
+          1004.6719437564606
+        ]
+      },
+      "cv": {
+        "maximumAbsoluteRelativeDifference": 0.005979954729138037,
+        "signedRelativeDifferenceAtMaximum": -0.005979954729138037,
+        "temperatureAtMaximumK": 360.0,
+        "referenceRange": [
+          715.1957701775433,
+          721.9399853987395
+        ],
+        "constantRange": [
+          717.6228169689005,
+          717.6228169689005
+        ]
+      },
+      "gamma": {
+        "maximumAbsoluteRelativeDifference": 0.0017114826622794954,
+        "signedRelativeDifferenceAtMaximum": 0.0017114826622794954,
+        "temperatureAtMaximumK": 360.0,
+        "referenceRange": [
+          1.3976080181083448,
+          1.401357416748007
+        ],
+        "constantRange": [
+          1.4,
+          1.4
+        ]
+      },
+      "sound": {
+        "maximumAbsoluteRelativeDifference": 0.0008553754975189065,
+        "signedRelativeDifferenceAtMaximum": 0.0008553754975189065,
+        "temperatureAtMaximumK": 360.0,
+        "referenceRange": [
+          245.6394988987275,
+          380.0336538099559
+        ],
+        "constantRange": [
+          245.5205014360056,
+          380.3587252856575
+        ]
+      },
+      "mu": {
+        "maximumAbsoluteRelativeDifference": 0.0,
+        "signedRelativeDifferenceAtMaximum": 0.0,
+        "temperatureAtMaximumK": 150.0,
+        "referenceRange": [
+          1.0285688602850156e-05,
+          2.1170148352397775e-05
+        ],
+        "constantRange": [
+          1.0285688602850156e-05,
+          2.1170148352397775e-05
+        ]
+      },
+      "conductivity": {
+        "maximumAbsoluteRelativeDifference": 0.0042787066556987385,
+        "signedRelativeDifferenceAtMaximum": -0.0042787066556987385,
+        "temperatureAtMaximumK": 360.0,
+        "referenceRange": [
+          0.014317748491637076,
+          0.029667290542969564
+        ],
+        "constantRange": [
+          0.01435242050208214,
+          0.029540352909466813
+        ]
+      },
+      "deltaH": {
+        "maximumAbsoluteRelativeDifference": 0.002396323228185837,
+        "signedRelativeDifferenceAtMaximum": 0.002396323228185837,
+        "temperatureAtMaximumK": 150.0,
+        "commonReferenceTemperatureK": 178.1075743306896,
+        "derivativeLimitRows": 2,
+        "zeroIncrementPolicy": "abs(T-Tref)<=1e-9 K: cp_constant/cp_reference(Tref)-1; no 0/0",
+        "rawAbsoluteEnthalpyCompared": false
+      }
+    },
+    "continuousIntervalErrorBoundProven": false
+  },
+  "localReduction": {
+    "cases": 5280,
+    "maximumRelativeDifference": 0.0023568817487904514,
+    "maximumNusseltRelativeDifference": 0.0023568817487903404,
+    "analyticSameStateFactorIdentityMaximumError": 4.440892098500626e-16,
+    "exactFactor": "new/old = k_old/k_new = cp_old/cp_constant at common p,T,U,s,q,Tw,Tr",
+    "edgeTemperatureRangeK": [
+      178.10757433068943,
+      316.6666666666667
+    ],
+    "edgePressurePa": [
+      20000.0,
+      60000.0
+    ],
+    "edgeSpeedMS": [
+      100.0,
+      300.0
+    ],
+    "syntheticQIntoWallWm2": -1000.0,
+    "localEdgeIsActual": false,
+    "qIsMeasured": false,
+    "measuredParameterUsedAsHeatFlux": false,
+    "sourceTransportTableEquivalent": false,
+    "measurementOperatorQualified": false,
+    "wholeMainPropertyRangeIsValidEdgeRange": false,
+    "physicalQualified": false
+  },
+  "developmentPureTransportReductionFactorMaximumDifference": 0.004297092654640178,
+  "commonReferenceEnthalpyIntegralChecks": [
+    {
+      "endpointK": 150.0,
+      "integratedCpDeltaH_Jkg": -28171.383596211268,
+      "kernelDeltaH_Jkg": -28171.38359621138,
+      "scaledDifference": 4.003258932408628e-15
+    },
+    {
+      "endpointK": 250.0,
+      "integratedCpDeltaH_Jkg": 72077.12980803588,
+      "kernelDeltaH_Jkg": 72077.1298080358,
+      "scaledDifference": 1.2113619341216727e-15
+    },
+    {
+      "endpointK": 316.6666666666667,
+      "integratedCpDeltaH_Jkg": 139020.7749124849,
+      "kernelDeltaH_Jkg": 139020.7749124848,
+      "scaledDifference": 6.280463580005557e-16
+    },
+    {
+      "endpointK": 336.35443376865095,
+      "integratedCpDeltaH_Jkg": 158833.0699228996,
+      "kernelDeltaH_Jkg": 158833.06992289948,
+      "scaledDifference": 7.329413319496058e-16
+    },
+    {
+      "endpointK": 360.0,
+      "integratedCpDeltaH_Jkg": 182666.9641985167,
+      "kernelDeltaH_Jkg": 182666.9641985168,
+      "scaledDifference": 4.779818384418634e-16
+    }
+  ],
+  "rejectionChecks": {
+    "passed": true,
+    "rejectedCases": [
+      {
+        "case": "unsupported-OTH-pair",
+        "rejected": true,
+        "reason": "\u672c\u6a21\u578b\u4ec5\u63a5\u53d7PT\u6216rhoe\uff1b\u4e0d\u5f97\u6df7\u5165OTH\u7113/\u5185\u80fd\u5b9a\u4e49"
+      },
+      {
+        "case": "zero-pressure",
+        "rejected": true,
+        "reason": "PT\u6216rhoe\u8f93\u5165\u5fc5\u987b\u4e25\u683c\u4e3a\u6b63\uff1b\u4e0d\u88c1\u6e29\u6216\u8865\u80fd\u91cf"
+      },
+      {
+        "case": "negative-temperature",
+        "rejected": true,
+        "reason": "PT\u6216rhoe\u8f93\u5165\u5fc5\u987b\u4e25\u683c\u4e3a\u6b63\uff1b\u4e0d\u88c1\u6e29\u6216\u8865\u80fd\u91cf"
+      },
+      {
+        "case": "zero-density",
+        "rejected": true,
+        "reason": "PT\u6216rhoe\u8f93\u5165\u5fc5\u987b\u4e25\u683c\u4e3a\u6b63\uff1b\u4e0d\u88c1\u6e29\u6216\u8865\u80fd\u91cf"
+      },
+      {
+        "case": "negative-static-energy",
+        "rejected": true,
+        "reason": "PT\u6216rhoe\u8f93\u5165\u5fc5\u987b\u4e25\u683c\u4e3a\u6b63\uff1b\u4e0d\u88c1\u6e29\u6216\u8865\u80fd\u91cf"
+      },
+      {
+        "case": "nan-temperature",
+        "rejected": true,
+        "reason": "\u72b6\u6001\u8f93\u5165\u5fc5\u987b\u5168\u90e8\u6709\u9650"
+      },
+      {
+        "case": "infinite-pressure",
+        "rejected": true,
+        "reason": "\u72b6\u6001\u8f93\u5165\u5fc5\u987b\u5168\u90e8\u6709\u9650"
+      },
+      {
+        "case": "two-dimensional-array",
+        "rejected": true,
+        "reason": "\u72b6\u6001\u8f93\u5165\u987b\u4e3a\u6807\u91cf\u6216\u540c\u5c3a\u5bf8\u4e00\u7ef4\u6570\u7ec4"
+      },
+      {
+        "case": "incompatible-arrays",
+        "rejected": true,
+        "reason": "\u72b6\u6001\u8f93\u5165\u987b\u4e3a\u6807\u91cf\u6216\u540c\u5c3a\u5bf8\u4e00\u7ef4\u6570\u7ec4"
+      },
+      {
+        "case": "empty-array",
+        "rejected": true,
+        "reason": "\u72b6\u6001\u8f93\u5165\u987b\u4e3a\u6807\u91cf\u6216\u540c\u5c3a\u5bf8\u4e00\u7ef4\u6570\u7ec4"
+      },
+      {
+        "case": "state-arithmetic-overflow",
+        "rejected": true,
+        "reason": "\u5b9a\u6bd4\u70ed\u72b6\u6001\u7b97\u672f\u6ea2\u51fa\u6216\u975e\u6cd5"
+      },
+      {
+        "case": "zero-Mach",
+        "rejected": true,
+        "reason": "M\u3001Re_D\u3001T0\u3001D\u987b\u5168\u90e8\u6709\u9650\u4e14\u4e25\u683c\u4e3a\u6b63"
+      },
+      {
+        "case": "negative-Reynolds",
+        "rejected": true,
+        "reason": "M\u3001Re_D\u3001T0\u3001D\u987b\u5168\u90e8\u6709\u9650\u4e14\u4e25\u683c\u4e3a\u6b63"
+      },
+      {
+        "case": "zero-diameter",
+        "rejected": true,
+        "reason": "M\u3001Re_D\u3001T0\u3001D\u987b\u5168\u90e8\u6709\u9650\u4e14\u4e25\u683c\u4e3a\u6b63"
+      },
+      {
+        "case": "missing-screening-metric",
+        "rejected": true,
+        "reason": "\u53d1\u5c55\u7b5b\u9009\u6307\u6807\u7f3a\u5931\u6216\u975e\u6cd5"
+      },
+      {
+        "case": "nonfinite-screening-metric",
+        "rejected": true,
+        "reason": "\u53d1\u5c55\u7b5b\u9009\u6307\u6807\u7f3a\u5931\u6216\u975e\u6cd5"
+      }
+    ],
+    "overAllocationEligibilityRejected": true,
+    "developmentRangeEligibilityRejectsOutside": true,
+    "positiveOutOfDevelopmentStateIsNotClipped": true,
+    "thresholdRelaxation": false
+  },
+  "primaryScreen": {
+    "eligible": true,
+    "criteria": {
+      "cp": {
+        "maximumRelativeDifference": 0.0023624497635204023,
+        "limit": 0.02,
+        "passed": true
+      },
+      "conductivity": {
+        "maximumRelativeDifference": 0.0023624497635206243,
+        "limit": 0.02,
+        "passed": true
+      },
+      "deltaH": {
+        "maximumRelativeDifference": 0.0023624497635204023,
+        "limit": 0.02,
+        "passed": true
+      },
+      "sound": {
+        "maximumRelativeDifference": 0.00047260162885409684,
+        "limit": 0.01,
+        "passed": true
+      },
+      "localReduction": {
+        "maximumRelativeDifference": 0.0023568817487904514,
+        "limit": 0.03,
+        "passed": true
+      }
+    },
+    "physicalQualified": false,
+    "experimentalQualified": false
+  },
+  "developmentScreen": {
+    "eligible": true,
+    "criteria": {
+      "cp": {
+        "maximumRelativeDifference": 0.0042787066556987385,
+        "limit": 0.02,
+        "passed": true
+      },
+      "conductivity": {
+        "maximumRelativeDifference": 0.0042787066556987385,
+        "limit": 0.02,
+        "passed": true
+      },
+      "deltaH": {
+        "maximumRelativeDifference": 0.002396323228185837,
+        "limit": 0.02,
+        "passed": true
+      },
+      "sound": {
+        "maximumRelativeDifference": 0.0008553754975189065,
+        "limit": 0.01,
+        "passed": true
+      },
+      "localReduction": {
+        "maximumRelativeDifference": 0.004297092654640178,
+        "limit": 0.03,
+        "passed": true
+      }
+    },
+    "physicalQualified": false,
+    "experimentalQualified": false
+  },
+  "developmentEntryEligible": true,
+  "officialSourceSHA256": {
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CIdealGas.hpp": "de02a1830906f135124a2737cdc65e9e72fbf44dc420ff2ef00f940f09cd5202",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\fluid\\CIdealGas.cpp": "d9dc59839db243f1671e0a2e11608c357736882f2a8cc6f4c4cd900ab0ecca87",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CSutherland.hpp": "e1e4a25687a7fa4ff2444061ff5b9596a0fbf485bf196c65cc5983f9009be298",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CConstantPrandtl.hpp": "2d70109b7e7e3bf2db1a7f9295cd9862bf61c973e9ebe5abc6c27ae47a0614e9"
+  },
+  "definitions": {
+    "cp": "\u5b9a\u538b\u6bd4\u70ed J/(kg K)\uff1b\u539f\u751fIDEAL_GAS\u4e3agamma*R/(gamma-1)\uff0c\u53c2\u8003\u503c\u7531\u65e2\u6709IdealAir DLL\u72ec\u7acb\u8fd4\u56de\u3002",
+    "cv": "\u5b9a\u5bb9\u6bd4\u70edcp-R\uff1bgamma=cp/cv\uff0c\u4e24\u8005\u5206\u522b\u62a5\u544a\u4f46\u4e0d\u79c1\u589e\u53d1\u5c55\u8bef\u5dee\u9608\u503c\u3002",
+    "sound": "a=sqrt(gamma*R*T)\uff0c\u5355\u4f4dm/s\uff1b\u53c2\u8003DLL\u76f4\u63a5\u58f0\u901f\u540c\u65f6\u6838\u5bf9\u70ed\u529b\u6052\u7b49\u5f0f\u3002",
+    "viscosity": "mu=mu_ref*(T/T_ref)^1.5*(T_ref+S)/(T+S)\uff0cPa s\uff1b\u4e24\u6a21\u578b\u540cT\u65f6\u91c7\u7528\u5b8c\u5168\u76f8\u540c\u660e\u786e\u8f93\u8fd0\u3002",
+    "conductivity": "k=mu*cp/Pr\uff0cW/(m K)\uff1b\u540cT\u65f6k\u5dee\u6765\u81eacp\uff0c\u672a\u5ba3\u79f0\u7b49\u4e8e\u539f\u8bba\u6587\u53c2\u800326\u8f93\u8fd0\u8868\u3002",
+    "energy": "\u65b0\u6a21\u578be=cv*T\u3001h=cp*T\uff0c\u65e0OTH\u504f\u79fb\u3002\u65e7\u6a21\u578b\u4fdd\u7559OTH\uff1b\u7edd\u5bf9h/e\u4e0d\u53ef\u4f5c\u4e3a\u6a21\u578b\u8bef\u5dee\u76f4\u63a5\u76f8\u51cf\u3002",
+    "deltaH": "\u540c\u4e00Tref=\u65e7\u8f93\u5165T\u221e\u6bd4\u8f83h(T)-h(Tref)\uff0c\u96f6\u589e\u91cf\u7528cp\u5bfc\u6570\u6781\u9650\uff0c\u8868\u5185\u9010\u884c\u6807\u8bb0\u3002",
+    "localReduction": "Nu_s=h_transfer*s/k_e\uff1bRe_s=rho_e*U_e*s/mu_e\uff1bh_transfer=-q_into/(Tw-Tr)\u3002\u540cedge p/T/U/s/q/Tw/Tr\u65f6\u65b0\u65e7Nu\u548cNu/sqrt(Re)\u6bd4\u7b49\u4e8ek_old/k_new\u3002",
+    "syntheticEdge": "p=20000/60000Pa\u3001U=100/300m/s\u5747\u72ec\u7acb\u6307\u5b9a\uff0c\u4ec5\u4e3a\u6a21\u578b\u6bd4\u8f83\uff1b\u4e0d\u6765\u81ea\u6765\u6d41\u66ff\u4ee3\u3001\u4e0d\u662f\u771f\u5b9e\u5916\u7f18\uff0c\u4e0d\u4fdd\u8bc1\u6bcf\u7ec4\u6ee1\u8db3\u5168\u5c40\u6d41\u52a8\u3002",
+    "developmentFactor": "\u6269\u5c55[150,360]K\u53ea\u7b97\u5171\u6001\u8f93\u8fd0\u5f52\u7ea6\u56e0\u5b50k_old/k_new\uff1bTe>T0\u90e8\u5206\u4e0d\u4ee3\u5165\u539f\u6062\u590d\u6e29\u5ea6\u5f0f\u3001\u4e0d\u79f0\u53ef\u7528\u5916\u7f18\u3002",
+    "uncertainty": "\u539fNu\u7ea615%\u3001Re\u7ea61%\u4e3aprobable error\uff0c\u5206\u522b\u5217\u51fa\uff0c\u4e0d\u5f53\u6807\u51c6\u5dee\u5408\u6210\uff1b\u6a21\u578b\u5c0f\u989d\u5ea6\u4e0d\u6388\u5b9e\u9a8c\u8d44\u683c\u3002"
+  },
+  "originalExperimentalProbableErrors": {
+    "Nusselt": 0.15,
+    "Reynolds": 0.01,
+    "combinedAsStandardDeviation": false
+  },
+  "originalTransportTableEquivalent": false,
+  "actualEdgeQualified": false,
+  "latterSixCenterIdentityClosed": false,
+  "originalContractModified": false,
+  "absoluteEnthalpyDifferenceUsedForEligibility": false,
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\reviewNACAConstantCpProperties.py": "db46e4cd076746f621938feda8a5ad690174d3cebb3cdc4fe970c7d1e920a0a3",
+    "E:\\RocketAeroHeat\\scripts\\nacaConstantCpModel.py": "a29ae12bcc96540be2a106490c72349b081fb653b81498a72cce5653475377f8",
+    "E:\\RocketAeroHeat\\docs\\validation\\v174\\PLAN.md": "5dbd285b2d5316ccedcf88fd5dd6d826c74256a7b9f7320bff89191a9b607f62",
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\source_tree.json": "c600dc43dc777e40a344f253b1adf89e7c51aa95caa98c6a58f57db1c65f0ee8",
+    "E:\\RocketAeroHeat\\scripts\\naca3344Model.py": "783d4e0cce6dbe376786bd19c1aa31e12fb89e64ef8b0801ca742d2c7beca944",
+    "E:\\RocketAeroHeat\\scripts\\naca3344Normalization.py": "055ffa15142b9d809e048c6eeecfa6a56d016027c7b66dc799bc8f8a59f58b39",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "efa6281bf174abb9e0183d7c551901229eda64c00f9a4a9903100a495485c4b5",
+    "E:\\RocketAeroHeat\\scripts\\validateIdealAir.py": "606a47e8fb0f4f1a4d8236a3dbfeea20fe971d915dd043fdb5ba3cfec33b01d3",
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\contract.json": "3290691fead2d185f2be232889c9e5e6803c222b2494538cc8203369bac4eeba",
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\source_manifest.json": "74000d7d71e1cf1563eef2e5436ab4bcb3d337900cfb795d13d17d35bdc36c5f",
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\wall_temperature.csv": "9213b9c8ce0b9410e4156cf658efc8fe2dc5db57cfe790eebca6de5409096a62",
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\heat_parameter.csv": "63685ad834b6c57d89095d652814cca9f4095a099fcd796ad9754e8067a56361",
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\normalization\\manifest.json": "c54bb96a2797d69b35a92df6c4745daa78d58bbb1f93bc97305db9fc3a16cdd1",
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\normalization\\recovery_factor.csv": "18fee1e702f38aeab6d10b69f841262bf5016c3933789981d573573d51f69064",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CIdealGas.hpp": "de02a1830906f135124a2737cdc65e9e72fbf44dc420ff2ef00f940f09cd5202",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\fluid\\CIdealGas.cpp": "d9dc59839db243f1671e0a2e11608c357736882f2a8cc6f4c4cd900ab0ecca87",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CSutherland.hpp": "e1e4a25687a7fa4ff2444061ff5b9596a0fbf485bf196c65cc5983f9009be298",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CConstantPrandtl.hpp": "2d70109b7e7e3bf2db1a7f9295cd9862bf61c973e9ebe5abc6c27ae47a0614e9",
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\normalization\\digitization.json": "dfd43078c6ff39670d497454ee50a0bc38fe8d3a0eec63c8d7f72804122fd3af",
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\normalization\\figure3b.png": "7f628e641a88a02668220dfd4c1e3249c4682ea84872a2f12a5a94dfa9a99ad3",
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAir.hpp": "62a880ed2e1ec76c5bc8c9a832ec7787b5b3f01494f31ed6a3ebf7bfb972969b",
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAirBatch.cpp": "5dbff0d52bd141a63a90e708ddf381115ab30cdbc1d61e2cdd1475325f930270",
+    "E:\\RocketAeroHeat\\scripts\\buildIdealAirBatch.py": "9a46a6a48311827aa41a060236bf3372300290e8c764fc383b31335a722e95ee",
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\runtime.json": "04c7800d328f5395e73a782560ba0545aac2cab5232e85d93fb2494f5e6fd45d",
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\idealAirBatch.dll": "03514d6657245cd7fa38b7e6bc074666a96320bf170fbc77302a01141a3c135a",
+    "E:\\RocketAeroHeat\\scripts\\idealAirProperties.py": "7d63ba9c250dfd7ecad3912b6ab1daaba0784aae43af7d22307d4d17ea659234"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\scripts\\reviewNACAConstantCpProperties.py": true,
+    "E:\\RocketAeroHeat\\scripts\\nacaConstantCpModel.py": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v174\\PLAN.md": true,
+    "E:\\RocketAeroHeat\\outputs\\v171_validation\\build01\\source_tree.json": true,
+    "E:\\RocketAeroHeat\\scripts\\naca3344Model.py": true,
+    "E:\\RocketAeroHeat\\scripts\\naca3344Normalization.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\scripts\\validateIdealAir.py": true,
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\contract.json": true,
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\source_manifest.json": true,
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\wall_temperature.csv": true,
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\heat_parameter.csv": true,
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\normalization\\manifest.json": true,
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\normalization\\recovery_factor.csv": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CIdealGas.hpp": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\fluid\\CIdealGas.cpp": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CSutherland.hpp": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\fluid\\CConstantPrandtl.hpp": true,
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\normalization\\digitization.json": true,
+    "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\normalization\\figure3b.png": true,
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAir.hpp": true,
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAirBatch.cpp": true,
+    "E:\\RocketAeroHeat\\scripts\\buildIdealAirBatch.py": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\runtime.json": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\idealAirBatch.dll": true,
+    "E:\\RocketAeroHeat\\scripts\\idealAirProperties.py": true
+  },
+  "elapsedSeconds": 0.14100000000325963,
+  "budgetPassed": true
+}

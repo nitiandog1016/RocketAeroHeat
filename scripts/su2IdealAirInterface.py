@@ -40,7 +40,8 @@ OBSERVATION = dict(numericalBaselineFlavor=PHASE_FLAVOR, asciiSignificantDigits=
                    terminationObservation='cpp-current-exception-windows-stack-delegate-v1')
 AXISYMMETRIC_FLAVOR = 'rah-ideal-air-axisymmetric-v1'
 PHASE_FLAVORS = ('rah-ideal-air-phase-v1', PHASE_FLAVOR, OBSERVED_FLAVOR, ADMISSIBLE_FLAVOR, STEP_FLAVOR, SST_ENERGY_FLAVOR, AXISYMMETRIC_FLAVOR)
-PHASE_FLAVORS = PHASE_FLAVORS + ('rah-ideal-air-spatial-wall-v1','rah-ideal-air-spatial-step-v1')
+PHASE_FLAVORS = PHASE_FLAVORS + ('rah-ideal-air-spatial-wall-v1','rah-ideal-air-spatial-step-v1',
+    'rah-native-ideal-gas-spatial-wall-v1')
 MODEL = 'Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1'
 R = 8.31451 / .02896546
 

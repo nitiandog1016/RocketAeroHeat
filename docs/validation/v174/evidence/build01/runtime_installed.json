@@ -1,0 +1,190 @@
+{
+  "flavor": "rah-native-ideal-gas-spatial-wall-v1",
+  "version": "8.6.0+rah-native-ideal-gas-spatial-wall-v1",
+  "status": "compiled-output-extension-tests-pending",
+  "executable": "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0-rah-native-ideal-gas-spatial-wall-v1\\bin\\SU2_CFD.exe",
+  "sourceCommit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+  "archiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+  "thermodynamicModel": "SU2-IDEAL_GAS-gamma1.4-Sutherland-Pr0.72-NACA-v1",
+  "gasConstant": 287.0491267875601,
+  "physicsQualified": false,
+  "systemDLLs": [
+    "KERNEL32.dll",
+    "msvcrt.dll"
+  ],
+  "archiveMembers": {
+    "Common/src/libSU2Common.a": 113,
+    "SU2_CFD/src/libSU2core.a": 184
+  },
+  "buildSourceSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\buildSU2NativeGasOutputRuntime.py": "857f9d964f9747c4e933be43d8b3d6d6f37b0d1e8cb328572053f86091acbc64",
+    "E:\\RocketAeroHeat\\docs\\validation\\v174\\PLAN.md": "89ef63e1843787bba69e9038697d8c1b80c6f177f3ea59a964c4cbbe86d64283",
+    "E:\\RocketAeroHeat\\docs\\validation\\v174\\BUILD_REVIEW.md": "be374962c61d1dc1922bcd334429f84383dbec479fcbbad0e7a61f02bbd3f005",
+    "E:\\RocketAeroHeat\\scripts\\prepareSU2NativeGasOutputPatch.py": "f240f65247f3d2a1ed15b6452205881a2b8cb5f6c7a7a68d04d70b350639065b",
+    "E:\\RocketAeroHeat\\scripts\\nacaConstantCpModel.py": "a29ae12bcc96540be2a106490c72349b081fb653b81498a72cce5653475377f8",
+    "E:\\RocketAeroHeat\\scripts\\naca3344Model.py": "783d4e0cce6dbe376786bd19c1aa31e12fb89e64ef8b0801ca742d2c7beca944",
+    "E:\\RocketAeroHeat\\scripts\\buildSU2IdealAirRuntime.py": "f7ad064479847c48479f6d9eca835e10584a5a40315042d5055dd4f16f6e6265",
+    "E:\\RocketAeroHeat\\scripts\\buildSU2IdealAirFirstSample.py": "aa35db54fa5f125ee0b8ae55ff84dd662a55da83b4f6e738ecd31ad1a075a404",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "efa6281bf174abb9e0183d7c551901229eda64c00f9a4a9903100a495485c4b5",
+    "E:\\RocketAeroHeat\\scripts\\validateIdealAir.py": "606a47e8fb0f4f1a4d8236a3dbfeea20fe971d915dd043fdb5ba3cfec33b01d3",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\executed_builder.py": "857f9d964f9747c4e933be43d8b3d6d6f37b0d1e8cb328572053f86091acbc64",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\commands.json": "4b3d6a6d754509bc56a6322a70cdb90c8e6b7d6991a11b82483ed2a1304097d2",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\objects_before.json": "ad95507b2558bead44c4505553ba9418bd9e36d7574f49aec673d9ea6e9b425b",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\source_tree.json": "7f5df95b0c5213266f21d8a86abf23f0d4ebc8f1b21ff12a169d04f72087720b",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\input_manifest.json": "5800ede34c80d3c4b81aff3cfadd2a3ff838336b2aa94080f013c288cb458863",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\source_restore.json": "1a36cf6749ccfd78e6083bbfe570111c4a3552dc04b2a0a8cf0eef382d8dbbd0",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\shared_binary_restore.json": "6d3c61d341c41f4f72e815d20231f8dee85c91dcb96204302e3b0f8e5e55cb3d",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\objects_restored.json": "ad95507b2558bead44c4505553ba9418bd9e36d7574f49aec673d9ea6e9b425b",
+    "E:\\RocketAeroHeat\\outputs\\v174_validation\\build01\\registered_build.json": "ac65269a25ba617f676c126dad27863406ee95deb4ea38631b2da67ee27ff481"
+  },
+  "sourceTreeSHA256": "7f5df95b0c5213266f21d8a86abf23f0d4ebc8f1b21ff12a169d04f72087720b",
+  "buildReceipt": {
+    "command": [
+      "D:\\anacondapython\\python.exe",
+      "E:\\RocketAeroHeat\\scripts\\buildSU2NativeGasOutputRuntime.py",
+      "--worker",
+      "link"
+    ],
+    "maximumSeconds": 30,
+    "maximumMemoryBytes": 4294967296,
+    "status": "terminal",
+    "processID": 48812,
+    "exitCode": 0,
+    "elapsedSeconds": 2.2189999999973224,
+    "sampledPeakMemoryBytes": 379740160,
+    "stoppedByBudget": null
+  },
+  "restrictions": [
+    "direct SI steady single-zone NS/SST",
+    "general Roe",
+    "resolved wall",
+    "static PT Riemann inlet and pressure outlet",
+    "research interface until validated"
+  ],
+  "files": [
+    {
+      "path": "AUTHORS.md",
+      "bytes": 3429,
+      "sha256": "bd2b76eada1999265ae26e89cc71759ba347bc69af2260ee588003b543fb9955"
+    },
+    {
+      "path": "bin/SU2_CFD.exe",
+      "bytes": 19501188,
+      "sha256": "dd092a7317568bf3ed1edefa2e4a7e09e9385867a377e94d4097fb9196b7fe8e"
+    },
+    {
+      "path": "CLI11_LICENSE",
+      "bytes": 1586,
+      "sha256": "51c69badd1cd4ffb036fb2a2efc4d7db8dd8c89905526e7193d57912968efae1"
+    },
+    {
+      "path": "COPYING",
+      "bytes": 24478,
+      "sha256": "b3aa400aca6d2ba1f0bd03bd98d03d1fe7489a3bbb26969d72016360af8a5c9d"
+    },
+    {
+      "path": "COPYING.MinGW-w64-runtime.txt",
+      "bytes": 15076,
+      "sha256": "ecff91ddb5799c8b79a4bdb576921b9c3e2989783fd1944527e8eb9b41a5ff5f"
+    },
+    {
+      "path": "Eigen_COPYING.MPL2",
+      "bytes": 16726,
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    {
+      "path": "Eigen_COPYING.README",
+      "bytes": 779,
+      "sha256": "c83230b770f17ef1386ea1fd3681271dd98aa93646bdbfb5bff3a1b7050fff9d"
+    },
+    {
+      "path": "ideal_air.diff",
+      "bytes": 29458,
+      "sha256": "98e09894061dc197aefe8e9bfbc75e57345a353366464dbb75a3340ddf660329"
+    },
+    {
+      "path": "LICENSE.CoolProp",
+      "bytes": 1103,
+      "sha256": "9bf835333ef602af4cb19338b9f9d43671e174fa029b00280e9bdba6ea4719b2"
+    },
+    {
+      "path": "LICENSE.md",
+      "bytes": 33393,
+      "sha256": "46ae25afd571da3e3761ff82ace5dc26b0b66cf514243379ac026ce094ba32cf"
+    },
+    {
+      "path": "mel_LICENSE",
+      "bytes": 7652,
+      "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+    }
+  ],
+  "parentRuntimeSHA256": "e794985c282f73913c679eb72ad1818c9d56e97371813270ec7364865bfa3b3d",
+  "incrementalObjectsRebuilt": 1,
+  "inheritedVerifiedObjects": 297,
+  "numericalBaselineFlavor": "rah-ideal-air-phase-v2",
+  "asciiSignificantDigits": 17,
+  "terminationObservation": "cpp-current-exception-windows-stack-delegate-v1",
+  "numericalParentFlavor": "rah-ideal-air-spatial-wall-v1",
+  "samePhysicsAndNumerics": false,
+  "spatialWall": {
+    "mode": "axial-node-temperature-table-v1",
+    "schema": "RAH_AXIAL_WALL_TEMPERATURE_V1,X_m,T_K",
+    "environmentVariable": "RAH_WALL_TEMPERATURE_FILE",
+    "marker": "wall",
+    "appliedReceipt": "rah_wall_temperature_applied.csv",
+    "interpolation": "linear-in-X-no-extrapolation",
+    "boundaryFormulaChanged": false,
+    "supportsNoTableBaseline": true
+  },
+  "adaptationObjectsRebuilt": 1,
+  "restoredParentObjectsRecompiled": 0,
+  "restoredParentObjectsFromExactCache": 4,
+  "unchangedSharedObjects": 293,
+  "inheritedPackageThermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+  "inheritedPackageTemperatureRangeK": [
+    60,
+    2000
+  ],
+  "supportedModel": "IDEAL_GAS",
+  "gamma": 1.4,
+  "modelMetadataMeaning": "supported selected native IDEAL_GAS case; inherited variable-cp implementation retained",
+  "nativeIdealGasOutputContract": {
+    "schema": "RAH.NativeIdealGas.FirstCompletedOutput.v1",
+    "supportedModel": "IDEAL_GAS",
+    "thermodynamicModel": "SU2-IDEAL_GAS-gamma1.4-Sutherland-Pr0.72-NACA-v1",
+    "gamma": 1.4,
+    "gasConstant": 287.0491267875601,
+    "supportedCaseKind": "naca-tn3344-constant-cp-spatial-wall-v1",
+    "steadyFirstCompletedUpdateLocalIteration": 0,
+    "iterationMeaning": "local-zero-is-first-completed-update-not-initial-state",
+    "changedSource": "SU2_CFD/src/output/CFlowOutput.cpp",
+    "changedObject": "SU2_CFD/src/libSU2core.a.p/output_CFlowOutput.cpp.obj",
+    "baseCOutputChanged": false,
+    "firstFrameOutputModelExtension": "IDEAL_GAS",
+    "existingFrequencyAndForcedFinalRulesUnchanged": true,
+    "numericalUpdateSourceUnchanged": true,
+    "sameNumericalUpdateSources": true,
+    "outputScheduleChanged": true,
+    "nativeSharedFrameEqualityVerified": false,
+    "selectedCaseNumericalEqualityRequiresSeparateRunEvidence": true,
+    "asciiSignificantDigits": 17,
+    "physicalQualified": false
+  },
+  "firstFrameOutputModelExtension": "IDEAL_GAS",
+  "numericalUpdateSourceUnchanged": true,
+  "sameNumericalUpdateSources": true,
+  "outputScheduleChanged": true,
+  "nativeSharedFrameEqualityVerified": false,
+  "allCFDObjectsRebuilt": 0,
+  "buildBudget": {
+    "compileMaximumSeconds": 60,
+    "linkMaximumSeconds": 30,
+    "auxiliaryMaximumSeconds": 20,
+    "parentMaximumSeconds": 110,
+    "maximumMemoryBytes": 4294967296,
+    "maximumObjects": 1,
+    "maximumLinks": 1,
+    "maximumCFDRuns": 0
+  },
+  "sharedStateRestored": true
+}

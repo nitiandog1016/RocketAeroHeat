@@ -1,0 +1,9 @@
+{"passed": false, "tests": 0, "elapsedSeconds": 0.031000000002677552, "error": "AssertionError: 未完整结束的保存文件"}
+Traceback (most recent call last):
+  File "scripts/reviewNACAConstantCpDomainGuard.py", line 215, in <module>
+    review(parser.parse_args().folder)
+  File "scripts/reviewNACAConstantCpDomainGuard.py", line 105, in review
+    result=guard.inspect_pair(request(REAL,real_manifest,step))
+  File "E:\RocketAeroHeat\scripts\nacaConstantCpDomainGuard.py", line 174, in inspect_pair
+    assert vr.endswith(b'\n') and sr.endswith(b'\n'), '未完整结束的保存文件'
+AssertionError: 未完整结束的保存文件

@@ -47,6 +47,9 @@ def inventory(folder, receipt):
     from su2SSTInterface import mesh
 
     manifest = read(folder/'case_manifest.json')
+    if manifest.get('caseKind') == 'naca-tn3344-constant-cp-spatial-wall-v1':
+        from su2NACAConstantCpInterface import inventory as ideal_gas_inventory
+        return ideal_gas_inventory(folder, receipt)
     if manifest.get('caseKind') == 'naca-tn3344-spatial-step-cold-restart-v1':
         from su2NACASpatialStepInterface import inventory as spatial_step_inventory
         return spatial_step_inventory(folder, receipt)

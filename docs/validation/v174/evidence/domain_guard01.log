@@ -1,0 +1,11 @@
+{"passed": false, "tests": 0, "elapsedSeconds": 0.031000000002677552, "error": "UnicodeDecodeError: 'gbk' codec can't decode byte 0x80 in position 219231: illegal multibyte sequence"}
+Traceback (most recent call last):
+  File "scripts/reviewNACAConstantCpDomainGuard.py", line 215, in <module>
+    review(parser.parse_args().folder)
+  File "scripts/reviewNACAConstantCpDomainGuard.py", line 88, in review
+    source,source_locks=source_review();locks.update(source_locks);report['writerSourceReview']=source
+  File "scripts/reviewNACAConstantCpDomainGuard.py", line 47, in source_review
+    assert 'GetMultizone_Problem() ? curOuterIter : curInnerIter' in (BUILD/'executed_sources'/entries[-1][0]).read_text()
+  File "D:\anacondapython\lib\pathlib.py", line 1217, in read_text
+    return f.read()
+UnicodeDecodeError: 'gbk' codec can't decode byte 0x80 in position 219231: illegal multibyte sequence

@@ -1,0 +1,204 @@
+{
+  "caseKind": "naca-tn3344-constant-cp-spatial-wall-v1",
+  "specification": {
+    "variant": "small-profile",
+    "actualValidationMesh": false,
+    "updates": 4,
+    "every": 2,
+    "maximumSeconds": 30,
+    "threads": 2,
+    "maximumOutputBytes": 33554432,
+    "requiredRuntimeFlavor": "rah-native-ideal-gas-spatial-wall-v1",
+    "thermalMode": "axialTemperature"
+  },
+  "requiredRuntimeFlavor": "rah-native-ideal-gas-spatial-wall-v1",
+  "selectedFluidModel": "IDEAL_GAS",
+  "idealGas": {
+    "schema": "RAH.NACA.NativeIdealGas.v1",
+    "initialization": "naca-tn3344-constant-cp-spatial-wall-v1",
+    "selectedFluidModel": "IDEAL_GAS",
+    "thermodynamicModel": "SU2-IDEAL_GAS-gamma1.4-Sutherland-Pr0.72-NACA-v1",
+    "gamma": 1.4,
+    "gasConstant": 287.0491267875601,
+    "energyReference": "e=cv*T; h=cp*T; no-OTH-offset",
+    "turbulent": false,
+    "developmentTemperatureRangeK": [
+      150.0,
+      360.0
+    ],
+    "physicalQualified": false,
+    "newQualifiedArea_m2": 0,
+    "configurationSHA256": "59587b5fdbc15c84c8949bef24067ef4920e53b0b175b164b6708f4a022a465b",
+    "meshSHA256": "8a8396f242cef6e4bc847c2c059a61faae1aa7696ab11eb44eb8ebbd5dca2c7b",
+    "geometrySHA256": "c5209ff4cb09f924f6de3f45c1100681075b2303655af5efce738ad4003d494d",
+    "meshArraysSHA256": "bd86edb64d17f3f6782b821b577d270d6f62a79be80df438a84788bf18792e78",
+    "checkpointContract": {
+      "schemaVersion": 1,
+      "stage": "same-flow-update-laminar-native-ideal-gas-v1",
+      "every": 2,
+      "maximumUpdates": 4,
+      "firstLocalIteration": 0,
+      "firstSuccessfulUpdate": 1,
+      "maximumNamedPairs": 3,
+      "estimatedVolumeBytes": 478432,
+      "estimatedSurfaceBytes": 67040,
+      "estimatedMaximumBytes": 3246848,
+      "maximumOutputBytes": 33554432,
+      "units": "file lengths including final aliases; physical allocation unknown",
+      "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold"
+    },
+    "reusedRuntimeMetadataIsSelectedModel": false,
+    "inheritedPackageMetadataIsSelectedModel": false,
+    "selectedRuntimeMetadataIsSelectedModel": true
+  },
+  "idealGasContractSHA256": "0038c47a57f28a9d48ec62e529ab22b240d511048ed97891b9ca4142256d6f25",
+  "runtimeUse": "native-ideal-gas-v171-parent-with-explicit-first-completed-output-extension",
+  "nativeIdealGasOutputContract": {
+    "schema": "RAH.NativeIdealGas.FirstCompletedOutput.v1",
+    "supportedModel": "IDEAL_GAS",
+    "thermodynamicModel": "SU2-IDEAL_GAS-gamma1.4-Sutherland-Pr0.72-NACA-v1",
+    "gamma": 1.4,
+    "gasConstant": 287.0491267875601,
+    "supportedCaseKind": "naca-tn3344-constant-cp-spatial-wall-v1",
+    "steadyFirstCompletedUpdateLocalIteration": 0,
+    "iterationMeaning": "local-zero-is-first-completed-update-not-initial-state",
+    "changedSource": "SU2_CFD/src/output/CFlowOutput.cpp",
+    "changedObject": "SU2_CFD/src/libSU2core.a.p/output_CFlowOutput.cpp.obj",
+    "baseCOutputChanged": false,
+    "firstFrameOutputModelExtension": "IDEAL_GAS",
+    "existingFrequencyAndForcedFinalRulesUnchanged": true,
+    "numericalUpdateSourceUnchanged": true,
+    "sameNumericalUpdateSources": true,
+    "outputScheduleChanged": true,
+    "nativeSharedFrameEqualityVerified": false,
+    "selectedCaseNumericalEqualityRequiresSeparateRunEvidence": true,
+    "asciiSignificantDigits": 17,
+    "physicalQualified": false
+  },
+  "runtimeIdentity": {
+    "runtimeSHA256": "faaed7f318876335f5309fb79bbbc0facb2d50a9972bfaaa94b97220f9457ebb",
+    "executableSHA256": "dd092a7317568bf3ed1edefa2e4a7e09e9385867a377e94d4097fb9196b7fe8e"
+  },
+  "thermalBoundary": {
+    "mode": "axialTemperature",
+    "givenTw_K": 335.0,
+    "spatialWall": {
+      "mode": "axial-node-temperature-table-v1",
+      "schema": "RAH_AXIAL_WALL_TEMPERATURE_V1,X_m,T_K",
+      "environmentVariable": "RAH_WALL_TEMPERATURE_FILE",
+      "marker": "wall",
+      "appliedReceipt": "rah_wall_temperature_applied.csv",
+      "interpolation": "linear-in-X-no-extrapolation",
+      "boundaryFormulaChanged": false,
+      "supportsNoTableBaseline": true
+    }
+  },
+  "thermalProfileSHA256": "62399f378f4417c29f5ecd0b60795ed598d1a7d02fa0b0fd2967148b4e8eee6a",
+  "publicBenchmark": {
+    "conditions": {
+      "Mach": 1.97,
+      "ReynoldsBasedOnDiameter": 2280000.0,
+      "totalTemperature_K": 316.6666666666667,
+      "diameter_m": 0.1016,
+      "staticTemperature_K": 178.28523385392626,
+      "pressure_Pa": 26183.7986721104,
+      "density_kg_m3": 0.511635944608275,
+      "speed_m_s": 527.3100474745006,
+      "soundSpeed_m_s": 267.67007486015257,
+      "viscosity_Pas": 1.202225555389944e-05,
+      "conductivity_WmK": 0.01677558729954591,
+      "staticEnergy_Jkg": 127941.55174221373,
+      "staticEnthalpy_Jkg": 179118.17243909923,
+      "totalEnergy_Jkg": 266969.4948259938,
+      "totalEnthalpy_Jkg": 318146.1155228792,
+      "derivedStateIsMeasured": false,
+      "model": "SU2-IDEAL_GAS-gamma1.4-Sutherland-Pr0.72-NACA-v1",
+      "gamma": 1.4,
+      "gasConstant_JkgK": 287.0491267875601,
+      "cp_JkgK": 1004.6719437564606,
+      "cv_JkgK": 717.6228169689005,
+      "Prandtl": 0.72,
+      "sutherland": {
+        "muRef_Pas": 1.716e-05,
+        "temperatureRef_K": 273.15,
+        "S_K": 110.4
+      },
+      "energyReference": "e=cv*T and h=cp*T; zero at T=0 by caloric model, no OTH offset",
+      "qualificationRange": {
+        "comparisonTemperatureRangeK": [
+          178.1075743306896,
+          336.35443376865095
+        ],
+        "developmentTemperatureRangeK": [
+          150.0,
+          360.0
+        ],
+        "physicalQualified": false,
+        "experimentalQualified": false,
+        "meaning": "predeclared comparison and development applicability checks; not a solved-field envelope"
+      },
+      "physicalQualified": false,
+      "wallTemperatureRangeK": [
+        333.40922942424004,
+        336.35443376865095
+      ],
+      "sourceSHA256": {
+        "E:\\RocketAeroHeat\\scripts\\nacaConstantCpModel.py": "a29ae12bcc96540be2a106490c72349b081fb653b81498a72cce5653475377f8",
+        "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\contract.json": "3290691fead2d185f2be232889c9e5e6803c222b2494538cc8203369bac4eeba",
+        "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\source_manifest.json": "74000d7d71e1cf1563eef2e5436ab4bcb3d337900cfb795d13d17d35bdc36c5f",
+        "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\wall_temperature.csv": "9213b9c8ce0b9410e4156cf658efc8fe2dc5db57cfe790eebca6de5409096a62",
+        "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\heat_parameter.csv": "63685ad834b6c57d89095d652814cca9f4095a099fcd796ad9754e8067a56361"
+      }
+    },
+    "fixture": true,
+    "experimentalQualification": false
+  },
+  "initialization": {
+    "kind": "naca-tn3344-constant-cp-spatial-wall-v1",
+    "priorSuccessfulUpdates": 0,
+    "initialStateSHA256": "ee5517a08a3179c4ecf35f21161ee1b8cf602e6f61cc68d65a677ecdda0deae6",
+    "sourceSHA256": {
+      "E:\\RocketAeroHeat\\scripts\\prepareNACAConstantCpCase.py": "176afb6bef3519f6be099b9fafe7f78ee5b45c49b22df9cd5cb16b190e6b52b2",
+      "E:\\RocketAeroHeat\\scripts\\su2NACAConstantCpInterface.py": "0a497ca023950a09e66f705ef5b2b064a281a782440ab945cb6abd4e39233fa9",
+      "E:\\RocketAeroHeat\\scripts\\nacaConstantCpModel.py": "a29ae12bcc96540be2a106490c72349b081fb653b81498a72cce5653475377f8",
+      "E:\\RocketAeroHeat\\scripts\\auditNACAConstantCp.py": "cf4d6959870899a97f634bffa9b7865be5b56cd748ccb4e63886f1b6e7a15e71",
+      "E:\\RocketAeroHeat\\scripts\\prepareNACASpatialCase.py": "0844e1a7fadced997b4080b508934238224bf7b3b838d852a4d612ad120e1129",
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2NACALaminar.py": "ed5ffa89aece6a1c11ac91515b0942de90c6304c51dac743fc95a3c1c8432921",
+      "E:\\RocketAeroHeat\\scripts\\naca3344Model.py": "783d4e0cce6dbe376786bd19c1aa31e12fb89e64ef8b0801ca742d2c7beca944",
+      "E:\\RocketAeroHeat\\scripts\\nacaSpatialWallFlux.py": "3cb82da2e1af0af7cfb6190fa9bd0dac1b18155a483987481418d8aa3f5329f7",
+      "E:\\RocketAeroHeat\\scripts\\nacaWallFlux.py": "a4a0043c633421a886566cd87880d947e47c699e7af5b1aa9d668f79bbb39fee",
+      "E:\\RocketAeroHeat\\scripts\\su2NACALaminarInterface.py": "bd64913200678f726f9a1f258d98c694037e31e206f7652fd797625e041ddf16",
+      "E:\\RocketAeroHeat\\scripts\\su2IdealAirCheckpoints.py": "bc9b14a1ea50a7ce7c9c2283b84347c8c14718a5897b26404d1ebc6d54ffea74",
+      "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "db71dd62f1f5db9166f9c4bbac7a76f4c7dded91d55ee211b6ec304d5d1030c3",
+      "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "94e16263026cdf13ee79ab631f73fe326a12ef3ffce189f337ffac61af789ea6",
+      "E:\\RocketAeroHeat\\scripts\\su2IdealAirInterface.py": "27e1120cc32b540a75ecde7abd15cf4fe146a6be2c963a1787d927608d73f85f",
+      "E:\\RocketAeroHeat\\scripts\\prepareSU2NativeGasOutputPatch.py": "f240f65247f3d2a1ed15b6452205881a2b8cb5f6c7a7a68d04d70b350639065b",
+      "E:\\RocketAeroHeat\\docs\\validation\\v174\\PLAN.md": "89ef63e1843787bba69e9038697d8c1b80c6f177f3ea59a964c4cbbe86d64283",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\contract.json": "3290691fead2d185f2be232889c9e5e6803c222b2494538cc8203369bac4eeba",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\source_manifest.json": "74000d7d71e1cf1563eef2e5436ab4bcb3d337900cfb795d13d17d35bdc36c5f",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\wall_temperature.csv": "9213b9c8ce0b9410e4156cf658efc8fe2dc5db57cfe790eebca6de5409096a62",
+      "E:\\RocketAeroHeat\\tests\\data\\naca_tn3344\\heat_parameter.csv": "63685ad834b6c57d89095d652814cca9f4095a099fcd796ad9754e8067a56361",
+      "E:\\RocketAeroHeat\\outputs\\v174_validation\\properties01\\report.json": "669a55dd6eb81525f7ea7e4024caec5bcaa9b97635a91e709de670db1e5b7e3d",
+      "E:\\RocketAeroHeat\\outputs\\v174_validation\\runtime_review01\\report.json": "122158c8c9542dee5689730193bcd9538688f7b7b29e404d292d059ce3bc6f96",
+      "E:\\RocketAeroHeat\\outputs\\v174_validation\\independent_anchor01\\report.json": "65fc5c7bdb4be18b6cc2b10a337120041cc3fc3ea054834408e3f80ca48bb734",
+      "E:\\RocketAeroHeat\\outputs\\v174_validation\\small02_source_snapshot\\project_sources\\scripts\\su2ThermalRuntime.py": "efa6281bf174abb9e0183d7c551901229eda64c00f9a4a9903100a495485c4b5"
+    },
+    "initialBlendThickness_m": 0.001,
+    "boundaryLayerSolved": false,
+    "energyReference": "e=cv*T; h=cp*T; no-OTH-offset",
+    "reusesPreviousConservativeState": false,
+    "temperatureRangeK": [
+      178.28523385392626,
+      336.3137187879568
+    ]
+  },
+  "nodes": 549,
+  "elements": 384,
+  "expectedVelocity": [
+    -527.3100474745006,
+    0,
+    0
+  ],
+  "physicalQualified": false,
+  "planSHA256": "89ef63e1843787bba69e9038697d8c1b80c6f177f3ea59a964c4cbbe86d64283"
+}

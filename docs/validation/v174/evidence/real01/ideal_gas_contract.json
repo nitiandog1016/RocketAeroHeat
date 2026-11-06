@@ -1,0 +1,54 @@
+{
+  "schema": "RAH.NACA.NativeIdealGas.v1",
+  "initialization": "naca-tn3344-constant-cp-spatial-wall-v1",
+  "selectedFluidModel": "IDEAL_GAS",
+  "thermodynamicModel": "SU2-IDEAL_GAS-gamma1.4-Sutherland-Pr0.72-NACA-v1",
+  "gamma": 1.4,
+  "gasConstant": 287.0491267875601,
+  "energyReference": "e=cv*T; h=cp*T; no-OTH-offset",
+  "turbulent": false,
+  "developmentTemperatureRangeK": [
+    150.0,
+    360.0
+  ],
+  "physicalQualified": false,
+  "newQualifiedArea_m2": 0,
+  "configurationSHA256": "904e5ee80e70bee430d7122db5987c21df92c36a2b01c70b3b7e53c13c274b78",
+  "meshSHA256": "5562d7e6a3985ec6877585db9984d273a409178e54b1fb1d336065c93cd77152",
+  "geometrySHA256": "62cb540c4a79d214434121a9f44ad9537de2258d006bcd808cd92ce814ba966b",
+  "meshArraysSHA256": "4e82f33ae66d0a19bf1a755d6c0d9210ca5cadd8db977ab5377da438517e3c01",
+  "checkpointContract": {
+    "schemaVersion": 1,
+    "stage": "same-flow-update-laminar-native-ideal-gas-v1",
+    "every": 100,
+    "maximumUpdates": 500,
+    "firstLocalIteration": 0,
+    "firstSuccessfulUpdate": 1,
+    "maximumNamedPairs": 6,
+    "estimatedVolumeBytes": 164452672,
+    "estimatedSurfaceBytes": 3191744,
+    "estimatedMaximumBytes": 1176607488,
+    "maximumOutputBytes": 1610612736,
+    "units": "file lengths including final aliases; physical allocation unknown",
+    "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold"
+  },
+  "reusedRuntimeMetadataIsSelectedModel": false,
+  "inheritedPackageMetadataIsSelectedModel": false,
+  "selectedRuntimeMetadataIsSelectedModel": true,
+  "savedFieldDomainGuard": {
+    "schema": "RAH.NACA.SavedFieldDomainGuard.v1",
+    "temperatureRangeK": [
+      150.0,
+      360.0
+    ],
+    "helperMaximumSeconds": 15.0,
+    "totalHelperMaximumSeconds": 60.0,
+    "historyStrictlyAfterForLive": true,
+    "requireWindowsNoWriterHandles": true,
+    "completeVolumeAndSurfacePair": true,
+    "observesUnsavedInstantaneousState": false,
+    "changesNumericalUpdates": false,
+    "stopReason": "model-domain-exceeded",
+    "errorStopReason": "model-domain-guard-error"
+  }
+}

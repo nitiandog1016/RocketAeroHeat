@@ -1,0 +1,1303 @@
+
+Common/src/CConfig.cpp:1326-1329 SHA256=bb137ca80063b9c9d775c8ff576b155ff3a0ad48bb8998572fd34afb3b54ec47
+1326:   /*!\brief GAS_CONSTANT \n DESCRIPTION: Specific gas constant (287.058 J/kg*K (air), only for compressible flows) \ingroup Config*/
+1327:   addDoubleOption("GAS_CONSTANT", Gas_Constant, 287.058);
+1328:   /*!\brief GAMMA_VALUE  \n DESCRIPTION: Ratio of specific heats (1.4 (air), only for compressible flows) \ingroup Config*/
+1329:   addDoubleOption("GAMMA_VALUE", Gamma, 1.4);
+
+Common/src/CConfig.cpp:3793-3805 SHA256=bb137ca80063b9c9d775c8ff576b155ff3a0ad48bb8998572fd34afb3b54ec47
+3793:   // 模块用途。只接受已明确接入的直接SI一般EOS路径。
+3794:   if (Kind_FluidModel == IDEAL_AIR_VARIABLE_CP) {
+3795:     if (SystemMeasurements != SI || Ref_NonDim != DIMENSIONAL || Time_Domain ||
+3796:         Multizone_Problem || DiscreteAdjoint || ContinuousAdjoint ||
+3797:         (Kind_Solver != MAIN_SOLVER::NAVIER_STOKES && Kind_Solver != MAIN_SOLVER::RANS) ||
+3798:         (Kind_Turb_Model != TURB_MODEL::NONE && Kind_Turb_Model != TURB_MODEL::SST) ||
+3799:         Kind_Upwind_Flow != UPWIND::ROE || nMarker_WallFunctions != 0 ||
+3800:         Low_Mach_Corr || nMarker_Giles != 0 || GetDynamic_Grid())
+3801:       SU2_MPI::Error("IDEAL_AIR_VARIABLE_CP requires direct SI steady single-zone NS/SST, ROE, resolved wall", CURRENT_FUNCTION);
+3802:     for (unsigned short i=0; i<nMarker_Riemann; ++i)
+3803:       if (Kind_Data_Riemann[i] != STATIC_SUPERSONIC_INFLOW_PT && Kind_Data_Riemann[i] != STATIC_PRESSURE)
+3804:         SU2_MPI::Error("IDEAL_AIR_VARIABLE_CP supports Riemann static PT inlet and static pressure outlet", CURRENT_FUNCTION);
+3805:   }
+
+Common/src/CConfig.cpp:5772-5781 SHA256=bb137ca80063b9c9d775c8ff576b155ff3a0ad48bb8998572fd34afb3b54ec47
+5772:   /*--- Check the conductivity model. Deactivate the turbulent component
+5773:    if we are not running RANS. ---*/
+5774: 
+5775:   if ((Kind_Solver != MAIN_SOLVER::RANS) &&
+5776:       (Kind_Solver != MAIN_SOLVER::ADJ_RANS) &&
+5777:       (Kind_Solver != MAIN_SOLVER::DISC_ADJ_RANS) &&
+5778:       (Kind_Solver != MAIN_SOLVER::INC_RANS) &&
+5779:       (Kind_Solver != MAIN_SOLVER::DISC_ADJ_INC_RANS)){
+5780:     Kind_ConductivityModel_Turb = CONDUCTIVITYMODEL_TURB::NONE;
+5781:   }
+
+Common/src/geometry/CGeometry.cpp:2752-2817 SHA256=6c16bc00d2759164ec81ecca0b40bbf563c8c686dd853b26cfcb591c5e6b0454
+2752: void CGeometry::SetCustomBoundary(CConfig* config) {
+2753:   try {
+2754:     RAHAxialWallTemperature rah;
+2755:     std::ofstream applied;
+2756:     unsigned long written = 0;
+2757:     unsigned short thermalMarkers = 0;
+2758:     if (rah.Active()) {
+2759:       if (size != 1 || config->GetnZone() != 1 || config->GetnMGLevels() != 0 ||
+2760:           config->GetGrid_Movement() || config->GetTime_Domain() || config->GetSystemMeasurements() != SI)
+2761:         throw std::runtime_error("RAH spatial wall requires serial-MPI, one zone, fixed SI mesh and MGLEVEL=0");
+2762:       applied.open("rah_wall_temperature_applied.csv", std::ios::out | std::ios::trunc);
+2763:       applied.imbue(std::locale::classic());
+2764:       if (!applied) throw std::runtime_error("Cannot write RAH wall-input receipt");
+2765:       applied << "globalNodeID,X_m,Y_m,Z_m,givenTemperature_K\n" << std::setprecision(17);
+2766:     }
+2767:     CustomBoundaryTemperature = new su2double*[nMarker];
+2768:     CustomBoundaryHeatFlux = new su2double*[nMarker];
+2769:     for (auto iMarker = 0u; iMarker < nMarker; iMarker++) {
+2770:       const std::string Marker_Tag = config->GetMarker_All_TagBound(iMarker);
+2771:       CustomBoundaryHeatFlux[iMarker] = nullptr;
+2772:       CustomBoundaryTemperature[iMarker] = nullptr;
+2773:       if (!config->GetMarker_All_PyCustom(iMarker)) continue;
+2774:       if (rah.Active() && (Marker_Tag != "wall" || config->GetMarker_All_KindBC(iMarker) != ISOTHERMAL))
+2775:         throw std::runtime_error("RAH spatial wall requires one custom ISOTHERMAL marker named wall");
+2776:       switch (config->GetMarker_All_KindBC(iMarker)) {
+2777:         case HEAT_FLUX:
+2778:           CustomBoundaryHeatFlux[iMarker] = new su2double[nVertex[iMarker]];
+2779:           for (auto iVertex = 0ul; iVertex < nVertex[iMarker]; iVertex++)
+2780:             CustomBoundaryHeatFlux[iMarker][iVertex] = config->GetWall_HeatFlux(Marker_Tag);
+2781:           break;
+2782:         case ISOTHERMAL:
+2783:           ++thermalMarkers;
+2784:           CustomBoundaryTemperature[iMarker] = new su2double[nVertex[iMarker]];
+2785:           for (auto iVertex = 0ul; iVertex < nVertex[iMarker]; iVertex++) {
+2786:             CustomBoundaryTemperature[iMarker][iVertex] = config->GetIsothermal_Temperature(Marker_Tag);
+2787:             if (rah.Active()) {
+2788:               const auto iPoint = vertex[iMarker][iVertex]->GetNode();
+2789:               const double x = SU2_TYPE::GetValue(nodes->GetCoord(iPoint,0));
+2790:               const double y = SU2_TYPE::GetValue(nodes->GetCoord(iPoint,1));
+2791:               const double z = nDim==3 ? SU2_TYPE::GetValue(nodes->GetCoord(iPoint,2)) : 0.0;
+2792:               const double value = rah.At(x);
+2793:               CustomBoundaryTemperature[iMarker][iVertex] = value;
+2794:               applied << nodes->GetGlobalIndex(iPoint) << ',' << x << ',' << y << ',' << z << ',' << value << '\n';
+2795:               ++written;
+2796:             }
+2797:           }
+2798:           break;
+2799:         case INLET_FLOW:
+2800:           break;
+2801:         default:
+2802:           std::cout << "WARNING: Marker " << Marker_Tag << " is not customizable. Using default behavior." << std::endl;
+2803:           break;
+2804:       }
+2805:     }
+2806:     if (rah.Active()) {
+2807:       if (thermalMarkers != 1 || written == 0)
+2808:         throw std::runtime_error("RAH temperature table was not applied to exactly one nonempty wall");
+2809:       applied.close();
+2810:       if (!applied) throw std::runtime_error("RAH wall-input receipt write failed");
+2811:       std::cout << "RAH_AXIAL_WALL_V1 applied " << written << " wall nodes; given SI temperatures, not solved material T." << std::endl;
+2812:     }
+2813:   } catch (const std::exception& ex) {
+2814:     SU2_MPI::Error(ex.what(), CURRENT_FUNCTION);
+2815:   }
+2816: }
+2817: 
+
+Common/src/geometry/RAHAxialWallTemperature.hpp:16-77 SHA256=9c09b738ea9327b3571ccbb716bafac2c5c82f723dcb6205d85cd3389f889920
+16: class RAHAxialWallTemperature {
+17:  public:
+18:   // 模块一：没有显式文件时保持官方行为；有文件时任何错误都不能回退到标量。
+19:   RAHAxialWallTemperature() {
+20:     const char* file = std::getenv("RAH_WALL_TEMPERATURE_FILE");
+21:     if (file && *file) Load(file);
+22:   }
+23:   explicit RAHAxialWallTemperature(const std::string& file) { Load(file); }
+24:   bool Active() const { return !x_.empty(); }
+25: 
+26:   // 模块二：线性插值、全节点覆盖和端点严格检查，不外推、不裁剪温度。
+27:   double At(double x) const {
+28:     if (!Active() || !std::isfinite(x) || x < x_.front() || x > x_.back())
+29:       throw std::runtime_error("RAH thermal table does not cover wall node X");
+30:     const auto it = std::lower_bound(x_.begin(), x_.end(), x);
+31:     if (it == x_.begin()) return t_.front();
+32:     if (it == x_.end()) return t_.back();
+33:     const auto j = static_cast<std::size_t>(it - x_.begin());
+34:     const double w = (x - x_[j-1]) / (x_[j] - x_[j-1]);
+35:     return (1-w)*t_[j-1] + w*t_[j];
+36:   }
+37: 
+38:  private:
+39:   std::vector<double> x_, t_;
+40:   static double Number(const std::string& token) {
+41:     std::istringstream in(token);in.imbue(std::locale::classic());double value;
+42:     if (!(in >> value) || !std::isfinite(value))
+43:       throw std::runtime_error("RAH thermal table requires finite numeric data");
+44:     in >> std::ws;
+45:     if (!in.eof()) throw std::runtime_error("RAH thermal table has trailing data");
+46:     return value;
+47:   }
+48:   void Load(const std::string& file) {
+49:     std::ifstream in(file);std::string line;
+50:     if (!in || !std::getline(in,line)) throw std::runtime_error("RAH thermal table cannot be read");
+51:     if (!line.empty() && line.back()=='\r') line.pop_back();
+52:     if (line != "RAH_AXIAL_WALL_TEMPERATURE_V1,X_m,T_K")
+53:       throw std::runtime_error("RAH thermal table schema or SI units mismatch");
+54:     while (std::getline(in,line)) {
+55:       if (!line.empty() && line.back()=='\r') line.pop_back();
+56:       const auto comma=line.find(',');
+57:       if (line.size()>4096 || comma==std::string::npos || line.find(',',comma+1)!=std::string::npos)
+58:         throw std::runtime_error("RAH thermal table requires exactly two columns");
+59:       const double x=Number(line.substr(0,comma)),t=Number(line.substr(comma+1));
+60:       if (t<=0 || (!x_.empty() && x<=x_.back()) || x_.size()>=10000)
+61:         throw std::runtime_error("RAH thermal table must have increasing X and positive T");
+62:       x_.push_back(x);t_.push_back(t);
+63:     }
+64:     if (!in.eof() || x_.size()<2) throw std::runtime_error("RAH thermal table is incomplete");
+65:   }
+66: };
+67: #endif
+
+SU2_CFD/src/python_wrapper_structure.cpp:1-20 SHA256=29e2dc83851adda19274918487e79a3519c0d5f9e229c9cd900903d4b8bfcd0b
+1: #include <cstdlib>
+2: /*!
+3:  * \file python_wrapper_structure.cpp
+4:  * \brief Driver subroutines that are used by the Python wrapper. Those routines are usually called from an external Python environment.
+5:  * \author D. Thomas
+6:  * \version 8.6.0 "Harrier"
+7:  *
+8:  * SU2 Project Website: https://su2code.github.io
+9:  *
+10:  * The SU2 Project is maintained by the SU2 Foundation
+11:  * (http://su2foundation.org)
+12:  *
+13:  * Copyright 2012-2026, SU2 Contributors (cf. AUTHORS.md)
+14:  *
+15:  * SU2 is free software; you can redistribute it and/or
+16:  * modify it under the terms of the GNU Lesser General Public
+17:  * License as published by the Free Software Foundation; either
+18:  * version 2.1 of the License, or (at your option) any later version.
+19:  *
+20:  * SU2 is distributed in the hope that it will be useful,
+
+SU2_CFD/src/fluid/CIdealGas.cpp:31-101 SHA256=d9dc59839db243f1671e0a2e11608c357736882f2a8cc6f4c4cd900ab0ecca87
+31:   Gamma = gamma;
+32:   Gamma_Minus_One = Gamma - 1.0;
+33:   Gas_Constant = R;
+34:   Cp = Gamma / Gamma_Minus_One * Gas_Constant;
+35:   Cv = Cp - R;
+36: 
+37:   dTdrho_e = 0.0;
+38:   dTde_rho = Gamma_Minus_One / Gas_Constant;
+39: 
+40:   ComputeEntropy = CompEntropy;
+41: }
+42: 
+43: void CIdealGas::SetTDState_rhoe(su2double rho, su2double e) {
+44:   Density = rho;
+45:   StaticEnergy = e;
+46:   dPdrho_e = Gamma_Minus_One * StaticEnergy;
+47:   dPde_rho = Gamma_Minus_One * Density;
+48:   Pressure = dPde_rho * StaticEnergy;
+49:   Temperature = dTde_rho * StaticEnergy;
+50:   SoundSpeed2 = Gamma * Gas_Constant * Temperature;
+51: 
+52:   if (ComputeEntropy) Entropy = Cv * log(Temperature) - Gas_Constant * log(Density);
+53: }
+54: 
+55: void CIdealGas::SetTDState_PT(su2double P, su2double T) {
+56:   su2double e = T * Gas_Constant / Gamma_Minus_One;
+57:   su2double rho = P / (T * Gas_Constant);
+58:   SetTDState_rhoe(rho, e);
+59: }
+60: 
+61: void CIdealGas::SetTDState_Prho(su2double P, su2double rho) {
+62:   su2double e = P / (Gamma_Minus_One * rho);
+63:   SetTDState_rhoe(rho, e);
+64: }
+65: 
+66: void CIdealGas::SetEnergy_Prho(su2double P, su2double rho) { StaticEnergy = P / (rho * Gamma_Minus_One); }
+67: 
+68: void CIdealGas::SetTDState_hs(su2double h, su2double s) {
+69:   su2double T = h * Gamma_Minus_One / Gas_Constant / Gamma;
+70:   su2double e = h / Gamma;
+71:   su2double v = exp(-1 / Gamma_Minus_One * log(T) + s / Gas_Constant);
+72: 
+73:   SetTDState_rhoe(1 / v, e);
+74: }
+75: 
+76: void CIdealGas::SetTDState_Ps(su2double P, su2double s) {
+77:   su2double T = exp(Gamma_Minus_One / Gamma * (s / Gas_Constant + log(P) - log(Gas_Constant)));
+78:   su2double rho = P / (T * Gas_Constant);
+79: 
+80:   SetTDState_Prho(P, rho);
+81: }
+82: 
+83: void CIdealGas::SetTDState_rhoT(su2double rho, su2double T) {
+84:   su2double e = T * Gas_Constant / Gamma_Minus_One;
+85:   SetTDState_rhoe(rho, e);
+86: }
+87: 
+88: void CIdealGas::ComputeDerivativeNRBC_Prho(su2double P, su2double rho) {
+89:   su2double dPdT_rho, dPdrho_T, dPds_rho;
+90: 
+91:   SetTDState_Prho(P, rho);
+92: 
+93:   dPdT_rho = Gas_Constant * rho;
+94:   dPdrho_T = Gas_Constant * Temperature;
+95: 
+96:   dhdrho_P = -dPdrho_e / dPde_rho - P / rho / rho;
+97:   dhdP_rho = 1.0 / dPde_rho + 1.0 / rho;
+98:   dPds_rho = rho * rho * (SoundSpeed2 - dPdrho_T) / dPdT_rho;
+99:   dsdP_rho = 1.0 / dPds_rho;
+100:   dsdrho_P = -SoundSpeed2 / dPds_rho;
+101: }
+
+SU2_CFD/src/fluid/CFluidModel.cpp:79-108 SHA256=e803103b0d2cc1fe77ea29adb699aba40fd488a91003efef0a3a7a31646d502e
+79: unique_ptr<CConductivityModel> CFluidModel::MakeThermalConductivityModel(const CConfig* config,
+80:                                                                          unsigned short iSpecies) {
+81:   switch (config->GetKind_ConductivityModel()) {
+82:     case CONDUCTIVITYMODEL::CONSTANT:
+83:       if (config->GetKind_ConductivityModel_Turb() == CONDUCTIVITYMODEL_TURB::CONSTANT_PRANDTL) {
+84:         return unique_ptr<CConstantConductivityRANS>(
+85:             new CConstantConductivityRANS(config->GetThermal_Conductivity_ConstantND(iSpecies),
+86:                                           config->GetPrandtl_Turb(iSpecies)));
+87:       } else {
+88:         return unique_ptr<CConstantConductivity>(
+89:             new CConstantConductivity(config->GetThermal_Conductivity_ConstantND(iSpecies)));
+90:       }
+91:       break;
+92:     case CONDUCTIVITYMODEL::COOLPROP:
+93:       if (config->GetKind_ConductivityModel_Turb() == CONDUCTIVITYMODEL_TURB::CONSTANT_PRANDTL) {
+94:         return unique_ptr<CConstantConductivityRANS>(
+95:             new CConstantConductivityRANS(config->GetThermal_Conductivity_ConstantND(iSpecies),
+96:                                           config->GetPrandtl_Turb(iSpecies)));
+97:       } else {
+98:         return unique_ptr<CCoolPropConductivity>(
+99:             new CCoolPropConductivity(config->GetFluid_Name()));
+100:       }
+101:       break;
+102:     case CONDUCTIVITYMODEL::CONSTANT_PRANDTL:
+103:       if (config->GetKind_ConductivityModel_Turb() == CONDUCTIVITYMODEL_TURB::CONSTANT_PRANDTL) {
+104:         return unique_ptr<CConstantPrandtlRANS>(
+105:             new CConstantPrandtlRANS(config->GetPrandtl_Lam(iSpecies), config->GetPrandtl_Turb(iSpecies)));
+106:       } else {
+107:         return unique_ptr<CConstantPrandtl>(new CConstantPrandtl(config->GetPrandtl_Lam(iSpecies)));
+108:       }
+
+SU2_CFD/src/fluid/CFluidModel.cpp:131-134 SHA256=e803103b0d2cc1fe77ea29adb699aba40fd488a91003efef0a3a7a31646d502e
+131: void CFluidModel::SetThermalConductivityModel(const CConfig* config) {
+132:   ThermalConductivity = MakeThermalConductivityModel(config, 0);
+133: }
+134: 
+
+SU2_CFD/include/fluid/CConstantPrandtl.hpp:42-60 SHA256=2d70109b7e7e3bf2db1a7f9295cd9862bf61c973e9ebe5abc6c27ae47a0614e9
+42:   CConstantPrandtl(su2double pr_lam) : pr_lam_(pr_lam) {}
+43: 
+44:   /*!
+45:    * \brief Set thermal conductivity.
+46:    */
+47:   void SetConductivity(su2double t, su2double rho, su2double mu_lam, su2double mu_turb, su2double cp,
+48:                        su2double dmudrho_t, su2double dmudt_rho) override {
+49:     kt_ = mu_lam * cp / pr_lam_;
+50:     dktdrho_t_ = dmudrho_t * cp / pr_lam_;
+51:     dktdt_rho_ = dmudt_rho * cp / pr_lam_;
+52:   }
+53: 
+54:  private:
+55:   const su2double pr_lam_{0.0};    /*!< \brief Laminar Prandtl number. */
+56: };
+
+SU2_CFD/include/fluid/SU2EnergyState.hpp:1-10 SHA256=65535d6ab1ee77cbd127be402952e40bab6985853ff62fd01249e767390e7590
+1: // 模块用途。集中记录SST总能量与热状态之间的换算，供原生调用点和差分测试共用。
+2: #pragma once
+3: #include "CFluidModel.hpp"
+4: 
+5: namespace rah_air {
+6: inline double thermal_energy(double total_energy,double velocity_squared,double turbulent_k) {
+7:   return total_energy-.5*velocity_squared-turbulent_k;
+8: }
+9: 
+10: // 冻结比湍动能k，密度/动量/总能量密度作为守恒自变量。
+
+SU2_CFD/src/variables/CEulerVariable.cpp:31-64 SHA256=9ab7e8aa43e362782a1d9249a89d2f233df70259d7927b8d0e00b9bd89d12034
+31: unsigned long EulerNPrimVarGrad(const CConfig *config, unsigned long ndim) {
+32:   if (config->GetContinuous_Adjoint()) return ndim + 4;
+33:   if (config->GetKind_ConvNumScheme_Flow() == SPACE_CENTERED) return ndim + 1;
+34: 
+35:   const bool ideal_gas = config->GetKind_FluidModel() == STANDARD_AIR ||
+36:                          config->GetKind_FluidModel() == IDEAL_GAS;
+37:   const bool low_mach = config->Low_Mach_Correction();
+38:   if (ideal_gas && !low_mach &&
+39:     (config->GetKind_Upwind_Flow() == UPWIND::ROE || config->GetKind_Upwind_Flow() == UPWIND::MSW)) {
+40:     // Based on CRoeBase (numerics_simd).
+41:     return ndim + 2;
+42:   }
+43:   return ndim + 4;
+44: }
+45: 
+46: unsigned long EulerNSecVar(const CConfig *config) {
+47:   const bool ideal_gas = config->GetKind_FluidModel() == STANDARD_AIR ||
+48:                          config->GetKind_FluidModel() == IDEAL_GAS;
+49:   if (ideal_gas) return 0;
+50:   return config->GetViscous() ? 8 : 2;
+51: }
+52: 
+53: CEulerVariable::CEulerVariable(su2double density, const su2double *velocity, su2double energy, unsigned long npoint,
+54:                                unsigned long ndim, unsigned long nvar, const CConfig *config)
+55:   : CFlowVariable(npoint, ndim, nvar, ndim + 9, EulerNPrimVarGrad(config, ndim), config),
+56:     indices(ndim, 0) {
+57: 
+58:   const bool dual_time = (config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_1ST) ||
+59:                          (config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_2ND);
+60:   const bool classical_rk4 = (config->GetKind_TimeIntScheme_Flow() == CLASSICAL_RK4_EXPLICIT);
+61: 
+62:   nSecondaryVar = EulerNSecVar(config);
+63: 
+64:   /*--- Solution initialization ---*/
+
+SU2_CFD/include/variables/CEulerVariable.hpp:48-65 SHA256=a345131210c29e2b25ed0fe210924003e826604d2061be5ede5b2f4c4941e105
+48:   static constexpr size_t MAXNVAR = 12;
+49: 
+50:   template <class IndexType>
+51:   struct CIndices {
+52:     const IndexType nDim;
+53:     CIndices(IndexType ndim, IndexType) : nDim(ndim) {}
+54:     inline IndexType NDim() const { return nDim; }
+55:     inline IndexType NSpecies() const { return 0; }
+56:     inline IndexType Temperature() const { return 0; }
+57:     inline IndexType Velocity() const { return 1; }
+58:     inline IndexType Pressure() const { return nDim+1; }
+59:     inline IndexType Density() const { return nDim+2; }
+60:     inline IndexType Enthalpy() const { return nDim+3; }
+61:     inline IndexType SoundSpeed() const { return nDim+4; }
+62:     inline IndexType LaminarViscosity() const { return nDim+5; }
+63:     inline IndexType EddyViscosity() const { return nDim+6; }
+64:     inline IndexType ThermalConductivity() const { return nDim+7; }
+65:     inline IndexType CpTotal() const { return nDim+8; }
+
+SU2_CFD/include/variables/CEulerVariable.hpp:124-148 SHA256=a345131210c29e2b25ed0fe210924003e826604d2061be5ede5b2f4c4941e105
+124:   /*!
+125:    * \brief Set the value of the pressure.
+126:    */
+127:   inline bool SetPressure(unsigned long iPoint, su2double pressure) final {
+128:     Primitive(iPoint,nDim+1) = pressure;
+129:     return pressure <= 0.0;
+130:   }
+131: 
+132:   /*!
+133:    * \brief Set the value of the speed of the sound.
+134:    * \param[in] soundspeed2 - Value of soundspeed^2.
+135:    */
+136:   bool SetSoundSpeed(unsigned long iPoint, su2double soundspeed2) final {
+137:     if (soundspeed2 < 0.0) return true;
+138:     Primitive(iPoint,nDim+4) = sqrt(soundspeed2);
+139:     return false;
+140:   }
+141: 
+142:   /*!
+143:    * \brief Set the value of the enthalpy.
+144:    */
+145:   inline void SetEnthalpy(unsigned long iPoint) final {
+146:     Primitive(iPoint, indices.Enthalpy()) =
+147:       (Solution(iPoint,nVar-1) + Primitive(iPoint, indices.Pressure())) / Solution(iPoint,0);
+148:   }
+
+SU2_CFD/include/variables/CEulerVariable.hpp:201-214 SHA256=a345131210c29e2b25ed0fe210924003e826604d2061be5ede5b2f4c4941e105
+201:   inline bool SetDensity(unsigned long iPoint) final {
+202:     Primitive(iPoint, indices.Density()) = Solution(iPoint,0);
+203:     return Primitive(iPoint, indices.Density()) <= 0.0;
+204:   }
+205: 
+206:   /*!
+207:    * \brief Set the value of the temperature.
+208:    * \param[in] temperature - how agitated the particles are :)
+209:    */
+210:   inline bool SetTemperature(unsigned long iPoint, su2double temperature) final {
+211:     Primitive(iPoint, indices.Temperature()) = temperature;
+212:     return temperature <= 0.0;
+213:   }
+214: 
+
+SU2_CFD/src/variables/CNSVariable.cpp:140-231 SHA256=3134abd33e753821a96386d19e9317d9f3d72afa216b31356c7af906284703c3
+140: bool CNSVariable::SetPrimVar(unsigned long iPoint, su2double eddy_visc, su2double turb_ke, CFluidModel *FluidModel) {
+141: 
+142:   // 直接捕获热状态计算输入，包含原生回退后的同一次调用。
+143:   FlowPrimitiveK(iPoint) = turb_ke;
+144: 
+145:   bool RightVol = true;
+146: 
+147:   SetVelocity(iPoint); // Computes velocity and velocity^2
+148:   su2double density      = GetDensity(iPoint);
+149:   su2double staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;
+150: 
+151:   /*--- Check will be moved inside fluid model plus error description strings ---*/
+152: 
+153:   FluidModel->SetTDState_rhoe(density, staticEnergy);
+154: 
+155:   bool check_dens  = SetDensity(iPoint);
+156:   bool check_press = SetPressure(iPoint, FluidModel->GetPressure());
+157:   bool check_sos   = SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+158:   bool check_temp  = SetTemperature(iPoint, FluidModel->GetTemperature());
+159: 
+160:   /*--- Check that the solution has a physical meaning ---*/
+161: 
+162:   if (check_dens || check_press || check_sos  || check_temp) {
+163: 
+164:     /*--- Copy the old solution ---*/
+165: 
+166:     for (unsigned long iVar = 0; iVar < nVar; iVar++)
+167:       Solution(iPoint,iVar) = Solution_Old(iPoint,iVar);
+168: 
+169:     /*--- Recompute the primitive variables ---*/
+170: 
+171:     SetVelocity(iPoint); // Computes velocity and velocity^2
+172:     density      = GetDensity(iPoint);
+173:     staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;
+174: 
+175:     /*--- Check will be moved inside fluid model plus error description strings ---*/
+176: 
+177:     FluidModel->SetTDState_rhoe(density, staticEnergy);
+178: 
+179:     SetDensity(iPoint);
+180:     SetPressure(iPoint, FluidModel->GetPressure());
+181:     SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+182:     SetTemperature(iPoint, FluidModel->GetTemperature());
+183: 
+184:     RightVol = false;
+185: 
+186:   }
+187: 
+188:   /*--- Set enthalpy ---*/
+189: 
+190:   SetEnthalpy(iPoint); // Requires pressure computation.
+191: 
+192:   /*--- Set laminar viscosity ---*/
+193: 
+194:   SetLaminarViscosity(iPoint, FluidModel->GetLaminarViscosity());
+195: 
+196:   /*--- Set eddy viscosity ---*/
+197: 
+198:   SetEddyViscosity(iPoint, eddy_visc);
+199: 
+200:   /*--- Set thermal conductivity ---*/
+201: 
+202:   SetThermalConductivity(iPoint, FluidModel->GetThermalConductivity());
+203: 
+204:   /*--- Set specific heat ---*/
+205: 
+206:   SetSpecificHeatCp(iPoint, FluidModel->GetCp());
+207: 
+208:   /*--- Set look-up variables in case of data-driven fluid model ---*/
+209:   if (DataDrivenFluid) {
+210:     SetDataExtrapolation(iPoint, FluidModel->GetExtrapolation());
+211:     SetEntropy(iPoint, FluidModel->GetEntropy());
+212:   }
+213: 
+214:   return RightVol;
+215: }
+216: 
+217: void CNSVariable::SetSecondaryVar(unsigned long iPoint, CFluidModel *FluidModel) {
+218:   if (nSecondaryVar == 0) return;
+219: 
+220:   /*--- Compute secondary thermodynamic properties (partial derivatives...) ---*/
+221: 
+222:   SetdPdrho_e( iPoint, FluidModel->GetdPdrho_e() );
+223:   SetdPde_rho( iPoint, FluidModel->GetdPde_rho() );
+224: 
+225:   SetdTdrho_e( iPoint, FluidModel->GetdTdrho_e() );
+226:   SetdTde_rho( iPoint, FluidModel->GetdTde_rho() );
+227: 
+228:   /*--- Compute secondary thermo-physical properties (partial derivatives...) ---*/
+229: 
+230:   Setdmudrho_T( iPoint, FluidModel->Getdmudrho_T() );
+231:   SetdmudT_rho( iPoint, FluidModel->GetdmudT_rho() );
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:873-891 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+873:     case STANDARD_AIR:
+874: 
+875:       switch (config->GetSystemMeasurements()) {
+876:         case SI: config->SetGas_Constant(287.058); break;
+877:         case US: config->SetGas_Constant(1716.49); break;
+878:       }
+879: 
+880:       auxFluidModel = new CIdealGas(1.4, config->GetGas_Constant());
+881: 
+882:       if (free_stream_temp && aeroelastic) {
+883:         Temperature_FreeStream = TgammaR / (config->GetGas_Constant()*1.4);
+884:         config->SetTemperature_FreeStream(Temperature_FreeStream);
+885:       }
+886:       break;
+887: 
+888:     case IDEAL_GAS:
+889: 
+890:       auxFluidModel = new CIdealGas(Gamma, config->GetGas_Constant());
+891:       break;
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:1140-1179 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+1140: 
+1141:       case STANDARD_AIR:
+1142:         FluidModel[thread] = new CIdealGas(1.4, Gas_ConstantND);
+1143:         break;
+1144: 
+1145:       case IDEAL_GAS:
+1146:         FluidModel[thread] = new CIdealGas(Gamma, Gas_ConstantND);
+1147:         break;
+1148: 
+1149:       case VW_GAS:
+1150:         FluidModel[thread] = new CVanDerWaalsGas(Gamma, Gas_ConstantND,
+1151:                                                  config->GetPressure_Critical() / config->GetPressure_Ref(),
+1152:                                                  config->GetTemperature_Critical() / config->GetTemperature_Ref());
+1153:         break;
+1154: 
+1155:       case PR_GAS:
+1156:         FluidModel[thread] = new CPengRobinson(Gamma, Gas_ConstantND,
+1157:                                                config->GetPressure_Critical() / config->GetPressure_Ref(),
+1158:                                                config->GetTemperature_Critical() / config->GetTemperature_Ref(),
+1159:                                                config->GetAcentric_Factor());
+1160:         break;
+1161: 
+1162:       case DATADRIVEN_FLUID:
+1163:         FluidModel[thread] = new CDataDrivenFluid(config, false);
+1164:         break;
+1165: 
+1166:       case IDEAL_AIR_VARIABLE_CP:
+1167:         FluidModel[thread] = new CSU2IdealAir();
+1168:         break;
+1169: 
+1170:       case COOLPROP:
+1171:         FluidModel[thread] = new CCoolProp(config->GetFluid_Name());
+1172:         break;
+1173:     }
+1174: 
+1175:     GetFluidModel()->SetEnergy_Prho(Pressure_FreeStreamND, Density_FreeStreamND);
+1176:     if (viscous) {
+1177:       GetFluidModel()->SetLaminarViscosityModel(config);
+1178:       GetFluidModel()->SetThermalConductivityModel(config);
+1179:       GetFluidModel()->SetMassDiffusivityModel(config);
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:1838-1850 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+1838: 
+1839:   const bool ideal_gas = (config->GetKind_FluidModel() == STANDARD_AIR) ||
+1840:                          (config->GetKind_FluidModel() == IDEAL_GAS);
+1841:   const bool low_mach_corr = config->Low_Mach_Correction();
+1842: 
+1843:   /*--- Use vectorization if the scheme supports it. ---*/
+1844:   if (ideal_gas && !low_mach_corr) {
+1845:     if (config->GetKind_Upwind_Flow() == UPWIND::ROE || config->GetKind_Upwind_Flow() == UPWIND::MSW) {
+1846:       EdgeFluxResidual(geometry, solver_container, config);
+1847:       return;
+1848:     }
+1849:   }
+1850: 
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:1964-1982 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+1964:       /*--- Recompute the reconstructed quantities in a thermodynamically consistent way. ---*/
+1965: 
+1966:       bool rah_invalid_reconstruction = false;
+1967:       if (!ideal_gas || low_mach_corr) {
+1968:         const bool variable_air = config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP;
+1969:         const bool with_k = variable_air && config->GetKind_Turb_Model() == TURB_MODEL::SST;
+1970:         const su2double k_i = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
+1971:         const su2double k_j = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(jPoint,0) : 0.0;
+1972:         try {
+1973:           ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i, k_i);
+1974:           ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j, k_j);
+1975:         } catch (const std::domain_error&) {
+1976:           if (!variable_air) throw;
+1977:           // 拒绝超温域重构，复用原生单元值降阶路径，避免半更新状态。
+1978:           rah_invalid_reconstruction = true;
+1979:           std::copy_n(V_i,nPrimVar,Primitive_i); std::copy_n(V_j,nPrimVar,Primitive_j);
+1980:           std::copy_n(S_i,nSecondaryVar,Secondary_i); std::copy_n(S_j,nSecondaryVar,Secondary_j);
+1981:         }
+1982:       }
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:5290-5296 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+5290:   const string Marker_Tag = config->GetMarker_All_TagBound(val_marker);
+5291:   const bool viscous      = config->GetViscous(),
+5292:              implicit     = config->GetKind_TimeIntScheme() == EULER_IMPLICIT,
+5293:              gravity      = config->GetGravityForce(),
+5294:              tkeNeeded    = config->GetKind_Turb_Model() == TURB_MODEL::SST,
+5295:              ideal_gas    = config->GetKind_FluidModel() == STANDARD_AIR ||
+5296:                             config->GetKind_FluidModel() == IDEAL_GAS;
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:5331-5348 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+5331: 
+5332:       /*--- Compute the internal state u_i ---*/
+5333:       su2double Velocity_i[MAXNDIM]={0};
+5334:       for (auto iDim=0u; iDim < nDim; iDim++)
+5335:         Velocity_i[iDim] = nodes->GetVelocity(iPoint,iDim);
+5336: 
+5337:       const auto Velocity2_i = GeometryToolbox::SquaredNorm(nDim, Velocity_i);
+5338: 
+5339:       const auto Density_i = nodes->GetDensity(iPoint);
+5340: 
+5341:       const auto Energy_i = nodes->GetEnergy(iPoint);
+5342:       const bool variable_air = config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP;
+5343:       const su2double k_i = variable_air && tkeNeeded ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
+5344:       const su2double StaticEnergy_i = rah_air::thermal_energy(Energy_i,Velocity2_i,k_i);
+5345: 
+5346:       GetFluidModel()->SetTDState_rhoe(Density_i, StaticEnergy_i);
+5347: 
+5348:       const auto Pressure_i = GetFluidModel()->GetPressure();
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:5399-5427 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+5399:         break;
+5400: 
+5401:       case STATIC_SUPERSONIC_INFLOW_PT:
+5402: 
+5403:         /*--- Retrieve the specified total conditions for this boundary. ---*/
+5404:         if (gravity) P_static = config->GetRiemann_Var1(Marker_Tag) - geometry->nodes->GetCoord(iPoint, nDim-1)*STANDARD_GRAVITY;/// check in which case is true (only freesurface?)
+5405:         else P_static  = config->GetRiemann_Var1(Marker_Tag);
+5406:         T_static  = config->GetRiemann_Var2(Marker_Tag);
+5407:         Mach = config->GetRiemann_FlowDir(Marker_Tag);
+5408: 
+5409:         /*--- Non-dim. the inputs if necessary. ---*/
+5410:         P_static /= config->GetPressure_Ref();
+5411:         T_static /= config->GetTemperature_Ref();
+5412: 
+5413:         /* --- Computes the total state --- */
+5414:         GetFluidModel()->SetTDState_PT(P_static, T_static);
+5415: 
+5416:         /* --- Compute the boundary state u_e --- */
+5417:         for (auto iDim = 0u; iDim < nDim; iDim++)
+5418:           Velocity_e[iDim] = Mach[iDim]*GetFluidModel()->GetSoundSpeed();
+5419: 
+5420:         Velocity2_e = GeometryToolbox::SquaredNorm(nDim, Velocity_e);
+5421:         Density_e = GetFluidModel()->GetDensity();
+5422:         StaticEnergy_e = GetFluidModel()->GetStaticEnergy();
+5423:         Energy_e = StaticEnergy_e + 0.5 * Velocity2_e;
+5424:         if (tkeNeeded) Energy_e += GetTke_Inf();
+5425:         break;
+5426: 
+5427:       case STATIC_SUPERSONIC_INFLOW_PD:
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:5469-5488 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+5469: 
+5470:       case STATIC_PRESSURE:
+5471: 
+5472:         /*--- Retrieve the static pressure for this boundary. ---*/
+5473:         Pressure_e = config->GetRiemann_Var1(Marker_Tag);
+5474:         Pressure_e /= config->GetPressure_Ref();
+5475:         Density_e = Density_i;
+5476: 
+5477:         /* --- Compute the boundary state u_e --- */
+5478:         GetFluidModel()->SetTDState_Prho(Pressure_e, Density_e);
+5479:         for (auto iDim = 0u; iDim < nDim; iDim++)
+5480:           Velocity_e[iDim] = Velocity_i[iDim];
+5481: 
+5482:         Velocity2_e = GeometryToolbox::SquaredNorm(nDim, Velocity_e);
+5483:         Energy_e = GetFluidModel()->GetStaticEnergy() + 0.5*Velocity2_e + k_i;
+5484:         break;
+5485: 
+5486:       default:
+5487:         SU2_MPI::Error("Invalid Riemann input!", CURRENT_FUNCTION);
+5488:         break;
+
+SU2_CFD/src/solvers/CEulerSolver.cpp:5527-5558 SHA256=199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67
+5527:       /*--- Compute the boundary state u_b using characteristics ---*/
+5528:       for (auto iVar = 0u; iVar < nVar; iVar++) {
+5529:         u_b[iVar] = u_i[iVar];
+5530:         for (auto jVar = 0u; jVar < nVar; jVar++) {
+5531:           if (Lambda_i[jVar] < 0)
+5532:             u_b[iVar] += P_Tensor[iVar][jVar]*dw[jVar];
+5533:         }
+5534:       }
+5535: 
+5536:       /*--- Compute the thermodynamic state in u_b ---*/
+5537:       su2double Velocity_b[MAXNDIM] = {0};
+5538:       const auto Density_b = u_b[0];
+5539:       for (auto iDim = 0u; iDim < nDim; iDim++)
+5540:         Velocity_b[iDim] = u_b[iDim+1]/Density_b;
+5541:       const auto Velocity2_b = GeometryToolbox::SquaredNorm(nDim, Velocity_b);
+5542: 
+5543:       const su2double Energy_b = u_b[nVar-1]/Density_b;
+5544:       const bool outgoing = GeometryToolbox::DotProduct(nDim,Velocity_b,UnitNormal) >= 0;
+5545:       const bool pressure_boundary = config->GetKind_Data_Riemann(Marker_Tag) == STATIC_PRESSURE;
+5546:       const su2double k_b = variable_air && tkeNeeded ? ((outgoing || pressure_boundary) ? k_i : GetTke_Inf()) : 0.0;
+5547:       const su2double StaticEnergy_b = rah_air::thermal_energy(Energy_b,Velocity2_b,k_b);
+5548:       GetFluidModel()->SetTDState_rhoe(Density_b, StaticEnergy_b);
+5549: 
+5550:       /*--- Store number of Newton iterations at BC ---*/
+5551:       if(config->GetKind_FluidModel() == DATADRIVEN_FLUID)
+5552:         nodes->SetNewtonSolverIterations(iPoint, GetFluidModel()->GetnIter_Newton());
+5553: 
+5554:       const auto Pressure_b = GetFluidModel()->GetPressure();
+5555:       const auto Temperature_b = GetFluidModel()->GetTemperature();
+5556:       const su2double Enthalpy_b = Energy_b + Pressure_b/Density_b;
+5557:       const su2double Kappa_b = GetFluidModel()->GetdPde_rho() / Density_b;
+5558:       const su2double Chi_b = GetFluidModel()->GetdPdrho_e() - Kappa_b * (StaticEnergy_b+k_b);
+
+SU2_CFD/src/solvers/CNSSolver.cpp:690-750 SHA256=2f7b1364d66388b4e34e91f65d62fecaa8324e9462aa64d8c96b33a32299a66c
+690:     /*--- Store the corrected velocity at the wall which will
+691:      be zero (v = 0), unless there is grid motion (v = u_wall)---*/
+692: 
+693:     if (dynamic_grid) {
+694:       nodes->SetVelocity_Old(iPoint, geometry->nodes->GetGridVel(iPoint));
+695:     } else {
+696:       su2double zero[MAXNDIM] = {0.0};
+697:       nodes->SetVelocity_Old(iPoint, zero);
+698:     }
+699: 
+700:     for (auto iDim = 0u; iDim < nDim; iDim++) LinSysRes(iPoint, iDim+1) = 0.0;
+701:     nodes->SetVel_ResTruncError_Zero(iPoint);
+702: 
+703:     /*--- Get transport coefficients ---*/
+704: 
+705:     su2double Cp = nodes->GetSpecificHeatCp(iPoint);
+706:     su2double eddy_viscosity       = nodes->GetEddyViscosity(iPoint);
+707:     su2double thermal_conductivity = nodes->GetThermalConductivity(iPoint) + Cp * eddy_viscosity / Prandtl_Turb;
+708: 
+709:     // work in progress on real-gases...
+710:     //thermal_conductivity = nodes->GetThermalConductivity(iPoint);
+711:     //Cp = nodes->GetSpecificHeatCp(iPoint);
+712:     //thermal_conductivity += Cp*eddy_viscosity/Prandtl_Turb;
+713: 
+714:     /*--- If it is a customizable or CHT patch, retrieve the specified wall temperature. ---*/
+715: 
+716:     const su2double There = nodes->GetTemperature(Point_Normal);
+717: 
+718:     if (cht_mode) {
+719:       Twall = GetCHTWallTemperature(config, val_marker, iVertex, dist_ij,
+720:                                     thermal_conductivity, There, Temperature_Ref);
+721:     } else if (config->GetMarker_All_PyCustom(val_marker)) {
+722:       Twall = geometry->GetCustomBoundaryTemperature(val_marker, iVertex) / Temperature_Ref;
+723:     }
+724: 
+725:     /*--- Compute the normal gradient in temperature using Twall ---*/
+726: 
+727:     su2double dTdn = -(There - Twall)/dist_ij;
+728: 
+729:     /*--- Apply a weak boundary condition for the energy equation.
+730:      Compute the residual due to the prescribed heat flux. ---*/
+731: 
+732:     su2double Res_Conv = 0.0;
+733:     su2double Res_Visc = thermal_conductivity * dTdn * Area;
+734: 
+735:     /*--- Calculate Jacobian for implicit time stepping ---*/
+736: 
+737:     if (implicit) {
+738: 
+739:       /*--- Add contributions to the Jacobian from the weak enforcement of the energy equations. ---*/
+740: 
+741:       su2double Density = nodes->GetDensity(iPoint);
+742:       su2double Vel2 = GeometryToolbox::SquaredNorm(nDim, &nodes->GetPrimitive(iPoint)[prim_idx.Velocity()]);
+743:       su2double dTdrho = 1.0/Density * ( -Twall + (Gamma-1.0)/Gas_Constant*(Vel2/2.0) );
+744:       su2double dTdrhoE = (Gamma-1.0)/(Gas_Constant*Density);
+745:       if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP) {
+746:         // 原生弱壁面近似对角预条件，采用同阶段实际状态和冻结k的热力学链式导数。
+747:         const su2double* secondary = nodes->GetSecondary(iPoint);
+748:         dTdrho = secondary[2] + secondary[3]*(Vel2-nodes->GetEnergy(iPoint))/Density;
+749:         dTdrhoE = secondary[3]/Density;
+750:       }
+
+SU2_CFD/src/drivers/CDriver.cpp:1667-1682 SHA256=a384328e069d9c62fe7ba860be5cf52be63b7032f75b4df26081827fb5a63e64
+1667:         if (compressible) {
+1668:           /*--- Compressible flow ---*/
+1669:           switch (config->GetKind_Upwind_Flow()) {
+1670:             case UPWIND::ROE:
+1671:               if (ideal_gas) {
+1672: 
+1673:                 for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {
+1674:                   numerics[iMGlevel][FLOW_SOL][conv_term] = new CUpwRoe_Flow(nDim, nVar_Flow, config, roe_low_dissipation);
+1675:                   numerics[iMGlevel][FLOW_SOL][conv_bound_term] = new CUpwRoe_Flow(nDim, nVar_Flow, config, false);
+1676:                 }
+1677:               } else {
+1678: 
+1679:                 for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {
+1680:                   numerics[iMGlevel][FLOW_SOL][conv_term] = new CUpwGeneralRoe_Flow(nDim, nVar_Flow, config);
+1681:                   numerics[iMGlevel][FLOW_SOL][conv_bound_term] = new CUpwGeneralRoe_Flow(nDim, nVar_Flow, config);
+1682:                 }
+
+SU2_CFD/src/drivers/CDriver.cpp:1804-1828 SHA256=a384328e069d9c62fe7ba860be5cf52be63b7032f75b4df26081827fb5a63e64
+1804: 
+1805:     /*--- Definition of the viscous scheme for each equation and mesh level ---*/
+1806:     if (compressible) {
+1807:       if (ideal_gas) {
+1808: 
+1809:         /*--- Compressible flow Ideal gas ---*/
+1810:         numerics[MESH_0][FLOW_SOL][visc_term] = new CAvgGrad_Flow(nDim, nVar_Flow, true, config);
+1811:         for (iMGlevel = 1; iMGlevel <= config->GetnMGLevels(); iMGlevel++)
+1812:           numerics[iMGlevel][FLOW_SOL][visc_term] = new CAvgGrad_Flow(nDim, nVar_Flow, false, config);
+1813: 
+1814:         /*--- Definition of the boundary condition method ---*/
+1815:         for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++)
+1816:           numerics[iMGlevel][FLOW_SOL][visc_bound_term] = new CAvgGrad_Flow(nDim, nVar_Flow, false, config);
+1817: 
+1818:       } else {
+1819: 
+1820:         /*--- Compressible flow Real gas ---*/
+1821:         numerics[MESH_0][FLOW_SOL][visc_term] = new CGeneralAvgGrad_Flow(nDim, nVar_Flow, true, config);
+1822:         for (iMGlevel = 1; iMGlevel <= config->GetnMGLevels(); iMGlevel++)
+1823:           numerics[iMGlevel][FLOW_SOL][visc_term] = new CGeneralAvgGrad_Flow(nDim, nVar_Flow, false, config);
+1824: 
+1825:         /*--- Definition of the boundary condition method ---*/
+1826:         for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++)
+1827:           numerics[iMGlevel][FLOW_SOL][visc_bound_term] = new CGeneralAvgGrad_Flow(nDim, nVar_Flow, false, config);
+1828: 
+
+SU2_CFD/src/numerics/flow/flow_diffusion.cpp:393-446 SHA256=fa305896da11bf487a89cfb897a6cb16f02c4e6ac366e946589abca8e9636639
+393: CNumerics::ResidualType<> CAvgGrad_Flow::ComputeResidual(const CConfig* config) {
+394: 
+395:   implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+396: 
+397:   AD::StartPreacc();
+398:   AD::SetPreaccIn(V_i, nDim+9);   AD::SetPreaccIn(V_j, nDim+9);
+399:   AD::SetPreaccIn(Coord_i, nDim); AD::SetPreaccIn(Coord_j, nDim);
+400:   AD::SetPreaccIn(PrimVar_Grad_i, nDim+1, nDim);
+401:   AD::SetPreaccIn(PrimVar_Grad_j, nDim+1, nDim);
+402:   AD::SetPreaccIn(turb_ke_i); AD::SetPreaccIn(turb_ke_j);
+403:   AD::SetPreaccIn(TauWall_i); AD::SetPreaccIn(TauWall_j);
+404:   AD::SetPreaccIn(Normal, nDim);
+405: 
+406:   unsigned short iVar, jVar, iDim;
+407: 
+408:   /*--- Normalized normal vector ---*/
+409: 
+410:   Area = GeometryToolbox::Norm(nDim, Normal);
+411: 
+412:   for (iDim = 0; iDim < nDim; iDim++)
+413:     UnitNormal[iDim] = Normal[iDim]/Area;
+414: 
+415:   PrimVar_i = V_i;
+416:   PrimVar_j = V_j;
+417: 
+418:   for (iVar = 0; iVar < nPrimVar; iVar++) {
+419:     Mean_PrimVar[iVar] = 0.5*(PrimVar_i[iVar]+PrimVar_j[iVar]);
+420:   }
+421: 
+422:   /*--- Compute vector going from iPoint to jPoint ---*/
+423: 
+424:   dist_ij_2 = 0.0;
+425:   for (iDim = 0; iDim < nDim; iDim++) {
+426:     Edge_Vector[iDim] = Coord_j[iDim]-Coord_i[iDim];
+427:     dist_ij_2 += Edge_Vector[iDim]*Edge_Vector[iDim];
+428:   }
+429: 
+430:   /*--- Laminar and Eddy viscosity ---*/
+431: 
+432:   Laminar_Viscosity_i = V_i[nDim+5]; Laminar_Viscosity_j = V_j[nDim+5];
+433:   Eddy_Viscosity_i = V_i[nDim+6]; Eddy_Viscosity_j = V_j[nDim+6];
+434:   Thermal_Conductivity_i = V_i[nDim+7]; Thermal_Conductivity_j = V_j[nDim+7];
+435:   Cp_i = V_i[nDim + 8]; Cp_j = V_j[nDim + 8];
+436: 
+437:   /*--- Mean Viscosities and turbulent kinetic energy---*/
+438: 
+439:   Mean_Laminar_Viscosity = 0.5*(Laminar_Viscosity_i + Laminar_Viscosity_j);
+440:   Mean_Eddy_Viscosity = 0.5*(Eddy_Viscosity_i + Eddy_Viscosity_j);
+441:   Mean_Thermal_Conductivity = 0.5*(Thermal_Conductivity_i + Thermal_Conductivity_j);
+442:   Mean_turb_ke = 0.5*(turb_ke_i + turb_ke_j);
+443:   Mean_Cp = 0.5 * (Cp_i + Cp_j);
+444: 
+445:   /*--- Mean gradient approximation ---*/
+446: 
+
+SU2_CFD/src/numerics/flow/flow_diffusion.cpp:486-510 SHA256=fa305896da11bf487a89cfb897a6cb16f02c4e6ac366e946589abca8e9636639
+486:   if (Mean_TauWall > 0) AddTauWall(UnitNormal, Mean_TauWall);
+487: 
+488:   SetHeatFluxVector(Mean_GradPrimVar, Mean_Eddy_Viscosity, Mean_Thermal_Conductivity, Mean_Cp);
+489: 
+490:   GetViscousProjFlux(Mean_PrimVar, Normal);
+491: 
+492:   /*--- Compute the implicit part ---*/
+493: 
+494:   if (implicit) {
+495: 
+496:     if (dist_ij_2 == 0.0) {
+497:       for (iVar = 0; iVar < nVar; iVar++) {
+498:         for (jVar = 0; jVar < nVar; jVar++) {
+499:           Jacobian_i[iVar][jVar] = 0.0;
+500:           Jacobian_j[iVar][jVar] = 0.0;
+501:         }
+502:       }
+503:     } else {
+504:       const su2double dist_ij = sqrt(dist_ij_2);
+505:       SetTauJacobian(Mean_PrimVar, Mean_Laminar_Viscosity, Mean_Eddy_Viscosity, dist_ij, UnitNormal);
+506: 
+507:       SetHeatFluxJacobian(Mean_PrimVar, Mean_Cp, Mean_Thermal_Conductivity, Mean_Eddy_Viscosity, dist_ij, UnitNormal);
+508: 
+509:       GetViscousProjJacs(Mean_PrimVar, Area, Proj_Flux_Tensor, Jacobian_i, Jacobian_j);
+510:     }
+
+SU2_CFD/include/numerics_simd/CNumericsSIMD.cpp:38-55 SHA256=df4e67d5cd6f375085d3df07cca89888ea52c41978b7fc1501fe49544e735f96
+38:  * \brief Upwind factory implementation for ideal gas.
+39:  */
+40: template<class ViscousDecorator>
+41: CNumericsSIMD* createUpwindIdealNumerics(const CConfig& config, int iMesh, const CVariable* turbVars) {
+42:   CNumericsSIMD* obj = nullptr;
+43:   switch (config.GetKind_Upwind_Flow()) {
+44:     case UPWIND::ROE:
+45:       obj = new CRoeScheme<ViscousDecorator>(config, iMesh, turbVars);
+46:       break;
+47:     case UPWIND::MSW:
+48:       obj = new CMSWScheme<ViscousDecorator>(config, iMesh, turbVars);
+49:       break;
+50:     default:
+51:       break;
+52:   }
+53:   return obj;
+54: }
+55: 
+
+SU2_CFD/include/numerics_simd/CNumericsSIMD.cpp:97-119 SHA256=df4e67d5cd6f375085d3df07cca89888ea52c41978b7fc1501fe49544e735f96
+97:   CNumericsSIMD* obj = nullptr;
+98:   const bool ideal_gas = (config.GetKind_FluidModel() == STANDARD_AIR) ||
+99:                          (config.GetKind_FluidModel() == IDEAL_GAS);
+100: 
+101:   switch (config.GetKind_ConvNumScheme_Flow()) {
+102:     case SPACE_UPWIND:
+103:       if (config.GetViscous()) {
+104:         if (ideal_gas)
+105:           obj = createUpwindIdealNumerics<CCompressibleViscousFlux<nDim> >(config, iMesh, turbVars);
+106:         else
+107:           obj = createUpwindGeneralNumerics<CGeneralCompressibleViscousFlux<nDim> >(config, iMesh, turbVars);
+108:       }
+109:       else {
+110:         if (ideal_gas)
+111:           obj = createUpwindIdealNumerics<CNoViscousFlux<nDim> >(config, iMesh, turbVars);
+112:         else
+113:           obj = createUpwindGeneralNumerics<CNoViscousFlux<nDim> >(config, iMesh, turbVars);
+114:       }
+115:       break;
+116: 
+117:     case SPACE_CENTERED:
+118:       if (config.GetViscous()) {
+119:         if (ideal_gas)
+
+SU2_CFD/include/numerics_simd/flow/variables.hpp:40-95 SHA256=9747a7d2a6a0a62a7bec354133087170964f9845120660005504eb2be4ba3c15
+40:   VectorDbl<nVar> all;
+41:   FORCEINLINE Double& temperature() { return all(0); }
+42:   FORCEINLINE Double& pressure() { return all(nDim+1); }
+43:   FORCEINLINE Double& density() { return all(nDim+2); }
+44:   FORCEINLINE Double& enthalpy() { return all(nDim+3); }
+45:   FORCEINLINE Double& velocity(size_t iDim) { return all(iDim+1); }
+46:   FORCEINLINE const Double& temperature() const { return all(0); }
+47:   FORCEINLINE const Double& pressure() const { return all(nDim+1); }
+48:   FORCEINLINE const Double& density() const { return all(nDim+2); }
+49:   FORCEINLINE const Double& enthalpy() const { return all(nDim+3); }
+50:   FORCEINLINE const Double& velocity(size_t iDim) const { return all(iDim+1); }
+51:   FORCEINLINE const Double* velocity() const { return &velocity(0); }
+52: 
+53:   /*--- Un-reconstructed variables. ---*/
+54:   FORCEINLINE Double& speedSound() { return all(nDim+4); }
+55:   FORCEINLINE Double& laminarVisc() { return all(nDim+5); }
+56:   FORCEINLINE Double& eddyVisc() { return all(nDim+6); }
+57:   FORCEINLINE Double& thermalCond() { return all(nDim+7); }
+58:   FORCEINLINE Double& cp() { return all(nDim+8); }
+59:   FORCEINLINE const Double& speedSound() const { return all(nDim+4); }
+60:   FORCEINLINE const Double& laminarVisc() const { return all(nDim+5); }
+61:   FORCEINLINE const Double& eddyVisc() const { return all(nDim+6); }
+62:   FORCEINLINE const Double& thermalCond() const { return all(nDim+7); }
+63:   FORCEINLINE const Double& cp() const { return all(nDim+8); }
+64: };
+65: 
+66: /*!
+67:  * \brief Type to store compressible conservative (i.e. solution) variables.
+68:  */
+69: template<size_t nDim_>
+70: struct CCompressibleConservatives {
+71:   static constexpr size_t nDim = nDim_;
+72:   static constexpr size_t nVar = nDim+2;
+73:   VectorDbl<nVar> all;
+74: 
+75:   FORCEINLINE Double& density() { return all(0); }
+76:   FORCEINLINE Double& rhoEnergy() { return all(nDim+1); }
+77:   FORCEINLINE Double& momentum(size_t iDim) { return all(iDim+1); }
+78:   FORCEINLINE const Double& density() const { return all(0); }
+79:   FORCEINLINE const Double& rhoEnergy() const { return all(nDim+1); }
+80:   FORCEINLINE const Double& momentum(size_t iDim) const { return all(iDim+1); }
+81: 
+82:   FORCEINLINE Double energy() const { return rhoEnergy() / density(); }
+83:   FORCEINLINE const Double* momentum() const { return &momentum(0); }
+84: };
+85: 
+86: /*!
+87:  * \brief Primitive to conservative conversion.
+88:  */
+89: template<size_t nDim, size_t N>
+90: FORCEINLINE CCompressibleConservatives<nDim> compressibleConservatives(const CCompressiblePrimitives<nDim,N>& V) {
+91:   CCompressibleConservatives<nDim> U;
+92:   U.density() = V.density();
+93:   for (size_t iDim = 0; iDim < nDim; ++iDim) {
+94:     U.momentum(iDim) = V.density() * V.velocity(iDim);
+95:   }
+
+SU2_CFD/include/numerics_simd/flow/convection/common.hpp:74-130 SHA256=8c372799bb5a7f8e5eada71c22f57a920eff4ee87e97cf4cbfeafba84a10327c
+74:   }
+75: 
+76:   if (muscl) {
+77:     /*--- Reconstruct density and enthalpy without using their gradients. ---*/
+78:     constexpr auto nVarGrad = ReconVarType::nVar - 2;
+79:     reconstruct<nVarGrad>(iPoint, jPoint, vector_ij, gradients, limiters, limiterType, 0, V, kappa, umusclRamp);
+80:     /*--- Recompute density using the reconstructed pressure and temperature. ---*/
+81:     V.i.density() = V.i.pressure() / (gasConst * V.i.temperature());
+82:     V.j.density() = V.j.pressure() / (gasConst * V.j.temperature());
+83: 
+84:     /*--- Reconstruct enthalpy using dH/dT = Cp and dH/dv = v. Recomputing enthalpy would cause
+85:      * stability issues because we use rho E = rho H - P, which loses its relation to temperature
+86:      * if both rho and H are recomputed. This only seems to be an issue for wall-function meshes.
+87:      * NOTE: This "one-sided" reconstruction does not lose much of the U-MUSCL benefit, because
+88:      * the static enthalpy is linear, and for the KE term we do the equivalent of using the
+89:      * average dH/dv, which is exact for quadratic functions. ---*/
+90:     const su2double cp = gasConst * gamma / (gamma - 1);
+91:     V.i.enthalpy() += cp * (V.i.temperature() - V1st.i.temperature());
+92:     V.j.enthalpy() += cp * (V.j.temperature() - V1st.j.temperature());
+93:     for (size_t iDim = 0; iDim < nDim; ++iDim) {
+94:       V.i.enthalpy() += 0.5 * (pow(V.i.velocity(iDim), 2) - pow(V1st.i.velocity(iDim), 2));
+95:       V.j.enthalpy() += 0.5 * (pow(V.j.velocity(iDim), 2) - pow(V1st.j.velocity(iDim), 2));
+96:     }
+97: 
+98:     /*--- Detect a non-physical reconstruction based on negative pressure or density. ---*/
+99:     const Double neg_p_or_rho = fmax(fmin(V.i.pressure(), V.j.pressure()) < 0.0,
+100:                                      fmin(V.i.density(), V.j.density()) < 0.0);
+101:     /*--- Test the sign of the Roe-averaged speed of sound. ---*/
+102:     const Double R = sqrt(abs(V.j.density() / V.i.density()));
+103:     /*--- Delay dividing by R+1 until comparing enthalpy and velocity magnitude. ---*/
+104:     const Double enthalpy = R*V.j.enthalpy() + V.i.enthalpy();
+105:     Double v_squared = 0.0;
+106:     for (size_t iDim = 0; iDim < nDim; ++iDim) {
+107:       v_squared += pow(R*V.j.velocity(iDim) + V.i.velocity(iDim), 2);
+108:     }
+109:     /*--- Multiply enthalpy by R+1 since v^2 was not divided by (R+1)^2.
+110:      * Note: a = sqrt((gamma-1) * (H - 0.5 * v^2)) ---*/
+111:     const Double neg_sound_speed = enthalpy * (R+1) < 0.5 * v_squared;
+112: 
+113:     /*--- Revert to first order if the state is non-physical. ---*/
+114:     nonPhysical = fmax(neg_p_or_rho, neg_sound_speed);
+115:     /*--- Handle SIMD dimensions 1 by 1. ---*/
+116:     for (size_t k = 0; k < Double::Size; ++k) {
+117:       nonPhysical[k] = solution.UpdateNonPhysicalEdgeCounter(iEdge[k], nonPhysical[k]);
+118:       nonPhysical[k] = fmax(nonPhysical[k],
+119:           fmax(solution.OutlierMitigation(iPoint[k]),
+120:                solution.OutlierMitigation(jPoint[k])) / VariableType::MAX_OUTLIER_MITIGATION);
+121:     }
+122:     for (size_t iVar = 0; iVar < ReconVarType::nVar; ++iVar) {
+123:       V.i.all(iVar) = nonPhysical * V1st.i.all(iVar) + (1-nonPhysical) * V.i.all(iVar);
+124:       V.j.all(iVar) = nonPhysical * V1st.j.all(iVar) + (1-nonPhysical) * V.j.all(iVar);
+125:     }
+126:   } else {
+127:     nonPhysical = 0;
+128:   }
+129:   return V;
+130: }
+
+SU2_CFD/include/numerics_simd/flow/convection/upwind.hpp:51-76 SHA256=50ee1ffa2d3bb97cac79a4e00b98aa5bfb5b9a08b2ff070ff963461a2d35c8f4
+51: protected:
+52:   using Base::nDim;
+53:   static constexpr size_t nVar = CCompressibleConservatives<nDim>::nVar;
+54:   static constexpr size_t nPrimVarGrad = nDim+4;
+55:   static constexpr size_t nPrimVar = Max(Base::nPrimVar, nPrimVarGrad);
+56: 
+57:   const su2double gamma;
+58:   const su2double gasConst;
+59:   const bool finestGrid;
+60:   const bool dynamicGrid;
+61:   const bool muscl;
+62:   const su2double umusclKappa;
+63:   const LIMITER typeLimiter;
+64: 
+65:   /*!
+66:    * \brief Constructor, store some constants and forward args to base.
+67:    */
+68:   template<class... Ts>
+69:   CUpwindBase(const CConfig& config, unsigned iMesh, Ts&... args) : Base(config, iMesh, args...),
+70:     gamma(config.GetGamma()),
+71:     gasConst(config.GetGas_ConstantND()),
+72:     finestGrid(iMesh == MESH_0),
+73:     dynamicGrid(config.GetDynamic_Grid()),
+74:     muscl(finestGrid && config.GetMUSCL_Flow()),
+75:     umusclKappa(config.GetMUSCL_Kappa_Flow()),
+76:     typeLimiter(config.GetKind_SlopeLimit_Flow()) {
+
+SU2_CFD/include/numerics_simd/flow/convection/upwind.hpp:112-148 SHA256=50ee1ffa2d3bb97cac79a4e00b98aa5bfb5b9a08b2ff070ff963461a2d35c8f4
+112:       unitNormal(iDim) = normal(iDim) / area;
+113:     }
+114: 
+115:     /*--- Reconstructed primitives. ---*/
+116: 
+117:     CPair<CCompressiblePrimitives<nDim,nPrimVar> > V1st;
+118:     V1st.i.all = gatherVariables<nPrimVar>(iPoint, solution.GetPrimitive());
+119:     V1st.j.all = gatherVariables<nPrimVar>(jPoint, solution.GetPrimitive());
+120: 
+121:     /*--- Recompute density and enthalpy instead of reconstructing. ---*/
+122:     Double nonPhysical;
+123:     auto V = reconstructPrimitives<CCompressiblePrimitives<nDim,nPrimVarGrad> >(
+124:         iEdge, iPoint, jPoint, gamma, gasConst, muscl, umusclKappa, umusclRamp,
+125:         typeLimiter, V1st, vector_ij, solution, nonPhysical);
+126: 
+127:     /*--- Compute conservative variables. ---*/
+128: 
+129:     CPair<CCompressibleConservatives<nDim> > U;
+130:     U.i = compressibleConservatives(V.i);
+131:     U.j = compressibleConservatives(V.j);
+132: 
+133:     /*--- Finalize in derived class (static polymorphism). ---*/
+134: 
+135:     const auto derived = static_cast<const Derived*>(this);
+136:     VectorDbl<nVar> flux;
+137:     MatrixDbl<nVar> jac_i, jac_j;
+138:     derived->finalizeFlux(flux, jac_i, jac_j, implicit, area, unitNormal, normal,
+139:                           V, U, iPoint, jPoint, nonPhysical, solution, geometry);
+140: 
+141:     /*--- Add the contributions from the base class (static decorator). ---*/
+142: 
+143:     Base::viscousTerms(iEdge, iPoint, jPoint, V1st, solution_, vector_ij, geometry,
+144:                        config, area, unitNormal, implicit, flux, jac_i, jac_j);
+145: 
+146:     /*--- Stop preaccumulation. ---*/
+147: 
+148:     stopPreacc(flux);
+
+SU2_CFD/include/numerics_simd/flow/diffusion/viscous_fluxes.hpp:252-300 SHA256=dcda5075a707823d918be3589434fdfd7010d86d8dd31df599bf1b9426a04f5b
+252:  */
+253: template<size_t NDIM>
+254: class CCompressibleViscousFlux : public CCompressibleViscousFluxBase<NDIM, CCompressibleViscousFlux<NDIM> > {
+255: public:
+256:   static constexpr size_t nPrimVar = NDIM+9;
+257:   using Base = CCompressibleViscousFluxBase<NDIM, CCompressibleViscousFlux<NDIM> >;
+258:   using Base::gamma;
+259:   using Base::gasConst;
+260:   using Base::prandtlTurb;
+261: 
+262:   /*!
+263:    * \brief Constructor, initialize constants and booleans.
+264:    */
+265:   template<class... Ts>
+266:   CCompressibleViscousFlux(Ts&... args) : Base(args...) {}
+267: 
+268:   /*!
+269:    * \brief Compute the thermal conductivity.
+270:    */
+271:   template<class PrimitiveType>
+272:   FORCEINLINE Double thermalConductivity(const PrimitiveType& V) const {
+273:     return V.thermalCond() + V.cp() * V.eddyVisc() / prandtlTurb;
+274:   }
+275: 
+276:   /*!
+277:    * \brief Compute Jacobian of the energy flux, except the part due to the work of viscous forces.
+278:    */
+279:   template<size_t nVar, size_t nDim, class PrimitiveType, class... Ts>
+280:   FORCEINLINE VectorDbl<nVar> energyJacobian(const PrimitiveType& V,
+281:                                              const MatrixDbl<nDim,nVar>& dtau,
+282:                                              const Double& thermalCond,
+283:                                              const Double& area,
+284:                                              const Double& dist_ij,
+285:                                              Ts&... args) const {
+286:     Double vel2 = 0.5 * squaredNorm<nDim>(V.velocity());
+287:     Double phi = (gamma-1) / V.density();
+288:     Double RdTdrho = phi*vel2 - V.pressure() / pow(V.density(),2);
+289:     Double condOnRd = thermalCond / (gasConst * dist_ij);
+290:     Double contraction = 0.0;
+291:     for (size_t iDim = 0; iDim < nDim; ++iDim) {
+292:       contraction += dtau(iDim,0) * V.velocity(iDim);
+293:     }
+294:     VectorDbl<nVar> dEdU;
+295:     dEdU(0) = area * (condOnRd * RdTdrho - contraction);
+296:     for (size_t iDim = 0; iDim < nDim; ++iDim) {
+297:       dEdU(iDim+1) = area * (dtau(iDim,0) - condOnRd*phi*V.velocity(iDim));
+298:     }
+299:     dEdU(nDim+1) = area * condOnRd * phi;
+300: 
+
+SU2_CFD/src/output/CFlowCompOutput.cpp:220-276 SHA256=41d279e0e78837e54731069d8dfd0f6756a8d87518f7ae3feb0a8404ef5f171e
+220:   AddVolumeOutput("DENSITY",    "Density",    "SOLUTION", "Density");
+221:   AddVolumeOutput("MOMENTUM-X", "Momentum_x", "SOLUTION", "x-component of the momentum vector");
+222:   AddVolumeOutput("MOMENTUM-Y", "Momentum_y", "SOLUTION", "y-component of the momentum vector");
+223: 
+224:   if (nDim == 3)
+225:     AddVolumeOutput("MOMENTUM-Z", "Momentum_z", "SOLUTION", "z-component of the momentum vector");
+226:   AddVolumeOutput("ENERGY",     "Energy",     "SOLUTION", "Energy");
+227: 
+228:   SetVolumeOutputFieldsScalarSolution(config);
+229: 
+230:   // Grid velocity
+231:   if (gridMovement){
+232:     AddVolumeOutput("GRID_VELOCITY-X", "Grid_Velocity_x", "GRID_VELOCITY", "x-component of the grid velocity vector");
+233:     AddVolumeOutput("GRID_VELOCITY-Y", "Grid_Velocity_y", "GRID_VELOCITY", "y-component of the grid velocity vector");
+234:     if (nDim == 3 )
+235:       AddVolumeOutput("GRID_VELOCITY-Z", "Grid_Velocity_z", "GRID_VELOCITY", "z-component of the grid velocity vector");
+236:   }
+237: 
+238:   // Primitive variables
+239:   AddVolumeOutput("PRESSURE",    "Pressure",                "PRIMITIVE", "Pressure");
+240:   AddVolumeOutput("TEMPERATURE", "Temperature",             "PRIMITIVE", "Temperature");
+241:   AddVolumeOutput("MACH",        "Mach",                    "PRIMITIVE", "Mach number");
+242:   AddVolumeOutput("PRESSURE_COEFF", "Pressure_Coefficient", "PRIMITIVE", "Pressure coefficient");
+243:   AddVolumeOutput("VELOCITY-X", "Velocity_x", "PRIMITIVE", "x-component of the velocity vector");
+244:   AddVolumeOutput("VELOCITY-Y", "Velocity_y", "PRIMITIVE", "y-component of the velocity vector");
+245: 
+246:   if (nDim == 3)
+247:     AddVolumeOutput("VELOCITY-Z", "Velocity_z", "PRIMITIVE", "z-component of the velocity vector");
+248: 
+249:   // Datadriven fluid model
+250:   if(config->GetKind_FluidModel() == DATADRIVEN_FLUID){
+251:     AddVolumeOutput("EXTRAPOLATION", "Extrapolation", "PRIMITIVE", "Density, energy outside data range");
+252:     AddVolumeOutput("FLUIDMODEL_NEWTONITER", "nIter_Newton", "PRIMITIVE", "Number of iterations evaluated by the Newton solver");
+253:     AddVolumeOutput("ENTROPY", "Entropy", "PRIMITIVE", "Fluid entropy value");
+254:   }
+255: 
+256:   if (config->GetViscous()) {
+257:     AddVolumeOutput("LAMINAR_VISCOSITY", "Laminar_Viscosity", "PRIMITIVE", "Laminar viscosity");
+258: 
+259:     AddVolumeOutput("SKIN_FRICTION-X", "Skin_Friction_Coefficient_x", "PRIMITIVE", "x-component of the skin friction vector");
+260:     AddVolumeOutput("SKIN_FRICTION-Y", "Skin_Friction_Coefficient_y", "PRIMITIVE", "y-component of the skin friction vector");
+261:     if (nDim == 3)
+262:       AddVolumeOutput("SKIN_FRICTION-Z", "Skin_Friction_Coefficient_z", "PRIMITIVE", "z-component of the skin friction vector");
+263: 
+264:     AddVolumeOutput("HEAT_FLUX", "Heat_Flux", "PRIMITIVE", "Heat-flux");
+265:     AddVolumeOutput("Y_PLUS", "Y_Plus", "PRIMITIVE", "Non-dim. wall distance (Y-Plus)");
+266:   }
+267: 
+268:   SetVolumeOutputFieldsScalarPrimitive(config);
+269: 
+270:   //Residuals
+271:   AddVolumeOutput("RES_DENSITY", "Residual_Density", "RESIDUAL", "Residual of the density");
+272:   AddVolumeOutput("RES_MOMENTUM-X", "Residual_Momentum_x", "RESIDUAL", "Residual of the x-momentum component");
+273:   AddVolumeOutput("RES_MOMENTUM-Y", "Residual_Momentum_y", "RESIDUAL", "Residual of the y-momentum component");
+274:   if (nDim == 3)
+275:     AddVolumeOutput("RES_MOMENTUM-Z", "Residual_Momentum_z", "RESIDUAL", "Residual of the z-momentum component");
+276:   AddVolumeOutput("RES_ENERGY", "Residual_Energy", "RESIDUAL", "Residual of the energy");
+
+SU2_CFD/src/output/CFlowCompOutput.cpp:309-327 SHA256=41d279e0e78837e54731069d8dfd0f6756a8d87518f7ae3feb0a8404ef5f171e
+309:   if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)
+310:     AddVolumeOutput("FLOW_PRIMITIVE_K", "Flow_Primitive_K", "FLOW_PHASE", "Independent k used by saved flow primitive state");
+311: 
+312:   AddCommonFVMOutputs(config);
+313: 
+314:   if (config->GetTime_Domain()) {
+315:     SetTimeAveragedFields(config);
+316:   }
+317: }
+318: 
+319: void CFlowCompOutput::LoadVolumeData(CConfig *config, CGeometry *geometry, CSolver **solver, unsigned long iPoint){
+320: 
+321:   const auto* Node_Flow = solver[FLOW_SOL]->GetNodes();
+322:   const CVariable* Node_Turb = nullptr;
+323:   if (config->GetKind_Turb_Model() != TURB_MODEL::NONE) Node_Turb = solver[TURB_SOL]->GetNodes();
+324:   auto* Node_Geo  = geometry->nodes;
+325: 
+326:   if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)
+327:     SetVolumeOutputValue("FLOW_PRIMITIVE_K", iPoint, static_cast<const CNSVariable*>(Node_Flow)->GetFlowPrimitiveK(iPoint));
+
+SU2_CFD/src/output/filewriter/CSU2FileWriter.cpp:44-68 SHA256=bdaa3e1cc2745344006a389e1c31d2486d4170ed3f7f86058ea951ed3053fef0
+44:   string header = "\"PointID\"";
+45:   for (auto& field : fieldNames) header += ",\"" + field + "\"";
+46:   header += "\n";
+47: 
+48:   WriteMPIString(header, MASTER_NODE);
+49: 
+50:   /*--- Each rank formats the data of its own points into a string, and all ranks then write their strings
+51:    to the file at the same time, one after the other in rank order. ---*/
+52: 
+53:   ostringstream data;
+54:   // scientific的precision统计小数位，17位有效数字采用max_digits10减一。
+55:   data.precision(std::numeric_limits<double>::max_digits10 - 1);
+56: 
+57:   for (auto iPoint = 0ul; iPoint < dataSorter->GetnPoints(); iPoint++) {
+58: 
+59:     /*--- Write global index of the current point. ---*/
+60: 
+61:     data << dataSorter->GetGlobalIndex(iPoint);
+62: 
+63:     /*--- Loop over the variables and write the values to file. ---*/
+64: 
+65:     for (size_t iVar = 0; iVar < fieldNames.size(); iVar++)
+66:       data << ", " << scientific << dataSorter->GetData(iVar, iPoint);
+67:     data << "\n";
+68:   }

@@ -14,6 +14,7 @@ IDEAL_AIR_FLAVOR='rah-ideal-air-v1'
 IDEAL_AIR_FLAVORS=(IDEAL_AIR_FLAVOR,'rah-ideal-air-phase-v2','rah-ideal-air-axisymmetric-v1','rah-ideal-air-observed-v1','rah-ideal-air-admissible-v1','rah-ideal-air-step-v1','rah-sst-energy-v1')
 SPATIAL_AIR_FLAVOR='rah-ideal-air-spatial-wall-v1'
 SPATIAL_STEP_FLAVOR='rah-ideal-air-spatial-step-v1'
+NATIVE_GAS_OUTPUT_FLAVOR='rah-native-ideal-gas-spatial-wall-v1'
 IDEAL_AIR_FLAVORS=IDEAL_AIR_FLAVORS+(SPATIAL_AIR_FLAVOR,SPATIAL_STEP_FLAVOR)
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text(encoding='utf-8-sig'))
@@ -32,7 +33,7 @@ def resolve(folder,config):
     if flavor not in IDEAL_AIR_FLAVORS and (re.search(r'^\s*SOLVER\s*=\s*RANS\s*$',config,re.M) or 'sst' in data):
         assert flavor in ('official',BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR),'SST仅适配显式定比热包，HEOS/空间壁温RANS尚未验证'
         locked.update(validate_sst_manifest(folder,data,config))
-    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR,*IDEAL_AIR_FLAVORS,*COOLPROP_FLAVORS),'未知SU2运行时类型'
+    assert flavor in ('official',FLAVOR,FROZEN_FLAVOR,BOUNDED_FLAVOR,UPDATE_TRACE_FLAVOR,NATIVE_GAS_OUTPUT_FLAVOR,*IDEAL_AIR_FLAVORS,*COOLPROP_FLAVORS),'未知SU2运行时类型'
     if re.search(r'^\s*FLUID_MODEL\s*=\s*IDEAL_AIR_VARIABLE_CP\s*$',config,re.M):
         assert flavor in IDEAL_AIR_FLAVORS,'变比热空气须显式选择相容运行包'
     if flavor!=FROZEN_FLAVOR:assert 'frozenEnergyMode' not in data,'运行时类型与冻结能量选项不匹配'
@@ -51,9 +52,18 @@ def resolve(folder,config):
         profile=folder/'wall_temperature.csv';assert profile.is_file()
         assert sha(profile)==data['thermalProfileSHA256'],'温度表与输入清单不符'
         locked.update({str(manifest):sha(manifest),str(profile):sha(profile)})
+    elif flavor==NATIVE_GAS_OUTPUT_FLAVOR:
+        # 独立定比热输出包只接受具名层流合同；不得套用旧变比热或SST入口。
+        assert data.get('caseKind')=='naca-tn3344-constant-cp-spatial-wall-v1'
+        from su2NACAConstantCpInterface import validate
+        locked.update(validate(folder,data,config,runtime))
+        profile=folder/'wall_temperature.csv'
     elif flavor in (SPATIAL_AIR_FLAVOR,SPATIAL_STEP_FLAVOR):
         # 新具名层流组合保持旧表禁用规则；有表/无表都由严格新合同核对。
-        from su2IdealAirInterface import validate
+        if data.get('caseKind')=='naca-tn3344-constant-cp-spatial-wall-v1':
+            from su2NACAConstantCpInterface import validate
+        else:
+            from su2IdealAirInterface import validate
         locked.update(validate(folder,data,config,runtime))
         if data['thermalBoundary']['mode']=='axialTemperature':profile=folder/'wall_temperature.csv'
     else:

@@ -1,0 +1,33 @@
+v174 定比热低焓模型比较（仅发展入选筛选，非实验通过）
+
+新模型：gamma=1.4，R=8.31451/0.02896546，原Sutherland参数和Pr=0.72。
+
+原M/Re_D/T0/D及22点Tw/20个热参数保持，重建静态条件，未复用OTH守恒能量。
+
+比较温区 178.107574331—336.354433769 K；开发检查150—360 K不是已解全场包络。
+
+发展入口入选：True；物理资格：False。
+
+新T∞=178.285233854 K，rho∞=0.511635944608 kg/m3，p∞=26183.7986721 Pa，U∞=527.310047475 m/s。
+
+cp：定压比热 J/(kg K)；原生IDEAL_GAS为gamma*R/(gamma-1)，参考值由既有IdealAir DLL独立返回。
+
+cv：定容比热cp-R；gamma=cp/cv，两者分别报告但不私增发展误差阈值。
+
+sound：a=sqrt(gamma*R*T)，单位m/s；参考DLL直接声速同时核对热力恒等式。
+
+viscosity：mu=mu_ref*(T/T_ref)^1.5*(T_ref+S)/(T+S)，Pa s；两模型同T时采用完全相同明确输运。
+
+conductivity：k=mu*cp/Pr，W/(m K)；同T时k差来自cp，未宣称等于原论文参考26输运表。
+
+energy：新模型e=cv*T、h=cp*T，无OTH偏移。旧模型保留OTH；绝对h/e不可作为模型误差直接相减。
+
+deltaH：同一Tref=旧输入T∞比较h(T)-h(Tref)，零增量用cp导数极限，表内逐行标记。
+
+localReduction：Nu_s=h_transfer*s/k_e；Re_s=rho_e*U_e*s/mu_e；h_transfer=-q_into/(Tw-Tr)。同edge p/T/U/s/q/Tw/Tr时新旧Nu和Nu/sqrt(Re)比等于k_old/k_new。
+
+syntheticEdge：p=20000/60000Pa、U=100/300m/s均独立指定，仅为模型比较；不来自来流替代、不是真实外缘，不保证每组满足全局流动。
+
+developmentFactor：扩展[150,360]K只算共态输运归约因子k_old/k_new；Te>T0部分不代入原恢复温度式、不称可用外缘。
+
+uncertainty：原Nu约15%、Re约1%为probable error，分别列出，不当标准差合成；模型小额度不授实验资格。

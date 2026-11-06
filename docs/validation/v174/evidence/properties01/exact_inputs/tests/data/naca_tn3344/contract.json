@@ -1,0 +1,90 @@
+{
+  "schema": "RocketAeroHeat.naca-tn3344-heat.v1",
+  "caseID": "NACA-TN3344-M1.97-ReD2.28e6-heated-hemisphere-cylinder",
+  "status": "selected-primary-experiment-with-digitized-conditions; solver-and-normalization-adapter-pending",
+  "geometry": {
+    "diameter_m": 0.1016,
+    "noseRadius_m": 0.0508,
+    "tipToCylinderEnd_m": 0.127,
+    "endRingThickness_m": 0.003175,
+    "incidence_deg": 0.0,
+    "incidenceTolerance_deg": 0.1,
+    "physicalShape": "hemisphere plus cylinder, stainless steel electrically heated shell; Figure 1(c)",
+    "coordinate": "s is meridional arclength from tip; project X=0 at tip, nose +X, flow -X",
+    "hemisphereMapping": "theta=2*s/D; X=-R*(1-cos(theta)), r=R*sin(theta)",
+    "cylinderMapping": "s>=pi*R/2; X=-R-(s-pi*R/2), r=R",
+    "experimentalStingAndElectricalHardware": "not axisymmetric; downstream computational truncation must have an independence check",
+    "measuredHeatSurfaceOnly": true,
+    "aftBaseAndStingHeatMeasured": false
+  },
+  "freeStream": {
+    "Mach": 1.97,
+    "ReynoldsBasedOnDiameter": 2280000.0,
+    "totalTemperature_R": 570.0,
+    "totalTemperature_K": 316.6666666666667,
+    "source": "Table I heat-transfer distribution, wind tunnel 1, final row",
+    "independentInputs": [
+      "Mach",
+      "Re_D",
+      "T0",
+      "D",
+      "gas/viscosity model"
+    ],
+    "uniformUpstreamFlow": true,
+    "prescribedIncomingBoundaryLayer": false,
+    "gas": "dry air, laminar; do not enable SST to match this experiment",
+    "model": "Lemmon2000 ideal Air OTH, Sutherland 1.716e-5/273.15/110.4, Pr=0.72 proposed",
+    "staticTemperature_K": 178.1075743306896,
+    "pressure_Pa": 26135.37495648134,
+    "density_kg_m3": 0.5111991418835654,
+    "speed_m_s": 527.2964534538137,
+    "viscosity_Pas": 1.2011682036676242e-05,
+    "totalEnthalpy_OTH_Jkg": 443281.1266472082,
+    "perfectGasGamma14Temperature_K": 178.28523385392623,
+    "derivedStateIsMeasured": false,
+    "propertyChoiceRequiresDeclaredComparison": true
+  },
+  "wall": {
+    "material": "stainless steel with electrical resistance heating; given thermal boundary, no solid solve",
+    "measuredProfile": "wall_temperature.csv",
+    "TwRange_K": [
+      333.40922942424004,
+      336.35443376865095
+    ],
+    "isExactlyUniform": false,
+    "source": "Figure 3(a), upper triangles, same Re_D=2.28e6",
+    "temperatureDataBeyondLastStation": null,
+    "extensionRule": "none yet: prepare explicit downstream continuation and independence check before solving",
+    "sign": "body is hotter than recovery temperature: heat flows OUT of wall; project positive-into-wall q is negative"
+  },
+  "measurements": {
+    "file": "heat_parameter.csv",
+    "points": 20,
+    "source": "Figure 4(b), circles with dot",
+    "observable": "Nu_s/sqrt(Re_s)",
+    "definitions": "Nu_s=h*s/k_e; Re_s=rho_e*U_e*s/mu_e; h=q_out/(Tw-Tr)",
+    "localProperties": "edge of boundary layer; s is arclength, NOT axial X; NOT freestream Re_D",
+    "sourceReduction": "published heat parameter uses measured electrical input, local outer state and recovery correction (equations 10-12)",
+    "rawDimensionalHeatFluxAvailable": false,
+    "forbidden": "cannot label these values as directly measured W/m2, use Re_D in local normalization, or use theoretical curves as measurements",
+    "publishedNusseltProbableError": 0.15,
+    "publishedReynoldsProbableError": 0.01,
+    "sourceReductionUncertainty": "includes small Tw nonuniformity/conduction; measured unheated surface is not true recovery T near nose s/D<0.35",
+    "acceptance": "not yet qualified: finalize normalization and experiment/reading/mesh uncertainties before any candidate"
+  },
+  "nextImplementation": {
+    "engine": "existing embedded mature SU2, dedicated laminar axisymmetric entry",
+    "scope": "source data/units and measured-Tw boundary adapter, single geometry, internal external-flow solution",
+    "prerequisites": [
+      "freeze heat-parameter comparison including edge/recovery definitions",
+      "bind measured Tw(s) and downstream extension without default 300 K",
+      "resolve source laminar no-turbulence 2D contract and axis boundary",
+      "preregister numerical convergence, heat stability, grid/domain uncertainty and one budgeted candidate"
+    ],
+    "noNewKernelPatchWithoutSmallEvidence": true
+  },
+  "experimentalQualification": false,
+  "newQualifiedArea_m2": 0.0,
+  "originalMach7GatesUnchanged": true,
+  "sourceManifestSHA256": "74000d7d71e1cf1563eef2e5436ab4bcb3d337900cfb795d13d17d35bdc36c5f"
+}

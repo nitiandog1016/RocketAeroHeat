@@ -47,6 +47,9 @@ def save_terminal_receipt(path, state):
 
 def validate_resource_budget(request, manifest):
     """模块用途。普通任务保留720秒；事前登记的有限发展任务才允许900秒。"""
+    if manifest.get('caseKind') == 'naca-tn3344-constant-cp-spatial-wall-v1':
+        from su2NACAConstantCpInterface import resource_budget
+        return resource_budget(request, manifest)
     if manifest.get('caseKind') == 'naca-tn3344-spatial-step-cold-restart-v1':
         from su2NACASpatialStepInterface import resource_budget
         return resource_budget(request, manifest)
@@ -135,10 +138,20 @@ def main():
         state['physicsModel']=read(folder/'sst_contract.json')
     if (folder/'ideal_air_contract.json').exists():
         state['thermodynamicModel']=read(folder/'ideal_air_contract.json')
+    if (folder/'ideal_gas_contract.json').exists():
+        assert 'thermodynamicModel' not in state, '新旧能量合同不能同时生效'
+        state['thermodynamicModel']=read(folder/'ideal_gas_contract.json')
     output_budget = None
+    domain_guard = None
+    domain_exceeded = False
+    domain_termination_requested = False
     if runtime_flavor in PHASE_FLAVORS:
         from su2IdealAirCheckpoints import output_length, inventory
         output_budget = state['thermodynamicModel']['checkpointContract']['maximumOutputBytes']
+    # 只有具名定比热实际候选启用保存场温域守卫；用户取消保持独立身份。
+    if state.get('thermodynamicModel', {}).get('savedFieldDomainGuard') is not None:
+        from nacaConstantCpDomainGuard import DomainGuard
+        domain_guard = DomainGuard(folder, read(folder/'case_manifest.json'))
 
     def save():
         atomic_write_json(receipt,state)
@@ -182,7 +195,15 @@ def main():
                 if output_budget is not None:
                     state['generatedOutputBytes'] = output_length(folder, locked)
                     output_exceeded = state['generatedOutputBytes'] > output_budget
-                if timed_out or cancelled or output_exceeded:
+                if domain_guard is not None:
+                    guard_state = domain_guard.poll(native_terminal=False)
+                    state['savedFieldDomainGuard'] = guard_state
+                    domain_exceeded = bool(guard_state['exceeded'])
+                    if guard_state.get('error'):
+                        supervisor_error = 'Saved field domain guard failed: '+str(guard_state['error'])
+                if timed_out or cancelled or output_exceeded or domain_exceeded or supervisor_error:
+                    if domain_exceeded:
+                        domain_termination_requested = process.poll() is None
                     process.kill()
                     break
                 state.update(elapsedSeconds=elapsed, progress=history_progress(folder / 'history.csv'))
@@ -196,10 +217,30 @@ def main():
             if process.poll() is None:
                 process.kill()
             code=process.wait()
+            if domain_guard is not None:
+                try:
+                    # 最新帧可能在退出时被重新保存。原生终态后再补查；检查有明确截止时间。
+                    guard_state = domain_guard.finish(deadline=min(time.monotonic()+20., start+timeout+30.))
+                    state['savedFieldDomainGuard'] = guard_state
+                    domain_exceeded = bool(guard_state['exceeded'])
+                    if guard_state.get('error'):
+                        supervisor_error = supervisor_error or 'Saved field domain guard failed: '+str(guard_state['error'])
+                except Exception as ex:
+                    supervisor_error = supervisor_error or 'Saved field domain guard failed: '+type(ex).__name__+': '+str(ex)
+                finally:
+                    try:
+                        domain_guard.close()
+                    except Exception as ex:
+                        supervisor_error = supervisor_error or 'Domain guard cleanup failed: '+type(ex).__name__+': '+str(ex)
     state.update(status='terminal', exitCode=code, timedOut=timed_out,
                  cancelled=cancelled, progress=history_progress(folder / 'history.csv'),
                  elapsedSeconds=time.monotonic() - start, endedUTC=datetime.now(timezone.utc).isoformat(),
                  inputsStable={path: sha(Path(path)) == digest for path, digest in locked.items()})
+    if domain_guard is not None:
+        state['modelDomainExceeded'] = domain_exceeded
+        state['domainGuardTerminationRequested'] = domain_termination_requested
+        if domain_exceeded:
+            state['stopReason'] = 'model-domain-exceeded'
     if supervisor_error is not None:state['supervisorError']=supervisor_error
     if thermal_profile is not None and code==0 and not timed_out and not cancelled:
         try:state['thermalProfileApplied']=audit_applied(folder,thermal_profile,mesh)
@@ -211,7 +252,7 @@ def main():
         state['outputBudgetExceeded'] = output_exceeded or state['generatedOutputBytes'] > output_budget
         try:
             state['checkpoints'] = inventory(folder, state)
-            if code == 0 and not timed_out and not cancelled:
+            if code == 0 and not timed_out and not cancelled and not domain_exceeded and not supervisor_error:
                 assert state['checkpoints']['normalFinalPairPresent'] and state['checkpoints']['normalScheduleComplete'], '正常终态缺少首帧、计划检查点或最后完整场'
         except Exception as ex:
             state['supervisorError'] = 'Checkpoint audit failed: '+type(ex).__name__+': '+str(ex)
@@ -222,6 +263,8 @@ def main():
     if supervisor_error is not None or terminal_receipt!=receipt:return 1
     if output_budget is not None and state['outputBudgetExceeded']:
         return 126
+    if domain_exceeded:
+        return 127
     return 125 if cancelled else (124 if timed_out else (code if code else (0 if all(state['inputsStable'].values()) else 2)))
 
 
