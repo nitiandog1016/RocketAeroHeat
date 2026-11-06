@@ -45,6 +45,25 @@ def save_terminal_receipt(path, state):
         atomic_write_json(fallback,state);return fallback
 
 
+def validate_resource_budget(request, manifest):
+    """模块用途。普通任务保留720秒；事前登记的v166单任务才允许900秒。"""
+    timeout, threads = float(request['maximumSeconds']), int(request['threads'])
+    profile = request.get('resourceProfile')
+    if profile is None:
+        assert 1 <= threads <= 8 and 1 <= timeout <= 720
+    else:
+        assert profile == 'v166-single-development'
+        assert manifest['requiredRuntimeFlavor'] == 'rah-ideal-air-admissible-v1'
+        init = manifest['initialization']; plan = manifest['idealAir']['checkpointContract']
+        assert init['runTransition']['kind'] == 'same-admissible-runtime-cold-restart-v1'
+        assert init['samePhysicsAndNumerics'] and not init['runTransition']['uninterruptedTrajectoryEquivalent']
+        assert init['priorSuccessfulUpdates'] == 200 and init['sourceLocalIteration'] == 49
+        assert plan['maximumUpdates'] == 200 and plan['every'] == 100
+        assert plan['maximumOutputBytes'] <= 1536*1024**2
+        assert 1 <= threads <= 2 and 1 <= timeout <= 900
+    return timeout, threads
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--request', required=True)
@@ -62,9 +81,8 @@ def main():
     exe,runtime,runtime_flavor,thermal_profile,thermal_locks=resolve(folder,config_text)
     if runtime_flavor in PHASE_FLAVORS:
         assert not request.get('dryRun', False), '稀疏保存合同要求实际更新'
-    timeout = float(request['maximumSeconds'])
-    threads = int(request['threads'])
-    assert 1 <= threads <= 8 and 1 <= timeout <= 720
+    timeout, threads = validate_resource_budget(request, read(folder/'case_manifest.json') if
+        request.get('resourceProfile') is not None else {})
     receipt = folder / 'engine_process.json'
     assert not receipt.exists(), '已有真实进程记录，禁止覆盖或盲目重启'
     locked = {str(file): sha(file) for file in (request_path, cfg, mesh, exe, Path(__file__).resolve())}

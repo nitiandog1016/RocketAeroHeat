@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "planSHA256": "1b1ee42246bde6c90ad2cf8abcf5b1bbdbe2978b7dd1b39ed55ed4bc0ed60337",
+  "configurationChanges": {
+    "ITER": {
+      "source": "50",
+      "target": "200"
+    },
+    "OUTPUT_WRT_FREQ": {
+      "source": "50",
+      "target": "100"
+    }
+  },
+  "expectedLocalCheckpoints": [
+    0,
+    100,
+    199
+  ],
+  "sourceSuccessfulUpdates": 200,
+  "maximumAdditionalUpdates": 200,
+  "maximumSeriesSuccessfulUpdates": 400,
+  "outputPlan": {
+    "schemaVersion": 1,
+    "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+    "every": 100,
+    "maximumUpdates": 200,
+    "firstLocalIteration": 0,
+    "firstSuccessfulUpdate": 1,
+    "maximumNamedPairs": 3,
+    "estimatedVolumeBytes": 290071360,
+    "estimatedSurfaceBytes": 11071040,
+    "estimatedMaximumBytes": 1206437376,
+    "maximumOutputBytes": 1610612736,
+    "units": "file lengths including final aliases; physical allocation unknown",
+    "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold"
+  },
+  "sameOperatorAndRuntime": true,
+  "uninterruptedTrajectoryEquivalent": false,
+  "engineCompilation": false,
+  "automaticAdditionalTasks": 0
+}

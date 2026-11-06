@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 3,
+  "thermodynamicModel": "Lemmon2000-ideal-Air-CoolProp7.2.0-OTH-v1",
+  "gasConstant": 287.0491267875601,
+  "temperatureRangeK": [
+    60,
+    2000
+  ],
+  "energyEntropyReference": "OTH",
+  "initialization": "same-mesh-ideal-air-state-v1",
+  "turbulent": true,
+  "flowFlux": "general-EOS Roe",
+  "conductivity": "molecular mu*cp(T)/Pr; native eddy term once",
+  "freestreamSpeed": 1509.141366647612,
+  "freestreamSoundSpeed": 301.8282733295224,
+  "freestreamCp": 1002.652940545915,
+  "provenance": "v155 explicit fully turbulent wall-distance initial guess; transition unknown",
+  "physicsQualified": false,
+  "newQualifiedArea": 0,
+  "initializationSHA256": "3da23a541fd9593f3c77425e3658d348edcf8852f552c00fc9f9568ae114aeb7",
+  "configurationSHA256": "d60d562160ca3f2cfc4206cf91890a6a8811f03cfd20712bd905265810f93151",
+  "meshSHA256": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+  "checkpointContract": {
+    "schemaVersion": 1,
+    "stage": "captured-primitive-k-and-post-turbulence-conservative-state-v1",
+    "every": 100,
+    "maximumUpdates": 200,
+    "firstLocalIteration": 0,
+    "firstSuccessfulUpdate": 1,
+    "maximumNamedPairs": 3,
+    "estimatedVolumeBytes": 290071360,
+    "estimatedSurfaceBytes": 11071040,
+    "estimatedMaximumBytes": 1206437376,
+    "maximumOutputBytes": 1610612736,
+    "units": "file lengths including final aliases; physical allocation unknown",
+    "monitor": "poll at 0.25 seconds; a write in progress can exceed the stop threshold"
+  }
+}

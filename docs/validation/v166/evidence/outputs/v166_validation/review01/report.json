@@ -1,0 +1,415 @@
+{
+  "passedChecks": true,
+  "developmentBenefitPassed": false,
+  "gates": {
+    "normal200Updates": false,
+    "strictStateAndSource": true,
+    "originalGeometry": true,
+    "densityEnergyDevelopment": null,
+    "turbulenceDevelopment": null,
+    "flowLateWindow": null,
+    "turbulenceLateWindow": null,
+    "pressureStability": null,
+    "heatStability": null,
+    "powerStability": null,
+    "maximumWallTemperature": null,
+    "rmsWallTemperature": null,
+    "yPlusNoRegression": null,
+    "massBalanceNoRegression": null,
+    "energyBalanceNoRegression": null
+  },
+  "thermalErrors": {
+    "0": {
+      "phaseEnergy": 1.9922134995631009e-13,
+      "EOS": 4.4363365223838153e-16,
+      "velocity": 0.0,
+      "viscosity": 3.3881317890172014e-20,
+      "heatGradient": 7.161369595207721e-15,
+      "surfacePressure": 4.992097113368298e-07,
+      "surfaceTemperature": 1.6718816499126038e-07,
+      "surfaceHeat": 4.910214313733802e-07,
+      "yPlus": 7.819511503720209e-12,
+      "power": 1.651869798291115e-11
+    },
+    "100": {
+      "phaseEnergy": 2.0020366969615658e-13,
+      "EOS": 4.417548994223709e-16,
+      "velocity": 0.0,
+      "viscosity": 3.3881317890172014e-20,
+      "heatGradient": 7.186698354044045e-15,
+      "surfacePressure": 4.989544391628852e-07,
+      "surfaceTemperature": 1.6760946510113073e-07,
+      "surfaceHeat": 4.7328499989673964e-07,
+      "yPlus": 7.819687378388098e-12,
+      "power": 1.9560423641451662e-11
+    }
+  },
+  "frames": [
+    {
+      "localIteration": 0,
+      "seriesSuccessfulUpdates": 201,
+      "givenWallTemperatureK": 300,
+      "wallFluidTemperatureRangeK": [
+        267.91877767778556,
+        374.414431105596
+      ],
+      "maximumWallTemperatureErrorK": 74.41443110559601,
+      "areaRMSWallTemperatureErrorK": 12.397036297322247,
+      "domainTemperatureRangeK": [
+        90.07326445991441,
+        1667.8349576541789
+      ],
+      "yPlusP99": 1.9235224725292326,
+      "physicalSurfaceHeatPowerW": 993654.6163890396,
+      "nativeDualHeatPowerW": 990193.1725836433,
+      "boundaryBalanceDiagnostic": {
+        "massNetKgS": 0.7720430104534415,
+        "massIncomingKgS": 1495.6630634994626,
+        "massRelativeImbalance": 0.000516187789412317,
+        "energyNetW": 2095680.3930497617,
+        "energyIncomingW": 2231245697.6621985,
+        "energyRelativeImbalance": 0.0009392423233557486,
+        "method": "v160 physical flux diagnostic: cell-edge WLS, effective Newtonian stress and Pr conduction, nodal flux triangle mean",
+        "nativeDiscreteBoundaryFluxAvailable": false,
+        "nativeConservationProven": false,
+        "normalizationReference": "OTH total energy including captured primitive SST k"
+      },
+      "regions": {
+        "nose": {
+          "faces": 1811,
+          "areaM2": 0.008924527272473986,
+          "pressureRangePa": [
+            5379.517765950568,
+            46643.196253239585
+          ],
+          "heatRangeWm2": [
+            1481594.0020731322,
+            3072703.1204452906
+          ],
+          "meanWallFluidTemperatureRangeK": [
+            320.7672346255609,
+            346.2110729920589
+          ],
+          "physicalHeatPowerW": 18525.336902184805,
+          "physicsQualified": false
+        },
+        "forward_side": {
+          "faces": 4233,
+          "areaM2": 0.5274774563071267,
+          "pressureRangePa": [
+            840.7913143386608,
+            32784.4285545882
+          ],
+          "heatRangeWm2": [
+            -51058.842403187846,
+            2623221.391756598
+          ],
+          "meanWallFluidTemperatureRangeK": [
+            298.4469924950834,
+            340.55844377393436
+          ],
+          "physicalHeatPowerW": 379318.48693984584,
+          "physicsQualified": false
+        },
+        "rear_side": {
+          "faces": 13662,
+          "areaM2": 1.3969527073769592,
+          "pressureRangePa": [
+            771.6477290698828,
+            7302.934398105895
+          ],
+          "heatRangeWm2": [
+            -76688.45618305654,
+            1618181.9410944113
+          ],
+          "meanWallFluidTemperatureRangeK": [
+            287.35391056259164,
+            356.76056073131934
+          ],
+          "physicalHeatPowerW": 594982.0001965892,
+          "physicsQualified": false
+        },
+        "base": {
+          "faces": 46,
+          "areaM2": 0.03127456561499915,
+          "pressureRangePa": [
+            789.1658067393059,
+            1885.5059751922727
+          ],
+          "heatRangeWm2": [
+            -79980.20517859132,
+            661785.497100883
+          ],
+          "meanWallFluidTemperatureRangeK": [
+            282.8397051843801,
+            348.802621728081
+          ],
+          "physicalHeatPowerW": 828.7923504199438,
+          "physicsQualified": false
+        }
+      },
+      "physicsQualified": false,
+      "newQualifiedArea": 0
+    },
+    {
+      "localIteration": 100,
+      "seriesSuccessfulUpdates": 301,
+      "givenWallTemperatureK": 300,
+      "wallFluidTemperatureRangeK": [
+        282.91674566014535,
+        332.4577109177166
+      ],
+      "maximumWallTemperatureErrorK": 32.45771091771661,
+      "areaRMSWallTemperatureErrorK": 2.989389253414354,
+      "domainTemperatureRangeK": [
+        63.99077985607465,
+        1619.0960549652334
+      ],
+      "yPlusP99": 1.595467009745113,
+      "physicalSurfaceHeatPowerW": 306814.2555707321,
+      "nativeDualHeatPowerW": 305818.68849401805,
+      "boundaryBalanceDiagnostic": {
+        "massNetKgS": -0.12230919076275615,
+        "massIncomingKgS": 1495.7350450337176,
+        "massRelativeImbalance": 8.177196300164177e-05,
+        "energyNetW": -128050.21968827368,
+        "energyIncomingW": 2231350836.46,
+        "energyRelativeImbalance": 5.73868607284649e-05,
+        "method": "v160 physical flux diagnostic: cell-edge WLS, effective Newtonian stress and Pr conduction, nodal flux triangle mean",
+        "nativeDiscreteBoundaryFluxAvailable": false,
+        "nativeConservationProven": false,
+        "normalizationReference": "OTH total energy including captured primitive SST k"
+      },
+      "regions": {
+        "nose": {
+          "faces": 1811,
+          "areaM2": 0.008924527272473986,
+          "pressureRangePa": [
+            5824.02946370369,
+            45782.63236125772
+          ],
+          "heatRangeWm2": [
+            738520.1865191135,
+            2039481.7006028034
+          ],
+          "meanWallFluidTemperatureRangeK": [
+            304.6535828987244,
+            331.63681252241764
+          ],
+          "physicalHeatPowerW": 10728.643198678492,
+          "physicsQualified": false
+        },
+        "forward_side": {
+          "faces": 4233,
+          "areaM2": 0.5274774563071267,
+          "pressureRangePa": [
+            736.0617449858825,
+            32059.26211449398
+          ],
+          "heatRangeWm2": [
+            -35773.30866011765,
+            1448079.4077925188
+          ],
+          "meanWallFluidTemperatureRangeK": [
+            298.43878444538376,
+            316.1122301633646
+          ],
+          "physicalHeatPowerW": 179892.3576797627,
+          "physicsQualified": false
+        },
+        "rear_side": {
+          "faces": 13662,
+          "areaM2": 1.3969527073769592,
+          "pressureRangePa": [
+            632.24250048147,
+            5542.918990133469
+          ],
+          "heatRangeWm2": [
+            -67800.42186413263,
+            509798.89069334936
+          ],
+          "meanWallFluidTemperatureRangeK": [
+            290.11483813770707,
+            317.1657232849827
+          ],
+          "physicalHeatPowerW": 117005.69104406549,
+          "physicsQualified": false
+        },
+        "base": {
+          "faces": 46,
+          "areaM2": 0.03127456561499915,
+          "pressureRangePa": [
+            651.0255110874496,
+            1292.4390684235068
+          ],
+          "heatRangeWm2": [
+            -67590.78456464074,
+            172632.89169648907
+          ],
+          "meanWallFluidTemperatureRangeK": [
+            290.5773061017103,
+            316.66789903169786
+          ],
+          "physicalHeatPowerW": -812.4363517746208,
+          "physicsQualified": false
+        }
+      },
+      "physicsQualified": false,
+      "newQualifiedArea": 0
+    }
+  ],
+  "coldRestartSurfaceJump": {
+    "p": 7.551649865412712e-05,
+    "q": 0.00043556984148466273
+  },
+  "surfaceChangePer100Updates": {
+    "p": {
+      "first100": 0.14903904804222973,
+      "last99Per100": null
+    },
+    "q": {
+      "first100": 0.6698563499545415,
+      "last99Per100": null
+    }
+  },
+  "nativePowerRelativeRanges": {
+    "first20": 0.024010272528290154,
+    "last20": 0.0007765473848221259
+  },
+  "meanLogResiduals": {
+    "first20": {
+      "rms[Rho]": -3.6648250573999994,
+      "rms[RhoU]": -0.5622916099349999,
+      "rms[RhoV]": -1.0775090757,
+      "rms[RhoW]": -0.9607336031700001,
+      "rms[RhoE]": 2.5119530376999997,
+      "rms[k]": -1.1599758511,
+      "rms[w]": 5.9057055727000005
+    },
+    "previous20": {
+      "rms[Rho]": -3.6981253267999996,
+      "rms[RhoU]": -0.559689058175,
+      "rms[RhoV]": -1.3579639886000001,
+      "rms[RhoW]": -1.05877006515,
+      "rms[RhoE]": 2.46701407905,
+      "rms[k]": -0.1072014147345,
+      "rms[w]": 5.1371305333
+    },
+    "last20": {
+      "rms[Rho]": -3.73517897585,
+      "rms[RhoU]": -0.5961584404950001,
+      "rms[RhoV]": -1.39118150535,
+      "rms[RhoW]": -1.0820706548000003,
+      "rms[RhoE]": 2.4246538464,
+      "rms[k]": -0.05764323075200001,
+      "rms[w]": 5.09021072985
+    }
+  },
+  "lastMinusFirst20Log": {
+    "rms[Rho]": -0.07035391845000039,
+    "rms[RhoU]": -0.03386683056000017,
+    "rms[RhoV]": -0.31367242965,
+    "rms[RhoW]": -0.12133705163000019,
+    "rms[RhoE]": -0.08729919129999963,
+    "rms[k]": 1.102332620348,
+    "rms[w]": -0.8154948428500006
+  },
+  "lastMinusPrevious20Log": {
+    "rms[Rho]": -0.03705364905000019,
+    "rms[RhoU]": -0.03646938232000008,
+    "rms[RhoV]": -0.033217516749999954,
+    "rms[RhoW]": -0.02330058965000026,
+    "rms[RhoE]": -0.04236023265000011,
+    "rms[k]": 0.04955818398249999,
+    "rms[w]": -0.0469198034499998
+  },
+  "finalResiduals": {
+    "rms[Rho]": -3.749495849,
+    "rms[RhoU]": -0.6102074896,
+    "rms[RhoV]": -1.402550091,
+    "rms[RhoW]": -1.090276708,
+    "rms[RhoE]": 2.408223329,
+    "rms[k]": -0.04129132928,
+    "rms[w]": 5.076185578
+  },
+  "originalResidualThresholdPassed": false,
+  "originalYPlusThresholdPassed": false,
+  "regionDefinitions": "v56 nose and base masks; side split at X=-0.6 m; statistics only",
+  "admissibilityEvents": 338,
+  "recoveredEvents": 337,
+  "failedOldStates": 1,
+  "energyReplayErrorJkg": 1.1641532182693481e-10,
+  "eventOracleEnergyError": 1.1853062323045747e-13,
+  "failurePair": {
+    "recoveredEvent": 336,
+    "failedEvent": 338,
+    "localRCMPoint": 292375,
+    "conservedComponentsExact": true,
+    "globalLocationKnown": false,
+    "oldK": 883.3828617871891,
+    "newK": 885.1682246102501,
+    "kIncreaseJkg": 1.7853628230610639,
+    "minimumThermalEnergyJkg": 168666.1522745639,
+    "priorThermalEnergyJkg": 168666.79567814575,
+    "failedThermalEnergyJkg": 168665.0103153227,
+    "deficitJkg": 1.1419592412130442,
+    "pairedEnergyChangeErrorJkg": 9.663381206337363e-12,
+    "actualSSTIncrementAndRHSAvailable": false,
+    "scope": "same five conserved values and recorded current k explain this EOS rejection; not the cause of whole-domain nonconvergence"
+  },
+  "eventGlobalLocationsKnown": false,
+  "eventVolumeCorrectionsAvailable": false,
+  "normalTerminal": false,
+  "lastSavedLocalIteration": 100,
+  "lastFiniteHistoryLocalIteration": 179,
+  "historyWindowIndices": {
+    "first20": [
+      0,
+      19
+    ],
+    "previous20": [
+      140,
+      159
+    ],
+    "last20": [
+      160,
+      179
+    ]
+  },
+  "requestedUpdates": 200,
+  "finiteHistoryUpdates": 180,
+  "priorUpdates": 200,
+  "seriesFiniteHistoryUpdates": 380,
+  "failureInstantFullStateAvailable": false,
+  "plannedFinalWindowAvailable": false,
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715642,
+  "boundaryVolumeRelativeError": 4.440892098500626e-16,
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\reviewSU2DevelopmentRun.py": "6ab7d16a0dba50c62b3073911c0175abbf14b12f4785104775cef073c7350393",
+    "E:\\RocketAeroHeat\\outputs\\v145_validation\\mesh\\hybrid_volume.mat": "22b35b72396c1a7d14195af9bd24d3c6328138484d4009638c1ab48cddec1d6c",
+    "E:\\RocketAeroHeat\\outputs\\v56_validation\\state_validity\\state_validity_actual_rocket.mat": "83c9f203d1f83ae1f3825da16809e521eeeb8640c03b0ce11839c2b9bf94a6af",
+    "E:\\RocketAeroHeat\\outputs\\v166_validation\\real02\\engine_process.json": "f9ef1f1c81d5fcc95492b13f265a73c095e9c1091d8038dd0453af6f7e658432",
+    "E:\\RocketAeroHeat\\outputs\\v166_validation\\real02\\case_manifest.json": "bbb5b3b40569ac9897e5f683bac1857a8cbb8be46e82a879156f091e026c7f16",
+    "E:\\RocketAeroHeat\\outputs\\v166_validation\\real02\\history.csv": "3891eb2186a44e395d7f08b46022c9707f5fc75f8704af4cac134d684b48df0f",
+    "E:\\RocketAeroHeat\\outputs\\v166_validation\\real02\\mesh.su2": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+    "E:\\RocketAeroHeat\\docs\\validation\\v166\\PLAN.md": "1b1ee42246bde6c90ad2cf8abcf5b1bbdbe2978b7dd1b39ed55ed4bc0ed60337",
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAir.hpp": "62a880ed2e1ec76c5bc8c9a832ec7787b5b3f01494f31ed6a3ebf7bfb972969b",
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAirBatch.cpp": "5dbff0d52bd141a63a90e708ddf381115ab30cdbc1d61e2cdd1475325f930270",
+    "E:\\RocketAeroHeat\\scripts\\buildIdealAirBatch.py": "9a46a6a48311827aa41a060236bf3372300290e8c764fc383b31335a722e95ee",
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\runtime.json": "04c7800d328f5395e73a782560ba0545aac2cab5232e85d93fb2494f5e6fd45d",
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\idealAirBatch.dll": "03514d6657245cd7fa38b7e6bc074666a96320bf170fbc77302a01141a3c135a",
+    "E:\\RocketAeroHeat\\scripts\\idealAirProperties.py": "7d63ba9c250dfd7ecad3912b6ab1daaba0784aae43af7d22307d4d17ea659234",
+    "E:\\RocketAeroHeat\\outputs\\v166_validation\\real02\\restart_flow_000000.csv": "a8dfd2849b55adcc8858d10c07bcaab844a5f58368a889858630bd3d98f7f105",
+    "E:\\RocketAeroHeat\\outputs\\v166_validation\\real02\\restart_flow_000100.csv": "a9b749ac7458215582cdabcf8c6878c8e98ac38aa5d08400d5f6067118023591",
+    "E:\\RocketAeroHeat\\outputs\\v164_validation\\real01\\restart_flow_000049.csv": "e25588a7507a9d5d7a3a96d54e1ec67f373a003a8457bb848c9bc5aeabeef2ac",
+    "E:\\RocketAeroHeat\\outputs\\v166_validation\\real02\\admissibility.csv": "09c025f01cba5fef148cd02090e8a67680b79750b1f8504aaa665e9d14a01252",
+    "E:\\RocketAeroHeat\\outputs\\v153_validation\\native03\\idealAirProbe.exe": "a66611cfd23ebb4de2c6a3db41ccc21d5aaf041cebabeca9624956bc0c6970ce"
+  },
+  "inputsStable": true,
+  "elapsedSeconds": 99.06299999999464,
+  "automaticAdditionalTasks": 0,
+  "engineCompilation": 0,
+  "physicsQualified": false,
+  "newQualifiedArea": 0
+}

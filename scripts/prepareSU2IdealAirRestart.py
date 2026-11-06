@@ -19,6 +19,61 @@ from su2ThermalRuntime import ROOT, read, sha
 
 KIND = 'same-mesh-ideal-air-state-v1'
 OUTPUT_KEYS = {'ITER', 'OUTPUT_WRT_FREQ', 'VOLUME_OUTPUT'}
+COLD_RESTART = 'conservative rho/rhoU/rhoE and post-update k/omega; rebuild primitives and eddy viscosity; reset adaptive CFL and solver histories'
+SAME_RUNTIME_CHANGE = 'same admissible-v1 operator and executable; cold restart resets solver histories'
+
+
+def admissible_checkpoint_identity(source, manifest, receipt, checkpoint):
+    """模块用途。只接受正常且严格热审核的同包末帧，锁定实际二进制与阶段来源。"""
+    assert manifest['requiredRuntimeFlavor'] == receipt['runtimeFlavor'] == ADMISSIBLE_FLAVOR
+    assert manifest['runtimeAdmissibility'] == ADMISSIBILITY
+    assert receipt['status'] == 'terminal' and receipt['exitCode'] == 0
+    assert all(receipt['inputsStable'].values())
+    assert not any(receipt.get(k, False) for k in ('timedOut', 'cancelled', 'outputBudgetExceeded', 'supervisorError'))
+    inventory = receipt['checkpoints']
+    assert inventory['normalScheduleComplete'] and inventory['normalTerminal']
+    entry = inventory['lastComplete']
+    assert entry['localIteration'] == checkpoint and entry['stage'] == STAGE
+    assert checkpoint == inventory['lastFiniteHistoryLocalIteration']
+    locks = {}
+    for key in ('volume', 'surface'):
+        path = (source/entry[key]).resolve(); path.relative_to(source)
+        assert sha(path) == entry[key+'SHA256'] == receipt['outputSHA256'][path.name]
+        locks[str(path)] = sha(path)
+    runtime_path = ROOT/'tools/runtime/su2'/('8.6.0-'+ADMISSIBLE_FLAVOR)/'runtime.json'
+    runtime = read(runtime_path)
+    assert runtime['flavor'] == runtime['numericalBaselineFlavor'] == ADMISSIBLE_FLAVOR
+    assert runtime['numericalParentFlavor'] == OBSERVED_FLAVOR
+    assert runtime['samePhysicsAndNumerics'] is False and runtime['admissibility'] == ADMISSIBILITY
+    executable = Path(runtime['executable']).resolve(); executable.relative_to(runtime_path.parent)
+    for path in (runtime_path, executable):
+        assert sha(path) == receipt['inputSHA256'][str(path)], '来源运行包身份改变'
+        locks[str(path)] = sha(path)
+    pointer_path = source/'ideal_air_review.json'; pointer = read(pointer_path)
+    assert pointer['receiptSHA256'] == sha(source/'engine_process.json')
+    for key in ('audit', 'wall', 'thermo'):
+        path = (source/pointer[key+'Path']).resolve(); path.relative_to(source)
+        assert sha(path) == pointer[key+'SHA256'], '来源热审核身份改变'
+        locks[str(path)] = sha(path)
+    report = read(source/pointer['auditPath'])
+    assert report['interfacePassed'] and report['nativeNormalTerminal'] and all(report['inputsStable'].values())
+    assert report['thermodynamicModel'] == manifest['idealAir']
+    assert report['checkpointLocalIteration'] == checkpoint
+    assert report['seriesSuccessfulUpdates'] == entry['seriesSuccessfulUpdates']
+    assert report['errors']['phaseEnergy'] < 2e-10 and report['errors']['EOS'] < 2e-12
+    assert report['errors']['heatGradient'] < 2e-10
+    for key in ('volume', 'surface'):
+        path = str((source/entry[key]).resolve())
+        assert report['inputSHA256'][path] == locks[path]
+    locks[str(pointer_path)] = sha(pointer_path)
+    identity = dict(kind='same-admissible-runtime-cold-restart-v1',
+        runtimeManifestPath=str(runtime_path), runtimeManifestSHA256=sha(runtime_path),
+        executablePath=str(executable), executableSHA256=sha(executable),
+        sourceAuditPath=str((source/pointer['auditPath']).resolve()), sourceAuditSHA256=pointer['auditSHA256'],
+        sourceReceiptSHA256=sha(source/'engine_process.json'),
+        unchangedOperator=True, uninterruptedTrajectoryEquivalent=False,
+        adaptiveCFLReset=True, solverHistoryReset=True)
+    return identity, locks
 
 
 def historical_locks(identities, snapshot):
@@ -71,11 +126,14 @@ def source_state(source, checkpoint, snapshot):
         prior = 0
     else:
         from auditSU2IdealAirState import load_state
-        assert manifest['requiredRuntimeFlavor'] == PHASE_FLAVOR
+        assert manifest['requiredRuntimeFlavor'] in (PHASE_FLAVOR, ADMISSIBLE_FLAVOR), '不支持该保存态来源包'
         receipt_path = source/'engine_process.json'
         receipt = read(receipt_path)
         assert receipt['status'] == 'terminal' and all(receipt['inputsStable'].values())
-        assert receipt['runtimeFlavor'] == PHASE_FLAVOR
+        assert receipt['runtimeFlavor'] == manifest['requiredRuntimeFlavor']
+        if receipt['runtimeFlavor'] == ADMISSIBLE_FLAVOR:
+            _, checked = admissible_checkpoint_identity(source, manifest, receipt, checkpoint)
+            locks.update(checked)
         for name in ('case.cfg', 'mesh.su2', 'case_manifest.json', 'ideal_air_contract.json'):
             assert sha(source/name) == receipt['inputSHA256'][str(source/name)]
         entry = next(row for row in receipt['checkpoints']['complete'] if row['localIteration'] == checkpoint)
@@ -117,6 +175,9 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
     try:
         source = Path(source).resolve()
         manifest, old_contract, data, columns, nd, prior, locks, rebinding, selected = source_state(source, checkpoint, snapshot)
+        same_admissible = checkpoint is not None and manifest['requiredRuntimeFlavor'] == ADMISSIBLE_FLAVOR
+        if same_admissible:
+            assert runtime_flavor == ADMISSIBLE_FLAVOR, '已审核的回退包来源只允许同包接续'
         assert nd == 3, '当前相容重启动合同限三维SST'
         manifest = copy.deepcopy(manifest)
         core = IdealAir()
@@ -152,7 +213,7 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
             localIterationStartsAt=0, sourceKind='prepared-initial-state' if checkpoint is None else 'native-checkpoint',
             samePhysicsAndNumerics=True, sourceRuntimeFlavor=manifest['requiredRuntimeFlavor'],
             runtimeChange='stage output and first saved iteration only',
-            coldRestart='conservative rho/rhoU/rhoE and post-update k/omega; rebuild primitives and eddy viscosity; reset adaptive CFL and solver histories',
+            coldRestart=COLD_RESTART,
             restartTemperatureRangeK=[float(min(recovered['T'])), float(max(recovered['T']))],
             sourceSHA256=locks, historicalSourceRebinding=rebinding,
             initialStateSHA256=sha(folder/'initial_flow.csv'), physicsQualified=False, newQualifiedArea=0)
@@ -162,9 +223,13 @@ def prepare(source, folder, iterations, every, maximum_bytes, checkpoint=None, s
             init['runtimeChange'] = 'phase-v2 numerics; C++ termination observation and 17-digit ASCII output'
             manifest['runtimeObservation'] = dict(OBSERVATION)
         if runtime_flavor == ADMISSIBLE_FLAVOR:
-            init['samePhysicsAndNumerics'] = False
-            init['runtimeChange'] = 'ideal-air domain rejection restores Solution_Old with current k; invalid old state terminates'
-            init['numericalChange'] = dict(ADMISSIBILITY)
+            if same_admissible:
+                init['runtimeChange'] = SAME_RUNTIME_CHANGE
+                init['runTransition'], _ = admissible_checkpoint_identity(source, manifest, read(source/'engine_process.json'), checkpoint)
+            else:
+                init['samePhysicsAndNumerics'] = False
+                init['runtimeChange'] = 'ideal-air domain rejection restores Solution_Old with current k; invalid old state terminates'
+                init['numericalChange'] = dict(ADMISSIBILITY)
             manifest['runtimeAdmissibility'] = dict(ADMISSIBILITY)
         if runtime_flavor == STEP_FLAVOR:
             init['samePhysicsAndNumerics'] = False
@@ -208,9 +273,19 @@ def validate_source(folder, c, manifest, contract):
         assert manifest['runtimeObservation'] == OBSERVATION
         assert init['runtimeChange'] == 'phase-v2 numerics; C++ termination observation and 17-digit ASCII output'
     if manifest['requiredRuntimeFlavor'] == ADMISSIBLE_FLAVOR:
-        assert manifest['runtimeAdmissibility'] == init['numericalChange'] == ADMISSIBILITY
-        assert init['samePhysicsAndNumerics'] is False
-        assert init['runtimeChange'] == 'ideal-air domain rejection restores Solution_Old with current k; invalid old state terminates'
+        assert manifest['runtimeAdmissibility'] == ADMISSIBILITY
+        if 'runTransition' in init:
+            assert init['samePhysicsAndNumerics'] is True and 'numericalChange' not in init
+            assert init['runtimeChange'] == SAME_RUNTIME_CHANGE and init['coldRestart'] == COLD_RESTART
+            assert init['sourceRuntimeFlavor'] == ADMISSIBLE_FLAVOR and init['sourceLocalIteration'] is not None
+            source = Path(init['sourceDirectory'])
+            identity, source_locks = admissible_checkpoint_identity(source, read(source/'case_manifest.json'),
+                read(source/'engine_process.json'), init['sourceLocalIteration'])
+            assert init['runTransition'] == identity
+            assert all(init['sourceSHA256'].get(k) == v for k, v in source_locks.items())
+        else:
+            assert init['numericalChange'] == ADMISSIBILITY and init['samePhysicsAndNumerics'] is False
+            assert init['runtimeChange'] == 'ideal-air domain rejection restores Solution_Old with current k; invalid old state terminates'
     elif manifest['requiredRuntimeFlavor'] == STEP_FLAVOR:
         assert manifest['runtimeConservativeStep'] == init['numericalChange'] == CONSERVATIVE_STEP
         assert init['samePhysicsAndNumerics'] is False and init['runtimeChange'] == STEP_CHANGE
@@ -232,6 +307,10 @@ def validate_source(folder, c, manifest, contract):
         expected['HISTORY_OUTPUT'] = '(ITER, RMS_RES, AERO_COEFF, HEAT, LINSOL)'
     assert {k: v for k, v in c.items() if k not in OUTPUT_KEYS} == {k: v for k, v in expected.items() if k not in OUTPUT_KEYS}
     old_manifest = read(source/'case_manifest.json')
+    if old_manifest['requiredRuntimeFlavor'] == ADMISSIBLE_FLAVOR:
+        assert manifest['requiredRuntimeFlavor'] == ADMISSIBLE_FLAVOR and 'runTransition' in init
+    else:
+        assert 'runTransition' not in init
     changed_contract_keys = {'schemaVersion', 'initialization', 'initializationSHA256',
                              'configurationSHA256', 'checkpointContract'}
     assert {key: value for key, value in contract.items() if key not in changed_contract_keys} == {

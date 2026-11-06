@@ -35,16 +35,20 @@ if variableAir
     assert(strcmp(init.kind,'same-mesh-ideal-air-state-v1') && ...
         init.localIterationStartsAt==0 && ~init.physicsQualified);
     if strcmp(receipt.runtimeFlavor,'rah-ideal-air-admissible-v1')
-        % 新包改变候选态处理。只有逐字绑定的已登记合同可进入此分支。
+        % 模块用途。区分首次改变数值包与同包冷重启，不把历史重建称为连续等价。
         a=manifest.runtimeAdmissibility;
-        assert(~init.samePhysicsAndNumerics && isequaln(a,init.numericalChange));
+        if isfield(init,'runTransition')
+            validateSameRuntimeRestart(init,receipt.runtimeFlavor);
+        else
+            assert(~init.samePhysicsAndNumerics && isequaln(a,init.numericalChange));
+            assert(strcmp(init.runtimeChange,'ideal-air domain rejection restores Solution_Old with current k; invalid old state terminates'));
+        end
         assert(strcmp(a.model,'IDEAL_AIR_VARIABLE_CP') && a.changesNumerics && ...
             strcmp(a.candidateRejection,'domain_error-before-primitive-read') && ...
             strcmp(a.fallback,'Solution_Old-with-current-turb_ke') && ...
             strcmp(a.invalidOldState,'record-and-rethrow') && ...
             strcmp(a.traceFile,'admissibility.csv') && strcmp(a.pointNumbering,'local-RCM') && ...
             a.maximumTraceEvents==4096 && ~a.temperatureClipping && ~a.kineticEnergyReset);
-        assert(strcmp(init.runtimeChange,'ideal-air domain rejection restores Solution_Old with current k; invalid old state terminates'));
     elseif strcmp(receipt.runtimeFlavor,'rah-ideal-air-step-v1')
         % 模块用途。共同守恒限步只标数值适配；明确没有全局守恒或物理资格证明。
         a=manifest.runtimeConservativeStep;
@@ -140,7 +144,35 @@ end
 result.solverMethod=[result.solverMethod sprintf('；线性 %s / %s，最多%s，目标%s', ...
     result.linearSolver.LINEAR_SOLVER,result.linearSolver.LINEAR_SOLVER_PREC, ...
     result.linearSolver.LINEAR_SOLVER_ITER,result.linearSolver.LINEAR_SOLVER_ERROR)];
+if isfield(init,'runTransition')
+    result.restartTransition=init.runTransition;
+    result.solverMethod=[result.solverMethod sprintf('；同包冷重启：源局部%d，已完成%d次；重建CFL及求解历史，非无中断等价', ...
+        init.sourceLocalIteration,init.priorSuccessfulUpdates)];
+end
 
+end
+
+function validateSameRuntimeRestart(init,flavor)
+% 模块五。重新核对源末帧、热审核和实际求解包，防止浏览时混用别的结果。
+t=init.runTransition;
+assert(strcmp(flavor,'rah-ideal-air-admissible-v1') && strcmp(init.sourceRuntimeFlavor,flavor));
+assert(init.samePhysicsAndNumerics && ~isfield(init,'numericalChange'));
+assert(strcmp(t.kind,'same-admissible-runtime-cold-restart-v1') && t.unchangedOperator && ...
+    ~t.uninterruptedTrajectoryEquivalent && t.adaptiveCFLReset && t.solverHistoryReset);
+assert(strcmp(init.runtimeChange,'same admissible-v1 operator and executable; cold restart resets solver histories'));
+assert(strcmp(init.coldRestart, ...
+    'conservative rho/rhoU/rhoE and post-update k/omega; rebuild primitives and eddy viscosity; reset adaptive CFL and solver histories'));
+assert(strcmp(sha(t.runtimeManifestPath),t.runtimeManifestSHA256) && strcmp(sha(t.executablePath),t.executableSHA256));
+sourceReceipt=fullfile(init.sourceDirectory,'engine_process.json');
+assert(strcmp(sha(sourceReceipt),t.sourceReceiptSHA256) && strcmp(sha(t.sourceAuditPath),t.sourceAuditSHA256));
+s=jsondecode(fileread(sourceReceipt));a=jsondecode(fileread(t.sourceAuditPath));
+assert(strcmp(s.status,'terminal') && s.exitCode==0 && strcmp(s.runtimeFlavor,flavor));
+assert(s.checkpoints.normalScheduleComplete && s.checkpoints.lastComplete.localIteration==init.sourceLocalIteration);
+assert(a.interfacePassed && a.nativeNormalTerminal && a.checkpointLocalIteration==init.sourceLocalIteration);
+assert(a.seriesSuccessfulUpdates==init.priorSuccessfulUpdates && ...
+    s.checkpoints.lastComplete.seriesSuccessfulUpdates==init.priorSuccessfulUpdates);
+assert(strcmp(sha(init.sourceStatePath),init.sourceStateSHA256));
+assert(strcmp(init.sourceStateSHA256,s.checkpoints.lastComplete.volumeSHA256));
 end
 function h=sha(file)
 fid=fopen(file,'rb');assert(fid>=0);g=onCleanup(@()fclose(fid));md=java.security.MessageDigest.getInstance('SHA-256');
