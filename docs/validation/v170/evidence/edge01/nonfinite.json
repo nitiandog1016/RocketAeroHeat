@@ -1,0 +1,37 @@
+{
+  "method": "local-normal-column-plateau-delta99-v1",
+  "scope": "attached-laminar-near-two-dimensional-profile-with-resolved-local-plateau",
+  "policy": {
+    "minimum_points": 18,
+    "minimum_plateau_points": 6,
+    "plateau_distance_ratio": 1.5,
+    "plateau_relative_spread": 0.005,
+    "shock_pressure_log_change": 0.1,
+    "shock_density_log_change": 0.05,
+    "shock_stencil_edges": 3,
+    "shock_guard_points": 2,
+    "minimum_edge_speed_ms": 1.0,
+    "maximum_crossflow_ratio": 0.02,
+    "maximum_normal_speed_ratio": 0.1,
+    "reverse_flow_tolerance_ratio": 1e-05,
+    "maximum_overshoot_ratio": 0.02,
+    "wall_velocity_tolerance_ratio": 1e-05,
+    "minimum_points_below_delta99": 8,
+    "maximum_delta99_bracket_ratio": 0.2,
+    "maximum_decimation_delta99_change": 0.05,
+    "maximum_decimation_edge_change": 0.01
+  },
+  "provenance": {
+    "stateKind": "synthetic-test",
+    "flowStateSource": "analytic-polynomial-v170",
+    "normalColumnSource": "exact-straight-normal-coordinates",
+    "thermodynamicModel": "synthetic-calorically-perfect-air-cp1004.5-R287"
+  },
+  "accepted": false,
+  "numericalExtractionAccepted": false,
+  "edge": null,
+  "physicalQualification": false,
+  "experimentalQualification": false,
+  "freestreamFallbackUsed": false,
+  "status": "nonfinite-or-malformed-profile"
+}

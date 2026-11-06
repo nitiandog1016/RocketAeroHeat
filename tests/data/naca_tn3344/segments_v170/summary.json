@@ -1,0 +1,66 @@
+{
+  "schema": "RocketAeroHeat.naca-nominal-electrode-segments.v170",
+  "source_document": "NACA TN3344, printed pages10/11/13/42/48; PDF pages11/12/14/43/49",
+  "selection": "M_inf1.97, Re_D2.28e6, Figure4(b) circle-with-center-dot",
+  "nominal_geometric_station_count": 22,
+  "nominal_voltage_segment_count": 20,
+  "nominal_segment_geometry_identified": true,
+  "nominal_segments_overlap": true,
+  "strict_all20_local_abscissa_identity_closed": false,
+  "temperature_station_and_interval_midpoint_identical_rows": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "plot_reading_bound_mismatch_rows_at_temperature_station": [
+    17,
+    18
+  ],
+  "plot_plus_station_bound_mismatch_rows_at_temperature_station": [
+    18
+  ],
+  "plot_plus_station_bound_mismatch_rows_at_interval_midpoint": [
+    17,
+    18
+  ],
+  "sphere_radius_m": 0.0508,
+  "diameter_m": 0.1016,
+  "shoulder_s_over_D": 0.7853981633974483,
+  "covered_s_over_D": [
+    0.0,
+    1.1018044133974483
+  ],
+  "union_area_full_circumference_m2": 0.02647546578284425,
+  "sum_overlapping_segment_areas_m2_not_union": 0.05108862989802568,
+  "maximum_independent_area_relative_error": 2.4479009468311797e-15,
+  "maximum_station_position_area_relative_sensitivity": 0.024196251600427036,
+  "station_position_tolerance_m": 0.000127,
+  "station_position_tolerance_over_D": 0.00125,
+  "uncertainty_rule": "旧图读范围与原文站位公差分列；并列界是保守可行性检查，不是独立随机误差合成。原文Nu±15%、Re±1%另列，不能用于吞掉坐标差。",
+  "heat_sign_rule": "原文电热向流体放热为正；CFD入壁为正时需取负；段内先积分有符号热流，再除以名义面积。",
+  "stop_rule": "不改旧CSV，不用理论曲线填点；第15至20行须保留中心身份敏感性，第18行不得宣称在旧坐标范围内闭合。",
+  "old_inputs_sha256_before_and_after_identical": {
+    "outputs/v168_validation/sources/NACA_TN_3344.pdf": "b63d630c30e833167acc9c033acfe7244b9cac4fc1921d5d1543e5a4c38dae58",
+    "outputs/v168_validation/sources/NACA_TN_3344.txt": "be090cd5afffed19d6a9da0ef7afd168bd0d3e28dbd2a4955a5a3cc54766bd83",
+    "tests/data/naca_tn3344/raw/figure1c.png": "3d2930f75368c87abb549662444a9c36daab28d25d7ee7390d31604384459ea0",
+    "tests/data/naca_tn3344/raw/figure4b.png": "f21655e848eb41d67d0b26615bec19137c0939635ade65d5b047c47457e8c465",
+    "tests/data/naca_tn3344/heat_parameter.csv": "63685ad834b6c57d89095d652814cca9f4095a099fcd796ad9754e8067a56361",
+    "tests/data/naca_tn3344/digitization.json": "d34061f11a09e019236e78e26a73d5734c1530e13c94f395f10022d70c41a487"
+  },
+  "generator_sha256": "4e2f153ebb606fa5cead14a2b137f1b623b407eb9671c430d704ec7aa0710dd3",
+  "generated_csv_sha256": {
+    "nominal_stations.csv": "e8b268f1df6c405dcd8c36eae293fb57ba70a853b2b65b626a707edc6a52a392",
+    "nominal_segments.csv": "bfa5c8ecf0c141d9bb6bf3f831a973ef9572e2ae78a183012a43fc4a3b993532"
+  }
+}

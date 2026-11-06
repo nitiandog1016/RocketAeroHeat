@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "tests/verifyNACASegmentsV170.py", line 67, in <module>
+    verify(Path(parser.parse_args().output).resolve())
+  File "tests/verifyNACASegmentsV170.py", line 25, in verify
+    answer=integrate_profile(s,q,source);errors=[]
+  File "E:\RocketAeroHeat\scripts\nacaMeasurementSegments.py", line 51, in integrate_profile
+    answer.append(dict(row=int(row['heat_row_1based']),boundsM=[a,b],nominalFullAreaM2=ar,
+KeyError: 'heat_row_1based'

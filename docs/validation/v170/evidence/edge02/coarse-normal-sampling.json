@@ -1,0 +1,79 @@
+{
+  "method": "local-normal-column-plateau-delta99-v1",
+  "scope": "attached-laminar-near-two-dimensional-profile-with-resolved-local-plateau",
+  "policy": {
+    "minimum_points": 18,
+    "minimum_plateau_points": 6,
+    "plateau_distance_ratio": 1.5,
+    "plateau_relative_spread": 0.005,
+    "shock_pressure_log_change": 0.1,
+    "shock_density_log_change": 0.05,
+    "shock_stencil_edges": 3,
+    "shock_guard_points": 2,
+    "minimum_edge_speed_ms": 1.0,
+    "maximum_crossflow_ratio": 0.02,
+    "maximum_normal_speed_ratio": 0.1,
+    "reverse_flow_tolerance_ratio": 1e-05,
+    "maximum_overshoot_ratio": 0.02,
+    "wall_velocity_tolerance_ratio": 1e-05,
+    "minimum_points_below_delta99": 8,
+    "maximum_delta99_bracket_ratio": 0.2,
+    "maximum_decimation_delta99_change": 0.05,
+    "maximum_decimation_edge_change": 0.01
+  },
+  "provenance": {
+    "stateKind": "synthetic-test",
+    "flowStateSource": "analytic-polynomial-v170",
+    "normalColumnSource": "exact-straight-normal-coordinates",
+    "thermodynamicModel": "synthetic-calorically-perfect-air-cp1004.5-R287"
+  },
+  "accepted": false,
+  "numericalExtractionAccepted": false,
+  "edge": null,
+  "physicalQualification": false,
+  "experimentalQualification": false,
+  "freestreamFallbackUsed": false,
+  "normalSamples": 31,
+  "stationS_m": 0.05,
+  "strongOuterChangeFirstIndex": null,
+  "usableLastIndex": 30,
+  "maximumCoordinateErrorM": 0.0,
+  "candidatePlatforms": [
+    {
+      "lowerIndex": 23,
+      "upperIndex": 30,
+      "lowerDistanceM": 0.002491361873372336,
+      "upperDistanceM": 0.03
+    }
+  ],
+  "platformRelativeSpread": {
+    "tangentialVelocity": 0.0,
+    "pressure": 0.0,
+    "temperature": 0.0,
+    "density": 0.0,
+    "viscosity": 0.0,
+    "conductivity": 0.0,
+    "totalEnthalpyThermalScaled": 0.0
+  },
+  "velocityFractionCrossings": {
+    "0.985": {
+      "distanceM": 0.0022388694856995783,
+      "lowerIndex": 22,
+      "upperIndex": 23,
+      "bracketWidthM": 0.0007453253564274045
+    },
+    "0.99": {
+      "distanceM": 0.002323033614923831,
+      "lowerIndex": 22,
+      "upperIndex": 23,
+      "bracketWidthM": 0.0007453253564274045
+    },
+    "0.995": {
+      "distanceM": 0.0024071977441480832,
+      "lowerIndex": 22,
+      "upperIndex": 23,
+      "bracketWidthM": 0.0007453253564274045
+    }
+  },
+  "status": "delta99-under-resolved"
+}

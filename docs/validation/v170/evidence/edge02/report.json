@@ -1,0 +1,93 @@
+{
+  "passed": true,
+  "acceptedTests": [
+    {
+      "name": "finite-polynomial",
+      "delta99RelativeError": 0.0005918227409260624,
+      "exactDelta99M": 0.0018821937284436078
+    },
+    {
+      "name": "postshock-local-state",
+      "delta99RelativeError": 0.0005918227409260624,
+      "exactDelta99M": 0.0018821937284436078
+    },
+    {
+      "name": "enthalpy-reference-shift",
+      "sameSelectedNode": true
+    }
+  ],
+  "rejectedTests": [
+    {
+      "name": "stagnant",
+      "status": "stagnant-or-near-stagnation-column"
+    },
+    {
+      "name": "exact-tip",
+      "status": "stagnation-limit-not-defined"
+    },
+    {
+      "name": "reverse-flow",
+      "status": "reverse-flow-outside-method-scope"
+    },
+    {
+      "name": "crossflow",
+      "status": "crossflow-outside-method-scope"
+    },
+    {
+      "name": "slipping-wall",
+      "status": "wall-no-slip-not-satisfied"
+    },
+    {
+      "name": "not-normal",
+      "status": "not-a-straight-normal-column"
+    },
+    {
+      "name": "duplicate-distance",
+      "status": "missing-wall-or-unordered-normal-distance"
+    },
+    {
+      "name": "nonfinite",
+      "status": "nonfinite-or-malformed-profile"
+    },
+    {
+      "name": "no-provenance",
+      "status": "missing-local-solution-provenance"
+    },
+    {
+      "name": "freestream-fallback",
+      "status": "freestream-substitution-forbidden"
+    },
+    {
+      "name": "no-platform",
+      "status": "no-resolved-local-platform"
+    },
+    {
+      "name": "overshoot",
+      "status": "multiple-platforms-ambiguous"
+    },
+    {
+      "name": "two-platforms",
+      "status": "multiple-platforms-ambiguous"
+    },
+    {
+      "name": "shock-inside-layer",
+      "status": "no-resolved-local-platform"
+    },
+    {
+      "name": "coarse-normal-sampling",
+      "status": "delta99-under-resolved"
+    }
+  ],
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\tests\\verifyNACAEdgeV170.py": "2e06b46bd0fc786ffc8975d7a47e65419461b03edd627c945256dc4914e4770a",
+    "E:\\RocketAeroHeat\\scripts\\nacaBoundaryLayerEdge.py": "6f558a76f20d57c4ea271012e8232c9b0db0543479655c87ffb762c1388a5db2"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\tests\\verifyNACAEdgeV170.py": true,
+    "E:\\RocketAeroHeat\\scripts\\nacaBoundaryLayerEdge.py": true
+  },
+  "realFlowColumnsTested": 0,
+  "syntheticTestsAreCFDValidation": false,
+  "experimentalQualification": false,
+  "newQualifiedArea_m2": 0
+}
