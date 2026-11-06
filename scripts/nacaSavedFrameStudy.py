@@ -1,7 +1,7 @@
 """只读选择 NACA 已保存完整帧；异常任务须显式选择，永不补造终止瞬间场。"""
 from pathlib import Path
 
-from su2NACASpatialInterface import inventory
+from su2IdealAirCheckpoints import inventory
 from su2ThermalRuntime import sha
 
 

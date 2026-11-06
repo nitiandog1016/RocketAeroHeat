@@ -1,0 +1,703 @@
+{
+  "reviewCompleted": true,
+  "normalTerminal": false,
+  "processExitCode": 134,
+  "processStatus": {
+    "timedOut": false,
+    "cancelled": false,
+    "outputBudgetExceeded": false,
+    "supervisorError": false,
+    "memoryBudgetExceeded": false
+  },
+  "completeSavedLocalIterations": [
+    0
+  ],
+  "lastCompleteLocalIteration": 0,
+  "lastFiniteHistoryLocalIteration": 45,
+  "lastHistoryHasFullState": false,
+  "abnormalInstantStateAvailable": false,
+  "history": {
+    "finiteHistoryRows": 46,
+    "lastFiniteLocalIteration": 45,
+    "rejectedNonfiniteOrIncompleteRows": 0,
+    "windows": {
+      "first20": {
+        "firstLocalIteration": 0,
+        "lastLocalIteration": 19,
+        "meanLogResidual": {
+          "rms[Rho]": -3.23115659205,
+          "rms[RhoU]": -0.31561866483,
+          "rms[RhoV]": -1.4869437341,
+          "rms[RhoW]": -1.4874816532000001,
+          "rms[RhoE]": 2.5640294796
+        },
+        "heatPowerMeanW": -2075.12654135,
+        "heatPowerRangeW": [
+          -2099.130671,
+          -1918.095445
+        ],
+        "heatPowerRelativeRange": 0.08724057178808248,
+        "zeroPowerScale": false
+      },
+      "previous20": {
+        "firstLocalIteration": 6,
+        "lastLocalIteration": 25,
+        "meanLogResidual": {
+          "rms[Rho]": -3.1825382916999994,
+          "rms[RhoU]": -0.27251093388,
+          "rms[RhoV]": -1.26081585315,
+          "rms[RhoW]": -1.25807779125,
+          "rms[RhoE]": 2.60592539615
+        },
+        "heatPowerMeanW": -1807.8286957349997,
+        "heatPowerRangeW": [
+          -2099.130671,
+          -390.9925139
+        ],
+        "heatPowerRelativeRange": 0.9448562029852784,
+        "zeroPowerScale": false
+      },
+      "last20": {
+        "firstLocalIteration": 26,
+        "lastLocalIteration": 45,
+        "meanLogResidual": {
+          "rms[Rho]": -3.05444742545,
+          "rms[RhoU]": -0.15369865226999999,
+          "rms[RhoV]": -1.00903167775,
+          "rms[RhoW]": -1.022073963675,
+          "rms[RhoE]": 2.71934894125
+        },
+        "heatPowerMeanW": 250.75290665749998,
+        "heatPowerRangeW": [
+          15.29812802,
+          580.7008911
+        ],
+        "heatPowerRelativeRange": 2.2548203752320846,
+        "zeroPowerScale": false
+      }
+    },
+    "lastWindowMinusReferenceLog": {
+      "first20": {
+        "rms[Rho]": 0.17670916660000024,
+        "rms[RhoU]": 0.16192001256000002,
+        "rms[RhoV]": 0.4779120563500001,
+        "rms[RhoW]": 0.4654076895250001,
+        "rms[RhoE]": 0.15531946165
+      },
+      "previous20": {
+        "rms[Rho]": 0.12809086624999955,
+        "rms[RhoU]": 0.11881228160999999,
+        "rms[RhoV]": 0.2517841754000001,
+        "rms[RhoW]": 0.23600382757500005,
+        "rms[RhoE]": 0.11342354509999986
+      }
+    },
+    "finalLogResidual": {
+      "rms[Rho]": -2.998862327,
+      "rms[RhoU]": -0.08301583016,
+      "rms[RhoV]": -0.9243361009,
+      "rms[RhoW]": -0.9489816162,
+      "rms[RhoE]": 2.786823473
+    },
+    "originalDensityEnergyMinus8Passed": false,
+    "historyPowerSign": "positive into wall",
+    "historyUsedAsPhysicalQualification": false
+  },
+  "frames": [
+    {
+      "localIteration": 0,
+      "successfulUpdates": 1,
+      "seriesSuccessfulUpdates": 1502,
+      "strictThermalAuditPassed": true,
+      "auditStatus": "bound-to-existing-report",
+      "wallFluidTemperatureRangeK": [
+        315.1931567234225,
+        336.3504188117643
+      ],
+      "givenTwRangeK": [
+        333.40922942424004,
+        336.35443376865095
+      ],
+      "wallTemperatureMaximumDifferenceK": 19.89273940799262,
+      "wallTemperatureProjectedAreaRMSDifferenceK": 4.212380856685994,
+      "pressureNodeRangePa": [
+        17986.552848302686,
+        173713.33009210916
+      ],
+      "signedHeatNodeRangeWm2": [
+        -481348.1133290153,
+        277264.0727483543
+      ],
+      "positiveIntoWallProjectedAreaFraction": 0.07746419412742553,
+      "negativeIntoWallProjectedAreaFraction": 0.9225358058725747,
+      "nativeProjectedAreaSectorM2": 0.010126541313315118,
+      "nativeNodalPowerIntoWallSectorW": -2092.9235404663696,
+      "domainTemperatureRangeK": [
+        158.31575181232333,
+        490.7085629454262
+      ],
+      "maximumWallSpeedMS": 0.0,
+      "independentFirstNeighborYPlus99": 0.8934931391030463,
+      "independentFirstNeighborYPlusMaximum": 0.8941365264934615,
+      "actualYPlusThresholdPassed": true,
+      "nativeYPlusUsedForQualification": false,
+      "physicalBoundaryDiagnostic": {
+        "byMarker": {
+          "outer": {
+            "massNetKgS": -13.64742768992709,
+            "massGrossKgS": 13.65015479428638,
+            "energyNetW": -6049647.016160892,
+            "energyGrossW": 6050856.068513261,
+            "flowDiagnostic": {
+              "faces": 3096,
+              "projectedFaceAreaM2": 0.13169445884722145,
+              "normalMachRange": [
+                -1.9698587028872223,
+                0.001155088075702273
+              ],
+              "areaMeanNormalMach": -0.7573640427817887,
+              "subsonicNormalAreaFraction": 0.615460285518405,
+              "incomingAreaFraction": 0.8419599217071874,
+              "outgoingAreaFraction": 0.15804007829281244,
+              "neutralAreaFraction": 0.0,
+              "directionMachTolerance": 1e-12,
+              "faceMeanPressureRangePa": [
+                26023.752219611102,
+                26239.969939093746
+              ],
+              "areaMeanFacePressurePa": 26138.071314732588,
+              "referencePressurePa": 26135.37495648134,
+              "areaMeanRelativePressureDeparture": 0.00010316891400016121,
+              "maximumAbsoluteRelativePressureDeparture": 0.004270944536135572,
+              "definition": "Mn=arithmetic-mean nodal velocity dot outward unit net-face-area-vector / arithmetic-mean nodal sound speed",
+              "areaConvention": "magnitude of summed center-fan area vectors for each face; projected geometric face area",
+              "subsonicDefinition": "abs(face-mean normal Mach)<1; includes near-tangential supersonic flow",
+              "directionDefinition": "incoming Mn<-1e-12; outgoing Mn>1e-12; neutral otherwise; outlet incoming means reverse flow",
+              "pressureDefinition": "arithmetic-mean nodal pressure per face; departure=(face pressure-p_inf)/abs(p_inf)",
+              "outletIndependenceProven": false,
+              "physicalQualified": false
+            }
+          },
+          "outlet": {
+            "massNetKgS": 13.39922308138056,
+            "massGrossKgS": 13.399224694453238,
+            "energyNetW": 6002006.510397635,
+            "energyGrossW": 6002007.242642141,
+            "flowDiagnostic": {
+              "faces": 1392,
+              "projectedFaceAreaM2": 0.048609196247945206,
+              "normalMachRange": [
+                -0.002563852380351728,
+                2.0937216349068954
+              ],
+              "areaMeanNormalMach": 1.9632661634128554,
+              "subsonicNormalAreaFraction": 0.0016299202257484928,
+              "incomingAreaFraction": 9.716275092669442e-05,
+              "outgoingAreaFraction": 0.9999028372490734,
+              "neutralAreaFraction": 0.0,
+              "directionMachTolerance": 1e-12,
+              "faceMeanPressureRangePa": [
+                22754.84980922534,
+                34879.11774819915
+              ],
+              "areaMeanFacePressurePa": 27104.33541513726,
+              "referencePressurePa": 26135.37495648134,
+              "areaMeanRelativePressureDeparture": 0.03707467217399237,
+              "maximumAbsoluteRelativePressureDeparture": 0.334555857961756,
+              "definition": "Mn=arithmetic-mean nodal velocity dot outward unit net-face-area-vector / arithmetic-mean nodal sound speed",
+              "areaConvention": "magnitude of summed center-fan area vectors for each face; projected geometric face area",
+              "subsonicDefinition": "abs(face-mean normal Mach)<1; includes near-tangential supersonic flow",
+              "directionDefinition": "incoming Mn<-1e-12; outgoing Mn>1e-12; neutral otherwise; outlet incoming means reverse flow",
+              "pressureDefinition": "arithmetic-mean nodal pressure per face; departure=(face pressure-p_inf)/abs(p_inf)",
+              "outletIndependenceProven": false,
+              "physicalQualified": false
+            }
+          },
+          "sym_y": {
+            "massNetKgS": 2.2016209809022488e-17,
+            "massGrossKgS": 2.2016209809022488e-17,
+            "energyNetW": -0.3711180979075317,
+            "energyGrossW": 0.4915016626428818,
+            "flowDiagnostic": {
+              "faces": 7482,
+              "projectedFaceAreaM2": 0.0641226121558742,
+              "normalMachRange": [
+                0.0,
+                5.528426545712583e-17
+              ],
+              "areaMeanNormalMach": 2.3456094483213566e-18,
+              "subsonicNormalAreaFraction": 1.0,
+              "incomingAreaFraction": 0.0,
+              "outgoingAreaFraction": 0.0,
+              "neutralAreaFraction": 1.0,
+              "directionMachTolerance": 1e-12,
+              "faceMeanPressureRangePa": [
+                17276.08883970149,
+                170833.720931878
+              ],
+              "areaMeanFacePressurePa": 29147.853135254794,
+              "referencePressurePa": 26135.37495648134,
+              "areaMeanRelativePressureDeparture": 0.11526439485905984,
+              "maximumAbsoluteRelativePressureDeparture": 5.536493974788479,
+              "definition": "Mn=arithmetic-mean nodal velocity dot outward unit net-face-area-vector / arithmetic-mean nodal sound speed",
+              "areaConvention": "magnitude of summed center-fan area vectors for each face; projected geometric face area",
+              "subsonicDefinition": "abs(face-mean normal Mach)<1; includes near-tangential supersonic flow",
+              "directionDefinition": "incoming Mn<-1e-12; outgoing Mn>1e-12; neutral otherwise; outlet incoming means reverse flow",
+              "pressureDefinition": "arithmetic-mean nodal pressure per face; departure=(face pressure-p_inf)/abs(p_inf)",
+              "outletIndependenceProven": false,
+              "physicalQualified": false
+            }
+          },
+          "sym_z": {
+            "massNetKgS": 0.0,
+            "massGrossKgS": 0.0,
+            "energyNetW": -0.37109156780226205,
+            "energyGrossW": 0.49140192189964765,
+            "flowDiagnostic": {
+              "faces": 7482,
+              "projectedFaceAreaM2": 0.0641226121558742,
+              "normalMachRange": [
+                0.0,
+                0.0
+              ],
+              "areaMeanNormalMach": 0.0,
+              "subsonicNormalAreaFraction": 1.0,
+              "incomingAreaFraction": 0.0,
+              "outgoingAreaFraction": 0.0,
+              "neutralAreaFraction": 1.0,
+              "directionMachTolerance": 1e-12,
+              "faceMeanPressureRangePa": [
+                17276.104667343196,
+                170833.718901384
+              ],
+              "areaMeanFacePressurePa": 29147.93811790044,
+              "referencePressurePa": 26135.37495648134,
+              "areaMeanRelativePressureDeparture": 0.11526764649198233,
+              "maximumAbsoluteRelativePressureDeparture": 5.536493897097075,
+              "definition": "Mn=arithmetic-mean nodal velocity dot outward unit net-face-area-vector / arithmetic-mean nodal sound speed",
+              "areaConvention": "magnitude of summed center-fan area vectors for each face; projected geometric face area",
+              "subsonicDefinition": "abs(face-mean normal Mach)<1; includes near-tangential supersonic flow",
+              "directionDefinition": "incoming Mn<-1e-12; outgoing Mn>1e-12; neutral otherwise; outlet incoming means reverse flow",
+              "pressureDefinition": "arithmetic-mean nodal pressure per face; departure=(face pressure-p_inf)/abs(p_inf)",
+              "outletIndependenceProven": false,
+              "physicalQualified": false
+            }
+          }
+        },
+        "massNetKgS": -0.2482046085465299,
+        "massIncomingKgS": 13.648792048643074,
+        "massRelativeImbalance": 0.018185097088588564,
+        "exteriorEnergyNetW": -47641.247972922276,
+        "wallPowerOutOfFluidW": -2092.9235404663696,
+        "energyNetW": -49734.17151338865,
+        "energyIncomingW": 6050252.771015953,
+        "energyRelativeImbalance": 0.008220180775197154,
+        "method": "independent cell-edge WLS; laminar Newtonian stress, Pr=.72 conduction; face-center linear flux quadrature",
+        "allExteriorMarkersIncluded": true,
+        "symmetryLeakageReported": true,
+        "energyReference": "OTH rhoE+p; no SST k or eddy viscosity",
+        "wallTerm": "native weak-wall qIntoWall times native projected nodal area; impermeable wall assumed",
+        "nativeDiscreteBoundaryFluxAvailable": false,
+        "nativeConservationProven": false,
+        "physicalQualified": false
+      },
+      "regions": [
+        {
+          "boundsM": [
+            0.0,
+            0.07979645340118074
+          ],
+          "powerIntoWallSectorW": -541.4062092041614,
+          "symmetryScaledPowerIntoWallFullW": -2165.6248368166457,
+          "discreteGeometricAreaSectorM2": 0.004051897449826945,
+          "nativeProjectedAreaSectorM2": 0.004050256248100072,
+          "meanQByDiscreteGeometricAreaWm2": -133617.9446563448,
+          "meanQByNativeProjectedAreaWm2": -133672.08789768023,
+          "fullyIncludedSubtriangles": 13776,
+          "intersectedSubtriangles": 0,
+          "sectorRadians": 1.5707963267948966,
+          "fullRevolutionScale": 4.0,
+          "method": "nodal-flux-vector-projected-median-subtriangle-clipping-v1",
+          "symmetryScalingIsExperimentalEvidence": false,
+          "physicalQualified": false,
+          "name": "hemisphere",
+          "wallNodesIncludingSharedEndpoints": 1801,
+          "pressureNodeRangePa": [
+            19103.65924700518,
+            173713.33009210916
+          ],
+          "signedHeatNodeRangeWm2": [
+            -481348.1133290153,
+            277264.0727483543
+          ],
+          "givenTwFluidMaximumDifferenceK": 19.89273940799262,
+          "independentFirstNeighborYPlus99": 0.8936646607889208
+        },
+        {
+          "boundsM": [
+            0.07979645340118074,
+            0.15599645340118073
+          ],
+          "powerIntoWallSectorW": -1551.517331262208,
+          "symmetryScaledPowerIntoWallFullW": -6206.069325048832,
+          "discreteGeometricAreaSectorM2": 0.006079404520309564,
+          "nativeProjectedAreaSectorM2": 0.006076285065215047,
+          "meanQByDiscreteGeometricAreaWm2": -255208.76692429814,
+          "meanQByNativeProjectedAreaWm2": -255339.78649951605,
+          "fullyIncludedSubtriangles": 10944,
+          "intersectedSubtriangles": 0,
+          "sectorRadians": 1.5707963267948966,
+          "fullRevolutionScale": 4.0,
+          "method": "nodal-flux-vector-projected-median-subtriangle-clipping-v1",
+          "symmetryScalingIsExperimentalEvidence": false,
+          "physicalQualified": false,
+          "name": "cylinder",
+          "wallNodesIncludingSharedEndpoints": 1450,
+          "pressureNodeRangePa": [
+            17986.552848302686,
+            24872.97704416429
+          ],
+          "signedHeatNodeRangeWm2": [
+            -358059.36060692195,
+            -83272.27358595851
+          ],
+          "givenTwFluidMaximumDifferenceK": 6.476633598861213,
+          "independentFirstNeighborYPlus99": 0.08925808346450667
+        }
+      ],
+      "measuredSegmentStatisticsAvailable": true,
+      "physicalQualified": false,
+      "newQualifiedAreaM2": 0
+    }
+  ],
+  "consecutiveSurfaceChanges": [],
+  "firstToLastSurfaceChange": null,
+  "surfaceChangeArea": "native projected nodal wall area; not smooth analytic area",
+  "boundaryGeometry": {
+    "outwardBoundaryVolumeM3": 0.01220822505896909,
+    "areaVectorRelativeClosure": 5.083447508393003e-16,
+    "totalBoundaryAreaM2": 0.3186801813770516
+  },
+  "wlsGeometry": {
+    "nodes": 19582,
+    "maximumCondition": 20.132293052919124,
+    "affineMomentMaximumError": 1.5543122344752192e-15,
+    "method": "cell-edge inverse-squared-distance WLS diagnostic; not native stored gradient"
+  },
+  "measurementFrames": [
+    {
+      "localIteration": 0,
+      "status": "discrete-segment-power-mapped",
+      "acceptedEdgeDiagnostics": 0,
+      "edgeColumnStatusCounts": {
+        "measurement-center-not-an-original-column": 650,
+        "no-resolved-local-platform": 683,
+        "crossflow-outside-method-scope": 92,
+        "reverse-flow-outside-method-scope": 75
+      },
+      "all20CenterIdentitiesClosed": false,
+      "originalTransportTableEquivalent": false,
+      "experimentalQualification": false,
+      "segments": [
+        {
+          "row": 1,
+          "boundsM": [
+            0.0,
+            0.010639527120157434
+          ],
+          "meanQByNominalAreaWm2": 134563.27093245968,
+          "powerIntoWallSectorW": 11.919909657340417,
+          "discreteVsNominalAreaRelativeDifference": -0.0007891864173448226,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.65896578704033
+        },
+        {
+          "row": 2,
+          "boundsM": [
+            0.005319763560078717,
+            0.01595929068023615
+          ],
+          "meanQByNominalAreaWm2": 203559.7185277761,
+          "powerIntoWallSectorW": 35.86597280547859,
+          "discreteVsNominalAreaRelativeDifference": -0.0007735987758190621,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.7278398179102354
+        },
+        {
+          "row": 3,
+          "boundsM": [
+            0.010639527120157434,
+            0.021279054240314867
+          ],
+          "meanQByNominalAreaWm2": 178470.0599957338,
+          "powerIntoWallSectorW": 46.73686705003011,
+          "discreteVsNominalAreaRelativeDifference": -0.000742626917796585,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.599384735756455
+        },
+        {
+          "row": 4,
+          "boundsM": [
+            0.01595929068023615,
+            0.026598817800393578
+          ],
+          "meanQByNominalAreaWm2": 93385.22712202894,
+          "powerIntoWallSectorW": 32.18869295498518,
+          "discreteVsNominalAreaRelativeDifference": -0.0007051817277862193,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.5773170211252578
+        },
+        {
+          "row": 5,
+          "boundsM": [
+            0.021279054240314867,
+            0.0319185813604723
+          ],
+          "meanQByNominalAreaWm2": 40973.301643533094,
+          "powerIntoWallSectorW": 17.361323446905743,
+          "discreteVsNominalAreaRelativeDifference": -0.0006541630603555948,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.593971832989544
+        },
+        {
+          "row": 6,
+          "boundsM": [
+            0.026598817800393578,
+            0.03723834492055102
+          ],
+          "meanQByNominalAreaWm2": -2580.26310591612,
+          "powerIntoWallSectorW": -1.2852705037245542,
+          "discreteVsNominalAreaRelativeDifference": -0.0006134023477762929,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.5506259335656876
+        },
+        {
+          "row": 7,
+          "boundsM": [
+            0.0319185813604723,
+            0.042558108480629735
+          ],
+          "meanQByNominalAreaWm2": -70827.9068588603,
+          "powerIntoWallSectorW": -40.16309435899669,
+          "discreteVsNominalAreaRelativeDifference": -0.000554184535822122,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.5421153709367665
+        },
+        {
+          "row": 8,
+          "boundsM": [
+            0.03723834492055102,
+            0.047877872040708445
+          ],
+          "meanQByNominalAreaWm2": -127046.17505446082,
+          "powerIntoWallSectorW": -80.0104872936355,
+          "discreteVsNominalAreaRelativeDifference": -0.0004902550123936367,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.5790739028380397
+        },
+        {
+          "row": 9,
+          "boundsM": [
+            0.042558108480629735,
+            0.053197635600787156
+          ],
+          "meanQByNominalAreaWm2": -126140.67173340362,
+          "powerIntoWallSectorW": -86.48178538322892,
+          "discreteVsNominalAreaRelativeDifference": -0.00044357437521747034,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.601518600184935
+        },
+        {
+          "row": 10,
+          "boundsM": [
+            0.047877872040708445,
+            0.05851739916086588
+          ],
+          "meanQByNominalAreaWm2": -149228.55832427807,
+          "powerIntoWallSectorW": -109.52025288915289,
+          "discreteVsNominalAreaRelativeDifference": -0.00038596666740342567,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.578494203001636
+        },
+        {
+          "row": 11,
+          "boundsM": [
+            0.053197635600787156,
+            0.0638371627209446
+          ],
+          "meanQByNominalAreaWm2": -197685.82444508106,
+          "powerIntoWallSectorW": -153.04443897721586,
+          "discreteVsNominalAreaRelativeDifference": -0.0003397220286243119,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.5757877516181806
+        },
+        {
+          "row": 12,
+          "boundsM": [
+            0.05851739916086588,
+            0.06915692628102331
+          ],
+          "meanQByNominalAreaWm2": -234722.13869988493,
+          "powerIntoWallSectorW": -189.17870232271426,
+          "discreteVsNominalAreaRelativeDifference": -0.00031259015532669743,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.5517995590013515
+        },
+        {
+          "row": 13,
+          "boundsM": [
+            0.0638371627209446,
+            0.07447668984110203
+          ],
+          "meanQByNominalAreaWm2": -266852.0333231807,
+          "powerIntoWallSectorW": -221.20084069993916,
+          "discreteVsNominalAreaRelativeDifference": -0.00027841652623983304,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.5181271783199375
+        },
+        {
+          "row": 14,
+          "boundsM": [
+            0.06915692628102331,
+            0.07979645340118074
+          ],
+          "meanQByNominalAreaWm2": -272807.6833630829,
+          "powerIntoWallSectorW": -229.92320757405975,
+          "discreteVsNominalAreaRelativeDifference": -0.0002567155794079845,
+          "strictLocalAbscissaIdentityClosed": true,
+          "measuredParameter": 0.45351731986627786
+        },
+        {
+          "row": 15,
+          "boundsM": [
+            0.07447668984110203,
+            0.08495582840118074
+          ],
+          "meanQByNominalAreaWm2": -263572.3015740579,
+          "powerIntoWallSectorW": -220.19427320346466,
+          "discreteVsNominalAreaRelativeDifference": -0.00021801748779426422,
+          "strictLocalAbscissaIdentityClosed": false,
+          "measuredParameter": 0.4295291272494488
+        },
+        {
+          "row": 16,
+          "boundsM": [
+            0.07979645340118074,
+            0.09051207840118075
+          ],
+          "meanQByNominalAreaWm2": -268768.1047269571,
+          "powerIntoWallSectorW": -229.81523986351482,
+          "discreteVsNominalAreaRelativeDifference": -0.00017847721239183656,
+          "strictLocalAbscissaIdentityClosed": false,
+          "measuredParameter": 0.4132690803044313
+        },
+        {
+          "row": 17,
+          "boundsM": [
+            0.08495582840118074,
+            0.09567145340118074
+          ],
+          "meanQByNominalAreaWm2": -301015.7516444623,
+          "powerIntoWallSectorW": -257.38919890493185,
+          "discreteVsNominalAreaRelativeDifference": -0.00017847721239194758,
+          "strictLocalAbscissaIdentityClosed": false,
+          "measuredParameter": 0.38833843089835696
+        },
+        {
+          "row": 18,
+          "boundsM": [
+            0.09051207840118075,
+            0.10122770340118074
+          ],
+          "meanQByNominalAreaWm2": -318667.0797830796,
+          "powerIntoWallSectorW": -272.482300127664,
+          "discreteVsNominalAreaRelativeDifference": -0.00017847721239183656,
+          "strictLocalAbscissaIdentityClosed": false,
+          "measuredParameter": 0.3749946653389288
+        },
+        {
+          "row": 19,
+          "boundsM": [
+            0.09567145340118074,
+            0.10638707840118075
+          ],
+          "meanQByNominalAreaWm2": -333105.90230645146,
+          "powerIntoWallSectorW": -284.8284878009616,
+          "discreteVsNominalAreaRelativeDifference": -0.00017847721239194758,
+          "strictLocalAbscissaIdentityClosed": false,
+          "measuredParameter": 0.34325698840600327
+        },
+        {
+          "row": 20,
+          "boundsM": [
+            0.10122770340118074,
+            0.11194332840118074
+          ],
+          "meanQByNominalAreaWm2": -349778.5818829934,
+          "powerIntoWallSectorW": -299.0847771026367,
+          "discreteVsNominalAreaRelativeDifference": -0.00017847721239183656,
+          "strictLocalAbscissaIdentityClosed": false,
+          "measuredParameter": 0.3066789956611423
+        }
+      ]
+    }
+  ],
+  "strictThermalAuditAvailable": true,
+  "strictAllSavedThermalChecksPassed": true,
+  "heatStabilityQualified": false,
+  "gridAndDomainQualified": false,
+  "experimentalQualification": false,
+  "physicalQualified": false,
+  "newQualifiedAreaM2": 0,
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\engine_process.json": "6fb68e1da65e2b8532400829f833dc72d2a2c4108b414dc5fd05e883ef85787d",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\case_manifest.json": "d69d4e3b6ecb4037134aaa4a123e3fb9496dcc00ff5d9015919af606c1d59980",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\mesh.su2": "5562d7e6a3985ec6877585db9984d273a409178e54b1fb1d336065c93cd77152",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\geometry.json": "62cb540c4a79d214434121a9f44ad9537de2258d006bcd808cd92ce814ba966b",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\mesh_arrays.npz": "4e82f33ae66d0a19bf1a755d6c0d9210ca5cadd8db977ab5377da438517e3c01",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\wall_temperature.csv": "d9b4e8916609fcb64ce4e95c10badd3793975da614d8b0f696bec3004d5ee660",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\case.cfg": "9b68d2e1610a00ec7ca1c34afc1b185f69e07a8202e1ce8ce8f962c4fcc7b571",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\history.csv": "b3412415b001f257a40c70e40abde9fcde6a778191fbeb42f51bc6ca87844a04",
+    "E:\\RocketAeroHeat\\scripts\\reviewNACASpatialDevelopment.py": "de6e8f594ac3dc00033eb37e9e956d359bd0c2550f71ea6c29ef1f3906cd5373",
+    "E:\\RocketAeroHeat\\scripts\\nacaSpatialWallFlux.py": "3cb82da2e1af0af7cfb6190fa9bd0dac1b18155a483987481418d8aa3f5329f7",
+    "E:\\RocketAeroHeat\\scripts\\nacaWallFlux.py": "a4a0043c633421a886566cd87880d947e47c699e7af5b1aa9d668f79bbb39fee",
+    "E:\\RocketAeroHeat\\scripts\\su2NACALaminarInterface.py": "bd64913200678f726f9a1f258d98c694037e31e206f7652fd797625e041ddf16",
+    "E:\\RocketAeroHeat\\scripts\\analyzeSU2DualVolumes.py": "f09e8d7618f215b9bce950bad605b934e6d510e90dda3ab1bfe9206770220952",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\audit_real01\\report.json": "42ae2a04c7289469d21ccb5ac48f8a0d1757d0271d4beea2b2a6d4d093c960b5",
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAir.hpp": "62a880ed2e1ec76c5bc8c9a832ec7787b5b3f01494f31ed6a3ebf7bfb972969b",
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAirBatch.cpp": "5dbff0d52bd141a63a90e708ddf381115ab30cdbc1d61e2cdd1475325f930270",
+    "E:\\RocketAeroHeat\\scripts\\buildIdealAirBatch.py": "9a46a6a48311827aa41a060236bf3372300290e8c764fc383b31335a722e95ee",
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\runtime.json": "04c7800d328f5395e73a782560ba0545aac2cab5232e85d93fb2494f5e6fd45d",
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\idealAirBatch.dll": "03514d6657245cd7fa38b7e6bc074666a96320bf170fbc77302a01141a3c135a",
+    "E:\\RocketAeroHeat\\scripts\\idealAirProperties.py": "7d63ba9c250dfd7ecad3912b6ab1daaba0784aae43af7d22307d4d17ea659234",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\restart_flow_000000.csv": "71c6b70fc5590b289edb9ccf4cb3ebd332a50e432d3345a2149ae9087fc18c9d",
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\audit_real01\\measurement_000000.json": "1bb334ec46fb46df945b25c1b839388deb3c6e9b1e516a87feb493f4824f770e"
+  },
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\engine_process.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\case_manifest.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\geometry.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\mesh_arrays.npz": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\wall_temperature.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\history.csv": true,
+    "E:\\RocketAeroHeat\\scripts\\reviewNACASpatialDevelopment.py": true,
+    "E:\\RocketAeroHeat\\scripts\\nacaSpatialWallFlux.py": true,
+    "E:\\RocketAeroHeat\\scripts\\nacaWallFlux.py": true,
+    "E:\\RocketAeroHeat\\scripts\\su2NACALaminarInterface.py": true,
+    "E:\\RocketAeroHeat\\scripts\\analyzeSU2DualVolumes.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\audit_real01\\report.json": true,
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAir.hpp": true,
+    "E:\\RocketAeroHeat\\third_party\\ideal_air\\IdealAirBatch.cpp": true,
+    "E:\\RocketAeroHeat\\scripts\\buildIdealAirBatch.py": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\runtime.json": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\ideal_air\\batch-v1\\idealAirBatch.dll": true,
+    "E:\\RocketAeroHeat\\scripts\\idealAirProperties.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\real01\\restart_flow_000000.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v172_validation\\audit_real01\\measurement_000000.json": true
+  },
+  "elapsedSeconds": 7.14100000000326,
+  "newCFDRuns": 0,
+  "automaticAdditionalTasks": 0
+}

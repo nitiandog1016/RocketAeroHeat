@@ -54,6 +54,9 @@ def settings(text):
 def validate(folder, manifest, text, runtime):
     """创建进程前核对模型、参考态、边界、SST阶段和逐字输入身份。"""
     c = settings(text)
+    if manifest.get('caseKind') == 'naca-tn3344-adaptive-cold-restart-v1':
+        from su2NACAAdaptiveInterface import validate as validate_adaptive_naca
+        return validate_adaptive_naca(folder, manifest, text, runtime)
     if manifest.get('caseKind') == 'naca-tn3344-spatial-wall-laminar-v1':
         from su2NACASpatialInterface import validate as validate_spatial_naca
         return validate_spatial_naca(folder, manifest, text, runtime)

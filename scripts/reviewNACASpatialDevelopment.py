@@ -245,7 +245,8 @@ def main(folder,audit_folder,out):
                 measurement['segments'].append({key:item.get(key) for key in ('row','boundsM','meanQByNominalAreaWm2',
                     'powerIntoWallSectorW','discreteVsNominalAreaRelativeDifference','strictLocalAbscissaIdentityClosed','measuredParameter')})
             measurements.append(measurement)
-        frame=dict(localIteration=step,successfulUpdates=pair['successfulUpdates'],strictThermalAuditPassed=audited.get('interfacePassed') if audited else None,
+        frame=dict(localIteration=step,successfulUpdates=pair['successfulUpdates'],
+            seriesSuccessfulUpdates=pair['seriesSuccessfulUpdates'],strictThermalAuditPassed=audited.get('interfacePassed') if audited else None,
             auditStatus='bound-to-existing-report' if audited else 'strict-thermal-audit-not-available',
             wallFluidTemperatureRangeK=[float(v['Temperature'][ids].min()),float(v['Temperature'][ids].max())],
             givenTwRangeK=[float(tw.min()),float(tw.max())],wallTemperatureMaximumDifferenceK=float(abs(delta).max()),

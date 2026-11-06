@@ -115,7 +115,10 @@ def audit(folder,out,saved_frames_only=False):
     files=[folder/name for name in ('engine_process.json','case_manifest.json','mesh.su2','geometry.json','case.cfg','history.csv')]
     files += [Path(__file__).resolve(),ROOT/'scripts/nacaSpatialWallFlux.py',ROOT/'scripts/nacaBoundaryLayerEdge.py',
               ROOT/'scripts/nacaMeasurementSegments.py',ROOT/'scripts/su2NACALaminarInterface.py',
-              ROOT/'scripts/nacaSavedFrameStudy.py',ROOT/'scripts/su2NACASpatialInterface.py']
+              ROOT/'scripts/nacaSavedFrameStudy.py',ROOT/'scripts/su2NACASpatialInterface.py',
+              ROOT/'scripts/su2IdealAirCheckpoints.py']
+    if manifest['caseKind']=='naca-tn3344-adaptive-cold-restart-v1':
+        files += [ROOT/'scripts/prepareNACAAdaptiveContinuation.py',ROOT/'scripts/su2NACAAdaptiveInterface.py']
     locks={str(path):sha(path) for path in files}
     for path in files:
         if path.suffix=='.py':(out/('executed_'+path.name)).write_bytes(path.read_bytes())
@@ -172,7 +175,8 @@ def audit(folder,out,saved_frames_only=False):
         measured_file='measurement_%06d.json'%step;save(out/measured_file,measured)
         residuals={key:float(h[key]) for key in ('rms[Rho]','rms[RhoE]')}
         passed=max(energy,eos,mu_error)<2e-11 and cp<2e-8 and q_error<2e-10 and power_error<2e-9
-        frames.append(dict(localIteration=step,interfacePassed=bool(passed),energyMaximumRelativeError=energy,
+        frames.append(dict(localIteration=step,seriesSuccessfulUpdates=pair['seriesSuccessfulUpdates'],
+            interfacePassed=bool(passed),energyMaximumRelativeError=energy,
             eosMaximumRelativeError=eos,paperCpMaximumRelativeError=cp,viscosityMaximumRelativeError=mu_error,
             nativeHeatMaximumScaledError=q_error,powerScaledDifference=power_error,
             nativeNodalPowerIntoWallW=flux['powerIntoWall'],nativeHistoryPowerW=native_power,
@@ -192,6 +196,8 @@ def audit(folder,out,saved_frames_only=False):
         savedFrameInterfacePassed=saved_passed,auditScope=identity['auditScope'],
         normalRunCompleted=identity['normalRunCompleted'],savedFrameIdentity=identity,frames=frames,
         appliedTemperatureCheck=applied,inletStateCheck=boundary,inputSHA256=locks,inputsStable=stable,
+        iterationOrigin={k:manifest['initialization'].get(k) for k in
+            ('kind','priorSuccessfulUpdates','sourceLocalIteration','sourceStatePath','uninterruptedTrajectoryEquivalent')},
         stage='same-flow-update-laminar-no-SST',nativeLaminarYPlusIsQualification=False,
         givenTwIsSolvedSolidTemperature=False,gridAndDomainQualified=False,experimentalQualification=False,
         newQualifiedArea_m2=0,elapsedSeconds=time.monotonic()-started)

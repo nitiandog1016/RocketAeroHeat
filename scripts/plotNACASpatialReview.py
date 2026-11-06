@@ -73,14 +73,19 @@ def plot(folder,audit_folder,out,iteration=None):
     ax.set_xlabel('壁面弧长 s / D');ax.set_ylabel('温度 / K');ax.grid(alpha=.2);ax.legend(fontsize=8)
     ax.set_title('给定壁温、流体温度与固体求解温度分开')
     normal=receipt['checkpoints']['normalTerminal'];last=receipt['checkpoints']['lastFiniteHistoryLocalIteration']
+    manifest=read(folder/'case_manifest.json');origin=manifest['initialization'];prior=origin['priorSuccessfulUpdates']
+    restart_label=('\n冷重启自局部步 %s；累计来源更新 %d（不代表不中断等价）'%
+        (origin['sourceLocalIteration'],pair['seriesSuccessfulUpdates'])) if prior else ''
     fig.suptitle(r'NACA TN3344 · M1.97 · $Re_D=2.28\times10^6$ · 层流 / 变比热空气'+'\n'
-        '已保存局部步 %d；最后有限历史 %s；正常终态 %s；研究场，尚无实验资格'%(step,last,normal),fontsize=12)
+        '已保存局部步 %d；最后有限历史 %s；正常终态 %s；研究场，尚无实验资格'%(step,last,normal)+restart_label,fontsize=12)
     target=out/'naca_spatial_fields.png';fig.savefig(str(target),dpi=170);plt.close(fig)
     (out/'executed_plot.py').write_bytes(Path(__file__).read_bytes())
     save(out/'manifest.json',dict(figure=target.name,localIteration=step,sourceFieldSHA256=sha(path),
         wallCSV_SHA256=sha(wall_csv),thermalAuditSHA256=sha(audit_folder/'report.json'),sourceMeshSHA256=sha(folder/'mesh.su2'),
         surfaceDisplay='original wall triangles; arithmetic nodal face means for display only',
         curveDisplay='original nodal projected-area weighted mean in each s row; not finite electrode reduction',
+        iterationOrigin={k:origin.get(k) for k in ('kind','priorSuccessfulUpdates','sourceLocalIteration','uninterruptedTrajectoryEquivalent')},
+        seriesSuccessfulUpdates=pair['seriesSuccessfulUpdates'],advancement=manifest.get('advancement'),
         originalQuarterDomain=True,physicalQualified=False))
     print(str(target))
 

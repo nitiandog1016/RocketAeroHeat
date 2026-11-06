@@ -1,0 +1,32 @@
+{
+  "workDirectory": "E:\\RocketAeroHeat\\outputs\\v172_validation\\small02",
+  "configFile": "case.cfg",
+  "meshFile": "mesh.su2",
+  "maximumSeconds": 30,
+  "threads": 2,
+  "resourceProfile": "v172-naca-adaptive-small",
+  "sourceFiles": [
+    "scripts/prepareNACAAdaptiveContinuation.py",
+    "scripts/su2NACAAdaptiveInterface.py",
+    "scripts/prepareNACASpatialCase.py",
+    "scripts/su2NACASpatialInterface.py",
+    "scripts/prepareSU2NACALaminar.py",
+    "scripts/su2NACALaminarInterface.py",
+    "scripts/su2IdealAirInterface.py",
+    "scripts/su2IdealAirCheckpoints.py",
+    "scripts/su2ThermalRuntime.py",
+    "scripts/runEmbeddedSU2.py",
+    "scripts/analyzeNACASpatialHeat.py",
+    "scripts/nacaSavedFrameStudy.py",
+    "scripts/nacaSpatialWallFlux.py",
+    "scripts/nacaWallFlux.py",
+    "scripts/nacaBoundaryLayerEdge.py",
+    "scripts/nacaMeasurementSegments.py",
+    "scripts/naca3344Model.py",
+    "scripts/idealAirProperties.py",
+    "scripts/buildIdealAirBatch.py",
+    "scripts/auditSU2SSTState.py",
+    "docs/validation/v172/PLAN.md",
+    "docs/validation/v171/evidence_manifest.json"
+  ]
+}

@@ -113,9 +113,15 @@ def resource_budget(request,manifest):
 
 def inventory(folder,receipt):
     """模块四：稀疏首/周期/正常末帧；异常最后历史不是自动应有的瞬间场。"""
+    manifest=read(folder/'case_manifest.json');spec=specification(manifest['specification']['variant'])
+    return _inventory_for_spec(folder,receipt,spec)
+
+
+def _inventory_for_spec(folder,receipt,spec,offset=0):
+    """模块五：复用同一层流文件审核；预算和累计起点由各具名严格合同提供。"""
     from auditSU2SSTState import vtk_tokens
     from scipy.spatial import cKDTree
-    manifest=read(folder/'case_manifest.json');spec=specification(manifest['specification']['variant'])
+    assert type(offset) is int and offset>=0
     p,_,markers=mesh(folder/'mesh.su2');ids=np.unique([i for f in markers['wall'] for i in f[1:]])
     history={}
     if (folder/'history.csv').exists():
@@ -141,7 +147,7 @@ def inventory(folder,receipt):
             xyz,surface=vtk_tokens(sp);assert set(surface)==required and len(xyz)==len(ids)
             assert np.isfinite(xyz).all() and all(np.isfinite(v).all() for v in surface.values())
             distance,mapped=cKDTree(p[ids]).query(xyz);assert max(distance)<1e-6 and len(np.unique(mapped))==len(ids)
-            complete.append(dict(localIteration=step,successfulUpdates=step+1,seriesSuccessfulUpdates=step+1,
+            complete.append(dict(localIteration=step,successfulUpdates=step+1,seriesSuccessfulUpdates=offset+step+1,
                 volume=vp.name,surface=sp.name,volumeSHA256=sha(vp),surfaceSHA256=sha(sp),stage=STAGE,physicalQualified=False))
         except (AssertionError,ValueError,KeyError,OSError,RuntimeError) as e:
             rejected.append(dict(localIteration=step,reason=type(e).__name__+': '+str(e)))
@@ -152,7 +158,7 @@ def inventory(folder,receipt):
     missing=sorted(set(expected)-{r['localIteration'] for r in complete})
     return dict(stage=STAGE,complete=complete,rejected=rejected,lastComplete=last,lastFiniteHistoryLocalIteration=last_history,
         historyRows=len(history),historyContiguous=sorted(history)==list(range(len(history))),
-        seriesUpdatesAtLastFiniteHistory=last_history+1 if history else 0,normalTerminal=normal,
+        seriesUpdatesAtLastFiniteHistory=offset+last_history+1 if history else offset,normalTerminal=normal,
         normalFinalPairPresent=bool(normal and last and last['localIteration']==last_history),
         expectedLocalIterations=expected,missingScheduledLocalIterations=missing,
         normalScheduleComplete=bool(normal and last and last['localIteration']==last_history and not missing and not rejected
