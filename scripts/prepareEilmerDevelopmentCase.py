@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse,copy,json,os,shutil,time
 from prepareEilmerRocketCase import validate_condition,make_job
 from runEilmerProcess import run,sha,COMMIT
-from readEilmerNative import need,audit_numerics
+from readEilmerNative import need,audit_numerics,audit_run_scope
 
 
 def prepare(source,prepared,audit,case,record,condition,seconds,output_mib=1024):
@@ -21,6 +21,7 @@ def prepare(source,prepared,audit,case,record,condition,seconds,output_mib=1024)
     c=validate_condition(condition);old=copy.deepcopy(m['condition'])
     changed=copy.deepcopy(c);changed.pop('development');changed['maxNewtonSteps']=old['maxNewtonSteps']
     need(changed==old and 'development' in c,'发展入口不得修改原物理工况')
+    audit_run_scope(dict(condition=c,mesh=m['mesh']))
     need(sha(m['mesh']['nativeSourcePath'])==m['mesh']['sourceSHA256'],'原网格变化')
     case.mkdir(parents=True);record.mkdir(parents=True)
     shutil.copyfile(__file__,record/'executed_preparation.py')

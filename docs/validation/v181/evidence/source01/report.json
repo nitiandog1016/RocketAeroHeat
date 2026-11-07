@@ -1,0 +1,112 @@
+{
+  "passed": true,
+  "hits": [
+    {
+      "file": "main.d",
+      "line": 107,
+      "text": "int main(string[] args)"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 171,
+      "text": "    bool useScalingInLineSearch = false;"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 180,
+      "text": "    bool useScaling = true;"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 186,
+      "text": "    double preconditionerPerturbation = 1.0e-30;"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 234,
+      "text": "        useScalingInLineSearch = getJSONbool(jsonData, \"use_scaling_in_line_search\", useScalingInLineSearch);"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 242,
+      "text": "        useScaling = getJSONbool(jsonData, \"use_scaling\", useScaling);"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 262,
+      "text": "        preconditionerPerturbation = getJSONdouble(jsonData, \"preconditioner_perturbation\", preconditionerPerturbation);"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 862,
+      "text": "        if (cfg.is_master_task && nkCfg.useScalingInLineSearch && !nkCfg.useScaling) {"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 1552,
+      "text": "            foreach (blk; localFluidBlocks) { blk.initialize_jacobian(0, nkCfg.preconditionerPerturbation); }"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 1555,
+      "text": "            foreach (blk; localFluidBlocks) { blk.initialize_jacobian(0, nkCfg.preconditionerPerturbation, nkCfg.iluFill); }"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 1558,
+      "text": "            foreach (blk; localFluidBlocks) { blk.initialize_jacobian(0, nkCfg.preconditionerPerturbation); }"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 1561,
+      "text": "            foreach (blk; localFluidBlocks) { blk.initialize_jacobian(-1, nkCfg.preconditionerPerturbation); }"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 1886,
+      "text": "    determineScaleFactors(rowScale, invColScale, nkCfg.useScaling);"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 2063,
+      "text": "    determineScaleFactors(rowScale, invColScale, nkCfg.useScaling);"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 2275,
+      "text": "void determineScaleFactors(ref ScaleFactors rowScale, ref ScaleFactors invColScale, bool useScaling)"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 2277,
+      "text": "    if (!useScaling) {"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 3662,
+      "text": "void evalRealMatVecProd(double sigma, bool for_preconditioning, size_t currentPhase, int stepsIntoCurrentPhase)"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 3887,
+      "text": "    if (nkCfg.useScalingInLineSearch) {"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 3910,
+      "text": "    if (nkCfg.useScalingInLineSearch) {"
+    },
+    {
+      "file": "newtonkrylovsolver.d",
+      "line": 3970,
+      "text": "    if (nkCfg.useScalingInLineSearch) {"
+    }
+  ],
+  "sourceSHA256": {
+    "main.d": "a6febda334148ddadb03224cd412040631fad4857a74f01d2cc6d4f3a5a5a70b",
+    "newtonkrylovsolver.d": "b505756b9aaffc5b18c01f5b0c53d56663f96aee1e289b8c6dd952a460f7411f"
+  },
+  "initialSearchFailure": "WSL rg is unavailable; no solver task was launched",
+  "nativeRuns": 0,
+  "elapsedSeconds": 0.04771712699999853
+}

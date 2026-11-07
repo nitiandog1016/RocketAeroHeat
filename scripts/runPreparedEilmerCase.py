@@ -5,7 +5,7 @@ import json
 import shutil
 import time
 from runEilmerProcess import run, sha, COMMIT
-from readEilmerNative import audit_prepared,audit_numerics
+from readEilmerNative import audit_prepared,audit_numerics,audit_run_scope
 from auditEilmerCompletion import audit_completion
 
 
@@ -16,6 +16,7 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     manifest_path=case/'case_manifest.json'
     manifest=json.loads(manifest_path.read_text())
     assert manifest['schema']=='RAH.EilmerPreparedCase.v1' and manifest['sourceCommit']==COMMIT
+    audit_run_scope(manifest)
     mesh=Path(manifest['mesh']['nativeSourcePath'])
     assert sha(mesh)==manifest['mesh']['sourceSHA256'], '原网格身份发生变化'
     locks=[manifest_path,mesh,Path(__file__),Path(__file__).with_name('readEilmerNative.py'),Path(__file__).with_name('auditEilmerCompletion.py')]
@@ -47,7 +48,11 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
         assert seconds>reserve
         native_seconds=int(seconds-(time.monotonic()-started)-reserve)
         assert native_seconds>0,'来源核验后没有剩余原生预算'
-        commands=[['lmr','run','--max-wall-clock='+str(native_seconds)]]
+        if manifest['condition'].get('development',{}).get('profile')=='rah-nk-real-v1':
+            # 直接监督固定实数二进制，取得真实求解退出码，绕开system()包装状态。
+            commands=[['lmr-run','--max-cpus=2','--max-wall-clock='+str(native_seconds)]]
+        else:
+            commands=[['lmr','run','--max-wall-clock='+str(native_seconds)]]
     record.mkdir(parents=True)
     shutil.copyfile(__file__,record/'executed_entry.py')
     result=dict(stage=stage,case=str(case),sourceCommit=COMMIT,caseManifestSHA256=sha(manifest_path),

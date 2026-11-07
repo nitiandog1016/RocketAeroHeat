@@ -1,0 +1,67 @@
+194:  * Eilmer has a small set of exectuables and each requires a "main" function.
+195:  * The main "main" is the Eilmer command dispatcher and it lives in main.d.
+196:  * Here we need the capability to build two flavours of "run" executable:
+197:  * one for shared memory and one for distributed memory (MPI).
+198:  * We require a "main" function exposed at compile time, but don't want
+199:  * this to collide with the one in main.d.
+200:  * So we wrap this in a version clause and only enable when building those
+201:  * specific executables.
+202:  *
+203:  * RJG, 2024-02-12
+204:  */
+205: 
+206: version(run_main)
+207: {
+208: 
+209: int main(string[] args)
+210: {
+211: 
+212:     version(mpi_parallel) {
+213:         // This preamble copied directly from the OpenMPI hello-world example.
+214:         auto c_args = Runtime.cArgs;
+215:         MPI_Init(&(c_args.argc), &(c_args.argv));
+216:         int rank, size;
+217:         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+218:         GlobalConfig.mpi_rank_for_local_task = rank;
+219:         MPI_Comm_size(MPI_COMM_WORLD, &size);
+220:         GlobalConfig.mpi_size = size;
+221:         scope(success) { MPI_Finalize(); }
+222:         // Make note that we are in the context of an MPI task, presumably, one of many.
+223:         GlobalConfig.in_mpi_context = true;
+224:         GlobalConfig.is_master_task = (GlobalConfig.mpi_rank_for_local_task == 0);
+225:     } else {
+226:         // We are NOT in the context of an MPI task.
+227:         GlobalConfig.in_mpi_context = false;
+228:         GlobalConfig.is_master_task = true;
+229:     }
+230: 
+231:     if (GlobalConfig.is_master_task) {
+232:         writeln("Eilmer simulation code.");
+233:         writeln("Revision-id: ",      buildCfg.revisionId);
+234:         writeln("Revision-date: ",    buildCfg.revisionDate);
+235:         writeln("Compiler-name: ",    buildCfg.compilerName);
+236:         writeln("Parallel-flavour: ", buildCfg.parallelType);
+237:         writeln("Number-type: ",      buildCfg.numberType);
+238:         writeln("Build-flavour: ",    buildCfg.buildFlavour);
+239:         writeln("Build-date: ",       buildCfg.buildDate);
+240:     }
+241: 
+242:     int verbosity = 0;
+243:     int snapshotStart = 0;
+244:     int numberSnapshots = 0;
+245:     int maxCPUs = totalCPUs;
+246:     int threadsPerMPITask = 1;
+247:     double startCFL = -1.0;
+248:     string maxWallClock = "24:00:00";
+249: 
+250:     getopt(args,
+251:            config.bundling,
+252:            "v|verbose+", &verbosity,
+253:            "s|snapshot-start", &snapshotStart,
+254:            "start-with-cfl|cfl", &startCFL,
+255:            "max-cpus", &maxCPUs,
+256:            "threads-per-mpi-task", &threadsPerMPITask,
+257:            "max-wall-clock", &maxWallClock);
+258: 
+259:     GlobalConfig.verbosity_level = verbosity;
+260: 

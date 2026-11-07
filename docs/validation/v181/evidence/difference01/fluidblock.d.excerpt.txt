@@ -1,0 +1,187 @@
+1495:         shared int interpolation_order_save = GlobalConfig.interpolation_order;
+1496:         myConfig.interpolation_order = to!int(flowJacobian.spatial_order);
+1497: 
+1498:         // copy some data for later use
+1499:         if (myConfig.viscous) {
+1500:             foreach(cell; cells) { cell.grad_save.copy_values_from(*(cell.grad)); }
+1501:         }
+1502:         if (flowJacobian.spatial_order >= 2) {
+1503:             foreach(cell; cells) { cell.gradients_save.copy_values_from(*(cell.gradients)); }
+1504:         }
+1505:         if (myConfig.reacting) {
+1506:             foreach(cell; cells) {
+1507:                 cell.clear_source_vector();
+1508:                 cell.add_thermochemical_source_vector(thermochem_source, 1.0);
+1509:                 cell.Q_save.copy_values_from(cell.Q);
+1510:             }
+1511:         }
+1512: 
+1513:         // the real-valued finite difference needs a base residual (R0)
+1514:         version(complex_numbers) { } // do nothing
+1515:         else {
+1516:             foreach(cell; cells) {
+1517:                 if (cell.doNotPerturb) continue;
+1518:                 evalRHS(0, 0, cell.cell_list, cell.face_list, cell);
+1519:             }
+1520:         }
+1521: 
+1522:         // fill out the rows of the Jacobian for a cell
+1523:         foreach(cell; cells) {
+1524:             if (cell.doNotPerturb) continue;
+1525:                 /*
+1526:                 debug {
+1527:                     writefln("cell.id= %d, pos= %s ", cell.id, cell.pos[0]);
+1528:                     foreach (cl; cell.cell_list) writef("[%d: %s] ", cl.id, cl.pos[0]);
+1529:                     writeln();
+1530:                 }
+1531:                 */
+1532:             evaluate_cell_contribution_to_jacobian(cell);
+1533:         }
+1534: 
+1535:         // add boundary condition corrections to boundary cells
+1536:         apply_jacobian_bcs();
+1537: 
+1538:         // return flux calculator to its original state
+1539:         myConfig.flux_calculator = flux_calculator_save;
+1540: 
+1541:         // return the interpolation order to its original state
+1542:         myConfig.interpolation_order = interpolation_order_save;
+1543:     } // end evaluate_jacobian()
+1544: 
+1545:     void evaluate_cell_contribution_to_jacobian(FluidFVCell pcell)
+1546:     {
+1547:         auto cqi = myConfig.cqi; // was GlobalConfig.cqi;
+1548:         auto nConserved = cqi.n;
+1549:         auto eps0 = flowJacobian.eps;
+1550:         number eps;
+1551:         int ftl = 1; int gtl = 0;
+1552: 
+1553:         // save a copy of the flowstate and copy conserved quantities
+1554:         fs_save.copy_values_from(*(pcell.fs));
+1555:         pcell.U[ftl].copy_values_from(pcell.U[0]);
+1556: 
+1557:         // perturb the current cell's conserved quantities
+1558:         // and then evaluate the residuals for each cell in
+1559:         // the local domain of influence
+1560:         foreach(j; 0..nConserved) {
+1561: 
+1562:             // peturb conserved quantity
+1563:             version(complex_numbers) { eps = complex(0.0, eps0.re); }
+1564:             else { eps = eps0*fabs(pcell.U[ftl][j]) + eps0; }
+1565:             pcell.U[ftl][j] += eps;
+1566:             pcell.decode_conserved(gtl, ftl, omegaz);
+1567: 
+1568:             // evaluate perturbed residuals in local stencil
+1569:             evalRHS(gtl, ftl, pcell.cell_list, pcell.face_list, pcell);
+1570: 
+1571:             // fill local Jacobians
+1572:             foreach (cell; pcell.cell_list) {
+1573:                 foreach(i; 0..nConserved) {
+1574:                     version(complex_numbers) { cell.dRdU[i][j] = cell.dUdt[ftl][i].im/eps.im; }
+1575:                     else { cell.dRdU[i][j] = (cell.dUdt[ftl][i]-cell.dUdt[0][i])/eps; }
+1576:                 }
+1577:             }
+1578: 
+1579:             // return cell to original state
+1580:             version(complex_numbers) {
+1581:                 pcell.U[ftl].copy_values_from(pcell.U[0]);
+1582:                 pcell.fs.copy_values_from(*fs_save);
+1583:                 if (myConfig.viscous) {
+1584:                     foreach (cell; pcell.cell_list) { cell.grad.copy_values_from(*(cell.grad_save)); }
+1585:                 }
+1586:                 if (flowJacobian.spatial_order >= 2) {
+1587:                     foreach(cell; pcell.cell_list) { cell.gradients.copy_values_from(*(cell.gradients_save)); }
+1588:                 }
+1589:             } else {
+1590:                 // TODO: for structured grids employing a real-valued low-order numerical Jacobian as
+1591:                 // the precondition matrix the above code doesn't completely clean up the effect of the
+1592:                 // perturbuation. Note that this does not occur for unstructured grids.
+1593:                 // This is currently under investigation, in the interim we will apply the more costly
+1594:                 // method of re-evaluating evalRHS with the unperturbed conserved state. KAD 2023-08-31
+1595:                 pcell.U[ftl].copy_values_from(pcell.U[0]);
+1596:                 pcell.decode_conserved(gtl, 0, omegaz);
+1597:                 evalRHS(gtl, 0, pcell.cell_list, pcell.face_list, pcell);
+1598:             }
+1599:         }
+1600: 
+
+1620:           This method accounts for the boundary conditions for the boundary cell entries in the flow Jacobian.
+1621:          */
+1622:         auto cqi = myConfig.cqi; // The block object has its own.
+1623:         auto nConserved = cqi.n;
+1624:         auto eps0 = flowJacobian.eps;
+1625:         number eps;
+1626:         int gtl = 0; int ftl = 1;
+1627: 
+1628:         foreach ( bndary; bc ) {
+1629:             if (!bndary.ghost_cell_data_available) { continue; }
+1630:             if (bndary.type == "exchange_using_mapped_cells" ||
+1631:                 bndary.type == "exchange_over_full_face" ||
+1632:                 bndary.type == "do_nothing") {
+1633:                 continue;
+1634:             }
+1635: 
+1636:             foreach ( bi, bface; bndary.faces) {
+1637:                 FluidFVCell ghost_cell;
+1638:                 if (bndary.outsigns[bi] == 1) {
+1639:                     ghost_cell = bface.right_cell;
+1640:                 } else {
+1641:                     ghost_cell = bface.left_cell;
+1642:                 }
+1643: 
+1644:                 // loop through each interior cell which contains the ghost cell in its stencil
+1645:                 foreach (pcell; ghost_cell.cell_list) {
+1646:                     // save a copy of the flowstate and copy conserved quantities
+1647:                     fs_save.copy_values_from(*(pcell.fs));
+1648:                     pcell.U[ftl].copy_values_from(pcell.U[0]);
+1649: 
+1650:                     foreach(j; 0..nConserved) {
+1651: 
+1652:                         // peturb conserved quantity
+1653:                         version(complex_numbers) { eps = complex(0.0, eps0.re); }
+1654:                         else { eps = eps0*fabs(pcell.U[ftl][j]) + eps0; }
+1655:                         pcell.U[ftl][j] += eps;
+1656:                         pcell.decode_conserved(gtl, ftl, omegaz);
+1657: 
+1658:                         // update ghost cell via boundary condition call
+1659:                         if (bc[bface.bc_id].preReconAction.length > 0) { bc[bface.bc_id].applyPreReconAction(0.0, 0, 0, bface); }
+1660: 
+1661:                         // return pcell to original state --> we have already accounted for this contribution to the Jacobian
+1662:                         pcell.U[ftl].copy_values_from(pcell.U[0]);
+1663:                         pcell.fs.copy_values_from(*fs_save);
+1664: 
+1665:                         // evaluate perturbed residuals in local stencil --> this will only propagate the sensitivity information from the perturb ghost cell state
+1666:                         evalRHS(gtl, ftl, ghost_cell.cell_list, ghost_cell.face_list, ghost_cell);
+1667: 
+1668:                         // fill local Jacobians
+1669:                         foreach (bcell; ghost_cell.cell_list) {
+1670:                             foreach(i; 0..nConserved) {
+1671:                                 version(complex_numbers) { bcell.dRdU[i][j] = bcell.dUdt[ftl][i].im/eps.im; }
+1672:                                 else { bcell.dRdU[i][j] = (bcell.dUdt[ftl][i]-bcell.dUdt[0][i])/eps; }
+1673:                             }
+1674:                         }
+1675: 
+1676:                         // return cell to original state
+1677:                         version(complex_numbers) {
+1678:                             if (myConfig.viscous) {
+1679:                                 foreach (cell; ghost_cell.cell_list) { cell.grad.copy_values_from(*(cell.grad_save)); }
+1680:                             }
+1681:                             if (flowJacobian.spatial_order >= 2) {
+1682:                                 foreach(cell; ghost_cell.cell_list) { cell.gradients.copy_values_from(*(cell.gradients_save)); }
+1683:                             }
+1684:                             ghost_cell.fs.clear_imaginary_components();
+1685:                         } else {
+1686:                             // TODO: for structured grids employing a real-valued low-order numerical Jacobian as
+1687:                             // the precondition matrix the above code doesn't completely clean up the effect of the
+1688:                             // perturbuation. Note that this does not occur for unstructured grids.
+1689:                             // This is currently under investigation, in the interim we will apply the more costly
+1690:                             // method of re-evaluating evalRHS with the unperturbed conserved state. KAD 2023-08-31
+1691: 
+1692:                             // we first return the ghost cell to the original state via a boundary condition call
+1693:                             if (bc[bface.bc_id].preReconAction.length > 0) { bc[bface.bc_id].applyPreReconAction(0.0, 0, 0, bface); }
+1694:                             evalRHS(gtl, 0, ghost_cell.cell_list, ghost_cell.face_list, ghost_cell);
+1695:                         }
+1696:                     }
+1697: 
+1698:                     // we now populate the pre-sized sparse matrix representation of the flow Jacobian
+1699:                     // loop through nConserved rows

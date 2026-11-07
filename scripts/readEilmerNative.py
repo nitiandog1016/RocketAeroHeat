@@ -139,6 +139,14 @@ def read_field(case,snapshot,ncells):
     return fields
 
 
+def audit_run_scope(manifest):
+    """未通过真实小例相容门槛的实数v1仅供有限诊断，禁止进入完整域或延长发展。"""
+    c=manifest['condition']
+    if c.get('development',{}).get('profile')=='rah-nk-real-v1':
+        need(manifest['mesh']['cells']<=1000 and c['maxNewtonSteps']<=8,
+             'rah-nk-real-v1小例比较未通过；完整域/延长计算关闭，需独立新方案证据')
+
+
 def audit_numerics(nk,c):
     """按具名合同审核原生已生成的阶段与输出；旧小检查配置保持原门槛。"""
     need(nk['max_newton_steps']==c['maxNewtonSteps'] and nk['write_loads'],'步数或载荷输出不符')
@@ -148,7 +156,13 @@ def audit_numerics(nk,c):
              '原生CFL没有按准备合同实际设置')
         return
     d=c['development']
-    need(d['profile']=='rah-nk-development-v1','发展方案错误')
+    need(d['profile'] in ('rah-nk-development-v1','rah-nk-real-v1'),'发展方案错误')
+    if d['profile']=='rah-nk-real-v1':
+        # 明确实数Jv和预条件矩阵两处差分尺度，禁止保留复数默认1e-30。
+        need(nk['use_scaling'] and nk['use_real_valued_frechet_derivative'],'实数缩放/导数合同错误')
+        need(nk['frechet_derivative_perturbation']==2.0**-26 and
+             nk['preconditioner_perturbation']==2.0**-26,'实数差分尺度错误')
+        need(nk['use_preconditioner'] and nk['preconditioner']=='ilu' and nk['ilu_fill']==0,'实数预条件合同错误')
     need(nk['number_of_phases']==2 and nk['max_steps_in_initial_phases']==[d['initialOrderSteps']],'阶段切换错误')
     need(nk['min_cfl']==.01 and nk['max_cfl']==1000,'发展CFL合同错误')
     need(nk['steps_between_loads_update']==d['loadsEvery'] and nk['steps_between_snapshots']==d['snapshotsEvery'] and
@@ -255,6 +269,12 @@ def export_loads(case,loads,output,run_receipt):
     need(np.max(np.abs(a['q_total']-a['q_cond']-a['q_diff']))<2e-12*heat_scale,'热流分项不闭合')
     order=mapping[tag]['nativeRows'];heat=-a['outsign']*a['q_total']
     output=Path(output);need(not output.exists(),'不覆盖原有原面CSV')
+    method='Eilmer5 thermally-perfect air / Wilcox k-omega'
+    numerics={}
+    if m['condition'].get('development',{}).get('profile')=='rah-nk-real-v1':
+        method += ' / rah-nk-real-v1 real finite-difference Jv+ILU (comparison failed)'
+        numerics=dict(numericsProfile='rah-nk-real-v1',nativeNumberType='real',
+                      compatibilityStatus='small-case-comparison-failed')
     with output.open('x',newline='',encoding='utf8') as f:
         writer=csv.writer(f);writer.writerow(['originalFaceId','nativeBoundaryRow','nativeFaceId','area_m2',
             'pressure_Pa','heatFluxIntoWall_W_m2','givenWallTemperature_K','wallFaceFluidTemperature_K',
@@ -262,14 +282,14 @@ def export_loads(case,loads,output,run_receipt):
         for original,j in enumerate(order):
             writer.writerow([original+1,int(j),int(boundary['ids'][j]),float(a['area'][j]),float(a['p'][j]),
                 float(heat[j]),m['condition']['wallTemperatureK'],float(a['T'][j]),float(a['q_total'][j]),
-                int(a['outsign'][j]),'Eilmer5 thermally-perfect air / Wilcox k-omega','research',False])
+                int(a['outsign'][j]),method,'research',False])
     return dict(passed=True,wallFaces=len(a),areaM2=float(areas.sum()),heatPowerIntoWallW=float(np.dot(heat,a['area'])),
                 negativeHeatFaces=int(np.sum(heat<0)),positiveHeatFaces=int(np.sum(heat>0)),
                 zeroHeatFaces=int(np.sum(heat==0)),newQualifiedAreaM2=0,originalFaceOrder=True,
                 sourceLoadsSHA256=sha(loads),csvSHA256=sha(output),
                 sourceRunReceiptSHA256=sha(run_receipt),nativeStep=int(row[0,2]),
                 outputBinding=receipt.get('outputBinding'),nativeLocalYPlusQualified=False,
-                limitation='符号/身份/原生热分项接口审核；不是独立温度梯度重放、收敛或实验验证')
+                limitation='符号/身份/原生热分项接口审核；不是独立温度梯度重放、收敛或实验验证',**numerics)
 
 
 if __name__=='__main__':

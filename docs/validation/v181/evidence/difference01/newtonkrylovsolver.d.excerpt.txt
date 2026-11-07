@@ -1,0 +1,280 @@
+1874:      */
+1875: 
+1876:     evalResidual(0, currentPhase, stepsIntoCurrentPhase);
+1877: 
+1878:     setResiduals();
+1879: 
+1880:     if (nkCfg.dualTime) { addUnsteadyTermToResiduals(); }
+1881: 
+1882:     if (nkCfg.useRealValuedFrechetDerivative) { setR0(currentPhase, stepsIntoCurrentPhase); }
+1883: 
+1884:     computeGlobalResidual();
+1885: 
+1886:     determineScaleFactors(rowScale, invColScale, nkCfg.useScaling);
+1887: 
+1888:     auto pcWallTimeStart = Clock.currTime();
+1889:     if (nkCfg.usePreconditioner && updatePreconditionerThisStep) {
+1890:         computePreconditioner();
+1891:     }
+1892:     gmresInfo.pcWallTime = to!double((Clock.currTime() - pcWallTimeStart).total!"msecs"())/1000.0;
+1893: 
+1894:     if (activePhase.useResidualSmoothing) {
+1895:         evalResidualSmoothing();
+1896:     	applyResidualSmoothing();
+1897:     }
+
+2212: void setR0(size_t currentPhase, int stepsIntoCurrentPhase)
+2213: {
+2214:     size_t nConserved = GlobalConfig.cqi.n;
+2215:     bool defectCorrectionUpdate = activePhase.frozenLimiterForJacobian || activePhase.jacobianInterpolationOrder != activePhase.residualInterpolationOrder;
+2216:     if (defectCorrectionUpdate) {
+2217:         // When performing a defect-correction update with a real-valued Frechet derivative, we cannot use R as our unperturbed state.
+2218:         // We must evaluate the Residual vector with the defects applied and store it as R0 for later use in the Fechet derivative.
+2219:         foreach (blk; parallel(localFluidBlocks,1)) { blk.set_interpolation_order(activePhase.jacobianInterpolationOrder); }
+2220:         foreach (blk; parallel(localFluidBlocks,1)) { GlobalConfig.frozen_limiter = activePhase.frozenLimiterForJacobian; }
+2221:         evalResidual(1, currentPhase, stepsIntoCurrentPhase);
+2222:         foreach (blk; parallel(localFluidBlocks,1)) blk.set_interpolation_order(activePhase.residualInterpolationOrder);
+2223:         foreach (blk; parallel(localFluidBlocks,1)) { GlobalConfig.frozen_limiter = activePhase.frozenLimiterForResidual; }
+2224:         foreach (blk; parallel(localFluidBlocks,1)) {
+2225:             size_t startIdx = 0;
+2226:             foreach (cell; blk.cells) {
+2227:                 foreach (ivar; 0 .. nConserved) {
+2228:                     blk.R0[startIdx+ivar] = cell.dUdt[1][ivar].re;
+2229:                 }
+2230:                 startIdx += nConserved;
+2231:             }
+2232:             if (GlobalConfig.grid_motion != GridMotion.none) {
+2233:                 foreach (vtx; blk.vertices) {
+2234:                     if (!vtx.solve_position) continue;
+2235:                     blk.R0[startIdx] = vtx.pos[1].x.re;
+2236:                     startIdx++;
+2237:                     blk.R0[startIdx] = vtx.pos[1].y.re;
+2238:                     startIdx++;
+2239:                     if (GlobalConfig.dimensions == 3) {
+2240:                         blk.R0[startIdx] = vtx.pos[1].z.re;
+2241:                         startIdx++;
+2242:                     }
+2243:                 }
+2244:             }
+2245:         }
+2246:     } else {
+2247:         // If we aren't performing a defect-correction update, then just set R0 to the already evaluated R vector.
+2248:         foreach (blk; parallel(localFluidBlocks,1)) {
+2249:             blk.R0[] = blk.R[];
+2250:         }
+2251:     }
+2252: }
+2253: 
+2254: /**
+2255:  * Determine scale factors Dr (diagonal row scaling matrix) and Dc (diagonal column scaling matrix) per conserved quantity.
+2256:  *
+2257:  * Row scale factors are set as the inverse of the global maximum rate of change
+2258:  * for each conserved quantity, with safeguards applied when these rates are small.
+2259:  * This balances the contributions of each equation to the scaled vector norms,
+
+2275: void determineScaleFactors(ref ScaleFactors rowScale, ref ScaleFactors invColScale, bool useScaling)
+2276: {
+2277:     if (!useScaling) {
+2278:         return;
+2279:     }
+2280:     // else we go ahead and determine the scale factors
+2281:     rowScale.fluidScaling[] = to!number(0.0);
+2282:     invColScale.fluidScaling[] = to!number(0.0);
+2283:     if (GlobalConfig.grid_motion != GridMotion.none) {
+2284: 
+2285:         rowScale.gridScaling[] = to!number(0.0);
+2286:         invColScale.gridScaling[] = to!number(0.0);
+2287:     }
+2288: 
+2289:     // First do this for each block.
+2290:     size_t nConserved = GlobalConfig.cqi.n;
+2291:     foreach (blk; parallel(localFluidBlocks,1)) {
+2292:         blk.maxRate[] = to!number(0.0);
+2293:         foreach (i, cell; blk.cells) {
+2294:             foreach (ivar; 0 .. nConserved) {
+2295:                 blk.maxRate[ivar] = fmax(blk.maxRate[ivar], fabs(cell.dUdt[0][ivar]));
+2296:             }
+2297:         }
+2298: 
+2299:         if (GlobalConfig.grid_motion != GridMotion.none) {
+2300:             foreach (i, vtx; blk.vertices) {
+2301:                 blk.maxVel[0] = fmax(blk.maxVel[0], fabs(vtx.vel[0].x));
+2302:                 blk.maxVel[1] = fmax(blk.maxVel[1], fabs(vtx.vel[0].y));
+2303:                 if (GlobalConfig.dimensions == 3) {
+2304:                     blk.maxVel[2] = fmax(blk.maxVel[2], fabs(vtx.vel[0].z));
+2305:                 }
+2306:             }
+2307:         }
+2308:     }
+2309: 
+2310:     // Next, reduce that maxR information across all blocks and processes
+2311:     foreach (blk; localFluidBlocks) {
+2312:         foreach (ivar; 0 .. nConserved) {
+2313:             invColScale.fluidScaling[ivar] = fmax(invColScale.fluidScaling[ivar], blk.maxRate[ivar]);
+2314:         }
+2315: 
+2316:         if (GlobalConfig.grid_motion != GridMotion.none) {
+2317:             invColScale.gridScaling[0] = fmax(invColScale.gridScaling[0], blk.maxVel[0]);
+2318:             invColScale.gridScaling[1] = fmax(invColScale.gridScaling[1], blk.maxVel[1]);
+2319:             if (GlobalConfig.dimensions == 3) {
+2320:                 invColScale.gridScaling[2] = fmax(invColScale.gridScaling[2], blk.maxVel[2]);
+2321:             }
+2322:         }
+2323:     }
+2324: 
+2325:     // In distributed memory, reduce max values and make sure everyone has a copy.
+2326:     version(mpi_parallel) {
+2327:         foreach (ivar; 0 .. nConserved) {
+2328:             MPI_Allreduce(MPI_IN_PLACE, &(invColScale.fluidScaling[ivar].re), 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+2329:         }
+2330:         
+2331:         if (GlobalConfig.grid_motion != GridMotion.none) {
+2332:             foreach (idim; 0 .. GlobalConfig.dimensions) {
+2333:                 MPI_Allreduce(MPI_IN_PLACE, &(invColScale.gridScaling[idim].re), 1, MPI_DOUBLE,
+2334:                               MPI_MAX, MPI_COMM_WORLD);
+2335:             }
+2336:         }
+2337:     }
+2338: 
+2339:     // Use a guard on scale values if they get small
+2340:     foreach (ivar; 0 .. nConserved) {
+2341:         invColScale.fluidScaling[ivar] = fmax(invColScale.fluidScaling[ivar], minScaleFactor);
+2342: 
+2343:     }
+2344:     if (GlobalConfig.grid_motion != GridMotion.none) {
+2345:         foreach (idim; 0 .. GlobalConfig.dimensions) {
+2346:             invColScale.gridScaling[idim] = fmax(invColScale.gridScaling[idim], minScaleFactor);
+2347:         }
+2348:     }
+2349: 
+2350:     // set row scaling = column scaling
+2351:     foreach (ivar; 0 .. nConserved) {
+2352:         rowScale.fluidScaling[ivar] = 1./invColScale.fluidScaling[ivar];
+2353: 
+2354:     }
+2355:     if (GlobalConfig.grid_motion != GridMotion.none) {
+2356:         foreach (idim; 0 .. GlobalConfig.dimensions) {
+2357:             rowScale.gridScaling[idim] = 1. / invColScale.gridScaling[idim];
+2358:         }
+2359:     }
+2360: 
+
+3194: double computePerturbationSize()
+3195: {
+3196:     // perturbation constant, Knoll and McHugh suggest a value on the order of the square
+3197:     // root of machine roundoff, however, we have observed that this value can be somewhat
+3198:     // problem dependent.
+3199:     auto a = nkCfg.frechetDerivativePerturbation;
+3200: 
+3201:     // calculate L2 norm of zed vector
+3202:     number z_L2 = 0.0;
+3203:     mixin(dotOverBlocks("z_L2", "zed", "zed"));
+3204:     version(mpi_parallel) {
+3205:         MPI_Allreduce(MPI_IN_PLACE, &(z_L2.re), 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+3206:     }
+3207:     z_L2 = sqrt(z_L2);
+3208:     // When the L2 norm of the zed vector is small, the sigma calculated from this routine
+3209:     // has been observed to result in noisy convergence as observed in the global residual.
+3210:     // We enforce a minimum value to guard against this behaviour.
+3211:     // From some experimentation a minimum value of sqrt(1.0e-07) appears sufficient.
+3212:     double min_z_L2 = sqrt(1.0e-07);
+3213:     if (z_L2.re <= min_z_L2) { z_L2.re = min_z_L2; }
+3214: 
+3215:     // compute sum of individual component perturbations, eps_i,
+3216:     // where eps_i is calculated using Eq. 12, i.e. eps_i = a*|var_i| + a
+3217:     double eps_sum = 0.0;
+3218:     double nvars = 0.0;
+3219:     foreach (blk; localFluidBlocks) {
+3220:         foreach (cell; blk.cells) {
+3221:             foreach (var; cell.U[0]) {
+3222:                 eps_sum += a*fabs(var.re) + a;
+3223:                 nvars += 1;
+3224:             }
+3225:         }
+3226:     }
+3227:     version(mpi_parallel) {
+3228:         MPI_Allreduce(MPI_IN_PLACE, &(eps_sum.re), 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+3229:     }
+3230:     version(mpi_parallel) {
+3231:         MPI_Allreduce(MPI_IN_PLACE, &(nvars.re), 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+3232:     }
+3233: 
+3234:     // compute perturbation parameter via Eq. 11
+3235:     double sigma = eps_sum/(nvars*z_L2.re);
+3236: 
+3237:     return sigma;
+3238: }
+
+3662: void evalRealMatVecProd(double sigma, bool for_preconditioning, size_t currentPhase, int stepsIntoCurrentPhase)
+3663: {
+3664:     foreach (blk; parallel(localFluidBlocks,1)) { blk.set_interpolation_order(activePhase.jacobianInterpolationOrder); }
+3665:     foreach (blk; parallel(localFluidBlocks,1)) { GlobalConfig.frozen_limiter = activePhase.frozenLimiterForJacobian; }
+3666: 
+3667:     // Make a stack-local copy of conserved quantities info
+3668:     size_t nConserved = GlobalConfig.cqi.n;
+3669: 
+3670:     // We perform a Frechet derivative to evaluate J*D^(-1)v
+3671:     foreach (blk; parallel(localFluidBlocks,1)) {
+3672:         blk.clear_fluxes_of_conserved_quantities();
+3673:         foreach (cell; blk.cells) cell.clear_source_vector();
+3674:         size_t startIdx = 0;
+3675:         foreach (cell; blk.cells) {
+3676:             cell.U[1][] = cell.U[0][];
+3677:             foreach (ivar; 0 .. nConserved) {
+3678:                 cell.U[1][ivar] += sigma*blk.zed[startIdx+ivar];
+3679:             }
+3680:             cell.decode_conserved(0, 1, blk.omegaz);
+3681:             startIdx += nConserved;
+3682:         }
+3683: 
+3684:         if (blk.myConfig.grid_motion) {
+3685:             foreach (i, vtx; blk.vertices) {
+3686:                 if (!vtx.solve_position) continue;
+3687:                 vtx.pos[1].x = vtx.pos[0].x + sigma * blk.zed[startIdx];
+3688:                 startIdx++;
+3689:                 vtx.pos[1].y = vtx.pos[0].y + sigma * blk.zed[startIdx];
+3690:                 startIdx++;
+3691:                 if (blk.myConfig.dimensions == 3) {
+3692:                     vtx.pos[1].z = vtx.pos[0].z + sigma * blk.zed[startIdx]; 
+3693:                     startIdx++;
+3694:                 }
+3695:             }
+3696:         }
+3697:     }
+3698:     evalResidual(1, currentPhase, stepsIntoCurrentPhase);
+3699:     foreach (blk; parallel(localFluidBlocks,1)) {
+3700:         size_t startIdx = 0;
+3701:         foreach (cell; blk.cells) {
+3702:             foreach (ivar; 0 .. nConserved) {
+3703:                 blk.zed[startIdx+ivar] = (cell.dUdt[1][ivar].re - blk.R0[startIdx+ivar])/(sigma);
+3704:             }
+3705:             cell.decode_conserved(0, 0, blk.omegaz);
+3706:             startIdx += nConserved;
+3707:         }
+3708:         if (blk.myConfig.grid_motion) {
+3709:             foreach (vtx; blk.vertices) {
+3710:                 if (!vtx.solve_position) continue;
+3711:                 blk.zed[startIdx] = (vtx.vel[1].x.re - blk.R0[startIdx])/(sigma);
+3712:                 startIdx++;
+3713:                 blk.zed[startIdx] = (vtx.vel[1].y.re - blk.R0[startIdx])/(sigma);
+3714:                 startIdx++;
+3715:                 if (blk.myConfig.dimensions == 3) {
+3716:                     blk.zed[startIdx] = (vtx.vel[1].z.re - blk.R0[startIdx])/(sigma);
+3717:                     startIdx++;
+3718:                 }
+3719:             }
+3720:         }
+3721:     }
+3722:     foreach (blk; parallel(localFluidBlocks,1)) blk.set_interpolation_order(activePhase.residualInterpolationOrder);
+3723:     foreach (blk; parallel(localFluidBlocks,1)) { GlobalConfig.frozen_limiter = activePhase.frozenLimiterForResidual; }
+3724: }
+3725: 
+3726: /**
+3727:  * Determine a relaxation factor based on a physicality check.
+3728:  *
+3729:  * In this algorithm, the relaxation factor keeps falling as we search across cells in order.
+3730:  * This is efficient since we're searching for a worst case. If at any point, the relaxation
+3731:  * factor gets smaller than what we're prepared to accept then we just break the search
+3732:  * in that block of cells.
+3733:  *
+3734:  * REFERENCE: A. Yildirim, G. K. W. Kenway, C. A. Mader, and J. R. R. A. Martins,

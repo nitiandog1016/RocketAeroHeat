@@ -70,7 +70,7 @@ def validate_condition(condition):
     if 'development' in c:
         d=c['development'];required={'profile','initialOrderSteps','loadsEvery','snapshotsEvery','snapshotCount'}
         require(isinstance(d,dict) and set(d)==required,'发展配置字段不完整或含未知参数')
-        require(d['profile']=='rah-nk-development-v1','未支持的发展方案')
+        require(d['profile'] in ('rah-nk-development-v1','rah-nk-real-v1'),'未支持的发展方案')
         for key in required-{'profile'}:
             require(isinstance(d[key],int) and not isinstance(d[key],bool) and d[key]>0,'发展步数必须为正整数')
         require(d['initialOrderSteps']<c['maxNewtonSteps'],'必须实际进入二阶阶段')
@@ -268,9 +268,16 @@ NewtonKrylovPhase:new{{use_local_timestep=true, use_auto_cfl=false,
 '''
     if 'development' not in c:return job
     d=c['development']
+    # 实数前向差分使用sqrt(binary64 epsilon)，Jv与预条件矩阵均显式设置。
+    # 原生另按守恒量/方向缩放；不是复步长等价替换，不向用户暴露参数扫描。
+    real_settings = ''
+    if d['profile']=='rah-nk-real-v1':
+        real_settings = ('    use_scaling=true, use_real_valued_frechet_derivative=true,\n'
+                         '    frechet_derivative_perturbation=1.490116119384765625e-8,\n'
+                         '    preconditioner_perturbation=1.490116119384765625e-8,\n')
     # 模块：生产发展单独具名；保留旧四步生成结果逐字不变，不暴露参数扫描入口。
     return job[:job.index('NewtonKrylovGlobalConfig')]+f'''NewtonKrylovGlobalConfig{{number_of_phases=2,
-    max_steps_in_initial_phases={{{d['initialOrderSteps']}}},
+{real_settings}    max_steps_in_initial_phases={{{d['initialOrderSteps']}}},
     max_newton_steps={c['maxNewtonSteps']}, stop_on_relative_residual={f(c['stopRelativeResidual'])},
     min_cfl=0.01, max_cfl=1000, use_line_search=true, use_physicality_check=true,
     max_consecutive_bad_steps=2, use_preconditioner=true, preconditioner="ilu", ilu_fill=0,

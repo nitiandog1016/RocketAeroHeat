@@ -1,0 +1,32 @@
+401: 
+402: # A user-defined-function to reduce the duplication of the d-lang compiler
+403: # recipe. The output will be the caller recipe name and source files will
+404: # be all dependencies of the caller recipe.
+405: # All variables are inherited from the caller recipe.
+406: define build_lmr_entry
+407: $(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ $^ $(DLINKFLAGS) -J=.
+408: endef
+409: 
+410: # The pattern of `target ...: variable-assignment` is termed
+411: # "target specific variable assignment". These variable assignments are
+412: # local to the context of the invoked target recipe.
+413: lmr-debug: FLAVOUR_FLAGS = $(DEBUG_DFLAGS)
+414: lmr-debug lmr: main.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS) | buildinfo.json 
+415: 	$(call build_lmr_entry)
+416: 
+417: # Use the pattern rule % to match *all* lmrZ[...] targets.
+418: # Add complex specialisations to all complex versions of programs
+419: lmrZ%: DFLAGS += $(DVERSION)complex_numbers
+420: 
+421: # Add MPI specialisations
+422: lmr-mpi-run lmrZ-mpi-run: DFLAGS += $(DVERSION)mpi_parallel
+423: lmr-mpi-run lmrZ-mpi-run: DLINKFLAGS += -L-lmpi $(MPI_LIB_DIRS_SEARCH)
+424: lmr-mpi-run lmrZ-mpi-run: $(MPI_FILES)
+425: 
+426: # Enable runsim main() function for lmr-runners
+427: lmr%run: DFLAGS += $(DVERSION)run_main
+428: lmr%run: $(LMR_SRC_DEPS) $(LMR_LUA_DEPS) | buildinfo.json
+429: 	$(call build_lmr_entry)
+430: 
+431: lmr%check-jacobian: $(LMR_CMD)/checkjacobian.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS) | buildinfo.json
+432: 	$(call build_lmr_entry)

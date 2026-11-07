@@ -1,0 +1,69 @@
+{
+  "passed": false,
+  "fieldMaxScaledDifferences": {
+    "p": 0.032174422932263795,
+    "T": 0.005473414287982389,
+    "rho": 0.00128681475748324,
+    "vel.x": 0.006151965632205985,
+    "vel.y": 0.022509247773365926,
+    "vel.z": 0.00625754905316098,
+    "tq-tke": 0.002518876038400493,
+    "tq-omega": 0.0014374001370633166
+  },
+  "wallAreaL1Differences": {
+    "p": 0.024987919237098078,
+    "q_total": 0.021076932162769096
+  },
+  "wallExport": {
+    "passed": true,
+    "wallFaces": 7,
+    "areaM2": 6.046357376887758,
+    "heatPowerIntoWallW": 2441.5908686847783,
+    "negativeHeatFaces": 0,
+    "positiveHeatFaces": 7,
+    "zeroHeatFaces": 0,
+    "newQualifiedAreaM2": 0,
+    "originalFaceOrder": true,
+    "sourceLoadsSHA256": "c061b02ed77afba2990edd83a3b5794b1c37a1cc14ae656ef38e325572b75858",
+    "csvSHA256": "c98e95f1d5d7e2842dd6d6abddcd6ee222c5e59745b7eea6992a64a458df7a05",
+    "sourceRunReceiptSHA256": "8e288006b0f324e6ab5ac22c60760633dbe9e79809f83130fa35f09037fba585",
+    "nativeStep": 8,
+    "outputBinding": "at-supervisor-completion",
+    "nativeLocalYPlusQualified": false,
+    "limitation": "\u7b26\u53f7/\u8eab\u4efd/\u539f\u751f\u70ed\u5206\u9879\u63a5\u53e3\u5ba1\u6838\uff1b\u4e0d\u662f\u72ec\u7acb\u6e29\u5ea6\u68af\u5ea6\u91cd\u653e\u3001\u6536\u655b\u6216\u5b9e\u9a8c\u9a8c\u8bc1"
+  },
+  "phase": [
+    0.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "lastGlobalRelativeResidual": 0.9274420670920267,
+  "maximumLinearResidual": 0.008056159529453011,
+  "linearIterations": [
+    2.0,
+    1.0,
+    3.0,
+    3.0,
+    3.0,
+    4.0,
+    4.0,
+    4.0
+  ],
+  "peakGroupRSSBytes": 14389248,
+  "binaryMismatchRejected": "wrong-native-number-type-for-real-profile",
+  "physicalQualification": false,
+  "newQualifiedAreaM2": 0,
+  "newNativeRuns": 0,
+  "sourceSHA256": {
+    "tests/verifyEilmerRealRun.py": "d2ee7a2df2889a031ef39e3bab8f64f81bcdd69aee02624a8e597ce197108c3d",
+    "scripts/readEilmerNative.py": "50d5252dc9da637f2d58559ba11fe93f52fae427c97484da0c89e91d11ecd9f4",
+    "scripts/auditEilmerCompletion.py": "947b1a91ae5a4ebcd02e68926c663bbb3590f7cfc73bdcafe94872f56725480f"
+  },
+  "firstReadFailure": "run_small.py requested tke; accurate metadata uses tq-tke and tq-omega. Native run succeeded; no rerun.",
+  "elapsedSeconds": 0.2744322369999992
+}

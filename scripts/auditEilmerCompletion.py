@@ -33,6 +33,10 @@ def audit_completion(case,stdout):
     meta=np.atleast_2d(np.loadtxt(case/'lmrsim/loads/loads-metadata',skiprows=1))
     if meta[-1,2]!=step:raise ValueError('final-loads-step-mismatch')
     m=json.loads((case/'case_manifest.json').read_text())
+    if m.get('condition',{}).get('development',{}).get('profile')=='rah-nk-real-v1':
+        # 实数新合同还需实际二进制自报；仅有配置名称不足以证明运行分派。
+        if re.findall(r'^Number-type:\s*(\S+)\s*$',text,re.M)!=['real']:
+            raise ValueError('wrong-native-number-type-for-real-profile')
     expected=m['mesh']['wallFaces'] if 'mesh' in m else m['wallFaces']
     files=list((case/'lmrsim/loads'/('%04d'%int(meta[-1,0]))).glob('*-wall.dat'))
     count=0
