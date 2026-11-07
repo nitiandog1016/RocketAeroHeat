@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "scripts/prepareHybridRocketEulerNative.py", line 263, in <module>
+    args=vars(parser.parse_args()); mode=args.pop('mode'); result=globals()[mode](**args)
+  File "scripts/prepareHybridRocketEulerNative.py", line 67, in design
+    old = json.loads(old_path.read_text())['condition']
+  File "D:\anacondapython\lib\pathlib.py", line 1217, in read_text
+    return f.read()
+UnicodeDecodeError: 'gbk' codec can't decode byte 0xac in position 2124: illegal multibyte sequence

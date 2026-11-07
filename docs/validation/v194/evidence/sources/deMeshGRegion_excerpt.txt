@@ -1,0 +1,6 @@
+{"url":"https://api.github.com/repos/live-clones/gmsh/contents/src/mesh/meshGRegion.cpp?ref=657c8e915f60405e6cad0c8ec7faf812bfff1a60","firstLine":230,"lastLine":234}
+void deMeshGRegion::operator()(GRegion *gr)
+{
+  if(gr->isFullyDiscrete()) return;
+  gr->deleteMesh();
+}

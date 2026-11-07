@@ -1,0 +1,79 @@
+{
+  "passed": true,
+  "profile": "original-wall-rocket-euler-01",
+  "geometry": {
+    "cells": 64982,
+    "vertices": 18027,
+    "faces": 143126,
+    "ghostCells": 26324,
+    "wallTriangles": 19752,
+    "farfieldTriangles": 6572,
+    "wallAreaM2": 1.9646292565715553,
+    "volumeM3": 381.4346146072696,
+    "cellObjectsIncludingGhost": 91306,
+    "stageArrayPayloadBytes": 29217920
+  },
+  "actualNumerics": {
+    "dimensions": 3,
+    "axisymmetric": false,
+    "viscous": false,
+    "reacting": false,
+    "turbulence_model": "none",
+    "solver_mode": "time-marching",
+    "grid_format": "rawbinary",
+    "field_format": "rawbinary",
+    "flux_calculator": "ausmdv",
+    "interpolation_order": 2,
+    "gasdynamic_update_scheme": "tvd_rk3",
+    "spatial_deriv_calc": "least_squares",
+    "spatial_deriv_locn": "cells",
+    "with_local_time_stepping": true,
+    "with_super_time_stepping": false,
+    "residual_smoothing": false,
+    "adjust_invalid_cell_data": false,
+    "max_invalid_cells": 0
+  },
+  "actualGasModel": {
+    "name": "eilmer-air-cea-v1",
+    "nativeClass": "CompositeGas/ThermPerfGasMixture",
+    "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+    "gasSHA256": "0787bbebbdd4460ffa49445723feec76169f60c9a1c435fc6ae2e880e3fe5c97",
+    "temperatureRangeK": [
+      200.0,
+      6000.0
+    ],
+    "gasConstantJkgK": 287.1032458563536,
+    "enthalpyReference": "CEA9 official air polynomial, no added shift",
+    "entropyReference": "CEA9 s(T) minus R*ln(p/101325 Pa); not s(298.15K)=0",
+    "blending": "linear coefficients 800--1200 K; cp is not exact dh/dT there",
+    "physicalQualification": false
+  },
+  "sourceCoordinateError": 0.0,
+  "originalFaceOwnerExact": true,
+  "maximumNormalDistanceErrorM": 2.6020852139652106e-18,
+  "nativeVolumeM3": 381.4346146072696,
+  "nativeMach": 5.0,
+  "nativeVelocityMps": [
+    -1418.2630865977853,
+    0,
+    516.2055478801032
+  ],
+  "fullVolumeEOSErrors": {
+    "rho": 0.0,
+    "e": 0.0,
+    "a": 0.0
+  },
+  "initialTotalEnthalpyJkg": 1062730.6164386885,
+  "executionAuthorized": false,
+  "physicalQualification": false,
+  "newSolvedHeatAreaM2": 0,
+  "solverPeakMemoryBytes": null,
+  "note": "uniform initial field, not a computed external-flow or thermal result",
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v194_validation\\preparation01\\report.json": "421c62a900b626779de434e88f5f2c2da62c70c3724fa5e8f1b20af239eeaa51",
+    "E:\\RocketAeroHeat\\scripts\\prepareHybridRocketEulerNative.py": "ef22807acff1ced037758f77039c715d18e09e21e96cd7e71f1f52d7bf425a3f",
+    "E:\\RocketAeroHeat\\outputs\\v194_validation\\rocket01\\manifest.json": "0a4b596f0c942797e7ead8b6ff8e82091e6068b0ddf350ae1aa95e059d707046",
+    "E:\\RocketAeroHeat\\outputs\\v194_validation\\rocket01\\lmrsim\\config": "05f577759e1dc3b4971489b90b4ac0c9a9450e216f32876f325fb0669e92d527"
+  },
+  "elapsedSeconds": 2.6089999999967404
+}
