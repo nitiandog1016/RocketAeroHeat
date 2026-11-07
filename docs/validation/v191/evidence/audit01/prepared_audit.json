@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "cells": 2400,
+  "vertices": 3843,
+  "faces": 8560,
+  "ghostCells": 2720,
+  "cellObjectsIncludingGhost": 5120,
+  "volumeM3": 0.022307260985198737,
+  "sourceCoordinateError": 0.0,
+  "boundaryFaces": {
+    "wall": 120,
+    "outer": 120,
+    "inflow": 40,
+    "outflow": 40,
+    "span": 2400
+  },
+  "actualGasModel": {
+    "name": "eilmer-air-cea-v1",
+    "nativeClass": "CompositeGas/ThermPerfGasMixture",
+    "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+    "gasSHA256": "46eeede15d0e8ec8f9e2b96dca04ba419cce43d0080c2218eab26784732253dc",
+    "temperatureRangeK": [
+      200.0,
+      6000.0
+    ],
+    "gasConstantJkgK": 287.1032458563536,
+    "enthalpyReference": "CEA9 official air polynomial, no added shift",
+    "entropyReference": "CEA9 s(T) minus R*ln(p/101325 Pa); not s(298.15K)=0",
+    "blending": "linear coefficients 800--1200 K; cp is not exact dh/dT there",
+    "physicalQualification": false
+  },
+  "actualNumerics": {
+    "solver_mode": "time-marching",
+    "grid_format": "rawbinary",
+    "field_format": "rawbinary",
+    "viscous": false,
+    "reacting": false,
+    "turbulence_model": "none",
+    "dimensions": 3,
+    "axisymmetric": false,
+    "gasdynamic_update_scheme": "tvd_rk3",
+    "flux_calculator": "ausmdv",
+    "interpolation_order": 2,
+    "spatial_deriv_calc": "least_squares",
+    "spatial_deriv_locn": "cells",
+    "with_local_time_stepping": true,
+    "with_super_time_stepping": false,
+    "residual_smoothing": false,
+    "adjust_invalid_cell_data": false,
+    "max_invalid_cells": 0
+  },
+  "initialTemperatureK": [
+    300.0,
+    300.0
+  ],
+  "physicalQualification": false
+}

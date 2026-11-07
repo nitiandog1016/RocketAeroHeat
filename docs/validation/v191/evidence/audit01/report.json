@@ -1,0 +1,157 @@
+{
+  "passed": true,
+  "physicalQualification": false,
+  "prepared": {
+    "passed": true,
+    "cells": 2400,
+    "vertices": 3843,
+    "faces": 8560,
+    "ghostCells": 2720,
+    "cellObjectsIncludingGhost": 5120,
+    "volumeM3": 0.022307260985198737,
+    "sourceCoordinateError": 0.0,
+    "boundaryFaces": {
+      "wall": 120,
+      "outer": 120,
+      "inflow": 40,
+      "outflow": 40,
+      "span": 2400
+    },
+    "actualGasModel": {
+      "name": "eilmer-air-cea-v1",
+      "nativeClass": "CompositeGas/ThermPerfGasMixture",
+      "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+      "gasSHA256": "46eeede15d0e8ec8f9e2b96dca04ba419cce43d0080c2218eab26784732253dc",
+      "temperatureRangeK": [
+        200.0,
+        6000.0
+      ],
+      "gasConstantJkgK": 287.1032458563536,
+      "enthalpyReference": "CEA9 official air polynomial, no added shift",
+      "entropyReference": "CEA9 s(T) minus R*ln(p/101325 Pa); not s(298.15K)=0",
+      "blending": "linear coefficients 800--1200 K; cp is not exact dh/dT there",
+      "physicalQualification": false
+    },
+    "actualNumerics": {
+      "solver_mode": "time-marching",
+      "grid_format": "rawbinary",
+      "field_format": "rawbinary",
+      "viscous": false,
+      "reacting": false,
+      "turbulence_model": "none",
+      "dimensions": 3,
+      "axisymmetric": false,
+      "gasdynamic_update_scheme": "tvd_rk3",
+      "flux_calculator": "ausmdv",
+      "interpolation_order": 2,
+      "spatial_deriv_calc": "least_squares",
+      "spatial_deriv_locn": "cells",
+      "with_local_time_stepping": true,
+      "with_super_time_stepping": false,
+      "residual_smoothing": false,
+      "adjust_invalid_cell_data": false,
+      "max_invalid_cells": 0
+    },
+    "initialTemperatureK": [
+      300.0,
+      300.0
+    ],
+    "physicalQualification": false
+  },
+  "reference": {
+    "schema": "RAH.HybridEulerReference.v1",
+    "states": [
+      {
+        "pressurePa": 5000.0,
+        "temperatureK": 300.0,
+        "densityKgm3": 0.058051125883144844,
+        "internalEnergyJkg": -88606.40697612382,
+        "enthalpyJkg": -2475.433219217746,
+        "entropyJkgK": 7735.494802958775,
+        "cpJkgK": 1004.9940239378442,
+        "soundSpeedMps": 347.24198564009015,
+        "viscosityPas": 1.8469051721849357e-05,
+        "conductivityWmK": 0.02624489778852644,
+        "name": "upstream",
+        "velocityMps": [
+          -1041.7259569202704,
+          0.0,
+          0.0
+        ],
+        "totalEnthalpyJkg": 540121.0514415088,
+        "Mach": 3.0
+      },
+      {
+        "pressurePa": 10268.789830080517,
+        "temperatureK": 372.2652728238168,
+        "densityKgm3": 0.09607903631274575,
+        "internalEnergyJkg": -36554.36176592109,
+        "enthalpyJkg": 70324.20638139774,
+        "entropyJkgK": 7746.273958862264,
+        "cpJkgK": 1010.4548426456018,
+        "soundSpeedMps": 386.3928185000591,
+        "viscosityPas": 2.1711895293809726e-05,
+        "conductivityWmK": 0.03164818515182989,
+        "name": "compressed",
+        "velocityMps": [
+          -954.600164273817,
+          0.0,
+          168.3217647502068
+        ],
+        "totalEnthalpyJkg": 540121.0514415089,
+        "Mach": 2.508655347883981
+      },
+      {
+        "pressurePa": 5012.280709824975,
+        "temperatureK": 303.4472812396429,
+        "densityKgm3": 0.0575326041332208,
+        "internalEnergyJkg": -86131.33908106986,
+        "enthalpyJkg": 989.3603091174109,
+        "entropyJkgK": 7746.273958862264,
+        "cpJkgK": 1005.167358999919,
+        "soundSpeedMps": 349.2193132848779,
+        "viscosityPas": 1.8632027581116855e-05,
+        "conductivityWmK": 0.02651354304833537,
+        "name": "expanded",
+        "velocityMps": [
+          -1038.394617794595,
+          0.0,
+          0.0
+        ],
+        "totalEnthalpyJkg": 540121.0514415088,
+        "Mach": 2.9734741988554276
+      }
+    ],
+    "shockAngleDeg": 27.366740917331494,
+    "densityRatio": 1.6550761910483862,
+    "residuals": {
+      "massRelative": 0.0,
+      "normalMomentumRelative": 0.0,
+      "totalEnthalpyRelative": 2.220446049250313e-16,
+      "entropyExpansionAbsolute": 0.0,
+      "expansionAngleRad": 0.0,
+      "cpIntegralEnthalpyAbsolute": 0.0
+    },
+    "temperatureRangeK": [
+      200,
+      800
+    ],
+    "physicalQualification": false,
+    "scope": "same-EOS 2D inviscid reference, not experimental heat or rocket validation"
+  },
+  "fullVolumeEOSErrors": {
+    "rho": 0.0,
+    "e": 0.0,
+    "a": 0.0
+  },
+  "sourcesStable": true,
+  "sourceSHA256": {
+    "tests\\testHybridEulerNative.py": "5ee89ac3983657282c92e23ba17a5e78915fde4b0b013f811cc7798b2f3acba7",
+    "E:\\RocketAeroHeat\\scripts\\readHybridEulerNative.py": "76af2ca2721ea6c6f92f5cd1a30bb6dbea8682843e8df183b00a5df2f3a1a130",
+    "E:\\RocketAeroHeat\\scripts\\eilmerAirThermo.py": "3d79fb0b916164a1a616d69482df960d07c42242af6ea80ff3d5c4cdb3f52183",
+    "E:\\RocketAeroHeat\\scripts\\hybridEulerReference.py": "a0bc3c2b031f1f34b95e09cfba9881b48ba940bd51f3f62a395187629794fe12",
+    "E:\\RocketAeroHeat\\scripts\\readEilmerNative.py": "2c0925d9d588c4d78c387f35e75603d05a26c2bde83c63d0d81dc46cf0e4b2f6",
+    "E:\\RocketAeroHeat\\scripts\\hybridExternalState.py": "cda0c6cc081c95c854912915589470afc08798a4676295b6d1336475f8d1124d"
+  },
+  "elapsedSeconds": 0.17199999999138527
+}
