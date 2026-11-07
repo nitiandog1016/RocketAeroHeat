@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "tests/testHybridEdgeSampling.py", line 75, in <module>
+    p=argparse.ArgumentParser();p.add_argument('--out',required=True);test(p.parse_args().out)
+  File "tests/testHybridEdgeSampling.py", line 27, in test
+    raw=read_field(case,8,info['cells']);record=candidate(frame,surface,grid,mapping,raw)
+  File "E:\RocketAeroHeat\scripts\hybridEdgeSampling.py", line 51, in candidate
+    need(frame.get('schema')=='RAH.HybridEulerFrame.v1' and frame.get('algebraicInterfacePassed'),'缺少同EOS已审核原生帧')
+  File "E:\RocketAeroHeat\scripts\readEilmerNative.py", line 19, in need
+    if not ok: raise ValueError(message)
+ValueError: 缺少同EOS已审核原生帧

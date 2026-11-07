@@ -1,0 +1,138 @@
+{
+  "schema": "RAH.HybridRocketEulerMesh.v1",
+  "passed": false,
+  "executionAuthorized": false,
+  "physicalQualification": false,
+  "newSolvedHeatAreaM2": 0,
+  "geometryPassed": true,
+  "qualityScreenPassed": false,
+  "originalWallExactlyPreserved": true,
+  "originalFarfieldExactlyPreserved": true,
+  "originalAreaM2": 1.9646292565715553,
+  "originalVertices": 9878,
+  "originalFaces": 19752,
+  "vertices": 18004,
+  "cells": 69177,
+  "faces": 151516,
+  "ghostCells": 26324,
+  "farfieldFaces": 6572,
+  "cellObjectsIncludingGhost": 95501,
+  "conservedVariables": 5,
+  "retainedTimeLevels": 4,
+  "stageArrayPayloadBytes": 30560320,
+  "minimumSICN": 0.04849554850717989,
+  "tetsBelowSICN01": 6,
+  "qualityPercentiles": [
+    0.04849554850717989,
+    0.20913802788869254,
+    0.6151807136173868,
+    0.9628481396444493,
+    0.9994197889811834
+  ],
+  "wallNormalDistancePercentilesM": [
+    0.0002301053076263789,
+    0.0004326405814970798,
+    0.007047463300345935,
+    0.0110234843048297,
+    0.02586690196218487
+  ],
+  "outerBoundsM": [
+    [
+      -8.584959844821329,
+      -2.878319945369148,
+      -2.878319945369148
+    ],
+    [
+      2.9283199366552637,
+      2.878319945369148,
+      2.878319945369148
+    ]
+  ],
+  "native": {
+    "components": [
+      {
+        "nodes": 9878,
+        "faces": 19752,
+        "signedVolume": -0.10284534456191156,
+        "holeWinding": -1.0,
+        "fluidWinding": -2.4848083448933724e-18
+      },
+      {
+        "nodes": 3288,
+        "faces": 6572,
+        "signedVolume": 381.5374599518316,
+        "holeWinding": 1.0,
+        "fluidWinding": 1.0
+      }
+    ],
+    "expectedFluidVolume": 381.4346146072697,
+    "holeSeed": [
+      -1.2562368117057496,
+      6.946793631396803e-05,
+      2.5226599797771365e-05
+    ],
+    "fluidWitness": [
+      -1.2455333041913663,
+      -2.5904879508322334,
+      0.0
+    ],
+    "closedOrientedTwoShells": true,
+    "sourceBoundaryNodes": 13166,
+    "sourceBoundaryFaces": 26324,
+    "exactPLCImport": true,
+    "fixedBoundaryExactlyRestored": true,
+    "maximumNativeFixedNodeDifferenceM": 0.0,
+    "roundtripToleranceM": 4.090338656750913e-14,
+    "nativeNodes": 18004,
+    "nativeTets": 69177,
+    "newInteriorNodes": 4838,
+    "nativeSeconds": 1.0310000000172295,
+    "nativeExitCode": 0,
+    "geometry": {
+      "internalFaces": 125192,
+      "boundaryFaces": 26324,
+      "oppositeOrientation": true,
+      "volume": 381.4346146072696,
+      "boundaryVolume": 381.4346146072697,
+      "volumeClosureRelative": 1.4902532880854243e-16,
+      "minimumVolume": 4.7093647715089886e-11
+    },
+    "connectedFluidComponents": 1,
+    "holeSeedInFluid": false,
+    "volumeRelativeDifference": 1.1102230246251565e-16,
+    "switches": "pY1q2/5O2/7S30000zVC",
+    "physicsQualified": false,
+    "newQualifiedArea": 0
+  },
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\scripts\\prepareHybridRocketEulerMesh.py": "0bfd7034bbdd94f997dd96452b26ebd3c02830211dc532e1692e54177dd46c26",
+    "E:\\RocketAeroHeat\\docs\\validation\\v193\\PLAN.md": "570ee48fc884e0e45940a34501f3c5ae33eebeaaf1b08d3f7358459906260a32",
+    "E:\\RocketAeroHeat\\outputs\\v144_validation\\actual\\hybrid_volume.mat": "22b35b72396c1a7d14195af9bd24d3c6328138484d4009638c1ab48cddec1d6c",
+    "E:\\RocketAeroHeat\\outputs\\v144_validation\\actual\\independent_review.json": "e86db3e16fc65e2bf4e6621e77991216d8fc49aa27e1673501c229fe6b4b5ddd",
+    "E:\\RocketAeroHeat\\outputs\\v104_validation\\baseline02\\current_case.mat": "b4889e42a28131c253a56f06472a58c9d2cb290d7c9937935fbb4b5d7349488f"
+  },
+  "filesSHA256": {
+    "mesh.npz": "61498cf2e9dcafa1c7d5ad21738fb83fc12b61aa4801980c903b3d65787d3928",
+    "mesh.su2": "c3e0265ba2be820e3c9ef1ca3ede0e80a42a09b8203a431a0635259b654af7ad",
+    "surface.json": "e0a2fb26465b0976a6930d4e1808a0451b5293a7457aab1d03c4210412a98b54",
+    "wall_sampling_geometry.csv": "cab945a4030c1028a799dfb24cc0b98c5fed95ec9be54c8267e94785937f5042"
+  },
+  "capacityStatus": "exact topology and stage payload only; full peak unknown",
+  "pending": [
+    "native Euler preparation and exact peak feasibility",
+    "spatial/outer-domain accuracy",
+    "wall-adjacent to attached-edge evidence",
+    "CEA/NASA7 compatibility",
+    "public thermal validation"
+  ],
+  "error": "AssertionError('SICN minimum below original 0.1 geometry screen')",
+  "sourceStableAfter": {
+    "E:\\RocketAeroHeat\\scripts\\prepareHybridRocketEulerMesh.py": true,
+    "E:\\RocketAeroHeat\\docs\\validation\\v193\\PLAN.md": true,
+    "E:\\RocketAeroHeat\\outputs\\v144_validation\\actual\\hybrid_volume.mat": true,
+    "E:\\RocketAeroHeat\\outputs\\v144_validation\\actual\\independent_review.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v104_validation\\baseline02\\current_case.mat": true
+  },
+  "elapsedSeconds": 4.078000000008615,
+  "outputBytesBeforeReport": 15384472
+}
