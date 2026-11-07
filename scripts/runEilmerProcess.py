@@ -36,7 +36,8 @@ def group_members(pgid):
     return members
 
 
-def run(argv, cwd, record, seconds, output_mib=128, locks=(), memory_mib=8192, group_rss_mib=None):
+def run(argv, cwd, record, seconds, output_mib=128, locks=(), memory_mib=8192, group_rss_mib=None,
+        checkpoint_guard=None):
     """模块一：明确源与运行包；输出只写新回执目录，绝不隐式接续旧求解。"""
     assert os.name == 'posix' and 0 < seconds <= 1800
     assert 0 < output_mib <= 2048 and 0 < memory_mib <= 8192
@@ -105,11 +106,24 @@ def run(argv, cwd, record, seconds, output_mib=128, locks=(), memory_mib=8192, g
             if elapsed > seconds: stopped='wall-clock-limit'
             if bytes_now > output_mib*1024**2: stopped='output-size-limit'
             if total_rss > group_rss_mib*1024**2: stopped='process-group-rss-limit'
+            # 可选观察器只检查调用方已登记的完整保存场；默认None保持旧行为。
+            # 停止仍由本监督器持有的proc执行，不按外部文件猜测/终止别的进程。
+            if stopped is None and checkpoint_guard is not None:
+                observation=checkpoint_guard()
+                if observation is not None:
+                    result['checkpointGuardStop']=observation
+                    stopped='checkpoint-guard-rejected'
             if stopped:
                 stop_group()
                 break
             time.sleep(.2)
         code=proc.wait()
+        if stopped is None and checkpoint_guard is not None:
+            observation=checkpoint_guard()
+            if observation is not None:
+                result['checkpointGuardStop']=observation
+                result['checkpointGuardAfterNativeExit']=True
+                stopped='checkpoint-guard-rejected'
     except BaseException as error:
         stopped='supervisor-interrupted' if isinstance(error,(KeyboardInterrupt,InterruptedError)) else 'supervisor-error'
         result['supervisorError']=repr(error)

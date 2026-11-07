@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "rejected": [
+    "snapshot_-1",
+    "snapshot_1",
+    "profile",
+    "budget",
+    "temperatureRangeK",
+    "evidenceSHA256",
+    "config_viscous",
+    "config_flux_calculator",
+    "config_max_step"
+  ],
+  "initialEOS": {
+    "rho": 0.0,
+    "e": 0.0,
+    "a": 0.0
+  },
+  "lowTemperatureGuard": {
+    "snapshot": 1,
+    "path": "outputs\\v195_validation\\interface01\\guard_fixture\\lmrsim\\snapshots\\0001\\fluid-0000",
+    "sha256": "df51c905995c562555bc8f639071cb785be48ba30768e1d4c5aa41c8d2db6d12",
+    "temperatureRangeK": [
+      199.0,
+      300.0
+    ],
+    "outsideTemperatureCount": 1,
+    "invalidCells": 1,
+    "firstInvalidCellZeroBased": 1,
+    "kind": "first-observation-of-complete-saved-field; not first-instantaneous-crossing",
+    "firstInvalidPositionM": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "nonpositiveGuard": {
+    "snapshot": 2,
+    "path": "outputs\\v195_validation\\interface01\\guard_fixture\\lmrsim\\snapshots\\0002\\fluid-0000",
+    "sha256": "c333245c73e27bb4b6ff86f4eb15a80fd780496b2e5c758a208c72dfa56c74ef",
+    "temperatureRangeK": [
+      300.0,
+      300.0
+    ],
+    "outsideTemperatureCount": 0,
+    "invalidCells": 1,
+    "firstInvalidCellZeroBased": 0,
+    "kind": "first-observation-of-complete-saved-field; not first-instantaneous-crossing",
+    "firstInvalidPositionM": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "scope": "actual original-wall initial mapping; manifest/config substitutions; synthetic complete-file guard; no CFD",
+  "elapsedSeconds": 3.812000000005355,
+  "physicalQualification": false,
+  "sourceSHA256": {
+    "E:\\RocketAeroHeat\\tests\\testHybridRocketEulerDevelopment.py": "1b7fe0de64c8105a0616d85922fff0e1f48f2c405b2a760fa1ef2f2140ecea28",
+    "E:\\RocketAeroHeat\\outputs\\v195_validation\\preparation01\\report.json": "b9111a5b6b72956d4cba2ce8ff2252072bff20378ab6784a082bb3df73ef194c",
+    "E:\\RocketAeroHeat\\scripts\\hybridRocketEuler.py": "fe796962a9f6cbe75e411214f0c0b560cac02718a134b9ff6622015e764e5b8b"
+  }
+}

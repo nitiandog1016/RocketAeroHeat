@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "actualBuildReceiptSHA256": "f9e7a0e6f34e57d985d8880641fcafde12931e6a3fcb6674818e40e74b31586f",
+  "sources": [
+    {
+      "path": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluidfvcell.d",
+      "sha256": "f59144600c35e2dfbdfb3d6688a12807ea35dead144604f183f933db18981942",
+      "boundToActualBuild": true,
+      "excerpts": [
+        {
+          "firstLine": 463,
+          "lastLine": 490,
+          "text": "463:    void update_3D_geometric_data(size_t gtl, bool true_centroid)\n464:    {\n465:        string msg = \"FluidFVCell.update_3D_geometric_data(): \";\n466:        number iL, jL, kL;\n467:        switch (vtx.length) {\n468:        case 4:\n469:            tetrahedron_properties(vtx[0].pos[gtl], vtx[1].pos[gtl],\n470:                                   vtx[2].pos[gtl], vtx[3].pos[gtl],\n471:                                   pos[gtl], volume[gtl], L_min);\n472:            iLength = L_min; jLength = L_min; kLength = L_min;\n473:            break;\n474:        case 8:\n475:            hex_cell_properties(vtx[0].pos[gtl], vtx[1].pos[gtl], vtx[2].pos[gtl], vtx[3].pos[gtl],\n476:                                vtx[4].pos[gtl], vtx[5].pos[gtl], vtx[6].pos[gtl], vtx[7].pos[gtl],\n477:                                true_centroid, pos[gtl], volume[gtl], iL, jL, kL);\n478:            iLength = iL; jLength = jL; kLength = kL;\n479:            L_min = min(iLength, jLength, kLength);\n480:            break;\n481:        case 5:\n482:            pyramid_properties(vtx[0].pos[gtl], vtx[1].pos[gtl], vtx[2].pos[gtl], vtx[3].pos[gtl],\n483:                               vtx[4].pos[gtl], true_centroid, pos[gtl], volume[gtl], L_min);\n484:            iLength = L_min; jLength = L_min; kLength = L_min;\n485:            break;\n486:        case 6:\n487:            wedge_properties(vtx[0].pos[gtl], vtx[1].pos[gtl], vtx[2].pos[gtl],\n488:                             vtx[3].pos[gtl], vtx[4].pos[gtl], vtx[5].pos[gtl],\n489:                             true_centroid, pos[gtl], volume[gtl], L_min);\n490:            iLength = L_min; jLength = L_min; kLength = L_min;"
+        },
+        {
+          "firstLine": 1000,
+          "lastLine": 1083,
+          "text": "1000:    double signal_frequency(bool using_structured_grid)\n1001:    // Remember to use stringent_cfl=true for unstructured-grid.\n1002:    {\n1003:        number signal = 0; // Signal speed is something like a frequency, with units 1/s.\n1004:        //\n1005:        // Check the convective/wave-driven time step limit first,\n1006:        // then add a component to ensure viscous stability.\n1007:        //\n1008:        // Look at gas-dynamic signal speeds along each face.\n1009:        // This works for gas-dynamics only (not MHD), on a structured grid.\n1010:        //\n1011:        // Get the local normal velocities by rotating the local frame of reference.\n1012:        // Also, compute the velocity magnitude and recall the minimum length.\n1013:        size_t first_face = 0; // west, assuming quad or hex cells from a structured grid conversion\n1014:        size_t second_face = 1; // south, assuming quad or hex cells from a structured grid conversion\n1015:        size_t third_face = iface.length - 1; // will be Face.top for structured grid\n1016:        if (using_structured_grid) {\n1017:            first_face = Face.north;\n1018:            second_face = Face.east;\n1019:        }\n1020:        number un_N = fabs(fs.vel.dot(iface[first_face].n));\n1021:        number un_E = fabs(fs.vel.dot(iface[second_face].n));\n1022:        number un_T = (myConfig.dimensions == 3) ? fabs(fs.vel.dot(iface[third_face].n)) : to!number(0.0);\n1023:        if (myConfig.stringent_cfl) {\n1024:            // Compute the speed with the shortest length and the highest speed.\n1025:            number un_max = fmax(un_N, un_E);\n1026:            number minLength = fmin(iLength, jLength);\n1027:            if (myConfig.dimensions == 3) {\n1028:                un_max = fmax(un_max, un_T);\n1029:                minLength = fmin(minLength, kLength);\n1030:            }\n1031:            signal = (un_max + fs.gas.a) / minLength;\n1032:        } else {\n1033:            // Compute the signal speed in each index direction.\n1034:            number signalN = (un_N + fs.gas.a) / jLength;\n1035:            signal = fmax(signal, signalN);\n1036:            number signalE = (un_E + fs.gas.a) / iLength;\n1037:            signal = fmax(signal, signalE);\n1038:            if (myConfig.dimensions == 3) {\n1039:                number signalT = (un_T + fs.gas.a) / kLength;\n1040:                signal = fmax(signal, signalT);\n1041:            }\n1042:        }\n1043:        this.signal_hyp = signal; // store hyperbolic signal for STS\n1044:        // Factor for the viscous time limit.\n1045:        // See Swanson, Turkel and White (1991)\n1046:        // This factor is not included if viscosity is zero.\n1047:        if (myConfig.viscous && (fs.gas.mu > 10.0e-23)) {\n1048:            auto gmodel = myConfig.gmodel;\n1049:            number gam_eff = gmodel.gamma(fs.gas);\n1050:            // Need to sum conductivities for thermal nonequilibrium.\n1051:            number k_total = fs.gas.k;\n1052:            version(multi_T_gas) {\n1053:                foreach(k_value; fs.gas.k_modes) { k_total += k_value; }\n1054:            }\n1055:            number Prandtl = fs.gas.mu * gmodel.Cp(fs.gas) / k_total;\n1056:            signal += 4.0 * myConfig.viscous_factor * (fs.gas.mu + fs.mu_t)\n1057:                * gam_eff / (Prandtl * fs.gas.rho)\n1058:                * 1.0/(L_min^^2) * myConfig.viscous_signal_factor;\n1059:        }\n1060:        this.signal_parab = signal - this.signal_hyp; // store parabolic signal for STS\n1061:        version(turbulence) {\n1062:            number turbulent_signal = myConfig.turb_model.turbulent_signal_frequency(*fs);\n1063:            turbulent_signal *= myConfig.turbulent_signal_factor;\n1064:            signal = fmax(signal, turbulent_signal);\n1065:            this.signal_parab = fmax(signal_parab, turbulent_signal);\n1066:        }\n1067:        version(MHD) {\n1068:            if (myConfig.MHD) {\n1069:                assert(myConfig.stringent_cfl, \"MHD seems to only works if stringent_cfl is used.\");\n1070:                // Gas dynamics speed\n1071:                // Ignoring flow and index directions, make the worst case assumptions.\n1072:                number u_mag_sq = (fs.vel.x)^^2 + (fs.vel.y)^^2;\n1073:                if (myConfig.dimensions == 3) { u_mag_sq += (fs.vel.z)^^2; }\n1074:                number u_mag = sqrt(u_mag_sq);\n1075:                // MHD signal speed\n1076:                number B_mag_sq = (fs.B.x)^^2 + (fs.B.y)^^2 + (fs.B.z)^^2;\n1077:                number ca2 = B_mag_sq / fs.gas.rho;\n1078:                number cfast = sqrt(ca2 + (fs.gas.a)^^2);\n1079:                signal = fmax(signal, (u_mag+cfast)/L_min);\n1080:            }\n1081:        }\n1082:        return signal.re;\n1083:    } // end signal_frequency()"
+        }
+      ]
+    },
+    {
+      "path": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/geom/elements/properties.d",
+      "sha256": "681b2823bd96dffdde4ea9a2eee4d76b44ef7421063ef31c6e09bce3fe6cd5f7",
+      "boundToActualBuild": true,
+      "excerpts": [
+        {
+          "firstLine": 326,
+          "lastLine": 345,
+          "text": "326:void tetrahedron_properties(ref const(Vector3) p0, ref const(Vector3) p1,\n327:                            ref const(Vector3) p2, ref const(Vector3) p3,\n328:                            ref Vector3 centroid, ref number volume, ref number L_min)\n329:// Variant including L_min calculation.\n330:{\n331:    centroid.set(0.25*(p0.x + p1.x + p2.x + p3.x),\n332:                 0.25*(p0.y + p1.y + p2.y + p3.y),\n333:                 0.25*(p0.z + p1.z + p2.z + p3.z));\n334:    volume = tetrahedron_volume(p0, p1, p2, p3);\n335:    number third = 1.0/3.0;\n336:    L_min = pow(volume, third);\n337:    Vector3 pmid = Vector3(third*(p0.x+p1.x+p2.x), third*(p0.y+p1.y+p2.y), third*(p0.z+p1.z+p2.z));\n338:    L_min = fmin(L_min, 2.0*distance_between(pmid, centroid));\n339:    pmid = Vector3(third*(p0.x+p1.x+p3.x), third*(p0.y+p1.y+p3.y), third*(p0.z+p1.z+p3.z));\n340:    L_min = fmin(L_min, 2.0*distance_between(pmid, centroid));\n341:    pmid = Vector3(third*(p1.x+p2.x+p3.x), third*(p1.y+p2.y+p3.y), third*(p1.z+p2.z+p3.z));\n342:    L_min = fmin(L_min, 2.0*distance_between(pmid, centroid));\n343:    pmid = Vector3(third*(p2.x+p0.x+p3.x), third*(p2.y+p0.y+p3.y), third*(p2.z+p0.z+p3.z));\n344:    L_min = fmin(L_min, 2.0*distance_between(pmid, centroid));\n345:} // end tetrahedron_properties()"
+        }
+      ]
+    },
+    {
+      "path": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/turbulence.d",
+      "sha256": "94e126b9337df880a3b056780e670e6f1f1bd6e58148e34f347e07de8b74be99",
+      "boundToActualBuild": true,
+      "excerpts": [
+        {
+          "firstLine": 109,
+          "lastLine": 112,
+          "text": "109:    @nogc final override number turbulent_signal_frequency(ref const(FlowState) fs) const {\n110:        number turb_signal = 1e-99; // We never want this to be the limiting factor (1/s)\n111:        return turb_signal;\n112:    }"
+        }
+      ]
+    },
+    {
+      "path": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/timemarching.d",
+      "sha256": "d80216eca42f386a34f52e4115813a9ddc532f1e02d3dbb28f93670e47508da5",
+      "boundToActualBuild": true,
+      "excerpts": [
+        {
+          "firstLine": 80,
+          "lastLine": 94,
+          "text": "80:double nextXxxxTime(double now, Schedule!double dt_schedule)\n81:{\n82:    // Returns the absolute simulation time at which the next snapshot should be made.\n83:    // Even if we have restarted the simulation from some intermediate time,\n84:    // we should continue to get the originally-requested instances.\n85:    double t = 0;\n86:    while (t <= now) { t += dt_schedule.get_value(now); }\n87:    return t;\n88:}\n89:\n90:double nextXxxxTime(double now, double dt)\n91:{\n92:    double t = 0;\n93:    while (t <= now) { t += dt; }\n94:    return t;"
+        },
+        {
+          "firstLine": 603,
+          "lastLine": 615,
+          "text": "603:            // 4.0 (Occasionally) Write out an intermediate solution\n604:            if ( SimState.step == GlobalConfig.write_flow_solution_at_step ) {\n605:                writeSnapshotFiles_timemarching();\n606:                GC.collect();\n607:                GC.minimize();\n608:            }\n609:            if ((SimState.time >= SimState.t_plot) && !SimState.output_just_written) {\n610:                writeSnapshotFiles_timemarching();\n611:                if (GlobalConfig.udf_supervisor_file.length > 0) { call_UDF_at_write_to_file(); }\n612:                SimState.output_just_written = true;\n613:                SimState.t_plot = nextXxxxTime(SimState.time, GlobalConfig.dt_plot_schedule);\n614:                GC.collect();\n615:                GC.minimize();"
+        }
+      ]
+    },
+    {
+      "path": "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/overlay/src/lmr/fluidblock.d",
+      "sha256": "11f5cd951a56156cae608f4b1bf79f6fdcaa949b76767b09f3887c540a39f482",
+      "boundToActualBuild": true,
+      "excerpts": [
+        {
+          "firstLine": 1200,
+          "lastLine": 1255,
+          "text": "1200:        int local_time_stepping_limit_factor = myConfig.local_time_stepping_limit_factor;\n1201:        bool first = true;\n1202:        bool gridFlag = grid_type == Grid_t.structured_grid;\n1203:        foreach(FluidFVCell cell; cells) {\n1204:            signal = cell.signal_frequency(gridFlag);\n1205:\t    if (myConfig.with_super_time_stepping) {\n1206:                signal_hyp = cell.signal_hyp.re;\n1207:                signal_parab = cell.signal_parab.re;\n1208:                if (first) {\n1209:                    dt_allow_hyp = cfl_value / signal_hyp;\n1210:                    dt_allow_parab = cfl_value / signal_parab;\n1211:                    first = false;\n1212:                } else {\n1213:                    dt_allow_hyp = fmin(dt_allow_hyp, cfl_value / signal_hyp);\n1214:                    dt_allow_parab = fmin(dt_allow_parab, cfl_value / signal_parab);\n1215:                }\n1216:                // Set the allowable time-step based on hyperbolic time-step.\n1217:                dt_allow = fmin(dt_allow_hyp, GlobalConfig.dt_max);\n1218:                cell.dt_hyper = cfl_value / signal_hyp;\n1219:                cell.dt_parab = cfl_value / signal_parab;\n1220:            } else {\n1221:                // no STS\n1222:                dt_allow_hyp = 0;\n1223:                dt_allow_parab = 0;\n1224:                // Compute current (Local) CFL number and recommend a time step.\n1225:                cfl_local = dt_current * signal;\n1226:                dt_local = cfl_value / signal;\n1227:                // Set local time-step in cell.\n1228:                cell.dt_local = fmin(dt_local, dt_current*local_time_stepping_limit_factor);\n1229:                // Limit the largest local time-step to a set input value.\n1230:                cell.dt_local = fmin(cell.dt_local, GlobalConfig.dt_max);\n1231:                if (first) {\n1232:                    cfl_min = cfl_local;\n1233:                    cfl_max = cfl_local;\n1234:                    dt_allow = dt_local;\n1235:                    first = false;\n1236:                } else {\n1237:                    cfl_min = fmin(cfl_min, cfl_local);\n1238:                    cfl_max = fmax(cfl_max, cfl_local);\n1239:                    dt_allow = fmin(dt_allow, dt_local);\n1240:                }\n1241:            }\n1242:        } // foreach cell\n1243:        if (myConfig.with_super_time_stepping == false && check_cfl && (cfl_max < 0.0 || cfl_max > cfl_allow)) {\n1244:            debug { writeln(\"Bad cfl number encountered cfl_max=\", cfl_max, \" for FluidBlock \", id); }\n1245:            // If cfl_max exceeds cfl_allow, simply reduce the cfl_max to cfl_adjust*cfl_allow.\n1246:            // For the low-order explicit updating schemes, a value of 0.5 seems\n1247:            // to work robustly. Values to 0.7 also work, beyond this\n1248:            // and code begins to crash due to numerical instability.\n1249:            // Results in auto-limitation of the time step/cfl\n1250:            cfl_max = cfl_adjust*cfl_allow;\n1251:            // Reduce dt_allow according to new rescaled cfl_max\n1252:            dt_allow = cfl_max/signal;\n1253:        }\n1254:        return [dt_allow, cfl_max, dt_allow_parab];\n1255:    } // end determine_time_step_size()"
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "geometry source assigns all tetrahedral lengths from computed L_min",
+    "signal_frequency reads selected normals, sound speed and directional lengths; no actual runtime values observed",
+    "none turbulence frequency is 1e-99; 0.3 divided by that value matches observed 3e98, but this is not proof of why convective signal disappeared",
+    "local dt is capped separately; global dt_allow is returned from unbounded cfl/signal",
+    "snapshot scheduler adds dt from zero in a while loop; huge now makes this impractical"
+  ],
+  "uniqueRuntimeCauseEstablished": false,
+  "newBuilds": 0,
+  "newCFDRuns": 0,
+  "elapsedSeconds": 0.017284005999999907
+}
