@@ -1,0 +1,121 @@
+1088:                         cell.add_inviscid_source_vector(blklocal_gtl, blk.omegaz);
+1089:                         if (blk.myConfig.viscous) { cell.add_viscous_source_vector(); }
+1090:                     }
+1091:                     blk.time_derivatives(blklocal_gtl, blklocal_ftl);
+1092:                     if (blk.myConfig.residual_smoothing) { blk.residual_smoothing_dUdt(blklocal_ftl); }
+1093:                     switch (stage) {
+1094:                     case 1:
+1095:                         double gamma_1 = 1.0; // for normal Predictor-Corrector or Euler update.
+1096:                         final switch (blk.myConfig.gasdynamic_update_scheme) {
+1097:                         case GasdynamicUpdate.euler:
+1098:                         case GasdynamicUpdate.backward_euler:
+1099:                         case GasdynamicUpdate.implicit_rk1:
+1100:                         case GasdynamicUpdate.moving_grid_1_stage:
+1101:                         case GasdynamicUpdate.moving_grid_2_stage:
+1102:                         case GasdynamicUpdate.pc: gamma_1 = 1.0; break;
+1103:                         case GasdynamicUpdate.midpoint: gamma_1 = 0.5; break;
+1104:                         case GasdynamicUpdate.classic_rk3: gamma_1 = 0.5; break;
+1105:                         case GasdynamicUpdate.tvd_rk3: gamma_1 = 1.0; break;
+1106:                         case GasdynamicUpdate.denman_rk3: gamma_1 = 8.0/15.0; break;
+1107:                         case GasdynamicUpdate.rkl1:
+1108:                         case GasdynamicUpdate.rkl2: assert(false, "invalid option");
+1109:                         case GasdynamicUpdate.classic_rk4: gamma_1 = 1.0 / 2.0; break;
+1110:                         }
+1111:                         foreach (cell; blk.cells) {
+1112:                             auto dt = (blklocal_with_local_time_stepping) ? cell.dt_local : blklocal_dt_global;
+1113:                             auto dUdt0 = cell.dUdt[0];
+1114:                             auto U0 = cell.U[0];
+1115:                             auto U1 = cell.U[1];
+1116:                             foreach (j; 0 .. cqi.n) {
+1117:                                 U1[j] = U0[j] + dt*gamma_1*dUdt0[j];
+1118:                             }
+1119:                             // Limits on the turbulent conserved quantities removed by NNG (22/01/25).
+1120:                             // This was prompted by an issue with lmr, caused by the cqi.mass
+1121:                             // not being defined in reacting simulations.
+1122:                             version(MHD) {
+1123:                                 if (blk.myConfig.MHD && blk.myConfig.divergence_cleaning && !blk.myConfig.MHD_static_field) {
+1124:                                     U1[cqi.psi] *= cell.divergence_damping_factor(dt, blk.myConfig.c_h, blk.myConfig.divB_damping_length);
+1125:                                 }
+1126:                             }
+1127:                             cell.decode_conserved(blklocal_gtl, blklocal_ftl+1, blk.omegaz);
+1128:                         } // end foreach cell
+1129:                         break;
+1130:                     case 2:
+1131:                         double gamma_1 = 0.5; // Presume predictor-corrector.
+1132:                         double gamma_2 = 0.5;
+1133:                         final switch (blk.myConfig.gasdynamic_update_scheme) {
+1134:                         case GasdynamicUpdate.euler:
+1135:                         case GasdynamicUpdate.backward_euler:
+1136:                         case GasdynamicUpdate.implicit_rk1:
+1137:                         case GasdynamicUpdate.moving_grid_1_stage:
+1138:                             assert(false, "invalid option for multi-stage update.");
+1139:                         case GasdynamicUpdate.moving_grid_2_stage:
+1140:                         case GasdynamicUpdate.pc: gamma_1 = 0.5, gamma_2 = 0.5; break;
+1141:                         case GasdynamicUpdate.midpoint: gamma_1 = 0.0; gamma_2 = 1.0; break;
+1142:                         case GasdynamicUpdate.classic_rk3: gamma_1 = -1.0; gamma_2 = 2.0; break;
+1143:                         case GasdynamicUpdate.tvd_rk3: gamma_1 = 0.25; gamma_2 = 0.25; break;
+1144:                         case GasdynamicUpdate.denman_rk3: gamma_1 = -17.0/60.0; gamma_2 = 5.0/12.0; break;
+1145:                         case GasdynamicUpdate.rkl1:
+1146:                         case GasdynamicUpdate.rkl2: assert(false, "invalid option");
+1147:                         case GasdynamicUpdate.classic_rk4: gamma_1 = 0.0; gamma_2 = 1.0 / 2.0; break;
+1148:                         }
+1149:                         foreach (cell; blk.cells) {
+1150:                             auto dt = (blklocal_with_local_time_stepping) ? cell.dt_local : blklocal_dt_global;
+1151:                             auto dUdt0 = cell.dUdt[0];
+1152:                             auto dUdt1 = cell.dUdt[1];
+1153:                             auto U_old = cell.U[0];
+1154:                             if (blk.myConfig.gasdynamic_update_scheme == GasdynamicUpdate.denman_rk3) { U_old = cell.U[1]; }
+1155:                             auto U2 = cell.U[2];
+1156:                             foreach (j; 0 .. cqi.n) {
+1157:                                 U2[j] = U_old[j] + dt*(gamma_1*dUdt0[j] + gamma_2*dUdt1[j]);
+1158:                             }
+1159:                             // Limits on the turbulent conserved quantities removed by NNG (22/01/25).
+1160:                             version(MHD) {
+1161:                                 if (blk.myConfig.MHD && blk.myConfig.divergence_cleaning && !blk.myConfig.MHD_static_field) {
+1162:                                     U2[cqi.psi] *= cell.divergence_damping_factor(dt, blk.myConfig.c_h, blk.myConfig.divB_damping_length);
+1163:                                 }
+1164:                             }
+1165:                             cell.decode_conserved(blklocal_gtl, blklocal_ftl+1, blk.omegaz);
+1166:                         } // end foreach cell
+1167:                         break;
+1168:                     case 3:
+1169:                         double gamma_1 = 1.0/6.0; // presume TVD_RK3 scheme.
+1170:                         double gamma_2 = 1.0/6.0;
+1171:                         double gamma_3 = 4.0/6.0;
+1172:                         final switch (blk.myConfig.gasdynamic_update_scheme) {
+1173:                         case GasdynamicUpdate.euler:
+1174:                         case GasdynamicUpdate.backward_euler:
+1175:                         case GasdynamicUpdate.implicit_rk1:
+1176:                         case GasdynamicUpdate.moving_grid_1_stage:
+1177:                         case GasdynamicUpdate.moving_grid_2_stage:
+1178:                         case GasdynamicUpdate.pc:
+1179:                         case GasdynamicUpdate.midpoint:
+1180:                             assert(false, "invalid option for 3-stage update.");
+1181:                         case GasdynamicUpdate.classic_rk3:
+1182:                             gamma_1 = 1.0/6.0; gamma_2 = 4.0/6.0; gamma_3 = 1.0/6.0;
+1183:                             break;
+1184:                         case GasdynamicUpdate.tvd_rk3:
+1185:                             gamma_1 = 1.0/6.0; gamma_2 = 1.0/6.0; gamma_3 = 4.0/6.0;
+1186:                             break;
+1187:                         case GasdynamicUpdate.denman_rk3:
+1188:                             // FIX-ME: Check that we have Andrew Denman's scheme ported correctly.
+1189:                             gamma_1 = 0.0; gamma_2 = -5.0/12.0; gamma_3 = 3.0/4.0;
+1190:                             break;
+1191:                         case GasdynamicUpdate.rkl1:
+1192:                         case GasdynamicUpdate.rkl2: assert(false, "invalid option");
+1193:                         case GasdynamicUpdate.classic_rk4:
+1194:                             gamma_1 = 0.0; gamma_2 = 0.0; gamma_3 = 1.0;
+1195:                             break;
+1196:                         }
+1197:                         foreach (cell; blk.cells) {
+1198:                             auto dt = (blklocal_with_local_time_stepping) ? cell.dt_local : blklocal_dt_global;
+1199:                             auto dUdt0 = cell.dUdt[0];
+1200:                             auto dUdt1 = cell.dUdt[1];
+1201:                             auto dUdt2 = cell.dUdt[2];
+1202:                             auto U_old = cell.U[0];
+1203:                             if (blk.myConfig.gasdynamic_update_scheme == GasdynamicUpdate.denman_rk3) { U_old = cell.U[2]; }
+1204:                             auto U3 = cell.U[3];
+1205:                             foreach (j; 0 .. cqi.n) {
+1206:                                 U3[j] = U_old[j] + dt * (gamma_1*dUdt0[j] + gamma_2*dUdt1[j] + gamma_3*dUdt2[j]);
+1207:                             }
+1208:                             // Limits on the turbulent conserved quantities removed by NNG (22/01/25).

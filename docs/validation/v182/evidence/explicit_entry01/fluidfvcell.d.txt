@@ -1,0 +1,73 @@
+998: 
+999:     @nogc
+1000:     double signal_frequency(bool using_structured_grid)
+1001:     // Remember to use stringent_cfl=true for unstructured-grid.
+1002:     {
+1003:         number signal = 0; // Signal speed is something like a frequency, with units 1/s.
+1004:         //
+1005:         // Check the convective/wave-driven time step limit first,
+1006:         // then add a component to ensure viscous stability.
+1007:         //
+1008:         // Look at gas-dynamic signal speeds along each face.
+1009:         // This works for gas-dynamics only (not MHD), on a structured grid.
+1010:         //
+1011:         // Get the local normal velocities by rotating the local frame of reference.
+1012:         // Also, compute the velocity magnitude and recall the minimum length.
+1013:         size_t first_face = 0; // west, assuming quad or hex cells from a structured grid conversion
+1014:         size_t second_face = 1; // south, assuming quad or hex cells from a structured grid conversion
+1015:         size_t third_face = iface.length - 1; // will be Face.top for structured grid
+1016:         if (using_structured_grid) {
+1017:             first_face = Face.north;
+1018:             second_face = Face.east;
+1019:         }
+1020:         number un_N = fabs(fs.vel.dot(iface[first_face].n));
+1021:         number un_E = fabs(fs.vel.dot(iface[second_face].n));
+1022:         number un_T = (myConfig.dimensions == 3) ? fabs(fs.vel.dot(iface[third_face].n)) : to!number(0.0);
+1023:         if (myConfig.stringent_cfl) {
+1024:             // Compute the speed with the shortest length and the highest speed.
+1025:             number un_max = fmax(un_N, un_E);
+1026:             number minLength = fmin(iLength, jLength);
+1027:             if (myConfig.dimensions == 3) {
+1028:                 un_max = fmax(un_max, un_T);
+1029:                 minLength = fmin(minLength, kLength);
+1030:             }
+1031:             signal = (un_max + fs.gas.a) / minLength;
+1032:         } else {
+1033:             // Compute the signal speed in each index direction.
+1034:             number signalN = (un_N + fs.gas.a) / jLength;
+1035:             signal = fmax(signal, signalN);
+1036:             number signalE = (un_E + fs.gas.a) / iLength;
+1037:             signal = fmax(signal, signalE);
+1038:             if (myConfig.dimensions == 3) {
+1039:                 number signalT = (un_T + fs.gas.a) / kLength;
+1040:                 signal = fmax(signal, signalT);
+1041:             }
+1042:         }
+1043:         this.signal_hyp = signal; // store hyperbolic signal for STS
+1044:         // Factor for the viscous time limit.
+1045:         // See Swanson, Turkel and White (1991)
+1046:         // This factor is not included if viscosity is zero.
+1047:         if (myConfig.viscous && (fs.gas.mu > 10.0e-23)) {
+1048:             auto gmodel = myConfig.gmodel;
+1049:             number gam_eff = gmodel.gamma(fs.gas);
+1050:             // Need to sum conductivities for thermal nonequilibrium.
+1051:             number k_total = fs.gas.k;
+1052:             version(multi_T_gas) {
+1053:                 foreach(k_value; fs.gas.k_modes) { k_total += k_value; }
+1054:             }
+1055:             number Prandtl = fs.gas.mu * gmodel.Cp(fs.gas) / k_total;
+1056:             signal += 4.0 * myConfig.viscous_factor * (fs.gas.mu + fs.mu_t)
+1057:                 * gam_eff / (Prandtl * fs.gas.rho)
+1058:                 * 1.0/(L_min^^2) * myConfig.viscous_signal_factor;
+1059:         }
+1060:         this.signal_parab = signal - this.signal_hyp; // store parabolic signal for STS
+1061:         version(turbulence) {
+1062:             number turbulent_signal = myConfig.turb_model.turbulent_signal_frequency(*fs);
+1063:             turbulent_signal *= myConfig.turbulent_signal_factor;
+1064:             signal = fmax(signal, turbulent_signal);
+1065:             this.signal_parab = fmax(signal_parab, turbulent_signal);
+1066:         }
+1067:         version(MHD) {
+1068:             if (myConfig.MHD) {
+1069:                 assert(myConfig.stringent_cfl, "MHD seems to only works if stringent_cfl is used.");
+1070:                 // Gas dynamics speed

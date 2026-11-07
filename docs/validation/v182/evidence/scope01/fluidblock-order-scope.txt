@@ -1,0 +1,65 @@
+1479:     } // end jacobian_nonzero_pattern()
+1480: 
+1481:     void evaluate_jacobian(FluxCalculator fluxCalculatorForPreconditioner)
+1482:     {
+1483:         /*
+1484:           Higher level method used to evaluate the flow Jacobian attached to the FluidBlock object.
+1485:          */
+1486: 
+1487:         // zero entries
+1488:         flowJacobian.local.aa[] = 0.0;
+1489: 
+1490:         // temporarily change flux calculator
+1491:         auto flux_calculator_save = myConfig.flux_calculator;
+1492:         myConfig.flux_calculator = fluxCalculatorForPreconditioner;
+1493: 
+1494:         // temporarily change interpolation order
+1495:         shared int interpolation_order_save = GlobalConfig.interpolation_order;
+1496:         myConfig.interpolation_order = to!int(flowJacobian.spatial_order);
+1497: 
+1498:         // copy some data for later use
+1499:         if (myConfig.viscous) {
+1500:             foreach(cell; cells) { cell.grad_save.copy_values_from(*(cell.grad)); }
+1501:         }
+1502:         if (flowJacobian.spatial_order >= 2) {
+1503:             foreach(cell; cells) { cell.gradients_save.copy_values_from(*(cell.gradients)); }
+1504:         }
+1505:         if (myConfig.reacting) {
+1506:             foreach(cell; cells) {
+1507:                 cell.clear_source_vector();
+1508:                 cell.add_thermochemical_source_vector(thermochem_source, 1.0);
+1509:                 cell.Q_save.copy_values_from(cell.Q);
+1510:             }
+1511:         }
+1512: 
+1513:         // the real-valued finite difference needs a base residual (R0)
+1514:         version(complex_numbers) { } // do nothing
+1515:         else {
+1516:             foreach(cell; cells) {
+1517:                 if (cell.doNotPerturb) continue;
+1518:                 evalRHS(0, 0, cell.cell_list, cell.face_list, cell);
+1519:             }
+1520:         }
+1521: 
+1522:         // fill out the rows of the Jacobian for a cell
+1523:         foreach(cell; cells) {
+1524:             if (cell.doNotPerturb) continue;
+1525:                 /*
+1526:                 debug {
+1527:                     writefln("cell.id= %d, pos= %s ", cell.id, cell.pos[0]);
+1528:                     foreach (cl; cell.cell_list) writef("[%d: %s] ", cl.id, cl.pos[0]);
+1529:                     writeln();
+1530:                 }
+1531:                 */
+1532:             evaluate_cell_contribution_to_jacobian(cell);
+1533:         }
+1534: 
+1535:         // add boundary condition corrections to boundary cells
+1536:         apply_jacobian_bcs();
+1537: 
+1538:         // return flux calculator to its original state
+1539:         myConfig.flux_calculator = flux_calculator_save;
+1540: 
+1541:         // return the interpolation order to its original state
+1542:         myConfig.interpolation_order = interpolation_order_save;
+1543:     } // end evaluate_jacobian()

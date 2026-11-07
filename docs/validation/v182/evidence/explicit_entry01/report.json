@@ -1,0 +1,134 @@
+{
+  "sourceReviewCompleted": true,
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "files": [
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/globalconfig.d",
+      "sha256": "528be1b2326b38ce8b130e2db9697ed5daaedcc12bf07e714b7c094dfedc1b3c",
+      "ranges": [
+        [
+          103,
+          116
+        ],
+        [
+          154,
+          173
+        ],
+        [
+          220,
+          235
+        ],
+        [
+          2418,
+          2430
+        ]
+      ],
+      "excerpt": "globalconfig.d.txt",
+      "excerptSHA256": "89e526f367c407ce5b2325a060c6942545644f010ace46c307893aa6422123d0"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/lua-modules/globalconfig.lua",
+      "sha256": "6438b804942b4ea781cfdf57eda8def3d2dbba427b0a6c95e9ee56ea5029be83",
+      "ranges": [
+        [
+          10,
+          75
+        ],
+        [
+          125,
+          160
+        ]
+      ],
+      "excerpt": "lua-modules__globalconfig.lua.txt",
+      "excerptSHA256": "fe34671cdb52209c60f48ed6737aeaecf5f7987f8fe8da5af3553fb2da9cdcc6"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluidfvcell.d",
+      "sha256": "f59144600c35e2dfbdfb3d6688a12807ea35dead144604f183f933db18981942",
+      "ranges": [
+        [
+          998,
+          1070
+        ]
+      ],
+      "excerpt": "fluidfvcell.d.txt",
+      "excerptSHA256": "743bbec6b3552c5628d43d6f98334f06c4a423a2af47395dac552593cfd0c76f"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluidblock.d",
+      "sha256": "09048332d929b4317db91278227fda1d2b8f5f25eb8858e8ba656f8f4646b109",
+      "ranges": [
+        [
+          1182,
+          1218
+        ]
+      ],
+      "excerpt": "fluidblock.d.txt",
+      "excerptSHA256": "96014ce51f97796226714373e97105abdf126d795937dc52139d5e2b22cf0160"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/simcore_gasdynamic_step.d",
+      "sha256": "e81184de518b43772fa76f7901e673fb9f48ae3c67f52e541effb8da4a29b6f4",
+      "ranges": [
+        [
+          1088,
+          1208
+        ]
+      ],
+      "excerpt": "simcore_gasdynamic_step.d.txt",
+      "excerptSHA256": "c916715454ba30b3fd9a6ac146da7db296f18593429acba27f791dd712faf30c"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/timemarching.d",
+      "sha256": "d80216eca42f386a34f52e4115813a9ddc532f1e02d3dbb28f93670e47508da5",
+      "ranges": [
+        [
+          420,
+          448
+        ]
+      ],
+      "excerpt": "timemarching.d.txt",
+      "excerptSHA256": "0fb306f1edf27296beea2ac8fe047949d91966e18999df2c9f1d2c52decb7755"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/commands/runsim.d",
+      "sha256": "953d941ef7096ffbfb3d8271e316a72e228d825d891598d6c77b6f8a9bea2413",
+      "ranges": [
+        [
+          342,
+          368
+        ]
+      ],
+      "excerpt": "commands__runsim.d.txt",
+      "excerptSHA256": "295caca98f1879b6091fb629e74b15f78742a6d26616dd85e70d899ef56af2f6"
+    }
+  ],
+  "proposedProfile": "rah-explicit-local-v1",
+  "implemented": false,
+  "nativeRuns": 0,
+  "newCFDSteps": 0,
+  "confirmed": [
+    "time-marching dispatches to native time integration",
+    "tvd_rk3 has three update stages and four flow time levels",
+    "local dt uses acoustic/convective and viscous signals plus turbulent source restriction",
+    "dt capped by global dt times local factor and dt_max",
+    "integrateInTime failure may only print a message; exit0 is insufficient"
+  ],
+  "requiredInputs": [
+    "fixed native lmr-run and original thermally-perfect air/Wilcox model",
+    "original mesh/wall mapping, Tw, freestream, turbulence and boundary data",
+    "explicit RK3/local stepping/stringent CFL and fixed diffusion/turbulence factors",
+    "interpolation/flux/limiter, initial local dt and local ratio cap",
+    "max step/pseudo-time/wall-clock, field/load cadence, native completion audit",
+    "group memory/disk/CPU limits and cleanup receipts"
+  ],
+  "limitations": [
+    "pseudo-time is not a physical trajectory",
+    "no proof of full-domain memory fit or convergence",
+    "thin near-wall cells may impose severe diffusion stiffness",
+    "old NK iteration comparison is not an explicit integration acceptance test"
+  ],
+  "physicalQualification": false,
+  "newQualifiedAreaM2": 0,
+  "elapsedSeconds": 0.6788080030000003
+}

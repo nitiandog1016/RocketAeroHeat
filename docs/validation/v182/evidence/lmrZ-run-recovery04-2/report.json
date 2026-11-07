@@ -1,0 +1,64 @@
+{
+  "schema": "RAH.EilmerProcess.v1",
+  "argv": [
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/ldc2-1.41.0-linux-x86_64/bin/ldc2",
+    "/mnt/e/RocketAeroHeat/outputs/v182_validation/build01/lmrZ-run-entry.o",
+    "/mnt/e/RocketAeroHeat/outputs/v182_validation/build01/lmrZ-run-native.o",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/extern/eqc/source/libeqc.a",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/extern/lua-5.4.3/install/lib/liblua.a",
+    "-L-no-pie",
+    "-L-ldl",
+    "-L-lz",
+    "-L-Wl,-E",
+    "-of=/mnt/e/RocketAeroHeat/outputs/v182_validation/build01/lmrZ-run-diagnostic"
+  ],
+  "cwd": "/mnt/e/RocketAeroHeat/outputs/v182_validation/build01",
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "runtimeSHA256": {
+    "lmr-debug": "dc0320435a3408faed21d9ff8b8fbdbd5f4ec8522067eb5a52b0586c2a3fa549",
+    "lmrZ-mpi-run": "b4e070a9e9cfa3b88d0dfb92bf26d7f25fee48339a8bbca225bc7920a73a7caf",
+    "lmrZ-run": "85748ec5b1801599c930c9ccc48a0fac9df1da72abc85780ed2ba546153d717f",
+    "lmr": "893efc0442e02f26bd1f9dc908ad79bde1936f10336dc084aedd7c160fe7a41a",
+    "lmr-mpi-run": "16d392e1c96b8aa8aaaf29549ae47571bfe8b1c35271cacc10b9a714820587e0",
+    "lmr-run": "5ba883260160f8efff7e240fd69c05f2bab82ff3c86ec73d14c64fb861d4561b",
+    "lmr-verify": "985bb5855e517090bb30cf143b4e2e16810d45777061b6ca7be5c940d8b44b13"
+  },
+  "limitSeconds": 50.16178926499998,
+  "outputLimitMiB": 256,
+  "addressSpaceLimitMiB": 8192,
+  "cpuCountLimit": 2,
+  "physicalQualification": false,
+  "groupRSSLimitMiB": 8192,
+  "memoryObservation": "sum-RSS-of-live-owned-process-group; shared-pages-may-be-counted-more-than-once",
+  "status": "process-completed",
+  "startedUTC": "2026-11-07T04:23:46Z",
+  "processId": 72,
+  "nativeExitCode": 0,
+  "stopReason": null,
+  "elapsedSeconds": 20.447958520999975,
+  "exitCodeScope": "supervised argv[0]; wrapper exit is not proof of child/native completion",
+  "peakObservedParentRSSBytes": 53952512,
+  "finalCaseBytes": 74163768,
+  "peakObservedGroupRSSBytes": 181182464,
+  "observedProcessPeakRSSBytes": {
+    "72": 53952512,
+    "73": 2744320,
+    "74": 2220032,
+    "75": 122265600
+  },
+  "liveGroupAfterCleanup": {},
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/native/eilmerOperatorDiagnostic.d": "209b45a805983694e8ae18686e77b879830184a3cbc5d79b2882f3bf302e614a",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/lmrZ-run.o": "9c0c67302d945bd605e89ea95b9bd5b8df1a9a391e213d086dd6a2ef17c5ff35",
+    "/mnt/e/RocketAeroHeat/outputs/v182_validation/recovery04.py": "67566847aa19e4a986114140e76a7b77b74c9cda38d6200076961523875c6380",
+    "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": "a794088e4b1a5212f6a270fc1c2240f09c3fb586b5a126108dd562086ec48874"
+  },
+  "inputStable": {
+    "/mnt/e/RocketAeroHeat/scripts/native/eilmerOperatorDiagnostic.d": true,
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/lmrZ-run.o": true,
+    "/mnt/e/RocketAeroHeat/outputs/v182_validation/recovery04.py": true,
+    "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": true
+  },
+  "inputsStable": true,
+  "passed": true
+}

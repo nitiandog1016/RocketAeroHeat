@@ -1,0 +1,103 @@
+10: local globalconfig = {}
+11: 
+12: configOptionsHidden = { -- hidden from user
+13:    -- set defaults here
+14:    solver_mode = "time-marching",
+15:    grid_format = "gziptext",
+16:    field_format = "gziptext",
+17:    --
+18:    gas_model_file = "gas-model.lua",
+19:    sticky_electrons = false,
+20:    include_quality = false,
+21:    --
+22:    udf_supervisor_file = "",
+23:    user_pad_length = 0,
+24:    nFluidBlocks = 0,
+25:    dimensions = 2,
+26:    true_centroids = false,
+27:    axisymmetric = false,
+28:    gravity = {x=0.0, y=0.0, z=0.0},
+29:    --
+30:    MHD = false,
+31:    MHD_static_field = false,
+32:    MHD_resistive = false,
+33:    divergence_cleaning = false,
+34:    c_h = 0.0,
+35:    divB_damping_length = 1.0,
+36:    electric_field_count = 1000000000,
+37:    electric_field_gmres_iters = -1,
+38:    solve_electric_field = false,
+39:    conductivity_model_name="none",
+40:    electric_field_work = false,
+41:    electron_pressure_convection_term = false,
+42:    --
+43:    strang_splitting = "full_T_full_R",
+44:    gasdynamic_update_scheme = "predictor_corrector",
+45:    dualtimestepping_update_scheme = "bdf1",
+46:    eval_udf_source_terms_at_each_stage = false,
+47:    residual_smoothing = false,
+48:    residual_smoothing_weight = 0.2,
+49:    residual_smoothing_type = "explicit",
+50:    residual_smoothing_iterations = 2,
+51:    with_local_time_stepping = false,
+52:    local_time_stepping_limit_factor = 10000,
+53:    with_super_time_stepping = false,
+54:    with_super_time_stepping_flexible_stages = false,
+55:    max_attempts_for_step = 3,
+56:    perturbation_for_real_differences = 1.0e-6,
+57:    --
+58:    solid_domain_cfl = 0.85,
+59:    coupling_with_solid_domains = "tight",
+60:    solid_has_isotropic_properties = true,
+61:    solid_domain_augmented_deriv_avg = true,
+62:    fluid_solid_bc_use_heat_transfer_coeff = false,
+63:    --
+64:    apply_bcs_in_parallel = true,
+65:    --
+66:    -- See struct FlowStateLimits in globalconfig.d.
+67:    flowstate_limits_max_velocity = 30000.0, -- m/s
+68:    flowstate_limits_max_tke = 0.01*1.0e38, -- guess for huge
+69:    flowstate_limits_min_tke = 0.0,
+70:    flowstate_limits_max_temp = 50000.0, -- Kelvin
+71:    flowstate_limits_min_temp = 0.0, -- Kelvin
+72:    flowstate_limits_min_pressure = 0.1, -- Pascals
+73:    --
+74:    user_specified_velocities_are_in_non_rotating_frame = true,
+75:    --
+
+125:    ac_alpha = 0.1,
+126:    --
+127:    radiation = false,
+128:    --
+129:    grid_motion = "none",
+130:    write_vertex_velocities = false,
+131:    udf_grid_motion_file = "dummy-grid-motion-file.txt",
+132:    --
+133:    shock_fitting_delay = 0.0,
+134:    shock_fitting_allow_flow_reconstruction = true,
+135:    shock_fitting_scale_factor = 0.5,
+136:    shock_fitting_filter_velocity_scale = 0.0,
+137:    shock_fitting_assume_symmetry_at_first_point = false,
+138:    --
+139:    viscous = false,
+140:    use_viscosity_from_cells = false,
+141:    inviscid_least_squares_type = "unweighted_normal",
+142:    viscous_least_squares_type = "weighted_normal",
+143:    spatial_deriv_calc = "least_squares",
+144:    spatial_deriv_locn = "cells",
+145:    include_ghost_cells_in_spatial_deriv_clouds = true,
+146:    include_boundary_faces_in_spatial_deriv_correction = false,
+147:    upwind_vertex_gradients = true,
+148:    save_convective_gradients = false,
+149:    save_viscous_gradients = false,
+150:    save_limiter_values = false,
+151:    save_residual_values = false,
+152:    save_timestep_values = false,
+153:    nic_write = 1,
+154:    njc_write = 1,
+155:    nkc_write = 1,
+156:    viscous_factor = 1.0,
+157:    viscous_factor_increment = 0.01,
+158:    viscous_delay = 0.0,
+159:    shear_stress_relative_limit = 1.0,
+160:    apply_shear_stress_relative_limit = false,

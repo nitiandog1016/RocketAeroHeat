@@ -1,0 +1,22 @@
+{
+  "passed": false,
+  "classificationCompleted": true,
+  "supersedesInterpretation": "scope01/report.json",
+  "rejectedOriginalStatement": "observed post-matrix residual matches original order 2",
+  "measuredPostMatrixVsOriginalOrder2MaxByCase": {
+    "real-state0": 0.40626357277547315,
+    "complex-state0": 0.40626357277547304,
+    "real-state2": 0.008628961075219224,
+    "complex-state2": 0.008628961075216447
+  },
+  "supportedSourceFact": "evaluate_jacobian saves/restores GlobalConfig.interpolation_order rather than block phase order",
+  "supportedNumericalFact": "The huge post-matrix real Jv difference is accounted for by its mismatched R0 offset to about 5.2e-16; this algebra does not isolate every state/cache side effect.",
+  "validNativeComparison": "Before-matrix mixed-order Jv vs independent central difference: late real <=3.94e-6, complex <=1.83e-9; initial both approximately0.2175, so initial gate remains failed.",
+  "productionCauseOfV181Proven": false,
+  "uniqueCauseUnknown": true,
+  "routeDecision": "Close current real-NK full-domain route; select native explicit local pseudo-time marching for next separately budgeted entry.",
+  "nativeRuns": 0,
+  "physicalQualification": false,
+  "newQualifiedAreaM2": 0,
+  "elapsedSeconds": 0.002391055000000031
+}

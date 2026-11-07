@@ -1,0 +1,156 @@
+{
+  "passed": true,
+  "scope": "classification-of-existing-diagnostic-columns",
+  "records": {
+    "real-state0": {
+      "matrixPostResidual_vs_originalOrder2": [
+        4.728709590332091e-09,
+        0.40626357277547315,
+        0.2047428138012301,
+        0.36399154866786826,
+        0.05882462468451835,
+        2.0842239702950704e-09,
+        2.5771310050295105e-09
+      ],
+      "validMixedJv_vs_central": [
+        0.1757384533262385,
+        0.043128853921749526,
+        0.2174874876031408,
+        0.034898305418011935,
+        0.06364905102446004,
+        0.020618073167013126,
+        0.024666373960832856
+      ],
+      "sparseJv_vs_central": [
+        0.1757459418013254,
+        0.043747658226683764,
+        0.21749675483616926,
+        0.04645730500709487,
+        0.06365178316626328,
+        0.020619160702487864,
+        0.029064382315611276
+      ],
+      "mismatchedR0ExplainsPostMatrixJv": [
+        8.170418566987927e-18,
+        0.0,
+        2.1804300386971878e-16,
+        2.468581053045253e-16,
+        1.4402536785122535e-16,
+        4.935233517743585e-17,
+        5.217380398305019e-17
+      ]
+    },
+    "complex-state0": {
+      "matrixPostResidual_vs_originalOrder2": [
+        4.728709590332091e-09,
+        0.40626357277547304,
+        0.2047428138012301,
+        0.36399154866786826,
+        0.05882462468451835,
+        2.0842239702950704e-09,
+        2.5771310050295105e-09
+      ],
+      "validMixedJv_vs_central": [
+        0.17573673076355972,
+        0.043128470661739395,
+        0.21748711297314097,
+        0.03489795200286678,
+        0.06364845599273745,
+        0.020617859692346776,
+        0.024666134549133058
+      ],
+      "sparseJv_vs_central": [
+        0.17573673076355933,
+        0.043128470661738805,
+        0.2174871129731401,
+        0.03489795200286651,
+        0.06364845599273719,
+        0.020617859692346776,
+        0.02466616026926719
+      ]
+    },
+    "real-state2": {
+      "matrixPostResidual_vs_originalOrder2": [
+        5.467788923368169e-10,
+        0.0010922512386444762,
+        1.0109674407627098e-10,
+        0.008628961075219224,
+        0.0019859694472904223,
+        2.802226210937768e-09,
+        1.956748726483422e-09
+      ],
+      "validMixedJv_vs_central": [
+        2.2714242489188222e-07,
+        8.919457168874088e-08,
+        3.938436700788548e-06,
+        1.044721166956196e-07,
+        2.0851296616188924e-07,
+        5.271227577664452e-08,
+        8.876902544058733e-08
+      ],
+      "sparseJv_vs_central": [
+        1.0113607940842423e-07,
+        1.9651743112999003e-07,
+        2.2876752839489598e-06,
+        3.922350179376532e-07,
+        1.2734124381552563e-07,
+        2.74734104109079e-07,
+        3.1873029078179663e-07
+      ],
+      "mismatchedR0ExplainsPostMatrixJv": [
+        1.2191460269369797e-16,
+        1.7510155044363007e-16,
+        1.4631525212978168e-16,
+        4.537374190384602e-16,
+        5.14384150144908e-16,
+        0.0,
+        0.0
+      ]
+    },
+    "complex-state2": {
+      "matrixPostResidual_vs_originalOrder2": [
+        5.467788122579283e-10,
+        0.0010922512386437732,
+        1.0109674407627098e-10,
+        0.008628961075216447,
+        0.001985969447290052,
+        2.802226210937768e-09,
+        1.956748726483424e-09
+      ],
+      "validMixedJv_vs_central": [
+        2.502388874400669e-10,
+        2.122850738815262e-10,
+        1.8247661990226443e-09,
+        1.1432270434715949e-10,
+        7.699260476624597e-11,
+        6.860929342762669e-11,
+        9.75897265924836e-11
+      ],
+      "sparseJv_vs_central": [
+        2.502384140081972e-10,
+        2.122849300975443e-10,
+        1.8247663208649789e-09,
+        1.143227657661209e-10,
+        7.699291479718443e-11,
+        6.860905013995944e-11,
+        9.758931499480513e-11
+      ]
+    }
+  },
+  "sourceSHA256": "09048332d929b4317db91278227fda1d2b8f5f25eb8858e8ba656f8f4646b109",
+  "observedOrderRestoration": "evaluate_jacobian saves GlobalConfig.interpolation_order, not the current block phase order; observed post-matrix residual matches original order 2.",
+  "invalidColumn": "Post-matrix J_native in real diagnostics used order-2 R0 after the matrix reset while Jv evaluates order 1. Do not call its enormous error a physical derivative error.",
+  "stillValidColumns": [
+    "J_mixed before matrix; native production mixed-order R0",
+    "J_sparse at explicit Jacobian order",
+    "J_central at matching order",
+    "R/U restoration observations"
+  ],
+  "correctedNativeRerun": false,
+  "productionCauseOfV181Proven": false,
+  "initialStateDerivativeGateStillFailed": true,
+  "realNKRouteStatus": "closed-for-full-domain; no proven minimal production fix closes all required checks",
+  "newNativeRuns": 0,
+  "physicalQualification": false,
+  "elapsedSeconds": 0.03693281000000015
+}
