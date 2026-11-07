@@ -1,0 +1,144 @@
+{
+  "schema": "RAH.HybridRegionDesign.v1",
+  "candidateID": "RAH-HYBRID-CONTRACTION-01",
+  "status": "design-selected-not-admitted",
+  "executionAuthorized": false,
+  "reason": "H2 edge and thermodynamic interface, actual volume meshes, boundaries, source controls and budgets not yet closed",
+  "baseline": {
+    "faces": 19752,
+    "areaM2": 1.964629256571555,
+    "Mach": 5,
+    "altitudeM": 30000,
+    "alphaDeg": 20,
+    "betaDeg": 0,
+    "wallTemperatureGivenK": 300,
+    "axis": "X",
+    "nose": "+X",
+    "zeroIncidenceVelocity": "-X",
+    "newSolvedAreaM2": 0,
+    "newPhysicalQualification": false
+  },
+  "evidence": {
+    "diagnosis": "evidence/analysis02/report.json",
+    "originalFaceIDs": "evidence/selection01/region_geometry.json",
+    "independentVerification": "evidence/selection01/report.json"
+  },
+  "global": {
+    "method": "3D thermally-perfect Euler",
+    "engine": "Eilmer5.0.0",
+    "numericalCarrier": "rah-explicit-workspace-v1 real transient; new model/config not yet tested",
+    "wall": "inviscid slip, no wall heat qualification",
+    "geometry": "full original body including base and wake; new independently verified outer mesh",
+    "output": [
+      "p",
+      "T",
+      "rho",
+      "velocityXYZ",
+      "h",
+      "h0",
+      "entropy",
+      "Mach",
+      "sourceFrame",
+      "modelAndEnergyReference",
+      "applicability"
+    ]
+  },
+  "engineering": {
+    "method": "reference-enthalpy and streamtube/axisymmetric-analog for applicable attached regions",
+    "reference": "Riley NASA-TM-107838 chapter3/4 AppendixH",
+    "legacy": "Thwaites/Head remain comparisons",
+    "notEnoughForInlet": [
+      "theta",
+      "H"
+    ],
+    "requiredForCutInlet": [
+      "bothTangentialVelocityProfiles",
+      "normalVelocityProfile",
+      "temperatureProfile",
+      "densityProfile",
+      "turbulenceModelVariables",
+      "massMomentumEnergyFluxes",
+      "compatibleBoundaryCharacteristics"
+    ]
+  },
+  "local": {
+    "method": "thermally-perfect SA-Edwards RANS, fully turbulent assumption explicit; laminar control separate",
+    "wallFaceCount": 7838,
+    "wallAreaM2": 0.7198603834559664,
+    "fullCircumference": true,
+    "upstream": "physical nose included; no guessed internal upstream boundary-layer inlet",
+    "cutXM": -0.894458635012947,
+    "provisionalTrustedEndXM": -0.7445491361082476,
+    "extensionTestCutXM": -1.1942776328223483,
+    "extensionWallFaceCount": 9678,
+    "extensionWallAreaM2": 0.9080195575741575,
+    "cutRingVertices": 46,
+    "artificialPhysicalCap": false,
+    "farBoundaryExtentM": null,
+    "boundaries": "after H2 shock/flow evidence; mixed inflow/outflow characteristics; reject backflow at assumed simple exit",
+    "nearWall": "preserve covered physical wall and independent spacing/y+/heat-convergence evidence; old full mesh/min19 layers unchanged"
+  },
+  "physics": {
+    "gas": "official ThermallyPerfectGas species air",
+    "tabulatedRangeK": [
+      200,
+      6000
+    ],
+    "outsideTable": "endpoint cp extension observed; physical validity unqualified until supported",
+    "energy": "all interfaces bind identical enthalpy reference and actual model energy definition; do not add k for SA",
+    "wallFluxSign": "positive into wall",
+    "solidWallTemperatureSolved": false
+  },
+  "validation": {
+    "euler": "new small geometry + same-EOS shock/expansion conservation control, not old Wilcox small rerun",
+    "attachedHeat": "exact SA flat-plate example numerical control and independent reference-enthalpy checks; variable-cp extension distinct",
+    "interaction": "Coleman-Stollery15deg in NASA/TM2013-216604 AppendixA; original source/profile/uncertainty pending",
+    "target3DQualification": false,
+    "convergence": "retain original -8 and heat/y+/stability gates with residual definitions mapped",
+    "interfaceCriteriaToFreezeBeforeCFD": [
+      "p/q overlap norm and heat-peak difference",
+      "signed power/flux tolerances",
+      "exit/farfield sensitivity",
+      "near-wall refinement",
+      "source thermodynamics and turbulence sensitivity"
+    ],
+    "noUniformFill": true,
+    "noSmoothingClosure": true,
+    "noAreaDoubleCounting": true
+  },
+  "resources": {
+    "hostMemoryGiB": 16,
+    "wslAddressSpaceLimitGiB": 8,
+    "threads": 2,
+    "actualGlobalCells": null,
+    "actualLocalCells": null,
+    "ghostCells": null,
+    "meshFaces": null,
+    "estimatedPeakBytes": null,
+    "measuredPeakRSSBytes": null,
+    "measuredPeakVirtualBytes": null,
+    "runtimeSeconds": null,
+    "feedbackIterations": null,
+    "knownPartialArrayBytes": "64*NincludingGhost*neq (Euler5; SA6), excludes objects/faces/gradients/grid/GC/profiles/I-O",
+    "speedupClaim": null,
+    "sequence": "global, engineering, local, optional feedback; no simultaneous resident full fields"
+  },
+  "next": {
+    "phase": "H2",
+    "action": "implement named Euler preparation/external-state contract and reference-enthalpy operator; then freeze new small geometry/control and estimate resources before registering native budget",
+    "offlineBudgetSeconds": 120,
+    "offlineParentLimitSeconds": 60,
+    "offlineOutputLimitMiB": 16,
+    "CFDBudget": null,
+    "buildBudget": null,
+    "automaticContinuation": false
+  },
+  "stops": [
+    "invalid thermodynamic state or missing compatible boundary source",
+    "unclosed geometry/resource budget",
+    "outlet/farfield perturbation not acceptable",
+    "failed original convergence/heat gates cannot become qualified",
+    "two successive rounds without the predeclared improvement trigger route review"
+  ],
+  "otherRegions": "all original wall faces retained in denominator; base/remaining afterbody/protuberance require separate applicable solutions"
+}

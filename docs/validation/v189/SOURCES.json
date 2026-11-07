@@ -1,0 +1,92 @@
+{
+  "schema": "RAH.HybridSourceSelection.v1",
+  "date": "2026-11-07",
+  "status": "H1-source-selection-not-runtime-validation",
+  "fixedSourceFiles": [
+    {
+      "url": "https://github.com/su2code/SU2/blob/7048fd35f56d4bf52e586429d6746a36a10255f8/LICENSE.md",
+      "gitBlobSHA1": "bce3315e4c4dc93b6643d0daf1dbf25a6ba4b545"
+    },
+    {
+      "url": "https://github.com/su2code/SU2/blob/7048fd35f56d4bf52e586429d6746a36a10255f8/SU2_CFD/src/solvers/CEulerSolver.cpp",
+      "gitBlobSHA1": "8380bfdf60dfaddaab8f29e3c07fec0c9f3c39f0"
+    },
+    {
+      "url": "https://github.com/OpenFOAM/OpenFOAM-13/blob/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/thermophysicalModels/specie/thermo/janaf/janafThermoI.H",
+      "gitBlobSHA1": "9514a512a961b046cdf85b3d7bb9408fd249c6b7"
+    },
+    {
+      "url": "https://github.com/OpenFOAM/OpenFOAM-13/blob/18870c24d21c6b982e2cdec27b2f59738cca5f90/applications/modules/shockFluid/shockFluid.C",
+      "gitBlobSHA1": "043af9dbe4dd1d437a701b9a5b1c9ff5a87f7d7f"
+    },
+    {
+      "url": "https://github.com/OpenFOAM/OpenFOAM-13/blob/18870c24d21c6b982e2cdec27b2f59738cca5f90/applications/modules/shockFluid/thermophysicalPredictor.C",
+      "gitBlobSHA1": "4d2a278237bbad5eabf41cfe372afe886bd407fc"
+    }
+  ],
+  "eilmer": {
+    "version": "5.0.0",
+    "commit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+    "license": "GPL-3.0-or-later; extern components have their own licenses",
+    "sourceBinding": "evidence/eilmer_source_binding.json",
+    "decision": "selected for first Euler implementation and conditional SA-Edwards local candidate",
+    "limitations": [
+      "New Euler/SA combinations not tested",
+      "200-6000 K pseudo-air table; endpoint Cp extension does not grant physical validity",
+      "StaticFlowProfile nearest-point copy is not a characteristic or conservative coupling guarantee"
+    ]
+  },
+  "su2": {
+    "version": "8.6.0",
+    "commit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+    "licenseFile": "LGPL-2.1 LICENSE.md",
+    "decision": "reserve; no reopening failed full-domain or NACA tasks",
+    "scope": "CEulerSolver.cpp BC_Riemann PT/PD branches read marker scalars, not ordinary pointwise inlet profile"
+  },
+  "openfoam": {
+    "version": "Foundation 13",
+    "commit": "18870c24d21c6b982e2cdec27b2f59738cca5f90",
+    "license": "GPL-3.0-or-later",
+    "decision": "reserve, not installed or benchmarked",
+    "scope": "shockFluid, janaf and mappedFixedValue capability reviewed; no combined boundary/heat validation"
+  },
+  "papers": [
+    {
+      "id": "Riley1992",
+      "url": "https://ntrs.nasa.gov/citations/19920016036",
+      "report": "NASA-TM-107838",
+      "reviewed": "Chapter 3/4 and Appendix H; H.6/H.7 visual check PDF page index133 (printed117)",
+      "adopt": "reference enthalpy and streamline metric/axisymmetric analog for eligible attached regions",
+      "limitation": "Not an implemented three-dimensional separated boundary layer solver"
+    },
+    {
+      "id": "Head1958",
+      "url": "https://naca.central.cranfield.ac.uk/handle/1826.2/3720",
+      "report": "ARC R&M3152",
+      "reviewed": "record/abstract; existing code uses compressibility reference treatment",
+      "adopt": "retain existing engineering comparison",
+      "limitation": "Full original equations not reverified this round; incompressible plane formulation not hypersonic3D qualification"
+    },
+    {
+      "id": "HeMorgan1994",
+      "url": "https://doi.org/10.1017/S0001924000050181",
+      "reviewed": "publisher abstract and exact Eilmer example",
+      "adopt": "SA-Edwards fixed-T numerical near-wall heat control",
+      "limitation": "Experiment transitional, sample fully turbulent ideal air; no current project validation"
+    },
+    {
+      "id": "MarvinBrownGnoffo2013",
+      "url": "https://ntrs.nasa.gov/citations/20140010683",
+      "report": "NASA/TM-2013-216604",
+      "reviewed": "Appendix A tables A.2,A.5,A.6 and figure A.2 visually checked, PDF indices22,23,25,26",
+      "adopt": "Coleman-Stollery15deg pressure and dimensional wall heat reference for later interaction validation",
+      "limitation": "Original experiment paper, profile and uncertainty extraction pending; compression case is not target3D contraction"
+    }
+  ],
+  "publicDocumentLinks": [
+    "https://gdtk.uqcloud.net/docs/eilmer/eilmer-reference-manual/",
+    "https://gdtk.uqcloud.net/docs/eilmer/examples-catalogue/",
+    "https://su2code.github.io/docs_v7/Setup-Guide-NICFD/"
+  ],
+  "newPhysicalQualification": false
+}
