@@ -45,7 +45,13 @@ thermalB=thermal.boundaryLayer;
 expectedTaw=airRecoveryTemperature(300,1500,sqrt(0.72));
 assert(strcmp(thermalB.thermalPropertyMode,'thermallyPerfect'));
 assert(abs(thermalB.recoveryTemperature(id)-expectedTaw)<1e-8);
-assert(abs(thermalB.referenceTemperature(id)- ...
+[~,h300]=airThermalProperties(300);
+[~,hRef]=airThermalProperties(thermalB.referenceTemperature(id));
+assert(abs(hRef-h300-0.22*sqrt(0.72)*1500^2/2)<1e-5);
+assert(strcmp(thermalB.referencePropertyModel,'referenceEnthalpy'));
+legacyCfg=cfg; legacyCfg.heating.referencePropertyModel='linearTemperature';
+legacy=calcBoundaryLayerState(m,fs,legacyCfg);
+assert(abs(legacy.boundaryLayer.referenceTemperature(id)- ...
     (300+0.22*(expectedTaw-300)))<1e-8);
 assert(contains(thermalB.recoveryTemperatureMethod,'焓恢复'));
 caloricCfg=cfg;
@@ -59,7 +65,7 @@ assert(abs(caloricB.recoveryTemperature(id)-caloricTaw)<1e-8);
 assert(abs(caloricB.referenceTemperature(id)- ...
     thermalB.referenceTemperature(id))>1);
 assert(abs(caloricB.skinFrictionCoefficient(id)- ...
-    thermalB.skinFrictionCoefficient(id))>1e-6);
+    legacy.boundaryLayer.skinFrictionCoefficient(id))>1e-6);
 % 模型域外热状态不得用于层流积分；定比热对照模式仍可显式计算。
 m.boundaryLayerEdge.temperature=70*ones(n,1);
 invalid=calcBoundaryLayerState(m,fs,cfg);

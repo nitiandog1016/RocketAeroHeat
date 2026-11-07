@@ -153,8 +153,7 @@ for j=1:nt
     localTe=edge.temperature(:); localP=edge.pressure(:);
     localTe(heat.noseFace)=Taw(heat.noseFace,j);
     localP(heat.noseFace)=fs.pressure;
-    reference=localTe+0.5*(initial-localTe)+ ...
-        0.22*(Taw(:,j)-localTe);
+    reference=airReferenceTemperature(localTe,initial,Taw(:,j),fs,cfg);
     mu=1.458e-6*reference.^(3/2)./(reference+110.4);
     localNu=mu.*fs.R.*reference./localP;
     active=eligible(:,j);
@@ -216,6 +215,7 @@ result.reasonNames=coverage.reasonNames;
 result.referenceLaw=struct('edgeTemperature',Te,'edgePressure',p, ...
     'exponent',exponent,'referenceViscosity0',nu0, ...
     'gasConstant',freestreams{1}.R);
+result.referenceLaw.referencePropertyModel=heat.referencePropertyModel;
 if strcmp(airMode,'thermallyPerfect')
     result.referenceLaw.thermalPropertyMode=airMode;
     result.referenceLaw.referenceCp0=cp0;

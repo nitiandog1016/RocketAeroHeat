@@ -1,6 +1,6 @@
 function mesh = calcSurfaceHeating(mesh,freestream,cfg)
 %CALCSURFACEHEATING 计算附着流侧壁的工程对流热流密度。
-% 算法：Eckert 参考温度法估算输运性质；有三维准流线时，层流
+% 算法：Eckert 参考焓反解温度以估算输运性质；有三维准流线时，层流
 % 使用沿程 Thwaites 型动量积分及局部速度梯度；已转捩湍流使用
 % von Karman 动量积分 + Ludwieg-Tillmann Cf。没有三维准流线时
 % 湍流使用局部平板 Cf_t=0.0592/Re_s*^0.2，层流也退回局部平板
@@ -77,7 +77,7 @@ L=max(mesh.V(:,1))-min(mesh.V(:,1));
 nearTip=s<0.01*L;
 allowed=allowed & ~nearTip;
 
-%% 3. Eckert 参考温度与局部 Reynolds 数
+%% 3. 相容参考焓温度与局部 Reynolds 数
 Te=e.temperature; U=e.speed;
 recoverLam=sqrt(Pr); recoverTurb=Pr^(1/3);
 if strcmp(airMode,'thermallyPerfect')
@@ -106,9 +106,10 @@ end
 % 沿完整可用路径判定，最后才筛去热物性越界的热流面元。
 % 连续介质失效已沿路径传播，其面元不能再进入转捩 Reynolds 判据。
 flowAllowed=allowed & ~continuum.unresolvedFace;
-% 参考温度 T*=Te+0.5(Tw-Te)+0.22(Taw-Te)。
-TrefLam=Te+0.5*(Tw-Te)+0.22*(TawLam-Te);
-TrefTurb=Te+0.5*(Tw-Te)+0.22*(TawTurb-Te);
+[TrefLam,referenceLam]=airReferenceTemperature(Te,Tw,TawLam,freestream,cfg);
+[TrefTurb,referenceTurb]=airReferenceTemperature(Te,Tw,TawTurb,freestream,cfg);
+thermalPropertyUnavailableFace=thermalPropertyUnavailableFace | ...
+    (allowed & (~referenceLam.validFace | ~referenceTurb.validFace));
 rhoRefLam=e.pressure./(freestream.R*TrefLam);
 rhoRefTurb=e.pressure./(freestream.R*TrefTurb);
 muRefLam=1.458e-6*TrefLam.^(3/2)./(TrefLam+110.4);
@@ -248,7 +249,7 @@ calculated=allowed|noseFill;
 h=struct;
 h.sidewallModel=sidewallModel;
 if hasIntegratedLayer
-    h.method=['Eckert 参考温度 + 沿流线 Thwaites 型层流积分/' ...
+    h.method=[referenceLam.method ' + 沿流线 Thwaites 型层流积分/' ...
         '湍流积分 + Reynolds 比拟'];
     h.boundaryLayerMethod=boundaryLayer.method;
     h.boundaryLayerValidity=boundaryLayer.scope;
@@ -256,7 +257,7 @@ if hasIntegratedLayer
     h.turbulentScope=turbulentBoundaryLayer.scope;
     h.turbulentBoundaryLayer=turbulentBoundaryLayer;
 else
-    h.method='Eckert 参考温度 + 局部平板 Cf + Reynolds 比拟';
+    h.method=[referenceLam.method ' + 局部平板 Cf + Reynolds 比拟'];
     h.boundaryLayerMethod='无三维流线：局部平板层流近似';
     h.boundaryLayerValidity='忽略沿程压力梯度';
     h.turbulentMethod='无三维流线：局部平板 Cf_t=0.0592/Re_s^0.2';
@@ -271,6 +272,12 @@ end
 h.edgeMethod=e.method;
 h.thermalPropertyMethod=airMode;
 h.thermalPropertyScope=airScope;
+h.referencePropertyModel=referenceLam.model;
+h.referencePropertyMethod=referenceLam.method;
+h.referenceTemperatureLaminar=TrefLam;
+h.referenceTemperatureTurbulent=TrefTurb;
+h.referenceEnthalpyLaminar=referenceLam.referenceEnthalpy;
+h.referenceEnthalpyTurbulent=referenceTurb.referenceEnthalpy;
 h.thermalPropertyUnavailableFace=thermalPropertyUnavailableFace;
 h.wallTemperatureUnavailableFace=~isfinite(Tw);
 if strcmp(airMode,'thermallyPerfect')

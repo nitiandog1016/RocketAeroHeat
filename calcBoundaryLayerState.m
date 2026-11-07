@@ -12,7 +12,7 @@ function mesh = calcBoundaryLayerState(mesh,freestream,cfg)
 % 与侧壁热流使用同一焓模型；显式定比热模式保留旧公式。
 % 此法是附着层流的准二维近似，不是三维边界层或湍流分离求解器。
 
-%% 1. 检查外流与路径，计算 Eckert 参考温度下的运动黏度
+%% 1. 检查外流与路径，计算相容参考焓温度下的运动黏度
 if nargin<3, cfg=struct; end
 if ~isfield(mesh,'boundaryLayerEdge') || ~isfield(mesh,'surfaceStreamlines')
     error('RocketAeroHeat:BoundaryLayer:Input', ...
@@ -53,7 +53,7 @@ else
     Taw=Te+sqrt(Pr)*U.^2/(2*cp);
     recoveryMethod='定比热温差恢复';
 end
-Tref=Te+0.5*(Tw-Te)+0.22*(Taw-Te);
+[Tref,referenceState]=airReferenceTemperature(Te,Tw,Taw,freestream,cfg);
 rhoRef=pe./(freestream.R*Tref);
 muRef=1.458e-6*Tref.^(3/2)./(Tref+110.4);
 nuRef=muRef./rhoRef;
@@ -107,7 +107,7 @@ outside=eligible & isfinite(lambda) & lambda>0.1;
 valid=isfinite(Cf) & Cf>0;
 b=struct;
 b.method=['沿三维准流线的变黏度 Thwaites 型层流动量积分 + ' ...
-    recoveryMethod];
+    recoveryMethod ' + ' referenceState.method];
 b.scope=sprintf(['附着层流工程近似；速度梯度取上游最多 %d 步' ...
     '准流线割线；%s；不能解析三维边界层或分离再附'], ...
     gradientSteps,airScope);
@@ -121,6 +121,9 @@ b.pressureGradientParameter=lambda;
 b.edgeVelocityGradient=gradient;
 b.skinFrictionCoefficient=Cf;
 b.referenceTemperature=Tref;
+b.referencePropertyModel=referenceState.model;
+b.referencePropertyMethod=referenceState.method;
+b.referenceEnthalpy=referenceState.referenceEnthalpy;
 b.referenceKinematicViscosity=nuRef;
 b.wallTemperatureByFace=Tw;
 b.thermalPropertyUnavailableFace=e.algebraicallyValid(:) & ...

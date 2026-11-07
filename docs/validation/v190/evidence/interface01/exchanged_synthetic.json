@@ -1,0 +1,102 @@
+{
+  "schema": "RAH.HybridExternalState.v1",
+  "faceIDs": [
+    1,
+    2,
+    3
+  ],
+  "originalAreaM2": 3.0,
+  "surfaceSHA256": "282ddaa3736f0c76a334ac66e48d3cb40938044ea8a2a62a98cd2f92a6c0add1",
+  "conditionSHA256": "79f0e6117252fb637e80247f5e326c5c92c3eb8fcb035d41d5a1f794405417ec",
+  "model": {
+    "name": "synthetic-caloric-control",
+    "R": 287.0,
+    "cp": 1004.5,
+    "temperatureRangeK": [
+      200,
+      2000
+    ],
+    "energyReference": "h=cp*T",
+    "entropyReference": "cp*log(T/300)-R*log(p/100000)"
+  },
+  "modelSHA256": "24ae9437fc7fa45aa2cb690edc3f8ed350a603d02ded6f9198b1d2b58fe075f6",
+  "sourceFilesSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v190_validation\\interface01\\synthetic_source.json": "a96edd946173c2797c1520cd92bfe47ddfce88b722f4f76105d25dd75c20b9cc"
+  },
+  "snapshot": 2,
+  "fields": {
+    "densityKgm3": [
+      0.023228803716608595,
+      0.03484320557491289,
+      0.039198606271777
+    ],
+    "internalEnergyJkg": [
+      215250.0,
+      358750.0,
+      574000.0
+    ],
+    "enthalpyJkg": [
+      301350.0,
+      502250.0,
+      803600.0
+    ],
+    "entropyJkgK": [
+      1122.750602557878,
+      1372.8995015829332,
+      1676.3233743333662
+    ],
+    "pressurePa": [
+      2000.0,
+      5000.0,
+      9000.0
+    ],
+    "temperatureK": [
+      300.0,
+      500.0,
+      800.0
+    ],
+    "velocityMps": [
+      [
+        -900.0,
+        20.0,
+        100.0
+      ],
+      [
+        -600.0,
+        -40.0,
+        200.0
+      ],
+      [
+        -450.0,
+        80.0,
+        250.0
+      ]
+    ],
+    "totalEnthalpyJkg": [
+      711550.0,
+      703050.0,
+      939300.0
+    ]
+  },
+  "algebraicInterfacePassed": true,
+  "thermodynamicErrors": {
+    "densityKgm3": 0.0,
+    "internalEnergyJkg": 0.0,
+    "enthalpyJkg": 0.0,
+    "entropyJkgK": 0.0
+  },
+  "method": "mapped Euler state, same-EOS checked; not yet an attached boundary-layer edge",
+  "attachedEdgeQualified": false,
+  "engineeringHeatReady": false,
+  "physicalQualification": false,
+  "wallHeatFluxWm2": [
+    null,
+    null,
+    null
+  ],
+  "wallTemperatureSolvedK": [
+    null,
+    null,
+    null
+  ]
+}

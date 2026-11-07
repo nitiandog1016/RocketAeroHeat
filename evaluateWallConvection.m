@@ -17,7 +17,17 @@ exponent=law.exponent(:); nu0=law.referenceViscosity0(:);
 if any([numel(Te),numel(p),numel(exponent),numel(nu0)]~=numel(Twall))
     error('RocketAeroHeat:WallConvection:Law','参考性质数据尺寸不一致。');
 end
-Tref=Te+0.5*(Twall-Te)+0.22*(Taw-Te);
+% 新结果使用同一参考焓算子；无标记的历史law保留原线性参考温度。
+referenceCfg.heating.airThermalModel='caloricallyPerfect';
+referenceCfg.heating.referencePropertyModel='linearTemperature';
+if isfield(law,'thermalPropertyMode')
+    referenceCfg.heating.airThermalModel=law.thermalPropertyMode;
+end
+if isfield(law,'referencePropertyModel')
+    referenceCfg.heating.referencePropertyModel=law.referencePropertyModel;
+end
+[Tref,referenceState]=airReferenceTemperature(Te,Twall,Taw, ...
+    struct('R',law.gasConstant,'gamma',1.4),referenceCfg);
 if any(~isfinite(Tref) | Tref<=0 | ~isfinite(p) | p<=0)
     error('RocketAeroHeat:WallConvection:Temperature', ...
         '壁温使参考温度或外缘压力无效。');
@@ -26,7 +36,8 @@ mu=1.458e-6*Tref.^(3/2)./(Tref+110.4);
 nu=mu.*law.gasConstant.*Tref./p;
 h=hBase.*(nu./nu0).^exponent;
 % ln(nu)=常数+2.5 ln(Tref)-ln(Tref+110.4)。
-dh=h.*exponent.*0.5.*(2.5./Tref-1./(Tref+110.4));
+dh=h.*exponent.*referenceState.temperatureDerivativeByWallTemperature.* ...
+    (2.5./Tref-1./(Tref+110.4));
 if isfield(law,'thermalPropertyMode') && ...
         strcmp(law.thermalPropertyMode,'thermallyPerfect')
     [cpCurrent,cpDerivative]=airEnthalpySecantCp(Taw,Twall);

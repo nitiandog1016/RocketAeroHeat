@@ -123,7 +123,18 @@ if isfield(mesh,'boundaryLayerEdge') && ...
             Te(noseFace)=Taw(noseFace);
             p(noseFace)=e.freestream.pressure;
         end
-        reference=Te+0.5*(initial-Te)+0.22*(Taw-Te);
+        % 按热流实际使用的方法构造反馈基准，旧保存结果保持旧式。
+        referenceCfg.heating.airThermalModel='caloricallyPerfect';
+        referenceCfg.heating.referencePropertyModel='linearTemperature';
+        if isfield(mesh.heating,'thermalPropertyMethod')
+            referenceCfg.heating.airThermalModel=mesh.heating.thermalPropertyMethod;
+        end
+        if isfield(mesh.heating,'referencePropertyModel')
+            referenceCfg.heating.referencePropertyModel=mesh.heating.referencePropertyModel;
+        end
+        % 历史对象可能只保存R；定cp参考温度与cp数值无关，干空气采用1.4识别。
+        reference=airReferenceTemperature(Te,initial,Taw, ...
+            struct('R',e.freestream.R,'gamma',1.4),referenceCfg);
         mu=1.458e-6*reference.^(3/2)./(reference+110.4);
         nu0=mu.*e.freestream.R.*reference./p;
         eligible=mesh.heating.eligibleFace(:);
@@ -135,6 +146,7 @@ if isfield(mesh,'boundaryLayerEdge') && ...
         law=struct('edgeTemperature',Te,'edgePressure',p, ...
             'exponent',exponent,'referenceViscosity0',nu0, ...
             'gasConstant',e.freestream.R);
+        law.referencePropertyModel=referenceCfg.heating.referencePropertyModel;
         if isfield(mesh.heating,'thermalPropertyMethod') && ...
                 strcmp(mesh.heating.thermalPropertyMethod,'thermallyPerfect')
             law.thermalPropertyMode='thermallyPerfect';

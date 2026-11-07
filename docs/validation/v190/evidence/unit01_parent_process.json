@@ -1,0 +1,15 @@
+{
+  "command": [
+    "D:/matlab/bin/matlab.exe",
+    "-batch",
+    "restoredefaultpath;maxNumCompThreads(1);addpath(pwd);addpath(fullfile(pwd,'tests'));r=testAirReferenceTemperature();fid=fopen('outputs/v190_validation/unit01/report.json','w');fprintf(fid,'%s',jsonencode(r));fclose(fid);"
+  ],
+  "maximumSeconds": 60,
+  "maximumMemoryBytes": 4294967296,
+  "status": "terminal",
+  "processID": 33996,
+  "exitCode": 1,
+  "elapsedSeconds": 16.14100000000326,
+  "sampledPeakMemoryBytes": 699789312,
+  "stoppedByBudget": null
+}

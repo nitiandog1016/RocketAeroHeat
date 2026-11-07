@@ -1,0 +1,15 @@
+{
+  "command": [
+    "D:/matlab/bin/matlab.exe",
+    "-batch",
+    "restoredefaultpath;maxNumCompThreads(1);addpath(pwd);addpath(fullfile(pwd,'tests'));r=compareReferenceEnthalpyRocket('outputs/v190_validation/real02');fid=fopen('outputs/v190_validation/real02/report.json','w');fprintf(fid,'%s',jsonencode(r));fclose(fid);"
+  ],
+  "maximumSeconds": 40,
+  "maximumMemoryBytes": 4294967296,
+  "status": "terminal",
+  "processID": 40496,
+  "exitCode": 0,
+  "elapsedSeconds": 30.219000000011874,
+  "sampledPeakMemoryBytes": 837799936,
+  "stoppedByBudget": null
+}
