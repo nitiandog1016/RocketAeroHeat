@@ -1,0 +1,81 @@
+{
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "files": [
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/lua-modules/output.lua",
+      "sha256": "390fb944af7d77c0e19728a2f91cbe128e85c6b11705e7dd61a01874d0e6d62c",
+      "spans": [
+        [
+          8,
+          36
+        ],
+        [
+          70,
+          135
+        ]
+      ],
+      "excerpt": "lua-modules__output.lua.txt"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/timemarching.d",
+      "sha256": "d80216eca42f386a34f52e4115813a9ddc532f1e02d3dbb28f93670e47508da5",
+      "spans": [
+        [
+          115,
+          123
+        ],
+        [
+          166,
+          175
+        ],
+        [
+          649,
+          658
+        ],
+        [
+          731,
+          751
+        ],
+        [
+          789,
+          807
+        ],
+        [
+          880,
+          897
+        ]
+      ],
+      "excerpt": "timemarching.d.txt"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluidblock.d",
+      "sha256": "09048332d929b4317db91278227fda1d2b8f5f25eb8858e8ba656f8f4646b109",
+      "spans": [
+        [
+          1004,
+          1048
+        ]
+      ],
+      "excerpt": "fluidblock.d.txt"
+    },
+    {
+      "source": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/commands/runsim.d",
+      "sha256": "953d941ef7096ffbfb3d8271e316a72e228d825d891598d6c77b6f8a9bea2413",
+      "spans": [
+        [
+          342,
+          367
+        ]
+      ],
+      "excerpt": "commands__runsim.d.txt"
+    }
+  ],
+  "newNativeRuns": 0,
+  "notes": [
+    "Direct lmr-run uses default verbosity; wrapper introduction is conditional, not mandatory.",
+    "initLoadsFiles initializes only; checkpoint is first native load index 0.",
+    "Transient Linf uses dUdt[0], not delta-U; RK3 stage-0 residual timing differs from final saved state.",
+    "Printed mixed-variable L2 is unscaled and not the NK relative-residual metric; no physical convergence claimed."
+  ],
+  "elapsedSeconds": 0.017733715000005645
+}

@@ -1,0 +1,45 @@
+1004:     void compute_Linf_residuals()
+1005:     // Compute Linf residuals for conserved quantities.
+1006:     // This is similar to the calculation above of
+1007:     // residual, but this differs by a factor of the timestep size
+1008:     // because here the residual is taken as R(U) = dU/dt.
+1009:     // We will assume that dUdt[0] is up-to-date.
+1010:     {
+1011:         auto cqi = myConfig.cqi;
+1012:         Linf_residuals.copy_values_from(cells[0].dUdt[0]);
+1013:         foreach (i; 0 .. cqi.n) {
+1014:             Linf_residuals[i] = fabs(Linf_residuals[i]);
+1015:             foreach (cell; cells) {
+1016:                 Linf_residuals[i] = fmax(Linf_residuals[i], fabs(cell.dUdt[0][i]));
+1017:             }
+1018:         }
+1019:     } // end compute_Linf_residuals()
+1020: 
+1021:     @nogc
+1022:     void compute_L2_residual()
+1023:     {
+1024:         auto cqi = myConfig.cqi;
+1025:         L2_residual = 0.0;
+1026:         foreach (cell; cells) {
+1027:             if (cqi.mass==0) L2_residual += fabs(cell.dUdt[0][cqi.mass])^^2;
+1028: 	    L2_residual += fabs(cell.dUdt[0][cqi.xMom])^^2;
+1029: 	    L2_residual += fabs(cell.dUdt[0][cqi.yMom])^^2;
+1030: 	    if (cqi.threeD) { L2_residual += fabs(cell.dUdt[0][cqi.zMom])^^2; }
+1031: 	    L2_residual += fabs(cell.dUdt[0][cqi.totEnergy])^^2;
+1032: 	    version(turbulence) {
+1033:                 foreach(it; 0 .. myConfig.turb_model.nturb){
+1034:                     L2_residual += fabs(cell.dUdt[0][cqi.rhoturb+it])^^2;
+1035:                 }
+1036: 	    }
+1037:             version(multi_species_gas) {
+1038:                 foreach(isp; 0 .. myConfig.gmodel.n_species){
+1039:                     L2_residual += fabs(cell.dUdt[0][cqi.species+isp])^^2;
+1040:                 }
+1041: 	    }
+1042:             version(multi_T_gas) {
+1043:                 foreach(imode; 0 .. myConfig.gmodel.n_modes){
+1044:                     L2_residual += fabs(cell.dUdt[0][cqi.modes+imode])^^2;
+1045:                 }
+1046: 	    }
+1047:         }
+1048:     } // end compute_L2_residual()

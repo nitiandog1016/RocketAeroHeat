@@ -1,0 +1,96 @@
+8: function output.write_control_file(fileName)
+9:    local f = assert(io.open(fileName, "w"))
+10:    f:write("{\n")
+11:    f:write(string.format('"dt_init": %.18e,\n', config.dt_init))
+12:    f:write(string.format('"dt_max": %.18e,\n', config.dt_max))
+13:    f:write(string.format('"cfl_scale_factor": %.18e,\n', config.cfl_scale_factor))
+14:    f:write(string.format('"stringent_cfl": %s,\n', tostring(config.stringent_cfl)))
+15:    f:write(string.format('"viscous_signal_factor": %.18e,\n', config.viscous_signal_factor))
+16:    f:write(string.format('"turbulent_signal_factor": %.18e,\n', config.turbulent_signal_factor))
+17:    f:write(string.format('"residual_smoothing_weight": %.18e,\n', config.residual_smoothing_weight))
+18:    f:write(string.format('"residual_smoothing_iterations": %d,\n', config.residual_smoothing_iterations))
+19:    f:write(string.format('"residual_smoothing_type": "%s",\n',
+20: 			 config.residual_smoothing_type))
+21:    f:write(string.format('"fixed_time_step": %s,\n', tostring(config.fixed_time_step)))
+22:    f:write(string.format('"print_count": %d,\n', config.print_count))
+23:    f:write(string.format('"cfl_count": %d,\n', config.cfl_count))
+24:    f:write(string.format('"max_time": %.18e,\n', config.max_time))
+25:    f:write(string.format('"max_step": %d,\n', config.max_step))
+26:    -- f:write(string.format('"dt_plot": %.18e,\n', config.dt_plot)) -- 2024-08-07 move to dt_plot schedule in config
+27:    f:write(string.format('"dt_history": %.18e,\n', config.dt_history))
+28:    f:write(string.format('"dt_loads": %.18e,\n', config.dt_loads))
+29:    f:write(string.format('"write_loads_at_step": %d,\n', config.write_loads_at_step))
+30:    f:write(string.format('"write_flow_solution_at_step": %d,\n', config.write_flow_solution_at_step))
+31:    f:write(string.format('"snapshot_count": %d,\n', config.snapshot_count))
+32:    f:write(string.format('"number_total_snapshots": %d,\n', config.number_total_snapshots))
+33:    f:write(string.format('"halt_now": %d\n', config.halt_now))
+34:    -- Note, also, no comma on last entry in JSON object. (^^^: Look up one line and check!)
+35:    f:write("}\n")
+36:    f:close()
+
+70:    f:write(string.format('"gravity": [%.18e, %.18e, %.18e],\n', config.gravity.x, config.gravity.y, config.gravity.z))
+71:    f:write(string.format('"strang_splitting": "%s",\n', config.strang_splitting))
+72:    f:write(string.format('"gasdynamic_update_scheme": "%s",\n', config.gasdynamic_update_scheme))
+73:    f:write(string.format('"dualtimestepping_update_scheme": "%s",\n', config.dualtimestepping_update_scheme))
+74:    f:write(string.format('"residual_smoothing": %s,\n', tostring(config.residual_smoothing)))
+75:    f:write(string.format('"with_local_time_stepping": %s,\n', tostring(config.with_local_time_stepping)))
+76:    f:write(string.format('"local_time_stepping_limit_factor": %d,\n', tostring(config.local_time_stepping_limit_factor)))
+77:    f:write(string.format('"with_super_time_stepping": %s,\n', tostring(config.with_super_time_stepping)))
+78:    f:write(string.format('"with_super_time_stepping_flexible_stages": %s,\n', tostring(config.with_super_time_stepping_flexible_stages)))
+79:    f:write(string.format('"max_attempts_for_step": %d,\n', config.max_attempts_for_step))
+80:    f:write(string.format('"ignore_low_T_thermo_update_failure": %s,\n', tostring(config.ignore_low_T_thermo_update_failure)))
+81:    f:write(string.format('"suggested_low_T_value": %.18e,\n', config.suggested_low_T_value))
+82:    f:write(string.format('"perturbation_for_real_differences": %.18e,\n', config.perturbation_for_real_differences))
+83:    if #config.cfl_schedule > 0 then
+84:       -- The table already has some values.
+85:       -- We will presume that they are valid entries, however,
+86:       -- if enough people get it wrong, we'll put some check here.
+87:    else
+88:       -- Fall back to making up a schedule from cfl_value.
+89:       config.cfl_schedule = {{0.0, config.cfl_value},}
+90:    end
+91:    local cfl_schedule_length = #config.cfl_schedule
+92:    f:write(string.format('"cfl_schedule_length": %d,\n', cfl_schedule_length))
+93:    local cfl_values = {}
+94:    local cfl_times = {}
+95:    for i,cfl_pair in ipairs(config.cfl_schedule) do
+96:       cfl_times[#cfl_times+1] = cfl_pair[1]
+97:       cfl_values[#cfl_values+1] = cfl_pair[2]
+98:    end
+99:    f:write('"cfl_schedule_values": [')
+100:    for i,e in ipairs(cfl_values) do
+101:       f:write(string.format('%.18e', e))
+102:       if i < #cfl_values then f:write(', ') end
+103:    end
+104:    f:write('],\n')
+105:    f:write('"cfl_schedule_times": [')
+106:    for i,e in ipairs(cfl_times) do
+107:       f:write(string.format('%.18e', e))
+108:       if i < #cfl_times then f:write(', ') end
+109:    end
+110:    f:write('],\n')
+111:    --
+112:    if type(config.dt_plot) == 'number' then
+113:       -- The user has written a single number; turn it into the required table.
+114:       config.dt_plot = {{0.0, config.dt_plot}}
+115:    end
+116:    -- At this point, we should have a table, but it may be empty.
+117:    if #config.dt_plot > 0 then
+118:       -- The table already has some values.
+119:       -- We will presume that they are valid entries, however,
+120:       -- if enough people get it wrong, we'll put some check here.
+121:    else
+122:       -- Fall back to making up a schedule from dt_plot_value.
+123:       config.dt_plot = {{0.0, config.dt_plot_value},}
+124:    end
+125:    local dt_plot_schedule_length = #config.dt_plot
+126:    f:write(string.format('"dt_plot_schedule_length": %d,\n', dt_plot_schedule_length))
+127:    local dt_plot_values = {}
+128:    local dt_plot_times = {}
+129:    for i,dt_plot_pair in ipairs(config.dt_plot) do
+130:       dt_plot_times[#dt_plot_times+1] = dt_plot_pair[1]
+131:       dt_plot_values[#dt_plot_values+1] = dt_plot_pair[2]
+132:    end
+133:    f:write('"dt_plot_schedule_values": [')
+134:    for i,e in ipairs(dt_plot_values) do
+135:       f:write(string.format('%.18e', e))

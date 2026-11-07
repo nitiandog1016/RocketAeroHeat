@@ -20,6 +20,8 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     mesh=Path(manifest['mesh']['nativeSourcePath'])
     assert sha(mesh)==manifest['mesh']['sourceSHA256'], '原网格身份发生变化'
     locks=[manifest_path,mesh,Path(__file__),Path(__file__).with_name('readEilmerNative.py'),Path(__file__).with_name('auditEilmerCompletion.py')]
+    if 'explicit' in manifest['condition']:
+        locks += [Path(__file__).with_name(n) for n in ['eilmerExplicitProfile.py','auditEilmerExplicitCompletion.py']]
     for name,digest in manifest['filesSHA256'].items():
         assert sha(case/name)==digest, '准备输入发生变化: '+name
         locks.append(case/name)
@@ -35,12 +37,17 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
             assert sha(path)==digest, '原生输入来源不符: '+path
             locks.append(Path(path))
         # exit0的准备过程不能替代几何/热壁合同；负体积或错CFL不得进入求解。
-        if 'development' in manifest['condition']:
+        if 'development' in manifest['condition'] or 'explicit' in manifest['condition']:
             assert previous.get('uniformInitialFieldBitwiseIdentical') and previous.get('nativeGridReused')
             reuse=manifest['reusedPreparation'];geometry=Path(reuse['geometryAudit'])
             assert sha(geometry)==reuse['geometryAuditSHA256']
             audit=json.loads(geometry.read_text());assert audit['passed'] and audit['nativeGridSHA256']==sha(case/'lmrsim/grid/grid-0000')
-            audit_numerics(json.loads((case/'lmrsim/nk-config').read_text()),manifest['condition'])
+            if 'explicit' in manifest['condition']:
+                from eilmerExplicitProfile import audit_explicit_config
+                audit_explicit_config(json.loads((case/'lmrsim/config').read_text()),manifest['condition'],
+                                      json.loads((case/'lmrsim/control').read_text()))
+            else:
+                audit_numerics(json.loads((case/'lmrsim/nk-config').read_text()),manifest['condition'])
             locks.append(geometry)
         else:audit_prepared(case)
         # 大场终态保存和输入核验需要余量；原生预算与整个阶段预算分别记录。
@@ -48,7 +55,7 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
         assert seconds>reserve
         native_seconds=int(seconds-(time.monotonic()-started)-reserve)
         assert native_seconds>0,'来源核验后没有剩余原生预算'
-        if manifest['condition'].get('development',{}).get('profile')=='rah-nk-real-v1':
+        if manifest['condition'].get('development',{}).get('profile')=='rah-nk-real-v1' or 'explicit' in manifest['condition']:
             # 直接监督固定实数二进制，取得真实求解退出码，绕开system()包装状态。
             commands=[['lmr-run','--max-cpus=2','--max-wall-clock='+str(native_seconds)]]
         else:
@@ -78,6 +85,10 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     except Exception as error:
         result['error']=repr(error)
     finally:
+        if stage=='run' and result['commands'] and 'outputSHA256' not in result:
+            # 原生已经结束但完成审核失败时也绑定原始场，便于只读定位，不追改原回执。
+            result['outputSHA256']={str(p):sha(p) for p in (case/'lmrsim').rglob('*') if p.is_file()}
+            result['outputBinding']='at-supervisor-completion-audit-failed'
         result['elapsedSeconds']=time.monotonic()-started
         (record/'report.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8')
     return result

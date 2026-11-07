@@ -1,0 +1,92 @@
+115:     // Create progress file and add 0th step entry.
+116:     initTimeMarchingProgressFile();
+117: 
+118:     if (GlobalConfig.writeTransientResiduals && GlobalConfig.is_master_task && (snapshotStart == 0)) {
+119:         std.file.write(lmrCfg.transResidFile, "# step time wall-clock mass x-mom y-mom z-mom energy L2 mass-balance\n");
+120:     }
+121: 
+122:     SimState.current_tindx = snapshotStart;
+123: 
+
+166: 
+167:     initHistoryCells();
+168: 
+169:     if (GlobalConfig.write_loads && (SimState.current_loads_tindx == 0)) {
+170:         if (GlobalConfig.is_master_task) {
+171:             initLoadsFiles();
+172:         }
+173:     }
+174: 
+175:     // For a simulation with shock fitting, the files defining the rails for
+
+649:             if (GlobalConfig.write_loads &&
+650:                 ( ((SimState.time >= SimState.t_loads) && !SimState.loads_just_written) ||
+651:                   SimState.step == GlobalConfig.write_loads_at_step )) {
+652:                 writeLoadsFiles_timemarching();
+653:                 SimState.loads_just_written = true;
+654:                 SimState.current_loads_tindx = SimState.current_loads_tindx + 1;
+655:                 SimState.t_loads = nextXxxxTime(SimState.time, GlobalConfig.dt_loads);
+656:                 GC.collect();
+657:                 GC.minimize();
+658:             }
+
+731:             write("STOP-REASON: ");
+732:             if (caughtException) {
+733:                 writeln("An exception was caught during the time step.");
+734:             }
+735:             if (SimState.time >= SimState.target_time) {
+736:                 writefln("maximum-time");
+737:                 writefln("Reached target simulation time of %g seconds.", SimState.target_time);
+738:             }
+739:             if (SimState.step >= GlobalConfig.max_step) {
+740:                 writefln("maximum-steps");
+741:                 writefln("Reached maximum number of steps with step=%d.", SimState.step);
+742:             }
+743:             if (GlobalConfig.halt_now == 1) { writeln("Halt set in control file."); }
+744:             if (SimState.maxWallClockSeconds > 0 && (wall_clock_elapsed > SimState.maxWallClockSeconds)) {
+745:                 writefln("maximum-wall-clock");
+746:                 writefln("Reached maximum wall-clock time with elapsed time %s.", to!string(wall_clock_elapsed));
+747:             }
+748:             writefln("FINAL-STEP: %d", SimState.step);
+749:             writefln("FINAL-TIME: %g", SimState.time);
+750:             stdout.flush();
+751:         }
+
+789: void writeLoadsFiles_timemarching()
+790: {
+791:     alias cfg = GlobalConfig;
+792:     if (cfg.is_master_task) {
+793:         writefln("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+794:         writefln("+   Writing loads at step = %6d; t = %8.3e s    +", SimState.step, SimState.time);
+795:         writefln("++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+796:     }
+797: 
+798:     if (cfg.is_master_task) {
+799:         init_current_loads_indx_dir(SimState.current_loads_tindx);
+800:     }
+801:     version(mpi_parallel) { MPI_Barrier(MPI_COMM_WORLD); }
+802:     wait_for_current_indx_dir(SimState.current_loads_tindx);
+803:     writeLoadsToFile(SimState.time, SimState.current_loads_tindx);
+804:     if (cfg.is_master_task) {
+805:         update_loads_metadata_file(SimState.time, SimState.step, SimState.current_loads_tindx);
+806:     }
+807: }
+
+880:     // Add entry in times file
+881:     auto f = File(lmrCfg.timesFile, "a");
+882:     string key = format(lmrCfg.snapshotIdxFmt, SimState.current_tindx);
+883:     f.writefln("'%s':", key);
+884:     f.writefln("   step: %d", SimState.step);
+885:     f.writefln("   time: %.18e", SimState.time);
+886:     f.writefln("   dt:   %.18e", SimState.dt_global);
+887:     if (isNaN(SimState.cfl_max)) {
+888:         // Then it has never been set.
+889:         // This might occur on initialisation, or if we are running with fixed timestepping.
+890:         // Put a value of -1.0 as the signal to outside world.
+891:         f.writeln("   cfl:  -1.0");
+892:     }
+893:     else {
+894:         f.writefln("   cfl:  %.18e", SimState.cfl_max);
+895:     }
+896:     double wall_clock_elapsed = to!double((Clock.currTime() - SimState.wall_clock_start).total!"msecs"())/1000.0;
+897:     f.writefln("   wall-clock-elapsed: %.3f", wall_clock_elapsed);

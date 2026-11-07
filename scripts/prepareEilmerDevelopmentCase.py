@@ -4,6 +4,7 @@ import argparse,copy,json,os,shutil,time
 from prepareEilmerRocketCase import validate_condition,make_job
 from runEilmerProcess import run,sha,COMMIT
 from readEilmerNative import need,audit_numerics,audit_run_scope
+from eilmerExplicitProfile import audit_explicit_config,settings
 
 
 def prepare(source,prepared,audit,case,record,condition,seconds,output_mib=1024):
@@ -19,8 +20,13 @@ def prepare(source,prepared,audit,case,record,condition,seconds,output_mib=1024)
     # 只复用已绑定的配置/网格/初态；源对象可已运行，但其已审核初场必须逐字保持。
     for p,h in prior['nativeInputSHA256'].items():need(sha(p)==h,'源准备输入变化: '+p)
     c=validate_condition(condition);old=copy.deepcopy(m['condition'])
-    changed=copy.deepcopy(c);changed.pop('development');changed['maxNewtonSteps']=old['maxNewtonSteps']
-    need(changed==old and 'development' in c,'发展入口不得修改原物理工况')
+    changed=copy.deepcopy(c)
+    if 'explicit' in c:
+        changed.pop('explicit');old.pop('development',None);old.pop('maxNewtonSteps')
+        need(changed==old,'显式入口不得修改原物理工况')
+    else:
+        changed.pop('development');changed['maxNewtonSteps']=old['maxNewtonSteps']
+        need(changed==old and 'development' in c,'发展入口不得修改原物理工况')
     audit_run_scope(dict(condition=c,mesh=m['mesh']))
     need(sha(m['mesh']['nativeSourcePath'])==m['mesh']['sourceSHA256'],'原网格变化')
     case.mkdir(parents=True);record.mkdir(parents=True)
@@ -40,12 +46,22 @@ def prepare(source,prepared,audit,case,record,condition,seconds,output_mib=1024)
     locks=[source/'case_manifest.json',Path(prepared),Path(audit),Path(__file__),case/'case_manifest.json',case/'job.lua',
            Path(__file__).with_name('prepareEilmerRocketCase.py'),Path(__file__).with_name('readEilmerNative.py')]
     locks += [Path(p) for p in prior['nativeInputSHA256']]
+    if 'explicit' in c:locks.append(Path(__file__).with_name('eilmerExplicitProfile.py'))
     result=dict(stage='prepare',case=str(case),passed=False,caseManifestSHA256=sha(case/'case_manifest.json'),commands=[],physicsQualified=False,newQualifiedAreaM2=0)
     try:
         process=run(['lmr','prep-sim','--job=job.lua'],case,record/'process00',seconds-(time.monotonic()-start),output_mib,locks)
         result['commands'].append(process);need(process['passed'],'原生准备失败')
-        audit_numerics(json.loads((case/'lmrsim/nk-config').read_text()),c)
-        need((case/'lmrsim/config').read_bytes()==(source/'lmrsim/config').read_bytes(),'非NK物理配置改变')
+        if 'explicit' in c:
+            cfg=json.loads((case/'lmrsim/config').read_text())
+            audit_explicit_config(cfg,c,json.loads((case/'lmrsim/control').read_text()))
+            previous_cfg=json.loads((source/'lmrsim/config').read_text())
+            allowed=set(settings(c['explicit']))|{p+s for p in ['cfl','dt_plot'] for s in ['_schedule_length','_schedule_times','_schedule_values']}
+            delta={key for key in set(cfg)|set(previous_cfg) if cfg.get(key)!=previous_cfg.get(key)}
+            need(delta<=allowed,'显式配置修改了未登记的物理或空间离散字段')
+            result['nativeConfigChangedKeys']=sorted(delta)
+        else:
+            audit_numerics(json.loads((case/'lmrsim/nk-config').read_text()),c)
+            need((case/'lmrsim/config').read_bytes()==(source/'lmrsim/config').read_bytes(),'非NK物理配置改变')
         for name in ['native-input-state.json','lmrsim/snapshots/0000/fluid-0000','lmrsim/grid/grid-0000']:
             need(sha(case/name)==sha(source/name),'原工况/网格/初场不等价: '+name)
         result.update(passed=True,uniformInitialFieldBitwiseIdentical=True,nativeGridReused=True,

@@ -54,18 +54,23 @@ def validate_condition(condition):
     c = dict(condition)
     mode = c.setdefault("flowMode", "explicitVelocity")
     common = {"flowMode", "pressurePa", "temperatureK", "wallTemperatureK", "maxNewtonSteps",
-              "stopRelativeResidual", "boundaryMarkers", "development"}
+              "stopRelativeResidual", "boundaryMarkers", "development", "explicit"}
     modes = {
         "explicitVelocity": {"velocityMps", "tkeM2s2", "omegaPerS", "targetMach"},
         "nativeMach": {"Mach", "alphaDeg", "betaDeg", "turbulenceIntensity", "eddyViscosityRatio"},
     }
     require(mode in modes, "flowMode 仅支持 explicitVelocity 或 nativeMach")
     require(not set(c) - common - modes[mode], "工况含未知参数")
-    for key in ["pressurePa", "temperatureK", "wallTemperatureK", "maxNewtonSteps", "stopRelativeResidual"]:
+    if 'explicit' in c:
+        from eilmerExplicitProfile import validate_explicit
+        require('development' not in c and 'maxNewtonSteps' not in c, '显式与NK配置不能混合')
+        c['explicit'] = validate_explicit(c['explicit'])
+    for key in ["pressurePa", "temperatureK", "wallTemperatureK", "stopRelativeResidual"] + ([] if 'explicit' in c else ["maxNewtonSteps"]):
         require(key in c, f"缺少 {key}")
         c[key] = number(c[key], key)
-    require(c["maxNewtonSteps"].is_integer(), "maxNewtonSteps 必须是正整数")
-    c["maxNewtonSteps"] = int(c["maxNewtonSteps"])
+    if 'explicit' not in c:
+        require(c["maxNewtonSteps"].is_integer(), "maxNewtonSteps 必须是正整数")
+        c["maxNewtonSteps"] = int(c["maxNewtonSteps"])
     require(c["stopRelativeResidual"] < 1, "相对残差目标必须小于1；不等价于物理收敛")
     if 'development' in c:
         d=c['development'];required={'profile','initialOrderSteps','loadsEvery','snapshotsEvery','snapshotCount'}
@@ -197,6 +202,10 @@ def lua_string(value):
 
 def make_job(mesh_native, c):
     """Lua名称逐项依据固定v5的bc/flowstate/nkconfig及官方SU2案例，不执行原生。"""
+    if 'explicit' in c:
+        from eilmerExplicitProfile import make_explicit_job
+        physical = dict(c); physical.pop('explicit'); physical['maxNewtonSteps'] = 1
+        return make_explicit_job(make_job(mesh_native, physical), c)
     f = lambda value: format(value, ".17g")
     if c["flowMode"] == "nativeMach":
         flow = f'''-- 按同一原生热完美气体求声速/输运，不能使用定gamma替代。

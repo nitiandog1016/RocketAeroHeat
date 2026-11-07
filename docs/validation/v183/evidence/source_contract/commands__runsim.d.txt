@@ -1,0 +1,26 @@
+342: 
+343:     final switch (solverMode) {
+344:     case SolverMode.steady:
+345:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Initialise Newton-Krylov simulation.");
+346:         // This is clunky but I need the information about tapered-blending here because
+347:         // it influences memory allocation.
+348:         JSONValue jsonData = readJSONfile(lmrCfg.nkCfgFile);
+349:         bool useTaperedBlending = false;
+350:         useTaperedBlending = getJSONbool(jsonData, "use_tapered_blending", useTaperedBlending);
+351: 
+352:         initNewtonKrylovSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock, useTaperedBlending);
+353: 
+354:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Perform Newton steps.");
+355:         performNewtonKrylovUpdates(snapshotStart, startCFL, maxCPUs, threadsPerMPITask);
+356:         break;
+357:     case SolverMode.transient:
+358:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Initialise transient simulation.");
+359:         initTimeMarchingSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);
+360: 
+361:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Perform integration in time.");
+362:         auto flag = integrateInTime(GlobalConfig.max_time);
+363:         if (flag != 0 && GlobalConfig.is_master_task) writeln("Note that integrateInTime failed.");
+364:         finalizeSimulation_timemarching();
+365:         break;
+366:     case SolverMode.dual_time_stepping:
+367:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Initialise Newton-Krylov simulation.");

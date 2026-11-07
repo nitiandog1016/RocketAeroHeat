@@ -142,6 +142,10 @@ def read_field(case,snapshot,ncells):
 def audit_run_scope(manifest):
     """未通过真实小例相容门槛的实数v1仅供有限诊断，禁止进入完整域或延长发展。"""
     c=manifest['condition']
+    if 'explicit' in c:
+        from eilmerExplicitProfile import validate_explicit
+        validate_explicit(c['explicit'])
+        need(manifest['mesh']['cells']<=1000,'显式完整域尚未登记候选预算；当前仅最小接口')
     if c.get('development',{}).get('profile')=='rah-nk-real-v1':
         need(manifest['mesh']['cells']<=1000 and c['maxNewtonSteps']<=8,
              'rah-nk-real-v1小例比较未通过；完整域/延长计算关闭，需独立新方案证据')
@@ -184,9 +188,13 @@ def audit_prepared(case):
         need(sha(case/name)==digest,'准备输入变化: '+name)
     gridpath=case/'lmrsim/grid/grid-0000';grid=read_grid(gridpath)
     mapping,coorderr=compare_source(grid,m['mesh']['nativeSourcePath'])
-    cfg=json.loads((case/'lmrsim/config').read_text());nk=json.loads((case/'lmrsim/nk-config').read_text())
+    cfg=json.loads((case/'lmrsim/config').read_text())
     need(cfg['dimensions']==3 and cfg['viscous'] and cfg['turbulence_model']=='k_omega','原生物理模型不符')
-    audit_numerics(nk,c)
+    if 'explicit' in c:
+        from eilmerExplicitProfile import audit_explicit_config
+        audit_explicit_config(cfg,c,json.loads((case/'lmrsim/control').read_text()))
+    else:
+        audit_numerics(json.loads((case/'lmrsim/nk-config').read_text()),c)
     walltag=c['boundaryMarkers']['wall'];wallid=grid['boundaries'][walltag]['index']
     wall=cfg['block_0']['boundary_'+str(wallid)]
     actions=wall['pre_spatial_deriv_action_at_bndry_faces']
@@ -244,7 +252,8 @@ def export_loads(case,loads,output,run_receipt):
          loads.name=='blk-0000-bndry-%d-wall.dat'%boundary['index'],'载荷位置/边界错误')
     metadata=np.atleast_2d(np.loadtxt(case/'lmrsim/loads/loads-metadata',skiprows=1))
     row=metadata[metadata[:,0]==int(loads.parent.name)]
-    need(len(row)==1 and row[0,2]>0 and row[0,2]<=m['condition']['maxNewtonSteps'],'载荷步骤来源不符')
+    limit=m['condition']['explicit']['maxSteps'] if 'explicit' in m['condition'] else m['condition']['maxNewtonSteps']
+    need(len(row)==1 and row[0,2]>0 and row[0,2]<=limit,'载荷步骤来源不符')
     a=np.genfromtxt(loads,names=True,deletechars='',encoding='utf8');a=np.atleast_1d(a)
     required=['pos.x','pos.y','pos.z','n.x','n.y','n.z','area','outsign','p','T','q_total','q_cond','q_diff']
     need(all(k in a.dtype.names for k in required),'载荷列不完整')
@@ -271,6 +280,10 @@ def export_loads(case,loads,output,run_receipt):
     output=Path(output);need(not output.exists(),'不覆盖原有原面CSV')
     method='Eilmer5 thermally-perfect air / Wilcox k-omega'
     numerics={}
+    if 'explicit' in m['condition']:
+        method += ' / rah-explicit-local-v1 TVD RK3 local pseudo-time (unconverged research)'
+        numerics=dict(numericsProfile='rah-explicit-local-v1',nativeNumberType='real',
+                      timeMeaning='local-pseudo-time-not-flight-time',compatibilityStatus='interface-only')
     if m['condition'].get('development',{}).get('profile')=='rah-nk-real-v1':
         method += ' / rah-nk-real-v1 real finite-difference Jv+ILU (comparison failed)'
         numerics=dict(numericsProfile='rah-nk-real-v1',nativeNumberType='real',

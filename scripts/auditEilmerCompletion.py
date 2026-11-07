@@ -19,6 +19,10 @@ def completion_log_for_receipt(case,receipt_path,receipt):
 
 def audit_completion(case,stdout):
     case=Path(case);text=Path(stdout).read_text(errors='replace')
+    manifest=json.loads((case/'case_manifest.json').read_text())
+    if 'explicit' in manifest.get('condition',{}):
+        from auditEilmerExplicitCompletion import audit_explicit_completion
+        return audit_explicit_completion(case,stdout,manifest)
     fatal=re.findall(r'^.*(?:OutOfMemoryError|Memory allocation failed|core\.exception\.).*$',text,re.M)
     if fatal:raise ValueError('native-fatal-error: '+fatal[0])
     reasons=re.findall(r'^STOP-REASON:\s*(.+)$',text,re.M)
