@@ -16,10 +16,18 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     manifest_path=case/'case_manifest.json'
     manifest=json.loads(manifest_path.read_text())
     assert manifest['schema']=='RAH.EilmerPreparedCase.v1' and manifest['sourceCommit']==COMMIT
-    audit_run_scope(manifest)
+    audit_run_scope(manifest,case)
+    admission=None;admission_locks=[]
+    if manifest['condition'].get('explicit',{}).get('profile')=='rah-explicit-local-development-v1':
+        from eilmerExplicitAdmission import audit_admission
+        admission,admission_locks=audit_admission(manifest,case)
+        assert stage=='run' and seconds==admission['budget']['runEntrySeconds'] and output_mib==admission['budget']['outputMiB'],'发展运行预算不符'
+        assert str(record)==admission['runRecord'] and not (case/'explicit-run-attempt.json').exists(),'已登记任务不可重复启动'
     mesh=Path(manifest['mesh']['nativeSourcePath'])
     assert sha(mesh)==manifest['mesh']['sourceSHA256'], '原网格身份发生变化'
     locks=[manifest_path,mesh,Path(__file__),Path(__file__).with_name('readEilmerNative.py'),Path(__file__).with_name('auditEilmerCompletion.py')]
+    locks += admission_locks
+    if admission is not None:locks.append(Path(__file__).with_name('eilmerExplicitAdmission.py'))
     if 'explicit' in manifest['condition']:
         locks += [Path(__file__).with_name(n) for n in ['eilmerExplicitProfile.py','auditEilmerExplicitCompletion.py']]
     for name,digest in manifest['filesSHA256'].items():
@@ -54,6 +62,7 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
         reserve=30 if manifest['mesh']['cells']>100000 else 5
         assert seconds>reserve
         native_seconds=int(seconds-(time.monotonic()-started)-reserve)
+        if admission is not None:native_seconds=min(native_seconds,admission['budget']['nativeWallClockSeconds'])
         assert native_seconds>0,'来源核验后没有剩余原生预算'
         if manifest['condition'].get('development',{}).get('profile')=='rah-nk-real-v1' or 'explicit' in manifest['condition']:
             # 直接监督固定实数二进制，取得真实求解退出码，绕开system()包装状态。
@@ -61,6 +70,10 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
         else:
             commands=[['lmr','run','--max-wall-clock='+str(native_seconds)]]
     record.mkdir(parents=True)
+    if admission is not None:
+        attempt=case/'explicit-run-attempt.json'
+        with attempt.open('x') as f:json.dump(dict(candidateSHA256=manifest['condition']['explicit']['candidateSHA256'],runRecord=str(record),automaticContinuation=0),f)
+        locks.append(attempt)
     shutil.copyfile(__file__,record/'executed_entry.py')
     result=dict(stage=stage,case=str(case),sourceCommit=COMMIT,caseManifestSHA256=sha(manifest_path),
                 physicsQualified=False,newQualifiedAreaM2=0,passed=False,commands=[])

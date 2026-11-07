@@ -139,13 +139,16 @@ def read_field(case,snapshot,ncells):
     return fields
 
 
-def audit_run_scope(manifest):
+def audit_run_scope(manifest,case=None):
     """未通过真实小例相容门槛的实数v1仅供有限诊断，禁止进入完整域或延长发展。"""
     c=manifest['condition']
     if 'explicit' in c:
-        from eilmerExplicitProfile import validate_explicit
+        from eilmerExplicitProfile import validate_explicit,DEVELOPMENT_PROFILE
         validate_explicit(c['explicit'])
-        need(manifest['mesh']['cells']<=1000,'显式完整域尚未登记候选预算；当前仅最小接口')
+        if c['explicit']['profile']==DEVELOPMENT_PROFILE:
+            # v184唯一原域在初始化耗尽内存；保留登记证据检查，但不再放行同一方案。
+            raise ValueError('rah-explicit-local-development-v1原完整域初始化OOM，当前方案关闭；需独立内存改动及新证据')
+        else:need(manifest['mesh']['cells']<=1000,'显式完整域尚未登记候选预算；当前仅最小接口')
     if c.get('development',{}).get('profile')=='rah-nk-real-v1':
         need(manifest['mesh']['cells']<=1000 and c['maxNewtonSteps']<=8,
              'rah-nk-real-v1小例比较未通过；完整域/延长计算关闭，需独立新方案证据')
@@ -281,8 +284,9 @@ def export_loads(case,loads,output,run_receipt):
     method='Eilmer5 thermally-perfect air / Wilcox k-omega'
     numerics={}
     if 'explicit' in m['condition']:
-        method += ' / rah-explicit-local-v1 TVD RK3 local pseudo-time (unconverged research)'
-        numerics=dict(numericsProfile='rah-explicit-local-v1',nativeNumberType='real',
+        profile=m['condition']['explicit']['profile']
+        method += ' / '+profile+' TVD RK3 local pseudo-time (unconverged research)'
+        numerics=dict(numericsProfile=profile,nativeNumberType='real',
                       timeMeaning='local-pseudo-time-not-flight-time',compatibilityStatus='interface-only')
     if m['condition'].get('development',{}).get('profile')=='rah-nk-real-v1':
         method += ' / rah-nk-real-v1 real finite-difference Jv+ILU (comparison failed)'

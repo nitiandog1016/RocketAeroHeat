@@ -1,0 +1,69 @@
+{
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "files": [
+    {
+      "path": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluidblock.d",
+      "sha256": "09048332d929b4317db91278227fda1d2b8f5f25eb8858e8ba656f8f4646b109",
+      "spans": [
+        [
+          237,
+          302
+        ],
+        [
+          2016,
+          2058
+        ],
+        [
+          2070,
+          2140
+        ]
+      ]
+    },
+    {
+      "path": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluidfvcell.d",
+      "sha256": "f59144600c35e2dfbdfb3d6688a12807ea35dead144604f183f933db18981942",
+      "spans": [
+        [
+          190,
+          220
+        ]
+      ]
+    },
+    {
+      "path": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/ufluidblock.d",
+      "sha256": "e0d2809b97ba71efab2f6b7f62e162b04054f3d0c6a4d9151cbc28a2692d481f",
+      "spans": [
+        [
+          283,
+          340
+        ]
+      ]
+    },
+    {
+      "path": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/globalconfig.d",
+      "sha256": "528be1b2326b38ce8b130e2db9697ed5daaedcc12bf07e714b7c094dfedc1b3c",
+      "spans": [
+        [
+          2418,
+          2430
+        ]
+      ]
+    }
+  ],
+  "directAccessCount": 37,
+  "totalCellsIncludingGhosts": 731814,
+  "equations": 7,
+  "timeLevels": 4,
+  "stageBuffers": 8,
+  "currentStageArrayPayloadBytes": 1311410688,
+  "proposedStageArrayPayloadBytes": 327852672,
+  "potentialPayloadSavingBytes": 983558016,
+  "allocationFormulaObserved": "Each U0..U3 and dUdt0..dUdt3 allocates N*neq*nftl; cell views use id*neq..(id+1)*neq.",
+  "patch": "patches/eilmer/explicit-dense-storage-v1.patch",
+  "patchSHA256": "0dd224f7470df1e125c9caf703522c5fea9910ea74e811f1cccda14aa44b069f",
+  "status": "unbuilt-allocation-only-draft",
+  "nativeRuns": 0,
+  "engineBuilds": 0,
+  "caveat": "Payload arithmetic only, not whole-process footprint or proof of the failed allocation. Full alias/bounds/native field equality validation pending. No assertion that saving is sufficient for 8GiB.",
+  "elapsedSeconds": 0.711455161
+}

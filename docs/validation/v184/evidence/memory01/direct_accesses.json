@@ -1,0 +1,187 @@
+[
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 274,
+    "text": "        celldata.U0.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 275,
+    "text": "        if (nftl>1) celldata.U1.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 276,
+    "text": "        if (nftl>2) celldata.U2.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 277,
+    "text": "        if (nftl>3) celldata.U3.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 278,
+    "text": "        if (nftl>4) celldata.U4.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 279,
+    "text": "        celldata.dUdt0.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 280,
+    "text": "        if (nftl>1) celldata.dUdt1.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 281,
+    "text": "        if (nftl>2) celldata.dUdt2.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 282,
+    "text": "        if (nftl>3) celldata.dUdt3.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 283,
+    "text": "        if (nftl>4) celldata.dUdt4.length = (ncells + nghost)*neq*nftl;"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2027,
+    "text": "        if (ftl==0) { dUdt = celldata.dUdt0; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2028,
+    "text": "        if (ftl==1) { dUdt = celldata.dUdt1; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2029,
+    "text": "        if (ftl==2) { dUdt = celldata.dUdt2; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2030,
+    "text": "        if (ftl==3) { dUdt = celldata.dUdt3; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2031,
+    "text": "        if (ftl==4) { dUdt = celldata.dUdt4; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2076,
+    "text": "        if (ftl==0) { dUdt = celldata.dUdt0; U = celldata.U0; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2077,
+    "text": "        if (ftl==1) { dUdt = celldata.dUdt1; U = celldata.U1; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2078,
+    "text": "        if (ftl==2) { dUdt = celldata.dUdt2; U = celldata.U2; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2079,
+    "text": "        if (ftl==3) { dUdt = celldata.dUdt3; U = celldata.U3; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2080,
+    "text": "        if (ftl==4) { dUdt = celldata.dUdt4; U = celldata.U4; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2117,
+    "text": "        if (ftl==0) { dUdt = celldata.dUdt0; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2118,
+    "text": "        if (ftl==1) { dUdt = celldata.dUdt1; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2119,
+    "text": "        if (ftl==2) { dUdt = celldata.dUdt2; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2120,
+    "text": "        if (ftl==3) { dUdt = celldata.dUdt3; }"
+  },
+  {
+    "path": "src/lmr/fluidblock.d",
+    "line": 2121,
+    "text": "        if (ftl==4) { dUdt = celldata.dUdt4; }"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 199,
+    "text": "        if (fvcd.U0){"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 201,
+    "text": "                        U[0] = fvcd.U0[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 202,
+    "text": "            if (nftl>1) U[1] = fvcd.U1[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 203,
+    "text": "            if (nftl>2) U[2] = fvcd.U2[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 204,
+    "text": "            if (nftl>3) U[3] = fvcd.U3[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 205,
+    "text": "            if (nftl>4) U[4] = fvcd.U4[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 210,
+    "text": "        if (fvcd.dUdt0){"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 212,
+    "text": "                        dUdt[0] = fvcd.dUdt0[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 213,
+    "text": "            if (nftl>1) dUdt[1] = fvcd.dUdt1[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 214,
+    "text": "            if (nftl>2) dUdt[2] = fvcd.dUdt2[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 215,
+    "text": "            if (nftl>3) dUdt[3] = fvcd.dUdt3[id*ncq + 0 .. id*ncq + ncq];"
+  },
+  {
+    "path": "src/lmr/fluidfvcell.d",
+    "line": 216,
+    "text": "            if (nftl>4) dUdt[4] = fvcd.dUdt4[id*ncq + 0 .. id*ncq + ncq];"
+  }
+]

@@ -27,7 +27,15 @@ def prepare(source,prepared,audit,case,record,condition,seconds,output_mib=1024)
     else:
         changed.pop('development');changed['maxNewtonSteps']=old['maxNewtonSteps']
         need(changed==old and 'development' in c,'发展入口不得修改原物理工况')
-    audit_run_scope(dict(condition=c,mesh=m['mesh']))
+    scoped=dict(condition=c,mesh=m['mesh']);audit_run_scope(scoped,case)
+    extra_locks=[]
+    if c.get('explicit',{}).get('profile')=='rah-explicit-local-development-v1':
+        from eilmerExplicitAdmission import audit_admission
+        admission,extra_locks=audit_admission(scoped,case)
+        need(seconds==admission['budget']['prepareSeconds'] and output_mib==admission['budget']['outputMiB'],'准备预算不符')
+        need(str(source)==admission['sourceCase'] and str(Path(prepared).resolve())==admission['evidence']['sourcePreparation']['path'] and
+             str(Path(audit).resolve())==admission['evidence']['sourceGeometry']['path'],'准备入口不是登记来源')
+        extra_locks.append(Path(__file__).with_name('eilmerExplicitAdmission.py'))
     need(sha(m['mesh']['nativeSourcePath'])==m['mesh']['sourceSHA256'],'原网格变化')
     case.mkdir(parents=True);record.mkdir(parents=True)
     shutil.copyfile(__file__,record/'executed_preparation.py')
@@ -46,6 +54,7 @@ def prepare(source,prepared,audit,case,record,condition,seconds,output_mib=1024)
     locks=[source/'case_manifest.json',Path(prepared),Path(audit),Path(__file__),case/'case_manifest.json',case/'job.lua',
            Path(__file__).with_name('prepareEilmerRocketCase.py'),Path(__file__).with_name('readEilmerNative.py')]
     locks += [Path(p) for p in prior['nativeInputSHA256']]
+    locks += extra_locks
     if 'explicit' in c:locks.append(Path(__file__).with_name('eilmerExplicitProfile.py'))
     result=dict(stage='prepare',case=str(case),passed=False,caseManifestSHA256=sha(case/'case_manifest.json'),commands=[],physicsQualified=False,newQualifiedAreaM2=0)
     try:

@@ -1,0 +1,182 @@
+237:     void allocate_dense_celldata(size_t ncells, size_t nghost, size_t neq, size_t nftl)
+238:     {
+239:     /*
+240:         Both kinds of blocks now share a structure of densely packed core flow data. This routine
+241:         allocates the storage for these structures, attempting to keep related bits of data together
+242:         on the heap.
+243: 
+244:         In an older draft of this code, I allocated all of the normal cells in one loop,
+245:         then added the ghost cells onto the end later. This caused all of the pointers
+246:         in the FVCell classes to no longer be pointing to the right objects, which was
+247:         very bad. The solution to this was to use .reserve on the arrays before
+248:         filling them, which prevented the pointers from being copied. Now however,
+249:         we do the cells and the ghost cells all at once, but we still do .reserve
+250:         because it should be faster.
+251: 
+252:         @author: Nick Gibbons
+253:     */
+254:         auto gmodel = myConfig.gmodel;
+255:         size_t nturb = myConfig.turb_model.nturb;
+256:         size_t ngtl = myConfig.n_grid_time_levels;
+257: 
+258:         celldata.all_cell_idxs.length = ncells;
+259:         celldata.halo_cell_ids.length = (ncells + nghost);
+260:         celldata.halo_face_ids.length = (ncells + nghost);
+261:         foreach(i; 0 .. ncells) celldata.all_cell_idxs[i] = i;
+262: 
+263:         celldata.nfaces.length = ncells;
+264:         celldata.dt_local.length = ncells;
+265:         celldata.wall_distances.length = ncells;
+266:         celldata.data_is_bad.length = ncells;
+267:         celldata.in_turbulent_zone.length = ncells;
+268:         celldata.lengths.length = ncells + nghost;
+269: 
+270:         celldata.areas.length     = ngtl*(ncells + nghost);
+271:         celldata.volumes.length   = ngtl*(ncells + nghost);
+272:         celldata.positions.length = ngtl*(ncells + nghost);
+273: 
+274:         celldata.U0.length = (ncells + nghost)*neq*nftl;
+275:         if (nftl>1) celldata.U1.length = (ncells + nghost)*neq*nftl;
+276:         if (nftl>2) celldata.U2.length = (ncells + nghost)*neq*nftl;
+277:         if (nftl>3) celldata.U3.length = (ncells + nghost)*neq*nftl;
+278:         if (nftl>4) celldata.U4.length = (ncells + nghost)*neq*nftl;
+279:         celldata.dUdt0.length = (ncells + nghost)*neq*nftl;
+280:         if (nftl>1) celldata.dUdt1.length = (ncells + nghost)*neq*nftl;
+281:         if (nftl>2) celldata.dUdt2.length = (ncells + nghost)*neq*nftl;
+282:         if (nftl>3) celldata.dUdt3.length = (ncells + nghost)*neq*nftl;
+283:         if (nftl>4) celldata.dUdt4.length = (ncells + nghost)*neq*nftl;
+284:         celldata.source_terms.length = (ncells + nghost)*neq;
+285: 
+286:         celldata.flowstates.reserve(ncells + nghost);
+287:         celldata.gradients.reserve(ncells + nghost);
+288:         celldata.workspaces.reserve(ncells + nghost);
+289:         foreach (n; 0 .. ncells+nghost) celldata.flowstates ~= FlowState(gmodel, nturb);
+290:         foreach (n; 0 .. ncells+nghost) celldata.gradients ~= FlowGradients(myConfig);
+291:         foreach (n; 0 .. ncells+nghost) celldata.workspaces ~= WLSQGradWorkspace();
+292: 
+293:         version(newton_krylov) {
+294:             celldata.cell_jacobians.length = (ncells+nghost)*neq*neq;
+295:             celldata.saved_gradients.reserve(ncells + nghost);
+296:             foreach (n; 0 .. ncells+nghost) celldata.saved_gradients ~= FlowGradients(myConfig);
+297:             celldata.saved_source_terms.length = (ncells + nghost)*neq;
+298:             celldata.doNotPerturb.length = (ncells+nghost);
+299:         }
+300:     }
+301: 
+302:     void allocate_dense_facedata(size_t nfaces, size_t nbfaces, size_t neq, size_t nftl)
+
+2016:     //       0: Start of stage-1 update.
+2017:     //       1: End of stage-1.
+2018:     //       2: End of stage-2.
+2019:     {
+2020: 
+2021:         immutable size_t neq = myConfig.cqi.n;
+2022:         immutable size_t ngtl = myConfig.n_grid_time_levels;
+2023:         if (cell_idxs.length == 0) cell_idxs = celldata.all_cell_idxs;
+2024: 
+2025:         // Doesn't allocate new memory and seems to be very fast (NNG)
+2026:         number[] dUdt;
+2027:         if (ftl==0) { dUdt = celldata.dUdt0; }
+2028:         if (ftl==1) { dUdt = celldata.dUdt1; }
+2029:         if (ftl==2) { dUdt = celldata.dUdt2; }
+2030:         if (ftl==3) { dUdt = celldata.dUdt3; }
+2031:         if (ftl==4) { dUdt = celldata.dUdt4; }
+2032: 
+2033:         foreach(cidx; cell_idxs){
+2034:             // Note this is the number of faces that the cell cidx has, not the total number
+2035:             size_t nfaces = celldata.nfaces[cidx];
+2036:             number vol_inv = 1.0 / celldata.volumes[cidx*ngtl + gtl]; // Cell volume (inverted).
+2037: 
+2038:             foreach(j; 0 .. neq){
+2039:                 number surface_integral = to!number(0.0);
+2040:                 size_t idx = cidx*neq + j;
+2041: 
+2042:                 foreach(i; 0 .. nfaces){
+2043:                     size_t fidx = celldata.c2f[cidx][i];
+2044:                     number area = celldata.outsigns[cidx][i]*facedata.areas[fidx*ngtl + gtl];
+2045:                     surface_integral -= facedata.fluxes[fidx*neq + j] * area;
+2046:                 }
+2047:                 dUdt[idx] = vol_inv*surface_integral + celldata.source_terms[idx];
+2048:             }
+2049:         }
+2050:         // GCL for steady-state
+2051:         if ((myConfig.solverMode == SolverMode.steady) && (myConfig.grid_motion != GridMotion.none)) {
+2052:             moving_grid_correction(gtl, ftl, cell_idxs);
+2053:         }
+2054: 
+2055:         if (myConfig.cqi.MHD && myConfig.MHD_static_field) {
+2056:             zero_magnetic_field_derivatives(gtl, ftl, cell_idxs);
+2057:         }
+2058:     } // end time_derivatives()
+
+2070:     {
+2071: 
+2072:         immutable size_t neq = myConfig.cqi.n;
+2073:         immutable size_t ngtl = myConfig.n_grid_time_levels;
+2074: 
+2075:         number[] U; number[] dUdt;
+2076:         if (ftl==0) { dUdt = celldata.dUdt0; U = celldata.U0; }
+2077:         if (ftl==1) { dUdt = celldata.dUdt1; U = celldata.U1; }
+2078:         if (ftl==2) { dUdt = celldata.dUdt2; U = celldata.U2; }
+2079:         if (ftl==3) { dUdt = celldata.dUdt3; U = celldata.U3; }
+2080:         if (ftl==4) { dUdt = celldata.dUdt4; U = celldata.U4; }
+2081: 
+2082: 
+2083:         foreach(cidx; cell_idxs){
+2084:             // Note this is the number of faces that the cell cidx has, not the total number
+2085:             size_t nfaces = celldata.nfaces[cidx];
+2086:             number vol_inv = 1.0 / celldata.volumes[cidx*ngtl + gtl]; // Cell volume (inverted).
+2087: 
+2088:             foreach(j; 0 .. neq){
+2089:                 number surface_integral = to!number(0.0);
+2090:                 size_t idx = cidx*neq + j;
+2091:                 foreach(i; 0 .. nfaces){
+2092:                     size_t fidx = celldata.c2f[cidx][i];
+2093:                     number area = celldata.outsigns[cidx][i]*facedata.areas[fidx*ngtl + gtl];
+2094:                     number vn = dot(facedata.normals[fidx], facedata.grid_velocities[fidx]);
+2095:                     surface_integral -= U[idx] * vn * area;
+2096:                 }
+2097:                 dUdt[idx] += vol_inv*surface_integral;
+2098:             }
+2099:         }
+2100:     }
+2101: 
+2102:     @nogc
+2103:     void zero_magnetic_field_derivatives(int gtl, int ftl, size_t[] cell_idxs)
+2104:     /*
+2105:         Implement MHD_static_field by zeroing the bits of the conservation
+2106:         equations that are involved in MHD>
+2107: 
+2108:         @author: Nick Gibbons and Peter Jacobs (May 2025)
+2109:     */
+2110:     {
+2111: 
+2112:         immutable size_t neq = myConfig.cqi.n;
+2113:         immutable size_t ngtl = myConfig.n_grid_time_levels;
+2114:         auto cqi = myConfig.cqi;
+2115: 
+2116:         number[] dUdt;
+2117:         if (ftl==0) { dUdt = celldata.dUdt0; }
+2118:         if (ftl==1) { dUdt = celldata.dUdt1; }
+2119:         if (ftl==2) { dUdt = celldata.dUdt2; }
+2120:         if (ftl==3) { dUdt = celldata.dUdt3; }
+2121:         if (ftl==4) { dUdt = celldata.dUdt4; }
+2122: 
+2123: 
+2124:         foreach(cidx; cell_idxs){
+2125:             size_t idx = cidx*neq;
+2126:             dUdt[idx + cqi.xB] = 0.0;
+2127:             dUdt[idx + cqi.yB] = 0.0;
+2128:             dUdt[idx + cqi.zB] = 0.0;
+2129:             dUdt[idx + cqi.psi] = 0.0;
+2130:             dUdt[idx + cqi.divB] = 0.0;
+2131:         }
+2132:     }
+2133: 
+2134:     @nogc
+2135:     void add_udf_source_vectors(size_t[] cell_list=[]){
+2136:     /*
+2137:         To save some computation, it is possible to compute the
+2138:         user defined source terms once per timestep, store them
+2139:         in Qudf (in the cells) and then apply them to the RHS
+2140:         for each stage of the explicit update here.

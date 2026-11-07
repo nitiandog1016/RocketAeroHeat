@@ -1,17 +1,28 @@
 """显式局部伪时间方案：固定成熟算子、严格配置及最小接口准入。"""
 PROFILE = 'rah-explicit-local-v1'
+DEVELOPMENT_PROFILE = 'rah-explicit-local-development-v1'
 
 
 def validate_explicit(value):
     """模块一：独立步数身份，不把显式更新称为Newton步或物理时间。"""
-    if not isinstance(value, dict) or set(value) != {'profile', 'maxSteps', 'checkpointStep'}:
+    if not isinstance(value, dict):
+        raise ValueError('显式方案须为对象')
+    development = value.get('profile') == DEVELOPMENT_PROFILE
+    required = {'profile', 'maxSteps', 'checkpointStep'} | ({'candidate', 'candidateSHA256'} if development else set())
+    if set(value) != required:
         raise ValueError('显式方案字段不完整或含未知参数')
-    if value['profile'] != PROFILE:
+    if value['profile'] not in (PROFILE, DEVELOPMENT_PROFILE):
         raise ValueError('未支持的显式方案')
     for key in ('maxSteps', 'checkpointStep'):
         if type(value[key]) is not int or value[key] <= 0:
             raise ValueError('显式步数须为正整数')
-    if not value['checkpointStep'] < value['maxSteps'] <= 8:
+    if development:
+        import re
+        if value['maxSteps'] != 200 or value['checkpointStep'] != 100:
+            raise ValueError('当前具名发展仅支持登记的200步/100检查点')
+        if not isinstance(value['candidate'],str) or not value['candidate'].startswith('/') or not re.fullmatch('[0-9a-f]{64}',value['candidateSHA256']):
+            raise ValueError('完整域缺少准确候选引用')
+    elif not value['checkpointStep'] < value['maxSteps'] <= 8:
         raise ValueError('当前仅开放最小显式接口；完整域/长任务须另登记准入')
     return dict(value)
 

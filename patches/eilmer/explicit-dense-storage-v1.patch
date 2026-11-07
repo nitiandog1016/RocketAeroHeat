@@ -1,0 +1,33 @@
+--- a/src/lmr/fluidblock.d
++++ b/src/lmr/fluidblock.d
+@@ -271,16 +271,20 @@
+         celldata.volumes.length   = ngtl*(ncells + nghost);
+         celldata.positions.length = ngtl*(ncells + nghost);
+ 
+-        celldata.U0.length = (ncells + nghost)*neq*nftl;
+-        if (nftl>1) celldata.U1.length = (ncells + nghost)*neq*nftl;
+-        if (nftl>2) celldata.U2.length = (ncells + nghost)*neq*nftl;
+-        if (nftl>3) celldata.U3.length = (ncells + nghost)*neq*nftl;
+-        if (nftl>4) celldata.U4.length = (ncells + nghost)*neq*nftl;
+-        celldata.dUdt0.length = (ncells + nghost)*neq*nftl;
+-        if (nftl>1) celldata.dUdt1.length = (ncells + nghost)*neq*nftl;
+-        if (nftl>2) celldata.dUdt2.length = (ncells + nghost)*neq*nftl;
+-        if (nftl>3) celldata.dUdt3.length = (ncells + nghost)*neq*nftl;
+-        if (nftl>4) celldata.dUdt4.length = (ncells + nghost)*neq*nftl;
++        // 显式每个时间层已有独立数组；只压缩尾部容量，不改变层数/索引/数值更新。
++        // 非显式路径保留原分配，待独立运行包和边界索引检查后使用。
++        size_t stage_storage = (ncells + nghost)*neq;
++        if (myConfig.solverMode != SolverMode.transient) stage_storage *= nftl;
++        celldata.U0.length = stage_storage;
++        if (nftl>1) celldata.U1.length = stage_storage;
++        if (nftl>2) celldata.U2.length = stage_storage;
++        if (nftl>3) celldata.U3.length = stage_storage;
++        if (nftl>4) celldata.U4.length = stage_storage;
++        celldata.dUdt0.length = stage_storage;
++        if (nftl>1) celldata.dUdt1.length = stage_storage;
++        if (nftl>2) celldata.dUdt2.length = stage_storage;
++        if (nftl>3) celldata.dUdt3.length = stage_storage;
++        if (nftl>4) celldata.dUdt4.length = stage_storage;
+         celldata.source_terms.length = (ncells + nghost)*neq;
+ 
+         celldata.flowstates.reserve(ncells + nghost);
