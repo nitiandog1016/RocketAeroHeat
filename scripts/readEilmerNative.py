@@ -143,12 +143,15 @@ def audit_run_scope(manifest,case=None):
     """未通过真实小例相容门槛的实数v1仅供有限诊断，禁止进入完整域或延长发展。"""
     c=manifest['condition']
     if 'explicit' in c:
-        from eilmerExplicitProfile import validate_explicit,DEVELOPMENT_PROFILE
+        from eilmerExplicitProfile import validate_explicit,DEVELOPMENT_PROFILE,DENSE_PROFILE
         validate_explicit(c['explicit'])
         if c['explicit']['profile']==DEVELOPMENT_PROFILE:
             # v184唯一原域在初始化耗尽内存；保留登记证据检查，但不再放行同一方案。
             raise ValueError('rah-explicit-local-development-v1原完整域初始化OOM，当前方案关闭；需独立内存改动及新证据')
         else:need(manifest['mesh']['cells']<=1000,'显式完整域尚未登记候选预算；当前仅最小接口')
+        if c['explicit']['profile'] == DENSE_PROFILE:
+            from eilmerDenseRuntime import audit_dense_runtime
+            audit_dense_runtime(c)
     if c.get('development',{}).get('profile')=='rah-nk-real-v1':
         need(manifest['mesh']['cells']<=1000 and c['maxNewtonSteps']<=8,
              'rah-nk-real-v1小例比较未通过；完整域/延长计算关闭，需独立新方案证据')
@@ -236,6 +239,10 @@ def export_loads(case,loads,output,run_receipt):
     need(run_receipt is not None,'缺少准确原生运行来源')
     receipt=json.loads(Path(run_receipt).read_text())
     need(receipt['stage']=='run' and receipt['passed'] and receipt['case']==str(case),'拒绝失败/错源运行')
+    manifest=json.loads((case/'case_manifest.json').read_text())
+    if manifest['condition'].get('explicit',{}).get('profile') == 'rah-explicit-dense-v1':
+        from eilmerDenseRuntime import audit_dense_execution
+        audit_dense_execution(manifest['condition'],receipt)
     # 旧回执可能只有启动器exit0；必须只读核对真正原生完成，失败历史不改写。
     completion=audit_completion(case,completion_log_for_receipt(case,run_receipt,receipt))
     need(receipt['caseManifestSHA256']==sha(case/'case_manifest.json'),'运行工况来源不符')

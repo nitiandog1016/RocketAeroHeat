@@ -1,6 +1,7 @@
 """显式局部伪时间方案：固定成熟算子、严格配置及最小接口准入。"""
 PROFILE = 'rah-explicit-local-v1'
 DEVELOPMENT_PROFILE = 'rah-explicit-local-development-v1'
+DENSE_PROFILE = 'rah-explicit-dense-v1'
 
 
 def validate_explicit(value):
@@ -8,10 +9,12 @@ def validate_explicit(value):
     if not isinstance(value, dict):
         raise ValueError('显式方案须为对象')
     development = value.get('profile') == DEVELOPMENT_PROFILE
+    dense = value.get('profile') == DENSE_PROFILE
     required = {'profile', 'maxSteps', 'checkpointStep'} | ({'candidate', 'candidateSHA256'} if development else set())
+    if dense: required |= {'runtimePackage', 'runtimePackageSHA256'}
     if set(value) != required:
         raise ValueError('显式方案字段不完整或含未知参数')
-    if value['profile'] not in (PROFILE, DEVELOPMENT_PROFILE):
+    if value['profile'] not in (PROFILE, DEVELOPMENT_PROFILE, DENSE_PROFILE):
         raise ValueError('未支持的显式方案')
     for key in ('maxSteps', 'checkpointStep'):
         if type(value[key]) is not int or value[key] <= 0:
@@ -24,6 +27,12 @@ def validate_explicit(value):
             raise ValueError('完整域缺少准确候选引用')
     elif not value['checkpointStep'] < value['maxSteps'] <= 8:
         raise ValueError('当前仅开放最小显式接口；完整域/长任务须另登记准入')
+    if dense:
+        import re
+        if value['maxSteps'] != 6 or value['checkpointStep'] != 3:
+            raise ValueError('新存储实现仅开放六步/三步检查点，完整域须另登记')
+        if not isinstance(value['runtimePackage'], str) or not value['runtimePackage'].startswith('/') or not isinstance(value['runtimePackageSHA256'], str) or not re.fullmatch('[0-9a-f]{64}', value['runtimePackageSHA256']):
+            raise ValueError('存储包引用不完整')
     return dict(value)
 
 

@@ -1,0 +1,18 @@
+ValueError: could not convert string to float: 'loads_index'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/e/RocketAeroHeat/tests/verifyEilmerDenseRuntime.py", line 154, in <module>
+    p=argparse.ArgumentParser(); p.add_argument('--out',required=True); verify(p.parse_args().out)
+                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/RocketAeroHeat/tests/verifyEilmerDenseRuntime.py", line 83, in verify
+    meta = np.loadtxt(case/'lmrsim/loads/loads-metadata')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/numpy/lib/npyio.py", line 1373, in loadtxt
+    arr = _read(fname, dtype=dtype, comment=comment, delimiter=delimiter,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/numpy/lib/npyio.py", line 1016, in _read
+    arr = _load_from_filelike(
+          ^^^^^^^^^^^^^^^^^^^^
+ValueError: could not convert string 'loads_index' to float64 at row 0, column 1.

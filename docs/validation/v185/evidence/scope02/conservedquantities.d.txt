@@ -1,0 +1,31 @@
+24: import lmr.turbulence;
+25: 
+26: // Underlying definition of the conserved quantities collection,
+27: // as seen by the transient solver, is just an array.
+28: immutable alias ConservedQuantities = number[];
+29: 
+30: ConservedQuantities new_ConservedQuantities(size_t n)
+31: {
+32:     return new number[n];
+33: }
+34: 
+35: @nogc void copy_values_from(ref number[] vec, ref const(number[]) src)
+36: {
+37:     foreach (i, ref e; vec) { e = src[i]; }
+38: }
+39: 
+40: @nogc void clear(ref number[] vec)
+41: {
+42:     foreach (ref e; vec) { e = 0.0; }
+43: }
+44: 
+45: @nogc void add(ref number[] vec, ref const(number[]) other, double factor=1.0)
+46: {
+47:     foreach (i, ref e; vec) e += other[i] * factor;
+48: }
+49: 
+50: @nogc void scale(ref number[] vec, double factor)
+51: {
+52:     foreach (ref e; vec) { e *= factor; }
+53: }
+54: 

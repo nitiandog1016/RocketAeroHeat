@@ -1,0 +1,75 @@
+20: 
+21: struct FluidCellData{
+22:     size_t[] all_cell_idxs;
+23:     size_t[] nfaces;
+24:     size_t[][] c2f;
+25:     size_t[][] c2v;
+26:     double[] dt_local;
+27:     int[][] outsigns;
+28:     bool[] data_is_bad;
+29:     size_t[][] halo_cell_ids;
+30:     size_t[][] halo_face_ids;
+31:     number[] areas;
+32:     number[] volumes;
+33:     Vector3[] positions;
+34:     number[3][] lengths;
+35:     number[] wall_distances;
+36:     bool[] in_turbulent_zone;
+37:     size_t[][] cell_cloud_indices;
+38:     Vector3[][] face_distances;
+39:     FlowState[] flowstates;
+40:     FlowGradients[] gradients;
+41:     ConservedQuantities U0, U1, U2, U3, U4;
+42:     ConservedQuantities dUdt0, dUdt1, dUdt2, dUdt3, dUdt4;
+43:     ConservedQuantities source_terms;
+44:     WLSQGradWorkspace[] workspaces;
+45:     LSQInterpWorkspace[] lsqws;
+46:     LSQInterpGradients[] lsqgradients;
+47:     version(newton_krylov) {
+48:         double[] cell_jacobians;
+49:         FlowGradients[] saved_gradients;
+50:         LSQInterpGradients[] saved_lsqgradients;
+51:         ConservedQuantities saved_source_terms;
+52:         bool[] doNotPerturb;
+53:     }
+54: 
+55:     void allocate_minimal(size_t ncells, size_t nghost, LocalConfig myConfig){
+56:     /*
+57:         FluidFVCells expect a certain some things in the FVCellData to be built
+58:         in order for their constructors to work properly. This routine
+59:         allocates only those things; principly for creating ghost fluid cells
+60:         in the solid_gas_full_face_copy code.
+61: 
+62:         TODO: Move the rest of the allocation to this file from fluidblock.d
+63:         @author: Nick N. Gibbons
+64:     */
+65:         auto gmodel = myConfig.gmodel;
+66:         size_t neq = myConfig.cqi.n;
+67:         size_t nturb = myConfig.turb_model.nturb;
+68:         size_t nftl = myConfig.n_flow_time_levels;
+69:         size_t ngtl = myConfig.n_grid_time_levels;
+70: 
+71:         areas.length     = ngtl*(ncells + nghost);
+72:         volumes.length   = ngtl*(ncells + nghost);
+73:         positions.length = ngtl*(ncells + nghost);
+74:         lengths.length   = ncells + nghost;
+75: 
+76:         U0.length = (ncells + nghost)*neq*nftl;
+77:         if (nftl>1) U1.length = (ncells + nghost)*neq*nftl;
+78:         if (nftl>2) U2.length = (ncells + nghost)*neq*nftl;
+79:         if (nftl>3) U3.length = (ncells + nghost)*neq*nftl;
+80:         if (nftl>4) U4.length = (ncells + nghost)*neq*nftl;
+81:         dUdt0.length = (ncells + nghost)*neq*nftl;
+82:         if (nftl>1) dUdt1.length = (ncells + nghost)*neq*nftl;
+83:         if (nftl>2) dUdt2.length = (ncells + nghost)*neq*nftl;
+84:         if (nftl>3) dUdt3.length = (ncells + nghost)*neq*nftl;
+85:         if (nftl>4) dUdt4.length = (ncells + nghost)*neq*nftl;
+86:         source_terms.length = (ncells + nghost)*neq;
+87: 
+88:         flowstates.reserve(ncells + nghost);
+89:         gradients.reserve(ncells + nghost);
+90:         workspaces.reserve(ncells + nghost);
+91:         foreach (n; 0 .. ncells+nghost) flowstates ~= FlowState(gmodel, nturb);
+92:         foreach (n; 0 .. ncells+nghost) gradients ~= FlowGradients(myConfig);
+93:         foreach (n; 0 .. ncells+nghost) workspaces ~= WLSQGradWorkspace();
+94:     }

@@ -18,6 +18,12 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     assert manifest['schema']=='RAH.EilmerPreparedCase.v1' and manifest['sourceCommit']==COMMIT
     audit_run_scope(manifest,case)
     admission=None;admission_locks=[]
+    dense_runtime=None;dense_locks=[]
+    if manifest['condition'].get('explicit',{}).get('profile')=='rah-explicit-dense-v1':
+        from eilmerDenseRuntime import audit_dense_runtime
+        dense_runtime,dense_locks=audit_dense_runtime(manifest['condition'])
+        assert stage=='run' and seconds<=30 and output_mib<=64,'新存储包只开放登记的小例预算'
+        assert not (case/'dense-run-attempt.json').exists(),'新存储小例不得重复启动'
     if manifest['condition'].get('explicit',{}).get('profile')=='rah-explicit-local-development-v1':
         from eilmerExplicitAdmission import audit_admission
         admission,admission_locks=audit_admission(manifest,case)
@@ -27,6 +33,7 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     assert sha(mesh)==manifest['mesh']['sourceSHA256'], '原网格身份发生变化'
     locks=[manifest_path,mesh,Path(__file__),Path(__file__).with_name('readEilmerNative.py'),Path(__file__).with_name('auditEilmerCompletion.py')]
     locks += admission_locks
+    locks += dense_locks
     if admission is not None:locks.append(Path(__file__).with_name('eilmerExplicitAdmission.py'))
     if 'explicit' in manifest['condition']:
         locks += [Path(__file__).with_name(n) for n in ['eilmerExplicitProfile.py','auditEilmerExplicitCompletion.py']]
@@ -67,9 +74,14 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
         if manifest['condition'].get('development',{}).get('profile')=='rah-nk-real-v1' or 'explicit' in manifest['condition']:
             # 直接监督固定实数二进制，取得真实求解退出码，绕开system()包装状态。
             commands=[['lmr-run','--max-cpus=2','--max-wall-clock='+str(native_seconds)]]
+            if dense_runtime is not None:commands[0][0]=dense_runtime['binary']
         else:
             commands=[['lmr','run','--max-wall-clock='+str(native_seconds)]]
     record.mkdir(parents=True)
+    if dense_runtime is not None:
+        attempt=case/'dense-run-attempt.json'
+        with attempt.open('x') as f:json.dump(dict(runtimePackageSHA256=manifest['condition']['explicit']['runtimePackageSHA256'],automaticContinuation=0),f)
+        locks.append(attempt)
     if admission is not None:
         attempt=case/'explicit-run-attempt.json'
         with attempt.open('x') as f:json.dump(dict(candidateSHA256=manifest['condition']['explicit']['candidateSHA256'],runRecord=str(record),automaticContinuation=0),f)
@@ -77,6 +89,9 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     shutil.copyfile(__file__,record/'executed_entry.py')
     result=dict(stage=stage,case=str(case),sourceCommit=COMMIT,caseManifestSHA256=sha(manifest_path),
                 physicsQualified=False,newQualifiedAreaM2=0,passed=False,commands=[])
+    if dense_runtime is not None:
+        result.update(runtimePackageSHA256=manifest['condition']['explicit']['runtimePackageSHA256'],
+                      storageProfile=dense_runtime['profile'],boundsCheck=dense_runtime['boundsCheck'])
     try:
         for i,command in enumerate(commands):
             remaining=seconds-(time.monotonic()-started)

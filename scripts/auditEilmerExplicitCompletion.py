@@ -75,7 +75,12 @@ def audit_explicit_completion(case, stdout, manifest):
             count+=len(a)
         require(count==manifest['mesh']['wallFaces'],'incomplete-explicit-wall-coverage')
     require(abs(meta[-1,1]-saved_time)<=5.1e-6*saved_time,'explicit-load-time-mismatch')
-    return dict(passed=True,stopReason=reasons[0],finalStep=step,wallFaces=count,
+    storage={}
+    if d['profile']=='rah-explicit-dense-v1':
+        from eilmerDenseRuntime import audit_dense_allocation
+        from readEilmerNative import read_grid
+        storage=audit_dense_allocation(manifest,read_grid(case/'lmrsim/grid/grid-0000'),text)
+    return dict(passed=True,stopReason=reasons[0],finalStep=step,wallFaces=count,storageAllocation=storage,
                 savedSteps=expected_steps,localDtRanges=dt_ranges,requestedSteps=d['maxSteps'],completedRequestedSteps=step==d['maxSteps'],
                 finalPseudoTime=saved_time,timeMeaning='local-pseudo-time-not-flight-time',
                 physicsQualified=False,newQualifiedAreaM2=0,

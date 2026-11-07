@@ -1,0 +1,124 @@
+317:         size_t nmodes = myConfig.n_modes;
+318:         size_t nturb  = myConfig.turb_model.nturb;
+319:         size_t nftl   = myConfig.n_flow_time_levels;
+320: 
+321:         size_t nghost = 0;
+322:         foreach (bndry; grid.boundaries) nghost += bndry.face_id_list.length;
+323: 
+324:         allocate_dense_celldata(ncells, nghost, neq, nftl);
+325:         allocate_dense_facedata(nfaces, nghost, neq, nftl); // nghost==nbfaces for unstructured
+326: 
+327:         // We have some unstructured specific stuff that also needs to be allocated
+328:         celldata.face_distances.length = ncells;
+329:         celldata.lsqws.length = ncells + nghost;
+330:         celldata.cell_cloud_indices.length = ncells;
+331:         celldata.c2v.length = ncells;
+332:         celldata.lsqgradients.reserve(ncells + nghost);
+333:         foreach (i; 0 .. ncells + nghost) celldata.lsqgradients ~= LSQInterpGradients(nsp, nmodes, nturb); // TODO: skip if not needed
+334:         // TODO: for now this is only needed for the adjoint solver and/or the check-jacobian tool - we can think about dropping this for the flow solver. KAD 2024-08-28
+335:         celldata.saved_lsqgradients.reserve(ncells + nghost);
+336:         foreach (n; 0 .. ncells+nghost) celldata.saved_lsqgradients ~= LSQInterpGradients(myConfig.n_species, myConfig.n_modes, myConfig.turb_model.nturb);
+337: 
+338:         facedata.dL.length = nfaces;
+339:         facedata.dR.length = nfaces;
+340: 
+341:         foreach (i, f; grid.faces) {
+342:             auto new_face = new FVInterface(myConfig, IndexDirection.none, &facedata, to!int(i));
+343:             faces ~= new_face;
+344:         }
+345: 
+346:         cells.reserve(ncells + nghost);
+347:         foreach (i, c; grid.cells) {
+348:             // Note that the cell id and the index in the cells array are the same.
+349:             // We will reply upon this connection in other parts of the flow code.
+350:             auto new_cell = new FluidFVCell(myConfig, &celldata, to!int(i));
+351:             new_cell.contains_flow_data = true;
+352:             new_cell.is_interior_to_domain = true;
+353:             cells ~= new_cell;
+354:         }
+355:         // Bind the interfaces, vertices and cells together,
+356:         // using the indices stored in the unstructured grid.
+357:         foreach (i, f; faces) {
+358:             foreach (j; grid.faces[i].vtx_id_list) {
+359:                 f.vtx ~= vertices[j];
+360:             }
+361:         }
+362:         celldata.outsigns.length=cells.length;
+363:         celldata.c2f.length = cells.length;
+364:         foreach (i, c; cells) {
+365:             foreach (j; grid.cells[i].vtx_id_list) {
+366:                 c.vtx ~= vertices[j];
+367:                 celldata.c2v[i] ~= j;
+368:             }
+369:             auto nf = grid.cells[i].face_id_list.length;
+370:             if (nf != grid.cells[i].outsign_list.length) {
+371:                 string msg = format("Mismatch in face_id_list, outsign_list lengths: %d %d",
+419:         if (nboundaries != grid.nboundaries) {
+420:             string msg = format("Mismatch in number of boundaries: %d %d",
+421:                                 nboundaries, grid.nboundaries);
+422:             throw new FlowSolverException(msg);
+423:         }
+424:         int ghost_cell_id = to!int(cells.length);
+425:         foreach (i, bndry; grid.boundaries) {
+426:             auto nf = bndry.face_id_list.length;
+427:             if (nf != bndry.outsign_list.length) {
+428:                 string msg = format("Mismatch in face_id_list, outsign_list lengths: %d %d",
+429:                                     bndry.face_id_list.length, bndry.outsign_list.length);
+430:                 throw new FlowSolverException(msg);
+431:             }
+432:             foreach (j; 0 .. nf) {
+433:                 FVInterface my_face = faces[bndry.face_id_list[j]];
+434:                 my_face.is_on_boundary = true;
+435:                 my_face.bc_id = i; // note which boundary this face is on
+436:                 int my_outsign = bndry.outsign_list[j];
+437:                 bc[i].faces ~= my_face;
+438:                 bc[i].outsigns ~= my_outsign;
+439:                 my_face.i_bndry = bc[i].outsigns.length - 1;
+440:                 if (bc[i].ghost_cell_data_available) {
+441:                     // We need ghost_cell_id to match the relevant position in the celldata arrays
+442:                     FluidFVCell ghost0 = new FluidFVCell(myConfig, &celldata, ghost_cell_id);
+443:                     ghost_cell_id++;
+444:                     ghost0.contains_flow_data = bc[i].ghost_cell_data_available;
+445:                     ghost0.is_ghost = true;
+446:                     bc[i].ghostcells ~= ghost0;
+447:                     if (my_outsign == 1) {
+448:                         if (my_face.right_cell) {
+449:                             string msg = format("Already have cell %d attached to right-of-face %d."
+450:                                                 ~" Attempt to add ghost cell %d.",
+451:                                                 my_face.right_cell.id, my_face.id, ghost0.id);
+452:                             throw new FlowSolverException(msg);
+453:                         } else {
+454:                             my_face.right_cell = ghost0;
+455:                             facedata.f2c[bndry.face_id_list[j]].right = ghost0.id;
+456:                         }
+457:                     } else {
+458:                         if (my_face.left_cell) {
+459:                             string msg = format("Already have cell %d attached to left-of-face %d."
+460:                                                 ~" Attempt to add ghost cell %d.",
+461:                                                 my_face.left_cell.id, my_face.id, ghost0.id);
+462:                             throw new FlowSolverException(msg);
+463:                         } else {
+464:                             my_face.left_cell = ghost0;
+465:                             facedata.f2c[bndry.face_id_list[j]].left = ghost0.id;
+466:                         }
+467:                     }
+468:                 } // end if (bc[i].ghost_cell_data_available
+469:             } // end foreach j
+470:         } // end foreach i
+471:         // Setup dense arrays for fast checks of left or right data available (NNG)
+472:         foreach (i, bndry; grid.boundaries) {
+473: 
+474:             // For any other kind of boundary we need to mark which side the interior cell is
+475:             auto nf = bndry.face_id_list.length;
+476:             foreach (j; 0 .. nf) {
+477:                 size_t my_id = faces[bndry.face_id_list[j]].id;
+478:                 size_t bid = faces[bndry.face_id_list[j]].id;
+479:                 int my_outsign = bndry.outsign_list[j];
+480: 
+481:                 // For a shared boundary both sides are okay, so we skip
+482:                 if (startsWith(bc[i].type, "exchange_")) { continue; }
+483: 
+484:                 if (my_outsign == 1) { // The ghost cell is a right cell
+485:                     facedata.left_interior_only[bid] = true;
+486:                 } else {               // the ghost cell is a left cell
+487:                     facedata.right_interior_only[bid] = true;
