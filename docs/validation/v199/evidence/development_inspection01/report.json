@@ -1,0 +1,435 @@
+{
+  "auditPassed": true,
+  "profile": "of13-sync-euler-upwind-nasa7-v1",
+  "updates": 8353,
+  "physicalEndTimeSeconds": 0.00211941448382,
+  "process": {
+    "schema": "RAH.OpenFOAMProcess.v1",
+    "argv": [
+      "bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "source /opt/openfoam13/etc/bashrc; exec \"$@\"",
+      "rah-openfoam",
+      "foamRun"
+    ],
+    "cwd": "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02",
+    "nativeExitCode": -15,
+    "stopReason": "supervisor-error",
+    "elapsedSeconds": 58.123520054000004,
+    "maximumSeconds": 236.918579679,
+    "peakObservedGroupRSSBytes": 149155840,
+    "liveGroupAfterCleanup": {},
+    "inputSHA256": {
+      "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": "48c5062f2c4a29cec422b124873eea0ed0b9692f355818becf926567e4952784",
+      "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+      "/mnt/e/RocketAeroHeat/scripts/openFoamSynchronousControl.py": "7d6d42098643ed03d5b5b630b09350d31e06a7fbe7fbf703fe9c8e23a53ad552",
+      "/mnt/e/RocketAeroHeat/scripts/openFoamFields.py": "d1043b0b225acb67593f4ec904928b0d21b7d6eee977273d736688b21d77dc87",
+      "/mnt/e/RocketAeroHeat/scripts/openFoamAirThermo.py": "1ff709fbb60c806c7157b7e1cc72472baa49fd5c6bbec11edfc1d6bfe9ca1206",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/source_review01/report.json": "d8df689b81f4c724ba33f65e94237dd9a9b71139e2b96e3cae50eb2f8c5d045f",
+      "/mnt/e/RocketAeroHeat/docs/validation/v199/PLAN.md": "4042941aa49acff7579b51d54bee55a36b3bd8656beb317195b4124ec0fdc192",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/small_run01/report.json": "62795d0ca03bc60d0e0b9dbbe771de0341cfb1ebc20cadd55ff8e72cb733fa11",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/small_audit01/report.json": "d5f83f5c87f24276401e7c4164650fd21851cb5a4f9bc1c885ff97ce328f5a41",
+      "/mnt/e/RocketAeroHeat/docs/validation/v199/DEVELOPMENT_PLAN.md": "924c9afa790efe3afea246c265132f1ecf235efe50d7d7a529572f74cecb9a95",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/exact_mesh.npz": "5ab4bd85c5f894c216136cdd04e27fe17a3249cb228c55e31b411ed3313485ad",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/patches.json": "cf4f1362ced0d2c1b547589a627c316ef3abda316e6cd5bd639fc8e7f7c7cb63",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/repair.json": "5d30fe8f3c41180eb0bc6ba09da159cae41d34fb5ce2e1280642ab851cda78ce",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/thermo_contract.json": "ff71e585117b45320ec6d9cad1065654e63cd5351201b85492afc7026cad9bcf",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/wall_identity.json": "8680813c56f73ae579bb7568574c4b0f3403887a25fc334d1389c8e4d0841aa2",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/0/p": "c9b2fe93116a025c99a49d9c2dbf0927d29258d9281aeb923bac542033a881d4",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/0/T": "328c42e4c34605f3cc22c7d6e4a35ea16f3e1da87b89a2827091d797f96e9eb1",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/0/U": "d6f24f60c1e0629a6fc32abfedb0aea2d4d91e365a8f25566608463672433aab",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/physicalProperties": "2b37ce44d408e36a58e2223249d9624729ab330be5e6313400c0abe9f2e423ba",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/system/controlDict": "cde00d9f9ed938c2e2ff116663532274d5f4185f38eb6109ab4e6689ff5168ff",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/system/fvSchemes": "a1817c7266958a54bd9a90a5330c2478ae09d1e151a421a17e1436e5f36a45af",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/system/fvSolution": "b78927ec4cad74019cac960fa7bf8c7bdf4488d72a450a09c772aa274bf4b787",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/boundary": "6f631552ef76f65e6559496043a9edddd40be09c763f162b0cb4229b8f413e0f",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/faces": "9e486b8a952a7c981c25ab81cca1856913e90b50bdd815c7601fb68669dba4cb",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/neighbour": "8f1c6953e97a9e210f81d96e1416571921d84375922276c118b421669f92f126",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/owner": "a5c56691bd0a583a16f17adba26ebaf98df3c82cb817838e4f86c21757b42aed",
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/points": "ded41b82f9ae599cc0f1964ba702c3d0f99c0c605cf6bd26d57c64a242db9540"
+    },
+    "inputStable": {
+      "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": true,
+      "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": true,
+      "/mnt/e/RocketAeroHeat/scripts/openFoamSynchronousControl.py": true,
+      "/mnt/e/RocketAeroHeat/scripts/openFoamFields.py": true,
+      "/mnt/e/RocketAeroHeat/scripts/openFoamAirThermo.py": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/source_review01/report.json": true,
+      "/mnt/e/RocketAeroHeat/docs/validation/v199/PLAN.md": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/small_run01/report.json": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/small_audit01/report.json": true,
+      "/mnt/e/RocketAeroHeat/docs/validation/v199/DEVELOPMENT_PLAN.md": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/exact_mesh.npz": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/patches.json": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/repair.json": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/thermo_contract.json": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/wall_identity.json": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/0/p": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/0/T": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/0/U": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/physicalProperties": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/system/controlDict": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/system/fvSchemes": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/system/fvSolution": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/boundary": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/faces": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/neighbour": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/owner": true,
+      "/mnt/e/RocketAeroHeat/outputs/v199_validation/development02/constant/polyMesh/points": true
+    },
+    "caseBytes": 15033936,
+    "caseLimitMiB": 96,
+    "addressSpaceLimitMiB": 2048,
+    "cpuCount": 1,
+    "physicalQualification": false,
+    "observationIORetries": [
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 2,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 2,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 1,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 2,
+        "errno": 61
+      },
+      {
+        "observation": "scientific-observer",
+        "attempt": 3,
+        "errno": 61
+      }
+    ],
+    "supervisorError": "OSError(61, 'No data available')",
+    "supervisorTraceback": "Traceback (most recent call last):\n  File \"/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py\", line 68, in run\n    problem=observe_io(lambda:guard(log,False),'scientific-observer',io_events)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py\", line 13, in observe_io\n    try:return action()\n               ^^^^^^^^\n  File \"/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py\", line 68, in <lambda>\n    problem=observe_io(lambda:guard(log,False),'scientific-observer',io_events)\n                              ^^^^^^^^^^^^^^^^\n  File \"/mnt/e/RocketAeroHeat/scripts/openFoamSynchronousControl.py\", line 16, in __call__\n    text=Path(log).read_text(errors='replace')\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/pathlib.py\", line 1030, in read_text\n    return f.read()\n           ^^^^^^^^\nOSError: [Errno 61] No data available\n",
+    "passed": false
+  },
+  "frames": [
+    {
+      "timeSeconds": 0.0005,
+      "state": {
+        "TminK": 296.6319583771239,
+        "TmaxK": 389.7103025565691,
+        "rhoMinKgm3": 0.04656322797615734,
+        "pMinPa": 3965.108597085849,
+        "densityEOSMaxRelative": 2.220446049250313e-16,
+        "internalEnergyMaxScaled": 8.536787319875029e-10
+      },
+      "residualVolumeL1Scaled": [
+        0.11756575532526725,
+        0.10566683004518491,
+        0.006381954505507241,
+        0.04295366758109542,
+        0.051109820684315514
+      ],
+      "residualVolumeL1Log10": [
+        -0.929719161585274,
+        -0.9760613210097903,
+        -2.195046296049369,
+        -1.3669997481952763,
+        -1.2914956427377566
+      ],
+      "integratedBoundaryFluxScaled": [
+        -0.0019705832207889467,
+        0.0014223393110967977,
+        2.1192571919476567e-06,
+        -0.0008947936872628127,
+        -0.0005701629887484719
+      ],
+      "totalEnthalpyRelativeMax": 0.11553833951253556,
+      "totalEnthalpyRelativeVolumeMean": 0.010948000749741659
+    },
+    {
+      "timeSeconds": 0.001,
+      "state": {
+        "TminK": 299.9999999999945,
+        "TmaxK": 389.7103025565824,
+        "rhoMinKgm3": 0.05012174274524929,
+        "pMinPa": 4401.463378233817,
+        "densityEOSMaxRelative": 2.220446049250313e-16,
+        "internalEnergyMaxScaled": 1.135793785414132e-10
+      },
+      "residualVolumeL1Scaled": [
+        0.029693094402963558,
+        0.017930301882592516,
+        0.0007851501776820294,
+        0.006667009910754971,
+        0.005263367761460387
+      ],
+      "residualVolumeL1Log10": [
+        -1.5273445409656088,
+        -1.746412398399868,
+        -3.1050472666933633,
+        -2.1760688992792665,
+        -2.2787362839456873
+      ],
+      "integratedBoundaryFluxScaled": [
+        -0.0006623716063037828,
+        0.0003999759236367657,
+        7.817971347068373e-06,
+        -0.00014763529127155258,
+        -0.00010736886383048408
+      ],
+      "totalEnthalpyRelativeMax": 0.04343485794846935,
+      "totalEnthalpyRelativeVolumeMean": 0.0037282697789219384
+    },
+    {
+      "timeSeconds": 0.0015,
+      "state": {
+        "TminK": 299.9999999999871,
+        "TmaxK": 389.7103025565762,
+        "rhoMinKgm3": 0.050142373054869425,
+        "pMinPa": 4403.913696294092,
+        "densityEOSMaxRelative": 2.220446049250313e-16,
+        "internalEnergyMaxScaled": 5.509225530557588e-13
+      },
+      "residualVolumeL1Scaled": [
+        0.000622902579558419,
+        0.0003781600110256447,
+        2.2836770106374852e-05,
+        7.496203032836565e-05,
+        9.66410458611229e-05
+      ],
+      "residualVolumeL1Log10": [
+        -3.205579870625831,
+        -3.4223243980428393,
+        -4.641365320048357,
+        -4.125158659200529,
+        -4.014838378709939
+      ],
+      "integratedBoundaryFluxScaled": [
+        -1.3895250408624856e-05,
+        8.435714057697058e-06,
+        5.094257904791295e-07,
+        -1.4407178843397704e-06,
+        -2.1557970315235207e-06
+      ],
+      "totalEnthalpyRelativeMax": 0.028790409015656104,
+      "totalEnthalpyRelativeVolumeMean": 0.0025450442698668006
+    },
+    {
+      "timeSeconds": 0.002,
+      "state": {
+        "TminK": 299.999999999978,
+        "TmaxK": 389.7103025565627,
+        "rhoMinKgm3": 0.05014237305491536,
+        "pMinPa": 4403.91369629935,
+        "densityEOSMaxRelative": 2.220446049250313e-16,
+        "internalEnergyMaxScaled": 5.522845506247538e-15
+      },
+      "residualVolumeL1Scaled": [
+        3.03701248841778e-09,
+        1.8288270168781332e-09,
+        2.0444257150156136e-10,
+        3.3166362305068715e-10,
+        4.6455696955791905e-10
+      ],
+      "residualVolumeL1Log10": [
+        -8.517553422227346,
+        -8.737827371160066,
+        -9.689428665077813,
+        -9.479302159396118,
+        -9.332961019996443
+      ],
+      "integratedBoundaryFluxScaled": [
+        -6.774501695506238e-11,
+        4.079308347599203e-11,
+        4.560047375967958e-12,
+        -6.907087254725347e-12,
+        -1.0362347099562985e-11
+      ],
+      "totalEnthalpyRelativeMax": 0.028790409015652774,
+      "totalEnthalpyRelativeVolumeMean": 0.002542742393153746
+    }
+  ],
+  "lastWallAreaL1Change": {
+    "pressure": 2.226298831912945e-05,
+    "temperature": 8.46292767419778e-06
+  },
+  "comparisons": [
+    {
+      "region": "compression",
+      "streamwiseRangeM": [
+        0.35,
+        0.5
+      ],
+      "faces": 36,
+      "pressurePa": 10696.582289998514,
+      "temperatureK": 382.78653950034504,
+      "referencePressurePa": 10268.603105421342,
+      "referenceTemperatureK": 372.2461966262619,
+      "pressureRelativeError": 0.04167842307112046,
+      "temperatureRelativeError": 0.028315515295017857
+    },
+    {
+      "region": "expansion",
+      "streamwiseRangeM": [
+        0.85,
+        0.95
+      ],
+      "faces": 24,
+      "pressurePa": 4877.519404908939,
+      "temperatureK": 313.94040092087096,
+      "referencePressurePa": 5012.294120933976,
+      "referenceTemperatureK": 303.4472437595614,
+      "pressureRelativeError": -0.026888828303619938,
+      "temperatureRelativeError": 0.03457984007798043
+    }
+  ],
+  "residualLogImprovement": [
+    7.587834260642072,
+    7.761766050150276,
+    7.494382369028443,
+    8.112302411200842,
+    8.041465377258685
+  ],
+  "developmentScreeningPassed": false,
+  "savedFrameNumericalThresholdPassed": true,
+  "numericallyConverged": false,
+  "observedIncompleteWindowCriteriaPassed": true,
+  "planAcceptance": false,
+  "inspectedInterrupted": true,
+  "lastCompleteSavedTimeSeconds": 0.002,
+  "originalNumericalThreshold": 1e-08,
+  "physicalQualification": false,
+  "newQualifiedHeatAreaM2": 0,
+  "originalControlWallExact": true,
+  "originalRocketRun": false,
+  "elapsedSeconds": 0.5310000000172295
+}

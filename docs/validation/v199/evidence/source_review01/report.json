@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "profile": "of13-sync-euler-upwind-nasa7-v1",
+  "actualChanges": [
+    "one global dt replaces per-cell pseudo-time",
+    "piecewise-constant complete face states replace separate limited reconstructions"
+  ],
+  "numericalOrder": "first-order; accuracy/refinement remain required",
+  "generalVariableCpPositivityTheorem": false,
+  "sourceSHA256": {
+    "/opt/openfoam13/applications/solvers/foamRun/foamRun.C": "5c1e6e34c4bd253f5cc4665a8672f21b6ded2c7a5e391c67419f7586a7b5de91",
+    "/opt/openfoam13/src/finiteVolume/finiteVolume/ddtSchemes/EulerDdtScheme/EulerDdtScheme.C": "5450404723d4d8089a7aa561b4ec4c01744d4dd941d0f998e4de762c293d356e",
+    "/opt/openfoam13/src/finiteVolume/finiteVolume/ddtSchemes/localEulerDdtScheme/localEulerDdtScheme.C": "ce0a88f2301a5961515f630e149c0345238585a57fe1c5f9b8cae96773cb6cef",
+    "/opt/openfoam13/src/finiteVolume/interpolation/surfaceInterpolation/limitedSchemes/upwind/upwind.H": "2b2233282c81110642207b090fc7a489679c4ae10fc573f82d7d354e164b2a00",
+    "/opt/openfoam13/src/finiteVolume/interpolation/surfaceInterpolation/limitedSchemes/vanLeer/vanLeer.H": "a8eb448928d255a73d4fb48c1c2dc1d35a5042e411347846322a945263e9e911",
+    "/opt/openfoam13/src/OpenFOAM/matrices/lduMatrix/solvers/diagonalSolver/diagonalSolver.C": "cb79ef583e681690122043e21d75bd0525f88a8302e05ebd00b6fcda83ef6527",
+    "/opt/openfoam13/tutorials/shockFluid/wedge15Ma5/system/fvSchemes": "751a536f959ade685b343471276736dd474b1bfef7210ea0f8964daf501d78d6",
+    "/opt/openfoam13/tutorials/shockFluid/wedge15Ma5/system/controlDict": "0ae127058b7334bc12c620b74fb34dc0f7b9414a71b542d57de286f5e56362d1",
+    "/opt/openfoam13/applications/modules/shockFluid/correctDensity.C": "d49a73eb28c2c408ce48990d6368e3c3a5cb6c4024a9c371b0a15143998a2037",
+    "/opt/openfoam13/applications/modules/shockFluid/thermophysicalPredictor.C": "64e3ed56492589cd43b7489126b5eaac25f1ddd41a70444600329354e365c694",
+    "/opt/openfoam13/applications/modules/shockFluid/momentumPredictor.C": "a563106d5ea140a790093f840d9094955ec181c9425934b3721519d55f50c9e3",
+    "/opt/openfoam13/applications/modules/shockFluid/moveMesh.C": "d3b606d7feee39ba3338d538bea00028b77058b06954ae7b0b2f12f9476feaab",
+    "/opt/openfoam13/applications/modules/shockFluid/shockFluid.C": "3ed6fae6b1e4e6c30aeeb9e7419fa3c9ff0f829caab412a0d20158de321dfbeb",
+    "/opt/openfoam13/applications/modules/shockFluid/setRDeltaT.C": "3296ed9951f86453c35ce5d1ab1cfccd369cc6c6560e83f2dbd81a8b930f1663",
+    "/opt/openfoam13/applications/modules/shockFluid/fluxPredictor.C": "bd6c1b655f7ee0112b7e23aa8c24fa81f8698326208dd119b584d8a1fb47999d",
+    "/opt/openfoam13/applications/modules/shockFluid/pressureCorrector.C": "32099b84cf93bcde21c6b120d8007b3ed32842e1f32e7de9244b98d7667a8f4a"
+  },
+  "runtimeSHA256": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+  "paperURL": "https://www.math.umd.edu/~tadmor/centpack/publications/files/Greenshields%20et%20al%20polyhedral%20FV%20IJNMF2009-centpack.pdf",
+  "paperScope": "calorically perfect only; no NASA7 qualification",
+  "CFDRuns": 0,
+  "engineBuilds": 0,
+  "elapsedSeconds": 0.33828665699999994,
+  "physicalQualification": false
+}

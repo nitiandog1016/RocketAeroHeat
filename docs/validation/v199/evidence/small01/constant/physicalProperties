@@ -1,0 +1,9 @@
+FoamFile { format ascii; class dictionary; object physicalProperties; }
+thermoType { type hePsiThermo; mixture pureMixture; transport const; thermo janaf; equationOfState perfectGas; specie specie; energy sensibleInternalEnergy; }
+mixture {
+specie { molWeight 28.962788805533126; }
+thermodynamics { Tlow 200; Thigh 2500; Tcommon 1000;
+ lowCpCoeffs (3.5740895983378547 -0.00072580626016489317 1.6751801799717169e-06 -1.3198747857239312e-10 -4.1855650654254182e-13 -1040.6712925682252 3.0844396917004624);
+ highCpCoeffs (3.0175986209465657 0.0014018326617807092 -5.4370564585214111e-07 1.0534123406409989e-10 -8.1474084937810465e-15 -949.78524716735433 5.7286313863057403); }
+transport { mu 0; Pr 0.72; }
+}

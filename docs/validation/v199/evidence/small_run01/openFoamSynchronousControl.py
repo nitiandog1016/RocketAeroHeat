@@ -1,0 +1,85 @@
+"""原生同步Euler/一致面状态控制；所有推进仍由固定OpenFOAM完成。"""
+from pathlib import Path
+import argparse,json,shutil,time,re
+from prepareOpenFoamControl import ROOT,sha,save,header
+from openFoamFields import read_state,audit_state
+
+BASE=ROOT/'outputs/v199_validation';OLD=ROOT/'outputs/v198_validation/control03'
+PROFILE='of13-sync-euler-upwind-nasa7-v1'
+
+
+class PhysicalTimeGuard:
+    """模块一：完整保存场与原生警告同时监督；不把物理时间误作伪步编号。"""
+    def __init__(self,case,record,count=14892,maximum_steps=16000):
+        self.case=Path(case);self.record=Path(record);self.count=count;self.maximum_steps=maximum_steps;self.checked={}
+    def __call__(self,log,final):
+        text=Path(log).read_text(errors='replace')
+        for token in ['out of temperature range','Negative initial temperature','Maximum number of iterations exceeded','FOAM FATAL']:
+            if token in text:return dict(reason='native-warning-or-fatal',token=token)
+        if len(re.findall(r'^Time = ',text,re.M))>self.maximum_steps:return dict(reason='step-budget')
+        candidates=[]
+        for d in self.case.iterdir():
+            if not d.is_dir():continue
+            try:t=float(d.name)
+            except ValueError:continue
+            if t>0:candidates.append((t,d))
+        for t,d in sorted(candidates):
+            if d.name in self.checked:continue
+            paths=[d/n for n in ['p','T','rho','U','e','phi']]
+            complete=all(p.is_file() and p.read_bytes().rstrip().endswith(b'// ************************************************************************* //') for p in paths)
+            if not complete and not final:continue
+            try:
+                row=audit_state(read_state(d,self.count));row['timeSeconds']=t
+                row['fieldsSHA256']={p.name:sha(p) for p in paths};self.checked[d.name]=row
+            except (ValueError,OSError) as error:return dict(reason='saved-state-rejected',timeSeconds=t,error=str(error))
+            save(self.record,dict(frames=self.checked,physicalQualification=False))
+        return None
+
+
+def prepare(case,small):
+    """模块二：仅改原生算子字典，原准确网格/气体/边界逐字复用。"""
+    source=BASE/'source_review01/report.json';assert json.loads(source.read_text())['passed']
+    prep=json.loads((ROOT/'outputs/v198_validation/preparation_repaired.json').read_text())
+    for p,h in prep['inputSHA256'].items():assert sha(Path(p))==h
+    shutil.copytree(OLD,case)
+    p=case/'system/fvSchemes';s=p.read_text()
+    for a,b in [('default localEuler;','default Euler;'),('reconstruct(rho) vanLeer;','reconstruct(rho) upwind;'),
+        ('reconstruct(U) vanLeerV;','reconstruct(U) upwind;'),('reconstruct(T) vanLeer;','reconstruct(T) upwind;')]:
+        assert s.count(a)==1;s=s.replace(a,b)
+    p.write_text(s)
+    p=case/'system/fvSolution';s=p.read_text()
+    s=s.replace(' U {',' "U.*" {').replace(' e {',' "e.*" {')
+    s=s.replace('PIMPLE { maxCo 0.8; rDeltaTSmoothingCoeff 0.02; }','PIMPLE {}');p.write_text(s)
+    dt='1e-7' if small else '1e-7';end='4e-7' if small else '0.003'
+    control='timeStep' if small else 'adjustableRunTime';interval='1' if small else '0.0005'
+    (case/'system/controlDict').write_text(header('controlDict')+f'''solver shockFluid;
+startFrom startTime; startTime 0; stopAt endTime; endTime {end}; deltaT {dt};
+writeControl {control}; writeInterval {interval}; purgeWrite 0; writeFormat ascii;
+writePrecision 17; timeFormat general; timePrecision 12; writeCompression off;
+runTimeModifiable false; adjustTimeStep {"no" if small else "yes"}; maxCo 0.2; maxDeltaT 2e-6;
+functions {{ energy {{ type writeObjects; libs ("libutilityFunctionObjects.so"); objects (e phi); writeControl writeTime; }} }}
+''')
+    for p in (OLD/'constant/polyMesh').iterdir():assert sha(p)==sha(case/'constant/polyMesh'/p.name)
+    assert sha(OLD/'constant/physicalProperties')==sha(case/'constant/physicalProperties')
+    return [source,ROOT/'docs/validation/v199/PLAN.md']
+
+
+def execute(small=True):
+    """模块三：4步接口通过后才能另登记发展预算；此阶段默认不允许长算。"""
+    from runOpenFoamProcess import run
+    if not small:raise ValueError('发展控制尚未登记预算')
+    start=time.monotonic();case=BASE/'small01';out=BASE/'small_run01';out.mkdir(parents=True,exist_ok=False)
+    evidence=prepare(case,True)
+    names=['openFoamSynchronousControl.py','openFoamFields.py','openFoamAirThermo.py','runOpenFoamProcess.py']
+    for name in names:shutil.copyfile(ROOT/'scripts'/name,out/name)
+    locks=[*[ROOT/'scripts'/n for n in names],*evidence,*[p for p in case.rglob('*') if p.is_file()]]
+    save(out/'admission.json',dict(profile=PROFILE,steps=4,dt=1e-7,budgetSeconds=60,memoryMiB=2048,outputMiB=96,
+        inputSHA256={str(p):sha(p) for p in locks},automaticContinuation=0,physicalQualification=False))
+    guard=PhysicalTimeGuard(case,out/'saved_guard.json',maximum_steps=4)
+    p=run(['foamRun'],case,out/'native',60,locks,96,2048,guard)
+    log=(out/'native/stdout.txt').read_text();passed=p['passed'] and len(guard.checked)==4 and 'End\n' in log
+    r=dict(passed=passed,profile=PROFILE,process=p,saved=guard.checked,elapsedSeconds=time.monotonic()-start,physicalQualification=False)
+    save(out/'report.json',r);print(json.dumps(dict(passed=passed,elapsedSeconds=r['elapsedSeconds'],stop=p['stopReason'])))
+    return passed
+
+if __name__=='__main__':raise SystemExit(0 if execute() else 1)

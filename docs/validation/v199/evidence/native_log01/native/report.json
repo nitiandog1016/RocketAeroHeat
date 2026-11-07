@@ -1,0 +1,43 @@
+{
+  "schema": "RAH.OpenFOAMProcess.v1",
+  "argv": [
+    "bash",
+    "--noprofile",
+    "--norc",
+    "-c",
+    "source /opt/openfoam13/etc/bashrc; exec \"$@\"",
+    "rah-openfoam",
+    "python3",
+    "/mnt/e/RocketAeroHeat/outputs/v199_validation/native_log01/case/writer.py"
+  ],
+  "cwd": "/mnt/e/RocketAeroHeat/outputs/v199_validation/native_log01/case",
+  "nativeExitCode": 0,
+  "stopReason": null,
+  "elapsedSeconds": 1.440390884,
+  "maximumSeconds": 10,
+  "peakObservedGroupRSSBytes": 10379264,
+  "liveGroupAfterCleanup": {},
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": "a02a492c35f7bf8d0980cc9a92b78488e271cd0e8143348065e1e7139f6c3d12",
+    "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+    "/mnt/e/RocketAeroHeat/tests/testOpenFoamNativeLog.py": "a0f52616c0b229e8df94ee84f2eb4ac49bdb96b3620771bf2ce6a5a2a78929c7",
+    "/mnt/e/RocketAeroHeat/outputs/v199_validation/native_log01/case/writer.py": "313991c24cf9b510865b0814ef5c835005d318f6298be5ebcc6c9fcdbd4de57b"
+  },
+  "inputStable": {
+    "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": true,
+    "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": true,
+    "/mnt/e/RocketAeroHeat/tests/testOpenFoamNativeLog.py": true,
+    "/mnt/e/RocketAeroHeat/outputs/v199_validation/native_log01/case/writer.py": true
+  },
+  "caseBytes": 161,
+  "logBytes": 1890014,
+  "caseAndLogLimitMiB": 16,
+  "addressSpaceLimitMiB": 2048,
+  "cpuCount": 1,
+  "liveLogFilesystem": "ext2/ext3",
+  "liveLogPath": "/home/rah/.cache/RocketAeroHeat/openfoam-observation/run-2m4_nyh1/stdout.txt",
+  "logExportPassed": true,
+  "physicalQualification": false,
+  "observationIORetries": [],
+  "passed": true
+}
