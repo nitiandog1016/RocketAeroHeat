@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "cells": 9600,
+  "vertices": 14883,
+  "faces": 33920,
+  "ghostCells": 10240,
+  "volumeM3": 0.022307260985198734,
+  "sourceCoordinateError": 0.0,
+  "actualGasModel": {
+    "name": "eilmer-air-cea-v1",
+    "nativeClass": "CompositeGas/ThermPerfGasMixture",
+    "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+    "gasSHA256": "46eeede15d0e8ec8f9e2b96dca04ba419cce43d0080c2218eab26784732253dc",
+    "temperatureRangeK": [
+      200.0,
+      6000.0
+    ],
+    "gasConstantJkgK": 287.1032458563536,
+    "enthalpyReference": "CEA9 official air polynomial, no added shift",
+    "entropyReference": "CEA9 s(T) minus R*ln(p/101325 Pa); not s(298.15K)=0",
+    "blending": "linear coefficients 800--1200 K; cp is not exact dh/dT there",
+    "physicalQualification": false
+  },
+  "physicalQualification": false
+}

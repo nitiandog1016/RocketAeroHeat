@@ -1,0 +1,179 @@
+{
+  "passed": true,
+  "physicalQualification": false,
+  "newSolvedHeatAreaM2": 0,
+  "profile": "coarse-restart-400-to-2000",
+  "sourceStep": 400,
+  "finalStep": 2000,
+  "newUpdates": 1600,
+  "savedSteps": [
+    0,
+    200,
+    400,
+    2000
+  ],
+  "expectedSavedSteps": [
+    0,
+    200,
+    400,
+    800,
+    1200,
+    1600,
+    2000
+  ],
+  "scheduledSamplingPassed": false,
+  "frames": [
+    {
+      "snapshot": 0,
+      "step": 0,
+      "temperatureRangeK": [
+        300.0,
+        300.0
+      ],
+      "fullVolumeEOSErrors": {
+        "rho": 0.0,
+        "e": 0.0,
+        "a": 0.0
+      },
+      "maximumTotalEnthalpyRelativeError": 0.0
+    },
+    {
+      "snapshot": 1,
+      "step": 200,
+      "temperatureRangeK": [
+        296.9266690004387,
+        385.24449624311575
+      ],
+      "fullVolumeEOSErrors": {
+        "rho": 1.3877787807814457e-17,
+        "e": 3.467402355385361e-15,
+        "a": 3.1570994036463544e-16
+      },
+      "maximumTotalEnthalpyRelativeError": 0.0757673360243718
+    },
+    {
+      "snapshot": 2,
+      "step": 400,
+      "temperatureRangeK": [
+        299.89134208927806,
+        385.24448810941243
+      ],
+      "fullVolumeEOSErrors": {
+        "rho": 1.3877787807814457e-17,
+        "e": 3.5359277984436566e-15,
+        "a": 1.6370328515048935e-16
+      },
+      "maximumTotalEnthalpyRelativeError": 0.002648811249157501
+    },
+    {
+      "snapshot": 3,
+      "step": 2000,
+      "temperatureRangeK": [
+        299.89134208943074,
+        385.24448810790284
+      ],
+      "fullVolumeEOSErrors": {
+        "rho": 1.3877787807814457e-17,
+        "e": 3.4671594883942612e-15,
+        "a": 3.0043593758282477e-16
+      },
+      "maximumTotalEnthalpyRelativeError": 0.002648811249107874
+    }
+  ],
+  "normalization": {
+    "lengthM": 1.0,
+    "densityKgm3": 0.058051125883144844,
+    "speedMps": 1041.7259569202704,
+    "equationOrder": [
+      "mass",
+      "x-momentum",
+      "y-momentum",
+      "z-momentum",
+      "total-energy"
+    ],
+    "scales": [
+      60.473364660918136,
+      62996.67366958341,
+      62996.67366958341,
+      62996.67366958341,
+      65625270.16124079
+    ],
+    "last50MaximumNormalizedResiduals": [
+      3.857045185229134e-12,
+      4.6113704593939875e-12,
+      0.0,
+      5.101039170503953e-13,
+      4.384538140460734e-12
+    ],
+    "limit": 1e-08
+  },
+  "residualConverged": true,
+  "nativeL2MixedUnits": 0.0003929707,
+  "massFluxImbalanceRelativeToFreestream": 3.346670353162287e-17,
+  "wallLastPairAreaL1": {
+    "pressurePa": 1.3861464034096169e-05,
+    "temperatureK": 6.772960047151385e-06,
+    "velocityMps": 5.037234959287446e-06
+  },
+  "numericalConvergencePassed": true,
+  "planAcceptancePassed": false,
+  "platformComparisons": [
+    {
+      "region": "compression",
+      "faceCount": 36,
+      "pressurePa": 10654.573806295693,
+      "temperatureK": 381.0701905152599,
+      "velocityMps": [
+        -944.7840095783765,
+        0.0,
+        169.61475768959434
+      ],
+      "pressureRelativeError": 0.03756859207353669,
+      "temperatureRelativeError": 0.023652267171346386,
+      "directionErrorDeg": 0.17775164755718278
+    },
+    {
+      "region": "expansion",
+      "faceCount": 24,
+      "pressurePa": 4994.827963290516,
+      "temperatureK": 317.3847933896401,
+      "velocityMps": [
+        -1024.1438989368062,
+        0.0,
+        -2.337190492379179
+      ],
+      "pressureRelativeError": -0.0034819970278696655,
+      "temperatureRelativeError": 0.045930588315240994,
+      "directionErrorDeg": 0.13075400713547392
+    }
+  ],
+  "coarseReferenceScreenPassed": true,
+  "nativeSeconds": 39.026731693,
+  "peakGroupRSSBytes": 70639616,
+  "storage": [
+    [
+      "2400",
+      "2720",
+      "5",
+      "4",
+      "8",
+      "25600",
+      "1638400"
+    ]
+  ],
+  "wallAreaM2": 0.04024682579017193,
+  "edgeQualified": false,
+  "inputSHA256": {
+    "scripts\\auditHybridEulerEvolution.py": "1b88cd1db5bec2ed125d2fed0a0f7b60f34757b32bd081fee8fcff040b7b8631",
+    "scripts\\hybridEulerEvolution.py": "9cddd857373a37ebbfb919da5327d5a55b920d0c3a9d74af0dcd3572f2f47ee7",
+    "scripts\\readHybridEulerNative.py": "212a1be69ae70af74db5941aa70d0e5e6cc6c3d62162c8424f2c8a2ce59bca61",
+    "scripts\\readEilmerNative.py": "2c0925d9d588c4d78c387f35e75603d05a26c2bde83c63d0d81dc46cf0e4b2f6",
+    "scripts\\eilmerAirThermo.py": "3d79fb0b916164a1a616d69482df960d07c42242af6ea80ff3d5c4cdb3f52183",
+    "scripts\\hybridExternalState.py": "cda0c6cc081c95c854912915589470afc08798a4676295b6d1336475f8d1124d",
+    "outputs\\v192_validation\\prepare01\\report.json": "44e076bd6714c404a248e07f90c055a897e4e4a36876b0aea43c7257d52d2cd7",
+    "outputs\\v192_validation\\coarse_run01\\report.json": "42e5bccb90d010fafdd3b4fc071a5f197f8d52b27b18d3a5475c98393511e07b",
+    "outputs\\v191_validation\\audit01\\reference.json": "29718d07e95a112a62b47deb954b3e750fad7bb92b2a244c8333d0858c4dc788"
+  },
+  "inputsStable": true,
+  "elapsedSeconds": 0.7190000000118744
+}

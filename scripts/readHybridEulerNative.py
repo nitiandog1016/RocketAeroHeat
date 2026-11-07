@@ -11,6 +11,9 @@ from hybridExternalState import exchange, fingerprint
 def audit_inputs(case, preparation):
     """模块一：逐文件准备来源、实际算子和边界合同；与旧RANS入口隔离。"""
     case=Path(case);receipt=json.loads(Path(preparation).read_text())
+    if receipt.get('schema')=='RAH.HybridEulerEvolutionPreparation.v1':
+        from hybridEulerEvolution import audit_evolution_inputs
+        return audit_evolution_inputs(case,preparation)
     need(receipt.get('schema')=='RAH.HybridEulerNativePreparation.v1' and receipt.get('passed'),
          '缺少已通过Euler准备回执')
     # receipt可在Windows复核WSL路径；不放行别的case身份。
@@ -104,6 +107,8 @@ def read_wall_frame(case, snapshot, preparation, run_receipt=None):
             Path(__file__).with_name('eilmerAirThermo.py'),Path(__file__).with_name('hybridExternalState.py'),
             Path(__file__).with_name('readEilmerNative.py')]
     source+=provenance
+    if json.loads(Path(preparation).read_text()).get('schema')=='RAH.HybridEulerEvolutionPreparation.v1':
+        source.append(Path(__file__).with_name('hybridEulerEvolution.py'))
     sources={str(p.resolve()):sha(p) for p in source}
     frame=dict(schema='RAH.HybridEulerFrame.v1',solver='Euler',turbulenceModel='none',
                surfaceSHA256=fingerprint(surface),conditionSHA256=fingerprint(condition),modelSHA256=fingerprint(model),

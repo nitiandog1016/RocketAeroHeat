@@ -1,0 +1,60 @@
+{
+  "schema": "RAH.HybridEulerPreparation.v1",
+  "candidate": "coarse-restart-400-to-2000",
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "preparedOnly": true,
+  "nativePrepared": false,
+  "executionAuthorized": false,
+  "model": "eilmer-air-cea-v1",
+  "energyReference": "fixed official air CEA polynomial reference",
+  "condition": {
+    "Mach": 3.0,
+    "pressurePa": 5000.0,
+    "temperatureK": 300.0,
+    "velocityDirection": [
+      -1.0,
+      0.0,
+      0.0
+    ]
+  },
+  "geometry": {
+    "cells": 2400,
+    "vertices": 3843,
+    "wallQuads": 120,
+    "wallTriangles": 240,
+    "gridIntervals": [
+      60,
+      2,
+      20
+    ],
+    "full3DTarget": false,
+    "analyticalVolumeM3": 0.022307260985198734
+  },
+  "nativeConfig": {
+    "viscous": false,
+    "turbulence_model": "none",
+    "gasdynamic_update_scheme": "tvd_rk3",
+    "max_step": 2000,
+    "write_flow_solution_at_step": 400,
+    "cfl_value": 0.3
+  },
+  "pending": [
+    "native prep/API and actual gas confirmation",
+    "same-EOS shock/expansion reference",
+    "ghost and complete memory accounting",
+    "finite native budget and admission",
+    "boundary/refinement sensitivity and convergence"
+  ],
+  "newPhysicalQualification": false,
+  "newSolvedHeatAreaM2": 0,
+  "wallHeatFluxAvailable": false,
+  "filesSHA256": {
+    "mesh.su2": "78283a2d7020cf4735ef4d4ea56ee089e9c494616ffb38a0add9dcc9bdde46c5",
+    "surface.json": "75f4c6b12c296387738042330992b8311b95b7675102dd96ec141153b9c7fcdb",
+    "gas.inp": "da5dc79b69cef1913abfcba2f50d34fb907abf081025ef9803a25f4c7512eed8",
+    "grid.lua": "775bc68a671e5dd46da9d4c1e353b2e3eee5187851cba67e6aecfef21221573b",
+    "job.lua": "cba58ac5b8c983982bd9f3e65c51902c354eab9907b8e6933fca1ee06b87699e"
+  },
+  "restartSnapshot": 2,
+  "restartStep": 400
+}

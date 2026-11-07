@@ -14,12 +14,14 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def prepare(folder):
+def prepare(folder, grid_intervals=(60,2,20)):
     """模块一：原X约定下挤出10度压缩/10度回转控制，所有端面具名。"""
     folder = Path(folder).resolve()
     if folder.exists():
         raise ValueError('目标已存在，禁止覆盖或当作自动续算')
-    nx, ny, nz = 60, 2, 20
+    if tuple(grid_intervals) not in ((60,2,20),(120,2,40)):
+        raise ValueError('当前只登记原控制或流向/法向各加密2倍的控制')
+    nx, ny, nz = grid_intervals
     ss = np.linspace(0, 1, nx+1)
     yy = np.linspace(-.02, .02, ny+1)
     ee = np.linspace(0, 1, nz+1)

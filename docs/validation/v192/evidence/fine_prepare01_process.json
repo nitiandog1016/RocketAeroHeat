@@ -1,0 +1,28 @@
+{
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\windows-wsl\\wsl.exe",
+    "-d",
+    "RocketAeroHeat-Ubuntu-24.04",
+    "-u",
+    "rah",
+    "--exec",
+    "python3",
+    "/mnt/e/RocketAeroHeat/scripts/prepareHybridEulerRefinement.py",
+    "--case",
+    "/mnt/e/RocketAeroHeat/outputs/v192_validation/fine01",
+    "--record",
+    "/mnt/e/RocketAeroHeat/outputs/v192_validation/fine_prepare01",
+    "--baseline",
+    "/mnt/e/RocketAeroHeat/outputs/v191_validation/control01",
+    "--coarse-audit",
+    "/mnt/e/RocketAeroHeat/outputs/v192_validation/coarse_audit02/report.json"
+  ],
+  "maximumSeconds": 90,
+  "maximumMemoryBytes": 4294967296,
+  "status": "terminal",
+  "processID": 48144,
+  "exitCode": 0,
+  "elapsedSeconds": 4.594000000011874,
+  "sampledPeakMemoryBytes": 46776320,
+  "stoppedByBudget": null
+}

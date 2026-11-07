@@ -1,0 +1,134 @@
+{
+  "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/timemarching.d": {
+    "sha256": "d80216eca42f386a34f52e4115813a9ddc532f1e02d3dbb28f93670e47508da5",
+    "matches": [
+      {
+        "line": 58,
+        "text": "    compute_L2_residual,"
+      },
+      {
+        "line": 59,
+        "text": "    compute_Linf_residuals,"
+      },
+      {
+        "line": 225,
+        "text": "        // SimState.time, SimState.step and SimState.dt_global set in prepareTimesFileOnRestart"
+      },
+      {
+        "line": 236,
+        "text": "            prepareTimesFileOnRestart(SimState.current_tindx);"
+      },
+      {
+        "line": 544,
+        "text": "\t                compute_L2_residual(L2_residual);"
+      },
+      {
+        "line": 545,
+        "text": "                    compute_Linf_residuals(Linf_residuals);"
+      },
+      {
+        "line": 604,
+        "text": "            if ( SimState.step == GlobalConfig.write_flow_solution_at_step ) {"
+      },
+      {
+        "line": 911,
+        "text": "void prepareTimesFileOnRestart(int restartIdx)"
+      }
+    ]
+  },
+  "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/commands/runsim.d": {
+    "sha256": "953d941ef7096ffbfb3d8271e316a72e228d825d891598d6c77b6f8a9bea2413",
+    "matches": [
+      {
+        "line": 91,
+        "text": " -s, --snapshot-start"
+      },
+      {
+        "line": 95,
+        "text": "       --snapshot-start=3 : start from snapshot 3"
+      },
+      {
+        "line": 253,
+        "text": "           \"s|snapshot-start\", &snapshotStart,"
+      }
+    ]
+  },
+  "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/lua-modules/bc.lua": {
+    "sha256": "ff7546154adb1b6d986a203195e9cd36b22f339ff488db60a4f810098115fe61",
+    "matches": [
+      {
+        "line": 765,
+        "text": "WallBC_WithSlip1 = BoundaryCondition:new()"
+      },
+      {
+        "line": 766,
+        "text": "WallBC_WithSlip1.type = \"wall_with_slip\""
+      },
+      {
+        "line": 767,
+        "text": "function WallBC_WithSlip1:new(o)"
+      },
+      {
+        "line": 770,
+        "text": "      error(\"Make sure that you are using WallBC_WithSlip1:new{}\".."
+      },
+      {
+        "line": 771,
+        "text": "               \" and not WallBC_WithSlip1.new{}\", 2)"
+      },
+      {
+        "line": 776,
+        "text": "      error(\"Invalid name for item supplied to WallBC_WithSlip1 constructor.\", 2)"
+      },
+      {
+        "line": 791,
+        "text": "WallBC_WithSlip2 = BoundaryCondition:new()"
+      },
+      {
+        "line": 792,
+        "text": "WallBC_WithSlip2.type = \"wall_with_slip2\""
+      },
+      {
+        "line": 793,
+        "text": "function WallBC_WithSlip2:new(o)"
+      },
+      {
+        "line": 796,
+        "text": "      error(\"Make sure that you are using WallBC_WithSlip2:new{}\".."
+      },
+      {
+        "line": 797,
+        "text": "               \" and not WallBC_WithSlip2.new{}\", 2)"
+      },
+      {
+        "line": 802,
+        "text": "      error(\"Invalid name for item supplied to WallBC_WithSlip2 constructor.\", 2)"
+      }
+    ]
+  },
+  "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/overlay/src/lmr/fluidblock.d": {
+    "sha256": "11f5cd951a56156cae608f4b1bf79f6fdcaa949b76767b09f3887c540a39f482",
+    "matches": [
+      {
+        "line": 1019,
+        "text": "    void compute_Linf_residuals()"
+      },
+      {
+        "line": 1034,
+        "text": "    } // end compute_Linf_residuals()"
+      },
+      {
+        "line": 1037,
+        "text": "    void compute_L2_residual()"
+      },
+      {
+        "line": 1063,
+        "text": "    } // end compute_L2_residual()"
+      },
+      {
+        "line": 1083,
+        "text": "    } // end compute_Linf_residuals()"
+      }
+    ]
+  }
+}
