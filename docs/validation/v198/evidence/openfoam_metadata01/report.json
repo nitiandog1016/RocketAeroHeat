@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "keySHA256": "fbaacfe37e704494f6e65ab424e67b031191769e84c31185acb701f9e74fe0a9",
+  "source": "deb [arch=amd64 signed-by=/usr/share/keyrings/rah-openfoam.asc] http://dl.openfoam.org/ubuntu noble main\n",
+  "commands": [
+    {
+      "argv": [
+        "gpg",
+        "--batch",
+        "--show-keys",
+        "--with-fingerprint",
+        "/usr/share/keyrings/rah-openfoam.asc"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.018256420000000162
+    },
+    {
+      "argv": [
+        "apt-get",
+        "-o",
+        "Dir::Etc::sourcelist=/etc/apt/sources.list.d/rah-openfoam13.list",
+        "-o",
+        "Dir::Etc::sourceparts=-",
+        "-o",
+        "APT::Get::List-Cleanup=0",
+        "-o",
+        "Acquire::Retries=0",
+        "-o",
+        "Acquire::http::Timeout=25",
+        "update"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.770486715000004
+    },
+    {
+      "argv": [
+        "apt-cache",
+        "policy",
+        "openfoam13"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.7182700249999954
+    },
+    {
+      "argv": [
+        "apt-cache",
+        "show",
+        "openfoam13"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.033272497999988104
+    }
+  ],
+  "elapsedSeconds": 4.6788182490000025,
+  "CFDRuns": 0,
+  "engineBuilds": 0
+}

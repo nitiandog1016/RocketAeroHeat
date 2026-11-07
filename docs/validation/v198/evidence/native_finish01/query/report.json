@@ -1,0 +1,42 @@
+{
+  "schema": "RAH.OpenFOAMProcess.v1",
+  "argv": [
+    "bash",
+    "--noprofile",
+    "--norc",
+    "-c",
+    "source /opt/openfoam13/etc/bashrc; exec \"$@\"",
+    "rah-openfoam",
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry02/probe/rahThermoProbe",
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_finish01/mixture.dict"
+  ],
+  "cwd": "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_finish01",
+  "nativeExitCode": 0,
+  "stopReason": null,
+  "elapsedSeconds": 0.8286997090000057,
+  "maximumSeconds": 20,
+  "peakObservedGroupRSSBytes": 6475776,
+  "liveGroupAfterCleanup": {},
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": "0f811168da2b7fa57e38eda5590229d274efd8b031086803c4e0576b28e00893",
+    "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+    "/mnt/e/RocketAeroHeat/scripts/completeOpenFoamEntry.py": "f0a8a6c626a2ae916ecd0d9faab5464a73901e6d3ee1a971de4d3b1e7e205593",
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry02/probe/rahThermoProbe": "5ecc7c9ab998e9092d431f9bc8f4875e3223c08318e716410b320891c28296df",
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_finish01/mixture.dict": "c44f6d6674445fd59718c89a2972574f5bb9a082ee4a8ecfc21aef84f33b6332",
+    "/mnt/e/RocketAeroHeat/scripts/openFoamAirThermo.py": "1ff709fbb60c806c7157b7e1cc72472baa49fd5c6bbec11edfc1d6bfe9ca1206"
+  },
+  "inputStable": {
+    "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": true,
+    "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": true,
+    "/mnt/e/RocketAeroHeat/scripts/completeOpenFoamEntry.py": true,
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry02/probe/rahThermoProbe": true,
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_finish01/mixture.dict": true,
+    "/mnt/e/RocketAeroHeat/scripts/openFoamAirThermo.py": true
+  },
+  "caseBytes": 18007,
+  "caseLimitMiB": 32,
+  "addressSpaceLimitMiB": 2048,
+  "cpuCount": 1,
+  "physicalQualification": false,
+  "passed": true
+}

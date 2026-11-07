@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "decision": "existing adapted SU2 Euler entry rejected; proceed to named OpenFOAM13 contract",
+  "reasons": [
+    "actual CConfig explicitly rejects EULER for IDEAL_AIR_VARIABLE_CP",
+    "CEulerVariable property exception precedes original rollback and is not caught",
+    "BC_Far_Field uses constant-Gamma invariants; not the desired variable-cp ambient contract",
+    "current Riemann whitelist is static PT supersonic inlet or static pressure outlet only"
+  ],
+  "sourceBinding": {
+    "Common/src/CConfig.cpp": {
+      "source": "E:\\RocketAeroHeat\\outputs\\v163_validation\\build03\\executed_sources\\Common\\src\\CConfig.cpp",
+      "sha256": "bb137ca80063b9c9d775c8ff576b155ff3a0ad48bb8998572fd34afb3b54ec47"
+    },
+    "SU2_CFD/src/solvers/CEulerSolver.cpp": {
+      "source": "E:\\RocketAeroHeat\\outputs\\v163_validation\\build03\\executed_sources\\SU2_CFD\\src\\solvers\\CEulerSolver.cpp",
+      "sha256": "199e03e4dc258fdd040e3f74510ffd79aff13114caf96c7523c41ab5eedc3f67"
+    },
+    "SU2_CFD/src/variables/CEulerVariable.cpp": {
+      "source": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\variables\\CEulerVariable.cpp",
+      "sha256": "9ab7e8aa43e362782a1d9249a89d2f233df70259d7927b8d0e00b9bd89d12034"
+    },
+    "SU2_CFD/src/solvers/CSolverFactory.cpp": {
+      "source": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\solvers\\CSolverFactory.cpp",
+      "sha256": "2de362d9e095cf53941173e283b15373a62f5086ba2bce527179148d52d31cb6"
+    },
+    "SU2_CFD/include/fluid/CSU2IdealAir.hpp": {
+      "source": "E:\\RocketAeroHeat\\outputs\\v163_validation\\build03\\executed_sources\\SU2_CFD\\include\\fluid\\CSU2IdealAir.hpp",
+      "sha256": "39b1de945124aaf8e7283262e499d20fd026e7ebd498dbb2b0db84b3c7c84cf8"
+    },
+    "SU2_CFD/include/fluid/IdealAir.hpp": {
+      "source": "E:\\RocketAeroHeat\\outputs\\v163_validation\\build03\\executed_sources\\SU2_CFD\\include\\fluid\\IdealAir.hpp",
+      "sha256": "62a880ed2e1ec76c5bc8c9a832ec7787b5b3f01494f31ed6a3ebf7bfb972969b"
+    }
+  },
+  "runtimeSHA256": "0899ac278e1053446ecb958f47ed7ef3810425daf6a4901406c1cc9937013f2e",
+  "sourceTreeSHA256": "5a29d1d19994eb1211fc0e923262ea77beabe3b91a00e8fd76ff78c80c9e063e",
+  "assessmentScope": "exact existing adapted package, not a claim that all SU2 formulations are impossible",
+  "CFDRuns": 0,
+  "builds": 0,
+  "physicalQualification": false,
+  "newSolvedHeatAreaM2": 0,
+  "elapsedSeconds": 0.5309999999881256
+}

@@ -7,8 +7,11 @@ from scipy.integrate import quad
 from eilmerAirThermo import evaluate, R
 
 
-def control_reference():
+def control_reference(eos=None,gas_constant=None,model=None):
     """模块一：Rankine-Hugoniot守恒关系求10度弱支，不用定gamma激波表。"""
+    # 原CEA默认保持；新的具名原生入口必须显式传入自身EOS和气体常数。
+    evaluate=eos if eos is not None else globals()['evaluate']
+    R=gas_constant if gas_constant is not None else globals()['R']
     theta=math.radians(10);p1=5000.;T1=300.
     gas1=evaluate(p1,T1);rho1=float(gas1['densityKgm3'])
     U1=3*float(gas1['soundSpeedMps']);h1=float(gas1['enthalpyJkg']);h0=h1+U1**2/2
@@ -51,8 +54,10 @@ def control_reference():
         expansionAngleRad=abs(angle(T3)-theta),
         cpIntegralEnthalpyAbsolute=abs(quad(lambda t:float(evaluate(p1,t)['cpJkgK']),T1,T2,
                                              epsabs=1e-8,epsrel=1e-12)[0]-(g2['enthalpyJkg']-h1)))
-    return dict(schema='RAH.HybridEulerReference.v1',states=states,
+    result=dict(schema='RAH.HybridEulerReference.v1',states=states,
                 shockAngleDeg=math.degrees(beta),densityRatio=float(r),
                 residuals={k:float(v) for k,v in residuals.items()},
                 temperatureRangeK=[200,800],physicalQualification=False,
                 scope='same-EOS 2D inviscid reference, not experimental heat or rocket validation')
+    if model is not None:result['gasModel']=model
+    return result

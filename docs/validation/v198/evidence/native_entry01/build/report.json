@@ -1,0 +1,45 @@
+{
+  "schema": "RAH.OpenFOAMProcess.v1",
+  "argv": [
+    "bash",
+    "--noprofile",
+    "--norc",
+    "-c",
+    "source /opt/openfoam13/etc/bashrc; exec \"$@\"",
+    "rah-openfoam",
+    "wmake"
+  ],
+  "cwd": "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry01/probe",
+  "nativeExitCode": 2,
+  "stopReason": null,
+  "elapsedSeconds": 1.5922141939999999,
+  "maximumSeconds": 90,
+  "peakObservedGroupRSSBytes": 94040064,
+  "liveGroupAfterCleanup": {},
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": "0f811168da2b7fa57e38eda5590229d274efd8b031086803c4e0576b28e00893",
+    "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+    "/mnt/e/RocketAeroHeat/scripts/verifyOpenFoamEntry.py": "ef880c19ede1f9e6409f66b340d0d682602717ace10d6d6ae55103c81eb64326",
+    "/mnt/e/RocketAeroHeat/scripts/openFoamAirThermo.py": "09661d43ede65aca4b1049838f2b3ff537440e2ea3811f36089fb7deb2f017cf",
+    "/mnt/e/RocketAeroHeat/docs/validation/v198/MINIMAL_ENTRY_PLAN.md": "d3f4e9b7a0acf6ff32e6b38bd2a14147d10e83b1f3747ed24a1cbc5a1e374c66",
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry01/probe/thermoProbe.C": "03553bb1dc5ee4f8315155fca751a10ed6f04d7c9366f185e3bcd4eb34f084ea",
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry01/probe/Make/files": "ca4aadb6368fe402bf6f48196ed6aae6fda64a4be115e839bff5d81a3d5adb75",
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry01/probe/Make/options": "993d335abcca3439d18fb117e24ef70e94c2a3ab26bed63795eb761c4e3f16a9"
+  },
+  "inputStable": {
+    "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": true,
+    "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": true,
+    "/mnt/e/RocketAeroHeat/scripts/verifyOpenFoamEntry.py": true,
+    "/mnt/e/RocketAeroHeat/scripts/openFoamAirThermo.py": true,
+    "/mnt/e/RocketAeroHeat/docs/validation/v198/MINIMAL_ENTRY_PLAN.md": true,
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry01/probe/thermoProbe.C": true,
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry01/probe/Make/files": true,
+    "/mnt/e/RocketAeroHeat/outputs/v198_validation/native_entry01/probe/Make/options": true
+  },
+  "caseBytes": 23009,
+  "caseLimitMiB": 32,
+  "addressSpaceLimitMiB": 2048,
+  "cpuCount": 1,
+  "physicalQualification": false,
+  "passed": false
+}

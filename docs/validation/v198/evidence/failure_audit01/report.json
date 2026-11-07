@@ -1,0 +1,106 @@
+{
+  "auditPassed": true,
+  "candidateAccepted": false,
+  "profile": "of13-nasa7-tetra-lts-600-v1",
+  "runs": [
+    {
+      "name": "control_run01",
+      "processPassed": false,
+      "nativeExitCode": -15,
+      "guardReason": {
+        "reason": "native-warning-or-fatal",
+        "token": "FOAM FATAL"
+      },
+      "supervisorSeconds": 1.3118681460000001,
+      "entrySeconds": 2.2097248019999998,
+      "peakGroupRSSBytes": 144961536,
+      "lockedInputs": 26,
+      "allInputsStable": true,
+      "groupEmpty": true,
+      "lastAnnouncedStep": 1,
+      "lastCompletedLogStep": null,
+      "warningQueries": [],
+      "savedDevelopmentFrames": [],
+      "normalCompleted600": false
+    },
+    {
+      "name": "control_run02",
+      "processPassed": false,
+      "nativeExitCode": -15,
+      "guardReason": {
+        "reason": "native-warning-or-fatal",
+        "token": "out of temperature range"
+      },
+      "supervisorSeconds": 1.667165010000005,
+      "entrySeconds": 2.557040039999997,
+      "peakGroupRSSBytes": 149815296,
+      "lockedInputs": 26,
+      "allInputsStable": true,
+      "groupEmpty": true,
+      "lastAnnouncedStep": 41,
+      "lastCompletedLogStep": 40,
+      "warningQueries": [
+        {
+          "step": 39,
+          "requestedTemperatureK": 181.36899944325523
+        },
+        {
+          "step": 39,
+          "requestedTemperatureK": 181.378442752005
+        },
+        {
+          "step": 40,
+          "requestedTemperatureK": 178.60928736495373
+        },
+        {
+          "step": 40,
+          "requestedTemperatureK": 178.61446834586047
+        }
+      ],
+      "savedDevelopmentFrames": [],
+      "normalCompleted600": false
+    }
+  ],
+  "originalResidualThresholdPassed": false,
+  "diagonalSolverZeroIsNotEquationConvergence": true,
+  "warningMeans": "native inverse-temperature trial was outside range; actual transient full state/location/cause unknown",
+  "finalFieldAvailable": false,
+  "wallPressureValidated": false,
+  "newQualifiedHeatAreaM2": 0,
+  "originalRocketFaces": 19752,
+  "originalRocketAreaM2": 1.9646292565715553,
+  "CFDOnRealRocket": 0,
+  "protectedFiles": {
+    "tests/verifyWebSectionExport.py": true,
+    "web/section.js": true,
+    "web/viewer.js": true,
+    "docs\\research\\d1372_source_checks.txt": true,
+    "docs\\research\\d1372_verified_conditions.csv": true,
+    "docs\\research\\evidence_manifest.json": true,
+    "docs\\research\\ntrs_19630001117_metadata.json": true,
+    "docs\\research\\opencode_protuberance_d1372.md": true,
+    "docs\\validation\\opencode_feature_retention\\evidence_manifest.json": true,
+    "docs\\validation\\opencode_feature_retention\\existing_geometry_test.log": true,
+    "docs\\validation\\opencode_feature_retention\\existing_remesh_test.log": true,
+    "docs\\validation\\opencode_feature_retention\\feature_retention_matrix.json": true,
+    "docs\\validation\\opencode_feature_retention\\README.md": true,
+    "docs\\validation\\opencode_feature_retention\\run.log": true,
+    "docs\\validation\\opencode_section_export\\browser_download_heatFlux.csv": true,
+    "docs\\validation\\opencode_section_export\\browser_test.html": true,
+    "docs\\validation\\opencode_section_export\\consistency_heatFlux.json": true,
+    "docs\\validation\\opencode_section_export\\evidence_manifest.json": true,
+    "docs\\validation\\opencode_section_export\\make_fixture.js": true,
+    "docs\\validation\\opencode_section_export\\README.md": true,
+    "docs\\validation\\opencode_section_export\\section_edgeTemperature.csv": true,
+    "docs\\validation\\opencode_section_export\\section_heatFlux.csv": true,
+    "docs\\validation\\opencode_section_export\\section_pressure.csv": true,
+    "docs\\validation\\opencode_section_export\\section_wallInput.csv": true,
+    "docs\\validation\\opencode_section_export\\section_wallSolved.csv": true,
+    "docs\\validation\\opencode_section_export\\snapshot.json": true,
+    "docs\\validation\\opencode_section_export\\surface_heatFlux.csv": true,
+    "tests/testRocketFeatureRetentionMatrix.m": true,
+    "tests/testSectionExportReasons.js": true
+  },
+  "elapsedSeconds": 0.014999999984866008,
+  "physicalQualification": false
+}

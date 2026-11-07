@@ -1,0 +1,104 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 13-18870c24d21c
+Exec   : checkMesh -allTopology -allGeometry
+Date   : Nov 07 2026
+Time   : 18:56:00
+Host   : "LAPTOP-APDSESFJ"
+PID    : 16
+I/O    : uncollated
+Case   : /mnt/e/RocketAeroHeat/outputs/v198_validation/control03
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Enabling all (cell, face, edge, point) topology checks.
+
+Enabling all geometry checks.
+
+Time = 0s
+
+Mesh stats
+    points:           4007
+    faces:            32504
+    internal faces:   27064
+    cells:            14892
+    faces per cell:   4
+    boundary patches: 5
+    point zones:      0
+    face zones:       0
+    cell zones:       0
+
+Overall number of cells of each type:
+    hexahedra:     0
+    prisms:        0
+    wedges:        0
+    pyramids:      0
+    tet wedges:    0
+    tetrahedra:    14892
+    polyhedra:     0
+
+Checking topology...
+    Boundary definition OK.
+    Cell to face addressing OK.
+    Point usage OK.
+    Upper triangular ordering OK.
+    Face vertices OK.
+    Topological cell zip-up check OK.
+    Face-face connectivity OK.
+    Number of regions: 1 (OK).
+
+Checking patch topology for multiply connected surfaces...
+    Patch               Faces    Points   Surface topology                  
+    wall                240      183      ok (non-closed singly connected)  
+    outer               240      183      ok (non-closed singly connected)  
+    inflow              80       63       ok (non-closed singly connected)  
+    outflow             80       63       ok (non-closed singly connected)  
+    span                4800     2562     ok (non-closed singly connected)  
+
+Checking geometry...
+    Overall domain bounding box (-1 -0.02 0) (0 0.02 0.60000000000000009)
+    Patch bounding boxes
+        wall                 (-1 -0.02 0) (0 0.02 0.07053079228338599)
+        outer                (-1 -0.02 0.59999999999999987) (0 0.02 0.60000000000000009)
+        inflow               (0 -0.02 0) (0 0.02 0.59999999999999998)
+        outflow              (-1 -0.02 0.07053079228338599) (-1 0.02 0.59999999999999998)
+        span                 (-1 -0.02 0) (0 0.02 0.60000000000000009)
+    Mesh has 3 geometric (non-empty/wedge) directions (1 1 1)
+    Mesh has 3 solution (non-empty) directions (1 1 1)
+    Max cell openness = 1.3619233777500734e-16 OK.
+    Max aspect ratio = 7.2000000000000499 OK.
+    Minimum face area = 6.9122855878947013e-05. Maximum face area = 0.00039051248379533336.  Face area magnitudes OK.
+    Min volume = 3.6768694980319235e-07. Max volume = 1.6666666666666766e-06.  Total volume = 0.022307260985192777.  Cell volumes OK.
+    Mesh non-orthogonality Max: 49.858539374126529 average: 29.143058527131583
+    Non-orthogonality check OK.
+    Face pyramids OK.
+    Max skewness = 0.62500000000002054 OK.
+    Coupled point location match (average 0) OK.
+    Face tets OK.
+    Min/max edge length = 0.011015262857880067 0.039721250959376647 OK.
+    All angles in faces OK.
+    All face flatness OK.
+    Cell determinant (wellposedness) : minimum: 0.03520525361547 average: 0.75181181292156263
+    Cell determinant check OK.
+    Concave cell check OK.
+    Face interpolation weight : minimum: 0.19911585672807136 average: 0.49631929758073706
+    Face interpolation weight check OK.
+    Face volume ratio : minimum: 0.24862005122810626 average: 0.99053325080219512
+    Face volume ratio check OK.
+
+Mesh OK.
+
+End
+

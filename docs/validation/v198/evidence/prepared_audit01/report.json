@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "queryReceiptSHA256": "7463d4cc3220a395de65883f492e305adc1515d529e2f9ff4cae51d9cc733730",
+  "queryLogSHA256": "ff0656e5df487719c470673e0c2d1d1302d82e809dee47aa9125c742236fc3bb",
+  "propertyMaxRelativeErrors": {
+    "cpJkgK": 1.9935923269513336e-16,
+    "cvJkgK": 2.664176361310425e-16,
+    "enthalpyJkg": 4.554746124822524e-14,
+    "sensibleEnthalpyJkg": 2.6911119450304927e-14,
+    "internalEnergyJkg": 5.180863931198777e-16,
+    "densityKgm3": 0.0,
+    "soundSpeedMps": 2.0042881798544777e-16
+  },
+  "inverseTemperatureMaxAbsK": 1.3028511602897197e-10,
+  "contract": {
+    "model": "rah-nasa7-air-of13-sensible-e-v1",
+    "source": {
+      "path": "/mnt/e/RocketAeroHeat/airThermalProperties.m",
+      "sha256": "b944e4b2def4786deac2121651a6675339a21eecbe999814499824ad1627c885"
+    },
+    "temperatureRangeK": [
+      200.0,
+      2500.0
+    ],
+    "gasConstantJkgK": 287.07413663878884,
+    "molarMassGmol": 28.962771483015608,
+    "massFractions": [
+      0.755,
+      0.232,
+      0.013
+    ],
+    "nativeUniversalConstantJmolK": 8.314467591,
+    "nativeEOSMolarParameter": 28.962788805533126,
+    "molarParameterMeaning": "RR_native/R_target; effective EOS parameter, not physical molecular mass",
+    "hfJkg": 2016.774642574509,
+    "referenceTemperatureK": 298.15,
+    "energy": "es=ha-hf-R*T",
+    "engineTotalEnergy": "E=es+0.5*|U|^2; engineering h0=E+hf+R*T; ha=es+hf+R*T",
+    "enthalpyJumpAt1000KJkg": -0.023498939583078027,
+    "originalJumpRetained": true,
+    "chemistry": "fixed composition, no dissociation",
+    "physicalQualification": false,
+    "nativeLimitBehavior": "warn and clamp; any warning rejects run, not a pre-query guarantee"
+  },
+  "geometry": {
+    "cells": 14892,
+    "points": 4007,
+    "faces": 32504,
+    "internalFaces": 27064,
+    "volumeM3": 0.02230726098519873,
+    "minimumCellVolumeM3": 3.676869498032001e-07,
+    "maxCellAreaClosureM2": 8.131516293641283e-20
+  },
+  "mesh": {
+    "schema": "RAH.OpenFOAMProcess.v1",
+    "argv": [
+      "bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "source /opt/openfoam13/etc/bashrc; exec \"$@\"",
+      "rah-openfoam",
+      "checkMesh",
+      "-allTopology",
+      "-allGeometry"
+    ],
+    "cwd": "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03",
+    "nativeExitCode": 0,
+    "stopReason": null,
+    "elapsedSeconds": 1.3684043099999883,
+    "maximumSeconds": 60,
+    "peakObservedGroupRSSBytes": 62459904,
+    "liveGroupAfterCleanup": {},
+    "inputSHA256": {
+      "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": "0f811168da2b7fa57e38eda5590229d274efd8b031086803c4e0576b28e00893",
+      "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+      "/mnt/e/RocketAeroHeat/scripts/auditOpenFoamPrepared.py": "0c06269b30aa3ed60d17aa34d5054a9216caef9846e1e9f9ec07ff2f793b3e69",
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/boundary": "6f631552ef76f65e6559496043a9edddd40be09c763f162b0cb4229b8f413e0f",
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/faces": "9e486b8a952a7c981c25ab81cca1856913e90b50bdd815c7601fb68669dba4cb",
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/neighbour": "8f1c6953e97a9e210f81d96e1416571921d84375922276c118b421669f92f126",
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/owner": "a5c56691bd0a583a16f17adba26ebaf98df3c82cb817838e4f86c21757b42aed",
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/points": "ded41b82f9ae599cc0f1964ba702c3d0f99c0c605cf6bd26d57c64a242db9540"
+    },
+    "inputStable": {
+      "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": true,
+      "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": true,
+      "/mnt/e/RocketAeroHeat/scripts/auditOpenFoamPrepared.py": true,
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/boundary": true,
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/faces": true,
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/neighbour": true,
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/owner": true,
+      "/mnt/e/RocketAeroHeat/outputs/v198_validation/control03/constant/polyMesh/points": true
+    },
+    "caseBytes": 3062511,
+    "caseLimitMiB": 96,
+    "addressSpaceLimitMiB": 2048,
+    "cpuCount": 1,
+    "physicalQualification": false,
+    "passed": true
+  },
+  "originalMeshCheckOverallPassed": false,
+  "correctedMeshCheckOverallPassed": true,
+  "CFDRuns": 0,
+  "engineBuilds": 0,
+  "elapsedSeconds": 1.5795095329999924,
+  "physicalQualification": false
+}

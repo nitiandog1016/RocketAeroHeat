@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "version": "20260624",
+  "debSHA256": "75cb48bb7aee5907fb449ff4b520cbbef5e095c867d8c7320a6ca976aca62791",
+  "commands": [
+    {
+      "argv": [
+        "apt-get",
+        "--no-install-recommends",
+        "-o",
+        "Acquire::Retries=0",
+        "-o",
+        "Acquire::http::Timeout=30",
+        "--assume-no",
+        "install",
+        "openfoam13=20260624"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 0.4670827999999858
+    },
+    {
+      "argv": [
+        "apt-get",
+        "--no-install-recommends",
+        "-o",
+        "Acquire::Retries=0",
+        "-o",
+        "Acquire::http::Timeout=30",
+        "-y",
+        "--download-only",
+        "install",
+        "openfoam13=20260624"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 10.092284202999991
+    },
+    {
+      "argv": [
+        "apt-get",
+        "--no-install-recommends",
+        "-o",
+        "Acquire::Retries=0",
+        "-o",
+        "Acquire::http::Timeout=30",
+        "-y",
+        "--no-download",
+        "install",
+        "openfoam13=20260624"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 33.140095222000014
+    }
+  ],
+  "elapsedSeconds": 43.845384166,
+  "CFDRuns": 0,
+  "engineBuilds": 0,
+  "rebootRequired": false
+}

@@ -1,0 +1,7 @@
+FoamFile { format ascii; class dictionary; object controlDict; }
+solver shockFluid;
+startFrom startTime; startTime 0; stopAt endTime; endTime 0; deltaT 1;
+writeControl timeStep; writeInterval 20; purgeWrite 0; writeFormat ascii;
+writePrecision 17; timeFormat general; timePrecision 12; writeCompression off;
+runTimeModifiable false; adjustTimeStep no;
+functions { energy { type writeObjects; libs ("libutilityFunctionObjects.so"); objects (e); writeControl writeTime; } }
