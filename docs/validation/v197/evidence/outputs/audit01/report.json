@@ -1,0 +1,184 @@
+{
+  "passed": true,
+  "physicalQualification": false,
+  "newSolvedHeatAreaM2": 0,
+  "screeningPassed": true,
+  "savedSteps": [
+    0,
+    20,
+    40,
+    60,
+    80,
+    100,
+    120
+  ],
+  "fields": [
+    {
+      "snapshot": 0,
+      "step": 0,
+      "temperatureRangeK": [
+        300.0,
+        300.0
+      ],
+      "minimumPressurePa": 5000.0,
+      "minimumDensityKgm3": 0.058051125883144844,
+      "EOSError": {
+        "rho": 0.0,
+        "e": 0.0,
+        "a": 0.0
+      }
+    },
+    {
+      "snapshot": 1,
+      "step": 20,
+      "temperatureRangeK": [
+        299.7301877542092,
+        333.15847611478586
+      ],
+      "minimumPressurePa": 4980.561004438965,
+      "minimumDensityKgm3": 0.05787276581864072,
+      "EOSError": {
+        "rho": 1.3877787807814457e-17,
+        "e": 1.9707715130290223e-15,
+        "a": 1.6371857349202802e-16
+      }
+    },
+    {
+      "snapshot": 2,
+      "step": 40,
+      "temperatureRangeK": [
+        299.57741079714793,
+        353.81253398613643
+      ],
+      "minimumPressurePa": 4961.710353314038,
+      "minimumDensityKgm3": 0.05768783531765777,
+      "EOSError": {
+        "rho": 1.3877787807814457e-17,
+        "e": 2.7637495235014326e-15,
+        "a": 1.6375385398063817e-16
+      }
+    },
+    {
+      "snapshot": 3,
+      "step": 60,
+      "temperatureRangeK": [
+        299.5231248672841,
+        363.533334184792
+      ],
+      "minimumPressurePa": 4947.06790690146,
+      "minimumDensityKgm3": 0.0575280179672105,
+      "EOSError": {
+        "rho": 1.3877787807814457e-17,
+        "e": 2.1450334589489425e-15,
+        "a": 3.273994575025357e-16
+      }
+    },
+    {
+      "snapshot": 4,
+      "step": 80,
+      "temperatureRangeK": [
+        299.33900241598036,
+        372.0209977339274
+      ],
+      "minimumPressurePa": 4934.321145535717,
+      "minimumDensityKgm3": 0.057415083698842205,
+      "EOSError": {
+        "rho": 1.3877787807814457e-17,
+        "e": 2.794171097478318e-15,
+        "a": 1.6376126827167435e-16
+      }
+    },
+    {
+      "snapshot": 5,
+      "step": 100,
+      "temperatureRangeK": [
+        299.23222439153926,
+        378.2148370650832
+      ],
+      "minimumPressurePa": 4928.553598547176,
+      "minimumDensityKgm3": 0.05736843736389608,
+      "EOSError": {
+        "rho": 1.3877787807814457e-17,
+        "e": 2.7988738102516255e-15,
+        "a": 3.27399457505279e-16
+      }
+    },
+    {
+      "snapshot": 6,
+      "step": 120,
+      "temperatureRangeK": [
+        299.21653358301626,
+        380.4345633335121
+      ],
+      "minimumPressurePa": 4927.920849198352,
+      "minimumDensityKgm3": 0.05736408014625001,
+      "EOSError": {
+        "rho": 1.3877787807814457e-17,
+        "e": 2.8368266567804723e-15,
+        "a": 1.6376198910336557e-16
+      }
+    }
+  ],
+  "controlWallFaces": 240,
+  "controlWallAreaM2": 0.04024682579017193,
+  "meanLog10ImprovementLast20VsFirst20": {
+    "mass": 0.34048357333444645,
+    "energy": 0.3300979028198885
+  },
+  "minimumRequiredImprovement": 0.05,
+  "nativeRelativeResidualLast20Max": {
+    "mass-rel": 0.5560828237226029,
+    "x-mom-rel": 0.5685026601710945,
+    "y-mom-rel": 401.16836751895704,
+    "z-mom-rel": 0.4407573921186659,
+    "total-energy-rel": 0.5486887512482861
+  },
+  "nativeRelativeResidualGatePassed": false,
+  "residualScope": "NK native component ratios to its initial reference; not explicit solver residual normalization",
+  "nativeGlobalRelativeResidualFinal": 0.6640668465181833,
+  "numericalConvergencePassed": false,
+  "lastPairWallAreaL1": {
+    "pressure": 0.013451630448280159,
+    "temperature": 0.004301543677843462
+  },
+  "platformComparisons": [
+    {
+      "region": "compression",
+      "count": 36,
+      "pressurePa": 9336.322746996759,
+      "temperatureK": 374.7643160041945,
+      "pressureRelativeError": -0.09080593706887141,
+      "temperatureRelativeError": 0.006713070927677922,
+      "status": "unconverged development observation; not accuracy qualification"
+    },
+    {
+      "region": "expansion",
+      "count": 24,
+      "pressurePa": 5000.000000000003,
+      "temperatureK": 300.0000000000001,
+      "pressureRelativeError": -0.0024501241123426887,
+      "temperatureRelativeError": -0.01136039586698534,
+      "status": "unconverged development observation; not accuracy qualification"
+    }
+  ],
+  "nativeMassBalanceFinal": 0.18675580498810102,
+  "finalCFL": 0.1497867616927076,
+  "relaxationFactorRange": [
+    1.0,
+    1.0
+  ],
+  "observedLinearSolveTargetMet": true,
+  "processSeconds": 55.07332379599998,
+  "peakGroupRSSBytes": 522510336,
+  "stableInputCount": 27,
+  "wallHeatFluxIdentity": "unknown, not zero",
+  "solvedWallTemperatureIdentity": "unknown",
+  "sourceSHA256": {
+    "scripts\\auditHybridNKControl.py": "0ec8fb60d6eced0e274ced20750b863a520e2c658522f742f4e8ed03559b2651",
+    "E:\\RocketAeroHeat\\outputs\\v197_validation\\run01\\report.json": "96bab579365208bcfaa611ae9286c23c772724150b414e9b59caff2759e2e37d",
+    "E:\\RocketAeroHeat\\outputs\\v197_validation\\preparation01\\report.json": "1597d8fc7f37b373e4369ebf1b08d60ae4ef4f87dc682d947ff1b02412995905",
+    "E:\\RocketAeroHeat\\docs\\validation\\v197\\ENTRY_DECISION.md": "10f528f487429381a9da57cb8700b1a7a53e68d04a97be2cabb78dadbe5b1b4c"
+  },
+  "inputsStable": true,
+  "elapsedSeconds": 0.5629999999946449
+}
