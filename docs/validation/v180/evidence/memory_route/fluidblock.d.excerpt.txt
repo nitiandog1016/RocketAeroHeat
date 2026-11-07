@@ -1,0 +1,84 @@
+265:         celldata.wall_distances.length = ncells;
+266:         celldata.data_is_bad.length = ncells;
+267:         celldata.in_turbulent_zone.length = ncells;
+268:         celldata.lengths.length = ncells + nghost;
+269: 
+270:         celldata.areas.length     = ngtl*(ncells + nghost);
+271:         celldata.volumes.length   = ngtl*(ncells + nghost);
+272:         celldata.positions.length = ngtl*(ncells + nghost);
+273: 
+274:         celldata.U0.length = (ncells + nghost)*neq*nftl;
+275:         if (nftl>1) celldata.U1.length = (ncells + nghost)*neq*nftl;
+276:         if (nftl>2) celldata.U2.length = (ncells + nghost)*neq*nftl;
+277:         if (nftl>3) celldata.U3.length = (ncells + nghost)*neq*nftl;
+278:         if (nftl>4) celldata.U4.length = (ncells + nghost)*neq*nftl;
+279:         celldata.dUdt0.length = (ncells + nghost)*neq*nftl;
+280:         if (nftl>1) celldata.dUdt1.length = (ncells + nghost)*neq*nftl;
+281:         if (nftl>2) celldata.dUdt2.length = (ncells + nghost)*neq*nftl;
+282:         if (nftl>3) celldata.dUdt3.length = (ncells + nghost)*neq*nftl;
+283:         if (nftl>4) celldata.dUdt4.length = (ncells + nghost)*neq*nftl;
+284:         celldata.source_terms.length = (ncells + nghost)*neq;
+285: 
+286:         celldata.flowstates.reserve(ncells + nghost);
+287:         celldata.gradients.reserve(ncells + nghost);
+288:         celldata.workspaces.reserve(ncells + nghost);
+289:         foreach (n; 0 .. ncells+nghost) celldata.flowstates ~= FlowState(gmodel, nturb);
+290:         foreach (n; 0 .. ncells+nghost) celldata.gradients ~= FlowGradients(myConfig);
+291:         foreach (n; 0 .. ncells+nghost) celldata.workspaces ~= WLSQGradWorkspace();
+292: 
+293:         version(newton_krylov) {
+294:             celldata.cell_jacobians.length = (ncells+nghost)*neq*neq;
+295:             celldata.saved_gradients.reserve(ncells + nghost);
+296:             foreach (n; 0 .. ncells+nghost) celldata.saved_gradients ~= FlowGradients(myConfig);
+297:             celldata.saved_source_terms.length = (ncells + nghost)*neq;
+298:             celldata.doNotPerturb.length = (ncells+nghost);
+299:         }
+300:     }
+301: 
+302:     void allocate_dense_facedata(size_t nfaces, size_t nbfaces, size_t neq, size_t nftl)
+303:     {
+304:     /*
+305:         Both kinds of blocks now share a structure of densely packed core flow
+306:         data. This routine allocates the storage for these structures,
+307:         attempting to keep related bits of data together on the heap.
+308: 
+309:         @author: Nick Gibbons
+310:     */
+311:         auto gmodel = myConfig.gmodel;
+312:         size_t nturb = myConfig.turb_model.nturb;
+313:         size_t ngtl = myConfig.n_grid_time_levels;
+314: 
+315:         facedata.all_face_idxs.length = nfaces;
+316:         foreach(i; 0 .. nfaces) facedata.all_face_idxs[i] = i;
+317: 
+318:         facedata.positions.length = nfaces;
+319:         facedata.areas.length = nfaces*ngtl;
+320:         facedata.grid_velocities.length = nfaces*ngtl;
+321:         facedata.normals.length = nfaces;
+322:         facedata.tangents1.length = nfaces;
+323:         facedata.tangents2.length = nfaces;
+324:         facedata.left_interior_only.length = nfaces;
+325:         facedata.right_interior_only.length = nfaces;
+326:         facedata.stencil_idxs.length = nfaces;
+327:         facedata.fluxes.length = nfaces*neq;
+328:         facedata.f2c.length = nfaces;
+329: 
+330:         if (myConfig.interpolation_order>=2) facedata.l2r2_interp_data.length = nfaces;
+331:         if (myConfig.interpolation_order==3) facedata.l3r3_interp_data.length = nfaces;
+332: 
+333:         facedata.flowstates.reserve(nfaces);
+334:         foreach (n; 0 .. nfaces) facedata.flowstates ~= FlowState(gmodel, nturb);
+335:         facedata.gradients.reserve(nfaces);
+336:         foreach (n; 0 .. nfaces) facedata.gradients ~= FlowGradients(myConfig);
+337:         facedata.workspaces.reserve(nfaces);
+338:         foreach (n; 0 .. nfaces) facedata.workspaces ~= WLSQGradWorkspace();
+339:     }
+340: 
+341:     @nogc
+342:     void identify_reaction_zones(int gtl)
+343:     // Adjust the reactions-allowed flag for cells in this block.
+344:     {
+345:         size_t total_cells_in_reaction_zones = 0;
+346:         size_t total_cells = 0;
+347:         foreach(cell; cells) {
+348:             if ( myConfig.reaction_zones.length > 0 ) {

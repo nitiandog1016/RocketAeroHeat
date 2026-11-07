@@ -5,13 +5,14 @@ import json
 import shutil
 import time
 from runEilmerProcess import run,sha,COMMIT
+from auditEilmerCompletion import audit_completion
 
 
 def execute(case,stage,record,seconds,prepared=None,audit=None):
     started=time.monotonic();case=Path(case).resolve();record=Path(record).resolve()
     assert not record.exists();m=json.loads((case/'case_manifest.json').read_text())
     assert m['schema']=='RAH.EilmerRun14Control.v1' and m['sourceCommit']==COMMIT
-    locks=[case/'case_manifest.json',Path(__file__)]
+    locks=[case/'case_manifest.json',Path(__file__),Path(__file__).with_name('auditEilmerCompletion.py')]
     for name,digest in m['filesSHA256'].items():
         assert sha(case/name)==digest;locks.append(case/name)
     if stage=='prepare':
@@ -33,7 +34,9 @@ def execute(case,stage,record,seconds,prepared=None,audit=None):
             receipt=run(cmd,case,record/('process%02d'%i),remaining,256,locks)
             result['commands'].append(receipt)
             if not receipt['passed']:break
-        else:result['passed']=True
+        else:
+            if stage=='run':result['nativeCompletion']=audit_completion(case,record/'process00/stdout.txt')
+            result['passed']=True
         key='nativeInputSHA256' if stage=='prepare' else 'outputSHA256'
         result[key]={str(p):sha(p) for p in case.rglob('*') if p.is_file()}
     except Exception as error:result['error']=repr(error)

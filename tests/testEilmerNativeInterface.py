@@ -17,6 +17,9 @@ from readEilmerNative import audit_prepared,read_field,export_loads,sha
 def verify(case,run_receipt,output):
     started=time.monotonic();case=Path(case).resolve();out=Path(output).resolve()
     out.mkdir(parents=True,exist_ok=False)
+    # 新完成审核需要准确原生日志；合成字段检查沿用同一已声明的小例步骤，不重跑CFD。
+    (out/'process00').mkdir()
+    shutil.copyfile(Path(run_receipt).parent/'process00/stdout.txt',out/'process00/stdout.txt')
     report,grid,mapping=audit_prepared(case)
     f0=read_field(case,0,4);f1=read_field(case,1,4)
     # 模块一：解析体积真值，分别核对四类单元，不能只比较总和。

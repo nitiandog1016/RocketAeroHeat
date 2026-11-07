@@ -54,7 +54,7 @@ def validate_condition(condition):
     c = dict(condition)
     mode = c.setdefault("flowMode", "explicitVelocity")
     common = {"flowMode", "pressurePa", "temperatureK", "wallTemperatureK", "maxNewtonSteps",
-              "stopRelativeResidual", "boundaryMarkers"}
+              "stopRelativeResidual", "boundaryMarkers", "development"}
     modes = {
         "explicitVelocity": {"velocityMps", "tkeM2s2", "omegaPerS", "targetMach"},
         "nativeMach": {"Mach", "alphaDeg", "betaDeg", "turbulenceIntensity", "eddyViscosityRatio"},
@@ -67,6 +67,14 @@ def validate_condition(condition):
     require(c["maxNewtonSteps"].is_integer(), "maxNewtonSteps 必须是正整数")
     c["maxNewtonSteps"] = int(c["maxNewtonSteps"])
     require(c["stopRelativeResidual"] < 1, "相对残差目标必须小于1；不等价于物理收敛")
+    if 'development' in c:
+        d=c['development'];required={'profile','initialOrderSteps','loadsEvery','snapshotsEvery','snapshotCount'}
+        require(isinstance(d,dict) and set(d)==required,'发展配置字段不完整或含未知参数')
+        require(d['profile']=='rah-nk-development-v1','未支持的发展方案')
+        for key in required-{'profile'}:
+            require(isinstance(d[key],int) and not isinstance(d[key],bool) and d[key]>0,'发展步数必须为正整数')
+        require(d['initialOrderSteps']<c['maxNewtonSteps'],'必须实际进入二阶阶段')
+        require(2<=d['snapshotCount']<=3,'发展保存槽数须为2或3')
     if mode == "nativeMach":
         for key in modes[mode]:
             require(key in c, f"缺少 {key}")
@@ -203,7 +211,7 @@ local omega = gs.rho*tke/(gs.mu*{f(c['eddyViscosityRatio'])})'''
         flow = f'''-- 显式速度模式；未核对它与任何目标Mach相等。
 local ux, uy, uz = {', '.join(f(v) for v in c['velocityMps'])}
 local tke, omega = {f(c['tkeM2s2'])}, {f(c['omegaPerS'])}'''
-    return f'''-- RocketAeroHeat：仅准备的Eilmer {TAG}输入，原生尚未验证。
+    job = f'''-- RocketAeroHeat：仅准备的Eilmer {TAG}输入，原生尚未验证。
 -- 固定源码 {COMMIT}；Wilcox k-omega，非SST、非旧重启动。
 config.dimensions = 3
 config.axisymmetric = false
@@ -257,6 +265,24 @@ NewtonKrylovPhase:new{{use_local_timestep=true, use_auto_cfl=false,
     ignore_stopping_criteria=false,
     residual_interpolation_order=2, jacobian_interpolation_order=1,
     linear_solve_tolerance=0.01}}
+'''
+    if 'development' not in c:return job
+    d=c['development']
+    # 模块：生产发展单独具名；保留旧四步生成结果逐字不变，不暴露参数扫描入口。
+    return job[:job.index('NewtonKrylovGlobalConfig')]+f'''NewtonKrylovGlobalConfig{{number_of_phases=2,
+    max_steps_in_initial_phases={{{d['initialOrderSteps']}}},
+    max_newton_steps={c['maxNewtonSteps']}, stop_on_relative_residual={f(c['stopRelativeResidual'])},
+    min_cfl=0.01, max_cfl=1000, use_line_search=true, use_physicality_check=true,
+    max_consecutive_bad_steps=2, use_preconditioner=true, preconditioner="ilu", ilu_fill=0,
+    max_linear_solver_iterations=50, max_linear_solver_restarts=0,
+    write_loads=true, steps_between_loads_update={d['loadsEvery']},
+    total_snapshots={d['snapshotCount']}, steps_between_snapshots={d['snapshotsEvery']},
+    write_snapshot_on_last_step=true, write_loads_on_last_step=true,
+    steps_between_status=10, steps_between_diagnostics=1}}
+NewtonKrylovPhase:new{{use_auto_cfl=true, start_cfl=0.1, max_cfl=1000,
+    threshold_relative_residual_for_cfl_growth=0.9, auto_cfl_exponent=0.75,
+    residual_interpolation_order=1, jacobian_interpolation_order=1, linear_solve_tolerance=0.01}}
+NewtonKrylovPhase:new{{start_cfl=1, residual_interpolation_order=2, jacobian_interpolation_order=1}}
 '''
 
 

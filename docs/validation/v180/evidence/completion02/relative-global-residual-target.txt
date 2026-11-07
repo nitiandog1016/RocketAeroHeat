@@ -1,0 +1,87 @@
+Eilmer simulation code.
+Revision-id: f53f460
+Revision-date: Mon Dec 22 17:46:51 2025 +1000
+Compiler-name: LDC v2.111
+Parallel-flavour: shared
+Number-type: complex
+Build-flavour: fast
+Build-date: Sat Nov  7 00:39:55 CST 2026
+
+--- WARNING 00 ---
+'extrema_clipping' is set to true.
+This is NOT recommended in steady_state mode.
+Suggestion: set 'config.extrema_clipping = false' in input script.
+------------------
+
+Computational Domain Reference Length (m): 1.28564
+Heap memory used: 1 MB, unused: 4 MB, total: 5 MB (5-5 MB per task)
+*************************************************************************
+*
+*  At step 0, reference residuals have been set.
+*  Reference global residual: 3.825657773037e+07
+*
+*  Reference residuals for each conservation equation:
+*            mass: 3.044581138863e+01
+*           x-mom: 5.169511949356e+04
+*           y-mom: 1.392345300184e+04
+*           z-mom: 5.921846926268e+04
+*    total-energy: 3.131181796177e+07
+*             tke: 2.575997751943e+04
+*           omega: 2.582589855450e+06
+*
+*************************************************************************
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++   Starting in Phase 1 (out of 2) at step =      1; global relative residual = 1.000000e+00   +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++   Start of Phase 2 (out of 2) at step =      2; global relative residual = 1.000000e+00   +
++   ---> CFL reset for the start of this phase: cfl= 1.000e+00                              +
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++
++   Writing loads at step =      2    +
++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++
++   Writing snapshot at step =      4 +
++++++++++++++++++++++++++++++++++++++++
+    |
+    |-->  Writing fluid values
+
++++++++++++++++++++++++++++++++++++++++
++   Writing loads at step =      4    +
++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++
++   Writing loads at step =      6    +
++++++++++++++++++++++++++++++++++++++++
+
+*** STOPPING: Reached maximum number of steps.
++++++++++++++++++++++++++++++++++++++++
++   Writing snapshot at step =      8 +
++++++++++++++++++++++++++++++++++++++++
+    |
+    |-->  Writing fluid values
+
++++++++++++++++++++++++++++++++++++++++
++   Writing loads at step =      8    +
++++++++++++++++++++++++++++++++++++++++
+
+--------------------------------------------------------------
+step=      8	cfl= 1.000e+00	dt= 7.366e-05	WC=0.2
+--------------------------------------------------------------
+      RESIDUALS		RELATIVE		ABSOLUTE
+         global		9.292520e-01		3.555000e+07
+           mass		9.106772e-01		2.772631e+01
+          x-mom		3.508004e-01		1.813467e+04
+          y-mom		1.072689e+00		1.493553e+04
+          z-mom		7.462821e-02		4.419368e+03
+   total-energy		8.882890e-01		2.781394e+07
+            tke		5.518287e-02		1.421509e+03
+          omega		5.277733e-02		1.363022e+05
+
+STOP-REASON: relative-global-residual-target
+FINAL-STEP: 8
+FINAL-CFL: 1.000e+00

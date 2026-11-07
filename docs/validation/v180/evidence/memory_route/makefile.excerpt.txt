@@ -1,0 +1,27 @@
+54: WITH_DIAGNOSTICS ?= 0
+55: MULTI_SPECIES_GAS ?= 1
+56: MULTI_T_GAS ?= 1
+57: MHD ?= 1
+58: NK ?= 1
+59: TURBULENCE ?= 1
+60: WITH_E4DEBUG ?= 0
+
+286:     DFLAGS += $(DVERSION)MHD
+287: endif
+288: 
+289: ifeq ($(NK),1)
+290:     DFLAGS += $(DVERSION)newton_krylov
+291: endif
+292: 
+293: ifeq ($(TURBULENCE),1)
+294:     DFLAGS += $(DVERSION)turbulence
+295: endif
+
+415: 	$(call build_lmr_entry)
+416: 
+417: # Use the pattern rule % to match *all* lmrZ[...] targets.
+418: # Add complex specialisations to all complex versions of programs
+419: lmrZ%: DFLAGS += $(DVERSION)complex_numbers
+420: 
+421: # Add MPI specialisations
+422: lmr-mpi-run lmrZ-mpi-run: DFLAGS += $(DVERSION)mpi_parallel

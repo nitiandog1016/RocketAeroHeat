@@ -9,6 +9,7 @@ import re
 import struct
 import time
 import numpy as np
+from auditEilmerCompletion import audit_completion,completion_log_for_receipt
 
 TYPES={4:10,5:13,6:12,7:14}
 WIDTH={10:4,13:6,12:8,14:5}
@@ -138,6 +139,27 @@ def read_field(case,snapshot,ncells):
     return fields
 
 
+def audit_numerics(nk,c):
+    """按具名合同审核原生已生成的阶段与输出；旧小检查配置保持原门槛。"""
+    need(nk['max_newton_steps']==c['maxNewtonSteps'] and nk['write_loads'],'步数或载荷输出不符')
+    need(nk['use_physicality_check'] and nk['use_line_search'],'成熟状态检查未启用')
+    if 'development' not in c:
+        need(nk['min_cfl']==.1 and nk['max_cfl']==.1 and all(v[1]==.1 for v in nk['cfl_schedule']),
+             '原生CFL没有按准备合同实际设置')
+        return
+    d=c['development']
+    need(d['profile']=='rah-nk-development-v1','发展方案错误')
+    need(nk['number_of_phases']==2 and nk['max_steps_in_initial_phases']==[d['initialOrderSteps']],'阶段切换错误')
+    need(nk['min_cfl']==.01 and nk['max_cfl']==1000,'发展CFL合同错误')
+    need(nk['steps_between_loads_update']==d['loadsEvery'] and nk['steps_between_snapshots']==d['snapshotsEvery'] and
+         nk['total_snapshots']==d['snapshotCount'] and nk['write_snapshot_on_last_step'] and nk['write_loads_on_last_step'],'保存合同错误')
+    for i,start in enumerate([.1,1.]):
+        p=nk['NewtonKrylovPhase_%d'%i]
+        need(p['use_auto_cfl'] and p['start_cfl']==start and p['residual_interpolation_order']==i+1 and
+             p['jacobian_interpolation_order']==1 and p['linear_solve_tolerance']==.01 and
+             p['threshold_relative_residual_for_cfl_growth']==.9 and p['auto_cfl_exponent']==.75,'原生阶段分派错误')
+
+
 def audit_prepared(case):
     """核对真正落地的原生配置、M/方向/热边界、初场和原面全体身份。"""
     case=Path(case);m=json.loads((case/'case_manifest.json').read_text());c=m['condition']
@@ -150,10 +172,7 @@ def audit_prepared(case):
     mapping,coorderr=compare_source(grid,m['mesh']['nativeSourcePath'])
     cfg=json.loads((case/'lmrsim/config').read_text());nk=json.loads((case/'lmrsim/nk-config').read_text())
     need(cfg['dimensions']==3 and cfg['viscous'] and cfg['turbulence_model']=='k_omega','原生物理模型不符')
-    need(nk['max_newton_steps']==c['maxNewtonSteps'] and nk['write_loads'],'步数或载荷输出不符')
-    need(nk['min_cfl']==.1 and nk['max_cfl']==.1 and all(v[1]==.1 for v in nk['cfl_schedule']),
-         '原生CFL没有按准备合同实际设置')
-    need(nk['use_physicality_check'] and nk['use_line_search'],'成熟状态检查未启用')
+    audit_numerics(nk,c)
     walltag=c['boundaryMarkers']['wall'];wallid=grid['boundaries'][walltag]['index']
     wall=cfg['block_0']['boundary_'+str(wallid)]
     actions=wall['pre_spatial_deriv_action_at_bndry_faces']
@@ -192,6 +211,8 @@ def export_loads(case,loads,output,run_receipt):
     need(run_receipt is not None,'缺少准确原生运行来源')
     receipt=json.loads(Path(run_receipt).read_text())
     need(receipt['stage']=='run' and receipt['passed'] and receipt['case']==str(case),'拒绝失败/错源运行')
+    # 旧回执可能只有启动器exit0；必须只读核对真正原生完成，失败历史不改写。
+    completion=audit_completion(case,completion_log_for_receipt(case,run_receipt,receipt))
     need(receipt['caseManifestSHA256']==sha(case/'case_manifest.json'),'运行工况来源不符')
     for cmd in receipt['commands']:
         need(cmd['passed'] and cmd['inputsStable'] and cmd['nativeExitCode']==0 and cmd['stopReason'] is None,'原生异常运行')

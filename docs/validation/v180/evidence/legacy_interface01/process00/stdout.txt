@@ -1,0 +1,103 @@
+Eilmer simulation code.
+Revision-id: f53f460
+Revision-date: Mon Dec 22 17:46:51 2025 +1000
+Compiler-name: LDC v2.111
+Parallel-flavour: shared
+Number-type: complex
+Build-flavour: fast
+Build-date: Sat Nov  7 00:39:55 CST 2026
+
+--- WARNING 00 ---
+'extrema_clipping' is set to true.
+This is NOT recommended in steady_state mode.
+Suggestion: set 'config.extrema_clipping = false' in input script.
+------------------
+
+Computational Domain Reference Length (m): 1.28564
+Heap memory used: 1 MB, unused: 4 MB, total: 5 MB (5-5 MB per task)
+*************************************************************************
+*
+*  At step 0, reference residuals have been set.
+*  Reference global residual: 4.931180783426e+07
+*
+*  Reference residuals for each conservation equation:
+*            mass: 3.621778503355e+01
+*           x-mom: 5.091791669457e+04
+*           y-mom: 1.108382109658e+04
+*           z-mom: 5.258777590637e+04
+*    total-energy: 4.290841449826e+07
+*             tke: 2.591791868041e+04
+*           omega: 2.602292674447e+06
+*
+*************************************************************************
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++   Starting in Phase 1 (out of 1) at step =      1; global relative residual = 1.000000e+00   +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+--------------------------------------------------------------
+step=      1	cfl= 1.000e-01	dt= 8.347e-06	WC=0.0
+--------------------------------------------------------------
+      RESIDUALS		RELATIVE		ABSOLUTE
+         global		1.000000e+00		4.931181e+07
+           mass		9.723893e-01		3.521779e+01
+          x-mom		9.999804e-01		5.091692e+04
+          y-mom		9.999098e-01		1.108282e+04
+          z-mom		9.999810e-01		5.258678e+04
+   total-energy		1.000000e+00		4.290841e+07
+            tke		9.999614e-01		2.591692e+04
+          omega		9.999996e-01		2.602292e+06
+
+--------------------------------------------------------------
+step=      2	cfl= 1.000e-01	dt= 8.267e-06	WC=0.0
+--------------------------------------------------------------
+      RESIDUALS		RELATIVE		ABSOLUTE
+         global		1.029455e+00		5.076430e+07
+           mass		9.885672e-01		3.580371e+01
+          x-mom		7.843429e-01		3.993711e+04
+          y-mom		9.741431e-01		1.079723e+04
+          z-mom		8.831389e-01		4.644231e+04
+   total-energy		9.444021e-01		4.052280e+07
+            tke		8.930679e-01		2.314646e+04
+          omega		9.069464e-01		2.360140e+06
+
+--------------------------------------------------------------
+step=      3	cfl= 1.000e-01	dt= 8.207e-06	WC=0.0
+--------------------------------------------------------------
+      RESIDUALS		RELATIVE		ABSOLUTE
+         global		1.032136e+00		5.089649e+07
+           mass		9.887439e-01		3.581011e+01
+          x-mom		6.468398e-01		3.293573e+04
+          y-mom		9.559634e-01		1.059573e+04
+          z-mom		8.150619e-01		4.286229e+04
+   total-energy		8.704346e-01		3.734897e+07
+            tke		8.021419e-01		2.078985e+04
+          omega		8.248641e-01		2.146538e+06
+
+*** STOPPING: Reached maximum number of steps.
++++++++++++++++++++++++++++++++++++++++
++   Writing snapshot at step =      4 +
++++++++++++++++++++++++++++++++++++++++
+    |
+    |-->  Writing fluid values
+
++++++++++++++++++++++++++++++++++++++++
++   Writing loads at step =      4    +
++++++++++++++++++++++++++++++++++++++++
+
+--------------------------------------------------------------
+step=      4	cfl= 1.000e-01	dt= 8.156e-06	WC=0.0
+--------------------------------------------------------------
+      RESIDUALS		RELATIVE		ABSOLUTE
+         global		1.039297e+00		5.124960e+07
+           mass		9.816294e-01		3.555244e+01
+          x-mom		5.452975e-01		2.776541e+04
+          y-mom		9.400416e-01		1.041925e+04
+          z-mom		7.705475e-01		4.052138e+04
+   total-energy		8.046245e-01		3.452516e+07
+            tke		7.247753e-01		1.878467e+04
+          omega		7.542226e-01		1.962708e+06
+
+STOP-REASON: maximum-steps
+FINAL-STEP: 4
+FINAL-CFL: 1.000e-01

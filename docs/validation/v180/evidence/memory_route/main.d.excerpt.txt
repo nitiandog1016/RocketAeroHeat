@@ -1,0 +1,41 @@
+108: {
+109:     bool helpWanted = false;
+110:     bool versionWanted = false;
+111:     bool versionLongWanted = false;
+112:     NumberType numberType;
+113:     try {
+114:         getopt(args,
+115:                std.getopt.config.stopOnFirstNonOption,
+116:                "h|help", &helpWanted,
+117:                "v|version", &versionWanted,
+118:                "version-long", &versionLongWanted,
+119:                "number-type", &numberType
+120:                );
+121:     } catch (Exception e) {
+122:         writeln("Eilmer top-level program quitting.");
+123:         writeln("There is something wrong with the command-line arguments/options.");
+124:         writeln(e.msg);
+125:         writeln("");
+126:         printHelp([""]);
+
+169:     auto cmd = args[1];
+170: 
+171:     if (cmd == "run") {
+172:         // We need to treat this one specially because of how delegation
+173:         // is made based on number type (real or complex)
+174:         return delegateAndExecute(args, numberType);
+175:     }
+176: 
+177:     if (cmd in commands) {
+178:         return (*commands[cmd].main)(args);
+179:     }
+
+280: 
+281: == Notes ==
+282: --number-type option, if used, must appear before "run" command.
+283: It is advanced usage to control delegation of "run" to lmr-run
+284: (which uses real numbers) or lmrZ-run (which uses complex numbers).
+285: 
+286: `;
+287:     write(generalHelp);
+288:     return 0;

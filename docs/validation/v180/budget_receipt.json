@@ -1,0 +1,100 @@
+{
+  "measuredEntries": [
+    {
+      "receipt": "evidence/memory02/report.json",
+      "scope": "group-memory-test",
+      "elapsedSeconds": 2.976320065000003
+    },
+    {
+      "receipt": "evidence/cancel01/report.json",
+      "scope": "cancel-timeout-test",
+      "elapsedSeconds": 2.044506285000004
+    },
+    {
+      "receipt": "evidence/profile01.json",
+      "scope": "configuration-test",
+      "elapsedSeconds": 0.017010898000000108
+    },
+    {
+      "receipt": "evidence/small01_prepare/report.json",
+      "scope": "small-preparation-entry",
+      "elapsedSeconds": 1.878453460000003
+    },
+    {
+      "receipt": "evidence/small01_run/report.json",
+      "scope": "small-run-entry",
+      "elapsedSeconds": 1.637048428
+    },
+    {
+      "receipt": "evidence/small01_phase.json",
+      "scope": "small-phase-readonly",
+      "elapsedSeconds": 0.03988296199999297
+    },
+    {
+      "receipt": "evidence/real01_prepare/report.json",
+      "scope": "real-preparation-entry",
+      "elapsedSeconds": 31.526918289999998
+    },
+    {
+      "receipt": "evidence/real01_run/report.json",
+      "scope": "real-failed-run-entry",
+      "elapsedSeconds": 23.773737208
+    },
+    {
+      "receipt": "evidence/real01_inspection.json",
+      "scope": "real-failure-readonly",
+      "elapsedSeconds": 0.013896110999999989
+    },
+    {
+      "receipt": "evidence/completion01/report.json",
+      "scope": "completion-check-initial",
+      "elapsedSeconds": 0.3237333109999554
+    },
+    {
+      "receipt": "evidence/completion02/report.json",
+      "scope": "completion-check-final",
+      "elapsedSeconds": 0.4296703710000003
+    },
+    {
+      "receipt": "evidence/legacy_interface01/report.json",
+      "scope": "legacy-readonly",
+      "elapsedSeconds": 2.3179245320000064
+    },
+    {
+      "receipt": "evidence/matlab_supervision.json",
+      "scope": "matlab-parent-including-preparation",
+      "elapsedSeconds": 28.14100000000326
+    },
+    {
+      "receipt": "evidence/memory_route/report.json",
+      "scope": "source-review-script",
+      "elapsedSeconds": 0.07700705599999935
+    },
+    {
+      "receipt": "evidence/closeout01.json",
+      "scope": "new-guard-run14-readonly",
+      "elapsedSeconds": 0.08965711700000001
+    }
+  ],
+  "measuredEntrySumSeconds": 95.28676609400323,
+  "initialMemoryTestProcessSeconds": {
+    "memory01/normal/report.json": 1.6421506479999999,
+    "memory01/limit/report.json": 0.26186053200000003
+  },
+  "initialMemoryTestFullWallClockUnknown": true,
+  "bootstrapFailedToolSeconds": 1.2826217,
+  "matlabInternalTestSeconds": 3.0075259,
+  "realProcessSupervisorSeconds": 18.660877823999954,
+  "limits": {
+    "planCombinedProgramSeconds": 2490,
+    "realEntrySeconds": 1800,
+    "realParentSeconds": 1860,
+    "matlabParentSeconds": 120
+  },
+  "deviation": "Early small preparation output limit was 1024MiB instead of planned 256MiB; actual about 30KB. No retrospective change.",
+  "scope": "Measured entry sum is not complete session time; nested MATLAB/process times shown separately. Development, shell coordination and source review reading time are not claimed as measured total.",
+  "nativeRealAttempts": 1,
+  "repeatedRealAttempts": 0,
+  "engineBuilds": 0,
+  "newMainUIRuns": 0
+}

@@ -5,10 +5,12 @@ import json
 import shutil
 import time
 from runEilmerProcess import run, sha, COMMIT
-from readEilmerNative import audit_prepared
+from readEilmerNative import audit_prepared,audit_numerics
+from auditEilmerCompletion import audit_completion
 
 
 def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
+    started=time.monotonic()
     case, record = Path(case).resolve(), Path(record).resolve()
     assert not record.exists(), '已有回执不覆盖'
     manifest_path=case/'case_manifest.json'
@@ -16,7 +18,7 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     assert manifest['schema']=='RAH.EilmerPreparedCase.v1' and manifest['sourceCommit']==COMMIT
     mesh=Path(manifest['mesh']['nativeSourcePath'])
     assert sha(mesh)==manifest['mesh']['sourceSHA256'], '原网格身份发生变化'
-    locks=[manifest_path,mesh,Path(__file__),Path(__file__).with_name('readEilmerNative.py')]
+    locks=[manifest_path,mesh,Path(__file__),Path(__file__).with_name('readEilmerNative.py'),Path(__file__).with_name('auditEilmerCompletion.py')]
     for name,digest in manifest['filesSHA256'].items():
         assert sha(case/name)==digest, '准备输入发生变化: '+name
         locks.append(case/name)
@@ -32,13 +34,24 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
             assert sha(path)==digest, '原生输入来源不符: '+path
             locks.append(Path(path))
         # exit0的准备过程不能替代几何/热壁合同；负体积或错CFL不得进入求解。
-        audit_prepared(case)
-        commands=[['lmr','run','--max-wall-clock='+str(max(1,int(seconds)-3))]]
+        if 'development' in manifest['condition']:
+            assert previous.get('uniformInitialFieldBitwiseIdentical') and previous.get('nativeGridReused')
+            reuse=manifest['reusedPreparation'];geometry=Path(reuse['geometryAudit'])
+            assert sha(geometry)==reuse['geometryAuditSHA256']
+            audit=json.loads(geometry.read_text());assert audit['passed'] and audit['nativeGridSHA256']==sha(case/'lmrsim/grid/grid-0000')
+            audit_numerics(json.loads((case/'lmrsim/nk-config').read_text()),manifest['condition'])
+            locks.append(geometry)
+        else:audit_prepared(case)
+        # 大场终态保存和输入核验需要余量；原生预算与整个阶段预算分别记录。
+        reserve=30 if manifest['mesh']['cells']>100000 else 5
+        assert seconds>reserve
+        native_seconds=int(seconds-(time.monotonic()-started)-reserve)
+        assert native_seconds>0,'来源核验后没有剩余原生预算'
+        commands=[['lmr','run','--max-wall-clock='+str(native_seconds)]]
     record.mkdir(parents=True)
     shutil.copyfile(__file__,record/'executed_entry.py')
     result=dict(stage=stage,case=str(case),sourceCommit=COMMIT,caseManifestSHA256=sha(manifest_path),
                 physicsQualified=False,newQualifiedAreaM2=0,passed=False,commands=[])
-    started=time.monotonic()
     try:
         for i,command in enumerate(commands):
             remaining=seconds-(time.monotonic()-started)
@@ -48,6 +61,8 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
             if not report['passed']:
                 break
         else:
+            if stage=='run':
+                result['nativeCompletion']=audit_completion(case,record/'process00/stdout.txt')
             result['passed']=True
             if stage=='prepare':
                 # 原生配置、网格、初场和热物性绑定；运行不从其他引擎或旧场接续。

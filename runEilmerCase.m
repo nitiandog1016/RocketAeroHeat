@@ -1,9 +1,11 @@
 function result = runEilmerCase(action, options)
 % runEilmerCase  调用固定 Eilmer 后端；准备、运行、读取必须分别明确调用。
 % 本文件是完整 MATLAB 入口。不会自动安装环境、接续旧场或取得物理资格。
-% action: input / prepare / run / read；options 字段见各模块。
+% action: input / prepare / development / run / read / inspect；options 字段见各模块。
 % 公共字段：caseDirectory、recordDirectory；seconds 默认60，outputMiB默认128。
 % input另需 meshFile、condition；run另需 preparedReceipt；read另需 loadsFile、runReceipt。
+% development另需sourceCase、sourcePreparedReceipt、sourceGeometryAudit、condition。
+% inspect另需runReceipt；只读返回失败状态，不调用求解器，不把exit0当物理/过程完成。
 
 %% 模块一：定位项目和固定运行时，拒绝覆盖已有回执。
 arguments
@@ -12,7 +14,7 @@ arguments
 end
 root = fileparts(mfilename('fullpath'));
 assert(ispc, 'RocketAeroHeat:EilmerHost', '此入口面向已安装的 Windows/WSL 运行时。');
-assert(any(action == ["input","prepare","run","read"]), ...
+assert(any(action == ["input","prepare","development","run","read","inspect"]), ...
     'RocketAeroHeat:EilmerAction', '未知后端操作。');
 caseDir = absolutePath(required(options,'caseDirectory'));
 recordDir = absolutePath(required(options,'recordDirectory'));
@@ -44,6 +46,23 @@ switch action
                 wslPath(absolutePath(required(options,'preparedReceipt')))}];
         end
         reportFile = fullfile(recordDir,'native','report.json');
+    case "development"
+        % 复用已审核原生网格；新初场由原生写入并与原均匀初态逐字核对。
+        conditionFile=fullfile(recordDir,'condition.json');
+        writeJSON(conditionFile,required(options,'condition'));
+        script='prepareEilmerDevelopmentCase.py';
+        args={'--source',wslPath(absolutePath(required(options,'sourceCase'))), ...
+            '--prepared',wslPath(absolutePath(required(options,'sourcePreparedReceipt'))), ...
+            '--audit',wslPath(absolutePath(required(options,'sourceGeometryAudit'))), ...
+            '--case',wslPath(caseDir),'--record',wslPath(fullfile(recordDir,'native')), ...
+            '--condition',wslPath(conditionFile),'--seconds',num2str(seconds,17), ...
+            '--output-mib',num2str(outputMiB)};
+        reportFile=fullfile(recordDir,'native','report.json');
+    case "inspect"
+        % 工作台可显示明确失败原因；没有原生终态时禁止伪装成空的成功云图。
+        script='inspectEilmerRun.py';reportFile=fullfile(recordDir,'inspection.json');
+        args={'--case',wslPath(caseDir),'--receipt',wslPath(absolutePath(required(options,'runReceipt'))), ...
+            '--out',wslPath(reportFile)};
     case "read"
         script = 'readEilmerNative.py';
         reportFile = fullfile(recordDir,'read-report.json');
@@ -83,7 +102,7 @@ writeJSON(fullfile(recordDir,'launcher.json'),launcher);
 assert(code == 0 && isfile(reportFile), 'RocketAeroHeat:EilmerFailed', ...
     '后端未通过；保留日志：%s', fullfile(recordDir,'launcher.log'));
 result = jsondecode(fileread(reportFile));
-if isfield(result,'passed')
+if isfield(result,'passed') && action ~= "inspect"
     assert(result.passed,'RocketAeroHeat:EilmerRejected','后端拒绝结果。');
 end
 result.matlabLauncher = launcher;

@@ -1,0 +1,190 @@
+174:     double minRelaxationFactorForUpdate = 0.01;
+175:     double minRelaxationFactorForCFLGrowth = 0.1;
+176:     double relaxationFactorReductionFactor = 0.7;
+177:     // Linear solver and preconditioning
+178:     int maxLinearSolverIterations = 10;
+179:     int maxLinearSolverRestarts = 0;
+180:     bool useScaling = true;
+181:     bool useRealValuedFrechetDerivative = false;
+182:     double frechetDerivativePerturbation = 1.0e-30;
+183:     bool usePreconditioner = true;
+184:     bool useFGMRES = false;
+185:     int maxFgmresPreconditioningIterations = 10;
+186:     double preconditionerPerturbation = 1.0e-30;
+187:     PreconditionerType preconditioner = PreconditionerType.ilu;
+188:     FluxCalculator fluxCalculatorForPreconditioner = FluxCalculator.adaptive_hanel_ausmdv; // same default as selected in GlobalConfig.
+189:     // ILU setting
+
+241:         maxLinearSolverRestarts = getJSONint(jsonData, "max_linear_solver_restarts", maxLinearSolverRestarts);
+242:         useScaling = getJSONbool(jsonData, "use_scaling", useScaling);
+243:         useRealValuedFrechetDerivative = getJSONbool(jsonData, "use_real_valued_frechet_derivative", useRealValuedFrechetDerivative);
+244:         version(complex_numbers)
+245:         {
+246:             {} // do nothing
+247:             // For complex numbers, we can use either an imagimary perturbation or real
+248:             // so we DO NOT touch the users choice
+249:         }
+250:         else {
+251:             if (!useRealValuedFrechetDerivative) {
+252:                 writefln("WARNING: use_real_valued_frechet_derivative is set to false in real-valued calculation.");
+253:                 writefln("WARNING: this setting is being overridden; now set to true.");
+254:                 useRealValuedFrechetDerivative = true;
+255:             }
+256:         }
+257:         frechetDerivativePerturbation = getJSONdouble(jsonData, "frechet_derivative_perturbation", frechetDerivativePerturbation);
+258:         usePreconditioner = getJSONbool(jsonData, "use_preconditioner", usePreconditioner);
+259:         useFGMRES = getJSONbool(jsonData, "use_fgmres", useFGMRES);
+260:         maxFgmresPreconditioningIterations = getJSONint(jsonData, "max_fgmres_preconditioning_iterations",
+261:             maxFgmresPreconditioningIterations);
+262:         preconditionerPerturbation = getJSONdouble(jsonData, "preconditioner_perturbation", preconditionerPerturbation);
+263:         auto pString = getJSONstring(jsonData, "preconditioner", "NO_SELECTION_SUPPLIED");
+
+1370:          * 2b. Stopping checks.
+1371:          *---
+1372:          */
+1373:         string reasonForStop;
+1374:         wallClockElapsed = 1.0e-3*(Clock.currTime() - wallClockStart).total!"msecs"();
+1375:         if (step == nkCfg.maxNewtonSteps) {
+1376:             finalStep = true;
+1377:             if (cfg.is_master_task) {
+1378:                 writeln("*** STOPPING: Reached maximum number of steps.");
+1379:                 reasonForStop = "STOP-REASON: maximum-steps";
+1380:             }
+1381:         }
+1382:         if ((SimState.maxWallClockSeconds > 0) && (wallClockElapsed > SimState.maxWallClockSeconds)) {
+1383:             finalStep = true;
+1384:             if (cfg.is_master_task) {
+1385:                 writefln("*** STOPPING: Reached maximum wall-clock-time with elapsed time %s", to!string(wallClockElapsed));
+1386:                 reasonForStop = "STOP-REASON: maximum-wall-clock";
+1387:             }
+1388:         }
+1389:         if (!activePhase.ignoreStoppingCriteria) {
+1390:             if (globalResidual <= nkCfg.stopOnAbsoluteResidual) {
+1391:                 finalStep = true;
+1392:                 if (cfg.is_master_task) {
+1393:                     writeln("*** STOPPING: The absolute global residual is below target value.");
+1394:                     writefln("         current global residual= %.6e  target value= %.6e", globalResidual, nkCfg.stopOnAbsoluteResidual);
+1395:                     reasonForStop = "STOP-REASON: absolute-global-residual-target";
+1396:                 }
+1397:             }
+1398:             if ((globalResidual/referenceGlobalResidual) <= nkCfg.stopOnRelativeResidual) {
+1399:                 finalStep = true;
+1400:                 if (cfg.is_master_task) {
+1401:                     writeln("*** STOPPING: The relative global residual is below target value.");
+1402:                     writefln("              current residual= %.6e  target value= %.6e", (globalResidual/referenceGlobalResidual), nkCfg.stopOnRelativeResidual);
+1403:                     reasonForStop = "STOP-REASON: relative-global-residual-target";
+1404:                 }
+1405:             }
+1406:         }
+1407:         /*---
+1408:          * 2c. Reporting (to files and screen)
+
+3180: }
+3181: 
+3182: 
+3183: /**
+3184:  * Compute perturbation size estimate for real-valued Frechet derivative.
+3185:  *
+3186:  * REFERENCE: Knoll, D.A. and McHugh, P.R.,
+3187:  *            Newton-Krylov Methods Applied to a System of Convection-Diffusion-Reaction Equations,
+3188:  *            Computer Physics Communications,
+3189:  *            1994
+3190:  *
+3191:  * Authors: KAD and RJG
+3192:  * Date: 2024-02-29
+3193:  */
+3194: double computePerturbationSize()
+3195: {
+3196:     // perturbation constant, Knoll and McHugh suggest a value on the order of the square
+3197:     // root of machine roundoff, however, we have observed that this value can be somewhat
+3198:     // problem dependent.
+3199:     auto a = nkCfg.frechetDerivativePerturbation;
+3200: 
+3201:     // calculate L2 norm of zed vector
+3202:     number z_L2 = 0.0;
+3203:     mixin(dotOverBlocks("z_L2", "zed", "zed"));
+3204:     version(mpi_parallel) {
+3205:         MPI_Allreduce(MPI_IN_PLACE, &(z_L2.re), 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+3206:     }
+3207:     z_L2 = sqrt(z_L2);
+3208:     // When the L2 norm of the zed vector is small, the sigma calculated from this routine
+3209:     // has been observed to result in noisy convergence as observed in the global residual.
+3210:     // We enforce a minimum value to guard against this behaviour.
+3211:     // From some experimentation a minimum value of sqrt(1.0e-07) appears sufficient.
+3212:     double min_z_L2 = sqrt(1.0e-07);
+3213:     if (z_L2.re <= min_z_L2) { z_L2.re = min_z_L2; }
+3214: 
+3215:     // compute sum of individual component perturbations, eps_i,
+3216:     // where eps_i is calculated using Eq. 12, i.e. eps_i = a*|var_i| + a
+3217:     double eps_sum = 0.0;
+3218:     double nvars = 0.0;
+3219:     foreach (blk; localFluidBlocks) {
+3220:         foreach (cell; blk.cells) {
+3221:             foreach (var; cell.U[0]) {
+3222:                 eps_sum += a*fabs(var.re) + a;
+3223:                 nvars += 1;
+3224:             }
+3225:         }
+3226:     }
+3227:     version(mpi_parallel) {
+3228:         MPI_Allreduce(MPI_IN_PLACE, &(eps_sum.re), 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+3229:     }
+3230:     version(mpi_parallel) {
+3231:         MPI_Allreduce(MPI_IN_PLACE, &(nvars.re), 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+3232:     }
+3233: 
+3234:     // compute perturbation parameter via Eq. 11
+3235:     double sigma = eps_sum/(nvars*z_L2.re);
+3236: 
+3237:     return sigma;
+3238: }
+3239: 
+3240: /**
+
+3272:     }
+3273: 
+3274:     // Determine perturbation size, sigma
+3275:     double sigma;
+3276:     version (complex_numbers) {
+3277:         // For complex-valued Frechet derivative, a very small perturbation
+3278:         // works well (almost) all the time.
+3279:         sigma = nkCfg.frechetDerivativePerturbation;
+3280:     }
+3281:     else {
+3282:         // For real-valued Frechet derivative, we compute a perturbation size
+3283:         // based on the zed vector.
+3284:         sigma = computePerturbationSize();
+3285:     }
+3286: 
+3287:     // Evaluate Jz and place result in zed vector
+3288:     evalJacobianVectorProduct(sigma, currentPhase, stepsIntoCurrentPhase, for_preconditioning);
+3289: 
+3290:     // Complete the calculation of w: (I/dt)z - Jz
+3291:     foreach (blk; parallel(localFluidBlocks,1)) {
+3292:         foreach (k; 0 .. blk.nvars)  blk.w[k] = blk.w[k] - blk.zed[k];
+3293:     }
+3294: }
+3295: 
+3296: /**
+3297:  * Evaluate J*v via a Frechet derivative.
+3298:  *
+3299:  * This is just a delegator function through to a complex-valued perturbation evaulation
+3300:  * or a real-valued perturbation evalulation.
+3301:  * Authors: KAD and RJG
+3302:  * Date: 2022-03-02
+3303:  */
+3304: void evalJacobianVectorProduct(double sigma, size_t currentPhase, int stepsIntoCurrentPhase, bool for_preconditioning=false)
+3305: {
+3306:     version (complex_numbers) {
+3307:         if (nkCfg.useRealValuedFrechetDerivative) {
+3308:             evalRealMatVecProd(sigma, for_preconditioning, currentPhase, stepsIntoCurrentPhase);
+3309:         } else {
+3310:             evalComplexMatVecProd(sigma, for_preconditioning, currentPhase, stepsIntoCurrentPhase);
+3311:         }
+3312:     }
+3313:     else {
+3314:         evalRealMatVecProd(sigma, for_preconditioning, currentPhase, stepsIntoCurrentPhase);
+3315:     }
+3316: }
+3317: 
+3318: void evalResidual(int ftl, size_t currentPhase, int stepsIntoCurrentPhase)

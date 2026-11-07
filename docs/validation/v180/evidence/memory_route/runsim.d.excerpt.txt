@@ -1,0 +1,46 @@
+145: int delegateAndExecute(string[] args, NumberType numberType)
+146: {
+147:     // We just want to pull out solver mode at this point, so that we can direct the execution flow.
+148:     // We choose to execute these few lines rather than invoking the overhead of reading the entire
+149:     // config file into GlobalConfig.
+150:     auto cfgJSON = readJSONfile(lmrCfg.cfgFile);
+151:     string solverModeStr = cfgJSON["solver_mode"].str;
+152:     auto solverMode = solverModeFromName(solverModeStr);
+153: 
+154:     string shellStr;
+155: 
+156:     final switch(solverMode) {
+157:     case SolverMode.dual_time_stepping:
+158:     case SolverMode.steady:
+159:         // Our first choice is to run with complex values.
+160:         final switch(numberType) {
+161:         case NumberType.default_type:
+162:         case NumberType.complex_values:
+163:             shellStr = args[0] ~ "Z-" ~ args[1];
+164:             break;
+165:         case NumberType.real_values:
+166:             shellStr = args[0] ~ "-" ~ args[1];
+167:              break;
+168: 	    }
+169:         break;
+170:     case SolverMode.transient:
+171:     case SolverMode.block_marching:
+172:         // Our first choice is to run with real values.
+173:         final switch(numberType) {
+174:         case NumberType.default_type:
+175:         case NumberType.real_values:
+176:             shellStr = args[0] ~ "-" ~ args[1];
+177:             break;
+178:         case NumberType.complex_values:
+179:             shellStr = args[0] ~ "Z-" ~ args[1];
+180:             break;
+181:         }
+182:         break;
+183:     }
+184: 
+185:     foreach (s; args[2 .. $]) {
+186:         shellStr ~= " " ~ s;
+187:     }
+188: 
+189:     return system(shellStr.toStringz);
+190: }
