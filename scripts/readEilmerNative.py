@@ -143,13 +143,16 @@ def audit_run_scope(manifest,case=None):
     """未通过真实小例相容门槛的实数v1仅供有限诊断，禁止进入完整域或延长发展。"""
     c=manifest['condition']
     if 'explicit' in c:
-        from eilmerExplicitProfile import validate_explicit,DEVELOPMENT_PROFILE,DENSE_PROFILE
+        from eilmerExplicitProfile import validate_explicit,DEVELOPMENT_PROFILE,DENSE_PROFILE,DENSE_DEVELOPMENT_PROFILE
         validate_explicit(c['explicit'])
         if c['explicit']['profile']==DEVELOPMENT_PROFILE:
             # v184唯一原域在初始化耗尽内存；保留登记证据检查，但不再放行同一方案。
             raise ValueError('rah-explicit-local-development-v1原完整域初始化OOM，当前方案关闭；需独立内存改动及新证据')
+        elif c['explicit']['profile']==DENSE_DEVELOPMENT_PROFILE:
+            # v186确认缩减容量已生效，但原域仍在初始化OOM；同包候选关闭。
+            raise ValueError('rah-explicit-dense-development-v1原域初始化仍OOM，当前候选关闭；需独立内存方案和证据')
         else:need(manifest['mesh']['cells']<=1000,'显式完整域尚未登记候选预算；当前仅最小接口')
-        if c['explicit']['profile'] == DENSE_PROFILE:
+        if c['explicit']['profile'] in (DENSE_PROFILE,DENSE_DEVELOPMENT_PROFILE):
             from eilmerDenseRuntime import audit_dense_runtime
             audit_dense_runtime(c)
     if c.get('development',{}).get('profile')=='rah-nk-real-v1':
@@ -240,7 +243,7 @@ def export_loads(case,loads,output,run_receipt):
     receipt=json.loads(Path(run_receipt).read_text())
     need(receipt['stage']=='run' and receipt['passed'] and receipt['case']==str(case),'拒绝失败/错源运行')
     manifest=json.loads((case/'case_manifest.json').read_text())
-    if manifest['condition'].get('explicit',{}).get('profile') == 'rah-explicit-dense-v1':
+    if manifest['condition'].get('explicit',{}).get('profile') in ('rah-explicit-dense-v1','rah-explicit-dense-development-v1'):
         from eilmerDenseRuntime import audit_dense_execution
         audit_dense_execution(manifest['condition'],receipt)
     # 旧回执可能只有启动器exit0；必须只读核对真正原生完成，失败历史不改写。

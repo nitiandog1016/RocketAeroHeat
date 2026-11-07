@@ -1,0 +1,36 @@
+2616:             const size_t r = cellOffset + row; // global row index
+2617:             size_t p = ia[r];
+2618:             const size_t pEnd = ia[r + 1];
+2619: 
+2620:             // find first column belonging to this block by increasing p until column == base
+2621:             while (p < pEnd && ja[p] < cellOffset) ++p;
+2622: 
+2623:             // copy the next n contiguous entries as the i-th row of D
+2624:             auto Drow = D._data[row*nConserved .. (row+1)*nConserved];
+2625:             memcpy(Drow.ptr, aa.ptr + p, nConserved * double.sizeof);
+2626:         }
+2627: 
+2628:         if (invertBlockDiag) {
+2629:             // compute and store the inverse D^{-1}
+2630:             nm.bbla.inverse(D, cell.invBlockDiag);
+2631:         } else {
+2632:             // diagonal block is already inverted
+2633:             nm.bbla.copy(D, cell.invBlockDiag);
+2634:         }
+2635:     }
+2636: }
+2637: 
+2638: void evalResidualSmoothing()
+2639: {
+2640:     // Compute an approximate solution: dU = D^{-1} * R(U)
+2641:     const size_t nConserved = GlobalConfig.cqi.n;
+2642: 
+2643:     foreach (blk; parallel(localFluidBlocks, 1)) {
+2644:         foreach (k, cell; blk.cells) {
+2645:             const size_t cellOffset = k * nConserved; // start of this cell's vector slice
+2646:             auto Dinv = cell.invBlockDiag._data;
+2647: 
+2648:             // perform dense matrix-vector multiplication
+2649:             foreach (row; 0 .. nConserved) {
+2650:                 const size_t dRow = row * nConserved;
+2651:                 double acc = 0.0;

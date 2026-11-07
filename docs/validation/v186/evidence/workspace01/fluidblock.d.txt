@@ -1,0 +1,106 @@
+289:         foreach (n; 0 .. ncells+nghost) celldata.flowstates ~= FlowState(gmodel, nturb);
+290:         foreach (n; 0 .. ncells+nghost) celldata.gradients ~= FlowGradients(myConfig);
+291:         foreach (n; 0 .. ncells+nghost) celldata.workspaces ~= WLSQGradWorkspace();
+292: 
+293:         version(newton_krylov) {
+294:             celldata.cell_jacobians.length = (ncells+nghost)*neq*neq;
+295:             celldata.saved_gradients.reserve(ncells + nghost);
+296:             foreach (n; 0 .. ncells+nghost) celldata.saved_gradients ~= FlowGradients(myConfig);
+297:             celldata.saved_source_terms.length = (ncells + nghost)*neq;
+298:             celldata.doNotPerturb.length = (ncells+nghost);
+299:         }
+300:     }
+301: 
+1480: 
+1481:     void evaluate_jacobian(FluxCalculator fluxCalculatorForPreconditioner)
+1482:     {
+1483:         /*
+1484:           Higher level method used to evaluate the flow Jacobian attached to the FluidBlock object.
+1485:          */
+1486: 
+1487:         // zero entries
+1488:         flowJacobian.local.aa[] = 0.0;
+1489: 
+1490:         // temporarily change flux calculator
+1491:         auto flux_calculator_save = myConfig.flux_calculator;
+1492:         myConfig.flux_calculator = fluxCalculatorForPreconditioner;
+1493: 
+1494:         // temporarily change interpolation order
+1495:         shared int interpolation_order_save = GlobalConfig.interpolation_order;
+1496:         myConfig.interpolation_order = to!int(flowJacobian.spatial_order);
+1497: 
+1498:         // copy some data for later use
+1499:         if (myConfig.viscous) {
+1500:             foreach(cell; cells) { cell.grad_save.copy_values_from(*(cell.grad)); }
+1501:         }
+1502:         if (flowJacobian.spatial_order >= 2) {
+1503:             foreach(cell; cells) { cell.gradients_save.copy_values_from(*(cell.gradients)); }
+1504:         }
+1505:         if (myConfig.reacting) {
+1506:             foreach(cell; cells) {
+1507:                 cell.clear_source_vector();
+1508:                 cell.add_thermochemical_source_vector(thermochem_source, 1.0);
+1509:                 cell.Q_save.copy_values_from(cell.Q);
+1510:             }
+1511:         }
+1512: 
+1513:         // the real-valued finite difference needs a base residual (R0)
+1514:         version(complex_numbers) { } // do nothing
+1515:         else {
+1516:             foreach(cell; cells) {
+1517:                 if (cell.doNotPerturb) continue;
+1518:                 evalRHS(0, 0, cell.cell_list, cell.face_list, cell);
+1565:             pcell.U[ftl][j] += eps;
+1566:             pcell.decode_conserved(gtl, ftl, omegaz);
+1567: 
+1568:             // evaluate perturbed residuals in local stencil
+1569:             evalRHS(gtl, ftl, pcell.cell_list, pcell.face_list, pcell);
+1570: 
+1571:             // fill local Jacobians
+1572:             foreach (cell; pcell.cell_list) {
+1573:                 foreach(i; 0..nConserved) {
+1574:                     version(complex_numbers) { cell.dRdU[i][j] = cell.dUdt[ftl][i].im/eps.im; }
+1575:                     else { cell.dRdU[i][j] = (cell.dUdt[ftl][i]-cell.dUdt[0][i])/eps; }
+1576:                 }
+1577:             }
+1578: 
+1579:             // return cell to original state
+1580:             version(complex_numbers) {
+1581:                 pcell.U[ftl].copy_values_from(pcell.U[0]);
+1582:                 pcell.fs.copy_values_from(*fs_save);
+1583:                 if (myConfig.viscous) {
+1584:                     foreach (cell; pcell.cell_list) { cell.grad.copy_values_from(*(cell.grad_save)); }
+1585:                 }
+1586:                 if (flowJacobian.spatial_order >= 2) {
+1587:                     foreach(cell; pcell.cell_list) { cell.gradients.copy_values_from(*(cell.gradients_save)); }
+1588:                 }
+1589:             } else {
+1590:                 // TODO: for structured grids employing a real-valued low-order numerical Jacobian as
+1591:                 // the precondition matrix the above code doesn't completely clean up the effect of the
+1592:                 // perturbuation. Note that this does not occur for unstructured grids.
+1593:                 // This is currently under investigation, in the interim we will apply the more costly
+1785:         }
+1786:         if (myConfig.conductivity_model) {
+1787:             foreach (cell; cell_list) cell.evaluate_electrical_conductivity();
+1788:         }
+1789:         foreach (i, cell; cell_list) {
+1790:             cell.add_inviscid_source_vector(gtl, 0.0);
+1791:             if (myConfig.viscous) {
+1792:                 cell.add_viscous_source_vector();
+1793:             }
+1794:             if (myConfig.reacting) {
+1795:                 // NOTE: we only need to evaluate the chemical source terms for the perturb cell
+1796:                 //       this saves us a lot of unnecessary computations
+1797:                 if (cell.id == pcell.id) {
+1798:                     cell.add_thermochemical_source_vector(thermochem_source, limit_factor);
+1799:                 } else {
+1800:                     foreach (j; 0 .. myConfig.cqi.n) { cell.Q[j] += cell.Q_save[j]; }
+1801:                 }
+1802:             }
+1803:             if (myConfig.udf_source_terms) {
+1804:                 size_t i_cell = cell.id;
+1805:                 size_t j_cell = 0;
+1806:                 size_t k_cell = 0;
+1807:                 // can't call a blk/this inside the FluidBlock class
+1808:                 /*
+1809:                 if (grid_type == Grid_t.structured_g31rid) {

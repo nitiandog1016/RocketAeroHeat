@@ -1,0 +1,14 @@
+42:     ConservedQuantities dUdt0, dUdt1, dUdt2, dUdt3, dUdt4;
+43:     ConservedQuantities source_terms;
+44:     WLSQGradWorkspace[] workspaces;
+45:     LSQInterpWorkspace[] lsqws;
+46:     LSQInterpGradients[] lsqgradients;
+47:     version(newton_krylov) {
+48:         double[] cell_jacobians;
+49:         FlowGradients[] saved_gradients;
+50:         LSQInterpGradients[] saved_lsqgradients;
+51:         ConservedQuantities saved_source_terms;
+52:         bool[] doNotPerturb;
+53:     }
+54: 
+55:     void allocate_minimal(size_t ncells, size_t nghost, LocalConfig myConfig){

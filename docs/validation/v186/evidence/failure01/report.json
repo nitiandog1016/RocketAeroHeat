@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "newNativeRuns": 0,
+  "physicalQualification": false,
+  "newQualifiedAreaM2": 0,
+  "failureConfirmed": "native-OOM-in-grid-and-flow-initialization-after-dense-array-allocation",
+  "nativeSupervisionSeconds": 12.864429329000004,
+  "entrySeconds": 17.78585285199999,
+  "parentSeconds": 18.034576553999997,
+  "nativeExitCode": 1,
+  "nativePeakGroupRSSBytes": 4702584832,
+  "inputCount": 44,
+  "inputsStable": true,
+  "allRunOutputSHA256Preserved": true,
+  "initialFieldUnchanged": true,
+  "historyDataRows": 0,
+  "newIterations": 0,
+  "newDevelopedFields": 0,
+  "newWallLoads": 0,
+  "observedStorage": {
+    "cells": 705490,
+    "ghosts": 26324,
+    "equations": 7,
+    "timeLevels": 4,
+    "arrayPayloadBytes": 327852672,
+    "previousArrayPayloadBytes": 1311410688,
+    "arrayPayloadReductionBytes": 983558016
+  },
+  "failedAllocationLineKnown": false,
+  "peakVirtualSizeKnown": false,
+  "screen": "not-evaluable-no-iterations",
+  "rejected": [
+    {
+      "label": "native-completion",
+      "reason": "native-explicit-failure"
+    },
+    {
+      "label": "failed-export",
+      "reason": "\u62d2\u7edd\u5931\u8d25/\u9519\u6e90\u8fd0\u884c"
+    },
+    {
+      "label": "closed-run",
+      "reason": "rah-explicit-dense-development-v1\u539f\u57df\u521d\u59cb\u5316\u4ecdOOM\uff0c\u5f53\u524d\u5019\u9009\u5173\u95ed\uff1b\u9700\u72ec\u7acb\u5185\u5b58\u65b9\u6848\u548c\u8bc1\u636e"
+    },
+    {
+      "label": "closed-prepare",
+      "reason": "rah-explicit-dense-development-v1\u539f\u57df\u521d\u59cb\u5316\u4ecdOOM\uff0c\u5f53\u524d\u5019\u9009\u5173\u95ed\uff1b\u9700\u72ec\u7acb\u5185\u5b58\u65b9\u6848\u548c\u8bc1\u636e"
+    },
+    {
+      "label": "closed-scope",
+      "reason": "rah-explicit-dense-development-v1\u539f\u57df\u521d\u59cb\u5316\u4ecdOOM\uff0c\u5f53\u524d\u5019\u9009\u5173\u95ed\uff1b\u9700\u72ec\u7acb\u5185\u5b58\u65b9\u6848\u548c\u8bc1\u636e"
+    }
+  ],
+  "sourceSHA256": {
+    "scripts/readEilmerNative.py": "7a3ce0aaf031986b99961fc0ba1051bb78a1298842fc7b738e626440da0a4f18",
+    "scripts/eilmerDenseRuntime.py": "918f104942cd0a284e3adac5d78dba0c3d212165ef9ae55106a079c138422844",
+    "scripts/runPreparedEilmerCase.py": "0761b149603b71d23f3711ef06be9f6fd145a0bf5fb0e5aa5abf92f4d4602efa",
+    "scripts/auditEilmerExplicitCompletion.py": "a461d7d108bb4cc9875702cb01378e8f077964063fce01d7444c64d79a637142",
+    "tests/verifyEilmerDenseFailure.py": "4fe25fb41f1bae84e49a600cf76ea5af5351eec641657236349817434bd81b25"
+  },
+  "elapsedSeconds": 4.029003886
+}

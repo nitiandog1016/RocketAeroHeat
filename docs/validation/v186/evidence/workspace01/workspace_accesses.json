@@ -1,0 +1,202 @@
+[
+  {
+    "path": "coredata.d",
+    "line": 48,
+    "text": "        double[] cell_jacobians;"
+  },
+  {
+    "path": "coredata.d",
+    "line": 49,
+    "text": "        FlowGradients[] saved_gradients;"
+  },
+  {
+    "path": "coredata.d",
+    "line": 50,
+    "text": "        LSQInterpGradients[] saved_lsqgradients;"
+  },
+  {
+    "path": "coredata.d",
+    "line": 51,
+    "text": "        ConservedQuantities saved_source_terms;"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 294,
+    "text": "            celldata.cell_jacobians.length = (ncells+nghost)*neq*neq;"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 295,
+    "text": "            celldata.saved_gradients.reserve(ncells + nghost);"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 296,
+    "text": "            foreach (n; 0 .. ncells+nghost) celldata.saved_gradients ~= FlowGradients(myConfig);"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 297,
+    "text": "            celldata.saved_source_terms.length = (ncells + nghost)*neq;"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1500,
+    "text": "            foreach(cell; cells) { cell.grad_save.copy_values_from(*(cell.grad)); }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1503,
+    "text": "            foreach(cell; cells) { cell.gradients_save.copy_values_from(*(cell.gradients)); }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1509,
+    "text": "                cell.Q_save.copy_values_from(cell.Q);"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1574,
+    "text": "                    version(complex_numbers) { cell.dRdU[i][j] = cell.dUdt[ftl][i].im/eps.im; }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1575,
+    "text": "                    else { cell.dRdU[i][j] = (cell.dUdt[ftl][i]-cell.dUdt[0][i])/eps; }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1584,
+    "text": "                    foreach (cell; pcell.cell_list) { cell.grad.copy_values_from(*(cell.grad_save)); }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1587,
+    "text": "                    foreach(cell; pcell.cell_list) { cell.gradients.copy_values_from(*(cell.gradients_save)); }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1612,
+    "text": "                    flowJacobian.local[I,J] = cell.dRdU[ip][jp].re;"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1671,
+    "text": "                                version(complex_numbers) { bcell.dRdU[i][j] = bcell.dUdt[ftl][i].im/eps.im; }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1672,
+    "text": "                                else { bcell.dRdU[i][j] = (bcell.dUdt[ftl][i]-bcell.dUdt[0][i])/eps; }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1679,
+    "text": "                                foreach (cell; ghost_cell.cell_list) { cell.grad.copy_values_from(*(cell.grad_save)); }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1682,
+    "text": "                                foreach(cell; ghost_cell.cell_list) { cell.gradients.copy_values_from(*(cell.gradients_save)); }"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1708,
+    "text": "                                flowJacobian.local[I,J] = flowJacobian.local[I,J] + bcell.dRdU[ip][jp].re;"
+  },
+  {
+    "path": "fluidblock.d",
+    "line": 1800,
+    "text": "                    foreach (j; 0 .. myConfig.cqi.n) { cell.Q[j] += cell.Q_save[j]; }"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 162,
+    "text": "        double[][] dRdU;"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 163,
+    "text": "        ConservedQuantities Q_save;"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 164,
+    "text": "        FlowGradients* grad_save;"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 165,
+    "text": "        LSQInterpGradients* gradients_save;"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 166,
+    "text": "        Matrix!double invBlockDiag;"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 241,
+    "text": "            if (fvcd.saved_gradients) this.grad_save = &(fvcd.saved_gradients[id]);"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 242,
+    "text": "            if (fvcd.saved_lsqgradients) this.gradients_save = &(fvcd.saved_lsqgradients[id]);"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 243,
+    "text": "            if (fvcd.saved_source_terms) this.Q_save = fvcd.saved_source_terms[id*ncq .. id*ncq + ncq];"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 245,
+    "text": "            if (fvcd.cell_jacobians){"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 246,
+    "text": "                dRdU.length = ncq; // number of conserved variables"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 247,
+    "text": "                foreach (i; 0 .. dRdU.length) {"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 249,
+    "text": "                    dRdU[i] = fvcd.cell_jacobians[idx .. idx+ncq];"
+  },
+  {
+    "path": "fluidfvcell.d",
+    "line": 251,
+    "text": "                invBlockDiag = new Matrix!double(ncq,ncq);"
+  },
+  {
+    "path": "newtonkrylovsolver.d",
+    "line": 2630,
+    "text": "            nm.bbla.inverse(D, cell.invBlockDiag);"
+  },
+  {
+    "path": "newtonkrylovsolver.d",
+    "line": 2633,
+    "text": "            nm.bbla.copy(D, cell.invBlockDiag);"
+  },
+  {
+    "path": "newtonkrylovsolver.d",
+    "line": 2646,
+    "text": "            auto Dinv = cell.invBlockDiag._data;"
+  },
+  {
+    "path": "ufluidblock.d",
+    "line": 335,
+    "text": "        celldata.saved_lsqgradients.reserve(ncells + nghost);"
+  },
+  {
+    "path": "ufluidblock.d",
+    "line": 336,
+    "text": "        foreach (n; 0 .. ncells+nghost) celldata.saved_lsqgradients ~= LSQInterpGradients(myConfig.n_species, myConfig.n_modes, myConfig.turb_model.nturb);"
+  }
+]

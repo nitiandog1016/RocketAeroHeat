@@ -1,0 +1,38 @@
+--- a/src/lmr/fluidblock.d
++++ b/src/lmr/fluidblock.d
+@@ -303,11 +303,14 @@
+         foreach (n; 0 .. ncells+nghost) celldata.workspaces ~= WLSQGradWorkspace();
+ 
+         version(newton_krylov) {
+-            celldata.cell_jacobians.length = (ncells+nghost)*neq*neq;
+-            celldata.saved_gradients.reserve(ncells + nghost);
+-            foreach (n; 0 .. ncells+nghost) celldata.saved_gradients ~= FlowGradients(myConfig);
+-            celldata.saved_source_terms.length = (ncells + nghost)*neq;
+-            celldata.doNotPerturb.length = (ncells+nghost);
++            // 保留NK编译物理分派；显式流动不分配其矩阵/备份工作区。
++            if (myConfig.solverMode != SolverMode.transient) {
++                celldata.cell_jacobians.length = (ncells+nghost)*neq*neq;
++                celldata.saved_gradients.reserve(ncells + nghost);
++                foreach (n; 0 .. ncells+nghost) celldata.saved_gradients ~= FlowGradients(myConfig);
++                celldata.saved_source_terms.length = (ncells + nghost)*neq;
++                celldata.doNotPerturb.length = (ncells+nghost);
++            }
+         }
+     }
+ 
+--- a/src/lmr/ufluidblock.d
++++ b/src/lmr/ufluidblock.d
+@@ -332,8 +332,11 @@
+         celldata.lsqgradients.reserve(ncells + nghost);
+         foreach (i; 0 .. ncells + nghost) celldata.lsqgradients ~= LSQInterpGradients(nsp, nmodes, nturb); // TODO: skip if not needed
+         // TODO: for now this is only needed for the adjoint solver and/or the check-jacobian tool - we can think about dropping this for the flow solver. KAD 2024-08-28
+-        celldata.saved_lsqgradients.reserve(ncells + nghost);
+-        foreach (n; 0 .. ncells+nghost) celldata.saved_lsqgradients ~= LSQInterpGradients(myConfig.n_species, myConfig.n_modes, myConfig.turb_model.nturb);
++        // 显式路径不使用Jacobian/伴随备份梯度，其他模式保留原分配。
++        if (myConfig.solverMode != SolverMode.transient) {
++            celldata.saved_lsqgradients.reserve(ncells + nghost);
++            foreach (n; 0 .. ncells+nghost) celldata.saved_lsqgradients ~= LSQInterpGradients(myConfig.n_species, myConfig.n_modes, myConfig.turb_model.nturb);
++        }
+ 
+         facedata.dL.length = nfaces;
+         facedata.dR.length = nfaces;

@@ -1,0 +1,28 @@
+2114:         static float max(float a, float b) nothrow
+2115:         {
+2116:             return a >= b ? a : b;
+2117:         }
+2118: 
+2119:         // instantly increases, slowly decreases
+2120:         static float smoothDecay(float oldVal, float newVal) nothrow
+2121:         {
+2122:             // decay to 63.2% of newVal over 5 collections
+2123:             // http://en.wikipedia.org/wiki/Low-pass_filter#Simple_infinite_impulse_response_filter
+2124:             enum alpha = 1.0 / (5 + 1);
+2125:             immutable decay = (newVal - oldVal) * alpha + oldVal;
+2126:             return max(newVal, decay);
+2127:         }
+2128: 
+2129:         immutable smTarget = usedSmallPages * config.heapSizeFactor;
+2130:         smallCollectThreshold = smoothDecay(smallCollectThreshold, smTarget);
+2131:         immutable lgTarget = usedLargePages * config.heapSizeFactor;
+2132:         largeCollectThreshold = smoothDecay(largeCollectThreshold, lgTarget);
+2133:     }
+2134: 
+2135:     /**
+2136:      * Minimizes physical memory usage by returning free pools to the OS.
+2137:      */
+2138:     void minimize() nothrow
+2139:     {
+2140:         debug(PRINTF) printf("Minimizing.\n");
+2141: 

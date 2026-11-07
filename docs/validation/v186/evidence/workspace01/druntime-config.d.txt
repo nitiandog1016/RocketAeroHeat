@@ -1,0 +1,19 @@
+17:     bool disable;            // start disabled
+18:     bool fork = false;       // optional concurrent behaviour
+19:     ubyte profile;           // enable profiling with summary when terminating program
+20:     string gc = "conservative"; // select gc implementation conservative|precise|manual
+21: 
+22:     @MemVal size_t initReserve;      // initial reserve (bytes)
+23:     @MemVal size_t minPoolSize = 1  << 20;  // initial and minimum pool size (bytes)
+24:     @MemVal size_t maxPoolSize = 64 << 20;  // maximum pool size (bytes)
+25:     @MemVal size_t incPoolSize = 3  << 20;  // pool size increment (bytes)
+26:     uint parallel = 99;      // number of additional threads for marking (limited by cpuid.threadsPerCPU-1)
+27:     float heapSizeFactor = 2.0; // heap size to used memory ratio
+28:     string cleanup = "collect"; // select gc cleanup method none|collect|finalize
+29: 
+30: @nogc nothrow:
+31: 
+32:     bool initialize()
+33:     {
+34:         return initConfigOptions(this, "gcopt");
+35:     }

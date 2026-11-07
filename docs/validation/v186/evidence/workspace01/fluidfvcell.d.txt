@@ -1,0 +1,39 @@
+237:             Q.clear();
+238:         }
+239: 
+240:         version(newton_krylov) {
+241:             if (fvcd.saved_gradients) this.grad_save = &(fvcd.saved_gradients[id]);
+242:             if (fvcd.saved_lsqgradients) this.gradients_save = &(fvcd.saved_lsqgradients[id]);
+243:             if (fvcd.saved_source_terms) this.Q_save = fvcd.saved_source_terms[id*ncq .. id*ncq + ncq];
+244: 
+245:             if (fvcd.cell_jacobians){
+246:                 dRdU.length = ncq; // number of conserved variables
+247:                 foreach (i; 0 .. dRdU.length) {
+248:                     size_t idx = id*ncq*ncq + i*ncq;
+249:                     dRdU[i] = fvcd.cell_jacobians[idx .. idx+ncq];
+250:                 }
+251:                 invBlockDiag = new Matrix!double(ncq,ncq);
+252:             }
+253:         }
+254: 
+255:         version(debug_chem) {
+1114:     void turbulence_viscosity_limit(double factor)
+1115:     // Limit the turbulent viscosity to reasonable values relative to
+1116:     // the local molecular viscosity.
+1117:     // The pre 2015 code introduced these limits, along with a default factor
+1118:     // of 300 for reasons that are now unclear. In July 2023 NNG changed
+1119:     // this factor to 3000, and removed it all together from the JFNK,
+1120:     // to prevent the turbulent viscosity from being clipped in anything
+1121:     // but a very abnormal scneario.
+1122:     {
+1123:         version(newton_krylov) {
+1124:             // Don't put limits in the NK solver, it messes with the gradients
+1125:         } else {
+1126:             fs.mu_t = fmin(fs.mu_t, factor * fs.gas.mu);
+1127:             fs.k_t = fmin(fs.k_t, factor * fs.gas.k); // ASSUMPTION re k
+1128:         }
+1129:     }
+1130: 
+1131:     @nogc
+1132:     void turbulence_viscosity_factor(double factor)
+1133:     // Scale the turbulent viscosity to model effects

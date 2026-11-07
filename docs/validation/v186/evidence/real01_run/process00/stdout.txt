@@ -1,0 +1,20 @@
+core.exception.OutOfMemoryError@core/internal/gc/impl/conservative/gc.d(530): Memory allocation failed
+----------------
+??:? onOutOfMemoryError [0x654037552126]
+??:? nothrow void* core.internal.gc.impl.conservative.gc.ConservativeGC.runLocked!(core.internal.gc.impl.conservative.gc.ConservativeGC.mallocNoSync(ulong, uint, ref ulong, const(TypeInfo)), core.internal.gc.impl.conservative.gc.mallocTime, core.internal.gc.impl.conservative.gc.numMallocs, immutable(ulong), uint, ulong, const(TypeInfo)).runLocked(ref immutable(ulong), ref uint, ref ulong, ref const(TypeInfo)) [0x654037bcbf69]
+??:? nothrow void* core.internal.gc.impl.conservative.gc.ConservativeGC.malloc(ulong, uint, const(TypeInfo)) [0x654037bcbdbc]
+??:? _d_arraysetlengthiT [0x654037babf93]
+??:? void lmr.ufluidblock.UFluidBlock.init_grid_and_flow_arrays(immutable(char)[]) [0x6540376a7310]
+??:? [0x6540378f52b7]
+??:? void lmr.init.initFluidBlocksMemoryAllocation() [0x6540378f35ca]
+??:? void lmr.timemarching.initTimeMarchingSimulation(int, int, int, immutable(char)[]) [0x65403793ff8f]
+??:? _Dmain [0x6540379bbc09]
+Eilmer simulation code.
+Revision-id: f53f460
+Revision-date: Mon Dec 22 17:46:51 2025 +1000
+Compiler-name: LDC v2.111
+Parallel-flavour: shared
+Number-type: real
+Build-flavour: fast
+Build-date: 2026-11-07 05:22:05 UTC
+RAH-STORAGE cells=705490 ghosts=26324 neq=7 nftl=4 scalarBytes=8 stageLength=5122698 payloadBytes=327852672

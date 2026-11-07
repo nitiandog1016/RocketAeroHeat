@@ -1,0 +1,13 @@
+327:         // We have some unstructured specific stuff that also needs to be allocated
+328:         celldata.face_distances.length = ncells;
+329:         celldata.lsqws.length = ncells + nghost;
+330:         celldata.cell_cloud_indices.length = ncells;
+331:         celldata.c2v.length = ncells;
+332:         celldata.lsqgradients.reserve(ncells + nghost);
+333:         foreach (i; 0 .. ncells + nghost) celldata.lsqgradients ~= LSQInterpGradients(nsp, nmodes, nturb); // TODO: skip if not needed
+334:         // TODO: for now this is only needed for the adjoint solver and/or the check-jacobian tool - we can think about dropping this for the flow solver. KAD 2024-08-28
+335:         celldata.saved_lsqgradients.reserve(ncells + nghost);
+336:         foreach (n; 0 .. ncells+nghost) celldata.saved_lsqgradients ~= LSQInterpGradients(myConfig.n_species, myConfig.n_modes, myConfig.turb_model.nturb);
+337: 
+338:         facedata.dL.length = nfaces;
+339:         facedata.dR.length = nfaces;

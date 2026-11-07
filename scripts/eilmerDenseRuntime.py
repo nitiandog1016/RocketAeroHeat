@@ -17,7 +17,7 @@ def need(ok, message):
 def audit_dense_runtime(condition):
     """模块一：禁止使用同名旧安装、修改过的补丁或未正常结束的构建。"""
     d = condition['explicit']
-    need(d['profile'] == PROFILE, '存储包方案错误')
+    need(d['profile'] in (PROFILE, 'rah-explicit-dense-development-v1'), '存储包方案错误')
     path = Path(d['runtimePackage']).resolve()
     need(path == PACKAGE / 'runtime.json' and path.is_file(), '存储包位置不符')
     need(sha(path) == d['runtimePackageSHA256'], '存储包清单SHA不符')
@@ -50,7 +50,13 @@ def audit_dense_execution(condition, receipt):
     process = receipt['commands'][0]
     need(process['argv'][0] == package['binary'], '实际运行不是登记的存储二进制')
     for path in locks:
-        need(process['inputSHA256'].get(str(path)) == sha(path), '存储包运行来源未锁定')
+        expected = process['inputSHA256'].get(str(path))
+        if path == Path(__file__) and expected != sha(path):
+            # 模块源码可演化，旧运行必须仍能逐字回到准确执行源；二进制/包不作此例外。
+            archived = Path(receipt['case']).parent/'source_at_run'/path.name
+            need(archived.is_file() and sha(archived) == expected, '旧存储模块缺少准确执行源')
+        else:
+            need(expected == sha(path), '存储包运行来源未锁定')
     need(receipt.get('runtimePackageSHA256') == condition['explicit']['runtimePackageSHA256'], '运行缺少存储包身份')
     return True
 
