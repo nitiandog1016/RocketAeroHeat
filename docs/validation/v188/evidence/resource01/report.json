@@ -1,0 +1,350 @@
+{
+  "passed": true,
+  "nativeRuns": 0,
+  "builds": 0,
+  "rows": [
+    {
+      "name": "stageArrays",
+      "bytes": 327852672,
+      "formula": "C*8*7*8",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "sourceTerms",
+      "bytes": 40981584,
+      "formula": "C*7*8",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "cellFlowStates",
+      "bytes": 210762432,
+      "formula": "C*288",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "cellGradients",
+      "bytes": 163926336,
+      "formula": "C*(200+24)",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "cellGradientWorkspace",
+      "bytes": 228325968,
+      "formula": "C*312",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "cellInterpolationWorkspace",
+      "bytes": 1967116032,
+      "formula": "C*2688",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "cellInterpolationGradients",
+      "bytes": 638141808,
+      "formula": "C*(824+48)",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "cellObjects",
+      "bytes": 497633520,
+      "formula": "C*680",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "cellStageViewsAndUdf",
+      "bytes": 134653776,
+      "formula": "C*(2*4*16+56)",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "cellGeometry",
+      "bytes": 46836096,
+      "formula": "C*(24+8+8+24)",
+      "source": "fluidblock/ufluidblock/fluidfvcell + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "faceObjects",
+      "bytes": 891699200,
+      "formula": "F*512",
+      "source": "fvinterface + v187 ABI",
+      "group": "v187"
+    },
+    {
+      "name": "faceFlowAndGradients",
+      "bytes": 1435078400,
+      "formula": "F*(288+200+24+312)",
+      "source": "fluidblock:333-338",
+      "group": "v187"
+    },
+    {
+      "name": "faceCorePriorLowerBound",
+      "bytes": 393601600,
+      "formula": "F*226",
+      "source": "v187 complete_capacity.py; dL/dR each counted as 8",
+      "group": "v187"
+    },
+    {
+      "name": "faceVectorRemainder",
+      "bytes": 55731200,
+      "formula": "F*(2*24-2*8)",
+      "source": "coredata:104-105",
+      "group": "payload"
+    },
+    {
+      "name": "faceStencil",
+      "bytes": 83596800,
+      "formula": "F*(6*8)",
+      "source": "coredata:99,113; fluidblock:326",
+      "group": "payload"
+    },
+    {
+      "name": "faceInterpolation",
+      "bytes": 125395200,
+      "formula": "F*(9*8)",
+      "source": "onedinterp:78-87; fluidblock:330",
+      "group": "payload"
+    },
+    {
+      "name": "vertices",
+      "bytes": 139997742,
+      "formula": "V*(137+2*24+200+24+8)",
+      "source": "fvvertex:26-55; ufluidblock:307-310",
+      "group": "payload"
+    },
+    {
+      "name": "gridObjects",
+      "bytes": 166821240,
+      "formula": "F*65+N*76",
+      "source": "usgrid:154-165,218-224; includes Object header 16",
+      "group": "payload"
+    },
+    {
+      "name": "gridConnectivity",
+      "bytes": 116015248,
+      "formula": "FV*8+CV*8+CF*(8+4)",
+      "source": "usgrid:167-193,245-269",
+      "group": "payload"
+    },
+    {
+      "name": "gridTopArrays",
+      "bytes": 27634144,
+      "formula": "F*8+N*8+V*24",
+      "source": "usgrid:424-432; grid.vertices",
+      "group": "payload"
+    },
+    {
+      "name": "cellTopology",
+      "bytes": 231398720,
+      "formula": "CV*(8+8)+CF*(8+8+4+4)+CF*24",
+      "source": "ufluidblock:364-405",
+      "group": "payload"
+    },
+    {
+      "name": "faceVertices",
+      "bytes": 41798400,
+      "formula": "FV*8",
+      "source": "ufluidblock:357-360",
+      "group": "payload"
+    },
+    {
+      "name": "vertexIncidence",
+      "bytes": 85275968,
+      "formula": "(CV+FV)*8+V*2*16",
+      "source": "ufluidblock:409-415",
+      "group": "payload"
+    },
+    {
+      "name": "cellOuterSlices",
+      "bytes": 56439200,
+      "formula": "N*5*16",
+      "source": "ufluidblock:328-331,362-363; coredata:24-38",
+      "group": "payload"
+    },
+    {
+      "name": "interpolationCloud",
+      "bytes": 60953936,
+      "formula": "(N+CF)*8+CF*8",
+      "source": "ufluidblock:588-606; all ghosts contain data",
+      "group": "payload"
+    },
+    {
+      "name": "viscousCloud",
+      "bytes": 66597856,
+      "formula": "(N+CF)*2*8",
+      "source": "ufluidblock:623-634; pointers only",
+      "group": "payload"
+    },
+    {
+      "name": "gasDynamic",
+      "bytes": 39574624,
+      "formula": "(C+F)*2*8",
+      "source": "gas_state:52-65",
+      "group": "payload"
+    },
+    {
+      "name": "faceDiffusion",
+      "bytes": 55731200,
+      "formula": "F*4*8",
+      "source": "fvinterface:136-140; multi_species_gas retained",
+      "group": "payload"
+    },
+    {
+      "name": "denseCellMisc",
+      "bytes": 47404708,
+      "formula": "N*(8+8+8+8+1+1)+C*2*16",
+      "source": "fluidblock:258-267; coredata:22-38",
+      "group": "payload"
+    },
+    {
+      "name": "solverObjectArrays",
+      "bytes": 19576720,
+      "formula": "(N+F)*8",
+      "source": "ufluidblock:341-354; ghost refs excluded",
+      "group": "payload"
+    },
+    {
+      "name": "cellClassRounding",
+      "bytes": 99526704,
+      "formula": "731814*(816-680)",
+      "source": "FluidFVCell + GC bins",
+      "group": "rounding"
+    },
+    {
+      "name": "vertexClassRounding",
+      "bytes": 13093314,
+      "formula": "335726*(176-137)",
+      "source": "FVVertex unpadded fields + GC bins",
+      "group": "rounding"
+    },
+    {
+      "name": "gridFaceClassRounding",
+      "bytes": 53989600,
+      "formula": "1741600*(96-65)",
+      "source": "USGFace unpadded fields + GC bins",
+      "group": "rounding"
+    },
+    {
+      "name": "gridCellClassRounding",
+      "bytes": 14109800,
+      "formula": "705490*(96-76)",
+      "source": "USGCell unpadded fields + GC bins",
+      "group": "rounding"
+    },
+    {
+      "name": "gasArrayRounding",
+      "bytes": 39574624,
+      "formula": "4946828*(16-8)",
+      "source": "massf/rho_s separately allocated",
+      "group": "rounding"
+    },
+    {
+      "name": "diffusionArrayRounding",
+      "bytes": 55731200,
+      "formula": "6966400*(16-8)",
+      "source": "jx/jy/jz/hs separately allocated",
+      "group": "rounding"
+    },
+    {
+      "name": "interpVectorRounding",
+      "bytes": 5854512,
+      "formula": "731814*(32-24)",
+      "source": "LSQInterpGradients.rho_s",
+      "group": "rounding"
+    },
+    {
+      "name": "interpScalarRounding",
+      "bytes": 17563536,
+      "formula": "2195442*(16-8)",
+      "source": "LSQInterpGradients.rho_sPhi/Max/Min",
+      "group": "rounding"
+    },
+    {
+      "name": "gradientArrayRounding",
+      "bytes": 22473120,
+      "formula": "2809140*(32-24)",
+      "source": "FlowGradients.massf",
+      "group": "rounding"
+    },
+    {
+      "name": "udfArrayRounding",
+      "bytes": 5854512,
+      "formula": "731814*(64-56)",
+      "source": "FluidFVCell.Qudf",
+      "group": "rounding"
+    },
+    {
+      "name": "vertexGradientRounding",
+      "bytes": 18800656,
+      "formula": "335726*(256-200)",
+      "source": "FVVertex new FlowGradients",
+      "group": "rounding"
+    }
+  ],
+  "counts": {
+    "C": 731814,
+    "N": 705490,
+    "F": 1741600,
+    "V": 335726,
+    "CV": 4091792,
+    "CF": 3456876,
+    "FV": 5224800
+  },
+  "payloadLowerBoundBytes": 8396552330,
+  "minimumAllocationLowerBoundBytes": 8743123908,
+  "fullRunPeakBytes": null,
+  "fitProven": false,
+  "physicalQualification": false,
+  "resourceDecision": {
+    "status": "impossible",
+    "lowerBoundBytes": 8743123908,
+    "budgetBytes": 8589934592,
+    "runAuthorized": false,
+    "reason": "\u521d\u59cb\u5316\u5fc5\u8981\u5206\u914d\u4e0b\u754c\uff1b\u5c1a\u672a\u5305\u542b\u5b8c\u6574\u8fd0\u884c\u5cf0\u503c"
+  },
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/overlay/src/lmr/fluidblock.d": "11f5cd951a56156cae608f4b1bf79f6fdcaa949b76767b09f3887c540a39f482",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluidblock.d": "09048332d929b4317db91278227fda1d2b8f5f25eb8858e8ba656f8f4646b109",
+    "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/overlay/src/lmr/ufluidblock.d": "788f01bd4f2ac29f69b1e78b9cca12d9b3d26edae352c66f1572c613f3e78171",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/ufluidblock.d": "e0d2809b97ba71efab2f6b7f62e162b04054f3d0c6a4d9151cbc28a2692d481f",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/coredata.d": "88895a0babc686327a375d7dc471ceec0643bae55db0896a7e05c9b2417d9bb6",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/onedinterp.d": "76d0a8e9506c7c90ccbbd27c23af8660bb500a82900f0186042692c1da94e1ed",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fvvertex.d": "ecc0d40f03088463ba153fab4867d32b9ccaf9051d16a3d12fee57916befeabf",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/geom/grid/usgrid.d": "2fcfd43d8d978336e28aceba100f657e595a2deaf7848812f99fe2d8fc75c450",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fvinterface.d": "46b501eee7fb04d8e4e40badba43275f833dca0ac81ad95641112ca888ea3293",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluidfvcell.d": "f59144600c35e2dfbdfb3d6688a12807ea35dead144604f183f933db18981942",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/gas/gas_state.d": "3cbd0d5b31229902687db1d34643c58114ce43fed9ed38523d90e2c1005ea7c6",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/flowgradients.d": "9dcde075fd3eb6556d0abfcf033910d690a0e2c472749fd85e46887f1901c293",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/lsqinterp.d": "44cf4c65781c6050fe929634dc67803a87f505e6320643211a9a4877c06157e4",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/eilmer/ufluidblock.d": "57801308bd92ff592d0745f315dc0168c311c3c90ba3ebe87cdbce63f80d9343",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/eilmer/lsqinterp.d": "1b62158c5ee7f37b25f0bc41afcd4ac5e140fb86856b21c105476a73488471a3",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/ldc2-1.41.0-linux-x86_64/import/core/internal/gc/impl/conservative/gc.d": "2976d54b95d66fde2e1aaa68108ab22f1d6145f4c75cfb1da5f9b610e5bcbd28",
+    "/mnt/e/RocketAeroHeat/outputs/v187_validation/scope03/report.json": "4f7cc9dd0b8d6432f09bf503c0709d24d9382be9c8ec36ac3b20c5c90a4edc8e",
+    "/mnt/e/RocketAeroHeat/outputs/v187_validation/capacity02/report.json": "d6acaa6139e865089d111646fb23778e62ec330011ba37a7583935dc6bee8219",
+    "/mnt/e/RocketAeroHeat/outputs/v187_validation/full/real01/lmrsim/config": "8b5cd74c107d10d7213f520bfbd238e94248ad4cc6cd1154e5a9c5f7f2116d87",
+    "/mnt/e/RocketAeroHeat/outputs/v187_validation/full/real01/case_manifest.json": "f55912e5a052bbd183fc13465958952878c0a3d4ef1c7eae3b3a382b9e9ca76b",
+    "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/runtime.json": "d904a4079838eefcfe9f7e424b6dd2bba5c88e671b19ca796c8fc645622ae08b",
+    "/mnt/e/RocketAeroHeat/scripts/eilmerResourceBudget.py": "855ee10c4c8bb22a311188610488b64bec68048783e079e10e9b9c2f00b66973"
+  },
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "excludes": [
+    "array metadata/growth",
+    "GC pool slack and page gaps",
+    "temporary/IO buffers",
+    "runtime/mappings/stacks",
+    "later solver allocations"
+  ],
+  "interpretation": "Necessary simultaneously live allocations at completed initialization; not failed RSS, peak virtual size, or exact OOM site.",
+  "inputsStable": true,
+  "elapsedSeconds": 0.09703091199999991
+}

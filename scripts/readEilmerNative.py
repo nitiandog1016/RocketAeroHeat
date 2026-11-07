@@ -152,8 +152,12 @@ def audit_run_scope(manifest,case=None):
             # v186确认缩减容量已生效，但原域仍在初始化OOM；同包候选关闭。
             raise ValueError('rah-explicit-dense-development-v1原域初始化仍OOM，当前候选关闭；需独立内存方案和证据')
         elif c['explicit']['profile']=='rah-explicit-workspace-development-v1':
-            # v187省去全部具名备份后仍初始化OOM；保留独立包，不再重复同一完整域候选。
-            raise ValueError('rah-explicit-workspace-development-v1完整域仍初始化OOM；当前候选关闭，需先闭合完整资源需求')
+            # v188按准确原网格/运行包核算必要分配；此分支始终拒绝，不隐式重开旧候选。
+            from eilmerResourceBudget import assess_budget
+            resource = assess_budget(manifest['mesh'], c['explicit']['runtimePackageSHA256'], 8192)
+            raise ValueError('rah-explicit-workspace-development-v1原8GiB候选关闭：初始化必要分配下界'
+                             '%d字节已超过预算%d字节；完整运行峰值未知，须新资源计划和准入'
+                             % (resource['lowerBoundBytes'], resource['budgetBytes']))
         else:need(manifest['mesh']['cells']<=1000,'显式完整域尚未登记候选预算；当前仅最小接口')
         if c['explicit']['profile'] in (DENSE_PROFILE,DENSE_DEVELOPMENT_PROFILE):
             from eilmerDenseRuntime import audit_dense_runtime

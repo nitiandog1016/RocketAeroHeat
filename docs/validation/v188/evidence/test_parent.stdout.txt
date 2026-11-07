@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/mnt/e/RocketAeroHeat/tests/testEilmerResourceBudget.py", line 84, in <module>
+    verify(parser.parse_args().out)
+  File "/mnt/e/RocketAeroHeat/tests/testEilmerResourceBudget.py", line 55, in verify
+    reject('real-run-rejected-before-launch',lambda:execute(case,out/'must-not-run',600,1024))
+  File "/mnt/e/RocketAeroHeat/tests/testEilmerResourceBudget.py", line 42, in reject
+    try: fn()
+         ^^^^
+  File "/mnt/e/RocketAeroHeat/tests/testEilmerResourceBudget.py", line 55, in <lambda>
+    reject('real-run-rejected-before-launch',lambda:execute(case,out/'must-not-run',600,1024))
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: execute() missing 1 required positional argument: 'output_mib'

@@ -1,0 +1,65 @@
+{
+  "budgetSeconds": 120,
+  "parentTotalSeconds": 0.9243942149999983,
+  "phases": [
+    {
+      "name": "resource",
+      "status": "terminal",
+      "parentLimitSeconds": 45,
+      "argv": [
+        "/usr/bin/timeout",
+        "--signal=TERM",
+        "--kill-after=5",
+        "45",
+        "python3",
+        "/mnt/e/RocketAeroHeat/scripts/eilmerResourceBudget.py",
+        "--out",
+        "/mnt/e/RocketAeroHeat/outputs/v188_validation/resource01"
+      ],
+      "pid": 13,
+      "exitCode": 0,
+      "elapsedSeconds": 0.16203924699999994
+    },
+    {
+      "name": "failed-test",
+      "status": "terminal",
+      "parentLimitSeconds": 45,
+      "argv": [
+        "/usr/bin/timeout",
+        "--signal=TERM",
+        "--kill-after=5",
+        "45",
+        "python3",
+        "/mnt/e/RocketAeroHeat/tests/testEilmerResourceBudget.py",
+        "--out",
+        "/mnt/e/RocketAeroHeat/outputs/v188_validation/test01"
+      ],
+      "pid": 13,
+      "exitCode": 1,
+      "elapsedSeconds": 0.43878438900000005
+    },
+    {
+      "name": "recovered-test",
+      "status": "terminal",
+      "parentLimitSeconds": 45,
+      "argv": [
+        "/usr/bin/timeout",
+        "--signal=TERM",
+        "--kill-after=5",
+        "45",
+        "python3",
+        "/mnt/e/RocketAeroHeat/tests/testEilmerResourceBudget.py",
+        "--out",
+        "/mnt/e/RocketAeroHeat/outputs/v188_validation/test02"
+      ],
+      "pid": 13,
+      "exitCode": 0,
+      "elapsedSeconds": 0.3235705789999983
+    }
+  ],
+  "sourceReadingEditingCoordinationSeparate": true,
+  "nativeRuns": 0,
+  "builds": 0,
+  "preliminaryInheritedArithmeticSeconds": null,
+  "preliminaryArithmeticNotFormalEvidence": true
+}
