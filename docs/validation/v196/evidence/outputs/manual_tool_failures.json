@@ -1,0 +1,32 @@
+{
+  "scope": "Observed tool failures, not reconstructed process receipts",
+  "failures": [
+    {
+      "stage": "initial-symbol-observation",
+      "reason": "No DWARF local symbol table; original native report preserved"
+    },
+    {
+      "stage": "inline-offset-query",
+      "reason": "PowerShell inline quoting caused Python SyntaxError before execution; no native process"
+    },
+    {
+      "stage": "offsets01",
+      "reason": "import path missed src; actual compiler failure/source preserved"
+    },
+    {
+      "stage": "first-small-tetra-audit",
+      "reason": "three mutable runtime outputs incorrectly locked as inputs; native normal, read-only recovery"
+    },
+    {
+      "stage": "first-rocket-preparation",
+      "reason": "Windows/WSL source-key KeyError before case creation; exact source preserved",
+      "toolParentSeconds": 2.196914
+    }
+  ],
+  "dependencyInstall": {
+    "toolParentSeconds": 6.2232852,
+    "packages": 7,
+    "downloadApproxMB": 4.646,
+    "installedApproxMB": 12.4
+  }
+}

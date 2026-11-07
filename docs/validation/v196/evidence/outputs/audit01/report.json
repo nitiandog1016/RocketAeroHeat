@@ -1,0 +1,110 @@
+{
+  "passed": true,
+  "scope": "read-only failure audit, not candidate acceptance",
+  "candidateAccepted": false,
+  "productionExportRejected": true,
+  "numericalConvergencePassed": false,
+  "physicalQualification": false,
+  "newSolvedHeatAreaM2": 0,
+  "frames": [
+    {
+      "snapshot": 0,
+      "reportedStep": 0,
+      "pseudoTime": 0.0,
+      "savedDt": 1e-10,
+      "temperatureRangeK": [
+        226.50908361133003,
+        226.50908361133003
+      ],
+      "pressureRangePa": [
+        1197.0279007383137,
+        1197.0279007383137
+      ],
+      "negativeTemperatureCount": 0,
+      "negativePressureCount": 0,
+      "negativeDensityCount": 0,
+      "outside200To6000Count": 0,
+      "eligibleThermoCells": 64982,
+      "subsetEOSErrors": {
+        "rho": 0.0,
+        "e": 0.0,
+        "a": 0.0
+      },
+      "allCellEOSPassed": true,
+      "minTemperatureCellZeroBased": 0,
+      "minTemperaturePositionM": [
+        -0.025819475406227813,
+        0.0034077481185791647,
+        -0.08525328434936219
+      ],
+      "originalFacesWithRejectedOwner": 0,
+      "originalAreaWithRejectedOwnerM2": 0.0
+    },
+    {
+      "snapshot": 1,
+      "reportedStep": 23,
+      "pseudoTime": 1.2533417506659136e-06,
+      "savedDt": 1.114472979830166e-08,
+      "temperatureRangeK": [
+        -140.3680024715706,
+        2107.926504896826
+      ],
+      "pressureRangePa": [
+        -0.9112837520291963,
+        66376.02779405333
+      ],
+      "negativeTemperatureCount": 1,
+      "negativePressureCount": 1,
+      "negativeDensityCount": 0,
+      "outside200To6000Count": 1351,
+      "eligibleThermoCells": 63631,
+      "subsetEOSErrors": {
+        "rho": 2.7755575615628914e-17,
+        "e": 1.1641532182693481e-10,
+        "a": 3.524112234467457e-16
+      },
+      "allCellEOSPassed": false,
+      "minTemperatureCellZeroBased": 9184,
+      "minTemperaturePositionM": [
+        -2.848729443212481,
+        -0.037703686966988455,
+        0.05366799174287391
+      ],
+      "originalFacesWithRejectedOwner": 1247,
+      "originalAreaWithRejectedOwnerM2": 0.13657453498645572
+    }
+  ],
+  "historyRows": 23,
+  "firstReportedDtS": 4.538e-08,
+  "liveReportedDtRangeS": [
+    4.538e-08,
+    6.111e-08
+  ],
+  "finalNormalizedResiduals": [
+    6674.188700152367,
+    3811.9713072363934,
+    5554.987773508133,
+    3289.880511384125,
+    4635.598751889535
+  ],
+  "full50WindowBenefit": null,
+  "nativeException": "Explicit update failed after 1 attempts",
+  "exceptionStageAndFirstInvalidQuery": "not recorded in fast-build log",
+  "savedFrameIdentity": "exception-path state, not an accepted completed step",
+  "actualStop": "checkpoint guard observed invalid saved field after native exception log; supervisor SIGTERM",
+  "nativeExitCode": -15,
+  "stopReason": "checkpoint-guard-rejected",
+  "nativeSupervisedSeconds": 22.975917587000005,
+  "peakGroupRSSBytes": 1007071232,
+  "inputCount": 54,
+  "inputsStable": true,
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "elapsedSeconds": 4.578000000008615,
+  "sourceSHA256": {
+    "scripts\\auditGeometricRocketEuler.py": "5f59ea6141359f9778193223840767f5da2a8f14d4e3be36807a266d990043e1",
+    "E:\\RocketAeroHeat\\outputs\\v196_validation\\run01\\report.json": "8aa416da790502aeccecd15e6585330eec86bee781e7c5312c94690b25a7a2e6",
+    "E:\\RocketAeroHeat\\outputs\\v196_validation\\preparation01\\report.json": "e15357ef12d95b55ce6e1c42e0cea2a3d527e11ddac8815753b2cfc2b11c337b",
+    "E:\\RocketAeroHeat\\outputs\\v196_validation\\run01\\native\\report.json": "6bf27ac8d2c5102f265461c07e6ff571c5b263551581d218ac8ce0f0fddfbb7e"
+  }
+}

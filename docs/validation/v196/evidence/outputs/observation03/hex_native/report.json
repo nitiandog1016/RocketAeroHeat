@@ -1,0 +1,72 @@
+{
+  "schema": "RAH.EilmerProcess.v1",
+  "argv": [
+    "gdb",
+    "--batch",
+    "-x",
+    "observe.gdb",
+    "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/lmr-run"
+  ],
+  "cwd": "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01",
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "runtimeSHA256": {
+    "lmr-debug": "dc0320435a3408faed21d9ff8b8fbdbd5f4ec8522067eb5a52b0586c2a3fa549",
+    "lmrZ-mpi-run": "b4e070a9e9cfa3b88d0dfb92bf26d7f25fee48339a8bbca225bc7920a73a7caf",
+    "lmrZ-run": "85748ec5b1801599c930c9ccc48a0fac9df1da72abc85780ed2ba546153d717f",
+    "lmr": "893efc0442e02f26bd1f9dc908ad79bde1936f10336dc084aedd7c160fe7a41a",
+    "lmr-mpi-run": "16d392e1c96b8aa8aaaf29549ae47571bfe8b1c35271cacc10b9a714820587e0",
+    "lmr-run": "5ba883260160f8efff7e240fd69c05f2bab82ff3c86ec73d14c64fb861d4561b",
+    "lmr-verify": "985bb5855e517090bb30cf143b4e2e16810d45777061b6ca7be5c940d8b44b13"
+  },
+  "limitSeconds": 20,
+  "outputLimitMiB": 32,
+  "addressSpaceLimitMiB": 4096,
+  "cpuCountLimit": 2,
+  "physicalQualification": false,
+  "groupRSSLimitMiB": 4096,
+  "memoryObservation": "sum-RSS-of-live-owned-process-group; shared-pages-may-be-counted-more-than-once",
+  "status": "process-completed",
+  "startedUTC": "2026-11-07T09:45:30Z",
+  "processId": 99,
+  "nativeExitCode": 0,
+  "stopReason": null,
+  "elapsedSeconds": 0.6269780819999937,
+  "exitCodeScope": "supervised argv[0]; wrapper exit is not proof of child/native completion",
+  "peakObservedParentRSSBytes": 60567552,
+  "finalCaseBytes": 17900,
+  "peakObservedGroupRSSBytes": 60567552,
+  "observedProcessPeakRSSBytes": {
+    "99": 60567552
+  },
+  "liveGroupAfterCleanup": {},
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/observeEilmerCellABI.py": "8c46b77acb85d6ce0c300bfc0b6105344821e22ec542ca02928aaf913e4eb6cf",
+    "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/runtime.json": "d904a4079838eefcfe9f7e424b6dd2bba5c88e671b19ca796c8fc645622ae08b",
+    "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/lmr-run": "81b9413134443d2638ab4495d76699d06c84fce5d7aeb0ba92817b3f2bed2080",
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/grid.lua": "3edf54f051d8ad2403f7f1d07a78efb8abd5e852180c035e95ee59da80e9181e",
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/job.lua": "3a7db8a3215ba5888e4e52bdcf64b57a5464ff9327af773b62302b9210b4ba29",
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/mesh.su2": "f601fe86e384f52bceebfa4a1566d85ef0e6dd126cc2a43b182cc80168844c37",
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/native-input-state.json": "5102c31575808863b09d0bb0992441822a4aad01f9dfb16fcffcb22ddade2764",
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/observe.gdb": "859d77fc8ae3e08eb9df3d83f3c8aef4e26740a0508fb1a735e6757840f37842",
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/offsets.json": "c01de18e7c9ecbade8d083b8787902eba8bf0dd121700625794a0d7e5e72a164",
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/origin.json": "0233f492825855cccdbec7ed07d21a609d9b2dd5bc7ef524105e89a240df2697",
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/rah-air.gas": "0787bbebbdd4460ffa49445723feec76169f60c9a1c435fc6ae2e880e3fe5c97",
+    "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": "beee44e1dac6f2f29015a5ab80ceb726740bbf0a9bbdb505871d45b896f97477"
+  },
+  "inputStable": {
+    "/mnt/e/RocketAeroHeat/scripts/observeEilmerCellABI.py": true,
+    "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/runtime.json": true,
+    "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/lmr-run": true,
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/grid.lua": true,
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/job.lua": true,
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/mesh.su2": true,
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/native-input-state.json": true,
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/observe.gdb": true,
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/offsets.json": true,
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/origin.json": true,
+    "/mnt/e/RocketAeroHeat/outputs/v196_validation/hex01/rah-air.gas": true,
+    "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": true
+  },
+  "inputsStable": true,
+  "passed": true
+}

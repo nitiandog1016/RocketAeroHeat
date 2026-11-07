@@ -16,6 +16,7 @@ from hybridExternalState import exchange, fingerprint
 
 ROOT=Path(__file__).resolve().parents[1]
 PROFILE='full-wall-euler-400-v1'
+GEOMETRIC_PROFILE='full-wall-euler-geometric-400-v1'
 BUDGET=dict(nativeSeconds=600,entrySeconds=630,parentSeconds=660,maxStep=400,cpuCount=2,
             memoryMiB=4096,outputMiB=128,automaticContinuation=0)
 
@@ -28,14 +29,16 @@ def check_admission(a):
     for p,d in a['evidenceSHA256'].items():need(sha(local(p))==d,'准入来源变化: '+p)
 
 
-def prepare(source, original_receipt, original_audit, case, record):
+def prepare(source, original_receipt, original_audit, case, record, profile=PROFILE):
     """模块二：复制已审核原生输入，只改已登记三处运行/保存参数，不重新prep。"""
+    need(profile in (PROFILE,GEOMETRIC_PROFILE),'未知真实发展准备身份')
     source,original_receipt,original_audit,case,record=map(lambda p:Path(p).resolve(),
         (source,original_receipt,original_audit,case,record))
     need(not case.exists() and not record.exists(),'禁止覆盖真实发展目录')
     m=verify_design(source);r=json.loads(original_receipt.read_text());audit=json.loads(original_audit.read_text())
     need(r['passed'] and r['schema']=='RAH.HybridRocketEulerNativePreparation.v1' and audit['passed'],'原生准备未审核')
-    need(local(r['case']).resolve()==source and audit['sourceSHA256'][str(original_receipt)]==sha(original_receipt),
+    audit_sources={local(p).resolve():d for p,d in audit['sourceSHA256'].items()}
+    need(local(r['case']).resolve()==source and audit_sources.get(original_receipt)==sha(original_receipt),
          '原生准备/审核来源不符')
     for p,d in r['nativeInputSHA256'].items():need(sha(local(p))==d,'原准备输入已变')
     sourcefiles=[p for p in source.rglob('*') if p.is_file()]+[original_receipt,original_audit]
@@ -45,7 +48,7 @@ def prepare(source, original_receipt, original_audit, case, record):
     ctl=json.loads((source/'lmrsim/control').read_text());ctl.update(max_step=400,write_flow_solution_at_step=200)
     save(case/'lmrsim/config',cfg);save(case/'lmrsim/control',ctl)
     files={str(p):sha(p) for p in case.rglob('*') if p.is_file()}
-    result=dict(schema='RAH.HybridRocketEulerDevelopmentPreparation.v1',profile=PROFILE,passed=True,
+    result=dict(schema='RAH.HybridRocketEulerDevelopmentPreparation.v1',profile=profile,passed=True,
         case=str(case),originalCase=str(source),originalPreparation=str(original_receipt),originalAudit=str(original_audit),
         sourceSHA256=hashes,nativeInputSHA256=files,geometry=m['geometry'],condition=m['condition'],
         actualOverrides={'control':dict(max_step=400,write_flow_solution_at_step=200),
@@ -60,7 +63,7 @@ def prepare(source, original_receipt, original_audit, case, record):
 def check_inputs(case, preparation):
     """原基线与复制品SHA逐一核对，并验证完整配置只发生已准入变化。"""
     case=Path(case).resolve();r=json.loads(Path(preparation).read_text())
-    need(r['schema']=='RAH.HybridRocketEulerDevelopmentPreparation.v1' and r['profile']==PROFILE and r['passed'],
+    need(r['schema']=='RAH.HybridRocketEulerDevelopmentPreparation.v1' and r['profile'] in (PROFILE,GEOMETRIC_PROFILE) and r['passed'],
          '真实发展准备未通过')
     need(local(r['case']).resolve()==case,'真实发展目录不符')
     for key in ['sourceSHA256','nativeInputSHA256']:
@@ -163,6 +166,9 @@ def execute(admission, record):
 def validate_terminal(case,preparation,run_receipt):
     """模块五：生产读取拒绝异常/守卫停止/错包和旧帧；单独诊断不得绕过此入口。"""
     case=Path(case).resolve();rp=Path(run_receipt);record=json.loads(rp.read_text())
+    if record.get('profile')==GEOMETRIC_PROFILE:
+        from geometricRocketEuler import validate_terminal as validate_geometric
+        return validate_geometric(case,preparation,rp)
     process=json.loads((rp.parent/'native/report.json').read_text())
     need(record['schema']=='RAH.HybridRocketEulerRun.v1' and record['profile']==PROFILE and record['processPassed']
          and process['passed'] and process['nativeExitCode']==0 and process['inputsStable']
@@ -215,7 +221,8 @@ def read_wall(case,snapshot,preparation,run_receipt=None):
     exchanged=exchange(frame,surface,condition,model,hashes,evaluate)
     result=candidate(exchanged,surface,grid,mapping,f)
     result.update(fullVolumeEOSErrors=errors,stateIdentity='uniform-initial-not-solved' if snapshot==0 else 'unqualified-Euler-development',
-                  faceAreasM2=area.tolist(),fullVolumeTemperatureRangeK=[float(f['T'].min()),float(f['T'].max())])
+                  faceAreasM2=area.tolist(),fullVolumeTemperatureRangeK=[float(f['T'].min()),float(f['T'].max())],
+                  numericsProfile=r['profile'],physicalQualification=False)
     return result
 
 

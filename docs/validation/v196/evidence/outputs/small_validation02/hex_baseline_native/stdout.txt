@@ -1,0 +1,30 @@
+Breakpoint 1 at 0x564f00
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+Eilmer simulation code.
+Revision-id: f53f460
+Revision-date: Mon Dec 22 17:46:51 2025 +1000
+Compiler-name: LDC v2.111
+Parallel-flavour: shared
+Number-type: real
+Build-flavour: fast
+Build-date: 2026-11-07 05:22:05 UTC
+RAH-STORAGE cells=1 ghosts=6 neq=5 nftl=4 scalarBytes=8 stageLength=35 payloadBytes=2240
+RAH-WORKSPACE jacobian=0 sourceBackup=0 viscousBackup=0 interpBackup=0 perturbBackup=0 viscous=7 interp=7 interpWorkspace=7
+RAH-WORKSPACE-CELLS internal=1 implicitObjects=0
+Computational Domain Reference Length (m): 1
+Heap memory used: 0 MB, unused: 5 MB, total: 5 MB (5-5 MB per task)
+
+Breakpoint 1, 0x0000555555ab8f00 in lmr.fluidfvcell.FluidFVCell.signal_frequency(bool) ()
+RAH-OBSERVATION {"observed": true, "abi": {"lengths": 144, "L_min": 160, "fs": 288, "iface": 176, "vel": 168, "gas": 0, "a": 24, "normal": 112}, "cellAddress": 140737349093776, "lengths": [1.0, 1.0, 1.0], "Lmin": 1.0, "velocity": [-1418.263086597785, -0.0, 516.2055478801032], "soundSpeed": 301.8568104560889, "normals": [[0.0, 1.0, -0.0], [1.0, 0.0, 0.0], [0.0, 1.0, -0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.0, 1.0]], "selectedFaces": [0, 1, 5]}
+0x0000555555aae9a4 in lmr.fluidblock.FluidBlock.determine_time_step_size(double, double, bool) ()
+RAH-SIGNAL 1720.119897053874
+Step=      1 t= 1.744e-04 dt= 1.744e-04 cfl=0.00 WC=0.2 WCtFT=917.2 WCtMS=0.0
+STOP-REASON: maximum-steps
+Reached maximum number of steps with step=1.
+FINAL-STEP: 1
+FINAL-TIME: 0.000174406
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++   Writing snapshot at step =      1; t = 1.744e-04 s +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[Inferior 1 (process 51) exited normally]

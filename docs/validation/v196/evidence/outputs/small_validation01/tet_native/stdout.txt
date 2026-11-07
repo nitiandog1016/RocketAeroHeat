@@ -1,0 +1,30 @@
+Breakpoint 1 at 0x564e10
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+Eilmer simulation code.
+Revision-id: f53f460
+Revision-date: Mon Dec 22 17:46:51 2025 +1000
+Compiler-name: LDC v2.111
+Parallel-flavour: shared
+Number-type: real
+Build-flavour: fast
+Build-date: 2026-11-07 05:22:05 UTC
+RAH-STORAGE cells=1 ghosts=4 neq=5 nftl=4 scalarBytes=8 stageLength=25 payloadBytes=1600
+RAH-WORKSPACE jacobian=0 sourceBackup=0 viscousBackup=0 interpBackup=0 perturbBackup=0 viscous=5 interp=5 interpWorkspace=5
+RAH-WORKSPACE-CELLS internal=1 implicitObjects=0
+Computational Domain Reference Length (m): 0.00662937
+Heap memory used: 0 MB, unused: 5 MB, total: 5 MB (5-5 MB per task)
+
+Breakpoint 1, 0x0000555555ab8e10 in lmr.fluidfvcell.FluidFVCell.signal_frequency(bool) ()
+RAH-OBSERVATION {"observed": true, "abi": {"lengths": 144, "L_min": 160, "fs": 288, "iface": 176, "vel": 168, "gas": 0, "a": 24, "normal": 112}, "cellAddress": 140737349094592, "lengths": [0.005494449950738, 0.005494449950738, 0.005494449950738], "Lmin": 0.005494449950738, "velocity": [-1418.263086597785, -0.0, 516.2055478801032], "soundSpeed": 301.8568104560889, "normals": [[0.7185308543916998, -0.014561197624520645, 0.6953426369861649], [0.05222216223859763, -0.020907881444920385, 0.998416599553819], [0.0277950152903436, -0.5150574718271302, -0.856704872076758], [0.373505573291097, 0.6657752660243824, 0.6459387601550566]], "selectedFaces": [0, 1, 3]}
+0x0000555555aae9a4 in lmr.fluidblock.FluidBlock.determine_time_step_size(double, double, bool) ()
+RAH-SIGNAL 175082.65241407012
+Step=      1 t= 1.713e-06 dt= 1.713e-06 cfl=0.00 WC=0.2 WCtFT=92210.0 WCtMS=0.0
+STOP-REASON: maximum-steps
+Reached maximum number of steps with step=1.
+FINAL-STEP: 1
+FINAL-TIME: 1.71348e-06
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++   Writing snapshot at step =      1; t = 1.713e-06 s +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[Inferior 1 (process 31) exited normally]

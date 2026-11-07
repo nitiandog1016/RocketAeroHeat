@@ -1,0 +1,47 @@
+Eilmer simulation code.
+Revision-id: f53f460
+Revision-date: Mon Dec 22 17:46:51 2025 +1000
+Compiler-name: LDC v2.111
+Parallel-flavour: shared
+Number-type: real
+Build-flavour: fast
+Build-date: 2026-11-07 05:22:05 UTC
+RAH-STORAGE cells=64982 ghosts=26324 neq=5 nftl=4 scalarBytes=8 stageLength=456530 payloadBytes=29217920
+RAH-WORKSPACE jacobian=0 sourceBackup=0 viscousBackup=0 interpBackup=0 perturbBackup=0 viscous=91306 interp=91306 interpWorkspace=91306
+RAH-WORKSPACE-CELLS internal=64982 implicitObjects=0
+Computational Domain Reference Length (m): 7.25226
+Heap memory used: 910 MB, unused: 154 MB, total: 1064 MB (1064-1064 MB per task)
+Step=      1 t= 4.538e-08 dt= 4.538e-08 cfl=0.00 WC=0.8 WCtFT=17298331.8 WCtMS=313.2
+Step=      2 t= 9.123e-08 dt= 4.585e-08 cfl=0.30 WC=1.6 WCtFT=17493598.6 WCtMS=319.2
+Step=      3 t= 1.397e-07 dt= 4.846e-08 cfl=0.28 WC=2.4 WCtFT=16818796.1 WCtMS=323.6
+Step=      4 t= 1.914e-07 dt= 5.175e-08 cfl=0.28 WC=3.3 WCtFT=15802353.3 WCtMS=323.8
+Step=      5 t= 2.466e-07 dt= 5.512e-08 cfl=0.28 WC=4.1 WCtFT=14854330.4 WCtMS=323.4
+Step=      6 t= 3.047e-07 dt= 5.818e-08 cfl=0.28 WC=4.9 WCtFT=14108361.5 WCtMS=323.4
+Step=      7 t= 3.658e-07 dt= 6.111e-08 cfl=0.29 WC=5.8 WCtFT=13455487.9 WCtMS=323.2
+Step=      8 t= 4.255e-07 dt= 5.961e-08 cfl=0.31 WC=6.6 WCtFT=13863309.8 WCtMS=323.9
+Step=      9 t= 4.835e-07 dt= 5.809e-08 cfl=0.31 WC=7.4 WCtFT=14239685.6 WCtMS=323.4
+Step=     10 t= 5.403e-07 dt= 5.671e-08 cfl=0.31 WC=8.3 WCtFT=14599902.7 WCtMS=322.9
+Step=     11 t= 5.959e-07 dt= 5.562e-08 cfl=0.31 WC=9.1 WCtFT=14910612.6 WCtMS=322.6
+Step=     12 t= 6.508e-07 dt= 5.493e-08 cfl=0.30 WC=10.0 WCtFT=15112035.7 WCtMS=322.1
+Step=     13 t= 7.054e-07 dt= 5.459e-08 cfl=0.30 WC=10.8 WCtFT=15213457.1 WCtMS=321.4
+Step=     14 t= 7.598e-07 dt= 5.445e-08 cfl=0.30 WC=11.6 WCtFT=15265607.3 WCtMS=320.8
+Step=     15 t= 8.142e-07 dt= 5.440e-08 cfl=0.30 WC=12.5 WCtFT=15289184.4 WCtMS=320.2
+Step=     16 t= 8.687e-07 dt= 5.444e-08 cfl=0.30 WC=13.3 WCtFT=15274887.4 WCtMS=319.3
+Step=     17 t= 9.232e-07 dt= 5.453e-08 cfl=0.30 WC=14.1 WCtFT=15243553.6 WCtMS=318.4
+Step=     18 t= 9.778e-07 dt= 5.462e-08 cfl=0.30 WC=15.0 WCtFT=15210887.9 WCtMS=317.4
+Step=     19 t= 1.033e-06 dt= 5.478e-08 cfl=0.30 WC=15.8 WCtFT=15182329.9 WCtMS=316.9
+Step=     20 t= 1.088e-06 dt= 5.498e-08 cfl=0.30 WC=16.6 WCtFT=15137227.0 WCtMS=316.2
+Step=     21 t= 1.143e-06 dt= 5.511e-08 cfl=0.30 WC=17.5 WCtFT=15105041.9 WCtMS=315.5
+Step=     22 t= 1.198e-06 dt= 5.524e-08 cfl=0.30 WC=18.3 WCtFT=15090067.5 WCtMS=315.1
+Step=     23 t= 1.253e-06 dt= 5.540e-08 cfl=0.30 WC=19.2 WCtFT=15048377.4 WCtMS=314.3
+Exception caught while trying to take step 23.
+----- Begin exception message -----
+lmr.globalconfig.FlowSolverException@/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/simcore_gasdynamic_step.d(1394): Explicit update failed after 1 attempts; giving up.
+----------------
+??:? void lmr.simcore_gasdynamic_step.gasdynamic_explicit_increment_with_fixed_grid() [0x5ffcc51280a8]
+??:? int lmr.timemarching.integrateInTime(double) [0x5ffcc510426e]
+??:? _Dmain [0x5ffcc5175bc7]
+----- End exception message -----
+STOP-REASON: An exception was caught during the time step.
+FINAL-STEP: 23
+FINAL-TIME: 1.25334e-06

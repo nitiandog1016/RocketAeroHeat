@@ -1,0 +1,13 @@
+--- a/src/lmr/fluidfvcell.d
++++ b/src/lmr/fluidfvcell.d
+@@ -493,9 +493,7 @@
+             debug { msg ~= format("Unhandled number of vertices: %d", vtx.length); }
+             throw new FlowSolverException(msg);
+         } // end switch
+-        fvcd.lengths[id][0] = iL;
+-        fvcd.lengths[id][1] = jL;
+-        fvcd.lengths[id][2] = kL;
++        // 各形状分支已通过属性写入共享长度；不可再用未赋值的局部量覆盖。
+         if (volume[gtl] <= 0.0) {
+             debug {
+                 msg ~= format("Invalid volume %g for cell %d in block %d at pos %s",
