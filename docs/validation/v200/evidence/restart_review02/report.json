@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "sourceFrame": "outputs/v199_validation/development02/0.002",
+  "sourceFieldsSHA256": {
+    "p": "34395e5f15ec2161484f0fd5cce474eaddbe2731ed5be6d365d07a4a78e68454",
+    "T": "bd67e29fa1f603b6b6860bfb44881d47c356970ba2277e652daf7830cd6de5c9",
+    "rho": "8e83b36e3d9e7878501c3fc01186bed276814349692746dcba382a3149b0e044",
+    "U": "bad1985ba84015ce236fd1b0bfdbed849653705823e8ed91531a1ba0092ce5a7",
+    "e": "1f16d4f8f87e6a5fa9d08c4d5a5f0f3a155e344ce0ed6226fd1d8824986f4fc8",
+    "phi": "5d0c25898737cee566156c39198b772b1253fd0efb2eab2f3db337a5717171fe"
+  },
+  "sourceTimeSHA256": "bc1d1497114288fea0ddb6717052cb9b5712403948f77bcdd5689984841e803b",
+  "sourceGeometrySHA256": "5ab4bd85c5f894c216136cdd04e27fe17a3249cb228c55e31b411ed3313485ad",
+  "state": {
+    "TminK": 299.999999999978,
+    "TmaxK": 389.7103025565627,
+    "rhoMinKgm3": 0.05014237305491536,
+    "pMinPa": 4403.91369629935,
+    "densityEOSMaxRelative": 2.220446049250313e-16,
+    "internalEnergyMaxScaled": 6.908651424962745e-15
+  },
+  "boundaryState": {
+    "TminK": 299.999999999978,
+    "TmaxK": 389.7103025565627,
+    "rhoMinKgm3": 0.05014237305491536,
+    "pMinPa": 4403.91369629935,
+    "densityEOSMaxRelative": 2.220446049250313e-16,
+    "internalEnergyMaxScaled": 6.908651424962745e-15
+  },
+  "reconstruction": {
+    "internal": {
+      "energyRebuildMaxScaled": 6.908651424962697e-15,
+      "densityEOSMaxRelative": 2.220446049250313e-16
+    },
+    "boundary": {
+      "energyRebuildMaxScaled": 6.908651424962697e-15,
+      "densityEOSMaxRelative": 2.220446049250313e-16
+    }
+  },
+  "time": {
+    "value": 0.002,
+    "index": 7889.0,
+    "deltaT": 2.56805341550953e-07,
+    "deltaT0": 2.5680534155116987e-07,
+    "beginTime": 0.0
+  },
+  "restartIdentity": {
+    "p": "MUST_READ",
+    "T": "MUST_READ; inverse after e reconstruction",
+    "U": "MUST_READ",
+    "rho": "READ_IF_PRESENT",
+    "e": "NO_READ; rebuild sensible internal energy from saved p/T",
+    "phi": "READ_IF_PRESENT then recomputed by constructor fluxPredictor",
+    "time": "saved index/deltaT/deltaT0/beginTime; adjustableRunTime continues schedule"
+  },
+  "continuousBitwiseEquivalent": false,
+  "oldRunPlanAcceptance": false,
+  "CFDRuns": 0,
+  "engineBuilds": 0,
+  "physicalQualification": false,
+  "sourceSHA256": {
+    "/opt/openfoam13/src/thermophysicalModels/basic/basicThermo/BasicThermo.C": "7785a7015754959b6a4e9a8b7deb094e322cee5284fcda8467b4132e9b7d50e3",
+    "/opt/openfoam13/src/thermophysicalModels/basic/basicThermo/basicThermo.C": "aa10df2945624b4677beb67af6dd603de7ff25b7e8d34d9c8d9696e34682d514",
+    "/opt/openfoam13/src/thermophysicalModels/basic/psiThermo/PsiThermo.C": "b909403e85e231e450c41de0e412f3d72d5ee7664b7867438673f8f59a546dba",
+    "/opt/openfoam13/src/OpenFOAM/db/Time/Time.C": "c25af623b370d07b877fa127398b499e1e0358931ddf46413f533d9305e685da",
+    "/opt/openfoam13/applications/modules/shockFluid/shockFluid.C": "3ed6fae6b1e4e6c30aeeb9e7419fa3c9ff0f829caab412a0d20158de321dfbeb",
+    "/opt/openfoam13/applications/modules/shockFluid/fluxPredictor.C": "bd6c1b655f7ee0112b7e23aa8c24fa81f8698326208dd119b584d8a1fb47999d",
+    "/opt/openfoam13/applications/solvers/foamRun/foamRun.C": "5c1e6e34c4bd253f5cc4665a8672f21b6ded2c7a5e391c67419f7586a7b5de91"
+  },
+  "runtimeSHA256": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+  "elapsedSeconds": 0.6638367869999939
+}

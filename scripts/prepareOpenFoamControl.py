@@ -13,12 +13,16 @@ def header(name,kind='dictionary'):
     return 'FoamFile { format ascii; class '+kind+'; object '+name+'; }\n'
 
 
-def read_tetra(path):
+def read_tetra(path,implicit_element_ids=False):
     """模块一：仅接受明确3D四面体/三角面及顺序编号，不隐式截断其他网格。"""
     lines=iter(Path(path).read_text().splitlines());assert next(lines)=='NDIME= 3'
     n=int(next(lines).split('=')[1]);cells=[]
     for i in range(n):
-        row=list(map(int,next(lines).split()));assert len(row)==6 and row[0]==10 and row[-1]==i
+        row=list(map(int,next(lines).split()))
+        if implicit_element_ids:
+            # 已登记v194 SU2采用行序单元编号；不猜测其他格式，点编号仍严格显式。
+            assert len(row)==5 and row[0]==10
+        else:assert len(row)==6 and row[0]==10 and row[-1]==i
         cells.append(row[1:5])
     nv=int(next(lines).split('=')[1]);pts=[]
     for i in range(nv):
