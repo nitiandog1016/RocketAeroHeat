@@ -1,0 +1,184 @@
+{
+  "stage": "prepare",
+  "case": "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01",
+  "caseManifestSHA256": "b956b689d8be9220575b6bcc1706a22ff77ffe03e56c27e8139595ff790c05ef",
+  "passed": true,
+  "physicalQualification": false,
+  "commands": [
+    {
+      "schema": "RAH.EilmerProcess.v1",
+      "argv": [
+        "prep-gas",
+        "gas.inp",
+        "nitrogen.gas"
+      ],
+      "cwd": "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01",
+      "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+      "runtimeSHA256": {
+        "lmr-debug": "dc0320435a3408faed21d9ff8b8fbdbd5f4ec8522067eb5a52b0586c2a3fa549",
+        "lmrZ-mpi-run": "b4e070a9e9cfa3b88d0dfb92bf26d7f25fee48339a8bbca225bc7920a73a7caf",
+        "lmrZ-run": "85748ec5b1801599c930c9ccc48a0fac9df1da72abc85780ed2ba546153d717f",
+        "lmr": "893efc0442e02f26bd1f9dc908ad79bde1936f10336dc084aedd7c160fe7a41a",
+        "lmr-mpi-run": "16d392e1c96b8aa8aaaf29549ae47571bfe8b1c35271cacc10b9a714820587e0",
+        "lmr-run": "5ba883260160f8efff7e240fd69c05f2bab82ff3c86ec73d14c64fb861d4561b",
+        "lmr-verify": "985bb5855e517090bb30cf143b4e2e16810d45777061b6ca7be5c940d8b44b13"
+      },
+      "limitSeconds": 169.969290914,
+      "outputLimitMiB": 256,
+      "addressSpaceLimitMiB": 8192,
+      "cpuCountLimit": 2,
+      "physicalQualification": false,
+      "status": "process-completed",
+      "startedUTC": "2026-11-07T02:58:07Z",
+      "processId": 27,
+      "nativeExitCode": 0,
+      "stopReason": null,
+      "elapsedSeconds": 0.2727399770000005,
+      "peakObservedParentRSSBytes": 0,
+      "finalCaseBytes": 11423,
+      "inputSHA256": {
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/case_manifest.json": "b956b689d8be9220575b6bcc1706a22ff77ffe03e56c27e8139595ff790c05ef",
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerRun14Control.py": "fd844ecc204fed1e982924c1455935708eabc161adc6085273a9c7d0123338d1",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/grid.lua": "278ad55ecf77f4e7f7bff98b0c848b2daede116c6b7db9c1a9f713027ef1f464",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/gas.inp": "45c855302e879ce4d4c7711a061a1fe14a5b82c7276c0935f5f0440907600644",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/job.lua": "e6c5cba7b565364a9ae0b26d018c442188046024ade28bbd687332b207fb2c92",
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": "2bae297fbe10e2122f17fab55f2a67ad1d09c8b33176528918d72ca2ac282285"
+      },
+      "inputStable": {
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/case_manifest.json": true,
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerRun14Control.py": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/grid.lua": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/gas.inp": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/job.lua": true,
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": true
+      },
+      "inputsStable": true,
+      "passed": true
+    },
+    {
+      "schema": "RAH.EilmerProcess.v1",
+      "argv": [
+        "lmr",
+        "prep-grids",
+        "--job=grid.lua"
+      ],
+      "cwd": "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01",
+      "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+      "runtimeSHA256": {
+        "lmr-debug": "dc0320435a3408faed21d9ff8b8fbdbd5f4ec8522067eb5a52b0586c2a3fa549",
+        "lmrZ-mpi-run": "b4e070a9e9cfa3b88d0dfb92bf26d7f25fee48339a8bbca225bc7920a73a7caf",
+        "lmrZ-run": "85748ec5b1801599c930c9ccc48a0fac9df1da72abc85780ed2ba546153d717f",
+        "lmr": "893efc0442e02f26bd1f9dc908ad79bde1936f10336dc084aedd7c160fe7a41a",
+        "lmr-mpi-run": "16d392e1c96b8aa8aaaf29549ae47571bfe8b1c35271cacc10b9a714820587e0",
+        "lmr-run": "5ba883260160f8efff7e240fd69c05f2bab82ff3c86ec73d14c64fb861d4561b",
+        "lmr-verify": "985bb5855e517090bb30cf143b4e2e16810d45777061b6ca7be5c940d8b44b13"
+      },
+      "limitSeconds": 168.730227333,
+      "outputLimitMiB": 256,
+      "addressSpaceLimitMiB": 8192,
+      "cpuCountLimit": 2,
+      "physicalQualification": false,
+      "status": "process-completed",
+      "startedUTC": "2026-11-07T02:58:08Z",
+      "processId": 41,
+      "nativeExitCode": 0,
+      "stopReason": null,
+      "elapsedSeconds": 0.300187385000001,
+      "peakObservedParentRSSBytes": 11665408,
+      "finalCaseBytes": 693719,
+      "inputSHA256": {
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/case_manifest.json": "b956b689d8be9220575b6bcc1706a22ff77ffe03e56c27e8139595ff790c05ef",
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerRun14Control.py": "fd844ecc204fed1e982924c1455935708eabc161adc6085273a9c7d0123338d1",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/grid.lua": "278ad55ecf77f4e7f7bff98b0c848b2daede116c6b7db9c1a9f713027ef1f464",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/gas.inp": "45c855302e879ce4d4c7711a061a1fe14a5b82c7276c0935f5f0440907600644",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/job.lua": "e6c5cba7b565364a9ae0b26d018c442188046024ade28bbd687332b207fb2c92",
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": "2bae297fbe10e2122f17fab55f2a67ad1d09c8b33176528918d72ca2ac282285"
+      },
+      "inputStable": {
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/case_manifest.json": true,
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerRun14Control.py": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/grid.lua": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/gas.inp": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/job.lua": true,
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": true
+      },
+      "inputsStable": true,
+      "passed": true
+    },
+    {
+      "schema": "RAH.EilmerProcess.v1",
+      "argv": [
+        "lmr",
+        "prep-sim",
+        "--job=job.lua"
+      ],
+      "cwd": "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01",
+      "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+      "runtimeSHA256": {
+        "lmr-debug": "dc0320435a3408faed21d9ff8b8fbdbd5f4ec8522067eb5a52b0586c2a3fa549",
+        "lmrZ-mpi-run": "b4e070a9e9cfa3b88d0dfb92bf26d7f25fee48339a8bbca225bc7920a73a7caf",
+        "lmrZ-run": "85748ec5b1801599c930c9ccc48a0fac9df1da72abc85780ed2ba546153d717f",
+        "lmr": "893efc0442e02f26bd1f9dc908ad79bde1936f10336dc084aedd7c160fe7a41a",
+        "lmr-mpi-run": "16d392e1c96b8aa8aaaf29549ae47571bfe8b1c35271cacc10b9a714820587e0",
+        "lmr-run": "5ba883260160f8efff7e240fd69c05f2bab82ff3c86ec73d14c64fb861d4561b",
+        "lmr-verify": "985bb5855e517090bb30cf143b4e2e16810d45777061b6ca7be5c940d8b44b13"
+      },
+      "limitSeconds": 168.11345828700001,
+      "outputLimitMiB": 256,
+      "addressSpaceLimitMiB": 8192,
+      "cpuCountLimit": 2,
+      "physicalQualification": false,
+      "status": "process-completed",
+      "startedUTC": "2026-11-07T02:58:09Z",
+      "processId": 58,
+      "nativeExitCode": 0,
+      "stopReason": null,
+      "elapsedSeconds": 0.7751109710000037,
+      "peakObservedParentRSSBytes": 52584448,
+      "finalCaseBytes": 5087193,
+      "inputSHA256": {
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/case_manifest.json": "b956b689d8be9220575b6bcc1706a22ff77ffe03e56c27e8139595ff790c05ef",
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerRun14Control.py": "fd844ecc204fed1e982924c1455935708eabc161adc6085273a9c7d0123338d1",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/grid.lua": "278ad55ecf77f4e7f7bff98b0c848b2daede116c6b7db9c1a9f713027ef1f464",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/gas.inp": "45c855302e879ce4d4c7711a061a1fe14a5b82c7276c0935f5f0440907600644",
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/job.lua": "e6c5cba7b565364a9ae0b26d018c442188046024ade28bbd687332b207fb2c92",
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": "2bae297fbe10e2122f17fab55f2a67ad1d09c8b33176528918d72ca2ac282285"
+      },
+      "inputStable": {
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/case_manifest.json": true,
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerRun14Control.py": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/grid.lua": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/gas.inp": true,
+        "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/job.lua": true,
+        "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": true
+      },
+      "inputsStable": true,
+      "passed": true
+    }
+  ],
+  "nativeInputSHA256": {
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/case_manifest.json": "b956b689d8be9220575b6bcc1706a22ff77ffe03e56c27e8139595ff790c05ef",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/executed_preparation.py": "82f42e65c3b201211ffe78db9d9aa38b9561f1544cd80e0d673109ffd075f910",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/gas.inp": "45c855302e879ce4d4c7711a061a1fe14a5b82c7276c0935f5f0440907600644",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/grid.lua": "278ad55ecf77f4e7f7bff98b0c848b2daede116c6b7db9c1a9f713027ef1f464",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/job.lua": "e6c5cba7b565364a9ae0b26d018c442188046024ade28bbd687332b207fb2c92",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/native-gas.csv": "7e428d4b5e4eb03d8a09dc90f71b583ca5334f6a5ec427240a7452637692b4be",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/nitrogen.gas": "2acb3ee963d5e2936275754dcc08089d7a964d7209f7cd844d7fa4a2dfc7039f",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/blocks.list": "a48af4ef7013e64385d9e12cbbbf2dd0283c16f8d4e4728978ddd4faec04fbc2",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/commands-to-steady-mode": "87993bfaf39972fc5655c14ef41454096359ecf9d5eb09608983f6da7e5e0169",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/config": "608dff0ede97e2215f303811cd653077782f4830fb35d57b9638f6851bd716a2",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/mpimap": "6bdd5a1c154f979fc4c44143e42d72e01b974eab78d1a4cea0d5b6f5dc68b3aa",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/nk-config": "190bf4486709a6b0c6dddc6312029963a9352b17353918a65d662c226b949aa1",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/grid/grid-0000.gz": "554a84d154becf01ff50c1674d9cc41e23739d9da65867209e5b948bb2153eee",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/grid/grid-0000.metadata": "09b4e5690435596e5a0155f8413e2dba5937cb8a6fd7bf0d6326f64ed6b87ba9",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/grid/grid-0001.gz": "597d9439ef0aae5d5e09ecac71c2d7ee4f2a8755ebd64990e1f7746aae75b912",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/grid/grid-0001.metadata": "eb4eb4e7c79599d8aa0cd7d629a7949a4fee670a9b3ac756d37abc40a64abf0e",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/grid/grid.metadata": "7cf93aec32a77f87deec11453a5be86f904e8c0ad681c77d8a8f5dc660fa97a5",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/snapshots/fluid.metadata": "63a239eb66b1f0ff667f32d295a0e656ef041a2576a9db7f1ad0790b3f5f7d0b",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/snapshots/0000/fluid-0000": "3611dd93b04999d1e70cda607ebdb2e016f809499c974f2c029a4080a0589e80",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/snapshots/0000/fluid-0001": "46ce8a7b0f3f6d5e5a144e5f17e1d4ea2577111b5f02ae4bc3a621e97f9371cf",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/snapshots/0000/grid-0000.gz": "554a84d154becf01ff50c1674d9cc41e23739d9da65867209e5b948bb2153eee",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01/lmrsim/snapshots/0000/grid-0001.gz": "597d9439ef0aae5d5e09ecac71c2d7ee4f2a8755ebd64990e1f7746aae75b912"
+  },
+  "elapsedSeconds": 3.103658555999999
+}

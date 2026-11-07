@@ -1,0 +1,119 @@
+{
+  "nativeProcessPassed": true,
+  "lastSavedLoadsStep": 831,
+  "historyLastStep": 831,
+  "nativeStopReason": "maximum-wall-clock",
+  "supervisorStopReason": null,
+  "reconstructionExtremaClipping": true,
+  "comparisonInterfacePassed": true,
+  "physicsQualified": false,
+  "newQualifiedAreaM2": 0,
+  "fullRingWallAreaM2": 0.07797274773364488,
+  "researchHeatPowerIntoWallW": 6406.507775355114,
+  "positiveHeatFaces": 320,
+  "negativeHeatFaces": 0,
+  "independentYPlus99": 0.5120498155135925,
+  "negativeTangentialStressFaces": 26,
+  "lastGlobalRelativeResidual": 0.0018602667139410891,
+  "lastMassRelativeResidual": 0.1011159539285218,
+  "lastEnergyRelativeResidual": 0.002207677375718291,
+  "meetsOriginalResidualTarget": false,
+  "sameOrderLogImprovements": {
+    "mass-rel": 1.3414752854175713,
+    "total-energy-rel": 0.9946347859138884
+  },
+  "developmentBenefit": true,
+  "savedWallStability": {
+    "savedSteps": [
+      800,
+      831
+    ],
+    "pAreaL1RelativeChange": 0.011757185363495768,
+    "qAreaL1RelativeChange": 0.08709228900151411,
+    "qPeakRelativeChange": 1.5870049270375963e-11
+  },
+  "metrics": {
+    "q": {
+      "matchedStations": 54,
+      "rmsAbsolute": 39682.01306086823,
+      "rmsDividedByMeasuredPeak": 0.16631143762572975,
+      "meanAbsoluteRelativeError": 0.679691698798903,
+      "measuredPeakAtStations": 238600.62559358875,
+      "predictedPeakAtStations": 203968.6122927177,
+      "calculatedContinuousFacePeak": 1189706.612343259,
+      "calculatedPeakX": 0.000140590153194413
+    },
+    "p": {
+      "matchedStations": 22,
+      "rmsAbsolute": 508.5857903991249,
+      "rmsDividedByMeasuredPeak": 0.1949884548803051,
+      "meanAbsoluteRelativeError": 0.6217499048889148,
+      "measuredPeakAtStations": 2608.2866840055913,
+      "predictedPeakAtStations": 1930.8931711595405,
+      "calculatedContinuousFacePeak": 1956.6972852794088,
+      "calculatedPeakX": 0.12868718750000002
+    }
+  },
+  "snapshots": [
+    {
+      "slot": 0,
+      "Tmin": 120.4,
+      "Tmax": 120.4
+    },
+    {
+      "slot": 1,
+      "Tmin": 120.39999996635908,
+      "Tmax": 1299.0788661764007
+    },
+    {
+      "slot": 2,
+      "Tmin": 120.39999878709008,
+      "Tmax": 1276.1636719487385
+    },
+    {
+      "slot": 3,
+      "Tmin": 120.39999960775353,
+      "Tmax": 1332.5399526864442
+    }
+  ],
+  "restartMetadataSteps": [
+    500,
+    750,
+    831
+  ],
+  "yPlusDefinition": "True face-normal centre distance and tangential viscous traction; wall rho/mu; not a mesh-convergence qualification",
+  "shearSignChangeBrackets": [
+    {
+      "xBracketM": [
+        0.09576054690184119,
+        0.09667318111109319
+      ],
+      "direction": "positive-to-negative",
+      "status": "unconverged-shear-sign-change-not-validated-separation-or-reattachment"
+    },
+    {
+      "xBracketM": [
+        0.1161178125,
+        0.11685718749999999
+      ],
+      "direction": "negative-to-positive",
+      "status": "unconverged-shear-sign-change-not-validated-separation-or-reattachment"
+    }
+  ],
+  "exactZeroShearFaces": 0,
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/compareEilmerRun14Control.py": "f01ee176cf46f559f7e572189dfa1d7f9d32c1e6047ecf464213fe006975905f",
+    "/mnt/e/RocketAeroHeat/scripts/readEilmerRun14Control.py": "5dc558cab0bdead73d761d726903dcaac7aad5c1b86fd57b332642594614f3a1",
+    "/mnt/e/RocketAeroHeat/outputs/v179_validation/control01_run/report.json": "74e48b10369bfb913707832bc1c8d6a33011d568e5d27fad918973b06885bac0",
+    "/mnt/e/RocketAeroHeat/docs/validation/v178/evidence/reference/reference01/heat_flux_SI.csv": "ac2e2468abfe64c6e0b1638feff0e7041f0082a02fd3cb3315e4fe9fa1187a04",
+    "/mnt/e/RocketAeroHeat/docs/validation/v178/evidence/reference/reference01/pressure_SI.csv": "dc61b31dba3e5dcd10993cc9fc78a5be6856e326db6307151b4f4465d012bd6c"
+  },
+  "inputsStable": true,
+  "unmatched": [
+    "P30",
+    "P32"
+  ],
+  "runReceiptSHA256": "74e48b10369bfb913707832bc1c8d6a33011d568e5d27fad918973b06885bac0",
+  "elapsedSeconds": 0.540355878000014,
+  "limitation": "Unconverged research unless separate physics gates pass; pointwise sensors with unknown footprint/uncertainty; no interpolation across corner."
+}
