@@ -71,18 +71,18 @@ def conservative(fields):
     return np.column_stack([rho,rho[:,None]*u,rho*total])
 
 
-def flux_and_residual(directory,g):
+def flux_and_residual(directory,g,evaluator=evaluate,gas_constant=R):
     """模块四：同EOS完整两侧状态→一个共享面通量→只读空间残差。"""
-    f=read_state(directory,len(g['cells']));audit_state(f);owner=g['owner'];nei=g['neighbor'];ni=len(nei)
+    f=read_state(directory,len(g['cells']));audit_state(f,evaluator);owner=g['owner'];nei=g['neighbor'];ni=len(nei)
     side={}
     boundaries={name:boundary_values(directory,name,f[name],g) for name in ['rho','U','T','e','p']}
-    audit_state(boundaries)
+    audit_state(boundaries,evaluator)
     for name in ['rho','U','T','e']:
         boundary=boundaries[name]
         left=np.concatenate([f[name][owner[:ni]],boundary]);right=np.concatenate([f[name][nei],boundary]);side[name]=(left,right)
     rhoL,rhoR=side['rho'];uL,uR=side['U'];tL,tR=side['T'];eL,eR=side['e']
-    pL=rhoL*R*tL;pR=rhoR*R*tR
-    aL=evaluate(pL,tL)['soundSpeedMps'];aR=evaluate(pR,tR)['soundSpeedMps']
+    pL=rhoL*gas_constant*tL;pR=rhoR*gas_constant*tR
+    aL=evaluator(pL,tL)['soundSpeedMps'];aR=evaluator(pR,tR)['soundSpeedMps']
     sf=g['sf'];mag=g['area'];phiL=np.einsum('ij,ij->i',uL,sf);phiR=np.einsum('ij,ij->i',uR,sf)
     ap=np.maximum.reduce([phiL+aL*mag,phiR+aR*mag,np.zeros_like(mag)])
     am=np.minimum.reduce([phiL-aL*mag,phiR-aR*mag,np.zeros_like(mag)])

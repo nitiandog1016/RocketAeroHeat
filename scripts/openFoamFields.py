@@ -26,12 +26,12 @@ def internal_field(path,count,vector=False):
     return a if vector else a[:,0]
 
 
-def audit_state(fields):
-    """模块二：热内能允许负参考值；正性靠p/rho/T与同一NASA7物性核对。"""
+def audit_state(fields,evaluator=evaluate):
+    """模块二：热内能允许负参考值；显式同模型核验，默认保持旧NASA7。"""
     p,T,rho,e=[fields[k] for k in ['p','T','rho','e']]
     if not all(np.isfinite(fields[k]).all() for k in fields):raise ValueError('非有限流场')
     if np.any(rho<=0):raise ValueError('非正密度')
-    gas=evaluate(p,T)
+    gas=evaluator(p,T)
     erho=float(np.max(abs(rho/gas['densityKgm3']-1)))
     # 原生温度逆算用1e-4相对种子容差；事前严格2e-8能量缩放门槛独立于显示精度。
     ee=float(np.max(abs(e-gas['internalEnergyJkg'])/np.maximum(1,np.abs(gas['internalEnergyJkg']))))

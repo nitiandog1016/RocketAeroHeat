@@ -1,0 +1,175 @@
+{
+  "passed": true,
+  "contract": {
+    "model": "rah-nist-integrated-air-of13-v1",
+    "source": "data/thermo/nist_air_shomate_v1.json",
+    "sourceSHA256": "b74b75301e37844e8c87b4da93d046d431fcc431da902295055ab0170373f51d",
+    "temperatureRangeK": [
+      100.0,
+      2500.0
+    ],
+    "pressureRangePa": [
+      0,
+      100000.0
+    ],
+    "pressureLowerExclusive": true,
+    "massFractions": [
+      0.755,
+      0.232,
+      0.013
+    ],
+    "moleFractions": [
+      0.7805868787679033,
+      0.20998796780065568,
+      0.009425153431440946
+    ],
+    "molarMassKgMol": [
+      0.0280134,
+      0.0319988,
+      0.039948
+    ],
+    "gasConstantJkgK": 287.07413663878884,
+    "nativeEOSMolarParameter": 28.962788805533126,
+    "nativeUniversalConstantJmolK": 8.314467591,
+    "physicalMixtureMolarMassGmol": 28.962771483015608,
+    "hfJkg": 0.0,
+    "referenceTemperatureK": 298.15,
+    "standardPressurePa": 100000.0,
+    "standardEntropyJkgK": 6864.101289670403,
+    "idealMixingEntropyJkgK": 162.21132476635592,
+    "tableNodes": 4802,
+    "energy": "hs=integral(Cp,298.15,T); ha=hs (hf=0); es=hs-R*T; h0=ha+|U|^2/2",
+    "integration": "piecewise-linear Cp integrated exactly; H and S continuous; source Shomate seams reported separately",
+    "nativeClass": "hIcoTabulatedThermo<perfectGas<specie>>",
+    "nativeOutOfRange": "NonUniformTable Fatal; no clamp or extrapolation",
+    "chemistry": "fixed N2/O2/Ar ideal gas; no dissociation or condensation",
+    "transport": "Euler only; viscosity and heat conduction not qualified",
+    "physicalQualification": false,
+    "engineeringHeatReady": false
+  },
+  "representationErrors": {
+    "cpRelative": 7.635405014128072e-05,
+    "hIntegralJkg": 0.022949892096221447,
+    "sIntegralJkgK": 1.0814287634275388e-05,
+    "rawNistHJkg": 19.481958883232437,
+    "rawNistSJkgK": 0.033816276263678446
+  },
+  "sourceSeams": [
+    {
+      "species": "N2",
+      "temperatureK": 500,
+      "CpJumpJmolK": -7.525000000185855e-05,
+      "HJumpJmol": 0.7683854166662059,
+      "SJumpJmolK": 0.001254713739683666
+    },
+    {
+      "species": "N2",
+      "temperatureK": 2000,
+      "CpJumpJmolK": -0.0053422499999982165,
+      "HJumpJmol": 0.10583333336398937,
+      "SJumpJmolK": 2.1014449885115027e-05
+    },
+    {
+      "species": "O2",
+      "temperatureK": 700,
+      "CpJumpJmolK": 0.0006799416530611779,
+      "HJumpJmol": -1.7140220321434754,
+      "SJumpJmolK": -0.0034461307283208953
+    },
+    {
+      "species": "O2",
+      "temperatureK": 2000,
+      "CpJumpJmolK": 0.006694250000002455,
+      "HJumpJmol": 1.2371666666658712,
+      "SJumpJmolK": 0.0005317524560268794
+    }
+  ],
+  "independentIntegralErrors": [
+    [
+      5.820766091346741e-11,
+      1.8189894035458565e-12
+    ],
+    [
+      0.0,
+      9.094947017729282e-13
+    ],
+    [
+      2.1827872842550278e-11,
+      0.0
+    ],
+    [
+      5.820766091346741e-11,
+      0.0
+    ],
+    [
+      1.1641532182693481e-10,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ],
+    [
+      9.313225746154785e-10,
+      1.8189894035458565e-12
+    ]
+  ],
+  "derivativeHRelative": 3.435045581312579e-10,
+  "derivativeERelative": 4.179514512259175e-10,
+  "publicTableErrors": {
+    "N2": {
+      "cpRelative": 0.00016117686637928674,
+      "hJmol": 0.9762930466386024,
+      "sJmolK": 0.0011382758230524814
+    },
+    "O2": {
+      "cpRelative": 0.0004279447915951362,
+      "hJmol": 2.4413551502584596,
+      "sJmolK": 0.012520708357754984
+    },
+    "Ar": {
+      "cpRelative": 7.53128947850179e-06,
+      "hJmol": 0.23602862287043536,
+      "sJmolK": 0.0007079376588592368
+    }
+  },
+  "oldNASA7Overlap": {
+    "cpMaxRelative": 0.0022438485081510695,
+    "alignedHMaxJkg": 1198.477316389326,
+    "alignedSMaxJkgK": 0.7708242432954648,
+    "nativeSpeedAtRocketM5Mps": 1509.276851758776
+  },
+  "rejects": [
+    [
+      "0",
+      "300"
+    ],
+    [
+      "-1",
+      "300"
+    ],
+    [
+      "100001",
+      "300"
+    ],
+    [
+      "5000",
+      "99.99"
+    ],
+    [
+      "5000",
+      "2500.01"
+    ],
+    [
+      "5000",
+      "nan"
+    ],
+    [
+      "inf",
+      "300"
+    ]
+  ],
+  "minimumCvJkgK": 715.0831835937454,
+  "elapsedSeconds": 0.20299999999997453,
+  "physicalQualification": false
+}

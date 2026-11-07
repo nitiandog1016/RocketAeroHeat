@@ -10,8 +10,8 @@ PROFILE='of13-sync-euler-upwind-nasa7-v1'
 
 class PhysicalTimeGuard:
     """模块一：完整保存场与原生警告同时监督；不把物理时间误作伪步编号。"""
-    def __init__(self,case,record,count=14892,maximum_steps=16000):
-        self.case=Path(case);self.record=Path(record);self.count=count;self.maximum_steps=maximum_steps;self.checked={}
+    def __init__(self,case,record,count=14892,maximum_steps=16000,auditor=audit_state):
+        self.case=Path(case);self.record=Path(record);self.count=count;self.maximum_steps=maximum_steps;self.checked={};self.auditor=auditor
     def __call__(self,log,final):
         text=Path(log).read_text(errors='replace')
         for token in ['out of temperature range','Negative initial temperature','Maximum number of iterations exceeded','FOAM FATAL']:
@@ -29,7 +29,7 @@ class PhysicalTimeGuard:
             complete=all(p.is_file() and p.read_bytes().rstrip().endswith(b'// ************************************************************************* //') for p in paths)
             if not complete and not final:continue
             try:
-                row=audit_state(read_state(d,self.count));row['timeSeconds']=t
+                row=self.auditor(read_state(d,self.count));row['timeSeconds']=t
                 row['fieldsSHA256']={p.name:sha(p) for p in paths};self.checked[d.name]=row
             except (ValueError,OSError) as error:return dict(reason='saved-state-rejected',timeSeconds=t,error=str(error))
             save(self.record,dict(frames=self.checked,physicalQualification=False))

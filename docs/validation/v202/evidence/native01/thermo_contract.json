@@ -1,0 +1,47 @@
+{
+  "model": "rah-nist-integrated-air-of13-v1",
+  "source": "data/thermo/nist_air_shomate_v1.json",
+  "sourceSHA256": "b74b75301e37844e8c87b4da93d046d431fcc431da902295055ab0170373f51d",
+  "temperatureRangeK": [
+    100.0,
+    2500.0
+  ],
+  "pressureRangePa": [
+    0,
+    100000.0
+  ],
+  "pressureLowerExclusive": true,
+  "massFractions": [
+    0.755,
+    0.232,
+    0.013
+  ],
+  "moleFractions": [
+    0.7805868787679033,
+    0.20998796780065568,
+    0.009425153431440946
+  ],
+  "molarMassKgMol": [
+    0.0280134,
+    0.0319988,
+    0.039948
+  ],
+  "gasConstantJkgK": 287.07413663878884,
+  "nativeEOSMolarParameter": 28.962788805533126,
+  "nativeUniversalConstantJmolK": 8.314467591,
+  "physicalMixtureMolarMassGmol": 28.962771483015608,
+  "hfJkg": 0.0,
+  "referenceTemperatureK": 298.15,
+  "standardPressurePa": 100000.0,
+  "standardEntropyJkgK": 6864.101289670403,
+  "idealMixingEntropyJkgK": 162.21132476635592,
+  "tableNodes": 4802,
+  "energy": "hs=integral(Cp,298.15,T); ha=hs (hf=0); es=hs-R*T; h0=ha+|U|^2/2",
+  "integration": "piecewise-linear Cp integrated exactly; H and S continuous; source Shomate seams reported separately",
+  "nativeClass": "hIcoTabulatedThermo<perfectGas<specie>>",
+  "nativeOutOfRange": "NonUniformTable Fatal; no clamp or extrapolation",
+  "chemistry": "fixed N2/O2/Ar ideal gas; no dissociation or condensation",
+  "transport": "Euler only; viscosity and heat conduction not qualified",
+  "physicalQualification": false,
+  "engineeringHeatReady": false
+}

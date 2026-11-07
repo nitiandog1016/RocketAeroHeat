@@ -1,0 +1,36 @@
+{
+  "schema": "RAH.NISTAirSource.v1",
+  "retrievedUTCDate": "2026-11-08",
+  "reference": "NIST Chemistry WebBook SRD 69, Chase 1998; NIST-JANAF Fourth Edition",
+  "coefficientOrder": ["A", "B", "C", "D", "E", "F", "G", "H"],
+  "temperatureVariable": "t = T / 1000",
+  "units": {"Cp": "J/mol/K", "H": "kJ/mol relative to 298.15K", "S": "J/mol/K at 100000Pa"},
+  "N2": {
+    "molarMassKgMol": 0.0280134,
+    "massFraction": 0.755,
+    "sourceURL": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Mask=1&Units=SI",
+    "segments": [
+      {"rangeK": [100, 500], "coefficients": [28.98641, 1.853978, -9.647459, 16.63537, 0.000117, -8.671914, 226.4168, 0]},
+      {"rangeK": [500, 2000], "coefficients": [19.50583, 19.88705, -8.598535, 1.369784, 0.527601, -4.935202, 212.3900, 0]},
+      {"rangeK": [2000, 6000], "coefficients": [35.51872, 1.128728, -0.196103, 0.014662, -4.553760, -18.97091, 224.9810, 0]}
+    ]
+  },
+  "O2": {
+    "molarMassKgMol": 0.0319988,
+    "massFraction": 0.232,
+    "sourceURL": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782447&Mask=1&Table=on&Type=JANAFG",
+    "segments": [
+      {"rangeK": [100, 700], "coefficients": [31.32234, -20.23531, 57.86644, -36.50624, -0.007374, -8.903471, 246.7945, 0]},
+      {"rangeK": [700, 2000], "coefficients": [30.03235, 8.772972, -3.988133, 0.788313, -0.741599, -11.32468, 236.1663, 0]},
+      {"rangeK": [2000, 6000], "coefficients": [20.91111, 10.72071, -2.020498, 0.146449, 9.245722, 5.337651, 237.6185, 0]}
+    ]
+  },
+  "Ar": {
+    "molarMassKgMol": 0.039948,
+    "massFraction": 0.013,
+    "sourceURL": "https://janaf.nist.gov/tables/Ar-001.html",
+    "idealMonatomicCpOverR": 2.5,
+    "standardEntropy29815JmolK": 154.845,
+    "janafRows_T_Cp_S_HkJmol": [[100,20.786,132.137,-4.119],[200,20.786,146.545,-2.040],[298.15,20.786,154.845,0],[1000,20.786,179.999,14.589],[2500,20.786,199.045,45.768]]
+  }
+}

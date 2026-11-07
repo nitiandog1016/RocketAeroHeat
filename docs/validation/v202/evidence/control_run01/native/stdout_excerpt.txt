@@ -1,0 +1,116 @@
+Full log retained locally; SHA256 0f7fc4a740ae0097fbc346c5fef22fd9d91971b91b0889d0e2d71fc34841e32a
+Lines 133958
+
+FIRST 55 LINES
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 13-18870c24d21c
+Exec   : foamRun
+Date   : Nov 08 2026
+Time   : 01:21:23
+Host   : "LAPTOP-APDSESFJ"
+PID    : 15
+I/O    : uncollated
+Case   : /mnt/e/RocketAeroHeat/outputs/v202_validation/control01
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Selecting solver shockFluid
+Selecting thermodynamics package 
+{
+    type            hePsiThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          hIcoTabulated;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          sensibleInternalEnergy;
+}
+
+--> FOAM Warning : 
+    From function const Foam::HashTable<Foam::List<int>, Foam::word>& Foam::polyBoundaryMesh::groupPatchIndices() const
+    in file meshes/polyMesh/polyBoundaryMesh/polyBoundaryMesh.C at line 506
+    Removing patchGroup 'wall' which clashes with patch 0 of the same name.
+Courant Number mean: 0.016769485970239782 max: 0.05812451395456926
+
+PIMPLE: No convergence criteria found
+
+
+PIMPLE: Operating solver in transient mode with 1 outer corrector
+PIMPLE: Operating solver in PISO mode
+
+
+
+Starting time loop
+
+Courant Number mean: 0.016769485970239782 max: 0.05812451395456926
+deltaT = 1.1999040076793857e-07
+
+LAST 55 LINES
+Time = 0.00399867461895s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0
+ExecutionTime = 42.859313 s  ClockTime = 45 s
+
+Courant Number mean: 0.055423290117769509 max: 0.19990934782744021
+deltaT = 3.3134526176243836e-07
+Time = 0.00399900596421s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0
+ExecutionTime = 42.862887999999998 s  ClockTime = 45 s
+
+Courant Number mean: 0.055423290117755007 max: 0.1999093478273879
+deltaT = 3.3134526176229379e-07
+Time = 0.00399933730948s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0
+ExecutionTime = 42.866301 s  ClockTime = 45 s
+
+Courant Number mean: 0.055423290117730825 max: 0.19990934782730066
+deltaT = 3.3134526176243836e-07
+Time = 0.00399966865474s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0
+ExecutionTime = 42.869746999999997 s  ClockTime = 45 s
+
+Courant Number mean: 0.055423290117755007 max: 0.1999093478273879
+deltaT = 3.3134526176287205e-07
+Time = 0.004s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0
+ExecutionTime = 42.908166000000001 s  ClockTime = 45 s
+
+End
+
