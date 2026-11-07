@@ -1,0 +1,65 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 13-18870c24d21c
+Exec   : foamRun
+Date   : Nov 08 2026
+Time   : 01:45:50
+Host   : "LAPTOP-APDSESFJ"
+PID    : 15
+I/O    : uncollated
+Case   : /mnt/e/RocketAeroHeat/outputs/v203_validation/dispatch_case01
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Selecting solver shockFluid
+Selecting thermodynamics package 
+{
+    type            hePsiThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          hIcoTabulated;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          rahBoundedNistInternalEnergy;
+}
+
+--> FOAM Warning : 
+    From function const Foam::HashTable<Foam::List<int>, Foam::word>& Foam::polyBoundaryMesh::groupPatchIndices() const
+    in file meshes/polyMesh/polyBoundaryMesh/polyBoundaryMesh.C at line 506
+    Removing patchGroup 'wall' which clashes with patch 0 of the same name.
+Courant Number mean: 0.00016726748957554538 max: 0.00060332641174363653
+
+PIMPLE: No convergence criteria found
+
+
+PIMPLE: Operating solver in transient mode with 1 outer corrector
+PIMPLE: Operating solver in PISO mode
+
+
+
+Starting time loop
+
+Courant Number mean: 0.00016726748957554538 max: 0.00060332641174363653
+Time = 1e-09s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Ux, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uy, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for Uz, Initial residual = 0, Final residual = 0, No Iterations 0
+diagonal:  Solving for e, Initial residual = 0, Final residual = 0, No Iterations 0
+ExecutionTime = 0.200182 s  ClockTime = 1 s
+
+End
+

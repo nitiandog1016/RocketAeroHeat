@@ -1,0 +1,7 @@
+FoamFile { format ascii; class dictionary; object fvSolution; }
+solvers {
+ "rho.*" { solver diagonal; }
+ "U.*" { solver smoothSolver; smoother symGaussSeidel; tolerance 1e-9; relTol 0; }
+ "e.*" { solver smoothSolver; smoother symGaussSeidel; tolerance 1e-10; relTol 0; }
+}
+PIMPLE {}

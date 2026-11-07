@@ -1,0 +1,8 @@
+FoamFile { format ascii; class dictionary; object controlDict; }
+solver shockFluid;
+libs ("/mnt/e/RocketAeroHeat/outputs/v203_validation/bounded01/library/librahBoundedNist.so");
+startFrom startTime; startTime 0; stopAt endTime; endTime 1e-9; deltaT 1e-9;
+writeControl timeStep; writeInterval 1; purgeWrite 0; writeFormat ascii;
+writePrecision 17; timeFormat general; timePrecision 12; writeCompression off;
+runTimeModifiable false; adjustTimeStep no;
+functions { energy { type writeObjects; libs ("libutilityFunctionObjects.so"); objects (e phi); writeControl writeTime; } }

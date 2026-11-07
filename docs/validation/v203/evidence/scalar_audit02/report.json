@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "originalAuditPassed": false,
+  "postRunReadOnlyRecovery": true,
+  "CFDRuns": 0,
+  "nativeQueries": 0,
+  "originalReportSHA256": "370ab4c157172dc9e32018b6e4f76b2fa5a11fb4408636135f0545d50d432919",
+  "nativeOutputSHA256": "054857dba98fe5ff02cc46e4a871ac5af9c0e034578e56d5ff97c76df7e0f1b0",
+  "printedTemperature": "99.9938",
+  "expectedAtActualPrecision": "99.9938",
+  "knownTrueTemperatureK": 100.01,
+  "seedK": 180,
+  "falseRejectionOfInRangeEnergy": true,
+  "exactRocketRootCauseEstablished": false,
+  "sourceFiles": [
+    {
+      "path": "/opt/openfoam13/src/OpenFOAM/db/IOstreams/IOstreams.C",
+      "sha256": "79f427562caeedeb13e5f6b570db2001de18373f4a135be73c661d0d042b93c5",
+      "matches": [
+        {
+          "line": 35,
+          "text": "// Define the default IOstream versions and precision"
+        },
+        {
+          "line": 38,
+          "text": "unsigned int IOstream::precision_(debug::infoSwitch(\"writePrecision\", 6));"
+        }
+      ]
+    },
+    {
+      "path": "/opt/openfoam13/src/OpenFOAM/db/IOstreams/IOstreams/IOstream.H",
+      "sha256": "354f29fb3909e3b80736f27ff8014017d93a2551b82ee494ad66293cbbad2cd8",
+      "matches": [
+        {
+          "line": 206,
+          "text": "        //- Default precision"
+        },
+        {
+          "line": 473,
+          "text": "            //- Return the default precision"
+        },
+        {
+          "line": 474,
+          "text": "            static unsigned int defaultPrecision()"
+        },
+        {
+          "line": 479,
+          "text": "            //- Reset the default precision (and return old precision)"
+        },
+        {
+          "line": 480,
+          "text": "            static unsigned int defaultPrecision(unsigned int p)"
+        }
+      ]
+    }
+  ],
+  "elapsedSeconds": 0.04502878399998167
+}

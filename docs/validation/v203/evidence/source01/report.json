@@ -1,0 +1,3347 @@
+{
+  "passed": true,
+  "files": [
+    {
+      "path": "applications/modules/shockFluid/thermophysicalPredictor.C",
+      "sha256": "64e3ed56492589cd43b7489126b5eaac25f1ddd41a70444600329354e365c694"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/psiThermo/PsiThermo.C",
+      "sha256": "b909403e85e231e450c41de0e412f3d72d5ee7664b7867438673f8f59a546dba"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/rhoFluidThermo/RhoFluidThermo.C",
+      "sha256": "ef60d3006cfde2bad21a05bf14421ea881a913ffda5d5356f585260ed1bdeead"
+    },
+    {
+      "path": "src/thermophysicalModels/specie/include/forThermo.H",
+      "sha256": "4789f12f5e415376ee4577c3f5d8ea51735aa77e01b37bc4c7581340a3b593c7"
+    },
+    {
+      "path": "src/thermophysicalModels/specie/thermo/hIcoTabulated/hIcoTabulatedThermoI.H",
+      "sha256": "99b690468c547f7702bf0c14fd1ea9e1ebfc3474fcf5aa1ff5bce17629405d1d"
+    },
+    {
+      "path": "src/thermophysicalModels/specie/thermo/sensibleInternalEnergy/sensibleInternalEnergy.H",
+      "sha256": "adcbda7297498fe4526fd2f82dacc6148ac9200edd6cee87cd9cef39fe2a883d"
+    },
+    {
+      "path": "src/thermophysicalModels/specie/thermo/thermo/thermo.C",
+      "sha256": "14360879997585ba07954d3439a1944e3955b30be718bfcf90bf45bfdf7c73fc"
+    },
+    {
+      "path": "src/thermophysicalModels/specie/thermo/thermo/thermo.H",
+      "sha256": "71e7b27573f8d51185ff3dc241031c382994e0996401e0cfc3cdb1705acb4a17"
+    },
+    {
+      "path": "src/thermophysicalModels/specie/thermo/thermo/thermoI.H",
+      "sha256": "91e8bd242808cbe8fe0bb5e4583fd37508fe6cd0a66ce7fee1ad2e91c9654efc"
+    }
+  ],
+  "thermoCallMatches": [
+    {
+      "path": "src/thermophysicalModels/basic/rhoFluidThermo/RhoFluidThermo.C",
+      "line": 31,
+      "text": "void Foam::RhoFluidThermo<BaseThermo>::calculate()"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/rhoFluidThermo/RhoFluidThermo.C",
+      "line": 152,
+      "text": "                pT[facei] = thermoMixture.The(phe[facei], pp[facei], pT[facei]);"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/rhoFluidThermo/RhoFluidThermo.C",
+      "line": 178,
+      "text": "    calculate();"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/rhoFluidThermo/RhoFluidThermo.C",
+      "line": 192,
+      "text": "void Foam::RhoFluidThermo<BaseThermo>::correct()"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/rhoFluidThermo/RhoFluidThermo.C",
+      "line": 199,
+      "text": "    calculate();"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/psiThermo/PsiThermo.C",
+      "line": 31,
+      "text": "void Foam::PsiThermo<BaseThermo>::calculate()"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/psiThermo/PsiThermo.C",
+      "line": 145,
+      "text": "                pT[facei] = thermoMixture.The(phe[facei], pp[facei], pT[facei]);"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/psiThermo/PsiThermo.C",
+      "line": 170,
+      "text": "    calculate();"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/psiThermo/PsiThermo.C",
+      "line": 187,
+      "text": "void Foam::PsiThermo<BaseThermo>::correct()"
+    },
+    {
+      "path": "src/thermophysicalModels/basic/psiThermo/PsiThermo.C",
+      "line": 197,
+      "text": "    calculate();"
+    }
+  ],
+  "cases": [
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 100.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 100.1,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 100.00000028423707
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.00000028423707,
+          "energyJkg": -227410.1361180224,
+          "trialTemperatureK": 99.99999999999997
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 100.00002775911908
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.00002775911908,
+          "energyJkg": -227410.11647119632,
+          "trialTemperatureK": 100.00000000000001
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 100.00186809090738
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.00186809090738,
+          "energyJkg": -227408.80048081133,
+          "trialTemperatureK": 100.00000000009915
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 100.00068394947908
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.00068394947908,
+          "energyJkg": -227409.64724049513,
+          "trialTemperatureK": 100.00000000001327
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 180.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 99.98383327666355
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 100.01004565784008
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.01004565784008,
+          "energyJkg": -227402.95283823484,
+          "trialTemperatureK": 100.00000000286838
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 300.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 100.56033116299108
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.56033116299108,
+          "energyJkg": -227009.44655008236,
+          "trialTemperatureK": 100.00000886742255
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.00000886742255,
+          "energyJkg": -227410.12998033082,
+          "trialTemperatureK": 99.99999999999999
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 111.1267690355748
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 111.1267690355748,
+          "energyJkg": -219451.5396079493,
+          "trialTemperatureK": 100.00219535391733
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.00219535391733,
+          "energyJkg": -227408.5664605093,
+          "trialTemperatureK": 100.00000000013698
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 1000.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 193.79634722789865
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 193.79634722789865,
+          "energyJkg": -160307.93444914935,
+          "trialTemperatureK": 99.9798947921884
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 331.2867026263891
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 331.2867026263891,
+          "energyJkg": -61778.77527230986,
+          "trialTemperatureK": 101.14347389238284
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 101.14347389238284,
+          "energyJkg": -226592.43106832332,
+          "trialTemperatureK": 100.00003596208302
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 100.00003596208302,
+          "energyJkg": -227410.11060539473,
+          "trialTemperatureK": 100.00000000000001
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.0,
+      "targetEnergyJkg": -227410.13632127558,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 380.1405276154769
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 380.1405276154769,
+          "energyJkg": -26519.963904079617,
+          "trialTemperatureK": 102.67875494941205
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 102.67875494941205,
+          "energyJkg": -225494.46372468266,
+          "trialTemperatureK": 100.00018495884896
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 100.00018495884896,
+          "energyJkg": -227410.00406031235,
+          "trialTemperatureK": 100.000000000001
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 100.00100000002843
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 100.00100027858076
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.00100027858076,
+          "energyJkg": -227409.42103886322,
+          "trialTemperatureK": 100.00099999999998
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 100.00102770318715
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.00102770318715,
+          "energyJkg": -227409.40142798724,
+          "trialTemperatureK": 100.00099999999999
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 100.0028676694466
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.0028676694466,
+          "energyJkg": -227408.08569891105,
+          "trialTemperatureK": 100.00100000009913
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 100.00168340693583
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.00168340693583,
+          "energyJkg": -227408.932545227,
+          "trialTemperatureK": 100.00100000001324
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 180.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 99.98483299742189
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 100.01104516584735
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.01104516584735,
+          "energyJkg": -227402.2381064385,
+          "trialTemperatureK": 100.0010000028681
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 100.56132745516206
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.56132745516206,
+          "energyJkg": -227008.73409566793,
+          "trialTemperatureK": 100.00100886642429
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.00100886642429,
+          "energyJkg": -227409.41489784038,
+          "trialTemperatureK": 100.00099999999999
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 111.12773240090235
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 111.12773240090235,
+          "energyJkg": -219450.8504097431,
+          "trialTemperatureK": 100.00319518083658
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.00319518083658,
+          "energyJkg": -227407.8515009833,
+          "trialTemperatureK": 100.00100000013697
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 1000.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 193.7971850029012
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 193.7971850029012,
+          "energyJkg": -160307.3352307194,
+          "trialTemperatureK": 99.98089451461313
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 331.2874452830565
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 331.2874452830565,
+          "energyJkg": -61778.24079106584,
+          "trialTemperatureK": 101.14448463452896
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 101.14448463452896,
+          "energyJkg": -226591.70825761126,
+          "trialTemperatureK": 100.0010359601265
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 100.0010359601265,
+          "energyJkg": -227409.3955235884,
+          "trialTemperatureK": 100.00099999999999
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.001,
+      "targetEnergyJkg": -227409.42123807166,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 380.1412512258439
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 380.1412512258439,
+          "energyJkg": -26519.439989676204,
+          "trialTemperatureK": 102.67977201121977
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 102.67977201121977,
+          "energyJkg": -225493.73633749885,
+          "trialTemperatureK": 100.001184948593
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 100.001184948593,
+          "energyJkg": -227409.28898443477,
+          "trialTemperatureK": 100.00100000000097
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 100.01000000284243
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.01000000284243,
+          "energyJkg": -227402.9854853745,
+          "trialTemperatureK": 100.00999999999999
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 100.01000023023207
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.01000023023207,
+          "energyJkg": -227402.9853227719,
+          "trialTemperatureK": 100.01000000000002
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 100.01002720235789
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.01002720235789,
+          "energyJkg": -227402.96603544735,
+          "trialTemperatureK": 100.01000000000006
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 100.01186387885657
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.01186387885657,
+          "energyJkg": -227401.6526581522,
+          "trialTemperatureK": 100.01000000009876
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 100.01067852660323
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.01067852660323,
+          "energyJkg": -227402.5002841583,
+          "trialTemperatureK": 100.0100000000131
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 180.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 99.99383048680444
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 100.02004074046977
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.02004074046977,
+          "energyJkg": -227395.80551661554,
+          "trialTemperatureK": 100.01000000286561
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 100.57029408724958
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.57029408724958,
+          "energyJkg": -227002.32200235614,
+          "trialTemperatureK": 100.01000885751961
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.01000885751961,
+          "energyJkg": -227402.9791535402,
+          "trialTemperatureK": 100.01000000000006
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 111.13640269131406
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 111.13640269131406,
+          "energyJkg": -219444.64762334607,
+          "trialTemperatureK": 100.01219362449653
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.01219362449653,
+          "energyJkg": -227401.41686242895,
+          "trialTemperatureK": 100.01000000013677
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 1000.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 193.80472498006634
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 193.80472498006634,
+          "energyJkg": -160301.94226333057,
+          "trialTemperatureK": 99.98989201901786
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 331.29412919496417
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 331.29412919496417,
+          "energyJkg": -61773.430456710244,
+          "trialTemperatureK": 101.15358131214455
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 101.15358131214455,
+          "energyJkg": -226585.20296066464,
+          "trialTemperatureK": 100.01003594267594
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 100.01003594267594,
+          "energyJkg": -227402.9597853893,
+          "trialTemperatureK": 100.01000000000005
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.01,
+      "targetEnergyJkg": -227402.98548740707,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 380.14776372100096
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 380.14776372100096,
+          "energyJkg": -26514.724756203606,
+          "trialTemperatureK": 102.68892556383815
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 102.68892556383815,
+          "energyJkg": -225487.18985384464,
+          "trialTemperatureK": 100.01018485666955
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 100.01018485666955,
+          "energyJkg": -227402.85329943546,
+          "trialTemperatureK": 100.01000000000097
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 100.1000002842387
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.1000002842387,
+          "energyJkg": -227338.6275964064,
+          "trialTemperatureK": 100.1
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 100.1
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 100.10002244730735
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.10002244730735,
+          "energyJkg": -227338.6117478786,
+          "trialTemperatureK": 100.1
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 100.10182622610581
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.10182622610581,
+          "energyJkg": -227337.32188859262,
+          "trialTemperatureK": 100.10000000009478
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 100.10062997639614
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.10062997639614,
+          "energyJkg": -227338.177311566,
+          "trialTemperatureK": 100.10000000001129
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 180.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 100.08380563381549
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.08380563381549,
+          "energyJkg": -227350.2081790904,
+          "trialTemperatureK": 100.10000000745435
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 100.10999673982555
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.10999673982555,
+          "energyJkg": -227331.47925645305,
+          "trialTemperatureK": 100.10000000284052
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 100.65996066044241
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.65996066044241,
+          "energyJkg": -226938.2007146367,
+          "trialTemperatureK": 100.10000877636269
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.10000877636269,
+          "energyJkg": -227338.62152379684,
+          "trialTemperatureK": 100.10000000000001
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 111.22310583941027
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 111.22310583941027,
+          "energyJkg": -219382.6195077193,
+          "trialTemperatureK": 100.10217819836195
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.10217819836195,
+          "energyJkg": -227337.0701976917,
+          "trialTemperatureK": 100.10000000013483
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 1000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 193.8801249638899
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 193.8801249638899,
+          "energyJkg": -160248.01243895537,
+          "trialTemperatureK": 100.07986731871196
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.07986731871196,
+          "energyJkg": -227353.0244150943,
+          "trialTemperatureK": 100.10000001152083
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 331.3609685021222
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 331.3609685021222,
+          "energyJkg": -61725.32680045096,
+          "trialTemperatureK": 101.24454791995905
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 101.24454791995905,
+          "energyJkg": -226520.149937951,
+          "trialTemperatureK": 100.10003578376103
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 100.10003578376103,
+          "energyJkg": -227338.60221115063,
+          "trialTemperatureK": 100.10000000000002
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 100.1,
+      "targetEnergyJkg": -227338.6277996619,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 380.2128888558259
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 380.2128888558259,
+          "energyJkg": -26467.572041339852,
+          "trialTemperatureK": 102.78046072862355
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 102.78046072862355,
+          "energyJkg": -225421.72511625718,
+          "trialTemperatureK": 100.10018397505787
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 100.10018397505787,
+          "energyJkg": -227338.4962414432,
+          "trialTemperatureK": 100.10000000000092
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 101.00002820280432
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 101.00002820280432,
+          "energyJkg": -226695.01280185097,
+          "trialTemperatureK": 101.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 101.00002280213936
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 101.00002280213936,
+          "energyJkg": -226695.01666399182,
+          "trialTemperatureK": 101.00000000000001
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 101.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 101.00147479261977
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 101.00147479261977,
+          "energyJkg": -226693.9783118685,
+          "trialTemperatureK": 101.00000000005801
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 101.0001695653069
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 101.0001695653069,
+          "energyJkg": -226694.91171024492,
+          "trialTemperatureK": 101.00000000000074
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 180.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 100.9835822015179
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 100.9835822015179,
+          "energyJkg": -226706.7737136451,
+          "trialTemperatureK": 101.00000000742271
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 101.00958182563413
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 101.00958182563413,
+          "energyJkg": -226688.1807827496,
+          "trialTemperatureK": 101.000000002449
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 101.5566514038891
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 101.5566514038891,
+          "energyJkg": -226296.9527271059,
+          "trialTemperatureK": 101.00000821459831
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 101.00000821459831,
+          "energyJkg": -226695.02709588088,
+          "trialTemperatureK": 101.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 112.09016150527549
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 112.09016150527549,
+          "energyJkg": -218762.31347236916,
+          "trialTemperatureK": 101.00202968815485
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 101.00202968815485,
+          "energyJkg": -226693.58149315952,
+          "trialTemperatureK": 101.00000000010989
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 1000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 194.63414583413464
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 194.63414583413464,
+          "energyJkg": -159708.69924541077,
+          "trialTemperatureK": 100.97966171965895
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 100.97966171965895,
+          "energyJkg": -226709.57733834817,
+          "trialTemperatureK": 101.00000001139101
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 332.0293802178021
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 332.0293802178021,
+          "energyJkg": -61244.25903825075,
+          "trialTemperatureK": 102.15425571731424
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 102.15425571731424,
+          "energyJkg": -225869.57278359393,
+          "trialTemperatureK": 101.00003434941655
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 101.00003434941655,
+          "energyJkg": -226695.00840626596,
+          "trialTemperatureK": 101.00000000000003
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 101.0,
+      "targetEnergyJkg": -226695.03297033074,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 380.86415837002687
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 380.86415837002687,
+          "energyJkg": -25996.006969024296,
+          "trialTemperatureK": 103.69582643944682
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 103.69582643944682,
+          "energyJkg": -224767.05202443537,
+          "trialTemperatureK": 101.0001753560487
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 101.0001753560487,
+          "energyJkg": -226694.90756915108,
+          "trialTemperatureK": 101.00000000000081
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 110.00234779070854
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 110.00234779070854,
+          "energyJkg": -220255.94604605174,
+          "trialTemperatureK": 110.0000000000779
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 110.00229121418181
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 110.00229121418181,
+          "energyJkg": -220255.98652003662,
+          "trialTemperatureK": 110.00000000007422
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 110.00181581499287
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 110.00181581499287,
+          "energyJkg": -220256.3266133675,
+          "trialTemperatureK": 110.00000000004663
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 110.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 109.99760474959825
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 109.99760474959825,
+          "energyJkg": -220259.33914513883,
+          "trialTemperatureK": 110.00000000008433
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 180.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 109.98338771096677
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 109.98338771096677,
+          "energyJkg": -220269.50979436375,
+          "trialTemperatureK": 110.00000000405569
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 110.00747208204699
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 110.00747208204699,
+          "energyJkg": -220252.2802058673,
+          "trialTemperatureK": 110.0000000007889
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 110.52559167508372
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 110.52559167508372,
+          "energyJkg": -219881.62257931643,
+          "trialTemperatureK": 110.00000388861754
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 110.00000388861754,
+          "energyJkg": -220257.62283782632,
+          "trialTemperatureK": 110.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 120.76268381665159
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 120.76268381665159,
+          "energyJkg": -212557.27041907323,
+          "trialTemperatureK": 110.0008850477703
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 110.0008850477703,
+          "energyJkg": -220256.992470033,
+          "trialTemperatureK": 110.0000000000111
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 1000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 202.17606393453104
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 202.17606393453104,
+          "energyJkg": -154314.324894346,
+          "trialTemperatureK": 109.98097247848207
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 109.98097247848207,
+          "energyJkg": -220271.23761385068,
+          "trialTemperatureK": 110.00000000532069
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 338.71501269289297
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 338.71501269289297,
+          "energyJkg": -56430.67120228374,
+          "trialTemperatureK": 111.25427382262461
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 111.25427382262461,
+          "energyJkg": -219360.3216525723,
+          "trialTemperatureK": 110.00002118538158
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 110.00002118538158,
+          "energyJkg": -220257.6104639858,
+          "trialTemperatureK": 110.00000000000003
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 110.0,
+      "targetEnergyJkg": -220257.62561968385,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 387.37832996821544
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 387.37832996821544,
+          "energyJkg": -21276.767911735296,
+          "trialTemperatureK": 112.85174823262258
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 112.85174823262258,
+          "energyJkg": -218217.4508519646,
+          "trialTemperatureK": 110.00010049403433
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 110.00010049403433,
+          "energyJkg": -220257.5537277881,
+          "trialTemperatureK": 110.00000000000014
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 180.03851908646567
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 180.03851908646567,
+          "energyJkg": -170148.38524043368,
+          "trialTemperatureK": 179.99999999569755
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 179.99999999569755,
+          "energyJkg": -170175.93728587442,
+          "trialTemperatureK": 180.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 180.03806437239382
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 180.03806437239382,
+          "energyJkg": -170148.71048957994,
+          "trialTemperatureK": 179.9999999957985
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 179.9999999957985,
+          "energyJkg": -170175.9372858022,
+          "trialTemperatureK": 180.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 180.0340678624308
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 180.0340678624308,
+          "energyJkg": -170151.56912438097,
+          "trialTemperatureK": 179.99999999663447
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 179.99999999663447,
+          "energyJkg": -170175.93728520427,
+          "trialTemperatureK": 180.00000000000003
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 180.006651805614
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 180.006651805614,
+          "energyJkg": -170171.1793598081,
+          "trialTemperatureK": 179.99999999987173
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 179.9957764026224
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 179.9957764026224,
+          "energyJkg": -170178.95834998763,
+          "trialTemperatureK": 179.99999999994685
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 180.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 180.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 180.0091841013893
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 180.0091841013893,
+          "energyJkg": -170169.36805192236,
+          "trialTemperatureK": 179.99999999975543
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 180.30207883943612
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 180.30207883943612,
+          "energyJkg": -169959.86563146883,
+          "trialTemperatureK": 179.99999973538954
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 179.99999973538954,
+          "energyJkg": -170175.9374720683,
+          "trialTemperatureK": 180.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 188.23310099467807
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 188.23310099467807,
+          "energyJkg": -164287.0603391264,
+          "trialTemperatureK": 179.99986624291975
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 179.99986624291975,
+          "energyJkg": -170176.0329569547,
+          "trialTemperatureK": 179.99999999999997
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 1000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 260.8506158453132
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 260.8506158453132,
+          "energyJkg": -112328.55636423538,
+          "trialTemperatureK": 180.07506117432047
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 180.07506117432047,
+          "energyJkg": -170122.24731698184,
+          "trialTemperatureK": 179.9999999836621
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 390.727840795005
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 390.727840795005,
+          "energyJkg": -18848.36498883809,
+          "trialTemperatureK": 182.0552348548571
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 182.0552348548571,
+          "energyJkg": -168705.8713871541,
+          "trialTemperatureK": 179.99998852839397
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 179.99998852839397,
+          "energyJkg": -170175.94548824104,
+          "trialTemperatureK": 180.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 180.0,
+      "targetEnergyJkg": -170175.93728279695,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 438.0572281617092
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 438.0572281617092,
+          "energyJkg": 15615.15452030659,
+          "trialTemperatureK": 184.0432915283308
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 184.0432915283308,
+          "energyJkg": -167283.8715746572,
+          "trialTemperatureK": 179.99995934087454
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 179.99995934087454,
+          "energyJkg": -170175.9663655758,
+          "trialTemperatureK": 180.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 226.56130879214953
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 226.56130879214953,
+          "energyJkg": -136870.90896094812,
+          "trialTemperatureK": 226.50908363528188
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 226.50908363528188,
+          "energyJkg": -136908.27269325824,
+          "trialTemperatureK": 226.50908361133006
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 226.56058960803392
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 226.56058960803392,
+          "energyJkg": -136871.42349104327,
+          "trialTemperatureK": 226.50908363462676
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 226.50908363462676,
+          "energyJkg": -136908.27269372693,
+          "trialTemperatureK": 226.50908361133003
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 226.554254136745
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 226.554254136745,
+          "energyJkg": -136875.95611401464,
+          "trialTemperatureK": 226.509083629248
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 226.509083629248,
+          "energyJkg": -136908.2726975751,
+          "trialTemperatureK": 226.50908361133006
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 226.50983265766206
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 226.50983265766206,
+          "energyJkg": -136907.73681628372,
+          "trialTemperatureK": 226.50908361133497
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 226.49332416039488
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 226.49332416039488,
+          "energyJkg": -136919.54757465757,
+          "trialTemperatureK": 226.50908361348476
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 226.50908361348476,
+          "energyJkg": -136908.27270885266,
+          "trialTemperatureK": 226.50908361133003
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 180.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 226.50979728277102
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 226.50979728277102,
+          "energyJkg": -136907.76212472602,
+          "trialTemperatureK": 226.5090836113345
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 226.50908361133003
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 226.65236867809801
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 226.65236867809801,
+          "energyJkg": -136805.76140203295,
+          "trialTemperatureK": 226.50908379162357
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 226.50908379162357,
+          "energyJkg": -136908.27258140588,
+          "trialTemperatureK": 226.50908361133003
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 233.0515422608733
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 233.0515422608733,
+          "energyJkg": -132227.2794821747,
+          "trialTemperatureK": 226.5095163472466
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 226.5095163472466,
+          "energyJkg": -136907.96311588914,
+          "trialTemperatureK": 226.50908361133168
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 1000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 299.82624499690155
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 299.82624499690155,
+          "energyJkg": -84388.12628215691,
+          "trialTemperatureK": 226.65144394201104
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 226.65144394201104,
+          "energyJkg": -136806.42299243322,
+          "trialTemperatureK": 226.50908378930393
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 226.50908378930393,
+          "energyJkg": -136908.27258306544,
+          "trialTemperatureK": 226.50908361133003
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 425.2782997796046
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 425.2782997796046,
+          "energyJkg": 6280.349024487543,
+          "trialTemperatureK": 229.01361823264565
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 229.01361823264565,
+          "energyJkg": -135116.40021915844,
+          "trialTemperatureK": 226.50914153016186
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 226.50914153016186,
+          "energyJkg": -136908.2312732236,
+          "trialTemperatureK": 226.50908361133006
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 226.50908361133003,
+      "targetEnergyJkg": -136908.27271039423,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 471.72160015050895
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 471.72160015050895,
+          "energyJkg": 40328.05999170046,
+          "trialTemperatureK": 231.21403322989403
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 231.21403322989403,
+          "energyJkg": -133542.0403220968,
+          "trialTemperatureK": 226.5092986204331
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 226.5092986204331,
+          "energyJkg": -136908.11888531482,
+          "trialTemperatureK": 226.50908361133042
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 503.66123932947767
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 503.66123932947767,
+          "energyJkg": 63960.09111171443,
+          "trialTemperatureK": 500.0016430462327
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.0016430462327,
+          "energyJkg": 61242.447386285145,
+          "trialTemperatureK": 500.0000000003271
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 503.6589449038254
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 503.6589449038254,
+          "energyJkg": 63958.38648981188,
+          "trialTemperatureK": 500.00164097345026
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.00164097345026,
+          "energyJkg": 61242.44584770739,
+          "trialTemperatureK": 500.0000000003262
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 503.63867806631714
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 503.63867806631714,
+          "energyJkg": 63943.32947593846,
+          "trialTemperatureK": 500.0016227207576
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.0016227207576,
+          "energyJkg": 61242.43229916177,
+          "trialTemperatureK": 500.000000000319
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 503.492968565632
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 503.492968565632,
+          "energyJkg": 63835.07849634584,
+          "trialTemperatureK": 500.00149448948684
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.00149448948684,
+          "energyJkg": 61242.33711609882,
+          "trialTemperatureK": 500.0000000002706
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 503.4429081244174
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 503.4429081244174,
+          "energyJkg": 63797.88832752907,
+          "trialTemperatureK": 500.0014517541127
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.0014517541127,
+          "energyJkg": 61242.30539463417,
+          "trialTemperatureK": 500.00000000025534
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 180.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 503.532342102058
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 503.532342102058,
+          "energyJkg": 63864.32962897097,
+          "trialTemperatureK": 500.00152861183165
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.00152861183165,
+          "energyJkg": 61242.36244431429,
+          "trialTemperatureK": 500.0000000002831
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 503.472675126632
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 503.472675126632,
+          "energyJkg": 63820.0023370024,
+          "trialTemperatureK": 500.0014770912196
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.0014770912196,
+          "energyJkg": 61242.32420177359,
+          "trialTemperatureK": 500.0000000002643
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 502.7248522056515
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 502.7248522056515,
+          "energyJkg": 63264.49118980928,
+          "trialTemperatureK": 500.00090711659385
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.00090711659385,
+          "energyJkg": 61241.901123022864,
+          "trialTemperatureK": 500.00000000009965
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 500.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 1000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 531.973633381788
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 531.973633381788,
+          "energyJkg": 85071.5272321422,
+          "trialTemperatureK": 500.1359789345313
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 500.1359789345313,
+          "energyJkg": 61342.1633884529,
+          "trialTemperatureK": 500.00000224010097
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 500.00000224010097,
+          "energyJkg": 61241.22945461783,
+          "trialTemperatureK": 499.99999999999994
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 631.0684049137265
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 631.0684049137265,
+          "energyJkg": 160344.92241284883,
+          "trialTemperatureK": 502.5749947103453
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 502.5749947103453,
+          "energyJkg": 63153.18365791868,
+          "trialTemperatureK": 500.00080960485644
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 500.00080960485644,
+          "energyJkg": 61241.82874236087,
+          "trialTemperatureK": 500.0000000000794
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 500.0,
+      "targetEnergyJkg": 61241.22779184405,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 672.2339769596638
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 672.2339769596638,
+          "energyJkg": 192299.49271883024,
+          "trialTemperatureK": 504.46940564401757
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 504.46940564401757,
+          "energyJkg": 64560.570790940255,
+          "trialTemperatureK": 500.00245519272323
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 500.00245519272323,
+          "energyJkg": 61243.050223636994,
+          "trialTemperatureK": 500.00000000073027
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 100.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 1062.3152676251839
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1062.3152676251839,
+          "energyJkg": 514271.9868306879,
+          "trialTemperatureK": 1000.4034572673601
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.4034572673601,
+          "energyJkg": 461069.715328955,
+          "trialTemperatureK": 1000.0000179663574
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000179663574,
+          "energyJkg": 460725.34420819976,
+          "trialTemperatureK": 1000.0000000000001
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 100.1,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 1062.309797395668
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1062.309797395668,
+          "energyJkg": 514267.2557083918,
+          "trialTemperatureK": 1000.403388592546
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.403388592546,
+          "energyJkg": 461069.6567063181,
+          "trialTemperatureK": 1000.0000179602418
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000179602418,
+          "energyJkg": 460725.3442029799,
+          "trialTemperatureK": 1000.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 101.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 1062.2614438897763
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1062.2614438897763,
+          "energyJkg": 514225.435689561,
+          "trialTemperatureK": 1000.4027818061658
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.4027818061658,
+          "energyJkg": 461069.13873746054,
+          "trialTemperatureK": 1000.0000179062524
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000179062524,
+          "energyJkg": 460725.3441568971,
+          "trialTemperatureK": 1000.0000000000001
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 110.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 1061.9115302192217
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1061.9115302192217,
+          "energyJkg": 513922.8142956996,
+          "trialTemperatureK": 1000.3984038740467
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.3984038740467,
+          "energyJkg": 461065.40162119607,
+          "trialTemperatureK": 1000.0000175191301
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000175191301,
+          "energyJkg": 460725.34382646874,
+          "trialTemperatureK": 1000.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 150.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 1061.7938265685448
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1061.7938265685448,
+          "energyJkg": 513821.0236075069,
+          "trialTemperatureK": 1000.3969360212825
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.3969360212825,
+          "energyJkg": 461064.148624861,
+          "trialTemperatureK": 1000.0000173902811
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000173902811,
+          "energyJkg": 460725.3437164897,
+          "trialTemperatureK": 1000.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 180.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 1062.0303550460735
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1062.0303550460735,
+          "energyJkg": 514025.5770485594,
+          "trialTemperatureK": 1000.3998882642837
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.3998882642837,
+          "energyJkg": 461066.66873474984,
+          "trialTemperatureK": 1000.0000176499146
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000176499146,
+          "energyJkg": 460725.3439381,
+          "trialTemperatureK": 1000.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 226.50908361133003,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 1061.8518338338793
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1061.8518338338793,
+          "energyJkg": 513871.18826816784,
+          "trialTemperatureK": 1000.3976590727847
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.3976590727847,
+          "energyJkg": 461064.76583990455,
+          "trialTemperatureK": 1000.0000174536915
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000174536915,
+          "energyJkg": 460725.3437706136,
+          "trialTemperatureK": 1000.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 300.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 1059.3074710652097
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1059.3074710652097,
+          "energyJkg": 511671.3799210763,
+          "trialTemperatureK": 1000.3665273057965
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.3665273057965,
+          "energyJkg": 461038.1910656789,
+          "trialTemperatureK": 1000.0000148279516
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000148279516,
+          "energyJkg": 460725.34152941225,
+          "trialTemperatureK": 1000.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 1038.1879056198452
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1038.1879056198452,
+          "energyJkg": 493456.10211512714,
+          "trialTemperatureK": 1000.1551350725563
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.1551350725563,
+          "energyJkg": 460857.7467466361,
+          "trialTemperatureK": 1000.0000026564934
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000026564934,
+          "energyJkg": 460725.331140459,
+          "trialTemperatureK": 1000.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 1000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 1000.0
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 2000.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 1045.9565320729184
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1045.9565320729184,
+          "energyJkg": 500147.16305971576,
+          "trialTemperatureK": 1000.2229746268521
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.2229746268521,
+          "energyJkg": 460915.6536433545,
+          "trialTemperatureK": 1000.0000054877352
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000054877352,
+          "energyJkg": 460725.3335570665,
+          "trialTemperatureK": 1000.0000000000001
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 1000.0,
+      "targetEnergyJkg": 460725.3288730079,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 1076.4818120650982
+        },
+        {
+          "iteration": 1,
+          "temperatureK": 1076.4818120650982,
+          "energyJkg": 526541.9323223626,
+          "trialTemperatureK": 1000.5993741195771
+        },
+        {
+          "iteration": 2,
+          "temperatureK": 1000.5993741195771,
+          "energyJkg": 461236.9587507379,
+          "trialTemperatureK": 1000.0000396431077
+        },
+        {
+          "iteration": 3,
+          "temperatureK": 1000.0000396431077,
+          "energyJkg": 460725.36271039915,
+          "trialTemperatureK": 1000.0000000000002
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 100.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 3029.5455517293744
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 100.1,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 3029.528898303783
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 101.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 3029.3816411082644
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 110.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 3028.312647995407
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 150.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 3027.9567472434323
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 180.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 3028.711250603712
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 226.50908361133003,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 3028.114199063046
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 300.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 3019.2435459322433
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 500.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 2933.3492986270335
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 1000.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 2648.09630922995
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 2000.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 2506.9331775877927
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2499.99,
+      "targetEnergyJkg": 1867458.6232922608,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 2499.9900000021717
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 100.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.0,
+          "energyJkg": -227410.13632127558,
+          "trialTemperatureK": 3029.559371318707
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 100.1,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 100.1,
+          "energyJkg": -227338.6277996619,
+          "trialTemperatureK": 3029.5427178145546
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 101.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 101.0,
+          "energyJkg": -226695.03297033074,
+          "trialTemperatureK": 3029.3954599242475
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 110.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 110.0,
+          "energyJkg": -220257.62561968385,
+          "trialTemperatureK": 3028.3264617599316
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 150.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 150.0,
+          "energyJkg": -191637.0567626824,
+          "trialTemperatureK": 3027.970559334647
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 180.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 180.0,
+          "energyJkg": -170175.93728279695,
+          "trialTemperatureK": 3028.7250663336467
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 226.50908361133003,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 226.50908361133003,
+          "energyJkg": -136908.27271039423,
+          "trialTemperatureK": 3028.128011852848
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 300.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 300.0,
+          "energyJkg": -84263.4153752855,
+          "trialTemperatureK": 3019.25731428051
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 500.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 500.0,
+          "energyJkg": 61241.22779184405,
+          "trialTemperatureK": 2933.3626119398577
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 1000.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 1000.0,
+          "energyJkg": 460725.3288730079,
+          "trialTemperatureK": 2648.1078869361077
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 2000.0,
+      "result": "trial-out-of-range",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2000.0,
+          "energyJkg": 1379346.9336579754,
+          "trialTemperatureK": 2506.943440797661
+        }
+      ]
+    },
+    {
+      "trueTemperatureK": 2500.0,
+      "targetEnergyJkg": 1867468.5054481965,
+      "seedK": 2500.0,
+      "result": "returned",
+      "history": [
+        {
+          "iteration": 0,
+          "temperatureK": 2500.0,
+          "energyJkg": 1867468.5054481965,
+          "trialTemperatureK": 2500.0
+        }
+      ]
+    }
+  ],
+  "trialOutOfRangeCount": 30,
+  "totalCases": 144,
+  "boostAvailable": false,
+  "exactRocketRootCauseEstablished": false,
+  "CFDRuns": 0,
+  "elapsedSeconds": 0.1865333650000025
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "RAH.OpenFOAMProcess.v1",
+  "argv": [
+    "bash",
+    "--noprofile",
+    "--norc",
+    "-c",
+    "source /opt/openfoam13/etc/bashrc; exec \"$@\"",
+    "rah-openfoam",
+    "apt-get",
+    "-y",
+    "--no-install-recommends",
+    "install",
+    "libboost1.83-dev=1.83.0-2.1ubuntu3.2"
+  ],
+  "cwd": "/mnt/e/RocketAeroHeat/outputs/v203_validation/boost01",
+  "nativeExitCode": 0,
+  "stopReason": null,
+  "elapsedSeconds": 21.830681029999994,
+  "maximumSeconds": 120,
+  "peakObservedGroupRSSBytes": 163655680,
+  "liveGroupAfterCleanup": {},
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": "a02a492c35f7bf8d0980cc9a92b78488e271cd0e8143348065e1e7139f6c3d12",
+    "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+    "/mnt/e/RocketAeroHeat/scripts/deployBoostMathHeaders.py": "80a604872d053ea149cbc77d1504154fb107a4589cd8d404a40bde807e406ebd",
+    "/mnt/e/RocketAeroHeat/outputs/v203_validation/boost01/package.txt": "0095231c8dd6f0f6bdda9b126150e6b28d2e2353a8b3c2c955083559966082d0",
+    "/mnt/e/RocketAeroHeat/outputs/v203_validation/boost01/admission.json": "0eb191185278411146e566728b78b2072e0f1d65f8b9829962edca94f1dca14c",
+    "/mnt/e/RocketAeroHeat/docs/validation/v203/BOUNDED_INVERSE_PLAN.md": "dd2c31e2dd343a5d5f048926163eb12f5bda9748a48cfa939e6cb4ebd7dee10f"
+  },
+  "inputStable": {
+    "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": true,
+    "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": true,
+    "/mnt/e/RocketAeroHeat/scripts/deployBoostMathHeaders.py": true,
+    "/mnt/e/RocketAeroHeat/outputs/v203_validation/boost01/package.txt": true,
+    "/mnt/e/RocketAeroHeat/outputs/v203_validation/boost01/admission.json": true,
+    "/mnt/e/RocketAeroHeat/docs/validation/v203/BOUNDED_INVERSE_PLAN.md": true
+  },
+  "caseBytes": 14305,
+  "logBytes": 2379,
+  "caseAndLogLimitMiB": 16,
+  "addressSpaceLimitMiB": 2048,
+  "cpuCount": 1,
+  "liveLogFilesystem": "ext2/ext3",
+  "liveLogPath": "/root/.cache/RocketAeroHeat/openfoam-observation/run-xbiy85mr/stdout.txt",
+  "logExportPassed": true,
+  "physicalQualification": false,
+  "observationIORetries": [],
+  "passed": true
+}
