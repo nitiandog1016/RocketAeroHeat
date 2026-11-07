@@ -284,3 +284,6 @@ scripts/checkEilmerRuntime.sh text eol=lf
 scripts/setupEilmerLinuxHost.sh text eol=lf
 scripts/setupEilmerRuntime.sh text eol=lf
 scripts/installWslRuntime.ps1 -text -eol
+# v178原生输入/小场/失败/准确执行源保留字节，不能改变回执SHA。
+docs/validation/v178/evidence/** -text -eol -whitespace
+tests/data/eilmer_cylinder_flare/** -text -eol -whitespace

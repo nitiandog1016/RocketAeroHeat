@@ -1,0 +1,164 @@
+{
+  "schema": "RAH.CUBRC.Run14.Reference.v1",
+  "caseID": "CUBRC-Run14-hollow-cylinder-30deg-extended-flare",
+  "status": "reference-preparation-only; laminar ideal-N2 control; not experimental qualification",
+  "repository": "gdtk-uq/gdtk",
+  "commit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "release": "v5.0.0",
+  "geometry": {
+    "radius_m": 0.0325,
+    "cylinderEndX_m": 0.1017,
+    "domainEndX_m": 0.22,
+    "flareAngle_deg": 30.0,
+    "source": "cyl-flare.lua",
+    "physicalGeometry": "axisymmetric hollow cylinder plus extended flare",
+    "coordinate": "原前缘x=0、流动沿+x；项目X=-x，原面测站不移动或裁到末面",
+    "experimentalNormalizationLength_m": 0.1017016,
+    "geometricLabelsAreNotFlowSeparationLabels": true,
+    "baseOrInteriorHeatingReferenceProvided": false
+  },
+  "reported": {
+    "Mach": 10.3,
+    "velocity_m_s": 2304.0,
+    "pressure_Pa": 31.88,
+    "temperature_K": 120.4,
+    "density_kg_m3": 0.000881,
+    "vibrationTemperature_K": 2467.0,
+    "wallTemperature_K": 295.2,
+    "Reynolds": null,
+    "ReynoldsNote": "本次取得的原表1/配置未独立给出Re；不把派生Re写为实测",
+    "source": {
+      "title": "MacLean and Holden, AIAA 2004-0529, Table 1",
+      "url": "https://chimeracfd.com/professional/public/aiaa2004_0529.pdf",
+      "sourceSHA256": null,
+      "paperCopiedIntoRepository": false,
+      "extraction": "人工核对网页可读表1；未建立整论文原始文件SHA",
+      "codeAlsoRecords": [
+        "p",
+        "T",
+        "U",
+        "Tw",
+        "Tv"
+      ]
+    }
+  },
+  "codeDerived": {
+    "independentInputs": [
+      "p_inf",
+      "T_inf",
+      "u_inf",
+      "idealN2 model selected by fixed source"
+    ],
+    "gasConstant_J_kgK": 296.80474344420884,
+    "universalGasConstant_J_molK": 8.31451,
+    "molarMass_kg_mol": 0.0280134,
+    "gamma": 1.4,
+    "cp_J_kgK": 1038.816602054731,
+    "density_kg_m3": 0.0008921153014049396,
+    "Mach": 10.300772480267696,
+    "caloricallyPerfectTotalTemperature_K": 2675.4304016609863,
+    "viscosity_Pas": 1.2882275539655426e-05,
+    "conductivity_W_mK": 0.018586557920607816,
+    "Re_per_m": 159555.1692796628,
+    "Re_L_originalTable": 16227.016004012556,
+    "Re_D": 10371.086003178081,
+    "densityRelativeDifferenceFromReported": 0.012616687179273223,
+    "derivationIsMeasurement": false,
+    "numericalRuntimeNotExecuted": true
+  },
+  "transport": {
+    "requested": {
+      "viscosity": "CEA",
+      "thermal_conductivity": "CEA",
+      "Prandtl": 0.72
+    },
+    "actual": {
+      "viscosity": "CEA with constant endpoint continuation",
+      "thermalConductivity": "cp*mu/Pr; Prandtl option takes precedence over CEA conductivity",
+      "Prandtl": 0.72,
+      "ceaFirstSegment": {
+        "T_lower": 200.0,
+        "T_upper": 1000.0,
+        "A": 0.62526577,
+        "B": -31.779652,
+        "C": -1640.7983,
+        "D": 1.7454992
+      },
+      "actualEvaluationTemperature_K": 200.0,
+      "freestreamBelowFittedRange": true,
+      "lowTemperatureAccuracyQualified": false
+    },
+    "sourceBindings": {
+      "N2.lua": "fe8471989c23944ea5b840d752053e46b290bc9bf5b2d471ea10930320992f7b",
+      "prep_gas.lua": "8b15d0ab61397d3b29c03fcae7dce3d93a2cc73a4e2a43da631e9bd0096bf717",
+      "ideal_gas.d": "21e3aade75322e48b0cf9be07b92c4ac906e4c17f4964a1f8ba06172cf792f8a",
+      "physical_constants.d": "ec9bae2a292fa8b4c62ebb932e16763561771ad16d583cf33ba1aec60dc8f7c0",
+      "cea_viscosity.d": "098d1525c6c7a6bc6846c4eb06d379182571901eaf8d6d57b0aa810cf3c436f7"
+    },
+    "sutherlandDiagnostic": {
+      "selected": false,
+      "coefficients": {
+        "mu_ref": 1.663e-05,
+        "T_ref": 273.0,
+        "S": 107.0
+      },
+      "viscosity_Pas": 8.139189224171162e-06,
+      "Re_L_originalTable": 25683.257335914233,
+      "relativeDifferenceFromActualViscosity": -0.36818699467214866,
+      "applicabilityQualified": false
+    }
+  },
+  "boundary": {
+    "inlet": "uniform supersonic p/T/U at real leading edge and outer boundary",
+    "upstreamBoundaryLayer": "developed internally from physical leading edge; no supplied profile",
+    "wall": "no-slip fixed Tw=295.2 K",
+    "turbulence": "none; laminar",
+    "downstream": "upstream example uses fixed outside pressure p_inf/5",
+    "downstreamPressure_Pa": 6.3759999999999994,
+    "baseInteriorWakeQualification": false,
+    "gasVibration": "reported Tv=2467 K retained; upstream ideal-N2 example ignores it",
+    "vibrationEnergySubstitutionPerformed": false,
+    "wallTemperatureSolved": false
+  },
+  "units": {
+    "BtuConvention": "International Table Btu (Btu_IT), explicit project conversion convention",
+    "originalBtuVariantSpecified": false,
+    "Btu_IT_J": "1055.05585262",
+    "foot_m": "0.3048",
+    "inch_m": "0.0254",
+    "heatFluxMultiplier_W_m2": "11356.52668222697556506224123559358229828",
+    "pressureMultiplier_Pa": "6894.757293168361336722673445346890693781",
+    "originalNormalizationInch": "4.004",
+    "measurementXUsesOriginalLength": true,
+    "originalCoefficientRoundoffOrUncertaintyImproved": false
+  },
+  "limitations": [
+    "当前原始数据不提供逐点实验/读数不确定度；unknown保持未知",
+    "报告p/T/rho并非完全相容，报告量不覆盖成派生量",
+    "CEA在来流温度返回200K端点常值；可复现源码不等于低温适用性通过",
+    "Prandtl优先，不能把该例说成同时采用CEA导热拟合",
+    "忽略振动是具名简化模型差异，不获非平衡资格",
+    "两处活跃压力测站超出示例尾端，保留而不插值、裁点或外推几何",
+    "内嵌成熟引擎的教程配置不等于本项目已运行或已验证",
+    "本轴对称层流候选不授真实20度三维RANS、底面、突起及全面积热环境资格"
+  ],
+  "experimentalQualification": false,
+  "newQualifiedArea_m2": 0,
+  "nativeTasks": 0,
+  "modifiesDefaultSolver": false,
+  "measurements": {
+    "heatFile": "heat_flux_SI.csv",
+    "pressureFile": "pressure_SI.csv",
+    "heatRowsIncludingSourceComments": 55,
+    "pressureRowsIncludingSourceComments": 26,
+    "activeHeatRows": 54,
+    "activePressureRows": 24,
+    "activeOutsidePressureSensors": [
+      "P30",
+      "P32"
+    ],
+    "noInterpolatedOrRepairedMeasurements": true,
+    "allUncertaintiesUnknown": true
+  },
+  "sourceManifestSHA256": "dff593fac3aa5ef838387bdd97e705e521f38c0b0f8d988cf3d2ae5e3b0713f6"
+}

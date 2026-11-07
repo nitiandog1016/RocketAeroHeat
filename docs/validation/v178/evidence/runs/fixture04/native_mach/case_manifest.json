@@ -1,0 +1,113 @@
+{
+  "schema": "RAH.EilmerPreparedCase.v1",
+  "status": "prepared-only",
+  "nativeVerified": false,
+  "runtimeReady": null,
+  "productionQualified": false,
+  "newQualifiedAreaM2": 0,
+  "nativeTasks": 0,
+  "meshCopied": false,
+  "sourceStable": true,
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "sourceTag": "v5.0.0",
+  "turbulenceModel": "Wilcox k-omega (2006); not SST",
+  "condition": {
+    "flowMode": "nativeMach",
+    "pressurePa": 1197.0279007383137,
+    "temperatureK": 226.50908361133003,
+    "wallTemperatureK": 300.0,
+    "Mach": 5.0,
+    "alphaDeg": 20.0,
+    "betaDeg": 0.0,
+    "turbulenceIntensity": 0.01,
+    "eddyViscosityRatio": 10.0,
+    "maxNewtonSteps": 4,
+    "stopRelativeResidual": 1e-08,
+    "boundaryMarkers": {
+      "wall": "wall",
+      "farfield": "farfield"
+    }
+  },
+  "mesh": {
+    "nodes": 13,
+    "cells": 4,
+    "cellTypeCounts": {
+      "10": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1
+    },
+    "wallFaces": 7,
+    "farfieldFaces": 7,
+    "wallAreaM2": 6.046357376887758,
+    "sourceSHA256": "82bd42fae5907ed314bfae59e542e0e5ca139e308aeb34366f68941ce575b5c7",
+    "sourcePath": "/mnt/e/RocketAeroHeat/outputs/v178_validation/fixture04/mixed_original.su2",
+    "nativeSourcePath": "/mnt/e/RocketAeroHeat/outputs/v178_validation/fixture04/mixed_original.su2",
+    "sourceOrder": "rah-su2-v1",
+    "expectGmshOrderForWedges": false,
+    "wedgePermutationZeroBased": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "auditReferenceWedgePermutationZeroBased": [
+      1,
+      0,
+      2,
+      4,
+      3,
+      5
+    ],
+    "markers": {
+      "wall": {
+        "faces": 7,
+        "areaM2": 6.046357376887758,
+        "orderedConnectivitySHA256": "41a278d5b5001cfd6aa1dac142c370ad0f792d3cec899927a3fe14e1eb9bccaf"
+      },
+      "farfield": {
+        "faces": 7,
+        "areaM2": 6.164391365637653,
+        "orderedConnectivitySHA256": "a243ca1f7ae63dca7a852ecb2d5a239b70a9bb749b2dd5a46e44be52987a4b51"
+      }
+    },
+    "discreteVolumeM3": 2.1249999999999996,
+    "minimumMedianSubVolumeM3": 0.013888888888888886,
+    "scope": "每个转换后单元的定向中位面离散体积；未证明全参考Jacobian、全域拓扑、近壁质量或原生读取"
+  },
+  "thermalProperties": {
+    "model": "official ThermallyPerfectGas species air",
+    "tableMinimumK": 200,
+    "tableMaximumK": 6000,
+    "outsideBehavior": "endpoint Cp with continuous enthalpy/entropy extension; temperature not clipped",
+    "givenTemperaturesOutsideTable": false,
+    "computedFieldTemperatureRangeKnown": false,
+    "physicalQualification": false
+  },
+  "pending": [
+    "WSL/runtime and pinned native preparation",
+    "native geometric interpretation/topology",
+    "native gas/velocity/turbulence receipt",
+    "signed heat and original-face mapping",
+    "near-wall, conservation, convergence and public physical validation"
+  ],
+  "sourceURLs": {
+    "src/geom/luawrap/luausgrid.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/geom/luawrap/luausgrid.d",
+    "src/geom/grid/usgrid.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/geom/grid/usgrid.d",
+    "src/lmr/lua-modules/bc.lua": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/lmr/lua-modules/bc.lua",
+    "src/lmr/lua-modules/nkconfig.lua": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/lmr/lua-modules/nkconfig.lua",
+    "src/lmr/turbulence.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/lmr/turbulence.d",
+    "src/lmr/loads.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/lmr/loads.d",
+    "src/gas/species-database/air.lua": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/gas/species-database/air.lua",
+    "src/gas/thermo/cea_thermo_curves.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/gas/thermo/cea_thermo_curves.d"
+  },
+  "filesSHA256": {
+    "gas.inp": "7c5159d5e52cb604318b3fcfe677db631671e9e2d73093c392f3373d0f45165c",
+    "job.lua": "baec04c1a6d76a884349f638e1e75faf364dd6b9198a2fc8b13a1d1eff7ed725",
+    "grid.lua": "7921c39a5644f80a1efdfb5d70292eb816e82d589955ebeaef553dd277ca1e87",
+    "PREPARATION.md": "27ad0cd10bda6d5bd5458451efea91d4942f8794ddea3c7164c3f6cbab003428"
+  },
+  "elapsedSeconds": 0.03540457500000116
+}

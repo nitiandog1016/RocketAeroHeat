@@ -1,0 +1,40 @@
+{
+  "schema": "RAH.EilmerProcess.v1",
+  "argv": [
+    "/usr/bin/python3",
+    "-c",
+    "import subprocess,time; p=subprocess.Popen(['sleep','60']); print(p.pid,flush=True); time.sleep(60)"
+  ],
+  "cwd": "/mnt/e/RocketAeroHeat/outputs/v178_validation/supervision01",
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "runtimeSHA256": {
+    "lmr-debug": "dc0320435a3408faed21d9ff8b8fbdbd5f4ec8522067eb5a52b0586c2a3fa549",
+    "lmrZ-mpi-run": "b4e070a9e9cfa3b88d0dfb92bf26d7f25fee48339a8bbca225bc7920a73a7caf",
+    "lmrZ-run": "85748ec5b1801599c930c9ccc48a0fac9df1da72abc85780ed2ba546153d717f",
+    "lmr": "893efc0442e02f26bd1f9dc908ad79bde1936f10336dc084aedd7c160fe7a41a",
+    "lmr-mpi-run": "16d392e1c96b8aa8aaaf29549ae47571bfe8b1c35271cacc10b9a714820587e0",
+    "lmr-run": "5ba883260160f8efff7e240fd69c05f2bab82ff3c86ec73d14c64fb861d4561b",
+    "lmr-verify": "985bb5855e517090bb30cf143b4e2e16810d45777061b6ca7be5c940d8b44b13"
+  },
+  "limitSeconds": 0.8,
+  "outputLimitMiB": 128,
+  "addressSpaceLimitMiB": 8192,
+  "cpuCountLimit": 2,
+  "physicalQualification": false,
+  "status": "failed",
+  "startedUTC": "2026-11-07T02:40:35Z",
+  "processId": 45,
+  "nativeExitCode": -15,
+  "stopReason": "wall-clock-limit",
+  "elapsedSeconds": 0.8326202639999991,
+  "peakObservedParentRSSBytes": 11915264,
+  "finalCaseBytes": 7421,
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": "2bae297fbe10e2122f17fab55f2a67ad1d09c8b33176528918d72ca2ac282285"
+  },
+  "inputStable": {
+    "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": true
+  },
+  "inputsStable": true,
+  "passed": false
+}
