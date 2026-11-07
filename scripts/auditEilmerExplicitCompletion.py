@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 import numpy as np
-from eilmerExplicitProfile import audit_explicit_config,DEVELOPMENT_PROFILE,DENSE_DEVELOPMENT_PROFILE
+from eilmerExplicitProfile import audit_explicit_config,DEVELOPMENT_PROFILE,DENSE_DEVELOPMENT_PROFILE,WORKSPACE_DEVELOPMENT_PROFILE
 
 
 def require(ok, message):
@@ -24,7 +24,7 @@ def audit_explicit_completion(case, stdout, manifest):
     times=re.findall(r'^FINAL-TIME:\s*(\S+)\s*$',text,re.M)
     require(len(reasons)==len(steps)==len(times)==1,'missing-explicit-stop-markers')
     step=int(steps[0]);pseudo=float(times[0]);d=condition['explicit']
-    development=d['profile'] in (DEVELOPMENT_PROFILE,DENSE_DEVELOPMENT_PROFILE)
+    development=d['profile'] in (DEVELOPMENT_PROFILE,DENSE_DEVELOPMENT_PROFILE,WORKSPACE_DEVELOPMENT_PROFILE)
     if development:
         from eilmerExplicitAdmission import audit_admission
         audit_admission(manifest,case)
@@ -76,6 +76,10 @@ def audit_explicit_completion(case, stdout, manifest):
         require(count==manifest['mesh']['wallFaces'],'incomplete-explicit-wall-coverage')
     require(abs(meta[-1,1]-saved_time)<=5.1e-6*saved_time,'explicit-load-time-mismatch')
     storage={}
+    if d['profile'] in ('rah-explicit-workspace-v1','rah-explicit-workspace-development-v1'):
+        from eilmerWorkspaceRuntime import audit_workspace_allocation
+        from readEilmerNative import read_grid
+        storage=audit_workspace_allocation(manifest,read_grid(case/'lmrsim/grid/grid-0000'),text)
     if d['profile'] in ('rah-explicit-dense-v1',DENSE_DEVELOPMENT_PROFILE):
         from eilmerDenseRuntime import audit_dense_allocation
         from readEilmerNative import read_grid

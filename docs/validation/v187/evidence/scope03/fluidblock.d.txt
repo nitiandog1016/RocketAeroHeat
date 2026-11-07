@@ -1,0 +1,290 @@
+237:     void allocate_dense_celldata(size_t ncells, size_t nghost, size_t neq, size_t nftl)
+238:     {
+239:     /*
+240:         Both kinds of blocks now share a structure of densely packed core flow data. This routine
+241:         allocates the storage for these structures, attempting to keep related bits of data together
+242:         on the heap.
+243: 
+244:         In an older draft of this code, I allocated all of the normal cells in one loop,
+245:         then added the ghost cells onto the end later. This caused all of the pointers
+246:         in the FVCell classes to no longer be pointing to the right objects, which was
+247:         very bad. The solution to this was to use .reserve on the arrays before
+248:         filling them, which prevented the pointers from being copied. Now however,
+249:         we do the cells and the ghost cells all at once, but we still do .reserve
+250:         because it should be faster.
+251: 
+252:         @author: Nick Gibbons
+253:     */
+254:         auto gmodel = myConfig.gmodel;
+255:         size_t nturb = myConfig.turb_model.nturb;
+256:         size_t ngtl = myConfig.n_grid_time_levels;
+257: 
+258:         celldata.all_cell_idxs.length = ncells;
+259:         celldata.halo_cell_ids.length = (ncells + nghost);
+260:         celldata.halo_face_ids.length = (ncells + nghost);
+261:         foreach(i; 0 .. ncells) celldata.all_cell_idxs[i] = i;
+262: 
+263:         celldata.nfaces.length = ncells;
+264:         celldata.dt_local.length = ncells;
+265:         celldata.wall_distances.length = ncells;
+266:         celldata.data_is_bad.length = ncells;
+267:         celldata.in_turbulent_zone.length = ncells;
+268:         celldata.lengths.length = ncells + nghost;
+269: 
+270:         celldata.areas.length     = ngtl*(ncells + nghost);
+271:         celldata.volumes.length   = ngtl*(ncells + nghost);
+272:         celldata.positions.length = ngtl*(ncells + nghost);
+273: 
+274:         celldata.U0.length = (ncells + nghost)*neq*nftl;
+275:         if (nftl>1) celldata.U1.length = (ncells + nghost)*neq*nftl;
+276:         if (nftl>2) celldata.U2.length = (ncells + nghost)*neq*nftl;
+277:         if (nftl>3) celldata.U3.length = (ncells + nghost)*neq*nftl;
+278:         if (nftl>4) celldata.U4.length = (ncells + nghost)*neq*nftl;
+279:         celldata.dUdt0.length = (ncells + nghost)*neq*nftl;
+280:         if (nftl>1) celldata.dUdt1.length = (ncells + nghost)*neq*nftl;
+281:         if (nftl>2) celldata.dUdt2.length = (ncells + nghost)*neq*nftl;
+282:         if (nftl>3) celldata.dUdt3.length = (ncells + nghost)*neq*nftl;
+283:         if (nftl>4) celldata.dUdt4.length = (ncells + nghost)*neq*nftl;
+284:         celldata.source_terms.length = (ncells + nghost)*neq;
+285: 
+286:         celldata.flowstates.reserve(ncells + nghost);
+287:         celldata.gradients.reserve(ncells + nghost);
+288:         celldata.workspaces.reserve(ncells + nghost);
+289:         foreach (n; 0 .. ncells+nghost) celldata.flowstates ~= FlowState(gmodel, nturb);
+290:         foreach (n; 0 .. ncells+nghost) celldata.gradients ~= FlowGradients(myConfig);
+291:         foreach (n; 0 .. ncells+nghost) celldata.workspaces ~= WLSQGradWorkspace();
+292: 
+293:         version(newton_krylov) {
+294:             celldata.cell_jacobians.length = (ncells+nghost)*neq*neq;
+295:             celldata.saved_gradients.reserve(ncells + nghost);
+296:             foreach (n; 0 .. ncells+nghost) celldata.saved_gradients ~= FlowGradients(myConfig);
+297:             celldata.saved_source_terms.length = (ncells + nghost)*neq;
+298:             celldata.doNotPerturb.length = (ncells+nghost);
+299:         }
+300:     }
+301: 
+302:     void allocate_dense_facedata(size_t nfaces, size_t nbfaces, size_t neq, size_t nftl)
+303:     {
+304:     /*
+305:         Both kinds of blocks now share a structure of densely packed core flow
+306:         data. This routine allocates the storage for these structures,
+307:         attempting to keep related bits of data together on the heap.
+308: 
+309:         @author: Nick Gibbons
+310:     */
+311:         auto gmodel = myConfig.gmodel;
+312:         size_t nturb = myConfig.turb_model.nturb;
+313:         size_t ngtl = myConfig.n_grid_time_levels;
+314: 
+315:         facedata.all_face_idxs.length = nfaces;
+316:         foreach(i; 0 .. nfaces) facedata.all_face_idxs[i] = i;
+317: 
+318:         facedata.positions.length = nfaces;
+319:         facedata.areas.length = nfaces*ngtl;
+320:         facedata.grid_velocities.length = nfaces*ngtl;
+321:         facedata.normals.length = nfaces;
+322:         facedata.tangents1.length = nfaces;
+323:         facedata.tangents2.length = nfaces;
+324:         facedata.left_interior_only.length = nfaces;
+325:         facedata.right_interior_only.length = nfaces;
+326:         facedata.stencil_idxs.length = nfaces;
+327:         facedata.fluxes.length = nfaces*neq;
+328:         facedata.f2c.length = nfaces;
+329: 
+330:         if (myConfig.interpolation_order>=2) facedata.l2r2_interp_data.length = nfaces;
+331:         if (myConfig.interpolation_order==3) facedata.l3r3_interp_data.length = nfaces;
+332: 
+333:         facedata.flowstates.reserve(nfaces);
+334:         foreach (n; 0 .. nfaces) facedata.flowstates ~= FlowState(gmodel, nturb);
+335:         facedata.gradients.reserve(nfaces);
+336:         foreach (n; 0 .. nfaces) facedata.gradients ~= FlowGradients(myConfig);
+337:         facedata.workspaces.reserve(nfaces);
+338:         foreach (n; 0 .. nfaces) facedata.workspaces ~= WLSQGradWorkspace();
+339:     }
+340: 
+341:     @nogc
+342:     void identify_reaction_zones(int gtl)
+343:     // Adjust the reactions-allowed flag for cells in this block.
+344:     {
+345:         size_t total_cells_in_reaction_zones = 0;
+346:         size_t total_cells = 0;
+347:         foreach(cell; cells) {
+348:             if ( myConfig.reaction_zones.length > 0 ) {
+349:                 cell.fr_reactions_allowed = false;
+350:                 foreach(rz; myConfig.reaction_zones) {
+351:                     if ( rz.is_inside(cell.pos[gtl], myConfig.dimensions) ) {
+352:                         cell.fr_reactions_allowed = true;
+353:                     }
+354:                 } // foreach rz
+355:             } else {
+1481:     void evaluate_jacobian(FluxCalculator fluxCalculatorForPreconditioner)
+1482:     {
+1483:         /*
+1484:           Higher level method used to evaluate the flow Jacobian attached to the FluidBlock object.
+1485:          */
+1486: 
+1487:         // zero entries
+1488:         flowJacobian.local.aa[] = 0.0;
+1489: 
+1490:         // temporarily change flux calculator
+1491:         auto flux_calculator_save = myConfig.flux_calculator;
+1492:         myConfig.flux_calculator = fluxCalculatorForPreconditioner;
+1493: 
+1494:         // temporarily change interpolation order
+1495:         shared int interpolation_order_save = GlobalConfig.interpolation_order;
+1496:         myConfig.interpolation_order = to!int(flowJacobian.spatial_order);
+1497: 
+1498:         // copy some data for later use
+1499:         if (myConfig.viscous) {
+1500:             foreach(cell; cells) { cell.grad_save.copy_values_from(*(cell.grad)); }
+1501:         }
+1502:         if (flowJacobian.spatial_order >= 2) {
+1503:             foreach(cell; cells) { cell.gradients_save.copy_values_from(*(cell.gradients)); }
+1504:         }
+1505:         if (myConfig.reacting) {
+1506:             foreach(cell; cells) {
+1507:                 cell.clear_source_vector();
+1508:                 cell.add_thermochemical_source_vector(thermochem_source, 1.0);
+1509:                 cell.Q_save.copy_values_from(cell.Q);
+1510:             }
+1511:         }
+1512: 
+1513:         // the real-valued finite difference needs a base residual (R0)
+1514:         version(complex_numbers) { } // do nothing
+1515:         else {
+1516:             foreach(cell; cells) {
+1517:                 if (cell.doNotPerturb) continue;
+1518:                 evalRHS(0, 0, cell.cell_list, cell.face_list, cell);
+1519:             }
+1520:         }
+1521: 
+1522:         // fill out the rows of the Jacobian for a cell
+1523:         foreach(cell; cells) {
+1524:             if (cell.doNotPerturb) continue;
+1525:                 /*
+1526:                 debug {
+1527:                     writefln("cell.id= %d, pos= %s ", cell.id, cell.pos[0]);
+1528:                     foreach (cl; cell.cell_list) writef("[%d: %s] ", cl.id, cl.pos[0]);
+1529:                     writeln();
+1530:                 }
+1531:                 */
+1532:             evaluate_cell_contribution_to_jacobian(cell);
+1533:         }
+1534: 
+1535:         // add boundary condition corrections to boundary cells
+1536:         apply_jacobian_bcs();
+1537: 
+1538:         // return flux calculator to its original state
+1539:         myConfig.flux_calculator = flux_calculator_save;
+1540: 
+1541:         // return the interpolation order to its original state
+1542:         myConfig.interpolation_order = interpolation_order_save;
+1543:     } // end evaluate_jacobian()
+1717:     void evalRHS(int gtl, int ftl, ref FluidFVCell[] cell_list, FVInterface[] iface_list, FluidFVCell pcell)
+1718:     /*
+1719:      *  This method evaluates the RHS residual on a subset of cells for a given FluidBlock.
+1720:      *  It is used when constructing the numerical Jacobian.
+1721:      *  Its effect should replicate evalRHS() in steadystatecore.d for a subset of cells.
+1722:      */
+1723:     {
+1724:         // assume static grid for the preconditioner jacobian for the moment.
+1725:         // if (GlobalConfig.grid_motion == GridMotion.shock_fitting) {
+1726:         //     foreach (i, fba; fluidBlockArrays) {
+1727:         //         if (fba.shock_fitting) { compute_vtx_velocities_for_sf(fba, ftl); }
+1728:         //     }
+1729: 
+1730:         //     foreach (blk; localFluidBlocksBySize) {
+1731:         //         compute_avg_face_vel(blk, ftl);        
+1732:         //     }
+1733:         // }
+1734: 
+1735: 
+1736:         foreach(iface; iface_list) iface.F.clear();
+1737:         foreach(cell; cell_list) cell.clear_source_vector();
+1738: 
+1739:         bool do_reconstruction = ( flowJacobian.spatial_order > 1 );
+1740: 
+1741:         // convective flux update
+1742:         convective_flux_phase0_legacy(do_reconstruction, gtl, cell_list, iface_list);
+1743:         convective_flux_phase1(do_reconstruction, gtl, cell_list, iface_list);
+1744:         convective_flux_phase2(do_reconstruction, gtl, cell_list, iface_list);
+1745: 
+1746:         foreach(f; iface_list) {
+1747:             if (f.is_on_boundary) { applyPostConvFluxAction(0.0, gtl, ftl, f); }
+1748:         }
+1749: 
+1750:         // Viscous flux update
+1751:         if (myConfig.viscous) {
+1752: 
+1753:             foreach(f; iface_list) {
+1754:                 if (f.is_on_boundary) { applyPreSpatialDerivActionAtBndryFaces(0.0, gtl, ftl, f); }
+1755:             }
+1756: 
+1757:             // currently only for least-squares at faces
+1758:             // TODO: generalise for all spatial gradient methods
+1759:             foreach(c; cell_list) {
+1760:                 c.grad.gradients_leastsq(myConfig, c.cloud_fs, *(c.ws_grad)); // flow_property_spatial_derivatives(0);
+1761:             }
+1762: 
+1763:             // we need to average cell-centered spatial (/viscous) gradients to get approximations of the gradients
+1764:             // at the cell interfaces before the viscous flux calculation.
+1765:             if (myConfig.spatial_deriv_locn == SpatialDerivLocn.cells) {
+1766:                 foreach(f; iface_list) {
+1767:                     f.average_cell_deriv_values(gtl);
+1768:                 }
+1769:             }
+1770:             estimate_turbulence_viscosity(cell_list);
+1771:             average_turbulent_transprops_to_faces(iface_list);
+1772:             viscous_flux(iface_list);
+1773:             foreach(f; iface_list) {
+1774:                 if (f.is_on_boundary) { applyPostDiffFluxAction(0.0, gtl, ftl, f); }
+1775:             }
+1776:         }
+1777: 
+1778:         // source terms and flux integration
+1779:         // the limit_factor is used to slowly increase the magnitude of the
+1780:         // thermochemical source terms from 0 to 1 for problematic reacting flows
+1781:         double limit_factor = 1.0;
+1782:         if (myConfig.nsteps_of_chemistry_ramp > 0) {
+1783:             double S = SimState.step/to!double(myConfig.nsteps_of_chemistry_ramp);
+1784:             limit_factor = min(1.0, S);
+1785:         }
+1786:         if (myConfig.conductivity_model) {
+1787:             foreach (cell; cell_list) cell.evaluate_electrical_conductivity();
+1788:         }
+1789:         foreach (i, cell; cell_list) {
+1790:             cell.add_inviscid_source_vector(gtl, 0.0);
+1791:             if (myConfig.viscous) {
+1792:                 cell.add_viscous_source_vector();
+1793:             }
+1794:             if (myConfig.reacting) {
+1795:                 // NOTE: we only need to evaluate the chemical source terms for the perturb cell
+1796:                 //       this saves us a lot of unnecessary computations
+1797:                 if (cell.id == pcell.id) {
+1798:                     cell.add_thermochemical_source_vector(thermochem_source, limit_factor);
+1799:                 } else {
+1800:                     foreach (j; 0 .. myConfig.cqi.n) { cell.Q[j] += cell.Q_save[j]; }
+1801:                 }
+1802:             }
+1803:             if (myConfig.udf_source_terms) {
+1804:                 size_t i_cell = cell.id;
+1805:                 size_t j_cell = 0;
+1806:                 size_t k_cell = 0;
+1807:                 // can't call a blk/this inside the FluidBlock class
+1808:                 /*
+1809:                 if (grid_type == Grid_t.structured_g31rid) {
+1810:                     auto sblk = cast(SFluidBlock) blk;
+1811:                     assert(sblk !is null, "Oops, this should be an SFluidBlock object.");
+1812:                     auto ijk_indices = sblk.cell_id_to_ijk_indices(cell.id);
+1813:                     i_cell = ijk_indices[0];
+1814:                     j_cell = ijk_indices[1];
+1815:                     k_cell = ijk_indices[2];
+1816:                 }
+1817:                 */
+1818:                 getUDFSourceTermsForCell(myL, cell, 0, 0.0, myConfig, id, i_cell, j_cell, k_cell);
+1819:                 cell.add_udf_source_vector();
+1820:             }
+1821:             cell.time_derivatives(gtl, ftl);
+1822:         }
+1823: 
+1824:     } // end evalRHS()

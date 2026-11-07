@@ -1,0 +1,56 @@
+300:         }
+301:         grid.sort_cells_into_bins();
+302:         ninteriorfaces = grid.ninteriorfaces;
+303: 
+304:         // Assemble array storage for finite-volume cells, etc.
+305:         bool lsq_workspace_at_vertices = (myConfig.viscous) && (myConfig.spatial_deriv_calc == SpatialDerivCalc.least_squares)
+306:             && (myConfig.spatial_deriv_locn == SpatialDerivLocn.vertices);
+307:         foreach (i, v; grid.vertices) {
+308:             auto new_vtx = new FVVertex(myConfig, lsq_workspace_at_vertices, to!int(i));
+309:             new_vtx.pos[0] = v;
+310:             vertices ~= new_vtx;
+311:         }
+312: 
+313:         // Allocate densified face and cell data
+314:         auto gmodel = myConfig.gmodel;
+315:         size_t neq    = myConfig.cqi.n;
+316:         size_t nsp    = myConfig.n_species;
+317:         size_t nmodes = myConfig.n_modes;
+318:         size_t nturb  = myConfig.turb_model.nturb;
+319:         size_t nftl   = myConfig.n_flow_time_levels;
+320: 
+321:         size_t nghost = 0;
+322:         foreach (bndry; grid.boundaries) nghost += bndry.face_id_list.length;
+323: 
+324:         allocate_dense_celldata(ncells, nghost, neq, nftl);
+325:         allocate_dense_facedata(nfaces, nghost, neq, nftl); // nghost==nbfaces for unstructured
+326: 
+327:         // We have some unstructured specific stuff that also needs to be allocated
+328:         celldata.face_distances.length = ncells;
+329:         celldata.lsqws.length = ncells + nghost;
+330:         celldata.cell_cloud_indices.length = ncells;
+331:         celldata.c2v.length = ncells;
+332:         celldata.lsqgradients.reserve(ncells + nghost);
+333:         foreach (i; 0 .. ncells + nghost) celldata.lsqgradients ~= LSQInterpGradients(nsp, nmodes, nturb); // TODO: skip if not needed
+334:         // TODO: for now this is only needed for the adjoint solver and/or the check-jacobian tool - we can think about dropping this for the flow solver. KAD 2024-08-28
+335:         celldata.saved_lsqgradients.reserve(ncells + nghost);
+336:         foreach (n; 0 .. ncells+nghost) celldata.saved_lsqgradients ~= LSQInterpGradients(myConfig.n_species, myConfig.n_modes, myConfig.turb_model.nturb);
+337: 
+338:         facedata.dL.length = nfaces;
+339:         facedata.dR.length = nfaces;
+340: 
+341:         foreach (i, f; grid.faces) {
+342:             auto new_face = new FVInterface(myConfig, IndexDirection.none, &facedata, to!int(i));
+343:             faces ~= new_face;
+344:         }
+345: 
+346:         cells.reserve(ncells + nghost);
+347:         foreach (i, c; grid.cells) {
+348:             // Note that the cell id and the index in the cells array are the same.
+349:             // We will reply upon this connection in other parts of the flow code.
+350:             auto new_cell = new FluidFVCell(myConfig, &celldata, to!int(i));
+351:             new_cell.contains_flow_data = true;
+352:             new_cell.is_interior_to_domain = true;
+353:             cells ~= new_cell;
+354:         }
+355:         // Bind the interfaces, vertices and cells together,

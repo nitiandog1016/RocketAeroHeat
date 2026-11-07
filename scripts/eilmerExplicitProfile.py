@@ -3,19 +3,21 @@ PROFILE = 'rah-explicit-local-v1'
 DEVELOPMENT_PROFILE = 'rah-explicit-local-development-v1'
 DENSE_PROFILE = 'rah-explicit-dense-v1'
 DENSE_DEVELOPMENT_PROFILE = 'rah-explicit-dense-development-v1'
+WORKSPACE_PROFILE = 'rah-explicit-workspace-v1'
+WORKSPACE_DEVELOPMENT_PROFILE = 'rah-explicit-workspace-development-v1'
 
 
 def validate_explicit(value):
     """模块一：独立步数身份，不把显式更新称为Newton步或物理时间。"""
     if not isinstance(value, dict):
         raise ValueError('显式方案须为对象')
-    development = value.get('profile') in (DEVELOPMENT_PROFILE, DENSE_DEVELOPMENT_PROFILE)
-    dense = value.get('profile') in (DENSE_PROFILE, DENSE_DEVELOPMENT_PROFILE)
+    development = value.get('profile') in (DEVELOPMENT_PROFILE, DENSE_DEVELOPMENT_PROFILE, WORKSPACE_DEVELOPMENT_PROFILE)
+    dense = value.get('profile') in (DENSE_PROFILE, DENSE_DEVELOPMENT_PROFILE, WORKSPACE_PROFILE, WORKSPACE_DEVELOPMENT_PROFILE)
     required = {'profile', 'maxSteps', 'checkpointStep'} | ({'candidate', 'candidateSHA256'} if development else set())
     if dense: required |= {'runtimePackage', 'runtimePackageSHA256'}
     if set(value) != required:
         raise ValueError('显式方案字段不完整或含未知参数')
-    if value['profile'] not in (PROFILE, DEVELOPMENT_PROFILE, DENSE_PROFILE, DENSE_DEVELOPMENT_PROFILE):
+    if value['profile'] not in (PROFILE, DEVELOPMENT_PROFILE, DENSE_PROFILE, DENSE_DEVELOPMENT_PROFILE, WORKSPACE_PROFILE, WORKSPACE_DEVELOPMENT_PROFILE):
         raise ValueError('未支持的显式方案')
     for key in ('maxSteps', 'checkpointStep'):
         if type(value[key]) is not int or value[key] <= 0:

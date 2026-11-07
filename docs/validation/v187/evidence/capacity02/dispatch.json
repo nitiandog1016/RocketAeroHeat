@@ -1,0 +1,102 @@
+[
+  {
+    "path": "commands/runsim.d",
+    "line": 34,
+    "text": "28: import util.json_helper : readJSONfile, getJSONbool;\n29: \n30: import lmr.commands.command;\n31: import lmr.globalconfig;\n32: import lmr.lmrbuild;\n33: import lmr.lmrconfig;\n34: import lmr.newtonkrylovsolver : initNewtonKrylovSimulation, performNewtonKrylovUpdates;\n35: import lmr.timemarching : initTimeMarchingSimulation, integrateInTime, finalizeSimulation_timemarching;\n36: import lmr.dualtimestepping : initDualTimeNewtonKrylovSimulation, performDualTimeNewtonKrylovUpdates;\n37: \n38: version(mpi_parallel) {\n39:     import mpi;\n40: }\n41: "
+  },
+  {
+    "path": "commands/runsim.d",
+    "line": 35,
+    "text": "29: \n30: import lmr.commands.command;\n31: import lmr.globalconfig;\n32: import lmr.lmrbuild;\n33: import lmr.lmrconfig;\n34: import lmr.newtonkrylovsolver : initNewtonKrylovSimulation, performNewtonKrylovUpdates;\n35: import lmr.timemarching : initTimeMarchingSimulation, integrateInTime, finalizeSimulation_timemarching;\n36: import lmr.dualtimestepping : initDualTimeNewtonKrylovSimulation, performDualTimeNewtonKrylovUpdates;\n37: \n38: version(mpi_parallel) {\n39:     import mpi;\n40: }\n41: \n42: enum NumberType {default_type, real_values, complex_values}"
+  },
+  {
+    "path": "commands/runsim.d",
+    "line": 355,
+    "text": "349:         bool useTaperedBlending = false;\n350:         useTaperedBlending = getJSONbool(jsonData, \"use_tapered_blending\", useTaperedBlending);\n351: \n352:         initNewtonKrylovSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock, useTaperedBlending);\n353: \n354:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Perform Newton steps.\");\n355:         performNewtonKrylovUpdates(snapshotStart, startCFL, maxCPUs, threadsPerMPITask);\n356:         break;\n357:     case SolverMode.transient:\n358:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Initialise transient simulation.\");\n359:         initTimeMarchingSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);\n360: \n361:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Perform integration in time.\");\n362:         auto flag = integrateInTime(GlobalConfig.max_time);"
+  },
+  {
+    "path": "commands/runsim.d",
+    "line": 359,
+    "text": "353: \n354:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Perform Newton steps.\");\n355:         performNewtonKrylovUpdates(snapshotStart, startCFL, maxCPUs, threadsPerMPITask);\n356:         break;\n357:     case SolverMode.transient:\n358:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Initialise transient simulation.\");\n359:         initTimeMarchingSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);\n360: \n361:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Perform integration in time.\");\n362:         auto flag = integrateInTime(GlobalConfig.max_time);\n363:         if (flag != 0 && GlobalConfig.is_master_task) writeln(\"Note that integrateInTime failed.\");\n364:         finalizeSimulation_timemarching();\n365:         break;\n366:     case SolverMode.dual_time_stepping:"
+  },
+  {
+    "path": "commands/runsim.d",
+    "line": 362,
+    "text": "356:         break;\n357:     case SolverMode.transient:\n358:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Initialise transient simulation.\");\n359:         initTimeMarchingSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);\n360: \n361:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Perform integration in time.\");\n362:         auto flag = integrateInTime(GlobalConfig.max_time);\n363:         if (flag != 0 && GlobalConfig.is_master_task) writeln(\"Note that integrateInTime failed.\");\n364:         finalizeSimulation_timemarching();\n365:         break;\n366:     case SolverMode.dual_time_stepping:\n367:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Initialise Newton-Krylov simulation.\");\n368:         initDualTimeNewtonKrylovSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);\n369: "
+  },
+  {
+    "path": "commands/runsim.d",
+    "line": 363,
+    "text": "357:     case SolverMode.transient:\n358:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Initialise transient simulation.\");\n359:         initTimeMarchingSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);\n360: \n361:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Perform integration in time.\");\n362:         auto flag = integrateInTime(GlobalConfig.max_time);\n363:         if (flag != 0 && GlobalConfig.is_master_task) writeln(\"Note that integrateInTime failed.\");\n364:         finalizeSimulation_timemarching();\n365:         break;\n366:     case SolverMode.dual_time_stepping:\n367:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Initialise Newton-Krylov simulation.\");\n368:         initDualTimeNewtonKrylovSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);\n369: \n370:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln(\"lmr run: Perform dual time steps.\");"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 66,
+    "text": "60:     compute_mass_balance,\n61:     set_mu_and_k,\n62:     synchronize_corner_coords_for_all_blocks,\n63:     update_ch_for_divergence_cleaning;\n64: import lmr.simcore_gasdynamic_step : \n65:     determine_time_step_size,\n66:     gasdynamic_explicit_increment_with_fixed_grid,\n67:     gasdynamic_explicit_increment_with_moving_grid,\n68:     gasdynamic_implicit_increment_with_fixed_grid,\n69:     gasdynamic_implicit_increment_with_moving_grid,\n70:     local_cfl_max,\n71:     local_dt_allow,\n72:     local_dt_allow_parab,\n73:     local_invalid_cell_count,"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 97,
+    "text": "91: {\n92:     double t = 0;\n93:     while (t <= now) { t += dt; }\n94:     return t;\n95: }\n96: \n97: void initTimeMarchingSimulation(int snapshotStart, int maxCPUs, int threadsPerMPITask, string maxWallClock)\n98: {\n99:     alias cfg = GlobalConfig;\n100:     if (cfg.verbosity_level > 0 && cfg.is_master_task) {\n101:         writeln(\"lmr run: Begin initTimeMarchingSimulation()...\");\n102:     }\n103: \n104:     SimState.is_restart = (snapshotStart > 0);"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 101,
+    "text": "95: }\n96: \n97: void initTimeMarchingSimulation(int snapshotStart, int maxCPUs, int threadsPerMPITask, string maxWallClock)\n98: {\n99:     alias cfg = GlobalConfig;\n100:     if (cfg.verbosity_level > 0 && cfg.is_master_task) {\n101:         writeln(\"lmr run: Begin initTimeMarchingSimulation()...\");\n102:     }\n103: \n104:     SimState.is_restart = (snapshotStart > 0);\n105:     SimState.maxWallClockSeconds = timeStringToSeconds(maxWallClock);\n106:     SimState.wall_clock_start = Clock.currTime();\n107: \n108:     // Initialise baseline configuration"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 311,
+    "text": "305:  *\n306:  * Authors: PAJ and RJG\n307:  * Date: 2024-02-07\n308:  * History:\n309:  *   2024-02-07 - brought across from Eilmer4, only I/O changed.\n310:  */\n311: int integrateInTime(double targetTimeAsRequested)\n312: {\n313:     number mass_balance = to!number(0.0);\n314:     number L2_residual = to!number(0.0);\n315:     auto Linf_residuals = new_ConservedQuantities(GlobalConfig.cqi.n);\n316:     version(mpi_parallel) { MPI_Barrier(MPI_COMM_WORLD); }\n317:     if (GlobalConfig.verbosity_level > 0 && GlobalConfig.is_master_task) {\n318:         writeln(\"Integrate in time.\");"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 348,
+    "text": "342:     foreach (myblk; localFluidBlocksBySize) {\n343:         myblk.myConfig.viscous_factor = GlobalConfig.viscous_factor;\n344:     }\n345:     //\n346:     // Select the actual gasdynamic update function.\n347:     // These functions are sitting in module simcore_gasdynamic_step.\n348:     void function() gasdynamic_step;\n349:     if (GlobalConfig.grid_motion == GridMotion.none) {\n350:         // Fixed grid\n351:         if (GlobalConfig.with_super_time_stepping) {\n352:             gasdynamic_step = &sts_gasdynamic_explicit_increment_with_fixed_grid;\n353:         } else if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n354:             gasdynamic_step = &gasdynamic_explicit_increment_with_fixed_grid;\n355:         } else {"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 352,
+    "text": "346:     // Select the actual gasdynamic update function.\n347:     // These functions are sitting in module simcore_gasdynamic_step.\n348:     void function() gasdynamic_step;\n349:     if (GlobalConfig.grid_motion == GridMotion.none) {\n350:         // Fixed grid\n351:         if (GlobalConfig.with_super_time_stepping) {\n352:             gasdynamic_step = &sts_gasdynamic_explicit_increment_with_fixed_grid;\n353:         } else if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n354:             gasdynamic_step = &gasdynamic_explicit_increment_with_fixed_grid;\n355:         } else {\n356:             gasdynamic_step = &gasdynamic_implicit_increment_with_fixed_grid;\n357:         }\n358:     } else {\n359:         // Moving Grid"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 354,
+    "text": "348:     void function() gasdynamic_step;\n349:     if (GlobalConfig.grid_motion == GridMotion.none) {\n350:         // Fixed grid\n351:         if (GlobalConfig.with_super_time_stepping) {\n352:             gasdynamic_step = &sts_gasdynamic_explicit_increment_with_fixed_grid;\n353:         } else if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n354:             gasdynamic_step = &gasdynamic_explicit_increment_with_fixed_grid;\n355:         } else {\n356:             gasdynamic_step = &gasdynamic_implicit_increment_with_fixed_grid;\n357:         }\n358:     } else {\n359:         // Moving Grid\n360:         if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n361:             gasdynamic_step = &gasdynamic_explicit_increment_with_moving_grid;"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 356,
+    "text": "350:         // Fixed grid\n351:         if (GlobalConfig.with_super_time_stepping) {\n352:             gasdynamic_step = &sts_gasdynamic_explicit_increment_with_fixed_grid;\n353:         } else if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n354:             gasdynamic_step = &gasdynamic_explicit_increment_with_fixed_grid;\n355:         } else {\n356:             gasdynamic_step = &gasdynamic_implicit_increment_with_fixed_grid;\n357:         }\n358:     } else {\n359:         // Moving Grid\n360:         if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n361:             gasdynamic_step = &gasdynamic_explicit_increment_with_moving_grid;\n362:         } else {\n363:             gasdynamic_step = &gasdynamic_implicit_increment_with_moving_grid;"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 361,
+    "text": "355:         } else {\n356:             gasdynamic_step = &gasdynamic_implicit_increment_with_fixed_grid;\n357:         }\n358:     } else {\n359:         // Moving Grid\n360:         if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n361:             gasdynamic_step = &gasdynamic_explicit_increment_with_moving_grid;\n362:         } else {\n363:             gasdynamic_step = &gasdynamic_implicit_increment_with_moving_grid;\n364:         }\n365:     }\n366:     if (!gasdynamic_step) {\n367:         throw new Error(\"Did not set a valid gasdynamic_step function.\");\n368:     }"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 363,
+    "text": "357:         }\n358:     } else {\n359:         // Moving Grid\n360:         if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n361:             gasdynamic_step = &gasdynamic_explicit_increment_with_moving_grid;\n362:         } else {\n363:             gasdynamic_step = &gasdynamic_implicit_increment_with_moving_grid;\n364:         }\n365:     }\n366:     if (!gasdynamic_step) {\n367:         throw new Error(\"Did not set a valid gasdynamic_step function.\");\n368:     }\n369:     //\n370:     local_dt_allow.length = localFluidBlocks.length+localSolidBlocks.length; // prepare array for use later (we use this for solid blocks as well)"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 366,
+    "text": "360:         if (is_explicit_update_scheme(GlobalConfig.gasdynamic_update_scheme)) {\n361:             gasdynamic_step = &gasdynamic_explicit_increment_with_moving_grid;\n362:         } else {\n363:             gasdynamic_step = &gasdynamic_implicit_increment_with_moving_grid;\n364:         }\n365:     }\n366:     if (!gasdynamic_step) {\n367:         throw new Error(\"Did not set a valid gasdynamic_step function.\");\n368:     }\n369:     //\n370:     local_dt_allow.length = localFluidBlocks.length+localSolidBlocks.length; // prepare array for use later (we use this for solid blocks as well)\n371:     local_cfl_max.length = localFluidBlocks.length; // prepare array for use later\n372:     local_dt_allow_parab.length = localFluidBlocks.length;\n373:     local_invalid_cell_count.length = localFluidBlocks.length;"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 367,
+    "text": "361:             gasdynamic_step = &gasdynamic_explicit_increment_with_moving_grid;\n362:         } else {\n363:             gasdynamic_step = &gasdynamic_implicit_increment_with_moving_grid;\n364:         }\n365:     }\n366:     if (!gasdynamic_step) {\n367:         throw new Error(\"Did not set a valid gasdynamic_step function.\");\n368:     }\n369:     //\n370:     local_dt_allow.length = localFluidBlocks.length+localSolidBlocks.length; // prepare array for use later (we use this for solid blocks as well)\n371:     local_cfl_max.length = localFluidBlocks.length; // prepare array for use later\n372:     local_dt_allow_parab.length = localFluidBlocks.length;\n373:     local_invalid_cell_count.length = localFluidBlocks.length;\n374:     //"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 467,
+    "text": "461:             //\n462:             // 2.2 Step the gasdynamic processes.\n463:             if (SimState.step >= GlobalConfig.freeze_limiter_on_step && !(GlobalConfig.frozen_limiter)) {\n464:                 // Freeze the limiter at this point to help alleviate any ringing of the residuals.\n465:                 GlobalConfig.frozen_limiter = true;\n466:             }\n467:             gasdynamic_step();\n468:             //\n469:             // 2.3 Solid domain update (if loosely coupled)\n470:             // If tight coupling, then this has already been performed in the gasdynamic_step().\n471:             if (GlobalConfig.coupling_with_solid_domains == SolidDomainCoupling.loose &&\n472:                 SimState.step == update_solid_domain_on_step) {\n473:                 // Determine stable time step in solid domain.\n474:                 double dt_solid_stable = determine_solid_time_step_size();"
+  },
+  {
+    "path": "timemarching.d",
+    "line": 470,
+    "text": "464:                 // Freeze the limiter at this point to help alleviate any ringing of the residuals.\n465:                 GlobalConfig.frozen_limiter = true;\n466:             }\n467:             gasdynamic_step();\n468:             //\n469:             // 2.3 Solid domain update (if loosely coupled)\n470:             // If tight coupling, then this has already been performed in the gasdynamic_step().\n471:             if (GlobalConfig.coupling_with_solid_domains == SolidDomainCoupling.loose &&\n472:                 SimState.step == update_solid_domain_on_step) {\n473:                 // Determine stable time step in solid domain.\n474:                 double dt_solid_stable = determine_solid_time_step_size();\n475:                 int n_solid_coupling = to!int(min((floor(dt_solid_stable/SimState.dt_global)), int.max));\n476:                 double dt_solid = n_solid_coupling*SimState.dt_global;\n477:                 update_solid_domain_on_step = SimState.step + n_solid_coupling;"
+  }
+]

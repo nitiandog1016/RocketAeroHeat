@@ -1,0 +1,14 @@
+module rah_layout;
+import lmr.flowgradients; import lmr.lsqinterp; import lmr.flowstate;
+import lmr.fluidfvcell; import lmr.fvinterface; import nm.bbla; import nm.number; import geom;
+pragma(msg, "RAH-LAYOUT FlowGradients=", FlowGradients.sizeof);
+pragma(msg, "RAH-LAYOUT LSQInterpGradients=", LSQInterpGradients.sizeof);
+pragma(msg, "RAH-LAYOUT WLSQGradWorkspace=", WLSQGradWorkspace.sizeof);
+pragma(msg, "RAH-LAYOUT LSQInterpWorkspace=", LSQInterpWorkspace.sizeof);
+pragma(msg, "RAH-LAYOUT FlowState=", FlowState.sizeof);
+pragma(msg, "RAH-LAYOUT FluidFVCell=", __traits(classInstanceSize, FluidFVCell));
+pragma(msg, "RAH-LAYOUT FVInterface=", __traits(classInstanceSize, FVInterface));
+pragma(msg, "RAH-LAYOUT Matrix=", __traits(classInstanceSize, Matrix!double));
+pragma(msg, "RAH-LAYOUT Vector3=", Vector3.sizeof);
+pragma(msg, "RAH-LAYOUT Slice=", (double[]).sizeof);
+pragma(msg, "RAH-LAYOUT Scalar=", number.sizeof);

@@ -1,0 +1,124 @@
+{
+  "schema": "RAH.EilmerPreparedCase.v1",
+  "status": "development-input",
+  "nativeVerified": false,
+  "runtimeReady": null,
+  "productionQualified": false,
+  "newQualifiedAreaM2": 0,
+  "nativeTasks": 0,
+  "meshCopied": false,
+  "sourceStable": true,
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "sourceTag": "v5.0.0",
+  "turbulenceModel": "Wilcox k-omega (2006); not SST",
+  "condition": {
+    "flowMode": "nativeMach",
+    "pressurePa": 1197.0279007383137,
+    "temperatureK": 226.50908361133003,
+    "wallTemperatureK": 300.0,
+    "Mach": 5.0,
+    "alphaDeg": 20.0,
+    "betaDeg": 0.0,
+    "turbulenceIntensity": 0.01,
+    "eddyViscosityRatio": 10.0,
+    "stopRelativeResidual": 1e-08,
+    "boundaryMarkers": {
+      "wall": "wall",
+      "farfield": "farfield"
+    },
+    "explicit": {
+      "profile": "rah-explicit-workspace-v1",
+      "maxSteps": 6,
+      "checkpointStep": 3,
+      "runtimePackage": "/mnt/e/RocketAeroHeat/tools/runtime/eilmer-explicit-workspace-v1/runtime.json",
+      "runtimePackageSHA256": "d904a4079838eefcfe9f7e424b6dd2bba5c88e671b19ca796c8fc645622ae08b"
+    }
+  },
+  "mesh": {
+    "nodes": 13,
+    "cells": 4,
+    "cellTypeCounts": {
+      "10": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1
+    },
+    "wallFaces": 7,
+    "farfieldFaces": 7,
+    "wallAreaM2": 6.046357376887758,
+    "sourceSHA256": "82bd42fae5907ed314bfae59e542e0e5ca139e308aeb34366f68941ce575b5c7",
+    "sourcePath": "/mnt/e/RocketAeroHeat/outputs/v178_validation/fixture02/mixed_original.su2",
+    "nativeSourcePath": "/mnt/e/RocketAeroHeat/outputs/v178_validation/fixture02/mixed_original.su2",
+    "sourceOrder": "rah-su2-v1",
+    "expectGmshOrderForWedges": false,
+    "wedgePermutationZeroBased": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "auditReferenceWedgePermutationZeroBased": [
+      1,
+      0,
+      2,
+      4,
+      3,
+      5
+    ],
+    "markers": {
+      "wall": {
+        "faces": 7,
+        "areaM2": 6.046357376887758,
+        "orderedConnectivitySHA256": "41a278d5b5001cfd6aa1dac142c370ad0f792d3cec899927a3fe14e1eb9bccaf"
+      },
+      "farfield": {
+        "faces": 7,
+        "areaM2": 6.164391365637653,
+        "orderedConnectivitySHA256": "a243ca1f7ae63dca7a852ecb2d5a239b70a9bb749b2dd5a46e44be52987a4b51"
+      }
+    },
+    "discreteVolumeM3": 2.1249999999999996,
+    "minimumMedianSubVolumeM3": 0.013888888888888886,
+    "scope": "\u6bcf\u4e2a\u8f6c\u6362\u540e\u5355\u5143\u7684\u5b9a\u5411\u4e2d\u4f4d\u9762\u79bb\u6563\u4f53\u79ef\uff1b\u672a\u8bc1\u660e\u5168\u53c2\u8003Jacobian\u3001\u5168\u57df\u62d3\u6251\u3001\u8fd1\u58c1\u8d28\u91cf\u6216\u539f\u751f\u8bfb\u53d6"
+  },
+  "thermalProperties": {
+    "model": "official ThermallyPerfectGas species air",
+    "tableMinimumK": 200,
+    "tableMaximumK": 6000,
+    "outsideBehavior": "endpoint Cp with continuous enthalpy/entropy extension; temperature not clipped",
+    "givenTemperaturesOutsideTable": false,
+    "computedFieldTemperatureRangeKnown": false,
+    "physicalQualification": false
+  },
+  "pending": [
+    "native-phase-check",
+    "nonlinear-development",
+    "strict-heat-and-physical-validation"
+  ],
+  "sourceURLs": {
+    "src/geom/luawrap/luausgrid.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/geom/luawrap/luausgrid.d",
+    "src/geom/grid/usgrid.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/geom/grid/usgrid.d",
+    "src/lmr/lua-modules/bc.lua": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/lmr/lua-modules/bc.lua",
+    "src/lmr/lua-modules/nkconfig.lua": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/lmr/lua-modules/nkconfig.lua",
+    "src/lmr/turbulence.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/lmr/turbulence.d",
+    "src/lmr/loads.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/lmr/loads.d",
+    "src/gas/species-database/air.lua": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/gas/species-database/air.lua",
+    "src/gas/thermo/cea_thermo_curves.d": "https://github.com/gdtk-uq/gdtk/blob/f53f4609a0331d48efee69a4e4f3c3598378cc03/src/gas/thermo/cea_thermo_curves.d"
+  },
+  "filesSHA256": {
+    "gas.inp": "7c5159d5e52cb604318b3fcfe677db631671e9e2d73093c392f3373d0f45165c",
+    "grid.lua": "7f630fb5f2f5fecdc7ba5fa7681ac7b06efc9b8870a5c2bb6d94bae338f59af4",
+    "rah-air.gas": "a36a545936a24faa0af6db38af1d76a8c723e21594174543bb13ba2e2be897c1",
+    "job.lua": "790f9636bb90367c474b51a24886a5a125132c5af2ff6fed3a151c6d24138ace"
+  },
+  "elapsedSeconds": 0.03359964799999915,
+  "reusedPreparation": {
+    "case": "/mnt/e/RocketAeroHeat/outputs/v178_validation/native03",
+    "receipt": "/mnt/e/RocketAeroHeat/outputs/v178_validation/native03_prepare/report.json",
+    "receiptSHA256": "ba3b0d0df56c1ad55a0bbebba54fbcd8b665b99709f4d38e5178894ae80e71c6",
+    "geometryAudit": "/mnt/e/RocketAeroHeat/outputs/v178_validation/native03_geometry.json",
+    "geometryAuditSHA256": "42da91cc9cabdc9211f4849caef33ce2b7896b91ebaa27856bf672db2274f140"
+  }
+}

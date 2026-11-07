@@ -19,6 +19,13 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
     audit_run_scope(manifest,case)
     admission=None;admission_locks=[]
     dense_runtime=None;dense_locks=[]
+    if manifest['condition'].get('explicit',{}).get('profile') in ('rah-explicit-workspace-v1','rah-explicit-workspace-development-v1'):
+        from eilmerWorkspaceRuntime import audit_workspace_runtime
+        dense_runtime,dense_locks=audit_workspace_runtime(manifest['condition'])
+        assert stage=='run','工作区包必须使用准确准备入口'
+        if manifest['condition']['explicit']['profile']=='rah-explicit-workspace-v1':
+            assert seconds<=30 and output_mib<=64,'工作区小例预算不符'
+        assert not (case/'dense-run-attempt.json').exists(),'工作区小例不得重复启动'
     if manifest['condition'].get('explicit',{}).get('profile') in ('rah-explicit-dense-v1','rah-explicit-dense-development-v1'):
         from eilmerDenseRuntime import audit_dense_runtime
         dense_runtime,dense_locks=audit_dense_runtime(manifest['condition'])
@@ -26,7 +33,7 @@ def execute(case, stage, record, seconds, output_mib, prepared_receipt=None):
         if manifest['condition']['explicit']['profile']=='rah-explicit-dense-v1':
             assert seconds<=30 and output_mib<=64,'新存储包小例预算不符'
         assert not (case/'dense-run-attempt.json').exists(),'新存储小例不得重复启动'
-    if manifest['condition'].get('explicit',{}).get('profile') in ('rah-explicit-local-development-v1','rah-explicit-dense-development-v1'):
+    if manifest['condition'].get('explicit',{}).get('profile') in ('rah-explicit-local-development-v1','rah-explicit-dense-development-v1','rah-explicit-workspace-development-v1'):
         from eilmerExplicitAdmission import audit_admission
         admission,admission_locks=audit_admission(manifest,case)
         assert stage=='run' and seconds==admission['budget']['runEntrySeconds'] and output_mib==admission['budget']['outputMiB'],'发展运行预算不符'

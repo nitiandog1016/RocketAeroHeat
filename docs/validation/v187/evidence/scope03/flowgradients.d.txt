@@ -1,0 +1,78 @@
+35:     // A place to hold the intermediate results for computing
+36:     // the least-squares model as a weighted sum of the flow data.
+37:     number[cloud_nmax] wx, wy, wz;
+38:     bool compute_about_mid;
+39:     size_t loop_init; // starting index for loops:
+40:     // 0=compute_about_mid, 1=compute_about_[0]
+41:     size_t n; // cloud_pos.length;
+42: 
+43:     this(in WLSQGradWorkspace other)
+44:     {
+45:         wx[] = other.wx[]; wy[] = other.wy[]; wz[] = other.wz[];
+46:         compute_about_mid = other.compute_about_mid;
+47:         loop_init = other.loop_init;
+48:         n = other.n;
+49:     }
+50: } // end struct WLSQGradWorkspace
+51: 
+52: 
+53: struct FlowGradients {
+54:     // Spatial derivatives of the flow quantities
+55: public:
+56:     number[3][3] vel;
+57:     // velocity derivatives stored as a second-order tensor
+58:     // [[du/dx du/dy du/dz]
+59:     //  [dv/dx dv/dy dv/dz]
+60:     //  [dw/dx dw/dy dw/dz]]
+61:     version(multi_species_gas) {
+62:         number[3][] massf; // mass fraction derivatives
+63:     }
+64:     number[3] T; // Temperature derivatives
+65:     version(multi_T_gas) {
+66:         number[3][] T_modes;
+67:     }
+68:     version(turbulence) {
+69:         number[3][2] turb; // turbulence primitive variables
+70:     }
+71: 
+72:     number[3] p_e; // electron pressure
+73: 
+74:     this(in LocalConfig myConfig)
+75:     {
+76:         // Note that the gradient values are initialized to zero.
+77:         // This is because some of the updates (e.g. the point-implicit update)
+78:         // will pick up some gradient values before thay have been computed and
+79:         // add them to a tally for taking an average.
+80:         // On the first iteration, having initial Nan values would poison
+81:         // that average but zero values are tolerable.
+82:         // On later iterations, the gradient value from a previous iteration is fine.
+83:         foreach (i; 0 .. 3) {
+84:             foreach (j; 0 .. 3) { vel[i][j] = to!number(0.0); }
+85:             T[i] = to!number(0.0);
+86:         }
+87:         version(multi_species_gas) {
+88:             massf.length = myConfig.n_species;
+89:             foreach (i; 0 .. myConfig.n_species) {
+90:                 foreach (j; 0 .. 3) { massf[i][j] = 0.0; }
+91:             }
+92:         }
+93:         version(multi_T_gas) {
+94:             T_modes.length = myConfig.n_modes;
+95:             foreach (i; 0 .. myConfig.n_modes) {
+96:                 foreach (j; 0 .. 3) { T_modes[i][j] = to!number(0.0); }
+97:                 if (myConfig.gmodel.is_plasma && myConfig.gmodel.n_modes > 0 && myConfig.electric_field_work){
+98:                     p_e[i] = to!number(0.0);
+99:                 }
+100:             }
+101:         }
+102:         version(turbulence) {
+103:             foreach (i; 0 .. myConfig.turb_model.nturb) {
+104:                 foreach (j; 0 .. 3) { turb[i][j] = to!number(0.0); }
+105:             }
+106:         }
+107:     }
+108: 
+109:     this(in FlowGradients other)
+110:     {
+111:         foreach(i; 0 .. 3) vel[i][] = other.vel[i][];
+112:         version(multi_species_gas) {

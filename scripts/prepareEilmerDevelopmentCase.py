@@ -29,10 +29,13 @@ def prepare(source,prepared,audit,case,record,condition,seconds,output_mib=1024)
         need(changed==old and 'development' in c,'发展入口不得修改原物理工况')
     scoped=dict(condition=c,mesh=m['mesh']);audit_run_scope(scoped,case)
     extra_locks=[]
+    if c.get('explicit',{}).get('profile') in ('rah-explicit-workspace-v1','rah-explicit-workspace-development-v1'):
+        from eilmerWorkspaceRuntime import audit_workspace_runtime
+        _,extra_locks=audit_workspace_runtime(c)
     if c.get('explicit',{}).get('profile') in ('rah-explicit-dense-v1','rah-explicit-dense-development-v1'):
         from eilmerDenseRuntime import audit_dense_runtime
         _,extra_locks=audit_dense_runtime(c)
-    if c.get('explicit',{}).get('profile') in ('rah-explicit-local-development-v1','rah-explicit-dense-development-v1'):
+    if c.get('explicit',{}).get('profile') in ('rah-explicit-local-development-v1','rah-explicit-dense-development-v1','rah-explicit-workspace-development-v1'):
         from eilmerExplicitAdmission import audit_admission
         admission,admission_locks=audit_admission(scoped,case);extra_locks+=admission_locks
         need(seconds==admission['budget']['prepareSeconds'] and output_mib==admission['budget']['outputMiB'],'准备预算不符')

@@ -1,7 +1,7 @@
 """完整域显式发展准入：准确候选目录、物理/网格、已有证据和固定资源必须闭合。"""
 from pathlib import Path
 import copy,hashlib,json
-from eilmerExplicitProfile import DEVELOPMENT_PROFILE,DENSE_DEVELOPMENT_PROFILE,validate_explicit
+from eilmerExplicitProfile import DEVELOPMENT_PROFILE,DENSE_DEVELOPMENT_PROFILE,WORKSPACE_DEVELOPMENT_PROFILE,validate_explicit
 
 
 def sha(path):
@@ -19,8 +19,9 @@ def need(ok,message):
 
 def audit_admission(manifest,case):
     """只读小证据；不重跑旧小例或遍历大场。返回实际锁定的登记文件。"""
-    c=manifest['condition'];d=validate_explicit(c['explicit']);need(d['profile'] in (DEVELOPMENT_PROFILE,DENSE_DEVELOPMENT_PROFILE),'非完整域方案')
-    dense=d['profile']==DENSE_DEVELOPMENT_PROFILE
+    c=manifest['condition'];d=validate_explicit(c['explicit']);need(d['profile'] in (DEVELOPMENT_PROFILE,DENSE_DEVELOPMENT_PROFILE,WORKSPACE_DEVELOPMENT_PROFILE),'非完整域方案')
+    workspace=d['profile']==WORKSPACE_DEVELOPMENT_PROFILE
+    dense=d['profile'] in (DENSE_DEVELOPMENT_PROFILE,WORKSPACE_DEVELOPMENT_PROFILE)
     path=Path(d['candidate']);need(path.is_file() and sha(path)==d['candidateSHA256'],'候选登记缺失/改变')
     a=json.loads(path.read_text());need(a['schema']=='RAH.EilmerExplicitCandidate.v1','候选版本错误')
     need(case is not None and Path(a['case']).resolve()==Path(case).resolve(),'候选目录不符')
@@ -46,20 +47,26 @@ def audit_admission(manifest,case):
     need(docs['sourceManifest']['mesh']['sourceSHA256']==a['sourceMeshSHA256'],'来源清单网格不符')
     need(docs['sourcePreparation']['caseManifestSHA256']==a['evidence']['sourceManifest']['sha256'],'原准备清单绑定错误')
     if dense:
-        from eilmerDenseRuntime import audit_dense_runtime,audit_dense_execution
+        if workspace:
+            from eilmerWorkspaceRuntime import audit_workspace_runtime as audit_dense_runtime,audit_workspace_execution as audit_dense_execution
+        else:
+            from eilmerDenseRuntime import audit_dense_runtime,audit_dense_execution
         package,runtime_locks=audit_dense_runtime(c);locks+=runtime_locks
         compatibility=docs['storageCompatibility'];verification=docs['storageVerification'];stored_run=docs['storageRun']
-        need(compatibility['schema']=='RAH.EilmerDenseCompatibility.v1' and compatibility['passed'],'缺少存储相容证据')
+        need(compatibility['schema']==('RAH.EilmerWorkspaceCompatibility.v1' if workspace else 'RAH.EilmerDenseCompatibility.v1') and compatibility['passed'],'缺少存储相容证据')
         need(compatibility['runtimePackageSHA256']==d['runtimePackageSHA256']==a['runtimePackageSHA256'] and
              compatibility['binarySHA256']==package['filesSHA256'][package['binary']],'相容证据不是当前运行包')
         need(compatibility['runReceiptSHA256']==a['evidence']['storageRun']['sha256'] and
              compatibility['verificationSHA256']==a['evidence']['storageVerification']['sha256'],'存储证据链不闭合')
         need(verification['passed'] and verification['comparedScalars']==658 and verification['maxScaledError']<=2e-12 and
-             all(verification['fieldAndWallBytesIdentical'].values()) and len(verification['rejected'])==12,'存储严格比较未过')
+             all(verification['fieldAndWallBytesIdentical'].values()) and len(verification['rejected'])==(18 if workspace else 12),'存储严格比较未过')
+        if workspace:
+            allocation=verification['storageAllocation']
+            need(allocation['workspaceLengths']==[0,0,0,0,0,18,18,18] and allocation['implicitObjects']==0,'新工作区实际容量未通过')
         need(stored_run['passed'] and stored_run['caseManifestSHA256']==compatibility['caseManifestSHA256'] and
              stored_run['nativeCompletion']['finalStep']==6,'存储原生六步证据不符')
         old_manifest=Path(stored_run['case'])/'case_manifest.json'
         need(sha(old_manifest)==stored_run['caseManifestSHA256'],'存储小例清单改变')
         audit_dense_execution(json.loads(old_manifest.read_text())['condition'],stored_run)
-        locks.extend([old_manifest,Path(stored_run['case']).parent/'source_at_run/eilmerDenseRuntime.py'])
+        locks.extend([old_manifest,Path(stored_run['case']).parent/'source_at_run'/('eilmerWorkspaceRuntime.py' if workspace else 'eilmerDenseRuntime.py')])
     return a,locks

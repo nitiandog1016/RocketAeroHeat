@@ -1,0 +1,35 @@
+20: 
+21: struct FluidCellData{
+22:     size_t[] all_cell_idxs;
+23:     size_t[] nfaces;
+24:     size_t[][] c2f;
+25:     size_t[][] c2v;
+26:     double[] dt_local;
+27:     int[][] outsigns;
+28:     bool[] data_is_bad;
+29:     size_t[][] halo_cell_ids;
+30:     size_t[][] halo_face_ids;
+31:     number[] areas;
+32:     number[] volumes;
+33:     Vector3[] positions;
+34:     number[3][] lengths;
+35:     number[] wall_distances;
+36:     bool[] in_turbulent_zone;
+37:     size_t[][] cell_cloud_indices;
+38:     Vector3[][] face_distances;
+39:     FlowState[] flowstates;
+40:     FlowGradients[] gradients;
+41:     ConservedQuantities U0, U1, U2, U3, U4;
+42:     ConservedQuantities dUdt0, dUdt1, dUdt2, dUdt3, dUdt4;
+43:     ConservedQuantities source_terms;
+44:     WLSQGradWorkspace[] workspaces;
+45:     LSQInterpWorkspace[] lsqws;
+46:     LSQInterpGradients[] lsqgradients;
+47:     version(newton_krylov) {
+48:         double[] cell_jacobians;
+49:         FlowGradients[] saved_gradients;
+50:         LSQInterpGradients[] saved_lsqgradients;
+51:         ConservedQuantities saved_source_terms;
+52:         bool[] doNotPerturb;
+53:     }
+54: 

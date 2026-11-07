@@ -1,0 +1,80 @@
+1: /** simcore.d
+2:  * Eilmer4 compressible-flow simulation code, core coordination functions.
+3:  *
+4:  * Author: Peter J. and Rowan G.
+5:  * First code: 2015-02-05
+6:  * History:
+7:  *   2024-02-12 -- moved to lmr5 area
+8:  *                 init simulation routines are time-marching specific, so moved to that module
+9:  *                 integrate-in-time moved to timemarching module
+10:  *                 march-over-blocks removed; will be reinstated in own module.
+11:  */
+12: 
+13: module lmr.simcore;
+14: 
+15: import core.memory;
+16: import std.algorithm;
+17: import std.array;
+18: import std.conv;
+19: import std.datetime;
+20: import std.file;
+21: import std.format;
+22: import std.json;
+23: import std.math;
+24: import std.parallelism;
+25: import std.stdio;
+26: import std.string;
+27: import std.typecons;
+28: 
+29: import gas;
+30: import geom.misc.kdtree;
+31: import geom;
+32: import nm.number;
+33: import ntypes.complex;
+34: import util.lua;
+35: import util.lua_service;
+36: 
+37: import lmr.bc.ghost_cell_effect.gas_solid_full_face_copy;
+38: import lmr.bc;
+39: import lmr.conservedquantities;
+40: import lmr.efield.efield;
+41: import lmr.fileutil;
+42: import lmr.flowstate;
+43: import lmr.fluidblock;
+44: import lmr.globalconfig;
+45: import lmr.globaldata;
+46: import lmr.grid_motion;
+47: import lmr.grid_motion_shock_fitting;
+48: import lmr.grid_motion_udf;
+49: import lmr.loads;
+50: import lmr.lua_helper;
+51: import lmr.sfluidblock;
+52: import lmr.solid.solid_full_face_copy;
+53: import lmr.solid.solid_gas_full_face_copy;
+54: import lmr.solid.solid_udf_source_terms;
+55: import lmr.solid.solidfvinterface;
+56: import lmr.solid.ssolidblock;
+57: import lmr.special_block_init;
+58: import lmr.ufluidblock;
+59: import lmr.user_defined_source_terms;
+60: 
+61: version (opencl_gpu_chem) {
+62:     import opencl_gpu_chem;
+63: }
+64: version (cuda_gpu_chem) {
+65:     import cuda_gpu_chem;
+66: }
+67: version(mpi_parallel) {
+68:     import mpi;
+69: }
+70: version(FSI) { import fsi; }
+71: 
+72: import lmr.simcore_gasdynamic_step;
+73: import lmr.simcore_solid_step;
+74: import lmr.simcore_exchange;
+75: import util.time_utils;
+76: import lmr.init : readControl;
+77: 
+78: // The shared double[] flavour of GlobalConfig.userPad can give trouble,
+79: // so we need a normal array for the MPI task to work with.
+80: double[] userPad_copy;

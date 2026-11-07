@@ -1,0 +1,49 @@
+2168: 
+2169:         void* p = bucket[bin];
+2170:         if (p)
+2171:             goto L_hasBin;
+2172: 
+2173:         if (recoverPool[bin])
+2174:             recoverNextPage(bin);
+2175: 
+2176:         bool tryAlloc() nothrow
+2177:         {
+2178:             if (!bucket[bin])
+2179:             {
+2180:                 bucket[bin] = allocPage(bin);
+2181:                 if (!bucket[bin])
+2182:                     return false;
+2183:             }
+2184:             p = bucket[bin];
+2185:             return true;
+2186:         }
+2187: 
+2188:         if (!tryAlloc())
+2189:         {
+2190:             if (!lowMem && (disabled || usedSmallPages < smallCollectThreshold))
+2191:             {
+2192:                 // disabled or threshold not reached => allocate a new pool instead of collecting
+2193:                 if (!newPool(1, false))
+2194:                 {
+2195:                     // out of memory => try to free some memory
+2196:                     fullcollect(false, true); // stop the world
+2197:                     if (lowMem)
+2198:                         minimize();
+2199:                     recoverNextPage(bin);
+2200:                 }
+2201:             }
+2202:             else if (usedSmallPages > 0)
+2203:             {
+2204:                 fullcollect();
+2205:                 if (lowMem)
+2206:                     minimize();
+2207:                 recoverNextPage(bin);
+2208:             }
+2209:             // tryAlloc will succeed if a new pool was allocated above, if it fails allocate a new pool now
+2210:             if (!tryAlloc() && (!newPool(1, false) || !tryAlloc()))
+2211:                 // out of luck or memory
+2212:                 onOutOfMemoryError();
+2213:         }
+2214:         assert(p !is null);
+2215:     L_hasBin:
+2216:         // Return next item from free list

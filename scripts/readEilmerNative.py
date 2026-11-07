@@ -151,10 +151,16 @@ def audit_run_scope(manifest,case=None):
         elif c['explicit']['profile']==DENSE_DEVELOPMENT_PROFILE:
             # v186确认缩减容量已生效，但原域仍在初始化OOM；同包候选关闭。
             raise ValueError('rah-explicit-dense-development-v1原域初始化仍OOM，当前候选关闭；需独立内存方案和证据')
+        elif c['explicit']['profile']=='rah-explicit-workspace-development-v1':
+            # v187省去全部具名备份后仍初始化OOM；保留独立包，不再重复同一完整域候选。
+            raise ValueError('rah-explicit-workspace-development-v1完整域仍初始化OOM；当前候选关闭，需先闭合完整资源需求')
         else:need(manifest['mesh']['cells']<=1000,'显式完整域尚未登记候选预算；当前仅最小接口')
         if c['explicit']['profile'] in (DENSE_PROFILE,DENSE_DEVELOPMENT_PROFILE):
             from eilmerDenseRuntime import audit_dense_runtime
             audit_dense_runtime(c)
+        if c['explicit']['profile'] in ('rah-explicit-workspace-v1','rah-explicit-workspace-development-v1'):
+            from eilmerWorkspaceRuntime import audit_workspace_runtime
+            audit_workspace_runtime(c)
     if c.get('development',{}).get('profile')=='rah-nk-real-v1':
         need(manifest['mesh']['cells']<=1000 and c['maxNewtonSteps']<=8,
              'rah-nk-real-v1小例比较未通过；完整域/延长计算关闭，需独立新方案证据')
@@ -246,6 +252,9 @@ def export_loads(case,loads,output,run_receipt):
     if manifest['condition'].get('explicit',{}).get('profile') in ('rah-explicit-dense-v1','rah-explicit-dense-development-v1'):
         from eilmerDenseRuntime import audit_dense_execution
         audit_dense_execution(manifest['condition'],receipt)
+    if manifest['condition'].get('explicit',{}).get('profile') in ('rah-explicit-workspace-v1','rah-explicit-workspace-development-v1'):
+        from eilmerWorkspaceRuntime import audit_workspace_execution
+        audit_workspace_execution(manifest['condition'],receipt)
     # 旧回执可能只有启动器exit0；必须只读核对真正原生完成，失败历史不改写。
     completion=audit_completion(case,completion_log_for_receipt(case,run_receipt,receipt))
     need(receipt['caseManifestSHA256']==sha(case/'case_manifest.json'),'运行工况来源不符')

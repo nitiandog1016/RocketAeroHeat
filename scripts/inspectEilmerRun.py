@@ -20,6 +20,9 @@ def inspect(case,receipt,out):
         log=completion_log_for_receipt(case,receipt,r)
         result['nativeCompletion']=audit_completion(case,log)
         m=json.loads(manifest.read_text())
+        if m['condition'].get('explicit',{}).get('profile') in ('rah-explicit-workspace-v1','rah-explicit-workspace-development-v1'):
+            from eilmerWorkspaceRuntime import audit_workspace_execution
+            audit_workspace_execution(m['condition'],r)
         if m['condition'].get('explicit',{}).get('profile') in ('rah-explicit-dense-v1','rah-explicit-dense-development-v1'):
             from eilmerDenseRuntime import audit_dense_execution
             audit_dense_execution(m['condition'],r)

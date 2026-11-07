@@ -1,0 +1,21 @@
+core.exception.OutOfMemoryError@core/internal/gc/impl/conservative/gc.d(2212): Memory allocation failed
+----------------
+??:? onOutOfMemoryError [0x57cc2f12c126]
+??:? nothrow void* core.internal.gc.impl.conservative.gc.Gcx.smallAlloc(ulong, ref ulong, uint, const(TypeInfo)) [0x57cc2f7ac2c0]
+??:? nothrow void* core.internal.gc.impl.conservative.gc.ConservativeGC.runLocked!(core.internal.gc.impl.conservative.gc.ConservativeGC.mallocNoSync(ulong, uint, ref ulong, const(TypeInfo)), core.internal.gc.impl.conservative.gc.mallocTime, core.internal.gc.impl.conservative.gc.numMallocs, immutable(ulong), uint, ulong, const(TypeInfo)).runLocked(ref immutable(ulong), ref uint, ref ulong, ref const(TypeInfo)) [0x57cc2f7a6f78]
+??:? nothrow void* core.internal.gc.impl.conservative.gc.ConservativeGC.malloc(ulong, uint, const(TypeInfo)) [0x57cc2f7a6e3c]
+??:? void lmr.ufluidblock.UFluidBlock.init_grid_and_flow_arrays(immutable(char)[]) [0x57cc2f281f77]
+??:? [0x57cc2f4d0187]
+??:? void lmr.init.initFluidBlocksMemoryAllocation() [0x57cc2f4ce49a]
+??:? void lmr.timemarching.initTimeMarchingSimulation(int, int, int, immutable(char)[]) [0x57cc2f51b00f]
+??:? _Dmain [0x57cc2f596c89]
+Eilmer simulation code.
+Revision-id: f53f460
+Revision-date: Mon Dec 22 17:46:51 2025 +1000
+Compiler-name: LDC v2.111
+Parallel-flavour: shared
+Number-type: real
+Build-flavour: fast
+Build-date: 2026-11-07 05:22:05 UTC
+RAH-STORAGE cells=705490 ghosts=26324 neq=7 nftl=4 scalarBytes=8 stageLength=5122698 payloadBytes=327852672
+RAH-WORKSPACE jacobian=0 sourceBackup=0 viscousBackup=0 interpBackup=0 perturbBackup=0 viscous=731814 interp=731814 interpWorkspace=731814

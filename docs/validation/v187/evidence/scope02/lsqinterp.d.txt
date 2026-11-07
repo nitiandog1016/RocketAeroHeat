@@ -1,0 +1,95 @@
+250: 
+251: } // end struct LSQInterpWorkspace
+252: 
+253: struct LSQInterpGradients {
+254:     // These are the quantities that will be interpolated from cell centres
+255:     // to the Left and Right sides of interfaces.
+256:     // We need to hold onto their gradients within cells.
+257: public:
+258:     number lref; // reference length (m) for a simulation
+259: 
+260:     Vector3 velx, vely, velz;
+261:     number velxPhi, velyPhi, velzPhi;
+262:     number velxMax, velyMax, velzMax;
+263:     number velxMin, velyMin, velzMin;
+264:     version(MHD) {
+265:         Vector3 Bx, By, Bz, psi;
+266:         number BxPhi, ByPhi, BzPhi, psiPhi;
+267:         number BxMax, ByMax, BzMax, psiMax;
+268:         number BxMin, ByMin, BzMin, psiMin;
+269:     }
+270:     version(turbulence) {
+271:         Vector3[2] turb;
+272:         number[2] turbPhi;
+273:         number[2] turbMax;
+274:         number[2] turbMin;
+275:     }
+276:     version(multi_species_gas) {
+277:         Vector3[] rho_s;
+278:         number[] rho_sPhi;
+279:         number[] rho_sMax;
+280:         number[] rho_sMin;
+281:     }
+282:     Vector3 rho, p;
+283:     number rhoPhi, pPhi;
+284:     number rhoMax, pMax;
+285:     number rhoMin, pMin;
+286:     Vector3 T, u;
+287:     number TPhi, uPhi;
+288:     number TMax, uMax;
+289:     number TMin, uMin;
+290:     version(multi_T_gas) {
+291:         Vector3[] T_modes, u_modes;
+292:         number[] T_modesPhi, u_modesPhi;
+293:         number[] T_modesMax, u_modesMax;
+294:         number[] T_modesMin, u_modesMin;
+295:     }
+296: 
+297: 
+298:     this(size_t nsp, size_t nmodes, size_t nturb)
+299:     {
+300:         version(multi_species_gas) {
+301:             rho_s.length    = nsp;
+302:             rho_sPhi.length = nsp;
+303:             rho_sMax.length = nsp;
+304:             rho_sMin.length = nsp;
+305:         }
+306:         version(multi_T_gas) {
+307:             T_modes.length = nmodes;
+308:             u_modes.length = nmodes;
+309:             T_modesPhi.length = nmodes;
+310:             u_modesPhi.length = nmodes;
+311:             T_modesMax.length = nmodes;
+312:             u_modesMax.length = nmodes;
+313:             T_modesMin.length = nmodes;
+314:             u_modesMin.length = nmodes;
+315:         }
+316: 
+317:         // The user has the option to postprocess the limiter values for visualisation,
+318:         // so we initialize these values to -1.0.
+319:         // We need to do this because:
+320:         // (1) in a simulation, we do not calculate a limiter value for every thermodynamic variable,
+321:         //     (note that this means if a variable has limiter values of -1.0 in a solution, then we did
+322:         //     not calculate or use that particular limiter value in that simulation)
+323:         // and
+324:         // (2) old versions of Paraview throw a segfault error when plotting NaNs
+325:         //
+326:         // KAD 22-10-2022
+327:         //
+328:         velxPhi = -1.0; velyPhi = -1.0; velzPhi = -1.0;
+329:         version(MHD) {
+330:             BxPhi = -1.0; ByPhi = -1.0; BzPhi = -1.0; psiPhi = -1.0;
+331:         }
+332:         version(turbulence) {
+333:             foreach (ref val; turbPhi) { val = -1.0; }
+334:         }
+335:         version(multi_species_gas) {
+336:             foreach (ref val; rho_sPhi) { val = -1.0; }
+337:         }
+338:         rhoPhi = -1.0; pPhi = -1.0;
+339:         TPhi = -1.0; uPhi = -1.0;
+340:         version(multi_T_gas) {
+341:             foreach (ref val; u_modesPhi) { val = -1.0; }
+342:             foreach (ref val; T_modesPhi) { val = -1.0; }
+343:         }
+344:     }

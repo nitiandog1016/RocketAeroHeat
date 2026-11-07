@@ -1,0 +1,92 @@
+179:     this(LocalConfig myConfig, FluidCellData* fvcd, int id_init)
+180:     {
+181:         this.myConfig = myConfig;
+182:         id = id_init;
+183:         contains_flow_data = false; // initial presumption to be adjusted later
+184:         is_interior_to_domain = false;
+185: 
+186:         size_t ngtl = myConfig.n_grid_time_levels;
+187: 
+188:         pos    = fvcd.positions[id*ngtl .. (id+1)*ngtl];
+189:         volume = fvcd.volumes[id*ngtl .. (id+1)*ngtl];
+190:         areaxy = fvcd.areas[id*ngtl .. (id+1)*ngtl];
+191:         lengths= fvcd.lengths[id][0 .. 3];
+192: 
+193:         GasModel gmodel = cast(GasModel) myConfig.gmodel;
+194:         if (gmodel is null) { gmodel = GlobalConfig.gmodel_master; }
+195: 
+196:         size_t ncq = myConfig.cqi.n; // number of conserved quantities
+197:         size_t nftl = myConfig.n_flow_time_levels;
+198: 
+199:         if (fvcd.U0){
+200:             U.length = nftl;
+201:                         U[0] = fvcd.U0[id*ncq + 0 .. id*ncq + ncq];
+202:             if (nftl>1) U[1] = fvcd.U1[id*ncq + 0 .. id*ncq + ncq];
+203:             if (nftl>2) U[2] = fvcd.U2[id*ncq + 0 .. id*ncq + ncq];
+204:             if (nftl>3) U[3] = fvcd.U3[id*ncq + 0 .. id*ncq + ncq];
+205:             if (nftl>4) U[4] = fvcd.U4[id*ncq + 0 .. id*ncq + ncq];
+206:             foreach(i; 0 .. nftl) {
+207:                 U[i].clear();
+208:             }
+209:         }
+210:         if (fvcd.dUdt0){
+211:             dUdt.length = nftl;
+212:                         dUdt[0] = fvcd.dUdt0[id*ncq + 0 .. id*ncq + ncq];
+213:             if (nftl>1) dUdt[1] = fvcd.dUdt1[id*ncq + 0 .. id*ncq + ncq];
+214:             if (nftl>2) dUdt[2] = fvcd.dUdt2[id*ncq + 0 .. id*ncq + ncq];
+215:             if (nftl>3) dUdt[3] = fvcd.dUdt3[id*ncq + 0 .. id*ncq + ncq];
+216:             if (nftl>4) dUdt[4] = fvcd.dUdt4[id*ncq + 0 .. id*ncq + ncq];
+217:             foreach(i; 0 .. nftl) {
+218:                 dUdt[i].clear();
+219:             }
+220:         }
+221:         Qudf = new_ConservedQuantities(ncq);
+222:         Qudf.clear();
+223:         if (myConfig.residual_smoothing) {
+224:             dUdt_copy[0] = new_ConservedQuantities(ncq);
+225:             dUdt_copy[1] = new_ConservedQuantities(ncq);
+226:         }
+227: 
+228:         this.fvcd = fvcd;
+229:         this.fs = &(fvcd.flowstates[id]);
+230:         this.grad = &(fvcd.gradients[id]);
+231:         this.ws_grad = &(fvcd.workspaces[id]);
+232:         if (fvcd.lsqws) this.ws = &(fvcd.lsqws[id]);
+233:         if (fvcd.lsqgradients) this.gradients = &(fvcd.lsqgradients[id]);
+234:         if (fvcd.lsqws) this.ws = &(fvcd.lsqws[id]);
+235:         if (fvcd.source_terms) {
+236:             this.Q = fvcd.source_terms[id*ncq + 0 .. id*ncq + ncq];
+237:             Q.clear();
+238:         }
+239: 
+240:         version(newton_krylov) {
+241:             if (fvcd.saved_gradients) this.grad_save = &(fvcd.saved_gradients[id]);
+242:             if (fvcd.saved_lsqgradients) this.gradients_save = &(fvcd.saved_lsqgradients[id]);
+243:             if (fvcd.saved_source_terms) this.Q_save = fvcd.saved_source_terms[id*ncq .. id*ncq + ncq];
+244: 
+245:             if (fvcd.cell_jacobians){
+246:                 dRdU.length = ncq; // number of conserved variables
+247:                 foreach (i; 0 .. dRdU.length) {
+248:                     size_t idx = id*ncq*ncq + i*ncq;
+249:                     dRdU[i] = fvcd.cell_jacobians[idx .. idx+ncq];
+250:                 }
+251:                 invBlockDiag = new Matrix!double(ncq,ncq);
+252:             }
+253:         }
+1113:     @nogc
+1114:     void turbulence_viscosity_limit(double factor)
+1115:     // Limit the turbulent viscosity to reasonable values relative to
+1116:     // the local molecular viscosity.
+1117:     // The pre 2015 code introduced these limits, along with a default factor
+1118:     // of 300 for reasons that are now unclear. In July 2023 NNG changed
+1119:     // this factor to 3000, and removed it all together from the JFNK,
+1120:     // to prevent the turbulent viscosity from being clipped in anything
+1121:     // but a very abnormal scneario.
+1122:     {
+1123:         version(newton_krylov) {
+1124:             // Don't put limits in the NK solver, it messes with the gradients
+1125:         } else {
+1126:             fs.mu_t = fmin(fs.mu_t, factor * fs.gas.mu);
+1127:             fs.k_t = fmin(fs.k_t, factor * fs.gas.k); // ASSUMPTION re k
+1128:         }
+1129:     }

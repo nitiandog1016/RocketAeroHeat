@@ -1,0 +1,95 @@
+145: int delegateAndExecute(string[] args, NumberType numberType)
+146: {
+147:     // We just want to pull out solver mode at this point, so that we can direct the execution flow.
+148:     // We choose to execute these few lines rather than invoking the overhead of reading the entire
+149:     // config file into GlobalConfig.
+150:     auto cfgJSON = readJSONfile(lmrCfg.cfgFile);
+151:     string solverModeStr = cfgJSON["solver_mode"].str;
+152:     auto solverMode = solverModeFromName(solverModeStr);
+153: 
+154:     string shellStr;
+155: 
+156:     final switch(solverMode) {
+157:     case SolverMode.dual_time_stepping:
+158:     case SolverMode.steady:
+159:         // Our first choice is to run with complex values.
+160:         final switch(numberType) {
+161:         case NumberType.default_type:
+162:         case NumberType.complex_values:
+163:             shellStr = args[0] ~ "Z-" ~ args[1];
+164:             break;
+165:         case NumberType.real_values:
+166:             shellStr = args[0] ~ "-" ~ args[1];
+167:              break;
+168: 	    }
+169:         break;
+170:     case SolverMode.transient:
+171:     case SolverMode.block_marching:
+172:         // Our first choice is to run with real values.
+173:         final switch(numberType) {
+174:         case NumberType.default_type:
+175:         case NumberType.real_values:
+176:             shellStr = args[0] ~ "-" ~ args[1];
+177:             break;
+178:         case NumberType.complex_values:
+179:             shellStr = args[0] ~ "Z-" ~ args[1];
+180:             break;
+181:         }
+182:         break;
+183:     }
+184: 
+185:     foreach (s; args[2 .. $]) {
+186:         shellStr ~= " " ~ s;
+187:     }
+188: 
+189:     return system(shellStr.toStringz);
+190: }
+191: 
+192: 
+193: /* Why the version(run_main)?
+194:  * Eilmer has a small set of exectuables and each requires a "main" function.
+195:  * The main "main" is the Eilmer command dispatcher and it lives in main.d.
+340:         MPI_Bcast(&snapshotStart, 1, MPI_INT, 0, MPI_COMM_WORLD);
+341:     }
+342: 
+343:     final switch (solverMode) {
+344:     case SolverMode.steady:
+345:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Initialise Newton-Krylov simulation.");
+346:         // This is clunky but I need the information about tapered-blending here because
+347:         // it influences memory allocation.
+348:         JSONValue jsonData = readJSONfile(lmrCfg.nkCfgFile);
+349:         bool useTaperedBlending = false;
+350:         useTaperedBlending = getJSONbool(jsonData, "use_tapered_blending", useTaperedBlending);
+351: 
+352:         initNewtonKrylovSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock, useTaperedBlending);
+353: 
+354:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Perform Newton steps.");
+355:         performNewtonKrylovUpdates(snapshotStart, startCFL, maxCPUs, threadsPerMPITask);
+356:         break;
+357:     case SolverMode.transient:
+358:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Initialise transient simulation.");
+359:         initTimeMarchingSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);
+360: 
+361:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Perform integration in time.");
+362:         auto flag = integrateInTime(GlobalConfig.max_time);
+363:         if (flag != 0 && GlobalConfig.is_master_task) writeln("Note that integrateInTime failed.");
+364:         finalizeSimulation_timemarching();
+365:         break;
+366:     case SolverMode.dual_time_stepping:
+367:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Initialise Newton-Krylov simulation.");
+368:         initDualTimeNewtonKrylovSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock);
+369: 
+370:         if (verbosity > 0 && GlobalConfig.is_master_task) writeln("lmr run: Perform dual time steps.");
+371:         performDualTimeNewtonKrylovUpdates(snapshotStart, startCFL, maxCPUs, threadsPerMPITask);
+372:         break;
+373:     case SolverMode.block_marching:
+374:         writeln("NOT IMPLEMENTED: block marching is not available right now.");
+375: 	    exit(1);
+376:     }
+377: 
+378:     GlobalConfig.finalize();
+379: 
+380:     return 0;
+381: }
+382: 
+383: } // end: version(run_main)
