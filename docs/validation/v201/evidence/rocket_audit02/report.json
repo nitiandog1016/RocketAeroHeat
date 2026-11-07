@@ -1,0 +1,162 @@
+{
+  "auditPassed": true,
+  "planAcceptance": false,
+  "candidateClosed": true,
+  "normalCompletion": false,
+  "progress": {
+    "announcedSteps": 67,
+    "completedLogSteps": 66,
+    "completionMarkerCount": 66,
+    "unpairedCompletionLines": [],
+    "logTimePairingComplete": true,
+    "lastAnnouncedTimeSeconds": 1.22379562093e-06,
+    "lastCompletedLogTimeSeconds": 1.20552071653e-06
+  },
+  "warningCount": 152,
+  "firstWarning": {
+    "announcedStep": 60,
+    "timeSeconds": 1.09586382855e-06,
+    "requestedTemperatureK": 199.87859522488802
+  },
+  "minimumRequestedTemperatureK": 197.36539304474493,
+  "requestedTemperatureMeaning": "native inverse-iteration request, not complete-field minimum or unique failure cause",
+  "savedDirectories": [
+    {
+      "name": "0",
+      "timeSeconds": 0.0,
+      "files": [
+        "T",
+        "U",
+        "p"
+      ]
+    },
+    {
+      "name": "1.82466953207e-08",
+      "timeSeconds": 1.82466953207e-08,
+      "files": [
+        "T",
+        "U",
+        "e",
+        "p",
+        "phi",
+        "rho"
+      ]
+    }
+  ],
+  "savedState": {
+    "schema": "RAH.OpenFOAMOriginalWallResearch.v1",
+    "profile": "of13-original-rocket-sync-development-v1",
+    "timeSeconds": 1.82466953207e-08,
+    "nativeTimeSeconds": 1.8246695320736354e-08,
+    "timeIndex": 1,
+    "nativeTimeDictionaryPresent": true,
+    "timeDictionarySHA256": "53dc0b5d472b9189b5f7adf3a1e26611c1921c8c3b620407a7f9aac86800d945",
+    "restartReady": false,
+    "status": "interrupted-run-diagnostic",
+    "faceCount": 19752,
+    "originalAreaM2": 1.9646292565715553,
+    "temperatureIdentity": "wall-adjacent fluid; not Te/Tr/solid Tw",
+    "samplePositionKind": "exact native-owner tetrahedron volume centroid",
+    "method": "OpenFOAM 13 shockFluid / NASA7 / synchronized Euler / upwind / Kurganov",
+    "energyReference": "engineering e = native es + hf; h = e + p/rho; h0 = h + |U|^2/2",
+    "hfJkg": 2016.774642574509,
+    "fieldsSHA256": {
+      "p": "c1281e523719b0481e5719403b43a201a23c2cc779ffd0f6621ec3af8901939b",
+      "T": "db637caeaee5e6addf21265dd7e601aa859ef0f4e37a6110f6721f22b3eaadca",
+      "rho": "8470ee3b7a8ef1de040c032443cd3b1c2926d4f8aae8b818ef734570d781fc28",
+      "U": "b5dade1f9695ad32f95234033d737b7d9a9367cfc1ec2793be56aa79a2fea6a5",
+      "e": "0953d38f31be3fb97f9ec434f84865283d48c4a63e30e1b47ddafce55f4aab91",
+      "phi": "3c43d071bc8f6a527ca0157df0ece1cc7d5db70967b2c0128f8824c9b81fbc2f"
+    },
+    "runReportSHA256": "9787d1fe6d2c3549c953120507664b0456f6d4a45255c4640db0877911b3b4ae",
+    "admissionSHA256": "2b4a7d658dece6e0b395a91963b15a4a598c376e88a90630e9713e08ec396856",
+    "stateAudit": {
+      "TminK": 226.03751881531846,
+      "TmaxK": 231.35811492391278,
+      "rhoMinKgm3": 0.018313711444861828,
+      "pMinPa": 1188.368046934284,
+      "densityEOSMaxRelative": 2.220446049250313e-16,
+      "internalEnergyMaxScaled": 3.6064057620313765e-12
+    },
+    "engineeringEnthalpyMaxScaled": 7.065332908305095e-12,
+    "attachedEdgeQualified": false,
+    "engineeringHeatReady": false,
+    "physicalQualification": false,
+    "wallHeatFluxWm2": null,
+    "solidWallTemperatureK": null,
+    "newQualifiedHeatAreaM2": 0
+  },
+  "firstNativeDtSeconds": 1.8246695320736354e-08,
+  "initialCourantRelativeError": 3.1086244689504383e-15,
+  "earlyUpdate": {
+    "conservativeUpdateMaxScaled": [
+      7.538686095573043e-16,
+      6.39377894990121e-16,
+      2.767552143742947e-18,
+      2.557511579960484e-16,
+      4.91066878952548e-16
+    ],
+    "nativeLaggedMassFluxMaxScaled": 2.6734468144240464e-17,
+    "discreteGlobalBalanceScaled": [
+      2.4763016386768504e-17,
+      -8.136175368228613e-18,
+      -1.7438372470682795e-22,
+      -8.635928300858518e-18,
+      -3.91947589747902e-18
+    ],
+    "passed": true
+  },
+  "residualVolumeL1Scaled": [
+    0.003850544700984576,
+    0.003618275087312465,
+    5.503886726262178e-07,
+    0.0013169509685809664,
+    0.001701474432268063
+  ],
+  "residualThreshold": 1e-08,
+  "residualScale": {
+    "referenceLengthM": 2.878319945369148,
+    "referenceSpeedMps": 1509.204224597503,
+    "conservedScale": [
+      0.018408761993636977,
+      27.78258137040688,
+      27.78258137040688,
+      27.78258137040688,
+      44449.89832975381
+    ],
+    "definition": "volume L1 divergence / conservedScale * L/U"
+  },
+  "boundaryFlux": [
+    -3.342992549448809e-12,
+    -0.6905693746767838,
+    -0.008558159314361567,
+    2.5062408830554546,
+    8.886563591659069e-07
+  ],
+  "boundaryVsVolumeClosureScaled": [
+    1.3263329971520563e-14,
+    -2.774887150489159e-15,
+    3.0730434115593395e-16,
+    -2.328646236288279e-15,
+    -1.993603291573178e-15
+  ],
+  "totalEnthalpyRelativeMax": 0.004548587005265503,
+  "wallPressureRangePa": [
+    1188.368046934284,
+    1291.5843056010647
+  ],
+  "wallFluidTemperatureRangeK": [
+    226.03751881531846,
+    231.35811492391278
+  ],
+  "areaStability": null,
+  "residualWindowImprovement": null,
+  "numericallyConverged": false,
+  "attachedEdgeQualified": false,
+  "physicalQualification": false,
+  "newQualifiedHeatAreaM2": 0,
+  "processSeconds": 3.578931324,
+  "entrySeconds": 4.948061757,
+  "sourceReportSHA256": "9787d1fe6d2c3549c953120507664b0456f6d4a45255c4640db0877911b3b4ae",
+  "elapsedSeconds": 1.655999999999949
+}

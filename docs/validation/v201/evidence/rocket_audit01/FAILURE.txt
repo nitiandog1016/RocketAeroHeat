@@ -1,0 +1,7 @@
+首版只读审核失败，未重新运行CFD。
+readOpenFoamRocketState.py比较uniform/time.value与12位目录名的浮点值，错误要求逐位相同。
+实际value=1.82466953207363542e-08，目录=1.82466953207e-08，原生timePrecision=12。
+ValueError: 原生时间字典错误。
+准确执行源已保存在本目录。后续按12位原生格式严格核对，并另存17位实际时刻和时间字典SHA。
+此外，事前计划认为早期writeObjects不会写uniform/time；真实运行确实生成该文件，原假设纠正。
+存在时间字典不自动授权重启；失败任务保持关闭。
