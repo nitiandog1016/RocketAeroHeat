@@ -1,0 +1,351 @@
+{
+  "auditPassed": true,
+  "nativeAcceptance": false,
+  "directionRelativeError": 6.370563827386186e-15,
+  "regimes": [
+    {
+      "regime": 0,
+      "equivalenceError": 0.0,
+      "zedError": 0,
+      "groups": {
+        "integratedFlux": {
+          "count": 7182,
+          "residentFDMax": 4.519535263199678e-08,
+          "frozenFDMax": 4.519535263199678e-08,
+          "failed": 0
+        },
+        "residual": {
+          "count": 2496,
+          "residentFDMax": 0.02444953638951945,
+          "frozenFDMax": 0.02444953638951945,
+          "failed": 827
+        },
+        "saGradient": {
+          "count": 1248,
+          "residentFDMax": 6.160551235812051e-12,
+          "frozenFDMax": 6.160551235812051e-12,
+          "failed": 0
+        },
+        "temperatureGradient": {
+          "count": 1248,
+          "residentFDMax": 0.0004707513932067364,
+          "frozenFDMax": 0.0004707513932067364,
+          "failed": 140
+        },
+        "velocityGradient": {
+          "count": 3744,
+          "residentFDMax": 0.0004438870665121873,
+          "frozenFDMax": 0.0004438870665121873,
+          "failed": 155
+        }
+      },
+      "conservationBalance": [
+        -6.245004513516506e-17,
+        -3.4298611894710995e-16,
+        1.7503852216967043e-17,
+        9.924159592468711e-16,
+        5.781863212107756e-16
+      ],
+      "passed": false
+    },
+    {
+      "regime": 1,
+      "equivalenceError": 0.0,
+      "zedError": 0,
+      "groups": {
+        "integratedFlux": {
+          "count": 7182,
+          "residentFDMax": 4.5513448352794625e-08,
+          "frozenFDMax": 4.5513448352794625e-08,
+          "failed": 0
+        },
+        "residual": {
+          "count": 2496,
+          "residentFDMax": 0.03280604823324378,
+          "frozenFDMax": 0.03280604823324378,
+          "failed": 812
+        },
+        "saGradient": {
+          "count": 1248,
+          "residentFDMax": 6.160551235812051e-12,
+          "frozenFDMax": 6.160551235812051e-12,
+          "failed": 0
+        },
+        "temperatureGradient": {
+          "count": 1248,
+          "residentFDMax": 0.00038019484581426665,
+          "frozenFDMax": 0.00038019484581426665,
+          "failed": 140
+        },
+        "velocityGradient": {
+          "count": 3744,
+          "residentFDMax": 0.0003454958630300098,
+          "frozenFDMax": 0.0003454958630300098,
+          "failed": 139
+        }
+      },
+      "conservationBalance": [
+        -1.0842021724855044e-17,
+        -6.16926271172198e-17,
+        -7.97728176616514e-18,
+        -4.923658501101881e-16,
+        -4.1376341097295557e-16
+      ],
+      "passed": false
+    },
+    {
+      "regime": 2,
+      "equivalenceError": 0.0,
+      "zedError": 0,
+      "groups": {
+        "integratedFlux": {
+          "count": 7182,
+          "residentFDMax": 7.434070106919033e-08,
+          "frozenFDMax": 7.434070106919033e-08,
+          "failed": 0
+        },
+        "residual": {
+          "count": 2496,
+          "residentFDMax": 0.03765232282341227,
+          "frozenFDMax": 0.03765232282341227,
+          "failed": 1067
+        },
+        "saGradient": {
+          "count": 1248,
+          "residentFDMax": 6.160551235812051e-12,
+          "frozenFDMax": 6.160551235812051e-12,
+          "failed": 0
+        },
+        "temperatureGradient": {
+          "count": 1248,
+          "residentFDMax": 0.00019010696128418658,
+          "frozenFDMax": 0.00019010696128418658,
+          "failed": 62
+        },
+        "velocityGradient": {
+          "count": 3744,
+          "residentFDMax": 7.156802928065531e-08,
+          "frozenFDMax": 7.156802928065531e-08,
+          "failed": 0
+        }
+      },
+      "conservationBalance": [
+        0.0,
+        2.3030758017392843e-16,
+        -2.1312132838824328e-17,
+        -4.972617524393834e-17,
+        0.0
+      ],
+      "passed": false
+    }
+  ],
+  "witnesses": [
+    {
+      "regime": 0,
+      "kind": "integratedFlux",
+      "id": 1183,
+      "component": 2,
+      "motherCellID": null,
+      "base": -0.20199640273415684,
+      "derivative": -0.0002120108183682418,
+      "plus": -0.20199642393524123,
+      "minus": -0.20199638152403848,
+      "finiteDifference": -0.0002120560137208738,
+      "error": 4.519535263199678e-08
+    },
+    {
+      "regime": 0,
+      "kind": "residual",
+      "id": 23,
+      "component": 1,
+      "motherCellID": 34310,
+      "base": 1538.4159854614854,
+      "derivative": -1.883079029891194,
+      "plus": 1538.4157935743772,
+      "minus": 1538.4161796290407,
+      "finiteDifference": -1.9302733176118636,
+      "error": 0.02444953638951945
+    },
+    {
+      "regime": 0,
+      "kind": "saGradient",
+      "id": 1,
+      "component": 2,
+      "motherCellID": 14376,
+      "base": 4.200507890396378,
+      "derivative": 0.042554593330855685,
+      "plus": 4.200512145855824,
+      "minus": 4.200503634937159,
+      "finiteDifference": 0.042554593324695134,
+      "error": 6.160551235812051e-12
+    },
+    {
+      "regime": 0,
+      "kind": "temperatureGradient",
+      "id": 21,
+      "component": 2,
+      "motherCellID": 34308,
+      "base": 7.226522743964583,
+      "derivative": 0.3186262177743493,
+      "plus": 7.226554587765421,
+      "minus": 7.226490956672145,
+      "finiteDifference": 0.31815546638114256,
+      "error": 0.0004707513932067364
+    },
+    {
+      "regime": 0,
+      "kind": "velocityGradient",
+      "id": 31,
+      "component": 2,
+      "motherCellID": 53971,
+      "base": 2.713330360884207,
+      "derivative": 2.279535017754338e-11,
+      "plus": 2.713330420069853,
+      "minus": 2.7133303312924353,
+      "finiteDifference": 0.0004438870893075375,
+      "error": 0.0004438870665121873
+    },
+    {
+      "regime": 1,
+      "kind": "integratedFlux",
+      "id": 1183,
+      "component": 2,
+      "motherCellID": null,
+      "base": -0.20210544805858155,
+      "derivative": -0.00021253066987435743,
+      "plus": -0.20210546931165105,
+      "minus": -0.20210542679641438,
+      "finiteDifference": -0.00021257618332271022,
+      "error": 4.5513448352794625e-08
+    },
+    {
+      "regime": 1,
+      "kind": "residual",
+      "id": 22,
+      "component": 1,
+      "motherCellID": 34309,
+      "base": -618.8874567142981,
+      "derivative": 0.024567936742488965,
+      "plus": -618.8874543406403,
+      "minus": -618.887452693018,
+      "finiteDifference": -0.008238111490754818,
+      "error": 0.03280604823324378
+    },
+    {
+      "regime": 1,
+      "kind": "saGradient",
+      "id": 1,
+      "component": 2,
+      "motherCellID": 14376,
+      "base": 4.200507890396378,
+      "derivative": 0.042554593330855685,
+      "plus": 4.200512145855824,
+      "minus": 4.200503634937159,
+      "finiteDifference": 0.042554593324695134,
+      "error": 6.160551235812051e-12
+    },
+    {
+      "regime": 1,
+      "kind": "temperatureGradient",
+      "id": 18,
+      "component": 2,
+      "motherCellID": 34219,
+      "base": 6.998650448782991,
+      "derivative": 1.4641024955429186e-11,
+      "plus": 6.998650391757462,
+      "minus": 6.998650467796428,
+      "finiteDifference": -0.0003801948311732417,
+      "error": 0.00038019484581426665
+    },
+    {
+      "regime": 1,
+      "kind": "velocityGradient",
+      "id": 49,
+      "component": 2,
+      "motherCellID": 73814,
+      "base": 3.114414244866087,
+      "derivative": 0.0,
+      "plus": 3.114414221837209,
+      "minus": 3.1144142909363817,
+      "finiteDifference": -0.0003454958630300098,
+      "error": 0.0003454958630300098
+    },
+    {
+      "regime": 2,
+      "kind": "integratedFlux",
+      "id": 1188,
+      "component": 1,
+      "motherCellID": null,
+      "base": 0.20994169802892604,
+      "derivative": 0.0002272747535717304,
+      "plus": 0.20994172075640477,
+      "minus": 0.20994167528658592,
+      "finiteDifference": 0.0002273490942727996,
+      "error": 7.434070106919033e-08
+    },
+    {
+      "regime": 2,
+      "kind": "residual",
+      "id": 5,
+      "component": 5,
+      "motherCellID": 14467,
+      "base": -87.15197620636206,
+      "derivative": -1.5781778920487073,
+      "plus": -87.15211637015548,
+      "minus": -87.15181261898977,
+      "finiteDifference": -1.518755828584517,
+      "error": 0.03765232282341227
+    },
+    {
+      "regime": 2,
+      "kind": "saGradient",
+      "id": 1,
+      "component": 2,
+      "motherCellID": 14376,
+      "base": 4.200507890396378,
+      "derivative": 0.042554593330855685,
+      "plus": 4.200512145855824,
+      "minus": 4.200503634937159,
+      "finiteDifference": 0.042554593324695134,
+      "error": 6.160551235812051e-12
+    },
+    {
+      "regime": 2,
+      "kind": "temperatureGradient",
+      "id": 18,
+      "component": 2,
+      "motherCellID": 34219,
+      "base": 6.998650429774269,
+      "derivative": 0.0,
+      "plus": 6.998650429777036,
+      "minus": 6.9986503917556435,
+      "finiteDifference": 0.00019010696128418658,
+      "error": 0.00019010696128418658
+    },
+    {
+      "regime": 2,
+      "kind": "velocityGradient",
+      "id": 34,
+      "component": 5,
+      "motherCellID": 54060,
+      "base": 12.022915113773461,
+      "derivative": -0.6372191534267935,
+      "plus": 12.022851391849297,
+      "minus": 12.022978835694296,
+      "finiteDifference": -0.6372192249948228,
+      "error": 7.156802928065531e-08
+    }
+  ],
+  "protectedFilesUnchanged": 29,
+  "originalInputsUnchanged": true,
+  "CFDAdvanceRuns": 0,
+  "newQualifiedAreaM2": 0,
+  "fullKrylovOrCoupledJacobianVerified": false,
+  "sourceSHA256": {
+    "outputs/v214_validation/control01/nk_samples.csv": "203f15dbe95e8f293baa5138efbbec91adda811704121eef8e9c74701d23e150",
+    "outputs/v214_validation/control01/directions.csv": "a6365093262401b9e5995ed15325c031ddee1364b2e9e96dc00d2e6556a3103d",
+    "outputs/v214_validation/control01/nk_results.jsonl": "73be8b02707b721fe3cb1e928db968ba18026414a0a75c41521e620f9355a425",
+    "scripts/auditNativeNKControlV214.py": "b60f1538da63767e37466c9d8a197a0c4f795b38d2a9e39531a5335ca6edc890"
+  },
+  "seconds": 0.7030000000013388
+}
