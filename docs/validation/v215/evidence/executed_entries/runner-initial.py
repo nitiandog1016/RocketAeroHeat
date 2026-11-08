@@ -1,0 +1,51 @@
+"""模块职责：独立监督文件桥接的准备/构建/导出/导入；没有 CFD 发展入口。"""
+from pathlib import Path
+import json,sys,shutil,os,time
+from runEilmerProcess import run,sha
+ROOT=Path(__file__).resolve().parents[1];BASE=ROOT/'outputs/v215_validation'
+PACKAGE=ROOT/'tools/runtime/eilmer-frozen-file-probe-v1';PLAN=ROOT/'docs/validation/v215/PLAN.md'
+def save(p,d):Path(p).write_text(json.dumps(d,indent=2)+'\n')
+def invoke(cmd,cwd,name,seconds,memory,output,locks):
+    start=time.monotonic();r=run(cmd,cwd,BASE/name,seconds,output,locks,memory,memory)
+    print(json.dumps(dict(stage=name,passed=r['passed'],seconds=r['elapsedSeconds'],entrySeconds=time.monotonic()-start)))
+    return r
+def main(stage):
+    BASE.mkdir(exist_ok=True)
+    common=[PLAN,Path(__file__).resolve(),ROOT/'scripts/prepareNativeFileBridgeV215.py',
+        ROOT/'native/eilmerFrozenMapped/lmr/bc/ghost_cell_effect/rah_frozen_file.d']
+    if stage=='prepare':
+        locks=common+[ROOT/'outputs/v214_validation/build01/report.json',ROOT/'native/eilmerFrozenMapped/probe.d']
+        locks += [p for p in (ROOT/'outputs/v213_validation/control02').rglob('*') if p.is_file()]
+        r=invoke([sys.executable,str(common[2])],BASE,'preparation01',60,1024,64,locks)
+    elif stage=='build':
+        assert json.loads((BASE/'preparation01/report.json').read_text())['passed'];PACKAGE.mkdir(exist_ok=False)
+        old=json.loads((ROOT/'outputs/v214_validation/build01/report.json').read_text())
+        oldpkg=ROOT/'tools/runtime/eilmer-frozen-nk-probe-v1'
+        shutil.copyfile(oldpkg/'buildinfo.json',PACKAGE/'buildinfo.json')
+        oldmain=ROOT/'outputs/v214_validation/prepared01/nk_probe.d';newmain=BASE/'prepared01/file_probe.d'
+        cmd=[str(newmain) if p==str(oldmain) else p.replace(str(oldpkg),str(PACKAGE)) for p in old['argv']]
+        cmd.append(str(common[3]));locks=[]
+        for p,h in old['inputSHA256'].items():
+            if Path(p).suffix not in ('.d','.di','.a','.json'):continue
+            assert sha(p)==h;locks.append(p)
+        locks += common+[newmain,PACKAGE/'buildinfo.json']
+        r=invoke(cmd,PACKAGE,'build01',150,6144,512,locks)
+        save(BASE/'build_result.json',dict(passed=r['passed'],binarySHA256=sha(PACKAGE/'probe') if r['passed'] else None))
+        if r['passed']:
+            m=json.loads((BASE/'prepared01/binding-template.json').read_text());m['nativeBuildSHA256']=sha(PACKAGE/'probe')
+            save(BASE/'control01/binding.json',m)
+    elif stage in ('export','import'):
+        assert json.loads((BASE/'build_result.json').read_text())['passed'];binary=PACKAGE/'probe'
+        assert sha(binary)==json.loads((BASE/'build_result.json').read_text())['binarySHA256']
+        case=BASE/'control01';locks=common+[binary]+[p for p in case.rglob('*') if p.is_file()]
+        remaining=60
+        if stage=='import':remaining-=json.loads((BASE/'export01/report.json').read_text())['elapsedSeconds']
+        r=invoke(['taskset','-c',str(min(os.sched_getaffinity(0))),str(binary),stage],case,stage+'01',remaining,2048,64,locks)
+    elif stage=='audit':
+        case=BASE/'control01';locks=common+[ROOT/'tests/testNativeFrozenFile.py',ROOT/'scripts/nativeFrozenSnapshot.py']
+        locks += [p for p in case.rglob('*') if p.is_file()]
+        remaining=60-json.loads((BASE/'preparation01/report.json').read_text())['elapsedSeconds']
+        r=invoke([sys.executable,str(ROOT/'tests/testNativeFrozenFile.py'),str(case)],BASE,'audit01',remaining,1024,64,locks)
+    else:raise ValueError('stage')
+    return r['passed']
+if __name__=='__main__':raise SystemExit(0 if main(sys.argv[1]) else 1)

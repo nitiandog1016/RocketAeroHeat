@@ -1,0 +1,10 @@
+gas.gas_model.GasModelException@/mnt/e/RocketAeroHeat/outputs/v210_validation/prepared02/overlay/gas/init_gas_model.d(64): In function init_gas_model() in gas_model.d there was a problem parsing the input file: phase-air.lua
+There could be a Lua syntax error OR the file might not exist.
+Lua error message follows:
+cannot open phase-air.lua: No such file or directory
+----------------
+??:? gas.gas_model.GasModel gas.init_gas_model.init_gas_model(immutable(char)[]) [0x615882bfdd1c]
+??:? void lmr.globalconfig.set_config_for_core(std.json.JSONValue) [0x615882ee5016]
+??:? void lmr.newtonkrylovsolver.initNewtonKrylovSimulation(int, int, int, immutable(char)[], bool) [0x615882f62e42]
+??:? _Dmain [0x615882f619cc]
+lmr run-steady: Begin initNewtonKrylovSimulation()...
