@@ -1,0 +1,27 @@
+        // We will now store the cloud of points in cloud_pos for viscous derivative calcualtions.
+        // This is equivalent to store_references_for_derivative_calc(size_t gtl) in sblock.d
+        if (myConfig.viscous) {
+            if (myConfig.spatial_deriv_calc ==  SpatialDerivCalc.divergence) {
+                throw new Error("Divergence theorem not implemented for unstructured grid");
+            }
+            // else continue on to fill least-squares/finite-difference cloud
+            final switch (myConfig.spatial_deriv_locn) {
+            case SpatialDerivLocn.vertices:
+                throw new Error("spatial_deriv_locn at vertices not implemented for unstructured grid");
+                // no need for break;
+            case SpatialDerivLocn.faces:
+                throw new Error("spatial_deriv_locn at interfaces not implemented for unstructured grid");
+                // no need for break;
+            case SpatialDerivLocn.cells:
+                // We will now store the cloud of points in cloud_pos for viscous derivative calcualtions.
+                foreach (c; cells) {
+                    // First cell in the cloud is the cell itself.  Differences are taken about it.
+                    c.cloud_pos ~= &(c.pos[0]);
+                    c.cloud_fs ~= c.fs;
+                    // Subsequent cells are the surrounding cells.
+                    foreach (i, f; c.iface) {
+                        c.cloud_pos ~= &(f.pos);
+                        c.cloud_fs ~= f.fs;
+                    } // end foreach face
+                }
+            } // end switch (myConfig.spatial_deriv_locn)

@@ -1,0 +1,68 @@
+    @nogc
+    double signal_frequency(bool using_structured_grid)
+    // Remember to use stringent_cfl=true for unstructured-grid.
+    {
+        number signal = 0; // Signal speed is something like a frequency, with units 1/s.
+        //
+        // Check the convective/wave-driven time step limit first,
+        // then add a component to ensure viscous stability.
+        //
+        // Look at gas-dynamic signal speeds along each face.
+        // This works for gas-dynamics only (not MHD), on a structured grid.
+        //
+        // Get the local normal velocities by rotating the local frame of reference.
+        // Also, compute the velocity magnitude and recall the minimum length.
+        size_t first_face = 0; // west, assuming quad or hex cells from a structured grid conversion
+        size_t second_face = 1; // south, assuming quad or hex cells from a structured grid conversion
+        size_t third_face = iface.length - 1; // will be Face.top for structured grid
+        if (using_structured_grid) {
+            first_face = Face.north;
+            second_face = Face.east;
+        }
+        number un_N = fabs(fs.vel.dot(iface[first_face].n));
+        number un_E = fabs(fs.vel.dot(iface[second_face].n));
+        number un_T = (myConfig.dimensions == 3) ? fabs(fs.vel.dot(iface[third_face].n)) : to!number(0.0);
+        if (myConfig.stringent_cfl) {
+            // Compute the speed with the shortest length and the highest speed.
+            number un_max = fmax(un_N, un_E);
+            number minLength = fmin(iLength, jLength);
+            if (myConfig.dimensions == 3) {
+                un_max = fmax(un_max, un_T);
+                minLength = fmin(minLength, kLength);
+            }
+            signal = (un_max + fs.gas.a) / minLength;
+        } else {
+            // Compute the signal speed in each index direction.
+            number signalN = (un_N + fs.gas.a) / jLength;
+            signal = fmax(signal, signalN);
+            number signalE = (un_E + fs.gas.a) / iLength;
+            signal = fmax(signal, signalE);
+            if (myConfig.dimensions == 3) {
+                number signalT = (un_T + fs.gas.a) / kLength;
+                signal = fmax(signal, signalT);
+            }
+        }
+        this.signal_hyp = signal; // store hyperbolic signal for STS
+        // Factor for the viscous time limit.
+        // See Swanson, Turkel and White (1991)
+        // This factor is not included if viscosity is zero.
+        if (myConfig.viscous && (fs.gas.mu > 10.0e-23)) {
+            auto gmodel = myConfig.gmodel;
+            number gam_eff = gmodel.gamma(fs.gas);
+            // Need to sum conductivities for thermal nonequilibrium.
+            number k_total = fs.gas.k;
+            version(multi_T_gas) {
+                foreach(k_value; fs.gas.k_modes) { k_total += k_value; }
+            }
+            number Prandtl = fs.gas.mu * gmodel.Cp(fs.gas) / k_total;
+            signal += 4.0 * myConfig.viscous_factor * (fs.gas.mu + fs.mu_t)
+                * gam_eff / (Prandtl * fs.gas.rho)
+                * 1.0/(L_min^^2) * myConfig.viscous_signal_factor;
+        }
+        this.signal_parab = signal - this.signal_hyp; // store parabolic signal for STS
+        version(turbulence) {
+            number turbulent_signal = myConfig.turb_model.turbulent_signal_frequency(*fs);
+            turbulent_signal *= myConfig.turbulent_signal_factor;
+            signal = fmax(signal, turbulent_signal);
+            this.signal_parab = fmax(signal_parab, turbulent_signal);
+        }

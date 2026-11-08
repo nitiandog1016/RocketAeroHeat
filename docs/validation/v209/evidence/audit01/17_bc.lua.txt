@@ -1,0 +1,72 @@
+OutFlowBC_SimpleFlux = BoundaryCondition:new()
+OutFlowBC_SimpleFlux.type = "outflow_simple_flux"
+function OutFlowBC_SimpleFlux:new(o)
+   local flag = type(self)=='table' and self.type=='outflow_simple_flux'
+   if not flag then
+      error("Make sure that you are using OutFlowBC_SimpleFlux:new{}"..
+               " and not OutFlowBC_SimpleFlux.new{}", 2)
+   end
+   o = o or {}
+   flag = checkAllowedNames(o, {"label", "group","field_bc"})
+   if not flag then
+      error("Invalid name for item supplied to OutFlowBC_SimpleFlux constructor.", 2)
+   end
+   o = BoundaryCondition.new(self, o)
+   o.is_wall_with_viscous_effects = false
+   o.preReconAction = { ExtrapolateCopy:new{xOrder = o.xOrder} }
+   o.preSpatialDerivActionAtBndryFaces = { CopyCellData:new() }
+   o.postConvFluxAction = { SimpleOutflowFlux:new() }
+   o.ghost_cell_data_available = true
+   o.convective_flux_computed_in_bc = true
+   o.is_configured = true
+   return o
+end
+-- Old name is retained as an alias.
+OutFlowBC_Simple = OutFlowBC_SimpleFlux
+
+OutFlowBC_FixedP = BoundaryCondition:new()
+OutFlowBC_FixedP.type = "outflow_fixed_p"
+function OutFlowBC_FixedP:new(o)
+   local flag = type(self)=='table' and self.type=='outflow_fixed_p'
+   if not flag then
+      error("Make sure that you are using OutFlowBC_FixedP:new{}"..
+               " and not OutFlowBC_FixedP.new{}", 2)
+   end
+   o = o or {}
+   flag = checkAllowedNames(o, {"xOrder", "p_outside", "label", "group","field_bc"})
+   if not flag then
+      error("Invalid name for item supplied to OutFlowBC_FixedP constructor.", 2)
+   end
+   o = BoundaryCondition.new(self, o)
+   o.is_wall_with_viscous_effects = false
+   o.preReconAction = { ExtrapolateCopy:new{xOrder = o.xOrder},
+			FixedP:new{p_outside=o.p_outside} }
+   o.preSpatialDerivActionAtBndryFaces = { CopyCellData:new() }
+   o.is_configured = true
+   return o
+end
+
+OutFlowBC_FixedPT = BoundaryCondition:new()
+OutFlowBC_FixedPT.type = "outflow_fixed_p_and_t"
+function OutFlowBC_FixedPT:new(o)
+   local flag = type(self)=='table' and self.type=='outflow_fixed_p_and_t'
+   if not flag then
+      error("Make sure that you are using OutFlowBC_FixedPT:new{}"..
+               " and not OutFlowBC_FixedPT.new{}", 2)
+   end
+   o = o or {}
+   flag = checkAllowedNames(o, {"xOrder", "p_outside", "T_outside",
+                                "label", "group","field_bc"})
+   if not flag then
+      error("Invalid name for item supplied to OutFlowBC_FixedPT constructor.", 2)
+   end
+   o = BoundaryCondition.new(self, o)
+   o.is_wall_with_viscous_effects = false
+   o.preReconAction = { ExtrapolateCopy:new{xOrder = o.xOrder},
+			FixedPT:new{p_outside=o.p_outside, T_outside=o.T_outside} }
+   o.preSpatialDerivActionAtBndryFaces = { CopyCellData:new() }
+   o.is_configured = true
+   return o
+end
+
+ExchangeBC_FullFace = BoundaryCondition:new()

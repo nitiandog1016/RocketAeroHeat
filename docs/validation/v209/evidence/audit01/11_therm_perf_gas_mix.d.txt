@@ -1,0 +1,47 @@
+
+    @nogc
+    number update_temperature_from_energy(ref GasState gs)
+    {
+    /*
+        Bespoke newton's method by NNG. This was turning into a major
+        bottleneck for multispecies flow, so it was time for some serious
+        corner-cutting...
+
+        @author: Nick Gibbons
+    */
+        immutable double TOL = 1e-10;
+        immutable number u_tgt = gs.u;
+        immutable size_t nsp = n_species;
+
+        number T_guess = gs.T;
+        number logT_guess = log(T_guess);
+        number u = internal_energy(nsp, gs.massf, T_guess, logT_guess);
+        number f_guess =  u - u_tgt;
+
+        // Do at least one iteration, in case we need to set the imaginary components of T
+        number Cv, dT;
+        immutable int MAX_ITERATIONS = 10;
+        foreach (iter; 0 .. MAX_ITERATIONS) {
+            Cv = constant_volume_specific_heat(nsp, gs.massf, T_guess);
+            dT = -f_guess/Cv;
+            T_guess += dT;
+            if (fabs(dT.re)/T_guess.re < TOL) {
+                return T_guess;
+            }
+            logT_guess = log(T_guess);
+            f_guess = internal_energy(nsp, gs.massf, T_guess, logT_guess) - u_tgt;
+        }
+
+        if (fabs(dT)>1e-3) {
+            string msg = "update_temperature_from_energy function failed to converge.\n";
+            debug {
+                msg ~= format("The final value for T was: %12.6f\n", T_guess);
+                msg ~= "The supplied GasState was:\n";
+                msg ~= gs.toString() ~ "\n";
+            }
+            throw new GasModelException(msg);
+        }
+        return T_guess;
+    }
+}
+

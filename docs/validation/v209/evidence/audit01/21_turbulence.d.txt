@@ -1,0 +1,82 @@
+Object representing the Modified Edwards version of the Spalart Allmaras model
+ Notes:
+ - The model here is taken from "Comparison of Eddy Viscosity-Transport Turbulence
+   Models for Three-Dimensional, Shock-Separated Flowfields", Edwards and Chandra (1997)
+ - This version is intended by a more stable in compressible flow, particularly for
+   implicit solvers with large timesteps.
+ - It also removes the ft2 sink term, which is designed to gently pull the nuhat
+   values down in regions of no strain, to allow for tripping. The paper does not
+   explain the reasoning for this, but I found leaving it in caused numerical problems.
+
+ @author: Nick Gibbons (n.gibbons@uq.edu.au)
+*/
+class saeTurbulenceModel : saTurbulenceModel {
+    this (){
+        number Pr_t = GlobalConfig.turbulence_prandtl_number;
+        this(Pr_t);
+    }
+
+    this (const JSONValue config){
+        number Pr_t = getJSONdouble(config, "turbulence_prandtl_number", 0.89);
+        this(Pr_t);
+    }
+
+    this (saeTurbulenceModel other){
+        this(other.Pr_t);
+    }
+
+    this (number Pr_t) {
+        super(Pr_t);
+    }
+
+    @nogc final override string modelName() const {return "spalart_allmaras_edwards";}
+
+    final override saeTurbulenceModel dup() {
+        return new saeTurbulenceModel(this);
+    }
+
+protected:
+    @nogc override number
+    compute_ft2(const number chi) const pure {
+        number ft2 = 0.0;
+        return ft2;
+    }
+
+    @nogc override number
+    compute_Shat_mulitplied_by_nuhat(ref const(FlowGradients) grad, const number nuhat, const number nu,
+                 const number d, const number fv1, const number fv2) const pure {
+        /*
+        The Edwards variant of Spalart-Allmaras contains a definition of Shat
+        that is singular when nuhat is equal to zero, such as during the Newton Krylov
+        startup phase where the boundary conditions are diffused into the flow.
+
+        Since Shat*nuhat is always non-singular and both the Edwards and normal models
+        need it, we compute that instead.
+        */
+        number S = 0.0;
+        foreach(i; 0 .. 3) {
+            foreach(j; 0 .. 3) {
+                 S += (grad.vel[i][j] + grad.vel[j][i])*grad.vel[i][j];
+            }
+        }
+        number div = grad.vel[0][0] + grad.vel[1][1] + grad.vel[2][2];
+        S -= 2.0/3.0*div*div;
+        number Shat_by_nuhat = sqrt(S)*(nu + fv1*nuhat);
+        return Shat_by_nuhat;
+    }
+
+    @nogc override number
+    compute_r(const number Shat_by_nuhat, const number nuhat, const number d) const pure {
+        number normal_r = super.compute_r(Shat_by_nuhat, nuhat, d);
+        number r = tanh(normal_r)/tanh(1.0);
+        return r;
+    }
+}
+
+
+/*
+Object representing the IDDES high fidelity turbulence model
+ Notes:
+ - The model here is taken from "A Hybrid RANS-LES Approach with
+   Delayed-DES and Wall Modelled LES Capabilities"
+ - Model constants and nomenclature from "Simulation and Dynamics of

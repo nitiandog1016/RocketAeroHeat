@@ -1,0 +1,70 @@
+    {
+        // Flux equations use the local flow state information.
+        // For a moving grid we need vel relative to the interface.
+        auto cqi = blk.myConfig.cqi;
+        Vector3 v_rel; v_rel.set(fs.vel); v_rel -= *(face.gvel);
+        number mass_flux = fs.gas.rho * dot(v_rel, face.n);
+        if ((outsign*mass_flux) > 0.0) {
+            // We have a true outflow flux.
+            if (cqi.mass==0) face.F[cqi.mass] = mass_flux;
+            face.F[cqi.xMom] = fs.gas.p * face.n.x + fs.vel.x * mass_flux;
+            face.F[cqi.yMom] = fs.gas.p * face.n.y + fs.vel.y * mass_flux;
+            if (cqi.threeD) { face.F[cqi.zMom] = fs.gas.p * face.n.z + fs.vel.z * mass_flux; }
+            number utot = fs.gas.u + 0.5*dot(fs.vel,fs.vel);
+            version(multi_T_gas) {
+                foreach (umode; fs.gas.u_modes) { utot += umode; }
+            }
+            version(turbulence) {
+                utot += blk.myConfig.turb_model.turbulent_kinetic_energy(*fs);
+            }
+            face.F[cqi.totEnergy] = mass_flux*utot + fs.gas.p*dot(fs.vel,face.n);
+            if (omegaz != 0.0) {
+                // Rotating frame.
+                number x = face.pos.x;
+                number y = face.pos.y;
+                number rsq = x*x + y*y;
+                // The conserved quantity is rotating-frame total energy,
+                // so we need to take -(u**2)/2 off the total energy.
+                // Note that rotating frame velocity u = omegaz * r.
+                face.F[cqi.totEnergy] -= mass_flux * 0.5*omegaz*omegaz*rsq;
+            }
+            version(turbulence) {
+                foreach (i; 0 .. blk.myConfig.turb_model.nturb) { face.F[cqi.rhoturb+i] = mass_flux * fs.turb[i]; }
+            }
+            version(MHD) {
+                // [TODO] PJ 2018-10-25 MHD?
+            }
+            version(multi_species_gas) {
+                if (cqi.n_species > 1) {
+                    foreach (i; 0 .. cqi.n_species) { face.F[cqi.species+i] = mass_flux * fs.gas.massf[i]; }
+                }
+            }
+            version(multi_T_gas) {
+                foreach (i; 0 .. cqi.n_modes) { face.F[cqi.modes+i] = mass_flux * fs.gas.u_modes[i]; }
+            }
+        } else {
+            // We have a situation where the nominal mass flux
+            // indicates that flow should be coming into the domain.
+            // Since we really do not want to have this happen,
+            // we close off the face and think of it as a wall.
+            if (cqi.mass==0) face.F[cqi.mass] = 0.0;
+            face.F[cqi.xMom] = face.n.x * fs.gas.p;
+            face.F[cqi.yMom] = face.n.y * fs.gas.p;
+            if (cqi.threeD) { face.F[cqi.zMom] = face.n.z * fs.gas.p; }
+            face.F[cqi.totEnergy] = fs.gas.p * dot(face.gvel,face.n);
+            version(turbulence) {
+                foreach (i; 0 .. blk.myConfig.turb_model.nturb) { face.F[cqi.rhoturb+i] = 0.0; }
+            }
+            version(MHD) {
+                // [TODO] PJ 2018-10-25 MHD?
+            }
+            version(multi_species_gas) {
+                if (cqi.n_species > 1) {
+                    foreach (i; 0 .. cqi.n_species) { face.F[cqi.species+i] = 0.0; }
+                }
+            }
+            version(multi_T_gas) {
+                foreach (i; 0 .. cqi.n_modes) { face.F[cqi.modes+i] = 0.0; }
+            }
+        }
+        return;

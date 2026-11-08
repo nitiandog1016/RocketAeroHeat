@@ -1,0 +1,48 @@
+
+    //----
+    // 2. Now check if primitives are valid. If not adjust relaxation factor until they are.
+    //----
+
+    foreach (blk; parallel(localFluidBlocks, 1)) {
+        blk.omegaLocal = omega;
+        size_t startIdx = 0;
+        foreach (cell; blk.cells) {
+            // make a copy of the original cell flow state
+            blk.fs_save.copy_values_from(*(cell.fs));
+            bool failedDecode = false;
+            while (blk.omegaLocal >= minOmega) {
+                foreach (i; 0 .. nConserved) {
+                    cell.U[1][i] = cell.U[0][i] + blk.omegaLocal * blk.dU[startIdx+i];
+                }
+                try {
+                    cell.decode_conserved(0, 1, blk.omegaz);
+                }
+                catch (FlowSolverException e) {
+                    failedDecode = true;
+                }
+                // return cell to original flow state
+                cell.fs.copy_values_from(*(blk.fs_save));
+
+                if (failedDecode) {
+                    blk.omegaLocal *= omegaReductionFactor;
+                    failedDecode = false;
+                }
+                else {
+                    // Update was good, so omega is ok for this cell.
+                    break;
+                }
+            }
+            startIdx += nConserved;
+        }
+    }
+    // In serial, find minimum omega across all blocks.
+    foreach (blk; localFluidBlocks) omega = fmin(omega, blk.omegaLocal);
+    version (mpi_parallel) {
+        // In parallel, find minimum and communicate to all processes
+        MPI_Allreduce(MPI_IN_PLACE, &(omega), 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+    }
+
+    return omega;
+}
+
+

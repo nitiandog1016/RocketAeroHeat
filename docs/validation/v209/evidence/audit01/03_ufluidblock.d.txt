@@ -1,0 +1,11 @@
+        if (myConfig.viscous && (myConfig.spatial_deriv_calc == SpatialDerivCalc.least_squares)) {
+            // LSQ weights are used in the calculation of flow gradients for the viscous terms.
+            if (myConfig.spatial_deriv_locn == SpatialDerivLocn.cells) {
+                foreach(cell; cells) {
+                    if (myConfig.viscous_least_squares_type == ViscousLeastSquaresType.weighted_normal ||
+                        myConfig.viscous_least_squares_type == ViscousLeastSquaresType.unweighted_normal) {
+                        cell.grad.set_up_workspace_leastsq_via_normal(myConfig, cell.cloud_pos, cell.pos[gtl], false, *(cell.ws_grad));
+                    } else {
+                        cell.grad.set_up_workspace_leastsq_via_qr_factorization(myConfig, cell.cloud_pos, cell.pos[gtl], false, *(cell.ws_grad));
+                    }
+                }

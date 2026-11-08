@@ -1,0 +1,99 @@
+    void determine_interpolants(ref const(GasState) Q, ref int ir, ref int ie,
+                                ref number lrfrac, ref number efrac) const
+    {
+        if ( Q.rho <= 0.0) {
+            string msg = "Oops, ";
+            debug {
+                msg ~= format("Error in function  %s \n", __FUNCTION__);
+                msg ~= format("density = %.5s is zero or negaive\n", Q.rho);
+                msg ~= format("  Supplied Q: %s", Q);
+            }
+            throw new Exception(msg);
+        }
+
+        // Find the enclosing cell
+        double logrho = log10(Q.rho.re);
+        // The couple of casts below were used instead of to!int()
+        // in order to be allowed in a @nogc context.
+        ir = cast(int) floor((logrho - _lrmin) / _dlr);
+        ie = cast(int) floor((Q.u.re - _emin) / _de);
+
+        // Make sure that we don't try to access data outside the
+        // actual arrays.
+        if (ir< 0 )ir= 0;
+        if (ir> (_irsteps - 1) )ir= _irsteps - 1;
+        if (ie< 0 )ie= 0;
+        if (ie> (_iesteps - 1) )ie= _iesteps - 1;
+
+        // Calculate bilinear interpolation(/extrapolation) fractions.
+        lrfrac = (logrho - (_lrmin +ir* _dlr)) / _dlr;
+        efrac  = (Q.u - (_emin +ie* _de)) / _de;
+
+        // Limit the extrapolation to small distances.
+        const number EXTRAP_MARGIN = 0.2;
+        lrfrac = max(lrfrac, -EXTRAP_MARGIN);
+        lrfrac = min(lrfrac, 1.0+EXTRAP_MARGIN);
+        efrac = max(efrac, -EXTRAP_MARGIN);
+        efrac = min(efrac, 1.0+EXTRAP_MARGIN);
+    }
+
+    override void update_thermo_from_rhou(ref GasState Q) const
+    {
+        number efrac, lrfrac, Cv_eff, R_eff, g_eff;
+        int    ir, ie;
+
+        try { determine_interpolants(Q, ir, ie, lrfrac, efrac); }
+        catch (Exception caughtException) {
+            string msg = "Oops, ";
+            debug {
+                msg ~= format("Error in function %s \n", __FUNCTION__);
+                msg ~= format("Exception message from determine_interpolants() was:\n\n");
+                msg ~= to!string(caughtException);
+            }
+            throw new Exception(msg);
+        }
+        Cv_eff = (1.0 - efrac) * (1.0 - lrfrac) * _Cv_hat[ie][ir] +
+            efrac         * (1.0 - lrfrac) * _Cv_hat[ie+1][ir] +
+            efrac         * lrfrac         * _Cv_hat[ie+1][ir+1] +
+            (1.0 - efrac) * lrfrac         * _Cv_hat[ie][ir+1];
+
+        R_eff  = (1.0 - efrac) * (1.0 - lrfrac) * _R_hat[ie][ir] +
+            efrac         * (1.0 - lrfrac) * _R_hat[ie+1][ir] +
+            efrac         * lrfrac         * _R_hat[ie+1][ir+1] +
+            (1.0 - efrac) * lrfrac         * _R_hat[ie][ir+1];
+
+        g_eff  = (1.0 - efrac) * (1.0 - lrfrac) * _g_hat[ie][ir] +
+            efrac         * (1.0 - lrfrac) * _g_hat[ie+1][ir] +
+            efrac         * lrfrac         * _g_hat[ie+1][ir+1] +
+            (1.0 - efrac) * lrfrac         * _g_hat[ie][ir+1];
+        // Reconstruct the thermodynamic properties.
+        Q.T = Q.u / Cv_eff;
+        Q.p = Q.rho*R_eff*Q.T;
+        Q.a = sqrt(g_eff*R_eff*Q.T);
+        if ( Q.T < T_MIN ) {
+            string msg = "Error in update_thermo_from_rhou().";
+            debug {
+                msg ~= format("Low temperature, rho = %.5s ", Q.rho);
+                msg ~= format("e= %.8s  T= %.5s \n", Q.u, Q.T);
+                msg ~= format(    "Supplied Q: %s ", Q);
+            }
+            throw new Exception(msg);
+        }
+        // Fix meaningless values if they arise
+        if ( Q.p < 0.0 ) Q.p = 0.0;
+        if ( Q.T < 0.0 ) Q.T = 0.0;
+        if ( Q.a < 0.0 ) Q.a = 0.0;
+    }
+
+    override void update_trans_coeffs(ref GasState Q) const
+    {
+        number efrac, lrfrac;
+        number mu_eff, k_eff;
+        int ir, ie;
+
+        try { determine_interpolants(Q, ir, ie, lrfrac, efrac); }
+        catch (Exception caughtException) {
+            string msg = "Error in function update_trans_coeffs().";
+            debug {
+                msg ~= format("Exception message from determine_interpolants() was:\n\n");
+                msg ~= to!string(caughtException);

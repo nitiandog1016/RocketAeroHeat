@@ -1,0 +1,51 @@
+WallBC_NoSlip_FixedT0 = BoundaryCondition:new()
+WallBC_NoSlip_FixedT0.type = "wall_no_slip_fixed_t"
+function WallBC_NoSlip_FixedT0:new(o)
+   local flag = type(self)=='table' and self.type=='wall_no_slip_fixed_t'
+   if not flag then
+      error("Make sure that you are using WallBC_NoSlip_FixedT0:new{}"..
+               " and not WallBC_NoSlip_FixedT0.new{}", 2)
+   end
+   o = o or {}
+   flag = checkAllowedNames(o, {"Twall", "wall_function", "field_bc",
+                                "catalytic_type", "wall_massf_composition",
+                                "label", "group", "is_design_surface", "num_cntrl_pts",
+                                "user_post_diff_flux"})
+   if not flag then
+      error("Invalid name for item supplied to WallBC_NoSlip_FixedT0 constructor.", 2)
+   end
+   o = BoundaryCondition.new(self, o)
+   o.ghost_cell_data_available = true
+   o.is_wall_with_viscous_effects = true
+   o.preReconAction = { InternalCopyThenReflect:new() }
+   o.preSpatialDerivActionAtBndryFaces = { CopyCellData:new(), ZeroSlipWallVelocity:new(),
+					   FixedT:new{Twall=o.Twall}}
+
+   if o.catalytic_type == "fixed_composition" then
+      o.preSpatialDerivActionAtBndryFaces[#o.preSpatialDerivActionAtBndryFaces+1] =
+         FixedComposition:new{wall_massf_composition=convertSpeciesTableToArray(o.wall_massf_composition)}
+   elseif o.catalytic_type == "catalytic_charged_species" then
+      o.preSpatialDerivActionAtBndryFaces[#o.preSpatialDerivActionAtBndryFaces+1] = 
+         ZeroChargedSpecies:new{}
+   elseif o.catalytic_type == "equilibrium" then
+      o.preSpatialDerivActionAtBndryFaces[#o.preSpatialDerivActionAtBndryFaces+1] =
+         EquilibriumComposition:new{}
+   end
+   o.preSpatialDerivActionAtBndryFaces[#o.preSpatialDerivActionAtBndryFaces+1] =
+      UpdateThermoTransCoeffs:new()
+
+   if config.turbulence_model ~= "none" then
+      o.preSpatialDerivActionAtBndryFaces[#o.preSpatialDerivActionAtBndryFaces+1] = WallTurbulent:new()
+      if o.wall_function and config.turbulence_model == "k_omega" then
+         -- Only makes sense to add a wall function if the k-omega model is active.
+         o.preSpatialDerivActionAtBndryFaces[#o.preSpatialDerivActionAtBndryFaces+1] =
+            WallFunctionInterfaceEffect:new{}
+         o.preSpatialDerivActionAtBndryCells = { WallFunctionCellEffect:new() }
+      end
+   end
+
+   if o.user_post_diff_flux then
+      o.postDiffFluxAction = {UserDefinedFlux:new{fileName=o.user_post_diff_flux}}
+   end
+   o.is_configured = true
+   return o
