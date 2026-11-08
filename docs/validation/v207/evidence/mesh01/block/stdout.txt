@@ -1,0 +1,78 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 13-18870c24d21c
+Exec   : blockMesh
+Date   : Nov 08 2026
+Time   : 12:03:32
+Host   : "LAPTOP-APDSESFJ"
+PID    : 830
+I/O    : uncollated
+Case   : /mnt/e/RocketAeroHeat/outputs/v207_validation/thermal01
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Reading "blockMeshDict"
+
+Creating block mesh from
+    "system/blockMeshDict"
+Creating block edges
+No non-planar block faces defined
+Creating topology blocks
+Creating topology patches
+
+Creating block mesh topology
+
+Basic statistics
+    Number of internal faces : 0
+    Number of boundary faces : 6
+    Number of defined boundary faces : 6
+    Number of undefined boundary faces : 0
+
+Checking topology
+Creating block offsets
+Creating merge list .
+
+Creating polyMesh from blockMesh
+Creating patches
+Creating cells
+Creating points with scale 1
+    Block 0 cell size :
+        i : 0.02
+        j : 3.1250000000000001e-05 .. 3.1250000000000028e-05
+        k : 0.02
+
+No patch pairs to merge
+
+Detected cyclic patches; ordering boundary faces
+
+Writing polyMesh
+----------------
+Mesh Information
+----------------
+  boundingBox: (0 0 0) (0.02 0.001 0.02)
+  nPoints: 132
+  nCells: 32
+  nFaces: 161
+  nInternalFaces: 31
+----------------
+Patches
+----------------
+  patch 0 (start: 31 size: 1) name: cold
+  patch 1 (start: 32 size: 1) name: hot
+  patch 2 (start: 33 size: 32) name: xMinus
+  patch 3 (start: 65 size: 32) name: xPlus
+  patch 4 (start: 97 size: 32) name: zMinus
+  patch 5 (start: 129 size: 32) name: zPlus
+
+End
+

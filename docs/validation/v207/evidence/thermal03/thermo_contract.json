@@ -1,0 +1,31 @@
+{
+  "caloric": {
+    "model": "rah-phase-aware-dry-air-of13-v1",
+    "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+    "temperatureRangeK": [
+      60.0,
+      2000.0
+    ],
+    "gasConstantJkgK": 287.0491267875601,
+    "moleFractions": [
+      0.7812,
+      0.2096,
+      0.0092
+    ],
+    "pressureDomain": "0<p<=min(1e6,1e4*(T/100)^3,0.1*p_dew(T) when T<=132.6312)",
+    "energyReference": "hf=0; hs(298.15K)=0; es=hs-RT",
+    "entropyReference": "relative s(298.15K,100000Pa)=0",
+    "sourceSHA256": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985",
+    "transportModel": "Lemmon2004-dilute-mu-k-v1",
+    "transportRequiresContinuumCheck": true,
+    "nativeFinalStateGuardVerified": false,
+    "physicalQualification": false,
+    "engineeringHeatReady": false
+  },
+  "transport": "rah-lemmon-dilute-icoTabulated-of13-v1",
+  "interpolation": "piecewise linear",
+  "solverTransportType": "icoTabulated",
+  "nativeWallHeatFluxToIntoWallSign": -1,
+  "turbulentPrandtlNumber": null,
+  "physicalQualification": false
+}

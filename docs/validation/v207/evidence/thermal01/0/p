@@ -1,0 +1,44 @@
+FoamFile { format ascii; class volScalarField; object p; }
+dimensions [1 -1 -2 0 0 0 0];
+internalField nonuniform List<scalar> 32
+(
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+100000
+);
+boundaryField {
+cold { type zeroGradient; } hot { type zeroGradient; }
+xMinus { type cyclic; }
+xPlus { type cyclic; }
+zMinus { type cyclic; }
+zPlus { type cyclic; }
+}

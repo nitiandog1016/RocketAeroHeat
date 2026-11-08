@@ -1,0 +1,417 @@
+{
+  "passed": false,
+  "auditCompleted": true,
+  "processPassed": true,
+  "nativeSignAndGradientInterfacePassed": true,
+  "independentReferencePassed": false,
+  "initialDiscreteHeatFluxIntoWallWm2": {
+    "cold": 10997.696204117425,
+    "hot": -10878.355743865166
+  },
+  "initialFirstOrderNormalMassFluxMinMaxKgm2s": [
+    1.7930781999055496,
+    8.092099620498727
+  ],
+  "exactReferenceNormalMassFlux": 0,
+  "initialMassFluxCalculationIsNotUniqueCauseProof": true,
+  "records": [
+    {
+      "time": "1e-08",
+      "heatFluxIntoWallWm2": {
+        "cold": 12161.08796127799,
+        "hot": -12598.143614737714
+      },
+      "heatFluxRelativeError": {
+        "cold": 0.09546565458879397,
+        "hot": 0.16101343289571868
+      },
+      "temperatureRelativeError": 0.0022503897468333367,
+      "velocityScaledError": 0.0022177522274744676,
+      "rawFourierMaxRelative": 1.3100631690576847e-14,
+      "nativeInternalNormalMassFluxMinMaxKgm2s": [
+        1.7251459387655224,
+        7.83924012760857
+      ],
+      "wallPowerIntoWallW": -4.2681216158176123e-07,
+      "referenceViscousPowerW": 2.444402738414499e-07,
+      "apparentSteadyHeatPowerDefectW": -6.712524354232112e-07,
+      "powerDefectIsNotFullTransientConservationResidual": true,
+      "fields": {
+        "timeName": "1e-08",
+        "timeSeconds": 1e-08,
+        "rows": [
+          {
+            "patch": "cold",
+            "nativeFaceIndex": 31,
+            "ownerCellIndex": 0,
+            "pressurePa": 100000.25542025435,
+            "givenWallTemperatureK": 300.0,
+            "heatFluxIntoWallWm2": 12161.08796127799,
+            "nativeWallHeatFluxWm2": -12161.08796127799,
+            "method": "OpenFOAM13 shockFluid + Fourier + Lemmon icoTabulated",
+            "nativeSignConversion": -1,
+            "solidWallTemperatureK": null,
+            "edgeTemperatureK": null,
+            "physicalQualification": false
+          },
+          {
+            "patch": "hot",
+            "nativeFaceIndex": 32,
+            "ownerCellIndex": 31,
+            "pressurePa": 99998.28738554365,
+            "givenWallTemperatureK": 600.0,
+            "heatFluxIntoWallWm2": -12598.143614737714,
+            "nativeWallHeatFluxWm2": 12598.143614737714,
+            "method": "OpenFOAM13 shockFluid + Fourier + Lemmon icoTabulated",
+            "nativeSignConversion": -1,
+            "solidWallTemperatureK": null,
+            "edgeTemperatureK": null,
+            "physicalQualification": false
+          }
+        ],
+        "contract": {
+          "caloric": {
+            "model": "rah-phase-aware-dry-air-of13-v1",
+            "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+            "temperatureRangeK": [
+              60.0,
+              2000.0
+            ],
+            "gasConstantJkgK": 287.0491267875601,
+            "moleFractions": [
+              0.7812,
+              0.2096,
+              0.0092
+            ],
+            "pressureDomain": "0<p<=min(1e6,1e4*(T/100)^3,0.1*p_dew(T) when T<=132.6312)",
+            "energyReference": "hf=0; hs(298.15K)=0; es=hs-RT",
+            "entropyReference": "relative s(298.15K,100000Pa)=0",
+            "sourceSHA256": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985",
+            "transportModel": "Lemmon2004-dilute-mu-k-v1",
+            "transportRequiresContinuumCheck": true,
+            "nativeFinalStateGuardVerified": false,
+            "physicalQualification": false,
+            "engineeringHeatReady": false
+          },
+          "transport": "rah-lemmon-dilute-icoTabulated-of13-v1",
+          "interpolation": "piecewise linear",
+          "solverTransportType": "icoTabulated",
+          "nativeWallHeatFluxToIntoWallSign": -1,
+          "turbulentPrandtlNumber": null,
+          "physicalQualification": false
+        },
+        "fieldSHA256": {
+          "p": "720694b5e893acb4a3be2c29329888e4e1b7826b3f2f29ab399cd14135be214b",
+          "T": "7e5730cc1d120189838767ed0be65c0681fd4555c5c59544c52435e8adb754a4",
+          "wallHeatFlux": "3d8213e304e0de8268882335aca8df17c650d53d758b4a39a582aca9524dc7b7"
+        },
+        "meshSHA256": {
+          "owner": "f196b15ce8f86f3f297b94830cff85a3cb0f6436aaef211dcabb17da03936a4d",
+          "boundary": "7f37941c7fe880a19c90274d0b4b58e292d2ca8d2e28716e4766d98356737dd7"
+        },
+        "originalRocketMapped": false,
+        "physicalQualification": false
+      }
+    },
+    {
+      "time": "2e-08",
+      "heatFluxIntoWallWm2": {
+        "cold": 13257.994674696063,
+        "hot": -14150.827997901128
+      },
+      "heatFluxRelativeError": {
+        "cold": 0.19427454690693624,
+        "hot": 0.3041049455048688
+      },
+      "temperatureRelativeError": 0.004372175126449163,
+      "velocityScaledError": 0.004311231969066682,
+      "rawFourierMaxRelative": 1.3100631690576847e-14,
+      "nativeInternalNormalMassFluxMinMaxKgm2s": [
+        1.6050765159026998,
+        7.376602824948236
+      ],
+      "wallPowerIntoWallW": -8.719075421924458e-07,
+      "referenceViscousPowerW": 2.444402738414499e-07,
+      "apparentSteadyHeatPowerDefectW": -1.1163478160338957e-06,
+      "powerDefectIsNotFullTransientConservationResidual": true,
+      "fields": {
+        "timeName": "2e-08",
+        "timeSeconds": 2e-08,
+        "rows": [
+          {
+            "patch": "cold",
+            "nativeFaceIndex": 31,
+            "ownerCellIndex": 0,
+            "pressurePa": 100000.18238167184,
+            "givenWallTemperatureK": 300.0,
+            "heatFluxIntoWallWm2": 13257.994674696063,
+            "nativeWallHeatFluxWm2": -13257.994674696063,
+            "method": "OpenFOAM13 shockFluid + Fourier + Lemmon icoTabulated",
+            "nativeSignConversion": -1,
+            "solidWallTemperatureK": null,
+            "edgeTemperatureK": null,
+            "physicalQualification": false
+          },
+          {
+            "patch": "hot",
+            "nativeFaceIndex": 32,
+            "ownerCellIndex": 31,
+            "pressurePa": 99999.07825666529,
+            "givenWallTemperatureK": 600.0,
+            "heatFluxIntoWallWm2": -14150.827997901128,
+            "nativeWallHeatFluxWm2": 14150.827997901128,
+            "method": "OpenFOAM13 shockFluid + Fourier + Lemmon icoTabulated",
+            "nativeSignConversion": -1,
+            "solidWallTemperatureK": null,
+            "edgeTemperatureK": null,
+            "physicalQualification": false
+          }
+        ],
+        "contract": {
+          "caloric": {
+            "model": "rah-phase-aware-dry-air-of13-v1",
+            "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+            "temperatureRangeK": [
+              60.0,
+              2000.0
+            ],
+            "gasConstantJkgK": 287.0491267875601,
+            "moleFractions": [
+              0.7812,
+              0.2096,
+              0.0092
+            ],
+            "pressureDomain": "0<p<=min(1e6,1e4*(T/100)^3,0.1*p_dew(T) when T<=132.6312)",
+            "energyReference": "hf=0; hs(298.15K)=0; es=hs-RT",
+            "entropyReference": "relative s(298.15K,100000Pa)=0",
+            "sourceSHA256": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985",
+            "transportModel": "Lemmon2004-dilute-mu-k-v1",
+            "transportRequiresContinuumCheck": true,
+            "nativeFinalStateGuardVerified": false,
+            "physicalQualification": false,
+            "engineeringHeatReady": false
+          },
+          "transport": "rah-lemmon-dilute-icoTabulated-of13-v1",
+          "interpolation": "piecewise linear",
+          "solverTransportType": "icoTabulated",
+          "nativeWallHeatFluxToIntoWallSign": -1,
+          "turbulentPrandtlNumber": null,
+          "physicalQualification": false
+        },
+        "fieldSHA256": {
+          "p": "a2281da3817c19cc19a0394ae8932508bb3e128b36c173bfcd8baa2df744c419",
+          "T": "55dcdaa6416bd8d1897f53517e3f92fb82ac4b99fba54f487cef7d21873072f6",
+          "wallHeatFlux": "c988aec351d187a50689934cb85efe4659f89dfc46dded56f8443120470ddbf9"
+        },
+        "meshSHA256": {
+          "owner": "f196b15ce8f86f3f297b94830cff85a3cb0f6436aaef211dcabb17da03936a4d",
+          "boundary": "7f37941c7fe880a19c90274d0b4b58e292d2ca8d2e28716e4766d98356737dd7"
+        },
+        "originalRocketMapped": false,
+        "physicalQualification": false
+      }
+    },
+    {
+      "time": "3e-08",
+      "heatFluxIntoWallWm2": {
+        "cold": 14296.084475731122,
+        "hot": -15595.214001916564
+      },
+      "heatFluxRelativeError": {
+        "cold": 0.2877852366604965,
+        "hot": 0.4372159501283388
+      },
+      "temperatureRelativeError": 0.006380188876042414,
+      "velocityScaledError": 0.006293727654003529,
+      "rawFourierMaxRelative": 1.2878587085651816e-14,
+      "nativeInternalNormalMassFluxMinMaxKgm2s": [
+        1.5022713213829908,
+        7.318801650722231
+      ],
+      "wallPowerIntoWallW": -1.2686811779154699e-06,
+      "referenceViscousPowerW": 2.444402738414499e-07,
+      "apparentSteadyHeatPowerDefectW": -1.5131214517569198e-06,
+      "powerDefectIsNotFullTransientConservationResidual": true,
+      "fields": {
+        "timeName": "3e-08",
+        "timeSeconds": 3e-08,
+        "rows": [
+          {
+            "patch": "cold",
+            "nativeFaceIndex": 31,
+            "ownerCellIndex": 0,
+            "pressurePa": 99999.93104869704,
+            "givenWallTemperatureK": 300.0,
+            "heatFluxIntoWallWm2": 14296.084475731122,
+            "nativeWallHeatFluxWm2": -14296.084475731122,
+            "method": "OpenFOAM13 shockFluid + Fourier + Lemmon icoTabulated",
+            "nativeSignConversion": -1,
+            "solidWallTemperatureK": null,
+            "edgeTemperatureK": null,
+            "physicalQualification": false
+          },
+          {
+            "patch": "hot",
+            "nativeFaceIndex": 32,
+            "ownerCellIndex": 31,
+            "pressurePa": 100000.05763011327,
+            "givenWallTemperatureK": 600.0,
+            "heatFluxIntoWallWm2": -15595.214001916564,
+            "nativeWallHeatFluxWm2": 15595.214001916564,
+            "method": "OpenFOAM13 shockFluid + Fourier + Lemmon icoTabulated",
+            "nativeSignConversion": -1,
+            "solidWallTemperatureK": null,
+            "edgeTemperatureK": null,
+            "physicalQualification": false
+          }
+        ],
+        "contract": {
+          "caloric": {
+            "model": "rah-phase-aware-dry-air-of13-v1",
+            "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+            "temperatureRangeK": [
+              60.0,
+              2000.0
+            ],
+            "gasConstantJkgK": 287.0491267875601,
+            "moleFractions": [
+              0.7812,
+              0.2096,
+              0.0092
+            ],
+            "pressureDomain": "0<p<=min(1e6,1e4*(T/100)^3,0.1*p_dew(T) when T<=132.6312)",
+            "energyReference": "hf=0; hs(298.15K)=0; es=hs-RT",
+            "entropyReference": "relative s(298.15K,100000Pa)=0",
+            "sourceSHA256": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985",
+            "transportModel": "Lemmon2004-dilute-mu-k-v1",
+            "transportRequiresContinuumCheck": true,
+            "nativeFinalStateGuardVerified": false,
+            "physicalQualification": false,
+            "engineeringHeatReady": false
+          },
+          "transport": "rah-lemmon-dilute-icoTabulated-of13-v1",
+          "interpolation": "piecewise linear",
+          "solverTransportType": "icoTabulated",
+          "nativeWallHeatFluxToIntoWallSign": -1,
+          "turbulentPrandtlNumber": null,
+          "physicalQualification": false
+        },
+        "fieldSHA256": {
+          "p": "825446b6a5ac476d252d81bc2756cd4f0a1130df3e103fa2445330f147e01be8",
+          "T": "2818941b2e8792df904fd28f8488a73d130f6f76f34c3df74267ad8477825b3d",
+          "wallHeatFlux": "ba05833a2d943e697a347e1497a0169bfa6dfd64a7c1023bf29be8ce2dcd7c01"
+        },
+        "meshSHA256": {
+          "owner": "f196b15ce8f86f3f297b94830cff85a3cb0f6436aaef211dcabb17da03936a4d",
+          "boundary": "7f37941c7fe880a19c90274d0b4b58e292d2ca8d2e28716e4766d98356737dd7"
+        },
+        "originalRocketMapped": false,
+        "physicalQualification": false
+      }
+    },
+    {
+      "time": "4e-08",
+      "heatFluxIntoWallWm2": {
+        "cold": 15281.489390829936,
+        "hot": -16946.72178459381
+      },
+      "heatFluxRelativeError": {
+        "cold": 0.37655009419552044,
+        "hot": 0.5617675299750542
+      },
+      "temperatureRelativeError": 0.008286292390846217,
+      "velocityScaledError": 0.008176754147269266,
+      "rawFourierMaxRelative": 1.2878587085651816e-14,
+      "nativeInternalNormalMassFluxMinMaxKgm2s": [
+        1.4135762273719108,
+        7.261344502873383
+      ],
+      "wallPowerIntoWallW": -1.6262035095350331e-06,
+      "referenceViscousPowerW": 2.444402738414499e-07,
+      "apparentSteadyHeatPowerDefectW": -1.8706437833764829e-06,
+      "powerDefectIsNotFullTransientConservationResidual": true,
+      "fields": {
+        "timeName": "4e-08",
+        "timeSeconds": 4e-08,
+        "rows": [
+          {
+            "patch": "cold",
+            "nativeFaceIndex": 31,
+            "ownerCellIndex": 0,
+            "pressurePa": 99999.53279751807,
+            "givenWallTemperatureK": 300.0,
+            "heatFluxIntoWallWm2": 15281.489390829936,
+            "nativeWallHeatFluxWm2": -15281.489390829936,
+            "method": "OpenFOAM13 shockFluid + Fourier + Lemmon icoTabulated",
+            "nativeSignConversion": -1,
+            "solidWallTemperatureK": null,
+            "edgeTemperatureK": null,
+            "physicalQualification": false
+          },
+          {
+            "patch": "hot",
+            "nativeFaceIndex": 32,
+            "ownerCellIndex": 31,
+            "pressurePa": 100001.18468951041,
+            "givenWallTemperatureK": 600.0,
+            "heatFluxIntoWallWm2": -16946.72178459381,
+            "nativeWallHeatFluxWm2": 16946.72178459381,
+            "method": "OpenFOAM13 shockFluid + Fourier + Lemmon icoTabulated",
+            "nativeSignConversion": -1,
+            "solidWallTemperatureK": null,
+            "edgeTemperatureK": null,
+            "physicalQualification": false
+          }
+        ],
+        "contract": {
+          "caloric": {
+            "model": "rah-phase-aware-dry-air-of13-v1",
+            "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+            "temperatureRangeK": [
+              60.0,
+              2000.0
+            ],
+            "gasConstantJkgK": 287.0491267875601,
+            "moleFractions": [
+              0.7812,
+              0.2096,
+              0.0092
+            ],
+            "pressureDomain": "0<p<=min(1e6,1e4*(T/100)^3,0.1*p_dew(T) when T<=132.6312)",
+            "energyReference": "hf=0; hs(298.15K)=0; es=hs-RT",
+            "entropyReference": "relative s(298.15K,100000Pa)=0",
+            "sourceSHA256": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985",
+            "transportModel": "Lemmon2004-dilute-mu-k-v1",
+            "transportRequiresContinuumCheck": true,
+            "nativeFinalStateGuardVerified": false,
+            "physicalQualification": false,
+            "engineeringHeatReady": false
+          },
+          "transport": "rah-lemmon-dilute-icoTabulated-of13-v1",
+          "interpolation": "piecewise linear",
+          "solverTransportType": "icoTabulated",
+          "nativeWallHeatFluxToIntoWallSign": -1,
+          "turbulentPrandtlNumber": null,
+          "physicalQualification": false
+        },
+        "fieldSHA256": {
+          "p": "4ae2005893f894c7110045904cab2bd823dbb4a37dc86712c740708f918a0ea0",
+          "T": "aac5ec3a5c8c890dcc852781d33fc92d848c63e19f7c6f7da50063065e4dd3a1",
+          "wallHeatFlux": "ae5caa6c64baf0a30c099b7078cd775ee5971a5d69d39de7675f8115d4468af9"
+        },
+        "meshSHA256": {
+          "owner": "f196b15ce8f86f3f297b94830cff85a3cb0f6436aaef211dcabb17da03936a4d",
+          "boundary": "7f37941c7fe880a19c90274d0b4b58e292d2ca8d2e28716e4766d98356737dd7"
+        },
+        "originalRocketMapped": false,
+        "physicalQualification": false
+      }
+    }
+  ],
+  "perStepFinalStateGuardVerified": true,
+  "protectedFilesUnchanged": 29,
+  "physicalQualification": false,
+  "numericallyConverged": false,
+  "newQualifiedHeatAreaM2": 0,
+  "elapsedSeconds": 0.01600000000325963
+}

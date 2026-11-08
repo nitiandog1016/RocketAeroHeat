@@ -1,0 +1,330 @@
+{
+  "passed": true,
+  "sourceChecks": {
+    "viscousMomentum": true,
+    "viscousEnergy": true,
+    "tableMu": true,
+    "tableKappa": true,
+    "FourierTemperatureFlux": true,
+    "nativeWallHeatNegatesOutwardFlux": true,
+    "waveTransmissiveUsesFixedGamma": true,
+    "freestreamIsInletOutlet": true,
+    "officialTutorialLaminar": true
+  },
+  "sources": [
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/correctDensity.C",
+      "relativePath": "applications/modules/shockFluid/correctDensity.C",
+      "sha256": "d49a73eb28c2c408ce48990d6368e3c3a5cb6c4024a9c371b0a15143998a2037",
+      "bytes": 1712
+    },
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/thermophysicalPredictor.C",
+      "relativePath": "applications/modules/shockFluid/thermophysicalPredictor.C",
+      "sha256": "64e3ed56492589cd43b7489126b5eaac25f1ddd41a70444600329354e365c694",
+      "bytes": 2607
+    },
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/shockFluid.H",
+      "relativePath": "applications/modules/shockFluid/shockFluid.H",
+      "sha256": "7e33a53d0c79f8fdccb9951a87f204813e241bd6a72356acf95654cda734082b",
+      "bytes": 7961
+    },
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/momentumPredictor.C",
+      "relativePath": "applications/modules/shockFluid/momentumPredictor.C",
+      "sha256": "a563106d5ea140a790093f840d9094955ec181c9425934b3721519d55f50c9e3",
+      "bytes": 2270
+    },
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/moveMesh.C",
+      "relativePath": "applications/modules/shockFluid/moveMesh.C",
+      "sha256": "d3b606d7feee39ba3338d538bea00028b77058b06954ae7b0b2f12f9476feaab",
+      "bytes": 1840
+    },
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/shockFluid.C",
+      "relativePath": "applications/modules/shockFluid/shockFluid.C",
+      "sha256": "3ed6fae6b1e4e6c30aeeb9e7419fa3c9ff0f829caab412a0d20158de321dfbeb",
+      "bytes": 6974
+    },
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/setRDeltaT.C",
+      "relativePath": "applications/modules/shockFluid/setRDeltaT.C",
+      "sha256": "3296ed9951f86453c35ce5d1ab1cfccd369cc6c6560e83f2dbd81a8b930f1663",
+      "bytes": 2984
+    },
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/fluxPredictor.C",
+      "relativePath": "applications/modules/shockFluid/fluxPredictor.C",
+      "sha256": "bd6c1b655f7ee0112b7e23aa8c24fa81f8698326208dd119b584d8a1fb47999d",
+      "bytes": 4039
+    },
+    {
+      "path": "/opt/openfoam13/applications/modules/shockFluid/pressureCorrector.C",
+      "relativePath": "applications/modules/shockFluid/pressureCorrector.C",
+      "sha256": "32099b84cf93bcde21c6b120d8007b3ed32842e1f32e7de9244b98d7667a8f4a",
+      "bytes": 1626
+    },
+    {
+      "path": "/opt/openfoam13/src/thermophysicalModels/specie/transport/icoTabulated/icoTabulatedTransportI.H",
+      "relativePath": "src/thermophysicalModels/specie/transport/icoTabulated/icoTabulatedTransportI.H",
+      "sha256": "43009e78ea4205354a9dc48b434818f8e05e3e99d178df2d6d46dfacd633a7c6",
+      "bytes": 2484
+    },
+    {
+      "path": "/opt/openfoam13/src/thermophysicalModels/specie/transport/icoTabulated/icoTabulatedTransport.C",
+      "relativePath": "src/thermophysicalModels/specie/transport/icoTabulated/icoTabulatedTransport.C",
+      "sha256": "20ad40def58122581173370323397f6790fa67a4e79e333c9b26a43eff8798dd",
+      "bytes": 2576
+    },
+    {
+      "path": "/opt/openfoam13/src/thermophysicalModels/specie/transport/icoTabulated/icoTabulatedTransport.H",
+      "relativePath": "src/thermophysicalModels/specie/transport/icoTabulated/icoTabulatedTransport.H",
+      "sha256": "f5ab9dd4e94c2423fc050f5412691a31a4ce6f7f75cee20e12277d0c76c5e99f",
+      "bytes": 4816
+    },
+    {
+      "path": "/opt/openfoam13/src/ThermophysicalTransportModels/fluid/laminar/Fourier/Fourier.C",
+      "relativePath": "src/ThermophysicalTransportModels/fluid/laminar/Fourier/Fourier.C",
+      "sha256": "55ec6259efb0a7046ff0099632a049875899f7d7948c1bec5a74aaf861d8f256",
+      "bytes": 5942
+    },
+    {
+      "path": "/opt/openfoam13/src/ThermophysicalTransportModels/fluid/laminar/Fourier/Fourier.H",
+      "relativePath": "src/ThermophysicalTransportModels/fluid/laminar/Fourier/Fourier.H",
+      "sha256": "3d0a53b924bc028ea774147456ee8b06580a93dd8488a90ac040425f4198cb82",
+      "bytes": 4727
+    },
+    {
+      "path": "/opt/openfoam13/src/ThermophysicalTransportModels/fluid/turbulence/eddyDiffusivity/eddyDiffusivity.C",
+      "relativePath": "src/ThermophysicalTransportModels/fluid/turbulence/eddyDiffusivity/eddyDiffusivity.C",
+      "sha256": "3ad50631ee66a4eacc983e4d21b0025aeeb9b25e2fc441e69903cfbcf1b53c89",
+      "bytes": 7099
+    },
+    {
+      "path": "/opt/openfoam13/src/ThermophysicalTransportModels/fluid/turbulence/eddyDiffusivity/eddyDiffusivity.H",
+      "relativePath": "src/ThermophysicalTransportModels/fluid/turbulence/eddyDiffusivity/eddyDiffusivity.H",
+      "sha256": "40c3564b9007d13d223afe28d2c6e25ff255080907f2816aff4efca7fa5e2612",
+      "bytes": 6986
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchField.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchField.H",
+      "sha256": "48ac42e90e406673bd1b0f50ef0da6295c07510b3d32609d29103133db0d5fe9",
+      "bytes": 5712
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchFieldsFwd.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchFieldsFwd.H",
+      "sha256": "a51093ae449c1cb99517dcf54aaf20c1d8ca728fef39db00c158acc851dabb04",
+      "bytes": 1861
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchField.C",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchField.C",
+      "sha256": "8afc8245e7549e01b4876240389207d48aeb10b60b86b5e9a6e8e3e6e006a3bd",
+      "bytes": 4223
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchFields.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchFields.H",
+      "sha256": "2ace83f0d91cb80d3f220b3493610c99d100cbb6c05a99f2d0791deb553e64ca",
+      "bytes": 1839
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchFields.C",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/waveTransmissive/waveTransmissiveFvPatchFields.C",
+      "sha256": "5e69849dbb683a1bad056935d30dc8acb766d168ea72a4876dff93ebab6d6d59",
+      "bytes": 1675
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchField.C",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchField.C",
+      "sha256": "9654c7b6be25349231474fbc1e8a0a7542719d6b680845cdaf4d9d4b6e7a7353",
+      "bytes": 2959
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchFieldsFwd.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchFieldsFwd.H",
+      "sha256": "645b88f69f6835d68420d53d4b2659a8de50a911e45342facc16be891e9f242f",
+      "bytes": 1837
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchFields.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchFields.H",
+      "sha256": "4247ab6cf38b8d22d1b456f6594e2726b7245f473c0d2efc6ca6f863afeda251",
+      "bytes": 1815
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchField.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchField.H",
+      "sha256": "136d470525ff821636a1e38c04f2b2c8d2365a58c5125dec98bf484f8e40c5a8",
+      "bytes": 4732
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchFields.C",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/freestream/freestreamFvPatchFields.C",
+      "sha256": "db7a7e22a65d8d65879bfa1288d1040b0609466c133bf6cdb2edf25ccb2bb029",
+      "bytes": 1663
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchField.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchField.H",
+      "sha256": "50799c1d56a4ad9d3bcdc339660b1afaa189df0540f1651612245d7c8df60985",
+      "bytes": 5600
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchFields.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchFields.H",
+      "sha256": "23f92c94e39a82de1459e2279c3b58fe8d9fddba8579e006189f43b319fd8380",
+      "bytes": 1819
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchFieldsFwd.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchFieldsFwd.H",
+      "sha256": "001356b348d167eeb1641d30db893ee2740e583e637dbce702c81f7de2a1d743",
+      "bytes": 1841
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchField.C",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchField.C",
+      "sha256": "97fa772be20ffa9f5141eb20ef4ac630fd04e03987d9cd20fba4dbf8701a5eeb",
+      "bytes": 4075
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchFields.C",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/inletOutlet/inletOutletFvPatchFields.C",
+      "sha256": "2af6d3328b54c3f9d421bce2e7bb2c7471ffb06dcebb501ca0cf3f822c2dbbab",
+      "bytes": 1692
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/supersonicFreestream/supersonicFreestreamFvPatchVectorField.C",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/supersonicFreestream/supersonicFreestreamFvPatchVectorField.C",
+      "sha256": "f5394a926b4bc521d2f200750bcad652be2453994ffe5ad362138b1561ef92fe",
+      "bytes": 8885
+    },
+    {
+      "path": "/opt/openfoam13/src/finiteVolume/fields/fvPatchFields/derived/supersonicFreestream/supersonicFreestreamFvPatchVectorField.H",
+      "relativePath": "src/finiteVolume/fields/fvPatchFields/derived/supersonicFreestream/supersonicFreestreamFvPatchVectorField.H",
+      "sha256": "26e86e250b6ef448e705691d2f9d3d988446777aa0375244bf99a77759fabd6a",
+      "bytes": 6651
+    },
+    {
+      "path": "/opt/openfoam13/src/functionObjects/field/wallHeatFlux/wallHeatFlux.C",
+      "relativePath": "src/functionObjects/field/wallHeatFlux/wallHeatFlux.C",
+      "sha256": "6c48e26ffad1fcca1aab0cd878ac2e2481e7f59aa6effe047f5d420e0c4e20b6",
+      "bytes": 7639
+    },
+    {
+      "path": "/opt/openfoam13/src/functionObjects/field/wallHeatFlux/wallHeatFlux.H",
+      "relativePath": "src/functionObjects/field/wallHeatFlux/wallHeatFlux.H",
+      "sha256": "5d3bc32ef9ab8dec5fd737e60aa4f5e98fbd8a16c306cc20f95bbbc50c2fba3a",
+      "bytes": 4918
+    },
+    {
+      "path": "/opt/openfoam13/src/MomentumTransportModels/momentumTransportModels/RAS/SpalartAllmaras/SpalartAllmaras.C",
+      "relativePath": "src/MomentumTransportModels/momentumTransportModels/RAS/SpalartAllmaras/SpalartAllmaras.C",
+      "sha256": "0f2ae8ceed35d3f527433ab57fb2366acdf773d5c07f5b6ba2025cf33ac26a22",
+      "bytes": 9244
+    },
+    {
+      "path": "/opt/openfoam13/src/MomentumTransportModels/momentumTransportModels/RAS/SpalartAllmaras/SpalartAllmaras.H",
+      "relativePath": "src/MomentumTransportModels/momentumTransportModels/RAS/SpalartAllmaras/SpalartAllmaras.H",
+      "sha256": "d8a7d4f07fc93eba39b15b512f81fb64d9b219d8b9a1104790d155839be623ae",
+      "bytes": 6192
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/Allclean",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/Allclean",
+      "sha256": "0793fad80a8c9b749a26c331d89a5c3c8bbbd291c5feb9c7a1a848b8bb53a229",
+      "bytes": 271
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/Allrun",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/Allrun",
+      "sha256": "c0b685bdf0e21f2c6ed517a2bc4d3244c3e79031540e7b32e3f132158c5559a0",
+      "bytes": 629
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/README",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/README",
+      "sha256": "32cd087322839ac972d02cd3c0f3f7b8017afc79dd63b8a257dcec81185f0bc3",
+      "bytes": 120
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/constant/momentumTransport",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/constant/momentumTransport",
+      "sha256": "1540aafc55c1ffe0cf7afadc627f64eae1ea58f6a4bd68e22ca830feb8fed471",
+      "bytes": 707
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/constant/physicalProperties",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/constant/physicalProperties",
+      "sha256": "5ceed21e544dcc0899bd34d7d7159135b0a14f797992edae92edf91744ed87ff",
+      "bytes": 1473
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/system/controlDict",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/system/controlDict",
+      "sha256": "4361c8ef80c36ab3a47f61bedcf6115897ad35a6fd3a0e32001baf612dfd9e48",
+      "bytes": 1052
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/system/fvSolution",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/system/fvSolution",
+      "sha256": "4a95441970898ea656b6a6e5245803a7459e3eb5e530e544ecc890b54124c361",
+      "bytes": 1068
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/system/blockMeshDict",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/system/blockMeshDict",
+      "sha256": "df7e7ec763b5c494de46d8f4dcd22922a4dcb18fe6272dbbf23c6f506ed603a7",
+      "bytes": 1492
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/system/collapseDict",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/system/collapseDict",
+      "sha256": "2cea0a30415f65a4f43ca4c29f33ed26eadb0f9e07f021ab8ac85225a6995ba7",
+      "bytes": 888
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/system/fvSchemes",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/system/fvSchemes",
+      "sha256": "9bc2a05bb78588aa63fc7d0332acd75e2eadfccecb48a6f3c24252228c880c6e",
+      "bytes": 1099
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/system/functions",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/system/functions",
+      "sha256": "89259ccaa48e147d1fe87b900334374f8b16e2d8f2e897591564c2d8c034841a",
+      "bytes": 717
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/system/sample",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/system/sample",
+      "sha256": "770466f6d81122dc90538c646966eebe6f09c521d8645cfc9bca93670f386012",
+      "bytes": 1340
+    },
+    {
+      "path": "/opt/openfoam13/tutorials/shockFluid/biconic25-55Run35/0/uniform/time",
+      "relativePath": "tutorials/shockFluid/biconic25-55Run35/0/uniform/time",
+      "sha256": "41ecb521747b1f7a5ce2f8514f17115751f0acc39fa67b48e645122d2fd0bc33",
+      "bytes": 799
+    }
+  ],
+  "bytes": 184279,
+  "elapsedSeconds": 1.499058869999999,
+  "fixedEngineCommit": "18870c24d21c6b982e2cdec27b2f59738cca5f90",
+  "license": "GPL-3.0-or-later",
+  "selected": "stock shockFluid + icoTabulated viscosity/conductivity + v206 bounded caloric adapter",
+  "laminarControlNotFullRocketQualification": true,
+  "SAIsNotSAEdwards": true,
+  "nativeWallHeatSignConversion": -1,
+  "fullVariableCpCharacteristicBoundaryVerified": false,
+  "officialTutorialStartsFromDevelopedState": true,
+  "officialTutorialIsNotNewValidation": true,
+  "CFDRuns": 0,
+  "builds": 0,
+  "physicalQualification": false
+}

@@ -1,0 +1,11 @@
+FoamFile { format ascii; class dictionary; object controlDict; }
+solver shockFluid;
+libs ("/mnt/e/RocketAeroHeat/outputs/v206_validation/native01/library/librahPhaseAwareAir.so" "/mnt/e/RocketAeroHeat/outputs/v207_validation/native01/library/librahPhaseAwareViscousAir.so");
+startFrom startTime; startTime 0; stopAt endTime; endTime 4e-8; deltaT 5e-9;
+writeControl timeStep; writeInterval 2; purgeWrite 0; writeFormat ascii; writePrecision 17;
+timeFormat general; timePrecision 12; writeCompression off; runTimeModifiable false; adjustTimeStep no;
+functions {
+phaseGuard { type rahPhaseStateGuard; model rah-phase-aware-dry-air-of13-v1; executeControl timeStep; executeInterval 1; executeAtStart true; writeControl none; }
+energy { type writeObjects; libs ("libutilityFunctionObjects.so"); objects (e phi); writeControl writeTime; }
+heat { type wallHeatFlux; libs ("libfieldFunctionObjects.so"); patches (cold hot); executeControl timeStep; executeInterval 1; writeControl writeTime; }
+}

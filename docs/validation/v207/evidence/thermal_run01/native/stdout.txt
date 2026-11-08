@@ -1,0 +1,146 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 13-18870c24d21c
+Exec   : foamRun
+Date   : Nov 08 2026
+Time   : 12:05:37
+Host   : "LAPTOP-APDSESFJ"
+PID    : 1261
+I/O    : uncollated
+Case   : /mnt/e/RocketAeroHeat/outputs/v207_validation/thermal02
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Selecting solver shockFluid
+Selecting thermodynamics package 
+{
+    type            hePsiThermo;
+    mixture         pureMixture;
+    transport       icoTabulated;
+    thermo          hIcoTabulated;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          rahPhaseAwareInternalEnergy;
+}
+
+Selecting turbulence model type laminar
+    Selecting laminar stress model Stokes
+Selecting thermophysical transport type laminar
+Selecting laminar thermophysical transport model Fourier
+Courant Number mean: 0.10723457557227833 max: 0.12443948262252966
+
+PIMPLE: No convergence criteria found
+
+
+PIMPLE: Operating solver in transient mode with 1 outer corrector
+PIMPLE: Operating solver in PISO mode
+
+
+
+Starting time loop
+
+wallHeatFlux heat:
+    processing wall patches: 
+        cold
+        hot
+
+RAH_PHASE_GUARD_OK index=0 time=0 checks=1
+Courant Number mean: 0.10723457557227833 max: 0.12443948262252966
+Time = 5e-09s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+smoothSolver:  Solving for Ux, Initial residual = 0.00024941454252932387, Final residual = 9.047774666925187e-14, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.75318856159194725, Final residual = 5.1589387540798969e-14, No Iterations 4
+smoothSolver:  Solving for Uz, Initial residual = 0.89048916216725715, Final residual = 1.5277821420370849e-13, No Iterations 4
+smoothSolver:  Solving for e, Initial residual = 0.00025331804444216597, Final residual = 7.0578319431327958e-13, No Iterations 3
+ExecutionTime = 0.094145999999999994 s  ClockTime = 0 s
+
+Courant Number mean: 0.10723457557227833 max: 0.12443948262252966
+Time = 1e-08s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+smoothSolver:  Solving for Ux, Initial residual = 0.00024307235695765651, Final residual = 8.9899637808382041e-14, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.99999999998255185, Final residual = 1.2174711172548783e-15, No Iterations 5
+smoothSolver:  Solving for Uz, Initial residual = 0.24712384396462617, Final residual = 4.9059952127855739e-14, No Iterations 4
+smoothSolver:  Solving for e, Initial residual = 0.0002428359192526926, Final residual = 6.75536997518705e-13, No Iterations 3
+ExecutionTime = 0.098073999999999995 s  ClockTime = 0 s
+
+RAH_PHASE_GUARD_OK index=2 time=1e-08 checks=3
+Courant Number mean: 0.10723266314437675 max: 0.12440784174877136
+Time = 1.5e-08s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+smoothSolver:  Solving for Ux, Initial residual = 0.00023709564693305012, Final residual = 8.9458558286204087e-14, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.24193425098936905, Final residual = 2.304624699308945e-13, No Iterations 4
+smoothSolver:  Solving for Uz, Initial residual = 0.13323176573375353, Final residual = 2.153725867451116e-14, No Iterations 4
+smoothSolver:  Solving for e, Initial residual = 0.00023672662630930215, Final residual = 6.7138428586214196e-13, No Iterations 3
+ExecutionTime = 0.100184 s  ClockTime = 0 s
+
+Courant Number mean: 0.1072308420699806 max: 0.1243784805076287
+Time = 2e-08s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+smoothSolver:  Solving for Ux, Initial residual = 0.00023162687984654772, Final residual = 8.8870960061599581e-14, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.15257366607033565, Final residual = 1.1961622559927053e-13, No Iterations 4
+smoothSolver:  Solving for Uz, Initial residual = 0.091541761855116435, Final residual = 1.8603334543490394e-14, No Iterations 4
+smoothSolver:  Solving for e, Initial residual = 0.00023107103765865751, Final residual = 6.6752579973507671e-13, No Iterations 3
+ExecutionTime = 0.10396 s  ClockTime = 0 s
+
+RAH_PHASE_GUARD_OK index=4 time=2e-08 checks=5
+Courant Number mean: 0.10722904279357458 max: 0.12435024087274286
+Time = 2.5e-08s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+smoothSolver:  Solving for Ux, Initial residual = 0.00023135478621760065, Final residual = 8.8710416904811842e-14, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.11894410913163991, Final residual = 7.4964582901463074e-14, No Iterations 4
+smoothSolver:  Solving for Uz, Initial residual = 0.060158197463190927, Final residual = 1.175565336697824e-14, No Iterations 4
+smoothSolver:  Solving for e, Initial residual = 0.00023075236111133791, Final residual = 6.6573750692777901e-13, No Iterations 3
+ExecutionTime = 0.106255 s  ClockTime = 0 s
+
+Courant Number mean: 0.10722726405547511 max: 0.1243230347626655
+Time = 3e-08s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+smoothSolver:  Solving for Ux, Initial residual = 0.00023093661465215835, Final residual = 8.8411086059996336e-14, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.10237687897442113, Final residual = 4.9882485963051382e-14, No Iterations 4
+smoothSolver:  Solving for Uz, Initial residual = 0.026152209825243432, Final residual = 2.457318019506649e-15, No Iterations 4
+smoothSolver:  Solving for e, Initial residual = 0.0002302870949550918, Final residual = 6.640423677662469e-13, No Iterations 3
+ExecutionTime = 0.110383 s  ClockTime = 0 s
+
+RAH_PHASE_GUARD_OK index=6 time=2.9999999999999997e-08 checks=7
+Courant Number mean: 0.10722550474857034 max: 0.12429678340191999
+Time = 3.5e-08s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+smoothSolver:  Solving for Ux, Initial residual = 0.00023038992266081971, Final residual = 8.82500067031699e-14, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.093353815024143569, Final residual = 3.2949955787753612e-14, No Iterations 4
+smoothSolver:  Solving for Uz, Initial residual = 0.024487909952394322, Final residual = 3.2439512498804311e-15, No Iterations 4
+smoothSolver:  Solving for e, Initial residual = 0.00022969304980025439, Final residual = 6.6232804314017548e-13, No Iterations 3
+ExecutionTime = 0.112551 s  ClockTime = 0 s
+
+Courant Number mean: 0.10722376382707238 max: 0.12427141506460412
+Time = 4e-08s
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+smoothSolver:  Solving for Ux, Initial residual = 0.00022973043597693105, Final residual = 8.797090158535968e-14, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.095848620821705574, Final residual = 2.9840142866390005e-14, No Iterations 4
+smoothSolver:  Solving for Uz, Initial residual = 0.0078073051270745467, Final residual = 2.8219881539658249e-15, No Iterations 4
+smoothSolver:  Solving for e, Initial residual = 0.00022898617136992089, Final residual = 6.6060491675488272e-13, No Iterations 3
+ExecutionTime = 0.116386 s  ClockTime = 0 s
+
+RAH_PHASE_GUARD_OK index=8 time=3.9999999999999994e-08 checks=9
+RAH_PHASE_GUARD_END index=8 checks=9
+End
+

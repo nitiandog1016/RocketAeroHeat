@@ -1,0 +1,79 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+6
+(
+    cold
+    {
+        type            wall;
+        inGroups        List<word> 1(wall);
+        nFaces          1;
+        startFace       31;
+    }
+    hot
+    {
+        type            wall;
+        inGroups        List<word> 1(wall);
+        nFaces          1;
+        startFace       32;
+    }
+    xMinus
+    {
+        type            cyclic;
+        inGroups        List<word> 1(cyclic);
+        nFaces          32;
+        startFace       33;
+        matchTolerance  0.0001;
+        neighbourPatch  xPlus;
+        transformType   translational;
+        separation      (-3.124999999999999e-05 0 0);
+    }
+    xPlus
+    {
+        type            cyclic;
+        inGroups        List<word> 1(cyclic);
+        nFaces          32;
+        startFace       65;
+        matchTolerance  0.0001;
+        neighbourPatch  xMinus;
+        transformType   translational;
+        separation      (3.124999999999999e-05 0 0);
+    }
+    zMinus
+    {
+        type            cyclic;
+        inGroups        List<word> 1(cyclic);
+        nFaces          32;
+        startFace       97;
+        matchTolerance  0.0001;
+        neighbourPatch  zPlus;
+        transformType   translational;
+        separation      (0 0 -3.124999999999999e-05);
+    }
+    zPlus
+    {
+        type            cyclic;
+        inGroups        List<word> 1(cyclic);
+        nFaces          32;
+        startFace       129;
+        matchTolerance  0.0001;
+        neighbourPatch  zMinus;
+        transformType   translational;
+        separation      (0 0 3.124999999999999e-05);
+    }
+)
+
+// ************************************************************************* //
