@@ -6,11 +6,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 小版本也同步到本GitHub仓库，不再默认生成大型本地工程包。用户已于2026-10-28确认保持仓库公开并直接同步。后文的“不推送/本地包/私有”属于历史阶段说明，以本节及[项目约定](AGENTS.md)为准。
 
-最新[v222真实完整箭体计算](docs/HYBRID_SU2_ROCKET_PHASE_V222.md)采用新相态Air/SA-neg，正常完成200次更新，约15分钟、原生峰约2.15GB。四完整场的原19752面压力/热流/温度、热梯度/y+/功率及逐点残差读取通过；但六式−8、末对稳定和物理验证未过，完整气动热尚未完成。
+最新[v223热壁与冻结收支审核](docs/HYBRID_SU2_FROZEN_BALANCE_V223.md)复用完整箭体末场，两次空间评估、零流动更新；335726点RHS逐位一致，原状态未改变，内部成对消去和独立壁热核对通过。但全域能量和仍1.429MW、壁反力与原生载荷差4.73%，尚未稳态/物理验证。v222的200次真实更新和四完整场保留，完整气动热尚未完成。
 
-[目标文档](docs/PROJECT_GOALS.md)采用低成本全局外流＋工程边界层＋必要局部黏性CFD，保留MATLAB和统一科研WebGL。下一项按[具体任务](docs/validation/v222/NEXT_DECISION.md)复用四份真实场闭合热壁、完整物理收支和稳态收益，不能因运行成功盲加步数。工程旧热流有值面积66.5626%、同面p/q交集43.0999%；新完整域研究数值覆盖100%，仍不算物理认证。单工况全面积与科研UI独立最高，累计后置，日常使用不需导入外部CFD。
+[目标文档](docs/PROJECT_GOALS.md)采用低成本全局外流＋工程边界层＋必要局部黏性CFD，保留MATLAB和统一科研WebGL。下一项按[具体任务](docs/validation/v223/NEXT_DECISION.md)完成新相态空气与工程边界层的同模型入口，复用已有恢复/参考焓接口，解决旧NASA7/Sutherland主链与新线性输运的衔接；未收敛壁值不能当可信外缘。当前不直接续算199。工程旧热流有值面积66.5626%、同面p/q交集43.0999%；完整域研究覆盖100%仍非物理认证。单工况全面积与科研UI独立最高，累计后置。
 
-已有[v176区域结果页面](docs/AEROTHERMAL_EVIDENCE_LEDGER_V176.md)支持逐变量面积、原面探针、固定色标、周向曲线和CSV。现有工作台可通过“打开结果JSON”读取[v222研究场](docs/validation/v222/evidence/workbench01/rocket_phase_research.json)，给定/未知/研究与物理资格分开。另有[实际箭体图及残差曲线](docs/validation/v222/evidence/visual02/rocket_research.png)。本轮通过数据回读和前端纯合同测试，未重做浏览器交互验收；v167及历史失败保持。
+现有工作台通过“打开结果JSON”读取[v223四阶段对比](docs/validation/v223/evidence/workbench01/rocket_phase_comparison.json)，选择第51/101/151/200次更新的压力、热流或壁流体温差；同变量共用色标，给定/未知壁温分开。可查看[真实箭体对比图](docs/validation/v223/evidence/workbench01/rocket_phase_comparison.png)。逐值回读和前端纯合同通过，无本轮浏览器交互验收。已有[v176区域页面](docs/AEROTHERMAL_EVIDENCE_LEDGER_V176.md)的原面探针、周向曲线和导出继续保留。
 
 小源码、必要证据和目标同步GitHub，大场本地，无工程包；不删除独有结果、不动OpenCode/共享历史。原壁面、面积、保护层、尾缘及原−8/热流/y+门槛保持，总目标进行中。
 
