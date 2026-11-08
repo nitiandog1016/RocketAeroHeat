@@ -1,0 +1,120 @@
+{
+  "passed": true,
+  "originalPlanAcceptance": false,
+  "mode": "post-run-read-only-audit-plus-one-preregistered-rejection",
+  "model": "rah-standard-dry-air-cp-table-of13-v1",
+  "domain": "rah-standard-dry-air-low-density-v1",
+  "positiveStates": 17,
+  "executedRejections": 10,
+  "priorRejectionExpectedTokenMatched": 8,
+  "underflowRejectedEarlier": true,
+  "finalDensityFailureBranchExercised": false,
+  "originalOneUlpEnergyCaseNotRun": true,
+  "pressureBoundaryBitwiseEqual": true,
+  "temperatureMaxAbsErrorK": 3.8062353269197047e-10,
+  "energyMaxScaledResidual": 4.874851648269102e-13,
+  "propertyMaxScaledErrors": {
+    "cpJkgK": 0.0,
+    "cvJkgK": 0.0,
+    "enthalpyJkg": 7.702283255639486e-12,
+    "entropyJkgK": 1.7021518439723485e-15,
+    "densityKgm3": 0.0,
+    "soundSpeedMps": 0.0
+  },
+  "buildSeconds": 8.757271217,
+  "querySeconds": 10.706717374999993,
+  "sourceFiles": [
+    {
+      "path": "/opt/openfoam13/src/thermophysicalModels/specie/thermo/thermo/HtoEthermo.H",
+      "sha256": "e324a3ec3d0113f2129e21c675f9d8dcd24ca0324cf1d6d443e95081361b0c86",
+      "lines": [
+        {
+          "line": 16,
+          "text": "    return hs(p, T) - p/EquationOfState::rho(p, T);"
+        },
+        {
+          "line": 25,
+          "text": "    return ha(p, T) - p/EquationOfState::rho(p, T);"
+        }
+      ]
+    },
+    {
+      "path": "/opt/openfoam13/src/thermophysicalModels/specie/equationOfState/perfectGas/perfectGasI.H",
+      "sha256": "9e4fb20deefef5d726fd9dc5bae0987846930bf52e3a377652e1f83a0c76948b",
+      "lines": [
+        {
+          "line": 59,
+          "text": "inline Foam::scalar Foam::perfectGas<Specie>::rho(scalar p, scalar T) const"
+        },
+        {
+          "line": 61,
+          "text": "    return p/(this->R()*T);"
+        }
+      ]
+    }
+  ],
+  "supplement": {
+    "schema": "RAH.OpenFOAMProcess.v1",
+    "argv": [
+      "bash",
+      "--noprofile",
+      "--norc",
+      "-c",
+      "source /opt/openfoam13/etc/bashrc; exec \"$@\"",
+      "rah-openfoam",
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native01/probe/rahStandardDryAirProbe",
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native01/mixture.dict",
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native_audit02/resolved-pressure-gap.txt"
+    ],
+    "cwd": "/mnt/e/RocketAeroHeat/outputs/v204_validation/native_audit02",
+    "nativeExitCode": 1,
+    "stopReason": null,
+    "elapsedSeconds": 0.8356774469999948,
+    "maximumSeconds": 10,
+    "peakObservedGroupRSSBytes": 6266880,
+    "liveGroupAfterCleanup": {},
+    "inputSHA256": {
+      "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": "a02a492c35f7bf8d0980cc9a92b78488e271cd0e8143348065e1e7139f6c3d12",
+      "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": "8fb4fce8c4fa8b268b0948d3ce9b6272e44a0c816ad9c327f0a8372b9fcd085f",
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native01/probe/rahStandardDryAirProbe": "18a7a09752aa84bf45d00eb4aa6124f747d5438c7bbab9bad667b80766cf0a53",
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native01/library/librahStandardDryAir.so": "c0b2a4794fde16ca2b3a8b9e3a8bdbe48431d542ca155da73142311f65a3b7be",
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native01/mixture.dict": "bb5ba8314a7e919381bd9e1c95a2b0c1bcf262691701c733bcf6b768d46cb84b",
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native_audit02/resolved-pressure-gap.txt": "d66e550c7439912cb6e53fc3da943d1d07b1ac80d79b5b240aaa629701a4cfc6",
+      "/mnt/e/RocketAeroHeat/scripts/auditStandardNativeDomain.py": "30188832d937ff478f531e0b9344dea9072e1eea22449fd343f5c41809aa66e0",
+      "/mnt/e/RocketAeroHeat/scripts/standardDryAir.py": "ba18d1bbaf89867d59d5b6b4292d43126619b6679d741363a0a704b0f82af1ce",
+      "/mnt/e/RocketAeroHeat/docs/validation/v204/NATIVE_AUDIT_RECOVERY.md": "91eea1af5587045626d9b039fd0ad0e3a0c4079a95d28197785e6eedd477e4f5"
+    },
+    "inputStable": {
+      "/mnt/e/RocketAeroHeat/scripts/runOpenFoamProcess.py": true,
+      "/mnt/e/RocketAeroHeat/tools/runtime/openfoam/13-20260624/runtime.json": true,
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native01/probe/rahStandardDryAirProbe": true,
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native01/library/librahStandardDryAir.so": true,
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native01/mixture.dict": true,
+      "/mnt/e/RocketAeroHeat/outputs/v204_validation/native_audit02/resolved-pressure-gap.txt": true,
+      "/mnt/e/RocketAeroHeat/scripts/auditStandardNativeDomain.py": true,
+      "/mnt/e/RocketAeroHeat/scripts/standardDryAir.py": true,
+      "/mnt/e/RocketAeroHeat/docs/validation/v204/NATIVE_AUDIT_RECOVERY.md": true
+    },
+    "caseBytes": 16615,
+    "logBytes": 494,
+    "caseAndLogLimitMiB": 96,
+    "addressSpaceLimitMiB": 2048,
+    "cpuCount": 1,
+    "liveLogFilesystem": "ext2/ext3",
+    "liveLogPath": "/home/rah/.cache/RocketAeroHeat/openfoam-observation/run-axb5c7sy/stdout.txt",
+    "logExportPassed": true,
+    "physicalQualification": false,
+    "observationIORetries": [],
+    "passed": false
+  },
+  "registrationLibrarySHA256": "c0b2a4794fde16ca2b3a8b9e3a8bdbe48431d542ca155da73142311f65a3b7be",
+  "queryBinarySHA256": "18a7a09752aa84bf45d00eb4aa6124f747d5438c7bbab9bad667b80766cf0a53",
+  "tableSHA256": "bb5ba8314a7e919381bd9e1c95a2b0c1bcf262691701c733bcf6b768d46cb84b",
+  "nativeTemplateVerified": true,
+  "actualSolverDispatchVerified": false,
+  "newQualifiedHeatAreaM2": 0,
+  "physicalQualification": false,
+  "CFDRuns": 0,
+  "engineBuilds": 0,
+  "elapsedSeconds": 1.1022189029999936
+}

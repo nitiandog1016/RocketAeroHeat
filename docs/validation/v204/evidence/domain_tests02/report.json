@@ -1,0 +1,114 @@
+{
+  "passed": true,
+  "rejections": [
+    {
+      "case": "T-low",
+      "message": "STANDARD_AIR_TEMPERATURE_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "T-high",
+      "message": "STANDARD_AIR_TEMPERATURE_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "T-nan",
+      "message": "STANDARD_AIR_INVALID_INPUT"
+    },
+    {
+      "case": "T-inf",
+      "message": "STANDARD_AIR_INVALID_INPUT"
+    },
+    {
+      "case": "p-zero",
+      "message": "STANDARD_AIR_PRESSURE_TEMPERATURE_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "p-negative",
+      "message": "STANDARD_AIR_PRESSURE_TEMPERATURE_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "p-nan",
+      "message": "STANDARD_AIR_INVALID_INPUT"
+    },
+    {
+      "case": "p-inf",
+      "message": "STANDARD_AIR_INVALID_INPUT"
+    },
+    {
+      "case": "cold-compressed",
+      "message": "STANDARD_AIR_PRESSURE_TEMPERATURE_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "cap",
+      "message": "STANDARD_AIR_PRESSURE_TEMPERATURE_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "curve",
+      "message": "STANDARD_AIR_PRESSURE_TEMPERATURE_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "empty",
+      "message": "STANDARD_AIR_INVALID_INPUT"
+    },
+    {
+      "case": "mixed-batch",
+      "message": "STANDARD_AIR_PRESSURE_TEMPERATURE_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "next-float-above-100",
+      "message": "strict boundary rejected"
+    },
+    {
+      "case": "next-float-above-132.53",
+      "message": "strict boundary rejected"
+    },
+    {
+      "case": "next-float-above-200",
+      "message": "strict boundary rejected"
+    },
+    {
+      "case": "next-float-above-250",
+      "message": "strict boundary rejected"
+    },
+    {
+      "case": "next-float-above-464.15888",
+      "message": "strict boundary rejected"
+    },
+    {
+      "case": "next-float-above-1000",
+      "message": "strict boundary rejected"
+    },
+    {
+      "case": "next-float-above-2000",
+      "message": "strict boundary rejected"
+    }
+  ],
+  "derivativeRelativeErrors": {
+    "h": 1.0306533404502716e-10,
+    "e": 1.8301671289577826e-10,
+    "s": 1.0918976833806937e-10
+  },
+  "oldPressureContractUnchanged": true,
+  "protectedUnchanged": 29,
+  "model": "rah-standard-dry-air-cp-table-of13-v1",
+  "designedFreestreamSpeedMps": 1509.141366435956,
+  "designedVelocityMps": [
+    -1418.1290057626304,
+    0.0,
+    516.1567464471211
+  ],
+  "isentropicDesign": {
+    "T0": 1274.08470223713,
+    "p0": 702078.7681721682,
+    "h0": 1066864.975934657,
+    "actualObserved": false
+  },
+  "nativeTested": false,
+  "CFDRuns": 0,
+  "builds": 0,
+  "elapsedSeconds": 0.015000000000327418,
+  "sourceSHA256": {
+    "tests\\testStandardDryAirDomain.py": "633d9f240e765fd46c212454b8ccaae2636de6c402d083dc2dc11737476b1258",
+    "scripts\\standardDryAir.py": "f6ba82f29705b77598ff69eb2ee8d43b372efa7d62311e42aab74dbcf7b0b7ee",
+    "data\\thermo\\standard_dry_air_cp_v1.json": "5b8591836581a7b945ffa4b967e5632401328d2ff515056127affbfe270a85c6"
+  }
+}

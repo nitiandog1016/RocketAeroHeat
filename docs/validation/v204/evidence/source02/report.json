@@ -1,0 +1,136 @@
+{
+  "passed": true,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "version": "7.2.0",
+  "revision": "98b3523d5daa98454618d381d2ae53f7471d216b",
+  "binarySHA256": {
+    "CoolProp.cp312-win_amd64.pyd": "8c0ae4a1ef80810e03a7fd114ed031d1b914603db822bb800ab3976d02597795",
+    "_constants.cp312-win_amd64.pyd": "4dc90ba40389695126e0ec6da4fc4e75f8cb2f55e52fd9616fe48a9854a36b05"
+  },
+  "fluids": {
+    "Nitrogen": {
+      "BibTeX_EOS": "Span-JPCRD-2000",
+      "T_max": 2000,
+      "p_max": 2200000000,
+      "gas_constant": 8.31451,
+      "molar_mass": 0.02801348
+    },
+    "Oxygen": {
+      "BibTeX_EOS": "Schmidt-FPE-1985,Stewart-JPCRD-1991",
+      "T_max": 2000,
+      "p_max": 80000000,
+      "gas_constant": 8.31434,
+      "molar_mass": 0.0319988
+    },
+    "Argon": {
+      "BibTeX_EOS": "Tegeler-JPCRD-1999",
+      "T_max": 2000,
+      "p_max": 1000000000,
+      "gas_constant": 8.31451,
+      "molar_mass": 0.039948
+    },
+    "Air": {
+      "BibTeX_EOS": "Lemmon-JPCRD-2000",
+      "T_max": 2000,
+      "p_max": 2000000000,
+      "gas_constant": 8.31451,
+      "molar_mass": 0.02896546
+    }
+  },
+  "binaryPairs": [
+    {
+      "BibTeX": "Gernert-Thesis-2013",
+      "CAS1": "7727-37-9",
+      "CAS2": "7782-44-7",
+      "F": 0.0,
+      "Name1": "Nitrogen",
+      "Name2": "Oxygen",
+      "betaT": 0.997190589,
+      "betaV": 0.99952177,
+      "gammaT": 0.995157044,
+      "gammaV": 0.997082328
+    },
+    {
+      "BibTeX": "Gernert-Thesis-2013",
+      "CAS1": "7727-37-9",
+      "CAS2": "7440-37-1",
+      "F": 0.0,
+      "Name1": "Nitrogen",
+      "Name2": "Argon",
+      "betaT": 0.999442,
+      "betaV": 1.006697,
+      "gammaT": 0.989311,
+      "gammaV": 1.001549
+    },
+    {
+      "BibTeX": "Gernert-Thesis-2013",
+      "CAS1": "7782-44-7",
+      "CAS2": "7440-37-1",
+      "F": 0.0,
+      "Name1": "Oxygen",
+      "Name2": "Argon",
+      "betaT": 0.999039,
+      "betaV": 1.006502,
+      "gammaT": 0.988822,
+      "gammaV": 1.001341
+    }
+  ],
+  "files": [
+    {
+      "path": "tools/runtime/su2-thermal-build/source/subprojects/CoolProp/dev/fluids/Nitrogen.json",
+      "bytes": 124382,
+      "sha256": "e044324c45c3c79a8dd1cc2893f8ba82d4a29e0a31c491853d52544f47d0bb6d"
+    },
+    {
+      "path": "tools/runtime/su2-thermal-build/source/subprojects/CoolProp/dev/fluids/Oxygen.json",
+      "bytes": 128671,
+      "sha256": "7ed571aa8753b7ed8a421f625fb4c896e17d17ec506bcd264642e5d88f34eadc"
+    },
+    {
+      "path": "tools/runtime/su2-thermal-build/source/subprojects/CoolProp/dev/fluids/Argon.json",
+      "bytes": 120855,
+      "sha256": "89cf2eaacdec9b601248be63654b879623711e0f64452b24ed2655b51a50a7a6"
+    },
+    {
+      "path": "tools/runtime/su2-thermal-build/source/subprojects/CoolProp/dev/fluids/Air.json",
+      "bytes": 14449,
+      "sha256": "c5e0d064d83fc91ed35d7354cea1fa38fea832a09d2e85faf4336e0017c33616"
+    },
+    {
+      "path": "tools/runtime/su2-thermal-build/source/subprojects/CoolProp/dev/mixtures/mixture_binary_pairs.json",
+      "bytes": 197143,
+      "sha256": "257901929bc96f47681b556c265fe51f2db7bb4e8b7d9456a4f99b9de49a97ae"
+    },
+    {
+      "path": "tools/runtime/su2-thermal-build/source/subprojects/CoolProp/CoolPropBibTeXLibrary.bib",
+      "bytes": 134407,
+      "sha256": "84d767376da3313fb59cf593adea07ba7b1c79e41f76835b34b4b4606c21aec6"
+    },
+    {
+      "path": "tools/runtime/su2-thermal-build/source/subprojects/CoolProp/LICENSE",
+      "bytes": 1103,
+      "sha256": "9bf835333ef602af4cb19338b9f9d43671e174fa029b00280e9bdba6ea4719b2"
+    },
+    {
+      "path": "tools/runtime/su2-thermal-build/source/subprojects/CoolProp/src/Backends/Helmholtz/FlashRoutines.cpp",
+      "bytes": 104115,
+      "sha256": "dc4e3f9ddab8e078b095e3db8b8e1ca9bef62d6115ce14f840ecbdf48d20732d"
+    }
+  ],
+  "paper": {
+    "path": "outputs/v153_validation/source_review/lemmon2000.pdf",
+    "sha256": "da608e268895405ad97912c7049b61cad7bf9de644f42c2c905f298515f35287",
+    "pages": 55
+  },
+  "conclusions": [
+    "100000Pa standard entropy reference is not an accuracy ceiling",
+    "Lemmon2000 standard Air validity to2000K is distinct from variable-mixture validity to1000K",
+    "CoolProp7.2 actual mixture pairs cite Gernert2013, not identical to Lemmon2000 mixture equation",
+    "Unimposed PT uses Gernert stability; returned iphase_liquid is hard-coded for any stable single-phase mixture",
+    "No imposed-phase result alone proves phase stability; metadata Tmax alone does not prove accuracy"
+  ],
+  "elapsedSeconds": 1.389999999999418,
+  "CFDRuns": 0,
+  "builds": 0,
+  "physicalQualification": false
+}

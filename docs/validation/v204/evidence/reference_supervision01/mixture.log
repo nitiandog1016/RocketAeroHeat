@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\validateNistPressureDomain.py", line 85, in <module>
+    parser=argparse.ArgumentParser();parser.add_argument('--kind',choices=['mixture','air'],required=True);parser.add_argument('--out',required=True);args=parser.parse_args();run(args.kind,args.out)
+                                                                                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RocketAeroHeat\scripts\validateNistPressureDomain.py", line 44, in run
+    pairs.append(dict(CAS1=a,CAS2=b,**{k:get_mixture_binary_pair_data(a,b,k) for k in ['betaT','gammaT','betaV','gammaV','F','BibTeX']}))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "CoolProp/CoolProp.pyx", line 379, in CoolProp.CoolProp.get_mixture_binary_pair_data
+  File "CoolProp/CoolProp.pyx", line 383, in CoolProp.CoolProp.get_mixture_binary_pair_data
+RuntimeError: Could not match the binary pair [7727-37-9,7440-37-1] - order of CAS numbers is backwards; found the swapped CAS numbers.
