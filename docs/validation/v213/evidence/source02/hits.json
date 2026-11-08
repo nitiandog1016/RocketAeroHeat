@@ -1,0 +1,151 @@
+[
+  {
+    "path": "src/lmr/bc/ghost_cell_effect/ghost_cell.d",
+    "lines": [
+      {
+        "line": 180,
+        "text": "        newGCE = new GhostCellMappedCellCopy(blk_id, boundary,"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/bc/ghost_cell_effect/full_face_copy.d",
+    "lines": [
+      {
+        "line": 1483,
+        "text": "    ref FluidFVCell get_mapped_cell(size_t i)"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/bc/ghost_cell_effect/mapped_cell_copy.d",
+    "lines": [
+      {
+        "line": 161,
+        "text": "    void set_up_cell_mapping()"
+      },
+      {
+        "line": 465,
+        "text": "    } // end set_up_cell_mapping()"
+      },
+      {
+        "line": 616,
+        "text": "    ref FluidFVCell get_mapped_cell(size_t i)"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/bc/ghost_cell_effect/gas_solid_full_face_copy.d",
+    "lines": [
+      {
+        "line": 836,
+        "text": "    ref SolidFVCell get_mapped_cell(size_t i)"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/commands/deformgrid.d",
+    "lines": [
+      {
+        "line": 54,
+        "text": "    initMappedCellDataExchange();"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/commands/prepmappedcells.d",
+    "lines": [
+      {
+        "line": 75,
+        "text": "     * Adapted set up from initNewtonKrylovSimulation up to the call to: initMappedCellDataExchange()"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/commands/runsim.d",
+    "lines": [
+      {
+        "line": 352,
+        "text": "        initNewtonKrylovSimulation(snapshotStart, maxCPUs, threadsPerMPITask, maxWallClock, useTaperedBlending);"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/globalconfig.d",
+    "lines": []
+  },
+  {
+    "path": "src/lmr/globaldata.d",
+    "lines": []
+  },
+  {
+    "path": "src/lmr/init.d",
+    "lines": [
+      {
+        "line": 547,
+        "text": "void initMappedCellDataExchange()"
+      },
+      {
+        "line": 560,
+        "text": "                if (mygce) { mygce.set_up_cell_mapping(); }"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/newtonkrylovsolver.d",
+    "lines": [
+      {
+        "line": 653,
+        "text": "void initNewtonKrylovSimulation(int snapshotStart, int maxCPUs, int threadsPerMPITask, string maxWallClock, bool useTaperedBlending=false)"
+      },
+      {
+        "line": 657,
+        "text": "        writeln(\"lmr run-steady: Begin initNewtonKrylovSimulation()...\");"
+      },
+      {
+        "line": 704,
+        "text": "    initMappedCellDataExchange();"
+      },
+      {
+        "line": 747,
+        "text": "        writefln(\"lmr run-steady: Done initNewtonKrylovSimulation() at wall-clock(WC)= %.1f sec\", wall_clock_elapsed);"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/dualtimestepping.d",
+    "lines": [
+      {
+        "line": 209,
+        "text": "    initMappedCellDataExchange();"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/timemarching.d",
+    "lines": [
+      {
+        "line": 145,
+        "text": "    initMappedCellDataExchange();"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/solid/solid_gas_full_face_copy.d",
+    "lines": [
+      {
+        "line": 858,
+        "text": "    ref FluidFVCell get_mapped_cell(size_t i)"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/solid/solid_full_face_copy.d",
+    "lines": [
+      {
+        "line": 930,
+        "text": "    ref SolidFVCell get_mapped_cell(size_t i)"
+      }
+    ]
+  }
+]

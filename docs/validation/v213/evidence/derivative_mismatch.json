@@ -1,0 +1,97 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "regime": 0,
+      "cellBalanceScaled": 3.619252425144214e-16,
+      "faceFailureByBoundary": {
+        "wall": {
+          "failedComponents": 0,
+          "maximum": 1.3620476968512207e-10
+        },
+        "outer": {
+          "failedComponents": 11,
+          "maximum": 0.00011482456244832351
+        },
+        "exchange": {
+          "failedComponents": 14,
+          "maximum": 7.26555358860903e-05
+        },
+        "internal": {
+          "failedComponents": 65,
+          "maximum": 6.18423395362111e-05
+        }
+      },
+      "worstFaceID": 1195,
+      "worstFaceBoundary": "outer",
+      "component": 4,
+      "complexDerivative": 0.3823566837050441,
+      "forwardDifference": 0.3823566294158809,
+      "backwardDifference": 0.3821270888693107,
+      "cancellationFreeUniqueCauseProven": false
+    },
+    {
+      "regime": 1,
+      "cellBalanceScaled": 1.8765279159049082e-16,
+      "faceFailureByBoundary": {
+        "wall": {
+          "failedComponents": 12,
+          "maximum": 4.5365610952696755e-05
+        },
+        "outer": {
+          "failedComponents": 13,
+          "maximum": 9.194632592390839e-05
+        },
+        "exchange": {
+          "failedComponents": 19,
+          "maximum": 0.00042804850603601826
+        },
+        "internal": {
+          "failedComponents": 60,
+          "maximum": 0.010603785821055589
+        }
+      },
+      "worstFaceID": 110,
+      "worstFaceBoundary": "internal",
+      "component": 4,
+      "complexDerivative": 0.719607242391524,
+      "forwardDifference": 0.7196072635906603,
+      "backwardDifference": 0.7408147928344988,
+      "cancellationFreeUniqueCauseProven": false
+    },
+    {
+      "regime": 2,
+      "cellBalanceScaled": 4.126494793624506e-16,
+      "faceFailureByBoundary": {
+        "wall": {
+          "failedComponents": 0,
+          "maximum": 1.4845519258344098e-10
+        },
+        "outer": {
+          "failedComponents": 39,
+          "maximum": 0.009468829514935079
+        },
+        "exchange": {
+          "failedComponents": 0,
+          "maximum": 3.6779537763236795e-06
+        },
+        "internal": {
+          "failedComponents": 22,
+          "maximum": 0.00016614009032751842
+        }
+      },
+      "worstFaceID": 1170,
+      "worstFaceBoundary": "outer",
+      "component": 4,
+      "complexDerivative": -0.06788161980184695,
+      "forwardDifference": -0.06788162721704794,
+      "backwardDifference": -0.08681927141651613,
+      "cancellationFreeUniqueCauseProven": false
+    }
+  ],
+  "sourceSHA256": "1db3465ce766bd3cb819e9a920ed08505f4dceeb17fe1d1d303e7a3e66349ba8",
+  "note": "Face-flux derivative failure is also present in resident-donor path; gradient finite differences pass. Root cause is unresolved.",
+  "actualNativeNKMatVecInvoked": false,
+  "nativeEntryDifference": "probe directly calls evalResidualWorker with primitive perturbations; native NK calls setJacobianEvalSettings then perturbs U[1] and decode_conserved.",
+  "seconds": 0.5310000000026776
+}
