@@ -20,6 +20,12 @@ function mesh = calcSurfaceHeating(mesh,freestream,cfg)
 
 %% 1. 检查输入，并按当前工况更新外缘状态
 if nargin<3, cfg=struct; end
+% 新相态链只接受显式绑定的内部外缘包，提前分派避免旧模块重算或混用物性。
+if isfield(cfg,'heating') && isfield(cfg.heating,'sidewallModel') && ...
+        strcmp(cfg.heating.sidewallModel,'phaseAwareLaminarIntegral')
+    mesh=calcPhaseAwareLaminarHeating(mesh,cfg);
+    return;
+end
 sidewallModel='boundaryLayerIntegral';
 if isfield(cfg,'heating') && isfield(cfg.heating,'sidewallModel')
     sidewallModel=char(cfg.heating.sidewallModel);

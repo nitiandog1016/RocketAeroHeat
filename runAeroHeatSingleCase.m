@@ -11,6 +11,12 @@ function [current,freestream,report] = runAeroHeatSingleCase(mesh,cfg,progressFc
 % 模块四：report 保存接受的设置与面积审计；执行完成不等于全面积求解完成。
 % 未解值、给定值和场量方法均由既有后端保留，不作补零或模型回退。
 if nargin<3,progressFcn=[];end
+% 新相态链需要带来源的外缘包；旧一键外流仍使用NASA7，不能偷偷混合两条链。
+if isfield(cfg,'heating') && isfield(cfg.heating,'sidewallModel') && ...
+        strcmp(cfg.heating.sidewallModel,'phaseAwareLaminarIntegral')
+    error('RAH:PhaseLayer:ProviderNotConnected', ...
+        '新相态链请通过calcSurfaceHeating及phaseAwareEdge包调用；一键外流生产器尚未提供相容且已接受的外缘。');
+end
 if ~isempty(progressFcn) && ~isa(progressFcn,'function_handle')
     error('RocketAeroHeat:SingleCase:ProgressCallback','progressFcn 须为空或函数句柄。');
 end

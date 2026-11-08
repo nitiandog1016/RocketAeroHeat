@@ -1,8 +1,12 @@
-function state=phaseAwareAirState(mode,p,value)
+function state=phaseAwareAirState(mode,p,value,transportModel)
 %PHASEAWAREAIRSTATE 相态有界标准干空气，供显式选择的新混合热链使用。
 % 模块用途：PT、Ph、Pe三个入口分别以压力/温度、压力/相对焓、压力/热内能
 % 恢复同一Cp表的状态。60—2000K；气相/低密度联合域；SI单位。
 % 旧NASA7、NIST、OTH及工程默认不变。整次输入非法即报错，不补值/裁温。
+% 可选transportModel='linearTable'与新SU2/OF13线性mu-k节点表一致；
+% 默认'lemmonAnalytic'保留原解析输运，调用方必须记录这一区别。
+if nargin<4, transportModel='lemmonAnalytic'; end
+transportModel=validatestring(transportModel,{'lemmonAnalytic','linearTable'});
 
 %% 1. 绑定生成数据及具名物性身份，缓存单调积分表
 persistent table knots cpNodes slopes hNodes sNodes digest
@@ -64,6 +68,18 @@ end
 x=log(T/103.3); omega=exp(.431-.4623*x+.08406*x.^2+.005341*x.^3-.00331*x.^4);
 mu=2.66958e-8*sqrt(28.9586*T)./(.36^2*omega); tau=132.6312./T;
 conductivity=.001308*(mu*1e6)+.001405*tau.^(-1.1)-.001036*tau.^(-.3);
+transportIdentity='rah-lemmon-dilute-analytic-v1';
+transportMethod='Lemmon2004 dilute Eq.2/5; not Sutherland or constant Pr';
+if strcmp(transportModel,'linearTable')
+    % 复用同一量热文件的节点；先算来源公式的节点值，再作无外推线性插值。
+    xn=log(knots/103.3);
+    on=exp(.431-.4623*xn+.08406*xn.^2+.005341*xn.^3-.00331*xn.^4);
+    mn=2.66958e-8*sqrt(28.9586*knots)./(.36^2*on); tn=132.6312./knots;
+    kn=.001308*(mn*1e6)+.001405*tn.^(-1.1)-.001036*tn.^(-.3);
+    mu=interp1(knots,mn,T,'linear'); conductivity=interp1(knots,kn,T,'linear');
+    transportIdentity='rah-lemmon-dilute-icoTabulated-of13-v1';
+    transportMethod='Lemmon2004 dilute Eq.2/5 sampled on Cp knots; piecewise linear mu/k';
+end
 assert(all(isfinite(mu(:))&mu(:)>0&isfinite(conductivity(:))&conductivity(:)>0), ...
     'RAH:PhaseAir:Transport','输运状态无效。');
 state=struct('pressurePa',p,'temperatureK',T,'cpJkgK',cp,'cvJkgK',cp-R, ...
@@ -75,7 +91,7 @@ state=struct('pressurePa',p,'temperatureK',T,'cpJkgK',cp,'cvJkgK',cp-R, ...
     'temperatureRangeK',[60 2000],'pressureCeilingPa',upper,'gasConstantJkgK',R, ...
     'energyReference','hf=0; hs(298.15K)=0; es=hs-RT', ...
     'entropyReference','relative s(298.15K,100000Pa)=0', ...
-    'transportMethod','Lemmon2004 dilute Eq.2/5; not Sutherland or constant Pr', ...
+    'transportMethod',transportMethod,'transportModel',transportIdentity, ...
     'continuumQualified',false,'physicalQualification',false,'engineeringHeatReady',false);
 
     function [cp,h,s]=thermal(t)
