@@ -1,0 +1,34 @@
+{
+  "schema": "rah-su2-phase-native-frame-v1",
+  "model": "rah-su2-phase-air-saneg-eplus300k-v1",
+  "energy": {
+    "schema": "rah-flow-energy-packet-v1",
+    "gasModel": "rah-phase-aware-dry-air-of13-v1",
+    "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+    "transport": "rah-lemmon-dilute-icoTabulated-of13-v1",
+    "physicalReference": "rah-hs298.15-zero-v1",
+    "solverReference": "rah-su2-phase-air-eplus300k-v1",
+    "solverMinusPhysicalJkg": 300000.0,
+    "components": [
+      "mass",
+      "momentumX",
+      "momentumY",
+      "momentumZ",
+      "totalEnergy"
+    ],
+    "units": "SI",
+    "nativeIntegrationVerified": false,
+    "physicalQualification": false
+  },
+  "meshSHA256": "8950a27b257c6fded02423a7bd009c9336697e2fc5a3d9f6747ff105270c3b5b",
+  "sourceConfigSHA256": "015d8bd48913e9d438ebe218428d65151a8725fcb4d1f1ad4720eea3352aea5a",
+  "engineSHA256": "badd860ac7a1399c06f0d411fcb13bd85c014da69c61a4b5288f28ff42b0f828",
+  "producerSHA256": "8c0ed33e4104e9a1a7e632aa857c26d09c996dc3d916663bb09beff3f9baf055",
+  "payloadSHA256": "dca5df1e161ed0b9a80a0274c0ec53f0706e4a7535355c650c90920d1c76d84a",
+  "role": "manufactured-control",
+  "physicalQualification": false,
+  "turbulence": "SA-neg/WITHFT2",
+  "saVariable": "nonconservative-nu-tilde",
+  "wallTemperatureRole": "prescribed",
+  "sourceThermoSHA256": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985"
+}
