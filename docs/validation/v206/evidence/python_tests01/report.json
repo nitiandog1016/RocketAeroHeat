@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "rejections": [
+    {
+      "case": "low",
+      "error": "PHASE_AIR_T_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "high",
+      "error": "PHASE_AIR_T_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "p-zero",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "nan",
+      "error": "PHASE_AIR_INVALID_INPUT"
+    },
+    {
+      "case": "inf",
+      "error": "PHASE_AIR_INVALID_INPUT"
+    },
+    {
+      "case": "cold-phase",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "cap",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "empty",
+      "error": "PHASE_AIR_INVALID_INPUT"
+    },
+    {
+      "case": "next-p-60",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "next-p-62",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "next-p-70",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "next-p-100",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "next-p-132.6312",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "next-p-1000",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "next-p-2000",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "outer-broadcast",
+      "error": "PHASE_AIR_SHAPE"
+    },
+    {
+      "case": "e-below",
+      "error": "PHASE_AIR_ENERGY_OUTSIDE_TABLE"
+    },
+    {
+      "case": "e-above",
+      "error": "PHASE_AIR_ENERGY_OUTSIDE_TABLE"
+    },
+    {
+      "case": "inverse-final-phase",
+      "error": "PHASE_AIR_PT_OUTSIDE_DOMAIN"
+    },
+    {
+      "case": "recovery-invalid",
+      "error": "PHASE_AIR_RECOVERY_INPUT"
+    },
+    {
+      "case": "recovery-energy-outside",
+      "error": "PHASE_AIR_ENERGY_OUTSIDE_TABLE"
+    },
+    {
+      "case": "old-model-stays-closed",
+      "error": "STANDARD_AIR_TEMPERATURE_OUTSIDE_DOMAIN"
+    }
+  ],
+  "positiveStates": 13,
+  "inverseMaxErrorK": 7.787548383930698e-12,
+  "independentIdealMaxScaled": 1.7405362746912514e-08,
+  "referenceIntegralMaxAbsJkg": 1.3969838619232178e-09,
+  "wallDerivativeMaxAbs": 4.029023781271235e-10,
+  "oldModelUnchanged": true,
+  "physicalQualification": false,
+  "nativeRuns": 0,
+  "sourceSHA256": {
+    "scripts/phaseAwareDryAir.py": "6cea256aa27231ed495c367dfc0bbdbb663d65e062c6fbc964360255b6ca9a14",
+    "tests/testPhaseAwareAir.py": "d35f0996bd02351969a372084377f27ed260090fb18fac82307e21f36f4694b0",
+    "data/thermo/phase_aware_dry_air_v1.json": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985"
+  },
+  "elapsedSeconds": 3.610000000000582
+}

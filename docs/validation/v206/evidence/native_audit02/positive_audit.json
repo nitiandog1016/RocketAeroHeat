@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "model": "rah-phase-aware-dry-air-of13-v1",
+  "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+  "positiveStates": 10,
+  "temperatureMaxAbsErrorK": 7.73070496506989e-12,
+  "energyMaxScaledError": 1.2041348047727335e-16,
+  "propertyMaxScaledErrors": {
+    "cpJkgK": 0.0,
+    "cvJkgK": 0.0,
+    "enthalpyJkg": 0.0,
+    "entropyJkgK": 7.49748067858273e-14,
+    "densityKgm3": 0.0,
+    "soundSpeedMps": 0.0
+  },
+  "pressureCeilingMaxRelative": 0.0,
+  "v205InputConditionalRootK": 99.99405746374737,
+  "conditionalRootIsNotSavedPhysicalState": true,
+  "registrationLibrarySHA256": "0f01e49f0424d4d64effd7c7c551367ca3e8e65a2c9c05a15a89fcb61c862b7e",
+  "queryBinarySHA256": "08da0cc25ccc04cb2b50ee40fa8d26b7236184ef95a6afded98ff7a53d887ce9",
+  "tableSHA256": "24148759ac432cb423d35925cf3d524593ae524a8041eb8c4721c6b67a19f46f",
+  "positiveLogSHA256": "dbbf5c89d21b15d2f608f382df3dc8bc7236280f16663620b15c0a20a0680391",
+  "cases": [
+    [
+      "e-low",
+      "E 10 -256003.63719941763 100 10",
+      1,
+      "RAH_PHASE_ENERGY_OUTSIDE_TABLE"
+    ],
+    [
+      "e-high",
+      "E 10 1379615.1447271667 100 10",
+      1,
+      "RAH_PHASE_ENERGY_OUTSIDE_TABLE"
+    ],
+    [
+      "e-nan",
+      "E 10 nan 100 10",
+      1,
+      "RAH_PHASE_INVERSE_INPUT"
+    ],
+    [
+      "old-p",
+      "E -1 0 300 1",
+      1,
+      "RAH_PHASE_INVERSE_INPUT"
+    ],
+    [
+      "seed-low",
+      "T 10 80 59 10",
+      1,
+      "RAH_PHASE_INVERSE_INPUT"
+    ],
+    [
+      "final-p-zero",
+      "T 10 80 100 0",
+      10,
+      "RAH_PHASE_PROBE_FINAL_REJECT"
+    ],
+    [
+      "final-p-high",
+      "T 10 1200 100 1000001",
+      10,
+      "RAH_PHASE_PROBE_FINAL_REJECT"
+    ],
+    [
+      "final-dew",
+      "T 10 60 300 1291.7925706815004",
+      10,
+      "RAH_PHASE_PROBE_FINAL_REJECT"
+    ]
+  ],
+  "elapsedSeconds": 0.2969999999986612,
+  "originalPlanPassed": false,
+  "originalFailure": "post-positive Python ModuleNotFoundError: scipy",
+  "referenceResourcePlanPassed": false,
+  "referencePeakRSSBytes": null
+}
