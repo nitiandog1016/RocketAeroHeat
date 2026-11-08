@@ -1,0 +1,185 @@
+{
+  "sources": [
+    {
+      "path": "outputs/v218_validation/source01/source/src/lmr/fluxcalc.d",
+      "origin": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fluxcalc.d",
+      "sha256": "38d24904ca02af67d72c66ecee27f109f2469ab5c9eb04dd3363dd30d77283a5",
+      "excerpts": [
+        {
+          "first": 504,
+          "last": 515,
+          "text": "504: void ausmdv(in FlowState Lft, in FlowState Rght, in FlowState fs, ref ConservedQuantities F, ref LocalConfig myConfig, number factor=1.0)\n505: // Wada and Liou's flux calculator.\n506: //\n507: // Implemented from details in their AIAA paper (ref. [1]) with hints from Ian Johnston.\n508: // Note that we don't calculate the complete numerical flux via eqn 12 and eqn 17 from ref. [1],\n509: // instead the mass flux is calculated as per ref. [1] and then the remaining conserved quantities are\n510: // upwinded via the mass flux direction, similar to the description from ref. [2] (eqn 39 and eqn 40).\n511: //\n512: // references:\n513: // [1] Y. Wada and M. S. Liou (1994)\n514: //     A flux splitting scheme with high-resolution and robustness for discontinuities.\n515: //     AIAA-94-0083."
+        },
+        {
+          "first": 553,
+          "last": 562,
+          "text": "553:     // Note that we have replaced the common sound speed am = max(aL, aR) with the smooth maximum (eqn 3)\n554:     // from Biswas et al., SMU: Smooth activation function for deep networks using smoothing maximum\n555:     // technique, CVPR 2021. The smooth max approaches max(aL, aR) when they differ significantly\n556:     // and ~0.5*(aL + aR) when they are close, ensuring differentiability.\n557:     // KAD 2025-08-18\n558:     number da = aL - aR;\n559:     number scale = 0.5*(aL + aR);\n560:     number eps = 1e-6 * scale + 1e-12; // smoothness parameter (tunable)\n561:     number am = 0.5*(aL + aR) + 0.5*sqrt(da*da + eps*eps);\n562:     number ML = uL / am;"
+        },
+        {
+          "first": 600,
+          "last": 614,
+          "text": "600:     number s = 0.5 * fmin(1.0, dp);\n601:     number ru2_AUSMV = uLplus * rL * uL + uRminus * rR * uR;\n602:     number ru2_AUSMD = 0.5 * (ru_half * (uL + uR) - fabs(ru_half) * (uR - uL));\n603:     number ru2_half = (0.5 + s) * ru2_AUSMV + (0.5 - s) * ru2_AUSMD;\n604:     //\n605:     // Assemble components of the flux vector.\n606:     auto cqi = myConfig.cqi;\n607:     if (cqi.mass==0) F[cqi.mass] += factor*ru_half;\n608:     if (ru_half >= 0.0) {\n609:         // Wind is blowing from the left.\n610:         F[cqi.xMom] += (ru2_half+p_half) * factor;\n611:         F[cqi.yMom] += (ru_half*vL) * factor;\n612:         if (cqi.threeD) { F[cqi.zMom] += (ru_half*wL) * factor; }\n613:         F[cqi.totEnergy] += factor*ru_half*HL;\n614:         version(turbulence) {"
+        },
+        {
+          "first": 657,
+          "last": 691,
+          "text": "657:     // Apply entropy fix (section 3.5 in Wada and Liou's paper)\n658:     if (myConfig.apply_entropy_fix) {\n659:         const double C_EFIX = 0.125;\n660:         bool caseA = ((uL - aL) < 0.0) && ((uR - aR) > 0.0);\n661:         bool caseB = ((uL + aL) < 0.0) && ((uR + aR) > 0.0);\n662:         //\n663:         number d_ua = 0.0;\n664:         if (caseA && !caseB) { d_ua = C_EFIX * ((uR - aR) - (uL - aL)); }\n665:         if (caseB && !caseA) { d_ua = C_EFIX * ((uR + aR) - (uL + aL)); }\n666:         //\n667:         if (d_ua != 0.0) {\n668:             if (cqi.mass==0) F[cqi.mass] -= factor*d_ua*(rR - rL);\n669:             F[cqi.xMom] -= factor*d_ua*(rR*uR - rL*uL);\n670:             F[cqi.yMom] -= factor*d_ua*(rR*vR - rL*vL);\n671:             if (cqi.threeD) { F[cqi.zMom] -= factor*d_ua*(rR*wR - rL*wL); }\n672:             F[cqi.totEnergy] -= factor*d_ua*(rR*HR - rL*HL);\n673:             version(turbulence) {\n674:                 foreach(i; 0 .. myConfig.turb_model.nturb) {\n675:                     F[cqi.rhoturb+i] -= factor*d_ua*(rR*Rght.turb[i] - rL*Lft.turb[i]);\n676:                 }\n677:             }\n678:             version(multi_species_gas) {\n679:                 if (cqi.n_species > 1) {\n680:                     foreach (i; 0 .. cqi.n_species) {\n681:                         F[cqi.species+i] -= factor*d_ua*(rR*Rght.gas.massf[i] - rL*Lft.gas.massf[i]);\n682:                     }\n683:                 }\n684:             }\n685:             version(multi_T_gas) {\n686:                 foreach (i; 0 .. cqi.n_modes) {\n687:                     F[cqi.modes+i] -= factor * d_ua * (rR*Rght.gas.u_modes[i] - rL*Lft.gas.u_modes[i]);\n688:                 }\n689:             }\n690:         } // end of entropy fix (d_ua != 0)\n691:     }"
+        }
+      ]
+    },
+    {
+      "path": "outputs/v218_validation/source01/source/src/lmr/fvinterface.d",
+      "origin": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/fvinterface.d",
+      "sha256": "46b501eee7fb04d8e4e40badba43275f833dca0ac81ad95641112ca888ea3293",
+      "excerpts": [
+        {
+          "first": 450,
+          "last": 464,
+          "text": "450:             FluidFVCell c = (right_cell && right_cell.is_interior_to_domain) ? right_cell : left_cell; // i --> the boundary interface is j\n451: \n452:             if (apply_boundary_correction) {\n453:                 // compute geometric terms\n454:                 number[3] dp_ij, dp_ij_hat, n_tilde;\n455:                 dp_ij[0] = pos.x - c.pos[gtl].x;\n456:                 dp_ij[1] = pos.y - c.pos[gtl].y;\n457:                 dp_ij[2] = pos.z - c.pos[gtl].z;\n458:                 const number dp_ij_mag = sqrt(dp_ij[0]*dp_ij[0] + dp_ij[1]*dp_ij[1] + dp_ij[2]*dp_ij[2]);\n459:                 dp_ij_hat[] = dp_ij[]/dp_ij_mag;\n460:                 const number n_dot_dp_ij_hat = n.x*dp_ij_hat[0] + n.y*dp_ij_hat[1] + n.z*dp_ij_hat[2];\n461:                 n_tilde[0] = n.x/n_dot_dp_ij_hat;\n462:                 n_tilde[1] = n.y/n_dot_dp_ij_hat;\n463:                 n_tilde[2] = n.z/n_dot_dp_ij_hat;\n464: "
+        },
+        {
+          "first": 500,
+          "last": 518,
+          "text": "500:                         grad.massf[isp][] = c.grad.massf[isp][];\n501:                     }\n502:                 }\n503:                 // temperature\n504:                 grad.T[] = c.grad.T[];\n505:                 // multi-temperature modes\n506:                 version(multi_T_gas) {\n507:                     uint n_modes = myConfig.n_modes;\n508:                     foreach (imode; 0 .. n_modes) {\n509:                         grad.T_modes[imode][] = c.grad.T_modes[imode][];\n510:                     }\n511:                 }\n512:                 // turbulence variables\n513:                 version(turbulence) {\n514:                     foreach (i; 0 .. myConfig.turb_model.nturb) {\n515:                         grad.turb[i][] = c.grad.turb[i][];\n516:                     }\n517:                 }\n518:             }"
+        },
+        {
+          "first": 539,
+          "last": 546,
+          "text": "539:             avg_grad[] = HALF*(cL0.grad.vel[0][]+cR0.grad.vel[0][]);\n540:             augment_gradients(avg_grad, cL0.fs.vel.x, cR0.fs.vel.x, n_tilde, dp_ij_hat, dp_ij_mag, grad.vel[0]);\n541:             // y-velocity\n542:             avg_grad[] = HALF*(cL0.grad.vel[1][]+cR0.grad.vel[1][]);\n543:             augment_gradients(avg_grad, cL0.fs.vel.y, cR0.fs.vel.y, n_tilde, dp_ij_hat, dp_ij_mag, grad.vel[1]);\n544:             // z-velocity\n545:             avg_grad[] = HALF*(cL0.grad.vel[2][]+cR0.grad.vel[2][]);\n546:             augment_gradients(avg_grad, cL0.fs.vel.z, cR0.fs.vel.z, n_tilde, dp_ij_hat, dp_ij_mag, grad.vel[2]);"
+        },
+        {
+          "first": 638,
+          "last": 648,
+          "text": "638:     // Note, also, that the viscous fluxes are added to the flux-vector components.\n639:     {\n640:         if (in_suppress_viscous_stresses_zone) {\n641:             // We wish to ignore the viscous fluxes here.\n642:             return;\n643:         }\n644:         auto gmodel = myConfig.gmodel;\n645:         uint n_species = myConfig.n_species;\n646:         uint n_modes = myConfig.n_modes;\n647:         double viscous_factor = myConfig.viscous_factor;\n648:         number k_eff = fs.gas.k + fs.k_t ;"
+        },
+        {
+          "first": 784,
+          "last": 800,
+          "text": "784:                 tau_xx = copysign(fmin(fabs(tau_xx),shear_stress_limit), tau_xx);\n785:                 tau_yy = copysign(fmin(fabs(tau_yy),shear_stress_limit), tau_yy);\n786:                 tau_zz = copysign(fmin(fabs(tau_zz),shear_stress_limit), tau_zz);\n787:                 tau_xy = copysign(fmin(fabs(tau_xy),shear_stress_limit), tau_xy);\n788:                 tau_xz = copysign(fmin(fabs(tau_xz),shear_stress_limit), tau_xz);\n789:                 tau_yz = copysign(fmin(fabs(tau_yz),shear_stress_limit), tau_yz);\n790:                 qx = copysign(fmin(fabs(qx),heat_transfer_limit), qx);\n791:                 qy = copysign(fmin(fabs(qy),heat_transfer_limit), qy);\n792:                 qz = copysign(fmin(fabs(qz),heat_transfer_limit), qz);\n793:             }\n794:         } // end if apply_shear_stress_relative_limit\n795:         //\n796:         // Combine into fluxes: store as the dot product (F.n).\n797:         number nx = n.x;\n798:         number ny = n.y;\n799:         number nz = n.z;\n800:         auto cqi = myConfig.cqi;"
+        },
+        {
+          "first": 836,
+          "last": 848,
+          "text": "836:                             F[cqi.modes+imode] += viscous_factor * hMode *(jx[isp]*n.x\n837:                                                                              + jy[isp]*n.y\n838:                                                                              + jz[isp]*n.z);\n839:                         }\n840:                     }\n841:                 }\n842:             }\n843:         }\n844:         version(turbulence) {\n845:             if ( myConfig.turb_model.isTurbulent &&\n846:                  !(myConfig.axisymmetric && (Ybar <= 1.0e-10)) ) {\n847:                 //\n848:                 // Turbulence transport of the turbulence properties themselves."
+        }
+      ]
+    },
+    {
+      "path": "outputs/v218_validation/source01/source/src/lmr/flowstate.d",
+      "origin": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/flowstate.d",
+      "sha256": "75fe95d2b2933c07fb748d9b94c6e211a4b26878bf03ca99fbf82b6caa3683b3",
+      "excerpts": []
+    },
+    {
+      "path": "outputs/v218_validation/source01/source/src/lmr/turbulence.d",
+      "origin": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/turbulence.d",
+      "sha256": "94e126b9337df880a3b056780e670e6f1f1bd6e58148e34f347e07de8b74be99",
+      "excerpts": [
+        {
+          "first": 636,
+          "last": 660,
+          "text": "636:              from Gibbons, 2019, equation 2.32\n637:         */\n638: \n639:         number nuhat = fs.turb[0];\n640:         number rho = fs.gas.rho;\n641:         number nu = fs.gas.mu/rho;\n642:         number chi = nuhat/nu;\n643:         number chi_cubed = chi*chi*chi;\n644:         number fv1 = chi_cubed/(chi_cubed + cv1_cubed);\n645:         number fv2 = 1.0 - chi/(1.0 + chi*fv1);\n646:         number ft2 = compute_ft2(chi);\n647:         number nut = nuhat*fv1;\n648: \n649:         number d = compute_d(nut,nu,grad.vel,dwall,L_min,L_max,fv1,fv2,ft2);\n650:         number Shat_by_nuhat = compute_Shat_mulitplied_by_nuhat(grad, nuhat, nu, d, fv1, fv2);\n651:         number production = rho*cb1*(1.0 - ft2)*Shat_by_nuhat;\n652: \n653:         number r = compute_r(Shat_by_nuhat, nuhat, d);\n654:         number g = r + cw2*(pow(r,6.0) - r);\n655:         number fw = (1.0 + cw3_to_the_sixth)/(pow(g,6.0) +  cw3_to_the_sixth);\n656:         fw = g*pow(fw, 1.0/6.0);\n657:         number destruction = rho*(cw1*fw - cb1/kappa/kappa*ft2)*(nuhat*nuhat/d/d);\n658: \n659:         //// No axisymmetric corrections terms in dS/dxi dS/dxi\n660:         number nuhat_gradient_squared = 0.0;"
+        },
+        {
+          "first": 679,
+          "last": 699,
+          "text": "679:     @nogc override number turbulent_viscosity(ref const(FlowState) fs, ref const(FlowGradients) grad, const number ybar, const number dwall) const {\n680:         /*\n681:         Compute the turbulent viscosity mu_t from the SA transport variable nuhat\n682:         See equation (1) from Allmaras (2012)\n683:         */\n684:         number nuhat = fs.turb[0];\n685:         number rho= fs.gas.rho;\n686:         number mu = fs.gas.mu;\n687:         number chi = rho*nuhat/mu;\n688:         number chi_cubed = chi*chi*chi;\n689:         number fv1 = chi_cubed/(chi_cubed + cv1_cubed);\n690:         number mu_t = rho*nuhat*fv1;\n691:         return mu_t;\n692:     }\n693:     @nogc override number turbulent_conductivity(ref const(FlowState) fs, GasModel gm) const {\n694:         // Warning: Make sure fs.mu_t is up to date before calling this method\n695:         number k_t = gm.Cp(fs.gas) * fs.mu_t / Pr_t;\n696:         return k_t;\n697:     }\n698: \n699:     @nogc final override number turbulent_signal_frequency(ref const(FlowState) fs) const {"
+        },
+        {
+          "first": 1021,
+          "last": 1031,
+          "text": "1021: Object representing the Modified Edwards version of the Spalart Allmaras model\n1022:  Notes:\n1023:  - The model here is taken from \"Comparison of Eddy Viscosity-Transport Turbulence\n1024:    Models for Three-Dimensional, Shock-Separated Flowfields\", Edwards and Chandra (1997)\n1025:  - This version is intended by a more stable in compressible flow, particularly for\n1026:    implicit solvers with large timesteps.\n1027:  - It also removes the ft2 sink term, which is designed to gently pull the nuhat\n1028:    values down in regions of no strain, to allow for tripping. The paper does not\n1029:    explain the reasoning for this, but I found leaving it in caused numerical problems.\n1030: \n1031:  @author: Nick Gibbons (n.gibbons@uq.edu.au)"
+        },
+        {
+          "first": 1069,
+          "last": 1100,
+          "text": "1069:         The Edwards variant of Spalart-Allmaras contains a definition of Shat\n1070:         that is singular when nuhat is equal to zero, such as during the Newton Krylov\n1071:         startup phase where the boundary conditions are diffused into the flow.\n1072: \n1073:         Since Shat*nuhat is always non-singular and both the Edwards and normal models\n1074:         need it, we compute that instead.\n1075:         */\n1076:         number S = 0.0;\n1077:         foreach(i; 0 .. 3) {\n1078:             foreach(j; 0 .. 3) {\n1079:                  S += (grad.vel[i][j] + grad.vel[j][i])*grad.vel[i][j];\n1080:             }\n1081:         }\n1082:         number div = grad.vel[0][0] + grad.vel[1][1] + grad.vel[2][2];\n1083:         S -= 2.0/3.0*div*div;\n1084:         number Shat_by_nuhat = sqrt(S)*(nu + fv1*nuhat);\n1085:         return Shat_by_nuhat;\n1086:     }\n1087: \n1088:     @nogc override number\n1089:     compute_r(const number Shat_by_nuhat, const number nuhat, const number d) const pure {\n1090:         number normal_r = super.compute_r(Shat_by_nuhat, nuhat, d);\n1091:         number r = tanh(normal_r)/tanh(1.0);\n1092:         return r;\n1093:     }\n1094: }\n1095: \n1096: \n1097: /*\n1098: Object representing the IDDES high fidelity turbulence model\n1099:  Notes:\n1100:  - The model here is taken from \"A Hybrid RANS-LES Approach with"
+        }
+      ]
+    },
+    {
+      "path": "outputs/v218_validation/source01/source/src/lmr/flowgradients.d",
+      "origin": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/flowgradients.d",
+      "sha256": "9dcde075fd3eb6556d0abfcf033910d690a0e2c472749fd85e46887f1901c293",
+      "excerpts": [
+        {
+          "first": 509,
+          "last": 519,
+          "text": "509:          * The following algorithm is taken from ref. [1].\n510:          * We use the inverse distance weighting as suggested in ref. [2] with a weighting coefficient of 0.75.\n511:          *\n512:          * references:\n513:          * [1] A. Haselbacher and J. Blazek,\n514:          *     Accurate and efficient discretization of Navier-Stokes equations on mixed grids,\n515:          *     AIAA Journal, vol. 38, no. 11, 2000\n516:          * [2] H. Nishikawa and J. White,\n517:          *     An efficient cell-centered finite-volume method with face-averaged nodal-gradients for triangular grids,\n518:          *     Journal of Computational Physics, vol. 411, 2020\n519:          *"
+        },
+        {
+          "first": 550,
+          "last": 574,
+          "text": "550: \n551:         // set the weighting coefficient (this is w from eq. 21 from ref. [2] with p = 0.75)\n552:         number x0 = pos.x; number y0 = pos.y; number z0 = pos.z;\n553:         bool apply_weighting = false;\n554:         if (myConfig.viscous_least_squares_type == ViscousLeastSquaresType.weighted_qr) {\n555:             apply_weighting = true;\n556:         }\n557:         if (apply_weighting) {\n558:             if (myConfig.dimensions == 2) {\n559:                 foreach (i; loop_init .. n) {\n560:                     number dx = cloud_pos[i].x - x0;\n561:                     number dy = cloud_pos[i].y - y0;\n562:                     theta[i] = 1.0/pow(sqrt(dx*dx+dy*dy), 0.75);\n563:                 }\n564:             } else { //3D\n565:                 foreach (i; loop_init .. n) {\n566:                     number dx = cloud_pos[i].x - x0;\n567:                     number dy = cloud_pos[i].y - y0;\n568:                     number dz = cloud_pos[i].z - z0;\n569:                     theta[i] = 1.0/pow(sqrt(dx*dx+dy*dy+dz*dz), 0.75);\n570:                 }\n571:             }\n572:         } else {\n573:             foreach (i; loop_init .. n) {\n574:                 theta[i] = 1.0;"
+        },
+        {
+          "first": 620,
+          "last": 656,
+          "text": "620:             }\n621:         } else {\n622:             // compute the vector of weights from eq. 12/13 from ref. [1]\n623:             number r11 = 0.0;\n624:             foreach(i; loop_init .. n) { r11 += pow(dx[i], 2); }\n625:             r11 = sqrt(r11);\n626: \n627:             number r12 = 0.0;\n628:             foreach(i; loop_init .. n) { r12 += dx[i]*dy[i]; }\n629:             r12 /= r11;\n630: \n631:             number r22 = 0.0;\n632:             foreach(i; loop_init .. n) { r22 += pow(dy[i], 2); }\n633:             r22 = sqrt(r22 - pow(r12,2));\n634: \n635:             number r13 = 0.0;\n636:             foreach(i; loop_init .. n) { r13 += dx[i]*dz[i]; }\n637:             r13 /= r11;\n638: \n639:             number r23 = 0.0;\n640:             foreach(i; loop_init .. n) { r23 += dy[i]*dz[i]; }\n641:             r23 = (1.0/r22) * (r23 - r12*r13);\n642: \n643:             number r33 = 0.0;\n644:             foreach(i; loop_init .. n) { r33 += pow(dz[i], 2); }\n645:             r33 = sqrt(r33-(pow(r13,2)+pow(r23,2)));\n646: \n647:             number beta = (r12*r23-r13*r22)/(r11*r22);\n648: \n649:             foreach (i; loop_init .. n) {\n650:                 number alpha1 = dx[i]*pow(r11,-2);\n651:                 number alpha2 = (dy[i]-(r12/r11)*dx[i])*pow(r22,-2);\n652:                 number alpha3 = (dz[i]-(r23/r22)*dy[i]+beta*dx[i])*pow(r33,-2);\n653:                 ws.wx[i] = theta[i]*(alpha1 - (r12/r11)*alpha2 + beta*alpha3);\n654:                 ws.wy[i] = theta[i]*(alpha2 - (r23/r22)*alpha3);\n655:                 ws.wz[i] = theta[i]*(alpha3);\n656:             }"
+        },
+        {
+          "first": 679,
+          "last": 699,
+          "text": "679:                 foreach (i; loop_init .. n) { q0 += cloud_fs[i].\"~qname~\"; }\n680:                 q0 /= n;\n681:             } else {\n682:                 q0 = cloud_fs[0].\"~qname~\";\n683:             }\n684:             \"~gname~\"[0] = 0.0; \"~gname~\"[1] = 0.0; \"~gname~\"[2] = 0.0;\n685:             foreach (i; loop_init .. n) {\n686:                 number dq = cloud_fs[i].\"~qname~\" - q0;\n687:                 \"~gname~\"[0] += ws.wx[i] * dq;\n688:                 \"~gname~\"[1] += ws.wy[i] * dq;\n689:                 if (dimensions == 3) { \"~gname~\"[2] += ws.wz[i] * dq; }\n690:             }\";\n691:             return code;\n692:         }\n693:         mixin(codeForGradients(\"vel.x\", \"vel[0]\"));\n694:         mixin(codeForGradients(\"vel.y\", \"vel[1]\"));\n695:         if (dimensions == 3) {\n696:             mixin(codeForGradients(\"vel.z\", \"vel[2]\"));\n697:         } else {\n698:             // 2D z-velocity\n699:             vel[2][0] = 0.0; vel[2][1] = 0.0; vel[2][2] = 0.0;"
+        }
+      ]
+    },
+    {
+      "path": "outputs/v218_validation/source01/source/src/lmr/ufluidblock.d",
+      "origin": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/ufluidblock.d",
+      "sha256": "e0d2809b97ba71efab2f6b7f62e162b04054f3d0c6a4d9151cbc28a2692d481f",
+      "excerpts": [
+        {
+          "first": 621,
+          "last": 636,
+          "text": "621:                 throw new Error(\"spatial_deriv_locn at interfaces not implemented for unstructured grid\");\n622:                 // no need for break;\n623:             case SpatialDerivLocn.cells:\n624:                 // We will now store the cloud of points in cloud_pos for viscous derivative calcualtions.\n625:                 foreach (c; cells) {\n626:                     // First cell in the cloud is the cell itself.  Differences are taken about it.\n627:                     c.cloud_pos ~= &(c.pos[0]);\n628:                     c.cloud_fs ~= c.fs;\n629:                     // Subsequent cells are the surrounding cells.\n630:                     foreach (i, f; c.iface) {\n631:                         c.cloud_pos ~= &(f.pos);\n632:                         c.cloud_fs ~= f.fs;\n633:                     } // end foreach face\n634:                 }\n635:             } // end switch (myConfig.spatial_deriv_locn)\n636:         } // if myConfig.viscous"
+        },
+        {
+          "first": 794,
+          "last": 805,
+          "text": "794:     override void average_turbulent_transprops_to_faces()\n795:     {\n796:         if (!myConfig.turb_model.isTurbulent) return;\n797: \n798:         foreach(idx; 0 .. ninteriorfaces){\n799:             faces[idx].fs.mu_t = 0.5*(faces[idx].left_cell.fs.mu_t + faces[idx].right_cell.fs.mu_t);\n800:             faces[idx].fs.k_t = 0.5*(faces[idx].left_cell.fs.k_t + faces[idx].right_cell.fs.k_t);\n801:         }\n802: \n803:         foreach(idx; ninteriorfaces .. nfaces){\n804:             faces[idx].average_turbulent_transprops();\n805:         }"
+        },
+        {
+          "first": 828,
+          "last": 846,
+          "text": "828:     override void set_face_flowstates_to_averages_from_cells()\n829:     {\n830:         // It turns out that some shock-detectors need flow derivatives before the\n831:         // convective-flux calculation is done.  That used to be the only place\n832:         // that the face FlowState was filled in and it was done as a side-effect,\n833:         // which has confused just about everyone at some time in their work on the code.\n834:         foreach (f; faces) {\n835:             if (f.left_cell && f.right_cell) {\n836:                 f.fs.copy_average_values_from(*(f.left_cell.fs), *(f.right_cell.fs));\n837:             } else if (f.right_cell) {\n838:                 f.fs.copy_values_from(f.right_cell.fs);\n839:             } else if (f.left_cell) {\n840:                 f.fs.copy_values_from(f.left_cell.fs);\n841:             } else {\n842:                 assert(0, \"oops, a face without attached cells\");\n843:             }\n844:         }\n845:     }\n846: "
+        },
+        {
+          "first": 1039,
+          "last": 1052,
+          "text": "1039:         foreach (f; iface_list) {\n1040:             bool do_reconstruction = allow_high_order_interpolation && !f.in_suppress_reconstruction_zone;\n1041:             if (f.left_cell && f.right_cell) {\n1042:                 interp_both(myConfig, f, gtl, *Lft, *Rght, do_reconstruction);\n1043:                 compute_interface_flux_interior(*Lft, *Rght, f, myConfig, omegaz);\n1044:             } else if (f.right_cell) {\n1045:                 interp_right(myConfig, f, gtl, *Rght, do_reconstruction);\n1046:                 compute_flux_at_left_wall(*Rght, f, myConfig, omegaz);\n1047:             } else if (f.left_cell) {\n1048:                 interp_left(myConfig, f, gtl, *Lft, do_reconstruction);\n1049:                 compute_flux_at_right_wall(*Lft, f, myConfig, omegaz);\n1050:             } else {\n1051:                 assert(0, \"oops, a face without attached cells\");\n1052:             }"
+        }
+      ]
+    },
+    {
+      "path": "outputs/v218_validation/source01/source/src/gas/gas_model.d",
+      "origin": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/gas/gas_model.d",
+      "sha256": "5cc43012b8285b48c8c9dd401f190a59a42efeeaf45582c8fe564957398af078",
+      "excerpts": []
+    },
+    {
+      "path": "outputs/v218_validation/source01/source/src/lmr/bc/boundary_interface_effect.d",
+      "origin": "/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr/bc/boundary_interface_effect.d",
+      "sha256": "c9701bcb5ad02ef5abe07aa672052b2b8bb1e10eb19b6316d667b866c59e5941",
+      "excerpts": []
+    }
+  ],
+  "config": {
+    "dimensions": 3,
+    "viscous": true,
+    "viscous_least_squares_type": "weighted_qr",
+    "spatial_deriv_locn": "cells",
+    "include_boundary_faces_in_spatial_deriv_correction": false,
+    "flux_calculator": "ausmdv",
+    "apply_entropy_fix": true,
+    "thermo_interpolator": "rhou",
+    "turbulence_model": "spalart_allmaras_edwards",
+    "apply_shear_stress_relative_limit": false,
+    "mass_diffusion_model": "none",
+    "adjust_invalid_cell_data": false
+  },
+  "jacobianInterpolationOrder": 1,
+  "residualInterpolationOrder": 2,
+  "fixedSupersonicBoundaryUnchangedAcrossRegimes": true,
+  "evidenceScope": "Fixed-source inspection, not a high-precision full residual evaluation"
+}

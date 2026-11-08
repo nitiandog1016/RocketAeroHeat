@@ -1,0 +1,181 @@
+{
+  "passed": true,
+  "meaningOfPassed": "Evidence inventory and closure decision completed; numerical gate remains false",
+  "branch": "Eilmer5 complex NK SA-Edwards frozen mapped sequential seven-region production",
+  "decision": "closed-to-production; return to H1 complete mature-combination review",
+  "knownDefectInSolverProven": false,
+  "rawInputsMathematicallyInsufficientProven": false,
+  "fullIndependentReferenceImplemented": false,
+  "fullUpstreamAndTruncationBoundAvailable": false,
+  "implementationDecision": "Do not duplicate the full residual graph as an open-ended project-specific kernel",
+  "fullStatesReconstructed": 1248,
+  "observedU0States": 16,
+  "observedU0Components": 96,
+  "originalScalarOutputs": 47754,
+  "actualLocalRecordKinds": {
+    "cloud": 3840,
+    "position": 1152,
+    "weight": 960,
+    "gradient": 960,
+    "residual": 384,
+    "source": 384,
+    "U0": 384,
+    "U1": 384,
+    "geometry": 128,
+    "faceID": 320,
+    "outsign": 320,
+    "flux": 1920,
+    "left": 3200,
+    "right": 3200
+  },
+  "unchangedPerturbation": 0.0001,
+  "unchangedGate": 1e-05,
+  "regimes": [
+    {
+      "regime": 0,
+      "oldFiniteDifference": {
+        "residual": {
+          "count": 2496,
+          "failed": 827,
+          "maxScaledError": 0.02444953638951945
+        },
+        "temperatureGradient": {
+          "count": 1248,
+          "failed": 140,
+          "maxScaledError": 0.0004707513932067364
+        },
+        "velocityGradient": {
+          "count": 3744,
+          "failed": 155,
+          "maxScaledError": 0.0004438870665121873
+        },
+        "saGradient": {
+          "count": 1248,
+          "failed": 0,
+          "maxScaledError": 6.160551235812051e-12
+        },
+        "integratedFlux": {
+          "count": 7182,
+          "failed": 0,
+          "maxScaledError": 4.519535263199678e-08
+        }
+      }
+    },
+    {
+      "regime": 1,
+      "oldFiniteDifference": {
+        "residual": {
+          "count": 2496,
+          "failed": 812,
+          "maxScaledError": 0.03280604823324378
+        },
+        "temperatureGradient": {
+          "count": 1248,
+          "failed": 140,
+          "maxScaledError": 0.00038019484581426665
+        },
+        "velocityGradient": {
+          "count": 3744,
+          "failed": 139,
+          "maxScaledError": 0.0003454958630300098
+        },
+        "saGradient": {
+          "count": 1248,
+          "failed": 0,
+          "maxScaledError": 6.160551235812051e-12
+        },
+        "integratedFlux": {
+          "count": 7182,
+          "failed": 0,
+          "maxScaledError": 4.5513448352794625e-08
+        }
+      }
+    },
+    {
+      "regime": 2,
+      "oldFiniteDifference": {
+        "residual": {
+          "count": 2496,
+          "failed": 1067,
+          "maxScaledError": 0.03765232282341227
+        },
+        "temperatureGradient": {
+          "count": 1248,
+          "failed": 62,
+          "maxScaledError": 0.00019010696128418658
+        },
+        "velocityGradient": {
+          "count": 3744,
+          "failed": 0,
+          "maxScaledError": 7.156802928065531e-08
+        },
+        "saGradient": {
+          "count": 1248,
+          "failed": 0,
+          "maxScaledError": 6.160551235812051e-12
+        },
+        "integratedFlux": {
+          "count": 7182,
+          "failed": 0,
+          "maxScaledError": 7.434070106919033e-08
+        }
+      }
+    }
+  ],
+  "missingIndependentEvidence": [
+    {
+      "id": "face-state-chain",
+      "available": "原配置、源代码、供体几何和制造态定义",
+      "missing": "独立的完整一阶左右态、实际边界动作、面平均和rhou物性更新实现及验证"
+    },
+    {
+      "id": "convective-branches",
+      "available": "准确AUSMDV实现与全部原生积分通量/切向输出",
+      "missing": "独立局部坐标通量、平滑声速max、上风/压力切换和熵修正的全量方向及分支界"
+    },
+    {
+      "id": "viscous-chain",
+      "available": "原网格/原生中心法向壁距、局部16工况单元的实际权重",
+      "missing": "全部单元点云/权重的独立重建验证、面梯度修正、湍黏性/热导和黏性通量完整参考"
+    },
+    {
+      "id": "full-error-bound",
+      "available": "独立局部解码、原生梯度/通量驱动的SA源项及散度审核",
+      "missing": "不依赖原生通量/梯度切向的完整残差方向与同h截断/上游误差界"
+    }
+  ],
+  "sourceFilesBound": 8,
+  "sourceBytes": 453521,
+  "nextReviewTarget": "Existing SU2 8.6 real NS/RANS path: source-only SA/thermo/physical-boundary/resource combination; not admitted",
+  "historicalFullDomainSU2PeakBytes": 2239016960,
+  "historicalPeakIsNotNewConfigurationGuarantee": true,
+  "fullNumericalAcceptance": false,
+  "physicalQualification": false,
+  "productionAdmitted": false,
+  "newNativeQueries": 0,
+  "newBuilds": 0,
+  "newMeshes": 0,
+  "CFDAdvanceRuns": 0,
+  "newQualifiedAreaM2": 0,
+  "goalComplete": false,
+  "inputSHA256": {
+    "outputs/v214_validation/control01/directions.csv": "a6365093262401b9e5995ed15325c031ddee1364b2e9e96dc00d2e6556a3103d",
+    "outputs/v214_validation/control01/nk_samples.csv": "203f15dbe95e8f293baa5138efbbec91adda811704121eef8e9c74701d23e150",
+    "outputs/v214_validation/control01/donors.json": "8ba65089b834caa10c3a7ec680beeb5404fda87b57e46cd01db3bb8f2a658081",
+    "outputs/v214_validation/control01/lmrsim/config": "d4dd54868ed8d18b908c588723748fe884961304cfdfd9ff419ae2ae8a805b61",
+    "outputs/v214_validation/control01/lmrsim/nk-config": "c00b86a6f87785eb9b5240122234803c0dc031aec69aa9fe5ef7e8b0d54a6576",
+    "outputs/v214_validation/control01/lmrsim/grid/grid-0000": "ff6bf412420f45bc48ab140783b414baa390445d4eee51546409fb67a08ac728",
+    "outputs/v213_validation/control03/geometry.csv": "d6636a97c4f230c06d3369fc240f11540a6ce61cf209f4a5472a0589c6169dca",
+    "outputs/v217_validation/control01/stencil.csv": "509badee9115e678be2334cd0614cedb3592308947bf6ec6c286a493421591e7",
+    "outputs/v217_validation/audit01/report.json": "82c3fc05beb8135947ce26fa0d8f09c1d43223ed9871b8a7d90d23800069021a",
+    "outputs/v218_validation/reconstruct01/report.json": "003a4ae711090050e3735e7f981942b8e7efdcd0806c8865b0f4f25971d501f9",
+    "outputs/v218_validation/source01/report.json": "358a745f19f9690781a3514a8fd214e655ef6d4154e5ca8b173b1810d81b3234",
+    "data/thermo/phase_aware_dry_air_v1.json": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985",
+    "scripts/auditNativeNKAssemblyV214.py": "205dc254ef3f33214367c373c0f56d89304f32103c6b5398d97e0f9d90dd966e",
+    "docs/SST_ENERGY_CONSTRAINT_V167.md": "a81052bd0db07bfc3f21edc7b373dde3459d4f07ac1d48ca2617148f81ad37a4",
+    "docs/HYBRID_OPENFOAM_ENTRY_V198.md": "d6fae4c21a42a4bbfa618f335434c78e4e8860098e072b825ac5e6b008b1dbf6",
+    "docs/HYBRID_REGIONAL_LAYER_COMPATIBILITY_V208.md": "5d48f60a78504ac6ed9c93871b044923f075f80048b743ecdb91015f47db45ee",
+    "scripts/assessIndependentReferenceV218.py": "2e7cea0f940cc9ec8b7db2d6c5c65eaa3ac764969139a61675f503ac295d6bac"
+  },
+  "seconds": 0.375
+}
