@@ -1,0 +1,419 @@
+{
+  "passed": true,
+  "schema": "RAH.CompleteRegionDesign.v1",
+  "motherSHA256": "22b35b72396c1a7d14195af9bd24d3c6328138484d4009638c1ab48cddec1d6c",
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "cells": 705490,
+  "faces": 1741600,
+  "vertices": 335726,
+  "regularLayerCells": 632064,
+  "preservedNonRegularPrisms": 2852,
+  "regions": [
+    {
+      "name": "nose",
+      "axialBoundsM": [
+        -0.39975728862743776,
+        null
+      ],
+      "counts": {
+        "cells": 173326,
+        "ghosts": 8972,
+        "faces": 427970,
+        "vertices": 82724,
+        "internalFaces": 418998,
+        "cellVertexLinks": 1000632,
+        "cellFaceLinks": 846968,
+        "faceVertexLinks": 1515142
+      },
+      "cellComponents": 1,
+      "wallFaceCount": 4802,
+      "ownedWallFaceCount": 4434,
+      "ownedWallAreaM2": 0.3214887716893075,
+      "interfaceFaces": 1946,
+      "physicalOuterFaces": 2224,
+      "payloadLowerBoundBytes": 5070063552,
+      "payloadLowerBoundGiB": 4.721864640712738,
+      "payloadExcludesExterior": false,
+      "exclusions": [
+        "GC bins/array metadata/spare capacity/page slack",
+        "additional residual face/ghost stencils and boundary objects",
+        "temporary Jacobian point graph/IO/JSON/mesh-read buffers",
+        "runtime/mappings/stacks/model/config copies/allocator peak"
+      ],
+      "interfaceHexPayloadLowerBoundBytes": 9262960,
+      "oneV2FileImpossible": false,
+      "neighborPatches": [
+        {
+          "donorRegion": "contraction",
+          "faces": 1946,
+          "hexPayloadLowerBoundBytes": 9262960,
+          "compactFileBoundUnder64KiBHeader": 10099112
+        }
+      ],
+      "fitProven": false,
+      "physicalQualification": false,
+      "runAuthorized": false
+    },
+    {
+      "name": "contraction",
+      "axialBoundsM": [
+        -0.8794676851224779,
+        -0.27982968950367837
+      ],
+      "counts": {
+        "cells": 129114,
+        "ghosts": 7858,
+        "faces": 321037,
+        "vertices": 63495,
+        "internalFaces": 313179,
+        "cellVertexLinks": 751976,
+        "cellFaceLinks": 634216,
+        "faceVertexLinks": 1141223
+      },
+      "cellComponents": 1,
+      "wallFaceCount": 3680,
+      "ownedWallFaceCount": 2760,
+      "ownedWallAreaM2": 0.3325150203872116,
+      "interfaceFaces": 3911,
+      "physicalOuterFaces": 267,
+      "payloadLowerBoundBytes": 3802663670,
+      "payloadLowerBoundGiB": 3.5415065195411444,
+      "payloadExcludesExterior": false,
+      "exclusions": [
+        "GC bins/array metadata/spare capacity/page slack",
+        "additional residual face/ghost stencils and boundary objects",
+        "temporary Jacobian point graph/IO/JSON/mesh-read buffers",
+        "runtime/mappings/stacks/model/config copies/allocator peak"
+      ],
+      "interfaceHexPayloadLowerBoundBytes": 18616360,
+      "oneV2FileImpossible": true,
+      "neighborPatches": [
+        {
+          "donorRegion": "nose",
+          "faces": 1986,
+          "hexPayloadLowerBoundBytes": 9453360,
+          "compactFileBoundUnder64KiBHeader": 10305352
+        },
+        {
+          "donorRegion": "afterbody",
+          "faces": 1924,
+          "hexPayloadLowerBoundBytes": 9158240,
+          "compactFileBoundUnder64KiBHeader": 9985680
+        },
+        {
+          "donorRegion": "aft_1",
+          "faces": 1,
+          "hexPayloadLowerBoundBytes": 4760,
+          "compactFileBoundUnder64KiBHeader": 70692
+        }
+      ],
+      "fitProven": false,
+      "physicalQualification": false,
+      "runAuthorized": false
+    },
+    {
+      "name": "afterbody",
+      "axialBoundsM": [
+        -1.1942776328223483,
+        -0.6995762864368374
+      ],
+      "counts": {
+        "cells": 106206,
+        "ghosts": 7092,
+        "faces": 264534,
+        "vertices": 52622,
+        "internalFaces": 257442,
+        "cellVertexLinks": 619128,
+        "cellFaceLinks": 521976,
+        "faceVertexLinks": 940802
+      },
+      "cellComponents": 2,
+      "wallFaceCount": 3036,
+      "ownedWallFaceCount": 2484,
+      "ownedWallAreaM2": 0.2540157654976384,
+      "interfaceFaces": 3840,
+      "physicalOuterFaces": 216,
+      "payloadLowerBoundBytes": 3137909070,
+      "payloadLowerBoundGiB": 2.922405553981662,
+      "payloadExcludesExterior": false,
+      "exclusions": [
+        "GC bins/array metadata/spare capacity/page slack",
+        "additional residual face/ghost stencils and boundary objects",
+        "temporary Jacobian point graph/IO/JSON/mesh-read buffers",
+        "runtime/mappings/stacks/model/config copies/allocator peak"
+      ],
+      "interfaceHexPayloadLowerBoundBytes": 18278400,
+      "oneV2FileImpossible": true,
+      "neighborPatches": [
+        {
+          "donorRegion": "contraction",
+          "faces": 1917,
+          "hexPayloadLowerBoundBytes": 9124920,
+          "compactFileBoundUnder64KiBHeader": 9949588
+        },
+        {
+          "donorRegion": "aft_1",
+          "faces": 1923,
+          "hexPayloadLowerBoundBytes": 9153480,
+          "compactFileBoundUnder64KiBHeader": 9980524
+        }
+      ],
+      "fitProven": false,
+      "physicalQualification": false,
+      "runAuthorized": false
+    },
+    {
+      "name": "aft_1",
+      "axialBoundsM": [
+        -1.6889789792078593,
+        -1.104331933479528
+      ],
+      "counts": {
+        "cells": 125472,
+        "ghosts": 7686,
+        "faces": 312195,
+        "vertices": 61869,
+        "internalFaces": 304509,
+        "cellVertexLinks": 731520,
+        "cellFaceLinks": 616704,
+        "faceVertexLinks": 1110281
+      },
+      "cellComponents": 1,
+      "wallFaceCount": 3588,
+      "ownedWallFaceCount": 2484,
+      "ownedWallAreaM2": 0.25400662605277136,
+      "interfaceFaces": 3858,
+      "physicalOuterFaces": 240,
+      "payloadLowerBoundBytes": 3697122820,
+      "payloadLowerBoundGiB": 3.4432139433920383,
+      "payloadExcludesExterior": false,
+      "exclusions": [
+        "GC bins/array metadata/spare capacity/page slack",
+        "additional residual face/ghost stencils and boundary objects",
+        "temporary Jacobian point graph/IO/JSON/mesh-read buffers",
+        "runtime/mappings/stacks/model/config copies/allocator peak"
+      ],
+      "interfaceHexPayloadLowerBoundBytes": 18364080,
+      "oneV2FileImpossible": true,
+      "neighborPatches": [
+        {
+          "donorRegion": "contraction",
+          "faces": 1,
+          "hexPayloadLowerBoundBytes": 4760,
+          "compactFileBoundUnder64KiBHeader": 70692
+        },
+        {
+          "donorRegion": "afterbody",
+          "faces": 1946,
+          "hexPayloadLowerBoundBytes": 9262960,
+          "compactFileBoundUnder64KiBHeader": 10099112
+        },
+        {
+          "donorRegion": "aft_2",
+          "faces": 1910,
+          "hexPayloadLowerBoundBytes": 9091600,
+          "compactFileBoundUnder64KiBHeader": 9913496
+        },
+        {
+          "donorRegion": "aft_3",
+          "faces": 1,
+          "hexPayloadLowerBoundBytes": 4760,
+          "compactFileBoundUnder64KiBHeader": 70692
+        }
+      ],
+      "fitProven": false,
+      "physicalQualification": false,
+      "runAuthorized": false
+    },
+    {
+      "name": "aft_2",
+      "axialBoundsM": [
+        -2.1087255761410155,
+        -1.509087580522219
+      ],
+      "counts": {
+        "cells": 128590,
+        "ghosts": 7796,
+        "faces": 319958,
+        "vertices": 63403,
+        "internalFaces": 312162,
+        "cellVertexLinks": 749880,
+        "cellFaceLinks": 632120,
+        "faceVertexLinks": 1137986
+      },
+      "cellComponents": 1,
+      "wallFaceCount": 3680,
+      "ownedWallFaceCount": 2576,
+      "ownedWallAreaM2": 0.2634001154561737,
+      "interfaceFaces": 3846,
+      "physicalOuterFaces": 270,
+      "payloadLowerBoundBytes": 3788050115,
+      "payloadLowerBoundGiB": 3.5278965858742595,
+      "payloadExcludesExterior": false,
+      "exclusions": [
+        "GC bins/array metadata/spare capacity/page slack",
+        "additional residual face/ghost stencils and boundary objects",
+        "temporary Jacobian point graph/IO/JSON/mesh-read buffers",
+        "runtime/mappings/stacks/model/config copies/allocator peak"
+      ],
+      "interfaceHexPayloadLowerBoundBytes": 18306960,
+      "oneV2FileImpossible": true,
+      "neighborPatches": [
+        {
+          "donorRegion": "aft_1",
+          "faces": 1911,
+          "hexPayloadLowerBoundBytes": 9096360,
+          "compactFileBoundUnder64KiBHeader": 9918652
+        },
+        {
+          "donorRegion": "aft_3",
+          "faces": 1935,
+          "hexPayloadLowerBoundBytes": 9210600,
+          "compactFileBoundUnder64KiBHeader": 10042396
+        }
+      ],
+      "fitProven": false,
+      "physicalQualification": false,
+      "runAuthorized": false
+    },
+    {
+      "name": "aft_3",
+      "axialBoundsM": [
+        -2.513481223183706,
+        -1.928834177455375
+      ],
+      "counts": {
+        "cells": 125246,
+        "ghosts": 7670,
+        "faces": 311735,
+        "vertices": 61836,
+        "internalFaces": 304065,
+        "cellVertexLinks": 730616,
+        "cellFaceLinks": 615800,
+        "faceVertexLinks": 1108901
+      },
+      "cellComponents": 1,
+      "wallFaceCount": 3588,
+      "ownedWallFaceCount": 2484,
+      "ownedWallAreaM2": 0.2539749783195554,
+      "interfaceFaces": 3824,
+      "physicalOuterFaces": 258,
+      "payloadLowerBoundBytes": 3690977201,
+      "payloadLowerBoundGiB": 3.4374903896823525,
+      "payloadExcludesExterior": false,
+      "exclusions": [
+        "GC bins/array metadata/spare capacity/page slack",
+        "additional residual face/ghost stencils and boundary objects",
+        "temporary Jacobian point graph/IO/JSON/mesh-read buffers",
+        "runtime/mappings/stacks/model/config copies/allocator peak"
+      ],
+      "interfaceHexPayloadLowerBoundBytes": 18202240,
+      "oneV2FileImpossible": true,
+      "neighborPatches": [
+        {
+          "donorRegion": "aft_1",
+          "faces": 2,
+          "hexPayloadLowerBoundBytes": 9520,
+          "compactFileBoundUnder64KiBHeader": 75848
+        },
+        {
+          "donorRegion": "aft_2",
+          "faces": 1918,
+          "hexPayloadLowerBoundBytes": 9129680,
+          "compactFileBoundUnder64KiBHeader": 9954744
+        },
+        {
+          "donorRegion": "aft_4",
+          "faces": 1904,
+          "hexPayloadLowerBoundBytes": 9063040,
+          "compactFileBoundUnder64KiBHeader": 9882560
+        }
+      ],
+      "fitProven": false,
+      "physicalQualification": false,
+      "runAuthorized": false
+    },
+    {
+      "name": "aft_4",
+      "axialBoundsM": [
+        null,
+        -2.3335898244980657
+      ],
+      "counts": {
+        "cells": 117417,
+        "ghosts": 8528,
+        "faces": 289836,
+        "vertices": 55977,
+        "internalFaces": 281308,
+        "cellVertexLinks": 672620,
+        "cellFaceLinks": 571144,
+        "faceVertexLinks": 1022458
+      },
+      "cellComponents": 1,
+      "wallFaceCount": 3082,
+      "ownedWallFaceCount": 2530,
+      "ownedWallAreaM2": 0.2852279791688973,
+      "interfaceFaces": 1931,
+      "physicalOuterFaces": 3515,
+      "payloadLowerBoundBytes": 3463275752,
+      "payloadLowerBoundGiB": 3.2254268899559975,
+      "payloadExcludesExterior": false,
+      "exclusions": [
+        "GC bins/array metadata/spare capacity/page slack",
+        "additional residual face/ghost stencils and boundary objects",
+        "temporary Jacobian point graph/IO/JSON/mesh-read buffers",
+        "runtime/mappings/stacks/model/config copies/allocator peak"
+      ],
+      "interfaceHexPayloadLowerBoundBytes": 9191560,
+      "oneV2FileImpossible": false,
+      "neighborPatches": [
+        {
+          "donorRegion": "aft_2",
+          "faces": 1,
+          "hexPayloadLowerBoundBytes": 4760,
+          "compactFileBoundUnder64KiBHeader": 70692
+        },
+        {
+          "donorRegion": "aft_3",
+          "faces": 1930,
+          "hexPayloadLowerBoundBytes": 9186800,
+          "compactFileBoundUnder64KiBHeader": 10016616
+        }
+      ],
+      "fitProven": false,
+      "physicalQualification": false,
+      "runAuthorized": false
+    }
+  ],
+  "ownershipCutsXM": [
+    -0.33979348906555734,
+    -0.7895219857796577,
+    -1.1942776328223483,
+    -1.5990332798650393,
+    -2.0187798767981953,
+    -2.4235355238408856
+  ],
+  "allMotherCellsCovered": true,
+  "allOriginalWallsOwnedExactlyOnce": true,
+  "oldThreeWallResponsibilitiesUnchanged": true,
+  "outerBoundary": {
+    "count": 6572,
+    "normalMachMin": -4.698463103929543,
+    "normalMachMax": 4.698463103929543,
+    "supersonicInflow": 1984,
+    "supersonicOutflow": 1984,
+    "mixed": 2604,
+    "initialOnly": true,
+    "physicalBoundaryQualified": false
+  },
+  "allDomainPayloadsBelow8GiB": true,
+  "allSingleV2FilesFeasible": false,
+  "allRegionsConnected": false,
+  "completeCandidateAccepted": false,
+  "newQualifiedAreaM2": 0,
+  "CFDRuns": 0,
+  "meshGenerated": false,
+  "partitionSHA256": "663e99fb877ede90e01b9fde045453cc18ffecbf93deff092638f28394cd26ff",
+  "seconds": 2.2969999999986612
+}

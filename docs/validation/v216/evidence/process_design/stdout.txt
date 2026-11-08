@@ -1,0 +1,8 @@
+E:\RocketAeroHeat\scripts\designCompleteRegionsV216.py:36: DeprecationWarning: Changing the shape of an F-contiguous array by descriptor assignment is deprecated. To maintain the Fortran contiguity of a multidimensional Fortran array, use 'a.T.view(...).T' instead
+  lookup=np.searchsorted(unique.view(dtype).reshape(-1),bk.view(dtype).reshape(-1))
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\designCompleteRegionsV216.py", line 131, in <module>
+    if __name__=='__main__':main()
+  File "E:\RocketAeroHeat\scripts\designCompleteRegionsV216.py", line 37, in main
+    assert np.array_equal(unique[lookup],bk) and np.all(~internal[lookup]) and np.sum(~internal)==len(boundary)
+AssertionError

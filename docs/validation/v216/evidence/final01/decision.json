@@ -1,0 +1,39 @@
+{
+  "schema": "RAH.CompleteRegionDecision.v1",
+  "geometryPartitionAccepted": true,
+  "resourcePeakAccepted": false,
+  "filePatchDesignAcceptedUnderHeaderContract": true,
+  "originalCubeBoundaryAccepted": false,
+  "normalMixedOuterFaces": 2604,
+  "originalFiniteDifferenceAccepted": false,
+  "productionSchedulerAccepted": false,
+  "CFDAdmitted": false,
+  "preferredBoundaryDesign": {
+    "status": "continuous-geometry-design-only",
+    "purpose": "enclose existing full cube; keep all original wall/layer/fan/cells",
+    "frontXM": 3.2161519311921785,
+    "backXM": -8.584959844821329,
+    "frontRadiusM": 4.274087058769537,
+    "backRadiusM": 14.176395597504325,
+    "halfAngleDeg": 40,
+    "alphaDeg": 20,
+    "Mach": 5,
+    "sideInitialNormalMachBounds": [
+      -4.330127018922193,
+      -1.7101007166283435
+    ],
+    "frontInitialNormalMach": -4.698463103929543,
+    "backInitialNormalMach": 4.698463103929543,
+    "meshGenerated": false,
+    "developmentBoundaryQualified": false,
+    "admissionConditions": [
+      "actual discrete normals/closed outer shell/preserve all old cells",
+      "supersonic upstream and side inflow stays outside disturbed region",
+      "downstream backflow/subsonic state explicitly rejects simple supersonic extrapolation",
+      "complete extra-cell/IO/allocator peak budget and independent outer-boundary sensitivity"
+    ]
+  },
+  "nextNumericalEvidence": "capture exact real primitive face/cell stencil inputs and native weights at the already located worst cases; independent high-precision local evaluation; no repeated three-group Jv/FD sweep",
+  "noNewQualifiedArea": true,
+  "goalComplete": false
+}

@@ -1,0 +1,68 @@
+{
+  "schema": "RAH.EilmerProcess.v1",
+  "argv": [
+    "taskset",
+    "-c",
+    "0",
+    "/usr/bin/python3",
+    "/mnt/e/RocketAeroHeat/scripts/inspectCompleteRegionInputsV216.py"
+  ],
+  "cwd": "/mnt/e/RocketAeroHeat/outputs/v216_validation",
+  "sourceCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "runtimeSHA256": {
+    "lmr-debug": "dc0320435a3408faed21d9ff8b8fbdbd5f4ec8522067eb5a52b0586c2a3fa549",
+    "lmrZ-mpi-run": "b4e070a9e9cfa3b88d0dfb92bf26d7f25fee48339a8bbca225bc7920a73a7caf",
+    "lmrZ-run": "85748ec5b1801599c930c9ccc48a0fac9df1da72abc85780ed2ba546153d717f",
+    "lmr": "893efc0442e02f26bd1f9dc908ad79bde1936f10336dc084aedd7c160fe7a41a",
+    "lmr-mpi-run": "16d392e1c96b8aa8aaaf29549ae47571bfe8b1c35271cacc10b9a714820587e0",
+    "lmr-run": "5ba883260160f8efff7e240fd69c05f2bab82ff3c86ec73d14c64fb861d4561b",
+    "lmr-verify": "985bb5855e517090bb30cf143b4e2e16810d45777061b6ca7be5c940d8b44b13"
+  },
+  "limitSeconds": 90,
+  "outputLimitMiB": 128,
+  "addressSpaceLimitMiB": 4096,
+  "cpuCountLimit": 2,
+  "physicalQualification": false,
+  "groupRSSLimitMiB": 4096,
+  "memoryObservation": "sum-RSS-of-live-owned-process-group; shared-pages-may-be-counted-more-than-once",
+  "status": "failed",
+  "startedUTC": "2026-11-08T07:58:46Z",
+  "processId": 26,
+  "nativeExitCode": 1,
+  "stopReason": null,
+  "elapsedSeconds": 0.5546561990000001,
+  "exitCodeScope": "supervised argv[0]; wrapper exit is not proof of child/native completion",
+  "peakObservedParentRSSBytes": 40235008,
+  "finalCaseBytes": 10285,
+  "peakObservedGroupRSSBytes": 40235008,
+  "observedProcessPeakRSSBytes": {
+    "26": 40235008
+  },
+  "liveGroupAfterCleanup": {},
+  "inputSHA256": {
+    "/mnt/e/RocketAeroHeat/scripts/inspectCompleteRegionInputsV216.py": "e1e436f3ef943aeac396db70d5d299886b351cdf03c405af9d556ec93e6ce363",
+    "/mnt/e/RocketAeroHeat/scripts/runCompleteRegionDecisionV216.py": "9317194134baef7bb18b34567cbe4db0969f7bc8a2dd5c4e581755f33f09bb6f",
+    "/mnt/e/RocketAeroHeat/docs/validation/v216/PLAN.md": "3780e8032de6308c48af2ab11667f6bc707afc736d3f4fbf7328c954d00ff429",
+    "/mnt/e/RocketAeroHeat/scripts/eilmerNKSAResourceBudget.py": "1d0569d07cbc157b259342d5e58526f0990dd15861adb13573bf75c0a0c23561",
+    "/mnt/e/RocketAeroHeat/outputs/v144_validation/actual/hybrid_volume.mat": "22b35b72396c1a7d14195af9bd24d3c6328138484d4009638c1ab48cddec1d6c",
+    "/mnt/e/RocketAeroHeat/outputs/v212_validation/design01/regions.json": "0da4a9deb186de778e96bb55b42a6d36eb72ae27d36fbd806acde0ac103876e5",
+    "/mnt/e/RocketAeroHeat/outputs/v214_validation/control01/nk_samples.csv": "203f15dbe95e8f293baa5138efbbec91adda811704121eef8e9c74701d23e150",
+    "/mnt/e/RocketAeroHeat/outputs/v214_validation/control01/directions.csv": "a6365093262401b9e5995ed15325c031ddee1364b2e9e96dc00d2e6556a3103d",
+    "/mnt/e/RocketAeroHeat/outputs/v213_validation/control03/geometry.csv": "d6636a97c4f230c06d3369fc240f11540a6ce61cf209f4a5472a0589c6169dca",
+    "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": "beee44e1dac6f2f29015a5ab80ceb726740bbf0a9bbdb505871d45b896f97477"
+  },
+  "inputStable": {
+    "/mnt/e/RocketAeroHeat/scripts/inspectCompleteRegionInputsV216.py": true,
+    "/mnt/e/RocketAeroHeat/scripts/runCompleteRegionDecisionV216.py": true,
+    "/mnt/e/RocketAeroHeat/docs/validation/v216/PLAN.md": true,
+    "/mnt/e/RocketAeroHeat/scripts/eilmerNKSAResourceBudget.py": true,
+    "/mnt/e/RocketAeroHeat/outputs/v144_validation/actual/hybrid_volume.mat": true,
+    "/mnt/e/RocketAeroHeat/outputs/v212_validation/design01/regions.json": true,
+    "/mnt/e/RocketAeroHeat/outputs/v214_validation/control01/nk_samples.csv": true,
+    "/mnt/e/RocketAeroHeat/outputs/v214_validation/control01/directions.csv": true,
+    "/mnt/e/RocketAeroHeat/outputs/v213_validation/control03/geometry.csv": true,
+    "/mnt/e/RocketAeroHeat/scripts/runEilmerProcess.py": true
+  },
+  "inputsStable": true,
+  "passed": false
+}
