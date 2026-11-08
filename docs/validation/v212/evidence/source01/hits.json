@@ -1,0 +1,320 @@
+[
+  {
+    "path": "doc/lmr/boundary-conditions.adoc",
+    "lines": [
+      {
+        "line": 246,
+        "text": "For reference, see the constructor function for the `StaticFlowProfile` class"
+      },
+      {
+        "line": 449,
+        "text": "  InOutFlowBC_Ambient:new{flowState}"
+      },
+      {
+        "line": 463,
+        "text": "  InOutFlowBC_DualState:new{flowState1, flowState2, p, n}"
+      },
+      {
+        "line": 553,
+        "text": "  ExchangeBC_MappedCell:new{transform_position, c0, n, alpha, delta,"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/convex-corner/usg-two-block/job.lua",
+    "lines": [
+      {
+        "line": 97,
+        "text": "   connection = ExchangeBC_MappedCell:new{cell_mapping_from_file=true, fileName=\"lmrsim/mapped-cells\"}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/double-cone-unsteady/job.lua",
+    "lines": [
+      {
+        "line": 62,
+        "text": "   METIS_INTERIOR = ExchangeBC_MappedCell:new{cell_mapping_from_file=true, filename=grid_location..\"mapped_cells\"}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/flat-plate-larc-test-case/spalart-allmaras/coarsest-grid/job.lua",
+    "lines": [
+      {
+        "line": 63,
+        "text": "   mapped_cells = ExchangeBC_MappedCell:new{cell_mapping_from_file=true, symmetric_mapping=true}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/flat-plate-larc-test-case/spalart-allmaras/finest-grid/job.lua",
+    "lines": [
+      {
+        "line": 63,
+        "text": "   mapped_cells = ExchangeBC_MappedCell:new{cell_mapping_from_file=true, symmetric_mapping=true}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/flat-plate-turbulent-mabey/job.lua",
+    "lines": [
+      {
+        "line": 79,
+        "text": "   METIS_INTERIOR = ExchangeBC_MappedCell:new{cell_mapping_from_file=true, filename=grid_location..\"mapped_cells\"}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/reacting-ramp/job.lua",
+    "lines": [
+      {
+        "line": 38,
+        "text": "          METIS_INTERIOR   = ExchangeBC_MappedCell:new{cell_mapping_from_file=true,"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/sharp-cone-20-degrees/sgrid2ugrid/steady.lua",
+    "lines": [
+      {
+        "line": 19,
+        "text": "   mapped_cells = ExchangeBC_MappedCell:new{cell_mapping_from_file=true, symmetric_mapping=true}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/sphere-heat-transfer/gmsh-grid/job.lua",
+    "lines": [
+      {
+        "line": 65,
+        "text": "          METIS_INTERIOR = ExchangeBC_MappedCell:new{cell_mapping_from_file=true,"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/sphere-heat-transfer/native-grid/job.lua",
+    "lines": [
+      {
+        "line": 86,
+        "text": "          mapped_cells=ExchangeBC_MappedCell:new{cell_mapping_from_file=true, symmetric_mapping=true}}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/sphere-larc/job.lua",
+    "lines": [
+      {
+        "line": 63,
+        "text": "   METIS_INTERIOR = ExchangeBC_MappedCell:new{cell_mapping_from_file=true, filename=grid_location..\"mapped_cells\"}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/supersonic-aerofoil/af.lua",
+    "lines": [
+      {
+        "line": 45,
+        "text": "             METIS_INTERIOR=ExchangeBC_MappedCell:new{cell_mapping_from_file=true}}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/supersonic-duct/job.lua",
+    "lines": [
+      {
+        "line": 62,
+        "text": "   METIS_INTERIOR = ExchangeBC_MappedCell:new{cell_mapping_from_file=true,"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/supersonic-ramp/job.lua",
+    "lines": [
+      {
+        "line": 62,
+        "text": "          METIS_INTERIOR = ExchangeBC_MappedCell:new{cell_mapping_from_file=true,"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/turbulent-flat-plate/unstructured/fp.lua",
+    "lines": [
+      {
+        "line": 46,
+        "text": "             METIS_INTERIOR=ExchangeBC_MappedCell:new{cell_mapping_from_file=true}}"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/2D/underexpanded-jet/transient.lua",
+    "lines": [
+      {
+        "line": 21,
+        "text": "   ambient = InOutFlowBC_Ambient:new{flowState=tank},"
+      }
+    ]
+  },
+  {
+    "path": "examples/lmr/3D/cylinder-larc/job.lua",
+    "lines": [
+      {
+        "line": 63,
+        "text": "   METIS_INTERIOR = ExchangeBC_MappedCell:new{cell_mapping_from_file=true, filename=grid_location..\"mapped_cells\"}"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/bc/boundary_interface_effect.d",
+    "lines": [
+      {
+        "line": 387,
+        "text": "        fprofile = new StaticFlowProfile(fileName, match);"
+      },
+      {
+        "line": 436,
+        "text": "    StaticFlowProfile fprofile;"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/bc/ghost_cell_effect/flow_state_copy_from_static_profile.d",
+    "lines": [
+      {
+        "line": 29,
+        "text": "        fprofile = new StaticFlowProfile(fileName, match);"
+      },
+      {
+        "line": 86,
+        "text": "    StaticFlowProfile fprofile;"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/flowstate.d",
+    "lines": [
+      {
+        "line": 436,
+        "text": "class StaticFlowProfile {"
+      },
+      {
+        "line": 452,
+        "text": "    // Construct a StaticFlowProfile from a data file."
+      },
+      {
+        "line": 627,
+        "text": "        assert(fstate.length > 0, \"StaticFlowProfile is empty.\");"
+      },
+      {
+        "line": 677,
+        "text": "} // end class StaticFlowProfile"
+      },
+      {
+        "line": 697,
+        "text": "    // As for the StaticFlowProfile, the format for each data file will be a header line"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/lua-modules/bc.lua",
+    "lines": [
+      {
+        "line": 1488,
+        "text": "InOutFlowBC_Ambient = BoundaryCondition:new()"
+      },
+      {
+        "line": 1489,
+        "text": "InOutFlowBC_Ambient.type = \"inoutflow_ambient\""
+      },
+      {
+        "line": 1490,
+        "text": "function InOutFlowBC_Ambient:new(o)"
+      },
+      {
+        "line": 1493,
+        "text": "      error(\"Make sure that you are using InOutFlowBC_Ambient:new{}\".."
+      },
+      {
+        "line": 1494,
+        "text": "               \" and not InOutFlowBC_Ambient.new{}\", 2)"
+      },
+      {
+        "line": 1499,
+        "text": "      error(\"Invalid name for item supplied to InOutFlowBC_Ambient constructor.\", 2)"
+      },
+      {
+        "line": 1510,
+        "text": "InOutFlowBC_DualState = BoundaryCondition:new()"
+      },
+      {
+        "line": 1511,
+        "text": "InOutFlowBC_DualState.type = \"inoutflow_dualstate\""
+      },
+      {
+        "line": 1512,
+        "text": "function InOutFlowBC_DualState:new(o)"
+      },
+      {
+        "line": 1515,
+        "text": "      error(\"Make sure that you are using InOutFlowBC_DualState:new{}\".."
+      },
+      {
+        "line": 1516,
+        "text": "               \" and not InOutFlowBC_DualState.new{}\", 2)"
+      },
+      {
+        "line": 1521,
+        "text": "      error(\"Invalid name for item supplied to InOutFlowBC_DualState constructor.\", 2)"
+      },
+      {
+        "line": 1524,
+        "text": "      error(\"Need to supply flowState1 for InOutFlowBC_DualState:new{}\", 2)"
+      },
+      {
+        "line": 1527,
+        "text": "      error(\"Need to supply flowState2 for InOutFlowBC_DualState:new{}\", 2)"
+      },
+      {
+        "line": 1530,
+        "text": "      error(\"Need to supply point p as a Vector3 or simple table for InOutFlowBC_DualState:new{}\", 2)"
+      },
+      {
+        "line": 1536,
+        "text": "      error(\"Need to supply direction vector n as a Vector3 or simple table for InOutFlowBC_DualState:new{}\", 2)"
+      },
+      {
+        "line": 1700,
+        "text": "ExchangeBC_MappedCell = BoundaryCondition:new()"
+      },
+      {
+        "line": 1701,
+        "text": "ExchangeBC_MappedCell.type = \"exchange_using_mapped_cells\""
+      },
+      {
+        "line": 1702,
+        "text": "function ExchangeBC_MappedCell:new(o)"
+      },
+      {
+        "line": 1705,
+        "text": "      error(\"Make sure that you are using ExchangeBC_MappedCell:new{}\".."
+      },
+      {
+        "line": 1706,
+        "text": "               \" and not ExchangeBC_MappedCell.new{}\", 2)"
+      },
+      {
+        "line": 1715,
+        "text": "      error(\"Invalid name for item supplied to ExchangeBC_MappedCell constructor.\", 2)"
+      }
+    ]
+  },
+  {
+    "path": "src/lmr/lua-modules/fluidblock.lua",
+    "lines": [
+      {
+        "line": 201,
+        "text": "\t bcList[i-1] = ExchangeBC_MappedCell:new{}"
+      }
+    ]
+  }
+]

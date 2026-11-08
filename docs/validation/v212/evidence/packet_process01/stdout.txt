@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/mnt/e/RocketAeroHeat/tests/testSequentialRegionSnapshot.py", line 123, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/mnt/e/RocketAeroHeat/tests/testSequentialRegionSnapshot.py", line 107, in main
+    assert len(protected)==29 and all(api.sha(ROOT/k)==v for k,v in protected.items())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/RocketAeroHeat/tests/testSequentialRegionSnapshot.py", line 107, in <genexpr>
+    assert len(protected)==29 and all(api.sha(ROOT/k)==v for k,v in protected.items())
+                                      ^^^^^^^^^^^^^^^
+  File "/mnt/e/RocketAeroHeat/scripts/sequentialRegionSnapshot.py", line 31, in sha
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1021, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/e/RocketAeroHeat/docs\\research\\d1372_source_checks.txt'
