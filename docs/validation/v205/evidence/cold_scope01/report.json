@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "model": "rah-standard-dry-air-cp-table-of13-v1",
+  "upstream": {
+    "pressurePa": 1197.0279007383137,
+    "temperatureK": 226.50908361133003,
+    "Mach": 5.0,
+    "alphaDeg": 20.0,
+    "betaDeg": 0.0,
+    "wallTemperatureK": 300.0,
+    "altitudeM": 30000.0,
+    "velocityDirection": [
+      -0.9396926207859084,
+      -0.0,
+      0.3420201433256687
+    ]
+  },
+  "evaluatedTemperatureRangeK": [
+    100.0,
+    226.50908361133003
+  ],
+  "sameEOSExpansionTurnDeg": 18.373655289684272,
+  "limitPressurePa": 68.90433068539592,
+  "limitMach": 7.932316810694287,
+  "cpIntegralEnthalpyErrorJkg": 0.0,
+  "entropyClosureErrorJkgK": 0.0,
+  "quadratureErrorEstimateRad": 3.560271859897743e-15,
+  "relation": "dtheta=sqrt(M^2-1)*dU/U; cp=dhs/dT; hs+U^2/2=constant",
+  "sourceURL": "https://www.grc.nasa.gov/WWW/BGH/pranmyer.html",
+  "reusedVariableCpDerivation": "scripts/hybridEulerReference.py; scripts/checkRocketExpansionTemperatureLimit.py",
+  "meaning": "2D isentropic scope reference only; not actual 3D cell, transient temperature or unique failure cause",
+  "changedThermoRange": false,
+  "CFDRuns": 0,
+  "builds": 0,
+  "physicalQualification": false,
+  "sourceSHA256": {
+    "scripts/checkStandardAirColdScope.py": "7f2e26704663a85d5bea6ad83f9c28d19bf17a6a1397c2c479406b582878e5c4",
+    "scripts/standardDryAir.py": "dac946ef6bdfd1bc69fefcd2d11068e776c8259db40bb7630bc0c32d7f30e242",
+    "scripts/hybridEulerReference.py": "8c8a1484285b121c5c55062e89f37c7a2431c949cc8b3d4c62690cb8306b7dd7",
+    "scripts/checkRocketExpansionTemperatureLimit.py": "506ff6ed4789861a8db119f7e3aab266a159c4278cbe5fab0d41feed550e5d04",
+    "docs/validation/v205/COLD_SCOPE_PLAN.md": "f5737e049affbb2dd8608e24e36fc2d032c0249261ebaa98ee1d507f2fd164a2"
+  },
+  "elapsedSeconds": 0.4850000000005821
+}
