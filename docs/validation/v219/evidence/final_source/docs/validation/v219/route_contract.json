@@ -1,0 +1,86 @@
+{
+  "schema": "rah-su2-route-contract-v1",
+  "candidate": "rah-su2-phase-air-saneg-eplus300k-v1",
+  "designAccepted": true,
+  "nativeIntegrationVerified": false,
+  "buildAdmission": false,
+  "CFDAdmission": false,
+  "sourceCommit": "7048fd35f56d4bf52e586429d6746a36a10255f8",
+  "sourceCount": 29,
+  "energy": {
+    "schema": "rah-flow-energy-packet-v1",
+    "gasModel": "rah-phase-aware-dry-air-of13-v1",
+    "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+    "transport": "rah-lemmon-dilute-icoTabulated-of13-v1",
+    "physicalReference": "rah-hs298.15-zero-v1",
+    "solverReference": "rah-su2-phase-air-eplus300k-v1",
+    "solverMinusPhysicalJkg": 300000.0,
+    "components": [
+      "mass",
+      "momentumX",
+      "momentumY",
+      "momentumZ",
+      "totalEnergy"
+    ],
+    "units": "SI",
+    "nativeIntegrationVerified": false,
+    "physicalQualification": false
+  },
+  "turbulence": {
+    "model": "SA-neg",
+    "options": [
+      "NEGATIVE",
+      "WITHFT2"
+    ],
+    "nuFactor": 3.0,
+    "PrT": 0.9,
+    "transition": "fully turbulent hypothesis"
+  },
+  "flow": {
+    "solver": "RANS",
+    "convective": "general Roe",
+    "time": "implicit Euler",
+    "gradient": "WEIGHTED_LEAST_SQUARES",
+    "MUSCL": true,
+    "limiter": "VENKATAKRISHNAN_WANG",
+    "limiterCoefficient": 0.05,
+    "linearSolver": "BCGSTAB",
+    "preconditioner": "LU_SGS",
+    "linearTolerance": 1e-05,
+    "linearIterations": 10,
+    "multigridLevels": 0,
+    "initialCFL": 0.1,
+    "adaptiveCFL": [
+      0.5,
+      1.1,
+      0.05,
+      5.0
+    ],
+    "remainingDefaultsMustFreezeBeforeRun": true
+  },
+  "geometry": {
+    "cells": 705490,
+    "points": 335726,
+    "wallFaces": 19752,
+    "areaM2": 1.9646292565715553,
+    "selection": "existing connected full domain fallback",
+    "changes": 0
+  },
+  "boundary": {
+    "physicalOuter": "RIEMANN STATIC_SUPERSONIC_INFLOW_PT",
+    "turbulenceConvection": "SCALAR_UPWIND",
+    "wall": "no-slip smooth isothermal",
+    "TwGivenK": 300.0,
+    "freestreamPressurePa": 1197.0279007383137,
+    "freestreamTemperatureK": 226.50908361133003,
+    "Mach": 5.0,
+    "alphaDeg": 20.0,
+    "betaDeg": 0.0,
+    "velocityRule": "5*a_current_air*[-cos(alpha),0,sin(alpha)]",
+    "actualMixedBoundaryVerified": false
+  },
+  "oldFullDomainMeasuredPeakBytes": 2239016960,
+  "newPeakBytes": null,
+  "physicalQualification": false,
+  "newQualifiedAreaM2": 0.0
+}

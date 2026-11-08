@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "protectedCount": 29,
+  "assets": {
+    "outputs/v144_validation/actual/hybrid_volume.mat": "22b35b72396c1a7d14195af9bd24d3c6328138484d4009638c1ab48cddec1d6c",
+    "outputs/v167_validation/real01/mesh.su2": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+    "data/thermo/phase_aware_dry_air_v1.json": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985"
+  },
+  "sourceCount": 29,
+  "scriptsSyntaxChecked": [
+    "inspectSU2RouteV219.py",
+    "inspectSU2RouteSupplementV219.py",
+    "runSU2RouteV219.py",
+    "su2EnergyReference.py",
+    "verifySU2EnergyReferenceV219.py",
+    "finalizeSU2RouteV219.py"
+  ],
+  "priorProcesses": [
+    {
+      "stage": "source",
+      "elapsedSeconds": 1.139999999999418,
+      "peakRSS": 27590656
+    },
+    {
+      "stage": "supplement",
+      "elapsedSeconds": 0.25,
+      "peakRSS": 18935808
+    },
+    {
+      "stage": "energy",
+      "elapsedSeconds": 1.5630000000019209,
+      "peakRSS": 54980608
+    }
+  ],
+  "sourceOutputGuardMatchesOriginalPlan": false,
+  "originalOnlineOutputLimitMiB": 128,
+  "originalPlannedOutputMiB": 64,
+  "observedOutputBytes": 2544734,
+  "originalPlanSHA256": "b9ab083d8366b5360ac14a6f7719396dda1fd291b48c4d722f924a45fc50baa8",
+  "originalPlanBytesRecovered": true,
+  "designAccepted": true,
+  "buildAdmission": false,
+  "nativeAdmission": false,
+  "CFDAdmission": false,
+  "physicalQualification": false,
+  "firstArchiveFailure": "CSU2IdealAir excerpt requested line 77 but exact file has 63 lines",
+  "secondArchiveFailure": "Python 3.7 shutil.copytree has no dirs_exist_ok keyword",
+  "recovery": "archive-only; no source/native/energy test repeated",
+  "newQualifiedAreaM2": 0,
+  "seconds": 0.17199999999866122
+}

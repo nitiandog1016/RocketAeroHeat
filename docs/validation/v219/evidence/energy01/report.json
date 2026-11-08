@@ -1,0 +1,63 @@
+{
+  "passed": true,
+  "contract": {
+    "schema": "rah-flow-energy-packet-v1",
+    "gasModel": "rah-phase-aware-dry-air-of13-v1",
+    "domain": "rah-lemmon-gas-low-density-60-2000-v1",
+    "transport": "rah-lemmon-dilute-icoTabulated-of13-v1",
+    "physicalReference": "rah-hs298.15-zero-v1",
+    "solverReference": "rah-su2-phase-air-eplus300k-v1",
+    "solverMinusPhysicalJkg": 300000.0,
+    "components": [
+      "mass",
+      "momentumX",
+      "momentumY",
+      "momentumZ",
+      "totalEnergy"
+    ],
+    "units": "SI",
+    "nativeIntegrationVerified": false,
+    "physicalQualification": false
+  },
+  "temperatureCount": 12,
+  "minimumCvJkgK": 715.1604414167253,
+  "minimumPhysicalEnergyJkg": -256002.63719941763,
+  "minimumSolverEnergyJkg": 43997.36280058237,
+  "scaledErrors": {
+    "conserved": 5.078157063661986e-16,
+    "roundTrip": 1.1528613642933275e-15,
+    "physicalFlux": 3.9145293169384415e-16,
+    "signedResidual": 4.0019495507917343e-16,
+    "soundSpeedSquared": 6.029252489091113e-16
+  },
+  "temperatureInverseMaxAbsK": 4.547473508864641e-13,
+  "wallDerivativeScaledError": 1.3609836702066502e-08,
+  "rejectionCount": 20,
+  "rejections": [
+    "schema",
+    "gasModel",
+    "domain",
+    "transport",
+    "reference",
+    "quantity",
+    "units",
+    "missingIdentity",
+    "unknownTarget",
+    "sixComponents",
+    "scalar",
+    "empty",
+    "NaN",
+    "Inf",
+    "zeroDensity",
+    "negativeDensity",
+    "overflow",
+    "specificNaN",
+    "specificEmpty",
+    "specificUnknown"
+  ],
+  "wrongRMSSubtractionCounterexample": -0.7071061919559725,
+  "seconds": 1.0930000000007567,
+  "nativeQueries": 0,
+  "CFDRuns": 0,
+  "newQualifiedAreaM2": 0.0
+}
