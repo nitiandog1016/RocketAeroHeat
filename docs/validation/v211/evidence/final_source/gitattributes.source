@@ -1,0 +1,373 @@
+# 文本统一以 LF 保存到 Git，二进制几何和验证图片保持原样。
+* text=auto
+*.m text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.py text eol=lf
+*.stl binary
+*.png binary
+*.mat binary
+docs/validation/v125/** -text -eol
+*.pdf binary
+
+# 追溯资料保留原始字节，避免自动换行破坏已有SHA校验。
+tests/data/**/raw/** -text -eol
+docs/validation/storage_20261028/preserved_v85_candidate/** -text -eol
+docs/validation/storage_20261028/outputs_cleanup_plan.json -text -eol
+docs/validation/v91/raw/** -text -eol
+# 清理回执互相引用原文件SHA，保留计划、日志及历史源码的原字节。
+docs/validation/storage_20261028/followup/** -text -eol
+*.json.gz binary
+# 数值/浏览器验证回执互相引用SHA，保存v92原始字节。
+docs/validation/v92/** -text -eol
+*.jpg binary
+# 样式URL使用已验收CSS的内容SHA，保留该资源原始换行字节。
+web/viewer.css -text -eol
+# 存储维护计划与回执绑定原字节SHA，历史源码同样保存原始换行。
+docs/validation/storage_20261029/** -text -eol
+# v93数值与浏览器回执引用源码/证据SHA，保存原始字节。
+docs/validation/v93/** -text -eol
+# v94实际计算与界面记录互相引用SHA，原始字节及源码修订证据保持。
+docs/validation/v94/** -text -eol
+# v95数值、实际下载及浏览器回执绑定原字节SHA。
+docs/validation/v95/** -text -eol
+# v96入口分辨率、实际下载及数值/浏览器证据保留原字节。
+docs/validation/v96/** -text -eol
+# v97原始进程、输入等价性和历史校核回执保留原字节。
+docs/validation/v97/** -text -eol
+# 2026-10-30清理计划、原始源码和执行回执互相引用SHA，保留原字节。
+docs/validation/storage_20261030/** -text -eol
+# v98薄激波层、原始进程、实际下载和修订源码绑定原始字节SHA。
+docs/validation/v98/** -text -eol
+# v99原进程、审核器修订、定量图和清理回执按精确SHA保留原字节。
+docs/validation/v99/** -text -eol
+# v100原进程、未通过项、浏览器下载及版本回执绑定原字节SHA。
+docs/validation/v100/** -text -eol
+tests/data/coupled_shock_patch/** -text -eol
+# v101移动激波、实际进程与UI回执按原始字节保存，日志保留原格式。
+docs/validation/v101/** -text -eol
+docs/validation/v101/**/*.raw -whitespace
+tests/data/shock_fitted_kernel/** -text -eol
+# 原始存储回执可能使用CRLF；保持原SHA并把CR识别为换行。
+docs/validation/storage_20261030/nested_operators/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/storage_20261030/nested_operators/**/*.raw -whitespace
+# 2026-10-31旧图预条件缓存维护回执绑定原始字节SHA。
+docs/validation/storage_20261031/** -text -eol
+docs/validation/storage_20261031/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/storage_20261031/**/*.raw -whitespace
+# v102实际进程、MAT与UI回执保留原字节，避免换行规范化破坏来源SHA。
+docs/validation/v102/** -text -eol
+docs/validation/v102/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v102/**/*.raw -whitespace
+tests/data/shock_fitted_dynamics/** -text -eol
+# 浏览器AX原始记录保留显示标签的尾随空格，不把证据当源码格式化。
+docs/validation/v102/browser/*.txt -whitespace
+# v103实际进程、界面导出及原生CSV下载绑定原字节SHA。
+docs/validation/v103/** -text -eol
+docs/validation/v103/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v103/**/*.raw -whitespace
+tests/data/shock_fitted_interface/** -text -eol
+
+# 路线审查保留旧目标全文原字节及其SHA，历史排版不重新格式化。
+docs/PROJECT_GOALS_HISTORY_20261031.md -text -eol -whitespace
+# v104实际终态、原来源和浏览器证据绑定准确字节；历史源码不重排。
+docs/validation/v104/** -text -eol
+docs/validation/v104/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v104/**/*.raw -whitespace
+docs/validation/v104/browser/*.txt -whitespace
+# v105实际引擎、参考解及准确源版本按原字节保存。
+docs/validation/v105/** -text -eol
+docs/validation/v105/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v105/**/*.raw -whitespace
+docs/validation/v105/upstream/** -whitespace
+# SU2原始日志和VTK行尾空白属于已散列的上游输出，不格式化证据。
+docs/validation/v105/**/*.log -whitespace
+docs/validation/v105/**/*.vtk -whitespace
+# v106实际三维启动、外域和映射证据保留原字节。
+docs/validation/v106/** -text -eol
+docs/validation/v106/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v106/**/*.raw -whitespace
+docs/validation/v106/**/*.log -whitespace
+docs/validation/v106/**/*.vtk -whitespace
+# v107主工作台进程、CSV、MAT和源版本保持已核对的原字节。
+docs/validation/v107/** -text -eol
+docs/validation/v107/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v107/**/*.raw -whitespace
+docs/validation/v107/**/*.log -whitespace
+docs/validation/v107/**/*.vtk -whitespace
+docs/validation/v107/**/history.csv -whitespace
+# v108原始源版本、真实终态及局部数值证据保持准确字节。
+docs/validation/v108/** -text -eol
+docs/validation/v108/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v108/**/*.raw -whitespace
+docs/validation/v108/**/*.log -whitespace
+docs/validation/v108/**/*.vtk -whitespace
+docs/validation/v108/**/*excerpt.txt -whitespace
+docs/validation/v108/upstream/** -whitespace
+# v109实际终态、网页截面回执及原始数值按字节保留。
+docs/validation/v109/** -text -eol
+docs/validation/v109/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v109/**/*.raw -whitespace
+docs/validation/v109/**/*.log -whitespace
+docs/validation/v109/**/*.vtk -whitespace
+docs/validation/v109/**/history_selected_rows.csv -whitespace
+# v110原生诊断、终态及失败源码按原字节保留。
+docs/validation/v110/** -text -eol
+docs/validation/v110/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v110/**/*.raw -whitespace
+docs/validation/v110/**/*.log -whitespace
+docs/validation/v110/**/history.csv -whitespace
+docs/validation/v110/upstream/** -whitespace
+# v111原生检查点、失败源码与配对筛选证据保持原字节。
+docs/validation/v111/** -text -eol
+docs/validation/v111/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v111/**/*.raw -whitespace
+docs/validation/v111/**/*.log -whitespace
+docs/validation/v111/**/*.vtk -whitespace
+docs/validation/v111/**/history.csv -whitespace
+docs/validation/v111/upstream/** -whitespace
+# v112真实回执、失败原文、具名场和来源摘录按准确字节保存。
+docs/validation/v112/** -text -eol
+docs/validation/v112/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v112/**/*.raw -whitespace
+docs/validation/v112/**/*.log -whitespace
+docs/validation/v112/**/*.vtk -whitespace
+docs/validation/v112/**/history.csv -whitespace
+docs/validation/v112/upstream/** -whitespace
+# v113运行回执、原输入和失败源码按准确字节保存。
+docs/validation/v113/** -text -eol
+docs/validation/v113/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v113/**/*.raw -whitespace
+docs/validation/v113/**/*.log -whitespace
+docs/validation/v113/**/*.vtk -whitespace
+docs/validation/v113/**/history.csv -whitespace
+third_party/gmsh/LICENSE.txt -text -eol -whitespace
+# v114原生热边界/面积勘误/失败及最终界面证据保留原字节。
+docs/validation/v114/** -text -eol
+docs/validation/v114/** whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/validation/v114/**/*.raw -whitespace
+docs/validation/v114/**/*.log -whitespace
+docs/validation/v114/**/*.vtk -whitespace
+docs/validation/v114/**/history.csv -whitespace
+# v115构建、实际运行、拒绝及界面证据保持准确字节。
+docs/validation/v115/** -text -eol -whitespace
+# v116配对运行、原图读数与失败源码按准确字节保存。
+docs/validation/v116/** -text -eol -whitespace
+tests/data/schaefer_ferguson_1961/heat_fig11.json -text -eol
+tests/data/schaefer_ferguson_1961/heat_fig11.json whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# v117真实增量、构建日志及源码快照保留准确字节，不格式化原生输出。
+docs/validation/v117/** -text -eol -whitespace
+# v118原精确来流、取消与预算重试、原面映射证据保持原字节。
+docs/validation/v118/** -text -eol -whitespace
+# v119具名续算、公开原数据及失败记录按原字节绑定。
+docs/validation/v119/** -text -eol -whitespace
+# v120固定外域近壁对照与真实运行能力探测保持准确证据字节。
+docs/validation/v120/** -text -eol -whitespace
+# v121构建、物性查询及真实非零热流证据保持原始字节。
+docs/validation/v121/** -text -eol -whitespace
+# v122真实完整域、失败与受控补丁证据按原始字节保存。
+docs/validation/v122/** -text -eol -whitespace
+# v123主工作台、阶段终态及独立复核按准确字节交付。
+docs/validation/v123/** -text -eol -whitespace
+# v124包含被拒的SST终态和准确版本，保留证据字节。
+docs/validation/v124/** -text -eol -whitespace
+# v126多步SST真实终态、失败和源码快照保留准确字节。
+docs/validation/v126/** -text -eol -whitespace
+# v127完整域数值对照保留准确输入、原失败和源码证据。
+docs/validation/v127/** -text -eol -whitespace
+# v128空间诊断、未运行准备、候选失败与准确源码保持证据字节。
+docs/validation/v128/** -text -eol -whitespace
+# v129保留实际冷壁对照、后处理失败与准确源版本。
+docs/validation/v129/** -text -eol -whitespace
+
+# v130保留近壁初猜实际对照、未运行准备及失败证据原字节。
+docs/validation/v130/** -text -eol -whitespace
+# v131构建、受控有界输运及失败记录保留准确输入和证据字节。
+docs/validation/v131/** -text -eol -whitespace
+# 固定补丁SHA及diff的空白上下文行必须按原字节保存。
+third_party/su2_bounded/*.diff -text -eol -whitespace
+# v132保留局部离散、官方梯度候选及执行证据原字节。
+docs/validation/v132/** -text -eol -whitespace
+# v133原面棱柱扇、外域失败及工作台证据保留准确字节。
+docs/validation/v133/** -text -eol -whitespace
+docs/validation/v134/** -text -eol -whitespace
+# v135保留小型实际接口、真实过渡失败及执行源码原字节。
+docs/validation/v135/** -text -eol -whitespace
+docs/validation/v136/** -text -eol -whitespace
+docs/validation/v137/** -text -eol -whitespace
+third_party/cgal/*.cpp text eol=lf
+docs/validation/v138/** -text -eol -whitespace
+third_party/mmg/*.cpp text eol=lf
+# v139细分谱系、原生拒绝及独立复核绑定准确字节，不格式化证据。
+docs/validation/v139/** -text -eol -whitespace
+docs/validation/v140/** -text -eol -whitespace
+docs/validation/v141/** -text -eol -whitespace
+# v142保留唯一小例失败、构建记录及准确执行源字节。
+docs/validation/v142/** -text -eol -whitespace
+third_party/tetgen/*.cpp text eol=lf
+docs/validation/v143/** -text -eol -whitespace
+docs/validation/v144/** -text -eol -whitespace
+docs/validation/v145/** -text -eol -whitespace
+docs/validation/v146/** -text -eol -whitespace
+# v147原生增量、构建失败与实际执行证据保留准确字节。
+docs/validation/v147/** -text -eol -whitespace
+third_party/su2_update_trace/*.diff -text -eol -whitespace
+third_party/su2_update_trace/*.hpp -text -eol
+# 构建器已绑定原生来源清单，保持执行时的Windows文本字节。
+scripts/buildSU2UpdateTraceRuntime.py -text -eol whitespace=cr-at-eol
+# v148固定通量、小检查失败与实际工作台证据保持准确执行字节。
+docs/validation/v148/** -text -eol -whitespace
+# v149准确执行源码、公开基准和原始失败证据保存执行字节。
+docs/validation/v149/** -text -eol -whitespace
+tests/data/tmr_mach7_su2/raw/** -text -eol
+# v150原生失败、工作台准确执行源和小型审核保持原字节。
+docs/validation/v150/** -text -eol -whitespace
+# v151实际原生场、验收和窗口观察的追溯文件保持准确字节。
+docs/validation/v151/** -text -eol -whitespace
+# v152公开续算失败、采样和工作台证据保持准确执行字节。
+docs/validation/v152/** -text -eol -whitespace
+# v153物性来源、小型原生与MATLAB检查保留准确执行字节。
+docs/validation/v153/** -text -eol -whitespace
+# v154物性适配、原生过程和工作台导出保留准确执行字节。
+docs/validation/v154/** -text -eol -whitespace
+third_party/ideal_air/*.hpp text eol=lf
+tests/testSU2IdealAirAdapter.cpp text eol=lf
+# v155初场、原生保存缺口和独立复核保留准确执行字节。
+docs/validation/v155/** -text -eol -whitespace
+docs/validation/v156/** -text -eol -whitespace
+docs/validation/v157/** -text -eol -whitespace
+docs/validation/v158/** -text -eol -whitespace
+docs/validation/v159/** -text -eol -whitespace
+docs/validation/v160/** -text -eol -whitespace
+docs/validation/v161/** -text -eol -whitespace
+docs/validation/v162/** -text -eol -whitespace
+docs/validation/v163/evidence/** -text -eol -whitespace
+docs/validation/v164/evidence/** -text -eol -whitespace
+third_party/ideal_air/IdealAirBatch.cpp text eol=lf
+# v165原生状态、失败、实际源码及UI证据保留原始字节。
+docs/validation/v165/evidence/** -text -eol -whitespace
+docs/validation/v165/storage_receipt.json -text -eol -whitespace
+tests/testSU2ConservativeStep.cpp text eol=lf
+# 原函数拼接片段的末尾空行用于分隔保留的尾部，保持实际构建字节。
+third_party/ideal_air/ConservativeStep.inc text eol=lf whitespace=-blank-at-eof
+# v166实际源码、原生/监督失败及核验回执保留原始字节。
+docs/validation/v166/evidence/** -text -eol -whitespace
+docs/validation/v166/storage_receipt.json -text -eol -whitespace
+# v167准确编译源码、失败与独立审核证据保留原始字节。
+docs/validation/v167/evidence/** -text -eol -whitespace
+docs/validation/v167/storage_receipt.json -text -eol -whitespace
+tests/testSU2SSTEnergy.cpp text eol=lf
+# v168只读失败、准确执行源和图读数据相互引用原始SHA。
+docs/validation/v168/evidence/** -text -eol -whitespace
+tests/data/naca_tn3344/** -text -eol -whitespace
+# v169准确执行源、输入错误与严格热审核失败均保留原始字节。
+docs/validation/v169/evidence/** -text -eol -whitespace
+# v170原文段界、实际几何、合成算子和失败准确源保留原字节。
+docs/validation/v170/evidence/** -text -eol -whitespace
+# v171准确运行源、超时保存帧、后处理失败及科学图保持原始字节。
+docs/validation/v171/evidence/** -text -eol -whitespace
+docs/validation/v172/evidence/** -text -eol -whitespace
+docs/validation/v173/evidence/** -text -eol -whitespace
+docs/validation/v174/evidence/** -text -eol -whitespace
+docs/validation/v174/storage_receipt.json -text -eol -whitespace
+# v175有限复审保留准确源、兼容失败和原始小回执字节。
+docs/validation/v175/evidence/** -text -eol -whitespace
+# v176保留真实断言失败、准确执行源和原面/独立复核小回执字节。
+docs/validation/v176/evidence/** -text -eol -whitespace
+# v177环境回执保留原始字节；WSL脚本保持Linux换行，Windows安装脚本保留BOM。
+docs/validation/v177/environment/** -text -eol -whitespace
+scripts/checkEilmerRuntime.sh text eol=lf
+scripts/setupEilmerLinuxHost.sh text eol=lf
+scripts/setupEilmerRuntime.sh text eol=lf
+scripts/installWslRuntime.ps1 -text -eol
+# v178原生输入/小场/失败/准确执行源保留字节，不能改变回执SHA。
+docs/validation/v178/evidence/** -text -eol -whitespace
+tests/data/eilmer_cylinder_flare/** -text -eol -whitespace
+# v179原生配置/载荷/后处理失败与对照回执绑定原始SHA，禁止换行规范化。
+docs/validation/v179/evidence/** -text -eol -whitespace
+# v180保留初始化OOM/启动器误报、准确运行源和修复检查的原始证据字节。
+docs/validation/v180/evidence/** -text -eol -whitespace
+# v181实数小例比较失败、原运行源及独立核对保留原始证据字节。
+docs/validation/v181/evidence/** -text -eol -whitespace
+# v182保留准确诊断源、构建失败、原始比较及撤回解释的证据字节。
+docs/validation/v182/evidence/** -text -eol -whitespace
+# v183保留唯一显式任务、原审核误拒、只读恢复和准确执行源的原始字节。
+docs/validation/v183/evidence/** -text -eol -whitespace
+# v184保留唯一原域OOM、候选登记、准确源与仅存储草稿证据字节。
+docs/validation/v184/evidence/** -text -eol -whitespace
+# unified diff空白上下文行以一个空格开头，这是补丁语法，保留原始SHA。
+patches/eilmer/*.patch text eol=lf whitespace=-blank-at-eol
+# v185保存准确构建/小例/失败/字段对照证据，禁止换行重写破坏SHA。
+docs/validation/v185/evidence/** -text -eol -whitespace
+# v186保留真实初始化失败、准确运行源与未构建工作区依据的原始字节。
+docs/validation/v186/evidence/** -text -eol -whitespace
+# v187保留布局失败、准确构建/小例/整域失败与阶段源码的原字节。
+docs/validation/v187/evidence/** -text -eol -whitespace
+# v188保留资源核算、首次签名失败和准确恢复源的小证据原字节。
+docs/validation/v188/evidence/** -text -eol -whitespace
+# v189保留原面诊断、首版失败、独立选区及输入拒绝检查的原始证据字节。
+docs/validation/v189/evidence/** -text -eol -whitespace
+# v190保留参考焓三次失败/恢复、原面CSV和新Euler小输入的准确字节。
+docs/validation/v190/evidence/** -text -eol -whitespace
+# v191保留原生Euler控制、分阶段准确读取器与同EOS核对的原始字节。
+docs/validation/v191/evidence/** -text -eol -whitespace
+# v192保存单次输出误用、JSON序列化失败及粗细真实原生证据的准确字节。
+docs/validation/v192/evidence/** -text -eol -whitespace
+# v193保留真实网格拒绝、准确失败源码和采样合同检查的原始字节。
+docs/validation/v193/evidence/** -text -eol -whitespace
+# v194保留网格重复/恢复失败、原生准备与准确源码证据的原始字节。
+docs/validation/v194/evidence/** -text -eol -whitespace
+# v195原生时间异常、科学停止、准确运行源与诊断字段保持原字节。
+docs/validation/v195/evidence/** -text -eol -whitespace
+# v196原生对象观测、几何修正和真实失败证据保持原字节。
+docs/validation/v196/evidence/** -text -eol -whitespace
+# v197原生复数NK、控制及真实收益失败证据保持原字节。
+docs/validation/v197/evidence/** -text -eol -whitespace
+# v198原生物性/网格/温域失败与安装证据保持原始字节。
+docs/validation/v198/evidence/** -text -eol -whitespace
+native/openfoamThermoProbe/** text eol=lf
+# v199准确原生源、监督失败、只读审核和科学图按原字节交付。
+docs/validation/v199/evidence/** -text -eol -whitespace
+# v200准确源、恢复日志、网格失败/修复及科学图保持原字节。
+docs/validation/v200/evidence/** -text -eol -whitespace
+# v201真实原箭体温域失败、首步校核及只读恢复证据保持原字节。
+docs/validation/v201/evidence/** -text -eol -whitespace
+# v202原生物性/低温控制/真实表域失败及准确执行源保持原字节。
+docs/validation/v202/evidence/** -text -eol -whitespace
+native/openfoamNistAir/** text eol=lf
+native/openfoamNistProbe/** text eol=lf
+# v203有界反算、实际分派与压力拒绝证据按原字节保存。
+docs/validation/v203/evidence/** -text -eol -whitespace
+native/openfoamBoundedNist/** text eol=lf
+native/openfoamBoundedNistProbe/** text eol=lf
+# v204压力—温度合同、实际查询与失败恢复证据保持原字节。
+docs/validation/v204/evidence/** -text -eol -whitespace
+native/openfoamStandardDryAir/** text eol=lf
+native/openfoamStandardDryAirProbe/** text eol=lf
+# 此生成数据参与实际原生任务的SHA绑定，保留执行时字节。
+data/thermo/standard_dry_air_cp_v1.json -text -eol -whitespace
+# v205实际全壁失败、准确执行源及只读恢复保留原始证据字节。
+docs/validation/v205/evidence/** -text -eol -whitespace
+# v206证据及MATLAB绑定数据按实际字节保存。
+docs/validation/v206/evidence/** -text -eol -whitespace
+native/openfoamPhaseAwareAir/** text eol=lf
+native/openfoamPhaseAwareAirProbe/** text eol=lf
+data/thermo/phase_aware_dry_air_v1.json -text -eol -whitespace
+# v207实际黏性控制、失败及只读证据保持原字节。
+docs/validation/v207/evidence/** -text -eol -whitespace
+native/openfoamPhaseAwareViscousAir/** text eol=lf
+# v208原近壁层导入、原生拒绝及格式恢复证据保持原始字节。
+docs/validation/v208/evidence/** -text -eol -whitespace
+# v209固定源码的精确摘录、路径失败与只读审核证据保持原字节。
+docs/validation/v209/evidence/** -text -eol -whitespace
+# v210实复数原生接口、准确失败与只读节点分支审核保持原字节。
+docs/validation/v210/evidence/** -text -eol -whitespace
+native/eilmerPhaseAwareAir/** text eol=lf
+# 统一补丁的空白上下文行含一个必要前缀空格。
+native/eilmerPhaseAwareAir/*.patch -whitespace
+# v211准确布局、原账及路径失败/只读恢复证据保持原字节。
+docs/validation/v211/evidence/** -text -eol -whitespace

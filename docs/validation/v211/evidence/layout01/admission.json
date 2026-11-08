@@ -1,0 +1,32 @@
+{
+  "seconds": 30,
+  "parentSeconds": 45,
+  "memoryMiB": 2048,
+  "outputMiB": 16,
+  "automaticRetry": 0,
+  "command": [
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/ldc2-1.41.0-linux-x86_64/bin/ldc2",
+    "-c",
+    "-o-",
+    "-boundscheck=on",
+    "-I/mnt/e/RocketAeroHeat/outputs/v210_validation/prepared02/overlay",
+    "-I/mnt/e/RocketAeroHeat/tools/runtime/eilmer-nk-geometric-v1/overlay/src",
+    "-d-version=complex_numbers",
+    "--d-version=flavour_fast",
+    "-I/opt/rocket-aeroheat/eilmer-v5.0.0/source/src",
+    "-d-version=enable_fp_exceptions",
+    "-d-version=multi_species_gas",
+    "-d-version=multi_T_gas",
+    "-d-version=MHD",
+    "-d-version=newton_krylov",
+    "-d-version=turbulence",
+    "-J=/mnt/e/RocketAeroHeat/tools/runtime/eilmer-nk-geometric-v1",
+    "-J=/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/lmr",
+    "-I/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/extern/eqc/source",
+    "-I/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/extern/D-YAML/source",
+    "-I/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/extern/gzip",
+    "-I/opt/rocket-aeroheat/eilmer-v5.0.0/source/src/extern/tinyendian/source",
+    "-J/mnt/e/RocketAeroHeat/data/thermo",
+    "/mnt/e/RocketAeroHeat/outputs/v211_validation/layout01/layout.d"
+  ]
+}
