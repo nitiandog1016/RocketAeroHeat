@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\prepareSU2PhaseAirV220.py", line 141, in <module>
+    if __name__=='__main__':main()
+  File "E:\RocketAeroHeat\scripts\prepareSU2PhaseAirV220.py", line 104, in main
+    old=p.read_text(encoding='utf8');new=patch(name,old);dest.write_text(new,encoding='utf8')
+  File "E:\RocketAeroHeat\scripts\prepareSU2PhaseAirV220.py", line 70, in patch
+    '  // 新身份非法平均明确拒绝；合法Roe公式及旧模型行为保持。\n'
+  File "E:\RocketAeroHeat\scripts\prepareSU2PhaseAirV220.py", line 19, in once
+    assert text.count(old)==1,(old[:80],text.count(old));return text.replace(old,new)
+AssertionError: ('  if (RoeSoundSpeed2 <= 0.0) {', 2)

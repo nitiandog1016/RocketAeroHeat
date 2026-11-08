@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "protectedFiles": 29,
+  "assets": {
+    "outputs/v144_validation/actual/hybrid_volume.mat": "22b35b72396c1a7d14195af9bd24d3c6328138484d4009638c1ab48cddec1d6c",
+    "outputs/v167_validation/real01/mesh.su2": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+    "data/thermo/phase_aware_dry_air_v1.json": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985"
+  },
+  "sourceSnapshots": 28,
+  "allVersionedInputSourceBytesRecovered": true,
+  "closedEntries": [
+    {
+      "script": "runSU2PhaseAirV220.py",
+      "exitCode": 1,
+      "output": "Traceback (most recent call last):\r\n  File \"E:\\RocketAeroHeat\\scripts\\runSU2PhaseAirV220.py\", line 122, in <module>\r\n    if __name__=='__main__':raise SystemExit(0 if main(sys.argv[1]) else 1)\r\n  File \"E:\\RocketAeroHeat\\scripts\\runSU2PhaseAirV220.py\", line 70, in main\r\n    raise RuntimeError('v220 execution closed; see docs/validation/v220/NEXT_DECISION.md')\r\nRuntimeError: v220 execution closed; see docs/validation/v220/NEXT_DECISION.md\r\n"
+    },
+    {
+      "script": "recoverSU2PhaseAirV220.py",
+      "exitCode": 1,
+      "output": "v220 recovery closed; new control requires a separate recorded plan\r\n"
+    }
+  ],
+  "processCount": 23,
+  "processBudgetSecondsBeforeFinal": {
+    "offline": 67.29699999999866,
+    "build": 102.32900000001246,
+    "query": 5.594000000004598
+  },
+  "peakObservedRSS": 1137152000,
+  "failedProcesses": [
+    {
+      "stage": "python.exe",
+      "exitCode": 15,
+      "seconds": 60.06199999999808,
+      "stopReason": "time"
+    },
+    {
+      "stage": "python.exe",
+      "exitCode": 1,
+      "seconds": 2.9059999999954016,
+      "stopReason": null
+    },
+    {
+      "stage": "phase_probe.exe",
+      "exitCode": 1,
+      "seconds": 0.43800000000192085,
+      "stopReason": null
+    },
+    {
+      "stage": "phase_probe02.exe",
+      "exitCode": 3221225477,
+      "seconds": 4.188000000001921,
+      "stopReason": null
+    },
+    {
+      "stage": "python.exe",
+      "exitCode": 2,
+      "seconds": 0.17199999999866122,
+      "stopReason": null
+    }
+  ],
+  "completeNativeCompatibility": false,
+  "newEngineStarted": false,
+  "CFDRuns": 0,
+  "newQualifiedAreaM2": 0,
+  "goalStatus": "active",
+  "seconds": 2.188000000001921
+}
