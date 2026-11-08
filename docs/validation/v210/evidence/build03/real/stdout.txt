@@ -1,0 +1,9 @@
+/mnt/e/RocketAeroHeat/outputs/v210_validation/prepared01/probe.d(56): Error: `write` matches conflicting symbols:
+            write(id," OK"); foreach (v; values) writef(" %.17g %.17g",v.re,imag(v)); writeln();
+                 ^
+/opt/rocket-aeroheat/eilmer-v5.0.0/ldc2-1.41.0-linux-x86_64/bin/../import/std/file.d(741):        function `std.file.write!string.write`
+void write(R)(R name, const void[] buffer)
+     ^
+/opt/rocket-aeroheat/eilmer-v5.0.0/ldc2-1.41.0-linux-x86_64/bin/../import/std/stdio.d(4183):        function `std.stdio.write!(string, string).write`
+void write(T...)(T args)
+     ^

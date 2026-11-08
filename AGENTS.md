@@ -1,5 +1,11 @@
 # RocketAeroHeat 项目执行约定
 
+**2026-11-08 v210当前起点：相态有界标准Air的原生实/复数GasModel已实现。** rah-phase-aware-dry-air-eilmer-v1仅隔离类/factory，60—2000K/压力相态域/原Cp积分/参考零点/v207线性mu-k不变；原生Brent实根＋解析复数切向，合法负u保持。实/复数helper构建9.645/11.337秒、峰.939/1.460GB、源稳定/组清空；14状态/168导数/14原生差分通过，最大实值1.100e−13/T逆算4.980e−11K/导数7.966e−13/差分1.777e−10。17类气体拒绝各两型，未知模型原生Error单列。见docs/HYBRID_PHASE_AWARE_EILMER_V210.md。
+
+清单cuda.d目录/缺EQC导入/helper write同名失败保留；4编译进程累计22.593秒。首查询遇未知模型Error exit1及limit60日志交错失败保持，117完整行复用、仅29补行，复数314首次；查询监督累计1.046秒。首导数审核18项对预设节点右斜率失败保留，实际返回T有24项跨邻区间（如80→79.9999999999997），按已核对实际状态同门槛只读恢复，无重构建/查询；不称节点高阶光滑或NK收敛。29保护/原层/数据SHA保持，0全引擎构建/网格/CFD/新热面积，无MATLAB/主UI；helper/准备CLI关闭，完整lmr分派未测。
+
+**下一次按docs/validation/v210/NEXT_DECISION.md直接准确NK/SA六变量/复数资源合同，再真实棱柱/出口准备。** 一次≤60秒定向复用原250816棱柱/635614面/17148ghost/130119点与实际对象/GMRES/ILU/梯度/外域布局，不套旧3.207GB Wilcox或面积缩算、不为测OOM分配全域。必要native布局helper另预算，当前无新构建/网格/CFD准入。可容纳才一次原wedge/face点云weighted_qr旋转拉伸/法向梯度验证及热壁—FixedP外压来源/逆流拒绝/截断扩域；Default SimpleFlux封堵禁用。通过后尽快实际分派/真实区域/原面热验证，不重做气体/物性网格/Couette/checkMesh/旧Euler，不降60K/裁状态/抬首层减层/调det/扫参数或第三品牌轮换。若必要下界不可行按H1具体改区域/耦合，不自研通用内核。原19752面/面积/32层/历史19层/尾缘/门槛/失败保持，工程/UI独立推进、累计后置，小证据公开、大资产E盘，无包/独有删除、不新代理/computer-use，总目标active，下方历史。
+
 **2026-11-08 v209当前起点：成熟各向异性来源核对完成，现成Eilmer气体/默认出口组合关闭。** 固定39上游源＋独立几何覆盖/22带行号摘录通过；三维黏性cell-gradient包含dz，weighted_qr仍需真实拉伸点云验证。显式对流信号取三面，官方NK选项才全五面求和；六变量/复数资源不能套旧Wilcox下界。CEA实际rhou是最多10次Newton而非所见ps/hs Brent，表外延拓；UniformLUT限制外推，PlusIdeal拒合法负u，不相容当前60—2000K/相态域/零点。见docs/HYBRID_ANISOTROPIC_ROUTE_DECISION_V209.md。
 
 默认OutFlowBC_Simple=SimpleFlux，回流把面当墙封闭质量/能量等通量，不能套真实回流区；Ambient仅符号复制，FixedP仅内态复制/定p后EOS，不是已验证特征/回流边界。源提取内计时.929秒/路径失败入口1.172秒/只读审核.235秒分列，非整轮wall；source03错几何路径及部分源保留，source04按实际properties.d恢复。29保护/原层SHA/物性表保持；0构建/网格/CFD/新热面积，无MATLAB/主UI，源提取CLI关闭。

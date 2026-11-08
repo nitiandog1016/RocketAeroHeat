@@ -1,0 +1,20 @@
+--- a/src/gas/init_gas_model.d
++++ b/src/gas/init_gas_model.d
+@@ -11,6 +11,7 @@
+ import util.msg_service;
+ 
+ import gas.gas_model;
++import gas.rah_phase_aware_air;
+ // Needs to know about all of the gas-model modules that are in play.
+ import gas.ideal_gas;
+ import gas.ideal_helium;
+@@ -74,6 +75,9 @@
+     GasModel gm;
+     try {
+         switch (gas_model_name) {
++        case "rah-phase-aware-dry-air-eilmer-v1":
++            gm = new RAHPhaseAwareAir();
++            break;
+         case "IdealGas":
+             gm = new IdealGas(L);
+             break;
