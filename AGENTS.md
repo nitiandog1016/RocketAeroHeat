@@ -1,5 +1,11 @@
 # RocketAeroHeat 项目执行约定
 
+**2026-11-12 v225当前起点：相态波系/顺序继承已测，真实钝鼻入口待接。** 新solvePhaseAwareWave给同Cp/线性输运法向、弱斜激波及等熵膨胀；数学量热根合法分区、无域外符号替代，最终p/T联合域审核。marchPhaseAwareWavePath保持逐段p/T/U及平面方向，脱体/域外不重置下游。11保存状态独立Python最大能量5.770e−16/角3.531e−11rad；非三维流场/实验验证/新热资格。见docs/HYBRID_PHASE_WAVES_V225.md。
+
+首MATLAB结果空结构字段失败53.047秒保留；恢复已保存波系后在“末环即鼻尖”测试假设失败。matlab02工具切换后原监督终态缺失、PID及MATLAB已不在；原exit/RSS/耗时未知，保守扣120秒，不重建成功回执。原9878鼻尖与末环分开，几何修复单独MATLAB18.937秒exit0/峰612917248B，与Python7.250秒审核对照通过，无波系重算；完整套件未整体重跑。两个轴向子午首段107.866/67.866度大于弱支42.458度，不是偏置驻点定位/所有原面无解证明。原19752面/1.9646292565715553m²保持，新外缘/热候选及资格0，无CFD/构建/原生/UI修改。
+
+**下一次按docs/validation/v225/NEXT_DECISION.md直接同相态钝鼻原面外缘与工作台。** 复用solveSphericalNoseEdge/estimateNoseRadius及SP-8062已有依据，显式正常激波→驻点总态→修正牛顿压力→同熵/总焓恢复，同轮原面p/Te/U与来源/面积/UI，不能再停在只接受外部输入的热力内核。偏置驻点/完整曲面路径/有限入口极限必须核对；旧零攻角Levy–Lees不能删角度守卫冒充20度热解。沿后体全用驻点熵/独立楔拼三维或任意重置层流均不准；复用CR-112180及v96标签H/S/横向度量，强三维后体底面仍H3黏性反馈。≤120秒新定向源/离线，MATLAB/新区域另预算；当前无CFD/构建/查询，不再11波系/旧平板/物性全表/冻结整域/原网格或续199。原面/面积/32层2微米/历史19层尾缘/门槛保持，全面积与科研UI并列最高、累计后置；29及engineering54并发保护，小证据GitHub、大资产E盘、无包/独有删除、不新代理/computer-use，总目标active，下方历史。
+
 **2026-11-08 v224当前起点：相态标准Air附着层流热链及主工作台出口已贯通，真实外缘生产器待接。** 新calcPhaseAwareLaminarHeating通过calcSurfaceHeating显式模式，线性mu-k/同模型恢复参考焓/原Thwaites型积分/Reynolds比拟给出q、Cf和参考性质动量厚度；不以该厚度伪造压缩性积分或CFD剖面。原NASA7/Sutherland默认保持。严格原面/源/能量/路径/三维方向与6类下游阻断、9畸形拒绝通过；unqualified-research不准入，accepted-edge声明本身不授物理资格。见docs/HYBRID_PHASE_LAMINAR_CHAIN_V224.md。
 
 唯一MATLAB38.390秒exit0/峰648654848B，真实主分派/工作台8字段通过；81面制造强制层流平板Cf相对Blasius差5.5545e−5，三组Python独立语言复算max8.543e−16/1.906秒，负/零热驱动保持。不是实验验证/箭体新解，无新真实面积或物理资格。旧默认小兼容通过，locale/perl警告保留未重跑。新一键模式明确ProviderNotConnected拒绝，不能从旧NASA7外流混入；共享WebGL未修改/无浏览器验收。旧剖面及压缩性位移/能量厚度未知，profileReady=false，候选来源独立证据未验证。
