@@ -1,0 +1,1514 @@
+{
+  "Common/src/CConfig.cpp": [
+    {
+      "line": 3805,
+      "text": "  }"
+    },
+    {
+      "line": 3806,
+      "text": ""
+    },
+    {
+      "line": 3807,
+      "text": "  // \u65b0\u6c14\u4f53\u53ea\u6269\u72ec\u7acb\u8eab\u4efd\uff0c\u65e7\u5408\u540c\u539f\u6837\u4fdd\u7559\u3002"
+    },
+    {
+      "line": 3808,
+      "text": "  if (Kind_FluidModel == RAH_PHASE_AIR) {"
+    },
+    {
+      "line": 3809,
+      "text": "    if (SystemMeasurements != SI || Ref_NonDim != DIMENSIONAL || Time_Domain ||"
+    },
+    {
+      "line": 3810,
+      "text": "        Multizone_Problem || DiscreteAdjoint || ContinuousAdjoint ||"
+    },
+    {
+      "line": 3811,
+      "text": "        (Kind_Solver != MAIN_SOLVER::NAVIER_STOKES && Kind_Solver != MAIN_SOLVER::RANS) ||"
+    },
+    {
+      "line": 3812,
+      "text": "        (Kind_Turb_Model != TURB_MODEL::NONE && Kind_Turb_Model != TURB_MODEL::SA) ||"
+    },
+    {
+      "line": 3813,
+      "text": "        Kind_Upwind_Flow != UPWIND::ROE || nMarker_WallFunctions != 0 ||"
+    },
+    {
+      "line": 3814,
+      "text": "        nMarker_FarField || nMarker_Supersonic_Inlet || nMarker_Supersonic_Outlet || nMarker_Inlet || nMarker_Outlet || Low_Mach_Corr || nMarker_Giles != 0 || GetDynamic_Grid())"
+    },
+    {
+      "line": 3815,
+      "text": "      SU2_MPI::Error(\"RAH_PHASE_AIR requires direct SI steady single-zone NS/SA, ROE, resolved wall\", CURRENT_FUNCTION);"
+    },
+    {
+      "line": 3816,
+      "text": "    for (unsigned short i=0; i<nMarker_Riemann; ++i)"
+    },
+    {
+      "line": 3817,
+      "text": "      if (Kind_Data_Riemann[i] != STATIC_SUPERSONIC_INFLOW_PT)"
+    },
+    {
+      "line": 3818,
+      "text": "        SU2_MPI::Error(\"RAH_PHASE_AIR supports Riemann ambient PT characteristic boundary\", CURRENT_FUNCTION);"
+    },
+    {
+      "line": 3819,
+      "text": "  }"
+    },
+    {
+      "line": 3820,
+      "text": ""
+    },
+    {
+      "line": 3821,
+      "text": "  /*--- Check if CoolProp is used with non-dimensionalization. ---*/"
+    },
+    {
+      "line": 3822,
+      "text": "  if (Kind_FluidModel == COOLPROP && Ref_NonDim != DIMENSIONAL) {"
+    },
+    {
+      "line": 3823,
+      "text": "    SU2_MPI::Error(\"CoolProp can not be used with non-dimensionalization.\", CURRENT_FUNCTION);"
+    },
+    {
+      "line": 3824,
+      "text": "  }"
+    },
+    {
+      "line": 3825,
+      "text": ""
+    },
+    {
+      "line": 3826,
+      "text": "  /*--- STL_BINARY output not implemented yet, but already a value in option_structure.hpp---*/"
+    },
+    {
+      "line": 3827,
+      "text": "  for (unsigned short iVolumeFile = 0; iVolumeFile < nVolumeOutputFiles; iVolumeFile++) {"
+    },
+    {
+      "line": 3828,
+      "text": "    if (VolumeOutputFiles[iVolumeFile] == OUTPUT_TYPE::STL_BINARY){"
+    },
+    {
+      "line": 3829,
+      "text": "      SU2_MPI::Error(string(\"OUTPUT_FILES: 'STL_BINARY' output not implemented. Use 'STL' for ASCII output.\\n\"), CURRENT_FUNCTION);"
+    },
+    {
+      "line": 3830,
+      "text": "    }"
+    },
+    {
+      "line": 3831,
+      "text": "    if (val_nDim == 2 && (VolumeOutputFiles[iVolumeFile] == OUTPUT_TYPE::STL_ASCII || VolumeOutputFiles[iVolumeFile] == OUTPUT_TYPE::STL_BINARY)) {"
+    },
+    {
+      "line": 3832,
+      "text": "      SU2_MPI::Error(string(\"OUTPUT_FILES: 'STL(_BINARY)' output only reasonable for 3D cases.\\n\"), CURRENT_FUNCTION);"
+    },
+    {
+      "line": 3833,
+      "text": "    }"
+    },
+    {
+      "line": 3834,
+      "text": "  }"
+    },
+    {
+      "line": 3835,
+      "text": ""
+    },
+    {
+      "line": 3836,
+      "text": "  /*--- Check if MESH_QUALITY is requested in VOLUME_OUTPUT and set the config boolean accordingly. ---*/"
+    },
+    {
+      "line": 3837,
+      "text": "  Wrt_MeshQuality = false;"
+    },
+    {
+      "line": 3838,
+      "text": "  for (unsigned short iField = 0; iField < nVolumeOutput; iField++) {"
+    }
+  ],
+  "Common/include/option_structure.hpp": [
+    {
+      "line": 659,
+      "text": "  COOLPROP = 10,          /*!< \\brief Thermodynamics library. */"
+    },
+    {
+      "line": 660,
+      "text": "  FLUID_FLAMELET = 11,    /*!< \\brief lookup table (LUT) method for premixed flamelets. */"
+    },
+    {
+      "line": 661,
+      "text": "  DATADRIVEN_FLUID = 12,  /*!< \\brief multi-layer perceptron driven fluid model. */"
+    },
+    {
+      "line": 662,
+      "text": "  RAH_PHASE_AIR = 15, // \u76f8\u6001\u6807\u51c6Air\uff0c\u5185\u90e8\u80fd\u91cf+300000J/kg"
+    },
+    {
+      "line": 663,
+      "text": "  IDEAL_AIR_VARIABLE_CP = 14, // RocketAeroHeat\u56fa\u5b9a\u7ec4\u5206\u53d8\u6bd4\u70ed\u7a7a\u6c14"
+    },
+    {
+      "line": 664,
+      "text": "  FLUID_CANTERA = 13,     /*!< \\brief Reacting flows model. */"
+    },
+    {
+      "line": 665,
+      "text": "};"
+    },
+    {
+      "line": 666,
+      "text": "static const MapType<std::string, ENUM_FLUIDMODEL> FluidModel_Map = {"
+    },
+    {
+      "line": 667,
+      "text": "  MakePair(\"STANDARD_AIR\", STANDARD_AIR)"
+    },
+    {
+      "line": 668,
+      "text": "  MakePair(\"IDEAL_GAS\", IDEAL_GAS)"
+    },
+    {
+      "line": 669,
+      "text": "  MakePair(\"VW_GAS\", VW_GAS)"
+    },
+    {
+      "line": 670,
+      "text": "  MakePair(\"PR_GAS\", PR_GAS)"
+    },
+    {
+      "line": 671,
+      "text": "  MakePair(\"CONSTANT_DENSITY\", CONSTANT_DENSITY)"
+    },
+    {
+      "line": 672,
+      "text": "  MakePair(\"INC_IDEAL_GAS\", INC_IDEAL_GAS)"
+    },
+    {
+      "line": 673,
+      "text": "  MakePair(\"INC_IDEAL_GAS_POLY\", INC_IDEAL_GAS_POLY)"
+    },
+    {
+      "line": 674,
+      "text": "  MakePair(\"MUTATIONPP\", MUTATIONPP)"
+    },
+    {
+      "line": 675,
+      "text": "  MakePair(\"SU2_NONEQ\", SU2_NONEQ)"
+    },
+    {
+      "line": 676,
+      "text": "  MakePair(\"FLUID_MIXTURE\", FLUID_MIXTURE)"
+    },
+    {
+      "line": 677,
+      "text": "  MakePair(\"RAH_PHASE_AIR\", RAH_PHASE_AIR)"
+    },
+    {
+      "line": 678,
+      "text": "  MakePair(\"IDEAL_AIR_VARIABLE_CP\", IDEAL_AIR_VARIABLE_CP)"
+    },
+    {
+      "line": 679,
+      "text": "  MakePair(\"COOLPROP\", COOLPROP)"
+    },
+    {
+      "line": 680,
+      "text": "  MakePair(\"DATADRIVEN_FLUID\", DATADRIVEN_FLUID)"
+    },
+    {
+      "line": 681,
+      "text": "  MakePair(\"FLUID_FLAMELET\", FLUID_FLAMELET)"
+    },
+    {
+      "line": 682,
+      "text": "  MakePair(\"FLUID_CANTERA\", FLUID_CANTERA)"
+    },
+    {
+      "line": 683,
+      "text": "};"
+    },
+    {
+      "line": 684,
+      "text": ""
+    },
+    {
+      "line": 685,
+      "text": "/*!"
+    },
+    {
+      "line": 686,
+      "text": " * \\brief types of gas models"
+    },
+    {
+      "line": 687,
+      "text": " */"
+    },
+    {
+      "line": 688,
+      "text": "enum ENUM_GASMODEL {"
+    },
+    {
+      "line": 689,
+      "text": "   NO_MODEL   = 0,"
+    },
+    {
+      "line": 690,
+      "text": "   ARGON      = 1,"
+    },
+    {
+      "line": 691,
+      "text": "   AIR7       = 2,"
+    },
+    {
+      "line": 692,
+      "text": "   AIR21      = 3,"
+    },
+    {
+      "line": 693,
+      "text": "   O2         = 4,"
+    },
+    {
+      "line": 694,
+      "text": "   N2         = 5,"
+    },
+    {
+      "line": 695,
+      "text": "   AIR5       = 6,"
+    },
+    {
+      "line": 696,
+      "text": "   ARGON_SID  = 7,"
+    },
+    {
+      "line": 697,
+      "text": "   ONESPECIES = 8"
+    },
+    {
+      "line": 698,
+      "text": "};"
+    },
+    {
+      "line": 699,
+      "text": "static const MapType<std::string, ENUM_GASMODEL> GasModel_Map = {"
+    },
+    {
+      "line": 700,
+      "text": "MakePair(\"NONE\", NO_MODEL)"
+    }
+  ],
+  "SU2_CFD/src/variables/CEulerVariable.cpp": [
+    {
+      "line": 109,
+      "text": "  OutlierMitigation.resize(nPoint) = 0;"
+    },
+    {
+      "line": 110,
+      "text": "}"
+    },
+    {
+      "line": 111,
+      "text": ""
+    },
+    {
+      "line": 112,
+      "text": "bool CEulerVariable::SetPrimVar(unsigned long iPoint, CFluidModel *FluidModel) {"
+    },
+    {
+      "line": 113,
+      "text": ""
+    },
+    {
+      "line": 114,
+      "text": "  bool RightVol = true;"
+    },
+    {
+      "line": 115,
+      "text": ""
+    },
+    {
+      "line": 116,
+      "text": "  SetVelocity(iPoint);   // Computes velocity and velocity^2"
+    },
+    {
+      "line": 117,
+      "text": "  su2double density      = GetDensity(iPoint);"
+    },
+    {
+      "line": 118,
+      "text": "  su2double staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint);"
+    },
+    {
+      "line": 119,
+      "text": ""
+    },
+    {
+      "line": 120,
+      "text": "  /*--- Check will be moved inside fluid model plus error description strings ---*/"
+    },
+    {
+      "line": 121,
+      "text": ""
+    },
+    {
+      "line": 122,
+      "text": "  FluidModel->SetTDState_rhoe(density, staticEnergy);"
+    },
+    {
+      "line": 123,
+      "text": ""
+    },
+    {
+      "line": 124,
+      "text": "  bool check_dens  = SetDensity(iPoint);"
+    },
+    {
+      "line": 125,
+      "text": "  bool check_press = SetPressure(iPoint, FluidModel->GetPressure());"
+    },
+    {
+      "line": 126,
+      "text": "  bool check_sos   = SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());"
+    },
+    {
+      "line": 127,
+      "text": "  bool check_temp  = SetTemperature(iPoint, FluidModel->GetTemperature());"
+    },
+    {
+      "line": 128,
+      "text": ""
+    },
+    {
+      "line": 129,
+      "text": "  /*--- Check that the solution has a physical meaning ---*/"
+    },
+    {
+      "line": 130,
+      "text": ""
+    },
+    {
+      "line": 131,
+      "text": "  if (check_dens || check_press || check_sos || check_temp) {"
+    },
+    {
+      "line": 132,
+      "text": ""
+    },
+    {
+      "line": 133,
+      "text": "    /*--- Copy the old solution ---*/"
+    },
+    {
+      "line": 134,
+      "text": ""
+    },
+    {
+      "line": 135,
+      "text": "    for (unsigned long iVar = 0; iVar < nVar; iVar++)"
+    }
+  ],
+  "SU2_CFD/include/solvers/CFVMFlowSolverBase.hpp": [
+    {
+      "line": 1151,
+      "text": "   * \\param[in] config - Definition of the particular problem."
+    },
+    {
+      "line": 1152,
+      "text": "   * \\param[in] val_marker - Surface marker where the boundary condition is applied."
+    },
+    {
+      "line": 1153,
+      "text": "   */"
+    },
+    {
+      "line": 1154,
+      "text": "  inline void BC_Euler_Wall(CGeometry* geometry, CSolver** solver_container, CNumerics* conv_numerics,"
+    },
+    {
+      "line": 1155,
+      "text": "                            CNumerics* visc_numerics, CConfig* config, unsigned short val_marker) final {"
+    },
+    {
+      "line": 1156,
+      "text": "    /*--- Call the equivalent symmetry plane boundary condition. ---*/"
+    },
+    {
+      "line": 1157,
+      "text": "    BC_Sym_Plane(geometry, solver_container, conv_numerics, visc_numerics, config, val_marker);"
+    },
+    {
+      "line": 1158,
+      "text": "  }"
+    },
+    {
+      "line": 1159,
+      "text": ""
+    },
+    {
+      "line": 1160,
+      "text": "  void MultigridProjectEulerWall(CGeometry* geometry, const CConfig* config, bool use_solution_old) override;"
+    },
+    {
+      "line": 1161,
+      "text": ""
+    },
+    {
+      "line": 1162,
+      "text": "  /*!"
+    },
+    {
+      "line": 1163,
+      "text": "   * \\author T. Kattmann"
+    },
+    {
+      "line": 1164,
+      "text": "   * \\brief Impose the symmetry boundary condition using the residual."
+    },
+    {
+      "line": 1165,
+      "text": "   * \\param[in] geometry - Geometrical definition of the problem."
+    },
+    {
+      "line": 1166,
+      "text": "   * \\param[in] solver_container - Container vector with all the solutions."
+    },
+    {
+      "line": 1167,
+      "text": "   * \\param[in] conv_numerics - Description of the numerical method."
+    },
+    {
+      "line": 1168,
+      "text": "   * \\param[in] visc_numerics - Description of the numerical method."
+    },
+    {
+      "line": 1169,
+      "text": "   * \\param[in] config - Definition of the particular problem."
+    },
+    {
+      "line": 1170,
+      "text": "   * \\param[in] val_marker - Surface marker where the boundary condition is applied."
+    },
+    {
+      "line": 1171,
+      "text": "   */"
+    },
+    {
+      "line": 1172,
+      "text": "  void BC_Sym_Plane(CGeometry* geometry, CSolver** solver_container, CNumerics* conv_numerics, CNumerics* visc_numerics,"
+    },
+    {
+      "line": 1173,
+      "text": "                    CConfig* config, unsigned short val_marker) override;"
+    },
+    {
+      "line": 1174,
+      "text": ""
+    },
+    {
+      "line": 1175,
+      "text": "  /*!"
+    },
+    {
+      "line": 1176,
+      "text": "   * \\brief Impose a periodic boundary condition by summing contributions from the complete control volume."
+    },
+    {
+      "line": 1177,
+      "text": "   * \\param[in] geometry - Geometrical definition of the problem."
+    }
+  ],
+  "SU2_CFD/include/solvers/CFVMFlowSolverBase.inl": [
+    {
+      "line": 1147,
+      "text": "}"
+    },
+    {
+      "line": 1148,
+      "text": ""
+    },
+    {
+      "line": 1149,
+      "text": "template <class V, ENUM_REGIME FlowRegime>"
+    },
+    {
+      "line": 1150,
+      "text": "void CFVMFlowSolverBase<V, FlowRegime>::BC_Sym_Plane(CGeometry* geometry, CSolver** solver_container, CNumerics* conv_numerics,"
+    },
+    {
+      "line": 1151,
+      "text": "                                                     CNumerics* visc_numerics, CConfig* config, unsigned short val_marker) {"
+    },
+    {
+      "line": 1152,
+      "text": "  SU2_ZONE_SCOPED"
+    },
+    {
+      "line": 1153,
+      "text": ""
+    },
+    {
+      "line": 1154,
+      "text": "  const bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);"
+    },
+    {
+      "line": 1155,
+      "text": "  const bool ideal_gas = (config->GetKind_FluidModel() == STANDARD_AIR) ||"
+    },
+    {
+      "line": 1156,
+      "text": "                         (config->GetKind_FluidModel() == IDEAL_GAS);"
+    },
+    {
+      "line": 1157,
+      "text": "  const auto iVel = prim_idx.Velocity();"
+    },
+    {
+      "line": 1158,
+      "text": ""
+    },
+    {
+      "line": 1159,
+      "text": "  /*--- Blazek chapter 8.:"
+    },
+    {
+      "line": 1160,
+      "text": "   * The components of the momentum residual normal to the symmetry plane are zeroed out."
+    },
+    {
+      "line": 1161,
+      "text": "   * The gradients have already been corrected acording to Eq. (8.40)."
+    },
+    {
+      "line": 1162,
+      "text": "   * Contrary to Blazek we keep some scalar fluxes computed on the boundary to improve stability (see below). ---*/"
+    },
+    {
+      "line": 1163,
+      "text": ""
+    },
+    {
+      "line": 1164,
+      "text": "  /*--- Loop over all the vertices on this boundary marker. ---*/"
+    },
+    {
+      "line": 1165,
+      "text": ""
+    },
+    {
+      "line": 1166,
+      "text": "  SU2_OMP_FOR_DYN(OMP_MIN_SIZE)"
+    },
+    {
+      "line": 1167,
+      "text": "  for (auto iVertex = 0ul; iVertex < geometry->nVertex[val_marker]; iVertex++) {"
+    },
+    {
+      "line": 1168,
+      "text": "    const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();"
+    },
+    {
+      "line": 1169,
+      "text": ""
+    },
+    {
+      "line": 1170,
+      "text": "    /*--- Halo points do not need to be considered. ---*/"
+    },
+    {
+      "line": 1171,
+      "text": "    if (!geometry->nodes->GetDomain(iPoint)) continue;"
+    },
+    {
+      "line": 1172,
+      "text": ""
+    },
+    {
+      "line": 1173,
+      "text": "    /*--- Get the normal of the current symmetry. This may be the original normal of the vertex"
+    }
+  ],
+  "SU2_CFD/src/solvers/CSolverFactory.cpp": [
+    {
+      "line": 72,
+      "text": "      solver[RAD_SOL]  = CreateSubSolver(SUB_SOLVER_TYPE::RADIATION, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 73,
+      "text": "      solver[POISSON_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::POISSON, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 74,
+      "text": "      break;"
+    },
+    {
+      "line": 75,
+      "text": "    case MAIN_SOLVER::EULER:"
+    },
+    {
+      "line": 76,
+      "text": "      solver[FLOW_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::EULER, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 77,
+      "text": "      break;"
+    },
+    {
+      "line": 78,
+      "text": "    case MAIN_SOLVER::NEMO_EULER:"
+    },
+    {
+      "line": 79,
+      "text": "      solver[FLOW_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::NEMO_EULER, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 80,
+      "text": "      break;"
+    },
+    {
+      "line": 81,
+      "text": "    case MAIN_SOLVER::INC_NAVIER_STOKES:"
+    },
+    {
+      "line": 82,
+      "text": "      solver[FLOW_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::INC_NAVIER_STOKES, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 83,
+      "text": "      solver[HEAT_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::HEAT, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 84,
+      "text": "      solver[RAD_SOL]  = CreateSubSolver(SUB_SOLVER_TYPE::RADIATION, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 85,
+      "text": "      solver[SPECIES_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::SPECIES, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 86,
+      "text": "      solver[POISSON_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::POISSON, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 87,
+      "text": "      break;"
+    },
+    {
+      "line": 88,
+      "text": "    case MAIN_SOLVER::NAVIER_STOKES:"
+    },
+    {
+      "line": 89,
+      "text": "      solver[FLOW_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::NAVIER_STOKES, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 90,
+      "text": "      solver[SPECIES_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::SPECIES, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 91,
+      "text": "      break;"
+    },
+    {
+      "line": 92,
+      "text": "    case MAIN_SOLVER::NEMO_NAVIER_STOKES:"
+    },
+    {
+      "line": 93,
+      "text": "      solver[FLOW_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::NEMO_NAVIER_STOKES, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 94,
+      "text": "      solver[SPECIES_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::SPECIES, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 95,
+      "text": "      break;"
+    },
+    {
+      "line": 96,
+      "text": "    case MAIN_SOLVER::RANS:"
+    },
+    {
+      "line": 97,
+      "text": "      solver[FLOW_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::NAVIER_STOKES, solver, geometry, config, iMGLevel);"
+    },
+    {
+      "line": 98,
+      "text": "      solver[TURB_SOL] = CreateSubSolver(SUB_SOLVER_TYPE::TURB, solver, geometry, config, iMGLevel);"
+    }
+  ],
+  "SU2_CFD/src/integration/CIntegration.cpp": [
+    {
+      "line": 192,
+      "text": "    if (config->GetMarker_All_KindBC(iMarker)==SYMMETRY_PLANE)"
+    },
+    {
+      "line": 193,
+      "text": "        solver_container[MainSolver]->BC_Sym_Plane(geometry, solver_container, conv_bound_numerics, visc_bound_numerics, config, iMarker);"
+    },
+    {
+      "line": 194,
+      "text": "    else if (config->GetMarker_All_KindBC(iMarker)==EULER_WALL)"
+    },
+    {
+      "line": 195,
+      "text": "        solver_container[MainSolver]->BC_Euler_Wall(geometry, solver_container, conv_bound_numerics, visc_bound_numerics, config, iMarker);"
+    },
+    {
+      "line": 196,
+      "text": "  }"
+    },
+    {
+      "line": 197,
+      "text": "  //AD::ResumePreaccumulation(pausePreacc);"
+    },
+    {
+      "line": 198,
+      "text": ""
+    },
+    {
+      "line": 199,
+      "text": "}"
+    },
+    {
+      "line": 200,
+      "text": ""
+    },
+    {
+      "line": 201,
+      "text": "void CIntegration::Time_Integration(CGeometry *geometry, CSolver **solver_container, CConfig *config,"
+    },
+    {
+      "line": 202,
+      "text": "                                    unsigned short iRKStep, unsigned short RunTime_EqSystem) {"
+    },
+    {
+      "line": 203,
+      "text": "  SU2_ZONE_SCOPED"
+    },
+    {
+      "line": 204,
+      "text": ""
+    },
+    {
+      "line": 205,
+      "text": "  unsigned short MainSolver = config->GetContainerPosition(RunTime_EqSystem);"
+    },
+    {
+      "line": 206,
+      "text": ""
+    },
+    {
+      "line": 207,
+      "text": "  switch (config->GetKind_TimeIntScheme()) {"
+    },
+    {
+      "line": 208,
+      "text": "    case (RUNGE_KUTTA_EXPLICIT):"
+    },
+    {
+      "line": 209,
+      "text": "      solver_container[MainSolver]->ExplicitRK_Iteration(geometry, solver_container, config, iRKStep);"
+    },
+    {
+      "line": 210,
+      "text": "      break;"
+    },
+    {
+      "line": 211,
+      "text": "    case (CLASSICAL_RK4_EXPLICIT):"
+    },
+    {
+      "line": 212,
+      "text": "      solver_container[MainSolver]->ClassicalRK4_Iteration(geometry, solver_container, config, iRKStep);"
+    },
+    {
+      "line": 213,
+      "text": "      break;"
+    },
+    {
+      "line": 214,
+      "text": "    case (EULER_EXPLICIT):"
+    },
+    {
+      "line": 215,
+      "text": "      solver_container[MainSolver]->ExplicitEuler_Iteration(geometry, solver_container, config);"
+    },
+    {
+      "line": 216,
+      "text": "      break;"
+    },
+    {
+      "line": 217,
+      "text": "    case (EULER_IMPLICIT):"
+    },
+    {
+      "line": 218,
+      "text": "      solver_container[MainSolver]->ImplicitEuler_Iteration(geometry, solver_container, config);"
+    }
+  ],
+  "SU2_CFD/src/solvers/CEulerSolver.cpp": [
+    {
+      "line": 908,
+      "text": "      auxFluidModel = new CDataDrivenFluid(config);"
+    },
+    {
+      "line": 909,
+      "text": ""
+    },
+    {
+      "line": 910,
+      "text": "      break;"
+    },
+    {
+      "line": 911,
+      "text": "    case RAH_PHASE_AIR:"
+    },
+    {
+      "line": 912,
+      "text": "      config->SetGas_Constant(rah_phase_air::R);"
+    },
+    {
+      "line": 913,
+      "text": "      auxFluidModel = new CSU2PhaseAwareAir();"
+    },
+    {
+      "line": 914,
+      "text": "      break;"
+    },
+    {
+      "line": 915,
+      "text": "    case IDEAL_AIR_VARIABLE_CP:"
+    },
+    {
+      "line": 916,
+      "text": "      config->SetGas_Constant(rah_air::gas_constant);"
+    },
+    {
+      "line": 917,
+      "text": "      auxFluidModel = new CSU2IdealAir();"
+    },
+    {
+      "line": 918,
+      "text": "      break;"
+    },
+    {
+      "line": 919,
+      "text": ""
+    },
+    {
+      "line": 920,
+      "text": "    case COOLPROP:"
+    },
+    {
+      "line": 921,
+      "text": ""
+    },
+    {
+      "line": 922,
+      "text": "      auxFluidModel = new CCoolProp(config->GetFluid_Name());"
+    },
+    {
+      "line": 923,
+      "text": "      break;"
+    },
+    {
+      "line": 924,
+      "text": ""
+    },
+    {
+      "line": 925,
+      "text": "    default:"
+    },
+    {
+      "line": 926,
+      "text": "      SU2_MPI::Error(\"Unknown fluid model.\", CURRENT_FUNCTION);"
+    },
+    {
+      "line": 927,
+      "text": "      break;"
+    },
+    {
+      "line": 928,
+      "text": "  }"
+    },
+    {
+      "line": 929,
+      "text": ""
+    },
+    {
+      "line": 930,
+      "text": "  if (free_stream_temp) {"
+    },
+    {
+      "line": 931,
+      "text": "    auxFluidModel->SetTDState_PT(Pressure_FreeStream, Temperature_FreeStream);"
+    },
+    {
+      "line": 932,
+      "text": "    Density_FreeStream = auxFluidModel->GetDensity();"
+    },
+    {
+      "line": 933,
+      "text": "    config->SetDensity_FreeStream(Density_FreeStream);"
+    },
+    {
+      "line": 934,
+      "text": "  }"
+    },
+    {
+      "line": 1168,
+      "text": "        FluidModel[thread] = new CDataDrivenFluid(config, false);"
+    },
+    {
+      "line": 1169,
+      "text": "        break;"
+    },
+    {
+      "line": 1170,
+      "text": ""
+    },
+    {
+      "line": 1171,
+      "text": "      case RAH_PHASE_AIR:"
+    },
+    {
+      "line": 1172,
+      "text": "        FluidModel[thread] = new CSU2PhaseAwareAir();"
+    },
+    {
+      "line": 1173,
+      "text": "        break;"
+    },
+    {
+      "line": 1174,
+      "text": "      case IDEAL_AIR_VARIABLE_CP:"
+    },
+    {
+      "line": 1175,
+      "text": "        FluidModel[thread] = new CSU2IdealAir();"
+    },
+    {
+      "line": 1176,
+      "text": "        break;"
+    },
+    {
+      "line": 1177,
+      "text": ""
+    },
+    {
+      "line": 1178,
+      "text": "      case COOLPROP:"
+    },
+    {
+      "line": 1179,
+      "text": "        FluidModel[thread] = new CCoolProp(config->GetFluid_Name());"
+    },
+    {
+      "line": 1180,
+      "text": "        break;"
+    },
+    {
+      "line": 1181,
+      "text": "    }"
+    },
+    {
+      "line": 1182,
+      "text": ""
+    },
+    {
+      "line": 1183,
+      "text": "    GetFluidModel()->SetEnergy_Prho(Pressure_FreeStreamND, Density_FreeStreamND);"
+    },
+    {
+      "line": 1184,
+      "text": "    if (viscous) {"
+    },
+    {
+      "line": 1185,
+      "text": "      GetFluidModel()->SetLaminarViscosityModel(config);"
+    },
+    {
+      "line": 1186,
+      "text": "      GetFluidModel()->SetThermalConductivityModel(config);"
+    },
+    {
+      "line": 1187,
+      "text": "      GetFluidModel()->SetMassDiffusivityModel(config);"
+    },
+    {
+      "line": 1188,
+      "text": "    }"
+    },
+    {
+      "line": 1189,
+      "text": ""
+    },
+    {
+      "line": 1190,
+      "text": "  }"
+    },
+    {
+      "line": 1191,
+      "text": "  END_SU2_OMP_PARALLEL"
+    },
+    {
+      "line": 1192,
+      "text": ""
+    },
+    {
+      "line": 1193,
+      "text": "  Energy_FreeStreamND = GetFluidModel()->GetStaticEnergy() + 0.5*ModVel_FreeStreamND*ModVel_FreeStreamND;"
+    },
+    {
+      "line": 1194,
+      "text": ""
+    },
+    {
+      "line": 5293,
+      "text": ""
+    },
+    {
+      "line": 5294,
+      "text": "}"
+    },
+    {
+      "line": 5295,
+      "text": ""
+    },
+    {
+      "line": 5296,
+      "text": "void CEulerSolver::BC_Riemann(CGeometry *geometry, CSolver **solver_container,"
+    },
+    {
+      "line": 5297,
+      "text": "                              CNumerics *conv_numerics, CNumerics *visc_numerics,"
+    },
+    {
+      "line": 5298,
+      "text": "                              CConfig *config, unsigned short val_marker) {"
+    },
+    {
+      "line": 5299,
+      "text": "  SU2_ZONE_SCOPED"
+    },
+    {
+      "line": 5300,
+      "text": ""
+    },
+    {
+      "line": 5301,
+      "text": "  const string Marker_Tag = config->GetMarker_All_TagBound(val_marker);"
+    },
+    {
+      "line": 5302,
+      "text": "  const bool viscous      = config->GetViscous(),"
+    },
+    {
+      "line": 5303,
+      "text": "             implicit     = config->GetKind_TimeIntScheme() == EULER_IMPLICIT,"
+    },
+    {
+      "line": 5304,
+      "text": "             gravity      = config->GetGravityForce(),"
+    },
+    {
+      "line": 5305,
+      "text": "             tkeNeeded    = config->GetKind_Turb_Model() == TURB_MODEL::SST,"
+    },
+    {
+      "line": 5306,
+      "text": "             ideal_gas    = config->GetKind_FluidModel() == STANDARD_AIR ||"
+    },
+    {
+      "line": 5307,
+      "text": "                            config->GetKind_FluidModel() == IDEAL_GAS;"
+    },
+    {
+      "line": 5308,
+      "text": ""
+    },
+    {
+      "line": 5309,
+      "text": "  su2double **P_Tensor = new su2double*[nVar],"
+    },
+    {
+      "line": 5310,
+      "text": "            **invP_Tensor = new su2double*[nVar];"
+    },
+    {
+      "line": 5311,
+      "text": "  for (auto iVar = 0u; iVar < nVar; iVar++){"
+    },
+    {
+      "line": 5312,
+      "text": "    P_Tensor[iVar] = new su2double[nVar];"
+    },
+    {
+      "line": 5313,
+      "text": "    invP_Tensor[iVar] = new su2double[nVar];"
+    },
+    {
+      "line": 5314,
+      "text": "  }"
+    },
+    {
+      "line": 5315,
+      "text": ""
+    },
+    {
+      "line": 5316,
+      "text": "  /*--- Loop over all the vertices on this boundary marker ---*/"
+    },
+    {
+      "line": 5317,
+      "text": ""
+    },
+    {
+      "line": 5318,
+      "text": "  SU2_OMP_FOR_DYN(OMP_MIN_SIZE)"
+    },
+    {
+      "line": 5319,
+      "text": "  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {"
+    }
+  ],
+  "SU2_CFD/src/numerics/flow/convection/roe.cpp": [
+    {
+      "line": 810,
+      "text": "  // \u65b0\u8eab\u4efd\u975e\u6cd5\u5e73\u5747\u660e\u786e\u62d2\u7edd\uff1b\u5408\u6cd5Roe\u516c\u5f0f\u53ca\u65e7\u6a21\u578b\u884c\u4e3a\u4fdd\u6301\u3002"
+    },
+    {
+      "line": 811,
+      "text": "  if (config->GetKind_FluidModel() == RAH_PHASE_AIR &&"
+    },
+    {
+      "line": 812,
+      "text": "      (!std::isfinite(RoeSoundSpeed2) || RoeSoundSpeed2 <= 0.0))"
+    },
+    {
+      "line": 813,
+      "text": "    throw std::domain_error(\"RAH_PHASE_ROE_AVERAGE_REJECTED\");"
+    },
+    {
+      "line": 814,
+      "text": "  if (RoeSoundSpeed2 <= 0.0) {"
+    },
+    {
+      "line": 815,
+      "text": "    for (iVar = 0; iVar < nVar; iVar++) {"
+    },
+    {
+      "line": 816,
+      "text": "      Flux[iVar] = 0.0;"
+    },
+    {
+      "line": 817,
+      "text": "      for (jVar = 0; jVar < nVar; jVar++) {"
+    },
+    {
+      "line": 818,
+      "text": "      Jacobian_i[iVar][iVar] = 0.0;"
+    },
+    {
+      "line": 819,
+      "text": "      Jacobian_j[iVar][iVar] = 0.0;"
+    },
+    {
+      "line": 820,
+      "text": "      }"
+    },
+    {
+      "line": 821,
+      "text": "    }"
+    },
+    {
+      "line": 822,
+      "text": "    AD::SetPreaccOut(Flux, nVar);"
+    },
+    {
+      "line": 823,
+      "text": "    AD::EndPreacc();"
+    },
+    {
+      "line": 824,
+      "text": ""
+    },
+    {
+      "line": 825,
+      "text": "    return ResidualType<>(Flux, Jacobian_i, Jacobian_j);"
+    },
+    {
+      "line": 826,
+      "text": "  }"
+    },
+    {
+      "line": 827,
+      "text": ""
+    },
+    {
+      "line": 828,
+      "text": "  RoeSoundSpeed = sqrt(RoeSoundSpeed2);"
+    },
+    {
+      "line": 829,
+      "text": ""
+    },
+    {
+      "line": 830,
+      "text": "  /*--- Compute ProjFlux_i ---*/"
+    },
+    {
+      "line": 831,
+      "text": "  GetInviscidProjFlux(&Density_i, Velocity_i, &Pressure_i, &Enthalpy_i, Normal, ProjFlux_i);"
+    },
+    {
+      "line": 832,
+      "text": ""
+    },
+    {
+      "line": 833,
+      "text": "  /*--- Compute ProjFlux_j ---*/"
+    },
+    {
+      "line": 834,
+      "text": "  GetInviscidProjFlux(&Density_j, Velocity_j, &Pressure_j, &Enthalpy_j, Normal, ProjFlux_j);"
+    },
+    {
+      "line": 835,
+      "text": ""
+    },
+    {
+      "line": 836,
+      "text": "  /*--- Compute P and Lambda (do it with the Normal) ---*/"
+    }
+  ],
+  "SU2_CFD/src/output/CFlowCompOutput.cpp": [
+    {
+      "line": 316,
+      "text": "  }"
+    },
+    {
+      "line": 317,
+      "text": "}"
+    },
+    {
+      "line": 318,
+      "text": ""
+    },
+    {
+      "line": 319,
+      "text": "void CFlowCompOutput::LoadVolumeData(CConfig *config, CGeometry *geometry, CSolver **solver, unsigned long iPoint){"
+    },
+    {
+      "line": 320,
+      "text": ""
+    },
+    {
+      "line": 321,
+      "text": "  const auto* Node_Flow = solver[FLOW_SOL]->GetNodes();"
+    },
+    {
+      "line": 322,
+      "text": "  const CVariable* Node_Turb = nullptr;"
+    },
+    {
+      "line": 323,
+      "text": "  if (config->GetKind_Turb_Model() != TURB_MODEL::NONE) Node_Turb = solver[TURB_SOL]->GetNodes();"
+    },
+    {
+      "line": 324,
+      "text": "  auto* Node_Geo  = geometry->nodes;"
+    },
+    {
+      "line": 325,
+      "text": ""
+    },
+    {
+      "line": 326,
+      "text": "  if (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP)"
+    },
+    {
+      "line": 327,
+      "text": "    SetVolumeOutputValue(\"FLOW_PRIMITIVE_K\", iPoint, static_cast<const CNSVariable*>(Node_Flow)->GetFlowPrimitiveK(iPoint));"
+    },
+    {
+      "line": 328,
+      "text": ""
+    },
+    {
+      "line": 329,
+      "text": "  LoadCoordinates(Node_Geo->GetCoord(iPoint), iPoint);"
+    },
+    {
+      "line": 330,
+      "text": ""
+    },
+    {
+      "line": 331,
+      "text": "  SetVolumeOutputValue(\"DENSITY\",    iPoint, Node_Flow->GetSolution(iPoint, 0));"
+    },
+    {
+      "line": 332,
+      "text": "  SetVolumeOutputValue(\"MOMENTUM-X\", iPoint, Node_Flow->GetSolution(iPoint, 1));"
+    },
+    {
+      "line": 333,
+      "text": "  SetVolumeOutputValue(\"MOMENTUM-Y\", iPoint, Node_Flow->GetSolution(iPoint, 2));"
+    },
+    {
+      "line": 334,
+      "text": "  if (nDim == 3){"
+    },
+    {
+      "line": 335,
+      "text": "    SetVolumeOutputValue(\"MOMENTUM-Z\", iPoint, Node_Flow->GetSolution(iPoint, 3));"
+    },
+    {
+      "line": 336,
+      "text": "    SetVolumeOutputValue(\"ENERGY\",     iPoint, Node_Flow->GetSolution(iPoint, 4));"
+    },
+    {
+      "line": 337,
+      "text": "  } else {"
+    },
+    {
+      "line": 338,
+      "text": "    SetVolumeOutputValue(\"ENERGY\",     iPoint, Node_Flow->GetSolution(iPoint, 3));"
+    },
+    {
+      "line": 339,
+      "text": "  }"
+    },
+    {
+      "line": 340,
+      "text": ""
+    },
+    {
+      "line": 341,
+      "text": "  if (gridMovement){"
+    },
+    {
+      "line": 342,
+      "text": "    SetVolumeOutputValue(\"GRID_VELOCITY-X\", iPoint, Node_Geo->GetGridVel(iPoint)[0]);"
+    },
+    {
+      "line": 399,
+      "text": "    SetVolumeOutputValue(\"ROE_DISSIPATION\", iPoint, Node_Flow->GetRoe_Dissipation(iPoint));"
+    },
+    {
+      "line": 400,
+      "text": "  }"
+    },
+    {
+      "line": 401,
+      "text": ""
+    },
+    {
+      "line": 402,
+      "text": "  LoadVolumeDataScalar(config, solver, geometry, iPoint);"
+    },
+    {
+      "line": 403,
+      "text": ""
+    },
+    {
+      "line": 404,
+      "text": "  LoadCommonFVMOutputs(config, geometry, iPoint);"
+    },
+    {
+      "line": 405,
+      "text": ""
+    },
+    {
+      "line": 406,
+      "text": "  if (config->GetTime_Domain()) {"
+    },
+    {
+      "line": 407,
+      "text": "    LoadTimeAveragedData(iPoint, Node_Flow, Node_Turb, config);"
+    },
+    {
+      "line": 408,
+      "text": "  }"
+    },
+    {
+      "line": 409,
+      "text": "}"
+    },
+    {
+      "line": 410,
+      "text": ""
+    },
+    {
+      "line": 411,
+      "text": "void CFlowCompOutput::LoadHistoryData(CConfig *config, CGeometry *geometry, CSolver **solver)  {"
+    },
+    {
+      "line": 412,
+      "text": ""
+    },
+    {
+      "line": 413,
+      "text": "  CSolver* flow_solver = solver[FLOW_SOL];"
+    },
+    {
+      "line": 414,
+      "text": "  CSolver* mesh_solver = solver[MESH_SOL];"
+    },
+    {
+      "line": 415,
+      "text": ""
+    },
+    {
+      "line": 416,
+      "text": "  SetHistoryOutputValue(\"RMS_DENSITY\", log10(flow_solver->GetRes_RMS(0)));"
+    },
+    {
+      "line": 417,
+      "text": "  SetHistoryOutputValue(\"RMS_MOMENTUM-X\", log10(flow_solver->GetRes_RMS(1)));"
+    },
+    {
+      "line": 418,
+      "text": "  SetHistoryOutputValue(\"RMS_MOMENTUM-Y\", log10(flow_solver->GetRes_RMS(2)));"
+    },
+    {
+      "line": 419,
+      "text": "  if (nDim == 2)"
+    },
+    {
+      "line": 420,
+      "text": "    SetHistoryOutputValue(\"RMS_ENERGY\", log10(flow_solver->GetRes_RMS(3)));"
+    },
+    {
+      "line": 421,
+      "text": "  else {"
+    },
+    {
+      "line": 422,
+      "text": "    SetHistoryOutputValue(\"RMS_MOMENTUM-Z\", log10(flow_solver->GetRes_RMS(3)));"
+    },
+    {
+      "line": 423,
+      "text": "    SetHistoryOutputValue(\"RMS_ENERGY\", log10(flow_solver->GetRes_RMS(4)));"
+    },
+    {
+      "line": 424,
+      "text": "  }"
+    },
+    {
+      "line": 425,
+      "text": "  SetHistoryOutputValue(\"MAX_DENSITY\", log10(flow_solver->GetRes_Max(0)));"
+    }
+  ]
+}

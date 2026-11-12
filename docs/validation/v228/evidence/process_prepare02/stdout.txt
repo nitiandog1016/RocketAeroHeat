@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\preparePhaseEulerV228.py", line 184, in <module>
+    if sys.argv[1] in ('prepare01','prepare02'):prepare(sys.argv[1])
+  File "E:\RocketAeroHeat\scripts\preparePhaseEulerV228.py", line 148, in prepare
+    ('resources.json',resources),('initial_state.json',initial)]:save(out/name,value)
+  File "E:\RocketAeroHeat\scripts\runSU2RocketPhaseV222.py", line 20, in save
+    tmp=p.with_name(p.name+'.tmp');tmp.write_text(json.dumps(obj,indent=2,allow_nan=False)+'\n',encoding='utf8');os.replace(str(tmp),str(p))
+  File "D:\anacondapython\lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+  File "D:\anacondapython\lib\json\encoder.py", line 201, in encode
+    chunks = list(chunks)
+  File "D:\anacondapython\lib\json\encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "D:\anacondapython\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "D:\anacondapython\lib\json\encoder.py", line 325, in _iterencode_list
+    yield from chunks
+  File "D:\anacondapython\lib\json\encoder.py", line 438, in _iterencode
+    o = _default(o)
+  File "D:\anacondapython\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type int32 is not JSON serializable

@@ -1,0 +1,109 @@
+--- a/Common/include/option_structure.hpp
++++ b/Common/include/option_structure.hpp
+@@ -659,6 +659,7 @@
+   COOLPROP = 10,          /*!< \brief Thermodynamics library. */
+   FLUID_FLAMELET = 11,    /*!< \brief lookup table (LUT) method for premixed flamelets. */
+   DATADRIVEN_FLUID = 12,  /*!< \brief multi-layer perceptron driven fluid model. */
++  RAH_PHASE_AIR_EULER = 16, // 独立Euler分派，同相态/能量坐标
+   RAH_PHASE_AIR = 15, // 相态标准Air，内部能量+300000J/kg
+   IDEAL_AIR_VARIABLE_CP = 14, // RocketAeroHeat固定组分变比热空气
+   FLUID_CANTERA = 13,     /*!< \brief Reacting flows model. */
+@@ -674,6 +675,7 @@
+   MakePair("MUTATIONPP", MUTATIONPP)
+   MakePair("SU2_NONEQ", SU2_NONEQ)
+   MakePair("FLUID_MIXTURE", FLUID_MIXTURE)
++  MakePair("RAH_PHASE_AIR_EULER", RAH_PHASE_AIR_EULER)
+   MakePair("RAH_PHASE_AIR", RAH_PHASE_AIR)
+   MakePair("IDEAL_AIR_VARIABLE_CP", IDEAL_AIR_VARIABLE_CP)
+   MakePair("COOLPROP", COOLPROP)
+--- a/Common/src/CConfig.cpp
++++ b/Common/src/CConfig.cpp
+@@ -3818,6 +3818,22 @@
+         SU2_MPI::Error("RAH_PHASE_AIR supports Riemann ambient PT characteristic boundary", CURRENT_FUNCTION);
+   }
+ 
++  // RocketAeroHeat: 独立无黏身份；旧RAH_PHASE_AIR的NS/SA合同保持。
++  if (Kind_FluidModel == RAH_PHASE_AIR_EULER) {
++    if (SystemMeasurements != SI || Ref_NonDim != DIMENSIONAL || Time_Domain ||
++        Multizone_Problem || DiscreteAdjoint || ContinuousAdjoint ||
++        Kind_Solver != MAIN_SOLVER::EULER || Kind_Turb_Model != TURB_MODEL::NONE ||
++        Kind_Upwind_Flow != UPWIND::ROE || nMarker_WallFunctions != 0 ||
++        nMarker_Euler == 0 || nMarker_Riemann == 0 ||
++        nMarker_Isothermal || nMarker_HeatFlux || nMarker_HeatTransfer ||
++        nMarker_FarField || nMarker_Supersonic_Inlet || nMarker_Supersonic_Outlet ||
++        nMarker_Inlet || nMarker_Outlet || Low_Mach_Corr || nMarker_Giles || GetDynamic_Grid())
++      SU2_MPI::Error("RAH_PHASE_AIR_EULER requires direct SI steady EULER/NONE, ROE, slip wall and ambient PT characteristics", CURRENT_FUNCTION);
++    for (unsigned short i=0; i<nMarker_Riemann; ++i)
++      if (Kind_Data_Riemann[i] != STATIC_SUPERSONIC_INFLOW_PT)
++        SU2_MPI::Error("RAH_PHASE_AIR_EULER supports ambient PT characteristic boundary only", CURRENT_FUNCTION);
++  }
++
+   /*--- Check if CoolProp is used with non-dimensionalization. ---*/
+   if (Kind_FluidModel == COOLPROP && Ref_NonDim != DIMENSIONAL) {
+     SU2_MPI::Error("CoolProp can not be used with non-dimensionalization.", CURRENT_FUNCTION);
+--- a/SU2_CFD/src/solvers/CEulerSolver.cpp
++++ b/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -908,6 +908,7 @@
+       auxFluidModel = new CDataDrivenFluid(config);
+ 
+       break;
++    case RAH_PHASE_AIR_EULER:
+     case RAH_PHASE_AIR:
+       config->SetGas_Constant(rah_phase_air::R);
+       auxFluidModel = new CSU2PhaseAwareAir();
+@@ -1168,7 +1169,8 @@
+         FluidModel[thread] = new CDataDrivenFluid(config, false);
+         break;
+ 
+-      case RAH_PHASE_AIR:
++      case RAH_PHASE_AIR_EULER:
++    case RAH_PHASE_AIR:
+         FluidModel[thread] = new CSU2PhaseAwareAir();
+         break;
+       case IDEAL_AIR_VARIABLE_CP:
+@@ -1332,7 +1334,7 @@
+     Unit.str("");
+     if      (config->GetSystemMeasurements() == SI) Unit << "N.m/kg.K";
+     else if (config->GetSystemMeasurements() == US) Unit << "lbf.ft/slug.R";
+-    if (config->GetKind_FluidModel() == COOLPROP || (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP || config->GetKind_FluidModel() == RAH_PHASE_AIR)) {
++    if (config->GetKind_FluidModel() == COOLPROP || (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP || (config->GetKind_FluidModel() == RAH_PHASE_AIR || config->GetKind_FluidModel() == RAH_PHASE_AIR_EULER))) {
+       NonDimTable << "Spec. Heat Ratio" << "-" << "-" << "-" << "-";
+     }
+     else {
+@@ -1353,6 +1355,7 @@
+     case PR_GAS:
+       ModelTable << "PR_GAS";
+       break;
++    case RAH_PHASE_AIR_EULER:
+     case RAH_PHASE_AIR:
+       ModelTable << "RAH_PHASE_AIR 60..2000K phase domain e+300000";
+       break;
+@@ -1976,7 +1979,7 @@
+ 
+       bool rah_invalid_reconstruction = false;
+       if (!ideal_gas || low_mach_corr) {
+-        const bool variable_air = (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP || config->GetKind_FluidModel() == RAH_PHASE_AIR);
++        const bool variable_air = (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP || (config->GetKind_FluidModel() == RAH_PHASE_AIR || config->GetKind_FluidModel() == RAH_PHASE_AIR_EULER));
+         const bool with_k = variable_air && config->GetKind_Turb_Model() == TURB_MODEL::SST;
+         const su2double k_i = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
+         const su2double k_j = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(jPoint,0) : 0.0;
+@@ -5350,7 +5353,7 @@
+       const auto Density_i = nodes->GetDensity(iPoint);
+ 
+       const auto Energy_i = nodes->GetEnergy(iPoint);
+-      const bool variable_air = (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP || config->GetKind_FluidModel() == RAH_PHASE_AIR);
++      const bool variable_air = (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP || (config->GetKind_FluidModel() == RAH_PHASE_AIR || config->GetKind_FluidModel() == RAH_PHASE_AIR_EULER));
+       const su2double k_i = variable_air && tkeNeeded ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
+       const su2double StaticEnergy_i = rah_air::thermal_energy(Energy_i,Velocity2_i,k_i);
+ 
+--- a/SU2_CFD/src/numerics/flow/convection/roe.cpp
++++ b/SU2_CFD/src/numerics/flow/convection/roe.cpp
+@@ -808,7 +808,7 @@
+   ComputeRoeAverage();
+ 
+   // 新身份非法平均明确拒绝；合法Roe公式及旧模型行为保持。
+-  if (config->GetKind_FluidModel() == RAH_PHASE_AIR &&
++  if ((config->GetKind_FluidModel() == RAH_PHASE_AIR || config->GetKind_FluidModel() == RAH_PHASE_AIR_EULER) &&
+       (!std::isfinite(RoeSoundSpeed2) || RoeSoundSpeed2 <= 0.0))
+     throw std::domain_error("RAH_PHASE_ROE_AVERAGE_REJECTED");
+   if (RoeSoundSpeed2 <= 0.0) {

@@ -4,17 +4,13 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-12）
 
-最新为[v227鼻部热剖面](docs/HYBRID_PHASE_NOSE_HEATING_V227.md)：1306面热候选、面积0.1790893%、区域入壁热功率866.146994W，实际剖面与15字段工作台已接。独立审核发现壁剪应力误读外缘变量，源码已修、保存剖面离线恢复及三站独立BVP通过；**修复后MATLAB尚未实际回归，原运行科学验收false**。新物理资格0，全面积尚未完成。此段及[v227执行点](docs/validation/v227/NEXT_DECISION.md)覆盖下方历史进度。
+最新[v228执行与准备](docs/HYBRID_PHASE_CONTINUATION_V228.md)：v227壁列修复的实际30°BVP和主工作台15字段/区域面积通过，原失败保留。已有1306面鼻部热候选/0.1790893%/866.146994W保持，本轮新面积及物理资格0。
 
-现有工作台“打开结果JSON”可加载[v227恢复原面15字段](docs/validation/v227/evidence/recovered/rocket_workbench.json)，查看q、p、外缘温度/速度、剪应力、Cf和密度加权厚度。给定Tw、未知固体Tw与恢复温度估计分开。[原面热流图](docs/validation/v227/evidence/recovered/rocket_nose_heat.png)灰色为未解；共享WebGL未改、无本轮浏览器验收。新模式`cfg.analysisMode='phaseAwareNoseHeating'`已接主工况；下一只补唯一非零角站壁列实际回归，随后直接鼻部到后体的熵层/非相似/三维入口。不要重复31站和旧波系。
+下一优先接入3128个前体原面/0.317970330711786m²，约占全表面16.18%；这是目标面积。相态SU2独立Euler四文件补丁、64982tet原完整域配置提案与19752面精确映射已准备，**尚未编译/运行**，旧NS引擎不可直接启动。按[执行点](docs/validation/v228/NEXT_DECISION.md)直接隔离构建/整体兼容控制，不重做物性、鼻部或旧网格；必要黏性反馈仍负责收缩/后体/底面。
 
-小版本也同步到本GitHub仓库，不再默认生成大型本地工程包。用户已于2026-10-28确认保持仓库公开并直接同步。后文的“不推送/本地包/私有”属于历史阶段说明，以本节及[项目约定](AGENTS.md)为准。
+现有工作台“打开结果JSON”继续加载[鼻部15字段](docs/validation/v227/evidence/recovered/rocket_workbench.json)：本轮实际主导出的全部数值/状态与它一致。q、p、温度、剪应力、Cf、真实剖面积分及来源分开显示；给定Tw和未知固体Tw不混合。共享WebGL未修改，无本轮浏览器交互验收。
 
-最新[v226真实球鼻外缘](docs/HYBRID_PHASE_NOSE_EDGE_V226.md)已在原19752面中计算1306面同相态压力、外缘温度和速度候选，面积0.00351844m²/0.1790893%。主工况、主工作台九字段和独立复算/源SHA通过；新热流面积及物理资格仍0。首软件/指纹失败保留，恢复验证通过。完整气动热尚未完成。
-
-[目标文档](docs/PROJECT_GOALS.md)采用低成本全局外流＋工程边界层＋必要局部黏性CFD。下一项按[具体任务](docs/validation/v226/NEXT_DECISION.md)接同物性热剖面、有限驻点入口及原面q/功率，保持真实偏置驻点和后体职责。可用`cfg.analysisMode='phaseAwareNoseEdge'`经`runAeroHeatSingleCase`只做局部外缘；旧新相态层流一键守卫保留。工程旧热流有值面积66.5626%、同面p/q交集43.0999%；完整域研究覆盖100%仍非物理认证。全面积与科研UI独立最高，累计后置。
-
-在现有工作台打开[v226真实鼻部JSON](docs/validation/v226/evidence/matlab02/rocket_workbench.json)，可查看原面压力/Te/U/Mach/恢复温度估计及弧长；热流和固体壁温明确未知、给定Tw300K另列。[原面压力与温度图](docs/validation/v226/evidence/render01/rocket_nose_comparison.png)只读保存结果，灰色区域未解；本轮无浏览器交互验收。
+小版本同步公开GitHub；完整源码直接更新，不默认生成ZIP/工程包。大体场及重复JSON留E盘，必要紧凑证据公开，保护并发和独有数据。单时刻全面积与科研UI最高，累计热量后置，总目标active。
 
 现有工作台通过“打开结果JSON”读取[v223四阶段对比](docs/validation/v223/evidence/workbench01/rocket_phase_comparison.json)，选择第51/101/151/200次更新的压力、热流或壁流体温差；同变量共用色标，给定/未知壁温分开。可查看[真实箭体对比图](docs/validation/v223/evidence/workbench01/rocket_phase_comparison.png)。逐值回读和前端纯合同通过，无本轮浏览器交互验收。已有[v176区域页面](docs/AEROTHERMAL_EVIDENCE_LEDGER_V176.md)的原面探针、周向曲线和导出继续保留。
 

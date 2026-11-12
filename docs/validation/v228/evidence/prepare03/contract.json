@@ -1,0 +1,46 @@
+{
+  "schema": "RAH.PhaseEulerDesign.v1",
+  "identity": "rah-su2-phase-air-euler-eplus300k-v1",
+  "nativeFluidModel": "RAH_PHASE_AIR_EULER",
+  "solver": "EULER",
+  "energyShiftJkg": 300000,
+  "physicalEnthalpyReference": "hs(298.15K)=0",
+  "meshPath": "E:\\RocketAeroHeat\\outputs\\v194_validation\\rocket01\\mesh.su2",
+  "meshSHA256": "faff7bf901d330eaf53a4616014620281f54e58e8137d1a0e4943ab14804f0e7",
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "wallBoundary": "MARKER_EULER",
+  "outerBoundary": "general-EOS-ambient-PT-characteristics",
+  "turbulenceModel": "NONE",
+  "condition": {
+    "Mach": 5,
+    "pressurePa": 1197.0279007383137,
+    "temperatureK": 226.50908361133003,
+    "speedMps": 1509.141366435956,
+    "flowDirection": [
+      -0.9396926207859084,
+      0,
+      0.3420201433256687
+    ],
+    "maximumPolarAngleDeg": 60
+  },
+  "heatFluxAvailable": false,
+  "wallTemperatureSolved": false,
+  "engineRegistered": false,
+  "runAuthorized": false,
+  "fullSurfaceResponsibility": true,
+  "engineeringHeatReady": false,
+  "physicalQualification": false,
+  "currentEnginePath": "E:\\RocketAeroHeat\\outputs\\v220_validation\\build02\\SU2_CFD.exe",
+  "currentEngineSHA256": "badd860ac7a1399c06f0d411fcb13bd85c014da69c61a4b5288f28ff42b0f828",
+  "currentEngineRejectedByExistingNSGuard": true,
+  "pending": [
+    "new isolated registration and all gas dispatch branches",
+    "native Euler slip/primitive/characteristic/save-restart compatibility",
+    "accurate actual process resource and full development budget",
+    "steady residual/stability/balance and spatial/farfield error",
+    "wall-adjacent vs BL-edge sampling and original-face qualification",
+    "labelled three-dimensional paths/entropy/total-enthalpy/metric and nonsimilar inlet",
+    "separation/base/strong crossflow mature viscous feedback"
+  ]
+}
