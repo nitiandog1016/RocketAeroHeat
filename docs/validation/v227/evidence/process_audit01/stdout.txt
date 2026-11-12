@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\auditPhaseNoseHeatingV227.py", line 127, in <module>
+    if __name__=='__main__':main(sys.argv[1])
+  File "E:\RocketAeroHeat\scripts\auditPhaseNoseHeatingV227.py", line 62, in main
+    refs=[independent_profile(air,profiles[j]) for j in indices]
+  File "E:\RocketAeroHeat\scripts\auditPhaseNoseHeatingV227.py", line 62, in <listcomp>
+    refs=[independent_profile(air,profiles[j]) for j in indices]
+  File "E:\RocketAeroHeat\scripts\auditPhaseNoseHeatingV227.py", line 48, in independent_profile
+    for key,err in errors.items():assert err<(2e-3 if key in ('delta','deltaStar','massThickness') else 2e-4),(key,err)
+AssertionError: ('wallShearStress', 0.9995588089490224)

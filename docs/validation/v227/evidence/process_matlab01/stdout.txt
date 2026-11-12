@@ -1,0 +1,24 @@
+[警告: 为文件或文件夹指定的位置 perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LC_ALL = "C.UTF-8",
+	LC_CTYPE = "C.UTF-8",
+	LANG = "C.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+D:\matlab\toolbox\matlab\addons_common\matlab 无效。] 
+[> 位置：restoredefaultpath (第 57 行)] 
+{在不同结构体之间进行下标赋值。
+
+出错 solvePhaseAwareNoseHeating (第 61 行)
+    stations(j)=struct('thetaRad',th,'arcM',R*th,'metricM',metric,'xi',xi(j),'beta',beta, ...
+
+出错 runPhaseAwareNoseHeatingCase (第 28 行)
+h=solvePhaseAwareNoseHeating(current,e,Tw);current.phaseAwareNoseHeating=h;
+
+出错 runAeroHeatSingleCase (第 24 行)
+    [current,freestream,report]=runPhaseAwareNoseHeatingCase(mesh,cfg,progressFcn);return;
+
+出错 testPhaseNoseHeatingV227 (第 14 行)
+[m,fs,caseReport]=runAeroHeatSingleCase(m,cfg);h=m.phaseAwareNoseHeating;
+} 
+ERROR: MATLAB error Exit Status: 0x00000001
