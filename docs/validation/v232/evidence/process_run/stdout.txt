@@ -1,0 +1,430 @@
+
+Parsing config file for zone 0
+
+----------------- Physical Case Definition ( Zone 0 ) -------------------
+Compressible Euler equations.
+Mach number: 5.
+Angle of attack (AoA): 160 deg, and angle of sideslip (AoS): -0 deg.
+No restart solution, use the values at infinity (freestream).
+Dimensional simulation.
+The reference area is 0.0721045 m^2.
+The semi-span will be computed using the max y(3D) value.
+The reference length is 1 m.
+Reference origin for moment evaluation is (0, 0, 0).
+Surface(s) where the force coefficients are evaluated: wall.
+
+Surface(s) plotted in the output file: wall.
+Input mesh file name: mesh.su2
+
+--------------- Space Numerical Integration ( Zone 0 ) ------------------
+Roe (with entropy fix = 0.001) solver for the flow inviscid terms.
+Standard Roe without low-dissipation function.
+Second order integration in space, with slope limiter.
+Venkatakrishnan-Wang slope-limiting method, with constant: 0.05.
+Gradient for upwind reconstruction: inverse-distance weighted Least-Squares.
+Gradient for viscous and source terms: inverse-distance weighted Least-Squares.
+
+--------------- Time Numerical Integration  ( Zone 0 ) ------------------
+Local time stepping (steady state simulation).
+Euler implicit method for the flow equations.
+BCGSTAB is used for solving the linear system.
+Using LU-SGS preconditioning.
+Convergence criteria of the linear solver: 1e-05.
+Max number of linear iterations: 10.
+CFL adaptation. Factor down: 0.5, factor up: 1.1,
+                lower limit: 0.05, upper limit: 5,
+                acceptable linear residual: 0.001'
+                starting iteration: 0.
+Courant-Friedrichs-Lewy number:      0.1
+
+------------------ Convergence Criteria  ( Zone 0 ) ---------------------
+Maximum number of solver subiterations: 800.
+Begin convergence monitoring at iteration 10.
+Residual minimum value: 1e-8.
+Cauchy series min. value: 1e-10.
+Number of Cauchy elements: 100.
+Begin windowed time average at iteration 0.
+
+-------------------- Output Information ( Zone 0 ) ----------------------
+File writing frequency: 
++------------------------------------+
+|                     File| Frequency|
++------------------------------------+
+|            RESTART_ASCII|        50|
++------------------------------------+
+Writing the convergence history file every 1 inner iterations.
+Writing the screen convergence history every 10 inner iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: surface_flow.
+Volume file name: volume_flow.
+Restart file name: restart_flow.
+
+------------- Config File Boundary Information ( Zone 0 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|                         Euler wall|                               wall|
++-----------------------------------------------------------------------+
+|                   Riemann boundary|                           farfield|
++-----------------------------------------------------------------------+
+
+-------------------- Output Preprocessing ( Zone 0 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: INNER_ITER, RMS_DENSITY, RMS_MOMENTUM-X, RMS_MOMENTUM-Y, RMS_ENERGY
+History output group(s): ITER, RMS_RES, AERO_COEFF, LINSOL
+Convergence field(s): RMS_DENSITY, RMS_MOMENTUM-X, RMS_MOMENTUM-Y, RMS_MOMENTUM-Z, RMS_ENERGY
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE, RESIDUAL
+
+------------------- Geometry Preprocessing ( Zone 0 ) -------------------
+Three dimensional problem.
+18027 grid points.
+64982 volume elements.
+2 surface markers.
+19752 boundary elements in index 0 (Marker = wall).
+6572 boundary elements in index 1 (Marker = farfield).
+64982 tetrahedra.
+Setting point connectivity.
+Renumbering points (Reverse Cuthill McKee Ordering).
+Recomputing point connectivity.
+Setting element connectivity.
+Checking the numerical grid orientation.
+All volume elements are correctly oriented.
+There has been a re-orientation of 26324 TRIANGLE surface elements.
+Identifying edges and vertices.
+Setting the control volume structure.
+Volume of the computational grid: 381.435.
+Searching for the closest normal neighbors to the surfaces.
+Storing a mapping from global to local point index.
+Compute the surface curvature.
+Max K: 664.941. Mean K: 38.7194. Standard deviation K: 42.0129.
+Computing mesh quality statistics for the dual control volumes.
++--------------------------------------------------------------+
+|           Mesh Quality Metric|        Minimum|        Maximum|
++--------------------------------------------------------------+
+|    Orthogonality Angle (deg.)|        34.1455|        84.9462|
+|     CV Face Area Aspect Ratio|          1.706|        158.575|
+|           CV Sub-Volume Ratio|              1|        321.313|
+|                     CV Volume|    3.09183e-10|        6.80676|
++--------------------------------------------------------------+
+Finding max control volume width.
+Semi-span length = 0.151498 m.
+Wetted area = 1.95529 m^2.
+Area projection in the x-plane = 0.0718916 m^2, y-plane = 0.603548 m^2, z-plane = 0.602949 m^2.
+Max. coordinate in the x-direction = 0.05 m, y-direction = 0.151498 m, z-direction = 0.151338 m.
+Min. coordinate in the x-direction = -2.82832 m, y-direction = -0.151473 m, z-direction = -0.151317 m.
+Computing wall distances.
+
+-------------------- Solver Preprocessing ( Zone 0 ) --------------------
+Inviscid flow: Computing density based on free-stream
+temperature and pressure using the ideal gas law.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|                        -|                         -|RAH_PHASE_AIR 60..2000K phase domain e+300000|
++------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|          Gas Constant|       287.049|             1|  N.m/kg.K|       287.049|
+|      Spec. Heat Ratio|             -|             -|         -|             -|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|       1197.03|             1|        Pa|       1197.03|
+|               Density|     0.0184104|             1|    kg/m^3|     0.0184104|
+|           Temperature|       226.509|             1|         K|       226.509|
+|          Total Energy|   1.30185e+06|             1|   m^2/s^2|   1.30185e+06|
+|            Velocity-X|      -1418.13|             1|       m/s|      -1418.13|
+|            Velocity-Y|            -0|             1|       m/s|            -0|
+|            Velocity-Z|       516.157|             1|       m/s|       516.157|
+|    Velocity Magnitude|       1509.14|             1|       m/s|       1509.14|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|             5|
++------------------------------------------------------------------------------+
+All ranks use edge coloring.
+Among the ranks that use edge coloring,
+      the minimum efficiency is 1,
+      the maximum number of colors is 1,
+      the minimum edge color group size is 512.
+Initialize Jacobian structure (Euler). MG level: 0.
+
+------------------- Numerics Preprocessing ( Zone 0 ) -------------------
+
+----------------- Integration Preprocessing ( Zone 0 ) ------------------
+
+------------------- Iteration Preprocessing ( Zone 0 ) ------------------
+Euler/Navier-Stokes/RANS fluid iteration.
+
+------------------------------ Begin Solver -----------------------------
+
+Simulation Run using the Single-zone Driver
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|           0|   -2.604500|    0.193804|   -0.342638|    3.531226|
+|          10|   -2.641912|    0.496088|   -0.339668|    3.473240|
+|          20|   -2.485741|    0.675209|   -0.328811|    3.633099|
+|          30|   -2.224194|    0.939553|    0.007547|    3.925893|
+|          40|   -2.122431|    1.035851|    0.371927|    4.005747|
+|          50|   -1.981363|    1.199206|    0.431571|    4.156674|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000050.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|          60|   -2.643152|    0.571065|   -0.199234|    3.569249|
+|          70|   -3.193794|    0.023623|   -0.657237|    3.027697|
+|          80|   -3.530577|   -0.227644|   -1.318857|    2.784339|
+|          90|   -3.827036|   -0.510023|   -1.487256|    2.512757|
+|         100|   -4.011202|   -0.715867|   -1.729199|    2.304899|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000100.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         110|   -4.219266|   -0.951880|   -1.906043|    2.057500|
+|         120|   -4.434866|   -1.207119|   -2.057767|    1.794579|
+|         130|   -4.613824|   -1.421217|   -2.181955|    1.542078|
+|         140|   -4.744617|   -1.568280|   -2.325923|    1.371228|
+|         150|   -4.757724|   -1.588060|   -2.203712|    1.350665|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000150.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         160|   -4.789691|   -1.626248|   -2.341605|    1.291016|
+|         170|   -4.791942|   -1.626125|   -2.322201|    1.296326|
+|         180|   -4.788294|   -1.624096|   -2.331108|    1.295759|
+|         190|   -4.788463|   -1.622307|   -2.325678|    1.300940|
+|         200|   -4.796168|   -1.627510|   -2.309966|    1.334667|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000200.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         210|   -4.772787|   -1.604659|   -2.308368|    1.325211|
+|         220|   -4.794554|   -1.630070|   -2.317944|    1.290068|
+|         230|   -4.647677|   -1.472395|   -2.262588|    1.489112|
+|         240|   -4.669970|   -1.498287|   -2.269440|    1.458008|
+|         250|   -4.704471|   -1.535531|   -2.291799|    1.413933|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000250.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         260|   -4.737396|   -1.570582|   -2.306670|    1.370569|
+|         270|   -4.733824|   -1.564215|   -2.305436|    1.384877|
+|         280|   -4.745585|   -1.579035|   -2.320806|    1.366194|
+|         290|   -4.729291|   -1.558837|   -2.309247|    1.412886|
+|         300|   -4.746108|   -1.580591|   -2.317888|    1.361914|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000300.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         310|   -4.758972|   -1.594280|   -2.325626|    1.346227|
+|         320|   -4.724428|   -1.556265|   -2.307711|    1.398791|
+|         330|   -4.733638|   -1.567146|   -2.321790|    1.385446|
+|         340|   -4.733564|   -1.565579|   -2.318759|    1.386312|
+|         350|   -4.750844|   -1.583594|   -2.330211|    1.364431|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000350.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         360|   -4.746235|   -1.579077|   -2.333930|    1.370303|
+|         370|   -4.715179|   -1.543457|   -2.315468|    1.413159|
+|         380|   -4.738066|   -1.567528|   -2.329122|    1.385273|
+|         390|   -4.720638|   -1.549255|   -2.323254|    1.408334|
+|         400|   -4.749215|   -1.577874|   -2.321051|    1.375007|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000400.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         410|   -4.740205|   -1.569440|   -2.296321|    1.387330|
+|         420|   -4.805412|   -1.653115|   -2.355208|    1.315810|
+|         430|   -4.577737|   -1.415628|   -2.219492|    1.576803|
+|         440|   -4.654162|   -1.481708|   -2.358966|    1.514823|
+|         450|   -4.420932|   -1.261317|   -2.083153|    1.716879|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000450.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         460|   -4.430430|   -1.266716|   -2.120530|    1.717935|
+|         470|   -4.497594|   -1.334667|   -2.159901|    1.649198|
+|         480|   -4.585237|   -1.423284|   -2.207945|    1.559822|
+|         490|   -4.673306|   -1.503357|   -2.253061|    1.483430|
+|         500|   -4.909417|   -1.754329|   -2.409788|    1.200769|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000500.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         510|   -4.699494|   -1.523903|   -2.320096|    1.448903|
+|         520|   -4.963624|   -1.798301|   -2.483244|    1.127868|
+|         530|   -4.746358|   -1.569808|   -2.421574|    1.416165|
+|         540|   -4.663334|   -1.485512|   -2.336697|    1.498429|
+|         550|   -4.713134|   -1.537907|   -2.372151|    1.438415|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000550.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         560|   -4.760445|   -1.580755|   -2.392805|    1.398658|
+|         570|   -4.796985|   -1.614915|   -2.400828|    1.387090|
+|         580|   -4.752571|   -1.577329|   -2.424048|    1.400610|
+|         590|   -4.760476|   -1.586289|   -2.403456|    1.385123|
+|         600|   -4.806284|   -1.633988|   -2.416827|    1.330732|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000600.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         610|   -4.798096|   -1.622396|   -2.424089|    1.350795|
+|         620|   -4.789072|   -1.611929|   -2.404898|    1.361401|
+|         630|   -4.811991|   -1.636706|   -2.417243|    1.334957|
+|         640|   -4.804713|   -1.631884|   -2.419398|    1.334362|
+|         650|   -4.774525|   -1.595613|   -2.427175|    1.403722|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000650.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         660|   -4.739263|   -1.560410|   -2.380370|    1.417564|
+|         670|   -4.757567|   -1.580841|   -2.414745|    1.394622|
+|         680|   -4.782790|   -1.607485|   -2.404139|    1.363680|
+|         690|   -4.747436|   -1.570968|   -2.423768|    1.408772|
+|         700|   -4.821748|   -1.644772|   -2.444568|    1.352789|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000700.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         710|   -4.733062|   -1.554887|   -2.389223|    1.423258|
+|         720|   -4.774137|   -1.600113|   -2.413163|    1.371552|
+|         730|   -4.807352|   -1.633331|   -2.422389|    1.334833|
+|         740|   -4.764399|   -1.587076|   -2.433858|    1.392458|
+|         750|   -4.820943|   -1.646751|   -2.449966|    1.322941|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000750.csv            |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|         760|   -4.737546|   -1.559485|   -2.403168|    1.417865|
+|         770|   -4.796988|   -1.622715|   -2.429834|    1.345182|
+|         780|   -4.823537|   -1.650384|   -2.431791|    1.314804|
+|         790|   -4.857471|   -1.686740|   -2.444738|    1.271855|
+|         799|   -4.783917|   -1.605412|   -2.448861|    1.396697|
+
+----------------------------- Solver Exit -------------------------------
+
+Maximum number of iterations reached (ITER = 800) before convergence.
++-----------------------------------------------------------------------+
+|      Convergence Field     |     Value    |   Criterion  |  Converged |
++-----------------------------------------------------------------------+
+|                    rms[Rho]|      -4.78392|          < -8|          No|
+|                   rms[RhoU]|      -1.60541|          < -8|          No|
+|                   rms[RhoV]|      -2.44886|          < -8|          No|
+|                   rms[RhoW]|      -2.08382|          < -8|          No|
+|                   rms[RhoE]|        1.3967|          < -8|          No|
++-----------------------------------------------------------------------+
+-------------------------------------------------------------------------
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
+|SU2 ASCII restart + iter           |restart_flow_000799.csv            |
++-----------------------------------------------------------------------+
+Warning: there are 8 non-physical points in the solution.
+Warning: 171 reconstructed states for upwinding are non-physical.
+
+--------------------------- Finalizing Solver ---------------------------
+Deleted CNumerics container.
+Deleted CIntegration container.
+Deleted CSolver container.
+Deleted CIteration container.
+Deleted CInterface container.
+Deleted CGeometry container.
+Deleted CFreeFormDefBox class.
+Deleted CSurfaceMovement class.
+Deleted CVolumetricMovement class.
+Deleted CConfig container.
+Deleted nInst container.
+Deleted COutput class.
+-------------------------------------------------------------------------
+
+------------------------- Exit Success (SU2_CFD) ------------------------
+

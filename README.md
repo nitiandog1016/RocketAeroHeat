@@ -4,11 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-12）
 
-最新[v231异常接口修复](docs/HYBRID_PHASE_PRIMITIVE_RECOVERY_V231.md)：同输入捕获与原30步逐字节一致，找到实际物性反算域异常及一个低内能节点。已把相态域拒绝接入原生旧状态回退；合法状态、5类非法试探和非法旧态处理通过原/新控制，独立p/T/导数差≤5.685e−16。**修复完整箭体尚未运行，没有新增热流面积或物理资格。**
+最新[v232真实全局发展](docs/HYBRID_PHASE_EULER_DEVELOPMENT_V232.md)：原64982单元正常完成800更新，约191秒，18个完整场已保存；原前30轨迹保持。末全表面压力变化约0.000904%，但残差/净收支及独立动量/空间外域仍未通过，末预处理8点回退。**不是合格外缘或气动热解，没有新增热流面积或物理资格。**
 
-最终修复驱动已编译链接。按[执行点](docs/validation/v231/NEXT_DECISION.md)另登记唯一原完整全局外流有限发展，保持原初态/数值组合/物性域，核对原30步与回退事件及全部科学门槛。可信全局外流后接3128前体原面/0.317970330711786m²的工程热层，该16.18%仍是目标面积。Euler不求壁热流，强三维/收缩/后体/底面仍需成熟黏性反馈。
+按[执行点](docs/validation/v232/NEXT_DECISION.md)一次形成前体外缘与尾部黏性反馈的完整区域方案；不以压力稳定为由盲续。前体3128面/0.317970330711786m²仍是工程热层目标；其壁面稳定不等于完整区域资格。Euler不求壁热流，强三维/收缩/后体/底面仍需成熟黏性反馈。
 
-现有工作台“打开结果JSON”可加载[全局外流研究11字段](docs/validation/v230/evidence/workbench01/rocket_euler_research.json)：初0/更新1压力与流体温度，更新1总焓/熵/三维速度；热流和固体Tw明确未知。共同色标、方法和适用限制随字段保存，[科学预览](docs/validation/v230/evidence/workbench01/rocket_euler_research.png)已查看。已有[鼻部15字段](docs/validation/v227/evidence/recovered/rocket_workbench.json)继续保留。本轮未改共享WebGL、未运行MATLAB，也没有浏览器交互验收。
+现有工作台“打开结果JSON”可加载[三阶段研究13字段](docs/validation/v232/evidence/workbench01/rocket_euler_research.json)：更新50/400/800压力与流体温度、末场总焓/熵/三维速度，热流和固体Tw明确未知。217272个数回读通过，共同色标/方法/限制随字段保存；[压力对数色标科学图](docs/validation/v232/evidence/plot02/rocket_euler_comparison.png)已查看。已有[鼻部15字段](docs/validation/v227/evidence/recovered/rocket_workbench.json)继续保留。本轮未改共享WebGL、未运行MATLAB，无浏览器交互验收。
 
 小版本同步公开GitHub；完整源码直接更新，不默认生成ZIP/工程包。大体场及重复JSON留E盘，必要紧凑证据公开，保护并发和独有数据。单时刻全面积与科研UI最高，累计热量后置，总目标active。
 

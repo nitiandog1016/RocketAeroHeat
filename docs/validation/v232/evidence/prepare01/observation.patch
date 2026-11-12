@@ -1,0 +1,31 @@
+--- v231/rocketEulerRun.cpp
++++ v232/rocketEulerObserved.cpp
+@@ -52,6 +52,7 @@
+ }
+ 
+ #include "rocketEulerFailure.hpp"
++#include "EulerDevelopmentObservationV232.hpp"
+ 
+ // 模块二：只重载观测时机；父类Solve仍负责完整迭代、收敛和文件调度。
+ class ObservedIteration final : public CFluidIteration {
+@@ -60,10 +61,12 @@
+   void Iterate(COutput* out,CIntegration**** integration,CGeometry**** geometry,CSolver***** solver,
+     CNumerics****** numerics,CConfig** config,CSurfaceMovement** surface,CVolumetricMovement*** grid,
+     CFreeFormDefBox*** box,unsigned short zone,unsigned short inst) override {
++    observation::verify_native_prefix(config[zone]->GetInnerIter());
+     observation::failure_phase="native-iterate";
+     CFluidIteration::Iterate(out,integration,geometry,solver,numerics,config,surface,grid,box,zone,inst);
+     observation::failure_phase="post-update-observation";
+     observation::observe(geometry[zone][inst][0],solver[zone][inst][0][FLOW_SOL],config[zone]);
++    observation::record_rejections_and_check(config[zone]);
+     observation::failure_phase="native-monitor-output";
+   }
+ };
+@@ -81,6 +84,7 @@
+     delete iteration_container[0][0];iteration_container[0][0]=new ObservedIteration(cfg);
+     observation::failure_geometry=g;observation::failure_flow=f;observation::failure_config=cfg;
+     observation::frame(g,f,0,false);
++    observation::load_baseline();
+     StartSolver();
+     if(observation::saved!=observation::last)observation::frame(g,f,observation::last,true);
+     std::ofstream result(observation::folder+"/native_completion.json");
