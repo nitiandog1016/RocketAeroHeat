@@ -1,0 +1,20 @@
+--- a/SU2_CFD/src/solvers/CEulerSolver.cpp
++++ b/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -5570,6 +5570,17 @@
+       const su2double Enthalpy_b = Energy_b + Pressure_b/Density_b;
+       const su2double Kappa_b = GetFluidModel()->GetdPde_rho() / Density_b;
+       const su2double Chi_b = GetFluidModel()->GetdPdrho_e() - Kappa_b * (StaticEnergy_b+k_b);
++
++      // RocketAeroHeat：Euler公开观测缓存；只保存已计算状态，不参与任何残差或Jacobian。
++      if (config->GetKind_FluidModel() == RAH_PHASE_AIR_EULER) {
++        auto observed = GetCharacPrimVar(val_marker, iVertex);
++        observed[prim_idx.Temperature()] = Temperature_b;
++        for (auto d = 0u; d < nDim; ++d) observed[prim_idx.Velocity() + d] = Velocity_b[d];
++        observed[prim_idx.Pressure()] = Pressure_b;
++        observed[prim_idx.Density()] = Density_b;
++        observed[prim_idx.Enthalpy()] = Enthalpy_b;
++        observed[nDim+4] = GetFluidModel()->GetSoundSpeed();
++      }
+ 
+       /*--- Compute the residuals ---*/
+       su2double Residual[MAXNVAR] = {0};

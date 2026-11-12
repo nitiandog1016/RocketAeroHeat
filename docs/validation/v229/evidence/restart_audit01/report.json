@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "actualRestartNodesBitwise": 24,
+  "conservativeValuesBitwise": 120,
+  "wholeNativeInterfacePassed": true,
+  "manufacturedControlOnly": true,
+  "CFDIterations": 0,
+  "newHeatAreaM2": 0,
+  "newQualifiedAreaM2": 0,
+  "actualEulerEngineBuilt": true,
+  "fullJacobianVerified": false,
+  "physicalSteadyBalanceVerified": false,
+  "rejectedFiles": [
+    {
+      "case": "missing_node",
+      "reason": "EULER_FRAME_COVERAGE"
+    },
+    {
+      "case": "duplicate_node",
+      "reason": "EULER_FRAME_IDS"
+    },
+    {
+      "case": "wrong_coordinate",
+      "reason": "EULER_FRAME_COORDINATES"
+    }
+  ],
+  "control": {
+    "passed": true,
+    "errors": {
+      "characteristicState": 3.321662211331655e-16,
+      "boundaryEOS": 1.734723475976807e-18,
+      "boundarySoundSpeed": 1.5168413021082241e-16,
+      "boundaryH": 1.7882853790643372e-16,
+      "boundaryFlux": 2.478424615192135e-16,
+      "unitNormal": 0,
+      "geometryNormal": 0,
+      "slipMomentumAndEnergy": 1.3839852038581975e-16,
+      "slipResidual": 2.6437185773886544e-17,
+      "slipDiagonalJacobian": 0,
+      "projectedEOS": 1.734723475976807e-18,
+      "projectedEnergy": 2.1151725013088722e-16,
+      "initialConservative": 7.477323587705681e-16
+    },
+    "characteristicClasses": [
+      "all-in",
+      "all-out",
+      "mixed-in",
+      "mixed-out"
+    ],
+    "boundaryRows": 6,
+    "wallRows": 6,
+    "nativeStateRefusals": [
+      {
+        "case": "negative_density",
+        "rejected": "1"
+      },
+      {
+        "case": "out_of_domain_energy",
+        "rejected": "1"
+      }
+    ],
+    "identityRefusals": 18,
+    "initialNodes": 24,
+    "savedValuesBitwise": 120,
+    "actualRestartVerified": false,
+    "fullFlowJacobianVerified": false,
+    "CFDIterations": 0,
+    "newQualifiedAreaM2": 0
+  }
+}
