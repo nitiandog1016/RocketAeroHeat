@@ -1,0 +1,33 @@
+--- SU2-8.6/CEulerVariable.cpp
++++ phase-euler-native-primitive-rejection-v1/CEulerVariable.cpp
+@@ -25,8 +25,9 @@
+  * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "../../include/variables/CEulerVariable.hpp"
+-#include "../../include/fluid/CFluidModel.hpp"
++#include "variables/CEulerVariable.hpp"
++#include "fluid/CFluidModel.hpp"
++#include "PhaseAirPrimitiveRecovery.hpp"
+ 
+ unsigned long EulerNPrimVarGrad(const CConfig *config, unsigned long ndim) {
+   if (config->GetContinuous_Adjoint()) return ndim + 4;
+@@ -119,12 +120,13 @@
+ 
+   /*--- Check will be moved inside fluid model plus error description strings ---*/
+ 
+-  FluidModel->SetTDState_rhoe(density, staticEnergy);
++  // 具名物性域拒绝进入下方原生Solution_Old回退，合法状态不改值。
++  const bool rah_valid_state = rah_phase_recovery::set_trial_state(FluidModel, density, staticEnergy);
+ 
+-  bool check_dens  = SetDensity(iPoint);
+-  bool check_press = SetPressure(iPoint, FluidModel->GetPressure());
+-  bool check_sos   = SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+-  bool check_temp  = SetTemperature(iPoint, FluidModel->GetTemperature());
++  bool check_dens  = !rah_valid_state || SetDensity(iPoint);
++  bool check_press = !rah_valid_state || SetPressure(iPoint, FluidModel->GetPressure());
++  bool check_sos   = !rah_valid_state || SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
++  bool check_temp  = !rah_valid_state || SetTemperature(iPoint, FluidModel->GetTemperature());
+ 
+   /*--- Check that the solution has a physical meaning ---*/
+ 

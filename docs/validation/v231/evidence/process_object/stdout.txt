@@ -1,0 +1,25 @@
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp:55:93: error: definition of 'CEulerVariable::CEulerVariable(su2double, const su2double*, su2double, long unsigned int, long unsigned int, long unsigned int, const CConfig*)' is not in namespace enclosing 'CEulerVariable' [-fpermissive]
+   55 |                                unsigned long ndim, unsigned long nvar, const CConfig *config)
+      |                                                                                             ^
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp: In constructor 'CEulerVariable::CEulerVariable(su2double, const su2double*, su2double, long unsigned int, long unsigned int, long unsigned int, const CConfig*)':
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp:63:19: error: 'EulerNSecVar' was not declared in this scope; did you mean 'rah_phase_recovery::EulerNSecVar'?
+   63 |   nSecondaryVar = EulerNSecVar(config);
+      |                   ^~~~~~~~~~~~
+      |                   rah_phase_recovery::EulerNSecVar
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp:47:15: note: 'rah_phase_recovery::EulerNSecVar' declared here
+   47 | unsigned long EulerNSecVar(const CConfig *config) {
+      |               ^~~~~~~~~~~~
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp: At global scope:
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp:113:78: error: definition of 'bool CEulerVariable::SetPrimVar(long unsigned int, CFluidModel*)' is not in namespace enclosing 'CEulerVariable' [-fpermissive]
+  113 | bool CEulerVariable::SetPrimVar(unsigned long iPoint, CFluidModel *FluidModel) {
+      |                                                                              ^
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp:168:83: error: definition of 'void CEulerVariable::SetSecondaryVar(long unsigned int, CFluidModel*)' is not in namespace enclosing 'CEulerVariable' [-fpermissive]
+  168 | void CEulerVariable::SetSecondaryVar(unsigned long iPoint, CFluidModel *FluidModel) {
+      |                                                                                   ^
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp:176:2: error: expected '}' at end of input
+  176 | }
+      |  ^
+In file included from E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\CEulerVariable.cpp:30:
+E:\RocketAeroHeat\outputs\v231_validation\recovery_prepare03\PhaseAirPrimitiveRecovery.hpp:5:30: note: to match this '{'
+    5 | namespace rah_phase_recovery {
+      |                              ^
