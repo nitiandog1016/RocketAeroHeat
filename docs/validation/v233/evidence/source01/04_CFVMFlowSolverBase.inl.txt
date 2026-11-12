@@ -1,0 +1,59 @@
+   586 
+   587 template <class V, ENUM_REGIME R>
+   588 void CFVMFlowSolverBase<V, R>::CompleteImplicitIteration(CGeometry *geometry, CSolver**, CConfig *config) {
+   589   SU2_ZONE_SCOPED
+   590 
+   591   if constexpr (R == ENUM_REGIME::COMPRESSIBLE) ComputeUnderRelaxationFactor(config);
+   592 
+   593   /*--- Update solution with under-relaxation and communicate it. ---*/
+   594 
+   595   if (!config->GetContinuous_Adjoint()) {
+   596     SU2_OMP_FOR_STAT(omp_chunk_size)
+   597     for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+   598       for (unsigned short iVar = 0; iVar < nVar; iVar++) {
+   599         nodes->AddSolution(iPoint, iVar, nodes->GetUnderRelaxation(iPoint) * LinSysSol(iPoint, iVar));
+   600       }
+   601     }
+   602     END_SU2_OMP_FOR
+   603   }
+   604 
+   605   for (unsigned short iPeriodic = 1; iPeriodic <= config->GetnMarker_Periodic()/2; iPeriodic++) {
+   606     InitiatePeriodicComms(geometry, config, iPeriodic, PERIODIC_IMPLICIT);
+   607     CompletePeriodicComms(geometry, config, iPeriodic, PERIODIC_IMPLICIT);
+   608   }
+   609 
+   610   InitiateComms(geometry, config, MPI_QUANTITIES::SOLUTION);
+   611   CompleteComms(geometry, config, MPI_QUANTITIES::SOLUTION);
+   612 
+   613   /*--- For verification cases, compute the global error metrics. ---*/
+   614   ComputeVerificationError(geometry, config);
+   615 }
+   616 
+   617 template <class V, ENUM_REGIME R>
+   618 void CFVMFlowSolverBase<V, R>::ImplicitEuler_Iteration(CGeometry *geometry, CSolver**, CConfig *config) {
+   619   SU2_ZONE_SCOPED
+   620 
+   621   PrepareImplicitIteration(geometry, nullptr, config);
+   622 
+   623   /*--- Solve or smooth the linear system. ---*/
+   624 
+   625   SU2_OMP_FOR_(schedule(static,OMP_MIN_SIZE) SU2_NOWAIT)
+   626   for (unsigned long iPoint = nPointDomain; iPoint < nPoint; iPoint++) {
+   627     LinSysRes.SetBlock_Zero(iPoint);
+   628     LinSysSol.SetBlock_Zero(iPoint);
+   629   }
+   630   END_SU2_OMP_FOR
+   631 
+   632   auto iter = System.Solve(Jacobian, LinSysRes, LinSysSol, geometry, config);
+   633 
+   634   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+   635     SetIterLinSolver(iter);
+   636     SetResLinSolver(System.GetResidual());
+   637   }
+   638   END_SU2_OMP_SAFE_GLOBAL_ACCESS
+   639 
+   640   CompleteImplicitIteration(geometry, nullptr, config);
+   641 }
+   642 
+   643 template <class V, ENUM_REGIME R>
+   644 void CFVMFlowSolverBase<V, R>::ComputeVorticityAndStrainMag(const CConfig& config, const CGeometry *geometry, unsigned short iMesh) {

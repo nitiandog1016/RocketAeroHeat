@@ -1,0 +1,66 @@
+   111 }
+   112 
+   113 bool CEulerVariable::SetPrimVar(unsigned long iPoint, CFluidModel *FluidModel) {
+   114 
+   115   bool RightVol = true;
+   116 
+   117   SetVelocity(iPoint);   // Computes velocity and velocity^2
+   118   su2double density      = GetDensity(iPoint);
+   119   su2double staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint);
+   120 
+   121   /*--- Check will be moved inside fluid model plus error description strings ---*/
+   122 
+   123   // 具名物性域拒绝进入下方原生Solution_Old回退，合法状态不改值。
+   124   const bool rah_valid_state = rah_phase_recovery::set_trial_state(FluidModel, density, staticEnergy);
+   125 
+   126   bool check_dens  = !rah_valid_state || SetDensity(iPoint);
+   127   bool check_press = !rah_valid_state || SetPressure(iPoint, FluidModel->GetPressure());
+   128   bool check_sos   = !rah_valid_state || SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+   129   bool check_temp  = !rah_valid_state || SetTemperature(iPoint, FluidModel->GetTemperature());
+   130 
+   131   /*--- Check that the solution has a physical meaning ---*/
+   132 
+   133   if (check_dens || check_press || check_sos || check_temp) {
+   134 
+   135     /*--- Copy the old solution ---*/
+   136 
+   137     for (unsigned long iVar = 0; iVar < nVar; iVar++)
+   138       Solution(iPoint, iVar) = Solution_Old(iPoint, iVar);
+   139 
+   140     /*--- Recompute the primitive variables ---*/
+   141 
+   142     SetVelocity(iPoint);   // Computes velocity and velocity^2
+   143     su2double density = GetDensity(iPoint);
+   144     su2double staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint);
+   145     /* check will be moved inside fluid model plus error description strings*/
+   146     FluidModel->SetTDState_rhoe(density, staticEnergy);
+   147 
+   148     SetDensity(iPoint);
+   149     SetPressure(iPoint, FluidModel->GetPressure());
+   150     SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+   151     SetTemperature(iPoint, FluidModel->GetTemperature());
+   152 
+   153     RightVol = false;
+   154 
+   155   }
+   156 
+   157   SetEnthalpy(iPoint); // Requires pressure computation.
+   158 
+   159   /*--- Set look-up variables in case of data-driven fluid model ---*/
+   160   if (DataDrivenFluid) {
+   161     SetDataExtrapolation(iPoint, FluidModel->GetExtrapolation());
+   162     SetEntropy(iPoint, FluidModel->GetEntropy());
+   163   }
+   164 
+   165   return RightVol;
+   166 }
+   167 
+   168 void CEulerVariable::SetSecondaryVar(unsigned long iPoint, CFluidModel *FluidModel) {
+   169   if (nSecondaryVar == 0) return;
+   170 
+   171   /*--- Compute secondary thermo-physical properties (partial derivatives...) ---*/
+   172 
+   173   SetdPdrho_e(iPoint, FluidModel->GetdPdrho_e());
+   174   SetdPde_rho(iPoint, FluidModel->GetdPde_rho());
+   175 
+   176 }

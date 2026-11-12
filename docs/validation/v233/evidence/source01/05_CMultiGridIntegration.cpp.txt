@@ -1,0 +1,127 @@
+   718 }
+   719 
+   720 void CMultiGridIntegration::PreSmoothing(unsigned short RunTime_EqSystem,
+   721                                          CGeometry**** geometry,
+   722                                          CSolver***** solver_container,
+   723                                          CConfig **config_container,
+   724                                          CSolver* solver_fine,
+   725                                          CNumerics** numerics_fine,
+   726                                          CGeometry* geometry_fine,
+   727                                          CSolver** solver_container_fine,
+   728                                          CConfig *config,
+   729                                          unsigned short iMesh,
+   730                                          unsigned short iZone,
+   731                                          unsigned short iRKLimit) {
+   732   SU2_ZONE_SCOPED
+   733 
+   734   const auto& mgOpts = config->GetMGOptions();
+   735   const bool classical_rk4 = (config->GetKind_TimeIntScheme() == CLASSICAL_RK4_EXPLICIT);
+   736   const unsigned short nPreSmooth = mgOpts.MG_PreSmooth[iMesh];
+   737   const unsigned long timeIter = config->GetTimeIter();
+   738   const bool early_exit = mgOpts.MG_Smooth_EarlyExit && (nPreSmooth > 1);
+   739   const bool need_per_step_rms = early_exit || mgOpts.MG_Smooth_Output;
+   740   /*--- Also capture initial RMS at MESH_0 for the cross-cycle EMA controller, even with nPreSmooth==1. ---*/
+   741   const bool need_initial_rms = need_per_step_rms || (iMesh == MESH_0 && mgOpts.MG_Smooth_EarlyExit);
+   742   const passivedouble stag_tol = (mgOpts.MG_Smooth_StagnationTol > 0.0)
+   743                                  ? SU2_TYPE::GetValue(mgOpts.MG_Smooth_StagnationTol) : passivedouble(1.0);
+   744 
+   745   /*--- Reset the shared early-exit flag (master only). ---*/
+   746   SU2_OMP_SAFE_GLOBAL_ACCESS(mg_early_exit_flag = false;)
+   747   for (unsigned short iPreSmooth = 0; iPreSmooth < nPreSmooth; iPreSmooth++) {
+   748 
+   749     /*--- Time and space integration ---*/
+   750     for (unsigned short iRKStep = 0; iRKStep < iRKLimit; iRKStep++) {
+   751 
+   752       /*--- Send-Receive boundary conditions, and preprocessing ---*/
+   753       solver_fine->Preprocessing(geometry_fine, solver_container_fine, config, iMesh, iRKStep, RunTime_EqSystem, false);
+   754 
+   755       if (iRKStep == 0) {
+   756 
+   757         /*--- Set the old solution ---*/
+   758         solver_fine->Set_OldSolution();
+   759 
+   760         if (classical_rk4) solver_fine->Set_NewSolution();
+   761         solver_fine->SetTime_Step(geometry_fine, solver_container_fine, config, iMesh, timeIter);
+   762         Adjoint_Setup(geometry, solver_container, config_container, RunTime_EqSystem, timeIter, iZone);
+   763       }
+   764 
+   765       /*--- Space integration ---*/
+   766       Space_Integration(geometry_fine, solver_container_fine, numerics_fine, config, iMesh, iRKStep, RunTime_EqSystem);
+   767 
+   768       /*--- Time integration, update solution using the old solution plus the solution increment ---*/
+   769       Time_Integration(geometry_fine, solver_container_fine, config, iRKStep, RunTime_EqSystem);
+   770 
+   771       /*--- At iRKStep==0 LinSysRes = R(u_k). ---*/
+   772       if (iRKStep == 0 && need_initial_rms) {
+   773         BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+   774           const passivedouble defect = ComputeLinSysResRMS(solver_fine);
+   775           prePostEarlyExit(iPreSmooth, iMesh, defect, mgOpts, stag_tol, early_exit,
+   776                            lastPreSmoothRMS[iMesh], lastPreSmoothExitReason[iMesh],
+   777                            lastPreSmoothWorstStepRatio[iMesh], lastPreSmoothWorstStep[iMesh]);
+   778         }
+   779         END_SU2_OMP_SAFE_GLOBAL_ACCESS
+   780         if (mg_early_exit_flag) break;
+   781       }
+   782 
+   783 
+   784       /*--- Send-Receive boundary conditions, and postprocessing ---*/
+   785       solver_fine->Postprocessing(geometry_fine, solver_container_fine, config, iMesh);
+   786     }
+   787     SU2_OMP_SAFE_GLOBAL_ACCESS(lastPreSmoothIters[iMesh] = iPreSmooth + 1;)
+   788     if (mg_early_exit_flag) break;
+   789   }
+   790 
+   791   /*--- Record the final pre-smooth defect; MultiGrid_Cycle overwrites it with the exact
+   792    *    d_N on non-coarsest levels. ---*/
+   793   if (nPreSmooth > 0) {
+   794     BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+   795       lastPreSmoothRMS[iMesh][1] = mg_prev_smooth_rms;
+   796     }
+   797     END_SU2_OMP_SAFE_GLOBAL_ACCESS
+   798   }
+   799 }
+   800 
+   801 
+   802 void CMultiGridIntegration::PostSmoothing(unsigned short RunTime_EqSystem,
+   803                                           CSolver* solver_fine,
+   804                                           CNumerics** numerics_fine,
+   805                                           CGeometry* geometry_fine,
+   806                                           CSolver** solver_container_fine,
+   807                                           CConfig *config,
+   808                                           unsigned short iMesh,
+   809                                           unsigned short iRKLimit) {
+   810   SU2_ZONE_SCOPED
+   811 
+   812   const auto& mgOpts = config->GetMGOptions();
+   813   const bool classical_rk4 = (config->GetKind_TimeIntScheme() == CLASSICAL_RK4_EXPLICIT);
+   814   const unsigned short nPostSmooth = mgOpts.MG_PostSmooth[iMesh];
+   815   const unsigned long timeIter = config->GetTimeIter();
+   816   const bool early_exit = mgOpts.MG_Smooth_EarlyExit && (nPostSmooth > 1);
+   817   const bool need_per_step_rms = early_exit || mgOpts.MG_Smooth_Output;
+   818   const passivedouble stag_tol = (mgOpts.MG_Smooth_StagnationTol > 0.0)
+   819                                  ? SU2_TYPE::GetValue(mgOpts.MG_Smooth_StagnationTol) : passivedouble(1.0);
+   820 
+   821   /*--- Reset the shared early-exit flag (master only). ---*/
+   822   SU2_OMP_SAFE_GLOBAL_ACCESS(mg_early_exit_flag = false;)
+   823 
+   824   /*--- Do a postsmoothing on the grid iMesh after prolongation from the grid iMesh+1 ---*/
+   825   for (unsigned short iPostSmooth = 0; iPostSmooth < nPostSmooth; iPostSmooth++) {
+   826 
+   827     for (unsigned short iRKStep = 0; iRKStep < iRKLimit; iRKStep++) {
+   828       solver_fine->Preprocessing(geometry_fine, solver_container_fine, config, iMesh, iRKStep, RunTime_EqSystem, false);
+   829       if (iRKStep == 0) {
+   830 
+   831         /*--- Set the old solution ---*/
+   832         solver_fine->Set_OldSolution();
+   833 
+   834         if (classical_rk4) solver_fine->Set_NewSolution();
+   835         solver_fine->SetTime_Step(geometry_fine, solver_container_fine, config, iMesh, timeIter);
+   836       }
+   837 
+   838       /*--- Space integration ---*/
+   839       Space_Integration(geometry_fine, solver_container_fine, numerics_fine, config, iMesh, iRKStep, RunTime_EqSystem);
+   840 
+   841       /*--- Time integration, update solution using the old solution plus the solution increment ---*/
+   842       Time_Integration(geometry_fine, solver_container_fine, config, iRKStep, RunTime_EqSystem);
+   843 
+   844       /*--- At iRKStep==0 LinSysRes = R(u_k) ---*/

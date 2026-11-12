@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\tests\testPhaseRegionalVolumeV233.py", line 46, in <module>
+    if __name__=='__main__':main()
+  File "E:\RocketAeroHeat\tests\testPhaseRegionalVolumeV233.py", line 15, in main
+    top=topology(xyz,cells,{'wall':wall});up=extract_region(top,np.array([True,False]));down=extract_region(top,np.array([False,True]))
+  File "E:\RocketAeroHeat\scripts\phaseEulerRegionalVolume.py", line 60, in topology
+    ordered=np.ascontiguousarray(keys).view(dtype).ravel();marker_ids={}
+ValueError: When changing to a larger dtype, its size must be a divisor of the total size in bytes of the last axis of the array.

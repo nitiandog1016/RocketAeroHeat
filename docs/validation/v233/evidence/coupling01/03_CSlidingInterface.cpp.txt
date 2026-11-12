@@ -1,0 +1,44 @@
+   124 void CSlidingInterface::GetDonor_Variable(CSolver *donor_solution, CGeometry *donor_geometry,
+   125                                           const CConfig *donor_config, unsigned long Marker_Donor,
+   126                                           unsigned long Vertex_Donor, unsigned long Point_Donor) {
+   127 
+   128   const auto nDonorVar = donor_solution->GetnPrimVar();
+   129   /// TODO: Replace with approach compatible with any number of variables (e.g. encapsulate in a "solver info" object).
+   130   const bool turbulent = nDonorVar <= 2;
+   131   if (turbulent){
+   132     /*---  For turbulent solver retrieve solution variables and set then as the donor variables. ---*/
+   133     for (unsigned short iVar = 0; iVar < nDonorVar; iVar++) {
+   134       Donor_Variable[iVar] = donor_solution->GetNodes()->GetSolution(Point_Donor, iVar);
+   135     }
+   136   } else {
+   137     /*---  For flow solver retrieve primitive variables and set them as the donor variables. ---*/
+   138     for (unsigned short iVar = 0; iVar < nDonorVar; iVar++) {
+   139       Donor_Variable[iVar] = donor_solution->GetNodes()->GetPrimitive(Point_Donor, iVar);
+   140     }
+   141   }
+   142 }
+   143 
+   144 void CSlidingInterface::InitializeTarget_Variable(CSolver *target_solution, unsigned long Marker_Target,
+   145                                                   unsigned long Vertex_Target, unsigned short nDonorPoints) {
+   146 
+   147   target_solution->SetnSlidingStates(Marker_Target, Vertex_Target, nDonorPoints); // This is to allocate
+   148   target_solution->SetSlidingStateStructure(Marker_Target, Vertex_Target);
+   149   target_solution->SetnSlidingStates(Marker_Target, Vertex_Target, 0); // Reset counter to 0
+   150 
+   151 }
+   152 
+   153 void CSlidingInterface::SetTarget_Variable(CSolver *target_solution, CGeometry *target_geometry,
+   154                                            const CConfig *target_config, unsigned long Marker_Target,
+   155                                            unsigned long Vertex_Target, unsigned long Point_Target) {
+   156 
+   157   unsigned short iVar, iDonorVertex, nTargetVar;
+   158   nTargetVar = target_solution->GetnPrimVar();
+   159   /*--- Set the Sliding solution with the value of the Target Variable ---*/
+   160 
+   161   iDonorVertex = target_solution->GetnSlidingStates(Marker_Target, Vertex_Target);
+   162 
+   163   for (iVar = 0; iVar < nTargetVar+1; iVar++)
+   164     target_solution->SetSlidingState(Marker_Target, Vertex_Target, iVar, iDonorVertex, Target_Variable[iVar]);
+   165 
+   166   target_solution->SetnSlidingStates( Marker_Target, Vertex_Target, iDonorVertex + 1 );
+   167 }

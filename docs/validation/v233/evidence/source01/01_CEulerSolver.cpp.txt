@@ -1,0 +1,44 @@
+  1756 }
+  1757 
+  1758 unsigned long CEulerSolver::SetPrimitive_Variables(CSolver **solver_container, const CConfig *config) {
+  1759   SU2_ZONE_SCOPED
+  1760 
+  1761   /*--- Number of non-physical points, local to the thread, needs
+  1762    *    further reduction if function is called in parallel ---*/
+  1763   unsigned long nonPhysicalPoints = 0;
+  1764 
+  1765   AD::StartNoSharedReading();
+  1766 
+  1767   SU2_OMP_FOR_STAT(omp_chunk_size)
+  1768   for (unsigned long iPoint = 0; iPoint < nPoint; iPoint ++) {
+  1769 
+  1770     /*--- Compressible flow, primitive variables nDim+9, (T, vx, vy, vz, P, rho, h, c, lamMu, eddyMu, ThCond, Cp) ---*/
+  1771 
+  1772     bool physical = nodes->SetPrimVar(iPoint, GetFluidModel());
+  1773     nodes->SetSecondaryVar(iPoint, GetFluidModel());
+  1774 
+  1775     /* Check for non-realizable states for reporting. */
+  1776 
+  1777     if (!physical) nonPhysicalPoints++;
+  1778   }
+  1779   END_SU2_OMP_FOR
+  1780 
+  1781   AD::EndNoSharedReading();
+  1782 
+  1783   return nonPhysicalPoints;
+  1784 }
+  1785 
+  1786 void CEulerSolver::SetTime_Step(CGeometry *geometry, CSolver **solver_container, CConfig *config,
+  1787                                 unsigned short iMesh, unsigned long Iteration) {
+  1788   SU2_ZONE_SCOPED
+  1789 
+  1790   /*--- Define an object to compute the speed of sound. ---*/
+  1791   struct SoundSpeed {
+  1792     FORCEINLINE su2double operator() (const CEulerVariable& nodes, unsigned long iPoint, unsigned long jPoint) const {
+  1793       return 0.5 * (nodes.GetSoundSpeed(iPoint) + nodes.GetSoundSpeed(jPoint));
+  1794     }
+  1795 
+  1796     FORCEINLINE su2double operator() (const CEulerVariable& nodes, unsigned long iPoint) const {
+  1797       return nodes.GetSoundSpeed(iPoint);
+  1798     }
+  1799 

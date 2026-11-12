@@ -1,0 +1,12 @@
+  1152    * \param[in] val_marker - Surface marker where the boundary condition is applied.
+  1153    */
+  1154   inline void BC_Euler_Wall(CGeometry* geometry, CSolver** solver_container, CNumerics* conv_numerics,
+  1155                             CNumerics* visc_numerics, CConfig* config, unsigned short val_marker) final {
+  1156     /*--- Call the equivalent symmetry plane boundary condition. ---*/
+  1157     BC_Sym_Plane(geometry, solver_container, conv_numerics, visc_numerics, config, val_marker);
+  1158   }
+  1159 
+  1160   void MultigridProjectEulerWall(CGeometry* geometry, const CConfig* config, bool use_solution_old) override;
+  1161 
+  1162   /*!
+  1163    * \author T. Kattmann

@@ -1,0 +1,180 @@
+  1335 void CFVMFlowSolverBase<V, FlowRegime>::BC_Fluid_Interface(CGeometry* geometry, CSolver** solver_container,
+  1336                                                            CNumerics* conv_numerics, CNumerics* visc_numerics,
+  1337                                                            CConfig* config) {
+  1338   SU2_ZONE_SCOPED
+  1339 
+  1340   const bool ideal_gas = config->GetKind_FluidModel() == STANDARD_AIR || config->GetKind_FluidModel() == IDEAL_GAS;
+  1341 
+  1342   unsigned long iVertex, jVertex, iPoint, Point_Normal = 0;
+  1343   unsigned short iDim, iVar, jVar, iMarker, nDonorVertex;
+  1344 
+  1345   bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+  1346   bool viscous = config->GetViscous();
+  1347 
+  1348   su2double Normal[MAXNDIM] = {0.0};
+  1349   su2double PrimVar_i[MAXNVAR] = {0.0};
+  1350   su2double PrimVar_j[MAXNVAR] = {0.0};
+  1351   su2double Secondary_j[MAXNVAR] = {0.0};
+  1352   su2double Residual[MAXNVAR] = {0.0};
+  1353   su2double** Jacobian_i = new su2double*[nVar];
+  1354   for (iVar = 0; iVar < nVar; iVar++) Jacobian_i[iVar] = new su2double[nVar];
+  1355 
+  1356   su2double weight;
+  1357   su2double P_static, rho_static;
+  1358 
+  1359   for (iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
+  1360     if (config->GetMarker_All_KindBC(iMarker) == FLUID_INTERFACE) {
+  1361       SU2_OMP_FOR_DYN(OMP_MIN_SIZE)
+  1362       for (iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+  1363         iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+  1364 
+  1365         if (geometry->nodes->GetDomain(iPoint)) {
+  1366           nDonorVertex = GetnSlidingStates(iMarker, iVertex);
+  1367 
+  1368           /*--- Initialize Residual, this will serve to accumulate the average ---*/
+  1369 
+  1370           for (iVar = 0; iVar < nVar; iVar++) {
+  1371             Residual[iVar] = 0.0;
+  1372             for (jVar = 0; jVar < nVar; jVar++) Jacobian_i[iVar][jVar] = 0.0;
+  1373           }
+  1374 
+  1375           /*--- Loop over the nDonorVertexes and compute the averaged flux ---*/
+  1376 
+  1377           for (jVertex = 0; jVertex < nDonorVertex; jVertex++) {
+  1378             Point_Normal = geometry->vertex[iMarker][iVertex]->GetNormal_Neighbor();
+  1379 
+  1380             for (iVar = 0; iVar < nPrimVar; iVar++) {
+  1381               PrimVar_i[iVar] = nodes->GetPrimitive(iPoint, iVar);
+  1382               PrimVar_j[iVar] = GetSlidingState(iMarker, iVertex, iVar, jVertex);
+  1383             }
+  1384 
+  1385             /*--- Get the weight computed in the interpolator class for the j-th donor vertex ---*/
+  1386 
+  1387             weight = GetSlidingState(iMarker, iVertex, nPrimVar, jVertex);
+  1388 
+  1389             /*--- Set primitive variables ---*/
+  1390 
+  1391             conv_numerics->SetPrimitive(PrimVar_i, PrimVar_j);
+  1392 
+  1393             if (FlowRegime == ENUM_REGIME::COMPRESSIBLE && !ideal_gas) {
+  1394               P_static = PrimVar_j[nDim + 1];
+  1395               rho_static = PrimVar_j[nDim + 2];
+  1396               GetFluidModel()->SetTDState_Prho(P_static, rho_static);
+  1397 
+  1398               Secondary_j[0] = GetFluidModel()->GetdPdrho_e();
+  1399               Secondary_j[1] = GetFluidModel()->GetdPde_rho();
+  1400 
+  1401               conv_numerics->SetSecondary(nodes->GetSecondary(iPoint), Secondary_j);
+  1402             }
+  1403 
+  1404             /*--- Set the normal vector ---*/
+  1405 
+  1406             geometry->vertex[iMarker][iVertex]->GetNormal(Normal);
+  1407             for (iDim = 0; iDim < nDim; iDim++) Normal[iDim] = -Normal[iDim];
+  1408 
+  1409             conv_numerics->SetNormal(Normal);
+  1410 
+  1411             if (dynamic_grid)
+  1412               conv_numerics->SetGridVel(geometry->nodes->GetGridVel(iPoint), geometry->nodes->GetGridVel(iPoint));
+  1413 
+  1414             /*--- Compute the convective residual using an upwind scheme ---*/
+  1415 
+  1416             auto residual = conv_numerics->ComputeResidual(config);
+  1417 
+  1418             /*--- Accumulate the residuals to compute the average ---*/
+  1419 
+  1420             for (iVar = 0; iVar < nVar; iVar++) {
+  1421               Residual[iVar] += weight * residual[iVar];
+  1422               for (jVar = 0; jVar < nVar; jVar++) Jacobian_i[iVar][jVar] += weight * residual.jacobian_i[iVar][jVar];
+  1423             }
+  1424           }
+  1425 
+  1426           /*--- Add Residuals and Jacobians ---*/
+  1427 
+  1428           LinSysRes.AddBlock(iPoint, Residual);
+  1429 
+  1430           if (implicit) Jacobian.AddBlock2Diag(iPoint, Jacobian_i);
+  1431 
+  1432           if (viscous) {
+  1433             /*--- Initialize Residual, this will serve to accumulate the average ---*/
+  1434 
+  1435             for (iVar = 0; iVar < nVar; iVar++) {
+  1436               Residual[iVar] = 0.0;
+  1437               for (jVar = 0; jVar < nVar; jVar++) Jacobian_i[iVar][jVar] = 0.0;
+  1438             }
+  1439 
+  1440             /*--- Loop over the nDonorVertexes and compute the averaged flux ---*/
+  1441 
+  1442             for (jVertex = 0; jVertex < nDonorVertex; jVertex++) {
+  1443               PrimVar_j[nDim + 5] = GetSlidingState(iMarker, iVertex, nDim + 5, jVertex);
+  1444               PrimVar_j[nDim + 6] = GetSlidingState(iMarker, iVertex, nDim + 6, jVertex);
+  1445 
+  1446               /*--- Get the weight computed in the interpolator class for the j-th donor vertex ---*/
+  1447 
+  1448               weight = GetSlidingState(iMarker, iVertex, nPrimVar, jVertex);
+  1449 
+  1450               /*--- Set the normal vector and the coordinates ---*/
+  1451 
+  1452               visc_numerics->SetNormal(Normal);
+  1453               su2double Coord_Reflected[MAXNDIM];
+  1454               GeometryToolbox::PointPointReflect(nDim, geometry->nodes->GetCoord(Point_Normal),
+  1455                                                         geometry->nodes->GetCoord(iPoint), Coord_Reflected);
+  1456               visc_numerics->SetCoord(geometry->nodes->GetCoord(iPoint), Coord_Reflected);
+  1457 
+  1458               /*--- Primitive variables, and gradient ---*/
+  1459 
+  1460               visc_numerics->SetPrimitive(PrimVar_i, PrimVar_j);
+  1461               visc_numerics->SetPrimVarGradient(nodes->GetGradient_Primitive(iPoint),
+  1462                                                 nodes->GetGradient_Primitive(iPoint));
+  1463 
+  1464               /*--- Turbulent kinetic energy ---*/
+  1465 
+  1466               if (config->GetKind_Turb_Model() == TURB_MODEL::SST)
+  1467                 visc_numerics->SetTurbKineticEnergy(solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint, 0),
+  1468                                                     solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint, 0));
+  1469 
+  1470               /*--- Compute and update residual ---*/
+  1471 
+  1472               auto residual = visc_numerics->ComputeResidual(config);
+  1473 
+  1474               /*--- Accumulate the residuals to compute the average ---*/
+  1475 
+  1476               for (iVar = 0; iVar < nVar; iVar++) {
+  1477                 Residual[iVar] += weight * residual[iVar];
+  1478                 for (jVar = 0; jVar < nVar; jVar++) Jacobian_i[iVar][jVar] += weight * residual.jacobian_i[iVar][jVar];
+  1479               }
+  1480             }
+  1481 
+  1482             LinSysRes.SubtractBlock(iPoint, Residual);
+  1483 
+  1484             /*--- Jacobian contribution for implicit integration ---*/
+  1485 
+  1486             if (implicit) Jacobian.SubtractBlock2Diag(iPoint, Jacobian_i);
+  1487           }
+  1488         }
+  1489       }
+  1490       END_SU2_OMP_FOR
+  1491     }
+  1492   }
+  1493 
+  1494   for (iVar = 0; iVar < nVar; iVar++) delete[] Jacobian_i[iVar];
+  1495   delete[] Jacobian_i;
+  1496 }
+  1497 
+  1498 template <class V, ENUM_REGIME R>
+  1499 void CFVMFlowSolverBase<V, R>::BC_Custom(CGeometry* geometry, CSolver** solver_container, CNumerics* conv_numerics,
+  1500                                          CNumerics* visc_numerics, CConfig* config, unsigned short val_marker) {
+  1501   SU2_ZONE_SCOPED
+  1502 
+  1503   /* Check for a verification solution. */
+  1504 
+  1505   if (VerificationSolution) {
+  1506     unsigned short iVar;
+  1507     unsigned long iVertex, iPoint;
+  1508 
+  1509     bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+  1510 
+  1511     /*--- Get the physical time. ---*/
+  1512 
+  1513     su2double time = 0.0;
+  1514     if (config->GetTime_Marching() != TIME_MARCHING::STEADY) time = config->GetPhysicalTime();
