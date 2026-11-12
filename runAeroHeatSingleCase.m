@@ -20,6 +20,9 @@ end
 if ~isempty(progressFcn) && ~isa(progressFcn,'function_handle')
     error('RocketAeroHeat:SingleCase:ProgressCallback','progressFcn 须为空或函数句柄。');
 end
+if isfield(cfg,'analysisMode')&&strcmp(cfg.analysisMode,'phaseAwareNoseEdge')
+    [current,freestream,report]=runPhaseAwareNoseCase(mesh,cfg,progressFcn);return;
+end
 started=tic;
 phases={'inputs','freestream','regions','pressure','loads','stagnation', ...
     'externalFlow','axisymmetricMarch','streamlines','heating','coverage'};

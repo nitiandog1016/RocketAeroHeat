@@ -6,9 +6,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 小版本也同步到本GitHub仓库，不再默认生成大型本地工程包。用户已于2026-10-28确认保持仓库公开并直接同步。后文的“不推送/本地包/私有”属于历史阶段说明，以本节及[项目约定](AGENTS.md)为准。
 
-最新[v225同相态波系](docs/HYBRID_PHASE_WAVES_V225.md)已实现法向/弱斜激波、膨胀及逐段上游状态继承，11保存状态独立复算通过。两次完整MATLAB测试失败保留，第二监督终态缺失；几何读取单独修复验证通过，不冒称整套重跑通过。真实钝鼻入口仍需补齐，新增原面热面积0。[v224相态热链](docs/HYBRID_PHASE_LAMINAR_CHAIN_V224.md)及科研JSON出口保持，完整气动热尚未完成。
+最新[v226真实球鼻外缘](docs/HYBRID_PHASE_NOSE_EDGE_V226.md)已在原19752面中计算1306面同相态压力、外缘温度和速度候选，面积0.00351844m²/0.1790893%。主工况、主工作台九字段和独立复算/源SHA通过；新热流面积及物理资格仍0。首软件/指纹失败保留，恢复验证通过。完整气动热尚未完成。
 
-[目标文档](docs/PROJECT_GOALS.md)采用低成本全局外流＋工程边界层＋必要局部黏性CFD。下一项按[具体任务](docs/validation/v225/NEXT_DECISION.md)复用有来源的球鼻工程方法，直接生成同相态气体的原面压力/外缘温度/速度并接工作台，同时核对偏置驻点与热入口。局部弱波不能绕过脱体鼻部，一键新模式暂时明确拒绝，不能混用旧NASA7状态。工程旧热流有值面积66.5626%、同面p/q交集43.0999%；完整域研究覆盖100%仍非物理认证。全面积与科研UI独立最高，累计后置。
+[目标文档](docs/PROJECT_GOALS.md)采用低成本全局外流＋工程边界层＋必要局部黏性CFD。下一项按[具体任务](docs/validation/v226/NEXT_DECISION.md)接同物性热剖面、有限驻点入口及原面q/功率，保持真实偏置驻点和后体职责。可用`cfg.analysisMode='phaseAwareNoseEdge'`经`runAeroHeatSingleCase`只做局部外缘；旧新相态层流一键守卫保留。工程旧热流有值面积66.5626%、同面p/q交集43.0999%；完整域研究覆盖100%仍非物理认证。全面积与科研UI独立最高，累计后置。
+
+在现有工作台打开[v226真实鼻部JSON](docs/validation/v226/evidence/matlab02/rocket_workbench.json)，可查看原面压力/Te/U/Mach/恢复温度估计及弧长；热流和固体壁温明确未知、给定Tw300K另列。[原面压力与温度图](docs/validation/v226/evidence/render01/rocket_nose_comparison.png)只读保存结果，灰色区域未解；本轮无浏览器交互验收。
 
 现有工作台通过“打开结果JSON”读取[v223四阶段对比](docs/validation/v223/evidence/workbench01/rocket_phase_comparison.json)，选择第51/101/151/200次更新的压力、热流或壁流体温差；同变量共用色标，给定/未知壁温分开。可查看[真实箭体对比图](docs/validation/v223/evidence/workbench01/rocket_phase_comparison.png)。逐值回读和前端纯合同通过，无本轮浏览器交互验收。已有[v176区域页面](docs/AEROTHERMAL_EVIDENCE_LEDGER_V176.md)的原面探针、周向曲线和导出继续保留。
 

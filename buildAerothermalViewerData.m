@@ -1,5 +1,8 @@
 function data = buildAerothermalViewerData(mesh)
 %BUILDAEROTHERMALVIEWERDATA 将真实计算结果转换成离线三维工作台数据。
+if isfield(mesh,'aerothermalResultMode')&&strcmp(mesh.aerothermalResultMode,'phaseAwareNoseEdge')
+    data=buildPhaseAwareNoseViewerData(mesh);return;
+end
 % 新相态区域优先使用自身来源，避免混入mesh中保留的旧NASA7/压力快照。
 if isfield(mesh,'heating') && isfield(mesh.heating,'sidewallModel') && ...
         strcmp(mesh.heating.sidewallModel,'phaseAwareLaminarIntegral')
