@@ -1,0 +1,44 @@
+  2630       /*--- Compute non-dimensional velocity and y+ ---*/
+  2631 
+  2632       const su2double FrictionVel = sqrt(fabs(WallShearStress[iMarker][iVertex]) / Density);
+  2633 
+  2634       if (!wallfunctions && MGLevel == MESH_0 && geometry->nodes->GetDomain(iPoint)) {
+  2635         // for CMultiGridGeometry and halos, the nearest neighbor distance is not set
+  2636         const su2double WallDistMod = geometry->vertex[iMarker][iVertex]->GetNearestNeighborDistance();
+  2637         YPlus[iMarker][iVertex] = WallDistMod * FrictionVel * Density / Viscosity;
+  2638       }
+  2639 
+  2640       /*--- Compute total and maximum heat flux on the wall ---*/
+  2641 
+  2642       if (!nemo) {
+  2643         su2double thermal_conductivity = 0.0;
+  2644         if ((FlowRegime == ENUM_REGIME::COMPRESSIBLE) || (FlowRegime == ENUM_REGIME::INCOMPRESSIBLE)) {
+  2645           thermal_conductivity = nodes->GetThermalConductivity(iPoint);
+  2646         }
+  2647 
+  2648         if (KindBC == BC_TYPE::HEAT_FLUX) {
+  2649           HeatFlux[iMarker][iVertex] =
+  2650               py_custom ? -geometry->GetCustomBoundaryHeatFlux(iMarker, iVertex) : Wall_HeatFlux_Value;
+  2651         } else if (KindBC == BC_TYPE::ISOTHERMAL) {
+  2652           const su2double Twall_local =
+  2653               py_custom ? geometry->GetCustomBoundaryTemperature(iMarker, iVertex) / RefTemperature : Twall;
+  2654           const auto iPointNormal = geometry->vertex[iMarker][iVertex]->GetNormal_Neighbor();
+  2655           const su2double* Coord_Normal = geometry->nodes->GetCoord(iPointNormal);
+  2656           const su2double dist_ij = GeometryToolbox::NormalDistance(nDim, UnitNormal, Coord, Coord_Normal);
+  2657           const su2double There = nodes->GetTemperature(iPointNormal);
+  2658           HeatFlux[iMarker][iVertex] = thermal_conductivity * (There - Twall_local) / dist_ij * RefHeatFlux;
+  2659         } else {
+  2660           su2double dTdn = GeometryToolbox::DotProduct(nDim, Grad_Temp, UnitNormal);
+  2661           if (FlowRegime == ENUM_REGIME::INCOMPRESSIBLE && !energy) dTdn = 0.0;
+  2662           HeatFlux[iMarker][iVertex] = thermal_conductivity * dTdn * RefHeatFlux;
+  2663         }
+  2664       } else {
+  2665 
+  2666         const auto& thermal_conductivity_tr = nodes->GetThermalConductivity(iPoint);
+  2667         const auto& thermal_conductivity_ve = nodes->GetThermalConductivity_ve(iPoint);
+  2668 
+  2669         const su2double dTdn = -GeometryToolbox::DotProduct(nDim, Grad_Temp, UnitNormal);
+  2670         const su2double dTvedn = -GeometryToolbox::DotProduct(nDim, Grad_Temp_ve, UnitNormal);
+  2671 
+  2672         /*--- Surface energy balance: trans-rot heat flux, vib-el heat flux ---*/
+  2673         HeatFlux[iMarker][iVertex] = -(thermal_conductivity_tr*dTdn + thermal_conductivity_ve*dTvedn);

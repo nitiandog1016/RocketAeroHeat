@@ -1,0 +1,65 @@
+   707     su2double thermal_conductivity = nodes->GetThermalConductivity(iPoint) + Cp * eddy_viscosity / Prandtl_Turb;
+   708 
+   709     // work in progress on real-gases...
+   710     //thermal_conductivity = nodes->GetThermalConductivity(iPoint);
+   711     //Cp = nodes->GetSpecificHeatCp(iPoint);
+   712     //thermal_conductivity += Cp*eddy_viscosity/Prandtl_Turb;
+   713 
+   714     /*--- If it is a customizable or CHT patch, retrieve the specified wall temperature. ---*/
+   715 
+   716     const su2double There = nodes->GetTemperature(Point_Normal);
+   717 
+   718     if (cht_mode) {
+   719       Twall = GetCHTWallTemperature(config, val_marker, iVertex, dist_ij,
+   720                                     thermal_conductivity, There, Temperature_Ref);
+   721     } else if (config->GetMarker_All_PyCustom(val_marker)) {
+   722       Twall = geometry->GetCustomBoundaryTemperature(val_marker, iVertex) / Temperature_Ref;
+   723     }
+   724 
+   725     /*--- Compute the normal gradient in temperature using Twall ---*/
+   726 
+   727     su2double dTdn = -(There - Twall)/dist_ij;
+   728 
+   729     /*--- Apply a weak boundary condition for the energy equation.
+   730      Compute the residual due to the prescribed heat flux. ---*/
+   731 
+   732     su2double Res_Conv = 0.0;
+   733     su2double Res_Visc = thermal_conductivity * dTdn * Area;
+   734 
+   735     /*--- Calculate Jacobian for implicit time stepping ---*/
+   736 
+   737     if (implicit) {
+   738 
+   739       /*--- Add contributions to the Jacobian from the weak enforcement of the energy equations. ---*/
+   740 
+   741       su2double Density = nodes->GetDensity(iPoint);
+   742       su2double Vel2 = GeometryToolbox::SquaredNorm(nDim, &nodes->GetPrimitive(iPoint)[prim_idx.Velocity()]);
+   743       su2double dTdrho = 1.0/Density * ( -Twall + (Gamma-1.0)/Gas_Constant*(Vel2/2.0) );
+   744       su2double dTdrhoE = (Gamma-1.0)/(Gas_Constant*Density);
+   745       if ((config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP || config->GetKind_FluidModel() == RAH_PHASE_AIR)) {
+   746         // 原生弱壁面近似对角预条件，采用同阶段实际状态和冻结k的热力学链式导数。
+   747         const su2double* secondary = nodes->GetSecondary(iPoint);
+   748         dTdrho = secondary[2] + secondary[3]*(Vel2-nodes->GetEnergy(iPoint))/Density;
+   749         dTdrhoE = secondary[3]/Density;
+   750       }
+   751 
+   752       Jacobian_i[nDim+1][0] = thermal_conductivity/dist_ij * dTdrho * Area;
+   753 
+   754       for (auto jDim = 0u; jDim < nDim; jDim++)
+   755         Jacobian_i[nDim+1][jDim+1] = 0.0;
+   756 
+   757       Jacobian_i[nDim+1][nDim+1] = thermal_conductivity/dist_ij * dTdrhoE * Area;
+   758     }
+   759 
+   760     /*--- If the wall is moving, there are additional residual contributions
+   761      due to pressure (p v_wall.n) and shear stress (tau.v_wall.n). ---*/
+   762 
+   763     if (dynamic_grid) {
+   764       AddDynamicGridResidualContribution(iPoint, Point_Normal, geometry, UnitNormal,
+   765                                          Area, geometry->nodes->GetGridVel(iPoint),
+   766                                          Jacobian_i, Res_Conv, Res_Visc);
+   767     }
+   768 
+   769     /*--- Convective and viscous contributions to the residual at the wall ---*/
+   770 
+   771     LinSysRes(iPoint, nDim+1) += Res_Conv - Res_Visc;

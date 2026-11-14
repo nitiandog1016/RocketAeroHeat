@@ -1,0 +1,397 @@
+
+Parsing config file for zone 0
+
+----------------- Physical Case Definition ( Zone 0 ) -------------------
+Compressible RANS equations.
+Turbulence model: Negative-Spalart-Allmaras
+Hybrid RANS/LES: No Hybrid RANS/LES
+Mach number: 5.
+Angle of attack (AoA): 160 deg, and angle of sideslip (AoS): -0 deg.
+Reynolds number: 0. Reference length 1.
+No restart solution, use the values at infinity (freestream).
+Dimensional simulation.
+The reference area is 3.14159 m^2.
+The semi-span will be computed using the max y(3D) value.
+The reference length is 1 m.
+Reference origin for moment evaluation is (0, 0, 0).
+Surface(s) where the force coefficients are evaluated: wall.
+
+Surface(s) plotted in the output file: wall.
+Surface(s) acting as an interface among zones: join0, join1.
+Input mesh file name: zone0.su2
+
+--------------- Space Numerical Integration ( Zone 0 ) ------------------
+Roe (with entropy fix = 0.001) solver for the flow inviscid terms.
+Standard Roe without low-dissipation function.
+Second order integration in space, with slope limiter.
+Venkatakrishnan-Wang slope-limiting method, with constant: 0.05.
+Scalar upwind solver for the turbulence model.
+First order integration in space.
+Average of gradients with correction (viscous flow terms).
+Average of gradients with correction (viscous turbulence terms).
+Gradient for upwind reconstruction: inverse-distance weighted Least-Squares.
+Gradient for viscous and source terms: inverse-distance weighted Least-Squares.
+
+--------------- Time Numerical Integration  ( Zone 0 ) ------------------
+Local time stepping (steady state simulation).
+Euler implicit method for the flow equations.
+BCGSTAB is used for solving the linear system.
+Using LU-SGS preconditioning.
+Convergence criteria of the linear solver: 1e-05.
+Max number of linear iterations: 10.
+CFL adaptation. Factor down: 0.5, factor up: 1.1,
+                lower limit: 0.05, upper limit: 5,
+                acceptable linear residual: 0.001'
+                starting iteration: 0.
+Courant-Friedrichs-Lewy number:      0.1
+Euler implicit time integration for the turbulence model.
+
+------------------ Convergence Criteria  ( Zone 0 ) ---------------------
+Maximum number of solver subiterations: 1.
+Maximum number of solver outer iterations: 1.
+Begin convergence monitoring at iteration 10.
+Residual minimum value: 1e-8.
+Cauchy series min. value: 1e-10.
+Number of Cauchy elements: 100.
+Begin windowed time average at iteration 0.
+
+-------------------- Output Information ( Zone 0 ) ----------------------
+File writing frequency: 
++------------------------------------+
+|                     File| Frequency|
++------------------------------------+
+|            RESTART_ASCII|         1|
++------------------------------------+
+Writing the convergence history file every 1 inner iterations.
+Writing the convergence history file every 1 outer iterations.
+Writing the screen convergence history every 50 inner iterations.
+Writing the screen convergence history every 1 outer iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: surface_flow.
+Volume file name: volume_flow.
+Restart file name: restart_flow.
+
+------------- Config File Boundary Information ( Zone 0 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|           Fluid interface boundary|                              join0|
++-----------------------------------------------------------------------+
+|                   Riemann boundary|                           farfield|
++-----------------------------------------------------------------------+
+|                    Isothermal wall|                               wall|
++-----------------------------------------------------------------------+
+
+Parsing config file for zone 1
+
+----------------- Physical Case Definition ( Zone 1 ) -------------------
+Compressible RANS equations.
+Turbulence model: Negative-Spalart-Allmaras
+Hybrid RANS/LES: No Hybrid RANS/LES
+Mach number: 5.
+Angle of attack (AoA): 160 deg, and angle of sideslip (AoS): -0 deg.
+Reynolds number: 0. Reference length 1.
+No restart solution, use the values at infinity (freestream).
+Dimensional simulation.
+The reference area is 3.14159 m^2.
+The semi-span will be computed using the max y(3D) value.
+The reference length is 1 m.
+Reference origin for moment evaluation is (0, 0, 0).
+Surface(s) where the force coefficients are evaluated: wall.
+
+Surface(s) plotted in the output file: wall.
+Surface(s) acting as an interface among zones: join0, join1.
+Input mesh file name: zone1.su2
+
+--------------- Space Numerical Integration ( Zone 1 ) ------------------
+Roe (with entropy fix = 0.001) solver for the flow inviscid terms.
+Standard Roe without low-dissipation function.
+Second order integration in space, with slope limiter.
+Venkatakrishnan-Wang slope-limiting method, with constant: 0.05.
+Scalar upwind solver for the turbulence model.
+First order integration in space.
+Average of gradients with correction (viscous flow terms).
+Average of gradients with correction (viscous turbulence terms).
+Gradient for upwind reconstruction: inverse-distance weighted Least-Squares.
+Gradient for viscous and source terms: inverse-distance weighted Least-Squares.
+
+--------------- Time Numerical Integration  ( Zone 1 ) ------------------
+Local time stepping (steady state simulation).
+Euler implicit method for the flow equations.
+BCGSTAB is used for solving the linear system.
+Using LU-SGS preconditioning.
+Convergence criteria of the linear solver: 1e-05.
+Max number of linear iterations: 10.
+CFL adaptation. Factor down: 0.5, factor up: 1.1,
+                lower limit: 0.05, upper limit: 5,
+                acceptable linear residual: 0.001'
+                starting iteration: 0.
+Courant-Friedrichs-Lewy number:      0.1
+Euler implicit time integration for the turbulence model.
+
+------------------ Convergence Criteria  ( Zone 1 ) ---------------------
+Maximum number of solver subiterations: 1.
+Maximum number of solver outer iterations: 1.
+Begin convergence monitoring at iteration 10.
+Residual minimum value: 1e-8.
+Cauchy series min. value: 1e-10.
+Number of Cauchy elements: 100.
+Begin windowed time average at iteration 0.
+
+-------------------- Output Information ( Zone 1 ) ----------------------
+File writing frequency: 
++------------------------------------+
+|                     File| Frequency|
++------------------------------------+
+|            RESTART_ASCII|         1|
++------------------------------------+
+Writing the convergence history file every 1 inner iterations.
+Writing the convergence history file every 1 outer iterations.
+Writing the screen convergence history every 50 inner iterations.
+Writing the screen convergence history every 1 outer iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: surface_flow.
+Volume file name: volume_flow.
+Restart file name: restart_flow.
+
+------------- Config File Boundary Information ( Zone 1 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|           Fluid interface boundary|                              join1|
++-----------------------------------------------------------------------+
+|                   Riemann boundary|                           farfield|
++-----------------------------------------------------------------------+
+|                    Isothermal wall|                               wall|
++-----------------------------------------------------------------------+
+
+-------------------- Output Preprocessing ( Zone 0 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: OUTER_ITER, INNER_ITER, RMS_DENSITY, RMS_MOMENTUM-X, RMS_MOMENTUM-Y, RMS_ENERGY
+History output group(s): ITER, RMS_RES, AERO_COEFF, HEAT
+Convergence field(s): RMS_DENSITY, RMS_ENERGY, RMS_NU_TILDE
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE, RESIDUAL
+
+-------------------- Output Preprocessing ( Zone 1 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: OUTER_ITER, INNER_ITER, RMS_DENSITY, RMS_MOMENTUM-X, RMS_MOMENTUM-Y, RMS_ENERGY
+History output group(s): ITER, RMS_RES, AERO_COEFF, HEAT
+Convergence field(s): RMS_DENSITY, RMS_ENERGY, RMS_NU_TILDE
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE, RESIDUAL
+
+------------------- Output Preprocessing ( Multizone ) ------------------
+Screen output fields: OUTER_ITER, AVG_BGS_RES[0], AVG_BGS_RES[1]
+  Info: Ignoring the following history output groups:
+  AVG_RES[0], AVG_RES[1]
+History output group(s): ITER, BGS_RES[0], BGS_RES[1]
+Convergence field(s): AVG_BGS_RES[0]
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+
+------------------- Geometry Preprocessing ( Zone 0 ) -------------------
+Three dimensional problem.
+20 grid points.
+20 volume elements.
+3 surface markers.
+4 boundary elements in index 0 (Marker = wall).
+4 boundary elements in index 1 (Marker = farfield).
+16 boundary elements in index 2 (Marker = join0).
+12 tetrahedra.
+8 prisms.
+Setting point connectivity.
+Renumbering points (Reverse Cuthill McKee Ordering).
+Recomputing point connectivity.
+Setting element connectivity.
+Checking the numerical grid orientation.
+All volume elements are correctly oriented.
+All surface elements are correctly oriented.
+Identifying edges and vertices.
+Setting the control volume structure.
+Volume of the computational grid: 4.66667.
+Searching for the closest normal neighbors to the surfaces.
+Storing a mapping from global to local point index.
+Compute the surface curvature.
+Max K: 16.8353. Mean K: 6.54695. Standard deviation K: 3.98645.
+Computing mesh quality statistics for the dual control volumes.
++--------------------------------------------------------------+
+|           Mesh Quality Metric|        Minimum|        Maximum|
++--------------------------------------------------------------+
+|    Orthogonality Angle (deg.)|        30.9089|             90|
+|     CV Face Area Aspect Ratio|         2.9519|          2e+06|
+|           CV Sub-Volume Ratio|              1|         198374|
+|                     CV Volume|    3.33334e-07|        1.11742|
++--------------------------------------------------------------+
+Finding max control volume width.
+Semi-span length = 1 m.
+Wetted area = 2.55228 m^2.
+Area projection in the x-plane = 0 m^2, y-plane = 0.333333 m^2, z-plane = 0.333333 m^2.
+Max. coordinate in the x-direction = 1 m, y-direction = 1 m, z-direction = 1 m.
+Min. coordinate in the x-direction = 0 m, y-direction = -1 m, z-direction = -1 m.
+
+------------------- Geometry Preprocessing ( Zone 1 ) -------------------
+Three dimensional problem.
+20 grid points.
+20 volume elements.
+3 surface markers.
+4 boundary elements in index 0 (Marker = wall).
+4 boundary elements in index 1 (Marker = farfield).
+16 boundary elements in index 2 (Marker = join1).
+12 tetrahedra.
+8 prisms.
+Setting point connectivity.
+Renumbering points (Reverse Cuthill McKee Ordering).
+Recomputing point connectivity.
+Setting element connectivity.
+Checking the numerical grid orientation.
+All volume elements are correctly oriented.
+All surface elements are correctly oriented.
+Identifying edges and vertices.
+Setting the control volume structure.
+Volume of the computational grid: 4.66667.
+Searching for the closest normal neighbors to the surfaces.
+Storing a mapping from global to local point index.
+Compute the surface curvature.
+Max K: 16.8353. Mean K: 6.54695. Standard deviation K: 3.98645.
+Computing mesh quality statistics for the dual control volumes.
++--------------------------------------------------------------+
+|           Mesh Quality Metric|        Minimum|        Maximum|
++--------------------------------------------------------------+
+|    Orthogonality Angle (deg.)|        30.9089|             90|
+|     CV Face Area Aspect Ratio|         2.9519|          2e+06|
+|           CV Sub-Volume Ratio|              1|         198374|
+|                     CV Volume|    3.33334e-07|        1.11742|
++--------------------------------------------------------------+
+Finding max control volume width.
+Semi-span length = 1 m.
+Wetted area = 2.55228 m^2.
+Area projection in the x-plane = 2 m^2, y-plane = 0.333333 m^2, z-plane = 0.333333 m^2.
+Max. coordinate in the x-direction = 0 m, y-direction = 1 m, z-direction = 1 m.
+Min. coordinate in the x-direction = -1 m, y-direction = -1 m, z-direction = -1 m.
+Computing wall distances.
+
+-------------------- Solver Preprocessing ( Zone 0 ) --------------------
+Viscous flow: Computing pressure using the ideal gas law
+based on the free-stream temperature and a density computed
+from the Reynolds number.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|RAH_PHASE_AIR 60..2000K phase domain e+300000|+------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|          Gas Constant|       287.049|             1|  N.m/kg.K|       287.049|
+|      Spec. Heat Ratio|             -|             -|         -|             -|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|       1197.03|             1|        Pa|       1197.03|
+|               Density|     0.0184104|             1|    kg/m^3|     0.0184104|
+|           Temperature|       226.509|             1|         K|       226.509|
+|          Total Energy|   1.30185e+06|             1|   m^2/s^2|   1.30185e+06|
+|            Velocity-X|      -1418.13|             1|       m/s|      -1418.13|
+|            Velocity-Y|            -0|             1|       m/s|            -0|
+|            Velocity-Z|       516.157|             1|       m/s|       516.157|
+|    Velocity Magnitude|       1509.14|             1|       m/s|       1509.14|
++------------------------------------------------------------------------------+
+|             Viscosity|    1.4779e-05|             1|   N.s/m^2|    1.4779e-05|
+|          Conductivity|             -|             1|   W/m^2.K|             -|
+|     Turb. Kin. Energy|       8540.65|             1|   m^2/s^2|       8540.65|
+|     Spec. Dissipation|   1.06392e+06|             1|       1/s|   1.06392e+06|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|             5|
+|       Reynolds Number|             -|             -|         -|   1.87996e+06|
++------------------------------------------------------------------------------+
+All ranks use edge coloring.
+Among the ranks that use edge coloring,
+      the minimum efficiency is 1,
+      the maximum number of colors is 1,
+      the minimum edge color group size is 512.
+Initialize Jacobian structure (Navier-Stokes). MG level: 0.
+Initialize Jacobian structure (SA model).
+
+------------------- Numerics Preprocessing ( Zone 0 ) -------------------
+
+----------------- Integration Preprocessing ( Zone 0 ) ------------------
+
+------------------- Iteration Preprocessing ( Zone 0 ) ------------------
+Euler/Navier-Stokes/RANS fluid iteration.
+
+-------------------- Solver Preprocessing ( Zone 1 ) --------------------
+Viscous flow: Computing pressure using the ideal gas law
+based on the free-stream temperature and a density computed
+from the Reynolds number.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|RAH_PHASE_AIR 60..2000K phase domain e+300000|+------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|          Gas Constant|       287.049|             1|  N.m/kg.K|       287.049|
+|      Spec. Heat Ratio|             -|             -|         -|             -|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|       1197.03|             1|        Pa|       1197.03|
+|               Density|     0.0184104|             1|    kg/m^3|     0.0184104|
+|           Temperature|       226.509|             1|         K|       226.509|
+|          Total Energy|   1.30185e+06|             1|   m^2/s^2|   1.30185e+06|
+|            Velocity-X|      -1418.13|             1|       m/s|      -1418.13|
+|            Velocity-Y|            -0|             1|       m/s|            -0|
+|            Velocity-Z|       516.157|             1|       m/s|       516.157|
+|    Velocity Magnitude|       1509.14|             1|       m/s|       1509.14|
++------------------------------------------------------------------------------+
+|             Viscosity|    1.4779e-05|             1|   N.s/m^2|    1.4779e-05|
+|          Conductivity|             -|             1|   W/m^2.K|             -|
+|     Turb. Kin. Energy|       8540.65|             1|   m^2/s^2|       8540.65|
+|     Spec. Dissipation|   1.06392e+06|             1|       1/s|   1.06392e+06|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|             5|
+|       Reynolds Number|             -|             -|         -|   1.87996e+06|
++------------------------------------------------------------------------------+
+All ranks use edge coloring.
+Among the ranks that use edge coloring,
+      the minimum efficiency is 1,
+      the maximum number of colors is 1,
+      the minimum edge color group size is 512.
+Initialize Jacobian structure (Navier-Stokes). MG level: 0.
+Initialize Jacobian structure (SA model).
+
+------------------- Numerics Preprocessing ( Zone 1 ) -------------------
+
+----------------- Integration Preprocessing ( Zone 1 ) ------------------
+
+------------------- Iteration Preprocessing ( Zone 1 ) ------------------
+Euler/Navier-Stokes/RANS fluid iteration.
+
+------------------- Multizone Interface Preprocessing -------------------
+From zone 1 to zone 0:
+ Setting coupling using a nearest neighbor approach.
+  Avg/max distance to closest donor point: 0/0
+ Transferring  Sliding interface.
+From zone 0 to zone 1:
+ Setting coupling using a nearest neighbor approach.
+  Avg/max distance to closest donor point: 0/0
+ Transferring  Sliding interface.

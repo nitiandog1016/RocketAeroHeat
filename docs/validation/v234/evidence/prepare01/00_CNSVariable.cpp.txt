@@ -1,0 +1,112 @@
+   145 bool CNSVariable::SetPrimVar(unsigned long iPoint, su2double eddy_visc, su2double turb_ke, CFluidModel *FluidModel) {
+   146 
+   147   // 直接捕获热状态计算输入，包含原生回退后的同一次调用。
+   148   FlowPrimitiveK(iPoint) = turb_ke;
+   149 
+   150   bool RightVol = true;
+   151 
+   152   SetVelocity(iPoint); // Computes velocity and velocity^2
+   153   su2double density      = GetDensity(iPoint);
+   154   su2double staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;
+   155 
+   156   /*--- Check will be moved inside fluid model plus error description strings ---*/
+   157 
+   158   // 模块一。新物性拒绝候选态时，进入原生旧态恢复，避免读取旧物性字段。
+   159   bool air_state_rejected = false;
+   160   std::string rejected_reason;
+   161   try {
+   162     FluidModel->SetTDState_rhoe(density, staticEnergy);
+   163   } catch (const std::domain_error& error) {
+   164     if ((dynamic_cast<CSU2IdealAir*>(FluidModel) == nullptr && dynamic_cast<CSU2PhaseAwareAir*>(FluidModel) == nullptr)) throw;
+   165     air_state_rejected = true;
+   166     rejected_reason = error.what();
+   167   }
+   168 
+   169   bool check_dens  = air_state_rejected || SetDensity(iPoint);
+   170   bool check_press = air_state_rejected || SetPressure(iPoint, FluidModel->GetPressure());
+   171   bool check_sos   = air_state_rejected || SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+   172   bool check_temp  = air_state_rejected || SetTemperature(iPoint, FluidModel->GetTemperature());
+   173 
+   174   /*--- Check that the solution has a physical meaning ---*/
+   175 
+   176   if (check_dens || check_press || check_sos  || check_temp) {
+   177 
+   178     // 模块二。失败证据使用明确的局部编号，保留原始全部守恒量与当前k。
+   179     std::array<double, 5> trial{}, restored{};
+   180     for (unsigned long iVar = 0; iVar < nVar; ++iVar) {
+   181       trial[iVar] = Solution(iPoint,iVar);
+   182       restored[iVar] = Solution_Old(iPoint,iVar);
+   183     }
+   184     if (nDim == 2) {
+   185       trial[4] = trial[3]; trial[3] = 0.0;
+   186       restored[4] = restored[3]; restored[3] = 0.0;
+   187     }
+   188     const double trial_energy = staticEnergy;
+   189 
+   190     /*--- Copy the old solution ---*/
+   191 
+   192     for (unsigned long iVar = 0; iVar < nVar; iVar++)
+   193       Solution(iPoint,iVar) = Solution_Old(iPoint,iVar);
+   194 
+   195     /*--- Recompute the primitive variables ---*/
+   196 
+   197     SetVelocity(iPoint); // Computes velocity and velocity^2
+   198     density      = GetDensity(iPoint);
+   199     staticEnergy = GetEnergy(iPoint)-0.5*Velocity2(iPoint) - turb_ke;
+   200 
+   201     /*--- Check will be moved inside fluid model plus error description strings ---*/
+   202 
+   203     // 模块三。旧守恒态必须与本次实际k共同通过完整物性查询，否则明确终止。
+   204     try {
+   205       FluidModel->SetTDState_rhoe(density, staticEnergy);
+   206     } catch (const std::domain_error& error) {
+   207       if ((dynamic_cast<CSU2IdealAir*>(FluidModel) != nullptr || dynamic_cast<CSU2PhaseAwareAir*>(FluidModel) != nullptr))
+   208         rah_admissibility::record(iPoint, nDim, trial.data(), restored.data(),
+   209                                   trial_energy, staticEnergy, turb_ke, false, error.what());
+   210       throw;
+   211     }
+   212     if (air_state_rejected)
+   213       rah_admissibility::record(iPoint, nDim, trial.data(), restored.data(),
+   214                                 trial_energy, staticEnergy, turb_ke, true, rejected_reason.c_str());
+   215 
+   216     SetDensity(iPoint);
+   217     SetPressure(iPoint, FluidModel->GetPressure());
+   218     SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());
+   219     SetTemperature(iPoint, FluidModel->GetTemperature());
+   220 
+   221     RightVol = false;
+   222 
+   223   }
+   224 
+   225   /*--- Set enthalpy ---*/
+   226 
+   227   SetEnthalpy(iPoint); // Requires pressure computation.
+   228 
+   229   /*--- Set laminar viscosity ---*/
+   230 
+   231   SetLaminarViscosity(iPoint, FluidModel->GetLaminarViscosity());
+   232 
+   233   /*--- Set eddy viscosity ---*/
+   234 
+   235   SetEddyViscosity(iPoint, eddy_visc);
+   236 
+   237   /*--- Set thermal conductivity ---*/
+   238 
+   239   SetThermalConductivity(iPoint, FluidModel->GetThermalConductivity());
+   240 
+   241   /*--- Set specific heat ---*/
+   242 
+   243   SetSpecificHeatCp(iPoint, FluidModel->GetCp());
+   244 
+   245   /*--- Set look-up variables in case of data-driven fluid model ---*/
+   246   if (DataDrivenFluid) {
+   247     SetDataExtrapolation(iPoint, FluidModel->GetExtrapolation());
+   248     SetEntropy(iPoint, FluidModel->GetEntropy());
+   249   }
+   250 
+   251   return RightVol;
+   252 }
+   253 
+   254 void CNSVariable::SetSecondaryVar(unsigned long iPoint, CFluidModel *FluidModel) {
+   255   if (nSecondaryVar == 0) return;
+   256 

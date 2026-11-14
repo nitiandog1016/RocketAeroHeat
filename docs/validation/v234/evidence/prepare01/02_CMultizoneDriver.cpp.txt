@@ -1,0 +1,50 @@
+   550 bool CMultizoneDriver::TransferData(unsigned short donorZone, unsigned short targetZone) {
+   551   SU2_ZONE_SCOPED
+   552 
+   553   bool UpdateMesh = false;
+   554 
+   555   /*--- Select the transfer method according to the magnitudes being transferred ---*/
+   556   if(donorZone == targetZone || interface_container[donorZone][targetZone] == nullptr) return UpdateMesh; // Zones are equal or unconnected
+   557 
+   558   auto HandleInterfaceType = [&] (const auto interface_type, auto* interface) {
+   559     auto BroadcastData = [&](int donorSol, int targetSol) {
+   560       interface->BroadcastData(
+   561         *interpolator_container[donorZone][targetZone],
+   562         solver_container[donorZone][INST_0][MESH_0][donorSol],
+   563         solver_container[targetZone][INST_0][MESH_0][targetSol],
+   564         geometry_container[donorZone][INST_0][MESH_0],
+   565         geometry_container[targetZone][INST_0][MESH_0],
+   566         config_container[donorZone],
+   567         config_container[targetZone]);
+   568     };
+   569 
+   570     switch (interface_type) {
+   571     case SLIDING_INTERFACE:
+   572       BroadcastData(FLOW_SOL, FLOW_SOL);
+   573 
+   574       /*--- Additional transfer for turbulence variables. ---*/
+   575       if (config_container[targetZone]->GetKind_Solver() == MAIN_SOLVER::RANS ||
+   576           config_container[targetZone]->GetKind_Solver() == MAIN_SOLVER::INC_RANS ||
+   577           config_container[targetZone]->GetKind_Solver() == MAIN_SOLVER::DISC_ADJ_RANS ||
+   578           config_container[targetZone]->GetKind_Solver() == MAIN_SOLVER::DISC_ADJ_INC_RANS
+   579         ) {
+   580         BroadcastData(TURB_SOL, TURB_SOL);
+   581       }
+   582 
+   583       /*--- Additional transfer for species variables. ---*/
+   584       if (config_container[targetZone]->GetKind_Species_Model() != SPECIES_MODEL::NONE) {
+   585         BroadcastData(SPECIES_SOL, SPECIES_SOL);
+   586       }
+   587       break;
+   588     case CONJUGATE_HEAT_SS:
+   589       BroadcastData(HEAT_SOL, HEAT_SOL);
+   590       break;
+   591     case CONJUGATE_HEAT_FS:
+   592       BroadcastData(FLOW_SOL, HEAT_SOL);
+   593       break;
+   594     case CONJUGATE_HEAT_WEAKLY_FS:
+   595       BroadcastData(HEAT_SOL, HEAT_SOL);
+   596       break;
+   597     case CONJUGATE_HEAT_SF:
+   598       BroadcastData(HEAT_SOL, FLOW_SOL);
+   599       break;

@@ -1,0 +1,86 @@
+  4547 void CGeometry::ComputeWallDistance(const CConfig* const* config_container, CGeometry**** geometry_container,
+  4548                                     const int record_zone) {
+  4549   int nZone = config_container[ZONE_0]->GetnZone();
+  4550   bool allEmpty = true;
+  4551   vector<bool> wallDistanceNeeded(nZone, false);
+  4552 
+  4553   for (int iInst = 0; iInst < config_container[ZONE_0]->GetnTimeInstances(); iInst++) {
+  4554     for (int iZone = 0; iZone < nZone; iZone++) {
+  4555       /*--- Check if a zone needs the wall distance and store a boolean ---*/
+  4556 
+  4557       MAIN_SOLVER kindSolver = config_container[iZone]->GetKind_Solver();
+  4558       if (kindSolver == MAIN_SOLVER::RANS || kindSolver == MAIN_SOLVER::INC_RANS ||
+  4559           kindSolver == MAIN_SOLVER::DISC_ADJ_RANS || kindSolver == MAIN_SOLVER::DISC_ADJ_INC_RANS ||
+  4560           kindSolver == MAIN_SOLVER::FEM_LES || kindSolver == MAIN_SOLVER::FEM_RANS) {
+  4561         wallDistanceNeeded[iZone] = true;
+  4562       }
+  4563 
+  4564       /*--- Set the wall distances in all zones to the numerical limit.
+  4565        * This is necessary, because before a computed distance is set, it will be checked
+  4566        * whether the new distance is smaller than the currently stored one. ---*/
+  4567       CGeometry* geometry = geometry_container[iZone][iInst][MESH_0];
+  4568       if (wallDistanceNeeded[iZone]) geometry->SetWallDistance(numeric_limits<su2double>::max());
+  4569     }
+  4570 
+  4571     /*--- Loop over all zones and compute the ADT based on the viscous walls in that zone ---*/
+  4572     for (int iZone = 0; iZone < nZone; iZone++) {
+  4573       unique_ptr<CADTElemClass> WallADT =
+  4574           geometry_container[iZone][iInst][MESH_0]->ComputeViscousWallADT(config_container[iZone]);
+  4575       if (WallADT && !WallADT->IsEmpty()) {
+  4576         allEmpty = false;
+  4577         /*--- Inner loop over all zones to update the wall distances.
+  4578          * It might happen that there is a closer viscous wall in zone iZone for points in zone jZone. ---*/
+  4579         for (int jZone = 0; jZone < nZone; jZone++) {
+  4580           if (wallDistanceNeeded[jZone])
+  4581             geometry_container[jZone][iInst][MESH_0]->SetWallDistance(WallADT.get(), config_container[jZone], iZone);
+  4582         }
+  4583       }
+  4584     }
+  4585 
+  4586     /*--- If there are no viscous walls in the entire domain, set distances to zero ---*/
+  4587     if (allEmpty) {
+  4588       for (int iZone = 0; iZone < nZone; iZone++) {
+  4589         CGeometry* geometry = geometry_container[iZone][iInst][MESH_0];
+  4590         geometry->SetWallDistance(0.0);
+  4591       }
+  4592       continue;
+  4593     }
+  4594 
+  4595     /*--- Otherwise, set wall roughnesses, storing them in a common data structure. ---*/
+  4596     // [iZone][iMarker] -> roughness, for this rank
+  4597     auto roughness_f = make_pair(nZone, [config_container, geometry_container, iInst](unsigned long iZone) {
+  4598       const CConfig* config = config_container[iZone];
+  4599       const auto nMarker = geometry_container[iZone][iInst][MESH_0]->GetnMarker();
+  4600 
+  4601       return make_pair(nMarker, [config](unsigned long iMarker) {
+  4602         return config->GetWallRoughnessProperties(config->GetMarker_All_TagBound(iMarker)).second;
+  4603       });
+  4604     });
+  4605     NdFlattener<2> roughness_local(roughness_f);
+  4606     // [rank][iZone][iMarker] -> roughness
+  4607     NdFlattener<3> roughness_global(Nd_MPI_Environment(), roughness_local);
+  4608     // use it to update roughnesses
+  4609     for (int jZone = 0; jZone < nZone; jZone++) {
+  4610       if (wallDistanceNeeded[jZone] && config_container[jZone]->GetnRoughWall() > 0) {
+  4611         geometry_container[jZone][iInst][MESH_0]->nodes->SetWallRoughness(roughness_global);
+  4612       }
+  4613     }
+  4614 
+  4615     for (int iZone = 0; iZone < nZone; iZone++) {
+  4616       /*--- When recording for a specific zone, only compute nearest-neighbor distances (which read vertex
+  4617        *    normals) for that zone. Reading normals from other zones at this tape position would create
+  4618        *    cross-zone AD dependencies before those zones have had their geometry updated. ---*/
+  4619       if (record_zone >= 0 && iZone != record_zone) continue;
+  4620 
+  4621       /*--- For the FEM solver, we use a different mesh structure ---*/
+  4622       MAIN_SOLVER kindSolver = config_container[iZone]->GetKind_Solver();
+  4623       if (!wallDistanceNeeded[iZone] || kindSolver == MAIN_SOLVER::FEM_LES || kindSolver == MAIN_SOLVER::FEM_RANS) {
+  4624         continue;
+  4625       }
+  4626       const auto* config = config_container[iZone];
+  4627       auto* geometry = geometry_container[iZone][iInst][MESH_0];
+  4628 
+  4629       for (unsigned short iMarker = 0; iMarker < config->GetnMarker_All(); ++iMarker) {
+  4630         const auto viscous = config->GetViscous_Wall(iMarker);
+  4631 
+  4632         SU2_OMP_FOR_STAT(OMP_MIN_SIZE)

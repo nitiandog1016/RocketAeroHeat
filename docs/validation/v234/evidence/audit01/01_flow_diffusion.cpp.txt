@@ -1,0 +1,138 @@
+   902 CNumerics::ResidualType<> CGeneralAvgGrad_Flow::ComputeResidual(const CConfig* config) {
+   903 
+   904   implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+   905 
+   906   AD::StartPreacc();
+   907   AD::SetPreaccIn(V_i, nDim+9);   AD::SetPreaccIn(V_j, nDim+9);
+   908   AD::SetPreaccIn(Coord_i, nDim); AD::SetPreaccIn(Coord_j, nDim);
+   909   AD::SetPreaccIn(S_i, 4); AD::SetPreaccIn(S_j, 4);
+   910   AD::SetPreaccIn(PrimVar_Grad_i, nDim+1, nDim);
+   911   AD::SetPreaccIn(PrimVar_Grad_j, nDim+1, nDim);
+   912   AD::SetPreaccIn(turb_ke_i); AD::SetPreaccIn(turb_ke_j);
+   913   AD::SetPreaccIn(TauWall_i); AD::SetPreaccIn(TauWall_j);
+   914   AD::SetPreaccIn(Normal, nDim);
+   915 
+   916   unsigned short iVar, jVar, iDim;
+   917 
+   918   /*--- Normalized normal vector ---*/
+   919 
+   920   Area = GeometryToolbox::Norm(nDim, Normal);
+   921 
+   922   for (iDim = 0; iDim < nDim; iDim++)
+   923     UnitNormal[iDim] = Normal[iDim]/Area;
+   924 
+   925   /*--- Mean primitive variables ---*/
+   926 
+   927   PrimVar_i = V_i;
+   928   PrimVar_j = V_j;
+   929 
+   930   for (iVar = 0; iVar < nPrimVar; iVar++) {
+   931     Mean_PrimVar[iVar] = 0.5*(PrimVar_i[iVar]+PrimVar_j[iVar]);
+   932   }
+   933 
+   934   /*--- Compute vector going from iPoint to jPoint ---*/
+   935 
+   936   dist_ij_2 = 0.0;
+   937   for (iDim = 0; iDim < nDim; iDim++) {
+   938     Edge_Vector[iDim] = Coord_j[iDim]-Coord_i[iDim];
+   939     dist_ij_2 += Edge_Vector[iDim]*Edge_Vector[iDim];
+   940   }
+   941 
+   942   /*--- Laminar and Eddy viscosity ---*/
+   943 
+   944   Laminar_Viscosity_i = V_i[nDim+5];    Laminar_Viscosity_j = V_j[nDim+5];
+   945   Eddy_Viscosity_i = V_i[nDim+6];       Eddy_Viscosity_j = V_j[nDim+6];
+   946   Thermal_Conductivity_i = V_i[nDim+7]; Thermal_Conductivity_j = V_j[nDim+7];
+   947   Cp_i = V_i[nDim+8]; Cp_j = V_j[nDim+8];
+   948 
+   949   /*--- Mean secondary variables ---*/
+   950 
+   951   for (iVar = 0; iVar < 2; iVar++) {
+   952     Mean_SecVar[iVar] = 0.5*(S_i[iVar+2]+S_j[iVar+2]);
+   953   }
+   954 
+   955   /*--- Mean Viscosities and turbulent kinetic energy---*/
+   956 
+   957   Mean_Laminar_Viscosity    = 0.5*(Laminar_Viscosity_i + Laminar_Viscosity_j);
+   958   Mean_Eddy_Viscosity       = 0.5*(Eddy_Viscosity_i + Eddy_Viscosity_j);
+   959   Mean_turb_ke              = 0.5*(turb_ke_i + turb_ke_j);
+   960   Mean_Thermal_Conductivity = 0.5*(Thermal_Conductivity_i + Thermal_Conductivity_j);
+   961   Mean_Cp                   = 0.5*(Cp_i + Cp_j);
+   962 
+   963   /*--- Mean gradient approximation ---*/
+   964 
+   965   for (iVar = 0; iVar < nDim+1; iVar++) {
+   966     for (iDim = 0; iDim < nDim; iDim++) {
+   967       Mean_GradPrimVar[iVar][iDim] = 0.5*(PrimVar_Grad_i[iVar][iDim] + PrimVar_Grad_j[iVar][iDim]);
+   968     }
+   969   }
+   970 
+   971   /*--- Projection of the mean gradient in the direction of the edge ---*/
+   972 
+   973   if (correct_gradient && dist_ij_2 != 0.0) {
+   974     CorrectGradient(Mean_GradPrimVar, PrimVar_i, PrimVar_j, Edge_Vector,
+   975                     dist_ij_2, nDim+1);
+   976   }
+   977 
+   978   /*--- Wall shear stress values (wall functions) only used if present for one but not both points (xor) ---*/
+   979 
+   980   const int scale = (TauWall_i > 0.0) ^ (TauWall_j > 0.0);
+   981   Mean_TauWall = (max(TauWall_i,0.0) + max(TauWall_j,0.0)) * scale;
+   982 
+   983   /*--- If using UQ methodology, set Reynolds Stress tensor and perform perturbation ---*/
+   984 
+   985   if (sstParsedOptions.uq) {
+   986     ComputePerturbedRSM(nDim, Eig_Val_Comp, uq_permute, uq_delta_b, uq_urlx,
+   987                         Mean_GradPrimVar+1, Mean_PrimVar[nDim+2], Mean_Eddy_Viscosity,
+   988                         Mean_turb_ke, MeanPerturbedRSM);
+   989   }
+   990 
+   991   /* --- If the Stochastic Backscatter Model is active, add random contribution to stress tensor ---*/
+   992 
+   993   if (config->GetSBSParam().StochasticBackscatter) SetStochReynStress(config);
+   994 
+   995   /*--- Get projected flux tensor (viscous residual) ---*/
+   996 
+   997   SetStressTensor(Mean_PrimVar, Mean_GradPrimVar, Mean_turb_ke,
+   998                   Mean_Laminar_Viscosity, Mean_Eddy_Viscosity, config);
+   999   if (config->GetSAParsedOptions().qcr2000) {
+  1000     const su2double total_viscosity = Mean_Laminar_Viscosity + Mean_Eddy_Viscosity;
+  1001     const su2double turb_fraction = Mean_Eddy_Viscosity / fmax(total_viscosity, EPS);
+  1002     AddQCR(nDim, &Mean_GradPrimVar[1], tau, turb_fraction);
+  1003   }
+  1004   if (Mean_TauWall > 0) AddTauWall(UnitNormal, Mean_TauWall);
+  1005 
+  1006   SetHeatFluxVector(Mean_GradPrimVar, Mean_Eddy_Viscosity, Mean_Thermal_Conductivity, Mean_Cp);
+  1007 
+  1008   GetViscousProjFlux(Mean_PrimVar, Normal);
+  1009 
+  1010   /*--- Compute the implicit part ---*/
+  1011 
+  1012   if (implicit) {
+  1013 
+  1014     if (dist_ij_2 == 0.0) {
+  1015       for (iVar = 0; iVar < nVar; iVar++) {
+  1016         for (jVar = 0; jVar < nVar; jVar++) {
+  1017           Jacobian_i[iVar][jVar] = 0.0;
+  1018           Jacobian_j[iVar][jVar] = 0.0;
+  1019         }
+  1020       }
+  1021     } else {
+  1022       const su2double dist_ij = sqrt(dist_ij_2);
+  1023 
+  1024       SetTauJacobian(Mean_PrimVar, Mean_Laminar_Viscosity, Mean_Eddy_Viscosity, dist_ij, UnitNormal);
+  1025 
+  1026       SetHeatFluxJacobian(Mean_PrimVar, Mean_SecVar, Mean_Eddy_Viscosity,
+  1027                           Mean_Thermal_Conductivity, Mean_Cp, dist_ij);
+  1028 
+  1029       GetViscousProjJacs(Mean_PrimVar, Area, Proj_Flux_Tensor, Jacobian_i, Jacobian_j);
+  1030     }
+  1031 
+  1032   }
+  1033 
+  1034   AD::SetPreaccOut(Proj_Flux_Tensor, nVar);
+  1035   AD::EndPreacc();
+  1036 
+  1037   return ResidualType<>(Proj_Flux_Tensor, Jacobian_i, Jacobian_j);
+  1038 
+  1039 }
