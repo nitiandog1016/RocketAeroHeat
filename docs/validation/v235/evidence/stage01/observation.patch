@@ -1,0 +1,110 @@
+--- SU2_CFD/src/integration/CIntegration.cpp
++++ observed/SU2_CFD/src/integration/CIntegration.cpp
+@@ -1,3 +1,4 @@
++#include "E:/RocketAeroHeat/native/su2PhaseAwareAir/SingleDomainHooksV235.hpp"
+ /*!
+  * \file CIntegration.cpp
+  * \brief Implementation of the base class for space and time integration.
+@@ -25,8 +26,8 @@
+  * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "../../include/integration/CIntegration.hpp"
+-#include "../../../Common/include/parallelization/omp_structure.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/integration/CIntegration.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/parallelization/omp_structure.hpp"
+ 
+ 
+ CIntegration::CIntegration() {
+@@ -65,6 +66,8 @@
+ 
+   /*--- Compute source term residuals ---*/
+   solver_container[MainSolver]->Source_Residual(geometry, solver_container, numerics, config, iMesh);
++  if (rah_single_observer::stage) rah_single_observer::stage("after_sources",geometry,solver_container,config,RunTime_EqSystem);
++
+ 
+   /*--- Add viscous and convective residuals, and compute the Dual Time Source term ---*/
+ 
+@@ -142,8 +145,12 @@
+     }
+   }
+ 
++
++  if (rah_single_observer::stage) rah_single_observer::stage("after_weak",geometry,solver_container,config,RunTime_EqSystem);
+   /*--- Modification of the system on the whole domain, like for a strong BC. ---*/
+   solver_container[MainSolver]->Impose_Fixed_Values(geometry, config);
++  if (rah_single_observer::stage) rah_single_observer::stage("before_strong",geometry,solver_container,config,RunTime_EqSystem);
++
+ 
+   /*--- Strong boundary conditions (Navier-Stokes and Dirichlet type BCs) ---*/
+ 
+@@ -195,6 +202,8 @@
+         solver_container[MainSolver]->BC_Euler_Wall(geometry, solver_container, conv_bound_numerics, visc_bound_numerics, config, iMarker);
+   }
+   //AD::ResumePreaccumulation(pausePreacc);
++  if (rah_single_observer::stage) rah_single_observer::stage("after_strong",geometry,solver_container,config,RunTime_EqSystem);
++
+ 
+ }
+ 
+@@ -203,6 +212,8 @@
+   SU2_ZONE_SCOPED
+ 
+   unsigned short MainSolver = config->GetContainerPosition(RunTime_EqSystem);
++  if (rah_single_observer::stage) rah_single_observer::stage("before_time",geometry,solver_container,config,RunTime_EqSystem);
++
+ 
+   switch (config->GetKind_TimeIntScheme()) {
+     case (RUNGE_KUTTA_EXPLICIT):
+@@ -218,6 +229,8 @@
+       solver_container[MainSolver]->ImplicitEuler_Iteration(geometry, solver_container, config);
+       break;
+   }
++
++  if (rah_single_observer::stage) rah_single_observer::stage("after_time",geometry,solver_container,config,RunTime_EqSystem);
+ 
+ }
+ 
+--- SU2_CFD/src/variables/CNSVariable.cpp
++++ observed/SU2_CFD/src/variables/CNSVariable.cpp
+@@ -1,3 +1,4 @@
++#include "E:/RocketAeroHeat/native/su2PhaseAwareAir/SingleDomainHooksV235.hpp"
+ /*!
+  * \file CNSVariable.cpp
+  * \brief Definition of the solution fields.
+@@ -25,12 +26,12 @@
+  * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "../../include/variables/CNSVariable.hpp"
+-#include "../../../Common/include/parallelization/omp_structure.hpp"
+-#include "../../include/fluid/CFluidModel.hpp"
+-#include "../../include/fluid/CSU2IdealAir.hpp"
+-#include "../../include/fluid/CSU2PhaseAwareAir.hpp"
+-#include "../../include/variables/AdmissibilityTrace.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/variables/CNSVariable.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/parallelization/omp_structure.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CFluidModel.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CSU2IdealAir.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CSU2PhaseAwareAir.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/variables/AdmissibilityTrace.hpp"
+ #include <array>
+ #include <string>
+ 
+@@ -207,6 +208,7 @@
+       if ((dynamic_cast<CSU2IdealAir*>(FluidModel) != nullptr || dynamic_cast<CSU2PhaseAwareAir*>(FluidModel) != nullptr))
+         rah_admissibility::record(iPoint, nDim, trial.data(), restored.data(),
+                                   trial_energy, staticEnergy, turb_ke, false, error.what());
++      if (rah_single_observer::rejection) rah_single_observer::rejection(this,iPoint,trial.data(),restored.data(),false,error.what());
+       throw;
+     }
+     if (air_state_rejected)
+@@ -219,6 +221,8 @@
+     SetTemperature(iPoint, FluidModel->GetTemperature());
+ 
+     RightVol = false;
++    if (rah_single_observer::rejection) rah_single_observer::rejection(this,iPoint,trial.data(),restored.data(),true,rejected_reason.c_str());
++
+ 
+   }
+ 

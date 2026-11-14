@@ -1,0 +1,1579 @@
+/*!
+ * \file CTurbSASolver.cpp
+ * \brief Main subroutines of CTurbSASolver class
+ * \author F. Palacios, A. Bueno
+ * \version 8.6.0 "Harrier"
+ *
+ * SU2 Project Website: https://su2code.github.io
+ *
+ * The SU2 Project is maintained by the SU2 Foundation
+ * (http://su2foundation.org)
+ *
+ * Copyright 2012-2026, SU2 Contributors (cf. AUTHORS.md)
+ *
+ * SU2 is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * SU2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "../../include/solvers/CTurbSASolver.hpp"
+#include "../../include/solvers/CScalarSolver.inl"
+#include "../../include/variables/CTurbSAVariable.hpp"
+#include "../../include/variables/CFlowVariable.hpp"
+#include "../../include/numerics/turbulent/turb_sa_edge_flux.hpp"
+#include "../../../Common/include/parallelization/omp_structure.hpp"
+#include "../../../Common/include/toolboxes/geometry_toolbox.hpp"
+#include "../../../Common/include/toolboxes/random_toolbox.hpp"
+
+
+CTurbSASolver::CTurbSASolver(CGeometry *geometry, CConfig *config, const CSolver* flow_solver, unsigned short iMesh,
+                             CFluidModel* FluidModel)
+             : CTurbSolver(geometry, config, flow_solver, false) {
+  SU2_ZONE_SCOPED
+  unsigned long iPoint;
+  su2double Density_Inf, Viscosity_Inf, Factor_nu_Inf, Factor_nu_Engine, Factor_nu_ActDisk;
+
+  bool multizone = config->GetMultizone_Problem();
+
+  /*--- Dimension of the problem --> dependent of the turbulent model ---*/
+
+  nVar = 1;
+  nPrimVar = 1;
+  nPoint = geometry->GetnPoint();
+  nPointDomain = geometry->GetnPointDomain();
+
+  /*--- Initialize nVarGrad for deallocation ---*/
+
+  nVarGrad = nVar;
+
+  /*--- Add Langevin equations if the Stochastic Backscatter Model is used ---*/
+
+  if (config->GetSBSParam().StochasticBackscatter && config->GetSBSParam().SBS_Ctau > 0.0) {
+    nVar += 3;
+    nVarGrad = nPrimVar = nVar;
+  }
+
+  /*--- Single grid simulation ---*/
+
+  if (iMesh == MESH_0 || config->GetMGCycle() == MG_CYCLE::FULL) {
+
+    /*--- Define some auxiliar vector related with the residual ---*/
+
+    Residual_RMS.resize(nVar,0.0);
+    Residual_Max.resize(nVar,0.0);
+    Point_Max.resize(nVar,0);
+    Point_Max_Coord.resize(nVar,nDim) = su2double(0.0);
+
+    /*--- Initialization of the structure of the whole Jacobian ---*/
+
+    if (rank == MASTER_NODE) cout << "Initialize Jacobian structure (SA model)." << endl;
+    Jacobian.Initialize(nPoint, nPointDomain, nVar, nVar, true, geometry, config, ReducerStrategy);
+    LinSysSol.Initialize(nPoint, nPointDomain, nVar, 0.0);
+    LinSysRes.Initialize(nPoint, nPointDomain, nVar, 0.0);
+    System.SetxIsZero(true);
+
+    if (ReducerStrategy) {
+      EdgeFluxes.Initialize(geometry->GetnEdge(), geometry->GetnEdge(), nVar, nullptr);
+      EdgeFluxesDiff.Initialize(geometry->GetnEdge(), geometry->GetnEdge(), nVar, nullptr);
+    }
+
+    if (config->GetExtraOutput()) {
+      if (nDim == 2) { nOutputVariables = 13; }
+      else if (nDim == 3) { nOutputVariables = 19; }
+      OutputVariables.Initialize(nPoint, nPointDomain, nOutputVariables, 0.0);
+      OutputHeadingNames = new string[nOutputVariables];
+    }
+
+    /*--- Initialize the BGS residuals in multizone problems. ---*/
+    if (multizone){
+      Residual_BGS.resize(nVar,0.0);
+      Residual_Max_BGS.resize(nVar,0.0);
+      Point_Max_BGS.resize(nVar,0);
+      Point_Max_Coord_BGS.resize(nVar,nDim) = su2double(0.0);
+    }
+
+  }
+
+  /*--- Read farfield conditions from config ---*/
+
+  Density_Inf   = config->GetDensity_FreeStreamND();
+  Viscosity_Inf = config->GetViscosity_FreeStreamND();
+
+  /*--- Factor_nu_Inf in [3.0, 5.0] ---*/
+
+  Factor_nu_Inf = config->GetNuFactor_FreeStream();
+  su2double nu_tilde_Inf  = Factor_nu_Inf*Viscosity_Inf/Density_Inf;
+  if (config->GetSAParsedOptions().bc) {
+    nu_tilde_Inf  = 0.005*Factor_nu_Inf*Viscosity_Inf/Density_Inf;
+  }
+
+  Solution_Inf[0] = nu_tilde_Inf;
+  if (config->GetSBSParam().StochasticBackscatter && config->GetSBSParam().SBS_Ctau > 0.0) {
+    for (unsigned short iVar = 1; iVar < nVar; iVar++) {
+      Solution_Inf[iVar] = 0.0;
+    }
+  }
+
+  /*--- Factor_nu_Engine ---*/
+  Factor_nu_Engine   = config->GetNuFactor_Engine();
+  nu_tilde_Engine[0] = Factor_nu_Engine*Viscosity_Inf/Density_Inf;
+  if (config->GetSAParsedOptions().bc) {
+    nu_tilde_Engine[0] = 0.005*Factor_nu_Engine*Viscosity_Inf/Density_Inf;
+  }
+
+  /*--- Factor_nu_ActDisk ---*/
+  Factor_nu_ActDisk   = config->GetNuFactor_Engine();
+  nu_tilde_ActDisk[0] = Factor_nu_ActDisk*Viscosity_Inf/Density_Inf;
+
+  /*--- Eddy viscosity at infinity ---*/
+  su2double Ji, Ji_3, fv1, cv1_3 = 7.1*7.1*7.1;
+  su2double muT_Inf;
+  Ji = nu_tilde_Inf/Viscosity_Inf*Density_Inf;
+  Ji_3 = Ji*Ji*Ji;
+  fv1 = Ji_3/(Ji_3+cv1_3);
+  muT_Inf = Density_Inf*fv1*nu_tilde_Inf;
+
+  if (config->GetSAParsedOptions().version != SA_OPTIONS::NEG) {
+    lowerlimit[0] = EPS;
+  }
+
+  /*--- Initialize the solution to the far-field state everywhere. ---*/
+
+  nodes = new CTurbSAVariable(nu_tilde_Inf, muT_Inf, nPoint, nDim, nVar, config);
+  SetBaseClassPointerToNodes();
+
+  /*--- Ghost states for boundary conditions, sized to the largest marker (see BoundaryFluxResidual). ---*/
+  unsigned long maxMarkerVertices = 0;
+  for (unsigned long iMarker = 0; iMarker < nMarker; iMarker++)
+    maxMarkerVertices = max(maxMarkerVertices, nVertex[iMarker]);
+  ghostNodes = make_unique<CTurbSAVariable>(nu_tilde_Inf, muT_Inf, maxMarkerVertices, nDim, nVar, config);
+
+  /*--- MPI solution ---*/
+
+  InitiateComms(geometry, config, MPI_QUANTITIES::SOLUTION_EDDY);
+  CompleteComms(geometry, config, MPI_QUANTITIES::SOLUTION_EDDY);
+
+  /*--- Initializate quantities for SlidingMesh Interface ---*/
+
+  SlidingState.resize(nMarker);
+  SlidingStateNodes.resize(nMarker);
+
+  for (unsigned long iMarker = 0; iMarker < nMarker; iMarker++) {
+    if (config->GetMarker_All_KindBC(iMarker) == FLUID_INTERFACE) {
+      SlidingState[iMarker].resize(nVertex[iMarker], nPrimVar+1) = nullptr;
+      SlidingStateNodes[iMarker].resize(nVertex[iMarker],0);
+    }
+  }
+
+  /*-- Allocation of inlets has to happen in derived classes (not CTurbSolver),
+   * due to arbitrary number of turbulence variables ---*/
+
+  Inlet_TurbVars.resize(nMarker);
+  for (unsigned long iMarker = 0; iMarker < nMarker; iMarker++) {
+    Inlet_TurbVars[iMarker].resize(nVertex[iMarker],nVar) = nu_tilde_Inf;
+    if (config->GetSBSParam().StochasticBackscatter && config->GetSBSParam().SBS_Ctau > 0.0) {
+      for (unsigned long iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
+        for (unsigned short iVar = 1; iVar < nVar; iVar++) {
+          Inlet_TurbVars[iMarker](iVertex,iVar) = 0.0;
+        }
+      }
+    }
+  }
+
+  /*--- Store the initial CFL number for all grid points. ---*/
+
+  const su2double CFL = config->GetCFL(MGLevel)*config->GetCFLRedCoeff_Turb();
+  for (iPoint = 0; iPoint < nPoint; iPoint++) {
+    nodes->SetLocalCFL(iPoint, CFL);
+  }
+  Min_CFL_Local = CFL;
+  Max_CFL_Local = CFL;
+  Avg_CFL_Local = CFL;
+
+  /*--- Add the solver name. ---*/
+  SolverName = "SA";
+
+}
+
+void CTurbSASolver::Preprocessing(CGeometry *geometry, CSolver **solver_container, CConfig *config,
+        unsigned short iMesh, unsigned short iRKStep, unsigned short RunTime_EqSystem, bool Output) {
+  SU2_ZONE_SCOPED
+  SU2_OMP_SAFE_GLOBAL_ACCESS(config->SetGlobalParam(config->GetKind_Solver(), RunTime_EqSystem);)
+
+  const auto kind_hybridRANSLES = config->GetKind_HybridRANSLES();
+
+  /*--- Clear Residual and Jacobian. Upwind second order reconstruction and gradients ---*/
+  CommonPreprocessing(geometry, config, Output);
+
+  if (kind_hybridRANSLES != NO_HYBRIDRANSLES) {
+
+    /*--- Set the vortex tilting coefficient at every node if required ---*/
+
+    if (kind_hybridRANSLES == SA_EDDES){
+      auto* flowNodes = su2staticcast_p<CFlowVariable*>(solver_container[FLOW_SOL]->GetNodes());
+
+      SU2_OMP_FOR_STAT(omp_chunk_size)
+      for (unsigned long iPoint = 0; iPoint < nPoint; iPoint++){
+        auto Vorticity = flowNodes->GetVorticity(iPoint);
+        auto PrimGrad_Flow = flowNodes->GetGradient_Primitive(iPoint);
+        auto Laminar_Viscosity = flowNodes->GetLaminarViscosity(iPoint);
+        nodes->SetVortex_Tilting(iPoint, PrimGrad_Flow, Vorticity, Laminar_Viscosity);
+      }
+      END_SU2_OMP_FOR
+    }
+
+    /*--- Compute the DES length scale ---*/
+
+    SetDES_LengthScale(solver_container, geometry, config);
+
+    InitiateComms(geometry, config, MPI_QUANTITIES::DES_LENGTHSCALE);
+    CompleteComms(geometry, config, MPI_QUANTITIES::DES_LENGTHSCALE);
+
+    /*--- Compute source terms for Langevin equations ---*/
+
+    bool backscatter = config->GetSBSParam().StochasticBackscatter;
+    unsigned long innerIter = config->GetInnerIter();
+    if (backscatter && innerIter==0) {
+      bool backscatterInBox = config->GetSBSParam().StochBackscatterInBox;
+      unsigned long timeIter = config->GetTimeIter();
+      unsigned long restartIter = config->GetRestart_Iter();
+      if (backscatterInBox && timeIter==restartIter) SetBackscatterInBox(config, geometry);
+      SetLangevinSourceTerms(config, geometry);
+      const unsigned short maxIter = config->GetSBSParam().SBS_maxIterSmooth;
+      if (maxIter > 0) SmoothLangevinSourceTerms(config, geometry);
+    }
+
+  }
+
+}
+
+void CTurbSASolver::Postprocessing(CGeometry *geometry, CSolver **solver_container, CConfig *config, unsigned short iMesh) {
+  SU2_ZONE_SCOPED
+
+  const su2double cv1_3 = 7.1*7.1*7.1, cR1 = 0.5, rough_const = 0.03;
+
+  const bool neg_spalart_allmaras = config->GetSAParsedOptions().version == SA_OPTIONS::NEG;
+
+  /*--- Compute eddy viscosity ---*/
+
+  AD::StartNoSharedReading();
+
+  SU2_OMP_FOR_STAT(omp_chunk_size)
+  for (unsigned long iPoint = 0; iPoint < nPoint; iPoint ++) {
+
+    const su2double rho = solver_container[FLOW_SOL]->GetNodes()->GetDensity(iPoint);
+    const su2double mu = solver_container[FLOW_SOL]->GetNodes()->GetLaminarViscosity(iPoint);
+
+    const su2double nu = mu/rho;
+    const su2double nu_hat = nodes->GetSolution(iPoint,0);
+    const su2double roughness = geometry->nodes->GetRoughnessHeight(iPoint);
+    const su2double dist = geometry->nodes->GetWall_Distance(iPoint) + rough_const * roughness;
+
+    su2double Ji = nu_hat/nu;
+    if (roughness > 1.0e-10)
+      Ji += cR1*roughness/(dist+EPS);
+
+    const su2double Ji_3 = Ji*Ji*Ji;
+    const su2double fv1  = Ji_3/(Ji_3+cv1_3);
+
+    su2double muT = rho*fv1*nu_hat;
+
+    if (neg_spalart_allmaras && nu_hat < 0) muT = 0.0;
+
+    nodes->SetmuT(iPoint,muT);
+
+  }
+  END_SU2_OMP_FOR
+
+
+  /*--- Compute turbulence index ---*/
+  if (config->GetKind_Trans_Model() != TURB_TRANS_MODEL::NONE || config->GetSAParsedOptions().bc) {
+    auto* flowNodes = su2staticcast_p<CFlowVariable*>(solver_container[FLOW_SOL]->GetNodes());
+
+    for (auto iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++){
+      if (config->GetViscous_Wall(iMarker)) {
+        SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+        for (auto iVertex = 0u; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+          const auto iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+
+          /*--- Check if the node belongs to the domain (i.e, not a halo node) ---*/
+
+          if (geometry->nodes->GetDomain(iPoint)) {
+            const auto jPoint = geometry->vertex[iMarker][iVertex]->GetNormal_Neighbor();
+
+            su2double FrictionVelocity = 0.0;
+            /*--- Formulation varies for 2D and 3D problems: in 3D the friction velocity is assumed to be sqrt(mu * |Omega|)
+            (provided by the reference paper https://doi.org/10.2514/6.1992-439), whereas in 2D we have to use the
+            standard definition sqrt(c_f / rho) since Omega = 0.  ---*/
+            if(nDim == 2){
+              su2double shearStress = 0.0;
+              for(auto iDim = 0u; iDim < nDim; iDim++) {
+                shearStress += pow(solver_container[FLOW_SOL]->GetCSkinFriction(iMarker, iVertex, iDim), 2.0);
+              }
+              shearStress = sqrt(shearStress);
+
+              FrictionVelocity = sqrt(shearStress/flowNodes->GetDensity(iPoint));
+            } else {
+              su2double VorticityMag = max(GeometryToolbox::Norm(3, flowNodes->GetVorticity(iPoint)), 1e-12);
+              FrictionVelocity = sqrt(flowNodes->GetLaminarViscosity(iPoint)*VorticityMag);
+            }
+
+            const su2double wall_dist = geometry->nodes->GetWall_Distance(jPoint);
+            const su2double Derivative = nodes->GetSolution(jPoint, 0) / wall_dist;
+            const su2double turbulence_index = Derivative / (FrictionVelocity * 0.41);
+
+            nodes->SetTurbIndex(iPoint, turbulence_index);
+
+          }
+        }
+        END_SU2_OMP_FOR
+      }
+    }
+  }
+
+  AD::EndNoSharedReading();
+}
+
+void CTurbSASolver::Upwind_Residual(CGeometry* geometry, CSolver** solver_container, CNumerics**,
+                                    CConfig* config, unsigned short iMesh) {
+  SU2_ZONE_SCOPED
+
+  const auto opt = ScalarFluxOptions::Interior(*config, config->GetBounded_Turb(),
+                                               config->GetUse_Accurate_Turb_Jacobians());
+
+  /*--- nVar is 1, or 4 with the three Langevin equations of stochastic backscatter. ---*/
+  DispatchScheme<CScalarFlux_SA, 1, 4>(config, [&](auto tag) {
+    EdgeFluxResidual<typename decltype(tag)::type>(geometry, solver_container, config, opt);
+  });
+}
+
+void CTurbSASolver::BoundaryFlux(CGeometry* geometry, CSolver** solver_container, CConfig* config,
+                                 const ScalarFluxOptions& opt, unsigned short val_marker) {
+  DispatchScheme<CScalarFlux_SA, 1, 4>(config, [&](auto tag) {
+    BoundaryFluxResidual<typename decltype(tag)::type>(geometry, solver_container, config, opt, val_marker);
+  });
+}
+
+void CTurbSASolver::BC_Far_Field(CGeometry *geometry, CSolver **solver_container, CNumerics*, CNumerics*,
+                                 CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+    for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(iVertex, iVar, Solution_Inf[iVar]);
+
+    SetGhostPrimitives(iVertex, flowSolver->GetCharacPrimVar(val_marker, iVertex));
+    SetGhostGeometry(geometry, val_marker, iVertex);
+  }
+  END_SU2_OMP_FOR
+
+  BoundaryFlux(geometry, solver_container, config,
+               ScalarFluxOptions::BoundaryConvective(*config, config->GetBounded_Turb()), val_marker);
+}
+
+void CTurbSASolver::Source_Residual(CGeometry *geometry, CSolver **solver_container,
+                                    CNumerics **numerics_container, CConfig *config, unsigned short iMesh) {
+  SU2_ZONE_SCOPED
+
+  bool axisymmetric = config->GetAxisymmetric();
+
+  const bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+  const bool harmonic_balance = (config->GetTime_Marching() == TIME_MARCHING::HARMONIC_BALANCE);
+  const bool transition_BC = config->GetSAParsedOptions().bc;
+
+  auto* flowNodes = su2staticcast_p<CFlowVariable*>(solver_container[FLOW_SOL]->GetNodes());
+
+  /*--- Pick one numerics object per thread. ---*/
+  auto* numerics = numerics_container[SOURCE_FIRST_TERM + omp_get_thread_num()*MAX_TERMS];
+
+  AD::StartNoSharedReading();
+
+  /*--- Loop over all points. ---*/
+
+  SU2_OMP_FOR_DYN(omp_chunk_size)
+  for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+
+    /*--- Conservative variables w/o reconstruction ---*/
+
+    numerics->SetPrimitive(flowNodes->GetPrimitive(iPoint), nullptr);
+
+    /*--- Gradient of the primitive and conservative variables ---*/
+
+    numerics->SetPrimVarGradient(flowNodes->GetGradient_Primitive(iPoint), nullptr);
+
+    /*--- Set vorticity and strain rate magnitude ---*/
+
+    numerics->SetVorticity(flowNodes->GetVorticity(iPoint), nullptr);
+
+    numerics->SetStrainMag(flowNodes->GetStrainMag(iPoint), 0.0);
+
+    /*--- Turbulent variables w/o reconstruction, and its gradient ---*/
+
+    numerics->SetScalarVar(nodes->GetSolution(iPoint), nullptr);
+    numerics->SetScalarVarGradient(nodes->GetGradient(iPoint), nullptr);
+
+    /*--- Set volume ---*/
+
+    numerics->SetVolume(geometry->nodes->GetVolume(iPoint));
+
+    /*--- Get Hybrid RANS/LES Type and set the appropriate wall distance ---*/
+
+    if (config->GetKind_HybridRANSLES() == NO_HYBRIDRANSLES) {
+
+    /*--- For the SA model, wall roughness is accounted by modifying the computed wall distance
+       *                              d_new = d + 0.03 k_s
+       *    where k_s is the equivalent sand grain roughness height that is specified in cfg file.
+       *    For smooth walls, wall roughness is zero and computed wall distance remains the same. */
+
+      su2double modifiedWallDistance = geometry->nodes->GetWall_Distance(iPoint);
+
+      modifiedWallDistance += 0.03*geometry->nodes->GetRoughnessHeight(iPoint);
+
+      /*--- Set distance to the surface ---*/
+
+      numerics->SetDistance(modifiedWallDistance, 0.0);
+
+      /*--- Set the roughness of the closest wall. ---*/
+
+      numerics->SetRoughness(geometry->nodes->GetRoughnessHeight(iPoint), 0.0 );
+
+    } else {
+
+      /*--- Set DES length scale ---*/
+
+      numerics->SetDistance(nodes->GetDES_LengthScale(iPoint), 0.0);
+
+      /*--- Compute source terms in Langevin equations (Stochastic Basckscatter Model) ---*/
+
+      if (config->GetSBSParam().StochasticBackscatter) {
+        for (unsigned short iDim = 0; iDim < nDim; iDim++)
+          numerics->SetStochSource(nodes->GetLangevinSourceTerms(iPoint, iDim), iDim);
+        numerics->SetLES_Mode(nodes->GetLES_Mode(iPoint), 0.0);
+        numerics->SetSbsInBoxSensor(nodes->GetSbsInBox(iPoint));
+      }
+
+    }
+
+    /*--- Effective Intermittency ---*/
+
+    if (config->GetKind_Trans_Model() != TURB_TRANS_MODEL::NONE) {
+      numerics->SetIntermittencyEff(solver_container[TRANS_SOL]->GetNodes()->GetIntermittencyEff(iPoint));
+      numerics->SetIntermittency(solver_container[TRANS_SOL]->GetNodes()->GetSolution(iPoint, 0));
+    }
+
+    if (axisymmetric) {
+      /*--- Set y coordinate ---*/
+      numerics->SetCoord(geometry->nodes->GetCoord(iPoint), geometry->nodes->GetCoord(iPoint));
+    }
+
+    /*--- Compute the source term ---*/
+
+    auto residual = numerics->ComputeResidual(config);
+
+    /*--- Store the intermittency ---*/
+
+    if (transition_BC || config->GetKind_Trans_Model() != TURB_TRANS_MODEL::NONE) {
+      nodes->SetIntermittency(iPoint,numerics->GetIntermittencyEff());
+    }
+
+    /*--- Subtract residual and the Jacobian ---*/
+
+    LinSysRes.SubtractBlock(iPoint, residual);
+
+    if (implicit) Jacobian.SubtractBlock2Diag(iPoint, residual.jacobian_i);
+
+  }
+  END_SU2_OMP_FOR
+
+  if (harmonic_balance) {
+
+    SU2_OMP_FOR_STAT(omp_chunk_size)
+    for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+
+      su2double Volume = geometry->nodes->GetVolume(iPoint);
+
+      /*--- Access stored harmonic balance source term ---*/
+
+      for (unsigned short iVar = 0; iVar < nVar; iVar++) {
+        su2double Source = nodes->GetHarmonicBalance_Source(iPoint,iVar);
+        LinSysRes(iPoint,iVar) += Source*Volume;
+      }
+    }
+    END_SU2_OMP_FOR
+  }
+
+  AD::EndNoSharedReading();
+
+  /*--- Custom user defined source term (from the python wrapper) ---*/
+  if (config->GetPyCustomSource()) {
+    CustomSourceResidual(geometry, solver_container, numerics_container, config, iMesh);
+  }
+
+}
+
+void CTurbSASolver::Source_Template(CGeometry *geometry, CSolver **solver_container, CNumerics *numerics,
+                                    CConfig *config, unsigned short iMesh) {
+  SU2_ZONE_SCOPED
+}
+
+void CTurbSASolver::BC_HeatFlux_Wall(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics,
+                                     CNumerics *visc_numerics, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  /*--- Evaluate nu tilde at the closest point to the surface using the wall functions. ---*/
+
+  if (config->GetWall_Functions()) {
+    SU2_OMP_SAFE_GLOBAL_ACCESS(SetTurbVars_WF(geometry, solver_container, config, val_marker);)
+    return;
+  }
+
+  const bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+  string Marker_Tag = config->GetMarker_All_TagBound(val_marker);
+  WALL_TYPE WallType;
+  su2double Roughness_Height;
+  tie(WallType, Roughness_Height) = config->GetWallRoughnessProperties(Marker_Tag);
+  Roughness_Height = max(Roughness_Height, EPS);
+
+  /*--- The dirichlet condition is used only without wall function, otherwise the
+   convergence is compromised as we are providing nu tilde values for the
+   first point of the wall  ---*/
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+
+    const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+
+    /*--- Check if the node belongs to the domain (i.e, not a halo node) ---*/
+
+    if (!geometry->nodes->GetDomain(iPoint)) continue;
+
+    if (WallType == WALL_TYPE::SMOOTH) {
+      for (auto iVar = 0u; iVar < nVar; iVar++)
+        nodes->SetSolution_Old(iPoint,iVar,0.0);
+
+      LinSysRes.SetBlock_Zero(iPoint);
+
+      /*--- Includes 1 in the diagonal ---*/
+
+      if (implicit) Jacobian.DeleteValsRowi(iPoint, 0);
+      continue;
+    }
+
+    /*--- For rough walls, the boundary condition is given by
+    * (\frac{\partial \nu}{\partial n})_wall = \frac{\nu}{0.03*k_s}
+    * where \nu is the solution variable, $n$ is the wall normal direction
+    * and k_s is the equivalent sand grain roughness specified. ---*/
+
+    /*--- Compute dual-grid area and boundary normal ---*/
+    su2double Normal[MAXNDIM] = {0.0};
+    for (auto iDim = 0u; iDim < nDim; iDim++)
+      Normal[iDim] = -geometry->vertex[val_marker][iVertex]->GetNormal(iDim);
+
+    su2double Area = GeometryToolbox::Norm(nDim, Normal);
+
+    /*--- Get laminar_viscosity and density ---*/
+    su2double sigma = 2.0/3.0;
+    su2double laminar_viscosity = solver_container[FLOW_SOL]->GetNodes()->GetLaminarViscosity(iPoint);
+    su2double density = solver_container[FLOW_SOL]->GetNodes()->GetDensity(iPoint);
+    su2double nu_lam = laminar_viscosity / density;
+
+    su2double denom = sigma * 0.03 * Roughness_Height;
+    su2double coeff = (nu_lam + nodes->GetSolution(iPoint,0)) / denom;
+
+    su2double Res_Wall = Area * coeff * nodes->GetSolution(iPoint,0);
+    LinSysRes(iPoint, 0) -= Res_Wall;
+
+    su2double Jac_Wall = Area * (coeff + nodes->GetSolution(iPoint,0) / denom);
+    if (implicit) Jacobian.AddVal2Diag(iPoint, 0, -Jac_Wall);
+  }
+  END_SU2_OMP_FOR
+}
+
+void CTurbSASolver::BC_Isothermal_Wall(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics,
+                                       CNumerics *visc_numerics, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  BC_HeatFlux_Wall(geometry, solver_container, conv_numerics, visc_numerics, config, val_marker);
+
+}
+
+void CTurbSASolver::BC_Inlet(CGeometry *geometry, CSolver **solver_container, CNumerics*, CNumerics*,
+                             CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+  CFluidModel* FluidModel = flowSolver->GetFluidModel();
+  const su2double* Turb_Properties = config->GetInlet_TurbVal(config->GetMarker_All_TagBound(val_marker));
+  const su2double Nu_Factor = Turb_Properties[0];
+  const su2double* Scalar_Inlet = config->GetKind_Species_Model() != SPECIES_MODEL::NONE
+                                      ? config->GetInlet_SpeciesVal(config->GetMarker_All_TagBound(val_marker))
+                                      : nullptr;
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+    su2double nuTilde = Inlet_TurbVars[val_marker][iVertex][0];
+    const auto* V_inlet = flowSolver->GetCharacPrimVar(val_marker, iVertex);
+
+    /*--- Non-dimensionalize Inlet_TurbVars if Inlet-Files are used. ---*/
+    if (config->GetInlet_Profile_From_File()) {
+      nuTilde *= config->GetDensity_Ref() / config->GetViscosity_Ref();
+    } else {
+      /*--- Fluid model evaluation of the inlet nu tilde. ---*/
+      su2double Density_Inlet;
+      if (config->GetKind_Regime() == ENUM_REGIME::COMPRESSIBLE) {
+        Density_Inlet = V_inlet[prim_idx.Density()];
+        FluidModel->SetTDState_Prho(V_inlet[prim_idx.Pressure()], Density_Inlet);
+      } else {
+        FluidModel->SetTDState_T(V_inlet[prim_idx.Temperature()], Scalar_Inlet);
+        Density_Inlet = FluidModel->GetDensity();
+      }
+      const su2double Laminar_Viscosity_Inlet = FluidModel->GetLaminarViscosity();
+      nuTilde = Nu_Factor * Laminar_Viscosity_Inlet / Density_Inlet;
+      if (config->GetSAParsedOptions().bc) nuTilde *= 0.005;
+    }
+    ghostNodes->SetSolution(iVertex, 0, nuTilde);
+
+    SetGhostPrimitives(iVertex, V_inlet);
+
+    SetGhostGeometry(geometry, val_marker, iVertex);
+  }
+  END_SU2_OMP_FOR
+
+  /*--- The diffusive term at this boundary causes serious convergence problems. ---*/
+  BoundaryFlux(geometry, solver_container, config,
+               ScalarFluxOptions::BoundaryConvective(*config, config->GetBounded_Turb()), val_marker);
+}
+
+void CTurbSASolver::BC_Outlet(CGeometry *geometry, CSolver **solver_container, CNumerics*, CNumerics*,
+                              CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+    const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+
+    /*--- Neumann: the turbulent variable is copied from the interior before computing the flux. ---*/
+    for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(iVertex, iVar, nodes->GetSolution(iPoint, iVar));
+
+    SetGhostPrimitives(iVertex, flowSolver->GetCharacPrimVar(val_marker, iVertex));
+
+    SetGhostGeometry(geometry, val_marker, iVertex);
+  }
+  END_SU2_OMP_FOR
+
+  /*--- The diffusive term at this boundary causes serious convergence problems. ---*/
+  BoundaryFlux(geometry, solver_container, config,
+               ScalarFluxOptions::BoundaryConvective(*config, config->GetBounded_Turb()), val_marker);
+}
+
+void CTurbSASolver::BC_Engine_Inflow(CGeometry *geometry, CSolver **solver_container, CNumerics*,
+                                     CNumerics*, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+    const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+
+    /*--- Neumann: the turbulent variable is copied from the interior before computing the flux. ---*/
+    for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(iVertex, iVar, nodes->GetSolution(iPoint, iVar));
+
+    SetGhostPrimitives(iVertex, flowSolver->GetCharacPrimVar(val_marker, iVertex));
+
+    SetGhostGeometry(geometry, val_marker, iVertex);
+  }
+  END_SU2_OMP_FOR
+
+  /*--- The diffusive term at this boundary causes serious convergence problems. ---*/
+  BoundaryFlux(geometry, solver_container, config,
+               ScalarFluxOptions::BoundaryConvective(*config, config->GetBounded_Turb()), val_marker);
+}
+
+void CTurbSASolver::BC_Engine_Exhaust(CGeometry *geometry, CSolver **solver_container, CNumerics*,
+                                      CNumerics*, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+    /*--- Prescribed turbulent state for an inflow. ---*/
+    for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(iVertex, iVar, nu_tilde_Engine[iVar]);
+
+    SetGhostPrimitives(iVertex, flowSolver->GetCharacPrimVar(val_marker, iVertex));
+
+    SetGhostGeometry(geometry, val_marker, iVertex);
+  }
+  END_SU2_OMP_FOR
+
+  /*--- The diffusive term at this boundary causes serious convergence problems. ---*/
+  BoundaryFlux(geometry, solver_container, config,
+               ScalarFluxOptions::BoundaryConvective(*config, config->GetBounded_Turb()), val_marker);
+}
+
+void CTurbSASolver::BC_ActDisk_Inlet(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics,
+                                     CNumerics *visc_numerics, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  BC_ActDisk(geometry, solver_container, conv_numerics, visc_numerics, config,  val_marker, true);
+}
+
+void CTurbSASolver::BC_ActDisk_Outlet(CGeometry *geometry, CSolver **solver_container, CNumerics *conv_numerics,
+                                      CNumerics *visc_numerics, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  BC_ActDisk(geometry, solver_container, conv_numerics, visc_numerics, config,  val_marker, false);
+}
+
+void CTurbSASolver::BC_ActDisk(CGeometry *geometry, CSolver **solver_container,
+                               CNumerics*, CNumerics*,
+                               CConfig *config, unsigned short val_marker, bool val_inlet_surface) {
+  SU2_ZONE_SCOPED
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+
+    const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+    const auto GlobalIndex_donor = flowSolver->GetDonorGlobalIndex(val_marker, iVertex);
+    const auto GlobalIndex = geometry->nodes->GetGlobalIndex(iPoint);
+
+    /*--- No flux at a vertex whose donor is the point itself. ---*/
+    if (GlobalIndex == GlobalIndex_donor) {
+      ghostSkip[iVertex] = true;
+      continue;
+    }
+
+    /*--- Normal vector for this vertex (negate for outward convention) ---*/
+
+    su2double Normal[MAXNDIM] = {0.0};
+    for (auto iDim = 0u; iDim < nDim; iDim++)
+      Normal[iDim] = -geometry->vertex[val_marker][iVertex]->GetNormal(iDim);
+
+    su2double Area = GeometryToolbox::Norm(nDim, Normal);
+
+    su2double UnitNormal[MAXNDIM] = {0.0};
+    for (auto iDim = 0u; iDim < nDim; iDim++)
+      UnitNormal[iDim] = Normal[iDim]/Area;
+
+    const auto* V_domain = flowSolver->GetNodes()->GetPrimitive(iPoint);
+
+    /*--- Check the flow direction. Project the flow into the normal to the inlet face ---*/
+
+    su2double Vn = GeometryToolbox::DotProduct(nDim, &V_domain[1], UnitNormal);
+
+    bool ReverseFlow = false;
+    if ((val_inlet_surface) && (Vn < 0.0)) { ReverseFlow = true; }
+    if ((!val_inlet_surface) && (Vn > 0.0)) { ReverseFlow = true; }
+
+    /*--- No flux at all if there is a reverse flow, Euler b.c. for the direct problem. ---*/
+
+    if (ReverseFlow) {
+      ghostSkip[iVertex] = true;
+      continue;
+    }
+
+    SetGhostPrimitives(iVertex, flowSolver->GetCharacPrimVar(val_marker, iVertex));
+
+    /*--- Inflow analysis (interior extrapolation, a Neumann BC) or outflow analysis
+     * (prescribed for an inflow), depending on which side val_marker is. ReverseFlow is always
+     * false here (the other case returned above), so this reduces to val_inlet_surface. ---*/
+
+    if (val_inlet_surface) {
+      for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(iVertex, iVar, nodes->GetSolution(iPoint, iVar));
+    } else {
+      for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(iVertex, iVar, nu_tilde_ActDisk[iVar]);
+    }
+
+    for (auto iDim = 0u; iDim < nDim; iDim++) ghostNormal(iVertex, iDim) = Normal[iDim];
+
+    ghostSkip[iVertex] = false;
+  }
+  END_SU2_OMP_FOR
+
+  /*--- The diffusive term at this boundary causes serious convergence problems. ---*/
+  BoundaryFlux(geometry, solver_container, config,
+               ScalarFluxOptions::BoundaryConvective(*config, config->GetBounded_Turb()), val_marker);
+}
+
+void CTurbSASolver::BC_Inlet_MixingPlane(CGeometry *geometry, CSolver **solver_container, CNumerics*,
+                                         CNumerics*, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+  const auto nSpanWiseSections = config->GetnSpanWiseSections();
+
+  /*--- The span loop below reaches a vertex of val_marker through GetOldVertex, which need not
+   * cover every one of them, so every vertex starts skipped and only the ones actually filled
+   * are cleared. ---*/
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) ghostSkip[iVertex] = true;
+  END_SU2_OMP_FOR
+
+  for (auto iSpan = 0u; iSpan < nSpanWiseSections; iSpan++){
+    su2double extAverageNu[MAXNVAR] = {0.0};
+    extAverageNu[0] = flowSolver->GetMixingState(val_marker, iSpan, 5);
+
+    SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+    for (auto iVertex = 0u; iVertex < geometry->GetnVertexSpan(val_marker,iSpan); iVertex++) {
+
+      /*--- find the node related to the vertex ---*/
+      const auto iPoint = geometry->turbovertex[val_marker][iSpan][iVertex]->GetNode();
+
+      /*--- using the other vertex information for retrieving some information ---*/
+      const auto oldVertex = geometry->turbovertex[val_marker][iSpan][iVertex]->GetOldVertex();
+
+      /*--- Index of the closest interior node ---*/
+      const auto Point_Normal = geometry->vertex[val_marker][oldVertex]->GetNormal_Neighbor();
+
+      for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(oldVertex, iVar, extAverageNu[iVar]);
+
+      SetGhostPrimitives(oldVertex, flowSolver->GetCharacPrimVar(val_marker, oldVertex));
+
+      SetGhostGeometry(geometry, val_marker, oldVertex);
+
+      SetGhostDiffusionState(geometry, oldVertex, iPoint, Point_Normal);
+    }
+    END_SU2_OMP_FOR
+  }
+
+  BoundaryFlux(geometry, solver_container, config, ScalarFluxOptions::BoundaryFull(*config), val_marker);
+}
+
+void CTurbSASolver::BC_Inlet_Turbo(CGeometry *geometry, CSolver **solver_container, CNumerics*,
+                                   CNumerics*, CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  auto* flowSolver = solver_container[FLOW_SOL];
+  const auto nSpanWiseSections = config->GetnSpanWiseSections();
+
+  CFluidModel *FluidModel = flowSolver->GetFluidModel();
+
+  su2double Factor_nu_Inf = config->GetNuFactor_FreeStream();
+
+  /*--- The span loop below reaches a vertex of val_marker through GetOldVertex, which need not
+   * cover every one of them, so every vertex starts skipped and only the ones actually filled
+   * are cleared. ---*/
+  SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) ghostSkip[iVertex] = true;
+  END_SU2_OMP_FOR
+
+  /*--- Loop over all the spans on this boundary marker ---*/
+  for (auto iSpan = 0; iSpan < nSpanWiseSections; iSpan++) {
+
+    su2double rho       = flowSolver->GetAverageDensity(val_marker, iSpan);
+    su2double pressure  = flowSolver->GetAveragePressure(val_marker, iSpan);
+
+    FluidModel->SetTDState_Prho(pressure, rho);
+    su2double muLam = FluidModel->GetLaminarViscosity();
+
+    su2double nu_tilde[MAXNVAR] = {0.0};
+    nu_tilde[0] = Factor_nu_Inf*muLam/rho;
+
+    SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+    for (auto iVertex = 0u; iVertex < geometry->GetnVertexSpan(val_marker,iSpan); iVertex++) {
+
+      /*--- find the node related to the vertex ---*/
+      const auto iPoint = geometry->turbovertex[val_marker][iSpan][iVertex]->GetNode();
+
+      /*--- using the other vertex information for retrieving some information ---*/
+      const auto oldVertex = geometry->turbovertex[val_marker][iSpan][iVertex]->GetOldVertex();
+
+      /*--- Index of the closest interior node ---*/
+      const auto Point_Normal = geometry->vertex[val_marker][oldVertex]->GetNormal_Neighbor();
+
+      for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(oldVertex, iVar, nu_tilde[iVar]);
+
+      SetGhostPrimitives(oldVertex, flowSolver->GetCharacPrimVar(val_marker, oldVertex));
+
+      SetGhostGeometry(geometry, val_marker, oldVertex);
+
+      SetGhostDiffusionState(geometry, oldVertex, iPoint, Point_Normal);
+    }
+    END_SU2_OMP_FOR
+  }
+
+  BoundaryFlux(geometry, solver_container, config, ScalarFluxOptions::BoundaryFull(*config), val_marker);
+}
+
+void CTurbSASolver::BC_Fluid_Interface(CGeometry *geometry, CSolver **solver_container, CNumerics*,
+                                       CNumerics*, CConfig *config) {
+  SU2_ZONE_SCOPED
+
+  if (solver_container[FLOW_SOL] == nullptr) return;
+
+  const auto optConv = ScalarFluxOptions::BoundaryConvective(*config, config->GetBounded_Turb());
+  const auto optVisc = ScalarFluxOptions::BoundaryDiffusive(*config, true);
+
+  /*--- SA's diffusion coefficients read no auxiliary ghost field. ---*/
+  const auto fillGhostExtras = [](unsigned long, unsigned long) {};
+
+  DispatchScheme<CScalarFlux_SA, 1, 4>(config, [&](auto tag) {
+    FluidInterfaceFluxResidual<typename decltype(tag)::type>(geometry, solver_container, config, optConv, optVisc,
+                                                             fillGhostExtras);
+  });
+}
+
+void CTurbSASolver::SetTurbVars_WF(CGeometry *geometry, CSolver **solver_container,
+                                  const CConfig *config, unsigned short val_marker) {
+  SU2_ZONE_SCOPED
+
+  const bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+
+  /*--- We use a very high max nr of iterations, but we only need this the first couple of iterations ---*/
+  const unsigned short max_iter = config->GetwallModel_MaxIter();
+
+  /* --- tolerance has LARGE impact on convergence, do not increase this value! --- */
+  const su2double tol = 1e-12;
+
+
+  /*--- Typical constants from boundary layer theory ---*/
+
+  const su2double cv1_3 = 7.1*7.1*7.1;
+
+  CVariable* flow_nodes = solver_container[FLOW_SOL]->GetNodes();
+
+  /*--- Loop over all of the vertices on this boundary marker ---*/
+
+  for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+
+    const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+    const auto iPoint_Neighbor = geometry->vertex[val_marker][iVertex]->GetNormal_Neighbor();
+
+    /*--- Check if the node belongs to the domain (i.e, not a halo node) ---*/
+
+    if (geometry->nodes->GetDomain(iPoint_Neighbor)) {
+
+      su2double Y_Plus = solver_container[FLOW_SOL]->GetYPlus(val_marker, iVertex);
+
+      /*--- Do not use wall model at the ipoint when y+ < "limit" ---*/
+
+      if (Y_Plus < config->GetwallModel_MinYPlus()) continue;
+
+      su2double Lam_Visc_Normal = flow_nodes->GetLaminarViscosity(iPoint_Neighbor);
+      su2double Density_Normal = flow_nodes->GetDensity(iPoint_Neighbor);
+      su2double Kin_Visc_Normal = Lam_Visc_Normal/Density_Normal;
+
+      su2double Eddy_Visc = solver_container[FLOW_SOL]->GetEddyViscWall(val_marker, iVertex);
+
+      /*--- Solve for the new value of nu_tilde given the eddy viscosity and using a Newton method.
+       * f(nu_til) = nu_til^4 - nu_t*(nu_til^3 + cv1^3*nu^3) has a single positive root, which is larger than nu_t,
+       * and f is increasing and convex for nu_til > nu_t, so the iteration converges from any start >= nu_t.
+       * Start from the value imposed at the previous iteration, not from the wall node: with wall functions the
+       * wall value is free and tends to zero (f' = 0) or below, e.g. after a restart without wall functions. ---*/
+
+      const su2double nu_til_start = max(nodes->GetSolution(iPoint_Neighbor,0), Eddy_Visc/Density_Normal);
+      su2double nu_til = 0.0;
+      su2double nu_til_old = nu_til_start;
+
+      unsigned short counter = 0;
+      su2double diff = 1.0;
+      su2double relax = config->GetwallModel_RelFac();
+      while (diff > tol) {
+        // note the error in Nichols and Nelson
+        su2double func = pow(nu_til_old,4) - (Eddy_Visc/Density_Normal)*(pow(nu_til_old,3) + pow(Kin_Visc_Normal,3)*cv1_3);
+        su2double func_prim = 4.0 * pow(nu_til_old,3) - 3.0*(Eddy_Visc/Density_Normal)*pow(nu_til_old,2);
+
+        // damped Newton method
+        nu_til = nu_til_old - relax*(func/func_prim);
+
+        diff = fabs(nu_til-nu_til_old);
+        nu_til_old = nu_til;
+
+        // sometimes we get negative values when the solution has not converged yet, we just reset the nu_tilde in that case.
+        if (nu_til_old<tol) {
+          relax /= 2.0;
+          nu_til_old = nu_til_start/relax;
+        }
+
+        counter++;
+        if (counter > max_iter) break;
+      }
+
+      su2double nuTil[MAXNVAR] = {0.0};
+      nuTil[0] = nu_til;
+      nodes->SetSolution_Old(iPoint_Neighbor, nuTil);
+      LinSysRes.SetBlock_Zero(iPoint_Neighbor);
+
+      /*--- includes 1 in the diagonal ---*/
+
+      if (implicit) Jacobian.DeleteValsRowi(iPoint_Neighbor, 0);
+    }
+  }
+}
+
+void CTurbSASolver::SetDES_LengthScale(CSolver **solver, CGeometry *geometry, CConfig *config){
+  SU2_ZONE_SCOPED
+
+  const auto kindHybridRANSLES = config->GetKind_HybridRANSLES();
+
+  const su2double constDES = config->GetConst_DES();
+
+  const su2double fw_star = 0.424, cv1_3 = pow(7.1, 3), k2 = pow(0.41, 2);
+  const su2double cb1   = 0.1355, ct3 = 1.2, ct4 = 0.5;
+  const su2double sigma = 2./3., cb2 = 0.622, f_max = 1.0, f_min = 0.1, a1 = 0.15, a2 = 0.3;
+
+  auto* flowNodes = su2staticcast_p<CFlowVariable*>(solver[FLOW_SOL]->GetNodes());
+
+  SU2_OMP_FOR_DYN(omp_chunk_size)
+  for (auto iPoint = 0ul; iPoint < nPointDomain; iPoint++){
+
+    const auto coord_i       = geometry->nodes->GetCoord(iPoint);
+    const auto nNeigh        = geometry->nodes->GetnPoint(iPoint);
+    const auto wallDistance  = geometry->nodes->GetWall_Distance(iPoint);
+    const auto velocityGrad  = flowNodes->GetVelocityGradient(iPoint);
+    const auto vorticity     = flowNodes->GetVorticity(iPoint);
+    const auto density       = flowNodes->GetDensity(iPoint);
+    const auto laminarViscosity = flowNodes->GetLaminarViscosity(iPoint);
+    const auto eddyViscosity    = nodes->GetmuT(iPoint);
+    const su2double kinematicViscosity     = laminarViscosity/density;
+    const su2double kinematicViscosityTurb = eddyViscosity/density;
+
+    su2double uijuij = 0.0;
+    for(auto iDim = 0u; iDim < nDim; iDim++){
+      for(auto jDim = 0u; jDim < nDim; jDim++){
+        uijuij += pow(velocityGrad[iDim][jDim], 2);
+      }
+    }
+    uijuij = sqrt(fabs(uijuij));
+    uijuij = max(uijuij,1e-10);
+
+    /*--- Low Reynolds number correction term ---*/
+
+    const su2double nu_hat = nodes->GetSolution(iPoint,0);
+    const su2double Ji   = nu_hat/kinematicViscosity;
+    const su2double Ji_2 = Ji * Ji;
+    const su2double Ji_3 = Ji*Ji*Ji;
+    const su2double fv1  = Ji_3/(Ji_3+cv1_3);
+    const su2double fv2 = 1.0 - Ji/(1.0+Ji*fv1);
+    const su2double ft2 = ct3*exp(-ct4*Ji_2);
+    const su2double cw1 = cb1/k2+(1.0+cb2)/sigma;
+
+    su2double psi_2 = (1.0 - (cb1/(cw1*k2*fw_star))*(ft2 + (1.0 - ft2)*fv2))/(fv1 * max(1.0e-10,1.0-ft2));
+    psi_2 = min(100.0,psi_2);
+
+    su2double lengthScale = 0.0, lesSensor = 0.0;
+
+    const su2double LES_FilterWidth = config->GetLES_FilterWidth();
+
+    switch(kindHybridRANSLES){
+      case SA_DES: {
+        /*--- Original Detached Eddy Simulation (DES97)
+        Spalart
+        1997
+        ---*/
+
+        su2double maxDelta = geometry->nodes->GetMaxLength(iPoint);
+        if (LES_FilterWidth > 0.0){
+          maxDelta = LES_FilterWidth;
+        }
+        const su2double distDES = constDES * maxDelta;
+        lengthScale = min(distDES,wallDistance);
+        lesSensor = (wallDistance<=distDES) ? 0.0 : 1.0;
+
+        if (config->GetEnforceLES()) {
+          lengthScale = distDES;
+          lesSensor = 1.0;
+        }
+
+        break;
+      }
+      case SA_DDES: {
+        /*--- A New Version of Detached-eddy Simulation, Resistant to Ambiguous Grid Densities.
+         Spalart et al.
+         Theoretical and Computational Fluid Dynamics - 2006
+         ---*/
+
+        su2double maxDelta = geometry->nodes->GetMaxLength(iPoint);
+        if (LES_FilterWidth > 0.0){
+          maxDelta = LES_FilterWidth;
+        }
+
+        const su2double r_d = (kinematicViscosityTurb+kinematicViscosity)/(uijuij*k2*pow(wallDistance, 2.0));
+        const su2double f_d = 1.0-tanh(pow(8.0*r_d,3.0));
+
+        const su2double distDES = constDES * maxDelta;
+        lengthScale = wallDistance-f_d*max(0.0,(wallDistance-distDES));
+        lesSensor = (wallDistance<=distDES) ? 0.0 : f_d;
+
+        if (config->GetEnforceLES()) {
+          lengthScale = distDES;
+          lesSensor = 1.0;
+        }
+
+        break;
+      }
+      case SA_ZDES: {
+        /*--- Recent improvements in the Zonal Detached Eddy Simulation (ZDES) formulation.
+         Deck
+         Theoretical and Computational Fluid Dynamics - 2012
+         ---*/
+
+        const su2double deltaDDES = geometry->nodes->GetMaxLength(iPoint);
+
+        su2double delta[MAXNDIM] = {}, ratioOmega[MAXNDIM] = {};
+
+        for (const auto jPoint : geometry->nodes->GetPoints(iPoint)) {
+          const auto coord_j = geometry->nodes->GetCoord(jPoint);
+          for (auto iDim = 0u; iDim < nDim; iDim++){
+            const su2double deltaAux = abs(coord_j[iDim] - coord_i[iDim]);
+            delta[iDim] = max(delta[iDim], deltaAux);
+          }
+        }
+
+        const su2double omega = GeometryToolbox::Norm(3, vorticity);
+
+        for (auto iDim = 0u; iDim < 3; iDim++){
+          ratioOmega[iDim] = vorticity[iDim]/omega;
+        }
+
+        su2double maxDelta = sqrt(pow(ratioOmega[0], 2)*delta[1]*delta[2] +
+                                  pow(ratioOmega[1], 2)*delta[0]*delta[2] +
+                                  pow(ratioOmega[2], 2)*delta[0]*delta[1]);
+
+        const su2double r_d = (kinematicViscosityTurb+kinematicViscosity)/(uijuij*k2*pow(wallDistance, 2.0));
+        const su2double f_d = 1.0-tanh(pow(8.0*r_d,3.0));
+
+        if (f_d < 0.99){
+          maxDelta = deltaDDES;
+        }
+
+        if (LES_FilterWidth > 0.0){
+          maxDelta = LES_FilterWidth;
+        }
+        const su2double distDES = constDES * maxDelta;
+        lengthScale = wallDistance-f_d*max(0.0,(wallDistance-distDES));
+        lesSensor = (wallDistance<=distDES) ? 0.0 : f_d;
+
+        if (config->GetEnforceLES()) {
+          lengthScale = distDES;
+          lesSensor = 1.0;
+        }
+
+        break;
+      }
+      case SA_EDDES: {
+        /*--- An Enhanced Version of DES with Rapid Transition from RANS to LES in Separated Flows.
+         Shur et al.
+         Flow Turbulence Combust - 2015
+         ---*/
+
+        su2double vortexTiltingMeasure = nodes->GetVortex_Tilting(iPoint);
+
+        const su2double omega = GeometryToolbox::Norm(3, vorticity);
+
+        su2double ratioOmega[MAXNDIM] = {};
+
+        for (auto iDim = 0; iDim < 3; iDim++){
+          ratioOmega[iDim] = vorticity[iDim]/omega;
+        }
+
+        const su2double deltaDDES = geometry->nodes->GetMaxLength(iPoint);
+
+        su2double ln_max = 0.0;
+        for (const auto jPoint : geometry->nodes->GetPoints(iPoint)) {
+          const auto coord_j = geometry->nodes->GetCoord(jPoint);
+          su2double delta[MAXNDIM] = {};
+          for (auto iDim = 0u; iDim < nDim; iDim++){
+            delta[iDim] = fabs(coord_j[iDim] - coord_i[iDim]);
+          }
+          su2double ln[3];
+          ln[0] = delta[1]*ratioOmega[2] - delta[2]*ratioOmega[1];
+          ln[1] = delta[2]*ratioOmega[0] - delta[0]*ratioOmega[2];
+          ln[2] = delta[0]*ratioOmega[1] - delta[1]*ratioOmega[0];
+          const su2double aux_ln = sqrt(ln[0]*ln[0] + ln[1]*ln[1] + ln[2]*ln[2]);
+          ln_max = max(ln_max, aux_ln);
+          vortexTiltingMeasure += nodes->GetVortex_Tilting(jPoint);
+        }
+        vortexTiltingMeasure /= (nNeigh + 1);
+
+        const su2double f_kh = max(f_min,
+                                   min(f_max,
+                                       f_min + ((f_max - f_min)/(a2 - a1)) * (vortexTiltingMeasure - a1)));
+
+        const su2double r_d = (kinematicViscosityTurb+kinematicViscosity)/(uijuij*k2*pow(wallDistance, 2.0));
+        const su2double f_d = 1.0-tanh(pow(8.0*r_d,3.0));
+
+        su2double maxDelta = (ln_max/sqrt(3.0)) * f_kh;
+        if (f_d < 0.999){
+          maxDelta = deltaDDES;
+        }
+
+        if (LES_FilterWidth > 0.0){
+          maxDelta = LES_FilterWidth;
+        }
+        const su2double distDES = constDES * maxDelta;
+        lengthScale = wallDistance-f_d*max(0.0,(wallDistance-distDES));
+        lesSensor = (wallDistance<=distDES) ? 0.0 : f_d;
+
+        if (config->GetEnforceLES()) {
+          lengthScale = distDES;
+          lesSensor = 1.0;
+        }
+
+        break;
+      }
+    }
+
+    nodes->SetDES_LengthScale(iPoint, lengthScale);
+    nodes->SetLES_Mode(iPoint, lesSensor);
+
+  }
+  END_SU2_OMP_FOR
+}
+
+void CTurbSASolver::SetBackscatterInBox(CConfig *config, CGeometry *geometry) {
+  SU2_ZONE_SCOPED
+
+  auto sbsBoxBounds = config->GetSBSParam().StochBackscatterBoxBounds;
+
+  SU2_OMP_FOR_STAT(omp_chunk_size)
+  for (unsigned long iPoint = 0; iPoint < nPoint; iPoint++) {
+    const auto coord = geometry->nodes->GetCoord(iPoint);
+    bool outOfBoxX = (coord[0]<sbsBoxBounds[0] || coord[0]>sbsBoxBounds[1]);
+    bool outOfBoxY = (coord[1]<sbsBoxBounds[2] || coord[1]>sbsBoxBounds[3]);
+    bool outOfBoxZ = (coord[2]<sbsBoxBounds[4] || coord[2]>sbsBoxBounds[5]);
+    bool outOfBox  = (outOfBoxX || outOfBoxY || outOfBoxZ);
+    nodes->SetSbsInBox(iPoint, outOfBox ? 0 : 1);
+  }
+  END_SU2_OMP_FOR
+
+}
+
+void CTurbSASolver::SetLangevinSourceTerms(CConfig *config, CGeometry* geometry) {
+  SU2_ZONE_SCOPED
+
+  const su2double threshold = config->GetSBSParam().stochFdThreshold;
+  const su2double dummySource = 1e3;
+  unsigned long timeIter = config->GetTimeIter();
+
+  SU2_OMP_FOR_STAT(omp_chunk_size)
+  for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++){
+    unsigned long iPointGlobal = geometry->nodes->GetGlobalIndex(iPoint);
+    for (unsigned short iDim = 0; iDim < nDim; iDim++){
+      su2double lesSensor = nodes->GetLES_Mode(iPoint);
+      su2double inBoxSensor = nodes->GetSbsInBox(iPoint);
+      bool insideBox = (inBoxSensor == 1);
+      if (lesSensor>threshold && insideBox) {
+        su2double rnd = RandomToolbox::GetNormal(iPointGlobal, iDim, timeIter);
+        nodes->SetLangevinSourceTermsOld(iPoint, iDim, rnd);
+        nodes->SetLangevinSourceTerms(iPoint, iDim, rnd);
+      } else {
+        nodes->SetLangevinSourceTermsOld(iPoint, iDim, dummySource);
+        nodes->SetLangevinSourceTerms(iPoint, iDim, 0.0);
+      }
+    }
+  }
+  END_SU2_OMP_FOR
+
+  for (unsigned short iMarker = 0; iMarker < config->GetnMarker_All(); iMarker++) {
+    SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+    for (unsigned long iVertex = 0; iVertex < geometry->nVertex[iMarker]; iVertex++) {
+      unsigned long iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
+      if (config->GetMarker_All_KindBC(iMarker) != SEND_RECEIVE) {
+        for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+          nodes->SetLangevinSourceTermsOld(iPoint, iDim, dummySource);
+          nodes->SetLangevinSourceTerms(iPoint, iDim, 0.0);
+        }
+      }
+    }
+    END_SU2_OMP_FOR
+  }
+
+  InitiateComms(geometry, config, MPI_QUANTITIES::STOCH_SOURCE_LANG);
+  CompleteComms(geometry, config, MPI_QUANTITIES::STOCH_SOURCE_LANG);
+
+}
+
+void CTurbSASolver::SmoothLangevinSourceTerms(CConfig* config, CGeometry* geometry) {
+  SU2_ZONE_SCOPED
+
+  static su2double globalResNorm;
+  static unsigned long global_nPointLES;
+  static std::array<su2double, 6> globalChecks;
+
+  const su2double LES_FilterWidth = config->GetLES_FilterWidth();
+  const su2double cDelta = config->GetSBSParam().SBS_Cdelta;
+  const unsigned short maxIter = config->GetSBSParam().SBS_maxIterSmooth;
+  const su2double tol = -5.0;
+  const su2double sourceLim = 3.0;
+  const su2double omega = 0.8;
+  unsigned long timeIter = config->GetTimeIter();
+  unsigned long restartIter = config->GetRestart_Iter();
+
+  /*--- Start SOR algorithm for the Laplacian smoothing. ---*/
+
+  for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+
+    for (unsigned short iter = 0; iter < maxIter; iter++) {
+
+      /*--- MPI communication. ---*/
+
+      InitiateComms(geometry, config, MPI_QUANTITIES::STOCH_SOURCE_LANG);
+      CompleteComms(geometry, config, MPI_QUANTITIES::STOCH_SOURCE_LANG);
+
+      su2double localResNorm = 0.0;
+      unsigned long local_nPointLES = 0;
+
+      BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS
+      for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+        su2double source_i_old = nodes->GetLangevinSourceTermsOld(iPoint, iDim);
+        if (source_i_old > 3.0*sourceLim) continue;
+        local_nPointLES += 1;
+        su2double maxDelta = geometry->nodes->GetMaxLength(iPoint);
+        if (LES_FilterWidth > 0.0) maxDelta = LES_FilterWidth;
+        su2double b2 = cDelta * pow(maxDelta, 2);
+        su2double volume_iPoint = geometry->nodes->GetVolume(iPoint) + geometry->nodes->GetPeriodicVolume(iPoint);
+        su2double source_i = nodes->GetLangevinSourceTerms(iPoint, iDim);
+        auto coord_i = geometry->nodes->GetCoord(iPoint);
+
+        /*--- Assemble system matrix. ---*/
+
+        su2double diag = 1.0;
+        su2double sum = 0.0;
+        for (unsigned short iNode = 0; iNode < geometry->nodes->GetnPoint(iPoint); iNode++) {
+          auto jPoint = geometry->nodes->GetPoint(iPoint, iNode);
+          auto coord_j = geometry->nodes->GetCoord(jPoint);
+          auto iEdge = geometry->nodes->GetEdge(iPoint, iNode);
+          auto* normal = geometry->edges->GetNormal(iEdge);
+          su2double area = GeometryToolbox::Norm(nDim, normal);
+          su2double dx_ij = GeometryToolbox::Distance(nDim, coord_i, coord_j);
+          su2double source_j = nodes->GetLangevinSourceTerms(jPoint, iDim);
+          su2double a_ij = area/volume_iPoint * b2/dx_ij;
+          diag += a_ij;
+          sum += a_ij * source_j;
+        }
+
+        /*--- Update the solution. ---*/
+
+        su2double source_tmp = (source_i_old + sum) / diag;
+        localResNorm += pow(omega * (source_tmp - source_i), 2);
+        source_i = (1.0-omega)*source_i + omega*source_tmp;
+        nodes->SetLangevinSourceTerms(iPoint, iDim, source_i);
+
+      }
+      END_SU2_OMP_SAFE_GLOBAL_ACCESS
+
+      /*--- Stop integration if residual drops below tolerance. ---*/
+
+      BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+        SU2_MPI::Allreduce(&local_nPointLES, &global_nPointLES, 1, MPI_UNSIGNED_LONG, MPI_SUM, SU2_MPI::GetComm());
+        SU2_MPI::Allreduce(&localResNorm, &globalResNorm, 1, MPI_DOUBLE, MPI_SUM, SU2_MPI::GetComm());
+        globalResNorm = (global_nPointLES==0) ? su2double(0.0) : sqrt(globalResNorm / global_nPointLES);
+      }
+      END_SU2_OMP_SAFE_GLOBAL_ACCESS
+
+      SU2_OMP_MASTER
+      if (rank == MASTER_NODE) {
+        if (iter == 0) {
+          cout << "\nResidual of Laplacian smoothing along dimension " << iDim+1
+               << "\n---------------------------------"
+               << "\n   Iter       RMS Residual"
+               << "\n---------------------------------" << endl;
+        }
+        if (iter%10 == 0) {
+          cout << "  "
+               << std::setw(5) << iter
+               << "       "
+               << std::setw(12) << std::fixed << std::setprecision(6) << log10(globalResNorm)
+               << endl;
+        }
+      }
+      END_SU2_OMP_MASTER
+
+      if (log10(globalResNorm) < tol || iter == maxIter-1) {
+
+        SU2_OMP_MASTER
+        if (rank == MASTER_NODE) {
+          cout << "  "
+               << std::setw(5) << iter
+               << "       "
+               << std::setw(12) << std::fixed << ::setprecision(6) << log10(globalResNorm)
+               << endl;
+          cout << "---------------------------------" << endl;
+        }
+        END_SU2_OMP_MASTER
+
+        /*--- Scale source terms for variance preservation. ---*/
+
+        su2double mean_check_old = 0.0, var_check_old = 0.0;
+        su2double mean_check_new = 0.0, var_check_new = 0.0;
+        su2double mean_check_notSmoothed = 0.0, var_check_notSmoothed = 0.0;
+
+        SU2_OMP_FOR_(schedule(static, omp_chunk_size) SU2_NOWAIT)
+        for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+          su2double source_notSmoothed = nodes->GetLangevinSourceTermsOld(iPoint, iDim);
+          if (source_notSmoothed > 3.0*sourceLim) continue;
+          su2double source = nodes->GetLangevinSourceTerms(iPoint, iDim);
+          mean_check_old += source;
+          var_check_old += pow(source, 2);
+          mean_check_notSmoothed += source_notSmoothed;
+          var_check_notSmoothed += pow(source_notSmoothed, 2);
+          su2double integral = 0.0;
+          if (timeIter==restartIter) {
+            su2double maxDelta = geometry->nodes->GetMaxLength(iPoint);
+            if (LES_FilterWidth > 0.0) maxDelta = LES_FilterWidth;
+            su2double b2 = cDelta * pow(maxDelta, 2);
+            auto coord_i = geometry->nodes->GetCoord(iPoint);
+            su2double maxDelta_vec[MAXNDIM] = {0.0};
+            su2double maxDelta2_tmp = 0.0;
+            for (const auto jPoint : geometry->nodes->GetPoints(iPoint)) {
+              auto coord_j = geometry->nodes->GetCoord(jPoint);
+              su2double dist2_ij = GeometryToolbox::SquaredDistance(nDim, coord_j, coord_i);
+              if (dist2_ij > maxDelta2_tmp) {
+                maxDelta2_tmp = dist2_ij;
+                GeometryToolbox::Distance(nDim, coord_j, coord_i, maxDelta_vec);
+              }
+            }
+            su2double max_dist_ij_normal = 0.0;
+            for (const auto jPoint : geometry->nodes->GetPoints(iPoint)) {
+              auto coord_j = geometry->nodes->GetCoord(jPoint);
+              su2double dist_ij_vec[MAXNDIM] = {0.0};
+              GeometryToolbox::Distance(nDim, coord_j, coord_i, dist_ij_vec);
+              su2double dist2_ij = GeometryToolbox::SquaredNorm(nDim, dist_ij_vec);
+              su2double dist_ij_parallel = GeometryToolbox::DotProduct(nDim, dist_ij_vec, maxDelta_vec);
+              dist_ij_parallel /= maxDelta;
+              su2double dist_ij_normal = sqrt(max(dist2_ij - pow(dist_ij_parallel, 2), 0.0));
+              max_dist_ij_normal = max(max_dist_ij_normal, dist_ij_normal);
+            }
+            su2double dI = maxDelta;
+            su2double dJ = max_dist_ij_normal;
+            su2double dK = geometry->nodes->GetVolume(iPoint) / (dI*dJ);
+            su2double dI2 = dI * dI;
+            su2double dJ2 = dJ * dJ;
+            su2double dK2 = dK * dK;
+            su2double bI = b2 / dI2;
+            su2double bJ = b2 / dJ2;
+            su2double bK = b2 / dK2;
+            integral = RandomToolbox::GetBesselIntegral(bI, bJ, bK);
+            nodes->SetBesselIntegral(iPoint, integral);
+          } else {
+            integral = nodes->GetBesselIntegral(iPoint);
+          }
+          su2double scaleFactor = 1.0 / sqrt(max(integral, 1e-10));
+          source *= scaleFactor;
+          if (source < -sourceLim || source > sourceLim) source = 0.0;
+          mean_check_new += source;
+          var_check_new += pow(source, 2);
+          nodes->SetLangevinSourceTerms(iPoint, iDim, source);
+        }
+        END_SU2_OMP_FOR
+
+        SU2_OMP_SAFE_GLOBAL_ACCESS(globalChecks = {0, 0, 0, 0, 0, 0};)
+
+        atomicAdd(mean_check_old, globalChecks[0]);
+        atomicAdd(var_check_old, globalChecks[1]);
+        atomicAdd(mean_check_notSmoothed, globalChecks[2]);
+        atomicAdd(var_check_notSmoothed, globalChecks[3]);
+        atomicAdd(mean_check_new, globalChecks[4]);
+        atomicAdd(var_check_new, globalChecks[5]);
+
+        BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+          auto tmp = globalChecks;
+          SU2_MPI::Allreduce(tmp.data(), globalChecks.data(), tmp.size(), MPI_DOUBLE, MPI_SUM, SU2_MPI::GetComm());
+        }
+        END_SU2_OMP_SAFE_GLOBAL_ACCESS
+
+        const auto invDenom = 1.0 / max(global_nPointLES, 1ul);
+        mean_check_new = globalChecks[4] * invDenom;
+
+        SU2_OMP_FOR_STAT(omp_chunk_size)
+        for (unsigned long iPoint = 0; iPoint < nPointDomain; iPoint++) {
+          su2double source_notSmoothed = nodes->GetLangevinSourceTermsOld(iPoint, iDim);
+          su2double source = nodes->GetLangevinSourceTerms(iPoint, iDim);
+          if (source_notSmoothed > 3.0*sourceLim) continue;
+          nodes->SetLangevinSourceTerms(iPoint, iDim, source - mean_check_new);
+        }
+        END_SU2_OMP_FOR
+
+        SU2_OMP_MASTER
+        if (rank == MASTER_NODE && config->GetSBSParam().stochSourceDiagnostics) {
+          mean_check_old = globalChecks[0] * invDenom;
+          var_check_old = globalChecks[1] * invDenom - pow(mean_check_old, 2);
+          mean_check_notSmoothed = globalChecks[2] * invDenom;
+          var_check_notSmoothed = globalChecks[3] * invDenom - pow(mean_check_notSmoothed, 2);
+          var_check_new = globalChecks[5] * invDenom - pow(mean_check_new, 2);
+
+          cout << "Mean of stochastic source term in Langevin equations:";
+          cout << "\n   Uncorrelated            --> " << mean_check_notSmoothed;
+          cout << "\n   Smoothed before scaling --> " << mean_check_old;
+          cout << "\n   Smoothed after scaling  --> " << mean_check_new << " (subtracted from stochastic field to guarantee zero mean)";
+          cout << "\nVariance of stochastic source term in Langevin equations:";
+          cout << "\n   Uncorrelated            --> " << var_check_notSmoothed;
+          cout << "\n   Smoothed before scaling --> " << var_check_old;
+          cout << "\n   Smoothed after scaling  --> " << var_check_new << '\n' << endl;
+        }
+        END_SU2_OMP_MASTER
+
+        /*--- Converged or maximum number of iterations reached. ---*/
+        break;
+      }
+    }
+  }
+
+}
+
+void CTurbSASolver::SetInletAtVertex(const su2double *val_inlet,
+                                    unsigned short iMarker,
+                                    unsigned long iVertex) {
+  SU2_ZONE_SCOPED
+
+  Inlet_TurbVars[iMarker][iVertex][0] = val_inlet[nDim+2+nDim];
+
+}
+
+su2double CTurbSASolver::GetInletAtVertex(unsigned short iMarker, unsigned long iVertex,
+                                          const CGeometry* geometry, su2double* val_inlet) const {
+  SU2_ZONE_SCOPED
+  const auto position = nDim + 2 + nDim;
+  val_inlet[position] = Inlet_TurbVars[iMarker][iVertex][0];
+
+  /*--- Compute boundary face area for this vertex. ---*/
+
+  su2double Normal[MAXNDIM] = {0.0};
+  geometry->vertex[iMarker][iVertex]->GetNormal(Normal);
+  return GeometryToolbox::Norm(nDim, Normal);
+}
+
+void CTurbSASolver::SetUniformInlet(const CConfig* config, unsigned short iMarker) {
+  SU2_ZONE_SCOPED
+  if (config->GetMarker_All_KindBC(iMarker) == INLET_FLOW) {
+    for (unsigned long iVertex = 0; iVertex < nVertex[iMarker]; iVertex++) {
+      Inlet_TurbVars[iMarker][iVertex][0] = GetNuTilde_Inf();
+    }
+  }
+}
+
+void CTurbSASolver::ComputeUnderRelaxationFactor(CSolver** solver_container, const CConfig *config) {
+  SU2_ZONE_SCOPED
+
+  /* Apply the turbulent under-relaxation to the SA variants. The
+   SA_NEG model is more robust due to allowing for negative nu_tilde,
+   so the under-relaxation is not applied to that variant. */
+
+  if (config->GetSAParsedOptions().version == SA_OPTIONS::NEG ||
+      config->GetSBSParam().StochasticBackscatter) return;
+
+  /* Loop over the solution update given by relaxing the linear
+   system for this nonlinear iteration. */
+
+  const su2double allowableRatio =  config->GetMaxUpdateFractionSA();
+
+  ComputeUnderRelaxationFactorHelper(solver_container, allowableRatio);
+
+}
