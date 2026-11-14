@@ -4,11 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-14）
 
-最新[v236真实状态重启动](docs/RESTART_BRANCH_V236.md)：原完整箭体完成300次新分支更新，按预定收益规则正常停止，耗时1029.094秒、采样峰1.683GB。初始六状态/坐标逐位核对，五完整场、19点466回退和停止条件独立通过。**仍未收敛、没有新增物理合格面积**；原生最终restart CSV未写，完整二进制末帧已保存，计划差异如实保留。
+最新[v237相态接受与真实分支](docs/PHASE_STEP_ACCEPTANCE_V237.md)：466条真实越域事件的步长控制通过，唯一整箭候选完成92次更新后，第93试探因无法取得合法进展退出；耗时910.171秒、采样峰1.696GB。实际5点28受限候选独立核对、0旧态回退。**仍未收敛、没有新增物理合格面积**；完整终态与原生终点CSV未生成，不自动续算。
 
-本地`outputs/v236_validation/workbench01/index.html`可打开8阶段34字段原箭体比较，也可在现有工作台打开其中的`rocket_restart_comparison.json`。同变量共用色标，压力/入壁热流/壁流体温度、给定及未知固体壁温分开。查看[修正版科研对照图](docs/validation/v236/evidence/visual02/rocket_restart_comparison.png)。数据与前端纯函数已核对，无本轮浏览器交互验收。
+本地 `outputs/v237_validation/workbench01/index.html` 提供0/1/50三阶段14字段原面比较，亦可加载其中 `rocket_restart_comparison.json`。0/1来自完整帧，50来自壁面快照；更新92不是可显示的完整终态。原19,752面、共同色标与未知固体壁温保持，查看[科研对照图](docs/validation/v237/evidence/visual01/rocket_restart_comparison.png)。逐值/前端纯函数通过，无浏览器交互验收。
 
-按[执行点](docs/validation/v236/NEXT_DECISION.md)针对已有真实试探态完善成熟相态更新接受机制，完整合同成立后才新预算真实发展；不能盲续300或裁状态/放宽物性域。混合主线、原19752面/面积/近壁与所有物理门槛保持，全面积与科研UI独立最高。
+按[下一执行点](docs/validation/v237/NEXT_DECISION.md)核对现成一般EOS HLLC完整组合与相态接口，再决定唯一真实候选。当前相态配置只准ROE，HLLC也含Roe平均，不能预称它能解决问题。混合主线、原面/近壁/全部科学门槛保持，全面积与科研UI独立最高。旧[v236八阶段研究](docs/RESTART_BRANCH_V236.md)继续保留。
 
 现有工作台“打开结果JSON”可加载[三阶段研究13字段](docs/validation/v232/evidence/workbench01/rocket_euler_research.json)：更新50/400/800压力与流体温度、末场总焓/熵/三维速度，热流和固体Tw明确未知。217272个数回读通过，共同色标/方法/限制随字段保存；[压力对数色标科学图](docs/validation/v232/evidence/plot02/rocket_euler_comparison.png)已查看。已有[鼻部15字段](docs/validation/v227/evidence/recovered/rocket_workbench.json)继续保留。本轮未改共享WebGL、未运行MATLAB，无浏览器交互验收。
 

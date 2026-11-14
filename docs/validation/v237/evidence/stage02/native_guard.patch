@@ -1,0 +1,60 @@
+--- SU2_CFD/src/solvers/CEulerSolver.cpp
++++ phase-acceptance/SU2_CFD/src/solvers/CEulerSolver.cpp
+@@ -1,3 +1,4 @@
++#include "E:/RocketAeroHeat/native/su2PhaseAwareAir/PhaseStepAcceptanceV237.hpp"
+ /*!
+  * \file CEulerSolver.cpp
+  * \brief Main subroutines for solving Finite-Volume Euler flow problems.
+@@ -25,22 +26,22 @@
+  * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "../../include/solvers/CEulerSolver.hpp"
+-#include "../../include/variables/CNSVariable.hpp"
+-#include "../../../Common/include/toolboxes/geometry_toolbox.hpp"
+-#include "../../../Common/include/toolboxes/printing_toolbox.hpp"
+-#include "../../include/fluid/CIdealGas.hpp"
+-#include "../../include/fluid/CVanDerWaalsGas.hpp"
+-#include "../../include/fluid/CPengRobinson.hpp"
+-#include "../../include/fluid/CDataDrivenFluid.hpp"
+-#include "../../include/fluid/CCoolProp.hpp"
+-#include "../../include/fluid/CSU2IdealAir.hpp"
+-#include "../../include/fluid/CSU2PhaseAwareAir.hpp"
+-#include "../../include/fluid/SU2EnergyState.hpp"
+-#include "../../include/numerics_simd/CNumericsSIMD.hpp"
+-#include "../../include/limiters/CLimiterDetails.hpp"
+-#include "../../include/output/COutput.hpp"
+-#include "../../include/output/CTurboOutput.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/solvers/CEulerSolver.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/variables/CNSVariable.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/toolboxes/geometry_toolbox.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/toolboxes/printing_toolbox.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CIdealGas.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CVanDerWaalsGas.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CPengRobinson.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CDataDrivenFluid.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CCoolProp.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CSU2IdealAir.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CSU2PhaseAwareAir.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/SU2EnergyState.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/numerics_simd/CNumericsSIMD.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/limiters/CLimiterDetails.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/output/COutput.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/output/CTurboOutput.hpp"
+ 
+ CEulerSolver::CEulerSolver(CGeometry *geometry, CConfig *config,
+                            unsigned short iMesh, const bool navier_stokes) :
+@@ -2607,6 +2608,13 @@
+ 
+     if (localUnderRelaxation < 1e-10) localUnderRelaxation = 0.0;
+ 
++    // 相态守卫只缩减原生松弛步长，五量共用同一个系数，不回写或裁剪状态。
++    if (config->GetKind_FluidModel() == RAH_PHASE_AIR) {
++      if (nDim != 3 || nVar != 5 || omp_get_max_threads() != 1)
++        throw std::runtime_error("PHASE_STEP_NATIVE_IDENTITY");
++      localUnderRelaxation = rah_phase_step_v237::native_limit(config->GetInnerIter()+1, iPoint,
++          nodes->GetSolution(iPoint), LinSysSol.GetBlock(iPoint), localUnderRelaxation);
++    }
+     nodes->SetUnderRelaxation(iPoint, localUnderRelaxation);
+   }
+   END_SU2_OMP_FOR

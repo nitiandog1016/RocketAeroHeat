@@ -1,0 +1,19 @@
+1739:               break;
+1740: 
+1741:             case UPWIND::HLLC:
+1742:               if (ideal_gas) {
+1743:                 for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {
+1744:                   numerics[iMGlevel][FLOW_SOL][conv_term] = new CUpwHLLC_Flow(nDim, nVar_Flow, config);
+1745:                   numerics[iMGlevel][FLOW_SOL][conv_bound_term] = new CUpwHLLC_Flow(nDim, nVar_Flow, config);
+1746:                 }
+1747:               }
+1748:               else {
+1749:                 for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {
+1750:                   numerics[iMGlevel][FLOW_SOL][conv_term] = new CUpwGeneralHLLC_Flow(nDim, nVar_Flow, config);
+1751:                   numerics[iMGlevel][FLOW_SOL][conv_bound_term] = new CUpwGeneralHLLC_Flow(nDim, nVar_Flow, config);
+1752:                 }
+1753:               }
+1754:               break;
+1755: 
+1756:             case UPWIND::MSW:
+1757:               for (iMGlevel = 0; iMGlevel <= config->GetnMGLevels(); iMGlevel++) {

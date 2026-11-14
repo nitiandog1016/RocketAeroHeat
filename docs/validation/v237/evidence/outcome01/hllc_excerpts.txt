@@ -1,0 +1,92 @@
+618:   sq_vel_j = 0.0;
+619: 
+620:   for (iDim = 0; iDim < nDim; iDim++) {
+621:     sq_vel_i += Velocity_i[iDim] * Velocity_i[iDim];
+622:     sq_vel_j += Velocity_j[iDim] * Velocity_j[iDim];
+623:   }
+624: 
+625:   Energy_i         = Enthalpy_i - Pressure_i / Density_i;
+626:   StaticEnthalpy_i = Enthalpy_i - 0.5 * sq_vel_i;
+627:   StaticEnergy_i   = Energy_i - 0.5 * sq_vel_i;
+628: 
+629:   Kappa_i = S_i[1] / Density_i;
+630:   Chi_i   = S_i[0] - Kappa_i * StaticEnergy_i;
+631:   SoundSpeed_i = sqrt(Chi_i + StaticEnthalpy_i * Kappa_i);
+632: 
+633: 
+634:   Energy_j         = Enthalpy_j - Pressure_j / Density_j;
+635:   StaticEnthalpy_j = Enthalpy_j - 0.5 * sq_vel_j;
+636:   StaticEnergy_j   = Energy_j - 0.5 * sq_vel_j;
+637: 
+638:   Kappa_j = S_j[1] / Density_j;
+639:   Chi_j   = S_j[0] - Kappa_j * StaticEnergy_j;
+640:   SoundSpeed_j = sqrt(Chi_j + StaticEnthalpy_j * Kappa_j);
+
+672: 
+673:   sq_velRoe        = 0.0;
+674:   RoeProjVelocity  = - ProjInterfaceVel;
+675: 
+676:   for (iDim = 0; iDim < nDim; iDim++) {
+677:     RoeVelocity[iDim] = ( Velocity_i[iDim] * sqrt(Density_i) + Velocity_j[iDim] * sqrt(Density_j) ) / Rrho;
+678:     sq_velRoe        +=  RoeVelocity[iDim] * RoeVelocity[iDim];
+679:     RoeProjVelocity  +=  RoeVelocity[iDim] * UnitNormal[iDim];
+680:   }
+681: 
+682:   /*--- Mean Roe variables iPoint and jPoint ---*/
+683: 
+684:   RoeKappa = 0.5 * ( Kappa_i + Kappa_j );
+685:   RoeChi   = 0.5 * ( Chi_i + Chi_j );
+686:   RoeDensity = sqrt( Density_i * Density_j );
+687:   RoeEnthalpy = ( sqrt(Density_j) * Enthalpy_j + sqrt(Density_i) * Enthalpy_i) / Rrho;
+688: 
+689:   VinokurMontagne();
+690: 
+691:   /*--- Roe-averaged speed of sound ---*/
+692: 
+693:   //RoeSoundSpeed2 = RoeChi + RoeKappa * ( RoeEnthalpy - 0.5 * sq_velRoe );
+694:   RoeSoundSpeed  = sqrt( RoeChi + RoeKappa * ( RoeEnthalpy - 0.5 * sq_velRoe ) ) - ProjInterfaceVel;
+695: 
+696:   /*--- Speed of sound at L and R ---*/
+697: 
+698:   sL = min( RoeProjVelocity - RoeSoundSpeed, ProjVelocity_i - SoundSpeed_i );
+699:   sR = max( RoeProjVelocity + RoeSoundSpeed, ProjVelocity_j + SoundSpeed_j );
+700: 
+701:   /*--- speed of contact surface ---*/
+702: 
+703:   RHO = Density_j * (sR - ProjVelocity_j) - Density_i * (sL - ProjVelocity_i);
+704:   sM = ( Pressure_i - Pressure_j - Density_i * ProjVelocity_i * ( sL - ProjVelocity_i ) + Density_j * ProjVelocity_j * ( sR - ProjVelocity_j ) ) / RHO;
+705: 
+706:   /*--- Pressure at right and left (Pressure_j=Pressure_i) side of contact surface ---*/
+707: 
+708:   pStar = Density_j * ( ProjVelocity_j - sR ) * ( ProjVelocity_j - sM ) + Pressure_j;
+709: 
+710: 
+711:   if (sM > 0.0) {
+712: 
+713:     if (sL > 0.0) {
+714: 
+
+1077: void CUpwGeneralHLLC_Flow::VinokurMontagne() {
+1078: 
+1079:   su2double delta_rhoStaticEnergy, delta_rho, delta_p, err_P, s, D;
+1080: 
+1081:   delta_rho = Density_j - Density_i;
+1082:   delta_p   = Pressure_j - Pressure_i;
+1083: 
+1084:   RoeKappaStaticEnthalpy = 0.5 * ( StaticEnthalpy_i * Kappa_i + StaticEnthalpy_j * Kappa_j );
+1085: 
+1086:   s = RoeChi + RoeKappaStaticEnthalpy;
+1087: 
+1088:   D = s*s * delta_rho * delta_rho + delta_p * delta_p;
+1089: 
+1090:   delta_rhoStaticEnergy = Density_j * StaticEnergy_j - Density_i * StaticEnergy_i;
+1091: 
+1092:   err_P = delta_p - RoeChi * delta_rho - RoeKappa * delta_rhoStaticEnergy;
+1093: 
+1094:   if (abs((D - delta_p*err_P)/Density_i) > 1e-3 && abs(delta_rho/Density_i) > 1e-3 && s/Density_i > 1e-3) {
+1095: 
+1096:     RoeKappa = ( D * RoeKappa ) / ( D - delta_p * err_P );
+1097:     RoeChi   = ( D * RoeChi+ s*s * delta_rho * err_P ) / ( D - delta_p * err_P );
+1098: 
+1099:   }
+1100: }

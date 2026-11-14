@@ -1,0 +1,96 @@
+--- restartBranchV236.cpp
++++ restartBranchV237.cpp
+@@ -1,3 +1,4 @@
++#include "E:/RocketAeroHeat/native/su2PhaseAwareAir/PhaseStepAcceptanceV237.hpp"
+ // 模块职责：在已验证原生入口上添加检查点身份与有界收益停止；不替换任何流动/SA公式。
+ #define main rah_v235_control_main
+ #include "singleDomainRunV235.cpp"
+@@ -5,7 +6,7 @@
+ #include "output/COutput.hpp"
+ #include <algorithm>
+ 
+-namespace branch236 {
++namespace branch237 {
+ using namespace observe;
+ struct Face {std::array<unsigned long,3> nodes;double area;};
+ std::vector<Face> faces;
+@@ -101,43 +102,63 @@
+ }
+ }
+ 
+-class BranchIterationV236 final:public CFluidIteration {
++class BranchIterationV237 final:public CFluidIteration {
+  public:using CFluidIteration::CFluidIteration;
+  void Iterate(COutput* o,CIntegration**** in,CGeometry**** g,CSolver***** s,CNumerics****** n,CConfig** c,CSurfaceMovement** sm,CVolumetricMovement*** gm,CFreeFormDefBox*** b,unsigned short z,unsigned short inst) override {
+    observe::phase="native-iterate/preprocessing";CFluidIteration::Iterate(o,in,g,s,n,c,sm,gm,b,z,inst);
+-   observe::phase="accepted-flow-SA/end-iteration";observe::end_iteration();branch236::benefit();
++   observe::phase="accepted-flow-SA/end-iteration";observe::end_iteration();branch237::benefit();
+  }
+  bool Monitor(COutput* o,CIntegration**** in,CGeometry**** g,CSolver***** s,CNumerics****** n,CConfig** c,CSurfaceMovement** sm,CVolumetricMovement*** gm,CFreeFormDefBox*** b,unsigned short z,unsigned short inst) override {
+    const bool native=CFluidIteration::Monitor(o,in,g,s,n,c,sm,gm,b,z,inst);
+-   if(native&&!branch236::stop)branch236::stopReason="native-convergence-stop-unqualified";
+-   return native||branch236::stop;
++   if(native&&!branch237::stop)branch237::stopReason="native-convergence-stop-unqualified";
++   return native||branch237::stop;
+  }
+ };
+ 
+-class BranchDriverV236 final:public CSinglezoneDriver {
++class BranchDriverV237 final:public CSinglezoneDriver {
+  public:using CSinglezoneDriver::CSinglezoneDriver;
+  void launch(const std::string& checkpoint,const std::string& facefile){using namespace observe;
+    cfg=config_container[0];geo=geometry_container[0][0][0];sol=solver_container[0][0][0];
+    if(cfg->GetKind_FluidModel()!=RAH_PHASE_AIR||cfg->GetKind_Solver()!=MAIN_SOLVER::RANS||cfg->GetKind_Turb_Model()!=TURB_MODEL::SA||cfg->GetSAParsedOptions().version!=SA_OPTIONS::NEG||!cfg->GetSAParsedOptions().ft2||cfg->GetnMGLevels()!=0||cfg->GetTime_Domain()||cfg->GetMultizone_Problem()||omp_get_max_threads()!=1||!dynamic_cast<CSU2PhaseAwareAir*>(sol[FLOW_SOL]->GetFluidModel())||sol[FLOW_SOL]->GetnVar()!=5||sol[TURB_SOL]->GetnVar()!=1||cfg->GetnInner_Iter()!=400)throw std::runtime_error("BRANCH_IDENTITY");
+-   phase="initial-check";branch236::initial(checkpoint,facefile);
++   phase="initial-check";branch237::initial(checkpoint,facefile);
+    ledger.open(folder+"/stages.csv");events.open(folder+"/rejections.csv");steps.open(folder+"/steps.csv");walls.open(folder+"/wall_stages.csv");
+-   branch236::trends.open(folder+"/surface_trend.csv");branch236::decisions.open(folder+"/benefit_decisions.csv");
+-   for(auto* f:{&ledger,&events,&steps,&walls,&branch236::trends,&branch236::decisions})*f<<std::setprecision(17);
++   branch237::trends.open(folder+"/surface_trend.csv");branch237::decisions.open(folder+"/benefit_decisions.csv");
++   for(auto* f:{&ledger,&events,&steps,&walls,&branch237::trends,&branch237::decisions})*f<<std::setprecision(17);
+    walls<<"update,stage,pNoutX,pNoutY,pNoutZ,tauNoutX,tauNoutY,tauNoutZ,wallRowX,wallRowY,wallRowZ,laminarHeatIntoWallW,effectiveHeatIntoWallW,maxWallSA\n";
+    ledger<<"update,system,stage,nodes";for(auto word:{"sum","rms"})for(int j=0;j<6;++j)ledger<<','<<word<<j;ledger<<",minRelax,maxCFL,maxScaledUpdate\n";
+    events<<"update,phase,localID,globalID,recovered,reason";for(auto word:{"trial","old","returned"})for(int j=0;j<5;++j)events<<','<<word<<j;events<<",SAcurrent,SAold\n";
+    steps<<"update,lastFlowRejectionCount,totalObservedRejections,maxWallSpeedComponent,maxWallSA,minT,maxT,maxFlowVsUpdatedSAMuTDifference\n";
+-   branch236::trends<<"update,pressureAreaL1Change,heatAreaL1Change\n";
+-   branch236::decisions<<"check,windowEnd,ratio0,ratio1,ratio2,ratio3,ratio4,ratio5,geometricMeanRatio,oldPressureChange,oldHeatChange,newPressureChange,newHeatChange,noSignificantDeterioration,benefit\n";
+-   std::ofstream schema(folder+"/schema.json");schema<<"{\"format\":\"RAH235LE\",\"columns\":\""<<columns<<",reserved0\",\"internalEnergyOffsetJkg\":300000,\"physicalQualification\":false,\"branch\":\"v222-state199-native-reset-v236\"}\n";schema.close();
+-   delete iteration_container[0][0];iteration_container[0][0]=new BranchIterationV236(cfg);
+-   rah_single_observer::stage=branch236::stage236;rah_single_observer::rejection=rejection;enabled=true;interval=100;
+-   state_frame(0);branch236::wall_frame(0);StartSolver();if(saved!=completed)state_frame(completed);if(completed%50)branch236::wall_frame(completed);
++   branch237::trends<<"update,pressureAreaL1Change,heatAreaL1Change\n";
++   branch237::decisions<<"check,windowEnd,ratio0,ratio1,ratio2,ratio3,ratio4,ratio5,geometricMeanRatio,oldPressureChange,oldHeatChange,newPressureChange,newHeatChange,noSignificantDeterioration,benefit\n";
++   std::ofstream schema(folder+"/schema.json");schema<<"{\"format\":\"RAH235LE\",\"columns\":\""<<columns<<",reserved0\",\"internalEnergyOffsetJkg\":300000,\"physicalQualification\":false,\"branch\":\"v222-state199-native-reset-v237\"}\n";schema.close();
++   delete iteration_container[0][0];iteration_container[0][0]=new BranchIterationV237(cfg);
++   rah_single_observer::stage=branch237::stage236;rah_single_observer::rejection=rejection;enabled=true;interval=100;
++   state_frame(0);branch237::wall_frame(0);StartSolver();if(saved!=completed)state_frame(completed);if(completed%50)branch237::wall_frame(completed);
++   // 收益停止不能依赖收敛标志；调用成熟强制输出接口，保存原生最终检查点。
++   const bool forced=output_container[0]->SetResultFiles(geo,cfg,sol,cfg->GetInnerIter(),true);
++   if(!forced)throw std::runtime_error("FORCED_FINAL_OUTPUT_MISSING");
++   std::ofstream acceptReport(folder+"/acceptance_summary.json");acceptReport<<"{\"checked\":"<<rah_phase_step_v237::checked<<",\"limited\":"<<rah_phase_step_v237::limited<<",\"forcedFinalNativeOutput\":true}\n";
+    rah_single_observer::stage=nullptr;rah_single_observer::rejection=nullptr;
+-   std::ofstream f(folder+"/native_completion.json");f<<"{\"normalReturn\":true,\"updates\":"<<completed<<",\"stopReason\":\""<<branch236::stopReason<<"\",\"initialSaved\":true,\"exactHistoricalContinuation\":false,\"physicalQualification\":false}\n";
++   std::ofstream f(folder+"/native_completion.json");f<<"{\"normalReturn\":true,\"updates\":"<<completed<<",\"stopReason\":\""<<branch237::stopReason<<"\",\"initialSaved\":true,\"exactHistoricalContinuation\":false,\"physicalQualification\":false}\n";
+  }
+ };
++
++// 模块四：只记录实际受限更新；包括真实线性增量、原生上限和全局ID。
++namespace accept237 {
++std::ofstream log;
++void record(unsigned long update,unsigned long point,const rah_phase_step_v237::State& old,
++ const rah_phase_step_v237::State& delta,double upper,const rah_phase_step_v237::Result& r){
++ if(rah_phase_step_v237::limited>100000)throw std::runtime_error("PHASE_STEP_EVENT_LIMIT");
++ log<<update<<','<<point<<','<<observe::geo->nodes->GetGlobalIndex(point)<<','<<upper<<','<<r.alpha<<','<<r.reductions;
++ for(const auto* a:{&old,&delta,&r.accepted})for(double v:*a)log<<','<<v;log<<'\n';log.flush();
++ if(!log)throw std::runtime_error("PHASE_STEP_EVENT_WRITE");
++}
++}
++
+ int main(int argc,char** argv){try{
+  if(argc!=5)throw std::runtime_error("CONFIG_OUTPUT_CHECKPOINT_FACES_REQUIRED");observe::folder=argv[2];std::set_terminate(observe::failed);
+- SU2_MPI::Init(&argc,&argv);BranchDriverV236 driver(argv[1],1,SU2_MPI::GetComm());driver.launch(argv[3],argv[4]);driver.Finalize();SU2_MPI::Finalize();return 0;
++ accept237::log.open(observe::folder+"/accepted_steps.csv");accept237::log<<std::setprecision(17)<<"update,localID,globalID,nativeUpper,acceptedAlpha,reductions";
++ for(auto prefix:{"old","delta","accepted"})for(int j=0;j<5;++j)accept237::log<<','<<prefix<<j;accept237::log<<'\n';
++ rah_phase_step_v237::observer=accept237::record;
++ SU2_MPI::Init(&argc,&argv);BranchDriverV237 driver(argv[1],1,SU2_MPI::GetComm());driver.launch(argv[3],argv[4]);driver.Finalize();SU2_MPI::Finalize();return 0;
+  }catch(const std::exception& e){std::ofstream f(observe::folder+"/caught_failure.txt");f<<"phase="<<observe::phase<<"\ncompleted="<<observe::completed<<"\nwhat="<<e.what()<<'\n';std::cerr<<e.what()<<'\n';return 1;}}
