@@ -1,0 +1,37 @@
+--- Common/src/CConfig.cpp
++++ hllc-v238/Common/src/CConfig.cpp
+@@ -29,15 +29,15 @@
+ #include <utility>
+ #include <limits>
+ 
+-#include "../include/CConfig.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/CConfig.hpp"
+ #undef ENABLE_MAPS
+ 
+-#include "../include/fem/fem_gauss_jacobi_quadrature.hpp"
+-#include "../include/toolboxes/classes_multiple_integers.hpp"
+-
+-#include "../include/basic_types/ad_structure.hpp"
+-#include "../include/toolboxes/printing_toolbox.hpp"
+-#include "../include/toolboxes/SwapBytes.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/fem/fem_gauss_jacobi_quadrature.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/toolboxes/classes_multiple_integers.hpp"
++
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/basic_types/ad_structure.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/toolboxes/printing_toolbox.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/toolboxes/SwapBytes.hpp"
+ 
+ using namespace PrintingToolbox;
+ 
+@@ -3810,9 +3810,9 @@
+         Multizone_Problem || DiscreteAdjoint || ContinuousAdjoint ||
+         (Kind_Solver != MAIN_SOLVER::NAVIER_STOKES && Kind_Solver != MAIN_SOLVER::RANS) ||
+         (Kind_Turb_Model != TURB_MODEL::NONE && Kind_Turb_Model != TURB_MODEL::SA) ||
+-        Kind_Upwind_Flow != UPWIND::ROE || nMarker_WallFunctions != 0 ||
++        Kind_Upwind_Flow != UPWIND::HLLC || nMarker_WallFunctions != 0 ||
+         nMarker_FarField || nMarker_Supersonic_Inlet || nMarker_Supersonic_Outlet || nMarker_Inlet || nMarker_Outlet || Low_Mach_Corr || nMarker_Giles != 0 || GetDynamic_Grid())
+-      SU2_MPI::Error("RAH_PHASE_AIR requires direct SI steady single-zone NS/SA, ROE, resolved wall", CURRENT_FUNCTION);
++      SU2_MPI::Error("RAH_PHASE_AIR requires direct SI steady single-zone NS/SA, HLLC-V238, resolved wall", CURRENT_FUNCTION);
+     for (unsigned short i=0; i<nMarker_Riemann; ++i)
+       if (Kind_Data_Riemann[i] != STATIC_SUPERSONIC_INFLOW_PT)
+         SU2_MPI::Error("RAH_PHASE_AIR supports Riemann ambient PT characteristic boundary", CURRENT_FUNCTION);

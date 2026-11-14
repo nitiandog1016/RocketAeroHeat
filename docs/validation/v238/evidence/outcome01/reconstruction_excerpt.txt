@@ -1,0 +1,65 @@
+1872:   const bool limiter          = (config->GetKind_SlopeLimit_Flow() != LIMITER::NONE);
+1873:   const bool van_albada       = (config->GetKind_SlopeLimit_Flow() == LIMITER::VAN_ALBADA_EDGE);
+1874: 
+1875:   const su2double kappa       = config->GetMUSCL_Kappa_Flow();
+1876:   const su2double musclRamp   = config->GetMUSCLRampValue() * config->GetNewtonKrylovRelaxation();
+1877: 
+1878:   /*--- Non-physical counter. ---*/
+1879:   unsigned long counter_local = 0;
+1880:   SU2_OMP_MASTER
+1881:   ErrorCounter = 0;
+1882:   END_SU2_OMP_MASTER
+1883: 
+1884:   /*--- Pick one numerics object per thread. ---*/
+1885:   CNumerics* numerics = numerics_container[CONV_TERM + omp_get_thread_num()*MAX_TERMS];
+1886: 
+1887:   /*--- Static arrays of MUSCL-reconstructed primitives and secondaries (thread safety). ---*/
+1888:   su2double Primitive_i[MAXNVAR] = {0.0}, Primitive_j[MAXNVAR] = {0.0};
+1889:   su2double Secondary_i[MAXNVAR] = {0.0}, Secondary_j[MAXNVAR] = {0.0};
+1890: 
+1891:   /*--- For hybrid parallel AD, pause preaccumulation if there is shared reading of
+1892:   * variables, otherwise switch to the faster adjoint evaluation mode. ---*/
+
+1973:         Primitive_j[iVar] = V_j[iVar] - 0.5 * lim_j * Project_Grad_j;
+1974: 
+1975:       }
+1976: 
+1977:       /*--- Recompute the reconstructed quantities in a thermodynamically consistent way. ---*/
+1978: 
+1979:       bool rah_invalid_reconstruction = false;
+1980:       if (!ideal_gas || low_mach_corr) {
+1981:         const bool variable_air = (config->GetKind_FluidModel() == IDEAL_AIR_VARIABLE_CP || config->GetKind_FluidModel() == RAH_PHASE_AIR);
+1982:         const bool with_k = variable_air && config->GetKind_Turb_Model() == TURB_MODEL::SST;
+1983:         const su2double k_i = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0) : 0.0;
+1984:         const su2double k_j = with_k ? solver_container[TURB_SOL]->GetNodes()->GetSolution(jPoint,0) : 0.0;
+1985:         try {
+1986:           ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_i, Secondary_i, k_i);
+1987:           ComputeConsistentExtrapolation(GetFluidModel(), nDim, Primitive_j, Secondary_j, k_j);
+1988:         } catch (const std::domain_error&) {
+1989:           if (!variable_air) throw;
+1990:           // 拒绝超温域重构，复用原生单元值降阶路径，避免半更新状态。
+1991:           rah_invalid_reconstruction = true;
+1992:           std::copy_n(V_i,nPrimVar,Primitive_i); std::copy_n(V_j,nPrimVar,Primitive_j);
+1993:           std::copy_n(S_i,nSecondaryVar,Secondary_i); std::copy_n(S_j,nSecondaryVar,Secondary_j);
+
+2016:       }
+2017:       su2double RoeEnthalpy = (R * Primitive_j[prim_idx.Enthalpy()] + Primitive_i[prim_idx.Enthalpy()]) / (R+1);
+2018: 
+2019:       const bool neg_sound_speed = ((Gamma-1)*(RoeEnthalpy-0.5*sq_vel) < 0.0);
+2020:       bool bad_recon = rah_invalid_reconstruction || neg_sound_speed || neg_pres_or_rho_i || neg_pres_or_rho_j;
+2021:       bad_recon = nodes->UpdateNonPhysicalEdgeCounter(iEdge, bad_recon);
+2022:       counter_local += bad_recon;
+2023: 
+2024:       numerics->SetPrimitive(bad_recon? V_i : Primitive_i,  bad_recon? V_j : Primitive_j);
+2025:       numerics->SetSecondary(bad_recon? S_i : Secondary_i,  bad_recon? S_j : Secondary_j);
+2026: 
+2027:     }
+2028: 
+2029:     /*--- Roe Low Dissipation Scheme ---*/
+2030: 
+2031:     if (kind_dissipation != NO_ROELOWDISS) {
+2032:       numerics->SetDissipation(nodes->GetRoe_Dissipation(iPoint),
+2033:                                nodes->GetRoe_Dissipation(jPoint));
+2034:     }
+2035:     if (msw || kind_dissipation == FD_DUCROS || kind_dissipation == NTS_DUCROS){
+2036:       numerics->SetSensor(nodes->GetSensor(iPoint),

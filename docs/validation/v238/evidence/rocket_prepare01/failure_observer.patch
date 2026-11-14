@@ -1,0 +1,16 @@
+--- CEulerSolver.cpp
++++ failure-observer/CEulerSolver.cpp
+@@ -1,3 +1,4 @@
++#include "E:/RocketAeroHeat/native/su2PhaseAwareAir/PhaseStepObservationV238.hpp"
+ #include "E:/RocketAeroHeat/native/su2PhaseAwareAir/PhaseStepAcceptanceV237.hpp"
+ /*!
+  * \file CEulerSolver.cpp
+@@ -2612,7 +2613,7 @@
+     if (config->GetKind_FluidModel() == RAH_PHASE_AIR) {
+       if (nDim != 3 || nVar != 5 || omp_get_max_threads() != 1)
+         throw std::runtime_error("PHASE_STEP_NATIVE_IDENTITY");
+-      localUnderRelaxation = rah_phase_step_v237::native_limit(config->GetInnerIter()+1, iPoint,
++      localUnderRelaxation = rah_phase_step_v238::native_limit(config->GetInnerIter()+1, iPoint,
+           nodes->GetSolution(iPoint), LinSysSol.GetBlock(iPoint), localUnderRelaxation);
+     }
+     nodes->SetUnderRelaxation(iPoint, localUnderRelaxation);

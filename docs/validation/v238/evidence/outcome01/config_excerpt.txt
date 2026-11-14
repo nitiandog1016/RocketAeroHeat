@@ -1,0 +1,21 @@
+2178:   addBoolOption("MUSCL_FLOW", MUSCL_Flow, true);
+2179:   /*!\brief MUSCL_KAPPA_FLOW \n DESCRIPTION: Blending coefficient for the U-MUSCL scheme \ingroup Config*/
+2180:   addDoubleOption("MUSCL_KAPPA_FLOW", MUSCL_Kappa_Flow, 0.0);
+2181:   /*!\brief RAMP_MUSCL \n DESCRIPTION: Enable ramping of the MUSCL scheme from 1st to 2nd order using specified method*/
+2182:   addBoolOption("RAMP_MUSCL", RampMUSCL, false);
+2183:   /*! brief RAMP_MUSCL_COEFF \n DESCRIPTION: the 1st coeff is the ramp start iteration,
+2184:    * the 2nd coeff is the iteration update frequenct, 3rd coeff is the total number of iterations */
+2185:   RampMUSCLParam.rampMUSCLCoeff[0] = 0.0; RampMUSCLParam.rampMUSCLCoeff[1] = 1.0; RampMUSCLParam.rampMUSCLCoeff[2] = 500.0;
+2186:   addULongArrayOption("RAMP_MUSCL_COEFF", 3, false, RampMUSCLParam.rampMUSCLCoeff);
+2187:   /*!\brief RAMP_MUSCL_POWER \n DESRCIPTION: Exponent of the MUSCL ramp formulation */
+2188:   addDoubleOption("RAMP_MUSCL_POWER", RampMUSCLParam.RampMUSCLPower, 1.0);
+2189:   /*!\brief KIND_MUSCL_RAMP \n DESCRIPTION: The kind of MUSCL Ramp to be applied */
+2190:   addEnumOption("KIND_MUSCL_RAMP", RampMUSCLParam.Kind_MUSCLRamp, MUSCLRamp_Map, MUSCL_RAMP_TYPE::ITERATION);
+2191:   /*!\brief SLOPE_LIMITER_FLOW
+2192:    * DESCRIPTION: Slope limiter for the direct solution. \n OPTIONS: See \link Limiter_Map \endlink \n DEFAULT VENKATAKRISHNAN \ingroup Config*/
+2193:   addEnumOption("SLOPE_LIMITER_FLOW", Kind_SlopeLimit_Flow, Limiter_Map, LIMITER::VENKATAKRISHNAN);
+2194:   jst_coeff[0] = 0.5; jst_coeff[1] = 0.02;
+2195:   /*!\brief JST_SENSOR_COEFF \n DESCRIPTION: 2nd and 4th order artificial dissipation coefficients for the JST method \ingroup Config*/
+2196:   addDoubleArrayOption("JST_SENSOR_COEFF", 2, false, jst_coeff);
+2197:   /*!\brief LAX_SENSOR_COEFF \n DESCRIPTION: 1st order artificial dissipation coefficients for the Lax-Friedrichs method. \ingroup Config*/
+2198:   addDoubleOption("LAX_SENSOR_COEFF", Kappa_1st_Flow, 0.15);

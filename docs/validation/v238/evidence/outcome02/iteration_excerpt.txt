@@ -1,0 +1,42 @@
+248:             config[val_iZone]->GetInnerIter(), val_iInst);
+249:     }
+250:     /*--- Update ramps, grid first then outlet boundary ---*/
+251:     if (config[val_iZone]->GetRampMotionFrame())
+252:       UpdateRamps(geometry, config, config[val_iZone]->GetInnerIter(), val_iZone, RAMP_TYPE::GRID);
+253:   }
+254: 
+255:   // Outside turbo scope as Riemann boundaries can be ramped (pressure only)
+256:   if (config[val_iZone]->GetRampOutflow())
+257:       UpdateRamps(geometry, config, config[val_iZone]->GetInnerIter(), val_iZone, RAMP_TYPE::BOUNDARY);
+258: 
+259:   if (config[val_iZone]->GetMUSCLRamp())
+260:     UpdateRamps(geometry, config, config[val_iZone]->GetInnerIter(), val_iZone, RAMP_TYPE::MUSCL);
+261: 
+262:   /*--- During Full-MG startup FinestMesh > 0: read residuals from the active (coarse) level. ---*/
+
+369: 
+370:   if (ramp_flag == RAMP_TYPE::MUSCL) {
+371:     const auto RampMUSCLParam = config->GetMUSCLRampParam();
+372:     const long unsigned startIter = RampMUSCLParam.rampMUSCLCoeff[RAMP_COEFF::INITIAL_VALUE];
+373:     const long unsigned updateFreq = RampMUSCLParam.rampMUSCLCoeff[RAMP_COEFF::UPDATE_FREQ];
+374:     const long unsigned rampLength = RampMUSCLParam.rampMUSCLCoeff[RAMP_COEFF::FINAL_ITER];
+375:     auto iterFrac = (static_cast<double>(iter - startIter)/static_cast<double>((rampLength + startIter) - startIter));
+376:     if (iter < startIter) {
+377:       config->SetMUSCLRampValue(0);
+378:       return;
+379:     }
+380:     if (iter == startIter && rank == MASTER_NODE) cout << "Beginning to ramp MUSCL scheme..." << endl;
+381:     if ((iter % updateFreq == 0 && iter < (rampLength + startIter)) || (iter == (rampLength + startIter))) {
+382:       switch (RampMUSCLParam.Kind_MUSCLRamp) {
+383:         case MUSCL_RAMP_TYPE::ITERATION:
+384:           config->SetMUSCLRampValue(std::pow(std::min<double>(1.0, iterFrac), RampMUSCLParam.RampMUSCLPower));
+385:           break;
+386:         case MUSCL_RAMP_TYPE::SMOOTH_FUNCTION:
+387:           config->SetMUSCLRampValue(std::pow((0.5 * (1 -  cos(PI_NUMBER * std::min(1.0, iterFrac)))), RampMUSCLParam.RampMUSCLPower));
+388:           break;
+389:         default:
+390:           break;
+391:       }
+392:       if (rank == MASTER_NODE) cout << "MUSCL Ramp value updated. New Value: " << config->GetMUSCLRampValue() << endl;
+393:     }
+394:   }

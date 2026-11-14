@@ -1,0 +1,446 @@
+{
+  "passed": true,
+  "goalStatus": "active",
+  "physicalQualification": false,
+  "newQualifiedAreaM2": 0,
+  "newHeatAreaM2": 0,
+  "realRocketUpdates": 200,
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "meshCells": 705490,
+  "points": 335726,
+  "numericalObjectsCompiled": 3,
+  "originalHLLCControlFailed": true,
+  "correctedControl": {
+    "passed": true,
+    "nativeCalls": 24,
+    "cases": 6,
+    "structuralRejections": 3,
+    "independentEulerAnalyticOracle": true,
+    "failures": [],
+    "maxError": 2.842170943040401e-14,
+    "nondifferentiableContactEvidence": [
+      {
+        "case": "stationary_contact",
+        "offset": 0.0,
+        "oneSidedJacobiansDiffer": true,
+        "leftRightMaxAbsoluteDifference": 27955481.76324912,
+        "exactDerivativeClaimed": false
+      },
+      {
+        "case": "stationary_contact",
+        "offset": 300000.0,
+        "oneSidedJacobiansDiffer": true,
+        "leftRightMaxAbsoluteDifference": 27955481.763249114,
+        "exactDerivativeClaimed": false
+      }
+    ],
+    "actualFactoryDispatchTested": false,
+    "wholeCombinationAccepted": false,
+    "flowUpdates": 0,
+    "physicalQualification": false,
+    "sourceSHA256": "7394139caa1784b2ec9bf5a495dd3302a9f06b0627a4fc60a85b6174bf579d06"
+  },
+  "acceptance": {
+    "passed": true,
+    "realCompletedUpdates": 200,
+    "limitedCandidates": 16,
+    "actualAcceptedEvents": 16,
+    "actualAcceptedInCompleteFlowSAUpdates": 16,
+    "partialFlowOnlyAcceptedEvents": 0,
+    "candidatesNotApplied": 0,
+    "actualAcceptedFiveStateComponentsBitEqual": 80,
+    "independentActualDirectionMaxError": 0,
+    "acceptedAlphaRange": [
+      7.450580596923828e-09,
+      0.5
+    ],
+    "nativeGuardFailures": [],
+    "oldStateRecoveryEvents": 0,
+    "productionGuardFailureObserverTested": false,
+    "completeFinalBinaryPresent": true,
+    "nativeFinalCSVWritten": true,
+    "nativeFinalSixStateCoordinatesBitEqual": true,
+    "nativeFinalSHA256": "f97c450e5a61e10ae0d1778f0b84489c03cd2647e3f062c648cbbbbefde4f433",
+    "nativeCompletion": {
+      "normalReturn": true,
+      "updates": 200,
+      "stopReason": "significant-deterioration",
+      "initialSaved": true,
+      "uniformFreestreamInitial": true,
+      "physicalQualification": false
+    },
+    "originalFaces": 19752,
+    "physicalQualification": false,
+    "newQualifiedAreaM2": 0
+  },
+  "realBranch": {
+    "normalReturn": true,
+    "updates": 200,
+    "stopReason": "significant-deterioration",
+    "initialSaved": true,
+    "uniformFreestreamInitial": true,
+    "physicalQualification": false
+  },
+  "physicalMinus8Passed": false,
+  "workbenchStages": [
+    0,
+    1,
+    50,
+    100,
+    150,
+    200
+  ],
+  "workbenchFields": 26,
+  "protectedCount": 29,
+  "engineeringArtifactsUnchanged": 54,
+  "candidateCount": 2,
+  "assets": {
+    "outputs/v144_validation/actual/hybrid_volume.mat": "22b35b72396c1a7d14195af9bd24d3c6328138484d4009638c1ab48cddec1d6c",
+    "outputs/v167_validation/real01/mesh.su2": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+    "data/thermo/phase_aware_dry_air_v1.json": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985"
+  },
+  "processSeconds": {
+    "audit": 17.45300000000134,
+    "build": 172.45199999999932,
+    "query": 7.296999999996842,
+    "offline": 28.70400000000336,
+    "cfd": 1166.0939999999991
+  },
+  "finalizationSeconds": 12.656000000000859,
+  "maxSampledGroupRSSBytes": 2107584512,
+  "outputBytes": 725314204,
+  "allRecordedInputsStable": true,
+  "allRecordedGroupsEmpty": true,
+  "historicalSourceBindings": [
+    {
+      "process": "process_acceptance_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\auditHLLCAcceptanceV238.py",
+      "executedSHA256": "feb0ca33ddbff6060404ab4d3c73276a559e625cd43ba1eac1cc9c6862e7f97a",
+      "snapshot": "process_acceptance_audit/execution_sources/feb0ca33ddbff6060404ab4d3c73276a559e625cd43ba1eac1cc9c6862e7f97a.py",
+      "currentSHA256": "f7f36706f556c2b659ac939b20333218abda973f50b813f498a6e0e550f80be7"
+    },
+    {
+      "process": "process_acceptance_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_acceptance_audit/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_acceptance_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_acceptance_audit/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_audit01",
+      "path": "E:\\RocketAeroHeat\\scripts\\auditHLLCInterfaceV238.py",
+      "executedSHA256": "e92b43ca5ef1330d667f2c834cc473a4f645f130df352fbe40e90e092416356f",
+      "snapshot": "process_audit01/execution_sources/e92b43ca5ef1330d667f2c834cc473a4f645f130df352fbe40e90e092416356f.py",
+      "currentSHA256": "ed9ba015f36ddda03813d82e48c021a4499e2a1eb3293b5a535adf967f65f52f"
+    },
+    {
+      "process": "process_audit01",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "b3c9a557a6d3a5ab977ad8b10b24c0988439724cb7ef73c84da0d80d00fff529",
+      "snapshot": "process_audit01/execution_sources/b3c9a557a6d3a5ab977ad8b10b24c0988439724cb7ef73c84da0d80d00fff529.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_audit01",
+      "path": "E:\\RocketAeroHeat\\docs\\validation\\v238\\PLAN.md",
+      "executedSHA256": "8e1a01e1ab064984d04514d6d8fd751a731f4efcce1f2f6fe7ecf93d0c64e0f5",
+      "snapshot": "process_audit01/execution_sources/8e1a01e1ab064984d04514d6d8fd751a731f4efcce1f2f6fe7ecf93d0c64e0f5.md",
+      "currentSHA256": "0f7f1b45e0418aed43e05d6e48d981159acdd1415d340b5fcff41aeca2c80305"
+    },
+    {
+      "process": "process_audit02",
+      "path": "E:\\RocketAeroHeat\\scripts\\auditHLLCInterfaceV238.py",
+      "executedSHA256": "e0d40d5ebe1c26815d4135d0c0f9b517d326dae5a139fbb66fa3dcad656f53e9",
+      "snapshot": "process_audit02/execution_sources/e0d40d5ebe1c26815d4135d0c0f9b517d326dae5a139fbb66fa3dcad656f53e9.py",
+      "currentSHA256": "ed9ba015f36ddda03813d82e48c021a4499e2a1eb3293b5a535adf967f65f52f"
+    },
+    {
+      "process": "process_audit02",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_audit02/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_build",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "b3c9a557a6d3a5ab977ad8b10b24c0988439724cb7ef73c84da0d80d00fff529",
+      "snapshot": "process_build/execution_sources/b3c9a557a6d3a5ab977ad8b10b24c0988439724cb7ef73c84da0d80d00fff529.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_build",
+      "path": "E:\\RocketAeroHeat\\docs\\validation\\v238\\PLAN.md",
+      "executedSHA256": "8e1a01e1ab064984d04514d6d8fd751a731f4efcce1f2f6fe7ecf93d0c64e0f5",
+      "snapshot": "process_build/execution_sources/8e1a01e1ab064984d04514d6d8fd751a731f4efcce1f2f6fe7ecf93d0c64e0f5.md",
+      "currentSHA256": "0f7f1b45e0418aed43e05d6e48d981159acdd1415d340b5fcff41aeca2c80305"
+    },
+    {
+      "process": "process_build2",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_build2/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_export",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_export/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_failure_control",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_failure_control/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_failure_control",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_failure_control/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_interface",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "b3c9a557a6d3a5ab977ad8b10b24c0988439724cb7ef73c84da0d80d00fff529",
+      "snapshot": "process_interface/execution_sources/b3c9a557a6d3a5ab977ad8b10b24c0988439724cb7ef73c84da0d80d00fff529.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_interface",
+      "path": "E:\\RocketAeroHeat\\docs\\validation\\v238\\PLAN.md",
+      "executedSHA256": "8e1a01e1ab064984d04514d6d8fd751a731f4efcce1f2f6fe7ecf93d0c64e0f5",
+      "snapshot": "process_interface/execution_sources/8e1a01e1ab064984d04514d6d8fd751a731f4efcce1f2f6fe7ecf93d0c64e0f5.md",
+      "currentSHA256": "0f7f1b45e0418aed43e05d6e48d981159acdd1415d340b5fcff41aeca2c80305"
+    },
+    {
+      "process": "process_interface2",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_interface2/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_native_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\auditHLLCNativeV238.py",
+      "executedSHA256": "2148280d65d6f9d7a3a3f8060acce84b7a15685a7585c4928e531332de22e90a",
+      "snapshot": "process_native_audit/execution_sources/2148280d65d6f9d7a3a3f8060acce84b7a15685a7585c4928e531332de22e90a.py",
+      "currentSHA256": "7a01461e49795c1e86705cb5b5a6c2f02d0f4aab9471e20ecaf87fe9fa0e1dcb"
+    },
+    {
+      "process": "process_native_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCNativeV238.py",
+      "executedSHA256": "e25be51659ab1eeb7c1eae17579dc6b592bd6c7a906f9fcdaa50be439049a448",
+      "snapshot": "process_native_audit/execution_sources/e25be51659ab1eeb7c1eae17579dc6b592bd6c7a906f9fcdaa50be439049a448.py",
+      "currentSHA256": "bf6984a56016596fdfcee32b00234819e151c196c19d9fbe693cd688b0c2f329"
+    },
+    {
+      "process": "process_native_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_native_audit/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_native_build",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCNativeV238.py",
+      "executedSHA256": "e25be51659ab1eeb7c1eae17579dc6b592bd6c7a906f9fcdaa50be439049a448",
+      "snapshot": "process_native_build/execution_sources/e25be51659ab1eeb7c1eae17579dc6b592bd6c7a906f9fcdaa50be439049a448.py",
+      "currentSHA256": "bf6984a56016596fdfcee32b00234819e151c196c19d9fbe693cd688b0c2f329"
+    },
+    {
+      "process": "process_native_build",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_native_build/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_native_control",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCNativeV238.py",
+      "executedSHA256": "e25be51659ab1eeb7c1eae17579dc6b592bd6c7a906f9fcdaa50be439049a448",
+      "snapshot": "process_native_control/execution_sources/e25be51659ab1eeb7c1eae17579dc6b592bd6c7a906f9fcdaa50be439049a448.py",
+      "currentSHA256": "bf6984a56016596fdfcee32b00234819e151c196c19d9fbe693cd688b0c2f329"
+    },
+    {
+      "process": "process_native_control",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_native_control/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_native_prepare",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCNativeV238.py",
+      "executedSHA256": "e25be51659ab1eeb7c1eae17579dc6b592bd6c7a906f9fcdaa50be439049a448",
+      "snapshot": "process_native_prepare/execution_sources/e25be51659ab1eeb7c1eae17579dc6b592bd6c7a906f9fcdaa50be439049a448.py",
+      "currentSHA256": "bf6984a56016596fdfcee32b00234819e151c196c19d9fbe693cd688b0c2f329"
+    },
+    {
+      "process": "process_native_prepare",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_native_prepare/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_outcome",
+      "path": "E:\\RocketAeroHeat\\scripts\\reviewHLLCOutcomeV238.py",
+      "executedSHA256": "bfd834b58dea894bd55497369a2ad3cee7ba7773b718b48103c8c2d6ddd6a900",
+      "snapshot": "process_outcome/execution_sources/bfd834b58dea894bd55497369a2ad3cee7ba7773b718b48103c8c2d6ddd6a900.py",
+      "currentSHA256": "69ec54a2f1e7f96da301b331ad62b715ec0ecc77d44033eccc1367ef93ce07bc"
+    },
+    {
+      "process": "process_outcome",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_outcome/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_outcome2",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_outcome2/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_prepare",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "b3c9a557a6d3a5ab977ad8b10b24c0988439724cb7ef73c84da0d80d00fff529",
+      "snapshot": "process_prepare/execution_sources/b3c9a557a6d3a5ab977ad8b10b24c0988439724cb7ef73c84da0d80d00fff529.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_prepare",
+      "path": "E:\\RocketAeroHeat\\docs\\validation\\v238\\PLAN.md",
+      "executedSHA256": "8e1a01e1ab064984d04514d6d8fd751a731f4efcce1f2f6fe7ecf93d0c64e0f5",
+      "snapshot": "process_prepare/execution_sources/8e1a01e1ab064984d04514d6d8fd751a731f4efcce1f2f6fe7ecf93d0c64e0f5.md",
+      "currentSHA256": "0f7f1b45e0418aed43e05d6e48d981159acdd1415d340b5fcff41aeca2c80305"
+    },
+    {
+      "process": "process_real_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\auditHLLCRocketV238.py",
+      "executedSHA256": "1218a80c1fc30ca089c1b96cae0f68a9298858bd3ad4c3b20342c4e9195c5861",
+      "snapshot": "process_real_audit/execution_sources/1218a80c1fc30ca089c1b96cae0f68a9298858bd3ad4c3b20342c4e9195c5861.py",
+      "currentSHA256": "6367b2ecd1278e2e3ffab99ae7708a9d044db977b336761acaab1b5d182ea2e9"
+    },
+    {
+      "process": "process_real_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_real_audit/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_render",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_render/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_repair_prepare",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_repair_prepare/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_rocket",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_rocket/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_rocket",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_rocket/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_rocket_admit",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_rocket_admit/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_rocket_admit",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_rocket_admit/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_rocket_build",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_rocket_build/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_rocket_build",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_rocket_build/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    },
+    {
+      "process": "process_rocket_prepare",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCRocketV238.py",
+      "executedSHA256": "a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f",
+      "snapshot": "process_rocket_prepare/execution_sources/a287ca65e5e4121fb26a8bd43096df97619dcbaba43ff9a756a1588e801fe87f.py",
+      "currentSHA256": "8967ca429d02d05a653eac604bb5c75ebc405c060b98389e1981a27236c6129f"
+    },
+    {
+      "process": "process_rocket_prepare",
+      "path": "E:\\RocketAeroHeat\\scripts\\runHLLCCompatibilityV238.py",
+      "executedSHA256": "43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd",
+      "snapshot": "process_rocket_prepare/execution_sources/43c090003e25279afdfd17a46df5550a87c008ebb6c96d66aeef23d1976e1abd.py",
+      "currentSHA256": "91a402542079020563eb04cffd198f1a3733ef9a09fb0d8987c80438429349a6"
+    }
+  ],
+  "closedCLIs": {
+    "scripts/runHLLCCompatibilityV238.py": "v238 execution closed; follow NEXT_DECISION",
+    "scripts/runHLLCNativeV238.py": "v238 native execution closed; follow NEXT_DECISION",
+    "scripts/runHLLCRocketV238.py": "v238 rocket execution closed; follow NEXT_DECISION",
+    "scripts/auditHLLCInterfaceV238.py": "v238 interface audit closed",
+    "scripts/auditHLLCNativeV238.py": "v238 native audit closed",
+    "scripts/auditHLLCRocketV238.py": "v238 real audit closed; follow NEXT_DECISION",
+    "scripts/auditHLLCAcceptanceV238.py": "v238 rocket acceptance audit closed"
+  },
+  "failedProcesses": {
+    "process_audit01": {
+      "exitCode": 2,
+      "stopReason": null,
+      "elapsedSeconds": 0.9529999999995198
+    },
+    "process_outcome": {
+      "exitCode": 1,
+      "stopReason": null,
+      "elapsedSeconds": 0.9220000000004802
+    }
+  },
+  "MATLABExecuted": false,
+  "sharedWebChanged": false,
+  "browserInteractionTested": false,
+  "scientificImageVisuallyInspected": true,
+  "uniqueAssetsDeleted": false,
+  "newRocketMeshGenerated": false,
+  "unmeteredDevelopmentAndTargetedReadsDisclosed": true
+}

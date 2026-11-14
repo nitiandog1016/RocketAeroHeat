@@ -1,0 +1,49 @@
+--- SU2_CFD/src/numerics/flow/convection/hllc.cpp
++++ pressure-derivative/SU2_CFD/src/numerics/flow/convection/hllc.cpp
+@@ -25,8 +25,8 @@
+  * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "../../../../include/numerics/flow/convection/hllc.hpp"
+-#include "../../../../../Common/include/toolboxes/geometry_toolbox.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/numerics/flow/convection/hllc.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/toolboxes/geometry_toolbox.hpp"
+ 
+ CUpwHLLC_Flow::CUpwHLLC_Flow(unsigned short val_nDim, unsigned short val_nVar, const CConfig* config) : CNumerics(val_nDim, val_nVar, config) {
+ 
+@@ -800,7 +800,7 @@
+ 
+       /*--- Computing pressure derivatives d/dU_L (PI) ---*/
+ 
+-      dPI_dU[0] = Chi_i - 0.5 * Kappa_i * sq_vel_i;
++      dPI_dU[0] = Chi_i + 0.5 * Kappa_i * sq_vel_i;
+       for (iDim = 0; iDim < nDim; iDim++)
+         dPI_dU[iDim+1] = - Kappa_i * Velocity_i[iDim];
+       dPI_dU[nVar-1] = Kappa_i;
+@@ -874,7 +874,7 @@
+ 
+       /*--- Computing pressure derivatives d/dU_R (PI) ---*/
+ 
+-      dPI_dU[0] = Chi_j - 0.5 * Kappa_j * sq_vel_j;
++      dPI_dU[0] = Chi_j + 0.5 * Kappa_j * sq_vel_j;
+       for (iDim = 0; iDim < nDim; iDim++)
+         dPI_dU[iDim+1] = - Kappa_j * Velocity_j[iDim];
+       dPI_dU[nVar-1] = Kappa_j;
+@@ -944,7 +944,7 @@
+ 
+       /*--- Computing pressure derivatives d/dU_L (PI) ---*/
+ 
+-      dPI_dU[0] = Chi_i - 0.5 * Kappa_i * sq_vel_i;
++      dPI_dU[0] = Chi_i + 0.5 * Kappa_i * sq_vel_i;
+       for (iDim = 0; iDim < nDim; iDim++)
+         dPI_dU[iDim+1] = - Kappa_i * Velocity_i[iDim];
+       dPI_dU[nVar-1] = Kappa_i;
+@@ -995,7 +995,7 @@
+ 
+       /*--- Computing pressure derivatives d/dU_R (PI) ---*/
+ 
+-      dPI_dU[0] = Chi_j - 0.5 * Kappa_j * sq_vel_j;
++      dPI_dU[0] = Chi_j + 0.5 * Kappa_j * sq_vel_j;
+       for (iDim = 0; iDim < nDim; iDim++)
+         dPI_dU[iDim+1] = - Kappa_j * Velocity_j[iDim];
+       dPI_dU[nVar-1] = Kappa_j;

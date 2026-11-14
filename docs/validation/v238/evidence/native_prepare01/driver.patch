@@ -1,0 +1,52 @@
+--- singleDomainRunV235.cpp
++++ nativeHLLCV238.cpp
+@@ -1,3 +1,6 @@
++#include "numerics/flow/convection/hllc.hpp"
++#include "PhaseStepAcceptanceV237.hpp"
++#include "output/COutput.hpp"
+ // 模块职责：复用完整原生单区flow-SA循环；只读观察实际阶段，完整保存状态，不更改推进。
+ #include "drivers/CSinglezoneDriver.hpp"
+ #include "iteration/CFluidIteration.hpp"
+@@ -121,7 +124,7 @@
+    observe::phase="accepted-flow-SA/end-iteration";observe::end_iteration();
+  }
+ };
+-class SingleDomainDriverV235 final:public CSinglezoneDriver {
++class HLLCDriverV238 final:public CSinglezoneDriver {
+  public:using CSinglezoneDriver::CSinglezoneDriver;
+  void launch(){using namespace observe;cfg=config_container[0];geo=geometry_container[0][0][0];sol=solver_container[0][0][0];
+    if(cfg->GetKind_FluidModel()!=RAH_PHASE_AIR||cfg->GetKind_Solver()!=MAIN_SOLVER::RANS||cfg->GetKind_Turb_Model()!=TURB_MODEL::SA||
+@@ -129,6 +132,14 @@
+       cfg->GetTime_Domain()||cfg->GetMultizone_Problem()||omp_get_max_threads()!=1||
+       !dynamic_cast<CSU2PhaseAwareAir*>(sol[FLOW_SOL]->GetFluidModel())||sol[FLOW_SOL]->GetnVar()!=5||sol[TURB_SOL]->GetnVar()!=1)
+      throw std::runtime_error("SINGLE_PHASE_SA_IDENTITY");
++   // 检查实际工厂及同一气体/SA组合，不靠配置字符串推断派发。
++   auto*** num=numerics_container[0][0][0];
++   if(cfg->GetKind_Upwind_Flow()!=UPWIND::HLLC||geo->GetnPoint()!=24||cfg->GetnInner_Iter()!=5||
++      !dynamic_cast<CUpwGeneralHLLC_Flow*>(num[FLOW_SOL][CONV_TERM])||
++      !dynamic_cast<CUpwGeneralHLLC_Flow*>(num[FLOW_SOL][CONV_BOUND_TERM]))
++      throw std::runtime_error("HLLC_V238_NATIVE_DISPATCH");
++   std::ofstream identity(folder+"/native_identity.json");
++   identity<<"{\"schemeID\":\"phase-air-general-hllc-density-jacobian-fix-v238\",\"physicalGasID\":15,\"actualInteriorBoundaryHLLC\":true,\"sameSAAirIdentity\":true,\"physicalQualification\":false}\n";identity.close();
+    ledger.open(folder+"/stages.csv");events.open(folder+"/rejections.csv");steps.open(folder+"/steps.csv");walls.open(folder+"/wall_stages.csv");
+    for(auto* f:{&ledger,&events,&steps,&walls})*f<<std::setprecision(17);
+    walls<<"update,stage,pNoutX,pNoutY,pNoutZ,tauNoutX,tauNoutY,tauNoutZ,wallRowX,wallRowY,wallRowZ,laminarHeatIntoWallW,effectiveHeatIntoWallW,maxWallSA\n";
+@@ -140,6 +151,11 @@
+    if(enabled){rah_single_observer::stage=stage;rah_single_observer::rejection=rejection;}
+    std::ofstream schema(folder+"/schema.json");schema<<"{\"format\":\"RAH235LE\",\"columns\":\""<<columns<<",reserved0\",\"initialRHSUnknown\":true,\"internalEnergyOffsetJkg\":300000,\"flowPrimitiveMutBeforeSACurrentRefresh\":true,\"physicalQualification\":false}\n";schema.close();
+    state_frame(0);StartSolver();if(saved!=completed)state_frame(completed);
++   // 显式原生终点保存，不设置或伪造收敛标志。
++   const bool forced=output_container[0]->SetResultFiles(geo,cfg,sol,cfg->GetInnerIter(),true);
++   if(!forced||completed!=5||rah_phase_step_v237::checked!=5*24)throw std::runtime_error("HLLC_V238_COMPLETE_CONTROL");
++   std::ofstream acceptance(folder+"/acceptance_summary.json");
++   acceptance<<"{\"checked\":"<<rah_phase_step_v237::checked<<",\"limited\":"<<rah_phase_step_v237::limited<<",\"forcedFinalNativeOutput\":true}\n";acceptance.close();
+    rah_single_observer::stage=nullptr;rah_single_observer::rejection=nullptr;
+    std::ofstream f(folder+"/native_completion.json");f<<"{\"normalReturn\":true,\"updates\":"<<completed<<",\"initialSaved\":true,\"observationEnabled\":"<<(enabled?"true":"false")<<",\"physicalQualification\":false}\n";
+  }
+@@ -148,5 +164,5 @@
+   if(argc!=5)throw std::runtime_error("CONFIG_OUTPUT_OBSERVATION_INTERVAL_REQUIRED");
+   observe::folder=argv[2];observe::enabled=std::string(argv[3])=="observe";observe::interval=std::stoul(argv[4]);
+   if(!observe::interval||(std::string(argv[3])!="observe"&&std::string(argv[3])!="off"))throw std::runtime_error("INVALID_OBSERVER_MODE");
+-  std::set_terminate(observe::failed);SU2_MPI::Init(&argc,&argv);SingleDomainDriverV235 driver(argv[1],1,SU2_MPI::GetComm());driver.launch();driver.Finalize();SU2_MPI::Finalize();return 0;
++  std::set_terminate(observe::failed);SU2_MPI::Init(&argc,&argv);HLLCDriverV238 driver(argv[1],1,SU2_MPI::GetComm());driver.launch();driver.Finalize();SU2_MPI::Finalize();return 0;
+ }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
