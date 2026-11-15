@@ -1,0 +1,18 @@
+--- E:\RocketAeroHeat\outputs\v229_validation\source\SU2_CFD\src\solvers\CEulerSolver_observed.cpp
++++ v240/CEulerSolver.cpp
+@@ -1,3 +1,4 @@
++#include "RiemannOutletObserverV240.hpp"
+ /*!
+  * \file CEulerSolver.cpp
+  * \brief Main subroutines for solving Finite-Volume Euler flow problems.
+@@ -5546,6 +5547,10 @@
+             u_b[iVar] += P_Tensor[iVar][jVar]*dw[jVar];
+         }
+       }
++
++      if (Marker_Tag == "outlet" && rah_outlet_v240::hook)
++        rah_outlet_v240::hook(config->GetInnerIter()+1, geometry->nodes->GetGlobalIndex(iPoint),
++                              ProjVelocity_i, SoundSpeed_i, u_i, u_b, Normal);
+ 
+       /*--- Compute the thermodynamic state in u_b ---*/
+       su2double Velocity_b[MAXNDIM] = {0};

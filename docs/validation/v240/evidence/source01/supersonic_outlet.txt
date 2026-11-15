@@ -1,0 +1,123 @@
+7761 void CEulerSolver::BC_Supersonic_Outlet(CGeometry *geometry, CSolver **solver_container,
+7762                                         CNumerics *conv_numerics, CNumerics *visc_numerics,
+7763                                         CConfig *config, unsigned short val_marker) {
+7764   SU2_ZONE_SCOPED
+7765   unsigned short iDim;
+7766   unsigned long iVertex, iPoint;
+7767   su2double *V_outlet, *V_domain;
+7768 
+7769   bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+7770   bool viscous = config->GetViscous();
+7771   string Marker_Tag = config->GetMarker_All_TagBound(val_marker);
+7772 
+7773   auto *Normal = new su2double[nDim];
+7774 
+7775   /*--- Supersonic outlet flow: there are no ingoing characteristics,
+7776    so all flow variables can should be interpolated from the domain. ---*/
+7777 
+7778   /*--- Loop over all the vertices on this boundary marker ---*/
+7779 
+7780   SU2_OMP_FOR_DYN(OMP_MIN_SIZE)
+7781   for (iVertex = 0; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+7782 
+7783     iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+7784 
+7785     /*--- Check if the node belongs to the domain (i.e, not a halo node) ---*/
+7786 
+7787     if (geometry->nodes->GetDomain(iPoint)) {
+7788 
+7789       /*--- Current solution at this boundary node ---*/
+7790 
+7791       V_domain = nodes->GetPrimitive(iPoint);
+7792 
+7793       /*--- Allocate the value at the outlet ---*/
+7794 
+7795       V_outlet = GetCharacPrimVar(val_marker, iVertex);
+7796 
+7797       /*--- Primitive variables, using the derived quantities ---*/
+7798 
+7799       V_outlet[0] = V_domain[0];
+7800       for (iDim = 0; iDim < nDim; iDim++)
+7801         V_outlet[iDim+1] = V_domain[iDim+1];
+7802       V_outlet[nDim+1] = V_domain[nDim+1];
+7803       V_outlet[nDim+2] = V_domain[nDim+2];
+7804       V_outlet[nDim+3] = V_domain[nDim+3];
+7805 
+7806       /*--- Current solution at this boundary node ---*/
+7807 
+7808       V_domain = nodes->GetPrimitive(iPoint);
+7809 
+7810       /*--- Normal vector for this vertex (negate for outward convention) ---*/
+7811 
+7812       geometry->vertex[val_marker][iVertex]->GetNormal(Normal);
+7813       for (iDim = 0; iDim < nDim; iDim++) Normal[iDim] = -Normal[iDim];
+7814 
+7815       /*--- Set various quantities in the solver class ---*/
+7816 
+7817       conv_numerics->SetNormal(Normal);
+7818       conv_numerics->SetPrimitive(V_domain, V_outlet);
+7819 
+7820       if (dynamic_grid)
+7821         conv_numerics->SetGridVel(geometry->nodes->GetGridVel(iPoint),
+7822                                   geometry->nodes->GetGridVel(iPoint));
+7823 
+7824       /*--- Compute the residual using an upwind scheme ---*/
+7825 
+7826       auto residual = conv_numerics->ComputeResidual(config);
+7827 
+7828       LinSysRes.AddBlock(iPoint, residual);
+7829 
+7830       /*--- Jacobian contribution for implicit integration ---*/
+7831 
+7832       if (implicit)
+7833         Jacobian.AddBlock2Diag(iPoint, residual.jacobian_i);
+7834 
+7835      /*--- Viscous contribution, commented out because serious convergence problems ---*/
+7836 
+7837      if (viscous) {
+7838 
+7839        /*--- Set laminar and eddy viscosity at the infinity ---*/
+7840 
+7841        V_outlet[nDim+5] = nodes->GetLaminarViscosity(iPoint);
+7842        V_outlet[nDim+6] = nodes->GetEddyViscosity(iPoint);
+7843 
+7844        /*--- Set the normal vector and the coordinates ---*/
+7845 
+7846        visc_numerics->SetNormal(Normal);
+7847        su2double Coord_Reflected[MAXNDIM];
+7848        unsigned long Point_Normal = geometry->vertex[val_marker][iVertex]->GetNormal_Neighbor();
+7849        GeometryToolbox::PointPointReflect(nDim, geometry->nodes->GetCoord(Point_Normal),
+7850                                                 geometry->nodes->GetCoord(iPoint), Coord_Reflected);
+7851        visc_numerics->SetCoord(geometry->nodes->GetCoord(iPoint), Coord_Reflected);
+7852 
+7853        /*--- Primitive variables, and gradient ---*/
+7854 
+7855        visc_numerics->SetPrimitive(V_domain, V_domain);
+7856        visc_numerics->SetPrimVarGradient(nodes->GetGradient_Primitive(iPoint), nodes->GetGradient_Primitive(iPoint));
+7857 
+7858        /*--- Turbulent kinetic energy ---*/
+7859 
+7860        if (config->GetKind_Turb_Model() == TURB_MODEL::SST)
+7861          visc_numerics->SetTurbKineticEnergy(solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0),
+7862                                              solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0));
+7863 
+7864        /*--- Compute and update residual ---*/
+7865 
+7866        auto residual = visc_numerics->ComputeResidual(config);
+7867        LinSysRes.SubtractBlock(iPoint, residual);
+7868 
+7869        /*--- Jacobian contribution for implicit integration ---*/
+7870 
+7871        if (implicit)
+7872          Jacobian.SubtractBlock2Diag(iPoint, residual.jacobian_i);
+7873      }
+7874 
+7875     }
+7876   }
+7877   END_SU2_OMP_FOR
+7878 
+7879   /*--- Free locally allocated memory ---*/
+7880 
+7881   delete [] Normal;
+7882 
+7883 }
