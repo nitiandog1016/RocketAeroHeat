@@ -2,13 +2,13 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
-## 最新状态与交付（2026-11-14）
+## 最新状态与交付（2026-11-15）
 
-最新[v238一般EOS HLLC与真实箭体](docs/GENERAL_HLLC_COMPATIBILITY_V238.md)：修正四处压力导数符号，原/新控制误差0.1045→2.842e−14，实际完整flow-SA组合通过。唯一相容均匀初场整箭分支完成200更新，按收益恶化正常停止；耗时1166.094秒、采样峰2.108GB。16受限实际量及完整末场与原生CSV逐位核对通过。**仍未收敛、没有新增物理合格面积**，不自动续算。
+最新[v239原生阶次渐进与中断恢复](docs/NATIVE_MUSCL_RAMP_V239.md)：第102更新起完整二阶，现存258次完整flow-SA更新；一次受限更新的五个实际量逐位核对通过。暂停/恢复后原会话及进程缺失，原监督终态、退出码/耗时/峰值未知，无258完整终态或末原生CSV。**仍未收敛，没有新增物理合格面积。** 已完成全二阶窗口的p/q变化之比1.324/1.317越过原1.25恶化阈值，关闭本日程，不重跑补300步日志。
 
-本地 `outputs/v238_validation/workbench01/index.html` 提供0/1/50/100/150/200六阶段26字段原面比较，亦可加载其中 `rocket_restart_comparison.json`。0/1/100/200来自完整帧，50/150来自壁面快照。原19,752面、共同色标与未知固体壁温保持，查看[科研对照图](docs/validation/v238/evidence/visual01/rocket_restart_comparison.png)。474048个研究场数值回读及前端纯函数通过，无浏览器交互验收。
+本地 `outputs/v239_validation/workbench01/index.html` 提供0/1/50/100/150/200/250七阶段30字段原面比较，亦可加载其中 `rocket_restart_comparison.json`。0/1/100/200来自完整帧，50/150/250来自壁面快照；258不是可显示完整终态。原19,752面、共同色标、渐进/完整二阶及未知固体壁温区分，查看[科研对照图](docs/validation/v239/evidence/visual01/rocket_restart_comparison.png)。553056个研究场数值回读及前端纯函数通过，无浏览器交互验收。
 
-按[下一执行点](docs/validation/v238/NEXT_DECISION.md)核对原生“由一阶逐渐恢复二阶”的实际调度，再决定唯一固定启动日程候选；最终必须回到完整二阶验收，不能扫参数或用低阶解授热资格。均匀初场与通量组合同时变化，跨版差异不能全归因于HLLC。混合主线、原面/近壁/全部科学门槛保持，全面积与科研UI独立最高。旧[v236八阶段研究](docs/RESTART_BRANCH_V236.md)及[v237停滞记录](docs/PHASE_STEP_ACCEPTANCE_V237.md)保留。
+按[下一执行点](docs/validation/v239/NEXT_DECISION.md)返回区域外流与工程边界层入口闭环，不连续增加整域初猜、CFL、通量或阶次日程分支。已完成窗口支持关闭本日程，但不解释原进程为何终止，也不证明所有成熟方法都失败。混合主线、原面/近壁/全部科学门槛保持，全面积与科研UI独立最高。旧[v238有限修正和完整末场](docs/GENERAL_HLLC_COMPATIBILITY_V238.md)、[v236八阶段研究](docs/RESTART_BRANCH_V236.md)及[v237停滞记录](docs/PHASE_STEP_ACCEPTANCE_V237.md)保留。
 
 现有工作台“打开结果JSON”可加载[三阶段研究13字段](docs/validation/v232/evidence/workbench01/rocket_euler_research.json)：更新50/400/800压力与流体温度、末场总焓/熵/三维速度，热流和固体Tw明确未知。217272个数回读通过，共同色标/方法/限制随字段保存；[压力对数色标科学图](docs/validation/v232/evidence/plot02/rocket_euler_comparison.png)已查看。已有[鼻部15字段](docs/validation/v227/evidence/recovered/rocket_workbench.json)继续保留。本轮未改共享WebGL、未运行MATLAB，无浏览器交互验收。
 

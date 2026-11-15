@@ -1,0 +1,422 @@
+
+Parsing config file for zone 0
+
+----------------- Physical Case Definition ( Zone 0 ) -------------------
+Compressible RANS equations.
+Turbulence model: Negative-Spalart-Allmaras
+Hybrid RANS/LES: No Hybrid RANS/LES
+Mach number: 5.
+Angle of attack (AoA): 160 deg, and angle of sideslip (AoS): -0 deg.
+Reynolds number: 0. Reference length 1.
+No restart solution, use the values at infinity (freestream).
+Dimensional simulation.
+The reference area is 3.14159 m^2.
+The semi-span will be computed using the max y(3D) value.
+The reference length is 1 m.
+Reference origin for moment evaluation is (0, 0, 0).
+Surface(s) where the force coefficients are evaluated: wall.
+
+Surface(s) plotted in the output file: wall.
+Input mesh file name: ../../v235_validation/observe02/mesh.su2
+
+--------------- Space Numerical Integration ( Zone 0 ) ------------------
+HLLC solver for the flow inviscid terms.
+Standard Roe without low-dissipation function.
+Second order integration in space, with slope limiter.
+Ramping MUSCL sheme from first to second order starting at iter 0, ending at iter 100, updating every 1 iterations.
+Ramp applied according to a cosine function, raised to the power 1.
+Venkatakrishnan-Wang slope-limiting method, with constant: 0.05.
+Scalar upwind solver for the turbulence model.
+First order integration in space.
+Average of gradients with correction (viscous flow terms).
+Average of gradients with correction (viscous turbulence terms).
+Gradient for upwind reconstruction: inverse-distance weighted Least-Squares.
+Gradient for viscous and source terms: inverse-distance weighted Least-Squares.
+
+--------------- Time Numerical Integration  ( Zone 0 ) ------------------
+Local time stepping (steady state simulation).
+Euler implicit method for the flow equations.
+BCGSTAB is used for solving the linear system.
+Using LU-SGS preconditioning.
+Convergence criteria of the linear solver: 1e-05.
+Max number of linear iterations: 10.
+CFL adaptation. Factor down: 0.5, factor up: 1.1,
+                lower limit: 0.05, upper limit: 5,
+                acceptable linear residual: 0.001'
+                starting iteration: 0.
+Courant-Friedrichs-Lewy number:      0.1
+Euler implicit time integration for the turbulence model.
+
+------------------ Convergence Criteria  ( Zone 0 ) ---------------------
+Maximum number of solver subiterations: 103.
+Begin convergence monitoring at iteration 10.
+Residual minimum value: 1e-8.
+Cauchy series min. value: 1e-10.
+Number of Cauchy elements: 100.
+Begin windowed time average at iteration 0.
+
+-------------------- Output Information ( Zone 0 ) ----------------------
+File writing frequency: 
++------------------------------------+
+|                     File| Frequency|
++------------------------------------+
+|            RESTART_ASCII|       103|
++------------------------------------+
+Writing the convergence history file every 1 inner iterations.
+Writing the screen convergence history every 103 inner iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: surface_flow.
+Volume file name: volume_flow.
+Restart file name: restart_flow.
+
+------------- Config File Boundary Information ( Zone 0 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|                   Riemann boundary|                           farfield|
++-----------------------------------------------------------------------+
+|                    Isothermal wall|                               wall|
++-----------------------------------------------------------------------+
+
+-------------------- Output Preprocessing ( Zone 0 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: INNER_ITER, RMS_DENSITY, RMS_MOMENTUM-X, RMS_MOMENTUM-Y, RMS_ENERGY
+History output group(s): ITER, RMS_RES, AERO_COEFF, HEAT
+Convergence field(s): RMS_DENSITY, RMS_ENERGY, RMS_NU_TILDE
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE, RESIDUAL
+
+------------------- Geometry Preprocessing ( Zone 0 ) -------------------
+Three dimensional problem.
+24 grid points.
+40 volume elements.
+2 surface markers.
+8 boundary elements in index 0 (Marker = wall).
+8 boundary elements in index 1 (Marker = farfield).
+24 tetrahedra.
+16 prisms.
+Setting point connectivity.
+Renumbering points (Reverse Cuthill McKee Ordering).
+Recomputing point connectivity.
+Setting element connectivity.
+Checking the numerical grid orientation.
+All volume elements are correctly oriented.
+All surface elements are correctly oriented.
+Identifying edges and vertices.
+Setting the control volume structure.
+Volume of the computational grid: 9.33333.
+Searching for the closest normal neighbors to the surfaces.
+Storing a mapping from global to local point index.
+Compute the surface curvature.
+Max K: 7.76646. Mean K: 5.82484. Standard deviation K: 1.94161.
+Computing mesh quality statistics for the dual control volumes.
++--------------------------------------------------------------+
+|           Mesh Quality Metric|        Minimum|        Maximum|
++--------------------------------------------------------------+
+|    Orthogonality Angle (deg.)|        40.9451|             90|
+|     CV Face Area Aspect Ratio|        2.43158|    1.41422e+06|
+|           CV Sub-Volume Ratio|              1|         198374|
+|                     CV Volume|    6.66667e-07|        1.11742|
++--------------------------------------------------------------+
+Finding max control volume width.
+Semi-span length = 1 m.
+Wetted area = 4 m^2.
+Area projection in the x-plane = 0.666667 m^2, y-plane = 0.666667 m^2, z-plane = 0.666667 m^2.
+Max. coordinate in the x-direction = 1 m, y-direction = 1 m, z-direction = 1 m.
+Min. coordinate in the x-direction = -1 m, y-direction = -1 m, z-direction = -1 m.
+Computing wall distances.
+
+-------------------- Solver Preprocessing ( Zone 0 ) --------------------
+Viscous flow: Computing pressure using the ideal gas law
+based on the free-stream temperature and a density computed
+from the Reynolds number.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|RAH_PHASE_AIR 60..2000K phase domain e+300000|+------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|          Gas Constant|       287.049|             1|  N.m/kg.K|       287.049|
+|      Spec. Heat Ratio|             -|             -|         -|             -|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|       1197.03|             1|        Pa|       1197.03|
+|               Density|     0.0184104|             1|    kg/m^3|     0.0184104|
+|           Temperature|       226.509|             1|         K|       226.509|
+|          Total Energy|   1.30185e+06|             1|   m^2/s^2|   1.30185e+06|
+|            Velocity-X|      -1418.13|             1|       m/s|      -1418.13|
+|            Velocity-Y|            -0|             1|       m/s|            -0|
+|            Velocity-Z|       516.157|             1|       m/s|       516.157|
+|    Velocity Magnitude|       1509.14|             1|       m/s|       1509.14|
++------------------------------------------------------------------------------+
+|             Viscosity|    1.4779e-05|             1|   N.s/m^2|    1.4779e-05|
+|          Conductivity|             -|             1|   W/m^2.K|             -|
+|     Turb. Kin. Energy|       8540.65|             1|   m^2/s^2|       8540.65|
+|     Spec. Dissipation|   1.06392e+06|             1|       1/s|   1.06392e+06|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|             5|
+|       Reynolds Number|             -|             -|         -|   1.87996e+06|
++------------------------------------------------------------------------------+
+All ranks use edge coloring.
+Among the ranks that use edge coloring,
+      the minimum efficiency is 1,
+      the maximum number of colors is 1,
+      the minimum edge color group size is 512.
+Initialize Jacobian structure (Navier-Stokes). MG level: 0.
+Initialize Jacobian structure (SA model).
+
+------------------- Numerics Preprocessing ( Zone 0 ) -------------------
+
+----------------- Integration Preprocessing ( Zone 0 ) ------------------
+
+------------------- Iteration Preprocessing ( Zone 0 ) ------------------
+Euler/Navier-Stokes/RANS fluid iteration.
+
+------------------------------ Begin Solver -----------------------------
+
+Simulation Run using the Single-zone Driver
+Beginning to ramp MUSCL scheme...
+MUSCL Ramp value updated. New Value: 0
++----------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoU]|   rms[RhoV]|   rms[RhoE]|
++----------------------------------------------------------------+
+|           0|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.00024672
+MUSCL Ramp value updated. New Value: 0.000986636
+MUSCL Ramp value updated. New Value: 0.00221902
+MUSCL Ramp value updated. New Value: 0.00394265
+MUSCL Ramp value updated. New Value: 0.00615583
+MUSCL Ramp value updated. New Value: 0.00885637
+MUSCL Ramp value updated. New Value: 0.0120416
+MUSCL Ramp value updated. New Value: 0.0157084
+MUSCL Ramp value updated. New Value: 0.0198532
+MUSCL Ramp value updated. New Value: 0.0244717
+|          10|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.0295596
+|          11|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.0351118
+|          12|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.0411227
+|          13|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.0475865
+|          14|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.0544967
+|          15|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.0618467
+|          16|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.069629
+|          17|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.077836
+|          18|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.0864597
+|          19|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.0954915
+|          20|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.104922
+|          21|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.114743
+|          22|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.124944
+|          23|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.135516
+|          24|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.146447
+|          25|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.157726
+|          26|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.169344
+|          27|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.181288
+|          28|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.193546
+|          29|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.206107
+|          30|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.218958
+|          31|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.232087
+|          32|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.245479
+|          33|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.259123
+|          34|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.273005
+|          35|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.28711
+|          36|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.301426
+|          37|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.315938
+|          38|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.330631
+|          39|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.345492
+|          40|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.360504
+|          41|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.375655
+|          42|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.390928
+|          43|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.406309
+|          44|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.421783
+|          45|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.437333
+|          46|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.452946
+|          47|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.468605
+|          48|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.484295
+|          49|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.5
+|          50|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.515705
+|          51|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.531395
+|          52|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.547054
+|          53|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.562667
+|          54|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.578217
+|          55|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.593691
+|          56|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.609072
+|          57|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.624345
+|          58|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.639496
+|          59|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.654508
+|          60|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.669369
+|          61|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.684062
+|          62|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.698574
+|          63|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.71289
+|          64|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.726995
+|          65|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.740877
+|          66|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.754521
+|          67|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.767913
+|          68|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.781042
+|          69|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.793893
+|          70|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.806454
+|          71|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.818712
+|          72|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.830656
+|          73|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.842274
+|          74|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.853553
+|          75|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.864484
+|          76|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.875056
+|          77|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.885257
+|          78|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.895078
+|          79|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.904508
+|          80|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.91354
+|          81|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.922164
+|          82|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.930371
+|          83|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.938153
+|          84|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.945503
+|          85|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.952414
+|          86|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.958877
+|          87|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.964888
+|          88|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.97044
+|          89|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.975528
+|          90|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.980147
+|          91|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.984292
+|          92|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.987958
+|          93|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.991144
+|          94|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.993844
+|          95|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.996057
+|          96|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.997781
+|          97|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.999013
+|          98|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 0.999753
+|          99|        -inf|        -inf|        -inf|        -inf|
+MUSCL Ramp value updated. New Value: 1
+|         100|        -inf|        -inf|        -inf|        -inf|
+|         101|        -inf|        -inf|        -inf|        -inf|
+|         102|        -inf|        -inf|        -inf|        -inf|
+
+----------------------------- Solver Exit -------------------------------
+All convergence criteria satisfied.
++-----------------------------------------------------------------------+
+|      Convergence Field     |     Value    |   Criterion  |  Converged |
++-----------------------------------------------------------------------+
+|                    rms[Rho]|          -inf|          < -8|         Yes|
+|                   rms[RhoE]|          -inf|          < -8|         Yes|
+|                     rms[nu]|          -inf|          < -8|         Yes|
++-----------------------------------------------------------------------+
+-------------------------------------------------------------------------
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 ASCII restart                  |restart_flow.csv                   |
++-----------------------------------------------------------------------+
+
+--------------------------- Finalizing Solver ---------------------------
+Deleted CNumerics container.
+Deleted CIntegration container.
+Deleted CSolver container.
+Deleted CIteration container.
+Deleted CInterface container.
+Deleted CGeometry container.
+Deleted CFreeFormDefBox class.
+Deleted CSurfaceMovement class.
+Deleted CVolumetricMovement class.
+Deleted CConfig container.
+Deleted nInst container.
+Deleted COutput class.
+-------------------------------------------------------------------------
+
+------------------------- Exit Success (SU2_CFD) ------------------------
+

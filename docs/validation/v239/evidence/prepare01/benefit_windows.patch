@@ -1,0 +1,11 @@
+--- commonBranchV238.hpp
++++ commonBranchV239.hpp
+@@ -87,7 +87,7 @@
+ void benefit(){
+  std::array<double,6> l{};for(int j=0;j<6;++j)l[j]=std::log10(std::max(1e-300,currentRMS[j]));logs.push_back(l);
+  if(completed%50==0)wall_frame(completed);
+- if(completed!=200&&completed!=300)return;
++ if(completed!=300&&completed!=400)return;
+  unsigned noBenefit=0;bool worse=false;
+  for(unsigned end:{unsigned(completed-50),unsigned(completed)}){
+    std::array<double,6> ratio{},later{};double logRatio=0;bool allSmall=true,notWorse=true;
