@@ -1,0 +1,19 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RocketAeroHeat · 内部三维流管</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#273541;background:#f5f7f9;font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}header{padding:14px 24px;background:white;border-bottom:1px solid #d9e0e6;display:flex;gap:24px;align-items:center}header span{color:#63717e}main{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 57px)}aside{padding:20px;background:#fff;border-right:1px solid #d9e0e6}h1{font-size:18px;margin:0 0 12px}h2{font-size:15px;margin:0}label{display:block;margin-top:16px;color:#52616d}select,button{font:inherit;padding:7px 9px;border:1px solid #bac7d1;background:#fff;color:inherit;border-radius:3px}select{width:100%}button{cursor:pointer}input[type=range]{width:100%}a{color:#1f637e}small,.note{color:#65737e;font-size:12px}.tag{display:inline-block;border:1px solid #d8bb83;background:#fff9ec;color:#7b5b20;padding:2px 7px;font-size:12px}section.content{padding:18px;min-width:0}.panel{background:white;border:1px solid #dce3e8;border-radius:4px;margin-bottom:14px;padding:14px}.bar{display:flex;gap:12px;align-items:center;justify-content:space-between}canvas{display:block;width:100%}#scene{height:360px;touch-action:none;cursor:grab}#curve{height:240px;cursor:crosshair}#original{width:100%;height:480px;border:0}.hidden{display:none}dl{margin:10px 0}dt{color:#62717e;font-size:12px}dd{margin:0 0 7px;font-variant-numeric:tabular-nums}#probe{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px}#probe div{border-top:1px solid #e6eaee;padding-top:5px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}.reason{border-left:3px solid #b68b42;padding-left:9px;color:#66522f}@media(max-width:850px){main{grid-template-columns:1fr}aside{border-right:0}#probe{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><header><strong>RocketAeroHeat</strong><span>单工况研究 · 内部三维流管</span><span>M5 · α20° · 保存更新 200</span></header>
+<main><aside><h1>沿程状态与横向尺度</h1><span class="tag">研究值 · 外缘未合格</span>
+<p>四个原面种子，各追踪中心线及八条邻线。流管坐标由内部三维场生成；原表面计算责任保持完整。</p>
+<label for="tube">原面种子 / 流管</label><select id="tube"></select>
+<label for="field">沿程变量</label><select id="field"></select>
+<label for="station">共同有效站点</label><input type="range" id="station" min="0" value="0"><div id="stationText"></div>
+<label><input type="checkbox" id="fixed" checked> 四管共用曲线纵轴范围</label>
+<p><button id="csv">导出当前流管 CSV</button></p><p><a href="streamtubes.json" download>下载研究数据与来源</a></p>
+<div class="reason" id="reason"></div><dl id="summary"></dl>
+<details><summary>方法、源帧与适用范围</summary><p>原四面体五守恒量重心插值、同相态 Air 热恢复、弧长 RK4、九线两横向标签差分。每段按原网格邻接检查，不穿壁延拓。H/S沿程取实际值。</p><p>这些是壁邻体样本，尚未取得边界层外缘资格。局部质量流率比不是严格管面积积分；当前流场未收敛。热流和求解固体壁温均未知，给定壁温为300 K。</p><pre id="source"></pre></details>
+</aside><section class="content"><div class="panel"><div class="bar"><h2 id="viewTitle">三维流管与完整原箭体</h2><div><button id="focus">放大前体</button> <button id="reset">复位视角</button> <button id="view">查看原面三维压力</button></div></div>
+<canvas id="scene" aria-label="实际三维流管投影，拖动旋转，滚轮缩放"></canvas><iframe id="original" class="hidden" title="既有原面三维科研工作台"></iframe>
+<p class="note">拖动旋转 · 滚轮缩放 · 细线为邻线，粗线为中心线 · 所有坐标采用同一几何比例。原面压力入口使用既有 WebGL 工作台。</p></div>
+<div class="panel"><h2 id="curveTitle"></h2><canvas id="curve" aria-label="沿程定量曲线，点击选择站点"></canvas><div id="probe"></div><p class="note">只显示九线共同有效前缀；全部单线轨迹和准确停止位置保存在下载数据中。指标有效不等于物理合格。</p></div></section></main>
+<script src="streamtubes-data.js"></script><script src="../../../web/streamtube-research-v241.js"></script></body></html>
