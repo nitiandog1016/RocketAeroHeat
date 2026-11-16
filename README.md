@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v241内部三维流管](docs/INTERNAL_VOLUME_STREAMTUBES_V241.md)已从程序内部保存场生成四组九线研究数据，接通沿程p/T/H/S、横向尺度、准确边界停止及独立科研页。原固定缓冲区的13个固定面无法支持原质量门槛，该组合已拒绝。修复了端点合法却中间穿壁的后处理缺陷，独立核对6748射线站点；**共同前缀443站仍不是合格边界层外缘，没有新增合格壁热面积。**
+最新[v242保持原壁的前体重建](docs/FOREBODY_FIXED_WALL_PLC_V242.md)：成熟Gmsh/TetGen网格通过原质量门槛，20277tet/5354点；内部前体实际400更新正常完成，用时29.422秒/采样峰约66MB。净质量/能量与压力稳定通过，**物理能量RMS及真实外缘尚未合格，没有新增合格壁热面积**。无需等待更大内存主机才能推进混合路线。
+
+本地`outputs/v242_validation/workbench01/index.html`或`forebody_research.json`提供10阶段63字段，266040个原面研究值核对通过。[科研图](docs/validation/v242/evidence/visual01/forebody_research.png)保留全箭灰色未知区和前体放大；[同入口流管对照](docs/validation/v242/evidence/tube_audit01/tube_comparison.png)表明H/S与局部流管误差仍需处理。无共享WebGL修改/浏览器验收。[当前下一执行点](docs/validation/v242/NEXT_DECISION.md)是成熟外流重构与真实工程入口，不盲续400。
+
+旧[v241内部三维流管](docs/INTERNAL_VOLUME_STREAMTUBES_V241.md)已从程序内部保存场生成四组九线研究数据，接通沿程p/T/H/S、横向尺度、准确边界停止及独立科研页。原固定缓冲区的13个固定面无法支持原质量门槛，该组合已拒绝。修复了端点合法却中间穿壁的后处理缺陷，独立核对6748射线站点；**共同前缀443站仍不是合格边界层外缘，没有新增合格壁热面积。**
 
 本地`outputs/v241_validation/workbench01/index.html`提供三维流管投影、原面压力工作台入口、站点滑块、同纵轴曲线、探针及CSV。9746数字逐数回读/前端纯函数通过，[科研图](docs/validation/v241/evidence/workbench01/streamtubes.png)已查看；没有浏览器交互验收。按[当前下一执行点](docs/validation/v241/NEXT_DECISION.md)实施保持原壁的人工裁切外围成熟网格方案，闭合真实入口，全面积和统一UI目标继续进行。
 

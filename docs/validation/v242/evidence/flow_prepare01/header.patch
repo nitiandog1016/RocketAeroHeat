@@ -1,0 +1,20 @@
+--- v240/header
++++ v242/header
+@@ -4,7 +4,7 @@
+ #include <array>
+ #include <vector>
+ #include <cstring>
+-namespace region240 {
++namespace region242 {
+ struct Face {unsigned long id,a,b,c;double area;};
+ std::vector<Face> faces;
+ std::vector<std::array<double,5>> rms;
+@@ -78,7 +78,7 @@
+ 
+ inline void record(CGeometry* g,CSolver* f,CConfig* cfg){
+   const auto step=cfg->GetInnerIter()+1;
+-  if(stage_update!=step||checked!=807)throw std::runtime_error("REGION_NATIVE_OUTLET_COUNT");
++  if(stage_update!=step||checked!=783)throw std::runtime_error("REGION_NATIVE_OUTLET_COUNT");
+   std::ofstream log(observation::folder+"/outlet_history.csv",step==1?std::ios::out:std::ios::app);
+   if(step==1)log<<"updates,nativeBoundaryNodes,minNormalMach,maxNormalMach,bitEqualComponents,lastPreprocessingRejectedPoints\n";
+   log<<std::setprecision(17)<<step<<','<<checked<<','<<min_mach<<','<<max_mach<<','<<5*checked<<','<<cfg->GetNonphysical_Points()<<'\n';

@@ -1,0 +1,51 @@
+--- v240/driver
++++ v242/driver
+@@ -52,7 +52,7 @@
+ }
+ 
+ #include "rocketEulerFailure.hpp"
+-#include "forebodyEulerV240.hpp"
++#include "forebodyEulerV242.hpp"
+ 
+ // 模块二：只重载观测时机；父类Solve仍负责完整迭代、收敛和文件调度。
+ class ObservedIteration final : public CFluidIteration {
+@@ -65,12 +65,12 @@
+     CFluidIteration::Iterate(out,integration,geometry,solver,numerics,config,surface,grid,box,zone,inst);
+     observation::failure_phase="post-update-observation";
+     observation::observe(geometry[zone][inst][0],solver[zone][inst][0][FLOW_SOL],config[zone]);
+-    region240::record(geometry[zone][inst][0],solver[zone][inst][0][FLOW_SOL],config[zone]);
++    region242::record(geometry[zone][inst][0],solver[zone][inst][0][FLOW_SOL],config[zone]);
+     observation::failure_phase="native-monitor-output";
+   }
+   bool Monitor(COutput* o,CIntegration**** in,CGeometry**** g,CSolver***** s,CNumerics****** n,CConfig** c,
+     CSurfaceMovement** sm,CVolumetricMovement*** gm,CFreeFormDefBox*** b,unsigned short z,unsigned short inst) override {
+-    return CFluidIteration::Monitor(o,in,g,s,n,c,sm,gm,b,z,inst)||region240::benefit_stop;
++    return CFluidIteration::Monitor(o,in,g,s,n,c,sm,gm,b,z,inst)||region242::benefit_stop;
+   }
+ 
+ };
+@@ -81,13 +81,13 @@
+   void launch(){
+     auto* cfg=config_container[0];auto* g=geometry_container[0][0][0];auto* f=solver_container[0][0][0][FLOW_SOL];
+     if(cfg->GetKind_FluidModel()!=RAH_PHASE_AIR_EULER||cfg->GetKind_Turb_Model()!=TURB_MODEL::NONE||
+-       cfg->GetnMGLevels()!=0||g->GetnPoint()!=6111||f->GetnVar()!=5||
++       cfg->GetnMGLevels()!=0||g->GetnPoint()!=5354||f->GetnVar()!=5||
+        !dynamic_cast<CSU2PhaseAwareAir*>(f->GetFluidModel())||
+        !dynamic_cast<CFluidIteration*>(iteration_container[0][0]))throw std::runtime_error("RAH_REAL_CASE_IDENTITY");
+     // 单区静网格原iteration仅保存构造配置和计时；替换为只加观测的同父类。
+     delete iteration_container[0][0];iteration_container[0][0]=new ObservedIteration(cfg);
+     observation::failure_geometry=g;observation::failure_flow=f;observation::failure_config=cfg;
+-    region240::initialize(g,f,cfg);
++    region242::initialize(g,f,cfg);
+     observation::frame(g,f,0,false);
+     StartSolver();
+     if(observation::saved!=observation::last)observation::frame(g,f,observation::last,true);
+@@ -95,7 +95,7 @@
+     if(!forced)throw std::runtime_error("REGION_FINAL_NATIVE_SAVE");
+     rah_outlet_v240::hook=nullptr;
+     std::ofstream result(observation::folder+"/native_completion.json");
+-    result<<"{\"normalReturn\":true,\"updates\":"<<observation::last<<",\"benefitStop\":"<<(region240::benefit_stop?"true":"false")<<",\"forcedFinalNativeOutput\":true,\"initialSaved\":true,\"physicalQualification\":false}\n";
++    result<<"{\"normalReturn\":true,\"updates\":"<<observation::last<<",\"benefitStop\":"<<(region242::benefit_stop?"true":"false")<<",\"forcedFinalNativeOutput\":true,\"initialSaved\":true,\"physicalQualification\":false}\n";
+   }
+ };
+ 
