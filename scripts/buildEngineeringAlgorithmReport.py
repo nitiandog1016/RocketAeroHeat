@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument('--math-package-dir', type=Path)
+    parser.add_argument('--explanatory-revision', action='store_true', help='保留原版科学来源，只生成解释补充修订清单')
     parser.add_argument('--math-xsl', type=Path, default=Path('C:/Program Files/Microsoft Office/root/Office16/MML2OMML.XSL'))
     args = parser.parse_args()
     root = args.root.resolve()
@@ -73,7 +74,7 @@ def main():
     header.style = 'Caption'
     footer = sec.footer.paragraphs[0]
     footer.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    footer.add_run('2026年11月12日   ')
+    footer.add_run('2026年11月16日 补充修订   ' if args.explanatory_revision else '2026年11月12日   ')
     field = OxmlElement('w:fldSimple'); field.set(qn('w:instr'), 'PAGE')
     footer._p.append(field)
 
@@ -166,7 +167,9 @@ def main():
         if line.startswith('# '):
             doc.add_paragraph(line[2:], 'Title')
         elif line.startswith('## '):
-            doc.add_paragraph(line[3:], 'Heading 1')
+            p = doc.add_paragraph(line[3:], 'Heading 1')
+            if args.explanatory_revision and line.startswith('## 附录 '):
+                p.paragraph_format.page_break_before = True
         elif line.startswith('### '):
             doc.add_paragraph(line[4:], 'Heading 2')
         else:
@@ -184,6 +187,29 @@ def main():
     doc.core_properties.keywords = '工程气动热 公式 适用边界 来源 核验'
     output = target / 'RocketAeroHeat_工程算法与适用边界_20261112.docx'
     doc.save(output)
+    if args.explanatory_revision:
+        baseline_file = target / 'source_manifest.json'
+        baseline = json.loads(baseline_file.read_text(encoding='utf-8'))
+        assert [e['latex'] for e in equations] == [e['latex'] for e in baseline['formulaIndex']], '解释补充不得改动原56组公式'
+        original_qa = target / 'document_qa_20261112.json'
+        original_qa_payload = subprocess.check_output(['git', 'show', '6601439630c0ac273e88de44026cc688c8933577:docs/reports/20261112_algorithm_inventory/document_qa.json'], cwd=root)
+        if not original_qa.exists():
+            original_qa.write_bytes(original_qa_payload)
+        else:
+            assert original_qa.read_bytes() == original_qa_payload
+        revision = {'revisionDate': '2026-11-16', 'operation': 'explanatory expansion only',
+                    'scientificBaselineUnchanged': True, 'scientificBaselineManifest': str(baseline_file.relative_to(root)),
+                    'scientificBaselineManifestSHA256': hashlib.sha256(baseline_file.read_bytes()).hexdigest(),
+                    'originalFormulaGroupsPreserved': eq_count, 'tables': table_count,
+                    'explanatoryMethodIDs': re.findall(r'^### (A\d{2}) ', text, re.MULTILINE),
+                    'formulaIndex': equations, 'sources': [], 'newPhysicalValidation': False,
+                    'headAtRevision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()}
+        for file in [source, Path(__file__).resolve(), output]:
+            revision['sources'].append({'path': str(file.relative_to(root)), 'bytes': file.stat().st_size,
+                                        'sha256': hashlib.sha256(file.read_bytes()).hexdigest()})
+        (target / 'revision_20261116.json').write_text(json.dumps(revision, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        print(json.dumps({'docx': str(output), 'equations': eq_count, 'tables': table_count, 'explanatoryMethods': len(revision['explanatoryMethodIDs']), 'baselinePreserved': True}, ensure_ascii=False))
+        return
     # 只读绑定真正用于报告的源码和记录；不盘点或复制大型计算输出。
     paths = [
         'AGENTS.md', 'docs/PROJECT_GOALS.md', str(source.relative_to(root)),
