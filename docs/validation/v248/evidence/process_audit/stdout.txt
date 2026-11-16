@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\auditFASRecoveryV248.py", line 142, in <module>
+    if sys.argv[1]=='task':audit()
+  File "E:\RocketAeroHeat\scripts\auditFASRecoveryV248.py", line 92, in audit
+    recovery=audit_events(CASE,OUT,air,check,completed,success)
+  File "E:\RocketAeroHeat\scripts\auditFASRecoveryEventsV248.py", line 20, in audit_events
+    coarse=binary(case/'coarse_initial.bin',b'RAH246LE',44484,33)
+  File "E:\RocketAeroHeat\scripts\fasRecoveryFieldsV248.py", line 14, in binary
+    if not np.array_equal(np.sort(a[:,0]),np.arange(points)):raise ValueError('FRAME_GLOBAL_IDS')
+ValueError: FRAME_GLOBAL_IDS
