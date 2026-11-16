@@ -1,0 +1,81 @@
+{
+  "schema": "rah-record-layout-migration-v1",
+  "captured_at": "2026-11-16T15:51:35.161317+08:00",
+  "base_commit": "4bd586347b95b902226642aa0281d9f2419adc2e",
+  "inputs": [
+    {
+      "original": "AGENTS.md",
+      "snapshot": "docs/validation/record_layout_20261116/AGENTS.before.md",
+      "bytes": 310742,
+      "sha256": "5deccc913b29251e186280dc455feb772532d729889207d0970b599e75f5367a"
+    },
+    {
+      "original": "docs/PROJECT_GOALS.md",
+      "snapshot": "docs/validation/record_layout_20261116/PROJECT_GOALS.before.md",
+      "bytes": 68160,
+      "sha256": "f1b4c7e9e823e0395d76463e7b05a027e3f965e8674bc973e5c59de7c47e7442"
+    },
+    {
+      "original": "AGENTS.md",
+      "snapshot": "docs/validation/record_layout_20261116/AGENTS.pre_apply.md",
+      "bytes": 313013,
+      "sha256": "2121431bb838a796589b9e791904b998c108988ac0ae0040b082dd1be10f59d7",
+      "role": "latest_input_after_v252_concurrent_update"
+    },
+    {
+      "original": "docs/PROJECT_GOALS.md",
+      "snapshot": "docs/validation/record_layout_20261116/PROJECT_GOALS.pre_apply.md",
+      "bytes": 69020,
+      "sha256": "f435daf04ea3cfd54e25307e443d39e328aa664adf575f453df01dd9742b8d83",
+      "role": "latest_input_after_v252_concurrent_update"
+    }
+  ],
+  "protected_at_capture": [
+    {
+      "path": "tests/verifyWebSectionExport.py",
+      "sha256": "6f67f9fecc3e806ed74ab879ff8a5ba1b745a239158babba55d1856d4d54225b"
+    },
+    {
+      "path": "web/section.js",
+      "sha256": "74fd8f6cd6f017ecb60a578ebedfe5aabfda2cde8ce5477fdd5b4b9bf24f9169"
+    },
+    {
+      "path": "web/viewer.js",
+      "sha256": "90d73959c1d39bf7fd0919d1a034e4994c24edd90a922270064a3c5892088ca5"
+    },
+    {
+      "path": "docs/validation/v251/NEXT_DECISION.md",
+      "sha256": "df12fa52d310b262df59794edea6b51b159f70f6c84e858ebf9b92720f5928ba"
+    },
+    {
+      "path": "docs/validation/v252/PLAN.md",
+      "sha256": "2bdd703faf88b1dd2b707caf1c6596ccdbc209c92344cfa13b6e2e326c5754eb"
+    }
+  ],
+  "scope": "documentation organization; no scientific calculation or qualification change",
+  "concurrency_rebase": {
+    "observed_at": "2026-11-16T15:59:18.336455+08:00",
+    "reason": "v252 writer updated both shared entries after initial snapshot; compare-before-write rejected old input; no shared entry was overwritten"
+  },
+  "applied_at": "2026-11-16T16:02:25.696655+08:00",
+  "scientific_commit_at_apply": "78da62aa80f25593a9644c3d4eeb4075d438ae20",
+  "indexed_versions": 148,
+  "replacements": [
+    {
+      "path": "AGENTS.md",
+      "old_sha256": "2121431bb838a796589b9e791904b998c108988ac0ae0040b082dd1be10f59d7",
+      "new_sha256": "cf064c6073217de0d7017dbd77f5d0a731046057107daab8179ef3ee876406c7",
+      "old_bytes": 313013,
+      "new_bytes": 5922
+    },
+    {
+      "path": "docs/PROJECT_GOALS.md",
+      "old_sha256": "f435daf04ea3cfd54e25307e443d39e328aa664adf575f453df01dd9742b8d83",
+      "new_sha256": "f5362814d17e25f21536c6411f9b0a0b51d3a8a743b56cb3cc5a65f83ab51423",
+      "old_bytes": 69020,
+      "new_bytes": 8732
+    }
+  ],
+  "latest_completed_version": "v252",
+  "scientific_calculations_started": 0
+}

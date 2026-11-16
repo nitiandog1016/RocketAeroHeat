@@ -1,0 +1,173 @@
+# 执行历史索引
+
+这里用于检索历史证据，不确定当前执行顺序。当前状态唯一入口是 [CURRENT_STATE.md](CURRENT_STATE.md)。历史报告的下一步不覆盖当前页。
+
+## 当前与独立工作入口
+
+- [v252报告](PHASE_NONSIMILAR_PROFILES_V252.md)、[最终回执](validation/v252/evidence/final_report.json)、[当时下一决定](validation/v252/NEXT_DECISION.md)。是否仍为最新请读当前页。
+- [公开实验模型资料](validation/public_benchmarks_20261116/README.md)。
+- [工程算法报告交付](reports/20261112_algorithm_inventory/README.md)。
+- [Harness第九批验收](../harness_tasks/acceptance_20261116_batch9/REPORT.md)。
+
+## 原记录无损快照
+
+- [原AGENTS完整原文（含v252）](validation/record_layout_20261116/AGENTS.pre_apply.md)：全部用户决定、阶段摘要、失败和存储记录。
+- [原目标完整原文（含v252）](validation/record_layout_20261116/PROJECT_GOALS.pre_apply.md)：原能力表与执行记录。
+- [开始整理时的v251快照及并发接续](validation/record_layout_20261116/README.md)。
+- [更早目标历史](PROJECT_GOALS_HISTORY_20261031.md)、[存储/恢复说明](OUTPUTS_STORAGE.md)。
+- [迁移SHA与来源](validation/record_layout_20261116/migration_manifest.json)。快照相对路径按原文件位置解释，不作现行指令。
+
+## 原AGENTS版本入口
+
+下表行号指含v252的原AGENTS快照，仅索引有明确版本标题的段落；未匹配的零散摘要和用户决定仍完整保存在快照。没有现存链接就不猜造。
+
+| 版本 | 专题报告 | 当时下一决定 | 原AGENTS行 |
+|---|---|---|---:|
+| v252 | [报告](PHASE_NONSIMILAR_PROFILES_V252.md) | [决定](validation/v252/NEXT_DECISION.md) | 5 |
+| v251 | [报告](NATIVE_ILU_ACCEPTANCE_V251.md) | [决定](validation/v251/NEXT_DECISION.md) | 13 |
+| v250 | [报告](NATIVE_NEWTON_DEVELOPMENT_V250.md) | [决定](validation/v250/NEXT_DECISION.md) | 21 |
+| v249 | [报告](NATIVE_NEWTON_CONTROL_V249.md) | [决定](validation/v249/NEXT_DECISION.md) | 29 |
+| v248 | [报告](FAS_NATIVE_RECOVERY_V248.md) | [决定](validation/v248/NEXT_DECISION.md) | 37 |
+| v247 | [报告](FAS_BOUNDED_DEVELOPMENT_V247.md) | [决定](validation/v247/NEXT_DECISION.md) | 45 |
+| v246 | [报告](REAL_FAS_CONTROL_V246.md) | [决定](validation/v246/NEXT_DECISION.md) | 53 |
+| v245 | [报告](FAS_COMPATIBILITY_V245.md) | [决定](validation/v245/NEXT_DECISION.md) | 61 |
+| v244 | [报告](VISCOUS_REGIONAL_BOUNDARY_V244.md) | [决定](validation/v244/NEXT_DECISION.md) | 67 |
+| v243 | [报告](FOREBODY_SPATIAL_COMPARISON_V243.md) | [决定](validation/v243/NEXT_DECISION.md) | 75 |
+| v242 | [报告](FOREBODY_FIXED_WALL_PLC_V242.md) | [决定](validation/v242/NEXT_DECISION.md) | 83 |
+| v241 | [报告](INTERNAL_VOLUME_STREAMTUBES_V241.md) | [决定](validation/v241/NEXT_DECISION.md) | 91 |
+| v240 | [报告](FOREBODY_PLANAR_EULER_V240.md) | [决定](validation/v240/NEXT_DECISION.md) | 99 |
+| v239 | [报告](NATIVE_MUSCL_RAMP_V239.md) | [决定](validation/v239/NEXT_DECISION.md) | 107 |
+| v238 | [报告](GENERAL_HLLC_COMPATIBILITY_V238.md) | [决定](validation/v238/NEXT_DECISION.md) | 115 |
+| v237 | [报告](PHASE_STEP_ACCEPTANCE_V237.md) | [决定](validation/v237/NEXT_DECISION.md) | 123 |
+| v236 | [报告](RESTART_BRANCH_V236.md) | [决定](validation/v236/NEXT_DECISION.md) | 129 |
+| v235 | [报告](SINGLE_DOMAIN_NATIVE_ENTRY_V235.md) | [决定](validation/v235/NEXT_DECISION.md) | 137 |
+| v234 | [报告](HYBRID_MULTIZONE_COMPATIBILITY_V234.md) | [决定](validation/v234/NEXT_DECISION.md) | 143 |
+| v233 | [报告](HYBRID_REGIONAL_CLOSURE_V233.md) | [决定](validation/v233/NEXT_DECISION.md) | 151 |
+| v232 | [报告](HYBRID_PHASE_EULER_DEVELOPMENT_V232.md) | [决定](validation/v232/NEXT_DECISION.md) | 157 |
+| v231 | [报告](HYBRID_PHASE_PRIMITIVE_RECOVERY_V231.md) | [决定](validation/v231/NEXT_DECISION.md) | 165 |
+| v230 | [报告](HYBRID_PHASE_EULER_ROCKET_V230.md) | [决定](validation/v230/NEXT_DECISION.md) | 171 |
+| v229 | [报告](HYBRID_PHASE_EULER_NATIVE_V229.md) | [决定](validation/v229/NEXT_DECISION.md) | 177 |
+| v228 | [报告](HYBRID_PHASE_CONTINUATION_V228.md) | [决定](validation/v228/NEXT_DECISION.md) | 183 |
+| v227 | [报告](HYBRID_PHASE_NOSE_HEATING_V227.md) | [决定](validation/v227/NEXT_DECISION.md) | 189 |
+| v226 | [报告](HYBRID_PHASE_NOSE_EDGE_V226.md) | [决定](validation/v226/NEXT_DECISION.md) | 195 |
+| v225 | [报告](HYBRID_PHASE_WAVES_V225.md) | [决定](validation/v225/NEXT_DECISION.md) | 201 |
+| v224 | [报告](HYBRID_PHASE_LAMINAR_CHAIN_V224.md) | [决定](validation/v224/NEXT_DECISION.md) | 207 |
+| v223 | [报告](HYBRID_SU2_FROZEN_BALANCE_V223.md) | [决定](validation/v223/NEXT_DECISION.md) | 213 |
+| v222 | [报告](HYBRID_SU2_ROCKET_PHASE_V222.md) | [决定](validation/v222/NEXT_DECISION.md) | 219 |
+| v221 | [报告](HYBRID_SU2_COMPATIBILITY_V221.md) | [决定](validation/v221/NEXT_DECISION.md) | 225 |
+| v220 | [报告](HYBRID_SU2_PHASE_AIR_V220.md) | [决定](validation/v220/NEXT_DECISION.md) | 231 |
+| v219 | [报告](HYBRID_SU2_ROUTE_V219.md) | [决定](validation/v219/NEXT_DECISION.md) | 237 |
+| v218 | [报告](HYBRID_INDEPENDENT_REFERENCE_DECISION_V218.md) | [决定](validation/v218/NEXT_DECISION.md) | 243 |
+| v217 | [报告](HYBRID_LOCAL_STENCIL_EVIDENCE_V217.md) | [决定](validation/v217/NEXT_DECISION.md) | 249 |
+| v216 | [报告](HYBRID_COMPLETE_REGION_DECISION_V216.md) | [决定](validation/v216/NEXT_DECISION.md) | 255 |
+| v215 | [报告](HYBRID_NATIVE_FILE_BRIDGE_V215.md) | [决定](validation/v215/NEXT_DECISION.md) | 261 |
+| v214 | [报告](HYBRID_NATIVE_NK_OPERATOR_V214.md) | [决定](validation/v214/NEXT_DECISION.md) | 267 |
+| v213 | [报告](HYBRID_FROZEN_NATIVE_OPERATOR_V213.md) | [决定](validation/v213/NEXT_DECISION.md) | 273 |
+| v212 | [报告](HYBRID_SEQUENTIAL_REGIONS_V212.md) | [决定](validation/v212/NEXT_DECISION.md) | 279 |
+| v211 | [报告](HYBRID_REGIONAL_NK_MEMORY_V211.md) | [决定](validation/v211/NEXT_DECISION.md) | 285 |
+| v210 | [报告](HYBRID_PHASE_AWARE_EILMER_V210.md) | [决定](validation/v210/NEXT_DECISION.md) | 291 |
+| v209 | [报告](HYBRID_ANISOTROPIC_ROUTE_DECISION_V209.md) | [决定](validation/v209/NEXT_DECISION.md) | 297 |
+| v208 | [报告](HYBRID_REGIONAL_LAYER_COMPATIBILITY_V208.md) | [决定](validation/v208/NEXT_DECISION.md) | 303 |
+| v207 | [报告](HYBRID_REGIONAL_VISCOUS_ENTRY_V207.md) | [决定](validation/v207/NEXT_DECISION.md) | 309 |
+| v206 | [报告](HYBRID_PHASE_AWARE_AIR_V206.md) | [决定](validation/v206/NEXT_DECISION.md) | 315 |
+| v205 | [报告](HYBRID_STANDARD_AIR_ROCKET_V205.md) | [决定](validation/v205/NEXT_DECISION.md) | 321 |
+| v204 | [报告](HYBRID_PRESSURE_DOMAIN_V204.md) | [决定](validation/v204/NEXT_DECISION.md) | 327 |
+| v203 | [报告](HYBRID_BOUNDED_THERMO_V203.md) | [决定](validation/v203/NEXT_DECISION.md) | 333 |
+| v202 | [报告](HYBRID_NIST_AIR_V202.md) | [决定](validation/v202/NEXT_DECISION.md) | 339 |
+| v201 | [报告](HYBRID_ROCKET_TEMPERATURE_LIMIT_V201.md) | [决定](validation/v201/NEXT_DECISION.md) | 345 |
+| v200 | [报告](HYBRID_ROCKET_OPENFOAM_READY_V200.md) | [决定](validation/v200/NEXT_DECISION.md) | 351 |
+| v199 | [报告](HYBRID_SYNCHRONOUS_CONTROL_V199.md) | [决定](validation/v199/NEXT_DECISION.md) | 357 |
+| v198 | [报告](HYBRID_OPENFOAM_ENTRY_V198.md) | [决定](validation/v198/NEXT_DECISION.md) | 363 |
+| v197 | [报告](HYBRID_NEWTON_KRYLOV_V197.md) | [决定](validation/v197/NEXT_DECISION.md) | 369 |
+| v196 | [报告](HYBRID_GEOMETRIC_TIME_SCALE_V196.md) | [决定](validation/v196/NEXT_DECISION.md) | 375 |
+| v195 | [报告](HYBRID_ROCKET_EULER_DEVELOPMENT_V195.md) | [决定](validation/v195/NEXT_DECISION.md) | 381 |
+| v194 | [报告](HYBRID_ROCKET_EULER_PREPARATION_V194.md) | [决定](validation/v194/NEXT_DECISION.md) | 385 |
+| v193 | [报告](HYBRID_ROCKET_EULER_MESH_V193.md) | [决定](validation/v193/NEXT_DECISION.md) | 389 |
+| v192 | [报告](HYBRID_EULER_REFINEMENT_V192.md) | [决定](validation/v192/NEXT_DECISION.md) | 393 |
+| v191 | [报告](HYBRID_EULER_CONTROL_V191.md) | [决定](validation/v191/NEXT_DECISION.md) | 397 |
+| v190 | [报告](HYBRID_REFERENCE_ENTHALPY_V190.md) | [决定](validation/v190/NEXT_DECISION.md) | 401 |
+| v189 | [报告](HYBRID_ROUTE_SELECTION_V189.md) | [决定](validation/v189/NEXT_DECISION.md) | 405 |
+| v188 | [报告](EILMER_RESOURCE_FEASIBILITY_V188.md) | [决定](validation/v188/NEXT_DECISION.md) | 415 |
+| v187 | [报告](EILMER_WORKSPACE_STORAGE_V187.md) | [决定](validation/v187/NEXT_DECISION.md) | 419 |
+| v186 | [报告](EILMER_DENSE_FULL_DOMAIN_V186.md) | [决定](validation/v186/NEXT_DECISION.md) | 425 |
+| v185 | [报告](EILMER_DENSE_STORAGE_V185.md) | [决定](validation/v185/NEXT_DECISION.md) | 429 |
+| v184 | [报告](EILMER_EXPLICIT_FULL_DOMAIN_V184.md) | [决定](validation/v184/NEXT_DECISION.md) | 433 |
+| v183 | [报告](EILMER_EXPLICIT_ENTRY_V183.md) | [决定](validation/v183/NEXT_DECISION.md) | 437 |
+| v182 | [报告](EILMER_NATIVE_OPERATOR_REVIEW_V182.md) | [决定](validation/v182/NEXT_DECISION.md) | 441 |
+| v181 | [报告](EILMER_REAL_NK_V181.md) | [决定](validation/v181/NEXT_DECISION.md) | 445 |
+| v180 | [报告](EILMER_FULL_DOMAIN_DEVELOPMENT_V180.md) | [决定](validation/v180/NEXT_DECISION.md) | 449 |
+| v179 | [报告](EILMER_RUN14_CONTROL_V179.md) | [决定](validation/v179/NEXT_DECISION.md) | 453 |
+| v178 | [报告](EILMER_NATIVE_INTERFACE_V178.md) | [决定](validation/v178/NEXT_DECISION.md) | 457 |
+| v177 | 查完整快照 | 查完整快照 | 461 |
+| v176 | [报告](AEROTHERMAL_EVIDENCE_LEDGER_V176.md) | [决定](validation/v176/NEXT_DECISION.md) | 463 |
+| v175 | 查完整快照 | [决定](validation/v175/NEXT_DECISION.md) | 467 |
+| v174 | [报告](NACA_NATIVE_IDEAL_GAS_V174.md) | [决定](validation/v174/NEXT_DECISION.md) | 473 |
+| v173 | [报告](NACA_SPATIAL_STEP_V173.md) | [决定](validation/v173/NEXT_DECISION.md) | 479 |
+| v172 | [报告](NACA_ADAPTIVE_DEVELOPMENT_V172.md) | [决定](validation/v172/NEXT_DECISION.md) | 485 |
+| v171 | [报告](NACA_SPATIAL_WALL_V171.md) | [决定](validation/v171/NEXT_DECISION.md) | 491 |
+| v170 | [报告](NACA_SEGMENTS_MESH_V170.md) | [决定](validation/v170/NEXT_DECISION.md) | 499 |
+| v169 | [报告](NACA_LAMINAR_ENTRY_V169.md) | [决定](validation/v169/NEXT_DECISION.md) | 505 |
+| v168 | [报告](WALL_HEAT_ROUTE_V168.md) | [决定](validation/v168/NEXT_DECISION.md) | 511 |
+| v167 | [报告](SST_ENERGY_CONSTRAINT_V167.md) | [决定](validation/v167/NEXT_DECISION.md) | 517 |
+| v166 | [报告](FULL_DOMAIN_DEVELOPMENT_V166.md) | [决定](validation/v166/NEXT_DECISION.md) | 527 |
+| v165 | [报告](CONSERVATIVE_STEP_V165.md) | [决定](validation/v165/NEXT_DECISION.md) | 537 |
+| v164 | [报告](IDEAL_AIR_ADMISSIBILITY_V164.md) | [决定](validation/v164/NEXT_DECISION.md) | 547 |
+| v163 | [报告](NATIVE_PROPERTY_EXCEPTION_V163.md) | [决定](validation/v163/NEXT_DECISION.md) | 555 |
+| v162 | [报告](NATIVE_TERMINATION_OBSERVATION_V162.md) | [决定](validation/v162/NEXT_DECISION.md) | 563 |
+| v161 | [报告](IDEAL_AIR_LINEAR_CONTROL_V161.md) | [决定](validation/v161/NEXT_DECISION.md) | 569 |
+| v160 | [报告](IDEAL_AIR_FULL_DOMAIN_V160.md) | [决定](validation/v160/NEXT_DECISION.md) | 575 |
+| v159 | [报告](AXISYMMETRIC_IDEAL_AIR_V159.md) | [决定](validation/v159/NEXT_DECISION.md) | 581 |
+| v158 | [报告](PUBLIC_THERMAL_PREPARATION_V158.md) | [决定](validation/v158/NEXT_DECISION.md) | 587 |
+| v157 | [报告](IDEAL_AIR_MAIN_WORKBENCH_V157.md) | [决定](validation/v157/NEXT_DECISION.md) | 593 |
+| v156 | [报告](IDEAL_AIR_CHECKPOINTS_V156.md) | [决定](validation/v156/NEXT_DECISION.md) | 599 |
+| v155 | 查完整快照 | [决定](validation/v155/NEXT_DECISION.md) | 605 |
+| v154 | [报告](IDEAL_AIR_ENGINE_V154.md) | [决定](validation/v154/NEXT_DECISION.md) | 613 |
+| v153 | [报告](FAST_IDEAL_AIR_V153.md) | [决定](validation/v153/NEXT_DECISION.md) | 619 |
+| v152 | [报告](ACC_SBLI_CONTINUATION_V152.md) | [决定](validation/v152/NEXT_DECISION.md) | 625 |
+| v151 | [报告](ACC_SBLI_INITIALIZATION_V151.md) | [决定](validation/v151/NEXT_DECISION.md) | 631 |
+| v150 | [报告](ACC_SBLI_CONVERGENCE_V150.md) | [决定](validation/v150/NEXT_DECISION.md) | 638 |
+| v149 | [报告](SST_JACOBIAN_PUBLIC_BENCHMARK_V149.md) | [决定](validation/v149/NEXT_DECISION.md) | 645 |
+| v148 | [报告](SST_FLOW_FLUX_V148.md) | [决定](validation/v148/NEXT_DECISION.md) | 650 |
+| v147 | [报告](SST_NATIVE_UPDATE_V147.md) | 查完整快照 | 655 |
+| v146 | [报告](SST_STARTUP_RECONSTRUCTION_V146.md) | 查完整快照 | 661 |
+| v145 | [报告](GENERAL_HYBRID_INITIALIZATION_V145.md) | 查完整快照 | 667 |
+| v144 | [报告](BASE_CAP_ENVELOPE_V144.md) | 查完整快照 | 675 |
+| v143 | [报告](TETGEN_PLC_EXTERIOR_V143.md) | 查完整快照 | 679 |
+| v142 | [报告](TETGEN_FIXED_REPAIR_V142.md) | 查完整快照 | 683 |
+| v141 | [报告](CONTINUOUS_PRISM_ENVELOPE_V141.md) | 查完整快照 | 687 |
+| v140 | [报告](GRADED_LAYER_TERMINATION_V140.md) | 查完整快照 | 691 |
+| v139 | [报告](MMG_SEED_OPTIMIZATION_V139.md) | 查完整快照 | 695 |
+| v138 | [报告](MMG_LOCAL_REMESH_V138.md) | 查完整快照 | 699 |
+| v137 | [报告](CGAL_LOCAL_CONTRACT_V137.md) | 查完整快照 | 703 |
+| v136 | [报告](SU2_EXPLICIT_TRANSITION_V136.md) | 查完整快照 | 707 |
+| v135 | [报告](SU2_PYRAMID_TRANSITION_V135.md) | 查完整快照 | 713 |
+| v134 | 查完整快照 | 查完整快照 | 719 |
+| v133 | 查完整快照 | 查完整快照 | 725 |
+| v132 | 查完整快照 | 查完整快照 | 733 |
+| v131 | 查完整快照 | 查完整快照 | 739 |
+| v130 | 查完整快照 | 查完整快照 | 747 |
+| v129 | [报告](SU2_DNS_HEAT_COMPARISON_V129.md) | 查完整快照 | 755 |
+| v128 | [报告](SU2_SST_SPATIAL_POCKET_V128.md) | 查完整快照 | 759 |
+| v127 | [报告](SU2_SST_CFL_COMPARISON_V127.md) | 查完整快照 | 762 |
+| v126 | [报告](SU2_SST_MULTISTEP_V126.md) | 查完整快照 | 765 |
+| v125 | [报告](SU2_SST_PHASE_V125.md) | 查完整快照 | 768 |
+| v124 | [报告](SU2_SST_INTERFACE_V124.md) | 查完整快照 | 771 |
+| v123 | [报告](SU2_HEOS_WORKBENCH_V123.md) | 查完整快照 | 774 |
+| v122 | [报告](SU2_ACTUAL_COOLPROP_V122.md) | 查完整快照 | 777 |
+| v121 | [报告](SU2_COOLPROP_CAPABILITY_V121.md) | 查完整快照 | 782 |
+| v120 | [报告](SU2_ACTUAL_NEAR_WALL_V120.md) | 查完整快照 | 786 |
+| v119 | [报告](SU2_ACTUAL_CONTINUATION_V119.md) | 查完整快照 | 790 |
+| v118 | [报告](ACTUAL_ROCKET_FULL_DOMAIN_V118.md) | 查完整快照 | 794 |
+| v117 | [报告](SU2_FROZEN_ENERGY_DECISION_V117.md) | 查完整快照 | 798 |
+| v116 | [报告](SU2_COLLAR_STUDY_V116.md) | 查完整快照 | 802 |
+| v115 | 查完整快照 | 查完整快照 | 805 |
+| v114 | [报告](SU2_CLASSIC_THERMAL_BOUNDARY_V114.md) | 查完整快照 | 807 |
+| v113 | [报告](SU2_HYBRID_ORIGINAL_SURFACE_V113.md) | 查完整快照 | 809 |
+| v112 | [报告](SU2_MULTIGRID_CHECKPOINT_UI_V112.md) | 查完整快照 | 811 |
+| v111 | [报告](SU2_NORMALIZATION_CHECKPOINT_V111.md) | 查完整快照 | 813 |
+| v110 | [报告](SU2_CHECKPOINT_DIAGNOSTICS_V110.md) | 查完整快照 | 815 |
+| v109 | [报告](SU2_ROCKET_STARTUP_SECTIONS_V109.md) | 查完整快照 | 817 |
+| v108 | [报告](SU2_INITIALIZATION_MESH_V108.md) | 查完整快照 | 819 |
+| v107 | [报告](EMBEDDED_WORKBENCH_V107.md) | 查完整快照 | 821 |
+| v106 | [报告](SU2_ROCKET_INTERFACE_V106.md) | 查完整快照 | 825 |
+| v105 | [报告](EMBEDDED_SU2_V105.md) | 查完整快照 | 827 |
