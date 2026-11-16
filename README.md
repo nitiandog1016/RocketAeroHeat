@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v244真实黏性区域与边界](docs/VISCOUS_REGIONAL_BOUNDARY_V244.md)：已导出160304原单元/76550点/4434原壁的区域几何与状态映射。1984接口中827个需要下游信息，当前直接切口生产拒绝；保留真实下游的单物理域内部反馈。没有新CFD或新增合格热面积。
+最新[v245两层FAS整体控制](docs/FAS_COMPATIBILITY_V245.md)：开/关各5次完整flow-SA、3548状态联合域与3272项层间代数核对通过，但小壳6个壁节点聚为1粗点后法向几乎抵消，**整体热壁相容拒绝，没有新增真实箭体热资格**。只编一个观察对象与薄入口，成熟数值对象复用。
+
+[控制壳科研图](docs/validation/v245/evidence/visual02/fas_wall_cancellation.png)明确显示问题；[下一执行点](docs/validation/v245/NEXT_DECISION.md)直接复用原完整真实域做一次零流动聚合预检，不重复小壳或扫描参数。工程/UI独立最高，总目标active。
+
+旧[v244真实黏性区域与边界](docs/VISCOUS_REGIONAL_BOUNDARY_V244.md)：已导出160304原单元/76550点/4434原壁的区域几何与状态映射。1984接口中827个需要下游信息，当前直接切口生产拒绝；保留真实下游的单物理域内部反馈。没有新CFD或新增合格热面积。
 
 [完整箭体与接口科研图](docs/validation/v244/evidence/visual01/viscous_region_boundary.png)和独立原面/状态核对通过，壁面接触统计修正14→46，原失败保留。[下一执行点](docs/validation/v244/NEXT_DECISION.md)为成熟FAS与相态Air/热壁/SA的整体相容控制，原细网格保持；匹配公开基准可作日常诊断，全面积/UI仍独立最高。
 

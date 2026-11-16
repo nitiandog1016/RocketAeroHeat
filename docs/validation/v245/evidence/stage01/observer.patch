@@ -1,0 +1,67 @@
+--- SU2_CFD/src/integration/CMultiGridIntegration.cpp
++++ observed/SU2_CFD/src/integration/CMultiGridIntegration.cpp
+@@ -1,3 +1,4 @@
++#include "E:/RocketAeroHeat/native/su2PhaseAwareAir/FASHooksV245.hpp"
+ /*!
+  * \file CMultiGridIntegration.cpp
+  * \brief Implementation of the multigrid integration class.
+@@ -25,9 +26,9 @@
+  * License along with SU2. If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "../../include/integration/CMultiGridIntegration.hpp"
+-#include "../../../Common/include/parallelization/omp_structure.hpp"
+-#include "../../../Common/include/toolboxes/printing_toolbox.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/integration/CMultiGridIntegration.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/parallelization/omp_structure.hpp"
++#include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/toolboxes/printing_toolbox.hpp"
+ #include <algorithm>
+ 
+ 
+@@ -637,15 +638,25 @@
+ 
+     /*--- Compute $r_(k+1) = F_(k+1)(I^(k+1)_k u_k)$ ---*/
+ 
++
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("restrict_in",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
+     SetRestricted_Solution(RunTime_EqSystem, solver_fine, solver_coarse, geometry_fine, geometry_coarse, config);
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("restrict_out",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
++
+ 
+     solver_coarse->Preprocessing(geometry_coarse, solver_container_coarse, config, iMesh+1, NO_RK_ITER, RunTime_EqSystem, false);
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("coarse_preprocessed",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
++
+ 
+     Space_Integration(geometry_coarse, solver_container_coarse, numerics_coarse, config, iMesh+1, NO_RK_ITER, RunTime_EqSystem);
+ 
+     /*--- Compute $P_(k+1) = I^(k+1)_k(r_k) - r_(k+1) ---*/
+ 
++
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("forcing_in",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
+     SetForcing_Term(solver_fine, solver_coarse, geometry_fine, geometry_coarse, config, iMesh+1);
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("forcing_out",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
++
+ 
+     /*--- Restore the time integration settings. ---*/
+ 
+@@ -670,12 +681,20 @@
+     /*--- Compute prolongated solution, and smooth the correction $u^(new)_k = u_k +
+           Smooth(I^k_(k+1)(u_(k+1)-I^(k+1)_k u_k))$ ---*/
+ 
++
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("correction_in",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
+     GetProlongated_Correction(RunTime_EqSystem, solver_fine, solver_coarse, geometry_fine, geometry_coarse, config);
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("correction_out",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
++
+ 
+     const auto& mgOpts = config->GetMGOptions();
+     SmoothProlongated_Correction(RunTime_EqSystem, solver_fine, geometry_fine, mgOpts.MG_CorrecSmooth[iMesh], mgOpts.MG_Smooth_Coeff, config, iMesh);
+ 
++
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("prolong_in",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
+     SetProlongated_Correction(solver_fine, geometry_fine, config, iMesh);
++    if(rah_fas_observer::transfer) rah_fas_observer::transfer("prolong_out",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);
++
+ 
+     /*--- Solution post-smoothing in the prolongated grid. ---*/
+ 
