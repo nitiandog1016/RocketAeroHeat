@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v249真实外区与原生Newton-Krylov控制](docs/NATIVE_NEWTON_CONTROL_V249.md)：真实外区单元星独立核对，原完整箭体完成1次完整flow-SA控制，约80秒/峰2.32GiB；**多步收敛尚未证明、无新增合格热面积**。原512MiB输出容量合同失败已保留，终态强制检查和两项实际测试已补。两阶段10字段已接[科研图](docs/validation/v249/evidence/workbench01/native_newton_control.png)，本地入口`outputs/v249_validation/workbench01/index.html`。
+最新[v250原生Newton-Krylov真实有限发展](docs/NATIVE_NEWTON_DEVELOPMENT_V250.md)：原完整箭体正常完成108次更新、按时间预算停止；1001完整乘积/717实际恢复与末场独立核对。**未收敛、无新增合格热面积，200双窗口未执行。** 76次线性求解达到上限仍未达报告目标，下一闭合成熟线性精度/预条件，不能盲续108。本机约28.3分钟/峰2.32GiB；五阶段22字段已接[首末云图](docs/validation/v250/evidence/workbench01/native_newton_development.png)和[基准趋势](docs/validation/v250/evidence/workbench01/nk_residual_trends.png)，本地入口`outputs/v250_validation/workbench01/index.html`。
+
+[下一执行点](docs/validation/v250/NEXT_DECISION.md)：现有FGMRES＋块ILU(0)候选的完整采用决定、真实精度接受与资源合同；候选尚未授兼容，工程外缘/热入口和科研UI独立最高，全部责任/门槛不减，总目标active。
+
+前版[v249真实外区与原生Newton-Krylov控制](docs/NATIVE_NEWTON_CONTROL_V249.md)：真实外区单元星独立核对，原完整箭体完成1次完整flow-SA控制，约80秒/峰2.32GiB；**多步收敛尚未证明、无新增合格热面积**。原512MiB输出容量合同失败已保留，终态强制检查和两项实际测试已补。两阶段10字段已接[科研图](docs/validation/v249/evidence/workbench01/native_newton_control.png)，本地入口`outputs/v249_validation/workbench01/index.html`。
 
 [下一执行点](docs/validation/v249/NEXT_DECISION.md)：准确区分原生差分乘积与真实接受阶段，进行唯一有界真实发展；工程外缘/热入口和科研UI独立最高，全部区域与科学门槛保持，总目标active。
 

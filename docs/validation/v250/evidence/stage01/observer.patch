@@ -1,0 +1,76 @@
+--- native
++++ observed
+@@ -29,6 +29,8 @@
+ #include "E:/RocketAeroHeat/outputs/v220_validation/source/Common/include/linear_algebra/CMatrixVectorProduct.hpp"
+ 
+ using Scalar = CNewtonIntegration::Scalar;
++#include "E:/RocketAeroHeat/native/su2PhaseAwareAir/NewtonHooksV250.hpp"
++
+ 
+ namespace {
+ 
+@@ -130,6 +132,8 @@
+ void CNewtonIntegration::ComputeResiduals(ResEvalType type) {
+   SU2_ZONE_SCOPED
+ 
++
++  if(rah_newton_observer::event) rah_newton_observer::event(type==ResEvalType::DEFAULT?"default_begin":"explicit_begin",geometry,solvers,config,nullptr,0.0,finDiffStep);
+   /*--- Save the default integration scheme, and force to explicit if required. ---*/
+   auto TimeIntScheme = config->GetKind_TimeIntScheme();
+   if (type == ResEvalType::EXPLICIT) {
+@@ -143,6 +147,8 @@
+   }
+ 
+   Space_Integration(geometry, solvers, numerics[FLOW_SOL], config, MESH_0, NO_RK_ITER, RUNTIME_FLOW_SYS);
++  if(rah_newton_observer::event) rah_newton_observer::event(type==ResEvalType::DEFAULT?"default_end":"explicit_end",geometry,solvers,config,nullptr,0.0,finDiffStep);
++
+ 
+   /*--- Restore default. ---*/
+   if (type == ResEvalType::EXPLICIT) {
+@@ -310,11 +316,19 @@
+ 
+   /*--- Update solution. ---*/
+ 
++
++  if(rah_newton_observer::event) rah_newton_observer::event("update_begin",geometry,solvers,config,&linSysSol,1.0,finDiffStep);
+   solvers[FLOW_SOL]->CompleteImplicitIteration(geometry, solvers, config);
++  if(rah_newton_observer::event) rah_newton_observer::event("update_end",geometry,solvers,config,nullptr,0.0,finDiffStep);
++
+ 
+   /*--- Call the various post processings. ---*/
+ 
++
++  if(rah_newton_observer::event) rah_newton_observer::event("accepted_preprocessing_begin",geometry,solvers,config,nullptr,0.0,finDiffStep);
+   solvers[FLOW_SOL]->Preprocessing(geometry, solvers, config, MESH_0, NO_RK_ITER, RUNTIME_FLOW_SYS, true);
++  if(rah_newton_observer::event) rah_newton_observer::event("accepted_preprocessing_end",geometry,solvers,config,nullptr,0.0,finDiffStep);
++
+ 
+   solvers[FLOW_SOL]->Postprocessing(geometry, solvers, config, MESH_0);
+ 
+@@ -337,6 +351,8 @@
+     END_SU2_OMP_FOR
+   }
+ 
++
++  if(rah_newton_observer::event) rah_newton_observer::event("flow_complete",geometry,solvers,config,nullptr,0.0,finDiffStep);
+   }
+   END_SU2_OMP_PARALLEL
+ }
+@@ -346,6 +362,8 @@
+ 
+   Scalar factor = finDiffStep / u.norm();
+ 
++
++  if(rah_newton_observer::event) rah_newton_observer::event("jv_begin",geometry,solvers,config,&u,factor,finDiffStep);
+   PerturbSolution(u, factor);
+ 
+   ComputeResiduals(ResEvalType::EXPLICIT);
+@@ -372,6 +390,8 @@
+ 
+   CSysMatrixComms::Initiate(v, geometry, config);
+   CSysMatrixComms::Complete(v, geometry, config);
++  if(rah_newton_observer::event) rah_newton_observer::event("jv_end",geometry,solvers,config,nullptr,0.0,finDiffStep);
++
+ }
+ 
+ void CNewtonIntegration::Preconditioner(const CSysVector<Scalar>& u, CSysVector<Scalar>& v) const {

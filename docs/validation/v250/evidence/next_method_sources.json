@@ -1,0 +1,39 @@
+{
+  "candidate": "native FGMRES with block ILU(0)",
+  "adopted": false,
+  "executed": false,
+  "sources": [
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v220_validation\\source\\Common\\include\\linear_algebra\\CPreconditioner.hpp",
+      "sha256": "d3f63edffe49f67c84572fc06b2583a5f2799a2316f6910c8805bdd2d65e22c7",
+      "matches": [
+        {
+          "line": 207,
+          "text": "* \\class CILUPreconditioner"
+        },
+        {
+          "line": 211,
+          "text": "class CILUPreconditioner final : public CPreconditioner<ScalarType> {"
+        },
+        {
+          "line": 250,
+          "text": "inline void Build() override { sparse_matrix.BuildILUPreconditioner(); }"
+        },
+        {
+          "line": 436,
+          "text": "case ILU:"
+        }
+      ]
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v220_validation\\source\\Common\\src\\CConfig.cpp",
+      "sha256": "241eb647b07a136eb87f5528960db0737ae933ef5e45579be97218d7d692a48e",
+      "matches": [
+        {
+          "line": 2021,
+          "text": "addUnsignedShortOption(\"LINEAR_SOLVER_ILU_FILL_IN\", IluOptions.FillIn, 0);"
+        }
+      ]
+    }
+  ]
+}
