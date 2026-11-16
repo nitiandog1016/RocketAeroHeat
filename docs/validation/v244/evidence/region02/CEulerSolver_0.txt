@@ -1,0 +1,23 @@
+  5481       case STATIC_PRESSURE:
+  5482 
+  5483         /*--- Retrieve the static pressure for this boundary. ---*/
+  5484         Pressure_e = config->GetRiemann_Var1(Marker_Tag);
+  5485         Pressure_e /= config->GetPressure_Ref();
+  5486         Density_e = Density_i;
+  5487 
+  5488         /* --- Compute the boundary state u_e --- */
+  5489         GetFluidModel()->SetTDState_Prho(Pressure_e, Density_e);
+  5490         for (auto iDim = 0u; iDim < nDim; iDim++)
+  5491           Velocity_e[iDim] = Velocity_i[iDim];
+  5492 
+  5493         Velocity2_e = GeometryToolbox::SquaredNorm(nDim, Velocity_e);
+  5494         Energy_e = GetFluidModel()->GetStaticEnergy() + 0.5*Velocity2_e + k_i;
+  5495         break;
+  5496 
+  5497       default:
+  5498         SU2_MPI::Error("Invalid Riemann input!", CURRENT_FUNCTION);
+  5499         break;
+  5500       }
+  5501 
+  5502       /*--- Compute P (matrix of right eigenvectors) ---*/
+  5503       conv_numerics->GetPMatrix(&Density_i, Velocity_i, &SoundSpeed_i, &Enthalpy_i, &Chi_i, &Kappa_i, UnitNormal, P_Tensor);

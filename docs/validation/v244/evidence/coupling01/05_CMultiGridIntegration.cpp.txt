@@ -1,0 +1,56 @@
+  1185 void CMultiGridIntegration::SetForcing_Term(CSolver *sol_fine, CSolver *sol_coarse, CGeometry *geo_fine,
+  1186                                             CGeometry *geo_coarse, CConfig *config, unsigned short iMesh) {
+  1187   SU2_ZONE_SCOPED
+  1188 
+  1189   const unsigned short nVar = sol_coarse->GetnVar();
+  1190   const su2double factor = config->GetDamp_Res_Restric();
+  1191 
+  1192   if (nVar > MAXNVAR) {
+  1193     SU2_MPI::Error("nVar larger than expected, increase MAXNVAR.", CURRENT_FUNCTION);
+  1194   }
+  1195 
+  1196   SU2_OMP_FOR_STAT(roundUpDiv(geo_coarse->GetnPointDomain(), omp_get_num_threads()))
+  1197   for (auto Point_Coarse = 0ul; Point_Coarse < geo_coarse->GetnPointDomain(); Point_Coarse++) {
+  1198 
+  1199     sol_coarse->GetNodes()->SetRes_TruncErrorZero(Point_Coarse);
+  1200 
+  1201     su2double RestrictedDefect[MAXNVAR] = {0.0};
+  1202 
+  1203     for (auto iChildren = 0u; iChildren < geo_coarse->nodes->GetnChildren_CV(Point_Coarse); iChildren++) {
+  1204       auto Point_Fine = geo_coarse->nodes->GetChildren_CV(Point_Coarse, iChildren);
+  1205       const su2double* Residual_Fine = sol_fine->LinSysRes.GetBlock(Point_Fine);
+  1206       for (auto iVar = 0u; iVar < nVar; iVar++)
+  1207         RestrictedDefect[iVar] += factor * Residual_Fine[iVar];
+  1208     }
+  1209     sol_coarse->GetNodes()->AddRes_TruncError(Point_Coarse, RestrictedDefect);
+  1210   }
+  1211   END_SU2_OMP_FOR
+  1212 
+  1213   for (auto iMarker = 0u; iMarker < config->GetnMarker_All(); iMarker++) {
+  1214     if (config->GetViscous_Wall(iMarker)) {
+  1215       SU2_OMP_FOR_STAT(32)
+  1216       for (auto iVertex = 0ul; iVertex < geo_coarse->nVertex[iMarker]; iVertex++) {
+  1217         auto Point_Coarse = geo_coarse->vertex[iMarker][iVertex]->GetNode();
+  1218         sol_coarse->GetNodes()->SetVel_ResTruncError_Zero(Point_Coarse);
+  1219       }
+  1220       END_SU2_OMP_FOR
+  1221     }
+  1222   }
+  1223 
+  1224   SU2_OMP_FOR_STAT(roundUpDiv(geo_coarse->GetnPointDomain(), omp_get_num_threads()))
+  1225   for (auto Point_Coarse = 0ul; Point_Coarse < geo_coarse->GetnPointDomain(); Point_Coarse++) {
+  1226     sol_coarse->GetNodes()->SubtractRes_TruncError(Point_Coarse, sol_coarse->LinSysRes.GetBlock(Point_Coarse));
+  1227   }
+  1228   END_SU2_OMP_FOR
+  1229 
+  1230 }
+  1231 
+  1232 void CMultiGridIntegration::SetResidual_Term(CGeometry *geometry, CSolver *solver) {
+  1233   SU2_ZONE_SCOPED
+  1234 
+  1235   AD::StartNoSharedReading();
+  1236   SU2_OMP_FOR_STAT(roundUpDiv(geometry->GetnPointDomain(), omp_get_num_threads()))
+  1237   for (auto iPoint = 0ul; iPoint < geometry->GetnPointDomain(); iPoint++)
+  1238     solver->LinSysRes.AddBlock(iPoint, solver->GetNodes()->GetResTruncError(iPoint));
+  1239   END_SU2_OMP_FOR
+  1240   AD::EndNoSharedReading();

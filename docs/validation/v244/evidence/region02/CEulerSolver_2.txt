@@ -1,0 +1,79 @@
+  5645       /*--- Viscous contribution ---*/
+  5646 
+  5647       if (viscous) {
+  5648 
+  5649         /*--- Primitive variables, using the derived quantities ---*/
+  5650         auto V_boundary= GetCharacPrimVar(val_marker, iVertex);
+  5651         V_boundary[prim_idx.Temperature()] = Temperature_b;
+  5652         for (auto iDim = 0u; iDim < nDim; iDim++)
+  5653           V_boundary[prim_idx.Velocity() + iDim] = Velocity_b[iDim];
+  5654         V_boundary[prim_idx.Pressure()] = Pressure_b;
+  5655         V_boundary[prim_idx.Density()] = Density_b;
+  5656         V_boundary[prim_idx.Enthalpy()] = Enthalpy_b;
+  5657 
+  5658         /*--- Set laminar and eddy viscosity at the infinity ---*/
+  5659 
+  5660         V_boundary[prim_idx.LaminarViscosity()] = GetFluidModel()->GetLaminarViscosity();
+  5661         V_boundary[prim_idx.EddyViscosity()] = nodes->GetEddyViscosity(iPoint);
+  5662         V_boundary[prim_idx.ThermalConductivity()] = GetFluidModel()->GetThermalConductivity();
+  5663         V_boundary[prim_idx.CpTotal()] = GetFluidModel()->GetCp();
+  5664 
+  5665         /*--- Set the normal vector and the coordinates ---*/
+  5666 
+  5667         visc_numerics->SetNormal(Normal);
+  5668         su2double Coord_Reflected[MAXNDIM];
+  5669         GeometryToolbox::PointPointReflect(nDim, geometry->nodes->GetCoord(Point_Normal),
+  5670                                                  geometry->nodes->GetCoord(iPoint), Coord_Reflected);
+  5671         visc_numerics->SetCoord(geometry->nodes->GetCoord(iPoint), Coord_Reflected);
+  5672 
+  5673         /*--- Primitive variables, and gradient ---*/
+  5674 
+  5675         visc_numerics->SetPrimitive(V_domain, V_boundary);
+  5676         visc_numerics->SetPrimVarGradient(nodes->GetGradient_Primitive(iPoint), nodes->GetGradient_Primitive(iPoint));
+  5677 
+  5678         /*--- Secondary variables ---*/
+  5679 
+  5680         const su2double* S_domain = ideal_gas? nullptr : nodes->GetSecondary(iPoint);
+  5681 
+  5682         /*--- Compute secondary thermodynamic properties (partial derivatives...) ---*/
+  5683         su2double S_boundary[8];
+  5684         S_boundary[0]= GetFluidModel()->GetdPdrho_e();
+  5685         S_boundary[1]= GetFluidModel()->GetdPde_rho();
+  5686 
+  5687         S_boundary[2]= GetFluidModel()->GetdTdrho_e();
+  5688         S_boundary[3]= GetFluidModel()->GetdTde_rho();
+  5689 
+  5690         /*--- Compute secondary thermo-physical properties (partial derivatives...) ---*/
+  5691 
+  5692         S_boundary[4]= GetFluidModel()->Getdmudrho_T();
+  5693         S_boundary[5]= GetFluidModel()->GetdmudT_rho();
+  5694 
+  5695         S_boundary[6]= GetFluidModel()->Getdktdrho_T();
+  5696         S_boundary[7]= GetFluidModel()->GetdktdT_rho();
+  5697 
+  5698         visc_numerics->SetSecondary(S_domain, S_boundary);
+  5699 
+  5700         /*--- Turbulent kinetic energy ---*/
+  5701 
+  5702         if (config->GetKind_Turb_Model() == TURB_MODEL::SST)
+  5703           visc_numerics->SetTurbKineticEnergy(solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0),
+  5704                                               solver_container[TURB_SOL]->GetNodes()->GetSolution(iPoint,0));
+  5705 
+  5706         /*--- Compute and update residual ---*/
+  5707         auto residual = visc_numerics->ComputeResidual(config);
+  5708         LinSysRes.SubtractBlock(iPoint, residual);
+  5709 
+  5710         /*--- Jacobian contribution for implicit integration ---*/
+  5711         if (implicit)
+  5712           Jacobian.SubtractBlock2Diag(iPoint, residual.jacobian_i);
+  5713 
+  5714       }
+  5715       /*--- Store number of Newton iterations at BC ---*/
+  5716       if(config->GetKind_FluidModel() == DATADRIVEN_FLUID)
+  5717         nodes->SetNewtonSolverIterations(iPoint, GetFluidModel()->GetnIter_Newton());
+  5718 
+  5719     }
+  5720   }
+  5721   END_SU2_OMP_FOR
+  5722 
+  5723   for(auto iVar=0u; iVar<nVar; iVar++) {

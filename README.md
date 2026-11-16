@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v243前体空间对照](docs/FOREBODY_SPATIAL_COMPARISON_V243.md)：完成真实供体/插值分析与一次细网格800更新（287.359秒/约265MB）。几何及原面聚合通过，压力稳定，但残差、净收支及总焓偏差未改善；粗细原面压力差13.2149%，**不能据此认定网格无关或可信外缘，没有新增合格壁热面积**。
+最新[v244真实黏性区域与边界](docs/VISCOUS_REGIONAL_BOUNDARY_V244.md)：已导出160304原单元/76550点/4434原壁的区域几何与状态映射。1984接口中827个需要下游信息，当前直接切口生产拒绝；保留真实下游的单物理域内部反馈。没有新CFD或新增合格热面积。
+
+[完整箭体与接口科研图](docs/validation/v244/evidence/visual01/viscous_region_boundary.png)和独立原面/状态核对通过，壁面接触统计修正14→46，原失败保留。[下一执行点](docs/validation/v244/NEXT_DECISION.md)为成熟FAS与相态Air/热壁/SA的整体相容控制，原细网格保持；匹配公开基准可作日常诊断，全面积/UI仍独立最高。
+
+旧[v243前体空间对照](docs/FOREBODY_SPATIAL_COMPARISON_V243.md)：完成真实供体/插值分析与一次细网格800更新（287.359秒/约265MB）。几何及原面聚合通过，压力稳定，但残差、净收支及总焓偏差未改善；粗细原面压力差13.2149%，**不能据此认定网格无关或可信外缘，没有新增合格壁热面积**。
 
 本地`outputs/v243_validation/workbench01/index.html`提供0/400/800三阶段21字段，79812研究数值及前端纯函数通过。[共同色标科研图](docs/validation/v243/evidence/visual01/spatial_comparison.png)同时显示压力、H偏差、残差和原面差值；未做浏览器交互验收。[下一执行点](docs/validation/v243/NEXT_DECISION.md)是有真实入口/出口及下游反馈依据的成熟局部黏性区域，工程/UI独立推进，不盲续800或叠加Euler细化。
 

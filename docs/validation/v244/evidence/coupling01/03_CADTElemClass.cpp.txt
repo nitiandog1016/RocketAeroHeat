@@ -1,0 +1,84 @@
+    64   if (globalTree) {
+    65     /*--- The local grids are gathered on all ranks. For very large cases this
+    66           could become a serious memory bottleneck and a parallel version may
+    67           be needed.  ---*/
+    68 
+    69     /*--- First determine the number of points per rank and make them
+    70           available to all ranks. ---*/
+    71     int rank, size;
+    72     SU2_MPI::Comm_rank(SU2_MPI::GetComm(), &rank);
+    73     SU2_MPI::Comm_size(SU2_MPI::GetComm(), &size);
+    74 
+    75     vector<int> recvCounts(size), displs(size);
+    76     int sizeLocal = (int)val_coor.size();
+    77 
+    78     SU2_MPI::Allgather(&sizeLocal, 1, MPI_INT, recvCounts.data(), 1, MPI_INT, SU2_MPI::GetComm());
+    79     displs[0] = 0;
+    80     for (int i = 1; i < size; ++i) displs[i] = displs[i - 1] + recvCounts[i - 1];
+    81 
+    82     /*--- Correct the local connectivities with the offset of this rank,
+    83           such that they get the correct values when all the points from
+    84           all ranks are gathered. ---*/
+    85     const unsigned long offsetRank = displs[rank] / nDim;
+    86     for (unsigned long i = 0; i < val_connElem.size(); ++i) val_connElem[i] += offsetRank;
+    87 
+    88     /*--- Gather the coordinates of the points on all ranks. ---*/
+    89     int sizeGlobal = displs.back() + recvCounts.back();
+    90 
+    91     coorPoints.resize(sizeGlobal);
+    92     SU2_MPI::Allgatherv(val_coor.data(), sizeLocal, MPI_DOUBLE, coorPoints.data(), recvCounts.data(), displs.data(),
+    93                         MPI_DOUBLE, SU2_MPI::GetComm());
+    94 
+    95     /*--- Determine the number of elements per rank and make them
+    96           available to all ranks. ---*/
+    97     sizeLocal = (int)val_VTKElem.size();
+    98 
+    99     SU2_MPI::Allgather(&sizeLocal, 1, MPI_INT, recvCounts.data(), 1, MPI_INT, SU2_MPI::GetComm());
+   100     displs[0] = 0;
+   101     for (int i = 1; i < size; ++i) displs[i] = displs[i - 1] + recvCounts[i - 1];
+   102 
+   103     /*--- Gather the element type, the possible markers of these elements
+   104           and the local element ID's on all ranks. ---*/
+   105     sizeGlobal = displs.back() + recvCounts.back();
+   106 
+   107     elemVTK_Type.resize(sizeGlobal);
+   108     localMarkers.resize(sizeGlobal);
+   109     localElemIDs.resize(sizeGlobal);
+   110 
+   111     SU2_MPI::Allgatherv(val_VTKElem.data(), sizeLocal, MPI_UNSIGNED_SHORT, elemVTK_Type.data(), recvCounts.data(),
+   112                         displs.data(), MPI_UNSIGNED_SHORT, SU2_MPI::GetComm());
+   113 
+   114     SU2_MPI::Allgatherv(val_markerID.data(), sizeLocal, MPI_UNSIGNED_SHORT, localMarkers.data(), recvCounts.data(),
+   115                         displs.data(), MPI_UNSIGNED_SHORT, SU2_MPI::GetComm());
+   116 
+   117     SU2_MPI::Allgatherv(val_elemID.data(), sizeLocal, MPI_UNSIGNED_LONG, localElemIDs.data(), recvCounts.data(),
+   118                         displs.data(), MPI_UNSIGNED_LONG, SU2_MPI::GetComm());
+   119 
+   120     /*--- Create the content of ranksOfElems, which stores the original ranks
+   121           where the elements come from. ---*/
+   122     ranksOfElems.resize(sizeGlobal);
+   123 
+   124     for (int i = 0; i < size; ++i) {
+   125       for (int j = 0; j < recvCounts[i]; ++j) ranksOfElems[displs[i] + j] = i;
+   126     }
+   127 
+   128     /*--- Determine the size of the local connectivity per rank and make them
+   129           available to all ranks. ---*/
+   130     sizeLocal = (int)val_connElem.size();
+   131 
+   132     SU2_MPI::Allgather(&sizeLocal, 1, MPI_INT, recvCounts.data(), 1, MPI_INT, SU2_MPI::GetComm());
+   133     displs[0] = 0;
+   134     for (int i = 1; i < size; ++i) displs[i] = displs[i - 1] + recvCounts[i - 1];
+   135 
+   136     /*--- Gather the element connectivity on all ranks. ---*/
+   137     sizeGlobal = displs.back() + recvCounts.back();
+   138 
+   139     elemConns.resize(sizeGlobal);
+   140 
+   141     SU2_MPI::Allgatherv(val_connElem.data(), sizeLocal, MPI_UNSIGNED_LONG, elemConns.data(), recvCounts.data(),
+   142                         displs.data(), MPI_UNSIGNED_LONG, SU2_MPI::GetComm());
+   143   } else {
+   144     /*--- A local tree must be built. Copy the data from the arguments into the
+   145           member variables and set the ranks to the rank of this processor. ---*/
+   146     int rank;
+   147     SU2_MPI::Comm_rank(SU2_MPI::GetComm(), &rank);

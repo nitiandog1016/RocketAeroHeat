@@ -1,0 +1,27 @@
+   658 void CTurbSASolver::BC_Outlet(CGeometry *geometry, CSolver **solver_container, CNumerics*, CNumerics*,
+   659                               CConfig *config, unsigned short val_marker) {
+   660   SU2_ZONE_SCOPED
+   661 
+   662   auto* flowSolver = solver_container[FLOW_SOL];
+   663 
+   664   SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+   665   for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+   666     const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+   667 
+   668     /*--- Neumann: the turbulent variable is copied from the interior before computing the flux. ---*/
+   669     for (auto iVar = 0u; iVar < nVar; iVar++) ghostNodes->SetSolution(iVertex, iVar, nodes->GetSolution(iPoint, iVar));
+   670 
+   671     SetGhostPrimitives(iVertex, flowSolver->GetCharacPrimVar(val_marker, iVertex));
+   672 
+   673     SetGhostGeometry(geometry, val_marker, iVertex);
+   674   }
+   675   END_SU2_OMP_FOR
+   676 
+   677   /*--- The diffusive term at this boundary causes serious convergence problems. ---*/
+   678   BoundaryFlux(geometry, solver_container, config,
+   679                ScalarFluxOptions::BoundaryConvective(*config, config->GetBounded_Turb()), val_marker);
+   680 }
+   681 
+   682 void CTurbSASolver::BC_Engine_Inflow(CGeometry *geometry, CSolver **solver_container, CNumerics*,
+   683                                      CNumerics*, CConfig *config, unsigned short val_marker) {
+   684   SU2_ZONE_SCOPED

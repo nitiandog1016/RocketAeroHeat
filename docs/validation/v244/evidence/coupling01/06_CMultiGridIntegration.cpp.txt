@@ -1,0 +1,58 @@
+  1244 void CMultiGridIntegration::SetRestricted_Solution(unsigned short RunTime_EqSystem, CSolver *sol_fine, CSolver *sol_coarse,
+  1245                                                    CGeometry *geo_fine, CGeometry *geo_coarse, CConfig *config) {
+  1246   SU2_ZONE_SCOPED
+  1247 
+  1248   const unsigned short Solver_Position = config->GetContainerPosition(RunTime_EqSystem);
+  1249   const bool grid_movement = config->GetGrid_Movement();
+  1250 
+  1251   /*--- Compute coarse solution from fine solution ---*/
+  1252 
+  1253   CSolver::MultigridRestriction(*geo_fine, sol_fine->GetNodes()->GetSolution(),
+  1254                                 *geo_coarse, sol_coarse->GetNodes()->GetSolution());
+  1255 
+  1256   /*--- Update the solution at the no-slip walls ---*/
+  1257 
+  1258   for (auto iMarker = 0u; iMarker < config->GetnMarker_All(); iMarker++) {
+  1259     if (config->GetViscous_Wall(iMarker)) {
+  1260 
+  1261       SU2_OMP_FOR_STAT(32)
+  1262       for (auto iVertex = 0ul; iVertex < geo_coarse->nVertex[iMarker]; iVertex++) {
+  1263 
+  1264         const auto Point_Coarse = geo_coarse->vertex[iMarker][iVertex]->GetNode();
+  1265 
+  1266         if (Solver_Position == FLOW_SOL) {
+  1267 
+  1268           /*--- At moving walls, set the solution based on the new density and wall velocity ---*/
+  1269 
+  1270           if (grid_movement) {
+  1271             const auto* Grid_Vel = geo_coarse->nodes->GetGridVel(Point_Coarse);
+  1272             sol_coarse->GetNodes()->SetVelSolutionVector(Point_Coarse, Grid_Vel);
+  1273           }
+  1274           else {
+  1275             /*--- For stationary no-slip walls, set the velocity to zero. ---*/
+  1276             su2double zero[3] = {0.0};
+  1277             sol_coarse->GetNodes()->SetVelSolutionVector(Point_Coarse, zero);
+  1278           }
+  1279 
+  1280         }
+  1281 
+  1282         if (Solver_Position == ADJFLOW_SOL) {
+  1283           sol_coarse->GetNodes()->SetVelSolutionDVector(Point_Coarse);
+  1284         }
+  1285 
+  1286       }
+  1287       END_SU2_OMP_FOR
+  1288     }
+  1289   }
+  1290 
+  1291   /*--- Enforce Euler wall BC by projecting velocity to tangent plane ---*/
+  1292   sol_coarse->MultigridProjectEulerWall(geo_coarse, config, false);
+  1293 
+  1294   /*--- MPI the new interpolated solution ---*/
+  1295 
+  1296   sol_coarse->InitiateComms(geo_coarse, config, MPI_QUANTITIES::SOLUTION);
+  1297   sol_coarse->CompleteComms(geo_coarse, config, MPI_QUANTITIES::SOLUTION);
+  1298 
+  1299 }
+  1300 
+  1301 void CMultiGridIntegration::SetRestricted_Gradient(unsigned short RunTime_EqSystem, CSolver *sol_fine, CSolver *sol_coarse,

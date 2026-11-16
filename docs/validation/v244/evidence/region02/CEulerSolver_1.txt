@@ -1,0 +1,24 @@
+  5531       /*--- Compute the characteristic jumps ---*/
+  5532       for (auto iVar = 0u; iVar < nVar; iVar++){
+  5533         dw[iVar] = 0;
+  5534         for (auto jVar = 0u; jVar < nVar; jVar++)
+  5535           dw[iVar] += invP_Tensor[iVar][jVar] * (u_e[jVar] - u_i[jVar]);
+  5536       }
+  5537 
+  5538       /*--- Compute the boundary state u_b using characteristics ---*/
+  5539       for (auto iVar = 0u; iVar < nVar; iVar++) {
+  5540         u_b[iVar] = u_i[iVar];
+  5541         for (auto jVar = 0u; jVar < nVar; jVar++) {
+  5542           if (Lambda_i[jVar] < 0)
+  5543             u_b[iVar] += P_Tensor[iVar][jVar]*dw[jVar];
+  5544         }
+  5545       }
+  5546 
+  5547       /*--- Compute the thermodynamic state in u_b ---*/
+  5548       su2double Velocity_b[MAXNDIM] = {0};
+  5549       const auto Density_b = u_b[0];
+  5550       for (auto iDim = 0u; iDim < nDim; iDim++)
+  5551         Velocity_b[iDim] = u_b[iDim+1]/Density_b;
+  5552       const auto Velocity2_b = GeometryToolbox::SquaredNorm(nDim, Velocity_b);
+  5553 
+  5554       const su2double Energy_b = u_b[nVar-1]/Density_b;

@@ -1,0 +1,49 @@
+  1460 void CSolver::GetCommCountAndType(const CConfig* config,
+  1461                                   MPI_QUANTITIES commType,
+  1462                                   unsigned short &COUNT_PER_POINT,
+  1463                                   COMM_TYPE &MPI_TYPE) const {
+  1464   SU2_ZONE_SCOPED
+  1465   switch (commType) {
+  1466     case MPI_QUANTITIES::SOLUTION:
+  1467     case MPI_QUANTITIES::SOLUTION_OLD:
+  1468     case MPI_QUANTITIES::UNDIVIDED_LAPLACIAN:
+  1469     case MPI_QUANTITIES::SOLUTION_LIMITER:
+  1470       COUNT_PER_POINT  = nVar;
+  1471       MPI_TYPE         = COMM_TYPE::DOUBLE;
+  1472       break;
+  1473     case MPI_QUANTITIES::MAX_EIGENVALUE:
+  1474     case MPI_QUANTITIES::SENSOR:
+  1475       COUNT_PER_POINT  = 1;
+  1476       MPI_TYPE         = COMM_TYPE::DOUBLE;
+  1477       break;
+  1478     case MPI_QUANTITIES::SOLUTION_GRADIENT:
+  1479     case MPI_QUANTITIES::SOLUTION_GRAD_REC:
+  1480       COUNT_PER_POINT  = nVar*nDim;
+  1481       MPI_TYPE         = COMM_TYPE::DOUBLE;
+  1482       break;
+  1483     case MPI_QUANTITIES::PRIMITIVE_GRADIENT:
+  1484     case MPI_QUANTITIES::PRIMITIVE_GRAD_REC:
+  1485       COUNT_PER_POINT  = nPrimVarGrad*nDim;
+  1486       MPI_TYPE         = COMM_TYPE::DOUBLE;
+  1487       break;
+  1488     case MPI_QUANTITIES::PRIMITIVE_LIMITER:
+  1489       COUNT_PER_POINT  = nPrimVarGrad;
+  1490       MPI_TYPE         = COMM_TYPE::DOUBLE;
+  1491       break;
+  1492     case MPI_QUANTITIES::SOLUTION_EDDY:
+  1493       COUNT_PER_POINT  = nVar+1;
+  1494       MPI_TYPE         = COMM_TYPE::DOUBLE;
+  1495       break;
+  1496     case MPI_QUANTITIES::STOCH_SOURCE_LANG:
+  1497       COUNT_PER_POINT  = nDim;
+  1498       MPI_TYPE         = COMM_TYPE::DOUBLE;
+  1499       break;
+  1500     case MPI_QUANTITIES::DES_LENGTHSCALE:
+  1501       COUNT_PER_POINT  = 1;
+  1502       MPI_TYPE         = COMM_TYPE::DOUBLE;
+  1503       break;
+  1504     case MPI_QUANTITIES::SOLUTION_FEA:
+  1505       if (config->GetTime_Domain())
+  1506         COUNT_PER_POINT  = nVar*3;
+  1507       else
+  1508         COUNT_PER_POINT  = nVar;

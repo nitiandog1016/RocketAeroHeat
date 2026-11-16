@@ -1,0 +1,89 @@
+ 10178 std::unique_ptr<CADTElemClass> CPhysicalGeometry::ComputeViscousWallADT(const CConfig* config) const {
+ 10179   /*--------------------------------------------------------------------------*/
+ 10180   /*--- Step 1: Create the coordinates and connectivity of the linear      ---*/
+ 10181   /*---         subelements of the local boundaries that must be taken     ---*/
+ 10182   /*---         into account in the wall distance computation.             ---*/
+ 10183   /*--------------------------------------------------------------------------*/
+ 10184 
+ 10185   /* Initialize an array for the mesh points, which eventually contains the
+ 10186      mapping from the local nodes to the number used in the connectivity of the
+ 10187      local boundary faces. However, in a first pass it is an indicator whether
+ 10188      or not a mesh point is on a local wall boundary. */
+ 10189   vector<unsigned long> meshToSurface(nPoint, 0);
+ 10190 
+ 10191   /* Define the vectors for the connectivity of the local linear subelements,
+ 10192      the element ID's, the element type and marker ID's. */
+ 10193   vector<unsigned long> surfaceConn;
+ 10194   vector<unsigned long> elemIDs;
+ 10195   vector<unsigned short> VTK_TypeElem;
+ 10196   vector<unsigned short> markerIDs;
+ 10197 
+ 10198   /* Loop over the boundary markers. */
+ 10199 
+ 10200   for (unsigned short iMarker = 0; iMarker < config->GetnMarker_All(); ++iMarker) {
+ 10201     /* Check for a viscous wall. */
+ 10202     if (config->GetViscous_Wall(iMarker)) {
+ 10203       /* Loop over the surface elements of this marker. */
+ 10204       for (unsigned long iElem = 0; iElem < nElem_Bound[iMarker]; iElem++) {
+ 10205         /* Set the flag of the mesh points on this surface to true. */
+ 10206         for (unsigned short iNode = 0; iNode < bound[iMarker][iElem]->GetnNodes(); iNode++) {
+ 10207           unsigned long iPoint = bound[iMarker][iElem]->GetNode(iNode);
+ 10208           meshToSurface[iPoint] = 1;
+ 10209         }
+ 10210         /* Determine the necessary data from the corresponding standard face,
+ 10211           such as the number of linear subfaces, the number of DOFs per
+ 10212           linear subface and the corresponding local connectivity. */
+ 10213         const unsigned short VTK_Type = bound[iMarker][iElem]->GetVTK_Type();
+ 10214         const unsigned short nDOFsPerElem = bound[iMarker][iElem]->GetnNodes();
+ 10215 
+ 10216         /* Loop over the nodes of element and store the required data. */
+ 10217 
+ 10218         markerIDs.push_back(iMarker);
+ 10219         VTK_TypeElem.push_back(VTK_Type);
+ 10220         elemIDs.push_back(iElem);
+ 10221         for (unsigned short iNode = 0; iNode < nDOFsPerElem; iNode++)
+ 10222           surfaceConn.push_back(bound[iMarker][iElem]->GetNode(iNode));
+ 10223       }
+ 10224     }
+ 10225   }
+ 10226 
+ 10227   /*--- Create the coordinates of the local points on the viscous surfaces and
+ 10228         create the final version of the mapping from all volume points to the
+ 10229         points on the viscous surfaces. ---*/
+ 10230   vector<su2double> surfaceCoor;
+ 10231   unsigned long nVertex_SolidWall = 0;
+ 10232 
+ 10233   for (unsigned long i = 0; i < nPoint; ++i) {
+ 10234     if (meshToSurface[i]) {
+ 10235       meshToSurface[i] = nVertex_SolidWall++;
+ 10236 
+ 10237       for (unsigned short k = 0; k < nDim; ++k) surfaceCoor.push_back(nodes->GetCoord(i, k));
+ 10238     }
+ 10239   }
+ 10240 
+ 10241   /*--- Change the surface connectivity, such that it corresponds to
+ 10242         the entries in surfaceCoor rather than in meshPoints. ---*/
+ 10243   for (unsigned long i = 0; i < surfaceConn.size(); ++i) surfaceConn[i] = meshToSurface[surfaceConn[i]];
+ 10244 
+ 10245   /*--------------------------------------------------------------------------*/
+ 10246   /*--- Step 2: Build the ADT, which is an ADT of bounding boxes of the    ---*/
+ 10247   /*---         surface elements. A nearest point search does not give     ---*/
+ 10248   /*---         accurate results, especially not for the integration       ---*/
+ 10249   /*---         points of the elements close to a wall boundary.           ---*/
+ 10250   /*--------------------------------------------------------------------------*/
+ 10251 
+ 10252   std::unique_ptr<CADTElemClass> WallADT(
+ 10253       new CADTElemClass(nDim, surfaceCoor, surfaceConn, VTK_TypeElem, markerIDs, elemIDs, true));
+ 10254 
+ 10255   return WallADT;
+ 10256 }
+ 10257 
+ 10258 /*--- Use a thread-sanitizer dependent loop schedule to work around suspected false positives ---*/
+ 10259 #ifndef __SANITIZE_THREAD__
+ 10260 #define CPHYSGEO_PARFOR SU2_OMP_FOR_DYN(roundUpDiv(nPoint, 2 * omp_get_max_threads()))
+ 10261 #else
+ 10262 #define CPHYSGEO_PARFOR SU2_OMP_FOR_()
+ 10263 #endif
+ 10264 
+ 10265 #define END_CPHYSGEO_PARFOR END_SU2_OMP_FOR
+ 10266 
