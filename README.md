@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v245两层FAS整体控制](docs/FAS_COMPATIBILITY_V245.md)：开/关各5次完整flow-SA、3548状态联合域与3272项层间代数核对通过，但小壳6个壁节点聚为1粗点后法向几乎抵消，**整体热壁相容拒绝，没有新增真实箭体热资格**。只编一个观察对象与薄入口，成熟数值对象复用。
+最新[v246原真实网格两层FAS](docs/REAL_FAS_CONTROL_V246.md)：335726细点→44484粗点，完整19752壁面及真实下游保持；观察开/关各5次完整flow-SA逐位一致，真实壁投影、SA及层间质量/能量通过。**这是完整兼容控制，尚未收敛，没有新增合格热面积。**
+
+本地`outputs/v246_validation/workbench01/index.html`提供0/1/5三阶段14字段，237024原面值/前端纯函数通过；[科研对照图](docs/validation/v246/evidence/workbench01/rocket_fas_control.png)区分给定Tw、壁流体温度和未知固体Tw。[下一执行点](docs/validation/v246/NEXT_DECISION.md)为同固定组合的一次有界真实发展，不再重复预检/5步，不把FAS修正数组当残差。工程/UI最高，总目标active。
+
+旧[v245两层FAS整体控制](docs/FAS_COMPATIBILITY_V245.md)：开/关各5次完整flow-SA、3548状态联合域与3272项层间代数核对通过，但小壳6个壁节点聚为1粗点后法向几乎抵消，**整体热壁相容拒绝，没有新增真实箭体热资格**。只编一个观察对象与薄入口，成熟数值对象复用。
 
 [控制壳科研图](docs/validation/v245/evidence/visual02/fas_wall_cancellation.png)明确显示问题；[下一执行点](docs/validation/v245/NEXT_DECISION.md)直接复用原完整真实域做一次零流动聚合预检，不重复小壳或扫描参数。工程/UI独立最高，总目标active。
 
