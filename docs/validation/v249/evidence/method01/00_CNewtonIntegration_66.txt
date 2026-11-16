@@ -1,0 +1,52 @@
+    66 
+    67   auto iparam = config->GetNewtonKrylovIntParam();
+    68   auto dparam = config->GetNewtonKrylovDblParam();
+    69 
+    70   startupIters = iter = iparam[0];
+    71   startupResidual = dparam[0];
+    72   useDeflation = iparam[3] > 0;
+    73   precondIters = iparam[1];
+    74   precondTol = dparam[1];
+    75   tolRelaxFactor = iparam[2];
+    76   fullTolResidual = dparam[2];
+    77   finDiffStepND = SU2_TYPE::GetValue(dparam[3]);
+    78   nkRelaxation = fmin(SU2_TYPE::GetValue(dparam[4]), 1);
+    79   if (nkRelaxation < 0) {
+    80     autoRelaxation = true;
+    81     nkRelaxation = 1;
+    82   }
+    83 
+    84   const auto nVar = solvers[FLOW_SOL]->GetnVar();
+    85   const auto nPoint = geometry->GetnPoint();
+    86   const auto nPointDomain = geometry->GetnPointDomain();
+    87 
+    88   omp_chunk_size = computeStaticChunkSize(nPoint, omp_get_max_threads(), 1024);
+    89 
+    90   LinSolver.SetxIsZero(true);
+    91 
+    92   LinSysRes.Initialize(nPoint, nPointDomain, nVar, 0.0);
+    93   if (autoRelaxation || nkRelaxation < 1) {
+    94     LinSysResRelax.Initialize(nPoint, nPointDomain, nVar, 0.0);
+    95   }
+    96 
+    97   if (!std::is_same<Scalar,su2double>::value) {
+    98     LinSysSol.Initialize(nPoint, nPointDomain, nVar, nullptr);
+    99   }
+   100 
+   101   /*--- Check if the solver is able to provide a linear preconditioner. ---*/
+   102   if (config->GetKind_TimeIntScheme() != EULER_IMPLICIT) return;
+   103 
+   104   const auto kindPrec = static_cast<ENUM_LINEAR_SOLVER_PREC>(config->GetKind_Linear_Solver_Prec());
+   105 
+   106   preconditioner = CPreconditioner<MixedScalar>::Create(kindPrec, solvers[FLOW_SOL]->Jacobian, geometry, config);
+   107 
+   108   if (!std::is_same<Scalar,MixedScalar>::value) {
+   109     precondIn.Initialize(nPoint, nPointDomain, nVar, nullptr);
+   110     precondOut.Initialize(nPoint, nPointDomain, nVar, nullptr);
+   111   }
+   112 
+   113   /*--- Only possible with a preconditioner. ---*/
+   114   startupPeriod = (startupIters > 0) || (startupResidual < 0.0);
+   115 
+   116 }
+   117 

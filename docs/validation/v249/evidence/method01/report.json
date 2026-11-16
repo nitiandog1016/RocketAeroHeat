@@ -1,0 +1,193 @@
+{
+  "passed": true,
+  "adoptedForNextBoundedControl": "existing SU2 8.6 native Newton-Krylov + unchanged staggered SA",
+  "productionAdopted": false,
+  "proofOfImprovedConvergence": false,
+  "fullResidualMeritLineSearch": false,
+  "PETSc": {
+    "version": "3.26.1",
+    "refObject": "ad945ac5124a1c59e557fb8a196df057711726a2",
+    "sources": [
+      {
+        "path": "include/petscversion.h",
+        "localPath": "E:\\RocketAeroHeat\\outputs\\v249_validation\\external_sources\\include__petscversion.h",
+        "url": "https://github.com/petsc/petsc/blob/v3.26.1/include/petscversion.h",
+        "gitBlob": "5ca5b0d674e10add23f6bb1fac8473df492bc168",
+        "sha256": "52da81b77cadd55078d09a2e31907a800a285a8ed4cd9e15f2d8c94339351f10"
+      },
+      {
+        "path": "src/snes/impls/fas/fas.c",
+        "localPath": "E:\\RocketAeroHeat\\outputs\\v249_validation\\external_sources\\src__snes__impls__fas__fas.c",
+        "url": "https://github.com/petsc/petsc/blob/v3.26.1/src/snes/impls/fas/fas.c",
+        "gitBlob": "7a2b615b844364f06a7692fa48e141c961259342",
+        "sha256": "f160e62a492fe71a6fd9d58440e1397ce077412c8ce62db8638d137715815182"
+      },
+      {
+        "path": "src/snes/impls/fas/fasfunc.c",
+        "localPath": "E:\\RocketAeroHeat\\outputs\\v249_validation\\external_sources\\src__snes__impls__fas__fasfunc.c",
+        "url": "https://github.com/petsc/petsc/blob/v3.26.1/src/snes/impls/fas/fasfunc.c",
+        "gitBlob": "3fa22c30a870ec9541b1b7cec17795ae3944e8cc",
+        "sha256": "c9d4de2c4503e9e1a14137476ce020b5b5bd2498f3ee907449585a088d6f6b66"
+      },
+      {
+        "path": "src/snes/impls/ls/ls.c",
+        "localPath": "E:\\RocketAeroHeat\\outputs\\v249_validation\\external_sources\\src__snes__impls__ls__ls.c",
+        "url": "https://github.com/petsc/petsc/blob/v3.26.1/src/snes/impls/ls/ls.c",
+        "gitBlob": "26ff48c136feb341482ddd29f3dc5f332273e6c6",
+        "sha256": "a630125798373dd9c7f0d3dcc29b266862fb590c45a7d15b5c7fa0b466142a10"
+      },
+      {
+        "path": "src/snes/interface/snes.c",
+        "localPath": "E:\\RocketAeroHeat\\outputs\\v249_validation\\external_sources\\src__snes__interface__snes.c",
+        "url": "https://github.com/petsc/petsc/blob/v3.26.1/src/snes/interface/snes.c",
+        "gitBlob": "e9bb3756db7ae05edb2f82b806d8be32d4540e08",
+        "sha256": "cd63f6074ce3377e51440b782adbfd0feb207f057ff9b9a0b8a29e6d196cc157"
+      },
+      {
+        "path": "LICENSE",
+        "localPath": "E:\\RocketAeroHeat\\outputs\\v249_validation\\external_sources\\LICENSE",
+        "url": "https://github.com/petsc/petsc/blob/v3.26.1/LICENSE",
+        "gitBlob": "37aa71d7e041475a828c01b51ad653df1a2b1b9e",
+        "sha256": "efc206ebe66fda24a32ebe69e81caa2c5595e093626170e57fbeff522507cc54"
+      }
+    ],
+    "capabilities": [
+      "separate configurable level smoothers",
+      "optional coarse correction line search",
+      "function-domain error handling"
+    ],
+    "currentDecision": "defer full replacement: no existing six-state SU2/PETSc per-level function and preconditioner bridge",
+    "variableBoundsSupportedByFAS": false,
+    "newInstallation": false,
+    "allSourcesBlobVerified": true
+  },
+  "nativeSourceExcerpts": [
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\integration\\CNewtonIntegration.cpp",
+      "sha256": "77aa24c092bc48184eac3f3bd10a1e4dc987e1876bb107b7c9cf1a21b87f5d58",
+      "firstLine": 66,
+      "lastLine": 117,
+      "excerpt": "00_CNewtonIntegration_66.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\integration\\CNewtonIntegration.cpp",
+      "sha256": "77aa24c092bc48184eac3f3bd10a1e4dc987e1876bb107b7c9cf1a21b87f5d58",
+      "firstLine": 120,
+      "lastLine": 161,
+      "excerpt": "00_CNewtonIntegration_120.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\integration\\CNewtonIntegration.cpp",
+      "sha256": "77aa24c092bc48184eac3f3bd10a1e4dc987e1876bb107b7c9cf1a21b87f5d58",
+      "firstLine": 186,
+      "lastLine": 229,
+      "excerpt": "00_CNewtonIntegration_186.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\integration\\CNewtonIntegration.cpp",
+      "sha256": "77aa24c092bc48184eac3f3bd10a1e4dc987e1876bb107b7c9cf1a21b87f5d58",
+      "firstLine": 267,
+      "lastLine": 330,
+      "excerpt": "00_CNewtonIntegration_267.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\integration\\CNewtonIntegration.cpp",
+      "sha256": "77aa24c092bc48184eac3f3bd10a1e4dc987e1876bb107b7c9cf1a21b87f5d58",
+      "firstLine": 365,
+      "lastLine": 394,
+      "excerpt": "00_CNewtonIntegration_365.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v220_validation\\source\\Common\\include\\CConfig.hpp",
+      "sha256": "31dbd74497759c5e7a9235826ac040587cc5499cc439064a5d27f967a075dd40",
+      "firstLine": 439,
+      "lastLine": 444,
+      "excerpt": "01_CConfig_439.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v220_validation\\source\\Common\\src\\CConfig.cpp",
+      "sha256": "241eb647b07a136eb87f5528960db0737ae933ef5e45579be97218d7d692a48e",
+      "firstLine": 1904,
+      "lastLine": 1911,
+      "excerpt": "02_CConfig_1904.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v220_validation\\source\\Common\\src\\CConfig.cpp",
+      "sha256": "241eb647b07a136eb87f5528960db0737ae933ef5e45579be97218d7d692a48e",
+      "firstLine": 3807,
+      "lastLine": 3820,
+      "excerpt": "02_CConfig_3807.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\solvers\\CSolverFactory.cpp",
+      "sha256": "2de362d9e095cf53941173e283b15373a62f5086ba2bce527179148d52d31cb6",
+      "firstLine": 272,
+      "lastLine": 286,
+      "excerpt": "03_CSolverFactory_272.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\integration\\CIntegrationFactory.cpp",
+      "sha256": "d18f86cdd2bd49e0975c53bf05e535c13fe294e8bbd0fdf33383a9f89865ccd2",
+      "firstLine": 50,
+      "lastLine": 69,
+      "excerpt": "04_CIntegrationFactory_50.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\include\\variables\\CVariable.hpp",
+      "sha256": "5b137ccdd34c14816ea0bde9993690c49da7ad925b6dda166afe873b4264f40b",
+      "firstLine": 335,
+      "lastLine": 346,
+      "excerpt": "05_CVariable_335.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v235_validation\\source01\\SU2_CFD\\src\\iteration\\CFluidIteration.cpp",
+      "sha256": "127bcf641915da25ad73b9035d36f05509050257ff19890daaa29169a7ef79e4",
+      "firstLine": 60,
+      "lastLine": 101,
+      "excerpt": "06_CFluidIteration_60.txt"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\outputs\\v235_validation\\source01\\SU2_CFD\\src\\iteration\\CFluidIteration.cpp",
+      "sha256": "127bcf641915da25ad73b9035d36f05509050257ff19890daaa29169a7ef79e4",
+      "firstLine": 118,
+      "lastLine": 139,
+      "excerpt": "06_CFluidIteration_118.txt"
+    }
+  ],
+  "nativeObjectsReused": [
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\SU2_CFD\\src\\libSU2core.a.p\\solvers_CSolverFactory.cpp.obj",
+      "sha256": "315a4137fc205b1a6a2451d2e37051b8b4e424e42125e2e2c0a37ae0cf307861"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\SU2_CFD\\src\\libSU2core.a.p\\integration_CIntegrationFactory.cpp.obj",
+      "sha256": "09277fc70ece0ffaccb0b55ed95eb4d9c2beba09dead10316fbf476f2104665d"
+    },
+    {
+      "path": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117\\SU2_CFD\\src\\libSU2core.a.p\\integration_CNewtonIntegration.cpp.obj",
+      "sha256": "8b3b64ba87d015280c5bd2db8da6cb80dbaafd7a445bbfd542c9a6a83fc158e6"
+    }
+  ],
+  "nativeSemantics": {
+    "flowVariables": 5,
+    "SA": "separate native auxiliary solve",
+    "pseudoTimeAddedToJv": true,
+    "perturbation": "Solution_Old + scaled direction, not accumulated perturbations",
+    "finiteDifferenceStep": "native norm of internal conservative coordinates; not claimed zero-offset invariant",
+    "defaultStartupWouldHideNK": true,
+    "controlledStartupIterations": 0,
+    "controlledStartupResidual": 0,
+    "domainRecoveryDuringProductsMustStopControl": true,
+    "nativeBacktrackingImplemented": false
+  },
+  "control": {
+    "input": "v248 accepted saved state200 as research-state method control",
+    "notContinuationOfOldFAS": true,
+    "initialSixStateMustMatch": true,
+    "resetCFL": 0.1,
+    "updates": 1,
+    "newCFDNotYetAdmitted": true,
+    "newThermalQualification": false
+  },
+  "physicalQualification": false
+}

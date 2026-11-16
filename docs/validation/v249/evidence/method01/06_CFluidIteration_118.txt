@@ -1,0 +1,22 @@
+   118                               CSolver***** solver, CNumerics****** numerics, CConfig** config,
+   119                               unsigned short val_iZone, unsigned short val_iInst, MAIN_SOLVER main_solver, bool frozen_visc) {
+   120 
+   121 
+   122   if (config[val_iZone]->GetKind_Turb_Model() != TURB_MODEL::NONE && !frozen_visc) {
+   123 
+   124     /*--- Solve transition model ---*/
+   125 
+   126     if (config[val_iZone]->GetKind_Trans_Model() == TURB_TRANS_MODEL::LM) {
+   127       config[val_iZone]->SetGlobalParam(main_solver, RUNTIME_TRANS_SYS);
+   128       integration[val_iZone][val_iInst][TRANS_SOL]->SingleGrid_Iteration(geometry, solver, numerics, config,
+   129                                                                          RUNTIME_TRANS_SYS, val_iZone, val_iInst);
+   130     }
+   131 
+   132     /*--- Solve the turbulence model ---*/
+   133 
+   134     config[val_iZone]->SetGlobalParam(main_solver, RUNTIME_TURB_SYS);
+   135     integration[val_iZone][val_iInst][TURB_SOL]->SingleGrid_Iteration(geometry, solver, numerics, config,
+   136                                                                       RUNTIME_TURB_SYS, val_iZone, val_iInst);
+   137   }
+   138 
+   139   if (config[val_iZone]->GetKind_Species_Model() != SPECIES_MODEL::NONE) {

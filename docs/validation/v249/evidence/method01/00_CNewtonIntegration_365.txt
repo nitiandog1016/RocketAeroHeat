@@ -1,0 +1,30 @@
+   365       v(iPoint,iVar) = (perturbRes + (*LinSysRes0)(iPoint,iVar)) * factor;
+   366 
+   367       /*--- Pseudotime term of the true Jacobian. ---*/
+   368       v(iPoint,iVar) += SU2_TYPE::GetValue(delta) * u(iPoint,iVar);
+   369     }
+   370   }
+   371   END_SU2_OMP_FOR
+   372 
+   373   CSysMatrixComms::Initiate(v, geometry, config);
+   374   CSysMatrixComms::Complete(v, geometry, config);
+   375 }
+   376 
+   377 void CNewtonIntegration::Preconditioner(const CSysVector<Scalar>& u, CSysVector<Scalar>& v) const {
+   378   SU2_ZONE_SCOPED
+   379 
+   380   if (preconditioner) {
+   381     Scalar eps = SU2_TYPE::GetValue(precondTol);
+   382     Preconditioner_impl(u, v, precondIters, eps);
+   383   }
+   384   else {
+   385     /*--- Approximate diagonal preconditioner. ---*/
+   386 
+   387     const bool dt1st = (config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_1ST);
+   388     const bool dt2nd = (config->GetTime_Marching() == TIME_MARCHING::DT_STEPPING_2ND);
+   389     const su2double dt = config->GetDelta_UnstTimeND() * (dt1st + 1.5 * dt2nd);
+   390 
+   391     SU2_OMP_FOR_STAT(omp_chunk_size)
+   392     for (auto iPoint = 0ul; iPoint < geometry->GetnPointDomain(); ++iPoint) {
+   393       su2double delta = (solvers[FLOW_SOL]->GetNodes()->GetDelta_Time(iPoint) + dt) /
+   394                         (geometry->nodes->GetVolume(iPoint) + geometry->nodes->GetPeriodicVolume(iPoint));

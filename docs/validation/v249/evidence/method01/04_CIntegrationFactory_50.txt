@@ -1,0 +1,20 @@
+    50 
+    51 CIntegration* CIntegrationFactory::CreateIntegration(INTEGRATION_TYPE integrationType){
+    52   SU2_ZONE_SCOPED
+    53 
+    54   CIntegration *integration = nullptr;
+    55 
+    56   switch(integrationType){
+    57     case INTEGRATION_TYPE::DEFAULT:
+    58       integration = new CIntegration();
+    59       break;
+    60     case INTEGRATION_TYPE::SINGLEGRID:
+    61       integration = new CSingleGridIntegration();
+    62       break;
+    63     case INTEGRATION_TYPE::MULTIGRID:
+    64       integration = new CMultiGridIntegration();
+    65       break;
+    66     case INTEGRATION_TYPE::NEWTON:
+    67       integration = new CNewtonIntegration();
+    68       break;
+    69     case INTEGRATION_TYPE::STRUCTURAL:

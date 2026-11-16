@@ -1,0 +1,44 @@
+   186   config = config_[iZone];
+   187   solvers = solvers_[iZone][iInst][MESH_0];
+   188   geometry = geometry_[iZone][iInst][MESH_0];
+   189   numerics = numerics_[iZone][iInst][MESH_0];
+   190 
+   191   if (!setup) { Setup(); setup = true; }
+   192 
+   193   /*--- Remove NK relaxation to compute the current residual. ---*/
+   194   config->SetNewtonKrylovRelaxation(1.0);
+   195 
+   196   /*--- When using NK relaxation (not fully 2nd order Jacobian products) we need an additional
+   197    * residual evaluation that is used as the reference for finite differences. ---*/
+   198   LinSysRes0 = (!startupPeriod && nkRelaxation < 1) ? &LinSysResRelax : &LinSysRes;
+   199 
+   200   SU2_OMP_PARALLEL_(if(solvers[FLOW_SOL]->GetHasHybridParallel())) {
+   201 
+   202   /*--- Save the current solution to be able to perturb it. ---*/
+   203 
+   204   solvers[FLOW_SOL]->Set_OldSolution();
+   205 
+   206   /*--- Current residual. ---*/
+   207 
+   208   ComputeResiduals(ResEvalType::DEFAULT);
+   209 
+   210   /*--- Compute the approximate Jacobian for preconditioning. ---*/
+   211 
+   212   solvers[FLOW_SOL]->PrepareImplicitIteration(geometry, solvers, config);
+   213 
+   214   if (preconditioner) {
+   215     /*--- The Jacobian is normally uploaded by CSysMatrixVectorProduct, but the outer product
+   216      * here is matrix free, so nothing else would upload it for Build(). ---*/
+   217 #ifdef SU2_ENABLE_CUDA_KERNELS
+   218     if constexpr (su2_gpu_capable_v<MixedScalar>) {
+   219       if (config->GetCUDA()) {
+   220         SU2_DEVICE_REGION(solvers[FLOW_SOL]->Jacobian.HtDTransfer();)
+   221       }
+   222     }
+   223 #endif
+   224     preconditioner->Build();
+   225   }
+   226 
+   227   auto CopyLinSysRes = [&](int sign, auto& dst) {
+   228     SU2_OMP_FOR_STAT(omp_chunk_size)
+   229     for (auto i = 0ul; i < dst.GetNElmDomain(); ++i)

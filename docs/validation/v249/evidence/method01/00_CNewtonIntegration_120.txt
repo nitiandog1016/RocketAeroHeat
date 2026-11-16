@@ -1,0 +1,42 @@
+   120 
+   121   SU2_OMP_FOR_STAT(omp_chunk_size)
+   122   for (auto iPoint = 0ul; iPoint < geometry->GetnPoint(); ++iPoint) {
+   123     SU2_OMP_SIMD
+   124     for (auto iVar = 0ul; iVar < solvers[FLOW_SOL]->GetnVar(); ++iVar)
+   125       solvers[FLOW_SOL]->GetNodes()->AddSolution(iPoint,iVar, mag*dir(iPoint,iVar));
+   126   }
+   127   END_SU2_OMP_FOR
+   128 }
+   129 
+   130 void CNewtonIntegration::ComputeResiduals(ResEvalType type) {
+   131   SU2_ZONE_SCOPED
+   132 
+   133   /*--- Save the default integration scheme, and force to explicit if required. ---*/
+   134   auto TimeIntScheme = config->GetKind_TimeIntScheme();
+   135   if (type == ResEvalType::EXPLICIT) {
+   136     SU2_OMP_SAFE_GLOBAL_ACCESS(config->SetKind_TimeIntScheme(EULER_EXPLICIT);)
+   137   }
+   138 
+   139   solvers[FLOW_SOL]->Preprocessing(geometry, solvers, config, MESH_0, NO_RK_ITER, RUNTIME_FLOW_SYS, false);
+   140 
+   141   if (type == ResEvalType::DEFAULT) {
+   142     solvers[FLOW_SOL]->SetTime_Step(geometry, solvers, config, MESH_0, config->GetTimeIter());
+   143   }
+   144 
+   145   Space_Integration(geometry, solvers, numerics[FLOW_SOL], config, MESH_0, NO_RK_ITER, RUNTIME_FLOW_SYS);
+   146 
+   147   /*--- Restore default. ---*/
+   148   if (type == ResEvalType::EXPLICIT) {
+   149     SU2_OMP_SAFE_GLOBAL_ACCESS(config->SetKind_TimeIntScheme(TimeIntScheme);)
+   150   }
+   151 
+   152 }
+   153 
+   154 void CNewtonIntegration::ComputeFinDiffStep() {
+   155   SU2_ZONE_SCOPED
+   156 
+   157   static su2double rmsSol;
+   158   su2double rmsSol_loc = 0.0;
+   159 
+   160   SU2_OMP_MASTER
+   161   rmsSol = 0.0;

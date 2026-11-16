@@ -1,0 +1,15 @@
+   272       metaData.integrationType = INTEGRATION_TYPE::DEFAULT;
+   273       break;
+   274     case SUB_SOLVER_TYPE::EULER:
+   275     case SUB_SOLVER_TYPE::INC_EULER:
+   276     case SUB_SOLVER_TYPE::NEMO_EULER:
+   277     case SUB_SOLVER_TYPE::NAVIER_STOKES:
+   278     case SUB_SOLVER_TYPE::INC_NAVIER_STOKES:
+   279     case SUB_SOLVER_TYPE::NEMO_NAVIER_STOKES:
+   280       genericSolver = CreateFlowSolver(kindSolver, solver, geometry, config, iMGLevel);
+   281       if (!config->GetNewtonKrylov() || config->GetDiscrete_Adjoint() || config->GetContinuous_Adjoint())
+   282         metaData.integrationType = INTEGRATION_TYPE::MULTIGRID;
+   283       else
+   284         metaData.integrationType = INTEGRATION_TYPE::NEWTON;
+   285       break;
+   286     case SUB_SOLVER_TYPE::FEA:

@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v248原生恢复后的真实FAS发展](docs/FAS_NATIVE_RECOVERY_V248.md)：原完整域正常完成200更新、139次合法恢复及末CSV/独立末残差核对；**后窗恶化停止，未收敛、无新增合格热面积**。本机约15.3分钟/峰2.20GiB，当前瓶颈是收敛而非本轮内存。六阶段26字段已接[共同色标科研图](docs/validation/v248/evidence/workbench01/rocket_fas_control.png)和[残差图](docs/validation/v248/evidence/workbench01/residual_trends.png)，本地入口`outputs/v248_validation/workbench01/index.html`。
+最新[v249真实外区与原生Newton-Krylov控制](docs/NATIVE_NEWTON_CONTROL_V249.md)：真实外区单元星独立核对，原完整箭体完成1次完整flow-SA控制，约80秒/峰2.32GiB；**多步收敛尚未证明、无新增合格热面积**。原512MiB输出容量合同失败已保留，终态强制检查和两项实际测试已补。两阶段10字段已接[科研图](docs/validation/v249/evidence/workbench01/native_newton_control.png)，本地入口`outputs/v249_validation/workbench01/index.html`。
+
+[下一执行点](docs/validation/v249/NEXT_DECISION.md)：准确区分原生差分乘积与真实接受阶段，进行唯一有界真实发展；工程外缘/热入口和科研UI独立最高，全部区域与科学门槛保持，总目标active。
+
+前版[v248原生恢复后的真实FAS发展](docs/FAS_NATIVE_RECOVERY_V248.md)：原完整域正常完成200更新、139次合法恢复及末CSV/独立末残差核对；**后窗恶化停止，未收敛、无新增合格热面积**。本机约15.3分钟/峰2.20GiB，当前瓶颈是收敛而非本轮内存。六阶段26字段已接[共同色标科研图](docs/validation/v248/evidence/workbench01/rocket_fas_control.png)和[残差图](docs/validation/v248/evidence/workbench01/residual_trends.png)，本地入口`outputs/v248_validation/workbench01/index.html`。
 
 [下一执行点](docs/validation/v248/NEXT_DECISION.md)：针对真实外区主导残差与成熟完整收敛控制形成一次采用决定及可执行入口，不能只把低温恢复当唯一原因；工程外缘/热入口和科研UI独立最高，全部区域与科学门槛不变，总目标active。
 

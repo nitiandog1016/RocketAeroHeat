@@ -1,0 +1,12 @@
+   335   inline virtual void SetVelSolutionVector(unsigned long iPoint, const su2double *val_vector) { }
+   336 
+   337   /*!
+   338    * \brief Add a value to the solution.
+   339    * \param[in] iPoint - Point index.
+   340    * \param[in] iVar - Number of the variable.
+   341    * \param[in] solution - Value that we want to add to the solution.
+   342    */
+   343   inline void AddSolution(unsigned long iPoint, unsigned long iVar, su2double solution) {
+   344     Solution(iPoint, iVar) = Solution_Old(iPoint, iVar) + solution;
+   345   }
+   346 

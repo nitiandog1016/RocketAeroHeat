@@ -1,0 +1,14 @@
+  3807   // 新气体只扩独立身份，旧合同原样保留。
+  3808   if (Kind_FluidModel == RAH_PHASE_AIR) {
+  3809     if (SystemMeasurements != SI || Ref_NonDim != DIMENSIONAL || Time_Domain ||
+  3810         Multizone_Problem || DiscreteAdjoint || ContinuousAdjoint ||
+  3811         (Kind_Solver != MAIN_SOLVER::NAVIER_STOKES && Kind_Solver != MAIN_SOLVER::RANS) ||
+  3812         (Kind_Turb_Model != TURB_MODEL::NONE && Kind_Turb_Model != TURB_MODEL::SA) ||
+  3813         Kind_Upwind_Flow != UPWIND::ROE || nMarker_WallFunctions != 0 ||
+  3814         nMarker_FarField || nMarker_Supersonic_Inlet || nMarker_Supersonic_Outlet || nMarker_Inlet || nMarker_Outlet || Low_Mach_Corr || nMarker_Giles != 0 || GetDynamic_Grid())
+  3815       SU2_MPI::Error("RAH_PHASE_AIR requires direct SI steady single-zone NS/SA, ROE, resolved wall", CURRENT_FUNCTION);
+  3816     for (unsigned short i=0; i<nMarker_Riemann; ++i)
+  3817       if (Kind_Data_Riemann[i] != STATIC_SUPERSONIC_INFLOW_PT)
+  3818         SU2_MPI::Error("RAH_PHASE_AIR supports Riemann ambient PT characteristic boundary", CURRENT_FUNCTION);
+  3819   }
+  3820 

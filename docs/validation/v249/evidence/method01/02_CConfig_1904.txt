@@ -1,0 +1,8 @@
+  1904 
+  1905   /* DESCRIPTION: Use a Newton-Krylov method. */
+  1906   addBoolOption("NEWTON_KRYLOV", NewtonKrylov, false);
+  1907   /* DESCRIPTION: Integer parameters {startup iters, precond iters, initial tolerance relaxation}. */
+  1908   addUShortArrayOption("NEWTON_KRYLOV_IPARAM", NK_IntParam.size(), true, NK_IntParam.data());
+  1909   /* DESCRIPTION: Double parameters {startup residual drop, precond tolerance, full tolerance residual drop, findiff step, NK relaxation}. */
+  1910   addDoubleArrayOption("NEWTON_KRYLOV_DPARAM", NK_DblParam.size(), true, NK_DblParam.data());
+  1911 

@@ -1,0 +1,64 @@
+   267   }
+   268 
+   269   /*--- Solve for the solution update. ---*/
+   270 
+   271   auto iter = config->GetLinear_Solver_Iter();
+   272   Scalar eps = SU2_TYPE::GetValue(config->GetLinear_Solver_Error());
+   273 
+   274   auto& linSysSol = GetSolutionVec(solvers[FLOW_SOL]->LinSysSol);
+   275 
+   276   if (startupPeriod) {
+   277     iter = Preconditioner_impl(LinSysRes, linSysSol, iter, eps);
+   278   } else {
+   279     ComputeFinDiffStep();
+   280 
+   281     eps *= toleranceFactor;
+   282     if (useDeflation) {
+   283       iter = LinSolver.FGCRODR_LinSolver(LinSysRes, linSysSol, CMatrixFreeProductWrapper(this),
+   284                                          CPreconditionerWrapper(this), eps, iter, eps, false, config);
+   285     } else {
+   286       iter = LinSolver.FGMRES_LinSolver(LinSysRes, linSysSol, CMatrixFreeProductWrapper(this),
+   287                                         CPreconditionerWrapper(this), eps, iter, eps, false, config);
+   288     }
+   289     /*--- Scale back the residual to trick the CFL adaptation. ---*/
+   290     eps /= toleranceFactor;
+   291   }
+   292   SetSolutionResult(solvers[FLOW_SOL]->LinSysSol);
+   293 
+   294   BEGIN_SU2_OMP_SAFE_GLOBAL_ACCESS {
+   295     solvers[FLOW_SOL]->SetIterLinSolver(iter);
+   296     solvers[FLOW_SOL]->SetResLinSolver(eps);
+   297 
+   298     if (!startupPeriod && autoRelaxation) {
+   299       const su2double adaptTol = config->GetCFL_Adapt() ? config->GetCFL_AdaptParam(4) : 0;
+   300       if (eps > fmax(config->GetLinear_Solver_Error(), adaptTol)) {
+   301         nkRelaxation *= 0.9;
+   302       } else if (eps < 0.9 * fmax(config->GetLinear_Solver_Error(), adaptTol)) {
+   303         nkRelaxation = fmin(fmax(nkRelaxation * 1.05, 0.05), 1);
+   304       }
+   305     }
+   306   }
+   307   END_SU2_OMP_SAFE_GLOBAL_ACCESS
+   308 
+   309   /// TODO: Clever back-tracking and CFL adaptation based on residual reduction.
+   310 
+   311   /*--- Update solution. ---*/
+   312 
+   313   solvers[FLOW_SOL]->CompleteImplicitIteration(geometry, solvers, config);
+   314 
+   315   /*--- Call the various post processings. ---*/
+   316 
+   317   solvers[FLOW_SOL]->Preprocessing(geometry, solvers, config, MESH_0, NO_RK_ITER, RUNTIME_FLOW_SYS, true);
+   318 
+   319   solvers[FLOW_SOL]->Postprocessing(geometry, solvers, config, MESH_0);
+   320 
+   321   solvers[FLOW_SOL]->Pressure_Forces(geometry, config);
+   322   solvers[FLOW_SOL]->Momentum_Forces(geometry, config);
+   323   solvers[FLOW_SOL]->Friction_Forces(geometry, config);
+   324 
+   325   /*--- At the end of the startup period the CFL is reset to the initial value. ---*/
+   326 
+   327   if (endStartup) {
+   328     SU2_OMP_MASTER {
+   329       startupPeriod = false;
+   330       firstResidual = residual;
