@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "decision": "adopt TP3271 laminar Levy-Lees + backward-xi + mature coupled bvp4c",
+  "full3DCrossflowAdopted": false,
+  "oldV61Frozen": true,
+  "sourceURL": "https://ntrs.nasa.gov/api/citations/19930006245/downloads/19930006245.pdf",
+  "sourceTextSHA256": "2e51a69309d573cc304e99dd131aff6ee9a77c72345e6923ee5211a9dc523c78",
+  "equations": [
+    6,
+    7,
+    19,
+    25,
+    27,
+    54,
+    56
+  ],
+  "equationAuthor": "Hamilton, Millman and Greendyke, NASA TP-3271 (1992)",
+  "implementation": "Own transformed residual / local installed MATLAB bvp4c; not the report tridiagonal algorithm",
+  "license": "NASA report equations cited; no MathWorks or SciPy source redistributed; existing licensed MATLAB invoked",
+  "externalState": "constant H/S along each supplied line; no cross-stream pressure-momentum equation",
+  "oldPhysicalN": "Rejected for new production adoption: frozen custom Newton and prior integral-balance failure",
+  "researchOnly": true,
+  "newQualifiedAreaM2": 0,
+  "codeBindings": {
+    "solvePhaseAwareNonsimilarStation.m": "fbce1bbf69356f116868d906ea3580db0fb6abd33a98f3b8678d180a099a4c16",
+    "marchPhaseAwareLaminarProfiles.m": "34efb5572ced8290bb77d3ab32e15581969d1c6614606ecca08aefd39210d62a",
+    "phaseAwareNoseMarchInputs.m": "1a74811e05535552baee1d3db9659da3c718275e993a55c4ef88692a90b71a76",
+    "mapPhaseAwareMarchToSurface.m": "42cc38391deaa744d1d875c60db153a56818683392cdd0755b37bdb1b33eb3cc",
+    "tests/testPhaseNonsimilarV252.m": "ef3bdf933e87f7585a08c3838430ac76cbde18801684212fd9bed2bce50fc856",
+    "phaseAwareAirState.m": "b6bc0d1339474e470e50d1393a05e07b00bbcd5c524622e45b81f881331febca",
+    "phaseAwareAirCaloric.m": "b9fab2d4eff5992bdf4f6c547c25bfe891860a9ea26b5890a0fa998cc324709a",
+    "phaseAwarePayloadSHA.m": "f2732ba60455b69e0e490aa33651c8afd9e0c0a3b880ac7ae8e44fe83454cb52",
+    "phaseAwareMeshIdentity.m": "a8b66a54000d05fc17d13747389e489143e055af40ebf33b17211fce5d49c12d",
+    "buildPhaseAwareNoseViewerData.m": "467271bf15fc82197d87098302bf29fb378302c50c84837d38d904aac7ad8d0c",
+    "data/thermo/phase_aware_dry_air_v1.json": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985",
+    "regionalFlow/nonsimilar/advanceNonsimilarLaminarStation.m": "0e12531a93e8f91dbda4f1aacf3f37aba06d855298d2714d95b5884d3525b5f6",
+    "regionalFlow/nonsimilar/nonsimilarLaminarResidual.m": "9ea957827f3677ff67c67683ff30d165fcacc9c9a1ef97ea8a7d86a0d30cd16b",
+    "solvePhaseAwareLaminarProfile.m": "3ba97704a6d26e02ae2e5ca8cbcf276d1bdcbbaba9a6b237b73118348ff2a8d4",
+    "solvePhaseAwareNoseHeating.m": "f3ed3a82b46c93134f48e391454861f4708ec5254b10e14008e585e4e8d736b1",
+    "docs/NONSIMILAR_BOUNDARY_LAYER_DRAFT.md": "9782312235d1ede9865709540434614d9880400ecde480083468297e25a545f7",
+    "docs/LABELLED_PRESSURE_SURFACE_FLOW_V96.md": "577844cb384ccfd440b0c26bde3c4b41f2be89836311eb8f16720ba207947437",
+    "scripts/tetraStreamtubes.py": "d18ead435a2ee62919cd7951d7be0f3e1b99e43fc97bd613b3748509fa914779"
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v104_validation\\baseline02\\current_case.mat": "b4889e42a28131c253a56f06472a58c9d2cb290d7c9937935fbb4b5d7349488f",
+    "E:\\RocketAeroHeat\\outputs\\v226_validation\\matlab02\\rocket_faces.csv": "d1a43a34c554b0c26dda062059d8cd2b6a99b9c14ed27652d5dae57379c10ce6",
+    "E:\\RocketAeroHeat\\outputs\\v226_validation\\matlab02\\rocket_metadata.json": "624c00c619da04de697b98d281b5761165a9584c4d4c90c667dacc11cc3e67a7",
+    "E:\\RocketAeroHeat\\outputs\\v227_validation\\audit02\\heating.json": "6e1a035a1631254ecc0e298f66b956b308b6ec95d46a2ae03773dd03b2c3ccfd"
+  },
+  "fixedBranches": [
+    "2deg Tw300",
+    "1deg Tw300",
+    "2deg Tw pulse 15-35deg return300"
+  ],
+  "noNewCFD": true
+}

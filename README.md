@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v251成熟块ILU与更新前精度检查](docs/NATIVE_ILU_ACCEPTANCE_V251.md)：原完整箭体完成25更新，第26在更新前因线性报告超差而拒绝；固定组合关闭，**未收敛、无新增合格热面积**。本机约400秒/峰2.725GiB，成熟对象零重编。原生帧0/1与25旧态恢复分开，三阶段14字段已接[原面云图](docs/validation/v251/evidence/workbench02/native_newton_development.png)、[精度检查曲线](docs/validation/v251/evidence/workbench02/linear_acceptance.png)和[基准趋势](docs/validation/v251/evidence/workbench02/nk_residual_trends.png)；本地入口`outputs/v251_validation/workbench02/index.html`。
+最新[v252非相似边界层剖面](docs/PHASE_NONSIMILAR_PROFILES_V252.md)：同相态Levy–Lees/沿程后退差分＋MATLAB bvp4c，三链及独立复算/积分账通过；上游壁温历史在40°处造成2.70%热流差。**仍只原1306球帽面候选，无新增合格热面积。** 原三链父监督终态缺失如实保留，单站修复回归已通过。34字段接原面WebGL，新增沿程滑块、实际速度/温度剖面与CSV；本地`outputs/v252_validation/workbench02/index.html`，图见[原面热流](docs/validation/v252/evidence/workbench02/rocket_nonsimilar.png)和[沿程/剖面](docs/validation/v252/evidence/workbench02/profiles_and_history.png)。
+
+[下一执行点](docs/validation/v252/NEXT_DECISION.md)：鼻部之后的真实外缘—熵层—横向流管入口，不重做鼻部链或整箭参数支线；全面积/UI最高，总目标active。
+
+前版[v251成熟块ILU与更新前精度检查](docs/NATIVE_ILU_ACCEPTANCE_V251.md)：原完整箭体完成25更新，第26在更新前因线性报告超差而拒绝；固定组合关闭，**未收敛、无新增合格热面积**。本机约400秒/峰2.725GiB，成熟对象零重编。原生帧0/1与25旧态恢复分开，三阶段14字段已接[原面云图](docs/validation/v251/evidence/workbench02/native_newton_development.png)、[精度检查曲线](docs/validation/v251/evidence/workbench02/linear_acceptance.png)和[基准趋势](docs/validation/v251/evidence/workbench02/nk_residual_trends.png)；本地入口`outputs/v251_validation/workbench02/index.html`。
 
 [下一执行点](docs/validation/v251/NEXT_DECISION.md)：直接推进具有实际剖面的非相似工程边界层与真实外缘/区域接口，不再追加当前ILU上限/时间或整箭参数支线；全面积/UI并列最高，总目标active。
 
