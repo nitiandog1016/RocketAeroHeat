@@ -1,0 +1,2 @@
+First docs update command exited 1: Python SyntaxError Non-UTF-8 code at line 8. No script body executed. Original file retained as update_delivery_docs.py. Investigate bytes and recover via a separate UTF-8 file; no numerical work replay.
+Read-only check: the whole original file decodes as UTF-8 and both text/byte compile() pass. File-invocation SyntaxError cause not established. Recovery explicitly read_text(encoding=utf8) then compile/exec succeeded using the same retained source; no separate numerical run.

@@ -1,0 +1,78 @@
+--- v242/header
++++ v243/header
+@@ -4,9 +4,12 @@
+ #include <array>
+ #include <vector>
+ #include <cstring>
+-namespace region242 {
+-struct Face {unsigned long id,a,b,c;double area;};
++#include <map>
++namespace region243 {
++struct Face {unsigned long id,a,b,c;double area;size_t parent;};
+ std::vector<Face> faces;
++std::vector<double> parent_area;
++std::map<unsigned long,size_t> parent_index;
+ std::vector<std::array<double,5>> rms;
+ std::vector<double> previous_pressure;
+ double latest_change=std::numeric_limits<double>::quiet_NaN();
+@@ -43,9 +46,13 @@
+     for(char& c:line)if(c==',')c=' ';std::istringstream row(line);Face q;
+     if(!(row>>q.id>>q.a>>q.b>>q.c>>q.area)||q.a>=g->GetnPoint()||q.b>=g->GetnPoint()||q.c>=g->GetnPoint())
+       throw std::runtime_error("REGION_FACE_MAP");
+-    q.a=local[q.a];q.b=local[q.b];q.c=local[q.c];faces.push_back(q);
++    q.a=local[q.a];q.b=local[q.b];q.c=local[q.c];
++    // 原面压力必须先按子面积聚合，不能把细化后的子面当新物理原面。
++    auto inserted=parent_index.emplace(q.id,parent_index.size());q.parent=inserted.first->second;
++    if(inserted.second)parent_area.push_back(0.0);
++    parent_area[q.parent]+=q.area;faces.push_back(q);
+   }
+-  if(faces.size()!=4434||cfg->GetRestart())throw std::runtime_error("REGION_INITIAL_IDENTITY");
++  if(faces.size()!=17736||parent_area.size()!=4434||cfg->GetRestart())throw std::runtime_error("REGION_INITIAL_IDENTITY");
+   rah_outlet_v240::hook=boundary;
+ }
+ 
+@@ -56,29 +63,15 @@
+     for(int d=1;d<4;++d){const double v=n->GetSolution(i,d)/rho;v2+=v*v;}
+     p[i]=rah_phase_air::state("rhoe",rho,n->GetSolution(i,4)/rho-.5*v2).p;
+   }
+-  std::vector<double> result;for(auto q:faces)result.push_back((p[q.a]+p[q.b]+p[q.c])/3);
++  std::vector<double> result(parent_area.size(),0.0);
++  for(auto q:faces)result[q.parent]+=q.area*(p[q.a]+p[q.b]+p[q.c])/3;
++  for(size_t i=0;i<result.size();++i)result[i]/=parent_area[i];
+   return result;
+-}
+-
+-inline void readback(CGeometry* g,CSolver* f){
+-  std::ifstream in(observation::folder+"/saved_final.csv");std::string line;std::getline(in,line);
+-  std::vector<std::array<double,5>> values(g->GetnPoint());std::vector<bool> seen(g->GetnPoint(),false);
+-  while(std::getline(in,line)){
+-    for(char& c:line)if(c==',')c=' ';std::istringstream row(line);unsigned long id;double coord[3];
+-    if(!(row>>id>>coord[0]>>coord[1]>>coord[2])||id>=seen.size()||seen[id])throw std::runtime_error("READBACK_GLOBAL_ID");
+-    for(double& v:values[id])if(!(row>>v))throw std::runtime_error("READBACK_STATE");seen[id]=true;
+-  }
+-  for(unsigned long i=0;i<g->GetnPoint();++i){auto id=g->nodes->GetGlobalIndex(i);if(!seen[id])throw std::runtime_error("READBACK_MISSING_NODE");
+-    for(int j=0;j<5;++j)f->GetNodes()->SetSolution(i,j,values[id][j]);}
+-  const auto p=surface_pressure(g,f);std::ofstream out(observation::folder+"/surface_readback.csv");out<<std::setprecision(17)<<"originalFaceID,pPa\n";
+-  for(size_t i=0;i<faces.size();++i)out<<faces[i].id<<','<<p[i]<<'\n';
+-  std::ofstream info(observation::folder+"/readback.json");info<<"{\"flowUpdates\":0,\"originalFaces\":4434,\"physicalQualification\":false}\n";
+-  rah_outlet_v240::hook=nullptr;
+ }
+ 
+ inline void record(CGeometry* g,CSolver* f,CConfig* cfg){
+   const auto step=cfg->GetInnerIter()+1;
+-  if(stage_update!=step||checked!=783)throw std::runtime_error("REGION_NATIVE_OUTLET_COUNT");
++  if(stage_update!=step||checked!=3022)throw std::runtime_error("REGION_NATIVE_OUTLET_COUNT");
+   std::ofstream log(observation::folder+"/outlet_history.csv",step==1?std::ios::out:std::ios::app);
+   if(step==1)log<<"updates,nativeBoundaryNodes,minNormalMach,maxNormalMach,bitEqualComponents,lastPreprocessingRejectedPoints\n";
+   log<<std::setprecision(17)<<step<<','<<checked<<','<<min_mach<<','<<max_mach<<','<<5*checked<<','<<cfg->GetNonphysical_Points()<<'\n';
+@@ -90,8 +83,8 @@
+   for(double& x:r)x=std::sqrt(x/g->GetnPointDomain());rms.push_back(r);
+   if(step%50==0){
+     const auto surface=surface_pressure(g,f);double difference=0,denominator=0;
+-    for(size_t i=0;i<faces.size();++i){auto q=faces[i];double value=surface[i];
+-      if(!previous_pressure.empty()){difference+=q.area*std::abs(value-previous_pressure[i]);denominator+=q.area*std::abs(previous_pressure[i]);}}
++    for(size_t i=0;i<parent_area.size();++i){double value=surface[i];
++      if(!previous_pressure.empty()){difference+=parent_area[i]*std::abs(value-previous_pressure[i]);denominator+=parent_area[i]*std::abs(previous_pressure[i]);}}
+     latest_change=previous_pressure.empty()?std::numeric_limits<double>::quiet_NaN():difference/denominator;
+     previous_pressure=surface;
+     std::ofstream out(observation::folder+"/pressure_trend.csv",step==50?std::ios::out:std::ios::app);

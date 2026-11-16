@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v242保持原壁的前体重建](docs/FOREBODY_FIXED_WALL_PLC_V242.md)：成熟Gmsh/TetGen网格通过原质量门槛，20277tet/5354点；内部前体实际400更新正常完成，用时29.422秒/采样峰约66MB。净质量/能量与压力稳定通过，**物理能量RMS及真实外缘尚未合格，没有新增合格壁热面积**。无需等待更大内存主机才能推进混合路线。
+最新[v243前体空间对照](docs/FOREBODY_SPATIAL_COMPARISON_V243.md)：完成真实供体/插值分析与一次细网格800更新（287.359秒/约265MB）。几何及原面聚合通过，压力稳定，但残差、净收支及总焓偏差未改善；粗细原面压力差13.2149%，**不能据此认定网格无关或可信外缘，没有新增合格壁热面积**。
+
+本地`outputs/v243_validation/workbench01/index.html`提供0/400/800三阶段21字段，79812研究数值及前端纯函数通过。[共同色标科研图](docs/validation/v243/evidence/visual01/spatial_comparison.png)同时显示压力、H偏差、残差和原面差值；未做浏览器交互验收。[下一执行点](docs/validation/v243/NEXT_DECISION.md)是有真实入口/出口及下游反馈依据的成熟局部黏性区域，工程/UI独立推进，不盲续800或叠加Euler细化。
+
+旧[v242保持原壁的前体重建](docs/FOREBODY_FIXED_WALL_PLC_V242.md)：成熟Gmsh/TetGen网格通过原质量门槛，20277tet/5354点；内部前体实际400更新正常完成，用时29.422秒/采样峰约66MB。净质量/能量与压力稳定通过，**物理能量RMS及真实外缘尚未合格，没有新增合格壁热面积**。无需等待更大内存主机才能推进混合路线。
 
 本地`outputs/v242_validation/workbench01/index.html`或`forebody_research.json`提供10阶段63字段，266040个原面研究值核对通过。[科研图](docs/validation/v242/evidence/visual01/forebody_research.png)保留全箭灰色未知区和前体放大；[同入口流管对照](docs/validation/v242/evidence/tube_audit01/tube_comparison.png)表明H/S与局部流管误差仍需处理。无共享WebGL修改/浏览器验收。[当前下一执行点](docs/validation/v242/NEXT_DECISION.md)是成熟外流重构与真实工程入口，不盲续400。
 

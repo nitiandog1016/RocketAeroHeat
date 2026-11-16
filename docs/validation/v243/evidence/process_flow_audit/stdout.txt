@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "E:\RocketAeroHeat\scripts\auditForebodySpatialV243.py", line 130, in <module>
+    if len(sys.argv)>1 and sys.argv[1]=='task':audit()
+  File "E:\RocketAeroHeat\scripts\auditForebodySpatialV243.py", line 56, in audit
+    [parent_average(value['v'][:,j]) for j in range(3)]+[value['M'][tri].mean(axis=1)])
+  File "<__array_function__ internals>", line 6, in column_stack
+  File "D:\anacondapython\lib\site-packages\numpy\lib\shape_base.py", line 656, in column_stack
+    return _nx.concatenate(arrays, 1)
+  File "<__array_function__ internals>", line 6, in concatenate
+ValueError: all the input array dimensions for the concatenation axis must match exactly, but along dimension 0, the array at index 0 has size 4434 and the array at index 9 has size 17736
