@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v250原生Newton-Krylov真实有限发展](docs/NATIVE_NEWTON_DEVELOPMENT_V250.md)：原完整箭体正常完成108次更新、按时间预算停止；1001完整乘积/717实际恢复与末场独立核对。**未收敛、无新增合格热面积，200双窗口未执行。** 76次线性求解达到上限仍未达报告目标，下一闭合成熟线性精度/预条件，不能盲续108。本机约28.3分钟/峰2.32GiB；五阶段22字段已接[首末云图](docs/validation/v250/evidence/workbench01/native_newton_development.png)和[基准趋势](docs/validation/v250/evidence/workbench01/nk_residual_trends.png)，本地入口`outputs/v250_validation/workbench01/index.html`。
+最新[v251成熟块ILU与更新前精度检查](docs/NATIVE_ILU_ACCEPTANCE_V251.md)：原完整箭体完成25更新，第26在更新前因线性报告超差而拒绝；固定组合关闭，**未收敛、无新增合格热面积**。本机约400秒/峰2.725GiB，成熟对象零重编。原生帧0/1与25旧态恢复分开，三阶段14字段已接[原面云图](docs/validation/v251/evidence/workbench02/native_newton_development.png)、[精度检查曲线](docs/validation/v251/evidence/workbench02/linear_acceptance.png)和[基准趋势](docs/validation/v251/evidence/workbench02/nk_residual_trends.png)；本地入口`outputs/v251_validation/workbench02/index.html`。
+
+[下一执行点](docs/validation/v251/NEXT_DECISION.md)：直接推进具有实际剖面的非相似工程边界层与真实外缘/区域接口，不再追加当前ILU上限/时间或整箭参数支线；全面积/UI并列最高，总目标active。
+
+前版[v250原生Newton-Krylov真实有限发展](docs/NATIVE_NEWTON_DEVELOPMENT_V250.md)：原完整箭体正常完成108次更新、按时间预算停止；1001完整乘积/717实际恢复与末场独立核对。**未收敛、无新增合格热面积，200双窗口未执行。** 76次线性求解达到上限仍未达报告目标，下一闭合成熟线性精度/预条件，不能盲续108。本机约28.3分钟/峰2.32GiB；五阶段22字段已接[首末云图](docs/validation/v250/evidence/workbench01/native_newton_development.png)和[基准趋势](docs/validation/v250/evidence/workbench01/nk_residual_trends.png)，本地入口`outputs/v250_validation/workbench01/index.html`。
 
 [下一执行点](docs/validation/v250/NEXT_DECISION.md)：现有FGMRES＋块ILU(0)候选的完整采用决定、真实精度接受与资源合同；候选尚未授兼容，工程外缘/热入口和科研UI独立最高，全部责任/门槛不减，总目标active。
 

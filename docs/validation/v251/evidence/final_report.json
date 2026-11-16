@@ -1,0 +1,389 @@
+{
+  "passed": true,
+  "goalStatus": "active",
+  "wholeSurfaceGoalComplete": false,
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "finePoints": 335726,
+  "volumeCells": 705490,
+  "completedUpdates": 25,
+  "completeSavedUpdates": [
+    0,
+    1
+  ],
+  "nativeExitedNormally": false,
+  "stopReason": "linear-tolerance-rejection",
+  "observedMatrixFreeProducts": 207,
+  "nativeLinearHistory": {
+    "nativeReportedOnly": true,
+    "iterationLimit": 20,
+    "reportedTargetLog10": -5,
+    "capReachedAboveReportedTolerance": 0,
+    "firstCapFailureUpdate": null,
+    "worstReportedLog10Residual": -5.028169074,
+    "lastReportedLog10Residual": -5.060836616,
+    "independentLinearAccuracyProved": false,
+    "gateRecords": 51,
+    "flowGateRecords": 26,
+    "SAReports": 25,
+    "rejected": [
+      {
+        "update": 26,
+        "system": "flow",
+        "report": 0.000231799073244781,
+        "iterations": 20
+      }
+    ],
+    "configuredTolerance": 1e-05,
+    "effectiveToleranceUpperBound": 2e-05,
+    "nativeResidualScaledByToleranceFactor": true,
+    "SAObservedAfterUpdateOnly": true,
+    "SAFailedReports": 0,
+    "SAZeroIterationEarlyExitCanReportAbsoluteNorm": true
+  },
+  "linearRefusal": {
+    "attemptedUpdate": 26,
+    "completedUpdates": 25,
+    "nativeReportedResidual": 0.000231799073244781,
+    "toleranceFactor": 1.937368860655376,
+    "configuredTolerance": 1e-05,
+    "nativeIterations": 20,
+    "flowUpdateApplied": false,
+    "SAUpdateApplied": false,
+    "independentLinearAccuracyProved": false,
+    "savedOldStatesLegallyDecoded": 335726,
+    "savedDirectionComponents": 1678630,
+    "oldStateIsCompletedUpdate": 25,
+    "currentStateIsDerivativeProbe": true,
+    "physicalUpdateAbsentInStageLog": true,
+    "oldMinimumK": 60.0791917733635,
+    "oldMaximumK": 1594.668050283409
+  },
+  "nativeMemoryGraph": {
+    "points": 335726,
+    "lowerBlocks": 1371834,
+    "upperBlocks": 1371834,
+    "outerScalarBytes": 8,
+    "preconditionerScalarBytes": 8,
+    "SAAndFlowPreconditioner": "ILU0",
+    "outerLimit": 20,
+    "innerLimit": 3
+  },
+  "jointPressureTemperatureRejections": 0,
+  "reconstructedOldSurface": {
+    "passed": true,
+    "update": 25,
+    "sourceKind": "pre-update-old-six-state-reconstruction",
+    "nativeFullFrame": false,
+    "nativeFinalCSV": false,
+    "terminalSpatialResidualAvailable": false,
+    "derivativeProbeUsed": false,
+    "states": 335726,
+    "BrentPoints": 13,
+    "maximumTemperatureRelativeError": 1.182676921554602e-15,
+    "maximumIndependentHeronRelativeError": 6.228648070341514e-15,
+    "faces": 19752,
+    "areaM2": 1.9646292565715642,
+    "faceCSV_SHA256": "ce0df3fcf668b540ff59ad357a77f9f0ed907424d2648ab64616964f37b7923d",
+    "sourceSHA256": "95be1260838670350604e59d5d3ce3b151c7b24b7fe2b93e8e8dcda4a6414a83",
+    "researchPowerIntoWallW": 691369.6766596218,
+    "wallFluidMinimumK": 264.9017026692999,
+    "wallFluidMaximumK": 358.9302867109886,
+    "physicalQualification": false,
+    "solidTwSolved": false,
+    "newQualifiedAreaM2": 0
+  },
+  "availableResearchSurfaceUpdates": [
+    0,
+    1,
+    25
+  ],
+  "recoveryCount": 164,
+  "recoveryRoles": {
+    "accepted_preprocessing": 164
+  },
+  "terminal": null,
+  "benefitDecisionReached": false,
+  "firstUpdateBitEqual": false,
+  "firstUpdateMaximumScaledDifference": 0.0014458237835385552,
+  "independentSavedStates": 671452,
+  "nativeNumericalStatementsUnchanged": true,
+  "physicalQualification": false,
+  "newQualifiedAreaM2": 0,
+  "nonlinearConvergenceProved": false,
+  "fullJacobianAccuracyProved": false,
+  "scientificImagesVisuallyInspected": true,
+  "sourceAndNumericTestsPassed": true,
+  "exportedFields": 14,
+  "originalFaceValuesVerified": 237024,
+  "readOnlyObserverObjectsCompiled": 0,
+  "matureObjectsRecompiled": 0,
+  "sharedWebGLChanged": false,
+  "MATLABExecuted": false,
+  "browserInteractionTested": false,
+  "protectedCount": 29,
+  "engineeringFilesUnchanged": 54,
+  "candidateCount": 2,
+  "assets": {
+    "outputs/v144_validation/actual/hybrid_volume.mat": "22b35b72396c1a7d14195af9bd24d3c6328138484d4009638c1ab48cddec1d6c",
+    "outputs/v167_validation/real01/mesh.su2": "00f96f3a0cb87a11c4218796cd1f5f25aebffb453c794e0cf97f7bd4abde3181",
+    "data/thermo/phase_aware_dry_air_v1.json": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985"
+  },
+  "unrelatedTrackedSHA256": {
+    "tests/verifyWebSectionExport.py": "6f67f9fecc3e806ed74ab879ff8a5ba1b745a239158babba55d1856d4d54225b",
+    "web/section.js": "74fd8f6cd6f017ecb60a578ebedfe5aabfda2cde8ce5477fdd5b4b9bf24f9169",
+    "web/viewer.js": "90d73959c1d39bf7fd0919d1a034e4994c24edd90a922270064a3c5892088ca5"
+  },
+  "splitDocumentationOwnership": {
+    "AGENTS.md": {
+      "localSupplementPreserved": true,
+      "publishedOwnVersionSHA256": "b31a6e5985c474ab99bb230552096c06e35848efa67cf8bdf500dc672c47c9b4",
+      "combinedWorktreeSHA256": "5deccc913b29251e186280dc455feb772532d729889207d0970b599e75f5367a"
+    },
+    "docs/PROJECT_GOALS.md": {
+      "localSupplementPreserved": true,
+      "publishedOwnVersionSHA256": "3544ae4f85ca6ca8c1017e5472dcd1e1886dd4dbde4263acf76555369ba7935a",
+      "combinedWorktreeSHA256": "f1b4c7e9e823e0395d76463e7b05a027e3f965e8674bc973e5c59de7c47e7442"
+    }
+  },
+  "concurrentLocalOnlyDataPublished": false,
+  "allReceiptsTerminalStableGroupsEmpty": true,
+  "executionFailuresPreserved": {
+    "process_prepare": 1,
+    "process_rocket": 86
+  },
+  "sourceBindingPreparationFailurePreserved": true,
+  "auditAdmissionPreProcessFailurePreserved": true,
+  "firstFrontendSourceReconstructedWithExactAdmissionSHA": true,
+  "publicationWhitespaceCorrection": {
+    "firstStageFailed": true,
+    "reason": "git diff --cached --check: nativeILUV251.cpp line202 trailing whitespace",
+    "fix": "whitespace only; original execution source preserved in stage01",
+    "oldSHA256": "fcd900076054b9e51420f19c5aefeed4ac9fe4845f33c6aa12ca58f72f8cfe6b",
+    "newSHA256": "644baeb5d4c737c2d01a6113441875f925cf01ad7fd99a480b5366b123d51772",
+    "numericalTokensUnchanged": true,
+    "CFDRerun": false
+  },
+  "terminalCapacities": {
+    "process_audit2": {
+      "passed": true,
+      "logicalBytes": 555121112,
+      "limitBytes": 1610612736,
+      "originalSupervisorPassed": true,
+      "originalReportPreserved": true,
+      "measurementAfterExit": true
+    },
+    "process_build": {
+      "passed": true,
+      "logicalBytes": 317573732,
+      "limitBytes": 1610612736,
+      "originalSupervisorPassed": true,
+      "originalReportPreserved": true,
+      "measurementAfterExit": true
+    },
+    "process_export": {
+      "passed": true,
+      "logicalBytes": 567612514,
+      "limitBytes": 1610612736,
+      "originalSupervisorPassed": true,
+      "originalReportPreserved": true,
+      "measurementAfterExit": true
+    },
+    "process_export2": {
+      "passed": true,
+      "logicalBytes": 585528910,
+      "limitBytes": 1610612736,
+      "originalSupervisorPassed": true,
+      "originalReportPreserved": true,
+      "measurementAfterExit": true
+    },
+    "process_prepare": {
+      "passed": true,
+      "logicalBytes": 32703,
+      "limitBytes": 1610612736,
+      "originalSupervisorPassed": false,
+      "originalReportPreserved": true,
+      "measurementAfterExit": true
+    },
+    "process_prepare2": {
+      "passed": true,
+      "logicalBytes": 293682862,
+      "limitBytes": 1610612736,
+      "originalSupervisorPassed": true,
+      "originalReportPreserved": true,
+      "measurementAfterExit": true
+    },
+    "process_recovery": {
+      "passed": true,
+      "logicalBytes": 569429680,
+      "limitBytes": 1610612736,
+      "originalSupervisorPassed": true,
+      "originalReportPreserved": true,
+      "measurementAfterExit": true
+    },
+    "process_rocket": {
+      "passed": true,
+      "logicalBytes": 551379763,
+      "limitBytes": 1610612736,
+      "originalSupervisorPassed": false,
+      "originalReportPreserved": true,
+      "measurementAfterExit": true
+    }
+  },
+  "processSeconds": {
+    "audit": 10.828000000001339,
+    "build": 8.6720000000023,
+    "offline": 4.828000000001339,
+    "cfd": 399.96800000000076
+  },
+  "maxSampledGroupRSSBytes": 2925715456,
+  "historicalSourceBindings": [
+    {
+      "process": "process_audit2",
+      "path": "E:\\RocketAeroHeat\\scripts\\auditNativeILUV251.py",
+      "executedSHA256": "519e7a424de242f7da8c7e559d2f45799817c8dd351158a720ef5de970b98e20",
+      "currentSHA256": "1b429ea72d821aacd606c5402752e079b2759c0d1c40285a4b4a98d3b1eaa028",
+      "snapshot": "process_audit2/execution_sources/519e7a424de242f7da8c7e559d2f45799817c8dd351158a720ef5de970b98e20.py"
+    },
+    {
+      "process": "process_audit2",
+      "path": "E:\\RocketAeroHeat\\scripts\\runNativeILUV251.py",
+      "executedSHA256": "72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789",
+      "currentSHA256": "92215bc5bf0319d296c89dec53a8b2643af159baff86a9cbf08e3d6fd3911a18",
+      "snapshot": "process_audit2/execution_sources/72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789.py"
+    },
+    {
+      "process": "process_build",
+      "path": "E:\\RocketAeroHeat\\scripts\\runNativeILUV251.py",
+      "executedSHA256": "34787c591b7335dba3df5b54a291dc87a2b4e316d418c65127dc233be1056ff0",
+      "currentSHA256": "92215bc5bf0319d296c89dec53a8b2643af159baff86a9cbf08e3d6fd3911a18",
+      "snapshot": "process_build/execution_sources/34787c591b7335dba3df5b54a291dc87a2b4e316d418c65127dc233be1056ff0.py"
+    },
+    {
+      "process": "process_build",
+      "path": "E:\\RocketAeroHeat\\native\\su2PhaseAwareAir\\nativeILUV251.cpp",
+      "executedSHA256": "fcd900076054b9e51420f19c5aefeed4ac9fe4845f33c6aa12ca58f72f8cfe6b",
+      "currentSHA256": "644baeb5d4c737c2d01a6113441875f925cf01ad7fd99a480b5366b123d51772",
+      "snapshot": "stage01/nativeILUV251.cpp"
+    },
+    {
+      "process": "process_export",
+      "path": "E:\\RocketAeroHeat\\scripts\\exportNativeILUV251.py",
+      "executedSHA256": "32c3ad6a2030b80807e2ad2a906b0fc233def7bf84030a9f7639f1fa79cf3285",
+      "currentSHA256": "79fd8d4f9c72ef177eb002ffd7995892db3a957c7e08b8c2ff6318e03c45548f",
+      "snapshot": "process_export/execution_sources/32c3ad6a2030b80807e2ad2a906b0fc233def7bf84030a9f7639f1fa79cf3285.py"
+    },
+    {
+      "process": "process_export",
+      "path": "E:\\RocketAeroHeat\\scripts\\runNativeILUV251.py",
+      "executedSHA256": "72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789",
+      "currentSHA256": "92215bc5bf0319d296c89dec53a8b2643af159baff86a9cbf08e3d6fd3911a18",
+      "snapshot": "process_audit2/execution_sources/72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789.py"
+    },
+    {
+      "process": "process_export",
+      "path": "E:\\RocketAeroHeat\\tests\\testNativeILUV251.js",
+      "executedSHA256": "d289b36d73cee51f82f883b2066bdefc328bb5fa0ed8df5ecf2c47b78bfda1f2",
+      "currentSHA256": "2727c7b78ddd688cc7b45f6edc2d6d24fd56938995f8eb8ef310de5a09df6c40",
+      "snapshot": "stage01/testNativeILUV251.js"
+    },
+    {
+      "process": "process_export2",
+      "path": "E:\\RocketAeroHeat\\scripts\\exportNativeILUV251.py",
+      "executedSHA256": "61edc4f75fbbdb4f67a52e38492071b7dd7b9eaf193c5297481bfd3c23aab876",
+      "currentSHA256": "79fd8d4f9c72ef177eb002ffd7995892db3a957c7e08b8c2ff6318e03c45548f",
+      "snapshot": "process_export2/execution_sources/61edc4f75fbbdb4f67a52e38492071b7dd7b9eaf193c5297481bfd3c23aab876.py"
+    },
+    {
+      "process": "process_export2",
+      "path": "E:\\RocketAeroHeat\\scripts\\runNativeILUV251.py",
+      "executedSHA256": "72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789",
+      "currentSHA256": "92215bc5bf0319d296c89dec53a8b2643af159baff86a9cbf08e3d6fd3911a18",
+      "snapshot": "process_audit2/execution_sources/72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789.py"
+    },
+    {
+      "process": "process_prepare",
+      "path": "E:\\RocketAeroHeat\\scripts\\runNativeILUV251.py",
+      "executedSHA256": "cf98305b47f41dd3a0361ab13f011f298664a00deb6d5729a72bb9364b715f45",
+      "currentSHA256": "92215bc5bf0319d296c89dec53a8b2643af159baff86a9cbf08e3d6fd3911a18",
+      "snapshot": "process_prepare/execution_sources/cf98305b47f41dd3a0361ab13f011f298664a00deb6d5729a72bb9364b715f45.py"
+    },
+    {
+      "process": "process_prepare",
+      "path": "E:\\RocketAeroHeat\\native\\su2PhaseAwareAir\\nativeILUV251.cpp",
+      "executedSHA256": "fcd900076054b9e51420f19c5aefeed4ac9fe4845f33c6aa12ca58f72f8cfe6b",
+      "currentSHA256": "644baeb5d4c737c2d01a6113441875f925cf01ad7fd99a480b5366b123d51772",
+      "snapshot": "stage01/nativeILUV251.cpp"
+    },
+    {
+      "process": "process_prepare2",
+      "path": "E:\\RocketAeroHeat\\scripts\\runNativeILUV251.py",
+      "executedSHA256": "34787c591b7335dba3df5b54a291dc87a2b4e316d418c65127dc233be1056ff0",
+      "currentSHA256": "92215bc5bf0319d296c89dec53a8b2643af159baff86a9cbf08e3d6fd3911a18",
+      "snapshot": "process_build/execution_sources/34787c591b7335dba3df5b54a291dc87a2b4e316d418c65127dc233be1056ff0.py"
+    },
+    {
+      "process": "process_prepare2",
+      "path": "E:\\RocketAeroHeat\\native\\su2PhaseAwareAir\\nativeILUV251.cpp",
+      "executedSHA256": "fcd900076054b9e51420f19c5aefeed4ac9fe4845f33c6aa12ca58f72f8cfe6b",
+      "currentSHA256": "644baeb5d4c737c2d01a6113441875f925cf01ad7fd99a480b5366b123d51772",
+      "snapshot": "stage01/nativeILUV251.cpp"
+    },
+    {
+      "process": "process_recovery",
+      "path": "E:\\RocketAeroHeat\\scripts\\recoverILUSurfaceV251.py",
+      "executedSHA256": "2b5c29e4cff2d614679bbb28843a40567018bb1919dd3154443a8c756a7a687a",
+      "currentSHA256": "bd7de75099fb7af420d3a9d83d229984b1d62b765ee7fc451c6fbc1db50e6a29",
+      "snapshot": "process_recovery/execution_sources/2b5c29e4cff2d614679bbb28843a40567018bb1919dd3154443a8c756a7a687a.py"
+    },
+    {
+      "process": "process_recovery",
+      "path": "E:\\RocketAeroHeat\\scripts\\runNativeILUV251.py",
+      "executedSHA256": "72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789",
+      "currentSHA256": "92215bc5bf0319d296c89dec53a8b2643af159baff86a9cbf08e3d6fd3911a18",
+      "snapshot": "process_audit2/execution_sources/72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789.py"
+    },
+    {
+      "process": "process_rocket",
+      "path": "E:\\RocketAeroHeat\\scripts\\runNativeILUV251.py",
+      "executedSHA256": "72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789",
+      "currentSHA256": "92215bc5bf0319d296c89dec53a8b2643af159baff86a9cbf08e3d6fd3911a18",
+      "snapshot": "process_audit2/execution_sources/72a3b1b15f5aafb56dd5b2b470116d90e8b9d2bd2813c26a040de3b1ef6cf789.py"
+    },
+    {
+      "process": "process_rocket",
+      "path": "E:\\RocketAeroHeat\\native\\su2PhaseAwareAir\\nativeILUV251.cpp",
+      "executedSHA256": "fcd900076054b9e51420f19c5aefeed4ac9fe4845f33c6aa12ca58f72f8cfe6b",
+      "currentSHA256": "644baeb5d4c737c2d01a6113441875f925cf01ad7fd99a480b5366b123d51772",
+      "snapshot": "stage01/nativeILUV251.cpp"
+    }
+  ],
+  "closedCLIs": {
+    "scripts/runNativeILUV251.py": "v251 native ILU branch closed; follow NEXT_DECISION",
+    "scripts/auditNativeILUV251.py": "v251 native ILU audit closed; follow NEXT_DECISION",
+    "scripts/exportNativeILUV251.py": "v251 native development export closed; follow NEXT_DECISION",
+    "scripts/recoverILUSurfaceV251.py": "v251 old-state surface recovery closed; follow NEXT_DECISION"
+  },
+  "ownedFiles": [
+    "scripts/runNativeILUV251.py",
+    "scripts/auditNativeILUV251.py",
+    "scripts/exportNativeILUV251.py",
+    "scripts/recoverILUSurfaceV251.py",
+    "scripts/finalizeNativeILUV251.py",
+    "native/su2PhaseAwareAir/nativeILUV251.cpp",
+    "tests/testNativeILUV251.js",
+    "docs/NATIVE_ILU_ACCEPTANCE_V251.md",
+    "docs/validation/v251/PLAN.md",
+    "docs/validation/v251/SURFACE_RECOVERY.md",
+    "docs/validation/v251/NEXT_DECISION.md",
+    "AGENTS.md",
+    "docs/PROJECT_GOALS.md",
+    "README.md",
+    ".gitattributes"
+  ],
+  "uniqueDataDeleted": false,
+  "newPackageInstalled": false,
+  "unmeteredDevelopmentReadsAndPublicationDisclosed": true,
+  "outputLogicalBytesBeforeFinalReport": 593283861,
+  "finalizationSeconds": 4.140999999999622
+}
