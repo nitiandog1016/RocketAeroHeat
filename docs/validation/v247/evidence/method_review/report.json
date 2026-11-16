@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "actualNativeRecoverySucceededBeforeObserverAbort": true,
+  "sourceBindings": [
+    {
+      "path": "outputs/v235_validation/stage01/CNSVariable.cpp",
+      "sha256": "e7b284dd4666685e9d91d28ff1a6a53cd2216815ea52c36bfaba045856400de7",
+      "startLine": 220,
+      "endLine": 230,
+      "excerpt": "    SetSoundSpeed(iPoint, FluidModel->GetSoundSpeed2());\n    SetTemperature(iPoint, FluidModel->GetTemperature());\n\n    RightVol = false;\n    if (rah_single_observer::rejection) rah_single_observer::rejection(this,iPoint,trial.data(),restored.data(),true,rejected_reason.c_str());\n\n\n  }\n\n  /*--- Set enthalpy ---*/\n"
+    },
+    {
+      "path": "outputs/v245_validation/stage01/CMultiGridIntegration_observed.cpp",
+      "sha256": "19a92f8fb7ae514c19c20f002bfbf8cdbf203fac6e48f20bd7e6bbd63cd10f6c",
+      "startLine": 691,
+      "endLine": 701,
+      "excerpt": "    SmoothProlongated_Correction(RunTime_EqSystem, solver_fine, geometry_fine, mgOpts.MG_CorrecSmooth[iMesh], mgOpts.MG_Smooth_Coeff, config, iMesh);\n\n\n    if(rah_fas_observer::transfer) rah_fas_observer::transfer(\"prolong_in\",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);\n    SetProlongated_Correction(solver_fine, geometry_fine, config, iMesh);\n    if(rah_fas_observer::transfer) rah_fas_observer::transfer(\"prolong_out\",geometry_fine,solver_container_fine,geometry_coarse,solver_container_coarse,config);\n\n\n    /*--- Solution post-smoothing in the prolongated grid. ---*/\n\n    PostSmoothing(RunTime_EqSystem, solver_fine, numerics_fine, geometry_fine, solver_container_fine,"
+    }
+  ],
+  "externalSourceReview": [
+    {
+      "file": "petsc_fas.c",
+      "sha256": "f160e62a492fe71a6fd9d58440e1397ce077412c8ce62db8638d137715815182",
+      "excerpts": [
+        {
+          "line": 681,
+          "text": "      PetscCall(MatInterpolate(interpolate, X_c, Xhat));\n      if (fasc->eventinterprestrict) PetscCall(PetscLogEventEnd(fasc->eventinterprestrict, snes, 0, 0, 0));\n      PetscCall(VecScale(Xhat, -1.0)); // SNESLineSearch expects the descent direction as -Y, so negate the correction\n      PetscCall(SNESLineSearchApply(fas->coarseCorrectionLineSearch, X, F, &snes->norm, Xhat));\n      SNESCheckLineSearchFailure(snes, fas->coarseCorrectionLineSearch);\n      if (snes->reason < 0) PetscFunctionReturn(PETSC_SUCCESS);\n    } else {"
+        },
+        {
+          "line": 923,
+          "text": "  PetscBool isFine;\n\n  PetscFunctionBegin;\n  PetscCheck(!snes->xl && !snes->xu && !snes->ops->computevariablebounds, PetscObjectComm((PetscObject)snes), PETSC_ERR_ARG_WRONGSTATE, \"SNES solver %s does not support bounds\", ((PetscObject)snes)->type_name);\n\n  PetscCall(PetscCitationsRegister(SNESCitation, &SNEScite));\n  snes->reason = SNES_CONVERGED_ITERATING;"
+        }
+      ],
+      "gitBlobSHA1": "7a2b615b844364f06a7692fa48e141c961259342",
+      "url": "https://github.com/petsc/petsc/blob/main/src/snes/impls/fas/fas.c",
+      "refDescription": "default branch returned by GitHub connector; not a pinned release or verified installation"
+    },
+    {
+      "file": "petsc_linesearchbt.c",
+      "sha256": "be2c7e37a97fcb6f32106153579652f89b79db46ed7286876efbcfc5cc23c155",
+      "excerpts": [
+        {
+          "line": 123,
+          "text": "    PetscCall(VecDotRealPart(Y, F, &initslope));\n  } else {\n    /* slope comes from the normal equations */\n    PetscCall(MatMult(jac, Y, W));\n    PetscCall(VecDotRealPart(F, W, &initslope));\n    if (initslope > 0.0) initslope = -initslope;\n    if (initslope == 0.0) initslope = -1.0;"
+        },
+        {
+          "line": 160,
+          "text": "      PetscCall(PetscViewerASCIISubtractTab(monitor, ((PetscObject)linesearch)->tablevel));\n    }\n    if (lambda <= minlambda) SNESCheckFunctionDomainError(snes, g);\n    lambda *= .5;\n  }\n\n  if (!objective) PetscCall(PetscInfo(snes, \"Initial fnorm %14.12e gnorm %14.12e\\n\", (double)fnorm, (double)gnorm));"
+        }
+      ],
+      "gitBlobSHA1": "4519aefdc2f1db8ae627bcaa8a79d5ce154b441c",
+      "url": "https://github.com/petsc/petsc/blob/main/src/snes/linesearch/impls/bt/linesearchbt.c",
+      "refDescription": "default branch returned by GitHub connector; not a pinned release or verified installation"
+    },
+    {
+      "file": "petsc_linesearchsecant.c",
+      "sha256": "d67af9ef947a80f609ee0e8d312bdff1659d5488c62321c1e10a954724ddcdc6",
+      "excerpts": [
+        {
+          "line": 105,
+          "text": "      maxlambda = .95 * lambda;\n\n      /* shrink lambda towards the previous one which was viable */\n      lambda     = .5 * (lambda + lambda_old);\n      lambda_mid = .5 * (lambda + lambda_old);\n    }\n"
+        },
+        {
+          "line": 97,
+          "text": "          PetscCall(PetscViewerASCIIPrintf(monitor, \"    Line search: objective function at lambda = %g <= lambda_min = %g is infinity or NaN, can not further cut lambda\\n\", (double)lambda, (double)lambda));\n          PetscCall(PetscViewerASCIISubtractTab(monitor, ((PetscObject)linesearch)->tablevel));\n        }\n        PetscCall(SNESLineSearchSetReason(linesearch, SNES_LINESEARCH_FAILED_REDUCT));\n        PetscFunctionReturn(PETSC_SUCCESS);\n      }\n"
+        }
+      ],
+      "gitBlobSHA1": "3178556dc12e81e929470917fa7c1b1f0df9143f",
+      "url": "https://github.com/petsc/petsc/blob/main/src/snes/linesearch/impls/secant/linesearchsecant.c",
+      "refDescription": "default branch returned by GitHub connector; not a pinned release or verified installation"
+    }
+  ],
+  "adoptedNext": "retain verified native legal-old-state recovery; passive recovered=true observation and whole-cycle accounting before any qualification",
+  "notAdoptedNow": "installing PETSc or adding custom prolongation damping/line search; not needed to remove observer-only abort",
+  "conditionalAlternative": "PETSc FAS coarse correction line search with SECANT; requires pinned build, side-effect-safe native residual adapter and domain-error semantics",
+  "nativeFallbackNotConservativeProof": true,
+  "actualPreProlongationStateMissing": true,
+  "postCallbackFullFlowSACompletionNotTested": true,
+  "terminalResidualCodeCompiledNotReached": true,
+  "newCFDAdmitted": false,
+  "newQualifiedAreaM2": 0,
+  "physicalQualification": false
+}

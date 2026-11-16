@@ -4,7 +4,11 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 ## 最新状态与交付（2026-11-16）
 
-最新[v246原真实网格两层FAS](docs/REAL_FAS_CONTROL_V246.md)：335726细点→44484粗点，完整19752壁面及真实下游保持；观察开/关各5次完整flow-SA逐位一致，真实壁投影、SA及层间质量/能量通过。**这是完整兼容控制，尚未收敛，没有新增合格热面积。**
+最新[v247真实FAS有限发展](docs/FAS_BOUNDED_DEVELOPMENT_V247.md)：原完整网格完成60更新，第61次原生已合法恢复旧态，但观察器按合同中止；**未收敛、无新增合格热面积**。不是资源不足或原生不可恢复崩溃。三阶段0/1/50、14字段原面研究已接[科研图](docs/validation/v247/evidence/workbench01/rocket_fas_control.png)，本地入口`outputs/v247_validation/workbench01/index.html`。
+
+[下一执行点](docs/validation/v247/NEXT_DECISION.md)：保留成熟原生合法恢复，记录完整接受/扰动账并完成有界发展与正常终态原生残差；不扫参数或重跑旧故障。原面/近壁/全部区域与科学门槛不变，工程/UI最高，总目标active。
+
+前版[v246原真实网格两层FAS](docs/REAL_FAS_CONTROL_V246.md)：335726细点→44484粗点，完整19752壁面及真实下游保持；观察开/关各5次完整flow-SA逐位一致，真实壁投影、SA及层间质量/能量通过。**这是完整兼容控制，尚未收敛，没有新增合格热面积。**
 
 本地`outputs/v246_validation/workbench01/index.html`提供0/1/5三阶段14字段，237024原面值/前端纯函数通过；[科研对照图](docs/validation/v246/evidence/workbench01/rocket_fas_control.png)区分给定Tw、壁流体温度和未知固体Tw。[下一执行点](docs/validation/v246/NEXT_DECISION.md)为同固定组合的一次有界真实发展，不再重复预检/5步，不把FAS修正数组当残差。工程/UI最高，总目标active。
 
