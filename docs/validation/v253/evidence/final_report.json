@@ -1,0 +1,367 @@
+{
+  "passed": true,
+  "goalStatus": "active",
+  "wholeSurfaceGoalComplete": false,
+  "baseCommit": "65523caaedb00a0cceb466cab1a3e333d23599ce",
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "commonRingEdges": 46,
+  "availableProfiles": 123,
+  "missingProfiles": 15,
+  "physicalConservativeSamples": 73923,
+  "onePassJointInletAccepted": false,
+  "profileReadyForCFD": false,
+  "newQualifiedAreaM2": 0,
+  "newHeatAreaM2": 0,
+  "physicalQualification": false,
+  "independentAudit": {
+    "passed": true,
+    "commonRingEdges": 46,
+    "availableProfileInlets": 123,
+    "missingProfileInlets": 15,
+    "physicalConservativeSamples": 73923,
+    "sourceTableDirectODEMaximumDifference": 1.6101570299298373e-08,
+    "labelJacobianRelativeDifference": 1.229097934540846e-10,
+    "maximumMassIntegrationRelativeDifference": 1.7969824918084853e-06,
+    "maximumWaveConservationRelativeError": 1.5276670828463955e-15,
+    "maximumIndependentEdgeRelativeDifference": 2.0872192862952943e-14,
+    "maximumDirectODEMassRelativeDifference": 7.334190992303036e-07,
+    "maximumMomentumReassociationAbsoluteDifference": 7.105427357601002e-15,
+    "momentumCheck": "two multiplies: abs(error)<=4*eps*abs(reference)",
+    "onePassJointInletAccepted": false,
+    "profileReadyForCFD": false,
+    "physicalQualification": false,
+    "newQualifiedAreaM2": 0,
+    "missingProfilePositions": [
+      [
+        "base",
+        32
+      ],
+      [
+        "base",
+        33
+      ],
+      [
+        "base",
+        34
+      ],
+      [
+        "base",
+        35
+      ],
+      [
+        "base",
+        36
+      ],
+      [
+        "fine",
+        32
+      ],
+      [
+        "fine",
+        33
+      ],
+      [
+        "fine",
+        34
+      ],
+      [
+        "fine",
+        35
+      ],
+      [
+        "fine",
+        36
+      ],
+      [
+        "history",
+        32
+      ],
+      [
+        "history",
+        33
+      ],
+      [
+        "history",
+        34
+      ],
+      [
+        "history",
+        35
+      ],
+      [
+        "history",
+        36
+      ]
+    ],
+    "inputSHA256": {
+      "outputs\\v253_validation\\inlet02\\inlets.json": "35b823dcfd817f99e1fcca16e1b2117ececcaa1f1c4cf56945e95722dc634947",
+      "outputs\\v253_validation\\inlet02\\inlet_profiles.npz": "be5b68cb1ecb03dccc7622233c682a5531684c7a2509c8eb86ca239e998ca5c2",
+      "outputs\\v253_validation\\inlet01\\shock_mass_source.json": "f71ec4a3474bfa12ea41327e5a2a856877589452f889aafd181d1aeee3acecf3"
+    },
+    "sourceKind": "same-equations independent pressure-coordinate shock / RK45 direct source / original topology",
+    "elapsedSeconds": 3.687000000001717
+  },
+  "productionSummary": {
+    "passed": true,
+    "originalFaces": 19752,
+    "originalAreaM2": 1.9646292565715642,
+    "targetFaces": 3128,
+    "commonRingEdges": 46,
+    "ringXM": 0.038727995668809724,
+    "sourceRadiusM": 0.049761432036371324,
+    "maximumRadialGeometryErrorM": 3.126925635257155e-05,
+    "maximumNormalLabelComponentM": 0.00013823719337704358,
+    "projectedMetricRangeM": [
+      0.02654528707620529,
+      0.031552600674919454
+    ],
+    "labelJacobianRange": [
+      0.7367743306185331,
+      1.920081744780163
+    ],
+    "maximumMetricVsRadiusRelativeDifference": 0.15682986648565245,
+    "sourceEntropyJkgK": 1821.301318941735,
+    "sourceTotalEnthalpyJkg": 1066864.975934657,
+    "branches": {
+      "base": {
+        "totalInlets": 46,
+        "availableInlets": 41,
+        "unavailableInlets": 5,
+        "normalSamples": 601,
+        "minMaxEntropyCorrection": [
+          -14.252620806182904,
+          -2.3441958001430976
+        ],
+        "maximumEdgeTemperatureCorrection": 0.012542747642300012,
+        "maximumEdgeSpeedCorrection": 0.03533931515613209,
+        "correctionsBelowOnePercent": 0,
+        "sourceFiniteProfileMassFluxPerWidthRange": [
+          0.013473700728994514,
+          0.03175613582628106
+        ],
+        "profileReadyForCFD": false
+      },
+      "fine": {
+        "totalInlets": 46,
+        "availableInlets": 41,
+        "unavailableInlets": 5,
+        "normalSamples": 601,
+        "minMaxEntropyCorrection": [
+          -14.248727337660057,
+          -2.3435917574640825
+        ],
+        "maximumEdgeTemperatureCorrection": 0.01253933919891892,
+        "maximumEdgeSpeedCorrection": 0.03533037332453359,
+        "correctionsBelowOnePercent": 0,
+        "sourceFiniteProfileMassFluxPerWidthRange": [
+          0.013470231609240034,
+          0.0317475019516536
+        ],
+        "profileReadyForCFD": false
+      },
+      "history": {
+        "totalInlets": 46,
+        "availableInlets": 41,
+        "unavailableInlets": 5,
+        "normalSamples": 601,
+        "minMaxEntropyCorrection": [
+          -14.18436610741287,
+          -2.352654032519922
+        ],
+        "maximumEdgeTemperatureCorrection": 0.012482994292282168,
+        "maximumEdgeSpeedCorrection": 0.03546451640828585,
+        "correctionsBelowOnePercent": 0,
+        "sourceFiniteProfileMassFluxPerWidthRange": [
+          0.013522277643795037,
+          0.031604775924493136
+        ],
+        "profileReadyForCFD": false
+      }
+    },
+    "sourceSHA256": {
+      "outputs\\v252_validation\\matlab01\\base.json": "1c20c92f00cac01fb914c9b5dc3dcb53c38f02216df58978554d779c99f95b5e",
+      "outputs\\v252_validation\\matlab01\\fine.json": "f67eaba4ee8cb6c412f3426d75ea41e8b4e6cabe34b2b6c0543e2029f0621d4d",
+      "outputs\\v252_validation\\matlab01\\history.json": "2ef9fae16e0bcfbe6489ec0cf2c1d85a1ae7e706082db5c9989f779e1a18fd12"
+    },
+    "newQualifiedAreaM2": 0,
+    "newHeatAreaM2": 0,
+    "acceptedEdge": false,
+    "profileReadyForCFD": false,
+    "exactExistingViscousCutBoundaryProduced": false,
+    "threeDimensionalRANSInletProduced": false,
+    "outputRole": "actual shared-ring profile and mass-matched entropy candidate; joint feedback not closed"
+  },
+  "workbenchSummary": {
+    "passed": true,
+    "branches": 3,
+    "inletStations": 138,
+    "availableProfiles": 123,
+    "missingProfiles": 15,
+    "fullNormalSamples": 73923,
+    "sourceDataRoundtripExact": true,
+    "physicalQualification": false,
+    "newQualifiedAreaM2": 0,
+    "sharedWebGLChanged": false,
+    "browserInteractionTested": false,
+    "existingSurfaceDataCopied": false,
+    "reusedSurfaceDataPath": "outputs/v252_validation/workbench02/case-data.js",
+    "reusedSurfaceDataSHA256": "5fa4c9b9358ea9529a5f373d1072498b586538a04b343a307ea2e020feb59da5",
+    "currentInletDataSHA256": "72e8d4e2c0b906c661b2ce5c1e687b97d96a0acbc6c4c3df60bfd66545fd808d"
+  },
+  "scientificImagesVisuallyInspected": true,
+  "browserInteractionTested": false,
+  "protectedCount": 29,
+  "engineeringFilesUnchanged": 54,
+  "candidateCount": 2,
+  "unrelatedTrackedSHA256": {
+    "tests/verifyWebSectionExport.py": "6f67f9fecc3e806ed74ab879ff8a5ba1b745a239158babba55d1856d4d54225b",
+    "web/section.js": "74fd8f6cd6f017ecb60a578ebedfe5aabfda2cde8ce5477fdd5b4b9bf24f9169",
+    "web/viewer.js": "90d73959c1d39bf7fd0919d1a034e4994c24edd90a922270064a3c5892088ca5"
+  },
+  "historicalSourceBindings": [
+    {
+      "process": "process_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\runEntropyInletV253.py",
+      "executedSHA256": "bce8d33e5c4752d6bd24fce51b75da3c08fe9eefb1ed54030ed320c62eaa57dc",
+      "currentSHA256": "2c67f690b01cb652a8efa44902fec18b9541aa948431cab150e9214326e27019",
+      "snapshot": "process_audit/execution_sources/bce8d33e5c4752d6bd24fce51b75da3c08fe9eefb1ed54030ed320c62eaa57dc.py"
+    },
+    {
+      "process": "process_audit",
+      "path": "E:\\RocketAeroHeat\\scripts\\auditEntropyInletV253.py",
+      "executedSHA256": "49ebf7de1e1b6285a1f15ff33dc1e267ddc060ce94fb34b2b7a5cb6cdadcebdd",
+      "currentSHA256": "787fcf87239094b7fb0d2daae849281fb2b2a1b87708b526f90a04a8dfd9616b",
+      "snapshot": "process_audit/execution_sources/49ebf7de1e1b6285a1f15ff33dc1e267ddc060ce94fb34b2b7a5cb6cdadcebdd.py"
+    },
+    {
+      "process": "process_audit2",
+      "path": "E:\\RocketAeroHeat\\scripts\\runEntropyInletV253.py",
+      "executedSHA256": "08affca4955827619d8e6622b2da99d96405e92735087ce2dc236860f4e9cb73",
+      "currentSHA256": "2c67f690b01cb652a8efa44902fec18b9541aa948431cab150e9214326e27019",
+      "snapshot": "process_audit2/execution_sources/08affca4955827619d8e6622b2da99d96405e92735087ce2dc236860f4e9cb73.py"
+    },
+    {
+      "process": "process_audit2",
+      "path": "E:\\RocketAeroHeat\\scripts\\auditEntropyInletV253.py",
+      "executedSHA256": "4f7b1bf3dc7ce5b3f0a8d56ba464558e3808418943876a00e0e51deb513e3844",
+      "currentSHA256": "787fcf87239094b7fb0d2daae849281fb2b2a1b87708b526f90a04a8dfd9616b",
+      "snapshot": "process_audit2/execution_sources/4f7b1bf3dc7ce5b3f0a8d56ba464558e3808418943876a00e0e51deb513e3844.py"
+    },
+    {
+      "process": "process_export",
+      "path": "E:\\RocketAeroHeat\\scripts\\runEntropyInletV253.py",
+      "executedSHA256": "bf18e9ec0ed71f4704f52e558e9e6dd7e00ee8f5c5ee2874480797ea6cb73cfe",
+      "currentSHA256": "2c67f690b01cb652a8efa44902fec18b9541aa948431cab150e9214326e27019",
+      "snapshot": "process_export/execution_sources/bf18e9ec0ed71f4704f52e558e9e6dd7e00ee8f5c5ee2874480797ea6cb73cfe.py"
+    },
+    {
+      "process": "process_export",
+      "path": "E:\\RocketAeroHeat\\scripts\\exportEntropyInletV253.py",
+      "executedSHA256": "069ce4492a30a5a8ac39202353bc0cf1e816b267c11d48ee2e1bc29abc112c26",
+      "currentSHA256": "fdaf7afaadec09f853b21840f75fbd6f2643400657225e517ebbdec1dd48c565",
+      "snapshot": "process_export/execution_sources/069ce4492a30a5a8ac39202353bc0cf1e816b267c11d48ee2e1bc29abc112c26.py"
+    },
+    {
+      "process": "process_produce",
+      "path": "E:\\RocketAeroHeat\\scripts\\runEntropyInletV253.py",
+      "executedSHA256": "31a222244f951d75e7bee691cce2bbfb0a091b379cceb8d9c057acb17b3c277f",
+      "currentSHA256": "2c67f690b01cb652a8efa44902fec18b9541aa948431cab150e9214326e27019",
+      "snapshot": "process_produce2/execution_sources/31a222244f951d75e7bee691cce2bbfb0a091b379cceb8d9c057acb17b3c277f.py"
+    },
+    {
+      "process": "process_produce",
+      "path": "E:\\RocketAeroHeat\\scripts\\produceEntropyInletV253.py",
+      "executedSHA256": "62085a113ded3052cbb52fe75b5adbfe6bb2825fc78aa134898ca6b0945279bf",
+      "currentSHA256": "eedcefb5d16091d3f1bac77a86531cf74b1c7e9a9c2de705875026dc451cd671",
+      "snapshot": "process_produce/execution_sources/62085a113ded3052cbb52fe75b5adbfe6bb2825fc78aa134898ca6b0945279bf.py"
+    },
+    {
+      "process": "process_produce",
+      "path": "E:\\RocketAeroHeat\\docs\\validation\\v253\\PLAN.md",
+      "executedSHA256": "35034280487f157c02fbb94a2ec6770028a8d1eff100601a95550d24f378c118",
+      "currentSHA256": "e9839c2f85675cbc4102bcad4a8cc6c41d03e058783fa1cbb1367420e08817a7",
+      "snapshot": "process_produce2/execution_sources/35034280487f157c02fbb94a2ec6770028a8d1eff100601a95550d24f378c118.md"
+    },
+    {
+      "process": "process_produce2",
+      "path": "E:\\RocketAeroHeat\\scripts\\runEntropyInletV253.py",
+      "executedSHA256": "31a222244f951d75e7bee691cce2bbfb0a091b379cceb8d9c057acb17b3c277f",
+      "currentSHA256": "2c67f690b01cb652a8efa44902fec18b9541aa948431cab150e9214326e27019",
+      "snapshot": "process_produce2/execution_sources/31a222244f951d75e7bee691cce2bbfb0a091b379cceb8d9c057acb17b3c277f.py"
+    },
+    {
+      "process": "process_produce2",
+      "path": "E:\\RocketAeroHeat\\scripts\\produceEntropyInletV253.py",
+      "executedSHA256": "44e9de18e6b99bde42580d4d497a1fb0d99a68efbbc60dd8683616ac02950f61",
+      "currentSHA256": "eedcefb5d16091d3f1bac77a86531cf74b1c7e9a9c2de705875026dc451cd671",
+      "snapshot": "process_produce2/execution_sources/44e9de18e6b99bde42580d4d497a1fb0d99a68efbbc60dd8683616ac02950f61.py"
+    },
+    {
+      "process": "process_produce2",
+      "path": "E:\\RocketAeroHeat\\docs\\validation\\v253\\PLAN.md",
+      "executedSHA256": "35034280487f157c02fbb94a2ec6770028a8d1eff100601a95550d24f378c118",
+      "currentSHA256": "e9839c2f85675cbc4102bcad4a8cc6c41d03e058783fa1cbb1367420e08817a7",
+      "snapshot": "process_produce2/execution_sources/35034280487f157c02fbb94a2ec6770028a8d1eff100601a95550d24f378c118.md"
+    },
+    {
+      "process": "process_produce3",
+      "path": "E:\\RocketAeroHeat\\scripts\\runEntropyInletV253.py",
+      "executedSHA256": "2399b9e392134231342ba1e751cf1c98926b8c3bfa0c5359a50ffde48b82ea02",
+      "currentSHA256": "2c67f690b01cb652a8efa44902fec18b9541aa948431cab150e9214326e27019",
+      "snapshot": "process_produce3/execution_sources/2399b9e392134231342ba1e751cf1c98926b8c3bfa0c5359a50ffde48b82ea02.py"
+    },
+    {
+      "process": "process_produce3",
+      "path": "E:\\RocketAeroHeat\\scripts\\produceEntropyInletV253.py",
+      "executedSHA256": "51886ad682347003d7763791f79f82a61e0d9fba1f6de6bc14f484ad40ce0702",
+      "currentSHA256": "eedcefb5d16091d3f1bac77a86531cf74b1c7e9a9c2de705875026dc451cd671",
+      "snapshot": "process_produce3/execution_sources/51886ad682347003d7763791f79f82a61e0d9fba1f6de6bc14f484ad40ce0702.py"
+    }
+  ],
+  "allReceiptsTerminalStableGroupsEmpty": true,
+  "executionFailuresPreserved": {
+    "process_audit": 1,
+    "process_produce": 1,
+    "process_produce2": 1
+  },
+  "processSeconds": {
+    "audit": 11.076999999997497,
+    "offline": 3.8590000000003783
+  },
+  "maxSampledGroupRSSBytes": 245927936,
+  "closedCLIs": {
+    "scripts/runEntropyInletV253.py": "v253 entropy inlet task closed; follow NEXT_DECISION",
+    "scripts/produceEntropyInletV253.py": "v253 fixed inlet production closed; follow NEXT_DECISION",
+    "scripts/auditEntropyInletV253.py": "v253 fixed inlet audit closed; follow NEXT_DECISION",
+    "scripts/exportEntropyInletV253.py": "v253 fixed inlet export closed; follow NEXT_DECISION"
+  },
+  "ownedFiles": [
+    "scripts/runEntropyInletV253.py",
+    "scripts/produceEntropyInletV253.py",
+    "scripts/auditEntropyInletV253.py",
+    "scripts/exportEntropyInletV253.py",
+    "scripts/phaseAwareEntropyInlet.py",
+    "scripts/finalizeEntropyInletV253.py",
+    "web/entropy-inlet-v253.html",
+    "web/entropy-inlet-v253.js",
+    "tests/testEntropyInletViewerV253.js",
+    "docs/ENTROPY_INLET_V253.md",
+    "docs/validation/v253/PLAN.md",
+    "docs/validation/v253/NEXT_DECISION.md",
+    "docs/CURRENT_STATE.md",
+    "docs/EXECUTION_INDEX.md",
+    ".gitattributes"
+  ],
+  "localOnly": true,
+  "githubPushed": false,
+  "newCFD": false,
+  "MATLABExecuted": false,
+  "sharedWebGLChanged": false,
+  "originalSourceProfilesUnchanged": true,
+  "uniqueDataDeleted": false,
+  "newPackageInstalled": false,
+  "developmentReadsAndArchivingSeparate": true,
+  "outputLogicalBytesBeforeFinalReport": 21299688,
+  "finalizationSeconds": 2.5160000000032596
+}

@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v253报告](ENTROPY_INLET_V253.md)、[最终回执](validation/v253/evidence/final_report.json)、[当时下一决定](validation/v253/NEXT_DECISION.md)。真实共同环入口与一次耦合拒绝；本地交付。
 - [v252报告](PHASE_NONSIMILAR_PROFILES_V252.md)、[最终回执](validation/v252/evidence/final_report.json)、[当时下一决定](validation/v252/NEXT_DECISION.md)。是否仍为最新请读当前页。
 - [公开实验模型资料](validation/public_benchmarks_20261116/README.md)。
 - [工程算法报告交付](reports/20261112_algorithm_inventory/README.md)。
