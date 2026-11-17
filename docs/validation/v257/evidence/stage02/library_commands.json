@@ -1,0 +1,40 @@
+{
+  "configure": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\cmake.exe",
+    "-S",
+    "E:\\RocketAeroHeat\\tools\\runtime\\sundials-7.4.0-8e17876\\source",
+    "-B",
+    "E:\\RocketAeroHeat\\tools\\runtime\\sundials-7.4.0-8e17876\\build",
+    "-G",
+    "Ninja",
+    "-DCMAKE_C_COMPILER=E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\gcc.exe",
+    "-DCMAKE_MAKE_PROGRAM=E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\ninja.exe",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DBUILD_SHARED_LIBS=OFF",
+    "-DBUILD_STATIC_LIBS=ON",
+    "-DBUILD_ARKODE=OFF",
+    "-DBUILD_CVODE=OFF",
+    "-DBUILD_CVODES=OFF",
+    "-DBUILD_IDA=OFF",
+    "-DBUILD_IDAS=OFF",
+    "-DBUILD_KINSOL=ON",
+    "-DBUILD_TESTING=OFF",
+    "-DBUILD_BENCHMARKS=OFF",
+    "-DEXAMPLES_ENABLE_C=OFF",
+    "-DEXAMPLES_ENABLE_CXX=OFF",
+    "-DEXAMPLES_INSTALL=OFF",
+    "-DBUILD_FORTRAN_MODULE_INTERFACE=OFF",
+    "-DENABLE_OPENMP=OFF",
+    "-DENABLE_MPI=OFF",
+    "-DSUNDIALS_INDEX_SIZE=64",
+    "-DSUNDIALS_PRECISION=double",
+    "-DSUNDIALS_LOGGING_LEVEL=3"
+  ],
+  "build": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\cmake.exe",
+    "--build",
+    "E:\\RocketAeroHeat\\tools\\runtime\\sundials-7.4.0-8e17876\\build",
+    "--parallel",
+    "1"
+  ]
+}

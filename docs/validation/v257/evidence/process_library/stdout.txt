@@ -1,0 +1,382 @@
+-- The C compiler identification is GNU 16.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: E:/RocketAeroHeat/tools/runtime/su2-thermal-build/toolchain/w64devkit/bin/gcc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- SUNDIALS_GIT_VERSION: 
+-- Building SUNDIALS in 'Release' mode.
+-- SUNDIALS logging level set to 3
+CMake Warning at cmake/SundialsBuildOptionsPre.cmake:121 (message):
+  SUNDIALS built with additional logging turned on, performance may be
+  affected.
+Call Stack (most recent call first):
+  CMakeLists.txt:163 (include)
+
+
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of int64_t
+-- Check size of int64_t - done
+-- Using int64_t for indices
+-- C standard set to 99
+-- C extensions set to ON
+-- Performing Test SUNDIALS_C_COMPILER_HAS_BUILTIN_EXPECT
+-- Performing Test SUNDIALS_C_COMPILER_HAS_BUILTIN_EXPECT - Success
+-- Performing Test SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_ASSUME
+-- Performing Test SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_ASSUME - Success
+-- Performing Test SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_UNUSED
+-- Performing Test SUNDIALS_C_COMPILER_HAS_ATTRIBUTE_UNUSED - Success
+-- Looking for POSIX timers... found
+-- Performing Test COMPILER_HAS_DEPRECATED_MSG
+-- Performing Test COMPILER_HAS_DEPRECATED_MSG - Success
+-- Appending C RELEASE flags
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+-- Added NVECTOR_SERIAL module
+-- Added NVECTOR_MANYVECTOR module
+-- Added SUNMATRIX_BAND module
+-- Added SUNMATRIX_DENSE module
+-- Added SUNMATRIX_SPARSE module
+-- Added SUNLINSOL_BAND module
+-- Added SUNLINSOL_DENSE module
+-- Added SUNLINSOL_PCG module
+-- Added SUNLINSOL_SPBCGS module
+-- Added SUNLINSOL_SPFGMR module
+-- Added SUNLINSOL_SPGMR module
+-- Added SUNLINSOL_SPTFQMR module
+-- Added SUNNONLINSOL_NEWTON module
+-- Added SUNNONLINSOL_FIXEDPOINT module
+-- Added KINSOL module
+-- Configuring done (6.8s)
+-- Generating done (0.2s)
+-- Build files have been written to: E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/build
+[1/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundatanode/sundatanode_inmem.c.obj
+[2/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_adaptcontroller.c.obj
+[3/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_adjointcheckpointscheme.c.obj
+[4/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_adjointstepper.c.obj
+[5/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_band.c.obj
+[6/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_context.c.obj
+[7/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_dense.c.obj
+[8/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_datanode.c.obj
+[9/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_direct.c.obj
+[10/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_errors.c.obj
+[11/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_futils.c.obj
+[12/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_hashmap.c.obj
+[13/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_iterative.c.obj
+[14/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_linearsolver.c.obj
+[15/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_logger.c.obj
+[16/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_math.c.obj
+[17/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_matrix.c.obj
+[18/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_memory.c.obj
+[19/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_nonlinearsolver.c.obj
+[20/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_nvector_senswrapper.c.obj
+[21/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_nvector.c.obj
+[22/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_stepper.c.obj
+[23/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_profiler.c.obj
+[24/63] Building C object src/sundials/CMakeFiles/sundials_core_obj_static.dir/sundials_version.c.obj
+[25/63] Linking C static library bin\libsundials_core.a
+[26/63] Building C object src/sunmatrix/band/CMakeFiles/sundials_sunmatrixband_obj_static.dir/sunmatrix_band.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/band/sunmatrix_band.c: In function 'SUNBandMatrixStorage':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/band/sunmatrix_band.c:89:3: warning: 'SUNMatSpace_Band' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   89 |   A->ops->space                    = SUNMatSpace_Band;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/band/sunmatrix_band.c:29:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunmatrix/sunmatrix_band.h:129:12: note: declared here
+  129 | SUNErrCode SUNMatSpace_Band(SUNMatrix A, long int* lenrw, long int* leniw);
+      |            ^~~~~~~~~~~~~~~~
+[27/63] Building C object src/sunmatrix/dense/CMakeFiles/sundials_sunmatrixdense_obj_static.dir/sunmatrix_dense.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/dense/sunmatrix_dense.c: In function 'SUNDenseMatrix':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/dense/sunmatrix_dense.c:73:3: warning: 'SUNMatSpace_Dense' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   73 |   A->ops->space                    = SUNMatSpace_Dense;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/dense/sunmatrix_dense.c:26:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunmatrix/sunmatrix_dense.h:107:12: note: declared here
+  107 | SUNErrCode SUNMatSpace_Dense(SUNMatrix A, long int* lenrw, long int* leniw);
+      |            ^~~~~~~~~~~~~~~~~
+[28/63] Linking C static library bin\libsundials_sunmatrixband.a
+[29/63] Linking C static library bin\libsundials_sunmatrixdense.a
+[30/63] Building C object src/nvector/serial/CMakeFiles/sundials_nvecserial_obj_static.dir/nvector_serial.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/nvector/serial/nvector_serial.c: In function 'N_VNewEmpty_Serial':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/nvector/serial/nvector_serial.c:97:3: warning: 'N_VSpace_Serial' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   97 |   v->ops->nvspace           = N_VSpace_Serial;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/nvector/serial/nvector_serial.c:22:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/nvector/nvector_serial.h:119:6: note: declared here
+  119 | void N_VSpace_Serial(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~~~~~~~~
+[31/63] Building C object src/nvector/manyvector/CMakeFiles/sundials_nvecmanyvector_obj_static.dir/nvector_manyvector.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/nvector/manyvector/nvector_manyvector.c: In function 'N_VNew_ManyVector':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/nvector/manyvector/nvector_manyvector.c:329:3: warning: 'N_VSpace_ManyVector' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  329 |   v->ops->nvspace       = N_VSpace_ManyVector;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/nvector/manyvector/nvector_manyvector.c:28:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/nvector/nvector_manyvector.h:105:6: note: declared here
+  105 | void N_VSpace_ManyVector(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/nvector/manyvector/nvector_manyvector.c: In function 'N_VSpace_ManyVector':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/nvector/manyvector/nvector_manyvector.c:587:7: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  587 |       N_VSpace(MANYVECTOR_SUBVEC(v, i), &lrw1, &liw1);
+      |       ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_adjointcheckpointscheme.h:18,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_core.h:19,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/nvector/nvector_manyvector.h:41:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+[32/63] Building C object src/sunmatrix/sparse/CMakeFiles/sundials_sunmatrixsparse_obj_static.dir/sunmatrix_sparse.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/sparse/sunmatrix_sparse.c: In function 'SUNSparseMatrix':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/sparse/sunmatrix_sparse.c:93:3: warning: 'SUNMatSpace_Sparse' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   93 |   A->ops->space                    = SUNMatSpace_Sparse;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunmatrix/sparse/sunmatrix_sparse.c:32:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunmatrix/sunmatrix_sparse.h:184:12: note: declared here
+  184 | SUNErrCode SUNMatSpace_Sparse(SUNMatrix A, long int* lenrw, long int* leniw);
+      |            ^~~~~~~~~~~~~~~~~~
+[33/63] Building C object src/sunlinsol/band/CMakeFiles/sundials_sunlinsolband_obj_static.dir/sunlinsol_band.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/band/sunlinsol_band.c: In function 'SUNLinSol_Band':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/band/sunlinsol_band.c:83:3: warning: 'SUNLinSolSpace_Band' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   83 |   S->ops->space      = SUNLinSolSpace_Band;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/band/sunlinsol_band.c:24:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_band.h:78:12: note: declared here
+   78 | SUNErrCode SUNLinSolSpace_Band(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~~~~~~
+[34/63] Building C object src/sunlinsol/dense/CMakeFiles/sundials_sunlinsoldense_obj_static.dir/sunlinsol_dense.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/dense/sunlinsol_dense.c: In function 'SUNLinSol_Dense':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/dense/sunlinsol_dense.c:79:3: warning: 'SUNLinSolSpace_Dense' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   79 |   S->ops->space      = SUNLinSolSpace_Dense;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/dense/sunlinsol_dense.c:24:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_dense.h:83:12: note: declared here
+   83 | SUNErrCode SUNLinSolSpace_Dense(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~~~~~~~
+[35/63] Building C object src/sunlinsol/pcg/CMakeFiles/sundials_sunlinsolpcg_obj_static.dir/sunlinsol_pcg.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/pcg/sunlinsol_pcg.c: In function 'SUNLinSol_PCG':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/pcg/sunlinsol_pcg.c:85:3: warning: 'SUNLinSolSpace_PCG' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   85 |   S->ops->space             = SUNLinSolSpace_PCG;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/pcg/sunlinsol_pcg.c:24:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_pcg.h:126:12: note: declared here
+  126 | SUNErrCode SUNLinSolSpace_PCG(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/pcg/sunlinsol_pcg.c: In function 'SUNLinSolSpace_PCG':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/pcg/sunlinsol_pcg.c:565:3: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  565 |   N_VSpace(PCG_CONTENT(S)->r, &lrw1, &liw1);
+      |   ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_iterative.h:31,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_linearsolver.h:59,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_pcg.h:28:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+[36/63] Building C object src/sunlinsol/spbcgs/CMakeFiles/sundials_sunlinsolspbcgs_obj_static.dir/sunlinsol_spbcgs.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spbcgs/sunlinsol_spbcgs.c: In function 'SUNLinSol_SPBCGS':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spbcgs/sunlinsol_spbcgs.c:94:3: warning: 'SUNLinSolSpace_SPBCGS' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   94 |   S->ops->space             = SUNLinSolSpace_SPBCGS;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spbcgs/sunlinsol_spbcgs.c:25:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_spbcgs.h:108:12: note: declared here
+  108 | SUNErrCode SUNLinSolSpace_SPBCGS(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spbcgs/sunlinsol_spbcgs.c: In function 'SUNLinSolSpace_SPBCGS':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spbcgs/sunlinsol_spbcgs.c:823:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  823 |     N_VSpace(SPBCGS_CONTENT(S)->vtemp, &lrw1, &liw1);
+      |     ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_iterative.h:31,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_linearsolver.h:59,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_spbcgs.h:31:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+[37/63] Building C object src/sunlinsol/spfgmr/CMakeFiles/sundials_sunlinsolspfgmr_obj_static.dir/sunlinsol_spfgmr.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spfgmr/sunlinsol_spfgmr.c: In function 'SUNLinSol_SPFGMR':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spfgmr/sunlinsol_spfgmr.c:94:3: warning: 'SUNLinSolSpace_SPFGMR' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   94 |   S->ops->space             = SUNLinSolSpace_SPFGMR;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spfgmr/sunlinsol_spfgmr.c:25:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_spfgmr.h:118:12: note: declared here
+  118 | SUNErrCode SUNLinSolSpace_SPFGMR(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spfgmr/sunlinsol_spfgmr.c: In function 'SUNLinSolSpace_SPFGMR':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spfgmr/sunlinsol_spfgmr.c:758:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  758 |     N_VSpace(SPFGMR_CONTENT(S)->vtemp, &lrw1, &liw1);
+      |     ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_iterative.h:31,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_linearsolver.h:59,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_spfgmr.h:31:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+[38/63] Building C object src/sunlinsol/spgmr/CMakeFiles/sundials_sunlinsolspgmr_obj_static.dir/sunlinsol_spgmr.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spgmr/sunlinsol_spgmr.c: In function 'SUNLinSol_SPGMR':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spgmr/sunlinsol_spgmr.c:92:3: warning: 'SUNLinSolSpace_SPGMR' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   92 |   S->ops->space             = SUNLinSolSpace_SPGMR;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spgmr/sunlinsol_spgmr.c:25:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_spgmr.h:117:12: note: declared here
+  117 | SUNErrCode SUNLinSolSpace_SPGMR(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spgmr/sunlinsol_spgmr.c: In function 'SUNLinSolSpace_SPGMR':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/spgmr/sunlinsol_spgmr.c:851:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  851 |     N_VSpace(SPGMR_CONTENT(S)->vtemp, &lrw1, &liw1);
+      |     ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_iterative.h:31,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_linearsolver.h:59,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_spgmr.h:32:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+[39/63] Building C object src/sunlinsol/sptfqmr/CMakeFiles/sundials_sunlinsolsptfqmr_obj_static.dir/sunlinsol_sptfqmr.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/sptfqmr/sunlinsol_sptfqmr.c: In function 'SUNLinSol_SPTFQMR':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/sptfqmr/sunlinsol_sptfqmr.c:91:3: warning: 'SUNLinSolSpace_SPTFQMR' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   91 |   S->ops->space             = SUNLinSolSpace_SPTFQMR;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/sptfqmr/sunlinsol_sptfqmr.c:24:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_sptfqmr.h:110:12: note: declared here
+  110 | SUNErrCode SUNLinSolSpace_SPTFQMR(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/sptfqmr/sunlinsol_sptfqmr.c: In function 'SUNLinSolSpace_SPTFQMR':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunlinsol/sptfqmr/sunlinsol_sptfqmr.c:1056:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+ 1056 |     N_VSpace(SPTFQMR_CONTENT(S)->vtemp1, &lrw1, &liw1);
+      |     ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_iterative.h:31,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_linearsolver.h:59,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_sptfqmr.h:30:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+[40/63] Building C object src/sunnonlinsol/newton/CMakeFiles/sundials_sunnonlinsolnewton_obj_static.dir/sunnonlinsol_newton.c.obj
+[41/63] Building C object src/sunnonlinsol/fixedpoint/CMakeFiles/sundials_sunnonlinsolfixedpoint_obj_static.dir/sunnonlinsol_fixedpoint.c.obj
+[42/63] Building C object src/sunmemory/system/CMakeFiles/sundials_sunmemsys_obj_static.dir/sundials_system_memory.c.obj
+[43/63] Building C object src/kinsol/CMakeFiles/sundials_kinsol_obj_static.dir/kinsol.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol.c: In function 'KINInit':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol.c:368:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  368 |     N_VSpace(tmpl, &lrw1, &liw1);
+      |     ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_iterative.h:31,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/kinsol/kinsol_ls.h:23,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/kinsol/kinsol.h:21,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol.c:62:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+[44/63] Building C object src/kinsol/CMakeFiles/sundials_kinsol_obj_static.dir/kinsol_bbdpre.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre.c: In function 'KINBBDPrecInit':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre.c:251:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  251 |     N_VSpace(kin_mem->kin_vtemp1, &lrw1, &liw1);
+      |     ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/nvector/nvector_serial.h:42,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre.c:26:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre.c:257:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  257 |     N_VSpace(pdata->zlocal, &lrw1, &liw1);
+      |     ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre.c:263:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  263 |     N_VSpace(pdata->rlocal, &lrw1, &liw1);
+      |     ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre.c:269:5: warning: 'SUNMatSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  269 |     flag = SUNMatSpace(pdata->PP, &lrw, &liw);
+      |     ^~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_linearsolver.h:60,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunlinsol/sunlinsol_band.h:28,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre_impl.h:23,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre.c:31:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_matrix.h:155:12: note: declared here
+  155 | SUNErrCode SUNMatSpace(SUNMatrix A, long int* lenrw, long int* leniw);
+      |            ^~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_bbdpre.c:275:5: warning: 'SUNLinSolSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  275 |     flag = SUNLinSolSpace(pdata->LS, &lrw, &liw);
+      |     ^~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_linearsolver.h:202:12: note: declared here
+  202 | SUNErrCode SUNLinSolSpace(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~
+[45/63] Building C object src/kinsol/CMakeFiles/sundials_kinsol_obj_static.dir/kinsol_io.c.obj
+[46/63] Building C object src/kinsol/CMakeFiles/sundials_kinsol_obj_static.dir/kinsol_ls.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_ls.c: In function 'KINGetLinWorkSpace':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_ls.c:430:5: warning: 'N_VSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  430 |     N_VSpace(kin_mem->kin_vtemp1, &lrw1, &liw1);
+      |     ^~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_matrix.h:50,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunmatrix/sunmatrix_band.h:35,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_ls.c:23:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_nvector.h:222:6: note: declared here
+  222 | void N_VSpace(N_Vector v, sunindextype* lrw, sunindextype* liw);
+      |      ^~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_ls.c:438:5: warning: 'SUNLinSolSpace' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  438 |     retval = SUNLinSolSpace(kinls_mem->LS, &lrw, &liw);
+      |     ^~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/kinsol/kinsol_ls.h:24,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/kinsol/kinsol.h:21,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_impl.h:25,
+                 from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/kinsol/kinsol_ls.c:27:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_linearsolver.h:202:12: note: declared here
+  202 | SUNErrCode SUNLinSolSpace(SUNLinearSolver S, long int* lenrwLS,
+      |            ^~~~~~~~~~~~~~
+[47/63] Linking C static library bin\libsundials_nvecserial.a
+[48/63] Linking C static library bin\libsundials_nvecmanyvector.a
+[49/63] Linking C static library bin\libsundials_sunmatrixsparse.a
+[50/63] Linking C static library bin\libsundials_sunlinsolband.a
+[51/63] Linking C static library bin\libsundials_sunlinsoldense.a
+[52/63] Linking C static library bin\libsundials_sunlinsolpcg.a
+[53/63] Linking C static library bin\libsundials_sunlinsolspbcgs.a
+[54/63] Linking C static library bin\libsundials_sunlinsolspfgmr.a
+[55/63] Linking C static library bin\libsundials_sunlinsolspgmr.a
+[56/63] Linking C static library bin\libsundials_sunlinsolsptfqmr.a
+[57/63] Linking C static library bin\libsundials_sunnonlinsolnewton.a
+[58/63] Linking C static library bin\libsundials_sunnonlinsolfixedpoint.a
+[59/63] Building C object src/sunadaptcontroller/imexgus/CMakeFiles/sundials_sunadaptcontrollerimexgus_obj_static.dir/sunadaptcontroller_imexgus.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/imexgus/sunadaptcontroller_imexgus.c: In function 'SUNAdaptController_ImExGus':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/imexgus/sunadaptcontroller_imexgus.c:80:3: warning: 'SUNAdaptController_Space_ImExGus' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   80 |   C->ops->space        = SUNAdaptController_Space_ImExGus;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/imexgus/sunadaptcontroller_imexgus.c:21:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunadaptcontroller/sunadaptcontroller_imexgus.h:84:12: note: declared here
+   84 | SUNErrCode SUNAdaptController_Space_ImExGus(SUNAdaptController C,
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[60/63] Building C object src/sunadaptcontroller/soderlind/CMakeFiles/sundials_sunadaptcontrollersoderlind_obj_static.dir/sunadaptcontroller_soderlind.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/soderlind/sunadaptcontroller_soderlind.c: In function 'SUNAdaptController_Soderlind':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/soderlind/sunadaptcontroller_soderlind.c:92:3: warning: 'SUNAdaptController_Space_Soderlind' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   92 |   C->ops->space        = SUNAdaptController_Space_Soderlind;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/soderlind/sunadaptcontroller_soderlind.c:21:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunadaptcontroller/sunadaptcontroller_soderlind.h:93:12: note: declared here
+   93 | SUNErrCode SUNAdaptController_Space_Soderlind(SUNAdaptController C,
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[61/63] Building C object src/sunadaptcontroller/mrihtol/CMakeFiles/sundials_sunadaptcontrollermrihtol_obj_static.dir/sunadaptcontroller_mrihtol.c.obj
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/mrihtol/sunadaptcontroller_mrihtol.c: In function 'SUNAdaptController_MRIHTol':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/mrihtol/sunadaptcontroller_mrihtol.c:86:3: warning: 'SUNAdaptController_Space_MRIHTol' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+   86 |   C->ops->space           = SUNAdaptController_Space_MRIHTol;
+      |   ^
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/mrihtol/sunadaptcontroller_mrihtol.c:21:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunadaptcontroller/sunadaptcontroller_mrihtol.h:82:5: note: declared here
+   82 | int SUNAdaptController_Space_MRIHTol(SUNAdaptController C, long int* lenrw,
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/mrihtol/sunadaptcontroller_mrihtol.c: In function 'SUNAdaptController_Space_MRIHTol':
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/mrihtol/sunadaptcontroller_mrihtol.c:269:3: warning: 'SUNAdaptController_Space' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  269 |   SUNCheckCall(SUNAdaptController_Space(MRIHTOL_CSLOW(C), lenrw, leniw));
+      |   ^~~~~~~~~~~~
+In file included from E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sunadaptcontroller/sunadaptcontroller_mrihtol.h:21:
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_adaptcontroller.h:184:12: note: declared here
+  184 | SUNErrCode SUNAdaptController_Space(SUNAdaptController C, long int* lenrw,
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/src/sunadaptcontroller/mrihtol/sunadaptcontroller_mrihtol.c:270:3: warning: 'SUNAdaptController_Space' is deprecated: Work space functions will be removed in version 8.0.0 [-Wdeprecated-declarations]
+  270 |   SUNCheckCall(SUNAdaptController_Space(MRIHTOL_CFAST(C), &lrw, &liw));
+      |   ^~~~~~~~~~~~
+E:/RocketAeroHeat/tools/runtime/sundials-7.4.0-8e17876/source/include/sundials/sundials_adaptcontroller.h:184:12: note: declared here
+  184 | SUNErrCode SUNAdaptController_Space(SUNAdaptController C, long int* lenrw,
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~
+[62/63] Building C object src/sunadjointcheckpointscheme/fixed/CMakeFiles/sundials_adjointcheckpointscheme_fixed_obj_static.dir/sunadjointcheckpointscheme_fixed.c.obj
+[63/63] Linking C static library bin\libsundials_kinsol.a
