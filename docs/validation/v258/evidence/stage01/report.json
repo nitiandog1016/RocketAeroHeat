@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "baseCommit": "29d7f95a2a01ba61cdf3db46799e88fab96f94ca",
+  "accurateSourceSHA256": {
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\Common\\src\\linear_algebra\\CSysMatrix.cpp": "e0197d74c3d8b17f8b749efc77939380699b6f6823749fb37085e6cff1aae6ef",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\solvers\\CTurbSASolver.cpp": "97bf7edc795f48b3f472bbd3ba336a01ac85c3923fecaa4f364e8986c0d25326",
+    "E:\\RocketAeroHeat\\outputs\\v220_validation\\source\\SU2_CFD\\src\\solvers\\CNSSolver.cpp": "f741511c64d9f325db895f64bf93be5eb91ee4a671530e76869ffca6a4b31d31",
+    "E:\\RocketAeroHeat\\tools\\runtime\\sundials-7.4.0-8e17876\\source\\src\\kinsol\\kinsol_ls.c": "46eadd0f9902bc02c2001251505300bf8ad7c0430b9f92cd3582e98dd8fe06dd",
+    "E:\\RocketAeroHeat\\tools\\runtime\\sundials-7.4.0-8e17876\\source\\src\\sunlinsol\\spgmr\\sunlinsol_spgmr.c": "27a74c58660e3c83e7e35a4e688886fec1b86150e5d6656b17e3b2d6b1d59bbb"
+  },
+  "sourceFindings": {
+    "strongWallRowsIdentity": true,
+    "physicalEnergyTransformation": "C: E_native=E_physical+300000*rho; C^-1 inverse on residual and direction",
+    "SPGMRRightScalingRemovedBeforeUserPSolve": true,
+    "SPGMRLeftScalingAfterATimes": true,
+    "blockPreconditionerOmitsFlowSACrossBlocks": true,
+    "ILUCopySeparateFromSpatialMatrix": true,
+    "noSpecificInterfaceBugProved": true
+  },
+  "forecastComponentsBytes": {
+    "nativeReference": 1549975552,
+    "ILU": 640513952,
+    "adapter10Vectors": 157987520,
+    "native6BlockVectors": 48344544,
+    "NVector5Vectors": 78993760,
+    "reserve": 268435456
+  },
+  "forecastBytes": 2744250784,
+  "fullResidualCallLimit": 4,
+  "KINSOLExecuted": false,
+  "physicalQualification": false
+}

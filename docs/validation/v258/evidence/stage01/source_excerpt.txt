@@ -1,0 +1,119 @@
+Common/src/linear_algebra/CSysMatrix.cpp:922-945
+922: void CSysMatrix<ScalarType>::DeleteValsRowi(unsigned long block_i, unsigned long row) {
+923:   SU2_ZONE_SCOPED
+924:   const auto blkSz = nVar * nEqn;
+925: 
+926:   auto* d = &mat.d[block_i * blkSz];
+927:   for (auto iVar = 0u; iVar < nEqn; iVar++) d[row * nEqn + iVar] = 0.0;
+928:   d[row * nEqn + row] = 1.0;
+929: 
+930:   if (quantized_mode) {
+931:     for (auto k = mat.row_ptr_l[block_i]; k < mat.row_ptr_l[block_i + 1]; ++k) {
+932:       for (auto iVar = 0u; iVar < nEqn; iVar++) q_blocks.l[k * blkSz + row * nEqn + iVar] = 0;
+933:     }
+934:     for (auto k = mat.row_ptr_u[block_i]; k < mat.row_ptr_u[block_i + 1]; ++k) {
+935:       for (auto iVar = 0u; iVar < nEqn; iVar++) q_blocks.u[k * blkSz + row * nEqn + iVar] = 0;
+936:     }
+937:   } else {
+938:     for (auto k = mat.row_ptr_l[block_i]; k < mat.row_ptr_l[block_i + 1]; ++k) {
+939:       for (auto iVar = 0u; iVar < nEqn; iVar++) mat.l[k * blkSz + row * nEqn + iVar] = 0;
+940:     }
+941:     for (auto k = mat.row_ptr_u[block_i]; k < mat.row_ptr_u[block_i + 1]; ++k) {
+942:       for (auto iVar = 0u; iVar < nEqn; iVar++) mat.u[k * blkSz + row * nEqn + iVar] = 0;
+943:     }
+944:   }
+945: }
+
+Common/src/linear_algebra/CSysMatrix.cpp:1080-1101
+1080:   const auto blockSize = nVar * nVar;
+1081:   ScalarType Lij[MAXNVAR * MAXNVAR], Lij_Ujk[MAXNVAR * MAXNVAR];
+1082: 
+1083:   /*--- Helper to copy block matrix to compute factorization in-place. ---*/
+1084:   auto InitIluRow = [&](const auto iPoint) {
+1085:     MatrixCopy(&mat.d[iPoint * blockSize], &ilu.d[iPoint * blockSize]);
+1086: 
+1087:     if (ilu_fill_in == 0) {
+1088:       /*--- ILU0: Same sparse pattern, copy L and U blocks directly. ---*/
+1089:       auto copy = [&](const su2uint* row_ptr, const ScalarType* mat, ScalarType* ilu) {
+1090:         const unsigned long begin = row_ptr[iPoint] * blockSize;
+1091:         const unsigned long end = row_ptr[iPoint + 1] * blockSize;
+1092:         SU2_OMP_SIMD
+1093:         for (auto k = begin; k < end; ++k) ilu[k] = mat[k];
+1094:       };
+1095:       copy(ilu.row_ptr_l, mat.l, ilu.l);
+1096:       copy(ilu.row_ptr_u, mat.u, ilu.u);
+1097:       return;
+1098:     }
+1099:     /*--- ILUn: Merge-scan L and U via shared lambda. ---*/
+1100:     auto scatterPart = [&](const su2uint* mat_row_ptr, const su2uint* mat_col_ind, const ScalarType* mat_vals,
+1101:                            const su2uint* ilu_row_ptr, const su2uint* ilu_col_ind, ScalarType* ilu_vals) {
+
+Common/src/linear_algebra/CSysMatrix.cpp:1229-1261
+1229:   /*--- Forward solve the system using the lower matrix entries
+1230:    * that were computed and stored during the ILU preprocessing.
+1231:    * Note that we are overwriting the prod vector as we go. ---*/
+1232: 
+1233:   auto ForwardSolve = [&](const auto iPoint, const auto begin) {
+1234:     for (auto iVar = 0ul; iVar < nVar; ++iVar) prod(iPoint, iVar) = vec(iPoint, iVar);
+1235: 
+1236:     for (auto kl = ilu.row_ptr_l[iPoint]; kl < ilu.row_ptr_l[iPoint + 1]; ++kl) {
+1237:       const auto jPoint = ilu.col_ind_l[kl];
+1238:       if (jPoint < begin) continue;
+1239:       MatrixVectorProductSub(&ilu.l[kl * blockSize], &prod[jPoint * nVar], &prod[iPoint * nVar]);
+1240:     }
+1241:   };
+1242: 
+1243:   auto BackwardSolve = [&](const auto iPoint, const auto end) {
+1244:     ScalarType aux_vec[MAXNVAR];
+1245:     for (auto iVar = 0ul; iVar < nVar; ++iVar) aux_vec[iVar] = prod(iPoint, iVar);
+1246: 
+1247:     const auto* invUii = &ilu.d[iPoint * blockSize];
+1248: 
+1249:     for (auto ku = ilu.row_ptr_u[iPoint]; ku < ilu.row_ptr_u[iPoint + 1]; ++ku) {
+1250:       const auto jPoint = ilu.col_ind_u[ku];
+1251:       if (jPoint >= end) break;
+1252:       const auto* Block_ij = &ilu.u[ku * blockSize];
+1253:       MatrixVectorProductSub(Block_ij, &prod[jPoint * nVar], aux_vec);
+1254:     }
+1255: 
+1256:     MatrixVectorProduct(invUii, aux_vec, &prod[iPoint * nVar]);
+1257:   };
+1258: 
+1259:   if (levels_ilu.empty()) {
+1260:     SU2_OMP_FOR_STAT(1)
+1261:     for (unsigned long thread = 0; thread < omp_num_parts; ++thread) {
+
+SU2_CFD/src/solvers/CTurbSASolver.cpp:540-572
+540: 
+541:   const bool implicit = (config->GetKind_TimeIntScheme() == EULER_IMPLICIT);
+542:   string Marker_Tag = config->GetMarker_All_TagBound(val_marker);
+543:   WALL_TYPE WallType;
+544:   su2double Roughness_Height;
+545:   tie(WallType, Roughness_Height) = config->GetWallRoughnessProperties(Marker_Tag);
+546:   Roughness_Height = max(Roughness_Height, EPS);
+547: 
+548:   /*--- The dirichlet condition is used only without wall function, otherwise the
+549:    convergence is compromised as we are providing nu tilde values for the
+550:    first point of the wall  ---*/
+551: 
+552:   SU2_OMP_FOR_STAT(OMP_MIN_SIZE)
+553:   for (auto iVertex = 0u; iVertex < geometry->nVertex[val_marker]; iVertex++) {
+554: 
+555:     const auto iPoint = geometry->vertex[val_marker][iVertex]->GetNode();
+556: 
+557:     /*--- Check if the node belongs to the domain (i.e, not a halo node) ---*/
+558: 
+559:     if (!geometry->nodes->GetDomain(iPoint)) continue;
+560: 
+561:     if (WallType == WALL_TYPE::SMOOTH) {
+562:       for (auto iVar = 0u; iVar < nVar; iVar++)
+563:         nodes->SetSolution_Old(iPoint,iVar,0.0);
+564: 
+565:       LinSysRes.SetBlock_Zero(iPoint);
+566: 
+567:       /*--- Includes 1 in the diagonal ---*/
+568: 
+569:       if (implicit) Jacobian.DeleteValsRowi(iPoint, 0);
+570:       continue;
+571:     }
+572: 
