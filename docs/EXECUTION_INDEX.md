@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v256报告](FULL_DOMAIN_RESIDUAL_V256.md)、[最终回执](validation/v256/evidence/final_report.json)、[当时下一决定](validation/v256/NEXT_DECISION.md)。来源拒绝后实现完整成熟F(x)，零时间接口/原面诊断通过；尚无新非线性发展，本地交付。
 - [v255报告](REGULARIZED_ENTROPY_INTEGRAL_V255.md)、[最终回执](validation/v255/evidence/final_report.json)、[当时下一决定](validation/v255/NEXT_DECISION.md)。驻点正则化及全原球帽目标数值对照通过；实际前体入口仍待闭合，本地交付。
 - [v254报告](COUPLED_ENTROPY_INTEGRAL_V254.md)、[最终回执](validation/v254/evidence/final_report.json)、[当时下一决定](validation/v254/NEXT_DECISION.md)。变熵积分/46交界通过，全球帽起步未收敛；本地交付。
 - [v253报告](ENTROPY_INLET_V253.md)、[最终回执](validation/v253/evidence/final_report.json)、[当时下一决定](validation/v253/NEXT_DECISION.md)。真实共同环入口与一次耦合拒绝；本地交付。
