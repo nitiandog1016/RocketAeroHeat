@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "C:/Windows/System32/wsl.exe",
+    "-d",
+    "RocketAeroHeat-Ubuntu-24.04",
+    "-u",
+    "rah",
+    "--exec",
+    "/usr/bin/timeout",
+    "15",
+    "/usr/bin/taskset",
+    "-c",
+    "0",
+    "/usr/bin/prlimit",
+    "--as=536870912",
+    "--cpu=10",
+    "--",
+    "/usr/bin/git",
+    "-C",
+    "/opt/rocket-aeroheat/eilmer-v5.0.0/source",
+    "show",
+    "f53f4609a0331d48efee69a4e4f3c3598378cc03:COPYING"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 1.3130000000019209,
+  "LinuxGitCPU": 1,
+  "LinuxGitAddressSpaceLimitBytes": 536870912,
+  "WindowsSupervisorRSSDoesNotMeasureLinuxRSS": true,
+  "stderrSHA256": "37a326ec4ab0656bcc9e4f1fdcdeebb5d44b6f284326139760578259a6c581a7"
+}

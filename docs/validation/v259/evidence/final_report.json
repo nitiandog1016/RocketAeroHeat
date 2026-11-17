@@ -1,0 +1,152 @@
+{
+  "passed": true,
+  "deliveryIntegrityPassed": true,
+  "methodAdopted": false,
+  "decision": {
+    "candidate": "fixed-lmr-block-marching-provider",
+    "status": "rejected",
+    "legacyDirectSubstituteRejected": true,
+    "legacyHasNoFeedbackAtAll": false,
+    "legacyAllUnstructuredMarchingCategoricallyRejected": false,
+    "legacyTwoActiveSlicesMeansOnlyTwoResidentSlices": false,
+    "reasons": [
+      "fixed lmr execution unimplemented",
+      "legacy temporary extrapolation/frozen upstream cannot prove required incoming/downstream closure",
+      "no original-wall/near-wall mapping and native phase-air/turbulence compatibility proof"
+    ],
+    "evidence": [
+      {
+        "id": "lmr-unimplemented",
+        "path": "src/lmr/commands/runsim.d",
+        "first": 373,
+        "last": 375,
+        "finding": "fixed lmr block-marching run branch prints NOT IMPLEMENTED and exits 1"
+      },
+      {
+        "id": "legacy-forward-only",
+        "path": "src/eilmer/simcore.d",
+        "first": 855,
+        "last": 926,
+        "finding": "two active slices, frozen older upstream slice, temporary downstream extrapolation; no reverse feedback sweep"
+      },
+      {
+        "id": "legacy-extrapolate",
+        "path": "src/eilmer/bc/boundary_condition.d",
+        "first": 258,
+        "last": 272,
+        "finding": "original convective and diffusive actions removed; zero-order GhostCellExtrapolateCopy installed"
+      },
+      {
+        "id": "legacy-all-block-residency",
+        "path": "src/eilmer/simcore.d",
+        "first": 182,
+        "last": 308,
+        "finding": "single process initializes workspace, grid/flow arrays and reads solution for every local block before marching"
+      },
+      {
+        "id": "unstructured-propagation-missing",
+        "path": "src/eilmer/ufluidblock.d",
+        "first": 743,
+        "last": 746,
+        "finding": "optional west-to-east initial-state propagation not implemented for unstructured grid"
+      },
+      {
+        "id": "actual-example-scope",
+        "path": "examples/eilmer/3D/flat-plate-laminar/lam_flat_plate_march.lua",
+        "first": 1,
+        "last": 90,
+        "finding": "3D ideal-gas laminar flat plate at approximately Mach4 and given Tw300; not alpha20 rocket/SA/experiment"
+      }
+    ],
+    "noNewEngineBuildOrRun": true,
+    "noNewWallHeatSolution": true,
+    "physicalQualification": false,
+    "newQualifiedAreaM2": 0,
+    "memoryPeakForNewCandidateMeasured": false,
+    "memoryOOMClaimed": false,
+    "fullDomainResponsibilityPreserved": true,
+    "nextAction": "stable piecewise caloric E/H inversion in existing same-model interface, with independent precision evidence before any flow integration",
+    "inverseIsProvedUniqueCauseOfV258Failure": false
+  },
+  "goalStatus": "active",
+  "wholeSurfaceGoalComplete": false,
+  "baseCommit": "fdc26459232763e01346d7524614db9522d9b652",
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "newQualifiedAreaM2": 0,
+  "physicalQualification": false,
+  "profileReadyForCFD": false,
+  "collectedPinnedSourceFiles": 20,
+  "officialConnectorComparisons": 7,
+  "upstreamCommit": "f53f4609a0331d48efee69a4e4f3c3598378cc03",
+  "license": "GPL-3.0-or-later",
+  "sourceCollectionSeconds": 4.453000000001339,
+  "WindowsSampledGroupRSSBytes": 73764864,
+  "LinuxRSSMeasured": false,
+  "LinuxGitPerCommandAddressSpaceLimitBytes": 536870912,
+  "LinuxGitCPU": 1,
+  "CFDExecutions": 0,
+  "meshExecutions": 0,
+  "MATLABExecutions": 0,
+  "engineBuilds": 0,
+  "propertyQueries": 0,
+  "UIChanged": false,
+  "protectedCount": 29,
+  "engineeringFilesUnchanged": 54,
+  "candidateCount": 2,
+  "unrelatedTrackedSHA256": {
+    "tests/verifyWebSectionExport.py": "6f67f9fecc3e806ed74ab879ff8a5ba1b745a239158babba55d1856d4d54225b",
+    "web/section.js": "74fd8f6cd6f017ecb60a578ebedfe5aabfda2cde8ce5477fdd5b4b9bf24f9169",
+    "web/viewer.js": "90d73959c1d39bf7fd0919d1a034e4994c24edd90a922270064a3c5892088ca5"
+  },
+  "historicalSourceBindings": [
+    {
+      "path": "E:\\RocketAeroHeat\\scripts\\reviewEilmerMarchV259.py",
+      "executedSHA256": "aaf3e7457f8d89fc69a7e61897d3f86ab2af14a686792213460e6dad077450f5",
+      "currentSHA256": "83dc9f27c15638396c3ffa2b3f275a1f836d1f842ec8ee9531b440ba4a79f8cf",
+      "snapshot": "source_collect/aaf3e7457f8d89fc69a7e61897d3f86ab2af14a686792213460e6dad077450f5.py",
+      "archivedSmallSource": "execution_sources/aaf3e7457f8d89fc69a7e61897d3f86ab2af14a686792213460e6dad077450f5.py"
+    }
+  ],
+  "allSupervisedReceiptsTerminalStableGroupsEmpty": true,
+  "supervisedExecutionFailures": {},
+  "discoveryFailures": [
+    "stale E-drive wsl.exe path missing, no process launched",
+    "JS syntax error before tool execution",
+    "PowerShell brace expansion parse error before commands"
+  ],
+  "WSLWarningsPreservedInReport": true,
+  "sourceDiscoveryShellSecondsApprox": [
+    3.734,
+    1.75
+  ],
+  "networkAndReadingTimeNotIncludedInCollection": true,
+  "localOnly": true,
+  "githubPushed": false,
+  "uniqueDataDeleted": false,
+  "fullFieldsArchivedInGit": false,
+  "nativeLibraryAndToolchainArchivedInGit": false,
+  "closedCLIs": {
+    "scripts/reviewEilmerMarchV259.py": "v259 fixed marching source review closed; follow NEXT_DECISION"
+  },
+  "ownedFiles": [
+    "scripts/reviewEilmerMarchV259.py",
+    "scripts/finalizeMarchReviewV259.py",
+    "docs/EILMER_MARCH_REVIEW_V259.md",
+    "docs/validation/v259/PLAN.md",
+    "docs/validation/v259/NEXT_DECISION.md",
+    "docs/CURRENT_STATE.md",
+    "docs/EXECUTION_INDEX.md",
+    ".gitattributes"
+  ],
+  "currentOwnedFileSHA256": {
+    "scripts/reviewEilmerMarchV259.py": "83dc9f27c15638396c3ffa2b3f275a1f836d1f842ec8ee9531b440ba4a79f8cf",
+    "scripts/finalizeMarchReviewV259.py": "0e1f80a6ed623bb9b9e3d49e0402a4edb4f7192cd8c6ead95e5cd5afdf6d11ef",
+    "docs/EILMER_MARCH_REVIEW_V259.md": "085b0b0173c0c257bb3f91df72ce987212eb7c8c240f233898fb66bb616847a3",
+    "docs/validation/v259/PLAN.md": "a3f9cd845a6585242f4bd09f772362dbc58d617783ce82e6bfa09e74e801a9b6",
+    "docs/validation/v259/NEXT_DECISION.md": "272ffdba331d1554f1097c70df47fd61135b0424e68252671dc12edd0780918c",
+    ".gitattributes": "bff88ed08a0b54071c582172a0f8d00e795b6a42cb7b6fc2845a66b4a6e1ef10"
+  },
+  "outputLogicalBytesBeforeFinalReport": 781602,
+  "finalizationSeconds": 0.5309999999990396
+}

@@ -1,0 +1,66 @@
+{
+  "candidate": "fixed-lmr-block-marching-provider",
+  "status": "rejected",
+  "legacyDirectSubstituteRejected": true,
+  "legacyHasNoFeedbackAtAll": false,
+  "legacyAllUnstructuredMarchingCategoricallyRejected": false,
+  "legacyTwoActiveSlicesMeansOnlyTwoResidentSlices": false,
+  "reasons": [
+    "fixed lmr execution unimplemented",
+    "legacy temporary extrapolation/frozen upstream cannot prove required incoming/downstream closure",
+    "no original-wall/near-wall mapping and native phase-air/turbulence compatibility proof"
+  ],
+  "evidence": [
+    {
+      "id": "lmr-unimplemented",
+      "path": "src/lmr/commands/runsim.d",
+      "first": 373,
+      "last": 375,
+      "finding": "fixed lmr block-marching run branch prints NOT IMPLEMENTED and exits 1"
+    },
+    {
+      "id": "legacy-forward-only",
+      "path": "src/eilmer/simcore.d",
+      "first": 855,
+      "last": 926,
+      "finding": "two active slices, frozen older upstream slice, temporary downstream extrapolation; no reverse feedback sweep"
+    },
+    {
+      "id": "legacy-extrapolate",
+      "path": "src/eilmer/bc/boundary_condition.d",
+      "first": 258,
+      "last": 272,
+      "finding": "original convective and diffusive actions removed; zero-order GhostCellExtrapolateCopy installed"
+    },
+    {
+      "id": "legacy-all-block-residency",
+      "path": "src/eilmer/simcore.d",
+      "first": 182,
+      "last": 308,
+      "finding": "single process initializes workspace, grid/flow arrays and reads solution for every local block before marching"
+    },
+    {
+      "id": "unstructured-propagation-missing",
+      "path": "src/eilmer/ufluidblock.d",
+      "first": 743,
+      "last": 746,
+      "finding": "optional west-to-east initial-state propagation not implemented for unstructured grid"
+    },
+    {
+      "id": "actual-example-scope",
+      "path": "examples/eilmer/3D/flat-plate-laminar/lam_flat_plate_march.lua",
+      "first": 1,
+      "last": 90,
+      "finding": "3D ideal-gas laminar flat plate at approximately Mach4 and given Tw300; not alpha20 rocket/SA/experiment"
+    }
+  ],
+  "noNewEngineBuildOrRun": true,
+  "noNewWallHeatSolution": true,
+  "physicalQualification": false,
+  "newQualifiedAreaM2": 0,
+  "memoryPeakForNewCandidateMeasured": false,
+  "memoryOOMClaimed": false,
+  "fullDomainResponsibilityPreserved": true,
+  "nextAction": "stable piecewise caloric E/H inversion in existing same-model interface, with independent precision evidence before any flow integration",
+  "inverseIsProvedUniqueCauseOfV258Failure": false
+}
