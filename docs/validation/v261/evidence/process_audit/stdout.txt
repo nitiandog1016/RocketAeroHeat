@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "reference": {
+    "temperatureK": "300.123",
+    "pressurePa": "100000",
+    "densityKgm3": "1.16076549824737371539714965420213391280173505661753131774016",
+    "internalEnergyJkg": "215832.2953750879882107348",
+    "tableSHA256": "7fdde65001d0d0aefe6b40136f269c5f512b8a94e327748854987cc831fe3985"
+  },
+  "cases": {
+    "default": {
+      "observation": {
+        "workerMethod": "TOMS748",
+        "inversePath": "legacy-TOMS748",
+        "stableRecoveryCallsInFrames": 0,
+        "threadsObserved": 1,
+        "nodes": 125,
+        "nonlinearUpdates": 0,
+        "timeUpdates": 0,
+        "rejectedCandidateSpecificInternalEnergy": -1000000,
+        "invalidCandidateAccepted": false,
+        "oldConservedStateRestored": true,
+        "restoredTemperatureK": 300.123
+      },
+      "maxErrors": {
+        "temperatureAbsK": 9.549694368615747e-15,
+        "pressureRel": 0.0,
+        "densityRel": 1.1622282748598424e-16,
+        "energyRel": 2.2195227913601232e-16,
+        "energyAbsJkg": 4.790446986965779e-11
+      },
+      "rejectionReason": "RAH_PHASE_ENERGY_ENTROPY_DOMAIN"
+    },
+    "stable": {
+      "observation": {
+        "workerMethod": "STABLE_PIECEWISE",
+        "inversePath": "stable-piecewise-quadratic",
+        "stableRecoveryCallsInFrames": 250,
+        "threadsObserved": 1,
+        "nodes": 125,
+        "nonlinearUpdates": 0,
+        "timeUpdates": 0,
+        "rejectedCandidateSpecificInternalEnergy": -1000000,
+        "invalidCandidateAccepted": false,
+        "oldConservedStateRestored": true,
+        "restoredTemperatureK": 300.123
+      },
+      "maxErrors": {
+        "temperatureAbsK": 9.549694368615747e-15,
+        "pressureRel": 0.0,
+        "densityRel": 1.1622282748598424e-16,
+        "energyRel": 2.2195227913601232e-16,
+        "energyAbsJkg": 4.790446986965779e-11
+      },
+      "rejectionReason": "RAH_PHASE_ENERGY_ENTROPY_DOMAIN"
+    },
+    "unknown": {
+      "rejectionLocation": "SetConfig_Parsing",
+      "reason": "RAH_CALORIC_INVERSE expects STABLE_PIECEWISE"
+    },
+    "incompatible": {
+      "rejectionLocation": "SetPostprocessing",
+      "reason": "RAH_CALORIC_INVERSE requires FLUID_MODEL=RAH_PHASE_AIR"
+    }
+  },
+  "processes": {
+    "prepare": {
+      "exitCode": 0,
+      "elapsedSeconds": 0.35999999999989996,
+      "peakObservedGroupRSSBytes": 26583040
+    },
+    "build": {
+      "exitCode": 0,
+      "elapsedSeconds": 47.34400000000005,
+      "peakObservedGroupRSSBytes": 1157013504
+    },
+    "default": {
+      "exitCode": 0,
+      "elapsedSeconds": 0.5779999999999745,
+      "peakObservedGroupRSSBytes": 8134656
+    },
+    "stable": {
+      "exitCode": 0,
+      "elapsedSeconds": 0.17200000000002547,
+      "peakObservedGroupRSSBytes": 2117632
+    },
+    "unknown": {
+      "exitCode": 1,
+      "elapsedSeconds": 0.5629999999998745,
+      "peakObservedGroupRSSBytes": 8757248
+    },
+    "incompatible": {
+      "exitCode": 1,
+      "elapsedSeconds": 0.1710000000000491,
+      "peakObservedGroupRSSBytes": 5218304
+    }
+  },
+  "newQualifiedSurfaceAreaM2": 0,
+  "flowAdvanced": false
+}

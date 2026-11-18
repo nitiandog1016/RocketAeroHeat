@@ -1,0 +1,95 @@
+--- CConfig.cpp (original)
++++ CConfig.cpp (v261)
+@@ -31,6 +31,7 @@
+ 
+ #include "../include/CConfig.hpp"
+ #undef ENABLE_MAPS
++#include "CaloricOptionV261.hpp"
+ 
+ #include "../include/fem/fem_gauss_jacobi_quadrature.hpp"
+ #include "../include/toolboxes/classes_multiple_integers.hpp"
+@@ -1284,6 +1285,8 @@
+   /*!\par CONFIG_CATEGORY: FluidModel \ingroup Config*/
+   /*!\brief FLUID_MODEL \n DESCRIPTION: Fluid model \n OPTIONS: See \link FluidModel_Map \endlink \n DEFAULT: STANDARD_AIR \ingroup Config*/
+   addEnumOption("FLUID_MODEL", Kind_FluidModel, FluidModel_Map, STANDARD_AIR);
++  all_options.emplace("RAH_CALORIC_INVERSE", true);
++  option_map.emplace("RAH_CALORIC_INVERSE", new CStableCaloricOption());
+   /*!\brief FLUID_NAME \n DESCRIPTION: Fluid name \n OPTIONS: see coolprop homepage \n DEFAULT: nitrogen \ingroup Config*/
+   addStringOption("FLUID_NAME", FluidName, string("nitrogen"));
+ 
+@@ -3805,6 +3808,8 @@
+   }
+ 
+   // 新气体只扩独立身份，旧合同原样保留。
++  if (OptionIsSet("RAH_CALORIC_INVERSE") && Kind_FluidModel != RAH_PHASE_AIR)
++    SU2_MPI::Error("RAH_CALORIC_INVERSE requires FLUID_MODEL=RAH_PHASE_AIR", CURRENT_FUNCTION);
+   if (Kind_FluidModel == RAH_PHASE_AIR) {
+     if (SystemMeasurements != SI || Ref_NonDim != DIMENSIONAL || Time_Domain ||
+         Multizone_Problem || DiscreteAdjoint || ContinuousAdjoint ||
+--- CEulerSolver.cpp (original)
++++ CEulerSolver.cpp (v261)
+@@ -36,6 +36,7 @@
+ #include "../../include/fluid/CCoolProp.hpp"
+ #include "../../include/fluid/CSU2IdealAir.hpp"
+ #include "../../include/fluid/CSU2PhaseAwareAir.hpp"
++#include "CaloricFactoryV261.hpp"
+ #include "../../include/fluid/SU2EnergyState.hpp"
+ #include "../../include/numerics_simd/CNumericsSIMD.hpp"
+ #include "../../include/limiters/CLimiterDetails.hpp"
+@@ -910,7 +911,9 @@
+       break;
+     case RAH_PHASE_AIR:
+       config->SetGas_Constant(rah_phase_air::R);
+-      auxFluidModel = new CSU2PhaseAwareAir();
++      auxFluidModel = rah_caloric_factory::create(*config);
++      if (rank == MASTER_NODE && MGLevel == MESH_0)
++        cout << "RAH caloric initialization: " << rah_caloric_factory::method(auxFluidModel) << endl;
+       break;
+     case IDEAL_AIR_VARIABLE_CP:
+       config->SetGas_Constant(rah_air::gas_constant);
+@@ -1169,7 +1172,7 @@
+         break;
+ 
+       case RAH_PHASE_AIR:
+-        FluidModel[thread] = new CSU2PhaseAwareAir();
++        FluidModel[thread] = rah_caloric_factory::create(*config);
+         break;
+       case IDEAL_AIR_VARIABLE_CP:
+         FluidModel[thread] = new CSU2IdealAir();
+@@ -1354,7 +1357,7 @@
+       ModelTable << "PR_GAS";
+       break;
+     case RAH_PHASE_AIR:
+-      ModelTable << "RAH_PHASE_AIR 60..2000K phase domain e+300000";
++      ModelTable << "RAH_PHASE_AIR 60..2000K e+300000 " << rah_caloric_factory::method(GetFluidModel());
+       break;
+     case IDEAL_AIR_VARIABLE_CP:
+       ModelTable << "IDEAL_AIR_VARIABLE_CP Lemmon2000 OTH 60..2000K";
+--- CNSVariable.cpp (original)
++++ CNSVariable.cpp (v261)
+@@ -32,6 +32,7 @@
+ #include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CSU2IdealAir.hpp"
+ #include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/fluid/CSU2PhaseAwareAir.hpp"
+ #include "E:/RocketAeroHeat/outputs/v220_validation/source/SU2_CFD/include/variables/AdmissibilityTrace.hpp"
++#include "CaloricFactoryV261.hpp"
+ #include <array>
+ #include <string>
+ 
+@@ -162,7 +163,7 @@
+   try {
+     FluidModel->SetTDState_rhoe(density, staticEnergy);
+   } catch (const std::domain_error& error) {
+-    if ((dynamic_cast<CSU2IdealAir*>(FluidModel) == nullptr && dynamic_cast<CSU2PhaseAwareAir*>(FluidModel) == nullptr)) throw;
++    if ((dynamic_cast<CSU2IdealAir*>(FluidModel) == nullptr && !rah_caloric_factory::isPhaseAir(FluidModel))) throw;
+     air_state_rejected = true;
+     rejected_reason = error.what();
+   }
+@@ -205,7 +206,7 @@
+     try {
+       FluidModel->SetTDState_rhoe(density, staticEnergy);
+     } catch (const std::domain_error& error) {
+-      if ((dynamic_cast<CSU2IdealAir*>(FluidModel) != nullptr || dynamic_cast<CSU2PhaseAwareAir*>(FluidModel) != nullptr))
++      if ((dynamic_cast<CSU2IdealAir*>(FluidModel) != nullptr || rah_caloric_factory::isPhaseAir(FluidModel)))
+         rah_admissibility::record(iPoint, nDim, trial.data(), restored.data(),
+                                   trial_energy, staticEnergy, turb_ke, false, error.what());
+       if (rah_single_observer::rejection) rah_single_observer::rejection(this,iPoint,trial.data(),restored.data(),false,error.what());
