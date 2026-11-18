@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>静止空气 · 节点探针</title>
+<style>
+:root{color-scheme:light;font:14px/1.55 "Segoe UI","Microsoft YaHei",sans-serif;color:#263746;background:#f7f9fa}
+*{box-sizing:border-box}body{max-width:1100px;margin:auto;padding:clamp(16px,3vw,40px)}h1{font-size:24px;margin:0}h2{font-size:17px;margin:0 0 10px}
+p{margin:4px 0 14px;color:#546573}.controls,section{background:white;border:1px solid #d6dfe3;border-radius:5px;padding:16px}
+.controls{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;margin:18px 0}.controls label{display:grid;gap:3px}.controls button{margin-left:auto}
+button,select,input{font:inherit;color:inherit;border:1px solid #b8c6ce;background:white;border-radius:3px;padding:5px 9px}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #176475;outline-offset:2px}
+main{display:grid;grid-template-columns:minmax(230px,1fr) minmax(320px,2fr);gap:14px}.slice{display:grid;grid-template-columns:32px repeat(5,1fr);gap:3px;align-items:center;text-align:center;margin:10px 0;font-variant-numeric:tabular-nums}
+.slice button{padding:5px 0;background:#edf3f4;border-color:transparent}.slice button[aria-pressed=true]{background:#245c68;color:white}.slice span{font-size:11px;color:#576976}
+table{border-collapse:collapse;width:100%}th,td{text-align:left;border-bottom:1px solid #e0e5e7;padding:6px 4px}td:nth-child(2){font-variant-numeric:tabular-nums}#sources{font-size:12px;overflow-wrap:anywhere}#sources div{margin:6px 0}summary{margin-top:12px;cursor:pointer}#error{color:#953c24}small{color:#546573}#position{font-variant-numeric:tabular-nums}
+@media(max-width:720px){main{grid-template-columns:1fr}.controls button{margin-left:0}body{padding:12px}}
+</style></head><body>
+<header><h1>静止空气 · 节点探针</h1><p>1 m 立方体 · 初始化回读 · 125 个气体节点 · 物理时间步 0</p></header>
+<div class="controls"><label>配置<select id="case"><option value="default">默认配置</option><option value="stable">稳定分段配置</option></select></label>
+<label>源帧<select id="frame"><option value="initial">初始回读</option><option value="terminal">结束前回读</option></select></label>
+<label>原节点编号<input id="node" type="number" min="0" max="124" step="1" value="0"></label><button id="download" type="button">导出所选节点 CSV</button></div>
+<p id="error" role="alert" hidden></p>
+<main><section><h2>节点位置</h2><label>Z 截面 / m <select id="z"></select></label><div id="slice" class="slice" aria-label="XY 截面节点，按钮文字为原编号"></div>
+<small>横轴 X、纵轴 Y，坐标单位 m。选择编号可查询内部节点。</small></section>
+<section><h2 id="probe">节点读数</h2><p id="position"></p>
+<table><thead><tr><th>物理量</th><th>数值</th><th>单位</th><th>身份</th></tr></thead><tbody id="values"></tbody></table>
+<p id="method"></p><details><summary>方法与数据来源</summary><div id="sources"></div></details></section></main>
+<script type="application/json" id="archive"><!--ARCHIVE_JSON--></script>
+<!--PROBE_SCRIPT-->
+</body></html>

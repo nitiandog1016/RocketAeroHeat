@@ -54,7 +54,7 @@ fig.UserData.actions=struct('selectStep',@go,'loadModel',@()loadInput([],[]), ..
     'setWallTemperatureProfile',@setWallTemperatureProfile,'readHybridMesh',@readHybridMesh, ...
     'readVerifiedHEOS',@readVerifiedHEOS,'readSSTStudy',@readSSTStudy,'probeMeshQuality',@probeMeshQuality, ...
     'inspectMeshCandidate',@inspectMeshCandidate,'readBenchmarkReview',@readBenchmarkReview, ...
-    'readIdealAirReview',@readIdealAirReview);
+    'readIdealAirReview',@readIdealAirReview,'readStaticAirProbe',@readStaticAirProbe);
 renderEditor();sync();showGeometry(true);
 
 %% 模块五：切页只读取当前状态；所有结果入口依赖已完成的当前版本。
@@ -62,6 +62,7 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing || ~isgraphics(fig),return;end
         try
             state=aeroHeatWorkflowState('selectStep',state,struct('step',step));
+            delete(findall(resultHost,'Tag','static-air-probe-host'));
             renderEditor();sync();
             if step==5,showResults();else,showGeometry(false);end
         catch ex,showError(ex);end
@@ -191,7 +192,7 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
-                grid=form(19);
+                grid=form(20);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
@@ -212,6 +213,7 @@ renderEditor();sync();showGeometry(true);
                 controls.classic=button(grid,17,'经典锥柱扩张体 · 绝热研究',@(~,~)loadClassic());
                 controls.readBenchmarkReview=button(grid,18,'公开算例验证记录',@readBenchmarkDialog);
                 controls.readIdealAirReview=button(grid,19,'变比热热流接口记录',@readIdealAirDialog);
+                controls.staticAir=button(grid,20,'静止空气 · 节点探针',@readStaticAirProbe);
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
@@ -433,15 +435,17 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,1,sprintf('输入版本%d · 内嵌NS研究快照\n%d个原面元 · 新增合格面积0',state.resultSourceRevision,size(r.F,1)));
                     tip(grid,4,'压力、物面平均q、流体节点T可拾取；保守热负荷密度另列。给定Tw只作输入；真实壁温未求。');
                     tip(grid,8,'点击三维表面或拖动X滑块查看该截面周向分布；云图与曲线共用色标，可导出带来源CSV。研究值仍须收敛、网格与物理审核。');
+                    controls.staticAir=button(grid,12,'静止空气 · 节点探针',@readStaticAirProbe);
                     sync();return;
                 end
-                grid=form(10);d=buildAerothermalViewerData(state.result);
+                grid=form(11);d=buildAerothermalViewerData(state.result);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
                     state.resultSourceRevision,100*h.computedAreaFraction,100*p.computedAreaFraction,100*p.prescribedAreaFraction));
                 tip(grid,4,'点选面元核对场量、算法和范围。灰色未解；未知外缘热力状态与有效状态的Kn超限分开，两者均可阻断下游热流。输入壁温与求解壁温分开。');
                 controls.export=button(grid,7,'导出完整离线工作台',@exportCase);
                 tip(grid,8,'任意X截面曲线和导出使用同一快照。完成计算不等于全面积已解；修改上游使结果失效，浏览与导出不重算。');
+                controls.staticAir=button(grid,11,'静止空气 · 节点探针',@readStaticAirProbe);
         end
         sync();
     end
@@ -1169,6 +1173,34 @@ renderEditor();sync();showGeometry(true);
         folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'查看已审核的变比热热流算例');
         if isequal(folder,0),return;end
         try,readIdealAirReview(folder);catch ex,showError(ex);end
+    end
+    function readStaticAirProbe(varargin)
+        % 模块用途：先核对归档，再在现有中央区显示节点页；保留当前工况和输入版本。
+        if state.busy || preparing,return;end
+        try
+            page=buildStaticAirProbePage();
+            prior=resultHost.Children;
+            layout=uigridlayout(resultHost,[1 1],'Tag','static-air-probe-host','Visible','off');
+            layout.Padding=[0 0 0 0];
+            uihtml(layout,'Tag','static-air-probe','DataChangedFcn',@staticAirMessage,'HTMLSource',page);
+            delete(prior);webUI=[];researchUI=[];
+            geometryHost.Visible='off';resultHost.Visible='on';layout.Visible='on';
+            sync();title.Text='静止空气 · 节点探针';
+        catch ex
+            if exist('layout','var') && isgraphics(layout),delete(layout);end
+            showError(ex);
+        end
+    end
+    function staticAirMessage(src,~)
+        % 内嵌页面通过主窗口保存文件，独立 HTML 使用浏览器下载相同的 CSV。
+        event=src.Data;
+        if ~isstruct(event) || ~isfield(event,'kind') || ~strcmp(event.kind,'static-air-export'),return;end
+        [file,folder]=uiputfile('*.csv','导出所选节点',event.filename);if isequal(file,0),return;end
+        try
+            fid=fopen(fullfile(folder,file),'wb');assert(fid>=0,'无法创建所选 CSV。');
+            guard=onCleanup(@()fclose(fid));bytes=unicode2native(event.csv,'UTF-8');
+            assert(fwrite(fid,bytes,'uint8')==numel(bytes),'CSV 写入不完整。');
+        catch ex,showError(ex);end
     end
     function readIdealAirReview(folder)
         % 独立热物性接口记录在主中央区显示，当前箭体输入继续由工作流管理。

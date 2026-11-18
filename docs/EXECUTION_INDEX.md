@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v262 静止空气节点探针](STATIC_AIR_PROBE_V262.md)、[离线节点页](validation/v262/evidence/workbench/index.html)、[下一决定](validation/v262/NEXT_DECISION.md)。主窗口查询和下载按实际节点、帧、量的身份与反算方法核对。
 - [v261 静止空气初始化](STATIC_AIR_FACTORY_V261.md)、[全节点核对](validation/v261/evidence/audit/report.json)、[下一决定](validation/v261/NEXT_DECISION.md)。两种配置的物性对象、温度回读与越界恢复通过本机单线程对照。
 - [v260 量热反算](STABLE_CALORIC_INVERSE_V260.md)、[独立审核](validation/v260/evidence/audit02/report.json)、[下一决定](validation/v260/NEXT_DECISION.md)。195 个固定状态的温度精度达标，修复 60 K 附近的域误拒并完成端点对照。
 - [v259报告](EILMER_MARCH_REVIEW_V259.md)、[最终回执](validation/v259/evidence/final_report.json)、[当时下一决定](validation/v259/NEXT_DECISION.md)。固定lmr块推进入口未实现、旧分支反馈/驻留语义不满足直接采用，候选拒绝；无新求解，本地交付。
