@@ -68,6 +68,15 @@ if isfield(mesh,'pressure')
     add('cp','压力系数 Cp','1',p.Cp,state,methods,'与表面压力采用相同来源；Cp=(p-pinf)/qinf',pressureScopes);
 end
 expansionOutside=[];
+% 混合入口已按原面完成求解，显示同一份有符号场和方法来源。
+if isfield(mesh,'hybridWall')
+    w=mesh.hybridWall; hybridFaceMethods=cellstr(w.method); hybridFaceMethods(strlength(w.method)==0)={'未求解'};
+    hybridScope='当前混合计算原面结果；方法见逐面来源，实验精度单独验证';
+    data.missingReason(isfinite(w.heatFluxWm2))={''};
+    add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridFaceMethods,hybridScope);
+    add('heatFlux','入壁热流','kW/m²',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)),hybridFaceMethods,hybridScope);
+    add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({'输入壁温'},n,1),hybridScope);
+end
 if isfield(mesh,'boundaryLayerEdge')
     e=mesh.boundaryLayerEdge; methods=methodNames(e,n);
     state=double(e.algebraicallyValid(:));
@@ -208,6 +217,12 @@ data.regions=rows; data.totalArea=sum(area);
 data.resultCondition=snapshotCondition(mesh);
 data.caseNote=[data.resultCondition.caption ...
     '。单点基准快照与热响应实际时间站分别列示；给定壁温不是求解壁温。'];
+if isfield(mesh,'hybridWall')
+    data.resultCondition.physics=mesh.hybridCondition;
+    data.caseNote='混合求解单工况；逐面标注计算方法，正热流入壁。';
+    data.resultCondition.caption=data.caseNote;
+    data.defaultField='heatFlux';
+end
 % 仅传递明确保存的来源/证据；旧快照不凭方法名自动获得物理资格。
 if isfield(mesh,'evidenceIdentity'),data.evidenceIdentity=mesh.evidenceIdentity;end
 if isfield(mesh,'evidenceRecords'),data.evidenceRecords=mesh.evidenceRecords;end
@@ -361,8 +376,10 @@ if isfield(mesh,'pressure') && isfield(mesh.pressure,'freestream')
     end
 end
 wallText='壁温输入类型/数值未记录';
-if isfield(mesh,'heating') && isfield(mesh.heating,'wallTemperatureByFace')
-    values=double(mesh.heating.wallTemperatureByFace(:));known=isfinite(values);
+if isfield(mesh,'hybridWallTemperatureK') || (isfield(mesh,'heating') && isfield(mesh.heating,'wallTemperatureByFace'))
+    if isfield(mesh,'hybridWallTemperatureK'),values=double(mesh.hybridWallTemperatureK(:));
+    else,values=double(mesh.heating.wallTemperatureByFace(:));end
+    known=isfinite(values);
     result.wallKnownFaces=nnz(known);result.wallUnknownFaces=nnz(~known);
     if any(known)
         result.wallMinK=min(values(known));result.wallMaxK=max(values(known));

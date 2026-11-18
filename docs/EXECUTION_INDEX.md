@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v267 混合求解入口和连通域壁面结果](validation/v267/RESULTS.md)。工程方法与局部黏性求解器实际交换切面状态，低速两壁的双变量计算覆盖 2/2 m²；原箭体覆盖另列。
 - [v266 单时刻热功率](validation/v263/SIDEWALL_TEMPERATURE.md#单时刻热功率v266) · [导出复算](validation/v263/evidence/snapshot_power/export_check.json)。主工况已算面功率与整表面未知量分列；公开风洞算例使用原壁曲面积。
 - [v265 原面超域分类与编号查询](validation/v263/SIDEWALL_TEMPERATURE.md#区域工作台按原面编号核对v265) · [原面核对](validation/v263/evidence/edge_domain/original_check.json)。主工况 336 个直接超域面按源记录分列，936 个下游缺热面的数值身份保持可查。
 - [v264 自绘模型的侧壁温度与上游来源](validation/v263/SIDEWALL_TEMPERATURE.md) · [NASA 风洞独立测站结果](validation/v263/TMR_RESOLVED.md) · [原面下一项](validation/v263/NEXT_DECISION.md)。在研 v263 阶段的本地代码交付。936 个缺热原面的保存路径和探针通过对照，风洞终态与实验按全部原始测站复核。

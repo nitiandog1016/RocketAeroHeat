@@ -1,0 +1,28 @@
+[警告: 为文件或文件夹指定的位置 perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LC_ALL = "C.UTF-8",
+	LC_CTYPE = "C.UTF-8",
+	LANG = "C.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+D:\matlab\toolbox\matlab\addons_common\matlab 无效。] 
+[> 位置：restoredefaultpath (第 57 行)] 
+{错误使用 assert
+字段 heatFlux 与面元数量不一致。
+
+出错 buildAerothermalViewerData/add (第 232 行)
+        assert(numel(values)==n && numel(state)==n && numel(methods)==n, ...
+
+出错 buildAerothermalViewerData (第 76 行)
+    add('heatFlux','入壁热流','kW/m?',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)),names,scope);
+
+出错 exportAerothermalWeb (第 9 行)
+payload=buildAerothermalViewerData(mesh);
+
+出错 demoHybridWallCalculation (第 24 行)
+report.viewer=exportAerothermalWeb(current,fullfile(folder,'workbench'));
+
+出错 testHybridWallCalculation (第 3 行)
+[r,mesh,cfg]=demoHybridWallCalculation(folder);c=cfg.hybridSurface.condition;
+} 
+ERROR: MATLAB error Exit Status: 0x00000001

@@ -95,6 +95,10 @@ for step=1:options.maxSteps
     history.retries(end+1)=attempt;history.convectiveFrequency(end+1)=convective;
     history.diffusiveFrequency(end+1)=diffusion;history.residualNorm(end+1)=currentNorm;
     history.conservationError(end+1)=balance;
+    % 可选只读观察器接收完整接受步，供本地保存周期场。
+    if ~isempty(options.acceptedStepObserver)
+        options.acceptedStepObserver(accepted,time,Q);
+    end
     if options.steadyEnabled && currentNorm<=options.steadyResidualTolerance
         steadyCount=steadyCount+1;
     else
@@ -122,6 +126,9 @@ result=struct('Q',Q,'initialState',initialState,'time',time,'initialTime',initia
     'options',options,'cp',cp,'cv',cv,'k',k,'positivityClippingCount',0, ...
     'scope','真实全局SSP-RK2推进；没有网格/边界收敛或实验验证，未收敛终态是暂态，不计覆盖');
 result.options.residualFunction=func2str(operator);
+if ~isempty(result.options.acceptedStepObserver)
+    result.options.acceptedStepObserver=func2str(result.options.acceptedStepObserver);
+end
 
     function [p,cpv,cvv,kv]=state(q)
         f=reshape(q,n,5);f=f(fluid,:);
@@ -173,11 +180,14 @@ function o=defaults(o)
 d=struct('residualFunction',@compressibleNavierStokesResidual3D,'initialTime',0, ...
     'targetTime',Inf,'steadyResidualTolerance',NaN,'steadyRequiredSteps',5,'minimumSteadySteps',5, ...
     'maxSteps',5000,'convectiveCFL',.45,'diffusiveCFL',.45,'maxRetries',12, ...
-    'minimumTimeStep',1e-14,'maximumTimeStep',Inf,'conservationTolerance',1e-9,'residualScale',[]);
+    'minimumTimeStep',1e-14,'maximumTimeStep',Inf,'conservationTolerance',1e-9,'residualScale',[], ...
+    'acceptedStepObserver',[]);
 for key=fieldnames(d)'
     if ~isfield(o,key{1}),o.(key{1})=d.(key{1});end
 end
 assert(isa(o.residualFunction,'function_handle'),'RocketAeroHeat:NSAdvance:Operator','residualFunction须为函数句柄。');
+assert(isempty(o.acceptedStepObserver)||isa(o.acceptedStepObserver,'function_handle'), ...
+    'RocketAeroHeat:NSAdvance:Observer','接受步观察器须为函数句柄。');
 for key={'convectiveCFL','diffusiveCFL'}
     v=o.(key{1});assert(isscalar(v) && isfinite(v) && v>0 && v<=1, ...
         'RocketAeroHeat:NSAdvance:CFL','CFL须在(0,1]；不自动裁CFL。');

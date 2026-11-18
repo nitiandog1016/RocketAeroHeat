@@ -11,6 +11,9 @@ function [current,freestream,report] = runAeroHeatSingleCase(mesh,cfg,progressFc
 % 模块四：report 保存接受的设置与面积审计；执行完成不等于全面积求解完成。
 % 未解值、给定值和场量方法均由既有后端保留，不作补零或模型回退。
 if nargin<3,progressFcn=[];end
+if isfield(cfg,'analysisMode') && strcmp(cfg.analysisMode,'hybridSurface')
+    [current,freestream,report]=runHybridSurfaceCase(mesh,cfg,progressFcn);return;
+end
 % 新相态链需要带来源的外缘包；旧一键外流仍使用NASA7，不能偷偷混合两条链。
 if isfield(cfg,'heating') && isfield(cfg.heating,'sidewallModel') && ...
         strcmp(cfg.heating.sidewallModel,'phaseAwareLaminarIntegral')
