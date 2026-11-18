@@ -34,6 +34,24 @@
       const all={name:'全模型',area,fields:{[fieldKey]:f.areaSummary},faceIDs:[]};
       [all,...list(ledger.regions)].forEach((r,index)=>{const row=document.createElement('tr'),name=index===0?'':r.name,stats=r.fields[fieldKey];row.tabIndex=0;row.classList.toggle('selected',name===regionName);row.setAttribute('aria-selected',String(name===regionName));const first=node('td',r.name);first.append(node('small',fmt(r.area)));row.append(first);['engineeringArea','researchArea','prescribedArea','unknownArea','outOfDomainArea','qualifiedArea'].forEach(k=>{const c=node('td',percent(stats[k],r.area));c.title=fmt(stats[k])+' m²';row.append(c);});const choose=()=>selectRegion(name);row.onclick=choose;row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}};body.append(row);});
       const selected=list(ledger.regions).find(r=>r.name===regionName),joint=selected?selected.joint:ledger.joint;
+      if(fieldKey==='heatFlux'){
+        const stats=selected?selected.fields.heatFlux:f.areaSummary,power=stats.heatPower;
+        if(power){
+          const scope=selected?selected.name:'全模型';
+          const basis=power.areaBasis==='source-curved'?'源壁曲面积':'三角面面积';
+          const origin=stats.researchArea>0?'研究计算':'工程计算';
+          let line;
+          if(power.status==='complete'||power.status==='partial'){
+            const total=power.status==='complete'?'该范围总热功率':'已算面热功率';
+            line=scope+' · '+origin+' · '+total+' '+fmt(power.calculatedPowerW)+' W（有符号，'+basis+' '+fmt(power.calculatedAreaM2)+' / '+fmt(power.integrationAreaM2)+' m²）。';
+            if(power.status==='partial')line+='该范围总热功率未知。';
+          }else{
+            const reasons={'no-calculated-faces':'没有可积分的计算热流','unit-unavailable':'热流单位未确认','area-unavailable':'积分面积未核实','time-frame-required':'需选择单一时间帧','nonfinite-integral':'积分超出数值范围'};
+            line=scope+' · 总热功率未知。'+(reasons[power.status]||'缺少积分依据')+'。';
+          }
+          box.append(node('div',line,'coverageLine'));
+        }
+      }
       const jointArea=v=>finite(v)?fmt(v)+' m²（'+percent(v,joint.totalArea)+'）':'未记录';
       $('jointSummary').textContent=(selected?selected.name:'全模型')+'壁压与热流的同面面积。工程解 '+jointArea(joint.pressureHeatFluxEngineeringArea)
         +'。含研究计算的可用面积 '+jointArea(joint.pressureHeatFluxAvailableArea)+'。两项均通过验证 '+jointArea(joint.pressureHeatFluxQualifiedArea)+'。';

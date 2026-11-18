@@ -161,11 +161,19 @@ end
 
 % 面积用原faceID集合；同面多份证据不重复计面积，失败覆盖通过。
 for k=1:numel(fields),fields(k).areaSummary=areas(area,fields(k).availability,fields(k).qualification);end
+heatIndex=find(strcmp(keys,'heatFlux'),1);
+if ~isempty(heatIndex)
+    [powerArea,areaBasis]=heatIntegrationArea(data,area);
+    fields(heatIndex).areaSummary.heatPower=heatPower(fields(heatIndex),powerArea,areaBasis,(1:n)');
+end
 names=unique(region,'stable');regions=struct([]);
 for j=1:numel(names)
     selected=find(strcmp(region,names{j}));summary=struct;
     for k=1:numel(fields)
         summary.(char(fields(k).key))=areas(area(selected),fields(k).availability(selected),fields(k).qualification(selected));
+    end
+    if ~isempty(heatIndex)
+        summary.heatFlux.heatPower=heatPower(fields(heatIndex),powerArea,areaBasis,selected);
     end
     regions=append(regions,struct('name',names{j},'faceIDs',selected-1,'area',sum(area(selected)), ...
         'fields',summary,'joint',jointAreas(fields,area,selected)));
@@ -181,6 +189,55 @@ ledger.acceptedEvidenceCount=numel(accepted);ledger.rejectedEvidenceCount=numel(
 ledger.qualificationIsIndependentOfAvailability=true;ledger.legacyValuesAndStatusPreserved=true;
 ledger.physicalQualificationIsFromExplicitBoundProofOnly=true;ledger.synthetic=synthetic;
 ledger.scope='原面逐变量两层证据台账；统计不求解、不补值、不自授资格；合成数据通过不属于真实物理认证';
+end
+
+function [weights,basis]=heatIntegrationArea(data,triangleArea)
+% 功率统计使用实际积分面积。旋转壁面从显示三角形回到各源环带的曲面积。
+weights=triangleArea;basis='triangles';
+hasCurvedWeights=isfield(data,'wallBinding') && isstruct(data.wallBinding) && ...
+    isfield(data.wallBinding,'curvedAreaPerTriangleM2');
+if ~hasCurvedWeights && ~isfield(data,'surfaceIntegralAudit'),return;end
+weights=[];basis='unavailable';
+if ~hasCurvedWeights || ~isscalar(data.wallBinding),return;end
+b=data.wallBinding;n=numel(triangleArea);
+if ~all(isfield(b,{'sourceAreaPerRadianM2','sourceFaceID'})),return;end
+w=b.curvedAreaPerTriangleM2(:);perRadian=b.sourceAreaPerRadianM2(:);ids=b.sourceFaceID(:);
+if ~isnumeric(w) || ~isnumeric(perRadian) || ~isnumeric(ids) || ...
+        ~isreal(w) || ~isreal(perRadian) || ~isreal(ids) || ...
+        numel(w)~=n || numel(perRadian)~=n || numel(ids)~=n || ...
+        ~all(isfinite(w)&w>0) || ~all(isfinite(perRadian)&perRadian>0) || ...
+        ~all(isfinite(ids)&ids>=1&ids==fix(ids)),return;end
+[~,~,group]=unique(ids);
+ringArea=accumarray(group,double(w));
+expected=2*pi*double(perRadian);
+if any(abs(ringArea(group)-expected)>1e-10*expected),return;end
+if isfield(data,'surfaceIntegralAudit')
+    audit=data.surfaceIntegralAudit;
+    if ~isstruct(audit) || ~isscalar(audit) || ~all(isfield(audit,{'sourceWallFaces','displayTriangleCount'})) || ...
+            ~isequal(audit.sourceWallFaces,numel(ringArea)) || ~isequal(audit.displayTriangleCount,n),return;end
+end
+weights=double(w);basis='source-curved';
+end
+
+function result=heatPower(field,weights,basis,selected)
+% 单时刻有符号热功率。只有每个选中面都有计算值时才给出整片区域的总功率。
+result=struct('areaBasis',basis,'status','area-unavailable','sourceUnit',field.unit, ...
+    'scaleToWm2',NaN,'calculatedAreaM2',NaN,'integrationAreaM2',NaN,'calculatedPowerW',NaN,'wholeSurfacePowerW',NaN);
+if isempty(weights),return;end
+a=weights(selected);available=field.availability(selected);
+computed=ismember(available,[1 2]);result.calculatedAreaM2=sum(a(computed));result.integrationAreaM2=sum(a);
+if isfield(field,'history') && ~isempty(field.history),result.status='time-frame-required';return;end
+switch char(field.unit)
+    case {'W/m²','W/m^2','W/m2'},scale=1;
+    case {'kW/m²','kW/m^2','kW/m2'},scale=1000;
+    otherwise,result.status='unit-unavailable';return;
+end
+result.scaleToWm2=scale;
+if ~any(computed),result.status='no-calculated-faces';return;end
+q=double(field.values(:));power=sum(q(selected(computed)).*a(computed))*scale;
+if ~isfinite(power),result.status='nonfinite-integral';return;end
+result.calculatedPowerW=power;result.status='partial';
+if all(computed),result.wholeSurfacePowerW=power;result.status='complete';end
 end
 
 function value=areas(area,a,q)

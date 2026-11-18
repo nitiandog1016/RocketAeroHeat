@@ -114,7 +114,7 @@ update(data,varargin{:});
                 cellText(f.methodNames,f.methodIndex(i)+1),scope,cellText(f.reason,i),evidence});
         end
         clear guard;
-        compact=compactLedger(ledger);v=s.viewState;
+        compact=compactAerothermalEvidenceLedger(d);v=s.viewState;
         summary=struct('schemaVersion',1,'kind','aerothermal-evidence-export','csvFile',[name ext], ...
             'csvSHA256',sha256File(path),'rows',size(d.faces,1),'fieldKey',key, ...
             'identity',ledger.identity,'evidenceLedger',compact,'viewState',v, ...
@@ -143,23 +143,6 @@ if iscell(values),value=values{i};else,value=values(i);end
 end
 function value=cellText(values,i)
 value=char(string(cellValue(values,i)));
-end
-function value=compactLedger(ledger)
-% 模块六：旁车保留身份/汇总/证据；逐面原值已经在独立CSV中，不重复大数组。
-value=struct('schemaVersion',ledger.schemaVersion,'kind',ledger.kind,'identity',ledger.identity, ...
-    'fields',struct([]),'regions',struct([]),'joint',withoutFaceIDs(ledger.joint), ...
-    'acceptedEvidence',ledger.acceptedEvidence,'rejectedEvidence',ledger.rejectedEvidence);
-for i=1:numel(ledger.fields)
-    f=ledger.fields(i);entry=struct('key',f.key,'label',f.label,'unit',f.unit,'valueSHA256',f.valueSHA256,'areaSummary',f.areaSummary);
-    if isempty(value.fields),value.fields=entry;else,value.fields(end+1)=entry;end
-end
-for i=1:numel(ledger.regions)
-    r=ledger.regions(i);entry=struct('name',r.name,'area',r.area,'faceCount',numel(r.faceIDs),'fields',r.fields,'joint',withoutFaceIDs(r.joint));
-    if isempty(value.regions),value.regions=entry;else,value.regions(end+1)=entry;end
-end
-end
-function value=withoutFaceIDs(value)
-names=fieldnames(value);remove=names(endsWith(names,'FaceIDs'));if ~isempty(remove),value=rmfield(value,remove);end
 end
 function hash=sha256File(path)
 fid=fopen(path,'rb');assert(fid>=0);guard=onCleanup(@()fclose(fid));digest=java.security.MessageDigest.getInstance('SHA-256');

@@ -15,6 +15,23 @@ assert(q.areaSummary.engineeringArea==15 && q.areaSummary.unknownArea==16 && q.a
 assert(q.values(1)==0 && q.values(2)==-2 && isnan(q.values(5)) && q.values(6)==6);
 assert(all(p.qualification==0) && q.qualification(6)==1);
 assert(initial.joint.pressureHeatFluxQualifiedArea==0);
+% 热功率按面面积累加有符号计算值；有限的超域值、给定值和未知面不进入计算积分。
+power=q.areaSummary.heatPower;
+assert(strcmp(power.status,'partial') && power.calculatedPowerW==40000 && ...
+    power.calculatedAreaM2==15 && power.integrationAreaM2==63 && isnan(power.wholeSurfacePowerW));
+watts=data;watts.fields(2).unit='W/m²';watts.fields(2).values=1000*watts.fields(2).values.';
+watts.fields(2).status(4)=2;
+f=field(buildAerothermalEvidenceLedger(watts),'heatFlux');power=f.areaSummary.heatPower;
+assert(power.calculatedPowerW==8000 && power.calculatedAreaM2==7 && isnan(power.wholeSurfacePowerW));
+watts.fields(2).values=[-2 1 0 0 0 0];watts.fields(2).status=ones(6,1);watts.fields(2).outOfDomainFace=false(6,1);
+f=field(buildAerothermalEvidenceLedger(watts),'heatFlux');power=f.areaSummary.heatPower;
+assert(strcmp(power.status,'complete') && power.wholeSurfacePowerW==0 && power.calculatedAreaM2==63);
+watts.fields(2).status(2)=2;f=field(buildAerothermalEvidenceLedger(watts),'heatFlux');
+assert(f.areaSummary.heatPower.calculatedPowerW==-2 && isnan(f.areaSummary.heatPower.wholeSurfacePowerW));
+watts.fields(2).status(:)=2;f=field(buildAerothermalEvidenceLedger(watts),'heatFlux');
+assert(strcmp(f.areaSummary.heatPower.status,'no-calculated-faces') && isnan(f.areaSummary.heatPower.calculatedPowerW));
+watts.fields(2).unit='raw heat flux';f=field(buildAerothermalEvidenceLedger(watts),'heatFlux');
+assert(strcmp(f.areaSummary.heatPower.status,'unit-unavailable') && isnan(f.areaSummary.heatPower.wholeSurfacePowerW));
 
 % 合成数值证据只是单元测试；所有记录都绑定完整几何、工况、来源与场值。
 pPass=proofRecord(out,initial,'pressure',[0 1 2],'synthetic-pressure-pass',false);

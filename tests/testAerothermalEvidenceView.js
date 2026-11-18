@@ -43,7 +43,12 @@ bridgeValue={kind:'aerothermal-evidence-view',revision:1,data:uiData,viewState:{
 assert.strictEqual(bridgeValue.kind,'evidence-state');assert.deepStrictEqual(geometryPayload.faceField.range,[-9,9]);
 assert(element('jointSummary').textContent.includes('工程解 0.00000 m²（0.00%）'));
 assert(element('jointSummary').textContent.includes('含研究计算的可用面积 8.00000 m²（50.00%）'));
+stats.heatPower={areaBasis:'triangles',status:'partial',calculatedPowerW:-2,calculatedAreaM2:8,integrationAreaM2:16,wholeSurfacePowerW:null};
+controller.selectRegion('');let line=element('coverageSummary').children.at(-1).textContent;
+assert(line.includes('研究计算')&&line.includes('-2.00000 W')&&line.includes('总热功率未知'));
+uiData.evidenceLedger.regions[1].fields.heatFlux={...stats,heatPower:{areaBasis:'source-curved',status:'complete',calculatedPowerW:0,calculatedAreaM2:8,integrationAreaM2:8,wholeSurfacePowerW:0}};
 controller.selectRegion('second');assert.strictEqual(selected.ids.length,8);assert.strictEqual(selected.face,8);
+line=element('coverageSummary').children.at(-1).textContent;assert(line.includes('second')&&line.includes('源壁曲面积')&&line.includes('总热功率 0.00000 W')&&!line.includes('未知'));
 assert.deepStrictEqual(controller.getState().ranges.heatFlux,[-9,9]);assert.deepStrictEqual(geometryPayload.faceField.values,values);
 controller.inspectFace(1);assert.strictEqual(controller.getState().regionName,'first');assert.strictEqual(selected.face,1);assert(segments.length>0);
 assert.strictEqual(geometryPayload.faces.length,16);assert.strictEqual(geometryPayload.vertices.length,16);
@@ -99,4 +104,4 @@ if(process.argv[2]){
   console.log(JSON.stringify({actualFaces:reference.originalFaces,queriedFaces:reference.probeExamples.map(x=>x.faceID),
     checkedFieldsPerFace:actual.evidenceLedger.fields.length,actualWebGL:false}));
 }
-console.log(JSON.stringify({checks:section.samples.length*6+54,components:2,originalValuesUnchanged:true,unknownNotZero:true,negativeAndZeroPreserved:true,qualificationIndependent:true,domStateDispatch:true,regionDoesNotCropOrRescale:true,compactProbeDetailsCollapsed:true,oneBasedFaceLookup:true,separateJointEngineeringArea:true,actualWebGL:false}));
+console.log(JSON.stringify({checks:section.samples.length*6+56,components:2,originalValuesUnchanged:true,unknownNotZero:true,negativeAndZeroPreserved:true,qualificationIndependent:true,domStateDispatch:true,regionDoesNotCropOrRescale:true,compactProbeDetailsCollapsed:true,oneBasedFaceLookup:true,separateJointEngineeringArea:true,signedPartialAndWholePower:true,actualWebGL:false}));
