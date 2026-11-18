@@ -5,6 +5,7 @@
 ## 当前与独立工作入口
 
 - [v263 主工况原面基线与侧壁缺口](validation/v263/RESULTS.md)。已核对联合覆盖和候选重叠，旧研究值的工程归类已更正，区域求解待完成。
+- [v263 NASA 侧壁同站实验对照](validation/v263/TMR_JOINT.md)。80 个截断域固壁环带，12 个压力与热流共同位置，含项目两套网格及 WIND 数值参照。
 - [v262 静止空气节点探针](STATIC_AIR_PROBE_V262.md)、[离线节点页](validation/v262/evidence/workbench/index.html)、[下一决定](validation/v262/NEXT_DECISION.md)。主窗口查询和下载按实际节点、帧、量的身份与反算方法核对。
 - [v261 静止空气初始化](STATIC_AIR_FACTORY_V261.md)、[全节点核对](validation/v261/evidence/audit/report.json)、[下一决定](validation/v261/NEXT_DECISION.md)。两种配置的物性对象、温度回读与越界恢复通过本机单线程对照。
 - [v260 量热反算](STABLE_CALORIC_INVERSE_V260.md)、[独立审核](validation/v260/evidence/audit02/report.json)、[下一决定](validation/v260/NEXT_DECISION.md)。195 个固定状态的温度精度达标，修复 60 K 附近的域误拒并完成端点对照。
