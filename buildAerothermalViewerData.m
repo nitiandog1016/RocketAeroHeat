@@ -269,6 +269,39 @@ if isfield(mesh,'continuumRegime')
             mask=logical(c.(names{k})(:)) & missing;reasons(mask)={text{k}};
         end
     end
+    if all(isfield(c,names)) && numel(c.(names{1}))==n && numel(c.(names{2}))==n
+        inherited=missing & logical(c.downstreamStateUnresolvedFace(:)) & ~logical(c.directStateUnresolvedFace(:));
+        if any(inherited)
+            reasons=addSavedUpstreamReason(mesh,reasons,inherited,c);
+        end
+    end
+end
+end
+function reasons=addSavedUpstreamReason(mesh,reasons,inherited,regime)
+% 模块用途：沿已保存的同源前驱链说明缺失位置，供探针和导出共同使用。
+if ~isfield(mesh,'surfaceStreamlines') || ~isfield(mesh,'boundaryLayerEdge'),return;end
+path=mesh.surfaceStreamlines;edge=mesh.boundaryLayerEdge;
+if ~all(isfield(path,{'predecessorFace','pathCost','connectedFace','velocitySource'})) || ...
+        ~isfield(edge,'method') || ~strcmp(path.velocitySource,edge.method) || ...
+        ~isscalar(string(edge.method)) || strlength(strtrim(string(edge.method)))==0,return;end
+n=numel(reasons);
+parent=double(path.predecessorFace(:));cost=path.pathCost(:);connected=logical(path.connectedFace(:));
+if numel(parent)~=n || numel(cost)~=n || numel(connected)~=n,return;end
+direct=logical(regime.directStateUnresolvedFace(:));
+downstream=logical(regime.downstreamStateUnresolvedFace(:));
+% 前驱成本必须严格递减。断链、环和来源不明的分支自然保留原说明。
+source=zeros(n,1);links=zeros(n,1);
+known=find(direct & connected & isfinite(cost));source(known)=known;
+ids=find(downstream & ~direct & connected & isfinite(cost));
+[~,order]=sort(cost(ids));
+for face=reshape(ids(order),1,[])
+    p=parent(face);
+    if ~isfinite(p) || p<1 || p>n || p~=fix(p) || cost(p)>=cost(face) || source(p)==0,continue;end
+    source(face)=source(p);links(face)=links(p)+1;
+    if inherited(face)
+        reasons{face}=sprintf('%s。沿保存的准流线回溯 %d 步，最近的外缘状态直接缺失原面为 %d。', ...
+            reasons{face},links(face),source(face));
+    end
 end
 end
 function note=fieldStateNote(key)

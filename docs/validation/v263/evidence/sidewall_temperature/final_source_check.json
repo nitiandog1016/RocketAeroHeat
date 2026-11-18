@@ -1,0 +1,41 @@
+{
+  "status": "terminal",
+  "command": [
+    "D:/matlab/bin/matlab.exe",
+    "-wait",
+    "-singleCompThread",
+    "-batch",
+    "cd('E:/RocketAeroHeat'); addpath('tests'); testAerothermalViewerTemperatures('E:/RocketAeroHeat/outputs/v263_validation/sidewall_source_check02/fixture',true); s=load('E:/RocketAeroHeat/outputs/v104_validation/baseline02/current_case.mat','current'); data=buildAerothermalViewerData(s.current); assert(strcmp(strtrim(fileread('E:/RocketAeroHeat/outputs/v263_validation/sidewall_view01/workbench/case-data.js')),['window.ROCKET_CASE=' jsonencode(data,'ConvertInfAndNaN',true) ';'])); disp('Original snapshot JS payload matches final source.');"
+  ],
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v104_validation\\baseline02\\current_case.mat": "b4889e42a28131c253a56f06472a58c9d2cb290d7c9937935fbb4b5d7349488f",
+    "E:\\RocketAeroHeat\\outputs\\v263_validation\\sidewall_view01\\workbench\\case-data.js": "4d7f78f8f37ec8f74951c278c408a05978412e05dd85c20c0e328f4afb2fada9",
+    "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "c38ac2178e07cbdcd3f6c6caf812984f80b652cbcb1da24b219df2dffd5463ff",
+    "E:\\RocketAeroHeat\\tests\\testAerothermalViewerTemperatures.m": "d110a1eef5a6c8389ec9284297e4087a08023493266a57794e0b1127221209ae"
+  },
+  "maximumSeconds": 120,
+  "maximumRSSBytes": 4294967296,
+  "maximumOutputBytes": 50331648,
+  "supervisorProcessID": 15724,
+  "physicsQualified": false,
+  "nativeExitCode": null,
+  "processID": 9176,
+  "debuggerExitCode": 0,
+  "elapsedSeconds": 15.375,
+  "stopReason": null,
+  "supervisorError": null,
+  "peakFamilyRSSBytes": 810602496,
+  "peakOutputBytes": 234,
+  "observedProcessIDs": [
+    9176,
+    51992,
+    14604
+  ],
+  "survivingProcessIDs": [],
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v104_validation\\baseline02\\current_case.mat": true,
+    "E:\\RocketAeroHeat\\outputs\\v263_validation\\sidewall_view01\\workbench\\case-data.js": true,
+    "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+    "E:\\RocketAeroHeat\\tests\\testAerothermalViewerTemperatures.m": true
+  }
+}

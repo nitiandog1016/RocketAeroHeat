@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v264 自绘模型的侧壁温度与上游来源](validation/v263/SIDEWALL_TEMPERATURE.md) · [NASA 风洞独立测站结果](validation/v263/TMR_RESOLVED.md) · [原面下一项](validation/v263/NEXT_DECISION.md)。在研 v263 阶段的本地代码交付。936 个缺热原面的保存路径和探针通过对照，风洞终态与实验按全部原始测站复核。
 - [v263 主工况原面基线与侧壁缺口](validation/v263/RESULTS.md)。已核对联合覆盖和候选重叠，旧研究值的工程归类已更正，区域求解待完成。
 - [v263 NASA 侧壁同站实验对照](validation/v263/TMR_JOINT.md)。80 个截断域固壁环带，12 个压力与热流共同位置，含项目两套网格及 WIND 数值参照。
 - [v262 静止空气节点探针](STATIC_AIR_PROBE_V262.md)、[离线节点页](validation/v262/evidence/workbench/index.html)、[下一决定](validation/v262/NEXT_DECISION.md)。主窗口查询和下载按实际节点、帧、量的身份与反算方法核对。

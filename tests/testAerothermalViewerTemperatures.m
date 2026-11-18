@@ -83,6 +83,23 @@ guardedData=buildAerothermalViewerData(guarded);hg=get(guardedData,'heatFlux');e
 assert(contains(hg.missingReason{5},'本面元外缘') && contains(hg.missingReason{6},'上游外缘'));
 assert(contains(hg.missingReason{6},'即使本面外缘有效') && eg.status(6)==1 && hg.status(6)==0);
 assert(isequaln(hg.values,guarded.heating.heatFlux/1000) && all(hg.values(1:4)==(1:4)'));
+% 原始前驱存在时，热流和恢复温度报告同一来源；断链和错配保留旧说明。
+traced=guarded;traced.boundaryLayerEdge.method='同一保存外缘';
+traced.surfaceStreamlines=struct('velocitySource','同一保存外缘','predecessorFace',[0;0;0;0;0;5], ...
+    'connectedFace',true(6,1),'pathCost',(1:6)');
+withTrace=buildAerothermalViewerData(traced);
+for key={'heatFlux','recoveryTemperature'}
+    field=get(withTrace,key{1});assert(contains(field.missingReason{6},'回溯 1 步，最近的外缘状态直接缺失原面为 5'));
+    assert(field.status(6)==0 && isnan(field.values(6)));
+end
+for badParent=[0 6 7 NaN]
+    broken=traced;broken.surfaceStreamlines.predecessorFace(6)=badParent;
+    field=get(buildAerothermalViewerData(broken),'heatFlux');assert(strcmp(field.missingReason{6},hg.missingReason{6}));
+end
+broken=traced;broken.surfaceStreamlines.velocitySource='不同外缘';
+field=get(buildAerothermalViewerData(broken),'heatFlux');assert(strcmp(field.missingReason{6},hg.missingReason{6}));
+broken.surfaceStreamlines.velocitySource='';broken.boundaryLayerEdge.method='';
+field=get(buildAerothermalViewerData(broken),'heatFlux');assert(strcmp(field.missingReason{6},hg.missingReason{6}));
 uniform=m;uniform.heating.wallTemperatureByFace(:)=300;
 du=buildAerothermalViewerData(uniform);assert(strcmp(du.resultCondition.wallInputType,'uniform'));
 assert(du.resultCondition.wallUniformValueK==300 && contains(du.caseNote,'统一壁温边界输入 300 K'));
