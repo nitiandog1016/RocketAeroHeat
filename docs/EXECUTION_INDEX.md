@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v260 量热反算](STABLE_CALORIC_INVERSE_V260.md)、[独立审核](validation/v260/evidence/audit02/report.json)、[下一决定](validation/v260/NEXT_DECISION.md)。195 个固定状态的温度精度达标，修复 60 K 附近的域误拒并完成端点对照。
 - [v259报告](EILMER_MARCH_REVIEW_V259.md)、[最终回执](validation/v259/evidence/final_report.json)、[当时下一决定](validation/v259/NEXT_DECISION.md)。固定lmr块推进入口未实现、旧分支反馈/驻留语义不满足直接采用，候选拒绝；无新求解，本地交付。
 - [v258报告](DIRECTION_CONSISTENCY_V258.md)、[最终回执](validation/v258/evidence/final_report.json)、[当时下一决定](validation/v258/NEXT_DECISION.md)。固定方向诊断完成，半步一致性未过、0更新；原面方向出口与本地交付，回H1具名区域候选复审。
 - [v257报告](KINSOL_COUPLED_CONTROL_V257.md)、[最终回执](validation/v257/evidence/final_report.json)、[当时下一决定](validation/v257/NEXT_DECISION.md)。固定KINSOL完整耦合接口/出口通过，首轮线性精度拒绝，接受更新0；本地交付，组合关闭。

@@ -1,0 +1,311 @@
+{
+  "passed": true,
+  "caloricComponentAccepted": true,
+  "goalStatus": "active",
+  "wholeSurfaceGoalComplete": false,
+  "baseCommit": "648f315d307ad568247597c48947752dfd964d2a",
+  "numericalSummary": {
+    "passed": true,
+    "domainAcceptancePassed": true,
+    "caloricComponentAccepted": true,
+    "sourceReplayRows": 195,
+    "distinctReplayEnergyTargets": 151,
+    "pairedDifferences": 130,
+    "frozenControls": 60,
+    "extraEdgeNeighbors": 132,
+    "disagreements": 0,
+    "fixedOriginallyRejectedRow": {
+      "id": "original-1",
+      "kind": "E",
+      "target": "43997.362800582378",
+      "oldAccepted": "1",
+      "newAccepted": "1",
+      "oldT": "60.000000000000014",
+      "newT": "60.000000000000014",
+      "method": "legacy-endpoint-bracket",
+      "oldReason": "",
+      "newReason": ""
+    },
+    "acceptedRowsWithoutUniqueMathematicalRoot": [
+      "original-1",
+      "original-3",
+      "original-5",
+      "original-6",
+      "original-33",
+      "original-39",
+      "original-45",
+      "band-E-60--2",
+      "band-E-60--1"
+    ],
+    "maximumTemperatureErrorK": {
+      "old": 6.078717717716794e-14,
+      "new": 2.6444786816944835e-14
+    },
+    "pairedDeltaErrorRMSK": {
+      "old": 2.786908160703552e-14,
+      "new": 1.3843921098043979e-14
+    },
+    "maximumErrorNewToOldRatio": 0.4350389020347151,
+    "pairedRMSErrorNewToOldRatio": 0.4967483784807999,
+    "reusedByteIdenticalStatesAndHS": true,
+    "all195CaloricTargetsInUniqueInterval": true,
+    "nativeSummary": {
+      "normalReturn": true,
+      "samples": 195,
+      "stateRows": 390,
+      "controls": 60,
+      "controlAcceptanceMismatches": 0,
+      "entropyTemperatureBitMismatches": 0,
+      "primitiveInputsBitwiseMatched": true,
+      "oldTracedMappingBitwiseOriginal22Fields": true,
+      "longDoubleDigits": 64,
+      "CFDExecuted": false,
+      "physicalQualification": false,
+      "newQualifiedAreaM2": 0
+    },
+    "priorAuditSHA256": "79be74bed6d9e8575a0592e158946aef4527cbbd744d372fa2a407557b24e4d3",
+    "CFDExecuted": false,
+    "newQualifiedAreaM2": 0,
+    "fullSurfaceMilestoneComplete": false
+  },
+  "initialGatePassed": false,
+  "terminalReceipts": 8,
+  "allReceiptsTerminalStableGroupsEmpty": true,
+  "executionFailures": {
+    "process_build": 1
+  },
+  "scientificGateFailures": {
+    "case01": "one old-accepted endpoint rejected"
+  },
+  "processSeconds": {
+    "audit": 1.125,
+    "build": 15.485999999997887,
+    "query": 1.8909999999986553,
+    "offline": 1.0160000000032596
+  },
+  "maximumSampledGroupRSSBytes": 562688000,
+  "scope": "caloric component replay and endpoint compatibility under pinned build flags",
+  "CFDExecuted": false,
+  "normalSolverFactoryUsesStableCaloric": false,
+  "normalGasConstructionSites": [
+    "outputs/v220_validation/source/SU2_CFD/src/solvers/CEulerSolver.cpp:913",
+    "outputs/v220_validation/source/SU2_CFD/src/solvers/CEulerSolver.cpp:1172"
+  ],
+  "newQualifiedAreaM2": 0,
+  "physicalQualification": false,
+  "profileReadyForCFD": false,
+  "originalFaces": 19752,
+  "originalAreaM2": 1.9646292565715553,
+  "protectedCount": 29,
+  "engineeringFilesUnchanged": 54,
+  "candidateCount": 2,
+  "unrelatedTrackedSHA256": {
+    "tests/verifyWebSectionExport.py": "6f67f9fecc3e806ed74ab879ff8a5ba1b745a239158babba55d1856d4d54225b",
+    "web/section.js": "74fd8f6cd6f017ecb60a578ebedfe5aabfda2cde8ce5477fdd5b4b9bf24f9169",
+    "web/viewer.js": "90d73959c1d39bf7fd0919d1a034e4994c24edd90a922270064a3c5892088ca5"
+  },
+  "historicalSourceBindings": [
+    {
+      "process": "process_audit",
+      "path": "scripts/runCaloricAuditV260.py",
+      "executedSHA256": "7810596d8f2bc0086e329e7edeb36d7e87148120feb34946695e87f1cc6c8411",
+      "currentSHA256": "c1f06dc7fa649d2f81f991914d795ea3e1f0449e95aafee358595320ee6db6d5",
+      "exactExecutedSource": "execution_sources/7810596d8f2bc0086e329e7edeb36d7e87148120feb34946695e87f1cc6c8411.py"
+    },
+    {
+      "process": "process_audit",
+      "path": "scripts/auditCaloricInverseV260.py",
+      "executedSHA256": "1c22df8a80ba2be5befded49c75657951bd8c417bf2376bfcb1995c3b1fcd5cb",
+      "currentSHA256": "5211e6b0ba0ed035f305fc80325736e86502c0e2a6ebe7b0b1323618a116782c",
+      "exactExecutedSource": "execution_sources/1c22df8a80ba2be5befded49c75657951bd8c417bf2376bfcb1995c3b1fcd5cb.py"
+    },
+    {
+      "process": "process_audit",
+      "path": "docs/validation/v260/PLAN.md",
+      "executedSHA256": "81701807877027935eead90e0f6ed62eddb3cc703815c1bf5cb18ac76062a039",
+      "currentSHA256": "a9639ab357c15f28312c99b37cf2caa52e0b0b8dabdaab1e6154a9b2c3a492c2",
+      "exactExecutedSource": "execution_sources/81701807877027935eead90e0f6ed62eddb3cc703815c1bf5cb18ac76062a039.md"
+    },
+    {
+      "process": "process_build",
+      "path": "scripts/runCaloricInverseV260.py",
+      "executedSHA256": "c6981cce65fa060f88b6a83945d6f85f9a05e80d05eb82d77e2a8810f68ffeb0",
+      "currentSHA256": "53c08535cb3cc8b435c977ed1f7b1b8fc89b4b365b1c9b1a737c7716a5cce415",
+      "exactExecutedSource": "execution_sources/c6981cce65fa060f88b6a83945d6f85f9a05e80d05eb82d77e2a8810f68ffeb0.py"
+    },
+    {
+      "process": "process_build",
+      "path": "docs/validation/v260/PLAN.md",
+      "executedSHA256": "f96f26c70ad13397a11a78e27aceb7818fd593175373ceb32c1e5840a94576f9",
+      "currentSHA256": "a9639ab357c15f28312c99b37cf2caa52e0b0b8dabdaab1e6154a9b2c3a492c2",
+      "exactExecutedSource": "execution_sources/f96f26c70ad13397a11a78e27aceb7818fd593175373ceb32c1e5840a94576f9.md"
+    },
+    {
+      "process": "process_build",
+      "path": "native/su2PhaseAwareAir/caloricReplayV260.cpp",
+      "executedSHA256": "c21ddf90956954762ae74d7a03e126e35825a795e77485b785f0bfc30014c890",
+      "currentSHA256": "961c52468b025c4bcf8b0c010b0de963806cdf1f2e730781db6ecbbb6e061512",
+      "exactExecutedSource": "execution_sources/c21ddf90956954762ae74d7a03e126e35825a795e77485b785f0bfc30014c890.cpp"
+    },
+    {
+      "process": "process_build",
+      "path": "native/su2PhaseAwareAir/StableCaloricInverseV260.hpp",
+      "executedSHA256": "fa444feac3468b66513cc2d405ba969db77abbaef157155440f933a656481e18",
+      "currentSHA256": "6866ade1c0d1001147f0fc5460fb32be321044e8b326264f8c80015abdc65302",
+      "exactExecutedSource": "execution_sources/fa444feac3468b66513cc2d405ba969db77abbaef157155440f933a656481e18.hpp"
+    },
+    {
+      "process": "process_build",
+      "path": "native/su2PhaseAwareAir/CSU2PhaseAwareAirStableV260.hpp",
+      "executedSHA256": "9884639fddac05a1f4307d049ec0cfd6fe645e8a290856b56688629522806b5e",
+      "currentSHA256": "23e3aea512bbe724603429b701ae88d2ba7aa3a2ac77a5b8b468865cbf1098cb",
+      "exactExecutedSource": "execution_sources/9884639fddac05a1f4307d049ec0cfd6fe645e8a290856b56688629522806b5e.hpp"
+    },
+    {
+      "process": "process_build2",
+      "path": "scripts/runCaloricInverseV260.py",
+      "executedSHA256": "9020988a800f129299015f372aeec7e301a6c3e9804156da8f4b978f14b872f4",
+      "currentSHA256": "53c08535cb3cc8b435c977ed1f7b1b8fc89b4b365b1c9b1a737c7716a5cce415",
+      "exactExecutedSource": "execution_sources/9020988a800f129299015f372aeec7e301a6c3e9804156da8f4b978f14b872f4.py"
+    },
+    {
+      "process": "process_build2",
+      "path": "docs/validation/v260/PLAN.md",
+      "executedSHA256": "81701807877027935eead90e0f6ed62eddb3cc703815c1bf5cb18ac76062a039",
+      "currentSHA256": "a9639ab357c15f28312c99b37cf2caa52e0b0b8dabdaab1e6154a9b2c3a492c2",
+      "exactExecutedSource": "execution_sources/81701807877027935eead90e0f6ed62eddb3cc703815c1bf5cb18ac76062a039.md"
+    },
+    {
+      "process": "process_build2",
+      "path": "native/su2PhaseAwareAir/caloricReplayV260.cpp",
+      "executedSHA256": "81cd4a43d9c7994fab72fa33370ad0c671a5c39c0965a323d5fb6dc8fb187145",
+      "currentSHA256": "961c52468b025c4bcf8b0c010b0de963806cdf1f2e730781db6ecbbb6e061512",
+      "exactExecutedSource": "execution_sources/81cd4a43d9c7994fab72fa33370ad0c671a5c39c0965a323d5fb6dc8fb187145.cpp"
+    },
+    {
+      "process": "process_build2",
+      "path": "native/su2PhaseAwareAir/StableCaloricInverseV260.hpp",
+      "executedSHA256": "fa444feac3468b66513cc2d405ba969db77abbaef157155440f933a656481e18",
+      "currentSHA256": "6866ade1c0d1001147f0fc5460fb32be321044e8b326264f8c80015abdc65302",
+      "exactExecutedSource": "execution_sources/fa444feac3468b66513cc2d405ba969db77abbaef157155440f933a656481e18.hpp"
+    },
+    {
+      "process": "process_edge-audit",
+      "path": "scripts/runCaloricAuditV260.py",
+      "executedSHA256": "fab69869fb09781b0d69edc20da7a10d50fd1b769c3228a923b3c639692fee7a",
+      "currentSHA256": "c1f06dc7fa649d2f81f991914d795ea3e1f0449e95aafee358595320ee6db6d5",
+      "exactExecutedSource": "execution_sources/fab69869fb09781b0d69edc20da7a10d50fd1b769c3228a923b3c639692fee7a.py"
+    },
+    {
+      "process": "process_edge-audit",
+      "path": "scripts/auditCaloricBoundaryV260.py",
+      "executedSHA256": "7f6402f7e6f3d5326905417d678fc10647c5af082804fd41c8fa600100b470a1",
+      "currentSHA256": "2a04d17584fcc5fe5e1b7d28b53dcbd634607610faa78595bd05d88b9007b51c",
+      "exactExecutedSource": "execution_sources/7f6402f7e6f3d5326905417d678fc10647c5af082804fd41c8fa600100b470a1.py"
+    },
+    {
+      "process": "process_edge-audit",
+      "path": "scripts/auditCaloricInverseV260.py",
+      "executedSHA256": "1c22df8a80ba2be5befded49c75657951bd8c417bf2376bfcb1995c3b1fcd5cb",
+      "currentSHA256": "5211e6b0ba0ed035f305fc80325736e86502c0e2a6ebe7b0b1323618a116782c",
+      "exactExecutedSource": "execution_sources/1c22df8a80ba2be5befded49c75657951bd8c417bf2376bfcb1995c3b1fcd5cb.py"
+    },
+    {
+      "process": "process_edge-build",
+      "path": "scripts/runCaloricInverseV260.py",
+      "executedSHA256": "f13b6e86a3ec4e22aa7214532352a1e2e0dba3609db4bf68647cba1541663e01",
+      "currentSHA256": "53c08535cb3cc8b435c977ed1f7b1b8fc89b4b365b1c9b1a737c7716a5cce415",
+      "exactExecutedSource": "execution_sources/f13b6e86a3ec4e22aa7214532352a1e2e0dba3609db4bf68647cba1541663e01.py"
+    },
+    {
+      "process": "process_edge-query",
+      "path": "scripts/runCaloricInverseV260.py",
+      "executedSHA256": "f13b6e86a3ec4e22aa7214532352a1e2e0dba3609db4bf68647cba1541663e01",
+      "currentSHA256": "53c08535cb3cc8b435c977ed1f7b1b8fc89b4b365b1c9b1a737c7716a5cce415",
+      "exactExecutedSource": "execution_sources/f13b6e86a3ec4e22aa7214532352a1e2e0dba3609db4bf68647cba1541663e01.py"
+    },
+    {
+      "process": "process_prepare",
+      "path": "scripts/runCaloricInverseV260.py",
+      "executedSHA256": "c6981cce65fa060f88b6a83945d6f85f9a05e80d05eb82d77e2a8810f68ffeb0",
+      "currentSHA256": "53c08535cb3cc8b435c977ed1f7b1b8fc89b4b365b1c9b1a737c7716a5cce415",
+      "exactExecutedSource": "execution_sources/c6981cce65fa060f88b6a83945d6f85f9a05e80d05eb82d77e2a8810f68ffeb0.py"
+    },
+    {
+      "process": "process_prepare",
+      "path": "docs/validation/v260/PLAN.md",
+      "executedSHA256": "f96f26c70ad13397a11a78e27aceb7818fd593175373ceb32c1e5840a94576f9",
+      "currentSHA256": "a9639ab357c15f28312c99b37cf2caa52e0b0b8dabdaab1e6154a9b2c3a492c2",
+      "exactExecutedSource": "execution_sources/f96f26c70ad13397a11a78e27aceb7818fd593175373ceb32c1e5840a94576f9.md"
+    },
+    {
+      "process": "process_prepare",
+      "path": "native/su2PhaseAwareAir/caloricReplayV260.cpp",
+      "executedSHA256": "c21ddf90956954762ae74d7a03e126e35825a795e77485b785f0bfc30014c890",
+      "currentSHA256": "961c52468b025c4bcf8b0c010b0de963806cdf1f2e730781db6ecbbb6e061512",
+      "exactExecutedSource": "execution_sources/c21ddf90956954762ae74d7a03e126e35825a795e77485b785f0bfc30014c890.cpp"
+    },
+    {
+      "process": "process_prepare",
+      "path": "native/su2PhaseAwareAir/StableCaloricInverseV260.hpp",
+      "executedSHA256": "fa444feac3468b66513cc2d405ba969db77abbaef157155440f933a656481e18",
+      "currentSHA256": "6866ade1c0d1001147f0fc5460fb32be321044e8b326264f8c80015abdc65302",
+      "exactExecutedSource": "execution_sources/fa444feac3468b66513cc2d405ba969db77abbaef157155440f933a656481e18.hpp"
+    },
+    {
+      "process": "process_prepare",
+      "path": "native/su2PhaseAwareAir/CSU2PhaseAwareAirStableV260.hpp",
+      "executedSHA256": "9884639fddac05a1f4307d049ec0cfd6fe645e8a290856b56688629522806b5e",
+      "currentSHA256": "23e3aea512bbe724603429b701ae88d2ba7aa3a2ac77a5b8b468865cbf1098cb",
+      "exactExecutedSource": "execution_sources/9884639fddac05a1f4307d049ec0cfd6fe645e8a290856b56688629522806b5e.hpp"
+    },
+    {
+      "process": "process_query",
+      "path": "scripts/runCaloricInverseV260.py",
+      "executedSHA256": "9020988a800f129299015f372aeec7e301a6c3e9804156da8f4b978f14b872f4",
+      "currentSHA256": "53c08535cb3cc8b435c977ed1f7b1b8fc89b4b365b1c9b1a737c7716a5cce415",
+      "exactExecutedSource": "execution_sources/9020988a800f129299015f372aeec7e301a6c3e9804156da8f4b978f14b872f4.py"
+    },
+    {
+      "process": "process_query",
+      "path": "docs/validation/v260/PLAN.md",
+      "executedSHA256": "81701807877027935eead90e0f6ed62eddb3cc703815c1bf5cb18ac76062a039",
+      "currentSHA256": "a9639ab357c15f28312c99b37cf2caa52e0b0b8dabdaab1e6154a9b2c3a492c2",
+      "exactExecutedSource": "execution_sources/81701807877027935eead90e0f6ed62eddb3cc703815c1bf5cb18ac76062a039.md"
+    },
+    {
+      "process": "process_query",
+      "path": "native/su2PhaseAwareAir/caloricReplayV260.cpp",
+      "executedSHA256": "81cd4a43d9c7994fab72fa33370ad0c671a5c39c0965a323d5fb6dc8fb187145",
+      "currentSHA256": "961c52468b025c4bcf8b0c010b0de963806cdf1f2e730781db6ecbbb6e061512",
+      "exactExecutedSource": "execution_sources/81cd4a43d9c7994fab72fa33370ad0c671a5c39c0965a323d5fb6dc8fb187145.cpp"
+    },
+    {
+      "process": "process_query",
+      "path": "native/su2PhaseAwareAir/StableCaloricInverseV260.hpp",
+      "executedSHA256": "fa444feac3468b66513cc2d405ba969db77abbaef157155440f933a656481e18",
+      "currentSHA256": "6866ade1c0d1001147f0fc5460fb32be321044e8b326264f8c80015abdc65302",
+      "exactExecutedSource": "execution_sources/fa444feac3468b66513cc2d405ba969db77abbaef157155440f933a656481e18.hpp"
+    }
+  ],
+  "localOnly": true,
+  "githubPushed": false,
+  "uniqueDataDeleted": false,
+  "ownedFiles": [
+    ".gitattributes",
+    "docs/CURRENT_STATE.md",
+    "docs/EXECUTION_INDEX.md",
+    "docs/STABLE_CALORIC_INVERSE_V260.md",
+    "docs/validation/v260/PLAN.md",
+    "docs/validation/v260/NEXT_DECISION.md",
+    "native/su2PhaseAwareAir/StableCaloricInverseV260.hpp",
+    "native/su2PhaseAwareAir/CSU2PhaseAwareAirStableV260.hpp",
+    "native/su2PhaseAwareAir/caloricReplayV260.cpp",
+    "scripts/runCaloricInverseV260.py",
+    "scripts/runCaloricAuditV260.py",
+    "scripts/auditCaloricInverseV260.py",
+    "scripts/auditCaloricBoundaryV260.py"
+  ],
+  "outputLogicalBytes": 17022788,
+  "finalizationSeconds": 6.75
+}
