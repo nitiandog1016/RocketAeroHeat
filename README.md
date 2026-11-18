@@ -2,7 +2,9 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
-## 最新状态与交付（2026-11-16）
+当前阶段、工程覆盖和验证面积见[当前交接](docs/CURRENT_STATE.md)。每个代码小版本以 `v数字` 标记，可在 [GitHub 版本标签](https://github.com/nitiandog1016/RocketAeroHeat/tags) 查看对应源码。[项目目标与验收](docs/PROJECT_GOALS.md)
+
+## 历史交付（截至 2026-11-16）
 
 最新[v252非相似边界层剖面](docs/PHASE_NONSIMILAR_PROFILES_V252.md)：同相态Levy–Lees/沿程后退差分＋MATLAB bvp4c，三链及独立复算/积分账通过；上游壁温历史在40°处造成2.70%热流差。**仍只原1306球帽面候选，无新增合格热面积。** 原三链父监督终态缺失如实保留，单站修复回归已通过。34字段接原面WebGL，新增沿程滑块、实际速度/温度剖面与CSV；本地`outputs/v252_validation/workbench02/index.html`，图见[原面热流](docs/validation/v252/evidence/workbench02/rocket_nonsimilar.png)和[沿程/剖面](docs/validation/v252/evidence/workbench02/profiles_and_history.png)。
 
