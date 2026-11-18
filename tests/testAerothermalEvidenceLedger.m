@@ -126,6 +126,14 @@ assert(field(research,'heatFlux').areaSummary.researchArea==15);
 assert(research.joint.pressureHeatFluxQualifiedArea==0);
 legacyData=rmfield(data,'evidenceIdentity');legacy=buildAerothermalEvidenceLedger(legacyData);
 assert(field(legacy,'pressure').areaSummary.qualifiedArea==0);
+assert(legacy.joint.pressureHeatFluxEngineeringArea==initial.joint.pressureHeatFluxEngineeringArea);
+% 旧区域快照只声明研究身份。有限值继续可读，原工程交集应保持为零。
+legacyData.researchIdentity=struct('productionQualified',false);
+oldStudy=buildAerothermalEvidenceLedger(legacyData);
+assert(strcmp(oldStudy.identity.origin,'research') && oldStudy.joint.pressureHeatFluxEngineeringArea==0);
+assert(oldStudy.joint.pressureHeatFluxAvailableArea==legacy.joint.pressureHeatFluxAvailableArea);
+assert(oldStudy.joint.pressureHeatFluxQualifiedArea==0);
+assert(field(oldStudy,'wallInput').areaSummary.prescribedArea==field(legacy,'wallInput').areaSummary.prescribedArea);
 % 历史SU2的均匀壁温可为标量；仅该边界输入允许展开，原物理场不许广播。
 surface=struct('V',data.vertices(1:6,:),'F',data.faces(1:2,:)+1, ...
     'pressureRaw',[10;20],'wallTemperatureInput',300);

@@ -1,0 +1,236 @@
+{
+  "inputs": {
+    "outputs/v176_validation/main02/engineering_data.json": "9518d1d1f44abb83f60664a8c1d072d25797ce16d2182823900cfdf119110b1b",
+    "outputs/v104_validation/baseline02/current_case.mat": "b4889e42a28131c253a56f06472a58c9d2cb290d7c9937935fbb4b5d7349488f",
+    "outputs/v255_validation/workbench01/coupled.json": "335cd47819b4c9a8db657107364f2e1f94f5cd133a6d852ecbc2db42ae34c1f4",
+    "outputs/v253_validation/inlet02/inlet_profiles.npz": "be5b68cb1ecb03dccc7622233c682a5531684c7a2509c8eb86ca239e998ca5c2"
+  },
+  "originalAreaM2": 1.9646292565715553,
+  "faceCount": 19752,
+  "condition": {
+    "source": "结果快照；未读取待编辑cfg",
+    "Mach": 5,
+    "alphaDeg": 20,
+    "betaDeg": 0,
+    "altitudeM": 30000,
+    "freestreamPressurePa": 1197.0279007383137,
+    "freestreamTemperatureK": 226.50908361133003,
+    "wallInputType": "uniform",
+    "wallUniformValueK": 300,
+    "wallMinK": 300,
+    "wallMaxK": 300,
+    "wallKnownFaces": 19752,
+    "wallUnknownFaces": 0,
+    "wallIdentity": "热流边界输入；不是本次求解壁温",
+    "caption": "单点基准快照：M 5，α 20°，β 0°，高度 30 km；p∞ 1197.0279 Pa，T∞ 226.50908 K；统一壁温边界输入 300 K（输入，不是壁温解）"
+  },
+  "fields": {
+    "pressure": {
+      "unknown": {
+        "faces": 0,
+        "areaM2": 0.0,
+        "percentOfOriginalArea": 0.0
+      },
+      "computed": {
+        "faces": 11158,
+        "areaM2": 0.9876393077495518,
+        "percentOfOriginalArea": 50.27102718978471
+      },
+      "given": {
+        "faces": 8594,
+        "areaM2": 0.9769899488220034,
+        "percentOfOriginalArea": 49.72897281021528
+      }
+    },
+    "heatFlux": {
+      "unknown": {
+        "faces": 6061,
+        "areaM2": 0.6569202997700511,
+        "percentOfOriginalArea": 33.43736725759815
+      },
+      "computed": {
+        "faces": 13691,
+        "areaM2": 1.3077089568015043,
+        "percentOfOriginalArea": 66.56263274240186
+      },
+      "given": {
+        "faces": 0,
+        "areaM2": 0.0,
+        "percentOfOriginalArea": 0.0
+      }
+    },
+    "edgeTemperature": {
+      "unknown": {
+        "faces": 1257,
+        "areaM2": 0.0881141872360515,
+        "percentOfOriginalArea": 4.485028762618461
+      },
+      "computed": {
+        "faces": 18495,
+        "areaM2": 1.8765150693355037,
+        "percentOfOriginalArea": 95.51497123738153
+      },
+      "given": {
+        "faces": 0,
+        "areaM2": 0.0,
+        "percentOfOriginalArea": 0.0
+      }
+    },
+    "recoveryTemperature": {
+      "unknown": {
+        "faces": 6061,
+        "areaM2": 0.6569202997700511,
+        "percentOfOriginalArea": 33.43736725759815
+      },
+      "computed": {
+        "faces": 13691,
+        "areaM2": 1.3077089568015043,
+        "percentOfOriginalArea": 66.56263274240186
+      },
+      "given": {
+        "faces": 0,
+        "areaM2": 0.0,
+        "percentOfOriginalArea": 0.0
+      }
+    },
+    "wallInput": {
+      "unknown": {
+        "faces": 0,
+        "areaM2": 0.0,
+        "percentOfOriginalArea": 0.0
+      },
+      "computed": {
+        "faces": 0,
+        "areaM2": 0.0,
+        "percentOfOriginalArea": 0.0
+      },
+      "given": {
+        "faces": 19752,
+        "areaM2": 1.9646292565715553,
+        "percentOfOriginalArea": 100.0
+      }
+    },
+    "wallSolved": {
+      "unknown": {
+        "faces": 19752,
+        "areaM2": 1.9646292565715553,
+        "percentOfOriginalArea": 100.0
+      },
+      "computed": {
+        "faces": 0,
+        "areaM2": 0.0,
+        "percentOfOriginalArea": 0.0
+      },
+      "given": {
+        "faces": 0,
+        "areaM2": 0.0,
+        "percentOfOriginalArea": 0.0
+      }
+    }
+  },
+  "jointGroups": {
+    "bothComputed": {
+      "faces": 9725,
+      "areaM2": 0.8467538430106993,
+      "percentOfOriginalArea": 43.099930441245526
+    },
+    "onlyPressureComputed": {
+      "faces": 1433,
+      "areaM2": 0.14088546473885252,
+      "percentOfOriginalArea": 7.171096748539193
+    },
+    "onlyHeatComputed": {
+      "faces": 3966,
+      "areaM2": 0.46095511379080495,
+      "percentOfOriginalArea": 23.462702301156337
+    },
+    "neitherComputed": {
+      "faces": 4628,
+      "areaM2": 0.5160348350311985,
+      "percentOfOriginalArea": 26.266270509058952
+    }
+  },
+  "jointQualified": {
+    "faces": 0,
+    "areaM2": 0.0,
+    "percentOfOriginalArea": 0.0
+  },
+  "jointGapByRegion": {
+    "aftTip": {
+      "faces": 46,
+      "areaM2": 0.031274565614999146,
+      "percentOfOriginalArea": 1.5918812931441282
+    },
+    "noseTip": {
+      "faces": 0,
+      "areaM2": 0.0,
+      "percentOfOriginalArea": 0.0
+    },
+    "sidewall": {
+      "faces": 9981,
+      "areaM2": 1.0866008479458569,
+      "percentOfOriginalArea": 55.308188265610355
+    }
+  },
+  "heatGapByReason": {
+    "上游外缘热力状态未解/域外占位影响": {
+      "faces": 5147,
+      "areaM2": 0.5263058371704923,
+      "percentOfOriginalArea": 26.78906645668815
+    },
+    "外流无有效解": {
+      "faces": 336,
+      "areaM2": 0.05001822561099456,
+      "percentOfOriginalArea": 2.545937124965786
+    },
+    "疑似层流分离及下游": {
+      "faces": 360,
+      "areaM2": 0.03946092604623697,
+      "percentOfOriginalArea": 2.0085685843394003
+    },
+    "端盖/尾端": {
+      "faces": 46,
+      "areaM2": 0.031274565614999146,
+      "percentOfOriginalArea": 1.5918812931441282
+    },
+    "特征折角或拓扑问题": {
+      "faces": 46,
+      "areaM2": 0.004702613657591936,
+      "percentOfOriginalArea": 0.23936392282981656
+    },
+    "鼻端模型不适用": {
+      "faces": 115,
+      "areaM2": 0.003819606316818828,
+      "percentOfOriginalArea": 0.19441868250930788
+    },
+    "层流相关式范围外": {
+      "faces": 11,
+      "areaM2": 0.0013385253529173114,
+      "percentOfOriginalArea": 0.06813119312155372
+    }
+  },
+  "candidateOverlap": {
+    "bothComputed": {
+      "faces": 1306,
+      "areaM2": 0.003518440977521073,
+      "percentOfOriginalArea": 0.17908930989152888
+    },
+    "onlyPressureComputed": {
+      "faces": 0,
+      "areaM2": 0.0,
+      "percentOfOriginalArea": 0.0
+    },
+    "onlyHeatComputed": {
+      "faces": 0,
+      "areaM2": 0.0,
+      "percentOfOriginalArea": 0.0
+    },
+    "neitherComputed": {
+      "faces": 0,
+      "areaM2": 0.0,
+      "percentOfOriginalArea": 0.0
+    }
+  },
+  "candidatePhysicalQualification": false,
+  "newSolvedAreaM2": 0
+}

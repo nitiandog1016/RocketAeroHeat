@@ -24,6 +24,11 @@ region=cellstr(string(data.region(:)));must(numel(region)==n,'区域标签数量
 must(isstruct(data.fields)&&~isempty(data.fields),'至少需要一个现有字段。');
 fields=data.fields;keys={fields.key};must(numel(unique(keys))==numel(keys),'变量键不能重复。');
 origin='engineering';sourceFrame=struct('kind','unrecorded-memory-snapshot');traceable=false;synthetic=false;
+% 旧区域结果用 researchIdentity 标识研究来源；新格式可显式指定整体及逐变量来源。
+if isfield(data,'researchIdentity') && isstruct(data.researchIdentity) && ...
+        isscalar(data.researchIdentity) && ~isempty(fieldnames(data.researchIdentity))
+    origin='research';
+end
 if isfield(data,'evidenceIdentity')
     identityInput=data.evidenceIdentity;must(isstruct(identityInput)&&isscalar(identityInput),'evidenceIdentity必须为结构。');
     if isfield(identityInput,'origin'),origin=char(identityInput.origin);end
