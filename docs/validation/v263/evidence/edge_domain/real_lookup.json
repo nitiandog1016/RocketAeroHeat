@@ -1,0 +1,90 @@
+{
+  "probeReplay": {
+    "actualFaces": 19752,
+    "queriedFaces": [
+      14307,
+      14309,
+      14311,
+      14347,
+      14349,
+      14351,
+      48
+    ],
+    "checkedFieldsPerFace": 8,
+    "actualWebGL": false
+  },
+  "uiRegression": {
+    "checks": 150,
+    "components": 2,
+    "originalValuesUnchanged": true,
+    "unknownNotZero": true,
+    "negativeAndZeroPreserved": true,
+    "qualificationIndependent": true,
+    "domStateDispatch": true,
+    "regionDoesNotCropOrRescale": true,
+    "compactProbeDetailsCollapsed": true,
+    "oneBasedFaceLookup": true,
+    "separateJointEngineeringArea": true,
+    "actualWebGL": false
+  },
+  "nodeProcess": {
+    "exitCode": 0,
+    "elapsedSeconds": 0.3440000000009604,
+    "inputSHA256": {
+      "tests\\testAerothermalEvidenceView.js": "e5e16b68dcaea79efc2b38a5cc113ad8b2dca8783eb5dcfc40dd221eb78217b4",
+      "web\\evidence.js": "b05b3022161f897a30fd6b88108b61096876b39c4623211d1063b9c43e7c85ab",
+      "web\\evidence.html": "c66443efbce0c07f29ad5b3b0e13de47b6f094cb4faedee154bac4a836e8ab5a",
+      "web\\evidence.css": "fe98c1d24a5021e6851c15b11bfae4d239d1f3c966ec5f98b1ebac8e4e022047",
+      "web\\ale-section-core.js": "00b6c92807a0df4261672dd337f67b2357ebcf1115d508addfa175e0d5e7187c",
+      "outputs\\v263_validation\\edge_domain_view01\\payload.json.gz": "f1e729eb872f71adacc82c4f7d4dd6836bba9152b94153f93a2d548e50393eb3",
+      "outputs\\v263_validation\\edge_domain02\\report.json": "37e4fd4863aaf051d7c395c2a7fc4f3269da23c8edb8f4e70fea7fcf170ff3b0"
+    },
+    "inputsStable": true,
+    "outputBytes": 2938005
+  },
+  "matlabProcess": {
+    "status": "terminal",
+    "command": [
+      "D:/matlab/bin/matlab.exe",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat'); s=load('E:/RocketAeroHeat/outputs/v104_validation/baseline02/current_case.mat','current'); d=buildAerothermalViewerData(s.current); d.evidenceRecords=[]; d.evidenceLedger=buildAerothermalEvidenceLedger(d,d.evidenceRecords); f=java.io.FileOutputStream('E:/RocketAeroHeat/outputs/v263_validation/edge_domain_view01/payload.json.gz'); g=java.util.zip.GZIPOutputStream(f); w=java.io.OutputStreamWriter(g,'UTF-8'); w.write(jsonencode(d,'ConvertInfAndNaN',true)); w.close();"
+    ],
+    "inputSHA256": {
+      "E:\\RocketAeroHeat\\outputs\\v104_validation\\baseline02\\current_case.mat": "b4889e42a28131c253a56f06472a58c9d2cb290d7c9937935fbb4b5d7349488f",
+      "E:\\RocketAeroHeat\\outputs\\v263_validation\\edge_domain02\\report.json": "37e4fd4863aaf051d7c395c2a7fc4f3269da23c8edb8f4e70fea7fcf170ff3b0",
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "0ea4aa484562100d9e79768fd74eb003544f149267579ca79b1506d2340368e8",
+      "E:\\RocketAeroHeat\\buildAerothermalEvidenceLedger.m": "0f0c124eeb9f792f43dda62e192141c08a16529e7cdc4ef4982b1b9f1fc1b97d",
+      "E:\\RocketAeroHeat\\createAerothermalEvidenceView.m": "244b9b4ff0d60c1572113708d3523a95ab7f043d564751a6f478dcfd709688b8",
+      "E:\\RocketAeroHeat\\docs\\validation\\v263\\PLAN.md": "d33ec38b71e47e017f1a9997561ad19a229ca0fcfefecd06195fea654c1009f9"
+    },
+    "maximumSeconds": 75,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 50331648,
+    "supervisorProcessID": 46180,
+    "physicsQualified": false,
+    "nativeExitCode": null,
+    "processID": 48820,
+    "debuggerExitCode": 0,
+    "elapsedSeconds": 17.937000000001717,
+    "stopReason": null,
+    "supervisorError": null,
+    "peakFamilyRSSBytes": 951525376,
+    "peakOutputBytes": 2938005,
+    "observedProcessIDs": [
+      48820,
+      50476,
+      17136
+    ],
+    "survivingProcessIDs": [],
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\outputs\\v104_validation\\baseline02\\current_case.mat": true,
+      "E:\\RocketAeroHeat\\outputs\\v263_validation\\edge_domain02\\report.json": true,
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+      "E:\\RocketAeroHeat\\buildAerothermalEvidenceLedger.m": true,
+      "E:\\RocketAeroHeat\\createAerothermalEvidenceView.m": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v263\\PLAN.md": true
+    }
+  }
+}

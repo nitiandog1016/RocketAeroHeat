@@ -34,12 +34,15 @@
       const all={name:'全模型',area,fields:{[fieldKey]:f.areaSummary},faceIDs:[]};
       [all,...list(ledger.regions)].forEach((r,index)=>{const row=document.createElement('tr'),name=index===0?'':r.name,stats=r.fields[fieldKey];row.tabIndex=0;row.classList.toggle('selected',name===regionName);row.setAttribute('aria-selected',String(name===regionName));const first=node('td',r.name);first.append(node('small',fmt(r.area)));row.append(first);['engineeringArea','researchArea','prescribedArea','unknownArea','outOfDomainArea','qualifiedArea'].forEach(k=>{const c=node('td',percent(stats[k],r.area));c.title=fmt(stats[k])+' m²';row.append(c);});const choose=()=>selectRegion(name);row.onclick=choose;row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}};body.append(row);});
       const selected=list(ledger.regions).find(r=>r.name===regionName),joint=selected?selected.joint:ledger.joint;
-      $('jointSummary').textContent=(selected?selected.name:'全模型')+'：压力与热流同时有计算值 '+fmt(joint.pressureHeatFluxAvailableArea)+' m²（'+percent(joint.pressureHeatFluxAvailableArea,joint.totalArea)+'）；二者同时验证通过 '+fmt(joint.pressureHeatFluxQualifiedArea)+' m²。交集按相同原面元计算；给定值不计入。';
+      const jointArea=v=>finite(v)?fmt(v)+' m²（'+percent(v,joint.totalArea)+'）':'未记录';
+      $('jointSummary').textContent=(selected?selected.name:'全模型')+'壁压与热流的同面面积。工程解 '+jointArea(joint.pressureHeatFluxEngineeringArea)
+        +'。含研究计算的可用面积 '+jointArea(joint.pressureHeatFluxAvailableArea)+'。两项均通过验证 '+jointArea(joint.pressureHeatFluxQualifiedArea)+'。';
     }
     function percent(v,area){return area>0?(100*v/area).toFixed(2)+'%':'—';}
     function renderProbe(){
       const target=$('probeFields');target.replaceChildren();$('probeID').textContent=face<0?'未选择':'#'+(face+1);
-      $('probePosition').textContent=face<0?'点击模型或选择区域定位。温度身份分别列出。':'原面元 '+(face+1)+' · '+text(at(data.region,face))+' · 面积 '+fmt(at(data.faceArea,face))+' m² · XYZ '+position.map(fmt).join(', ')+' m';
+      $('faceNumber').value=face<0?'':String(face+1);$('lookupNote').textContent='';
+      $('probePosition').textContent=face<0?'可输入原面编号或点击模型。':'原面元 '+(face+1)+' · '+text(at(data.region,face))+' · 面积 '+fmt(at(data.faceArea,face))+' m² · XYZ '+position.map(fmt).join(', ')+' m';
       if(face<0)return;
       // 查询默认只展开数值与两层状态；完整算法、范围和拒绝理由仍逐变量保留。
       list(data.evidenceLedger.fields).forEach(f=>{
@@ -62,6 +65,7 @@
     function load(payload){try{
       data=payload.data;revision=payload.revision;
       if(!data||!data.evidenceLedger||data.evidenceLedger.kind!=='aerothermal-evidence-ledger')throw Error('区域账本负载缺失');
+      $('faceNumber').max=String(data.faces.length);$('faceNumber').disabled=false;$('findFace').disabled=false;
       $('caseCondition').textContent=(data.resultCondition&&data.resultCondition.caption)||data.caseNote||'工况与来源见验证证据；未记录量不推断';
       const nextIdentity=JSON.stringify(data.evidenceLedger.identity.geometrySHA256);pendingFit=geometryIdentity!==nextIdentity;geometryIdentity=nextIdentity;
       const next=payload.viewState||{};ranges={...(next.ranges||{})};fieldKey=next.fieldKey||list(data.fields)[0].key;regionName=next.regionName||'';face=Number.isInteger(next.selectedFace)?next.selectedFace:-1;position=list(next.position);
@@ -70,6 +74,17 @@
       currentSection=null;selectField(fieldKey);if(finite(next.sectionX))updateSection(next.sectionX);renderProbe();renderEvidence();notify();
     }catch(e){$('error').hidden=false;$('error').textContent=e.message;send({kind:'evidence-error',message:e.message});}}
     // 模块三：只接受当前版本的工作台消息；导出交给MATLAB保存至用户选择的路径。
+    // 按原面编号查询与鼠标拾取共用同一选择、探针和截面；界面编号从 1 开始。
+    $('faceLookup').onsubmit=event=>{
+      event.preventDefault();
+      if(!data)return;
+      const id=Number($('faceNumber').value);
+      if(!Number.isSafeInteger(id)||id<1||id>data.faces.length){
+        $('lookupNote').textContent='请输入 1 至 '+data.faces.length+' 的整数。';
+        return;
+      }
+      inspect(id-1);
+    };
     window.setup=function(real){component=real;geometrySetup(geometryBridge);real.addEventListener('DataChanged',()=>{const p=real.Data;if(p&&p.kind==='aerothermal-evidence-view')load(p);});send({kind:'ready'});};
     $('fieldChoice').onchange=()=>selectField($('fieldChoice').value);$('applyRange').onclick=()=>{const a=Number($('rangeLow').value),b=Number($('rangeHigh').value);if(!finite(a)||!finite(b)||a>=b){$('error').hidden=false;$('error').textContent='色标须为有限且递增的范围。';return;}ranges[fieldKey]=[a,b];loadGeometry();drawSection();notify();};$('resetRange').onclick=()=>{ranges[fieldKey]=fieldRange(fieldByKey(data,fieldKey));selectField(fieldKey);};$('sectionX').onchange=()=>{updateSection(Number($('sectionX').value));notify();};$('sectionSlider').oninput=()=>{updateSection(Number($('sectionSlider').value));notify();};$('exportLedger').onclick=()=>send({kind:'evidence-export',...state()});$('exportSection').onclick=()=>send({kind:'evidence-section-export',...state()});new ResizeObserver(drawSection).observe($('sectionCanvas'));
     return {selectField,selectRegion,inspectFace:inspect,getState:state,setSectionX:x=>{updateSection(x);notify();}};

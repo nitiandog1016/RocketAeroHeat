@@ -83,6 +83,33 @@ guardedData=buildAerothermalViewerData(guarded);hg=get(guardedData,'heatFlux');e
 assert(contains(hg.missingReason{5},'本面元外缘') && contains(hg.missingReason{6},'上游外缘'));
 assert(contains(hg.missingReason{6},'即使本面外缘有效') && eg.status(6)==1 && hg.status(6)==0);
 assert(isequaln(hg.values,guarded.heating.heatFlux/1000) && all(hg.values(1:4)==(1:4)'));
+% 超域只记到触发拒绝的外缘字段；依赖它的热流和恢复温度保留未知。
+ledger=buildAerothermalEvidenceLedger(guardedData);
+for key={'edgePressure','edgeTemperature'}
+    f=get(ledger,key{1});assert(f.availability(5)==4 && f.qualification(5)==1 && isnan(f.values(5)));
+    assert(f.availability(6)==1 && ~f.outOfDomainFace(6));
+end
+for key={'heatFlux','recoveryTemperature'}
+    f=get(ledger,key{1});assert(all(f.availability([5 6])==0) && all(f.qualification([5 6])==0));
+end
+diagnostic=guarded;diagnostic.boundaryLayerEdge=rmfield(guarded.boundaryLayerEdge,'thermalExpansionOutOfRangeFace');
+diagnostic.boundaryLayerEdge.diagnosticPlaceholderFace=[false;false;false;false;true;false];
+ledger=buildAerothermalEvidenceLedger(buildAerothermalViewerData(diagnostic));
+f=get(ledger,'edgeTemperature');assert(f.availability(5)==0 && isnan(f.values(5)));
+% 独立鼻区的外缘状态取自该区域自身，即使原外流曾在同面拒绝也不能继承。
+sphere=guarded;sphere.heating.noseModel='sphericalLocalSimilarity';
+sphere.heating.noseDistribution.edgeState=struct('geometryFace',logical([0;0;0;0;1;0]), ...
+    'algebraicallyValid',true(6,1),'pressure',3000*ones(6,1),'temperature',350*ones(6,1), ...
+    'method','测试压力来源','stateMethod','测试温度来源','scope','测试区域');
+ledger=buildAerothermalEvidenceLedger(buildAerothermalViewerData(sphere));
+f=get(ledger,'edgeTemperature');assert(f.availability(5)==1 && f.values(5)==350);
+% 末帧来源替换单点字段时，旧单点的超域标志不得污染时间站。
+other=guarded;other.boundaryLayerEdge.thermalExpansionOutOfRangeFace=[];
+other.boundaryLayerEdge.diagnosticPlaceholderFace=[];
+station=captureAerothermalFlowSnapshot(other);
+historyMesh=guarded;historyMesh.flightHeatingHistory=struct('time',0,'flowStations',{{station}},'flight',other.pressure.freestream);
+ledger=buildAerothermalEvidenceLedger(buildAerothermalViewerData(historyMesh));
+f=get(ledger,'edgeTemperature');assert(~isempty(f.history) && f.availability(5)==1 && f.values(5)==400);
 % 原始前驱存在时，热流和恢复温度报告同一来源；断链和错配保留旧说明。
 traced=guarded;traced.boundaryLayerEdge.method='同一保存外缘';
 traced.surfaceStreamlines=struct('velocitySource','同一保存外缘','predecessorFace',[0;0;0;0;0;5], ...

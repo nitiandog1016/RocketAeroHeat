@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v265 原面超域分类与编号查询](validation/v263/SIDEWALL_TEMPERATURE.md#区域工作台按原面编号核对v265) · [原面核对](validation/v263/evidence/edge_domain/original_check.json)。主工况 336 个直接超域面按源记录分列，936 个下游缺热面的数值身份保持可查。
 - [v264 自绘模型的侧壁温度与上游来源](validation/v263/SIDEWALL_TEMPERATURE.md) · [NASA 风洞独立测站结果](validation/v263/TMR_RESOLVED.md) · [原面下一项](validation/v263/NEXT_DECISION.md)。在研 v263 阶段的本地代码交付。936 个缺热原面的保存路径和探针通过对照，风洞终态与实验按全部原始测站复核。
 - [v263 主工况原面基线与侧壁缺口](validation/v263/RESULTS.md)。已核对联合覆盖和候选重叠，旧研究值的工程归类已更正，区域求解待完成。
 - [v263 NASA 侧壁同站实验对照](validation/v263/TMR_JOINT.md)。80 个截断域固壁环带，12 个压力与热流共同位置，含项目两套网格及 WIND 数值参照。

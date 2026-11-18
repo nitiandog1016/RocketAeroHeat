@@ -67,14 +67,24 @@ if isfield(mesh,'pressure')
         '逐面元来源：修正牛顿、给定边界或经审核的区域关联；缺失保留未解',pressureScopes);
     add('cp','压力系数 Cp','1',p.Cp,state,methods,'与表面压力采用相同来源；Cp=(p-pinf)/qinf',pressureScopes);
 end
+expansionOutside=[];
 if isfield(mesh,'boundaryLayerEdge')
     e=mesh.boundaryLayerEdge; methods=methodNames(e,n);
     state=double(e.algebraicallyValid(:));
     edgePressure=e.pressure;edgeTemperature=e.temperature;
     % 数值占位可用于诊断流向，但不是压力/温度场的有效计算结果。
     placeholder=false(n,1);
-    if isfield(e,'thermalExpansionOutOfRangeFace')
-        placeholder=logical(e.thermalExpansionOutOfRangeFace(:));
+    if isfield(e,'thermalExpansionOutOfRangeFace') && ~isempty(e.thermalExpansionOutOfRangeFace)
+        rawMask=e.thermalExpansionOutOfRangeFace(:);
+        assert(numel(rawMask)==n && all(ismember(rawMask,[0 1])), ...
+            'RocketAeroHeat:Viewer:Size','膨胀超域标志须与原面一一对应。');
+        expansionOutside=logical(rawMask);placeholder=expansionOutside;
+    end
+    if isfield(e,'diagnosticPlaceholderFace') && ~isempty(e.diagnosticPlaceholderFace)
+        rawMask=e.diagnosticPlaceholderFace(:);
+        assert(numel(rawMask)==n && all(ismember(rawMask,[0 1])), ...
+            'RocketAeroHeat:Viewer:Size','诊断占位标志须与原面一一对应。');
+        placeholder=placeholder | logical(rawMask);
     end
     if isfield(e,'thermalStateValidFace')
         placeholder=placeholder | (logical(e.algebraicallyValid(:)) & ...
@@ -82,19 +92,21 @@ if isfield(mesh,'boundaryLayerEdge')
     end
     state(placeholder)=0;edgePressure(placeholder)=NaN;edgeTemperature(placeholder)=NaN;
     edgeReasons=repmat({'内部外流没有接受本面元外缘热力状态；没有有效外缘解'},n,1);
-    edgeReasons(placeholder)={'本面元外缘热力状态未知/域外占位；定比热状态仅供流向诊断，不是有效外缘解'};
+    edgeReasons(placeholder)={'本面元外缘热力状态未知；原记录只提供诊断状态'};
+    edgeReasons(expansionOutside)={'本面元外缘热力状态未知；原膨胀计算超出热物性适用范围，留存状态只用于诊断流向'};
     pressureScopes=repmat({'内部工程外流外缘静压；代数有效不代表实验验证或区域接口已匹配'},n,1);
     [temperatureMethods,temperatureScopes]=edgeTemperatureProvenance(e,n);
     for i=find(placeholder)'
-        methods{i}=['外缘压力未解：域外定比热状态仅供流向诊断；尝试模型：' methods{i}];
+        methods{i}=['外缘压力未解：原热力状态未被接受；尝试模型：' methods{i}];
     end
-    pressureScopes(placeholder)={'未取得所选热物性范围内的外缘压力；占位不计入已求压力面积'};
+    pressureScopes(placeholder)={'原结果未给出有效外缘压力，流向占位不计入已求面积'};
     % 局部相似鼻区使用自己的同压力/熵外缘。这里仅组合区域结果用于
     % 展示，不改写后体外流或流线，不把分区展示称作接口匹配已完成。
     if isfield(mesh,'heating') && isfield(mesh.heating,'noseModel') && ...
             strcmp(mesh.heating.noseModel,'sphericalLocalSimilarity')
         noseEdge=mesh.heating.noseDistribution.edgeState;
         sphere=noseEdge.geometryFace;keep=sphere & noseEdge.algebraicallyValid;
+        if ~isempty(expansionOutside),expansionOutside(sphere)=false;end
         state(sphere)=0;edgePressure(sphere)=NaN;edgeTemperature(sphere)=NaN;
         state(keep)=1;edgePressure(keep)=noseEdge.pressure(keep);
         edgeTemperature(keep)=noseEdge.temperature(keep);
@@ -170,6 +182,13 @@ for j=1:numel(histories)
     data.fields(end).history=h.history;
     if ~isempty(existing)
         data.fields(existing)=data.fields(end);data.fields(end)=[];
+    end
+end
+% 区域台账只接受当前场量的直接超域记录。历史场和独立球鼻外缘具有各自的来源。
+if any(expansionOutside)
+    for key={'edgePressure','edgeTemperature'}
+        k=find(strcmp({data.fields.key},key{1}));
+        if isempty(data.fields(k).history),data.fields(k).outOfDomainFace=expansionOutside;end
     end
 end
 % 模块五：按真实三角形面积分区汇总，给定值单独统计。
@@ -387,7 +406,7 @@ if isfield(e,'thermalPropertyModeByFace') && isfield(e,'thermalPropertyModeNames
         end
     end
 end
-if isfield(e,'thermalExpansionOutOfRangeFace')
+if isfield(e,'thermalExpansionOutOfRangeFace') && ~isempty(e.thermalExpansionOutOfRangeFace)
     mask=logical(e.thermalExpansionOutOfRangeFace(:));
     assert(numel(mask)==n,'RocketAeroHeat:Viewer:Size','外缘低温适用标志与面元数量不一致。');
     for i=find(mask)'
