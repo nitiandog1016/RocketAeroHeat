@@ -13,7 +13,7 @@ html.DataChangedFcn=@receive;
 view=struct('html',html,'host',host,'update',@update,'getState',@getState,'getData',@getData, ...
     'selectField',@selectField,'selectRegion',@selectRegion,'inspectFace',@inspectFace, ...
     'setRange',@setRange,'setSectionX',@setSectionX,'getSection',@getSection, ...
-    'exportTo',@exportTo,'exportSectionTo',@exportSectionTo);
+    'exportTo',@exportTo,'exportSectionTo',@exportSectionTo,'exportWallPairTo',@exportWallPairTo);
 update(data,varargin{:});
 
     function update(next,varargin)
@@ -39,6 +39,14 @@ update(data,varargin{:});
         message=src.Data;s=src.UserData;if ~isstruct(message)||~isfield(message,'kind'),return;end
         if strcmp(message.kind,'ready'),s.ready=true;src.UserData=s;src.Data=s.payload;return;end
         if ~isfield(message,'revision')||message.revision~=s.revision,return;end
+        if strcmp(message.kind,'evidence-wall-pair-export')
+            % 只使用当前 MATLAB 账本，网页传递版本号，不传递物理量。
+            [name,folder]=uiputfile('*.csv','导出全部原面的壁压与热流','wall_pressure_heat_flux.csv');
+            if ~isequal(name,0) && html.UserData.revision==message.revision
+                exportWallPairTo(fullfile(folder,name));
+            end
+            return;
+        end
         if any(strcmp(message.kind,{'evidence-state','evidence-rendered','evidence-export','evidence-section-export'}))
             for key={'fieldKey','regionName','selectedFace','position','ranges','sectionX'}
                 if isfield(message,key{1}),s.viewState.(key{1})=message.(key{1});end
@@ -94,6 +102,11 @@ update(data,varargin{:});
     end
     function value=getData(),s=html.UserData;value=s.payload.data;end
     function value=getSection(),s=html.UserData;value=s.sectionInfo;end
+    function receipt=exportWallPairTo(path)
+        % 同一快照两量按原编号并列，导出全部面元，采用各变量自己的单位和资格。
+        d=html.UserData.payload.data;
+        receipt=exportWallPairEvidence(d,path);
+    end
     function receipt=exportTo(path)
         % 模块三：独立CSV只导出当前变量的全部原面元；选区不会筛掉未知区域。
         % SHA及全部变量的面积汇总写入小型旁车JSON，不在每一行重复。

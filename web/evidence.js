@@ -81,6 +81,7 @@
     function selectRegion(name){if(!data)return;if(name!==''&&!list(data.evidenceLedger.regions).some(r=>r.name===name))throw Error('未知区域');regionName=name;const ids=regionFaces();if(ids.length&&!ids.includes(face)){face=ids[0];position=data.faces[face].reduce((v,i)=>v.map((q,j)=>q+data.vertices[i][j]/3),[0,0,0]);updateSection(position[0]);}window.RocketGeometry.selectFaces(ids,face);renderTable();renderProbe();drawSection();notify();}
     function inspect(i,p){if(!data||!Number.isInteger(i)||i<0||i>=data.faces.length)throw Error('原面元编号无效');face=i;position=Array.isArray(p)&&p.length===3&&p.every(finite)?p:data.faces[i].reduce((v,k)=>v.map((q,j)=>q+data.vertices[k][j]/3),[0,0,0]);regionName=text(at(data.region,i));window.RocketGeometry.selectFaces(regionFaces(),face);renderTable();renderProbe();updateSection(position[0]);notify();}
     function load(payload){try{
+      $('exportWallPair').hidden=true;
       data=payload.data;revision=payload.revision;
       if(!data||!data.evidenceLedger||data.evidenceLedger.kind!=='aerothermal-evidence-ledger')throw Error('区域账本负载缺失');
       $('faceNumber').max=String(data.faces.length);$('faceNumber').disabled=false;$('findFace').disabled=false;
@@ -90,6 +91,8 @@
       const choice=$('fieldChoice');choice.replaceChildren();list(data.fields).forEach(f=>{const o=node('option',f.label+' / '+f.unit);o.value=f.key;choice.append(o);});
       let lo=Infinity,hi=-Infinity;data.vertices.forEach(v=>{lo=Math.min(lo,v[0]);hi=Math.max(hi,v[0]);});$('sectionX').min=$('sectionSlider').min=String(lo);$('sectionX').max=$('sectionSlider').max=String(hi);$('sectionSlider').step=String((hi-lo)/2000||1);
       currentSection=null;selectField(fieldKey);if(finite(next.sectionX))updateSection(next.sectionX);renderProbe();renderEvidence();notify();
+      const pair=['pressure','heatFlux'].map(key=>list(data.evidenceLedger.fields).find(f=>f.key===key));
+      $('exportWallPair').hidden=!pair.every(f=>f && !list(f.history).length);
     }catch(e){$('error').hidden=false;$('error').textContent=e.message;send({kind:'evidence-error',message:e.message});}}
     // 模块三：只接受当前版本的工作台消息；导出交给MATLAB保存至用户选择的路径。
     // 按原面编号查询与鼠标拾取共用同一选择、探针和截面；界面编号从 1 开始。
@@ -104,6 +107,7 @@
       inspect(id-1);
     };
     window.setup=function(real){component=real;geometrySetup(geometryBridge);real.addEventListener('DataChanged',()=>{const p=real.Data;if(p&&p.kind==='aerothermal-evidence-view')load(p);});send({kind:'ready'});};
+    $('exportWallPair').onclick=()=>{if(data && !$('exportWallPair').hidden)send({kind:'evidence-wall-pair-export'});};
     $('fieldChoice').onchange=()=>selectField($('fieldChoice').value);$('applyRange').onclick=()=>{const a=Number($('rangeLow').value),b=Number($('rangeHigh').value);if(!finite(a)||!finite(b)||a>=b){$('error').hidden=false;$('error').textContent='色标须为有限且递增的范围。';return;}ranges[fieldKey]=[a,b];loadGeometry();drawSection();notify();};$('resetRange').onclick=()=>{ranges[fieldKey]=fieldRange(fieldByKey(data,fieldKey));selectField(fieldKey);};$('sectionX').onchange=()=>{updateSection(Number($('sectionX').value));notify();};$('sectionSlider').oninput=()=>{updateSection(Number($('sectionSlider').value));notify();};$('exportLedger').onclick=()=>send({kind:'evidence-export',...state()});$('exportSection').onclick=()=>send({kind:'evidence-section-export',...state()});new ResizeObserver(drawSection).observe($('sectionCanvas'));
     return {selectField,selectRegion,inspectFace:inspect,getState:state,setSectionX:x=>{updateSection(x);notify();}};
   }

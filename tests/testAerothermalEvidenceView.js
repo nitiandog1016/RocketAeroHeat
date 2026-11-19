@@ -40,6 +40,7 @@ const stats={totalArea:16,engineeringArea:0,researchArea:8,prescribedArea:4,unkn
 const joint={totalArea:16,pressureHeatFluxAvailableArea:8,pressureHeatFluxEngineeringArea:0,pressureHeatFluxQualifiedArea:0};
 const uiData={...data,fields:[field],faceArea:F.map(()=>1),region:F.map((_,i)=>i<8?'first':'second'),evidenceLedger:{kind:'aerothermal-evidence-ledger',identity:{geometrySHA256:'same'},fields:[{...field,areaSummary:stats}],regions:['first','second'].map((name,i)=>({name,area:8,faceIDs:Array.from({length:8},(_,j)=>i*8+j),fields:{heatFlux:stats},joint})),joint,acceptedEvidence:[],rejectedEvidence:[]}};
 bridgeValue={kind:'aerothermal-evidence-view',revision:1,data:uiData,viewState:{fieldKey:'heatFlux',ranges:{heatFlux:[-9,9]},sectionX:1}};listener();
+assert.strictEqual(element('exportWallPair').hidden,true);
 assert.strictEqual(bridgeValue.kind,'evidence-state');assert.deepStrictEqual(geometryPayload.faceField.range,[-9,9]);
 assert(element('jointSummary').textContent.includes('工程解 0.00000 m²（0.00%）'));
 assert(element('jointSummary').textContent.includes('含研究计算的可用面积 8.00000 m²（50.00%）'));
@@ -84,6 +85,10 @@ if(process.argv[2]){
   listener();
   assert.strictEqual(bridgeValue.kind,'evidence-state');
   assert.strictEqual(Number(element('faceNumber').max),reference.originalFaces);
+  assert.strictEqual(element('exportWallPair').hidden,false);
+  element('exportWallPair').onclick();
+  assert.strictEqual(bridgeValue.kind,'evidence-wall-pair-export');
+  assert.strictEqual(bridgeValue.revision,2);
   assert(element('jointSummary').textContent.includes('43.10%'));
   const available=['未知','工程计算','研究计算','给定条件','超出适用域'];
   for(const example of reference.probeExamples){
@@ -101,6 +106,11 @@ if(process.argv[2]){
       assert(card.children[2].children.some(n=>n.textContent==='算法：'+expected.method));
     });
   }
+  const q=actual.evidenceLedger.fields.find(f=>f.key==='heatFlux');
+  q.history=[1,2];
+  bridgeValue={kind:'aerothermal-evidence-view',revision:3,data:actual,viewState:{fieldKey:'heatFlux'}};
+  listener();assert.strictEqual(element('exportWallPair').hidden,true);
+  element('exportWallPair').onclick();assert.notStrictEqual(bridgeValue.kind,'evidence-wall-pair-export');
   console.log(JSON.stringify({actualFaces:reference.originalFaces,queriedFaces:reference.probeExamples.map(x=>x.faceID),
     checkedFieldsPerFace:actual.evidenceLedger.fields.length,actualWebGL:false}));
 }
