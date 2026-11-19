@@ -11,6 +11,14 @@ function [current,freestream,report] = runAeroHeatSingleCase(mesh,cfg,progressFc
 % 模块四：report 保存接受的设置与面积审计；执行完成不等于全面积求解完成。
 % 未解值、给定值和场量方法均由既有后端保留，不作补零或模型回退。
 if nargin<3,progressFcn=[];end
+% 导入的低速 CM-011 使用已冻结的试件网格，从均匀初场在独立目录推进。
+if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'cm011Imported')
+    [~,freestream]=cm011WorkbenchBoundary(cfg.cm011Boundary);
+    prepared=mesh.cm011Prepared;prepared.V=mesh.V;prepared.F=mesh.F;
+    out=fullfile(fileparts(prepared.directory),['run_' char(java.util.UUID.randomUUID())]);
+    [current,report]=runCM011TunnelCase(out,'inclined','','','','',prepared,progressFcn);
+    return
+end
 if isfield(cfg,'analysisMode') && strcmp(cfg.analysisMode,'hybridSurface')
     [current,freestream,report]=runHybridSurfaceCase(mesh,cfg,progressFcn);return;
 end

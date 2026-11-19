@@ -70,6 +70,11 @@ renderEditor();sync();showGeometry(true);
     function s=getState(),s=state;end
     function sync()
         if ~isgraphics(fig),return;end
+        if isempty(state.result) && ~isempty(webUI)
+            % 输入失效后释放旧结果页，防止隐藏页探针继续指向上一次计算。
+            if isgraphics(webUI.tab),delete(webUI.tab.Parent);end
+            webUI=[];
+        end
         if ~isempty(candidatePreview) && candidatePreview.revision~=state.revision,candidatePreview=[];qualityPreview=false;end
         % 父面板也必须恢复；仅重建子控件不会解除父面板的禁用状态。
         if isprop(editor,'Enable'),editor.Enable=onoff(~state.busy && ~preparing);end
@@ -103,7 +108,10 @@ renderEditor();sync();showGeometry(true);
         assignin('base','rawMesh',state.orientedMesh);assignin('base','quality',state.quality);
         current=state.mesh;if ~isempty(state.result),current=state.result;end
         assignin('base','mesh',current);assignin('base','freestream',state.freestream);
-        if isfield(state.cfg,'flight'),assignin('base','flight',state.cfg.flight);end
+        if isCM011()
+            % 工程链的飞行设置留在 cfg.flight；独立工作区变量显示当前试件边界。
+            assignin('base','flight',getOption(state.cfg,'cm011Boundary',[]));
+        elseif isfield(state.cfg,'flight'),assignin('base','flight',state.cfg.flight);end
         if state.busy || preparing
             list=findall(editor);
             for q=1:numel(list),if isprop(list(q),'Enable'),list(q).Enable='off';end,end
@@ -280,6 +288,18 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,11,'混合模式接受通过闭合/定向/单元审核的原三角表面和光滑整流罩；复杂悬挑/尖翼未验证。旧两种模式仅支持无突起原生箭体。');
                     sync();return;
                 end
+                if isCM011()
+                    grid=form(8);meshBackendChoice(grid,1);
+                    controls.generate=button(grid,2,'核对原面并生成半域体网',@generate);
+                    description='使用已确认的米制 CM-011 表面，保留导入面元编号。';
+                    if ~isempty(state.mesh) && isfield(state.mesh,'cm011Prepared')
+                        p=state.mesh.cm011Prepared;
+                        description=sprintf('%d 个导入面 · %d 个体单元\n最大节点匹配偏差 %.3g m', ...
+                            size(state.mesh.F,1),p.cells,p.maxVertexDistanceM);
+                    end
+                    controls.volumeSummary=tip(grid,3,description);
+                    sync();return;
+                end
                 grid=form(13);c=state.cfg.remesh;
                 controls.hMin=numberField(grid,1,'最小尺寸 / mm',c.hMin*1000,[.01 inf]);
                 controls.hMax=numberField(grid,2,'最大尺寸 / mm',c.hMax*1000,[.01 inf]);
@@ -296,10 +316,20 @@ renderEditor();sync();showGeometry(true);
                         q.meanAspectRatio,q.maxAspectRatio,q.minimumAngle,q.numberDegenerate);
                 end
                 tip(grid,8,description);
-                tip(grid,11,'参数修改即使旧网格和下游结果失效；不改变现有网格方法。质量差面保留真实指标。');
+                meshBackendChoice(grid,11);
                 controls.useSurfaceForSU2=button(grid,13,'当前表面 → 内嵌SU2混合网格',@(~,~)useSurfaceForSU2());
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
+                if isCM011()
+                    grid=form(8);selected='none';
+                    if ~isempty(state.cfg.cm011Boundary),selected='inclined';end
+                    controls.cm011Condition=choice(grid,1,'试件工况',{'请选择工况','CM-011 · +10° 等温'}, ...
+                        {'none','inclined'},selected);
+                    controls.cm011Condition.ValueChangedFcn=@boundaryEdited;
+                    tip(grid,2,'空气 300 K · 101325 Pa · 0.1 m/s。攻角 +10°，侧滑 0°。无滑移等温壁 300.1 K。');
+                    controls.confirm=button(grid,5,'确认试件边界条件',@confirmBoundary);
+                    controls.confirm.Enable=onoff(~isempty(state.cfg.cm011Boundary));sync();return;
+                end
                 if isEmbedded()
                     grid=form(61);c=state.cfg;
                     controls.altitude=numberField(grid,2,'高度 / km',c.flight.altitude/1000,[0 86]);
@@ -401,6 +431,13 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,23+12*methodDetailsOpen,sprintf('当前保留 %d 个面元壁温输入；修改统一壁温将切换为统一边界。',numel(c.heating.wallTemperatureByFace)));
                 end
             case 4
+                if isCM011()
+                    grid=form(12);
+                    controls.run=button(grid,1,'计算 CM-011 全表面压力与热流',@solveCase);
+                    tip(grid,2,'+10° 低速等温试件 · 内部三维不可压层流与能量方程，Y≥0 半域。');
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);
+                    controls.log.Layout.Row=[5 12];controls.log.Layout.Column=[1 2];sync();return;
+                end
                 if isEmbedded()
                     grid=form(20);controls.run=button(grid,1,'启动内嵌SU2 · 研究计算',@solveCase);
                     controls.cancel=button(grid,2,'取消当前引擎任务',@cancelEngine);
@@ -442,7 +479,11 @@ renderEditor();sync();showGeometry(true);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
                     state.resultSourceRevision,100*h.computedAreaFraction,100*p.computedAreaFraction,100*p.prescribedAreaFraction));
-                tip(grid,4,'点选面元核对场量、算法和范围。灰色未解；未知外缘热力状态与有效状态的Kn超限分开，两者均可阻断下游热流。输入壁温与求解壁温分开。');
+                if isCM011()
+                    tip(grid,4,'点选导入三角面查看压力、热流和流体温度。相对环境壁压适合比较同一圆周两侧。');
+                else
+                    tip(grid,4,'点选面元核对场量、算法和范围。灰色未解；未知外缘热力状态与有效状态的Kn超限分开，两者均可阻断下游热流。输入壁温与求解壁温分开。');
+                end
                 controls.export=button(grid,7,'导出完整离线工作台',@exportCase);
                 tip(grid,8,'任意X截面曲线和导出使用同一快照。完成计算不等于全面积已解；修改上游使结果失效，浏览与导出不重算。');
                 controls.staticAir=button(grid,11,'静止空气 · 节点探针',@readStaticAirProbe);
@@ -518,9 +559,12 @@ renderEditor();sync();showGeometry(true);
             next.geometry.stlFile=controls.file.Value;next.geometry.scale=controls.scale.Value;
             state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
             preview=[];report=[];preparing=true;message('正在加载模型并核对SI尺度…');
+            hash=cm011FileSHA256(next.geometry.stlFile);
             raw=quietCall(@()loadSTLMesh(next));raw=quietCall(@()calcFaceGeometry(raw));
+            assert(strcmp(hash,cm011FileSHA256(next.geometry.stlFile)),'RAH:STL:Changed','STL 读取期间发生改变，请重新加载。');
+            [ok,stlFile]=fileattrib(next.geometry.stlFile);assert(ok,'无法定位导入文件。');
             state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'cfg',next, ...
-                'modelSource',struct('file',next.geometry.stlFile,'scale',next.geometry.scale,'unit','m')));
+                'modelSource',struct('file',stlFile.Name,'scale',next.geometry.scale,'unit','m','sha256',hash)));
             preview=raw;rotation=eye(3);rotationCenter=mean(raw.V,1);report=[];
             preparing=false;renderEditor();message('模型已按所选尺度转换为m；朝向尚未确认。');showGeometry(true);
         catch ex,preparing=false;renderEditor();showError(ex);showGeometry(true);end
@@ -583,6 +627,15 @@ renderEditor();sync();showGeometry(true);
     function generate(~,~)
         if state.busy || preparing,return;end
         if isEmbedded(),generateNative();return;end
+        if isCM011()
+            try
+                preparing=true;message('正在核对导入原面并生成 CM-011 半域体网…');drawnow;
+                candidate=prepareCM011WorkbenchMesh(state.orientedMesh,state.modelSource);
+                state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));
+                preparing=false;renderEditor();message('体网已生成，请选择并确认低速试件工况。');showGeometry(true);
+            catch ex,preparing=false;renderEditor();showError(ex);end
+            return;
+        end
         try
             next=meshConfiguration();validateMeshOptions(next.remesh);
             state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
@@ -612,7 +665,13 @@ renderEditor();sync();showGeometry(true);
 
 %% 模块九：边界输入与热物性/方法选择均入集中状态，不立即求物理场。
     function next=boundaryConfiguration()
-        next=state.cfg;altitude=controls.altitude.Value*1000;
+        next=state.cfg;
+        if isCM011()
+            if strcmp(controls.cm011Condition.Value,'inclined'),next.cm011Boundary=cm011WorkbenchBoundary();
+            else,next.cm011Boundary=[];end
+            return;
+        end
+        altitude=controls.altitude.Value*1000;
         if altitude~=next.flight.altitude && isfield(next.flight,'atmosphere'),next.flight=rmfield(next.flight,'atmosphere');end
         next.flight.altitude=altitude;next.flight.Mach=controls.mach.Value;
         next.flight.alpha=controls.alpha.Value;next.flight.beta=controls.beta.Value;
@@ -739,6 +798,10 @@ renderEditor();sync();showGeometry(true);
         if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
+            if isCM011()
+                controls.confirm.Enable=onoff(~isempty(state.cfg.cm011Boundary));
+                message('试件工况已更改，请重新确认。');showGeometry(false);return;
+            end
             if isEmbedded() && isfield(controls,'storageEstimate'),controls.storageEstimate.Text=checkpointBudgetText(state.cfg);end
             if isEmbedded(),controls.wall.Enable=onoff(strcmp(controls.thermalMode.Value,'isothermal'));end
             updateMethodScope();message('边界设置已编辑；请重新确认并显式计算，旧结果不会冒充新工况。');showGeometry(false);
@@ -772,6 +835,12 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         try
             next=boundaryConfiguration();
+            if isCM011()
+                [~,fs]=cm011WorkbenchBoundary(next.cm011Boundary);
+                state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
+                state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',fs));
+                message('边界已确认：0.1 m/s，攻角 +10°，给定壁温 300.1 K。');go(4);return;
+            end
             if isEmbedded(),fs=calcSU2Freestream(next);else,fs=calcFreestream(next.flight);end
             if isEmbedded() && strcmp(getOption(next.su2,'wallThermalMode','isothermal'),'axialTemperature')
                 assert(isfield(next.su2,'wallTemperatureProfile'),'请先导入覆盖整个模型的X—壁温表。');
@@ -851,6 +920,20 @@ renderEditor();sync();showGeometry(true);
 %% 模块十一：内嵌引擎在原五步骤中运行；研究结果独立于工程覆盖状态。
     function yes=isEmbedded()
         yes=strcmp(getOption(state.cfg,'computationBackend','engineering'),'embeddedSU2Research');
+    end
+    function yes=isCM011()
+        yes=strcmp(getOption(state.cfg,'computationBackend','engineering'),'cm011Imported');
+    end
+    function meshBackendChoice(grid,row)
+        controls.meshBackend=choice(grid,row,'网格方法',{'工程表面重构','CM-011 低速半域'}, ...
+            {'engineering','cm011Imported'},getOption(state.cfg,'computationBackend','engineering'));
+        controls.meshBackend.ValueChangedFcn=@changeMeshBackend;
+    end
+    function changeMeshBackend(field,~)
+        if state.busy || preparing,return;end
+        next=state.cfg;next.computationBackend=field.Value;next.cm011Boundary=[];
+        state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));report=[];
+        renderEditor();showGeometry(true);message('网格方法已选择，请生成当前网格。');
     end
     function loadNative(~,~,featureEnabled)
         if state.busy || preparing,return;end

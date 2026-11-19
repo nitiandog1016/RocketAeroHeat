@@ -195,7 +195,11 @@ switch action
             error('RocketAeroHeat:WorkflowResultGeometry', ...
                 '返回结果的 V/F 与当前求解网格不一致，拒绝接收。');
         end
-        validateResultFields(result);
+        if strcmp(optional(state.cfg,'computationBackend',''),'cm011Imported')
+            validateCM011Result(result,state.mesh);
+        else
+            validateResultFields(result);
+        end
         % 不补场量或温度：后端快照中的 NaN、算法及逐面元状态完整保留。
         fs=optional(payload,'freestream',state.frozenInputs.freestream);
         if ~isempty(fs),assertScalarStruct(fs,'freestream');end
@@ -392,6 +396,9 @@ end
 
 %% 模块十：边界输入基础检查；完整物理适用性仍由后端各模型审核。
 function validateFlight(cfg)
+if strcmp(optional(cfg,'computationBackend',''),'cm011Imported')
+    cm011WorkbenchBoundary(cfg.cm011Boundary);return;
+end
 if ~isfield(cfg,'flight') || ~isstruct(cfg.flight) || ~isscalar(cfg.flight)
     error('RocketAeroHeat:WorkflowBoundary','尚未提供 cfg.flight 边界条件。');
 end
@@ -407,6 +414,19 @@ end
 if cfg.flight.Mach<=0 || cfg.flight.Twall<=0
     error('RocketAeroHeat:WorkflowBoundary','Mach 和给定壁温必须大于零。');
 end
+end
+function validateCM011Result(result,mesh)
+% 低速全壁数值快照须与本次网格指纹及原面编号一致，各场量使用真实来源。
+p=mesh.cm011Prepared;n=size(mesh.F,1);w=result.hybridWall;
+assert(istable(w) && height(w)==n && isequal(w.faceID,(0:n-1)') && ...
+    strcmp(result.evidenceIdentity.stlSHA256,p.sourceSHA256) && ...
+    strcmp(result.evidenceIdentity.preparedSHA256,p.manifestSHA256) && ...
+    isequal(result.evidenceIdentity.productionQualified,false),'RAH:CM011:Snapshot','试件快照的来源或面编号不符。');
+for name={'pressurePa','pressureGaugePa','heatFluxWm2','wallFluidTemperatureK','nearWallCellTemperatureK'}
+    x=w.(name{1});assert(isequal(size(x),[n,1]) && isreal(x) && all(isfinite(x)),'RAH:CM011:Snapshot','试件场量不完整。');
+end
+assert(all(w.pressurePa>0) && all(result.hybridWallTemperatureK==300.1) && ...
+    all(strlength(w.pressureMethod)>0) && all(strlength(w.heatFluxMethod)>0),'RAH:CM011:Snapshot','压力、壁温或算法记录无效。');
 end
 function record=errorRecord(err)
 if isa(err,'MException')

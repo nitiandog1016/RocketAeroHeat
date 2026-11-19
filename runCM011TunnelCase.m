@@ -1,4 +1,4 @@
-function [current,report,page]=runCM011TunnelCase(folder,grid,savedRun,energyObservation,sectorRun,sectorObservation)
+function [current,report,page]=runCM011TunnelCase(folder,grid,savedRun,energyObservation,sectorRun,sectorObservation,prepared,progressFcn)
 %RUNCM011TUNNELCASE 在普通单工况入口内计算低速等温 CM-011 缩比试件，导出离线三维结果。
 % 字段和方法逐面返回。第三个参数可显式回读本项目同一工况的已核对原生终态。
 % 第四个参数可附同一终场的边界能量观测；来源和收支核对后在热流视图显示。
@@ -14,11 +14,14 @@ if nargin<3,savedRun='';end
 if nargin<4,energyObservation='';end
 if nargin<5,sectorRun='';end
 if nargin<6,sectorObservation='';end
+if nargin<7,prepared=[];end
+if nargin<8,progressFcn=[];end
 assert(isempty(sectorObservation) || ~isempty(sectorRun),'RAH:CM011:SectorObservation','请指定三维观测对应的运行目录。');
 assert(isempty(energyObservation) || ~isempty(savedRun),'RAH:CM011:Observation', ...
     '读入能量观测时请同时指定该观测对应的原生终场目录。');
 grid=validatestring(grid,{'coarse','fine','outer','inclined'});
 inclined=strcmp(grid,'inclined');
+assert(isempty(prepared)||(inclined && isempty(savedRun)),'RAH:CM011:Prepared','导入网格必须用于新建的低速半域计算。');
 assert(isempty(sectorRun) || (~isempty(savedRun) && strcmp(grid,'fine')), ...
     'RAH:CM011:Sector','三维对照需要绑定的 12D 细网终场。');
 folder=canonicalPath(folder);
@@ -34,7 +37,10 @@ if fromArchive
     native=canonicalPath(savedRun);
 else
     native=fullfile(folder,'flow');
-    if inclined
+    if ~isempty(prepared)
+        pythonCommand({fullfile(root,'scripts','cm011Imported.py'),'instantiate',prepared.directory,native, ...
+            prepared.manifestSHA256},'prepare');
+    elseif inclined
         pythonCommand({inclinedDriver,'prepare',native},'prepare');
     else
         pythonCommand({prepare,native,grid,'--prepare-only'},'prepare');
@@ -59,6 +65,11 @@ if inclined
     condition.alphaDeg=geometry.alphaDeg;
     condition.betaDeg=geometry.betaDeg;
 end
+if ~isempty(prepared)
+    assert(isequal(mesh.V,prepared.V) && isequal(mesh.F,prepared.F) && ...
+        strcmp(geometry.importedSurface.sourceSHA256,prepared.sourceSHA256), ...
+        'RAH:CM011:ImportedMesh','求解输入与确认的导入表面不一致。');
+end
 labels=string(body.regionNames);region=labels(body.regionCode+1);
 setup=struct('condition',condition,'region',region(:),'wallTemperatureK',repmat(condition.wallTemperatureK,size(mesh.F,1),1), ...
     'engineeringSolver',@noWallEstimate,'localSolver',@localWall);
@@ -77,6 +88,15 @@ else
     current.hybridWall.pressureGaugePa=current.hybridWall.pressurePa-condition.ambientPressurePa;
 end
 report.native=stats;report.reusedNativeRun=fromArchive;
+if inclined && isfield(geometry,'importedSurface')
+    registration=geometry.importedSurface;
+    current.evidenceIdentity.stlSHA256=registration.sourceSHA256;
+    current.evidenceIdentity.maxVertexDistanceM=registration.maxVertexDistanceM;
+    report.importedSurface=registration;report.outputDirectory=folder;
+    if ~isempty(prepared)
+        current.evidenceIdentity.preparedSHA256=prepared.manifestSHA256;
+    end
+end
 if isfield(stats,'nativeEnergyBalance'),current.hybridEnergyBalance=stats.nativeEnergyBalance;end
 % 只有这一可选分支会回读三维帧。主结果保留二维终场的身份和原面分母。
 if ~isempty(sectorRun)
@@ -154,12 +174,22 @@ fprintf('%s\n%s\n',report.coverageMessage,page);
     end
     function pythonCommand(args,name)
         % 独立参数启动项目 Python，路径空格或括号保持原样。失败日志留在本次目录。
-        items=[{'python'},args];argv=javaArray('java.lang.String',numel(items));
-        for k=1:numel(items),argv(k)=java.lang.String(items{k});end
-        cmd=java.lang.ProcessBuilder(argv);cmd.directory(java.io.File(root));cmd.redirectErrorStream(true);
-        logPath=fullfile(folder,[name '.log']);cmd.redirectOutput(java.io.File(logPath));
-        proc=cmd.start();code=proc.waitFor();
-        assert(code==0,'RAH:CM011:Process','%s 阶段退出 %d，见 %s。',name,code,logPath);
+        beat=[];
+        if ~isempty(progressFcn),beat=@heartbeat;end
+        runCM011Python(args,fullfile(folder,[name '.log']),beat);
+        function heartbeat()
+            % 关闭窗口时通知本次原生监督器，等待其回收子进程。
+            try
+                progressFcn(struct('status','running','message','正在处理低速三维工况'));
+            catch ex
+                if strcmp(name,'solve')
+                    req=jsondecode(fileread(fullfile(native,'engine_request.json')));
+                    fidCancel=fopen(fullfile(native,'engine_cancel.json'),'w');
+                    if fidCancel>=0,fprintf(fidCancel,'%s',jsonencode(struct('jobToken',req.jobToken)));fclose(fidCancel);end
+                end
+                rethrow(ex);
+            end
+        end
     end
 end
 

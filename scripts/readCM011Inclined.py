@@ -17,16 +17,28 @@ COLD_SHA = "c53c990a74166997b730fe967271f82f38312a0bfdd89edd514b530b50248fc6"
 
 def state_at_frame(folder):
     rec = checked_process(folder)
-    for name,expected in (("body.json",BODY_SHA),("mesh.su2",MESH_SHA)):
+    geom = json.loads((folder/"geometry.json").read_bytes())
+    fixed={"body.json":BODY_SHA,"mesh.su2":MESH_SHA,"initial_flow.csv":COLD_SHA}
+    if "importedSurface" in geom:
+        from cm011Imported import FILES, match_surface
+        path=folder/"prepared.json"
+        if sha(path)!=rec["inputSHA256"].get(str(path)):
+            raise ValueError("导入网格回执与本次求解不一致")
+        fixed=json.loads(path.read_bytes())
+        if set(fixed)!=set(FILES): raise ValueError("导入网格回执不完整")
+        body=json.loads((folder/"body.json").read_bytes())
+        verified,reg=match_surface(np.array(body["V"]),np.array(body["F"]))
+        if verified!=body or any(geom["importedSurface"].get(k)!=v for k,v in reg.items()):
+            raise ValueError("导入表面的坐标、编号或区域对应关系发生变化")
+    for name,expected in fixed.items():
         if sha(folder/name)!=expected or rec["inputSHA256"].get(str(folder/name))!=expected:
             raise ValueError("三维工况的网格或原面不匹配")
-    geom = json.loads((folder/"geometry.json").read_bytes())
     if (geom["alphaDeg"]!=ALPHA or geom["betaDeg"]!=0 or geom["reflection"]!="Y=0" or geom["copies"]!=2 or
-            geom["originalBodySHA256"]!=BODY_SHA or not np.array_equal(geom["velocityMps"],U*FLOW) or
+            geom["originalBodySHA256"]!=fixed["body.json"] or not np.array_equal(geom["velocityMps"],U*FLOW) or
             not np.array_equal(geom["rayRadians"],RAYS)):
         raise ValueError("半域边界或来流方向不匹配")
     if (sha(folder/"case.cfg")!="f93b190bf00a68979c02d56c59ccd2fdb51a3856356ad0c00971f79bd5660b34" or
-            (folder/"case.cfg").read_text("ascii")!=config(12000) or sha(folder/"initial_flow.csv")!=COLD_SHA):
+            (folder/"case.cfg").read_text("ascii")!=config(12000)):
         raise ValueError("当前运行与登记的 +10° 配置或初态不匹配")
     return frame_window(folder,rec)
 
@@ -35,8 +47,8 @@ def evaluate(folder):
     frame = state_at_frame(folder)
     body = json.loads((folder/"body.json").read_bytes())
     geom = json.loads((folder/"geometry.json").read_bytes())
-    coarse,_ = meridian(1)
-    fine,_ = meridian(2)
+    fine=np.asarray(body["meridian"])
+    coarse=fine[::2]
     parsed = wall_fields(folder,frame["savedIndex"],len(coarse),RAYS)
     p,q,temp,near,normal,no_slip,chord_area,chord_power,state = parsed
     assert np.isclose(geom["chordWallAreaM2"],chord_area,rtol=1e-12,atol=0)
@@ -44,7 +56,8 @@ def evaluate(folder):
     v = np.asarray(body["V"])
     f = np.asarray(body["F"])-1
     row = np.asarray(body["nodeRow"])
-    np.testing.assert_allclose(fine[row],np.column_stack((v[:,0],np.hypot(v[:,1],v[:,2])))/D,rtol=0,atol=1e-12)
+    ring_tol=geom.get("importedSurface",{}).get("maxRingDeviationM",0)/D+1e-12
+    np.testing.assert_allclose(fine[row],np.column_stack((v[:,0],np.hypot(v[:,1],v[:,2])))/D,rtol=0,atol=ring_tol)
     phi = np.arctan2(v[:,2],abs(v[:,1]))
     j = np.minimum(np.searchsorted(RAYS,phi,side="right")-1,len(RAYS)-2)
     assert np.min(j)>=0
@@ -77,7 +90,7 @@ def evaluate(folder):
                             gaugePressureRangePa=[min(gauge[use]),max(gauge[use])],
                             heatFluxRangeWm2=[min(heat[use]),max(heat[use])]))
     stats = dict(frame,grid="inclined",alphaDeg=ALPHA,betaDeg=0,velocityMps=geom["velocityMps"],
-                 originalFaces=len(f),originalBodySHA256=BODY_SHA,areaM2=area.sum(),triangularPowerW=area@heat,
+                 originalFaces=len(f),originalBodySHA256=geom["originalBodySHA256"],areaM2=area.sum(),triangularPowerW=area@heat,
                  fullChordPowerW=2*chord_power,fullWallMonitorW=2*frame["historySectorWallMonitor"]*RHO*U*D**2*CP*DT,
                  maxWallSpeedOverU=no_slip,maxMirrorNormalSpeedsOverU=normal,coneRing=curve,byRegion=regions,
                  pressureGaugeRangePa=[min(gauge),max(gauge)],heatFluxRangeWm2=[min(heat),max(heat)],

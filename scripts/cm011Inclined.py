@@ -36,14 +36,20 @@ def config(iterations):
     return text.replace("RMS_VELOCITY-Y, RMS_ENTHALPY","RMS_VELOCITY-Y, RMS_VELOCITY-Z, RMS_ENTHALPY")
 
 
-def prepare(folder):
+def prepare(folder, imported_body=None, registration=None):
     folder.mkdir(parents=True,exist_ok=False)
     wall,bands = meridian(2)
-    body = surface(wall,bands,2)
-    body.update(meridian=wall.tolist(),diameterM=D,grid="fine",layers=42,extentD=12.)
+    if imported_body is None:
+        body = surface(wall,bands,2)
+        body.update(meridian=wall.tolist(),diameterM=D,grid="fine",layers=42,extentD=12.)
+    else:
+        body = imported_body
+        wall = np.asarray(body["meridian"])
     write_json(folder/"body.json",body)
-    assert sha(folder/"body.json")==BODY_SHA
-    _,xyz,_,_,ids,cells,markers,stats = mesh(RAYS,level=1,layers=24)
+    if imported_body is None:
+        assert sha(folder/"body.json")==BODY_SHA
+    coarse = wall[::2] if imported_body is not None else meridian(1)[0]
+    _,xyz,_,_,ids,cells,markers,stats = mesh(RAYS,level=1,layers=24,wall=coarse)
     # 两端位于同一 XZ 平面，有同一外法向。共享轴线只受一个法向约束。
     markers["mirror"] = markers.pop("sym0")+markers.pop("sym1")
     for face in markers["mirror"]:
@@ -51,12 +57,13 @@ def prepare(folder):
         assert np.max(abs(points[:,1]))<1e-12
         assert np.cross(points[1]-points[0],points[-1]-points[0])[1]<0
     write_volume(folder,xyz,cells,markers)
-    coarse,_ = meridian(1)
     np.testing.assert_allclose(wall[::2],coarse,atol=1e-13,rtol=0)
     stats.update(boundaryFaces={k:len(v) for k,v in markers.items()},alphaDeg=ALPHA,betaDeg=0,
                  velocityMps=(U*FLOW).tolist(),grid="inclined",reflection="Y=0",copies=2,
-                 originalFaces=len(body["F"]),originalBodySHA256=BODY_SHA,
+                 originalFaces=len(body["F"]),originalBodySHA256=sha(folder/"body.json"),
                  rayRadians=RAYS.tolist(),meridianNodes=len(coarse),radialLayers=24)
+    if registration is not None:
+        stats["importedSurface"]=registration
     write_json(folder/"geometry.json",stats)
     np.savez_compressed(folder/"nodes.npz",xyz=xyz,ids=ids)
     fields = np.tile([0.,*FLOW,1.-298.15],(len(xyz),1))

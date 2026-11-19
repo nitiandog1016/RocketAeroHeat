@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v275 从 STL 在五步工作台完成低速 CM-011 计算](validation/v275/RESULTS.md) · [原面与截面核对](validation/v275/evidence/verification.json) · [下一项](validation/v275/NEXT_DECISION.md)。14,140 导入面和同一输入版本的云图、探针、两条截面 CSV 已核对。
 - [v274 CM-011 低速 +10° 三维全壁计算](validation/v274/RESULTS.md) · [周向曲线](validation/v274/evidence/cone_ring.png) · [下一项](validation/v274/NEXT_DECISION.md)。14,140 原面和同一截面迎背流差均已复算，MATLAB 从空目录计算到导出通过。
 - [v273 CM-011 三维等温试件全表面压力与热流](validation/v273/RESULTS.md) · [三维能量账](validation/v273/evidence/energy.json) · [下一项](validation/v273/NEXT_DECISION.md)。14,140 面映射核对通过，12D 三维扇区壁面与远场差额为壁面放热的 0.01142%。
 - [v272 CM-011 全壁放热与远场流出的同阶段核对](validation/v272/RESULTS.md) · [工作台核对](validation/v272/evidence/workbench.json) · [下一项](validation/v272/NEXT_DECISION.md)。12D 细网原生边界差额为 8.900 µW，归档旧节点重建差额的四项贡献。

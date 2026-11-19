@@ -19,9 +19,10 @@ HEX_FACES = ((3,2,1,0),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7))
 PRISM_FACES = ((2,1,0),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5))
 
 
-def mesh(rays=RAYS, level=2, layers=42):
+def mesh(rays=RAYS, level=2, layers=42, wall=None):
     """合并轴线节点，沿母线法向和周向生成体单元，并独立核对面邻接。"""
-    wall, _ = meridian(level)
+    if wall is None:
+        wall, _ = meridian(level)
     xy, quads, _ = volume(wall, layers, 12., level)
     steps = len(rays)-1
     angle = rays[-1]-rays[0]
