@@ -1,0 +1,112 @@
+{
+  "schema": "cm011-native-energy-v1",
+  "grid": "fine",
+  "sourceRun": "fine02",
+  "sourceSHA256": {
+    "restart.csv": "50745a4193f291386f8d6b25351ddd2e97f57a0162706b28610ab787a448b56b",
+    "mesh.su2": "85d8f03842a5e95fd25fc2283558c2a733ec35dc2f4e7a57e12384d9c6d0229c",
+    "case.cfg": "94b2491ce27ae52dafdfdf6ec286c20ef5694943baf47225ae637049974a3acf",
+    "surface.vtk": "9d5a9a1ee1c6a75e1874f416b8bb4a716e906612491614cec0d18ea775501bed",
+    "vol_solution.vtk": "87d304a02f8e24167b1df87efbe962d378d1214b55bb4454561baf9c4366b8e0"
+  },
+  "sampledInitialSolutionExact": true,
+  "stockOneStepMaximumStateDifference": 1.1368683772161603e-13,
+  "observedSingleStepMaximumChange": 3.61799479264846e-11,
+  "localObservationOffByteEquality": true,
+  "referenceNativeEnthalpy": -297.15,
+  "originalWallReleaseW": 0.00011268484894939025,
+  "reconstructed": {
+    "radialRow": 42,
+    "outwardHeatW": 0.00010525567434157095,
+    "outwardSensibleAdvectionW": 0.00010361881791192411,
+    "outwardConductionW": 1.636856429646838e-06,
+    "relativeNetMassFlow": 9.225002557344724e-05
+  },
+  "nativeConvection": {
+    "massKgS": -2.715599358367852e-08,
+    "rawEnthalpyW": 0.0009146891007226273,
+    "referenceAdvectionW": 0.0008125889317843803,
+    "excessEnergyW": 0.00010210016893836068
+  },
+  "farAdvectionWithNodeNormalsW": 0.00010213156667512867,
+  "nativeDiffusion": {
+    "massKgS": 0.0,
+    "rawEnthalpyW": 1.6766070830763782e-06,
+    "referenceAdvectionW": -0.0,
+    "excessEnergyW": 1.6766070830763782e-06
+  },
+  "nativeFarExcessOutW": 0.00010377677602143707,
+  "nativeWallReleaseW": 0.00011267717208636498,
+  "stageIncrements": {
+    "start": {
+      "massKgS": 0.0,
+      "rawEnthalpyW": 0.0,
+      "referenceAdvectionW": -0.0,
+      "excessEnergyW": 0.0
+    },
+    "convection": {
+      "massKgS": -1.2847977159625412e-06,
+      "rawEnthalpyW": 0.03829390042855676,
+      "referenceAdvectionW": 0.0384450084787357,
+      "excessEnergyW": -0.00015110805017814262
+    },
+    "diffusion": {
+      "massKgS": 0.0,
+      "rawEnthalpyW": 0.0,
+      "referenceAdvectionW": -0.0,
+      "excessEnergyW": 0.0
+    },
+    "source": {
+      "massKgS": 1.3119537102031876e-06,
+      "rawEnthalpyW": -0.03909758898385196,
+      "referenceAdvectionW": -0.03925759743017854,
+      "excessEnergyW": 0.00016000844632657686
+    },
+    "before_far": {
+      "massKgS": 0.0,
+      "rawEnthalpyW": 0.0,
+      "referenceAdvectionW": -0.0,
+      "excessEnergyW": 0.0
+    },
+    "after_far": {
+      "massKgS": -2.715599358367852e-08,
+      "rawEnthalpyW": 0.0009163657078054149,
+      "referenceAdvectionW": 0.0008125889317843803,
+      "excessEnergyW": 0.00010377677602123306
+    },
+    "before_wall": {
+      "massKgS": 0.0,
+      "rawEnthalpyW": 0.0,
+      "referenceAdvectionW": -0.0,
+      "excessEnergyW": 0.0
+    },
+    "after_wall": {
+      "massKgS": 0.0,
+      "rawEnthalpyW": -0.00011267717208636498,
+      "referenceAdvectionW": -0.0,
+      "excessEnergyW": -0.00011267717208636498
+    },
+    "end": {
+      "massKgS": 0.0,
+      "rawEnthalpyW": 0.0,
+      "referenceAdvectionW": -0.0,
+      "excessEnergyW": 0.0
+    }
+  },
+  "weightedAssembledResidual": {
+    "massKgS": 6.56998741443624e-16,
+    "rawEnthalpyW": -1.9576331055709122e-11,
+    "referenceAdvectionW": -1.9659376625211265e-11,
+    "excessEnergyW": 8.3045569502144e-14
+  },
+  "innerFacePlusAxisSourceW": 8.900396148434233e-06,
+  "reconstructedGapW": 7.429174607819292e-06,
+  "gapTerms": {
+    "wallQuadratureW": 7.676863025265698e-09,
+    "nativeSurfaceImbalanceW": 8.90039606492791e-06,
+    "farAdvectionChoiceW": -1.5186489735634275e-06,
+    "farDiffusionChoiceW": 3.975065342954021e-08
+  },
+  "physicalValidation": false,
+  "newSolvedAreaM2": 0
+}

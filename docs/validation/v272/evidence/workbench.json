@@ -1,0 +1,42 @@
+{
+  "fieldKeys": [
+    "pressure",
+    "heatFlux",
+    "pressureGauge",
+    "wallFluidTemperature",
+    "nearWallCellTemperature",
+    "wallInput",
+    "edgeTemperature",
+    "recoveryTemperature",
+    "wallSolved"
+  ],
+  "originalFaces": 14140,
+  "areaM2": 3.734978876467929e-05,
+  "powerIntoWallW": -0.0001126318063992908,
+  "priorPageSHA256": "83b0e7644b547e6183f746ee23804d5f8c63ca42d9590819d288a2fcf3722715",
+  "pageSHA256": "14d443ad5e0cd25d665b50b84d1eec10c1c0f84aa39dd7bc9db58750f226c54d",
+  "heatFluxStateNote": "入壁热流取自当前工况的逐面数值结果，算法见面元探针。 壁面放热 112.677 µW，远场显热流出 103.777 µW。两者相差 8.900 µW（壁面放热的 7.90%）。离散方程中，内部面与轴对称源项合计 8.900 µW。该试件的实验精度待验证。",
+  "nativeEnergyBalance": {
+    "sourceRestartSHA256": "50745a4193f291386f8d6b25351ddd2e97f57a0162706b28610ab787a448b56b",
+    "observationSHA256": "8444d07deec763badbc22a5f47f572492aa24acfd7e63d25e955cf6bba0cfff3",
+    "nativeWallReleaseW": 0.00011267717208636498,
+    "nativeFarExcessOutW": 0.00010377677602143707,
+    "nativeSurfaceImbalanceW": 8.90039606492791e-06,
+    "nativeSensibleAdvectionW": 0.00010210016893836068,
+    "nativeConductionW": 1.6766070830763782e-06,
+    "innerFacePlusAxisSourceW": 8.900396148434233e-06,
+    "weightedAssembledResidualW": 8.3045569502144e-14,
+    "nodeReconstructionGapW": 7.429174607819292e-06
+  },
+  "fieldsAndCoverageMatch": true,
+  "invalidObservationsRejected": {
+    "otherGrid": "能量观测与当前算例或网格不匹配",
+    "changedRestart": "能量观测与本次计算的输入或终场不匹配",
+    "compensatingTerms": "能量账不一致：对流读法差",
+    "changedStage": "能量账不一致：显热",
+    "nonFiniteHeat": "能量账不一致：原生远场显热"
+  },
+  "legacyWallCsvSHA256": "db6d03a26dc5342300787929a324a009384cc6969cca1438b5fa212c27946f0e",
+  "legacyObservationAbsent": true,
+  "browserTested": false
+}

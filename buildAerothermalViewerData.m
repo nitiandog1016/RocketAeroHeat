@@ -99,6 +99,18 @@ if isfield(mesh,'hybridWall')
             data.fields(k).computedStateLabel='研究数值解';
         end
     end
+    % 热流视图同时给出当前终场的原生边界账，保留全部原面字段及其数值。
+    if isfield(mesh,'hybridEnergyBalance')
+        b=mesh.hybridEnergyBalance;
+        data.nativeEnergyBalance=b;
+        k=find(strcmp({data.fields.key},'heatFlux'),1);
+        data.fields(k).stateNote=sprintf(['%s 壁面放热 %.3f µW，远场显热流出 %.3f µW。' ...
+            '两者相差 %.3f µW（壁面放热的 %.2f%%）。' ...
+            '离散方程中，内部面与轴对称源项合计 %.3f µW。该试件的实验精度待验证。'], ...
+            data.fields(k).stateNote,1e6*b.nativeWallReleaseW,1e6*b.nativeFarExcessOutW, ...
+            1e6*b.nativeSurfaceImbalanceW,100*b.nativeSurfaceImbalanceW/b.nativeWallReleaseW, ...
+            1e6*b.innerFacePlusAxisSourceW);
+    end
 end
 if isfield(mesh,'boundaryLayerEdge')
     e=mesh.boundaryLayerEdge; methods=methodNames(e,n);

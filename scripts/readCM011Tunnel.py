@@ -1,7 +1,9 @@
 """回读同一次 CM-011 低速计算，核对终态、完整原面和有符号的净热功率。"""
 import argparse
 import csv
+import hashlib
 import json
+import math
 from pathlib import Path
 
 import numpy as np
@@ -33,15 +35,18 @@ def shell_balance(xy, velocity, theta, j):
     delta = theta[hi]-theta[lo]
     gradient = np.linalg.solve(system, np.column_stack((np.diff(theta[j]), (delta[:-1]+delta[1:])*.5))[..., None])[..., 0]
     d_normal = np.sum(gradient*normal, axis=1)
-    mass, heat, inflow = 0., 0., 0.
+    mass, advective, conductive, inflow = 0., 0., 0., 0.
     for f in (.5-.5/np.sqrt(3), .5+.5/np.sqrt(3)):
         area = np.pi*length*((1-f)*points[:-1, 1]+f*points[1:, 1])
         speed = np.sum(((1-f)*velocity[j, :-1]+f*velocity[j, 1:])*normal, axis=1)
         excess = (1-f)*theta[j, :-1]+f*theta[j, 1:]-1
         mass += np.sum(area*speed)
         inflow += np.sum(area*np.maximum(-speed, 0))
-        heat += np.sum(area*(excess*speed-d_normal/PE))
-    return dict(radialRow=int(j), outwardHeatW=heat*RHO*CP*U*DT*D**2,
+        advective += np.sum(area*excess*speed)
+        conductive -= np.sum(area*d_normal/PE)
+    power_scale = RHO*CP*U*DT*D**2
+    return dict(radialRow=int(j), outwardHeatW=(advective+conductive)*power_scale,
+                outwardSensibleAdvectionW=advective*power_scale, outwardConductionW=conductive*power_scale,
                 relativeNetMassFlow=mass/inflow)
 
 
@@ -132,12 +137,68 @@ def evaluate(folder):
     return stats, wall_rows
 
 
+def read_energy_observation(folder, stats, path):
+    """读取与当前原生终场绑定的边界观测，仅用于显示能量账。"""
+    raw = path.read_bytes()
+    data = json.loads(raw)
+    if data["schema"] != "cm011-native-energy-v1" or data["grid"] != stats["grid"]:
+        raise ValueError("能量观测与当前算例或网格不匹配")
+    bindings = {name: sha(folder/name) for name in ("mesh.su2", "case.cfg", "restart.csv", "surface.vtk", "vol_solution.vtk")}
+    if data["sourceSHA256"] != bindings:
+        raise ValueError("能量观测与本次计算的输入或终场不匹配")
+    if (data["sampledInitialSolutionExact"] is not True or data["physicalValidation"] is not False or
+            data["newSolvedAreaM2"] != 0 or not 0 <= data["stockOneStepMaximumStateDifference"] < 2e-7):
+        raise ValueError("单步对照或观测资格不符")
+
+    def check(name, actual, expected):
+        if not math.isfinite(actual) or not math.isclose(actual, expected, abs_tol=1e-12, rel_tol=0):
+            raise ValueError("能量账不一致：" + name)
+
+    # 先核对署名的节点重建，再分别核对实际装配增量和四项差额；相反误差不能互相抵消。
+    shell = stats["shellReconstruction"][-1]
+    for key in ("radialRow", "outwardHeatW", "outwardSensibleAdvectionW", "outwardConductionW", "relativeNetMassFlow"):
+        check(key, data["reconstructed"][key], shell[key])
+    old_wall = -stats["curvedPowerW"]
+    wall = data["nativeWallReleaseW"]
+    far = data["nativeFarExcessOutW"]
+    internal = data["innerFacePlusAxisSourceW"]
+    residual = data["weightedAssembledResidual"]
+    conv, diff = data["nativeConvection"], data["nativeDiffusion"]
+    stages = data["stageIncrements"]
+    for block in (conv, diff, residual, *stages.values()):
+        check("参考焓", block["referenceAdvectionW"], block["massKgS"]*data["referenceNativeEnthalpy"]*CP*DT)
+        check("显热", block["excessEnergyW"], block["rawEnthalpyW"] - block["referenceAdvectionW"])
+    for key in residual:
+        check(key, residual[key], math.fsum(stage[key] for stage in stages.values()))
+        check(key, stages["after_far"][key], conv[key] + diff[key])
+    check("旋转壁面放热", data["originalWallReleaseW"], old_wall)
+    check("原生壁面放热", wall, -stages["after_wall"]["excessEnergyW"])
+    check("原生远场显热", far, conv["excessEnergyW"] + diff["excessEnergyW"])
+    check("内部面与轴对称源", internal, math.fsum(stages[k]["excessEnergyW"] for k in ("convection", "diffusion", "source")))
+    check("装配余量", residual["excessEnergyW"], internal + far - wall)
+    terms = data["gapTerms"]
+    check("曲面积分差", terms["wallQuadratureW"], old_wall - wall)
+    check("边界差", terms["nativeSurfaceImbalanceW"], wall - far)
+    check("对流读法差", terms["farAdvectionChoiceW"], conv["excessEnergyW"] - shell["outwardSensibleAdvectionW"])
+    check("导热读法差", terms["farDiffusionChoiceW"], diff["excessEnergyW"] - shell["outwardConductionW"])
+    check("重建差额", data["reconstructedGapW"], old_wall - shell["outwardHeatW"])
+    check("分项加总", math.fsum(terms.values()), data["reconstructedGapW"])
+    return dict(sourceRestartSHA256=bindings["restart.csv"], observationSHA256=hashlib.sha256(raw).hexdigest(),
+                nativeWallReleaseW=wall, nativeFarExcessOutW=far, nativeSurfaceImbalanceW=wall-far,
+                nativeSensibleAdvectionW=conv["excessEnergyW"], nativeConductionW=diff["excessEnergyW"],
+                innerFacePlusAxisSourceW=internal, weightedAssembledResidualW=residual["excessEnergyW"],
+                nodeReconstructionGapW=data["reconstructedGapW"])
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("folder", type=Path)
     parser.add_argument("new_output", type=Path)
+    parser.add_argument("--native-balance",type=Path,help="同一终场的可选原生边界观测 JSON")
     args = parser.parse_args()
     stats, wall_rows = evaluate(args.folder.resolve())
+    if args.native_balance is not None:
+        stats["nativeEnergyBalance"]=read_energy_observation(args.folder.resolve(),stats,args.native_balance)
     args.new_output.mkdir(parents=True, exist_ok=False)
     write_json(args.new_output/"summary.json", stats)
     if stats["acceptedNumericalWall"]:

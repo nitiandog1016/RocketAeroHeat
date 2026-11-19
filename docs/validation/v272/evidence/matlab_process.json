@@ -1,0 +1,63 @@
+{
+  "status": "terminal",
+  "command": [
+    "D:\\matlab\\bin\\matlab.exe",
+    "-wait",
+    "-singleCompThread",
+    "-batch",
+    "cd('E:/RocketAeroHeat'); [m,r,p]=runCM011TunnelCase('E:/RocketAeroHeat/outputs/v272_validation/workbench01','fine','E:/RocketAeroHeat/outputs/v271_validation/fine02','E:/RocketAeroHeat/outputs/v272_validation/check01/fine02.json'); assert(r.fullSurfaceComputed && r.reusedNativeRun && height(m.hybridWall)==14140); assert(abs(r.wholeSurfaceHeatPowerW+0.00011263180639929073)<1e-12); assert(isequal(m.hybridEnergyBalance,r.native.nativeEnergyBalance)); assert(isfile(p));"
+  ],
+  "inputSHA256": {
+    "D:\\matlab\\bin\\matlab.exe": "12a120a3e95a2c5603c33d385304f70248d52b5c68a06b6ac02071ecbac6ea38",
+    "E:\\RocketAeroHeat\\runCM011TunnelCase.m": "2841a00f5001e96d9f93e1d26195cc976bc8dbbd48dadf4ffa4556ad006ad925",
+    "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "007019107aa6092c4c947e88126d89bbbf9f964f16d2b8caa8781dcde9f2103f",
+    "E:\\RocketAeroHeat\\exportAerothermalWeb.m": "591e0e3bdaf93c1d3e3a5c48b7c1b8b992510563f79140f14abcf853ed69ea50",
+    "E:\\RocketAeroHeat\\runAeroHeatSingleCase.m": "814c44ee0427159a318d2c41bc92c1cfbecd5e620feb3ec9d69d9676bc6d7bb1",
+    "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": "863c46326f3c2e46ca579911b95f90081be98fedd0442d7ccf05abac18355b30",
+    "E:\\RocketAeroHeat\\outputs\\v272_validation\\check01\\fine02.json": "8444d07deec763badbc22a5f47f572492aa24acfd7e63d25e955cf6bba0cfff3",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\restart.csv": "50745a4193f291386f8d6b25351ddd2e97f57a0162706b28610ab787a448b56b",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\case.cfg": "94b2491ce27ae52dafdfdf6ec286c20ef5694943baf47225ae637049974a3acf",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\mesh.su2": "85d8f03842a5e95fd25fc2283558c2a733ec35dc2f4e7a57e12384d9c6d0229c",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\surface.vtk": "9d5a9a1ee1c6a75e1874f416b8bb4a716e906612491614cec0d18ea775501bed",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\vol_solution.vtk": "87d304a02f8e24167b1df87efbe962d378d1214b55bb4454561baf9c4366b8e0",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\engine_process.json": "5f91e539ec6473203e9aafb352ba616ee3eb19e85c9b4c4f266f1074bd88230b",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\body.json": "07588689cfec2d88933a516520cdb905eff1976403b0990bb86ac0fc12946c19"
+  },
+  "maximumSeconds": 90,
+  "maximumRSSBytes": 4294967296,
+  "maximumOutputBytes": 25165824,
+  "supervisorProcessID": 30360,
+  "physicsQualified": false,
+  "nativeExitCode": null,
+  "processID": 31884,
+  "debuggerExitCode": 0,
+  "elapsedSeconds": 15.875,
+  "stopReason": null,
+  "supervisorError": null,
+  "peakFamilyRSSBytes": 810074112,
+  "peakOutputBytes": 198,
+  "observedProcessIDs": [
+    31884,
+    664,
+    38724,
+    37564,
+    41192
+  ],
+  "survivingProcessIDs": [],
+  "inputsStable": {
+    "D:\\matlab\\bin\\matlab.exe": true,
+    "E:\\RocketAeroHeat\\runCM011TunnelCase.m": true,
+    "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+    "E:\\RocketAeroHeat\\exportAerothermalWeb.m": true,
+    "E:\\RocketAeroHeat\\runAeroHeatSingleCase.m": true,
+    "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v272_validation\\check01\\fine02.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\restart.csv": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\surface.vtk": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\vol_solution.vtk": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\engine_process.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\body.json": true
+  }
+}

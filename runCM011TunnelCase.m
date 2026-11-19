@@ -1,12 +1,16 @@
-function [current,report,page]=runCM011TunnelCase(folder,grid,savedRun)
+function [current,report,page]=runCM011TunnelCase(folder,grid,savedRun,energyObservation)
 %RUNCM011TUNNELCASE 在普通单工况入口内计算低速等温 CM-011 缩比试件，导出离线三维结果。
 % 字段和方法逐面返回。第三个参数可显式回读本项目同一工况的已核对原生终态。
+% 第四个参数可附同一终场的边界能量观测；来源和收支核对后在热流视图显示。
 root=fileparts(mfilename('fullpath'));outputs=fullfile(root,'outputs');
 if nargin<1 || isempty(folder)
     folder=fullfile(outputs,['cm011_' char(java.util.UUID.randomUUID())]);
 end
 if nargin<2,grid='coarse';end
 if nargin<3,savedRun='';end
+if nargin<4,energyObservation='';end
+assert(isempty(energyObservation) || ~isempty(savedRun),'RAH:CM011:Observation', ...
+    '读入能量观测时请同时指定该观测对应的原生终场目录。');
 grid=validatestring(grid,{'coarse','fine','outer'});
 folder=char(java.io.File(folder).getCanonicalPath());
 assert(startsWith(folder,[char(java.io.File(outputs).getCanonicalPath()) filesep],'IgnoreCase',ispc), ...
@@ -40,6 +44,7 @@ current.hybridWall.wallFluidTemperatureK=rows.wallFluidTemperatureK;
 current.hybridWall.wallFluidTemperatureMethod=repmat("SU2 能量方程的壁节点流体温度",height(rows),1);
 current.hybridWall.pressureGaugePa=current.hybridWall.pressurePa-condition.ambientPressurePa;
 report.native=stats;report.reusedNativeRun=fromArchive;
+if isfield(stats,'nativeEnergyBalance'),current.hybridEnergyBalance=stats.nativeEnergyBalance;end
 stlwrite(triangulation(mesh.F,mesh.V),fullfile(folder,'CM011-mm-scale-SI.stl'));
 page=exportAerothermalWeb(current,fullfile(folder,'workbench'));
 save(fullfile(folder,'result.mat'),'current','report','condition');
@@ -58,7 +63,11 @@ fprintf('%s\n%s\n',report.coverageMessage,page);
         % 四个壁区共享同一个连通外域，每个原面只返回一次。
         if isempty(rows)
             if ~fromArchive,pythonCommand({solver,'--request',fullfile(native,'engine_request.json')},'solve');end
-            pythonCommand({reader,native,readFolder},'audit');
+            auditArgs={};
+            if ~isempty(energyObservation)
+                auditArgs={'--native-balance',char(java.io.File(energyObservation).getCanonicalPath())};
+            end
+            pythonCommand([{reader,native,readFolder},auditArgs],'audit');
             stats=jsondecode(fileread(fullfile(readFolder,'summary.json')));
             if ~fromArchive && ~stats.acceptedNumericalWall && max(stats.last20MaximumLogRMS)<-4
                 next=fullfile(folder,'continued');
