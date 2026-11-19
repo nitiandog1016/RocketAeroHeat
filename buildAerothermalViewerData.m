@@ -104,12 +104,18 @@ if isfield(mesh,'hybridWall')
         b=mesh.hybridEnergyBalance;
         data.nativeEnergyBalance=b;
         k=find(strcmp({data.fields.key},'heatFlux'),1);
-        data.fields(k).stateNote=sprintf(['%s 壁面放热 %.3f µW，远场显热流出 %.3f µW。' ...
+        if isfield(b,'schema') && strcmp(b.schema,'cm011-inclined-half-energy-v1')
+            data.fields(k).stateNote=sprintf(['%s 三维半域折合整壁放热 %.3f µW，远场流出 %.3f µW。' ...
+                '壁面减远场为 %.3g W，占壁面放热 %.3g%%。该工况的实验精度待验证。'],data.fields(k).stateNote, ...
+                1e6*b.nativeWallReleaseW,1e6*b.nativeFarExcessOutW,b.wallMinusFarW,100*b.wallMinusFarFraction);
+        else
+            data.fields(k).stateNote=sprintf(['%s 壁面放热 %.3f µW，远场显热流出 %.3f µW。' ...
             '两者相差 %.3f µW（壁面放热的 %.2f%%）。' ...
             '离散方程中，内部面与轴对称源项合计 %.3f µW。该试件的实验精度待验证。'], ...
             data.fields(k).stateNote,1e6*b.nativeWallReleaseW,1e6*b.nativeFarExcessOutW, ...
             1e6*b.nativeSurfaceImbalanceW,100*b.nativeSurfaceImbalanceW/b.nativeWallReleaseW, ...
             1e6*b.innerFacePlusAxisSourceW);
+        end
     end
 end
 % 同一低速试件的三维体网格对照。研究帧沿用自己的残差、资格和功率，单列对照面积。
@@ -313,6 +319,11 @@ if isfield(mesh,'hybridWall')
     if isfield(hc,'caseLabel') && ischar(hc.caseLabel) && isrow(hc.caseLabel)
         data.caseNote=[hc.caseLabel ' · ' data.caseNote];
     end
+    if all(isfield(hc,{'alphaDeg','betaDeg','ambientPressurePa','ambientTemperatureK'}))
+        data.resultCondition.alphaDeg=hc.alphaDeg;data.resultCondition.betaDeg=hc.betaDeg;
+        data.resultCondition.freestreamPressurePa=hc.ambientPressurePa;
+        data.resultCondition.freestreamTemperatureK=hc.ambientTemperatureK;
+    end
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
 end
@@ -327,7 +338,13 @@ if isempty(histories)
     end
 end
 % 仅传递明确保存的来源/证据；旧快照不凭方法名自动获得物理资格。
-if isfield(mesh,'evidenceIdentity'),data.evidenceIdentity=mesh.evidenceIdentity;end
+if isfield(mesh,'evidenceIdentity')
+    data.evidenceIdentity=mesh.evidenceIdentity;
+    % 对已明确标注研究资格的快照，曲线和 CSV 共用同一来源。
+    if isfield(mesh.evidenceIdentity,'productionQualified') && isequal(mesh.evidenceIdentity.productionQualified,false)
+        data.researchIdentity=mesh.evidenceIdentity;
+    end
+end
 if isfield(mesh,'evidenceRecords'),data.evidenceRecords=mesh.evidenceRecords;end
     function add(key,label,unit,values,state,methods,scope,faceScopes,faceReasons)
         if nargin<8,faceScopes={};end

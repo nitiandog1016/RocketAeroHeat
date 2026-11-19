@@ -15,7 +15,7 @@ from observe_flux import BIN, BUILD, FILES, OFFICIAL, SRC, TOOL, arguments, invo
 BASE = ROOT/"outputs/v273_validation"
 
 
-def instrument(original):
+def instrument(original, domain_nodes=12341):
     before,tail = original.split("void CIntegration::Space_Integration(",1)
     body,after = tail.split("void CIntegration::Time_Integration(",1)
     anchor = "  /*--- Compute inviscid residuals ---*/"
@@ -71,10 +71,11 @@ def instrument(original):
     sym = "solver_container[MainSolver]->BC_Sym_Plane(geometry, solver_container, conv_bound_numerics, visc_bound_numerics, config, iMarker);"
     body = replace(body,sym,'{ '+sym+' snapshot(config->GetMarker_All_TagBound(iMarker).c_str()); }')
     body = replace(body,"//AD::ResumePreaccumulation", 'snapshot("end");\n  if(tally) std::fclose(tally);\n  //AD::ResumePreaccumulation')
+    body = replace(body,"GetnPointDomain()==12341",f"GetnPointDomain()=={int(domain_nodes)}")
     return before+"void CIntegration::Space_Integration("+body+"void CIntegration::Time_Integration("+after
 
 
-def build(out):
+def build(out, domain_nodes=12341):
     """只编译修改的集成对象，链接 v272 已核对的缓存，原安装和源码保持只读。"""
     out.mkdir(parents=True,exist_ok=False)
     previous = json.loads(gzip.decompress((ROOT/"docs/validation/v272/evidence/build.json.gz").read_bytes()))
@@ -87,7 +88,7 @@ def build(out):
         member, = [n for n in zip_file.namelist() if n.endswith("/"+FILES[0])]
         assert zip_file.read(member)==path.read_bytes()
     local = out/path.name
-    local.write_text(instrument(path.read_text("utf8")),encoding="utf8")
+    local.write_text(instrument(path.read_text("utf8"),domain_nodes),encoding="utf8")
     entries = json.loads((BUILD/"compile_commands.json").read_bytes())
     entry, = [e for e in entries if e["file"].replace("\\","/").endswith("/"+FILES[0])]
     cmd = arguments(entry["command"])
@@ -105,9 +106,10 @@ def build(out):
          previousBuildReceiptSHA256=sha(ROOT/"docs/validation/v272/evidence/build.json.gz")))
 
 
-def sample(parent, out, build_folder):
-    from readCM011TunnelSector import state_at_frame
-    frame = state_at_frame(parent)
+def sample(parent, out, build_folder, frame_reader=None):
+    if frame_reader is None:
+        from readCM011TunnelSector import state_at_frame as frame_reader
+    frame = frame_reader(parent)
     if not frame["normalTerminal"] or not frame["passesResidualAndHeatWindow"]:
         raise ValueError("本轮单步观测要求三维正常终场通过残差与热稳定窗口")
     rec = json.loads((parent/"engine_process.json").read_bytes())
@@ -121,7 +123,7 @@ def sample(parent, out, build_folder):
         assert sha(parent/n)==rec["inputSHA256"][str(parent/n)]
     shutil.copyfile(parent/"mesh.su2",out/"mesh.su2")
     shutil.copyfile(parent/"restart.csv",out/"initial_flow.csv")
-    config,count = re.subn(r"^ITER= (16000|5000)$","ITER= 1",(parent/"case.cfg").read_text("ascii"),flags=re.M)
+    config,count = re.subn(r"^ITER= [0-9]+$","ITER= 1",(parent/"case.cfg").read_text("ascii"),flags=re.M)
     assert count==1
     (out/"case.cfg").write_text(config,encoding="ascii")
     locks = {str(p):sha(p) for p in (exe,out/"mesh.su2",out/"case.cfg",out/"initial_flow.csv")}

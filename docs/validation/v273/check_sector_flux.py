@@ -14,8 +14,9 @@ from readCM011TunnelSector import state_at_frame
 from runEmbeddedSU2 import sha
 
 
-def audit(parent,control,observed):
-    frame=state_at_frame(parent)
+def audit(parent,control,observed,frame_reader=state_at_frame,meridian_nodes=97,copies=60,
+          symmetry=("sym0","sym1"),schema="cm011-sector-energy-v1"):
+    frame=frame_reader(parent)
     assert frame["normalTerminal"] and frame["passesResidualAndHeatWindow"]
     source=sha(parent/"restart.csv")
     for folder in (control,observed):
@@ -40,21 +41,21 @@ def audit(parent,control,observed):
     assert diff<2e-7
     ref=np.loadtxt(observed/"far_reference.csv",delimiter=",",skiprows=1)
     grid=np.load(parent/"nodes.npz")
-    assert np.array_equal(np.sort(ref[:,0]),np.unique(grid["ids"][:,-97:]))
+    assert np.array_equal(np.sort(ref[:,0]),np.unique(grid["ids"][:,-meridian_nodes:]))
     href=ref[0,1]
     assert np.all(ref[:,1]==href) and abs(href+297.15)<1e-12
     with (observed/"sector_stages.csv").open() as f:
         rows=list(csv.DictReader(f))
     names=[r["stage"] for r in rows]
-    assert names==["start","internal","before_far","after_far","before_wall","after_wall","sym0","sym1","end"]
+    assert names==["start","internal","before_far","after_far","before_wall","after_wall",*symmetry,"end"]
     values=np.array([[float(r["mass"]),float(r["enthalpy"])] for r in rows])
     assert np.isfinite(values).all()
     deltas=np.diff(values,axis=0,prepend=np.zeros((1,2)))
-    mass_scale=60*RHO*U*D**2
+    mass_scale=copies*RHO*U*D**2
     power_scale=mass_scale*CP*DT
     increments={name:dict(massKgS=m*mass_scale,rawEnthalpyW=e*power_scale,referenceAdvectionW=m*href*power_scale,
                          excessHeatW=(e-m*href)*power_scale) for name,(m,e) in zip(names,deltas)}
-    for key in ("start","internal","before_far","before_wall","sym0","sym1","end"):
+    for key in ("start","internal","before_far","before_wall",*symmetry,"end"):
         assert abs(increments[key]["excessHeatW"])<1e-12 and abs(increments[key]["massKgS"])<1e-12,key
     far=increments["after_far"]["excessHeatW"]
     wall=-increments["after_wall"]["excessHeatW"]
@@ -62,8 +63,8 @@ def audit(parent,control,observed):
     m,e=values[-1]
     residual=(e-href*m)*power_scale
     assert abs(residual-(far-wall))<1e-12
-    return dict(schema="cm011-sector-energy-v1",sourceRestartSHA256=source,savedIndex=frame["savedIndex"],
-                sourceFrameSHA256=frame["frameSHA256"],copies=60,referenceNativeEnthalpy=href,
+    return dict(schema=schema,sourceRestartSHA256=source,savedIndex=frame["savedIndex"],
+                sourceFrameSHA256=frame["frameSHA256"],copies=copies,referenceNativeEnthalpy=href,
                 sampledInputExact=True,updatedStateDifference=diff,allBoundaryIncrements=increments,
                 nativeWallReleaseW=wall,nativeFarExcessOutW=far,wallMinusFarW=wall-far,
                 wallMinusFarFraction=(wall-far)/wall,weightedResidualW=residual,

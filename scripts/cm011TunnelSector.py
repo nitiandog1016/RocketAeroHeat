@@ -19,14 +19,18 @@ HEX_FACES = ((3,2,1,0),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7))
 PRISM_FACES = ((2,1,0),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5))
 
 
-def mesh():
+def mesh(rays=RAYS, level=2, layers=42):
     """合并轴线节点，沿母线法向和周向生成体单元，并独立核对面邻接。"""
-    wall, _ = meridian(2)
-    xy, quads, _ = volume(wall, 42, 12., 2)
+    wall, _ = meridian(level)
+    xy, quads, _ = volume(wall, layers, 12., level)
+    steps = len(rays)-1
+    angle = rays[-1]-rays[0]
+    delta = angle/steps
+    assert 0 < delta < np.pi and np.allclose(np.diff(rays),delta,atol=1e-14,rtol=0)
     width = len(wall)
-    ids = np.empty((len(RAYS), len(xy)), dtype=int)
+    ids = np.empty((len(rays), len(xy)), dtype=int)
     xyz, source_node, angles = [], [], []
-    for k, phi in enumerate(RAYS):
+    for k, phi in enumerate(rays):
         for i, (x, r) in enumerate(xy):
             if k and i % width in (0, width-1):
                 ids[k,i] = ids[0,i]
@@ -39,7 +43,7 @@ def mesh():
     source_node = np.asarray(source_node)
     cells, owners, boundary = [], {}, {}
     total_volume, min_volume = 0., float("inf")
-    for k in range(len(RAYS)-1):
+    for k in range(steps):
         for q in quads:
             a,b,c,d = ids[k,q]
             e,f,g,h = ids[k+1,q]
@@ -81,33 +85,49 @@ def mesh():
     p = xy[quads]
     end = np.roll(p,-1,axis=1)
     moment = np.sum((p[:,:,1]+end[:,:,1])*(p[:,:,0]*end[:,:,1]-end[:,:,0]*p[:,:,1]))/6
-    reference_volume = moment*2*np.sin(ANGLE/2)
+    reference_volume = moment*steps*np.sin(delta)
     assert np.isclose(total_volume,reference_volume,rtol=1e-12,atol=0)
     markers = {key:[] for key in ("wall","far","sym0","sym1")}
     plane0, plane1 = set(ids[0]), set(ids[-1])
     for face in boundary.values():
         layer = source_node[list(face)]//width
         if np.all(layer==0): name="wall"
-        elif np.all(layer==42): name="far"
+        elif np.all(layer==layers): name="far"
         elif plane0.issuperset(face): name="sym0"
         elif plane1.issuperset(face): name="sym1"
         else: raise ValueError("出现未归属的三维边界面")
         markers[name].append(face)
     assert len(markers["sym0"])==len(markers["sym1"])==len(quads)
-    assert len(markers["wall"])==len(markers["far"])==2*(width-1)
+    assert len(markers["wall"])==len(markers["far"])==steps*(width-1)
     counts = Counter(len(c) for c in cells)
     counts_by_marker = {k:len(v) for k,v in markers.items()}
     wall_area = sum(np.linalg.norm(owners[tuple(sorted(f))]) for f in markers["wall"])
     mid_r = .5*(wall[1:,1]+wall[:-1,1])
     dx,dr = np.diff(wall,axis=0).T
-    chord_area = np.sum(4*np.sin(ANGLE/4)*mid_r*np.hypot(dx,dr*np.cos(ANGLE/4)))
+    chord_area = np.sum(2*steps*np.sin(delta/2)*mid_r*np.hypot(dx,dr*np.cos(delta/2)))
     assert np.isclose(wall_area,chord_area,rtol=1e-12,atol=0)
-    stats = dict(nodes=len(xyz), hexahedra=counts[8], prisms=counts[6], sharedAxisNodes=86,
+    copies = round(2*np.pi/angle)
+    assert abs(angle*copies-2*np.pi)<1e-12
+    stats = dict(nodes=len(xyz), hexahedra=counts[8], prisms=counts[6], sharedAxisNodes=2*(layers+1),
                  boundaryFaces=counts_by_marker, minCellVolumeD3=min_volume, volumeD3=total_volume,
                  meridianMomentVolumeD3=reference_volume, chordWallAreaM2=wall_area*D**2,
-                 fullChordWallAreaM2=60*wall_area*D**2,
+                 fullChordWallAreaM2=copies*wall_area*D**2,
                  fullRotatedWallAreaM2=2*np.pi*np.sum(mid_r*np.hypot(dx,dr))*D**2)
     return xy,xyz,source_node,np.array(angles),ids,cells,markers,stats
+
+
+def write_volume(folder,xyz,cells,markers):
+    with (folder/"mesh.su2").open("x",encoding="ascii") as f:
+        f.write(f"NDIME= 3\nNELEM= {len(cells)}\n")
+        for cell in cells:
+            f.write(" ".join(map(str,[13 if len(cell)==6 else 12,*cell]))+"\n")
+        f.write(f"NPOIN= {len(xyz)}\n")
+        np.savetxt(f,xyz,fmt="%.17g")
+        f.write(f"NMARK= {len(markers)}\n")
+        for marker,faces in markers.items():
+            f.write(f"MARKER_TAG= {marker}\nMARKER_ELEMS= {len(faces)}\n")
+            for face in faces:
+                f.write(" ".join(map(str,[5 if len(face)==3 else 9,*face]))+"\n")
 
 
 def prepare(folder):
@@ -122,17 +142,7 @@ def prepare(folder):
     assert np.array_equal(state[:,0],np.arange(len(xy)))
     np.testing.assert_allclose(state[:,1:3],xy,atol=1e-12,rtol=0)
     pressure,u,v,h = state[source,3:].T
-    with (folder/"mesh.su2").open("x",encoding="ascii") as f:
-        f.write(f"NDIME= 3\nNELEM= {len(cells)}\n")
-        for cell in cells:
-            f.write(" ".join(map(str,[13 if len(cell)==6 else 12,*cell]))+"\n")
-        f.write(f"NPOIN= {len(xyz)}\n")
-        np.savetxt(f,xyz,fmt="%.17g")
-        f.write("NMARK= 4\n")
-        for marker,faces in markers.items():
-            f.write(f"MARKER_TAG= {marker}\nMARKER_ELEMS= {len(faces)}\n")
-            for face in faces:
-                f.write(" ".join(map(str,[5 if len(face)==3 else 9,*face]))+"\n")
+    write_volume(folder,xyz,cells,markers)
     fields = np.column_stack((np.arange(len(xyz)),xyz,pressure,u,v*np.cos(phi),v*np.sin(phi),h))
     np.savetxt(folder/"initial_flow.csv",fields,fmt=["%d"]+8*["%.17g"],delimiter=",",comments="",
                header='"PointID","x","y","z","Pressure","Velocity_x","Velocity_y","Velocity_z","Enthalpy"')
