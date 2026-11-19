@@ -61,13 +61,13 @@ def match_surface(vertices,faces):
     return body,reg
 
 
-def prepare_import(folder,mat,source,source_hash,scale):
+def prepare_import(folder,mat,source,source_hash,scale,sectors=12):
     if not np.isfinite(scale) or scale<=0 or sha(source)!=source_hash:
         raise ValueError("STL 尺度无效或文件自导入后发生改变")
     arrays=loadmat(mat,variable_names=("V","F"))
     body,reg=match_surface(arrays["V"],arrays["F"])
     reg.update(sourceFile=source.name,sourceSHA256=source_hash,scaleToM=scale,inputArraySHA256=sha(mat))
-    prepare(folder,body,reg)
+    prepare(folder,body,reg,sectors)
     write_json(folder/"prepared.json",{n:sha(folder/n) for n in FILES})
 
 
@@ -99,6 +99,7 @@ if __name__=="__main__":
     for name in ("directory","mat","source"): prep.add_argument(name,type=Path)
     prep.add_argument("sha")
     prep.add_argument("scale",type=float)
+    prep.add_argument("--half-sectors",type=int,choices=(12,24),default=12)
     clone=sub.add_parser("instantiate")
     clone.add_argument("template",type=Path)
     clone.add_argument("directory",type=Path)
@@ -106,5 +107,5 @@ if __name__=="__main__":
     args=parser.parse_args()
     folder=args.directory.resolve()
     folder.relative_to(ROOT/"outputs")
-    if args.action=="prepare": prepare_import(folder,args.mat,args.source,args.sha,args.scale)
+    if args.action=="prepare": prepare_import(folder,args.mat,args.source,args.sha,args.scale,args.half_sectors)
     else: instantiate(args.template,folder,args.sha)

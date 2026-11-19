@@ -290,7 +290,10 @@ renderEditor();sync();showGeometry(true);
                 end
                 if isCM011()
                     grid=form(8);meshBackendChoice(grid,1);
-                    controls.generate=button(grid,2,'核对原面并生成半域体网',@generate);
+                    controls.cm011HalfSectors=choice(grid,2,'半周角向单元',{'12（15°）','24（7.5°）'}, ...
+                        [12 24],getOption(state.cfg,'cm011HalfSectors',12));
+                    controls.cm011HalfSectors.ValueChangedFcn=@changeCM011Resolution;
+                    controls.generate=button(grid,3,'核对原面并生成半域体网',@generate);
                     description='使用已确认的米制 CM-011 表面，保留导入面元编号。';
                     if ~isempty(state.mesh) && isfield(state.mesh,'cm011Prepared')
                         p=state.mesh.cm011Prepared;
@@ -301,7 +304,7 @@ renderEditor();sync();showGeometry(true);
                                 size(state.mesh.F,1),p.cells,1e6*p.maxFacetSampleDistanceM,1e6*p.maxVertexToSolverWallM);
                         end
                     end
-                    controls.volumeSummary=tip(grid,3,description);
+                    controls.volumeSummary=tip(grid,4,description);
                     sync();return;
                 end
                 grid=form(13);c=state.cfg.remesh;
@@ -634,7 +637,7 @@ renderEditor();sync();showGeometry(true);
         if isCM011()
             try
                 preparing=true;message('正在核对导入原面并生成 CM-011 半域体网…');drawnow;
-                candidate=prepareCM011WorkbenchMesh(state.orientedMesh,state.modelSource);
+                candidate=prepareCM011WorkbenchMesh(state.orientedMesh,state.modelSource,getOption(state.cfg,'cm011HalfSectors',12));
                 state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));
                 preparing=false;renderEditor();message('体网已生成，请选择并确认低速试件工况。');showGeometry(true);
             catch ex,preparing=false;renderEditor();showError(ex);end
@@ -938,6 +941,14 @@ renderEditor();sync();showGeometry(true);
         next=state.cfg;next.computationBackend=field.Value;next.cm011Boundary=[];
         state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));report=[];
         renderEditor();showGeometry(true);message('网格方法已选择，请生成当前网格。');
+    end
+    function changeCM011Resolution(field,~)
+        % 周向离散变化会使网格、边界确认和结果页失效。
+        if state.busy || preparing,return;end
+        next=state.cfg;next.cm011HalfSectors=field.Value;next.cm011Boundary=[];
+        state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
+        report=[];renderEditor();showGeometry(true);
+        message('半周单元数已改变，请重新生成网格。');
     end
     function loadNative(~,~,featureEnabled)
         if state.busy || preparing,return;end

@@ -60,7 +60,8 @@ if inclined
     geometry=jsondecode(fileread(fullfile(native,'geometry.json')));
     assert(strcmp(geometry.grid,'inclined') && geometry.alphaDeg==10 && geometry.betaDeg==0, ...
         'RAH:CM011:Incidence','指定结果与 +10° 的半域工况不匹配。');
-    condition.caseLabel='CM-011 低速等温缩比试件 · 攻角 +10° · 三维半域';
+    % 由实际求解网格标记云图和截面导出的周向分辨率。
+    condition.caseLabel=sprintf('CM-011 低速等温缩比试件 · 攻角 +10° · 半周 %d 单元',numel(geometry.rayRadians)-1);
     condition.velocityMps=reshape(geometry.velocityMps,1,3);
     condition.alphaDeg=geometry.alphaDeg;
     condition.betaDeg=geometry.betaDeg;
@@ -83,6 +84,7 @@ current.hybridWall.wallFluidTemperatureMethod=repmat("SU2 能量方程的壁节�
 if inclined
     current.hybridWall.pressureGaugePa=rows.gaugePressurePa;
     current.evidenceIdentity.productionQualified=false;
+    current.evidenceIdentity.halfSectors=numel(geometry.rayRadians)-1;
     current.evidenceIdentity.scope='CM-011 低速试件 +10° 三维数值结果，实验精度待验证';
 else
     current.hybridWall.pressureGaugePa=current.hybridWall.pressurePa-condition.ambientPressurePa;

@@ -36,7 +36,17 @@ def config(iterations):
     return text.replace("RMS_VELOCITY-Y, RMS_ENTHALPY","RMS_VELOCITY-Y, RMS_VELOCITY-Z, RMS_ENTHALPY")
 
 
-def prepare(folder, imported_body=None, registration=None):
+def half_domain_rays(sectors):
+    """两种半周离散共用同一对称面和原有的 13 个方位。"""
+    if sectors not in (12, 24):
+        raise ValueError("CM-011 半周网格只支持 12 或 24 个角向单元")
+    return np.deg2rad(np.linspace(-90., 90., sectors+1))
+
+
+def prepare(folder, imported_body=None, registration=None, sectors=12):
+    rays = half_domain_rays(sectors)
+    if imported_body is None and sectors != 12:
+        raise ValueError("加密对照需要导入试件的实际壁面与配准记录")
     folder.mkdir(parents=True,exist_ok=False)
     wall,bands = meridian(2)
     if imported_body is None:
@@ -49,7 +59,7 @@ def prepare(folder, imported_body=None, registration=None):
     if imported_body is None:
         assert sha(folder/"body.json")==BODY_SHA
     coarse = wall[::2] if imported_body is not None else meridian(1)[0]
-    _,xyz,_,_,ids,cells,markers,stats = mesh(RAYS,level=1,layers=24,wall=coarse)
+    _,xyz,_,_,ids,cells,markers,stats = mesh(rays,level=1,layers=24,wall=coarse)
     # 两端位于同一 XZ 平面，有同一外法向。共享轴线只受一个法向约束。
     markers["mirror"] = markers.pop("sym0")+markers.pop("sym1")
     for face in markers["mirror"]:
@@ -61,7 +71,7 @@ def prepare(folder, imported_body=None, registration=None):
     stats.update(boundaryFaces={k:len(v) for k,v in markers.items()},alphaDeg=ALPHA,betaDeg=0,
                  velocityMps=(U*FLOW).tolist(),grid="inclined",reflection="Y=0",copies=2,
                  originalFaces=len(body["F"]),originalBodySHA256=sha(folder/"body.json"),
-                 rayRadians=RAYS.tolist(),meridianNodes=len(coarse),radialLayers=24)
+                 rayRadians=rays.tolist(),meridianNodes=len(coarse),radialLayers=24)
     if registration is not None:
         stats["importedSurface"]=registration
     write_json(folder/"geometry.json",stats)

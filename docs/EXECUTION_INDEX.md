@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v277 CM-011 周向网格敏感性](validation/v277/RESULTS.md) · [锥面压力与热流曲线](validation/v277/evidence/cone_section.png) · [下一项](validation/v277/NEXT_DECISION.md)。10,080 面总放热变化 0.1604%，肩部 202 面的表压变化达到或超过 0.0002 Pa。
 - [v276 同一低速试件的两套 STL 剖分](validation/v276/RESULTS.md) · [四个截面与原面积分](validation/v276/evidence/comparison.json) · [下一项](validation/v276/NEXT_DECISION.md)。10,080 与 14,140 面均有同工况全壁数值，原面积分功率相差 0.2075%。
 - [v275 从 STL 在五步工作台完成低速 CM-011 计算](validation/v275/RESULTS.md) · [原面与截面核对](validation/v275/evidence/verification.json) · [下一项](validation/v275/NEXT_DECISION.md)。14,140 导入面和同一输入版本的云图、探针、两条截面 CSV 已核对。
 - [v274 CM-011 低速 +10° 三维全壁计算](validation/v274/RESULTS.md) · [周向曲线](validation/v274/evidence/cone_ring.png) · [下一项](validation/v274/NEXT_DECISION.md)。14,140 原面和同一截面迎背流差均已复算，MATLAB 从空目录计算到导出通过。
