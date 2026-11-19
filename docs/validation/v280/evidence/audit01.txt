@@ -1,0 +1,4 @@
+First offline audit, exit 1, before writing output. Script SHA-256 78133709581d52cb475941586c03b5d387181079fa0872285f3872627507cc24.
+wall_fields: np.testing.assert_allclose(t[ids], condition["wallTemperatureK"], rtol=0, atol=1e-9)
+Mismatched elements: 1800 / 1800 (100%). Max absolute difference: 0.00032118 K.
+The revised audit records this failed comparison separately for wall-node fluid T versus prescribed Tw. It retains prescribed Tw in the native cylinder flux definition, checks that flux independently against the saved native heat field and monitor, and grants zero qualified area.

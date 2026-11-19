@@ -1,0 +1,1 @@
+Third offline audit passed the field and mapping checks, then stopped while compressing the history. In the project Python runtime gzip.compress() does not accept mtime. Switched to gzip.GzipFile() with an explicit timestamp. Kept the original partial output folder.

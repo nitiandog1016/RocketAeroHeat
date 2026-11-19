@@ -36,18 +36,22 @@ try
             'ValueChangedFcn',@invalidate);
     end
     calculate=uibutton(bar,'Text','计算工况','ButtonPushedFcn',@calculateCase);
-    feedback=uigridlayout(panel,[1 2]);feedback.Padding=[0 0 0 0];feedback.ColumnWidth={'1x',146};
+    feedback=uigridlayout(panel,[1 3]);feedback.Padding=[0 0 0 0];feedback.ColumnWidth={'1x',130,146};
     status=uilabel(feedback,'Text','输入研究工况的绝对压力和温度后计算。','WordWrap','on');
+    % 同一工况下切换诊断来源，使用同一幅云图、探针和截面。
+    trialScheme=uidropdown(feedback,'Items',{'固定 CFL','自适应 CFL'},'ItemsData',{'fixed','adaptive'}, ...
+        'Enable','off','Tooltip','同一物理步的伪时间推进方案','ValueChangedFcn',@changeTrial);
     trialButton=uibutton(feedback,'Text','载入未收敛三维试算','Enable','off','ButtonPushedFcn',@showTrial);
     host=uipanel(panel,'BorderType','none');
     tabs.SelectedTab=tab;
     view=struct('tabs',tabs,'comparisonTab',tab,'surface',surface,'stations',stations,'report',report, ...
-        'caseTab',caseTab,'inputs',inputs,'calculate',calculate,'trialButton',trialButton,'caseHost',host,'caseStatus',status);
+        'caseTab',caseTab,'inputs',inputs,'calculate',calculate,'trialButton',trialButton, ...
+        'trialScheme',trialScheme,'caseHost',host,'caseStatus',status);
 catch ex
     delete(tabs);rethrow(ex);
 end
     function invalidate(~,~)
-        delete(host.Children);host.UserData=[];trialButton.Enable='off';status.Text='边界已改变，请重新计算。';
+        delete(host.Children);host.UserData=[];trialButton.Enable='off';trialScheme.Enable='off';status.Text='边界已改变，请重新计算。';
     end
     function calculateCase(~,~)
         invalidate([],[]);
@@ -56,19 +60,28 @@ end
             inner=uitabgroup(host,'Units','normalized','Position',[0 0 1 1]);
             web=createAerothermalWebTab(inner,result);
             host.UserData=struct('web',web,'report',summary,'mesh',result);
-            if isequal([inputs.Value],defaults),trialButton.Enable='on';end
+            if isequal([inputs.Value],defaults),trialButton.Enable='on';trialScheme.Enable='on';end
             status.Text=summary.wallCoverage.coverageMessage;
         catch ex
             delete(host.Children);host.UserData=[];status.Text=ex.message;
         end
     end
+    function changeTrial(~,~)
+        if isempty(host.UserData),return;end
+        showTrial([],[]);
+    end
     function showTrial(~,~)
         try
-            active=host.UserData;meshWithTrial=attachLewisTunnelTrial(active.mesh);
+            active=host.UserData;meshWithTrial=attachLewisTunnelTrial(active.mesh,trialScheme.Value);
             updateAerothermalWebTab(active.web,meshWithTrial);
             trialButton.Enable='off';
-            status.Text='变量列表已加入「未收敛试算」壁压和热流。工程覆盖及部分功率仍按原工程场计。';
+            status.Text=sprintf('已载入%s未收敛壁压和热流，%d 次内迭代。', ...
+                meshWithTrial.lewisTrial.schemeName,meshWithTrial.lewisTrial.innerIterations);
         catch ex
+            if ~isempty(host.UserData)
+                updateAerothermalWebTab(host.UserData.web,host.UserData.mesh);
+            end
+            trialButton.Enable='on';
             status.Text=ex.message;
         end
     end

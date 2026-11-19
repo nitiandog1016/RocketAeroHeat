@@ -277,13 +277,19 @@ if isfield(mesh,'lewisCylinder')
         if isfield(mesh,'lewisTrial')
             % 试算使用独立字段，绝不写入下方按 pressure / heatFlux 统计的覆盖和整壁功率。
             trial=mesh.lewisTrial;
-            scopeTrial=sprintf('首个物理步 Δt=%.6g s，120 次内迭代，九分量残差未通过；未作脱涡统计。源帧 %s', ...
-                trial.physicalDtS,trial.sourceFrameSHA256);
+            % 模块：探针和导出均引用本次载入的终态。旧版结构只有固定 CFL 的 120 次记录。
+            if isfield(trial,'innerIterations') && isfield(trial,'schemeName')
+                scheme=trial.schemeName;iterations=trial.innerIterations;
+            else
+                scheme='固定 CFL';iterations=120;
+            end
+            scopeTrial=sprintf('%s，首个物理步 Δt=%.6g s，%d 次内迭代，九分量残差未通过。源帧 %s', ...
+                scheme,trial.physicalDtS,iterations,trial.sourceFrameSHA256);
             add('trialPressure','未收敛试算 · 壁压','kPa',trial.pressurePa/1000,ones(n,1), ...
-                repmat({'SU2 INC_RANS + SST + LM；上游中心点定压，原面带积分'},n,1),scopeTrial);
+                repmat({'SU2 INC_RANS + SST + LM；上游中心点定压，原面带积分'},n,1),scopeTrial,repmat({scopeTrial},n,1));
             data.fields(end).computedStateLabel='未收敛试算';
             add('trialHeatFlux','未收敛试算 · 入壁热流','kW/m²',trial.heatFluxWm2/1000,ones(n,1), ...
-                repmat({'保存态等温圆柱法向 Fourier 通量；圆柱标记单独重建，原面带积分'},n,1),scopeTrial);
+                repmat({'保存态等温圆柱法向 Fourier 通量；圆柱标记单独重建，原面带积分'},n,1),scopeTrial,repmat({scopeTrial},n,1));
             data.fields(end).computedStateLabel='未收敛试算';
         end
     else

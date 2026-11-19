@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v280 同一物理步的风洞圆柱对照](validation/v280/RESULTS.md) · [九分量与原面诊断](validation/v280/evidence/trial.json) · [回到单工况原面缺项](validation/v280/NEXT_DECISION.md)。固定 120 次、自适应 720 次均为 0/9 达标，工作台可切换归档，自绘模型本轮新增 0 m²。
+
 - [v279 给定热边界的三维风洞圆柱](validation/v279/RESULTS.md) · [首个物理步](validation/v279/evidence/trial.json) · [下一项](validation/v279/NEXT_DECISION.md)。220 原面有工程壁压和热流，2160 面试算均保留未收敛身份，安装壁交线热通量已按圆柱标记复核。
 - [v278 NASA Lewis 光滑圆柱换热实测对照](validation/v278/RESULTS.md) · [六站数据](validation/v278/evidence/stations.csv) · [下一项](validation/v278/NEXT_DECISION.md)。铜带平均 Nu 的六站相对均方根差 3.26%；有量纲热流、壁压和背面换热单列未知。
 - [v277 CM-011 周向网格敏感性](validation/v277/RESULTS.md) · [锥面压力与热流曲线](validation/v277/evidence/cone_section.png) · [下一项](validation/v277/NEXT_DECISION.md)。10,080 面总放热变化 0.1604%，肩部 202 面的表压变化达到或超过 0.0002 Pa。
