@@ -132,6 +132,7 @@ renderEditor();sync();showGeometry(true);
     end
     function showGeometry(reset)
         if ~isgraphics(fig),return;end
+        delete(findall(resultHost,'Tag','lewis-cylinder-review'));fig.UserData.lewisCylinderReview=[];
         resultHost.Visible='off';geometryHost.Visible='on';
         fig.UserData.benchmarkReview=[];
         fig.UserData.idealAirReview=[];
@@ -171,6 +172,7 @@ renderEditor();sync();showGeometry(true);
         updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2,'resetCamera',reset));
     end
     function showResults()
+        delete(findall(resultHost,'Tag','lewis-cylinder-review'));fig.UserData.lewisCylinderReview=[];
         if ~isempty(state.researchResult)
             geometryHost.Visible='off';resultHost.Visible='on';
             delete(resultHost.Children);webUI=[];
@@ -200,7 +202,7 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
-                grid=form(20);
+                grid=form(21);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
@@ -222,6 +224,7 @@ renderEditor();sync();showGeometry(true);
                 controls.readBenchmarkReview=button(grid,18,'公开算例验证记录',@readBenchmarkDialog);
                 controls.readIdealAirReview=button(grid,19,'变比热热流接口记录',@readIdealAirDialog);
                 controls.staticAir=button(grid,20,'静止空气 · 节点探针',@readStaticAirProbe);
+                controls.lewisCylinder=button(grid,21,'计算 NASA 圆柱换热对照',@showLewisCylinder);
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
@@ -1261,6 +1264,19 @@ renderEditor();sync();showGeometry(true);
         [name,folder]=uigetfile('*.json','查看公开算例审核',fullfile(fileparts(mfilename('fullpath')),'outputs'));
         if isequal(name,0),return;end
         try,readBenchmarkReview(fullfile(folder,name));catch ex,showError(ex);end
+    end
+    function showLewisCylinder(~,~)
+        % 显式运行独立风洞工况，在当前中央区显示结果并保留用户的模型输入。
+        if state.busy || preparing,return;end
+        try
+            [mesh,stations,summary]=runLewisCylinderBenchmark();
+            prior=resultHost.Children;
+            view=createLewisCylinderReview(resultHost,mesh,stations,summary);
+            delete(prior);webUI=[];researchUI=[];
+            geometryHost.Visible='off';resultHost.Visible='on';view.tabs.Visible='on';
+            sync();title.Text='NASA Lewis 圆柱 · 风洞测站对照';
+            fig.UserData.lewisCylinderReview=view;
+        catch ex,showError(ex);end
     end
     function readBenchmarkReview(file)
         % 公开基准是独立验证记录，按原终态显示并保留当前五步骤输入。

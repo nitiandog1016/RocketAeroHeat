@@ -249,6 +249,26 @@ if isfield(mesh,'heating')
         end
     end
 end
+% 风洞圆柱只显示可辨识的无量纲预测；实验点保存在测带表中。
+if isfield(mesh,'lewisCylinder')
+    nu=mesh.lewisCylinder.nusselt;
+    scope='TM 1432 第20页空气四次式；Re_D=177000；中央66 mm、迎流角绝对值不超过55°。';
+    reasons=cellstr(data.region);
+    reasons(strcmp(reasons,'靠近风洞侧壁'))={'靠近风洞侧壁，未建模跨向变化'};
+    reasons(strcmp(reasons,'中央跨度 · 模型角域外'))={'超出迎流层流级数的角度范围'};
+    add('nusselt','局部努塞尔数 Nu_D','1',nu,double(isfinite(nu)), ...
+        repmat({'Frössling 圆柱空气四次式，周向面带平均'},n,1),scope,{},reasons);
+    data.fields(end).computedStateLabel='工程预测（研究对照）';
+    missing={'pressure','绝对壁压','kPa','本工况没有可用的绝对壁压解'; ...
+             'heatFlux','入壁热流','kW/m²','缺少该次试验的导热系数与壁面至绝热壁温差'; ...
+             'wallInput','输入壁温','K','原文说明恒温控制，图9没有给出该次设定温度'};
+    for j=1:size(missing,1)
+        reason=missing{j,4};
+        add(missing{j,1},missing{j,2},missing{j,3},nan(n,1),zeros(n,1), ...
+            repmat({reason},n,1),reason,{},repmat({reason},n,1));
+    end
+    data.missingReason=repmat(missing(2,4),n,1);
+end
 % 模块三：显式区分输入壁温与壁温解；单一外流/热流工况本身不确定壁温。
 % 尚无材料热响应解时仍允许探针查看“未求解”，不能以输入壁温补齐。
 if isfield(mesh,'hybridWall')
@@ -326,6 +346,13 @@ if isfield(mesh,'hybridWall')
     end
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
+end
+if isfield(mesh,'lewisCylinder')
+    data.defaultField='nusselt';data.flowDirection=[0 -1 0];
+    data.coordinateNote='SI · X 为圆柱跨向 · +Y 为迎流驻点 · +Z 为正圆周角';
+    data.caseNote='NASA Lewis 光滑圆柱 · Re_D = 177000 · 低湍流空气 · 直径 66 mm';
+    data.resultCondition.caption=data.caseNote;
+    data.resultCondition.physics=rmfield(mesh.lewisCylinder,'nusselt');
 end
 % 静态三角面快照按当前两列场重新统计。旧存档可直接导出，历史帧单独显示。
 if isempty(histories)

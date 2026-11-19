@@ -1,0 +1,96 @@
+{
+  "legacy01": {
+    "status": "terminal",
+    "command": [
+      "D:/matlab/bin/matlab.exe",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat'); s=load('E:/RocketAeroHeat/outputs/cm011_import_19155e25-a004-4d68-b8cd-7679e38b5200/run_aa5a941f-f3dc-4973-9e22-b488ec942d14/result.mat','current'); page=fileread('E:/RocketAeroHeat/outputs/cm011_import_19155e25-a004-4d68-b8cd-7679e38b5200/run_aa5a941f-f3dc-4973-9e22-b488ec942d14/workbench/case-data.js'); data=buildAerothermalViewerData(s.current); expected=['window.ROCKET_CASE=' jsonencode(data,'ConvertInfAndNaN',true) ';'];assert(strcmp(strtrim(page),expected));disp('Prior 10080-face payload matched.');"
+    ],
+    "inputSHA256": {
+      "E:\\RocketAeroHeat\\outputs\\cm011_import_19155e25-a004-4d68-b8cd-7679e38b5200\\run_aa5a941f-f3dc-4973-9e22-b488ec942d14\\result.mat": "f4547ce2f05fdb3278cd07d8dadf55793aa9e0c5fc32eb0ec503177e9a10ca6e",
+      "E:\\RocketAeroHeat\\outputs\\cm011_import_19155e25-a004-4d68-b8cd-7679e38b5200\\run_aa5a941f-f3dc-4973-9e22-b488ec942d14\\workbench\\case-data.js": "a6011800f380e73a0807a400d6e9d442cdc4449c39b9c51b7866a2ce0e2f40ee",
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "3479fad9c5cbf23c4af812b75531e7c2522bb91504cd1e6042f96b7aff56f79b"
+    },
+    "maximumSeconds": 60,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 4194304,
+    "supervisorProcessID": 46308,
+    "physicsQualified": false,
+    "nativeExitCode": null,
+    "processID": 44592,
+    "debuggerExitCode": 0,
+    "elapsedSeconds": 12.968000000000757,
+    "stopReason": null,
+    "supervisorError": null,
+    "peakFamilyRSSBytes": 714711040,
+    "peakOutputBytes": 35,
+    "observedProcessIDs": [
+      44592,
+      42208,
+      10008
+    ],
+    "survivingProcessIDs": [],
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\outputs\\cm011_import_19155e25-a004-4d68-b8cd-7679e38b5200\\run_aa5a941f-f3dc-4973-9e22-b488ec942d14\\result.mat": true,
+      "E:\\RocketAeroHeat\\outputs\\cm011_import_19155e25-a004-4d68-b8cd-7679e38b5200\\run_aa5a941f-f3dc-4973-9e22-b488ec942d14\\workbench\\case-data.js": true,
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true
+    }
+  },
+  "matlab01": {
+    "status": "terminal",
+    "command": [
+      "D:/matlab/bin/matlab.exe",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat');addpath('docs/validation/v278');check_workflow('E:/RocketAeroHeat/outputs/v278_validation/gui01');"
+    ],
+    "inputSHA256": {
+      "E:\\RocketAeroHeat\\rocketAeroHeatWorkbench.m": "8cf45428cc036e424e1a35f4409919d07b439c52a33383ee5bd1e74a8009a0c5",
+      "E:\\RocketAeroHeat\\calcLewisCylinderNu.m": "659cdd5189c54170d9091e6e2648af61d1752e9adc3cbaaaab1bfd3c32946cb1",
+      "E:\\RocketAeroHeat\\runLewisCylinderBenchmark.m": "d5e8e87529d8fdaf41dcaf343d637b45c5e0b3d5c0c3f6b189f15e03626129ab",
+      "E:\\RocketAeroHeat\\createLewisCylinderReview.m": "72ac9c6494d73942efabbebb217022452d6de85900a771313132ff998491188d",
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "3479fad9c5cbf23c4af812b75531e7c2522bb91504cd1e6042f96b7aff56f79b",
+      "E:\\RocketAeroHeat\\tests\\data\\lewis_smooth_cylinder\\stations.csv": "2fe634e4a0ca5d5ab91940dd4720d40d43937aeef41b05402a9b3f4dc8c14ffe",
+      "E:\\RocketAeroHeat\\docs\\validation\\v278\\check_workflow.m": "d76b17a59d55d93fb67c219bd53d47e47d60d611dc5df353d82e6a515534a279",
+      "E:\\RocketAeroHeat\\docs\\validation\\v278\\PLAN.md": "9cc6675cad08e8591a42118250754a43ef089ca58d55b8de89be877bdd1566ec"
+    },
+    "maximumSeconds": 120,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 16777216,
+    "supervisorProcessID": 22864,
+    "physicsQualified": false,
+    "nativeExitCode": null,
+    "processID": 34256,
+    "debuggerExitCode": 0,
+    "elapsedSeconds": 24.07800000000134,
+    "stopReason": null,
+    "supervisorError": null,
+    "peakFamilyRSSBytes": 2037727232,
+    "peakOutputBytes": 561,
+    "observedProcessIDs": [
+      34256,
+      33112,
+      30276,
+      1484,
+      45900,
+      38672,
+      45136,
+      47132,
+      45192
+    ],
+    "survivingProcessIDs": [],
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\rocketAeroHeatWorkbench.m": true,
+      "E:\\RocketAeroHeat\\calcLewisCylinderNu.m": true,
+      "E:\\RocketAeroHeat\\runLewisCylinderBenchmark.m": true,
+      "E:\\RocketAeroHeat\\createLewisCylinderReview.m": true,
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+      "E:\\RocketAeroHeat\\tests\\data\\lewis_smooth_cylinder\\stations.csv": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v278\\check_workflow.m": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v278\\PLAN.md": true
+    }
+  }
+}
