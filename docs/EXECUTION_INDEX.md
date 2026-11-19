@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v270 Apollo AS-202 原量热测点与单工况适用范围](validation/v270/RESULTS.md) · [图读数据](validation/v270/evidence/station.json) · [下一项](validation/v270/NEXT_DECISION.md)。区分 CA1253R 飞行散点、相邻压力孔和给定壁温下的工程预测。
 - [v269 单工况同面覆盖与热功率](validation/v269/RESULTS.md) · [下一项区域交付](validation/v269/NEXT_DECISION.md)。常用入口、混合入口与三维结果侧栏共用原面统计，并核对部分、完整、零及负功率。
 - [v268 等温微球的全面积压力与热流](validation/v268/RESULTS.md) · [下一项交付](validation/v268/NEXT_DECISION.md)。2,608 个原面及双向穿流接口通过解析和独立数值核对，自绘算例新增 0 m²。
 - [v267 混合求解入口和连通域壁面结果](validation/v267/RESULTS.md)。工程方法与局部黏性求解器实际交换切面状态，低速两壁的双变量计算覆盖 2/2 m²；原箭体覆盖另列。
