@@ -112,6 +112,43 @@ if isfield(mesh,'hybridWall')
             1e6*b.innerFacePlusAxisSourceW);
     end
 end
+% 同一低速试件的三维体网格对照。研究帧沿用自己的残差、资格和功率，单列对照面积。
+if isfield(mesh,'cm011Sector')
+    sector=mesh.cm011Sector.summary; w=mesh.cm011Sector.wall;
+    assert(isequal(w.faceID,(0:n-1)'),'RAH:CM011:SectorIDs','三维结果的原面编号不一致。');
+    data.cm011SectorSummary=sector;
+    data.researchIdentity=struct('productionQualified',false,'scope','CM-011 同工况的数值对照');
+    label='三维研究帧（未达稳态验收）';
+    if sector.numericalWallAccepted,label='三维数值稳态（实验精度待验）';end
+    scope=sprintf(['低速等温试件，6° 三维对称扇区，原生保存步 %d。%s。' ...
+        '同一原三角面入壁热功率 %.3f µW，二维对照 %.3f µW。'], ...
+        sector.savedIndex,label,1e6*sector.fullTrianglePowerW,1e6*sector.axisymmetricTrianglePowerW);
+    if isfield(sector,'nativeEnergyBalance')
+        balance=sector.nativeEnergyBalance;
+        scope=[scope sprintf(' 三维原生壁放热 %.3f µW，远场流出 %.3f µW，差额占壁放热 %.4f%%。', ...
+            1e6*balance.nativeWallReleaseW,1e6*balance.nativeFarExcessOutW,100*balance.wallMinusFarFraction)];
+    end
+    source='SU2 三维不可压层流，按对称扇区镜像后映射到原三角面';
+    entries={
+        'sectorGaugePressure','三维对照 · 相对环境壁压','Pa',w.gaugePressurePa,'数值壁压';
+        'sectorHeatFlux','三维对照 · 入壁热流','kW/m²',w.heatFluxWm2/1000,'等温壁 Fourier 热流';
+        'sectorWallNode','三维对照 · 壁节点流体温度','K',w.wallNodeK,'原生壁节点温度';
+        'sectorFirstNode','三维对照 · 首层流体温度','K',w.firstNodeK,'首层节点焓按定比热还原温度'};
+    for i=1:size(entries,1)
+        values=entries{i,4};methods=repmat({[source '，' entries{i,5}]},n,1);
+        add(entries{i,1},entries{i,2},entries{i,3},values,double(isfinite(values)),methods,scope);
+        data.fields(end).stateNote=scope;
+        data.fields(end).computedStateLabel=label;
+    end
+    for pair={{'heatFlux','sectorHeatFlux'},{'pressureGauge','sectorGaugePressure'}}
+        keys=pair{1};
+        k1=find(strcmp({data.fields.key},keys{1}),1);k2=find(strcmp({data.fields.key},keys{2}),1);
+        both=[data.fields(k1).values(:);data.fields(k2).values(:)];
+        limits=[min(both),max(both)];
+        data.comparisonColorRanges.(keys{1})=limits;
+        data.comparisonColorRanges.(keys{2})=limits;
+    end
+end
 if isfield(mesh,'boundaryLayerEdge')
     e=mesh.boundaryLayerEdge; methods=methodNames(e,n);
     state=double(e.algebraicallyValid(:));

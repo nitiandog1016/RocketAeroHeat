@@ -1,0 +1,574 @@
+{
+  "build01/CIntegration_process.json": {
+    "record": {
+      "args": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe",
+        "-ISU2_CFD/src\\libSU2core.a.p",
+        "-ISU2_CFD/src",
+        "-I..\\source\\SU2_CFD\\src",
+        "-I..\\source\\externals\\CLI11",
+        "-I..\\source\\externals\\eigen",
+        "-I..\\source\\externals\\mel",
+        "-ICommon\\src",
+        "-I..\\source\\Common\\src",
+        "-fdiagnostics-color=always",
+        "-DNDEBUG",
+        "-D_FILE_OFFSET_BITS=64",
+        "-std=c++17",
+        "-O3",
+        "-fopenmp",
+        "-march=x86-64",
+        "-ffast-math",
+        "-fno-finite-math-only",
+        "-DEIGEN_DONT_PARALLELIZE",
+        "-MD",
+        "-MQ",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\build01\\CIntegration.obj",
+        "-MF",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\build01\\CIntegration.obj.d",
+        "-o",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\build01\\CIntegration.obj",
+        "-c",
+        "-iquote",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\source\\SU2_CFD\\src\\integration",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\build01\\CIntegration.cpp"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117",
+      "elapsedSeconds": 2.67200000000048,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 531369984,
+      "stopReason": null,
+      "livePids": []
+    },
+    "fileSHA256": "40b878edc72146d06a0d8ea3ccd2fb39b8466fb4fe632d9e37c47c26c851353b"
+  },
+  "build01/link_process.json": {
+    "record": {
+      "args": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\toolchain\\w64devkit\\bin\\g++.exe",
+        "-o",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\build01\\CM011_sector_observe.exe",
+        "SU2_CFD/src/SU2_CFD.exe.p/SU2_CFD.cpp.obj",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\build01\\CIntegration.obj",
+        "-Wl,--allow-shlib-undefined",
+        "-Wl,-O1",
+        "-Wl,--start-group",
+        "SU2_CFD/src/libSU2core.a",
+        "Common/src/libSU2Common.a",
+        "-fopenmp",
+        "-fopenmp",
+        "-fopenmp",
+        "-Wl,--subsystem,console",
+        "-lkernel32",
+        "-luser32",
+        "-lgdi32",
+        "-lwinspool",
+        "-lshell32",
+        "-lole32",
+        "-loleaut32",
+        "-luuid",
+        "-lcomdlg32",
+        "-ladvapi32",
+        "-Wl,--end-group"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\tools\\runtime\\su2-thermal-build\\build-v117",
+      "elapsedSeconds": 1.2189999999991414,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 325431296,
+      "stopReason": null,
+      "livePids": []
+    },
+    "fileSHA256": "e6af1a18907de4cf81e183870f05e0ed050ba404a5339cb76ca7ed2dd7f38d22"
+  },
+  "matlab01/debugger_process.json": {
+    "record": {
+      "status": "terminal",
+      "command": [
+        "D:/matlab/bin/matlab.exe",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "cd('E:/RocketAeroHeat'); [m,r,p]=runCM011TunnelCase('outputs/v273_validation/workbench01','fine','outputs/v271_validation/fine02','docs/validation/v272/evidence/fine02.json','outputs/v273_validation/sector01'); assert(r.fullSurfaceComputed && ~r.sector.numericalWallAccepted && r.sector.savedIndex==13000 && isfile(p));"
+      ],
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\runCM011TunnelCase.m": "4c3f7cf2f631ca093048ba368360971731b64d9c70692bc194b6885de6dc4f7f",
+        "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "a807612b35eac4f777b807e147c3a4d55706f0b7baec2059c33a2f6325909520",
+        "E:\\RocketAeroHeat\\scripts\\readCM011TunnelSector.py": "8888294359d30d04a149733f84a0a8ac817e2f03295677b5c02c0858bfbdec1e",
+        "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": "863c46326f3c2e46ca579911b95f90081be98fedd0442d7ccf05abac18355b30",
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": "8444d07deec763badbc22a5f47f572492aa24acfd7e63d25e955cf6bba0cfff3",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\engine_process.json": "1461b47ec49cdce1e6ec0ef169c561e9c0a96e901d594b47254c345b2eb9570a",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\restart_013000.csv": "38acf6c69405b7c81201e4905bf90a1a4d45c31ac54c71a5b6638e4375706c75",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\surface_013000.vtk": "90e1bdb8098f98e18129fb766fbe16211d9b74528173bc0114c1a8f34e92966f"
+      },
+      "maximumSeconds": 90,
+      "maximumRSSBytes": 4294967296,
+      "maximumOutputBytes": 33554432,
+      "supervisorProcessID": 46312,
+      "physicsQualified": false,
+      "nativeExitCode": null,
+      "processID": 44240,
+      "debuggerExitCode": 1,
+      "elapsedSeconds": 14.75,
+      "stopReason": null,
+      "supervisorError": null,
+      "peakFamilyRSSBytes": 577040384,
+      "peakOutputBytes": 302,
+      "observedProcessIDs": [
+        44240,
+        43592,
+        43796
+      ],
+      "survivingProcessIDs": [],
+      "inputsStable": {
+        "E:\\RocketAeroHeat\\runCM011TunnelCase.m": true,
+        "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+        "E:\\RocketAeroHeat\\scripts\\readCM011TunnelSector.py": true,
+        "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": true,
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\engine_process.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\restart_013000.csv": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\surface_013000.vtk": true
+      }
+    },
+    "fileSHA256": "c5bc8449879fb24cc306cb4db0022bf2f337f77a9a2a15431e891bfcd815a6fb"
+  },
+  "matlab02/debugger_process.json": {
+    "record": {
+      "status": "terminal",
+      "command": [
+        "D:/matlab/bin/matlab.exe",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "cd('E:/RocketAeroHeat'); [m,r,p]=runCM011TunnelCase('outputs/v273_validation/workbench01','fine','outputs/v271_validation/fine02','docs/validation/v272/evidence/fine02.json','outputs/v273_validation/sector01'); assert(r.fullSurfaceComputed && ~r.sector.numericalWallAccepted && r.sector.savedIndex==13000 && isfile(p));"
+      ],
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\runCM011TunnelCase.m": "d77525fa28c9472131e5aff1e4e444017ec092316306c2bf16f0f19eb689a53a",
+        "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "a807612b35eac4f777b807e147c3a4d55706f0b7baec2059c33a2f6325909520",
+        "E:\\RocketAeroHeat\\scripts\\readCM011TunnelSector.py": "8888294359d30d04a149733f84a0a8ac817e2f03295677b5c02c0858bfbdec1e",
+        "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": "863c46326f3c2e46ca579911b95f90081be98fedd0442d7ccf05abac18355b30",
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": "8444d07deec763badbc22a5f47f572492aa24acfd7e63d25e955cf6bba0cfff3",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\engine_process.json": "1461b47ec49cdce1e6ec0ef169c561e9c0a96e901d594b47254c345b2eb9570a",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\restart_013000.csv": "38acf6c69405b7c81201e4905bf90a1a4d45c31ac54c71a5b6638e4375706c75",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\surface_013000.vtk": "90e1bdb8098f98e18129fb766fbe16211d9b74528173bc0114c1a8f34e92966f"
+      },
+      "maximumSeconds": 90,
+      "maximumRSSBytes": 4294967296,
+      "maximumOutputBytes": 33554432,
+      "supervisorProcessID": 14628,
+      "physicsQualified": false,
+      "nativeExitCode": null,
+      "processID": 43136,
+      "debuggerExitCode": 0,
+      "elapsedSeconds": 18.563000000000102,
+      "stopReason": null,
+      "supervisorError": null,
+      "peakFamilyRSSBytes": 820498432,
+      "peakOutputBytes": 198,
+      "observedProcessIDs": [
+        43136,
+        45856,
+        44052,
+        44252,
+        43092,
+        44304,
+        43192
+      ],
+      "survivingProcessIDs": [],
+      "inputsStable": {
+        "E:\\RocketAeroHeat\\runCM011TunnelCase.m": true,
+        "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+        "E:\\RocketAeroHeat\\scripts\\readCM011TunnelSector.py": true,
+        "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": true,
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\engine_process.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\restart_013000.csv": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\surface_013000.vtk": true
+      }
+    },
+    "fileSHA256": "0d7ca718f7c739b020791328c2d7fb81f536ae6c3a6f57f1d8fa19603b3ad645"
+  },
+  "matlab03/debugger_process.json": {
+    "record": {
+      "status": "terminal",
+      "command": [
+        "D:/matlab/bin/matlab.exe",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "cd('E:/RocketAeroHeat'); [m,r,p]=runCM011TunnelCase('outputs/v273_validation/workbench02','fine','outputs/v271_validation/fine02','docs/validation/v272/evidence/fine02.json','outputs/v273_validation/sector02','outputs/v273_validation/energy01.json'); assert(r.fullSurfaceComputed && r.sector.numericalWallAccepted && r.sector.savedIndex==4999 && r.sector.nativeEnergyBalance.belowHalfPercent && isfile(p));"
+      ],
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\runCM011TunnelCase.m": "d77525fa28c9472131e5aff1e4e444017ec092316306c2bf16f0f19eb689a53a",
+        "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "a807612b35eac4f777b807e147c3a4d55706f0b7baec2059c33a2f6325909520",
+        "E:\\RocketAeroHeat\\scripts\\readCM011TunnelSector.py": "8888294359d30d04a149733f84a0a8ac817e2f03295677b5c02c0858bfbdec1e",
+        "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": "863c46326f3c2e46ca579911b95f90081be98fedd0442d7ccf05abac18355b30",
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": "8444d07deec763badbc22a5f47f572492aa24acfd7e63d25e955cf6bba0cfff3",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\engine_process.json": "b859959d50e07b12e53a8ed70ab479b2e24cfabdbb9220ffaac8d703c84c6790",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\restart_004999.csv": "b1d03c52ead352ad4824526b6353d7593e5a7d034e45f10d561137396d2a0843",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\surface_004999.vtk": "9578a40515658f087d60cd9238ab3c3fcf9a9e97777891c4690e35d07fa48109",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\energy01.json": "216237dbc5c4c39c9be420285c359073f3e3f4da8e8c92b1ad85deb750d35498"
+      },
+      "maximumSeconds": 90,
+      "maximumRSSBytes": 4294967296,
+      "maximumOutputBytes": 33554432,
+      "supervisorProcessID": 10048,
+      "physicsQualified": false,
+      "nativeExitCode": null,
+      "processID": 46104,
+      "debuggerExitCode": 0,
+      "elapsedSeconds": 16.82799999999952,
+      "stopReason": null,
+      "supervisorError": null,
+      "peakFamilyRSSBytes": 815558656,
+      "peakOutputBytes": 198,
+      "observedProcessIDs": [
+        46104,
+        46100,
+        45296,
+        45444,
+        46760,
+        47916,
+        42604
+      ],
+      "survivingProcessIDs": [],
+      "inputsStable": {
+        "E:\\RocketAeroHeat\\runCM011TunnelCase.m": true,
+        "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+        "E:\\RocketAeroHeat\\scripts\\readCM011TunnelSector.py": true,
+        "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": true,
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\engine_process.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\restart_004999.csv": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\surface_004999.vtk": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\energy01.json": true
+      }
+    },
+    "fileSHA256": "5f562f3f1bbdd4caa4ad2acdfa0404554fa00d174b3256f63885f11330779bc6"
+  },
+  "monitor01/resources.json": {
+    "record": {
+      "elapsedSeconds": 720.8589999999986,
+      "exitCode": 124,
+      "peakRSSBytes": 154030080,
+      "peakDirectoryBytes": 40492568,
+      "limitReason": null,
+      "observedPids": [
+        21412,
+        10064,
+        17424,
+        36288
+      ],
+      "livePids": []
+    },
+    "fileSHA256": "c82bf78b8018fff6bd7958eb8db4f1f9eb3de42ee54b44af27cbe4d3a2619695"
+  },
+  "monitor02/resources.json": {
+    "record": {
+      "elapsedSeconds": 285.3279999999995,
+      "exitCode": 0,
+      "peakRSSBytes": 153157632,
+      "peakDirectoryBytes": 22232619,
+      "limitReason": null,
+      "observedPids": [
+        37672,
+        29264,
+        20332,
+        20204
+      ],
+      "livePids": []
+    },
+    "fileSHA256": "183be98fac8505559ecf70f0454b6dea34960ffcb73dc691560016f9233f5444"
+  },
+  "official01/sample.json": {
+    "record": {
+      "parentRestartSHA256": "b1d03c52ead352ad4824526b6353d7593e5a7d034e45f10d561137396d2a0843",
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\official01\\mesh.su2": "f315415421c134e6609b88030190f1ecb4f9053025e7e6e8e63b77480fb2a97a",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\official01\\case.cfg": "b4064d7cb05f5bf2981acfbe993162df00518dbbe4a649d7a201faa823a97bc6",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\official01\\initial_flow.csv": "b1d03c52ead352ad4824526b6353d7593e5a7d034e45f10d561137396d2a0843"
+      },
+      "outputSHA256": {
+        "history.csv": "71032240dabb070e0c96852ccc653fb5638794e0502016a2bebe222a2aff2f2e",
+        "restart.csv": "8bf59b9821e89c77dc3ac086e05095eb22e172d01460b455fcfa93993eb5b884",
+        "restart_000000.csv": "8bf59b9821e89c77dc3ac086e05095eb22e172d01460b455fcfa93993eb5b884",
+        "step.log": "926047b4c1b85c0f14a93375b893c7d47ac9e95a329eb138848b4ef360ec689e",
+        "step_process.json": "cecc510f86a033d62d931a7a9198b64c3f1d572f3b38834bddf78040e251ef37",
+        "surface.vtk": "608a2ca2feed8aca1fea8abf0c46a62a7a771dd77c6097ef5313197f71510502",
+        "surface_000000.vtk": "608a2ca2feed8aca1fea8abf0c46a62a7a771dd77c6097ef5313197f71510502",
+        "vol_solution.vtk": "843d760ec44f15837f8d3998c284b58acf433829ceb4f93b58180217d9f32b4a"
+      }
+    },
+    "fileSHA256": "dd5e1ac012213b9172481198d3a41066b3ab3b5e3607a555684f3abf5c7c81cb"
+  },
+  "official01/step_process.json": {
+    "record": {
+      "args": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "1"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v273_validation\\official01",
+      "elapsedSeconds": 0.7029999999995198,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 100810752,
+      "stopReason": null,
+      "livePids": []
+    },
+    "fileSHA256": "cecc510f86a033d62d931a7a9198b64c3f1d572f3b38834bddf78040e251ef37"
+  },
+  "sector01/engine_process.json": {
+    "record": {
+      "status": "terminal",
+      "startedUTC": "2026-11-19T03:23:21.947157+00:00",
+      "request": {
+        "workDirectory": "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01",
+        "configFile": "case.cfg",
+        "meshFile": "mesh.su2",
+        "maximumSeconds": 720,
+        "threads": 1,
+        "sourceFiles": [
+          "scripts/cm011TunnelSector.py",
+          "docs/validation/v272/evidence/fine02.json",
+          "outputs/v271_validation/fine02/body.json",
+          "outputs/v273_validation/sector01/geometry.json",
+          "outputs/v273_validation/sector01/nodes.npz"
+        ],
+        "jobToken": "9bb4bcc1e2c44fdeb9be85178b755d75"
+      },
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\engine_request.json": "4ceed0edbefe7123eb62618b72ede90fa1b9634ff1fc37162f0d2a9b3ce289b8",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\case.cfg": "d07e10ea75b335b9abbfc1af380c87e684078d71915e64aae8323b7682a68da6",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\mesh.su2": "f315415421c134e6609b88030190f1ecb4f9053025e7e6e8e63b77480fb2a97a",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+        "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "ff33d39f42682a54424ad23118f4cfc4839a26f9a203ba9a50819a9adf19de53",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": "c8808eb2abb1ace016904fa72e21eb58e7f71b5f29715b6b1855b02178d77dbf",
+        "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "db71dd62f1f5db9166f9c4bbac7a76f4c7dded91d55ee211b6ec304d5d1030c3",
+        "E:\\RocketAeroHeat\\scripts\\cm011TunnelSector.py": "354515df7aac059358f0eff6c1ed6764850e20d3a72e3217076044e2ddf62c65",
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": "8444d07deec763badbc22a5f47f572492aa24acfd7e63d25e955cf6bba0cfff3",
+        "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\body.json": "07588689cfec2d88933a516520cdb905eff1976403b0990bb86ac0fc12946c19",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\geometry.json": "97ca6332e4590279f9284ff51632b0d3041e554b3a57435321cd667038884a04",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\nodes.npz": "5dcbb5fd42b964df0d165a756b1ff69cbca58418b2b91344f04e70fdc6486273",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\initial_flow.csv": "94569fba64f67299f4b9130f55a80d44a1e086972767a4ca82aef7662bc53e69"
+      },
+      "executableVersion": "8.6.0",
+      "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+      "supervisorProcessID": 21412,
+      "physicalSolutionQualified": false,
+      "runtimeFlavor": "official",
+      "processID": 17424,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\case.cfg",
+        "--threads",
+        "1"
+      ],
+      "elapsedSeconds": 720.0780000000013,
+      "progress": {
+        "Inner_Iter": 13993.0,
+        "HF": -0.01013424112
+      },
+      "exitCode": 1,
+      "timedOut": true,
+      "cancelled": false,
+      "endedUTC": "2026-11-19T03:35:22.023762+00:00",
+      "inputsStable": {
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\engine_request.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\case.cfg": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\mesh.su2": true,
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+        "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": true,
+        "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+        "E:\\RocketAeroHeat\\scripts\\cm011TunnelSector.py": true,
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\body.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\geometry.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\nodes.npz": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\initial_flow.csv": true
+      },
+      "outputSHA256": {
+        "engine_stdout.log": "d2b7eb735c1ee2799fc5a965677c96f0173055b5728e144733d6ca406975978a",
+        "history.csv": "d290f637a4bdb5acaee65345aa573d9c13734375a00450fd9a70f4eaecf02674",
+        "restart.csv": "38acf6c69405b7c81201e4905bf90a1a4d45c31ac54c71a5b6638e4375706c75",
+        "restart_001000.csv": "4c20675ba91d097a112424bc79449088c4f8cce2d5753585de5f2da3125834a3",
+        "restart_002000.csv": "83032b0e96a11ab2abde90219aebbf63f324bfbc14794dbb19b9b5c2ebf675c3",
+        "restart_003000.csv": "3d9ecbacf4d37f2869461ab189cbc9cc3e88a484841fd6c9767b8551b4ddbe3c",
+        "restart_004000.csv": "447a39402117b53b5f99a5f76c79149299767885e3dc3f2b36d8420da4fea4b4",
+        "restart_005000.csv": "fb65b0e173d199c9f774d45b19aedb34a12b07b100ea03701f55c42692849b01",
+        "restart_006000.csv": "f3a1e5e074056bf8a129781fdfa5515ea2cc6908b55f902417cd0ee3c1a2819b",
+        "restart_007000.csv": "aa104d74c48c453bd712b6ce8bb04f623750176fa544811480f0ded42292b108",
+        "restart_008000.csv": "c8a4e9336496a73ed0e79e01e3e96a41adaa626350ca5e385a66505103045bb4",
+        "restart_009000.csv": "8d2c30522d3c824c43746f0e153884083e4e0202bf3bd84282f59671416e1c8e",
+        "restart_010000.csv": "4340261d3d6361b3906273a2386994122b9bc5dfdf6a71e1ec0a8959898ca349",
+        "restart_011000.csv": "4e2d14a0fc1f6bc99b18e4503e339fb866f0e192744585b50a33819035ebafab",
+        "restart_012000.csv": "3207fd4ebe091006d4511747449d02971aa5de73e5aececc8e68af005be0810c",
+        "restart_013000.csv": "38acf6c69405b7c81201e4905bf90a1a4d45c31ac54c71a5b6638e4375706c75",
+        "surface.vtk": "90e1bdb8098f98e18129fb766fbe16211d9b74528173bc0114c1a8f34e92966f",
+        "surface_001000.vtk": "dc8f8ffadf928de629abb2d948d011654292075ae58cd69eeedcc9e4f8ea2059",
+        "surface_002000.vtk": "b364d9df5b9996b16074f96cf2c72660fc968111802ddaf82142efd2a49f2525",
+        "surface_003000.vtk": "c202b7e87a97ab49b0904b235a54cb40b575489e55026a43b1d462d72cec32ca",
+        "surface_004000.vtk": "893ab9c23c1b0ef857758a8355b8acd18c5fbeb968fe13c0917851f784952b48",
+        "surface_005000.vtk": "cdb08fcc1353090c05ea2fafb91878ac93556b60611d85f69d90145ecb8813f3",
+        "surface_006000.vtk": "2f68b2f9a0bb689310a028f0aa7b3c8a26dc0e7db428720834eee280c975a58f",
+        "surface_007000.vtk": "fac25022176ffa0cd9b892379a9e90a84fe1513d6f7d23b0fe5b453f27bc9d71",
+        "surface_008000.vtk": "3b898236c52d5cf3582048f17097d55c00ea263760c132bad90cbabf9860a4dd",
+        "surface_009000.vtk": "791155673923a13b9f399ea321782631632e2d55cc96905407cc240954ab858c",
+        "surface_010000.vtk": "3fe94fc0faee9864f00291ea3d5dfeb9d471e15cc2672f195de3ed07d6930b61",
+        "surface_011000.vtk": "1908e77e35572c85c7617a74057b6b75967118157122fc8cbb058e815779aa31",
+        "surface_012000.vtk": "ee27794ddfbd80b99b066f0512684606a676ac2d8c00f3a9854dc6134ea69e52",
+        "surface_013000.vtk": "90e1bdb8098f98e18129fb766fbe16211d9b74528173bc0114c1a8f34e92966f"
+      }
+    },
+    "fileSHA256": "1461b47ec49cdce1e6ec0ef169c561e9c0a96e901d594b47254c345b2eb9570a"
+  },
+  "sector02/engine_process.json": {
+    "record": {
+      "status": "terminal",
+      "startedUTC": "2026-11-19T03:37:02.914090+00:00",
+      "request": {
+        "workDirectory": "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02",
+        "configFile": "case.cfg",
+        "meshFile": "mesh.su2",
+        "maximumSeconds": 320,
+        "threads": 1,
+        "sourceFiles": [
+          "scripts/cm011TunnelSector.py",
+          "docs/validation/v272/evidence/fine02.json",
+          "outputs/v271_validation/fine02/body.json",
+          "outputs/v273_validation/sector01/geometry.json",
+          "outputs/v273_validation/sector01/nodes.npz",
+          "outputs/v273_validation/sector01/engine_process.json",
+          "outputs/v273_validation/sector01/restart_013000.csv",
+          "outputs/v273_validation/sector02/geometry.json",
+          "outputs/v273_validation/sector02/nodes.npz",
+          "docs/validation/v273/continue_sector.py"
+        ],
+        "jobToken": "29c6cff4d921459980626cae1c3642ff"
+      },
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\engine_request.json": "e415b5dce6329b4b052d067ccf489820383a76a814a81f7328bee74735fd00f3",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\case.cfg": "1b36120141e4e7eff9c3a39ae69f5a7f0253f85f140836585a3fac6a9701d6c6",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\mesh.su2": "f315415421c134e6609b88030190f1ecb4f9053025e7e6e8e63b77480fb2a97a",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+        "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "ff33d39f42682a54424ad23118f4cfc4839a26f9a203ba9a50819a9adf19de53",
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": "c8808eb2abb1ace016904fa72e21eb58e7f71b5f29715b6b1855b02178d77dbf",
+        "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "db71dd62f1f5db9166f9c4bbac7a76f4c7dded91d55ee211b6ec304d5d1030c3",
+        "E:\\RocketAeroHeat\\scripts\\cm011TunnelSector.py": "354515df7aac059358f0eff6c1ed6764850e20d3a72e3217076044e2ddf62c65",
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": "8444d07deec763badbc22a5f47f572492aa24acfd7e63d25e955cf6bba0cfff3",
+        "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\body.json": "07588689cfec2d88933a516520cdb905eff1976403b0990bb86ac0fc12946c19",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\geometry.json": "97ca6332e4590279f9284ff51632b0d3041e554b3a57435321cd667038884a04",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\nodes.npz": "5dcbb5fd42b964df0d165a756b1ff69cbca58418b2b91344f04e70fdc6486273",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\engine_process.json": "1461b47ec49cdce1e6ec0ef169c561e9c0a96e901d594b47254c345b2eb9570a",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\restart_013000.csv": "38acf6c69405b7c81201e4905bf90a1a4d45c31ac54c71a5b6638e4375706c75",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\geometry.json": "97ca6332e4590279f9284ff51632b0d3041e554b3a57435321cd667038884a04",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\nodes.npz": "5dcbb5fd42b964df0d165a756b1ff69cbca58418b2b91344f04e70fdc6486273",
+        "E:\\RocketAeroHeat\\docs\\validation\\v273\\continue_sector.py": "231c89e17f8df9fed27e6a7918776cb1bd8b908cb9611bb2537caf37746f835f",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\initial_flow.csv": "38acf6c69405b7c81201e4905bf90a1a4d45c31ac54c71a5b6638e4375706c75"
+      },
+      "executableVersion": "8.6.0",
+      "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+      "supervisorProcessID": 37672,
+      "physicalSolutionQualified": false,
+      "runtimeFlavor": "official",
+      "processID": 20332,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\case.cfg",
+        "--threads",
+        "1"
+      ],
+      "elapsedSeconds": 284.6869999999999,
+      "progress": {
+        "Inner_Iter": 4999.0,
+        "HF": -0.01013417007
+      },
+      "exitCode": 0,
+      "timedOut": false,
+      "cancelled": false,
+      "endedUTC": "2026-11-19T03:41:47.603900+00:00",
+      "inputsStable": {
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\engine_request.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\case.cfg": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\mesh.su2": true,
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+        "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": true,
+        "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+        "E:\\RocketAeroHeat\\scripts\\cm011TunnelSector.py": true,
+        "E:\\RocketAeroHeat\\docs\\validation\\v272\\evidence\\fine02.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v271_validation\\fine02\\body.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\geometry.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\nodes.npz": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\engine_process.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector01\\restart_013000.csv": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\geometry.json": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\nodes.npz": true,
+        "E:\\RocketAeroHeat\\docs\\validation\\v273\\continue_sector.py": true,
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\sector02\\initial_flow.csv": true
+      },
+      "outputSHA256": {
+        "engine_stdout.log": "0b0dc268e62b1791123a82981263462a3a0aba5c6294586a652f0dc8804b2351",
+        "history.csv": "b02b87ad0323c9ea3c16acea512eff6fa322bc8e01370ad22526ccb6d4e3d623",
+        "restart.csv": "b1d03c52ead352ad4824526b6353d7593e5a7d034e45f10d561137396d2a0843",
+        "restart_001000.csv": "c8c0f70106cf8a26636d97e4973e5c69c9eae5e69efce8e8a143bd7ef08a17e7",
+        "restart_002000.csv": "727aded4e6c952dec7c8f2db358396da439b8122ad80d3109a1de5736dcec5c9",
+        "restart_003000.csv": "b06438af9524705836f5d5db5e7ddf257a65a99acd21f591962cbebda688da0f",
+        "restart_004000.csv": "5ff485da85cf70b17bb67c3a42e0ab4d5119fb01d07a9f8257e4fce8145ee57f",
+        "restart_004999.csv": "b1d03c52ead352ad4824526b6353d7593e5a7d034e45f10d561137396d2a0843",
+        "surface.vtk": "9578a40515658f087d60cd9238ab3c3fcf9a9e97777891c4690e35d07fa48109",
+        "surface_001000.vtk": "21df5f5c76c78e8446200da77b6c525d3f6755c3a587d206e496f3fdc8b0da43",
+        "surface_002000.vtk": "632c85736ea98358b077e71b176ef7c543a13ab742c4412df0fdf535cf306336",
+        "surface_003000.vtk": "9642f28c0e5949b93b16aed6a1ad101f8cbdd40c34c9e1e9311b6f95ffa61527",
+        "surface_004000.vtk": "45ce1aed87300f86eee0d953f423650d634b2976409bf50fcc6d2d38da90b75a",
+        "surface_004999.vtk": "9578a40515658f087d60cd9238ab3c3fcf9a9e97777891c4690e35d07fa48109",
+        "vol_solution.vtk": "4f91fa132d9bad38d026d44cf2a55a4f817c90671a04aeff0cb85a4a90c507d1"
+      }
+    },
+    "fileSHA256": "b859959d50e07b12e53a8ed70ab479b2e24cfabdbb9220ffaac8d703c84c6790"
+  },
+  "trace01/sample.json": {
+    "record": {
+      "parentRestartSHA256": "b1d03c52ead352ad4824526b6353d7593e5a7d034e45f10d561137396d2a0843",
+      "inputSHA256": {
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\build01\\CM011_sector_observe.exe": "d40c9534353ce49c99b912a99edcf3f649727c98b558d195d7d73d71b0287956",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\trace01\\mesh.su2": "f315415421c134e6609b88030190f1ecb4f9053025e7e6e8e63b77480fb2a97a",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\trace01\\case.cfg": "b4064d7cb05f5bf2981acfbe993162df00518dbbe4a649d7a201faa823a97bc6",
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\trace01\\initial_flow.csv": "b1d03c52ead352ad4824526b6353d7593e5a7d034e45f10d561137396d2a0843"
+      },
+      "outputSHA256": {
+        "far_reference.csv": "68dfa405289b29f3562b4b2a164298aabf233dd1b91470fc098584864a98cc48",
+        "history.csv": "0b214c1af7c96292ebce6df448a55ac9ebecb20e08722b26259691192402fe6a",
+        "observed_input.csv": "0786647eaa2d946ff9242a7e36a6628b605714110a425d4c3a8fccadb055cefb",
+        "restart.csv": "5b55454312f59ea414bdbbdb65b3ab110236d01cb03397338de98f3889cdc8d4",
+        "restart_000000.csv": "5b55454312f59ea414bdbbdb65b3ab110236d01cb03397338de98f3889cdc8d4",
+        "sector_stages.csv": "4defa5a80427144a75aa172a6065b5d065bc310e3d30851040c8d60c6558afa6",
+        "step.log": "926047b4c1b85c0f14a93375b893c7d47ac9e95a329eb138848b4ef360ec689e",
+        "step_process.json": "7256f2728695eed3b0a6a04b70c9866f856b1eba624ece394e39f80ca7856efe",
+        "surface.vtk": "608a2ca2feed8aca1fea8abf0c46a62a7a771dd77c6097ef5313197f71510502",
+        "surface_000000.vtk": "608a2ca2feed8aca1fea8abf0c46a62a7a771dd77c6097ef5313197f71510502",
+        "vol_solution.vtk": "5103bf121f5cfa67c09321f37aacdea3d100aa0909a1160779f2bce2baef0716"
+      }
+    },
+    "fileSHA256": "204d918c51ae528f46166a9dbdf743edcdef9faa51c4147c8e466c83b47c8397"
+  },
+  "trace01/step_process.json": {
+    "record": {
+      "args": [
+        "E:\\RocketAeroHeat\\outputs\\v273_validation\\build01\\CM011_sector_observe.exe",
+        "case.cfg",
+        "--threads",
+        "1"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v273_validation\\trace01",
+      "elapsedSeconds": 1.2180000000007567,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 108752896,
+      "stopReason": null,
+      "livePids": []
+    },
+    "fileSHA256": "7256f2728695eed3b0a6a04b70c9866f856b1eba624ece394e39f80ca7856efe"
+  }
+}

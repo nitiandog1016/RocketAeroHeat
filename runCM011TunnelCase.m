@@ -1,7 +1,9 @@
-function [current,report,page]=runCM011TunnelCase(folder,grid,savedRun,energyObservation)
+function [current,report,page]=runCM011TunnelCase(folder,grid,savedRun,energyObservation,sectorRun,sectorObservation)
 %RUNCM011TUNNELCASE 在普通单工况入口内计算低速等温 CM-011 缩比试件，导出离线三维结果。
 % 字段和方法逐面返回。第三个参数可显式回读本项目同一工况的已核对原生终态。
 % 第四个参数可附同一终场的边界能量观测；来源和收支核对后在热流视图显示。
+% 第五个参数可附低速同工况的三维扇区目录，在同一组原面上比较两种离散。
+% 第六个参数是该三维保存态的可选热收支观测，单独绑定到三维结果。
 root=fileparts(mfilename('fullpath'));outputs=fullfile(root,'outputs');
 if nargin<1 || isempty(folder)
     folder=fullfile(outputs,['cm011_' char(java.util.UUID.randomUUID())]);
@@ -9,10 +11,15 @@ end
 if nargin<2,grid='coarse';end
 if nargin<3,savedRun='';end
 if nargin<4,energyObservation='';end
+if nargin<5,sectorRun='';end
+if nargin<6,sectorObservation='';end
+assert(isempty(sectorObservation) || ~isempty(sectorRun),'RAH:CM011:SectorObservation','请指定三维观测对应的运行目录。');
 assert(isempty(energyObservation) || ~isempty(savedRun),'RAH:CM011:Observation', ...
     '读入能量观测时请同时指定该观测对应的原生终场目录。');
 grid=validatestring(grid,{'coarse','fine','outer'});
-folder=char(java.io.File(folder).getCanonicalPath());
+assert(isempty(sectorRun) || (~isempty(savedRun) && strcmp(grid,'fine')), ...
+    'RAH:CM011:Sector','三维对照需要绑定的 12D 细网终场。');
+folder=canonicalPath(folder);
 assert(startsWith(folder,[char(java.io.File(outputs).getCanonicalPath()) filesep],'IgnoreCase',ispc), ...
     'RAH:CM011:Output','请选择项目 outputs 下的新结果目录。');
 assert(java.io.File(folder).mkdirs(),'RAH:CM011:Output','须使用新的结果目录。');
@@ -20,7 +27,7 @@ prepare=fullfile(root,'scripts','cm011Tunnel.py');reader=fullfile(root,'scripts'
 solver=fullfile(root,'scripts','runEmbeddedSU2.py');
 fromArchive=~isempty(savedRun);
 if fromArchive
-    native=char(java.io.File(savedRun).getCanonicalPath());
+    native=canonicalPath(savedRun);
 else
     native=fullfile(folder,'flow');
     pythonCommand({prepare,native,grid,'--prepare-only'},'prepare');
@@ -45,12 +52,29 @@ current.hybridWall.wallFluidTemperatureMethod=repmat("SU2 能量方程的壁节�
 current.hybridWall.pressureGaugePa=current.hybridWall.pressurePa-condition.ambientPressurePa;
 report.native=stats;report.reusedNativeRun=fromArchive;
 if isfield(stats,'nativeEnergyBalance'),current.hybridEnergyBalance=stats.nativeEnergyBalance;end
+% 只有这一可选分支会回读三维帧。主结果保留二维终场的身份和原面分母。
+if ~isempty(sectorRun)
+    sectorFolder=fullfile(folder,'sector_audit');
+    sectorArgs={fullfile(root,'scripts','readCM011TunnelSector.py'), ...
+        canonicalPath(sectorRun),native,sectorFolder};
+    if ~isempty(sectorObservation)
+        sectorArgs=[sectorArgs,{'--energy-observation',canonicalPath(sectorObservation)}];
+    end
+    pythonCommand(sectorArgs,'sector_audit');
+    sector=jsondecode(fileread(fullfile(sectorFolder,'summary.json')));
+    sectorRows=readtable(fullfile(sectorFolder,'wall.csv'));
+    assert(sector.originalFaces==height(rows) && isequal(rows.faceID,sectorRows.faceID), ...
+        'RAH:CM011:SectorMapping','三维对照与主场原面编号不一致。');
+    current.cm011Sector=struct('wall',sectorRows,'summary',sector);
+    report.sector=sector;
+end
 stlwrite(triangulation(mesh.F,mesh.V),fullfile(folder,'CM011-mm-scale-SI.stl'));
 page=exportAerothermalWeb(current,fullfile(folder,'workbench'));
 save(fullfile(folder,'result.mat'),'current','report','condition');
 fid=fopen(fullfile(folder,'summary.json'),'w','n','UTF-8');assert(fid>=0);closer=onCleanup(@()fclose(fid)); %#ok<NASGU>
-fprintf(fid,'%s\n',jsonencode(struct('condition',condition,'coverage',report.coverageMessage, ...
-    'reusedNativeRun',fromArchive,'native',stats),'PrettyPrint',true));
+summary=struct('condition',condition,'coverage',report.coverageMessage,'reusedNativeRun',fromArchive,'native',stats);
+if isfield(report,'sector'),summary.sector=report.sector;end
+fprintf(fid,'%s\n',jsonencode(summary,'PrettyPrint',true));
 fprintf('%s\n%s\n',report.coverageMessage,page);
 
     function empty=noWallEstimate(~,~,~)
@@ -65,7 +89,7 @@ fprintf('%s\n%s\n',report.coverageMessage,page);
             if ~fromArchive,pythonCommand({solver,'--request',fullfile(native,'engine_request.json')},'solve');end
             auditArgs={};
             if ~isempty(energyObservation)
-                auditArgs={'--native-balance',char(java.io.File(energyObservation).getCanonicalPath())};
+                auditArgs={'--native-balance',canonicalPath(energyObservation)};
             end
             pythonCommand([{reader,native,readFolder},auditArgs],'audit');
             stats=jsondecode(fileread(fullfile(readFolder,'summary.json')));
@@ -97,4 +121,11 @@ fprintf('%s\n%s\n',report.coverageMessage,page);
         proc=cmd.start();code=proc.waitFor();
         assert(code==0,'RAH:CM011:Process','%s 阶段退出 %d，见 %s。',name,code,logPath);
     end
+end
+
+function result=canonicalPath(value)
+% 模块用途：相对路径随 MATLAB 当前目录解析，包括批处理启动后曾经 cd 的情况。
+file=java.io.File(char(value));
+if ~file.isAbsolute(),file=java.io.File(pwd,char(value));end
+result=char(file.getCanonicalPath());
 end
