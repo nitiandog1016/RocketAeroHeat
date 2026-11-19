@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v269 单工况同面覆盖与热功率](validation/v269/RESULTS.md) · [下一项区域交付](validation/v269/NEXT_DECISION.md)。常用入口、混合入口与三维结果侧栏共用原面统计，并核对部分、完整、零及负功率。
 - [v268 等温微球的全面积压力与热流](validation/v268/RESULTS.md) · [下一项交付](validation/v268/NEXT_DECISION.md)。2,608 个原面及双向穿流接口通过解析和独立数值核对，自绘算例新增 0 m²。
 - [v267 混合求解入口和连通域壁面结果](validation/v267/RESULTS.md)。工程方法与局部黏性求解器实际交换切面状态，低速两壁的双变量计算覆盖 2/2 m²；原箭体覆盖另列。
 - [v266 单时刻热功率](validation/v263/SIDEWALL_TEMPERATURE.md#单时刻热功率v266) · [导出复算](validation/v263/evidence/snapshot_power/export_check.json)。主工况已算面功率与整表面未知量分列；公开风洞算例使用原壁曲面积。

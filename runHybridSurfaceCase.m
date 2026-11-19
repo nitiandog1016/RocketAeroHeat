@@ -62,14 +62,13 @@ if any(isfinite(nearT))
     wall.nearWallCellTemperatureK=nearT;wall.nearWallTemperatureMethod=nearMethod;
 end
 % 模块三：完整性以每个原面均有双变量计算值为准，独立验证由证据台账处理。
-p=isfinite(wall.pressurePa); q=isfinite(wall.heatFluxWm2); joint=p&q;
-total=sum(area); power=NaN;
-if all(q),power=sum(area.*wall.heatFluxWm2);end
-report=struct('status','completed','faceCount',n,'totalArea',total,'engineeringFirstAreaM2',sum(area(eng)), ...
-    'regionalAddedAreaM2',sum(area(joint&~eng)),'jointComputedAreaM2',sum(area(joint)), ...
-    'fullSurfaceComputed',all(joint),'wholeSurfaceHeatPowerW',power,'attempts',attempts, ...
-    'pressureComputedAreaFraction',sum(area(p))/total,'heatComputedAreaFraction',sum(area(q))/total, ...
-    'elapsedSeconds',toc(started));
+p=isfinite(wall.pressurePa); q=isfinite(wall.heatFluxWm2);
+report=summarizeComputedWall(area,p,q,wall.heatFluxWm2);
+report.status='completed';
+report.engineeringFirstAreaM2=sum(area(eng));
+report.regionalAddedAreaM2=sum(area(p&q&~eng));
+report.attempts=attempts;
+report.elapsedSeconds=toc(started);
 current=struct('V',v,'F',f,'localGeometry',struct('region',{cellstr(region)}), ...
     'hybridWall',wall,'hybridCondition',setup.condition,'hybridWallTemperatureK',tw, ...
     'evidenceIdentity',struct('origin','research','physicalCondition',setup.condition));

@@ -78,7 +78,7 @@ try
                 current=calcSurfaceHeating(current,freestream,cfg);
             case 'coverage'
                 % 面积由实际三角形取得；预设底压或背风Cp不计入求解压力面积。
-                area=current.localGeometry.area(:);totalArea=sum(area);
+                area=current.localGeometry.area(:);
                 ps=current.pressure.fieldStatus(:);
                 if numel(ps)~=numel(area) || ...
                         any(~ismember(ps,[0 1 2])) || ...
@@ -86,15 +86,12 @@ try
                     error('RocketAeroHeat:SingleCase:PressureStatus', ...
                         '当前压力值与逐面元未解/计算/给定状态不一致。');
                 end
+                report=summarizeComputedWall(area,ps==1,current.heating.eligibleFace,current.heating.heatFlux);
                 report.status='completed';
                 report.cfg=cfg;
                 report.condition=cfg.flight;
-                report.faceCount=size(current.F,1);
-                report.totalArea=totalArea;
-                report.pressureComputedAreaFraction=sum(area(ps==1))/totalArea;
-                report.pressurePrescribedAreaFraction=sum(area(ps==2))/totalArea;
-                report.pressureMissingAreaFraction=sum(area(ps==0))/totalArea;
-                report.heatComputedAreaFraction=current.heatingCoverage.summary.computedAreaFraction;
+                report.pressurePrescribedAreaFraction=sum(area(ps==2))/report.totalArea;
+                report.pressureMissingAreaFraction=sum(area(ps==0))/report.totalArea;
                 report.loadsAvailable=current.aerodynamicLoads.available;
                 report.scope=['当前工况工程链执行完成；面积审计不是区域求解，' ...
                     '仍需检查各变量的未解、给定与模型适用范围。'];

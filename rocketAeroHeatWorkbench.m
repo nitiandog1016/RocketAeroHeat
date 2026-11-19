@@ -821,7 +821,11 @@ renderEditor();sync();showGeometry(true);
             [solved,fs,newReport]=quietTriple(@()runAeroHeatSingleCase(frozen.mesh,frozen.cfg,@progress));
             state=aeroHeatWorkflowState('completeSolve',state,struct('result',solved, ...
                 'freestream',fs,'solveId',token,'sourceRevision',revision));report=newReport;
-            message(sprintf('当前计算快照已接受；热流计算面积 %.4g%%，未解区仍保留。',100*newReport.heatComputedAreaFraction));
+            if isfield(newReport,'coverageMessage')
+                message(newReport.coverageMessage);
+            else
+                message(sprintf('当前区域快照已接受，热流候选面积 %.4g%%。',100*newReport.heatComputedAreaFraction));
+            end
             go(5);
         catch ex
             if exist('token','var') && state.busy

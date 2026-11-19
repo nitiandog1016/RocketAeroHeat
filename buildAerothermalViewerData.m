@@ -246,6 +246,16 @@ if isfield(mesh,'hybridWall')
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
 end
+% 静态三角面快照按当前两列场重新统计。旧存档可直接导出，历史帧单独显示。
+if isempty(histories)
+    pf=data.fields(strcmp({data.fields.key},'pressure'));
+    qf=data.fields(strcmp({data.fields.key},'heatFlux'));
+    if isscalar(pf) && isscalar(qf)
+        % 上述标准字段固定使用 kPa 和 kW/m²，功率汇总的输入单位为 W/m²。
+        data.wallCoverage=summarizeComputedWall(area,pf.status==1,qf.status==1,1000*qf.values);
+        data.caseNote=[data.wallCoverage.coverageMessage ' ' data.caseNote];
+    end
+end
 % 仅传递明确保存的来源/证据；旧快照不凭方法名自动获得物理资格。
 if isfield(mesh,'evidenceIdentity'),data.evidenceIdentity=mesh.evidenceIdentity;end
 if isfield(mesh,'evidenceRecords'),data.evidenceRecords=mesh.evidenceRecords;end
