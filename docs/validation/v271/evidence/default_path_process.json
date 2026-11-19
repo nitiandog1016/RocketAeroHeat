@@ -1,0 +1,47 @@
+{
+  "status": "terminal",
+  "command": [
+    "D:\\matlab\\bin\\matlab.exe",
+    "-wait",
+    "-singleCompThread",
+    "-batch",
+    "cd('E:/RocketAeroHeat'); [~,r,p]=runCM011TunnelCase([],'coarse','E:/RocketAeroHeat/outputs/v271_validation/coarse03'); assert(r.fullSurfaceComputed && r.reusedNativeRun && isfile(p)); fid=fopen('E:/RocketAeroHeat/outputs/v271_validation/default01/opened_page.txt','w'); fprintf(fid,'%s',p); fclose(fid);"
+  ],
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\runCM011TunnelCase.m": "f77fd390c78354ba3503e93217aeefb9bddc2745ef38d200b1e8b82cd94e622c",
+    "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "8874be277b90ac3605da72f958e5a0442c1854124e22eea13e13a0b6ff79a15b",
+    "E:\\RocketAeroHeat\\scripts\\cm011Tunnel.py": "5efeb7cf562e6af3fb63f3a227a58f3e74eed11af82d52c2a1e3addd95d9e439",
+    "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": "a16f96affe9bdb97f0f0c5a79ceb1320be14847a1f9de21e0d4adc5cf3194ab6",
+    "E:\\RocketAeroHeat\\runAeroHeatSingleCase.m": "814c44ee0427159a318d2c41bc92c1cfbecd5e620feb3ec9d69d9676bc6d7bb1",
+    "E:\\RocketAeroHeat\\runHybridSurfaceCase.m": "fc49801ad46d0aa8cb9566525d730dcaa37e4005226d0ca33716bf4540b83c06"
+  },
+  "maximumSeconds": 75,
+  "maximumRSSBytes": 4294967296,
+  "maximumOutputBytes": 25165824,
+  "supervisorProcessID": 15244,
+  "physicsQualified": false,
+  "nativeExitCode": null,
+  "processID": 10504,
+  "debuggerExitCode": 0,
+  "elapsedSeconds": 14.32799999999952,
+  "stopReason": null,
+  "supervisorError": null,
+  "peakFamilyRSSBytes": 799059968,
+  "peakOutputBytes": 300,
+  "observedProcessIDs": [
+    10504,
+    22128,
+    40220,
+    30240,
+    14960
+  ],
+  "survivingProcessIDs": [],
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\runCM011TunnelCase.m": true,
+    "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+    "E:\\RocketAeroHeat\\scripts\\cm011Tunnel.py": true,
+    "E:\\RocketAeroHeat\\scripts\\readCM011Tunnel.py": true,
+    "E:\\RocketAeroHeat\\runAeroHeatSingleCase.m": true,
+    "E:\\RocketAeroHeat\\runHybridSurfaceCase.m": true
+  }
+}

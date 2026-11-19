@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v271 CM-011 等温缩比试件的全表面计算](validation/v271/RESULTS.md) · [热流与压力图](validation/v271/evidence/wall_distribution.png) · [下一项](validation/v271/NEXT_DECISION.md)。低速细网 14,140 面均有压力与热流，远场热收支差额仍待解释。
 - [v270 Apollo AS-202 原量热测点与单工况适用范围](validation/v270/RESULTS.md) · [图读数据](validation/v270/evidence/station.json) · [下一项](validation/v270/NEXT_DECISION.md)。区分 CA1253R 飞行散点、相邻压力孔和给定壁温下的工程预测。
 - [v269 单工况同面覆盖与热功率](validation/v269/RESULTS.md) · [下一项区域交付](validation/v269/NEXT_DECISION.md)。常用入口、混合入口与三维结果侧栏共用原面统计，并核对部分、完整、零及负功率。
 - [v268 等温微球的全面积压力与热流](validation/v268/RESULTS.md) · [下一项交付](validation/v268/NEXT_DECISION.md)。2,608 个原面及双向穿流接口通过解析和独立数值核对，自绘算例新增 0 m²。

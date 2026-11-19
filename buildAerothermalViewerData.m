@@ -75,12 +75,30 @@ if isfield(mesh,'hybridWall')
     data.missingReason(isfinite(w.heatFluxWm2))={''};
     add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridMethod(w,'pressureMethod'),hybridScope);
     add('heatFlux','入壁热流','kW/m²',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope);
+    if ismember('pressureGaugePa',w.Properties.VariableNames)
+        delta=w.pressureGaugePa;
+        add('pressureGauge','相对环境壁压','Pa',delta,double(isfinite(delta)),hybridMethod(w,'pressureMethod'), ...
+            '同工况壁面绝对压力与环境参考压力之差');
+    end
+    if ismember('wallFluidTemperatureK',w.Properties.VariableNames)
+        fluidT=w.wallFluidTemperatureK;
+        add('wallFluidTemperature','壁节点流体温度','K',fluidT,double(isfinite(fluidT)), ...
+            hybridMethod(w,'wallFluidTemperatureMethod'),'求解器实际输出的壁节点流体温度');
+    end
     if ismember('nearWallCellTemperatureK',w.Properties.VariableNames)
         tCell=w.nearWallCellTemperatureK;
         add('nearWallCellTemperature','临壁流体单元温度','K',tCell,double(isfinite(tCell)), ...
             hybridMethod(w,'nearWallTemperatureMethod'),'与原面对应的首层流体单元温度');
     end
     add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({'输入壁温'},n,1),hybridScope);
+    % 混合结果使用适配器实际返回的算法，不沿用默认工程压力、热流的解释文字。
+    physical={'pressure','pressureGauge','heatFlux','wallFluidTemperature','nearWallCellTemperature'};
+    for k=find(ismember({data.fields.key},physical))
+        data.fields(k).stateNote=[data.fields(k).label '取自当前工况的逐面数值结果，算法见面元探针。'];
+        if isfield(mesh,'evidenceIdentity') && isfield(mesh.evidenceIdentity,'origin') && strcmp(mesh.evidenceIdentity.origin,'research')
+            data.fields(k).computedStateLabel='研究数值解';
+        end
+    end
 end
 if isfield(mesh,'boundaryLayerEdge')
     e=mesh.boundaryLayerEdge; methods=methodNames(e,n);
@@ -242,6 +260,9 @@ if isfield(mesh,'hybridWall')
         if norm(u)>0,data.flowDirection=u/norm(u);end
         data.caseNote=sprintf('混合求解 · 来流速度 %.6g m/s · 环境压力 %.8g Pa · 环境温度 %.6g K · 正热流入壁', ...
             norm(u),hc.ambientPressurePa,hc.ambientTemperatureK);
+    end
+    if isfield(hc,'caseLabel') && ischar(hc.caseLabel) && isrow(hc.caseLabel)
+        data.caseNote=[hc.caseLabel ' · ' data.caseNote];
     end
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';

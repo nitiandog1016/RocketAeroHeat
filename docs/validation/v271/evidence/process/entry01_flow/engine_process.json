@@ -1,0 +1,93 @@
+{
+  "status": "terminal",
+  "startedUTC": "2026-11-19T02:35:10.857363+00:00",
+  "request": {
+    "workDirectory": "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow",
+    "configFile": "case.cfg",
+    "meshFile": "mesh.su2",
+    "maximumSeconds": 180,
+    "threads": 1,
+    "sourceFiles": [
+      "scripts/cm011Tunnel.py",
+      "outputs/v271_validation/entry01/flow/body.json"
+    ]
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\engine_request.json": "16996ef2e6668a5f1d92a85cc51871df2eb81ec9d7c811fd66d5c37f95e2691c",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\case.cfg": "b97e03d9e985608c41e4bff73701b8c0d16ec5ba27460623a9b9c59a2c67f9a3",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\mesh.su2": "ec969869409419dbf74512185e27e1b17801bbddb712864965c0f03a338d188c",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": "ff33d39f42682a54424ad23118f4cfc4839a26f9a203ba9a50819a9adf19de53",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": "c8808eb2abb1ace016904fa72e21eb58e7f71b5f29715b6b1855b02178d77dbf",
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": "db71dd62f1f5db9166f9c4bbac7a76f4c7dded91d55ee211b6ec304d5d1030c3",
+    "E:\\RocketAeroHeat\\scripts\\cm011Tunnel.py": "5efeb7cf562e6af3fb63f3a227a58f3e74eed11af82d52c2a1e3addd95d9e439",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\body.json": "91b49becdedebef81d50c37ca3a92c899a8a956e02b86a2e89a3647115696784"
+  },
+  "executableVersion": "8.6.0",
+  "archiveSHA256": "4bc28b656def415b4d22c8274af2473dd719aa5ebfa6bc1c95c08b1bac26508c",
+  "supervisorProcessID": 33904,
+  "physicalSolutionQualified": false,
+  "runtimeFlavor": "official",
+  "processID": 37528,
+  "command": [
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\case.cfg",
+    "--threads",
+    "1"
+  ],
+  "elapsedSeconds": 16.26599999999962,
+  "progress": {
+    "Inner_Iter": 9999.0,
+    "HF": -0.350683531
+  },
+  "exitCode": 0,
+  "timedOut": false,
+  "cancelled": false,
+  "endedUTC": "2026-11-19T02:35:27.121179+00:00",
+  "inputsStable": {
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\engine_request.json": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\case.cfg": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\mesh.su2": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+    "E:\\RocketAeroHeat\\scripts\\runEmbeddedSU2.py": true,
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\runtime.json": true,
+    "E:\\RocketAeroHeat\\scripts\\su2ThermalRuntime.py": true,
+    "E:\\RocketAeroHeat\\scripts\\cm011Tunnel.py": true,
+    "E:\\RocketAeroHeat\\outputs\\v271_validation\\entry01\\flow\\body.json": true
+  },
+  "outputSHA256": {
+    "engine_stdout.log": "0f5d8184544ed624aba39c5728e0eebdd12732cb6f8d5a11d9ae78304538611d",
+    "history.csv": "61ff5c485758d05a7f6b9b4f5aabbd5a862c6f0e48b4479dc80f0df03f479236",
+    "initial.npz": "a8c1630aa3653843d9917cb0aa0714b5b2783fc703343a9a59ae59e649277760",
+    "restart.csv": "3d3feeedf03e1788b84e76529c9ee41fa27e568bcdfe185c77d2addbc1fbf676",
+    "restart_001500.csv": "c4634f858b2e2acbab24b14182b46cbffacb69db73cf8899296895a9ebfa4cb1",
+    "restart_003000.csv": "a5c5c5d6dea2357640aee27c3a145095b4702743cbe8968f9cef5ad38c7152a6",
+    "restart_004500.csv": "0f2706131e9cf75762f6e737e394a2bf5b690de9af2dd1dfad7dc3751b72b793",
+    "restart_006000.csv": "dc97bf60781db0513f796562dbf71bda91e758846f0217f3881d65a1516d0fba",
+    "restart_007500.csv": "fdab51a48d85460da909c6afafa69609bcc2ed913088050b83ccc3ee29769b8d",
+    "restart_009000.csv": "fce9d29cb7802bcf46aa5252a581805c0bc5754727a8c12fb4ad2cbf1eac74d9",
+    "restart_009999.csv": "3d3feeedf03e1788b84e76529c9ee41fa27e568bcdfe185c77d2addbc1fbf676",
+    "surface.vtk": "730cd8a72e867e56982adbd5240ca196959df196313a6e95bb2e91d7f73978f2",
+    "surface_000500.vtk": "2c7687b748cf90ce9c175b0d81e3a9111ee1607299a6a2b69640c13bc619d51a",
+    "surface_001000.vtk": "0488ec1e861e04cb1a4a2e0b5161703c9f867d2b0b7b1a690bfab710c719af03",
+    "surface_001500.vtk": "d5eb1154a6ed16ccc952dc7acdead5808dbfee48e2423ef6abd7cdb92bef85f7",
+    "surface_002000.vtk": "65627cfbecc7fed6d90883512b4d9f094101f5642805af3ce6e9144e5fbe8347",
+    "surface_002500.vtk": "b6469e89773f5f54e09a3aef2badd2049f9b2aa13782654a2f2948e5603c2c41",
+    "surface_003000.vtk": "5f241dc1e687cd33f908241d0fc37a70ef1edbb672dd7c8ed49c4f054606b506",
+    "surface_003500.vtk": "2d465fdea13974a29493cca66adb965681daa28ee02e3fa11714e52aa476ea26",
+    "surface_004000.vtk": "002ad699f339c8fbdffe5c43d3461b1d73657d897ed90691a654cb6712d1db55",
+    "surface_004500.vtk": "fcaf7fd389539bd00dcc919d59b7e349aff869f21d2f4bab04d41341fd7659e1",
+    "surface_005000.vtk": "1c3c1e00cfb60e0340b6b923f9bd6278800f9afc36a899dade268238beb197c9",
+    "surface_005500.vtk": "ec3c9795fc19dc7d378d4af79916b6004dc8c0de61e60a4ee8ddac2c08d6c225",
+    "surface_006000.vtk": "a679fbc4792768c514255b7df25c935d8e9646fdae497764a094d42094551b2a",
+    "surface_006500.vtk": "c81a583c80f81e0f565d5c52795bda7582b2204504525ac67cb11ce876096bbc",
+    "surface_007000.vtk": "c243ce4cc868201d8259b83e5b7677dc9366f8b34461b862b790ac1618c319b3",
+    "surface_007500.vtk": "6fdfba823c935324cde547d2ddf3d3f548305ee0a54ec726073000b17e4e9ffc",
+    "surface_008000.vtk": "7b1511e451981638fca0d2f6f9b852b334e5e749b3f859ebf3e030d2b43f9fae",
+    "surface_008500.vtk": "f4cd28e20990e2aa78320b6fcb4d55a7b4aa61e4c9d87955434a7aadbdd7eb74",
+    "surface_009000.vtk": "52fcfa7b4d291d29c9368a0cd78d6f36abb7fb3e0cfb915cdd953767d5bc8bb2",
+    "surface_009500.vtk": "1b7282fbc2999875c45471fe099b7d8c0a5064c7a673deb5122ff34ea13afb67",
+    "surface_009999.vtk": "730cd8a72e867e56982adbd5240ca196959df196313a6e95bb2e91d7f73978f2",
+    "vol_solution.vtk": "43290f8ab44b2e028cb9da07ab9406ad2f0540d852a4b69b0243a4208662354d"
+  }
+}
