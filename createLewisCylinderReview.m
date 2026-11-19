@@ -24,9 +24,52 @@ try
         '实测图读 Nu','带平均预测 Nu','相对差 / %','表 III 回归 Nu'},'RowName',[]);
     uilabel(grid,'WordWrap','on','Text',sprintf(['六站相对 RMS %.2f%%。图读范围反映扫描和定位。' ...
         '原报告给出全部数据平均误差 5.7%%、最大 7.8%%。绝对热流与壁压未知。'],100*report.stationRmsRelative));
+    % 单独的给定工况接受用户热边界，实测试验及其原始读数继续保存在相邻页。
+    caseTab=uitab(tabs,'Title','给定边界工况');
+    panel=uigridlayout(caseTab,[3 1]);panel.RowHeight={40,40,'1x'};
+    bar=uigridlayout(panel,[1 7]);bar.Padding=[0 0 0 0];bar.ColumnWidth={'fit','1x','fit','1x','fit','1x',110};
+    labels={'上游静压 / Pa','来流静温 / K','圆柱壁温 / K'};defaults=[101325 293.15 303.15];
+    inputs=gobjects(1,3);
+    for j=1:3
+        uilabel(bar,'Text',labels{j});
+        inputs(j)=uieditfield(bar,'numeric','Value',defaults(j),'Limits',[eps inf], ...
+            'ValueChangedFcn',@invalidate);
+    end
+    calculate=uibutton(bar,'Text','计算工况','ButtonPushedFcn',@calculateCase);
+    feedback=uigridlayout(panel,[1 2]);feedback.Padding=[0 0 0 0];feedback.ColumnWidth={'1x',146};
+    status=uilabel(feedback,'Text','输入研究工况的绝对压力和温度后计算。','WordWrap','on');
+    trialButton=uibutton(feedback,'Text','载入未收敛三维试算','Enable','off','ButtonPushedFcn',@showTrial);
+    host=uipanel(panel,'BorderType','none');
     tabs.SelectedTab=tab;
-    view=struct('tabs',tabs,'comparisonTab',tab,'surface',surface,'stations',stations,'report',report);
+    view=struct('tabs',tabs,'comparisonTab',tab,'surface',surface,'stations',stations,'report',report, ...
+        'caseTab',caseTab,'inputs',inputs,'calculate',calculate,'trialButton',trialButton,'caseHost',host,'caseStatus',status);
 catch ex
     delete(tabs);rethrow(ex);
 end
+    function invalidate(~,~)
+        delete(host.Children);host.UserData=[];trialButton.Enable='off';status.Text='边界已改变，请重新计算。';
+    end
+    function calculateCase(~,~)
+        invalidate([],[]);
+        try
+            [result,~,summary]=runLewisCylinderCondition(inputs(1).Value,inputs(2).Value,inputs(3).Value);
+            inner=uitabgroup(host,'Units','normalized','Position',[0 0 1 1]);
+            web=createAerothermalWebTab(inner,result);
+            host.UserData=struct('web',web,'report',summary,'mesh',result);
+            if isequal([inputs.Value],defaults),trialButton.Enable='on';end
+            status.Text=summary.wallCoverage.coverageMessage;
+        catch ex
+            delete(host.Children);host.UserData=[];status.Text=ex.message;
+        end
+    end
+    function showTrial(~,~)
+        try
+            active=host.UserData;meshWithTrial=attachLewisTunnelTrial(active.mesh);
+            updateAerothermalWebTab(active.web,meshWithTrial);
+            trialButton.Enable='off';
+            status.Text='变量列表已加入「未收敛试算」壁压和热流。工程覆盖及部分功率仍按原工程场计。';
+        catch ex
+            status.Text=ex.message;
+        end
+    end
 end

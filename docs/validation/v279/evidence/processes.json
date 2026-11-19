@@ -1,0 +1,433 @@
+{
+  "condition01": {
+    "status": "terminal",
+    "command": [
+      "D:/matlab/bin/matlab.exe",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat'); c=lewisCylinderCondition(101325,293.15,303.15); fid=fopen('E:/RocketAeroHeat/outputs/v279_validation/condition01/condition.json','w');fprintf(fid,'%s',jsonencode(c));fclose(fid);"
+    ],
+    "inputSHA256": {
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "0c08b0a62dd25946e1abc8ece6f3af7e177a2a20e904871515ca68a3bc37fb43",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\PLAN.md": "69e8de0aee903a3308d1259eea94c7e5bf0e9d2645c4dc3e914462f63888bf50"
+    },
+    "maximumSeconds": 60,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 1048576,
+    "supervisorProcessID": 41224,
+    "physicsQualified": false,
+    "nativeExitCode": null,
+    "processID": 43496,
+    "debuggerExitCode": 0,
+    "elapsedSeconds": 13.375,
+    "stopReason": null,
+    "supervisorError": null,
+    "peakFamilyRSSBytes": 587132928,
+    "peakOutputBytes": 412,
+    "observedProcessIDs": [
+      43496,
+      43944,
+      44224
+    ],
+    "survivingProcessIDs": [],
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\PLAN.md": true
+    }
+  },
+  "matlab01": {
+    "status": "terminal",
+    "command": [
+      "D:/matlab/bin/matlab.exe",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat');addpath('docs/validation/v279');check_workflow('E:/RocketAeroHeat/outputs/v279_validation/gui01');"
+    ],
+    "inputSHA256": {
+      "E:\\RocketAeroHeat\\runLewisCylinderCondition.m": "09a772ccb910285678555c12649b169cd605fc8292ffdd1efbedac58dccb6428",
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "0c08b0a62dd25946e1abc8ece6f3af7e177a2a20e904871515ca68a3bc37fb43",
+      "E:\\RocketAeroHeat\\createLewisCylinderReview.m": "3673e30aaed953f323bcf2a6b46fcc4403c4521579dd2f94a334b4e4111d069e",
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "9705be9f65fb7fafbb5e41c5fbab95362055c250cd26c2ed863bf12a50bdeabf",
+      "E:\\RocketAeroHeat\\runLewisCylinderBenchmark.m": "d5e8e87529d8fdaf41dcaf343d637b45c5e0b3d5c0c3f6b189f15e03626129ab",
+      "E:\\RocketAeroHeat\\calcLewisCylinderNu.m": "659cdd5189c54170d9091e6e2648af61d1752e9adc3cbaaaab1bfd3c32946cb1",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\check_workflow.m": "1cfef0759fc1a8d2a285f3d46c5e3c0a278eae75d18293b5fa6ded0082dd8e2c",
+      "E:\\RocketAeroHeat\\rocketAeroHeatWorkbench.m": "8cf45428cc036e424e1a35f4409919d07b439c52a33383ee5bd1e74a8009a0c5"
+    },
+    "maximumSeconds": 120,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 16777216,
+    "supervisorProcessID": 42584,
+    "physicsQualified": false,
+    "nativeExitCode": null,
+    "processID": 39120,
+    "debuggerExitCode": 0,
+    "elapsedSeconds": 24.781000000002678,
+    "stopReason": null,
+    "supervisorError": null,
+    "peakFamilyRSSBytes": 2198274048,
+    "peakOutputBytes": 561,
+    "observedProcessIDs": [
+      39120,
+      26672,
+      44720,
+      45844,
+      47572,
+      42816,
+      31420,
+      44900,
+      45084
+    ],
+    "survivingProcessIDs": [],
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\runLewisCylinderCondition.m": true,
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": true,
+      "E:\\RocketAeroHeat\\createLewisCylinderReview.m": true,
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+      "E:\\RocketAeroHeat\\runLewisCylinderBenchmark.m": true,
+      "E:\\RocketAeroHeat\\calcLewisCylinderNu.m": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\check_workflow.m": true,
+      "E:\\RocketAeroHeat\\rocketAeroHeatWorkbench.m": true
+    }
+  },
+  "matlab02": {
+    "status": "terminal",
+    "command": [
+      "D:/matlab/bin/matlab.exe",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat');addpath('docs/validation/v279');check_workflow('E:/RocketAeroHeat/outputs/v279_validation/gui02');"
+    ],
+    "inputSHA256": {
+      "E:\\RocketAeroHeat\\runLewisCylinderCondition.m": "09a772ccb910285678555c12649b169cd605fc8292ffdd1efbedac58dccb6428",
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "0c08b0a62dd25946e1abc8ece6f3af7e177a2a20e904871515ca68a3bc37fb43",
+      "E:\\RocketAeroHeat\\attachLewisTunnelTrial.m": "705f14bd7662340ff2306116a1f9ba13164fd7569f7c5581bee66c0213ff7adf",
+      "E:\\RocketAeroHeat\\createLewisCylinderReview.m": "54739a724bc5897c97b6d9712b114edc6d3a7286fdfe5a9c145550ac4049fc89",
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "c8404d195b0a0089d9602c0b77005e53911f557763cb797308ec93b2ff02864b",
+      "E:\\RocketAeroHeat\\runLewisCylinderBenchmark.m": "d5e8e87529d8fdaf41dcaf343d637b45c5e0b3d5c0c3f6b189f15e03626129ab",
+      "E:\\RocketAeroHeat\\calcLewisCylinderNu.m": "659cdd5189c54170d9091e6e2648af61d1752e9adc3cbaaaab1bfd3c32946cb1",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\check_workflow.m": "8a973acb124a8647d10339bc15d01a0ff3045c85366779f06c722fba73feeee4",
+      "E:\\RocketAeroHeat\\rocketAeroHeatWorkbench.m": "8cf45428cc036e424e1a35f4409919d07b439c52a33383ee5bd1e74a8009a0c5",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\evidence\\trial.json": "4f8d10e6fb6b7f94f799ebe6713394779a9c84f592e601b5cafc8e5d5bd19a00",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\evidence\\trial_faces.csv": "93edee17728edb5f7e7e887c67647d56b67f913d2e5f0aa08989d864541552a9"
+    },
+    "maximumSeconds": 120,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 16777216,
+    "supervisorProcessID": 37756,
+    "physicsQualified": false,
+    "nativeExitCode": null,
+    "processID": 41724,
+    "debuggerExitCode": 0,
+    "elapsedSeconds": 25.610000000000582,
+    "stopReason": null,
+    "supervisorError": null,
+    "peakFamilyRSSBytes": 2185293824,
+    "peakOutputBytes": 561,
+    "observedProcessIDs": [
+      41724,
+      46252,
+      43568,
+      48040,
+      37644,
+      43756,
+      17340,
+      43476,
+      37632
+    ],
+    "survivingProcessIDs": [],
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\runLewisCylinderCondition.m": true,
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": true,
+      "E:\\RocketAeroHeat\\attachLewisTunnelTrial.m": true,
+      "E:\\RocketAeroHeat\\createLewisCylinderReview.m": true,
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+      "E:\\RocketAeroHeat\\runLewisCylinderBenchmark.m": true,
+      "E:\\RocketAeroHeat\\calcLewisCylinderNu.m": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\check_workflow.m": true,
+      "E:\\RocketAeroHeat\\rocketAeroHeatWorkbench.m": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\evidence\\trial.json": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\evidence\\trial_faces.csv": true
+    }
+  },
+  "matlab03": {
+    "status": "terminal",
+    "command": [
+      "D:/matlab/bin/matlab.exe",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat');addpath('docs/validation/v279');check_workflow('E:/RocketAeroHeat/outputs/v279_validation/gui03');"
+    ],
+    "inputSHA256": {
+      "E:\\RocketAeroHeat\\runLewisCylinderCondition.m": "09a772ccb910285678555c12649b169cd605fc8292ffdd1efbedac58dccb6428",
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "afb8d7c8f052bbf3a8035b51f3fc55f322b8de3df3bc7336413fe14e7ea8a045",
+      "E:\\RocketAeroHeat\\attachLewisTunnelTrial.m": "705f14bd7662340ff2306116a1f9ba13164fd7569f7c5581bee66c0213ff7adf",
+      "E:\\RocketAeroHeat\\createLewisCylinderReview.m": "54739a724bc5897c97b6d9712b114edc6d3a7286fdfe5a9c145550ac4049fc89",
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": "c8404d195b0a0089d9602c0b77005e53911f557763cb797308ec93b2ff02864b",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\check_workflow.m": "63a523265971f3a438ae6698a6b37c0a7ad3d88e862bdce2cc74d47975876c69",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\evidence\\trial.json": "4f8d10e6fb6b7f94f799ebe6713394779a9c84f592e601b5cafc8e5d5bd19a00",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\evidence\\trial_faces.csv": "93edee17728edb5f7e7e887c67647d56b67f913d2e5f0aa08989d864541552a9",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\PLAN.md": "4c572fb6eb537280c31b6f979d6615937445b531a34db45871b3e85d0b5e9cfa"
+    },
+    "maximumSeconds": 120,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 16777216,
+    "supervisorProcessID": 42720,
+    "physicsQualified": false,
+    "nativeExitCode": null,
+    "processID": 40040,
+    "debuggerExitCode": 0,
+    "elapsedSeconds": 25.360000000000582,
+    "stopReason": null,
+    "supervisorError": null,
+    "peakFamilyRSSBytes": 2147717120,
+    "peakOutputBytes": 561,
+    "observedProcessIDs": [
+      40040,
+      17416,
+      43896,
+      35660,
+      44588,
+      24916,
+      42616,
+      39236,
+      43808
+    ],
+    "survivingProcessIDs": [],
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\runLewisCylinderCondition.m": true,
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": true,
+      "E:\\RocketAeroHeat\\attachLewisTunnelTrial.m": true,
+      "E:\\RocketAeroHeat\\createLewisCylinderReview.m": true,
+      "E:\\RocketAeroHeat\\buildAerothermalViewerData.m": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\check_workflow.m": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\evidence\\trial.json": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\evidence\\trial_faces.csv": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\PLAN.md": true
+    }
+  },
+  "flow01": {
+    "terminal": {
+      "exitCode": 1,
+      "stopReason": null,
+      "elapsedSeconds": 1.4540000000015425,
+      "peakSampledRssBytes": 391872512,
+      "peakSampledFolderBytes": 22060167,
+      "pid": 42200,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "2"
+      ],
+      "inputsStable": true,
+      "outputs": {
+        "history_00001.csv": "2eff205cffa8094adad58eb65d54e06f4f921776b0ff287c6b4615c924503024",
+        "inputs.json": "7ad91c365ba6c550635c66efe02c2dcabe7442c754e88a55cbab80b6e85a2212",
+        "mesh.json": "5757d461c8fce7b1c3f7f9120a4f7b953d47b88ebeafe972c419193edca8c2d7",
+        "native.log": "7291c4dd98c8b44e6dde894f2696b028c37bef190ed7cf01490e2fd4d7ade56d",
+        "started.json": "0c28167140e466b033d1f78c54edd27ef72d6658c53713500ac529a2ad427483"
+      }
+    },
+    "started": {
+      "pid": 42200,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "2"
+      ],
+      "inputsSHA256": "7ad91c365ba6c550635c66efe02c2dcabe7442c754e88a55cbab80b6e85a2212"
+    },
+    "inputs": {
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\tunnel_step.py": "f31a61d96e9fbf8d04023101191aee5f117e8738c1ef465ac5cbecb014da4507",
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "0c08b0a62dd25946e1abc8ece6f3af7e177a2a20e904871515ca68a3bc37fb43",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow01\\condition.json": "0075585329d18c4858ff4001c6ce8213f4953f6e4267d5294315d89a39ed23a1",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow01\\wall.npz": "be437ec9282008333306e1c4120c8e7d4d3c83a6a2bd88fb8b57d9ecdfb57f4f",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow01\\case.cfg": "45bbfa9433ab0e97d231fc91e94ed7253198334efa3300dd3da5fffd343f4131",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow01\\mesh.su2": "184916ab136a092c00600384ac5a1c652fde12d5835938168e2acafa1501b2e8",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow01\\seed_000000.csv": "a04c1cb2b90fd472982a91fe367a23e9313dfb3bf44efed9031e8f1c10ad8a87"
+    },
+    "terminalDirectoryBytes": 22061326
+  },
+  "flow02": {
+    "terminal": {
+      "exitCode": 0,
+      "stopReason": null,
+      "elapsedSeconds": 36.04699999999866,
+      "peakSampledRssBytes": 710991872,
+      "peakSampledFolderBytes": 22095181,
+      "pid": 39796,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "2"
+      ],
+      "inputsStable": true,
+      "outputs": {
+        "cylinder_surface_00001.vtk": "5d2af6725b93f6ca801312e3cc6291c114efc2572ed47076a0bd850ec058a92f",
+        "history_00001.csv": "68af11f795f434e27ea137736c779f9b8a6441552de54876d47f10923aa56c2e",
+        "inputs.json": "beca9c805901348f52242c9c450e1587eb6b50b31b97d81ad9412bd371fe814a",
+        "mesh.json": "5757d461c8fce7b1c3f7f9120a4f7b953d47b88ebeafe972c419193edca8c2d7",
+        "native.log": "86624a469e5764f2b971d69c8794fef1c8efe9ddaaaf985a513f84756d716484",
+        "restart_00001.csv": "823ccdd26cf27d400260d88438f01c4da687672299d10e9eafd31c6a5e1ddbfd",
+        "started.json": "8434428bec7bcbb51c36c842b196f978d008b8f5e586126c4867df79e6ff8400"
+      }
+    },
+    "started": {
+      "pid": 39796,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "2"
+      ],
+      "inputsSHA256": "beca9c805901348f52242c9c450e1587eb6b50b31b97d81ad9412bd371fe814a"
+    },
+    "inputs": {
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\tunnel_step.py": "afde6829b389c4988f0c1e2009f4a5e8738c429fe036292dfca41d368b2cb052",
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "0c08b0a62dd25946e1abc8ece6f3af7e177a2a20e904871515ca68a3bc37fb43",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow02\\condition.json": "0075585329d18c4858ff4001c6ce8213f4953f6e4267d5294315d89a39ed23a1",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow02\\wall.npz": "be437ec9282008333306e1c4120c8e7d4d3c83a6a2bd88fb8b57d9ecdfb57f4f",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow02\\case.cfg": "45bbfa9433ab0e97d231fc91e94ed7253198334efa3300dd3da5fffd343f4131",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow02\\mesh.su2": "184916ab136a092c00600384ac5a1c652fde12d5835938168e2acafa1501b2e8",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow02\\seed_00000.csv": "a04c1cb2b90fd472982a91fe367a23e9313dfb3bf44efed9031e8f1c10ad8a87"
+    },
+    "terminalDirectoryBytes": 43671702
+  },
+  "flow03": {
+    "terminal": {
+      "exitCode": 0,
+      "stopReason": null,
+      "elapsedSeconds": 36.48400000000038,
+      "peakSampledRssBytes": 711254016,
+      "peakSampledFolderBytes": 22536709,
+      "pid": 41560,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "2"
+      ],
+      "inputsStable": true,
+      "outputs": {
+        "cylinder_surface_00001.vtk": "5d2af6725b93f6ca801312e3cc6291c114efc2572ed47076a0bd850ec058a92f",
+        "history_00001.csv": "68af11f795f434e27ea137736c779f9b8a6441552de54876d47f10923aa56c2e",
+        "inputs.json": "c0b15bae70c21d809c96623d23f02ca6027754e52ec8505e0620255dcec4ac07",
+        "mesh.json": "5757d461c8fce7b1c3f7f9120a4f7b953d47b88ebeafe972c419193edca8c2d7",
+        "native.log": "248737a71b9ef5c123145d7b6dde051bf7cf24d75ea3fff8e9f9f5d31d5bf5f1",
+        "restart_00001.csv": "823ccdd26cf27d400260d88438f01c4da687672299d10e9eafd31c6a5e1ddbfd",
+        "started.json": "52da7155b60c0627475089fdb77bb0e9b47d0999ea1fcda175de1670c8ce726d"
+      }
+    },
+    "started": {
+      "pid": 41560,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "2"
+      ],
+      "inputsSHA256": "c0b15bae70c21d809c96623d23f02ca6027754e52ec8505e0620255dcec4ac07"
+    },
+    "inputs": {
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\tunnel_step.py": "1d6e7306a6a2bd0a63d094970af73288748a42812efac76e7b142fb1d3efc0b7",
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "0c08b0a62dd25946e1abc8ece6f3af7e177a2a20e904871515ca68a3bc37fb43",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow03\\condition.json": "0075585329d18c4858ff4001c6ce8213f4953f6e4267d5294315d89a39ed23a1",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow03\\wall.npz": "be437ec9282008333306e1c4120c8e7d4d3c83a6a2bd88fb8b57d9ecdfb57f4f",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow03\\case.cfg": "fd14ec7daf8bd4bf1a25c533afe5db310c7c997e2645a3f5053ca6b65b0bcfab",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow03\\mesh.su2": "184916ab136a092c00600384ac5a1c652fde12d5835938168e2acafa1501b2e8",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow03\\seed_00000.csv": "a04c1cb2b90fd472982a91fe367a23e9313dfb3bf44efed9031e8f1c10ad8a87"
+    },
+    "terminalDirectoryBytes": 43671856
+  },
+  "flow04": {
+    "terminal": {
+      "exitCode": 0,
+      "stopReason": null,
+      "elapsedSeconds": 36.82800000000134,
+      "peakSampledRssBytes": 700334080,
+      "peakSampledFolderBytes": 22095206,
+      "pid": 47940,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "2"
+      ],
+      "inputsStable": true,
+      "outputs": {
+        "cylinder_surface_00001.vtk": "5d2af6725b93f6ca801312e3cc6291c114efc2572ed47076a0bd850ec058a92f",
+        "history_00001.csv": "68af11f795f434e27ea137736c779f9b8a6441552de54876d47f10923aa56c2e",
+        "inputs.json": "4398894cdef2cfcbd060d1090b1dcdd0cf3742bc64a11ddb82cb91279e5ed551",
+        "mesh.json": "5757d461c8fce7b1c3f7f9120a4f7b953d47b88ebeafe972c419193edca8c2d7",
+        "native.log": "86624a469e5764f2b971d69c8794fef1c8efe9ddaaaf985a513f84756d716484",
+        "restart_00001.csv": "e82a11eb32bea878e957f56f152e3f3da95901e355b489fd59a02ab5016f3dbb",
+        "started.json": "927c65f09e4db0e3538b8843ef38c3086c9e1af1e0c31754f6db68e662711a50"
+      }
+    },
+    "started": {
+      "pid": 47940,
+      "command": [
+        "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+        "case.cfg",
+        "--threads",
+        "2"
+      ],
+      "inputsSHA256": "4398894cdef2cfcbd060d1090b1dcdd0cf3742bc64a11ddb82cb91279e5ed551"
+    },
+    "inputs": {
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+      "E:\\RocketAeroHeat\\docs\\validation\\v279\\tunnel_step.py": "8b0eff802bfe0c70f97fd9b062a7eeb55cb6091ecd1f8690037398f20ef94e35",
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "0c08b0a62dd25946e1abc8ece6f3af7e177a2a20e904871515ca68a3bc37fb43",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow04\\condition.json": "0075585329d18c4858ff4001c6ce8213f4953f6e4267d5294315d89a39ed23a1",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow04\\wall.npz": "be437ec9282008333306e1c4120c8e7d4d3c83a6a2bd88fb8b57d9ecdfb57f4f",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow04\\case.cfg": "c7e64760ce036ea8717b0092a479f99149b518197f47e0b2477d878390bbdd38",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow04\\mesh.su2": "184916ab136a092c00600384ac5a1c652fde12d5835938168e2acafa1501b2e8",
+      "E:\\RocketAeroHeat\\outputs\\v279_validation\\flow04\\seed_00000.csv": "a04c1cb2b90fd472982a91fe367a23e9313dfb3bf44efed9031e8f1c10ad8a87"
+    },
+    "terminalDirectoryBytes": 52167226
+  },
+  "typecheck": {
+    "status": "terminal",
+    "command": [
+      "D:/matlab/bin/matlab.exe",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat');a=lewisCylinderCondition(101325,293,303);b=lewisCylinderCondition(uint32(101325),int16(293),single(303));assert(isequaln(a,b));[~,~,s]=runLewisCylinderCondition(101325,293.15,303.15);assert(abs(s.wallCoverage.calculatedHeatPowerW+5.88454436501883)<1e-12);"
+    ],
+    "inputSHA256": {
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": "66be619fcebe79a5a8e72ccd8ad0a1191e16d2f6b9cb3c51c16f489760b4b7c9"
+    },
+    "maximumSeconds": 60,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 1048576,
+    "supervisorProcessID": 44348,
+    "physicsQualified": false,
+    "nativeExitCode": null,
+    "processID": 39100,
+    "debuggerExitCode": 0,
+    "elapsedSeconds": 14.937999999998283,
+    "stopReason": null,
+    "supervisorError": null,
+    "peakFamilyRSSBytes": 748404736,
+    "peakOutputBytes": 0,
+    "observedProcessIDs": [
+      39100,
+      31832,
+      42276
+    ],
+    "survivingProcessIDs": [],
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\lewisCylinderCondition.m": true
+    }
+  }
+}

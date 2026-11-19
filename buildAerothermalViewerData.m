@@ -259,15 +259,44 @@ if isfield(mesh,'lewisCylinder')
     add('nusselt','局部努塞尔数 Nu_D','1',nu,double(isfinite(nu)), ...
         repmat({'Frössling 圆柱空气四次式，周向面带平均'},n,1),scope,{},reasons);
     data.fields(end).computedStateLabel='工程预测（研究对照）';
-    missing={'pressure','绝对壁压','kPa','本工况没有可用的绝对壁压解'; ...
+    if isfield(mesh,'lewisCondition')
+        c=mesh.lewisCondition;w=mesh.lewisWall;
+        pressureMethod=repmat({'Hiemenz 圆柱前部外缘速度，Bernoulli 静压，按周向面带平均'},n,1);
+        pressureScope='中央附着区；Hiemenz 外缘取自不同雷诺数的试验，壁压尚无同工况独立验证。';
+        add('pressure','绝对壁压','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),pressureMethod,pressureScope,{},reasons);
+        add('pressureGauge','相对上游壁压','Pa',w.gaugePa,double(isfinite(w.gaugePa)),pressureMethod,pressureScope,{},reasons);
+        add('heatFlux','入壁热流','kW/m²',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)), ...
+            repmat({'Frössling 带平均 Nu × k/D × (Tad − Tw)'},n,1),scope,{},reasons);
+        add('wallInput','给定壁温','K',repmat(c.wallTemperatureK,n,1),2*ones(n,1), ...
+            repmat({'研究工况输入 · 等温圆柱'},n,1),'设定值覆盖完整圆柱侧壁');
+        % Tad 是试验换热系数统一采用的温度基准，不充当背面回流的局部恢复温度。
+        add('heatReferenceTemperature','换热定义所用绝热壁温','K',repmat(c.adiabaticWallK,n,1),ones(n,1), ...
+            repmat({'NASA TM-83557 式 (9)–(10)，来流总静温差与空气恢复因子'},n,1), ...
+            '整组换热系数共用的定义基准；背面局部恢复温度未知');
+        data.missingReason=reasons;data.missingReason(isfinite(w.heatFluxWm2))={''};
+        if isfield(mesh,'lewisTrial')
+            % 试算使用独立字段，绝不写入下方按 pressure / heatFlux 统计的覆盖和整壁功率。
+            trial=mesh.lewisTrial;
+            scopeTrial=sprintf('首个物理步 Δt=%.6g s，120 次内迭代，九分量残差未通过；未作脱涡统计。源帧 %s', ...
+                trial.physicalDtS,trial.sourceFrameSHA256);
+            add('trialPressure','未收敛试算 · 壁压','kPa',trial.pressurePa/1000,ones(n,1), ...
+                repmat({'SU2 INC_RANS + SST + LM；上游中心点定压，原面带积分'},n,1),scopeTrial);
+            data.fields(end).computedStateLabel='未收敛试算';
+            add('trialHeatFlux','未收敛试算 · 入壁热流','kW/m²',trial.heatFluxWm2/1000,ones(n,1), ...
+                repmat({'保存态等温圆柱法向 Fourier 通量；圆柱标记单独重建，原面带积分'},n,1),scopeTrial);
+            data.fields(end).computedStateLabel='未收敛试算';
+        end
+    else
+        missing={'pressure','绝对壁压','kPa','本工况没有可用的绝对壁压解'; ...
              'heatFlux','入壁热流','kW/m²','缺少该次试验的导热系数与壁面至绝热壁温差'; ...
              'wallInput','输入壁温','K','原文说明恒温控制，图9没有给出该次设定温度'};
-    for j=1:size(missing,1)
-        reason=missing{j,4};
-        add(missing{j,1},missing{j,2},missing{j,3},nan(n,1),zeros(n,1), ...
-            repmat({reason},n,1),reason,{},repmat({reason},n,1));
+        for j=1:size(missing,1)
+            reason=missing{j,4};
+            add(missing{j,1},missing{j,2},missing{j,3},nan(n,1),zeros(n,1), ...
+                repmat({reason},n,1),reason,{},repmat({reason},n,1));
+        end
+        data.missingReason=repmat(missing(2,4),n,1);
     end
-    data.missingReason=repmat(missing(2,4),n,1);
 end
 % 模块三：显式区分输入壁温与壁温解；单一外流/热流工况本身不确定壁温。
 % 尚无材料热响应解时仍允许探针查看“未求解”，不能以输入壁温补齐。
@@ -353,6 +382,17 @@ if isfield(mesh,'lewisCylinder')
     data.caseNote='NASA Lewis 光滑圆柱 · Re_D = 177000 · 低湍流空气 · 直径 66 mm';
     data.resultCondition.caption=data.caseNote;
     data.resultCondition.physics=rmfield(mesh.lewisCylinder,'nusselt');
+    if isfield(mesh,'lewisCondition')
+        c=mesh.lewisCondition;data.defaultField='heatFlux';
+        data.caseNote=sprintf('给定边界的 66 mm 圆柱 · Re_D = 177000 · 来流 %.5g m/s · 上游 %.7g Pa、%.6g K · 给定壁温 %.6g K', ...
+            c.velocityMps,c.referencePressurePa,c.airTemperatureK,c.wallTemperatureK);
+        data.resultCondition.physics=c;data.resultCondition.caption=data.caseNote;
+        data.resultCondition.freestreamPressurePa=c.referencePressurePa;
+        data.resultCondition.freestreamTemperatureK=c.airTemperatureK;
+        data.resultCondition.wallInputType='uniform';data.resultCondition.wallUniformValueK=c.wallTemperatureK;
+        data.resultCondition.wallMinK=c.wallTemperatureK;data.resultCondition.wallMaxK=c.wallTemperatureK;
+        data.resultCondition.wallKnownFaces=n;data.resultCondition.wallUnknownFaces=0;
+    end
 end
 % 静态三角面快照按当前两列场重新统计。旧存档可直接导出，历史帧单独显示。
 if isempty(histories)
