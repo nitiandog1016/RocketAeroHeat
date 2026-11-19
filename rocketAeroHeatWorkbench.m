@@ -296,6 +296,10 @@ renderEditor();sync();showGeometry(true);
                         p=state.mesh.cm011Prepared;
                         description=sprintf('%d 个导入面 · %d 个体单元\n最大节点匹配偏差 %.3g m', ...
                             size(state.mesh.F,1),p.cells,p.maxVertexDistanceM);
+                        if isfield(p,'maxFacetSampleDistanceM')
+                            description=sprintf('%d 个导入面 · %d 个体单元\n面片抽样偏差 %.3g µm · 顶点至求解壁面最大距离 %.3g µm', ...
+                                size(state.mesh.F,1),p.cells,1e6*p.maxFacetSampleDistanceM,1e6*p.maxVertexToSolverWallM);
+                        end
                     end
                     controls.volumeSummary=tip(grid,3,description);
                     sync();return;

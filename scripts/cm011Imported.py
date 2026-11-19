@@ -10,6 +10,7 @@ from scipy.io import loadmat
 from scipy.spatial import cKDTree
 
 from cm011Inclined import prepare
+from cm011SurfaceProjection import register_surface
 from cm011Tunnel import D, ROOT, meridian, surface, write_json
 from runEmbeddedSU2 import sha
 
@@ -24,21 +25,25 @@ def oriented_keys(faces):
 
 
 def match_surface(vertices,faces):
+    vertices=np.ascontiguousarray(vertices,dtype=float)
+    if (vertices.ndim!=2 or vertices.shape[1]!=3 or len(vertices)<4 or not np.isfinite(vertices).all() or
+            faces.ndim!=2 or faces.shape[1]!=3 or len(faces)<4 or not np.isfinite(faces).all() or
+            not np.array_equal(faces,np.floor(faces)) or faces.min()<1 or faces.max()>len(vertices)):
+        raise ValueError("导入表面的节点或三角面无效")
     line,bands = meridian(2)
     ref = surface(line,bands,2)
     expected = np.array(ref["V"])
     ref_faces = np.array(ref["F"])-1
-    if (vertices.shape!=expected.shape or faces.shape!=ref_faces.shape or not np.isfinite(vertices).all() or
-            not np.array_equal(faces,faces.astype(int)) or faces.min()<1 or faces.max()>len(vertices)):
-        raise ValueError("导入表面的节点或三角面与 CM-011 缩比试件不匹配")
+    if vertices.shape!=expected.shape or faces.shape!=ref_faces.shape:
+        return register_surface(vertices,faces,TOL_M)
     idx = faces.astype(int)-1
     dist,vertex_id = cKDTree(expected).query(vertices)
     if max(dist)>TOL_M or len(np.unique(vertex_id))!=len(expected):
-        raise ValueError("CM-011 节点匹配失败，请核对尺度、朝向和局部几何")
+        return register_surface(vertices,faces,TOL_M)
     lookup = {tuple(key):i for i,key in enumerate(oriented_keys(ref_faces))}
     face_id = np.array([lookup.get(tuple(key),-1) for key in oriented_keys(vertex_id[idx])])
     if np.any(face_id<0) or len(np.unique(face_id))!=len(ref_faces):
-        raise ValueError("导入面与参考三角面无法同向一一对应")
+        return register_surface(vertices,faces,TOL_M)
     rows = np.array(ref["nodeRow"])[vertex_id]
     radii = np.hypot(vertices[:,1],vertices[:,2])
     order = np.argsort(vertex_id)
@@ -80,7 +85,7 @@ def instantiate(template,folder,expected):
     shutil.copyfile(template/"prepared.json",folder/"prepared.json")
     if sha(folder/"prepared.json")!=expected:
         raise ValueError("体网准备回执已更改")
-    sources=[Path(__file__),Path(__file__).with_name("cm011Inclined.py"),folder/"prepared.json",folder/"body.json",
+    sources=[Path(__file__),Path(__file__).with_name("cm011SurfaceProjection.py"),Path(__file__).with_name("cm011Inclined.py"),folder/"prepared.json",folder/"body.json",
              folder/"nodes.npz",folder/"geometry.json"]
     write_json(folder/"engine_request.json",dict(workDirectory=str(folder),configFile="case.cfg",meshFile="mesh.su2",
                maximumSeconds=720,threads=1,jobToken=uuid.uuid4().hex,

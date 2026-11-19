@@ -11,4 +11,9 @@ candidate=oriented;
 candidate.cm011Prepared=struct('directory',folder,'manifestSHA256',cm011FileSHA256(fullfile(folder,'prepared.json')), ...
     'sourceSHA256',source.sha256,'nodes',geometry.nodes,'cells',geometry.hexahedra+geometry.prisms, ...
     'maxVertexDistanceM',geometry.importedSurface.maxVertexDistanceM);
+% 新剖分分别显示 CAD 轮廓的三角面抽样偏差和实际求解壁面的投影误差。
+if isfield(geometry.importedSurface,'maxFacetSampleDistanceM')
+    candidate.cm011Prepared.maxFacetSampleDistanceM=geometry.importedSurface.maxFacetSampleDistanceM;
+    candidate.cm011Prepared.maxVertexToSolverWallM=geometry.importedSurface.maxVertexToSolverWallM;
+end
 end

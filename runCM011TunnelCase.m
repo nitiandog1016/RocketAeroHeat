@@ -92,6 +92,11 @@ if inclined && isfield(geometry,'importedSurface')
     registration=geometry.importedSurface;
     current.evidenceIdentity.stlSHA256=registration.sourceSHA256;
     current.evidenceIdentity.maxVertexDistanceM=registration.maxVertexDistanceM;
+    if isfield(registration,'registrationMethod')
+        current.evidenceIdentity.surfaceRegistration=registration.registrationMethod;
+        current.evidenceIdentity.maxFacetSampleDistanceM=registration.maxFacetSampleDistanceM;
+        current.evidenceIdentity.maxVertexToSolverWallM=registration.maxVertexToSolverWallM;
+    end
     report.importedSurface=registration;report.outputDirectory=folder;
     if ~isempty(prepared)
         current.evidenceIdentity.preparedSHA256=prepared.manifestSHA256;

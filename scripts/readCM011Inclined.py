@@ -55,15 +55,20 @@ def evaluate(folder):
     # 方位角从 +Y 转向 +Z。镜像仅翻转 Y，保留 Z 正负和迎背流差异。
     v = np.asarray(body["V"])
     f = np.asarray(body["F"])-1
-    row = np.asarray(body["nodeRow"])
-    ring_tol=geom.get("importedSurface",{}).get("maxRingDeviationM",0)/D+1e-12
-    np.testing.assert_allclose(fine[row],np.column_stack((v[:,0],np.hypot(v[:,1],v[:,2])))/D,rtol=0,atol=ring_tol)
+    if "wallStation" in body:
+        # 不同剖分的连续站号来自导入顶点射线与真实求解壁面的交点。
+        coordinate=np.asarray(body["wallStation"])
+    else:
+        row = np.asarray(body["nodeRow"])
+        ring_tol=geom.get("importedSurface",{}).get("maxRingDeviationM",0)/D+1e-12
+        np.testing.assert_allclose(fine[row],np.column_stack((v[:,0],np.hypot(v[:,1],v[:,2])))/D,rtol=0,atol=ring_tol)
+        coordinate=.5*row
     phi = np.arctan2(v[:,2],abs(v[:,1]))
     j = np.minimum(np.searchsorted(RAYS,phi,side="right")-1,len(RAYS)-2)
     assert np.min(j)>=0
     azimuth = (phi-RAYS[j])/(RAYS[j+1]-RAYS[j])
-    i = np.minimum(row//2,len(coarse)-2)
-    meridional = .5*row-i
+    i = np.minimum(np.floor(coordinate).astype(int),len(coarse)-2)
+    meridional = coordinate-i
     assert np.all((meridional>=0)&(meridional<=1)) and np.all((azimuth>=0)&(azimuth<=1+1e-13))
 
     def map_to_faces(field):
