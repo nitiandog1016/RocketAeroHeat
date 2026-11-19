@@ -70,11 +70,16 @@ end
 expansionOutside=[];
 % 混合入口已按原面完成求解，显示同一份有符号场和方法来源。
 if isfield(mesh,'hybridWall')
-    w=mesh.hybridWall; hybridFaceMethods=cellstr(w.method); hybridFaceMethods(strlength(w.method)==0)={'未求解'};
+    w=mesh.hybridWall;
     hybridScope='当前混合计算原面结果；方法见逐面来源，实验精度单独验证';
     data.missingReason(isfinite(w.heatFluxWm2))={''};
-    add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridFaceMethods,hybridScope);
-    add('heatFlux','入壁热流','kW/m²',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)),hybridFaceMethods,hybridScope);
+    add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridMethod(w,'pressureMethod'),hybridScope);
+    add('heatFlux','入壁热流','kW/m²',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope);
+    if ismember('nearWallCellTemperatureK',w.Properties.VariableNames)
+        tCell=w.nearWallCellTemperatureK;
+        add('nearWallCellTemperature','临壁流体单元温度','K',tCell,double(isfinite(tCell)), ...
+            hybridMethod(w,'nearWallTemperatureMethod'),'与原面对应的首层流体单元温度');
+    end
     add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({'输入壁温'},n,1),hybridScope);
 end
 if isfield(mesh,'boundaryLayerEdge')
@@ -173,6 +178,14 @@ if isfield(mesh,'heating')
 end
 % 模块三：显式区分输入壁温与壁温解；单一外流/热流工况本身不确定壁温。
 % 尚无材料热响应解时仍允许探针查看“未求解”，不能以输入壁温补齐。
+if isfield(mesh,'hybridWall')
+    for term={'edgeTemperature','recoveryTemperature'}
+        if any(strcmp({data.fields.key},term{1})),continue;end
+        if strcmp(term{1},'edgeTemperature'),label='外缘静温';else,label='恢复温度';end
+        reason=['本次混合计算未提供具有独立定义的' label];
+        add(term{1},label,'K',nan(n,1),zeros(n,1),repmat({reason},n,1),reason,{},repmat({reason},n,1));
+    end
+end
 add('wallSolved','求解壁温','K',nan(n,1),zeros(n,1), ...
     repmat({'未求解：当前未提供壁体热响应或其他独立壁温解'},n,1), ...
     '单点压力和对流热流计算使用壁温边界输入；求解壁温还需独立热平衡或材料热响应及边界条件');
@@ -220,6 +233,16 @@ data.caseNote=[data.resultCondition.caption ...
 if isfield(mesh,'hybridWall')
     data.resultCondition.physics=mesh.hybridCondition;
     data.caseNote='混合求解单工况；逐面标注计算方法，正热流入壁。';
+    hc=mesh.hybridCondition;
+    if all(isfield(hc,{'ambientPressurePa','ambientTemperatureK','velocityMps'})) && ...
+            isnumeric(hc.velocityMps) && numel(hc.velocityMps)==3 && all(isfinite(hc.velocityMps(:))) && ...
+            isnumeric(hc.ambientPressurePa) && isscalar(hc.ambientPressurePa) && isfinite(hc.ambientPressurePa) && ...
+            isnumeric(hc.ambientTemperatureK) && isscalar(hc.ambientTemperatureK) && isfinite(hc.ambientTemperatureK)
+        u=reshape(hc.velocityMps,1,3);
+        if norm(u)>0,data.flowDirection=u/norm(u);end
+        data.caseNote=sprintf('混合求解 · 来流速度 %.6g m/s · 环境压力 %.8g Pa · 环境温度 %.6g K · 正热流入壁', ...
+            norm(u),hc.ambientPressurePa,hc.ambientTemperatureK);
+    end
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
 end
@@ -287,6 +310,12 @@ if isfield(mesh,'evidenceRecords'),data.evidenceRecords=mesh.evidenceRecords;end
         if isempty(data.fields),data.fields=entry;else,data.fields(end+1)=entry;end
     end
 end
+function names=hybridMethod(w,key)
+% 模块用途：从本次混合求解的原面表读取当前变量的算法。
+if ismember(key,w.Properties.VariableNames),v=w.(key);else,v=w.method;end
+names=cellstr(v);names(strlength(v)==0)={'未求解'};
+end
+
 function reasons=thermalMissingReasons(mesh,original,state,n)
 % 模块八：区分本面外缘未知与未知上游传播；只解释已有拒绝，不改变有效掩码。
 reasons=original(:);missing=state==0;

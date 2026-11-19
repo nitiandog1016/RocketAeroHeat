@@ -28,8 +28,12 @@ started=tic;
 engineering=setup.engineeringSolver(geometry,setup.condition,tw);
 idx=checkWall(engineering,ids);
 wall(idx,:)=engineering(:,wall.Properties.VariableNames);
+pMethod=wall.method;qMethod=wall.method;
+pMethod(idx)=fieldMethod(engineering,'pressureMethod');qMethod(idx)=fieldMethod(engineering,'heatFluxMethod');
+nearT=nan(n,1);nearMethod=strings(n,1);
+[temperatures,methods]=adjacentFluid(engineering);nearT(idx)=temperatures;nearMethod(idx)=methods;
 eng=isfinite(wall.pressurePa)&isfinite(wall.heatFluxWm2);
-pending=unique(region(~eng),'stable'); attempts=struct('region',{},'targetFaceIDs',{},'accepted',{},'reason',{});
+pending=unique(region(~eng),'stable'); attempts=struct('region',{},'targetFaceIDs',{},'accepted',{},'reason',{},'diagnostics',{});
 % 模块二：每个有缺项的区域只调用一次。已有完整工程解优先保留；缺项原面
 % 只有在同一次被接受的区域结果给出成对 p/q 时才替换，保留合法零和负热流。
 for k=1:numel(pending)
@@ -38,11 +42,24 @@ for k=1:numel(pending)
     validateattributes(local.accepted,{'logical'},{'scalar'});
     reason=string(local.reason);
     assert(isscalar(reason)&&~ismissing(reason)&&strlength(strtrim(reason))>0,'RAH:Hybrid:Reason','区域须记录停止或接受原因。');
-    attempts(end+1)=struct('region',pending(k),'targetFaceIDs',target,'accepted',local.accepted,'reason',reason); %#ok<AGROW>
+    % 保留适配器实际计算的接口与守恒量，拒绝的区域也能回查。
+    diagnostics=struct;
+    if isfield(local,'diagnostics'),diagnostics=local.diagnostics;end
+    attempts(end+1)=struct('region',pending(k),'targetFaceIDs',target,'accepted',local.accepted, ...
+        'reason',reason,'diagnostics',diagnostics); %#ok<AGROW>
     if ~local.accepted,continue;end
     idx=checkWall(local.wall,ids(inRegion));
     take=ismember(local.wall.faceID,target)&isfinite(local.wall.pressurePa)&isfinite(local.wall.heatFluxWm2);
     wall(idx(take),:)=local.wall(take,wall.Properties.VariableNames);
+    sources=fieldMethod(local.wall,'pressureMethod');pMethod(idx(take))=sources(take);
+    sources=fieldMethod(local.wall,'heatFluxMethod');qMethod(idx(take))=sources(take);
+    [temperatures,methods]=adjacentFluid(local.wall);nearT(idx(take))=temperatures(take);nearMethod(idx(take))=methods(take);
+end
+if ~isequal(pMethod,wall.method) || ~isequal(qMethod,wall.method)
+    wall.pressureMethod=pMethod;wall.heatFluxMethod=qMethod;
+end
+if any(isfinite(nearT))
+    wall.nearWallCellTemperatureK=nearT;wall.nearWallTemperatureMethod=nearMethod;
 end
 % 模块三：完整性以每个原面均有双变量计算值为准，独立验证由证据台账处理。
 p=isfinite(wall.pressurePa); q=isfinite(wall.heatFluxWm2); joint=p&q;
@@ -78,4 +95,24 @@ assert(all(isnan(rows.pressurePa)|rows.pressurePa>0),'RAH:Hybrid:Pressure','计�
 assert(isstring(rows.method)&&size(rows.method,2)==1&&all(~ismissing(rows.method)&strlength(strtrim(rows.method))>0), ...
     'RAH:Hybrid:Method','每行须注明求解方法。');
 index=double(id)+1;
+end
+
+function names=fieldMethod(rows,key)
+% 允许压力和热流使用不同方法；历史适配器继续使用共同的 method 列。
+names=rows.method;
+if ismember(key,rows.Properties.VariableNames)
+    names=rows.(key);
+    assert(isstring(names)&&isequal(size(names),size(rows.method))&&all(~ismissing(names)&strlength(strtrim(names))>0), ...
+        'RAH:Hybrid:Method','逐变量方法须与原面对应。');
+end
+end
+
+function [values,methods]=adjacentFluid(rows)
+% 可选临壁流体结果按同一次接受的原面记录传递，未提供时维持未知。
+values=nan(height(rows),1);methods=strings(height(rows),1);
+if ~ismember('nearWallCellTemperatureK',rows.Properties.VariableNames),return;end
+values=rows.nearWallCellTemperatureK;
+assert(isnumeric(values) && isreal(values) && isequal(size(values),size(rows.faceID)) && ...
+    all(isnan(values) | (isfinite(values)&values>0)),'RAH:Hybrid:Temperature','临壁流体温度须为正 K 或 NaN。');
+methods=fieldMethod(rows,'nearWallTemperatureMethod');
 end

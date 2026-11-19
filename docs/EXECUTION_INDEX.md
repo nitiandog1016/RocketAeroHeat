@@ -4,6 +4,7 @@
 
 ## 当前与独立工作入口
 
+- [v268 等温微球的全面积压力与热流](validation/v268/RESULTS.md) · [下一项交付](validation/v268/NEXT_DECISION.md)。2,608 个原面及双向穿流接口通过解析和独立数值核对，自绘算例新增 0 m²。
 - [v267 混合求解入口和连通域壁面结果](validation/v267/RESULTS.md)。工程方法与局部黏性求解器实际交换切面状态，低速两壁的双变量计算覆盖 2/2 m²；原箭体覆盖另列。
 - [v266 单时刻热功率](validation/v263/SIDEWALL_TEMPERATURE.md#单时刻热功率v266) · [导出复算](validation/v263/evidence/snapshot_power/export_check.json)。主工况已算面功率与整表面未知量分列；公开风洞算例使用原壁曲面积。
 - [v265 原面超域分类与编号查询](validation/v263/SIDEWALL_TEMPERATURE.md#区域工作台按原面编号核对v265) · [原面核对](validation/v263/evidence/edge_domain/original_check.json)。主工况 336 个直接超域面按源记录分列，936 个下游缺热面的数值身份保持可查。
