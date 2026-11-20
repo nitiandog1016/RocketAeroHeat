@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v291 热敏珠第一半步的连续残差核对](validation/v291/RESULTS.md) · [实际终场](validation/v291/evidence/first_half.json) · [下一项](validation/v291/NEXT_DECISION.md)。240 次内迭代末尾有 18 行六项全部通过，第一半步未达 20 行要求。
+
 - [v290 热敏珠 6 m/s 启动时刻的全表面压力与热流](validation/v290/RESULTS.md) · [同阶段热量账](validation/v290/evidence/surface.json) · [界面核对](validation/v290/evidence/ui.json) · [下一项](validation/v290/NEXT_DECISION.md)。5,216 个原面数值覆盖完整，适用时刻为距构造初场 7.809 µs。
 
 - [v289 全周松弛与 6 m/s 热敏珠首次接受的物理步](validation/v289/RESULTS.md) · [200 次复核](validation/v289/evidence/first_step_200.json) · [下一项](validation/v289/NEXT_DECISION.md)。同一 7.809 µs 启动步在第 188 次内迭代形成首个连续窗，终点六项通过。

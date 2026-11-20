@@ -50,9 +50,17 @@ def energy(source,observer,release,geom,ids,xyz):
     base_cfg=(source/"case.cfg").read_text("ascii")
     assert (observer/"case.cfg").read_text("ascii")==base_cfg.replace("INNER_ITER= 200","INNER_ITER= 201")
     assert (release/"case.cfg").read_text("ascii")==base_cfg.replace("INNER_ITER= 200","INNER_ITER= 1").replace("(wall, VALUE, 1.0)","(wall, FLUX, 0.0)")
+    return step_energy(source,observer,release,geom,ids,xyz,obs,step=1,inner=200,dt_nd=.05)
+
+
+def step_energy(source,observer,release,geom,ids,xyz,obs,step,inner,dt_nd):
+    """在已绑定的同一热敏珠时间层比对原生装配、完整旧新态与独立壁读数。"""
+    end_name=f"restart_{step:05}.csv"
+    old_name=f"seed_{step-1:05}.csv"
+    history_name=f"history_{step:05}.csv"
     fields=["PointID","x","y","z","Pressure","Velocity_x","Velocity_y","Velocity_z","Enthalpy","Species_0"]
-    new=columns(source/"restart_00001.csv",fields)
-    old=columns(source/"seed_00000.csv",fields)
+    new=columns(source/end_name,fields)
+    old=columns(source/old_name,fields)
     n=len(xyz);node_ids=np.arange(n)
     for state in (new,old):
         assert np.isfinite(state).all() and np.array_equal(state[:,0],node_ids)
@@ -62,7 +70,7 @@ def energy(source,observer,release,geom,ids,xyz):
     after=columns(observer/"after_wall.csv",["id","rhs"])
     sample=sample[np.argsort(sample[:,0])];after=after[np.argsort(after[:,0])]
     assert np.array_equal(sample[:,0],node_ids) and np.array_equal(after[:,0],node_ids)
-    assert np.all(sample[:,4]>0) and np.all(sample[:,9]==1) and np.all(sample[:,10]==.05)
+    assert np.all(sample[:,4]>0) and np.all(sample[:,9]==1) and np.all(sample[:,10]==dt_nd)
     matches=dict(oldTheta=float(np.max(abs(sample[:,3]-old[:,9]))),newTheta=float(np.max(abs(sample[:,2]-new[:,9]))),
                  pressure=float(np.max(abs(sample[:,5]-new[:,4]))),velocity=float(np.max(abs(sample[:,6:9]-new[:,5:8]))))
     assert matches["oldTheta"]<=1e-13 and matches["newTheta"]<=2e-10 and max(matches["pressure"],matches["velocity"])<=1e-8,matches
@@ -70,7 +78,7 @@ def energy(source,observer,release,geom,ids,xyz):
     assert np.all(after[wids,1]==0)
     delta=sample[:,1]-after[:,1]
     assert np.count_nonzero(delta)==np.count_nonzero(delta[wids]) and np.isfinite(delta).all()
-    stages={i:{} for i in (199,200)}
+    stages={i:{} for i in (inner-1,inner)}
     for i,key,value in csv.reader((observer/"stages.csv").read_text("ascii").splitlines()):
         assert key not in stages[int(i)]
         stages[int(i)][key]=float(value)
@@ -80,7 +88,8 @@ def energy(source,observer,release,geom,ids,xyz):
     scale=geom["rho"]*geom["cp"]*speed*diam**2*delta_t
     def wall(t):
         return (t["beforeWall"]-t["afterWall"])*scale
-    now=stages[200];wall_w=wall(now);assert wall_w>0
+    previous=stages[inner-1]
+    now=stages[inner];wall_w=wall(now);assert wall_w>0
     far=(now["afterFar"]-now["beforeFar"])*scale
     storage=(now["afterTime"]-now["beforeTime"])*scale
     from_frames=float(np.dot(sample[:,4],new[:,9]-old[:,9])*geom["rho"]*geom["cp"]*delta_t*diam**3/dt)
@@ -88,24 +97,24 @@ def energy(source,observer,release,geom,ids,xyz):
     assert max(abs(now["beforeTime"]),abs(now["start"]),abs(now["beforeWall"]-now["afterFar"]),
                abs(now["beforeFar"]-now["afterTime"]))*scale<1e-10
     closure=(wall_w-far-storage)/wall_w
-    assert abs(closure)<.005 and abs(wall(stages[199])/wall_w-1)<.002
-    released=columns(release/"restart_00001.csv",["PointID","Residual_Species_0"])
+    assert abs(closure)<.005 and abs(wall(previous)/wall_w-1)<.002
+    released=columns(release/end_name,["PointID","Residual_Species_0"])
     assert np.array_equal(released[:,0],node_ids)
     max_error=float(np.max(abs(released[wids,1]+delta[wids]))/np.max(abs(delta[wids])))
     assert max_error<1e-5,max_error
     keys=["Time_Iter","Inner_Iter"]+["rms["+s+"]" for s in ("P","U","V","W","h","rho*Y_0")]
-    official=columns(source/"history_00001.csv",keys)
-    observed=columns(observer/"history_00001.csv",keys)
-    assert len(official)==200 and len(observed)==201 and np.array_equal(official[:,:2],observed[:-1,:2])
+    official=columns(source/history_name,keys)
+    observed=columns(observer/history_name,keys)
+    assert len(official)==inner and len(observed)==inner+1 and np.array_equal(official[:,:2],observed[:-1,:2])
     history_diff=float(np.max(abs(official[:,2:]-observed[:-1,2:])))
     assert history_diff<.01,history_diff
     receipt=dict(wallReleaseW=wall_w,farOutW=far,airStorageW=storage,independentStorageW=from_frames,
-        imbalanceW=wall_w-far-storage,relativeImbalance=closure,previousAssemblyReleaseW=wall(stages[199]),
-        relativeWallChange=abs(wall(stages[199])/wall_w-1),releasePeakRelativeError=max_error,
+        imbalanceW=wall_w-far-storage,relativeImbalance=closure,previousAssemblyReleaseW=wall(previous),
+        relativeWallChange=abs(wall(previous)/wall_w-1),releasePeakRelativeError=max_error,
         observedHistoryMaxLogDifference=history_diff,assemblyStateErrors=matches,stages=stages,
         observerSHA256=obs["inputSHA256"][obs["command"][0]],observedWallSHA256=sha(observer/"before_wall.csv"),
-        reactionCheckFrameSHA256=sha(release/"restart_00001.csv"),acceptedFrameSHA256=sha(source/"restart_00001.csv"),
-        oldFrameSHA256=sha(source/"seed_00000.csv"),dtSeconds=dt)
+        reactionCheckFrameSHA256=sha(release/end_name),acceptedFrameSHA256=sha(source/end_name),
+        oldFrameSHA256=sha(source/old_name),dtSeconds=dt)
     return new,-scale*delta,receipt
 
 
@@ -116,6 +125,19 @@ def collect(source,observer,release,out):
         ids,xyz=grid["ids"],grid["xyz"]
     assert ids.shape==(49,3185) and np.array_equal(ids[0],ids[-1])
     state,reaction,balance=energy(source,observer,release,geom,ids,xyz)
+    summary=map_surface(source,geom,ids,xyz,state,reaction,balance,out/"wall.csv")
+    write(out/"summary.json",summary)
+    write(out/"case.json",{k:geom[k] for k in ("speedMps","airK","airPa","nominalWallK","dtSeconds","transverseDiameterM")})
+    shutil.copyfile(source/"body.json",out/"body.json")
+    with zipfile.ZipFile(out/"startup_6ms.zip","x") as bundle:
+        for key in ("body.json","case.json","summary.json","wall.csv"):
+            info=zipfile.ZipInfo(key,date_time=(2026,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+            bundle.writestr(info,(out/key).read_bytes())
+    return summary
+
+
+def map_surface(source,geom,ids,xyz,state,reaction,balance,wall):
+    """把同一时刻的热敏珠壁反力和节点状态按真实方位映回原面，并核对功率。"""
     shape=read(source/"body.json");v=np.array(shape["V"]);f=np.array(shape["F"])-1;tris=v[f]
     assert sha(source/"body.json")=="5e66bb2f70f0774b8ebb87a77b76061fc84b89b9f379d54e90879e81628bf62f"
     area=np.linalg.norm(np.cross(tris[:,1]-tris[:,0],tris[:,2]-tris[:,0]),axis=1)/2
@@ -133,7 +155,6 @@ def collect(source,observer,release,out):
     p=geom["airPa"]+gauge;power=float(area@q)
     assert abs(power+balance["wallReleaseW"])<1e-11*abs(power)
     assert np.isfinite(q).all() and (p>0).all() and first.min()>=geom["airK"]-1e-10 and first.max()<=geom["nominalWallK"]+1e-10
-    wall=out/"wall.csv"
     np.savetxt(wall,np.column_stack((np.arange(len(f)),area,p,gauge,q,first)),
         fmt=["%d"]+["%.17g"]*5,delimiter=",",header="faceID,areaM2,pressurePa,pressureGaugePa,heatFluxWm2,nearWallCellTemperatureK",comments="")
     summary=dict(originalFaces=len(f),areaM2=float(area.sum()),powerIntoWallW=power,energy=balance,
@@ -142,13 +163,6 @@ def collect(source,observer,release,out):
         heatFluxWm2=[float(q.min()),float(q.max())],nearWallK=[float(first.min()),float(first.max())],
         peakOutwardFaceID=int(np.argmin(q)),peakFaceCentroidM=tris[np.argmin(q)].mean(axis=0).tolist(),
         jointExperimentVerifiedAreaM2=0,fullSurfaceComputed=True)
-    write(out/"summary.json",summary)
-    write(out/"case.json",{k:geom[k] for k in ("speedMps","airK","airPa","nominalWallK","dtSeconds","transverseDiameterM")})
-    shutil.copyfile(source/"body.json",out/"body.json")
-    with zipfile.ZipFile(out/"startup_6ms.zip","x") as bundle:
-        for key in ("body.json","case.json","summary.json","wall.csv"):
-            info=zipfile.ZipInfo(key,date_time=(2026,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
-            bundle.writestr(info,(out/key).read_bytes())
     return summary
 
 
