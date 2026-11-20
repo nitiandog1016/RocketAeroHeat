@@ -22,7 +22,7 @@ def match_nodes(actual, expected):
     return ids
 
 
-def shell_balance(xy, velocity, theta, j):
+def shell_balance(xy, velocity, theta, j, peclet=PE, power_scale=RHO*CP*U*DT*D**2):
     # 以终场内侧数据重构闭合旋转面的质量、显热对流和扩散。
     # 这项独立面积分不等于引擎在远场面上实际使用的数值通量。
     points = xy[j]
@@ -43,8 +43,7 @@ def shell_balance(xy, velocity, theta, j):
         mass += np.sum(area*speed)
         inflow += np.sum(area*np.maximum(-speed, 0))
         advective += np.sum(area*excess*speed)
-        conductive -= np.sum(area*d_normal/PE)
-    power_scale = RHO*CP*U*DT*D**2
+        conductive -= np.sum(area*d_normal/peclet)
     return dict(radialRow=int(j), outwardHeatW=(advective+conductive)*power_scale,
                 outwardSensibleAdvectionW=advective*power_scale, outwardConductionW=conductive*power_scale,
                 relativeNetMassFlow=mass/inflow)

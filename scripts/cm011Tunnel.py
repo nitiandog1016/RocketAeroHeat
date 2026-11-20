@@ -59,7 +59,7 @@ def meridian(level):
     return w, np.array(strips)
 
 
-def surface(w, bands, level):
+def surface(w, bands, level, diameter=D, region_names=REGIONS):
     # 不同半径上用不同环点数；面编号与母线源节点一同返回给 MATLAB。
     vertices, rings, source, faces, tags = [], [], [], [], []
     for i, (x, r) in enumerate(w):
@@ -85,11 +85,11 @@ def surface(w, bands, level):
                     j += 1
         faces.extend(strip)
         tags.extend([int(bands[k])]*len(strip))
-    v, f = np.array(vertices)*D, np.array(faces)
+    v, f = np.array(vertices)*diameter, np.array(faces)
     signed = np.einsum("ij,ij->i", v[f[:, 0]], np.cross(v[f[:, 1]], v[f[:, 2]]))
     if signed.sum() <= 0:
         raise ValueError("三维试件表面朝向错误")
-    return dict(V=v.tolist(), F=(f+1).tolist(), nodeRow=source, regionCode=tags, regionNames=REGIONS)
+    return dict(V=v.tolist(), F=(f+1).tolist(), nodeRow=source, regionCode=tags, regionNames=region_names)
 
 
 def volume(w, layers, extent, level):
@@ -143,15 +143,8 @@ def extend_initial_field(previous, folder, w, xy, layers):
                header='"PointID","x","y","Pressure","Velocity_x","Velocity_y","Enthalpy"')
 
 
-def prepare(folder, grid, restart=None, seed=None):
-    folder.mkdir(parents=True, exist_ok=False)
-    level, layers, extent = GRIDS[grid]
-    w, bands = meridian(level)
-    surf = surface(w, bands, level)
-    surf.update(meridian=w.tolist(), diameterM=D, grid=grid, layers=layers, extentD=extent)
-    write_json(folder/"body.json", surf)
-    xy, cells, markers = volume(w, layers, extent, level)
-    with (folder/"mesh.su2").open("x", encoding="ascii") as stream:
+def write_volume_mesh(path, xy, cells, markers):
+    with path.open("x", encoding="ascii") as stream:
         stream.write(f"NDIME= 2\nNELEM= {len(cells)}\n")
         np.savetxt(stream, cells, fmt="9 %d %d %d %d")
         stream.write(f"NPOIN= {len(xy)}\n")
@@ -160,7 +153,10 @@ def prepare(folder, grid, restart=None, seed=None):
         for name, edges in markers.items():
             stream.write(f"MARKER_TAG= {name}\nMARKER_ELEMS= {len(edges)}\n")
             np.savetxt(stream, edges, fmt="3 %d %d")
-    config = f"""SOLVER= INC_NAVIER_STOKES
+
+
+def laminar_config(reynolds, peclet, iterations):
+    return f"""SOLVER= INC_NAVIER_STOKES
 AXISYMMETRIC= YES
 MATH_PROBLEM= DIRECT
 INC_DENSITY_MODEL= CONSTANT
@@ -172,9 +168,9 @@ INC_VELOCITY_INIT= (-1, 0, 0)
 INC_TEMPERATURE_INIT= 1
 SPECIFIC_HEAT_CP= 1
 VISCOSITY_MODEL= CONSTANT_VISCOSITY
-MU_CONSTANT= {1/RE:.17g}
+MU_CONSTANT= {1/reynolds:.17g}
 CONDUCTIVITY_MODEL= CONSTANT_CONDUCTIVITY
-THERMAL_CONDUCTIVITY_CONSTANT= {1/PE:.17g}
+THERMAL_CONDUCTIVITY_CONSTANT= {1/peclet:.17g}
 MARKER_ISOTHERMAL= (wall, 2)
 MARKER_SYM= (axis)
 MARKER_FAR= (far)
@@ -190,7 +186,7 @@ LINEAR_SOLVER= FGMRES
 LINEAR_SOLVER_PREC= ILU
 LINEAR_SOLVER_ERROR= 0.001
 LINEAR_SOLVER_ITER= 20
-ITER= {10000 if grid == "coarse" else 18000}
+ITER= {iterations}
 CONV_FIELD= (RMS_PRESSURE, RMS_VELOCITY-X, RMS_VELOCITY-Y, RMS_ENTHALPY)
 CONV_RESIDUAL_MINVAL= -11
 CONV_STARTITER= 50
@@ -206,6 +202,18 @@ WRT_RESTART_OVERWRITE= NO
 WRT_SURFACE_OVERWRITE= NO
 TABULAR_FORMAT= CSV
 """
+
+
+def prepare(folder, grid, restart=None, seed=None):
+    folder.mkdir(parents=True, exist_ok=False)
+    level, layers, extent = GRIDS[grid]
+    w, bands = meridian(level)
+    surf = surface(w, bands, level)
+    surf.update(meridian=w.tolist(), diameterM=D, grid=grid, layers=layers, extentD=extent)
+    write_json(folder/"body.json", surf)
+    xy, cells, markers = volume(w, layers, extent, level)
+    write_volume_mesh(folder/"mesh.su2", xy, cells, markers)
+    config = laminar_config(RE, PE, 10000 if grid == "coarse" else 18000)
     if restart is not None:
         previous = restart.resolve()
         receipt = json.loads((previous/"engine_process.json").read_bytes())

@@ -132,6 +132,7 @@ renderEditor();sync();showGeometry(true);
     end
     function showGeometry(reset)
         if ~isgraphics(fig),return;end
+        delete(findall(resultHost,'Tag','thermistor-bead-review'));fig.UserData.thermistorReview=[];
         delete(findall(resultHost,'Tag','lewis-cylinder-review'));fig.UserData.lewisCylinderReview=[];
         resultHost.Visible='off';geometryHost.Visible='on';
         fig.UserData.benchmarkReview=[];
@@ -172,6 +173,7 @@ renderEditor();sync();showGeometry(true);
         updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2,'resetCamera',reset));
     end
     function showResults()
+        delete(findall(resultHost,'Tag','thermistor-bead-review'));fig.UserData.thermistorReview=[];
         delete(findall(resultHost,'Tag','lewis-cylinder-review'));fig.UserData.lewisCylinderReview=[];
         if ~isempty(state.researchResult)
             geometryHost.Visible='off';resultHost.Visible='on';
@@ -202,7 +204,7 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
-                grid=form(21);
+                grid=form(23);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
@@ -225,6 +227,9 @@ renderEditor();sync();showGeometry(true);
                 controls.readIdealAirReview=button(grid,19,'变比热热流接口记录',@readIdealAirDialog);
                 controls.staticAir=button(grid,20,'静止空气 · 节点探针',@readStaticAirProbe);
                 controls.lewisCylinder=button(grid,21,'计算 NASA 圆柱换热对照',@showLewisCylinder);
+                controls.thermistorMode=choice(grid,22,'B 型热敏珠',{'查看已算原面','从冷初场计算'}, ...
+                    {'archive','solve'},'archive');
+                controls.thermistor=button(grid,23,'打开热敏珠全表面结果',@showThermistor);
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
@@ -1264,6 +1269,30 @@ renderEditor();sync();showGeometry(true);
         [name,folder]=uigetfile('*.json','查看公开算例审核',fullfile(fileparts(mfilename('fullpath')),'outputs'));
         if isequal(name,0),return;end
         try,readBenchmarkReview(fullfile(folder,name));catch ex,showError(ex);end
+    end
+    function showThermistor(~,~)
+        % 独立民用试件在现有中央区显示，页内探针与导出共用同一份原面表。
+        if state.busy || preparing,return;end
+        mode=controls.thermistorMode.Value;preparing=true;
+        try
+            if strcmp(mode,'solve'),message('正在计算 B 型热敏珠的三维壁压和热流…');
+            else,message('正在读取 B 型热敏珠原面结果…');end
+            [bead,summary]=runThermistorBeadCase([],mode,@()isgraphics(fig));
+            if ~isgraphics(fig),return;end
+            prior=resultHost.Children;
+            group=uitabgroup(resultHost,'Tag','thermistor-bead-review','Visible','off', ...
+                'Units','normalized','Position',[0 0 1 1]);
+            view=createAerothermalWebTab(group,bead);
+            delete(prior);webUI=[];researchUI=[];
+            geometryHost.Visible='off';resultHost.Visible='on';group.Visible='on';
+            fig.UserData.thermistorReview=view;preparing=false;renderEditor();
+            message(sprintf('热敏珠共 %d 面，整珠放热 %.4f mW，正热流入壁。',height(bead.hybridWall),-1000*summary.wholeSurfaceHeatPowerW));
+            title.Text='B 型热敏珠 · 三维场与实验对照';
+        catch ex
+            preparing=false;if ~isgraphics(fig),return;end
+            if exist('group','var') && isgraphics(group),delete(group);end
+            renderEditor();showError(ex);
+        end
     end
     function showLewisCylinder(~,~)
         % 显式运行独立风洞工况，在当前中央区显示结果并保留用户的模型输入。

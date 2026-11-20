@@ -19,11 +19,11 @@ HEX_FACES = ((3,2,1,0),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7))
 PRISM_FACES = ((2,1,0),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5))
 
 
-def mesh(rays=RAYS, level=2, layers=42, wall=None):
+def mesh(rays=RAYS, level=2, layers=42, wall=None, extent=12., diameter=D):
     """合并轴线节点，沿母线法向和周向生成体单元，并独立核对面邻接。"""
     if wall is None:
         wall, _ = meridian(level)
-    xy, quads, _ = volume(wall, layers, 12., level)
+    xy, quads, _ = volume(wall, layers, extent, level)
     steps = len(rays)-1
     angle = rays[-1]-rays[0]
     delta = angle/steps
@@ -111,9 +111,9 @@ def mesh(rays=RAYS, level=2, layers=42, wall=None):
     assert abs(angle*copies-2*np.pi)<1e-12
     stats = dict(nodes=len(xyz), hexahedra=counts[8], prisms=counts[6], sharedAxisNodes=2*(layers+1),
                  boundaryFaces=counts_by_marker, minCellVolumeD3=min_volume, volumeD3=total_volume,
-                 meridianMomentVolumeD3=reference_volume, chordWallAreaM2=wall_area*D**2,
-                 fullChordWallAreaM2=copies*wall_area*D**2,
-                 fullRotatedWallAreaM2=2*np.pi*np.sum(mid_r*np.hypot(dx,dr))*D**2)
+                 meridianMomentVolumeD3=reference_volume, chordWallAreaM2=wall_area*diameter**2,
+                 fullChordWallAreaM2=copies*wall_area*diameter**2,
+                 fullRotatedWallAreaM2=2*np.pi*np.sum(mid_r*np.hypot(dx,dr))*diameter**2)
     return xy,xyz,source_node,np.array(angles),ids,cells,markers,stats
 
 

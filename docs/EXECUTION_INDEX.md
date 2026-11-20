@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v282 公开 B 型热敏珠全表面壁压与热流](validation/v282/RESULTS.md) · [论文图 7 与三网对照](validation/v282/evidence/comparison.json) · [下一项](validation/v282/NEXT_DECISION.md)。新增 5,216 个珠体原面，整珠放热 9.38210 mW，平均换热系数比实验读数高 15.7%。
+
 - [v281 缺热原面的三份存档与同面导出](validation/v281/RESULTS.md) · [逐量核对](validation/v281/evidence/comparison.json) · [下一项](validation/v281/NEXT_DECISION.md)。目标 936 面上两份工程热流存档均缺项，研究热流有值 936 面，新增工程面积 0 m²。
 
 - [v280 同一物理步的风洞圆柱对照](validation/v280/RESULTS.md) · [九分量与原面诊断](validation/v280/evidence/trial.json) · [回到单工况原面缺项](validation/v280/NEXT_DECISION.md)。固定 120 次、自适应 720 次均为 0/9 达标，工作台可切换归档，自绘模型本轮新增 0 m²。

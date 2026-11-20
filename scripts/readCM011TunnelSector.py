@@ -74,7 +74,7 @@ def frame_window(folder,rec,parent_index=None):
                 passesResidualAndHeatWindow=bool(max(res)<-8 and spread<.002))
 
 
-def wall_fields(folder,idx,m,rays):
+def wall_fields(folder,idx,m,rays,*,pressure_scale=None,heat_scale=None,diameter=D,ambient_pressure=P0):
     """独立核对三维原生坐标、壁压和焓，并从同一保存帧读取热流及首层温度。"""
     dims = np.load(folder/"nodes.npz")
     xyz,ids = dims["xyz"],dims["ids"]
@@ -87,22 +87,29 @@ def wall_fields(folder,idx,m,rays):
     dist,order = cKDTree(surf).query(xyz[unique])
     assert len(unique)==len(surf)==len(np.unique(order)) and max(dist)<2e-6
     order = order[np.searchsorted(unique,wall_ids)]
-    pressure = fields["Pressure"][:,0][order]*RHO*U**2
-    heat = fields["Heat_Flux"][:,0][order]*RHO*CP*U*DT
+    gauge = fields["Pressure"][:,0][order]
+    native_heat = fields["Heat_Flux"][:,0][order]
+    # 旧工况沿用原始量纲乘法次序与原压力容差，使保存的逐面输出可逐值重放。
+    if pressure_scale is None:
+        pressure = gauge*RHO*U**2
+        np.testing.assert_allclose(pressure,restart[wall_ids,4]*RHO*U**2,rtol=0,atol=2e-8)
+    else:
+        pressure = gauge*pressure_scale
+        np.testing.assert_array_equal(gauge,np.char.mod("%.6e",restart[wall_ids,4]).astype(float))
+    heat = native_heat*RHO*CP*U*DT if heat_scale is None else native_heat*heat_scale
     temp = fields["Temperature"][:,0][order]
     np.testing.assert_allclose(temp,restart[wall_ids,8]+298.15,rtol=0,atol=2e-6)
-    np.testing.assert_allclose(pressure,restart[wall_ids,4]*RHO*U**2,rtol=0,atol=2e-8)
     normal_speeds = [np.max(abs(restart[ids[k],7]*np.cos(rays[k])-restart[ids[k],6]*np.sin(rays[k]))) for k in (0,-1)]
     no_slip = np.max(abs(restart[wall_ids,5:8]))
     near_temp = restart[ids[:,m:2*m],8]+298.15
-    assert np.isfinite(heat).all() and (pressure+P0>0).all()
+    assert np.isfinite(heat).all() and (pressure+ambient_pressure>0).all()
     # 在求解器的弦面上用分片线性热流作独立三角积分，再与原三角面映射分别比较。
     chord_area, chord_power = 0., 0.
     for k in range(len(rays)-1):
         coords = xyz[wall_ids[k:k+2]]
         for strip in (((0,0),(0,1),(1,1)),((0,0),(1,1),(1,0))):
             pts = [coords[ray,start:start+m-1] for ray,start in strip]
-            areas = .5*np.linalg.norm(np.cross(pts[1]-pts[0],pts[2]-pts[0]),axis=1)*D**2
+            areas = .5*np.linalg.norm(np.cross(pts[1]-pts[0],pts[2]-pts[0]),axis=1)*diameter**2
             flux = np.mean([heat[k+ray,start:start+m-1] for ray,start in strip],axis=0)
             chord_area += np.sum(areas)
             chord_power += areas@flux

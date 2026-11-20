@@ -382,6 +382,21 @@ if isfield(mesh,'hybridWall')
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
 end
+% 热敏珠只具备整珠平均换热的实验读数；探针上的局部压力和热流均保留研究身份。
+if isfield(mesh,'thermistorBead')
+    bead=mesh.thermistorBead;observation=bead.experiment;
+    data.thermistorBead=bead;
+    data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
+    data.caseNote=sprintf('%s · 给定壁温 %.2f K · 无引线名义珠体',data.caseNote,mesh.hybridCondition.wallTemperatureK);
+    data.resultCondition.caption=data.caseNote;
+    k=find(strcmp({data.fields.key},'heatFlux'),1);
+    data.fields(k).stateNote=sprintf(['名义面积上的整珠平均换热系数 %.1f W/(m²·K)，论文图 7 约 %.1f，' ...
+        '相差 %+.1f%%。图读范围 %.1f–%.1f W/(m²·K)。局部热流缺少逐面实验数据。'], ...
+        bead.meanH,observation.hWm2K,100*bead.relativeDifference,observation.graphReadRangeWm2K);
+    k=find(strcmp({data.fields.key},'nearWallCellTemperature'),1);
+    data.fields(k).label='首层流体节点温度';
+    data.fields(k).stateNote='首层流体节点温度由三维温差标量求得，壁面温度由边界条件给定。';
+end
 if isfield(mesh,'lewisCylinder')
     data.defaultField='nusselt';data.flowDirection=[0 -1 0];
     data.coordinateNote='SI · X 为圆柱跨向 · +Y 为迎流驻点 · +Z 为正圆周角';
