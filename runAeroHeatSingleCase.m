@@ -13,7 +13,7 @@ function [current,freestream,report] = runAeroHeatSingleCase(mesh,cfg,progressFc
 if nargin<3,progressFcn=[];end
 % 珠体只使用已生成的扇区、已确认的等温边界和用户在计算页选择的来源。
 if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'thermistorB')
-    [boundary,freestream]=thermistorWorkbenchBoundary(cfg.thermistorBoundary);
+    [boundary,freestream]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells);
     mode='solve';
     if isfield(cfg,'thermistorResultSource'),mode=validatestring(cfg.thermistorResultSource,{'archive','solve'});end
     assert(isequal(cfg.thermistorAngularCells,mesh.thermistorPrepared.angularCells),'RAH:Bead:Mesh','配置中的网格与已生成网格不符。');
@@ -22,7 +22,7 @@ if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'thermisto
     if ~isempty(progressFcn)
         startedBead=tic;pulse=@()thermistorWindowOpen(progressFcn,startedBead);
     end
-    [current,report]=runThermistorBeadCase([],mode,pulse,mesh,boundary.wallTemperatureK);
+    [current,report]=runThermistorBeadCase([],mode,pulse,mesh,boundary);
     return;
 end
 % 导入的低速 CM-011 使用已冻结的试件网格，从均匀初场在独立目录推进。

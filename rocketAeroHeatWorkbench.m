@@ -372,15 +372,23 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isBead()
-                    grid=form(8);selected='none';boundary=thermistorWorkbenchBoundary();
-                    if ~isempty(state.cfg.thermistorBoundary),selected='published';boundary=state.cfg.thermistorBoundary;end
-                    controls.beadCondition=choice(grid,1,'空气工况',{'请选择工况','3.0 m/s · 热珠等温'}, ...
-                        {'none','published'},selected);
+                    grid=form(9);selected='none';temp=305.15;watts=0.004;
+                    boundary=state.cfg.thermistorBoundary;
+                    if isstruct(boundary)
+                        if isfield(boundary,'netHeatingPowerW'),selected='power';watts=boundary.netHeatingPowerW;
+                        else,selected='published';temp=boundary.wallTemperatureK;end
+                    end
+                    controls.beadCondition=choice(grid,1,'热边界',{'请选择热边界','给定均匀壁温','给定净加热功率'}, ...
+                        {'none','published','power'},selected);
                     controls.beadCondition.ValueChangedFcn=@boundaryEdited;
-                    controls.beadWall=numberField(grid,2,'给定壁温 / K',boundary.wallTemperatureK,[293.15 305.15]);
-                    controls.beadWall.ValueChangedFcn=@boundaryEdited;controls.beadWall.Enable=onoff(~strcmp(selected,'none'));
-                    tip(grid,3,'来流沿 −X，空气 293.15 K、101325 Pa。无滑移等温珠面，可设 293.15–305.15 K。');
-                    controls.confirm=button(grid,6,'确认热敏珠边界',@confirmBoundary);
+                    controls.beadWall=numberField(grid,2,'给定壁温 / K',temp,[293.15 305.15]);
+                    controls.beadWall.ValueChangedFcn=@boundaryEdited;controls.beadWall.Enable=onoff(strcmp(selected,'published'));
+                    limit=thermistorNetPowerLimit(state.cfg.thermistorAngularCells);
+                    controls.beadPower=numberField(grid,3,'整珠净功率 / W',watts,[0 limit]);
+                    controls.beadPower.ValueDisplayFormat='%.10g';
+                    controls.beadPower.ValueChangedFcn=@boundaryEdited;controls.beadPower.Enable=onoff(strcmp(selected,'power'));
+                    tip(grid,4,sprintf('3 m/s 空气，293.15 K，101325 Pa。净功率已扣除引线、辐射等损失。本网上限约 %.6g mW。',1000*limit));
+                    controls.confirm=button(grid,7,'确认热敏珠边界',@confirmBoundary);
                     controls.confirm.Enable=onoff(~isempty(state.cfg.thermistorBoundary));sync();return;
                 end
                 if isCM011()
@@ -496,9 +504,9 @@ renderEditor();sync();showGeometry(true);
             case 4
                 if isBead()
                     grid=form(11);p=state.mesh.thermistorPrepared;
-                    controls.readBead=button(grid,1,'使用已算场求当前壁温结果',@(~,~)solveCase([],[],'archive'));
+                    controls.readBead=button(grid,1,'用参照场计算当前工况',@(~,~)solveCase([],[],'archive'));
                     controls.run=button(grid,2,'从冷初场计算当前试件',@solveCase);
-                    tip(grid,3,sprintf('B 型热敏珠 · 周向单元 %g° · %d 体单元\n3 m/s 空气 · 给定壁温 %.12g K',30/p.angularCells,p.cells,state.cfg.thermistorBoundary.wallTemperatureK));
+                    tip(grid,3,sprintf('B 型热敏珠 · 周向单元 %g° · %d 体单元\n3 m/s 空气 · %s',30/p.angularCells,p.cells,beadBoundaryText(state.cfg.thermistorBoundary)));
                     controls.log=uitextarea(grid,'Editable','off','Value',logLines);
                     controls.log.Layout.Row=[6 11];controls.log.Layout.Column=[1 2];sync();return;
                 end
@@ -753,9 +761,14 @@ renderEditor();sync();showGeometry(true);
         next=state.cfg;
         if isBead()
             next.thermistorBoundary=[];
-            if strcmp(controls.beadCondition.Value,'published')
-                b=thermistorWorkbenchBoundary();b.wallTemperatureK=controls.beadWall.Value;
-                next.thermistorBoundary=thermistorWorkbenchBoundary(b);
+            if ~strcmp(controls.beadCondition.Value,'none')
+                b=thermistorWorkbenchBoundary();
+                if strcmp(controls.beadCondition.Value,'power')
+                    b=rmfield(b,'wallTemperatureK');b.netHeatingPowerW=controls.beadPower.Value;
+                else
+                    b.wallTemperatureK=controls.beadWall.Value;
+                end
+                next.thermistorBoundary=thermistorWorkbenchBoundary(b,next.thermistorAngularCells);
             end
             return;
         end
@@ -892,7 +905,8 @@ renderEditor();sync();showGeometry(true);
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
             if isBead()
-                controls.beadWall.Enable=onoff(~isempty(state.cfg.thermistorBoundary));
+                controls.beadWall.Enable=onoff(strcmp(controls.beadCondition.Value,'published'));
+                controls.beadPower.Enable=onoff(strcmp(controls.beadCondition.Value,'power'));
                 controls.confirm.Enable=onoff(~isempty(state.cfg.thermistorBoundary));
                 message('热敏珠边界选择已更新，请确认工况。');showGeometry(false);return;
             end
@@ -934,10 +948,10 @@ renderEditor();sync();showGeometry(true);
         try
             next=boundaryConfiguration();
             if isBead()
-                [~,fs]=thermistorWorkbenchBoundary(next.thermistorBoundary);
+                [~,fs]=thermistorWorkbenchBoundary(next.thermistorBoundary,next.thermistorAngularCells);
                 state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
                 state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',fs));
-                message(sprintf('已确认 3 m/s、293.15 K 空气和 %.12g K 等温珠面。',next.thermistorBoundary.wallTemperatureK));go(4);return;
+                message(['已确认 3 m/s、293.15 K 空气，' beadBoundaryText(next.thermistorBoundary) '。']);go(4);return;
             end
             if isCM011()
                 [~,fs]=cm011WorkbenchBoundary(next.cm011Boundary);
@@ -1033,6 +1047,11 @@ renderEditor();sync();showGeometry(true);
     end
     function yes=isCM011()
         yes=strcmp(getOption(state.cfg,'computationBackend','engineering'),'cm011Imported');
+    end
+    function label=beadBoundaryText(b)
+        % 计算页和确认回执显示实际冻结的热边界与单位。
+        if isfield(b,'netHeatingPowerW'),label=sprintf('整珠净功率 %.12g mW',1000*b.netHeatingPowerW);
+        else,label=sprintf('给定壁温 %.12g K',b.wallTemperatureK);end
     end
     function yes=isBead()
         yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'thermistorB');

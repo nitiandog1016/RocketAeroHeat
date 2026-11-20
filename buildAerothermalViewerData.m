@@ -90,7 +90,13 @@ if isfield(mesh,'hybridWall')
         add('nearWallCellTemperature','临壁流体单元温度','K',tCell,double(isfinite(tCell)), ...
             hybridMethod(w,'nearWallTemperatureMethod'),'与原面对应的首层流体单元温度');
     end
-    add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({'输入壁温'},n,1),hybridScope);
+    if isfield(mesh,'hybridSolvedWallTemperatureK')
+        reason='此工况输入整珠净功率，壁温由稳态热平衡求出。';
+        add('wallInput','给定壁温','K',nan(n,1),zeros(n,1),repmat({'未给定壁温'},n,1),reason,{},repmat({reason},n,1));
+        data.fields(end).stateNote=reason;
+    else
+        add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({'输入壁温'},n,1),hybridScope);
+    end
     % 混合结果使用适配器实际返回的算法，不沿用默认工程压力、热流的解释文字。
     physical={'pressure','pressureGauge','heatFlux','wallFluidTemperature','nearWallCellTemperature'};
     for k=find(ismember({data.fields.key},physical))
@@ -324,10 +330,18 @@ if isfield(mesh,'hybridWall')
         add(term{1},label,'K',nan(n,1),zeros(n,1),repmat({reason},n,1),reason,{},repmat({reason},n,1));
     end
 end
-add('wallSolved','求解壁温','K',nan(n,1),zeros(n,1), ...
+if isfield(mesh,'hybridSolvedWallTemperatureK')
+    t=mesh.thermistorBead.thermal;
+    add('wallSolved','稳态求解壁温','K',mesh.hybridSolvedWallTemperatureK,ones(n,1), ...
+        repmat({t.wallMethod},n,1),t.scope);
+    data.fields(end).stateNote=t.wallMethod;
+    data.fields(end).computedStateLabel='研究数值解';
+else
+    add('wallSolved','求解壁温','K',nan(n,1),zeros(n,1), ...
     repmat({'未求解：当前未提供壁体热响应或其他独立壁温解'},n,1), ...
     '单点压力和对流热流计算使用壁温边界输入；求解壁温还需独立热平衡或材料热响应及边界条件');
-data.fields(end).availability='notProvidedInSnapshot';
+    data.fields(end).availability='notProvidedInSnapshot';
+end
 % 模块四：采用求解器实际接受的时间轴，不插值、不恢复已失效的历程。
 histories=buildAerothermalViewerHistory(mesh);
 flowHistories=buildAerothermalFlowHistory(mesh);
@@ -397,7 +411,14 @@ if isfield(mesh,'thermistorBead')
     bead=mesh.thermistorBead;
     data.thermistorBead=bead;
     data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
-    data.caseNote=sprintf('%s · 给定壁温 %.12g K · 无引线名义珠体',data.caseNote,mesh.hybridCondition.wallTemperatureK);
+    powerMode=isfield(mesh.hybridCondition,'netHeatingPowerW');
+    if powerMode
+        thermal=bead.thermal;
+        data.caseNote=sprintf('%s · 净加热功率 %.12g mW · 稳态求解壁温 %.9g K · 无引线名义珠体', ...
+            data.caseNote,1000*thermal.netHeatingPowerW,thermal.wallTemperatureK);
+    else
+        data.caseNote=sprintf('%s · 给定壁温 %.12g K · 无引线名义珠体',data.caseNote,mesh.hybridCondition.wallTemperatureK);
+    end
     if isfield(bead,'cellAngleDeg'),data.caseNote=sprintf('%s · 周向单元 %g°',data.caseNote,bead.cellAngleDeg);end
     data.resultCondition.caption=data.caseNote;
     k=find(strcmp({data.fields.key},'heatFlux'),1);
@@ -412,6 +433,13 @@ if isfield(mesh,'thermistorBead')
         data.fields(k).stateNote=sprintf('恒物性对流扩散场按 %.12g K 壁面温差换算。名义面积平均换热系数 %.2f W/(m²·K)。', ...
             bead.thermal.deltaTemperatureK,bead.meanH);
     end
+    if powerMode
+        data.fields(k).stateNote=sprintf('%s 净功率 %.9g mW，原面放热积分 %.9g mW，空气侧热导 %.9g mW/K。', ...
+            data.fields(k).stateNote,1000*thermal.netHeatingPowerW,1000*thermal.surfaceReleaseW,1000*thermal.conductanceWK);
+    end
+    if isfield(bead,'comparisonUnavailable')
+        data.fields(k).stateNote=[data.fields(k).stateNote ' ' bead.comparisonUnavailable];
+    end
     if isfield(bead,'baselineH')
         data.fields(k).stateNote=[data.fields(k).stateNote sprintf(' 15° 基准网为 %.2f W/(m²·K)，周向细化后变化 %+.2f%%。', ...
             bead.baselineH,100*(bead.meanH/bead.baselineH-1))];
@@ -419,6 +447,7 @@ if isfield(mesh,'thermistorBead')
     k=find(strcmp({data.fields.key},'nearWallCellTemperature'),1);
     data.fields(k).label='首层流体节点温度';
     data.fields(k).stateNote='首层流体节点温度由三维温差标量求得，壁面温度由边界条件给定。';
+    if powerMode,data.fields(k).stateNote='首层流体温度由参照温差标量按稳态集总壁温换算。';end
     % 声明静态试件场的真实单值。空场不产生色标，固定的比较／手动色标另行保留。
     for k=1:numel(data.fields)
         f=data.fields(k);valid=f.values(f.status>0 & isfinite(f.values));
@@ -618,6 +647,14 @@ if isfield(mesh,'pressure') && isfield(mesh.pressure,'freestream')
             result.(to{k})=double(fs.(from{k}));
         end
     end
+end
+if isfield(mesh,'hybridSolvedWallTemperatureK')
+    % 只在功率模式登记求解温度；给定壁温的计数及范围维持无输入状态。
+    t=mesh.thermistorBead.thermal;
+    result.wallInputType='netHeatingPower';result.wallIdentity=t.wallMethod;
+    result.netHeatingPowerW=t.netHeatingPowerW;result.solvedWallTemperatureK=t.wallTemperatureK;
+    result.caption=sprintf('净加热功率 %.12g W，稳态求解壁温 %.12g K',t.netHeatingPowerW,t.wallTemperatureK);
+    return;
 end
 wallText='壁温输入类型/数值未记录';
 if isfield(mesh,'hybridWallTemperatureK') || (isfield(mesh,'heating') && isfield(mesh.heating,'wallTemperatureByFace'))

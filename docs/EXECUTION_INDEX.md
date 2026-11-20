@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v286 热敏珠净功率边界与稳态壁温](validation/v286/RESULTS.md) · [细网核对](validation/v286/evidence/grid7p5.json) · [下一项](validation/v286/NEXT_DECISION.md)。4 mW 时两网均覆盖 5,216 面，稳态壁温相差 0.06820 K。
+
 - [v285 B 型热敏珠可调给定壁温](validation/v285/RESULTS.md) · [中间温差与零温差原生核对](validation/v285/evidence/native.json) · [下一项](validation/v285/NEXT_DECISION.md)。两档网格支持 293.15–305.15 K，零温差的 5,216 个面元均有物理零热流。
 
 - [v284 B 型热敏珠的五步主工作台](validation/v284/RESULTS.md) · [15° 冷启动原面核对](validation/v284/evidence/fresh_audit.json) · [下一项](validation/v284/NEXT_DECISION.md)。两档网格可确认边界、回读或计算；15° 新运行逐字节复现原面表。
