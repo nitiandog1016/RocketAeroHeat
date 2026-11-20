@@ -29,9 +29,14 @@ def mesh(rays=RAYS, level=2, layers=42, wall=None, extent=12., diameter=D):
     delta = angle/steps
     assert 0 < delta < np.pi and np.allclose(np.diff(rays),delta,atol=1e-14,rtol=0)
     width = len(wall)
+    closed_ring = abs(angle-2*np.pi) < 1e-12
     ids = np.empty((len(rays), len(xy)), dtype=int)
     xyz, source_node, angles = [], [], []
     for k, phi in enumerate(rays):
+        # 全周计算只保留一组接缝节点，首末两排体单元共享真实内面。
+        if closed_ring and k == steps:
+            ids[k] = ids[0]
+            continue
         for i, (x, r) in enumerate(xy):
             if k and i % width in (0, width-1):
                 ids[k,i] = ids[0,i]
@@ -88,17 +93,20 @@ def mesh(rays=RAYS, level=2, layers=42, wall=None, extent=12., diameter=D):
     moment = np.sum((p[:,:,1]+end[:,:,1])*(p[:,:,0]*end[:,:,1]-end[:,:,0]*p[:,:,1]))/6
     reference_volume = moment*steps*np.sin(delta)
     assert np.isclose(total_volume,reference_volume,rtol=1e-12,atol=0)
-    markers = {key:[] for key in ("wall","far","sym0","sym1")}
+    markers = {key:[] for key in (("wall","far") if closed_ring else ("wall","far","sym0","sym1"))}
     plane0, plane1 = set(ids[0]), set(ids[-1])
     for face in boundary.values():
         layer = source_node[list(face)]//width
         if np.all(layer==0): name="wall"
         elif np.all(layer==layers): name="far"
-        elif plane0.issuperset(face): name="sym0"
-        elif plane1.issuperset(face): name="sym1"
+        elif not closed_ring and plane0.issuperset(face): name="sym0"
+        elif not closed_ring and plane1.issuperset(face): name="sym1"
         else: raise ValueError("出现未归属的三维边界面")
         markers[name].append(face)
-    assert len(markers["sym0"])==len(markers["sym1"])==len(quads)
+    if closed_ring:
+        assert all(owners[tuple(sorted(ids[0,q]))] is None for q in quads)
+    else:
+        assert len(markers["sym0"])==len(markers["sym1"])==len(quads)
     assert len(markers["wall"])==len(markers["far"])==steps*(width-1)
     counts = Counter(len(c) for c in cells)
     counts_by_marker = {k:len(v) for k,v in markers.items()}

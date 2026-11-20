@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v287 热敏珠 6 m/s 的实验点和全周首步](validation/v287/RESULTS.md) · [原生残差与完整场核对](validation/v287/evidence/first_step.json) · [下一项](validation/v287/NEXT_DECISION.md)。已排除 30° 扇区，147,456 单元的完整周向首步能在本机运行，三项残差尚未达标。
+
 - [v286 热敏珠净功率边界与稳态壁温](validation/v286/RESULTS.md) · [细网核对](validation/v286/evidence/grid7p5.json) · [下一项](validation/v286/NEXT_DECISION.md)。4 mW 时两网均覆盖 5,216 面，稳态壁温相差 0.06820 K。
 
 - [v285 B 型热敏珠可调给定壁温](validation/v285/RESULTS.md) · [中间温差与零温差原生核对](validation/v285/evidence/native.json) · [下一项](validation/v285/NEXT_DECISION.md)。两档网格支持 293.15–305.15 K，零温差的 5,216 个面元均有物理零热流。
