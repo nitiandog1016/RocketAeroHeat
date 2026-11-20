@@ -11,6 +11,20 @@ function [current,freestream,report] = runAeroHeatSingleCase(mesh,cfg,progressFc
 % 模块四：report 保存接受的设置与面积审计；执行完成不等于全面积求解完成。
 % 未解值、给定值和场量方法均由既有后端保留，不作补零或模型回退。
 if nargin<3,progressFcn=[];end
+% 珠体只使用已生成的扇区、已确认的等温边界和用户在计算页选择的来源。
+if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'thermistorB')
+    [~,freestream]=thermistorWorkbenchBoundary(cfg.thermistorBoundary);
+    mode='solve';
+    if isfield(cfg,'thermistorResultSource'),mode=validatestring(cfg.thermistorResultSource,{'archive','solve'});end
+    assert(isequal(cfg.thermistorAngularCells,mesh.thermistorPrepared.angularCells),'RAH:Bead:Mesh','配置中的网格与已生成网格不符。');
+    if cfg.thermistorAngularCells==4,mode=[mode '7p5'];end
+    pulse=[];
+    if ~isempty(progressFcn)
+        startedBead=tic;pulse=@()thermistorWindowOpen(progressFcn,startedBead);
+    end
+    [current,report]=runThermistorBeadCase([],mode,pulse,mesh);
+    return;
+end
 % 导入的低速 CM-011 使用已冻结的试件网格，从均匀初场在独立目录推进。
 if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'cm011Imported')
     [~,freestream]=cm011WorkbenchBoundary(cfg.cm011Boundary);
@@ -125,4 +139,16 @@ report.events=events;
         if isempty(events),events=event;else,events(end+1,1)=event;end %#ok<AGROW>
         if ~isempty(progressFcn),progressFcn(event);end
     end
+end
+
+function open=thermistorWindowOpen(callback,started)
+% 工作台主动关闭时让原生监督器取消此任务，其他程序异常继续按原原因上报。
+open=true;
+try
+    callback(struct('phase','thermistor','status','running','fraction',0,'message','热敏珠计算中', ...
+        'elapsedSeconds',toc(started),'errorIdentifier','','errorMessage',''));
+catch ex
+    if ~strcmp(ex.identifier,'RocketAeroHeat:Workbench:Closed'),rethrow(ex);end
+    open=false;
+end
 end

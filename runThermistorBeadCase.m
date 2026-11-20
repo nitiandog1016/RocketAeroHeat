@@ -1,4 +1,4 @@
-function [current,report,page]=runThermistorBeadCase(folder,mode,windowOpen)
+function [current,report,page]=runThermistorBeadCase(folder,mode,windowOpen,inputMesh)
 %RUNTHERMISTORBEADCASE 读取 B 型热敏珠的冻结结果，或从冷初场计算同一工况。
 % [mesh,report]=runThermistorBeadCase() 只读随项目发布的原面表。
 % [mesh,report,page]=runThermistorBeadCase([], 'solve') 运行内嵌求解器并导出离线页。
@@ -10,6 +10,12 @@ if nargin<2,mode='archive';end
 if nargin<3,windowOpen=[];end
 mode=validatestring(mode,{'archive','solve','archive7p5','solve7p5'});
 fresh=startsWith(mode,'solve');refined=endsWith(mode,'7p5');
+angularCells=2+2*refined;
+if nargin<4,inputMesh=[];end
+if ~isempty(inputMesh)
+    % 将显式计算或归档绑定到主侧栏已确认的米制原面与实际体网。
+    verifyThermistorWorkbenchMesh(inputMesh,angularCells);
+end
 writePage=fresh || ~isempty(folder) || nargout>=3;page='';
 if writePage
     if isempty(folder),folder=fullfile(outputs,['thermistor_' char(java.util.UUID.randomUUID())]);end
@@ -21,10 +27,8 @@ if writePage
 end
 
 % 模块一：新计算经过同网格三维动量、强温差和反力核对；浏览时校验归档后再解包。
-caseDir=fullfile(root,'cases','thermistor_b');
 if ~fresh || refined
-    [baseline,baseCleanup]=extractChecked(fullfile(caseDir,'surface.zip'), ...
-        '11ba9c504f8df41a1be7c317d1047e77ab76800d3eae7b569d0b34333ffbb563'); %#ok<NASGU>
+    [baseline,baseCleanup]=openThermistorArchive(2); %#ok<NASGU>
 end
 if fresh
     native=fullfile(folder,'native');
@@ -32,13 +36,16 @@ if fresh
     if ~isempty(windowOpen),pulse=@checkWindow;end
     args={fullfile(root,'scripts','runThermistorCase.py'),native};
     if refined,args=[args,{'--angular-cells','4'}];end
+    if ~isempty(inputMesh)
+        p=inputMesh.thermistorPrepared;
+        args=[args,{'--prepared',p.directory,'--prepared-sha',p.manifestSHA256}];
+    end
     runCM011Python(args,fullfile(folder,'solve.log'),pulse);
     geo=fullfile(native,'strong');result=fullfile(native,'result');
 else
     geo=baseline;result=baseline;
     if refined
-        [result,refinedCleanup]=extractChecked(fullfile(caseDir,'surface_7p5.zip'), ...
-            'd02c8ac7fb41a7072e416e251efd2ccf8d19101ec388c98a46b3ed0a6e72449b'); %#ok<NASGU>
+        [result,refinedCleanup]=openThermistorArchive(4); %#ok<NASGU>
     end
 end
 spec=jsondecode(fileread(fullfile(geo,'case.json')));
@@ -100,15 +107,28 @@ if refined
     current.evidenceIdentity.sourceFrame.comparisonFrameSHA256=old.sourceFrameSHA256;
 end
 report.native=stats;report.reusedArchive=~fresh;report.comparison=current.thermistorBead;
+if ~isempty(inputMesh)
+    p=inputMesh.thermistorPrepared;
+    assert(isequal(mesh.V,inputMesh.V) && isequal(mesh.F,inputMesh.F),'RAH:Bead:Geometry','返回原面与当前输入不符。');
+    if fresh
+        assert(strcmp(cm011FileSHA256(fullfile(geo,'mesh.su2')),p.meshSHA256),'RAH:Bead:Mesh','求解终场与确认体网不符。');
+        report.outputDirectory=folder;
+    end
+    current.evidenceIdentity.meshSHA256=p.meshSHA256;
+    current.evidenceIdentity.preparedSHA256=p.manifestSHA256;
+    current.evidenceIdentity.reusedArchive=~fresh;
+end
 if writePage,page=exportAerothermalWeb(current,fullfile(folder,'workbench'));end
 
     function checkWindow()
         % 关闭主窗口后通知当前原生监督器收回本次计算，其他工况继续独立运行。
         drawnow limitrate;
-        if ~windowOpen()
+        try
+            if ~windowOpen(),error('RAH:Bead:Closed','热敏珠窗口已关闭。');end
+        catch ex
             fid=fopen(fullfile(folder,'thermistor_cancel.request'),'w');
             if fid>=0,fclose(fid);end
-            error('RAH:Bead:Closed','热敏珠窗口已关闭。');
+            rethrow(ex);
         end
     end
     function empty=emptyWall(~,~,~)
@@ -125,19 +145,4 @@ if writePage,page=exportAerothermalWeb(current,fullfile(folder,'workbench'));end
         solution=struct('accepted',true,'reason','六个分量的末窗残差、温界与边界热量账通过', ...
             'wall',wall,'diagnostics',struct('sourceFrameSHA256',stats.sourceFrameSHA256));
     end
-end
-
-function [folder,cleanup]=extractChecked(archive,expected)
-% 只展开已绑定的小归档。每个工作台实例单独拥有临时目录及其清理句柄。
-assert(strcmp(cm011FileSHA256(archive),expected),'RAH:Bead:Archive','B 型珠体的归档指纹不符。');
-folder=tempname;mkdir(folder);cleanup=onCleanup(@()removeExtracted(folder));
-unzip(archive,folder);
-end
-
-function removeExtracted(folder)
-% 模块四：释放此调用独有的四个临时文件。新计算的现场和用户导出保存在项目中。
-for name={'case.json','body.json','wall.csv','summary.json'}
-    path=fullfile(folder,name{1});if isfile(path),delete(path);end
-end
-rmdir(folder);
 end

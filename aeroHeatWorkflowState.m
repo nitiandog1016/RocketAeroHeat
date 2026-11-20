@@ -146,6 +146,10 @@ switch action
         requireUnchangedConfigSection(cfg,state.cfg,'geometry','模型输入或朝向');
         requireUnchangedConfigSection(cfg,state.cfg,'remesh','网格参数');
         requireUnchangedConfigSection(cfg,state.cfg,'mesh','网格参数');
+        if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') || strcmp(optional(cfg,'computationBackend',''),'thermistorB')
+            requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','试件来源');
+            requireUnchangedConfigSection(cfg,state.cfg,'thermistorAngularCells','周向网格');
+        end
         if ~isequaln(cfg,state.cfg)
             state=invalidate(state,'边界条件或工程算法改变');
             state.revision=state.revision+1;state.boundaryRevision=state.boundaryRevision+1;
@@ -155,6 +159,11 @@ switch action
         requireCondition(~isempty(state.mesh),'请先生成网格。');
         validateFlight(state.cfg);
         fs=optional(payload,'freestream',state.freestream);
+        if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB')
+            [~,reference]=thermistorWorkbenchBoundary(state.cfg.thermistorBoundary);
+            if isempty(fs),fs=reference;end
+            assert(isequal(fs,reference),'RAH:Bead:Boundary','来流记录与确认的珠体边界不符。');
+        end
         if ~isempty(fs),assertScalarStruct(fs,'freestream');end
         if ~isequaln(fs,state.freestream)
             state=invalidate(state,'确认当前边界及重新建立来流');
@@ -195,13 +204,18 @@ switch action
             error('RocketAeroHeat:WorkflowResultGeometry', ...
                 '返回结果的 V/F 与当前求解网格不一致，拒绝接收。');
         end
-        if strcmp(optional(state.cfg,'computationBackend',''),'cm011Imported')
+        if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB')
+            validateThermistorResult(result,state.frozenInputs);
+        elseif strcmp(optional(state.cfg,'computationBackend',''),'cm011Imported')
             validateCM011Result(result,state.mesh);
         else
             validateResultFields(result);
         end
         % 不补场量或温度：后端快照中的 NaN、算法及逐面元状态完整保留。
         fs=optional(payload,'freestream',state.frozenInputs.freestream);
+        if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB')
+            assert(isequal(fs,state.frozenInputs.freestream),'RAH:Bead:Snapshot','返回的来流与本次冻结工况不符。');
+        end
         if ~isempty(fs),assertScalarStruct(fs,'freestream');end
         state.result=result;state.freestream=fs;state.resultSourceRevision=state.revision;
         state.busy=false;state.status='solved';state.currentStep=5;
@@ -396,6 +410,9 @@ end
 
 %% 模块十：边界输入基础检查；完整物理适用性仍由后端各模型审核。
 function validateFlight(cfg)
+if strcmp(optional(cfg,'computationBackend',''),'thermistorB')
+    thermistorWorkbenchBoundary(cfg.thermistorBoundary);return;
+end
 if strcmp(optional(cfg,'computationBackend',''),'cm011Imported')
     cm011WorkbenchBoundary(cfg.cm011Boundary);return;
 end
@@ -414,6 +431,24 @@ end
 if cfg.flight.Mach<=0 || cfg.flight.Twall<=0
     error('RocketAeroHeat:WorkflowBoundary','Mach 和给定壁温必须大于零。');
 end
+end
+function validateThermistorResult(result,frozen)
+% 低速研究场进入普通五步结果页，逐面方法、来源和给定壁温保持原身份。
+cfg=frozen.cfg;[b,fs]=thermistorWorkbenchBoundary(cfg.thermistorBoundary);
+p=frozen.mesh.thermistorPrepared;w=result.hybridWall;n=size(frozen.mesh.F,1);c=result.hybridCondition;
+id=result.evidenceIdentity;
+assert(cfg.thermistorAngularCells==p.angularCells && result.thermistorBead.cellAngleDeg==30/p.angularCells && ...
+    strcmp(id.origin,'research') && isequal(id.productionQualified,false) && strcmp(id.meshSHA256,p.meshSHA256) && ...
+    strcmp(id.preparedSHA256,p.manifestSHA256) && strcmp(id.sourceFrame.bodySHA256,p.bodySHA256), ...
+    'RAH:Bead:Snapshot','热敏珠快照的网格或来源不符。');
+assert(isequal(c.velocityMps,fs.velocityMps) && c.ambientPressurePa==b.airPressurePa && ...
+    c.ambientTemperatureK==b.airTemperatureK && c.wallTemperatureK==b.wallTemperatureK && ...
+    isequal(result.hybridWallTemperatureK,repmat(b.wallTemperatureK,n,1)), ...
+    'RAH:Bead:Snapshot','结果边界与当前确认的试件工况不符。');
+assert(istable(w) && isequal(w.faceID,(0:n-1)') && all(isfinite(w.pressurePa) & w.pressurePa>0) && ...
+    all(isfinite(w.heatFluxWm2)) && all(isfinite(w.nearWallCellTemperatureK)) && ...
+    all(strlength(w.pressureMethod)>0 & strlength(w.heatFluxMethod)>0), ...
+    'RAH:Bead:Snapshot','原面数值或算法来源不完整。');
 end
 function validateCM011Result(result,mesh)
 % 低速全壁数值快照须与本次网格指纹及原面编号一致，各场量使用真实来源。

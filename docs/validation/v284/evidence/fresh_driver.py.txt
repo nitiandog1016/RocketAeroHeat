@@ -1,0 +1,54 @@
+"""运行 B 型热敏珠固定工况。前驱只提供初值，壁面结果取自强温差三维终场。"""
+import argparse
+import os
+from pathlib import Path
+
+import beadSurfaceResult
+import thermistorBead
+import thermistorBeadSector
+import thermistorReaction
+import thermistorTemperature
+
+
+def run(folder, angular_cells=2, prepared=None, expected=None):
+    if not __debug__:
+        raise RuntimeError("运行时需要开启输入和物理检查，请使用默认 Python 模式。")
+    folder = folder.resolve()
+    folder.relative_to(thermistorBead.ROOT / "outputs")
+    folder.mkdir(parents=True, exist_ok=False)
+    os.environ["RAH_THERMISTOR_CANCEL_FILE"] = str(folder.parent / "thermistor_cancel.request")
+    axis, sector, strong = (folder / name for name in ("axis", "sector", "strong"))
+    probes = folder / "probes"
+    thermistorBead.prepare(axis, "outer")
+    thermistorBead.solve(axis)
+    if prepared is not None:
+        thermistorBeadSector.prepare(axis,sector,angular_cells,prepared,expected)
+    elif angular_cells==2:
+        thermistorBeadSector.prepare(axis, sector)
+    else:
+        thermistorBeadSector.prepare(axis, sector, angular_cells)
+    thermistorBead.solve(sector)
+    thermistorTemperature.prepare(sector, strong)
+    thermistorBead.solve(strong)
+    thermistorReaction.observe(strong, probes / "reaction0", release=True)
+    thermistorReaction.observe(strong, probes / "plus20", release=False)
+    thermistorReaction.observe(probes / "plus20", probes / "reaction20", release=True)
+    beadSurfaceResult.collect(strong, probes, folder / "result")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("new_output", type=Path)
+    parser.add_argument("--angular-cells",type=int,choices=(2,4),default=2)
+    parser.add_argument("--mesh-only",action="store_true")
+    parser.add_argument("--prepared",type=Path)
+    parser.add_argument("--prepared-sha")
+    args=parser.parse_args()
+    if args.mesh_only:
+        dest=args.new_output.resolve()
+        dest.relative_to(thermistorBead.ROOT/"outputs")
+        thermistorBeadSector.prepare_workbench(dest,args.angular_cells)
+    else:
+        if bool(args.prepared)!=bool(args.prepared_sha):
+            parser.error("预生成体网目录和指纹须同时提供")
+        run(args.new_output,args.angular_cells,args.prepared,args.prepared_sha)

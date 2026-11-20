@@ -1,20 +1,20 @@
 # 当前交接
 
-2026-11-20。当前首要交付是单工况完整外表面气动热与统一科研工作台。作为独立交付对象的民用 B 型热敏珠，在 3.0 m/s、空气 293.15 K、给定壁温 305.15 K 下，**5,216 / 5,216 个原面**均有数值壁压和热流，计算面积为 **3.08983026 × 10⁻⁶ m²**。v283 在同一原面完成 7.5° 周向细网求解，整珠放热 9.50885 mW。相对 v282，热敏珠和自绘模型分别新增 **0 面、0 m²**。[本轮报告](validation/v283/RESULTS.md) · [工作台逐面复验](validation/v283/evidence/view.json)
+2026-11-20。当前首要交付是单工况完整外表面气动热与统一科研工作台。作为独立交付对象的民用 B 型热敏珠，在 3.0 m/s、空气 293.15 K、给定壁温 305.15 K 下，**5,216 / 5,216 个原面**均有数值壁压和热流，面积 **3.08983026 × 10⁻⁶ m²**。v284 已把两种离散接入主窗口五步流程。在主窗口从冷初场用已确认的 15° 体网计算，逐面表与基线逐字节一致。相对 v283，热敏珠和自绘模型分别新增 **0 面、0 m²**。[本轮报告](validation/v284/RESULTS.md) · [新运行与逐面核对](validation/v284/evidence/fresh_audit.json)
 
-<!-- records:last_completed=v283 -->
+<!-- records:last_completed=v284 -->
 <!-- records:active=none -->
-<!-- records:base_commit=32f5e648aa314a18324247ffcd4431eb4b9329a6 -->
+<!-- records:base_commit=9cf6b040a77564a7cf404d6535ba1547abf225d9 -->
 
 ## 热敏珠当前结果
 
 15° 和 7.5° 周向网分别给出整珠放热 9.38210 和 9.50885 mW。按论文珠体面积计算的平均 h 从 252.70 增至 256.11 W/(m²·K)，相对图 7 读数 218.36 W/(m²·K) 的偏差由 +15.73% 增至 +17.29%。局部放热峰值增加 6.18%。实验只支持整珠平均换热对照，逐面压力与热流联合独立验证面积为 0 m²。实际试件含引线，名义模型采用光滑旋转长椭球、长轴沿气流和理想等温边界。强约束标量的壁节点温度取给定值，首层流体温度来自终场，固体壁温未求。[网格差值](validation/v283/evidence/comparison.json) · [图 7 读点](validation/v282/evidence/comparison.json) · [细网独立热量账](validation/v283/evidence/energy.json)
 
-原生计算均有终态。早期弱等温焓超温和二维远场重建差额保留。MATLAB 的「输入模型 → B 型热敏珠」可选 15° 或 7.5° 归档及相应的新计算。细网页额外显示带符号的同面热流差和壁压差。5,216 行主场、逐面差值及一个截面的 121 行导出已与原面表核对。[本机细网离线页面](../outputs/v283_validation/ui02/export/workbench/index.html) · [完整原面导出](../outputs/v283_validation/ui02/wall_pair.csv) · [本地场及校验值](validation/v283/evidence/local_assets.json)
+在「输入模型」选择 B 型热敏珠，网格页可生成 15° 或 7.5° 的三维扇区并显示实际壁面。用户确认物理边界后可从冷初场计算，或回读匹配归档。两档归档均经主侧栏核对，15° 另从新计算返回并核对全部原面；7.5° 的原生结果沿用 v283。撤销边界、换网格、更换模型及错配拒绝均已实测。六个新原生进程均有终态。弱焓超温和早期二维重建差额继续留档。[本机新算离线页](../outputs/thermistor_0ba7e8dd-6d95-4a96-aeab-777f7b0d3228/workbench/index.html) · [本机细网离线页](../outputs/v283_validation/ui02/export/workbench/index.html) · [工作台回执](validation/v284/evidence/archives.json)
 
 ## 下一项
 
-[当前下一决定](validation/v283/NEXT_DECISION.md) 将民用珠体接入主侧栏五步流程，处理网格选择、边界确认与旧结果失效。已完成的周向单次对照退出排期。v283 计算现场为 `outputs/v283_validation`，源输入、预算及门槛见 [v283 计划](validation/v283/PLAN.md)。总目标仍在进行。
+[当前下一决定](validation/v284/NEXT_DECISION.md) 在已支持的恒物性民用珠体工况中扩展给定壁温输入，验收原工况重放、中间温差和物理零热流。尚未开始新工况计算。v284 的范围及预算见 [执行计划](validation/v284/PLAN.md)，总目标仍在进行。
 
 ## 自绘模型保留的状态
 

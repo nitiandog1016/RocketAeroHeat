@@ -10,18 +10,28 @@ import thermistorReaction
 import thermistorTemperature
 
 
-def run(folder, angular_cells=2):
+def run(folder, angular_cells=2, prepared=None, expected=None):
     if not __debug__:
         raise RuntimeError("运行时需要开启输入和物理检查，请使用默认 Python 模式。")
     folder = folder.resolve()
     folder.relative_to(thermistorBead.ROOT / "outputs")
+    if prepared is not None:
+        prepared=prepared.resolve()
+        prepared.relative_to(thermistorBead.ROOT / "outputs")
+        fixed=thermistorBead.read(thermistorBead.ROOT/"cases/thermistor_b/grids.json")["grids"]
+        grid=fixed["outer" if angular_cells==2 else "outerAngular4"]
+        if (thermistorBead.sha(prepared/"prepared.json")!=expected or
+                any(thermistorBead.sha(prepared/name)!=grid[name] for name in ("mesh.su2","nodes.npz"))):
+            raise ValueError("确认的热敏珠体网与所选分辨率不符")
     folder.mkdir(parents=True, exist_ok=False)
     os.environ["RAH_THERMISTOR_CANCEL_FILE"] = str(folder.parent / "thermistor_cancel.request")
     axis, sector, strong = (folder / name for name in ("axis", "sector", "strong"))
     probes = folder / "probes"
     thermistorBead.prepare(axis, "outer")
     thermistorBead.solve(axis)
-    if angular_cells==2:
+    if prepared is not None:
+        thermistorBeadSector.prepare(axis,sector,angular_cells,prepared,expected)
+    elif angular_cells==2:
         thermistorBeadSector.prepare(axis, sector)
     else:
         thermistorBeadSector.prepare(axis, sector, angular_cells)
@@ -38,5 +48,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("new_output", type=Path)
     parser.add_argument("--angular-cells",type=int,choices=(2,4),default=2)
+    parser.add_argument("--mesh-only",action="store_true")
+    parser.add_argument("--prepared",type=Path)
+    parser.add_argument("--prepared-sha")
     args=parser.parse_args()
-    run(args.new_output,args.angular_cells)
+    if args.mesh_only:
+        dest=args.new_output.resolve()
+        dest.relative_to(thermistorBead.ROOT/"outputs")
+        thermistorBeadSector.prepare_workbench(dest,args.angular_cells)
+    else:
+        if bool(args.prepared)!=bool(args.prepared_sha):
+            parser.error("预生成体网目录和指纹须同时提供")
+        run(args.new_output,args.angular_cells,args.prepared,args.prepared_sha)

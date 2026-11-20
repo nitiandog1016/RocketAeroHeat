@@ -1,6 +1,7 @@
 """在热敏珠的同工况三维扇区中推进全部动量和能量分量。"""
 import argparse
 from pathlib import Path
+import shutil
 import uuid
 
 import numpy as np
@@ -18,7 +19,50 @@ def sector_rays(angular_cells):
     return np.deg2rad(np.linspace(0., 30., angular_cells+1))
 
 
-def prepare(parent, out, angular_cells=2):
+def prepare_workbench(out, angular_cells):
+    """在边界确认前生成真实的体网及壁面预览，输入仅含固定珠体几何和分辨率。"""
+    m,n,extent,level = GRIDS["outer"]
+    rays = sector_rays(angular_cells)
+    _,xyz,_,_,ids,cells,markers,geom = mesh(rays,level,n,wall(m),extent,D)
+    out.mkdir(parents=True,exist_ok=False)
+    write_volume(out,xyz,cells,markers)
+    np.savez_compressed(out/"nodes.npz",xyz=xyz,ids=ids)
+    fixed = read(ROOT/"cases/thermistor_b/grids.json")["grids"]["outer" if angular_cells==2 else "outerAngular4"]
+    for name in ("mesh.su2","nodes.npz"):
+        assert sha(out/name)==fixed[name], name
+    # 只把原生壁面边界三角化用于预览；体网中的四边形面保留原拓扑。
+    triangles=[]
+    for face in markers["wall"]:
+        triangles.append([face[0],face[1],face[2]])
+        if len(face)==4:
+            triangles.append([face[0],face[2],face[3]])
+    nodes,local=np.unique(triangles,return_inverse=True)
+    geom.update(angularCells=angular_cells,meshSHA256=fixed["mesh.su2"],nodesSHA256=fixed["nodes.npz"],
+                preview=dict(V=(D*xyz[nodes]).tolist(),F=(local.reshape(-1,3)+1).tolist()))
+    write_json(out/"prepared.json",geom)
+
+
+def use_workbench_grid(directory, expected, out, angular_cells, rays):
+    """复用用户确认的确切体网字节，在本次独立计算目录核对输入并恢复初猜映射。"""
+    assert sha(directory/"prepared.json")==expected
+    geom=read(directory/"prepared.json")
+    fixed=read(ROOT/"cases/thermistor_b/grids.json")["grids"]["outer" if angular_cells==2 else "outerAngular4"]
+    assert geom.pop("angularCells")==angular_cells
+    assert geom.pop("meshSHA256")==fixed["mesh.su2"] and geom.pop("nodesSHA256")==fixed["nodes.npz"]
+    geom.pop("preview")
+    for name in ("mesh.su2","nodes.npz"):
+        shutil.copyfile(directory/name,out/name)
+        assert sha(out/name)==fixed[name], name
+    with np.load(out/"nodes.npz") as data:
+        ids,xyz=data["ids"],data["xyz"]
+    source=np.empty(len(xyz),int);phi=np.empty(len(xyz))
+    for k in reversed(range(len(rays))):
+        source[ids[k]]=np.arange(ids.shape[1])
+        phi[ids[k]]=rays[k]
+    return xyz[ids[0],:2],xyz,source,phi,geom
+
+
+def prepare(parent, out, angular_cells=2, prepared=None, expected=None):
     spec = read(parent/"case.json")
     rec = read(parent/"engine_process.json")
     assert rec["status"]=="terminal" and rec["exitCode"]==0 and all(rec["inputsStable"].values())
@@ -30,16 +74,20 @@ def prepare(parent, out, angular_cells=2):
     rays = sector_rays(angular_cells)
     if angular_cells == 4 and spec["grid"] != "outer":
         raise ValueError("7.5° 对照使用 20D 外域")
-    xy,xyz,source,phi,ids,cells,markers,geom = mesh(rays,level,n,wall(m),extent,D)
+    out.mkdir(parents=True,exist_ok=False)
+    if prepared is None:
+        xy,xyz,source,phi,ids,cells,markers,geom = mesh(rays,level,n,wall(m),extent,D)
+        write_volume(out,xyz,cells,markers)
+        np.savez_compressed(out/"nodes.npz",xyz=xyz,ids=ids)
+    else:
+        assert spec["grid"]=="outer"
+        xy,xyz,source,phi,geom=use_workbench_grid(prepared,expected,out,angular_cells,rays)
     native = np.loadtxt(parent/"restart.csv",delimiter=",",skiprows=1)
     assert np.array_equal(native[:,0],np.arange(len(xy)))
     np.testing.assert_allclose(native[:,1:3],xy,rtol=0,atol=1e-13)
     p,u,v,h = native[source,3:7].T
     z = h+298.15
     assert np.isfinite(native).all() and z.min()>=1-1e-10 and z.max()<=2+1e-10
-    out.mkdir(parents=True,exist_ok=False)
-    write_volume(out,xyz,cells,markers)
-    np.savez_compressed(out/"nodes.npz",xyz=xyz,ids=ids)
     state = np.column_stack((np.arange(len(xyz)),xyz,p,u,v*np.cos(phi),v*np.sin(phi),h))
     np.savetxt(out/"initial_flow.csv",state,fmt=["%d"]+["%.17g"]*8,delimiter=",",comments="",
                header='"PointID","x","y","z","Pressure","Velocity_x","Velocity_y","Velocity_z","Enthalpy"')
@@ -58,6 +106,8 @@ def prepare(parent, out, angular_cells=2):
     inputs=[Path(__file__).resolve(),ROOT/"scripts/thermistorBead.py",ROOT/"scripts/cm011Tunnel.py",
             ROOT/"scripts/cm011TunnelSector.py",parent/"restart.csv",out/"body.json",out/"case.json",
             out/"initial_flow.csv",out/"nodes.npz",out/"geometry.json"]
+    if prepared is not None:
+        inputs.extend(prepared/name for name in ("mesh.su2","nodes.npz","prepared.json"))
     write_json(out/"engine_request.json",dict(workDirectory=str(out),configFile="case.cfg",meshFile="mesh.su2",
                threads=1,maximumSeconds=360,jobToken=str(uuid.uuid4()),
                sourceFiles=[p.relative_to(ROOT).as_posix() for p in inputs]))

@@ -94,6 +94,11 @@ renderEditor();sync();showGeometry(true);
         counts='尚无求解网格';
         if ~isempty(state.mesh),counts=sprintf('求解网格 %d 节点 / %d 面元',size(state.mesh.V,1),size(state.mesh.F,1));end
         inputSummary.Text=[counts newline 'SI · 主轴 X · 鼻尖 +X · 零攻角来流 −X'];
+        if isBead()
+            counts=sprintf('B 型热敏珠 · %d 个原面',size(state.rawMesh.F,1));
+            if ~isempty(state.mesh),counts=sprintf('%s · %d 体单元',counts,state.mesh.thermistorPrepared.cells);end
+            inputSummary.Text=[counts newline 'SI · 长轴 X · 来流 −X'];
+        end
         footer.Text=logLines{end};
         fig.UserData.workflowState=state;fig.UserData.controls=controls;
         fig.UserData.webUI=webUI;fig.UserData.caseReport=report;
@@ -108,7 +113,9 @@ renderEditor();sync();showGeometry(true);
         assignin('base','rawMesh',state.orientedMesh);assignin('base','quality',state.quality);
         current=state.mesh;if ~isempty(state.result),current=state.result;end
         assignin('base','mesh',current);assignin('base','freestream',state.freestream);
-        if isCM011()
+        if isBead()
+            assignin('base','flight',state.cfg.thermistorBoundary);
+        elseif isCM011()
             % 工程链的飞行设置留在 cfg.flight；独立工作区变量显示当前试件边界。
             assignin('base','flight',getOption(state.cfg,'cm011Boundary',[]));
         elseif isfield(state.cfg,'flight'),assignin('base','flight',state.cfg.flight);end
@@ -170,6 +177,13 @@ renderEditor();sync();showGeometry(true);
         if state.currentStep==1 && ~isempty(state.rawMesh) && isempty(state.orientedMesh)
             caption='朝向预览待确认：请核对主轴X、鼻尖+X；鼠标旋转仅改变视角';
         elseif ~isempty(state.mesh),caption='已生成真实求解网格；显示旋转不改变坐标或边界';end
+        if isBead()
+            caption='B 型热敏珠 · 米制原面 · 沿长轴来流';
+            if state.currentStep==2 && ~isempty(state.mesh)
+                p=state.mesh.thermistorPrepared;m=p.preview;
+                caption=sprintf('实际三维体网的 30° 壁面扇区 · 周向单元 %g° · %d 个原生壁面',30/p.angularCells,p.wallFaces);
+            end
+        end
         updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2,'resetCamera',reset));
     end
     function showResults()
@@ -204,11 +218,18 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
+                if isBead()
+                    grid=form(6);tip(grid,1,'B 型热敏珠 · 光滑名义珠体，沿 X 轴放置。长度和三角面采用公开试件的米制重建几何。');
+                    controls.nextMesh=button(grid,4,'选择周向网格',@(~,~)go(2));
+                    controls.changeModel=button(grid,5,'更换模型',@leaveBead);sync();return;
+                end
                 grid=form(23);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
                 controls.browse=button(grid,3,'选择 STL 文件',@browseFile);
+                controls.browse.Layout.Column=1;
+                controls.beadModel=button(grid,3,'选用 B 型热敏珠',@loadBeadModel);controls.beadModel.Layout.Column=2;
                 controls.load=button(grid,4,'加载当前模型',@loadInput);
                 controls.pca=button(grid,5,'PCA 对齐主轴',@pcaOrientation);
                 controls.flip=button(grid,6,'翻转鼻向（Y轴180°）',@flipOrientation);
@@ -236,6 +257,19 @@ renderEditor();sync();showGeometry(true);
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
             case 2
+                if isBead()
+                    grid=form(8);
+                    controls.beadCells=choice(grid,1,'扇区周向单元',{'2 个 · 15°','4 个 · 7.5°'},[2 4],state.cfg.thermistorAngularCells);
+                    controls.beadCells.ValueChangedFcn=@changeBeadGrid;
+                    controls.generate=button(grid,2,'生成热敏珠体网',@generate);
+                    description='外域 20 倍横径 · 子午 64 × 径向 48 · 30° 对称扇区';
+                    if ~isempty(state.mesh)
+                        p=state.mesh.thermistorPrepared;
+                        description=sprintf('%s\n%d 节点 · %d 体单元 · %d 个全珠原面',description,p.nodes,p.cells,size(state.mesh.F,1));
+                        controls.nextBoundary=button(grid,6,'设置边界条件',@(~,~)go(3));
+                    end
+                    controls.volumeSummary=tip(grid,3,description);sync();return;
+                end
                 if isEmbedded()
                     [~,mode]=su2WorkbenchMeshOptions(state.cfg);
                     grid=form(22);
@@ -337,6 +371,16 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2=button(grid,13,'当前表面 → 内嵌SU2混合网格',@(~,~)useSurfaceForSU2());
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
+                if isBead()
+                    grid=form(7);selected='none';
+                    if ~isempty(state.cfg.thermistorBoundary),selected='published';end
+                    controls.beadCondition=choice(grid,1,'空气工况',{'请选择工况','3.0 m/s · 热珠等温'}, ...
+                        {'none','published'},selected);
+                    controls.beadCondition.ValueChangedFcn=@boundaryEdited;
+                    tip(grid,2,'来流沿 −X，空气 293.15 K、101325 Pa。珠面无滑移，给定壁温 305.15 K。');
+                    controls.confirm=button(grid,5,'确认热敏珠边界',@confirmBoundary);
+                    controls.confirm.Enable=onoff(~isempty(state.cfg.thermistorBoundary));sync();return;
+                end
                 if isCM011()
                     grid=form(8);selected='none';
                     if ~isempty(state.cfg.cm011Boundary),selected='inclined';end
@@ -448,6 +492,14 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,23+12*methodDetailsOpen,sprintf('当前保留 %d 个面元壁温输入；修改统一壁温将切换为统一边界。',numel(c.heating.wallTemperatureByFace)));
                 end
             case 4
+                if isBead()
+                    grid=form(11);p=state.mesh.thermistorPrepared;
+                    controls.readBead=button(grid,1,'读取当前网格的已算结果',@(~,~)solveCase([],[],'archive'));
+                    controls.run=button(grid,2,'从冷初场计算当前试件',@solveCase);
+                    tip(grid,3,sprintf('B 型热敏珠 · 周向单元 %g° · %d 体单元\n3 m/s 空气 · 给定壁温 305.15 K',30/p.angularCells,p.cells));
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);
+                    controls.log.Layout.Row=[6 11];controls.log.Layout.Column=[1 2];sync();return;
+                end
                 if isCM011()
                     grid=form(12);
                     controls.run=button(grid,1,'计算 CM-011 全表面压力与热流',@solveCase);
@@ -496,7 +548,12 @@ renderEditor();sync();showGeometry(true);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
                     state.resultSourceRevision,100*h.computedAreaFraction,100*p.computedAreaFraction,100*p.prescribedAreaFraction));
-                if isCM011()
+                if isBead()
+                    origin='本次冷启动计算';
+                    if state.result.evidenceIdentity.reusedArchive,origin='读取匹配归档';end
+                    tip(grid,4,sprintf('%s · 周向单元 %g°。点选面元可查壁压、入壁热流、首层流体温度和各量的方法。', ...
+                        origin,state.result.thermistorBead.cellAngleDeg));
+                elseif isCM011()
                     tip(grid,4,'点选导入三角面查看压力、热流和流体温度。相对环境壁压适合比较同一圆周两侧。');
                 else
                     tip(grid,4,'点选面元核对场量、算法和范围。灰色未解；未知外缘热力状态与有效状态的Kn超限分开，两者均可阻断下游热流。输入壁温与求解壁温分开。');
@@ -643,6 +700,15 @@ renderEditor();sync();showGeometry(true);
     end
     function generate(~,~)
         if state.busy || preparing,return;end
+        if isBead()
+            try
+                preparing=true;message('正在生成热敏珠扇区体网…');
+                candidate=prepareThermistorWorkbenchMesh(state.orientedMesh,state.cfg.thermistorAngularCells);
+                state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));report=[];
+                preparing=false;renderEditor();showGeometry(true);message('扇区体网已生成，可以设置边界条件。');
+            catch ex,preparing=false;if isgraphics(fig),renderEditor();showError(ex);end,end
+            return;
+        end
         if isEmbedded(),generateNative();return;end
         if isCM011()
             try
@@ -683,6 +749,11 @@ renderEditor();sync();showGeometry(true);
 %% 模块九：边界输入与热物性/方法选择均入集中状态，不立即求物理场。
     function next=boundaryConfiguration()
         next=state.cfg;
+        if isBead()
+            next.thermistorBoundary=[];
+            if strcmp(controls.beadCondition.Value,'published'),next.thermistorBoundary=thermistorWorkbenchBoundary();end
+            return;
+        end
         if isCM011()
             if strcmp(controls.cm011Condition.Value,'inclined'),next.cm011Boundary=cm011WorkbenchBoundary();
             else,next.cm011Boundary=[];end
@@ -815,6 +886,10 @@ renderEditor();sync();showGeometry(true);
         if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
+            if isBead()
+                controls.confirm.Enable=onoff(~isempty(state.cfg.thermistorBoundary));
+                message('热敏珠边界选择已更新，请确认工况。');showGeometry(false);return;
+            end
             if isCM011()
                 controls.confirm.Enable=onoff(~isempty(state.cfg.cm011Boundary));
                 message('试件工况已更改，请重新确认。');showGeometry(false);return;
@@ -852,6 +927,12 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         try
             next=boundaryConfiguration();
+            if isBead()
+                [~,fs]=thermistorWorkbenchBoundary(next.thermistorBoundary);
+                state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
+                state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',fs));
+                message('已确认 3 m/s、293.15 K 空气和 305.15 K 等温珠面。');go(4);return;
+            end
             if isCM011()
                 [~,fs]=cm011WorkbenchBoundary(next.cm011Boundary);
                 state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
@@ -897,13 +978,19 @@ renderEditor();sync();showGeometry(true);
     end
 
 %% 模块十：唯一物理计算入口；输入冻结，阶段失败不接受中间快照。
-    function solveCase(~,~)
+    function solveCase(~,~,source)
         if state.busy || preparing,return;end
         if isEmbedded(),startEngine();return;end
         try
             state=aeroHeatWorkflowState('beginSolve',state);token=state.solveId;revision=state.solveInputRevision;
-            renderEditor();message('正在显式计算当前工况；各阶段完成不代表全面积已求解。');
+            renderEditor();
             frozen=state.frozenInputs;
+            if isBead()
+                if nargin<3,source='solve';end
+                frozen.cfg.thermistorResultSource=source;
+                if strcmp(source,'archive'),message('正在核对当前体网并读取匹配的热敏珠结果…');
+                else,message('正在使用已确认的体网从冷初场计算热敏珠…');end
+            else,message('正在显式计算当前工况；各阶段完成不代表全面积已求解。');end
             [solved,fs,newReport]=quietTriple(@()runAeroHeatSingleCase(frozen.mesh,frozen.cfg,@progress));
             state=aeroHeatWorkflowState('completeSolve',state,struct('result',solved, ...
                 'freestream',fs,'solveId',token,'sourceRevision',revision));report=newReport;
@@ -940,6 +1027,32 @@ renderEditor();sync();showGeometry(true);
     end
     function yes=isCM011()
         yes=strcmp(getOption(state.cfg,'computationBackend','engineering'),'cm011Imported');
+    end
+    function yes=isBead()
+        yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'thermistorB');
+    end
+    function loadBeadModel(~,~)
+        % 固定朝向的民用试件从模型步骤进入主流程，原面在网格步骤继续使用。
+        if state.busy || preparing,return;end
+        try
+            [raw,source]=thermistorWorkbenchModel();
+            next=state.cfg;next.computationBackend='thermistorB';next.thermistorAngularCells=2;next.thermistorBoundary=[];
+            state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'orientedMesh',raw,'modelSource',source,'cfg',next));
+            embeddedVolume=[];qualityPreview=false;creasePreview=false;candidatePreview=[];preview=raw;report=[];
+            go(2);message('已加载 B 型热敏珠，沿长轴来流。请选择周向分辨率。');
+        catch ex,showError(ex);end
+    end
+    function leaveBead(~,~)
+        if state.busy || preparing,return;end
+        next=state.cfg;next.computationBackend='engineering';next=rmfield(next,{'thermistorAngularCells','thermistorBoundary'});
+        state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
+        report=[];preview=[];renderEditor();showGeometry(true);message('请选择新的输入模型。');
+    end
+    function changeBeadGrid(field,~)
+        if state.busy || preparing || field.Value==state.cfg.thermistorAngularCells,return;end
+        next=state.cfg;next.thermistorAngularCells=field.Value;next.thermistorBoundary=[];
+        state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
+        report=[];renderEditor();showGeometry(true);message('周向分辨率已改变，请生成新网格并确认边界。');
     end
     function meshBackendChoice(grid,row)
         controls.meshBackend=choice(grid,row,'网格方法',{'工程表面重构','CM-011 低速半域'}, ...
