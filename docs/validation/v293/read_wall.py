@@ -43,49 +43,51 @@ def build(out,grid):
           cachedInputsVerified=len(cached)))
 
 
-def diag_config(index,n,stage):
-    cfg=configuration(index)
+def diag_config(index,n,stage,settings=configuration,inner_cap=LIMIT):
+    cfg=settings(index)
     count=n+1 if stage=="observe" else 1
-    cfg=replace(cfg,f"INNER_ITER= {LIMIT}\n",f"INNER_ITER= {count}\n")
+    cfg=replace(cfg,f"INNER_ITER= {inner_cap}\n",f"INNER_ITER= {count}\n")
     if stage=="release":return replace(cfg,"(wall, VALUE, 1.0)","(wall, FLUX, 0.0)")
-    if n<LIMIT:cfg=replace(cfg,"CONV_STARTITER= 50\n",f"CONV_STARTITER= {n+2}\n")
+    if n<inner_cap:cfg=replace(cfg,"CONV_STARTITER= 50\n",f"CONV_STARTITER= {n+2}\n")
     return cfg
 
 
-def sample(index,stage,area,out,grid,src,proof):
+def sample(index,stage,area,out,grid,src,proof,settings=configuration,inner_cap=LIMIT,built=None,replay_seconds=900,extra_inputs=()):
     info=inputs(grid);s=read(proof);checked(src)
     assert s["step"]==index and s["passed"] and s["gridSHA256"]==info["gridSHA256"]
     name=f"seed_{index-1:05}.csv";end=src/f"restart_{index:05}.csv"
     assert sha(end)==s["frameSHA256"] and sha(src/name)==s["oldFrameSHA256"]
     locks=[HERE/"PLAN.md",HERE/"run_step.py",Path(__file__).resolve(),grid/"grid.json",proof,
-           src/"case.cfg",src/"debugger_process.json",ROOT/"scripts/runSU2NativeDebugger.py"]
+           src/"case.cfg",src/"debugger_process.json",ROOT/"scripts/runSU2NativeDebugger.py",*extra_inputs]
     if stage=="observe":
-        built=area/"build01";exe=built/"observe_bead.exe"
+        if built is None:built=area/"build01"
+        exe=built/"observe_bead.exe"
         assert sha(exe)==read(built/"build.json")["observerSHA256"]
-        locks.extend([built/"build.json",built/"CIntegration.cpp"]);seed=src/name;limit,mb=900,400
+        locks.extend([built/"build.json",built/"CIntegration.cpp"]);seed=src/name;limit,mb=replay_seconds,400
     else:
         exe=OFFICIAL;assert sha(exe)==ENGINE_SHA
         seed=end;limit,mb=100,200
     os.link(seed,out/name);os.link(grid/"mesh.su2",out/"mesh.su2")
-    cfg=out/"case.cfg";cfg.write_text(diag_config(index,s["innerRows"],stage),encoding="ascii")
+    cfg=out/"case.cfg";cfg.write_text(diag_config(index,s["innerRows"],stage,settings,inner_cap),encoding="ascii")
     locks.extend([exe,cfg,out/name,out/"mesh.su2"])
     os.environ["PATH"]=str(BIN)+os.pathsep+os.environ["PATH"]
     observe([str(exe),"case.cfg","--threads","1"],out,{str(p):sha(p) for p in locks},limit,mb*1024**2)
     checked(out)
 
 
-def energy(index,grid,src,obs,ctrl,proof,out):
+def energy(index,grid,src,obs,ctrl,proof,out,settings=configuration,inner_cap=LIMIT,built=None):
     info=inputs(grid);s=read(proof)
     assert s["passed"] and s["step"]==index
     official,witness,release=[checked(f) for f in (src,obs,ctrl)]
     assert official["command"]==release["command"]==[str(OFFICIAL),"case.cfg","--threads","1"] and sha(OFFICIAL)==ENGINE_SHA
-    assert sha(Path(witness["command"][0]))==read(src.parent/"build01/build.json")["observerSHA256"]
+    if built is None:built=src.parent/"build01"
+    assert sha(Path(witness["command"][0]))==read(built/"build.json")["observerSHA256"]
     assert all(sha(f/"mesh.su2")==info["gridSHA256"] for f in (src,obs,ctrl))
     name=f"seed_{index-1:05}.csv";end=f"restart_{index:05}.csv";n=s["innerRows"]
     assert sha(src/end)==sha(ctrl/name)==s["frameSHA256"] and sha(src/name)==sha(obs/name)==s["oldFrameSHA256"]
-    assert (src/"case.cfg").read_text("ascii")==configuration(index)
-    assert (obs/"case.cfg").read_text("ascii")==diag_config(index,n,"observe")
-    assert (ctrl/"case.cfg").read_text("ascii")==diag_config(index,n,"release")
+    assert (src/"case.cfg").read_text("ascii")==settings(index)
+    assert (obs/"case.cfg").read_text("ascii")==diag_config(index,n,"observe",settings,inner_cap)
+    assert (ctrl/"case.cfg").read_text("ascii")==diag_config(index,n,"release",settings,inner_cap)
     skipped=(obs/"readout_updates.csv").read_text("ascii").splitlines()
     assert skipped==[f"{index},{n},flow",f"{index},{n},scalar"]
     with np.load(grid/"nodes.npz") as z:
@@ -102,6 +104,7 @@ def energy(index,grid,src,obs,ctrl,proof,out):
     result=dict(accepted=True,step=index,gridSHA256=info["gridSHA256"],acceptedFrame=str(src/end),energy=balance,
                 elapsedPhysicalTimeS=s["elapsedPhysicalTimeS"],nativeDualMaxRelativeDifference=dual_error,
                 scratchFrameMaxDifference=scratch_error.tolist(),skippedAppendedUpdates=skipped)
+    if "verifiedPrefixRows" in s:result["verifiedPrefixRows"]=s["verifiedPrefixRows"]
     if index==2:
         # 第一列温度属于加密网首层；另取原第一层的同一 XYZ，再作原面内积分。
         os.link(bound_source("body.json"),out/"body.json");os.link(grid/"mesh.su2",out/"mesh.su2")

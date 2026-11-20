@@ -13,10 +13,10 @@ sys.path[:0]=[str(HERE.parent/v) for v in ("v287","v288","v289")]
 from audit_step import RMS, frame
 
 
-def audit(index,grid,folder,out):
+def audit(index,grid,folder,out,settings=configuration,inner_cap=LIMIT):
     info=inputs(grid);rec=checked(folder);end=folder/f"restart_{index:05}.csv"
     hist=folder/f"history_{index:05}.csv";seed=folder/f"seed_{index-1:05}.csv"
-    assert (folder/"case.cfg").read_text("ascii")==configuration(index)
+    assert (folder/"case.cfg").read_text("ascii")==settings(index)
     assert rec["command"]==[str(OFFICIAL),"case.cfg","--threads","1"] and sha(OFFICIAL)==ENGINE_SHA
     assert sha(folder/"mesh.su2")==info["gridSHA256"] and end.name in (folder/"debugger.log").read_text(errors="replace")
     if index==1:expected=info["seedSHA256"]
@@ -29,7 +29,7 @@ def audit(index,grid,folder,out):
     before=frame(seed,xyz);new=frame(end,xyz)
     assert np.any(before[:,4:]!=new[:,4:])
     h=columns(hist,["Time_Iter","Inner_Iter"]+RMS)
-    assert np.isfinite(h).all() and 20<=len(h)<=LIMIT and np.all(h[:,0]==index)
+    assert np.isfinite(h).all() and 20<=len(h)<=inner_cap and np.all(h[:,0]==index)
     np.testing.assert_array_equal(h[:,1],np.arange(len(h)))
     rhs=columns(end,["Residual_"+s for s in ("Pressure","Velocity_x","Velocity_y","Velocity_z","Enthalpy","Species_0")])
     assert rhs.shape==(len(xyz),6) and np.isfinite(rhs).all()

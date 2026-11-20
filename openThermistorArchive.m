@@ -14,6 +14,9 @@ switch angularCells
     case 'halfsteps'
         archive=fullfile(caseDir,'startup_6ms_halfsteps.zip');
         expected='9a1ce5800c51a19b845877b83c735cd56d082a873c04024194f1f666eb1f84f3';
+    case 'nearWall6'
+        archive=fullfile(caseDir,'startup_6ms_nearwall56.zip');
+        expected='9bd48452a2516bd42b4aab6e644d101a883146d0e6e225322e109f66d15dab9e';
     otherwise
         error('RAH:Bead:Angle','请选择已登记的 3 m/s 扇区或 6 m/s 全周启动快照。');
 end
@@ -23,8 +26,8 @@ unzip(archive,folder);
 end
 
 function removeExtracted(folder)
-% 模块四：释放此调用独有的四个临时文件。新计算的现场和用户导出保存在项目中。
-for name={'case.json','body.json','wall.csv','summary.json'}
+% 模块四：释放本次从已校验数据包展开的临时文件。
+for name={'case.json','body.json','wall.csv','summary.json','matched_temperature.csv'}
     path=fullfile(folder,name{1});if isfile(path),delete(path);end
 end
 rmdir(folder);

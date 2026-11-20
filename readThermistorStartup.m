@@ -1,6 +1,8 @@
-function [current,report]=readThermistorStartup()
-%READTHERMISTORSTARTUP 核验并装入 B 型热敏珠全周首个物理步的壁面快照。
+function [current,report]=readThermistorStartup(mode)
+%READTHERMISTORSTARTUP 核验 B 型热敏珠全周启动瞬态，并将选定终点设为主结果。
 % 模块一：绑定给定壁温、物理时间、实际旧新帧、原面号与原生热量收支。
+if nargin==0,mode='startup6';end
+refined=strcmp(validatestring(mode,{'startup6','nearWall6'}),'nearWall6');
 [folder,cleanup]=openThermistorArchive('startup6'); %#ok<NASGU>
 c=jsondecode(fileread(fullfile(folder,'case.json')));
 s=jsondecode(fileread(fullfile(folder,'summary.json')));e=s.energy;
@@ -12,6 +14,16 @@ assert(c.speedMps==6 && c.airK==293.15 && c.nominalWallK==303.15 && c.airPa==101
     strcmp(e.acceptedFrameSHA256,'c8a15e3c275f95711557462562237d6534908b5a7d40062693100978a4c8d4ba') && ...
     strcmp(e.oldFrameSHA256,'ea94eb8a3b668a47e1d3e66e59065e704ab05c57ae752fcd6ab75fa112f42445'), ...
     'RAH:Bead:Startup','旧新物理状态或时间步不符。');
+initial=e.oldFrameSHA256;
+kind='SU2-8.6.0-thermistor-B-first-step';
+if refined
+    [fineDir,fineCleanup]=openThermistorArchive('nearWall6'); %#ok<NASGU>
+    [refDir,refCleanup]=openThermistorArchive('halfsteps'); %#ok<NASGU>
+    trial=readGridComparison(fineDir,refDir,s,c);
+    s=trial.summary.fineSurface;e=s.energy;wallFile=fullfile(fineDir,'wall.csv');
+    initial=trial.summary.gridTransfer.seedSHA256;
+    kind='SU2-8.6.0-thermistor-B-56-layers-two-halfsteps';
+end
 body=jsondecode(fileread(bodyFile));mesh=struct('V',body.V,'F',body.F);
 rows=readtable(wallFile);n=size(mesh.F,1);
 assert(s.fullSurfaceComputed && n==5216 && isequal(rows.faceID,(0:n-1)') && ...
@@ -30,7 +42,7 @@ assert(all(abs(rows.areaM2-area)<1e-10*area) && abs(sum(area)-s.areaM2)<1e-11*s.
 % 模块二：每个三角面的计算值与对应方法进入主台账，温度身份由边界和近壁场决定。
 condition=struct('caseLabel','B 型热敏珠 · 全周启动瞬态','velocityMps',[-c.speedMps 0 0], ...
     'ambientPressurePa',c.airPa,'ambientTemperatureK',c.airK,'wallTemperatureK',c.nominalWallK, ...
-    'elapsedPhysicalTimeS',c.dtSeconds,'initialStateSHA256',e.oldFrameSHA256, ...
+    'elapsedPhysicalTimeS',c.dtSeconds,'initialStateSHA256',initial, ...
     'alphaDeg',0,'betaDeg',0,'geometryScope','无引线等温名义珠体，360° 全周计算域');
 setup=struct('condition',condition,'region',repmat("热敏珠完整外表面",n,1), ...
     'wallTemperatureK',repmat(c.nominalWallK,n,1),'engineeringSolver',@emptyWall,'localSolver',@localWall);
@@ -39,12 +51,20 @@ assert(report.fullSurfaceComputed && abs(report.wholeSurfaceHeatPowerW-s.powerIn
     'RAH:Bead:Startup','工作台功率与原生反力不符。');
 current.hybridWall.pressureGaugePa=rows.pressureGaugePa;
 current.thermistorStartup=s;
-current.evidenceIdentity.sourceFrame=struct('kind','SU2-8.6.0-thermistor-B-first-step', ...
+current.evidenceIdentity.sourceFrame=struct('kind',kind, ...
     'sha256',e.acceptedFrameSHA256,'oldFrameSHA256',e.oldFrameSHA256,'reactionSHA256',e.observedWallSHA256, ...
     'wallSHA256',s.wallTableSHA256,'bodySHA256',s.bodySHA256,'meshSHA256',s.meshSHA256);
 current.evidenceIdentity.sourceTraceable=true;current.evidenceIdentity.productionQualified=false;
 current.evidenceIdentity.scope='首个已接受时间步的研究数值解。逐面实验精度和发展后尾迹待验证。';
 report.elapsedPhysicalTimeS=c.dtSeconds;report.energy=e;
+if refined
+    current.beadNearWallComparison=trial;report.nearWallComparison=trial.summary;
+    current.evidenceIdentity.sourceFrame.initialSHA256=initial;
+    current.evidenceIdentity.sourceFrame.comparisonFrameSHA256=trial.summary.referenceFrameSHA256;
+    current.evidenceIdentity.sourceFrame.comparisonWallSHA256=trial.summary.referenceWallTableSHA256;
+    current.evidenceIdentity.sourceFrame.matchedTemperatureSHA256=trial.summary.matchedTableSHA256;
+    current.evidenceIdentity.scope='56 层网格两个物理半步的启动结果。48 层同刻场用于近壁离散对照。局部实验精度待验证。';
+end
 
     function empty=emptyWall(~,~,~)
         empty=rows([],{'faceID','pressurePa','heatFluxWm2'});empty.method=strings(0,1);
@@ -55,7 +75,43 @@ report.elapsedPhysicalTimeS=c.dtSeconds;report.energy=e;
         w.pressureMethod=repmat("已接受终场的相对壁压加环境压力，按实际周向位置在原三角面内积分平均",count,1);
         w.heatFluxMethod=repmat("BDF1 强温差标量壁反力，按实际周向节点保守分配至原三角面，正值入壁",count,1);
         w.nearWallTemperatureMethod=repmat("终场同方位首层流体节点的强温差标量换算为 K，再按原面权重平均",count,1);
-        result=struct('accepted',true,'reason','首步六分量连续窗、原生反力、含空气储热的收支及原面积分已核对', ...
+        result=struct('accepted',true,'reason','物理步终点六分量连续窗、原生反力、含空气储热的收支及原面积分已核对', ...
             'wall',w,'diagnostics',struct('sourceFrameSHA256',e.acceptedFrameSHA256));
     end
+end
+
+function trial=readGridComparison(fineDir,refDir,startup,condition)
+% 模块三：核验两套网格的同刻两半步、同面功率与共同空间位置的温度。
+s=jsondecode(fileread(fullfile(fineDir,'summary.json')));g=s.gridTransfer;
+ref=jsondecode(fileread(fullfile(refDir,'summary.json')));fine=s.fineSurface;
+one=s.firstHalfEnergy;two=fine.energy;t=condition.dtSeconds;
+assert(g.admitted && g.originalNodesPreserved && g.oldLayers==48 && g.newLayers==56 && ...
+    g.matchedOriginalFirstLayer==2 && strcmp(g.sourceSeedSHA256,startup.energy.oldFrameSHA256) && ...
+    strcmp(g.seedSHA256,one.oldFrameSHA256) && strcmp(one.acceptedFrameSHA256,two.oldFrameSHA256) && ...
+    strcmp(g.gridSHA256,fine.meshSHA256) && strcmp(s.referenceMeshSHA256,ref.meshSHA256) && ...
+    strcmp(ref.meshSHA256,startup.meshSHA256) && strcmp(ref.fineFrameSHA256,s.referenceFrameSHA256) && ...
+    strcmp(ref.initialSHA256,g.sourceSeedSHA256) && strcmp(s.bodySHA256,startup.bodySHA256) && ...
+    strcmp(ref.bodySHA256,fine.bodySHA256) && strcmp(fine.bodySHA256,s.bodySHA256) && ...
+    ref.elapsedPhysicalTimeS==t && s.elapsedPhysicalTimeS==t && ...
+    one.dtSeconds==ref.firstHalfEnergy.dtSeconds && two.dtSeconds==ref.secondHalfEnergy.dtSeconds && ...
+    one.dtSeconds+two.dtSeconds==t,'RAH:Bead:GridSource','近壁对照的网格、几何、初场或时刻不符。');
+fineFile=fullfile(fineDir,'wall.csv');refFile=fullfile(refDir,'wall.csv');
+temperatureFile=fullfile(fineDir,'matched_temperature.csv');
+assert(strcmp(cm011FileSHA256(fineFile),fine.wallTableSHA256) && ...
+    strcmp(cm011FileSHA256(refFile),s.referenceWallTableSHA256) && ...
+    strcmp(ref.fineWallTableSHA256,s.referenceWallTableSHA256) && ...
+    strcmp(cm011FileSHA256(temperatureFile),s.matchedTableSHA256),'RAH:Bead:GridTable','逐面表的来源不符。');
+w=readtable(fineFile);r=readtable(refFile);m=readtable(temperatureFile);
+temperature=m.temperatureAtOriginalFirstLayerK;area=w.areaM2;
+assert(isequal(w.faceID,(0:5215)',r.faceID,m.faceID) && isequal(area,r.areaM2) && ...
+    all(isfinite(area) & area>0) && abs(sum(area)-s.areaM2)<1e-11*s.areaM2 && ...
+    all(temperature>=condition.airK & temperature<=condition.nominalWallK) && ...
+    abs(sum(area.*r.heatFluxWm2)+ref.secondHalfEnergy.wallReleaseW)<1e-11*ref.secondHalfEnergy.wallReleaseW, ...
+    'RAH:Bead:GridFaces','两网的原面顺序、面积、功率或同位置温度不符。');
+delta=[w.pressureGaugePa-r.pressureGaugePa,w.heatFluxWm2-r.heatFluxWm2,temperature-r.nearWallCellTemperatureK];
+expected=[s.pressurePa,s.heatFluxWm2,s.matchedTemperatureK];
+assert(all(abs(sqrt(sum(area.*delta.^2,1)/sum(area))-[expected.weightedRMS])<1e-9) && ...
+    all(abs(max(abs(delta),[],1)-[expected.maximumAbsolute])<1e-9), ...
+    'RAH:Bead:GridMetrics','同面、同刻的差值与面积加权对照不符。');
+trial=struct('summary',s,'reference',r,'matchedTemperatureK',temperature);
 end

@@ -471,10 +471,10 @@ if isfield(mesh,'thermistorStartup')
         '空气储热率 %.6g nW，收支差 %.4g pW。'],1e3*e.wallReleaseW,1e3*e.farOutW,1e9*e.airStorageW,1e12*e.imbalanceW);
     k=find(strcmp({data.fields.key},'nearWallCellTemperature'),1);
     data.fields(k).label='首层流体节点温度';
-    data.fields(k).stateNote='首步终场的流体温度，取原面所对应的全周首层节点。';
+    data.fields(k).stateNote='终场的流体温度，取原面所对应的全周首层节点。';
     data.uniformFieldValues.wallInput=struct('value',c.wallTemperatureK,'unit','K');
 end
-% 时间步对照使用同一构造初场和同一物理终点，所有差值统一按两个半步减一个整步。
+% 模块用途：按对照类型指定同刻两份实际场、差值方向及温度取样位置。
 if isfield(mesh,'beadStepComparison')
     trial=mesh.beadStepComparison;s=trial.summary;w=trial.wall;
     data.defaultField='timeHeatDifference';
@@ -487,23 +487,60 @@ if isfield(mesh,'beadStepComparison')
         'timeHalfGauge','相对环境壁压 · 两个半步','Pa',w.pressureGaugePa,'全周层流 BDF1，终帧表压按原三角面内积分平均','pressureGauge';
         'timeHalfHeat','入壁热流 · 两个半步','kW/m²',w.heatFluxWm2/1000,'全周 BDF1 强温差标量固定端点壁反力，按原面面积保守分配','heatFlux';
         'timeHalfNearWall','首层流体温度 · 两个半步','K',w.nearWallCellTemperatureK,'全周 BDF1 终帧首层节点标量换算为 K 后按原面平均','nearWallCellTemperature'};
+    differenceMethod='同一原面、同一物理时刻，两个 BDF1 半步减一个 BDF1 整步';
+    differenceLabel='时间步对照';
+    delta={'timeHeatDifference','入壁热流差','W/m²',trial.heatDifferenceWm2;
+           'timePressureDifference','壁压差','Pa',trial.pressureDifferencePa};
+elseif isfield(mesh,'beadNearWallComparison')
+    trial=mesh.beadNearWallComparison;s=trial.summary;r=trial.reference;w=mesh.hybridWall;
+    data.nearWallComparison=s;data.defaultField='gridHeatDifference';
+    data.caseNote=[data.caseNote ' · 主值为 56 层，对照为 48 层 · 两网各推进两个半步'];
+    data.resultCondition.caption=data.caseNote;
+    scope='同一启动时刻和原面。近壁最内八层等分，温度差在原第一层的相同物理位置计算。';
+    fields={
+        'gridRefPressure','绝对壁压 · 48 层','kPa',r.pressurePa/1000,'48 层全周层流 BDF1，壁节点压力按原面积分并加环境压力','pressure';
+        'gridRefGauge','相对环境壁压 · 48 层','Pa',r.pressureGaugePa,'48 层全周层流 BDF1，表压按原面积分','pressureGauge';
+        'gridRefHeat','入壁热流 · 48 层','kW/m²',r.heatFluxWm2/1000,'48 层 BDF1 强温差标量壁反力，按原面保守分配','heatFlux';
+        'gridMatchedTemperature','共同位置温度 · 56 层','K',trial.matchedTemperatureK,'56 层第二层节点的终场标量换算为温度，按原面权重平均','';
+        'gridRefTemperature','共同位置温度 · 48 层','K',r.nearWallCellTemperatureK,'48 层第一层节点的终场标量换算为温度，按相同原面权重平均','gridMatchedTemperature'};
+    differenceMethod='同一原面、同一物理时刻，56 层减 48 层';
+    differenceLabel='近壁网格对照';
+    delta={'gridHeatDifference','入壁热流差','W/m²',w.heatFluxWm2-r.heatFluxWm2;
+           'gridPressureDifference','壁压差','Pa',w.pressureGaugePa-r.pressureGaugePa;
+           'gridTemperatureDifference','共同位置温度差','K',trial.matchedTemperatureK-r.nearWallCellTemperatureK};
+    k=find(strcmp({data.fields.key},'nearWallCellTemperature'),1);
+    data.fields(k).label='首层流体温度 · 56 层';
+    data.fields(k).stateNote='加密网实际首层。共同位置对照使用加密网第二层及原网第一层。';
+end
+% 主场和对照场使用共同比较色标，各差场使用关于零对称的比较色标。
+if isfield(mesh,'beadStepComparison') || isfield(mesh,'beadNearWallComparison')
     for j=1:size(fields,1)
         values=fields{j,4};key=fields{j,1};ref=fields{j,6};
         add(key,fields{j,2},fields{j,3},values,ones(n,1),repmat(fields(j,5),n,1),scope);
         data.fields(end).stateNote=scope;data.fields(end).computedStateLabel='研究数值解';
+        if isempty(ref),continue;end
         pair=[values;data.fields(strcmp({data.fields.key},ref)).values];
         data.comparisonColorRanges.(key)=[min(pair) max(pair)];
         data.comparisonColorRanges.(ref)=data.comparisonColorRanges.(key);
     end
-    methods=repmat({'同一原面、同一物理时刻，两个 BDF1 半步减一个 BDF1 整步'},n,1);
-    delta={'timeHeatDifference','入壁热流差','W/m²',trial.heatDifferenceWm2;
-           'timePressureDifference','壁压差','Pa',trial.pressureDifferencePa};
+    methods=repmat({differenceMethod},n,1);
     for j=1:size(delta,1)
         key=delta{j,1};values=delta{j,4};
         add(key,delta{j,2},delta{j,3},values,ones(n,1),methods,scope);
-        data.fields(end).stateNote=['两个半步减一个整步。' scope];data.fields(end).computedStateLabel='时间步对照';
+        data.fields(end).stateNote=[differenceMethod '。' scope];data.fields(end).computedStateLabel=differenceLabel;
         limit=max(abs(values));if limit>0,data.comparisonColorRanges.(key)=[-limit limit];end
     end
+end
+if isfield(mesh,'beadNearWallComparison')
+    % 在对应差场的说明中给出量纲、归一化参照及整珠功率，便于读者核对局部图。
+    k=find(strcmp({data.fields.key},'gridHeatDifference'),1);
+    data.fields(k).stateNote=sprintf(['56 层减 48 层。面积加权 RMS %.5g W/m²，局部最大绝对差 %.5g W/m²' ...
+        '（占 48 层峰值 %.3g%%）。整珠放热 %.7g → %.7g mW，变化 %+.4g%%。'], ...
+        s.heatFluxWm2.weightedRMS,s.heatFluxWm2.maximumAbsolute,100*s.heatFluxWm2.maximumFraction, ...
+        1000*s.referenceWallReleaseW,1000*s.fineSurface.energy.wallReleaseW,100*s.relativePowerDifference);
+    k=find(strcmp({data.fields.key},'gridPressureDifference'),1);
+    data.fields(k).stateNote=sprintf(['56 层减 48 层。面积加权 RMS %.5g Pa，局部最大绝对差 %.5g Pa。' ...
+        '比较用动压 %.5g Pa。'],s.pressurePa.weightedRMS,s.pressurePa.maximumAbsolute,s.pressurePa.scale);
 end
 if isfield(mesh,'lewisCylinder')
     data.defaultField='nusselt';data.flowDirection=[0 -1 0];
