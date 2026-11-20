@@ -1,8 +1,9 @@
-function [current,report,page]=runThermistorBeadCase(folder,mode,windowOpen,inputMesh)
+function [current,report,page]=runThermistorBeadCase(folder,mode,windowOpen,inputMesh,wallTemperatureK)
 %RUNTHERMISTORBEADCASE 读取 B 型热敏珠的冻结结果，或从冷初场计算同一工况。
 % [mesh,report]=runThermistorBeadCase() 只读随项目发布的原面表。
 % [mesh,report,page]=runThermistorBeadCase([], 'solve') 运行内嵌求解器并导出离线页。
 % 'archive7p5' 和 'solve7p5' 使用 7.5° 周向单元，并与 15° 归档按面配对。
+% runThermistorBeadCase([], 'archive', [], [], 299.15) 使用参照场计算给定壁温的稳态结果。
 % 显式指定 outputs 下的新目录，或请求第三个输出，都会在那里导出离线页。
 root=fileparts(mfilename('fullpath'));outputs=fullfile(root,'outputs');
 if nargin<1,folder='';end
@@ -12,6 +13,9 @@ mode=validatestring(mode,{'archive','solve','archive7p5','solve7p5'});
 fresh=startsWith(mode,'solve');refined=endsWith(mode,'7p5');
 angularCells=2+2*refined;
 if nargin<4,inputMesh=[];end
+boundary=thermistorWorkbenchBoundary();
+if nargin>=5,boundary.wallTemperatureK=wallTemperatureK;end
+boundary=thermistorWorkbenchBoundary(boundary);
 if ~isempty(inputMesh)
     % 将显式计算或归档绑定到主侧栏已确认的米制原面与实际体网。
     verifyThermistorWorkbenchMesh(inputMesh,angularCells);
@@ -67,28 +71,55 @@ assert(all(rows.pressurePa>0 & rows.heatFluxWm2<0) && all(rows.nearWallCellTempe
 f=mesh.F;v=mesh.V;area=vecnorm(cross(v(f(:,2),:)-v(f(:,1),:),v(f(:,3),:)-v(f(:,1),:),2),2,2)/2;
 assert(all(abs(rows.areaM2-area)<1e-10*area),'RAH:Bead:Area','逐面面积与原几何不符。');
 
+% 恒物性、无源被动温差方程在固定速度场中是线性的，压力和面积直接沿用。
+% 原归档的温度界限与热反力先按 12 K 参照工况审核，再换算到给定边界。
+wallTemperatureK=boundary.wallTemperatureK;
+deltaT=wallTemperatureK-spec.ambientK;
+scale=deltaT/(spec.wallK-spec.ambientK);
+if scale==0
+    rows.heatFluxWm2(:)=0;
+    rows.nearWallCellTemperatureK(:)=spec.ambientK;
+elseif scale~=1
+    rows.heatFluxWm2=scale*rows.heatFluxWm2;
+    rows.nearWallCellTemperatureK=spec.ambientK+scale*(rows.nearWallCellTemperatureK-spec.ambientK);
+end
+
 % 模块二：同一名义等温珠体的全部原面交给区域求解入口，保留每个变量的算法来源。
 condition=struct('caseLabel','B 型热敏珠 · 名义长椭球 · 沿长轴来流','velocityMps',[-spec.freestreamMps 0 0], ...
-    'ambientPressurePa',spec.pressurePa,'ambientTemperatureK',spec.ambientK,'wallTemperatureK',spec.wallK, ...
+    'ambientPressurePa',spec.pressurePa,'ambientTemperatureK',spec.ambientK,'wallTemperatureK',wallTemperatureK, ...
     'alphaDeg',0,'betaDeg',0,'diameterM',spec.diameterM,'geometryScope','光滑等温珠体，未建引线');
 setup=struct('condition',condition,'region',repmat("热敏珠完整外表面",n,1), ...
-    'wallTemperatureK',repmat(spec.wallK,n,1),'engineeringSolver',@emptyWall,'localSolver',@localWall);
+    'wallTemperatureK',repmat(wallTemperatureK,n,1),'engineeringSolver',@emptyWall,'localSolver',@localWall);
 [current,~,report]=runAeroHeatSingleCase(mesh,struct('analysisMode','hybridSurface','hybridSurface',setup));
+targetPower=scale*stats.powerW;
 assert(report.fullSurfaceComputed && isequal(current.hybridWall.faceID,rows.faceID) && ...
-    abs(report.wholeSurfaceHeatPowerW/stats.powerW-1)<1e-11,'RAH:Bead:Power','完整原面功率与回执不符。');
+    abs(report.wholeSurfaceHeatPowerW-targetPower)<=1e-11*abs(targetPower),'RAH:Bead:Power','完整原面功率与给定壁温的反力不符。');
 current.hybridWall.pressureGaugePa=rows.pressureGaugePa;
 identity=struct('kind','SU2-8.6.0-thermistor-B','sha256',stats.sourceFrameSHA256, ...
     'reactionSHA256',stats.sourceReactionSHA256,'wallSHA256',stats.wallTableSHA256,'bodySHA256',stats.bodySHA256);
 current.evidenceIdentity.sourceFrame=identity;current.evidenceIdentity.sourceTraceable=true;
 current.evidenceIdentity.productionQualified=false;
 current.evidenceIdentity.scope='名义等温珠体的数值解。实验只给整珠平均换热系数。';
+thermal=struct('referenceWallTemperatureK',spec.wallK,'wallTemperatureK',wallTemperatureK, ...
+    'ambientTemperatureK',spec.ambientK,'deltaTemperatureK',deltaT,'scale',scale, ...
+    'densityKgM3',spec.rho,'viscosityPaS',spec.mu,'specificHeatJkgK',spec.cp,'conductivityWmK',spec.k, ...
+    'nativeFrameSHA256',stats.sourceFrameSHA256,'nativeReactionSHA256',stats.sourceReactionSHA256);
+if scale~=1
+    current.evidenceIdentity.sourceFrame.thermalConversion=thermal;
+end
 
 % 模块三：按论文的名义面积比较总功率；逐面验证面积、给定温度与首层温度独立保存。
-comparison=jsondecode(fileread(fullfile(root,'docs','validation','v282','evidence','comparison.json')));
-meanH=-report.wholeSurfaceHeatPowerW/((spec.wallK-spec.ambientK)*spec.areaSourceM2);
-assert(abs(meanH/stats.nominalExperimentAreaCoefficientWm2K-1)<1e-11,'RAH:Bead:Mean','名义面积换热积分不符。');
-current.thermistorBead=struct('experiment',comparison.experiment,'meanH',meanH, ...
-    'relativeDifference',meanH/comparison.experiment.hWm2K-1,'verifiedJointAreaM2',0);
+meanH=NaN;
+if deltaT>0
+    meanH=-report.wholeSurfaceHeatPowerW/(deltaT*spec.areaSourceM2);
+    assert(abs(meanH/stats.nominalExperimentAreaCoefficientWm2K-1)<1e-11,'RAH:Bead:Mean','名义面积换热积分不符。');
+end
+current.thermistorBead=struct('meanH',meanH,'verifiedJointAreaM2',0,'thermal',thermal);
+if scale==1
+    comparison=jsondecode(fileread(fullfile(root,'docs','validation','v282','evidence','comparison.json')));
+    current.thermistorBead.experiment=comparison.experiment;
+    current.thermistorBead.relativeDifference=meanH/comparison.experiment.hWm2K-1;
+end
 current.thermistorBead.cellAngleDeg=15;
 if refined
     % 模块四：根据两份各自绑定的场计算同面差值，主热流和主压力保留细网原值。
@@ -100,13 +131,14 @@ if refined
         isequal(oldWall.faceID,rows.faceID) && isequal(oldWall.areaM2,rows.areaM2), ...
         'RAH:Bead:Angle','周向网格、配置或原面身份与对照不符。');
     current.beadAngularDelta=struct('pressurePa',rows.pressureGaugePa-oldWall.pressureGaugePa, ...
-        'heatFluxWm2',rows.heatFluxWm2-oldWall.heatFluxWm2);
+        'heatFluxWm2',rows.heatFluxWm2-scale*oldWall.heatFluxWm2);
     current.thermistorBead.cellAngleDeg=stats.cellAngleDeg;
-    current.thermistorBead.baselineH=old.nominalExperimentAreaCoefficientWm2K;
+    if deltaT>0,current.thermistorBead.baselineH=old.nominalExperimentAreaCoefficientWm2K;end
     current.thermistorBead.baselineFrameSHA256=old.sourceFrameSHA256;
     current.evidenceIdentity.sourceFrame.comparisonFrameSHA256=old.sourceFrameSHA256;
 end
-report.native=stats;report.reusedArchive=~fresh;report.comparison=current.thermistorBead;
+if scale==1,report.native=stats;else,report.referenceNative=stats;end
+report.thermal=thermal;report.reusedArchive=~fresh;report.comparison=current.thermistorBead;
 if ~isempty(inputMesh)
     p=inputMesh.thermistorPrepared;
     assert(isequal(mesh.V,inputMesh.V) && isequal(mesh.F,inputMesh.F),'RAH:Bead:Geometry','返回原面与当前输入不符。');
@@ -142,6 +174,10 @@ if writePage,page=exportAerothermalWeb(current,fullfile(folder,'workbench'));end
         wall.pressureMethod=repmat("原生壁节点相对压力按面内权重平均，加环境静压",count,1);
         wall.heatFluxMethod=repmat("强等温对流扩散方程的壁反力，按原三角面积守恒分配",count,1);
         wall.nearWallTemperatureMethod=repmat("首层流体节点的温差标量换算为 K，再按面内权重平均",count,1);
+        if scale~=1
+            wall.heatFluxMethod(:)="恒物性线性换算：已收敛的强等温壁反力乘以当前温差与参照温差之比，原面守恒分配";
+            wall.nearWallTemperatureMethod(:)="环境温度加上当前壁温差乘以原面对应的首层无量纲温差";
+        end
         solution=struct('accepted',true,'reason','六个分量的末窗残差、温界与边界热量账通过', ...
             'wall',wall,'diagnostics',struct('sourceFrameSHA256',stats.sourceFrameSHA256));
     end

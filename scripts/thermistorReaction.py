@@ -21,15 +21,16 @@ def terminal(folder):
     return record
 
 
-def observe(parent, out, *, release):
+def observe(parent, out, *, release, wall_value=1.0):
     terminal(parent)
     cfg=(parent/"case.cfg").read_text("ascii")
-    assert "MARKER_WALL_SPECIES= (wall, VALUE, 1.0)" in cfg
+    strong_wall=f"MARKER_WALL_SPECIES= (wall, VALUE, {float(wall_value)})"
+    assert strong_wall in cfg
     cfg,count=re.subn(r"^ITER= \d+$","ITER= "+("1" if release else "20"),cfg,flags=re.M)
     assert count==1
     if release:
         # 同一输入态取消该行的强约束，令外加壁通量为零。未约束 RHS 即原壁反力的相反数。
-        cfg=cfg.replace("MARKER_WALL_SPECIES= (wall, VALUE, 1.0)","MARKER_WALL_SPECIES= (wall, FLUX, 0.0)")
+        cfg=cfg.replace(strong_wall,"MARKER_WALL_SPECIES= (wall, FLUX, 0.0)")
         cfg=cfg.replace("VOLUME_OUTPUT= (COORDINATES, SOLUTION, PRIMITIVE)",
                         "VOLUME_OUTPUT= (COORDINATES, SOLUTION, RESIDUAL)")
         cfg+="WRT_RESTART_COMPACT= NO\n"

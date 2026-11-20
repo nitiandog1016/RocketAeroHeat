@@ -394,16 +394,24 @@ if isfield(mesh,'hybridWall')
 end
 % 热敏珠只具备整珠平均换热的实验读数；探针上的局部压力和热流均保留研究身份。
 if isfield(mesh,'thermistorBead')
-    bead=mesh.thermistorBead;observation=bead.experiment;
+    bead=mesh.thermistorBead;
     data.thermistorBead=bead;
     data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
-    data.caseNote=sprintf('%s · 给定壁温 %.2f K · 无引线名义珠体',data.caseNote,mesh.hybridCondition.wallTemperatureK);
+    data.caseNote=sprintf('%s · 给定壁温 %.12g K · 无引线名义珠体',data.caseNote,mesh.hybridCondition.wallTemperatureK);
     if isfield(bead,'cellAngleDeg'),data.caseNote=sprintf('%s · 周向单元 %g°',data.caseNote,bead.cellAngleDeg);end
     data.resultCondition.caption=data.caseNote;
     k=find(strcmp({data.fields.key},'heatFlux'),1);
-    data.fields(k).stateNote=sprintf(['名义面积上的整珠平均换热系数 %.1f W/(m²·K)，论文图 7 约 %.1f，' ...
-        '相差 %+.1f%%。图读范围 %.1f–%.1f W/(m²·K)。局部热流缺少逐面实验数据。'], ...
-        bead.meanH,observation.hWm2K,100*bead.relativeDifference,observation.graphReadRangeWm2K);
+    if isfield(bead,'experiment')
+        observation=bead.experiment;
+        data.fields(k).stateNote=sprintf(['名义面积上的整珠平均换热系数 %.1f W/(m²·K)，论文图 7 约 %.1f，' ...
+            '相差 %+.1f%%。图读范围 %.1f–%.1f W/(m²·K)。局部热流缺少逐面实验数据。'], ...
+            bead.meanH,observation.hWm2K,100*bead.relativeDifference,observation.graphReadRangeWm2K);
+    elseif bead.thermal.deltaTemperatureK==0
+        data.fields(k).stateNote='珠面与来流同温，全部原面对流热流为 0。零温差下按功率除以温差得到的平均换热系数未定义。';
+    else
+        data.fields(k).stateNote=sprintf('恒物性对流扩散场按 %.12g K 壁面温差换算。名义面积平均换热系数 %.2f W/(m²·K)。', ...
+            bead.thermal.deltaTemperatureK,bead.meanH);
+    end
     if isfield(bead,'baselineH')
         data.fields(k).stateNote=[data.fields(k).stateNote sprintf(' 15° 基准网为 %.2f W/(m²·K)，周向细化后变化 %+.2f%%。', ...
             bead.baselineH,100*(bead.meanH/bead.baselineH-1))];
@@ -411,6 +419,13 @@ if isfield(mesh,'thermistorBead')
     k=find(strcmp({data.fields.key},'nearWallCellTemperature'),1);
     data.fields(k).label='首层流体节点温度';
     data.fields(k).stateNote='首层流体节点温度由三维温差标量求得，壁面温度由边界条件给定。';
+    % 声明静态试件场的真实单值。空场不产生色标，固定的比较／手动色标另行保留。
+    for k=1:numel(data.fields)
+        f=data.fields(k);valid=f.values(f.status>0 & isfinite(f.values));
+        if ~isempty(valid) && all(valid==valid(1))
+            data.uniformFieldValues.(f.key)=struct('value',valid(1),'unit',f.unit);
+        end
+    end
 end
 if isfield(mesh,'lewisCylinder')
     data.defaultField='nusselt';data.flowDirection=[0 -1 0];

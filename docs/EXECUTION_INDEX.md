@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v285 B 型热敏珠可调给定壁温](validation/v285/RESULTS.md) · [中间温差与零温差原生核对](validation/v285/evidence/native.json) · [下一项](validation/v285/NEXT_DECISION.md)。两档网格支持 293.15–305.15 K，零温差的 5,216 个面元均有物理零热流。
+
 - [v284 B 型热敏珠的五步主工作台](validation/v284/RESULTS.md) · [15° 冷启动原面核对](validation/v284/evidence/fresh_audit.json) · [下一项](validation/v284/NEXT_DECISION.md)。两档网格可确认边界、回读或计算；15° 新运行逐字节复现原面表。
 
 - [v283 B 型热敏珠的周向细化与同面差值](validation/v283/RESULTS.md) · [定量对照](validation/v283/evidence/comparison.json) · [下一项](validation/v283/NEXT_DECISION.md)。从 15° 到 7.5°，平均换热系数增加 1.35%，迎流端放热峰值增加 6.18%。

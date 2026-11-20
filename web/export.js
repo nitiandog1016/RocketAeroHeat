@@ -45,7 +45,19 @@
       options.scaleLabel||'',options.paletteLabel||'',options.exportedAt||'',faceMissingReason(model,field,i)];
   }
   // 模块二：RFC 4180 引号与 CRLF；保留浮点原精度、中文 BOM、缺失空字段和真实 MATLAB 面元编号。
+  function singleValueOptions(model,field,options){
+    const entry=model.uniformFieldValues&&model.uniformFieldValues[field.key];
+    const automatic=['全模型色标','当前截面色标','2–98% 分位色标'].includes(options.scaleLabel);
+    if(!entry||!finite(entry.value)||!options.rangeHasData||!automatic)return options;
+    const next={...options,range:[entry.value,entry.value]};
+    if(options.colors&&options.colors.length){
+      const middle=options.colors[Math.floor(options.colors.length/2)];
+      next.colors=[middle,middle];
+    }
+    return next;
+  }
   function csv(model,field,options={}){
+    options=singleValueOptions(model,field,options);
     check(model,field);const quote=v=>'"'+String(v===undefined||v===null?'':v).replace(/"/g,'""')+'"',lines=[headers.map(quote).join(',')];
     model.faces.forEach((f,i)=>lines.push(row(model,field,i,options).map(quote).join(',')));
     return '\ufeff'+lines.join('\r\n')+'\r\n';
@@ -60,6 +72,7 @@
   }
   function figurePlan(model,field,options,measure){
     check(model,field);
+    options=singleValueOptions(model,field,options);
     const width=Math.max(720,Math.round(options.sceneWidth||720)),margin=24,fontSize=12,lineHeight=19,texts=[];
     const fit=(text,x,y,maxWidth,size=fontSize,color='#b7c9d9')=>{
       const lines=wrap(text,maxWidth,t=>measure(t,size));lines.forEach((text,i)=>texts.push({text,x,y:y+i*(size===16?24:lineHeight),size,color}));
@@ -72,10 +85,14 @@
     const scene={x:margin+(sceneWidth-sourceW*factor)/2,y:top+(sceneHeight-sourceH*factor)/2,width:sourceW*factor,height:sourceH*factor};
     const legend={x:width-margin-111,y:top+30,width:17,height:Math.max(130,sceneHeight-90)};
     fit(field.unit,legend.x,top+8,111,12,'#e1eaf4');
-    const ticks=[1,.75,.5,.25,0].map(t=>({text:options.rangeHasData?format(options.range[0]+t*(options.range[1]-options.range[0])):'—',x:legend.x+25,y:legend.y+(1-t)*legend.height+4,size:11,color:'#e1eaf4'}));texts.push(...ticks);
+    const uniform=options.rangeHasData&&options.range[0]===options.range[1];
+    const ticks=(uniform?[.5]:[1,.75,.5,.25,0]).map(t=>({text:options.rangeHasData?format(options.range[0]+t*(options.range[1]-options.range[0])):'—',x:legend.x+25,y:legend.y+(1-t)*legend.height+4,size:11,color:'#e1eaf4'}));texts.push(...ticks);
     fit('灰色：未求解',legend.x,legend.y+legend.height+25,111,11);
     y=top+sceneHeight+20;
-    y=fit('色标：'+(options.scaleLabel||'全模型色标')+'；范围 '+(options.rangeHasData?format(options.range[0])+' ～ '+format(options.range[1])+' '+field.unit:'无有效数据')+'；'+(options.paletteLabel||'Viridis'),margin,y,width-2*margin);
+    let scaleText='无有效数据';
+    if(uniform)scaleText='单值 '+format(options.range[0])+' '+field.unit;
+    else if(options.rangeHasData)scaleText='范围 '+format(options.range[0])+' ～ '+format(options.range[1])+' '+field.unit;
+    y=fit('色标：'+(options.scaleLabel||'全模型色标')+'；'+scaleText+'；'+(options.paletteLabel||'Viridis'),margin,y,width-2*margin);
     if(options.scaleLabel&&/分位/.test(options.scaleLabel))y=fit('超出分位范围的有效数值显示端点颜色；原值保留在 CSV。',margin,y,width-2*margin);
     const c=coverage(model,field),pct=a=>(100*a/c.total).toFixed(2)+'%';
     y=fit('按面积统计：'+stateLabel(field,1)+' '+pct(c.computed)+'；给定条件 '+pct(c.prescribed)+'；未求解 '+pct(c.missing)+'。',margin,y,width-2*margin);
@@ -88,7 +105,7 @@
       y=fit('该面元算法：'+faceMethod(field,i),margin,y,width-2*margin);
       y=fit('该面元适用范围：'+faceScope(field,i),margin,y,width-2*margin);
     }
-    return {width,height:Math.ceil(y+margin),texts,scene,legend,rangeHasData:options.rangeHasData,colors:options.colors};
+    return {width,height:Math.ceil(y+margin),texts,scene,legend,range:options.range,rangeHasData:options.rangeHasData,colors:options.colors};
   }
   // 模块四：图像内容与颜色使用当前显示场量；图中模型保持原比例，图注和色标放在独立留白内。
   function drawFigure(ctx,source,plan){
@@ -98,5 +115,33 @@
     ctx.fillRect(l.x,l.y,l.width,l.height);ctx.strokeStyle='#8192a6';ctx.lineWidth=.5;ctx.strokeRect(l.x,l.y,l.width,l.height);
     ctx.textBaseline='alphabetic';plan.texts.forEach(t=>{ctx.font=t.size+'px Microsoft YaHei, Segoe UI, sans-serif';ctx.fillStyle=t.color;ctx.fillText(t.text,t.x,t.y);});
   }
-  return {headers,faceState,faceScope,faceMethod,faceMissingReason,coverage,row,csv,filename,wrap,figurePlan,drawFigure};
+  // 只补充静态模型声明的单值色标。原三维渲染器继续管理相机、颜色映射与用户自设范围。
+  function mountSingleValueLegend(){
+    const doc=root.document,field=doc.getElementById('field'),scale=doc.getElementById('scale');
+    const low=doc.getElementById('legendMin'),high=doc.getElementById('legendMax'),note=doc.getElementById('legendNote');
+    const swatch=doc.querySelector('.gradient');
+    let entries=root.ROCKET_CASE&&root.ROCKET_CASE.uniformFieldValues;
+    const setup=root.setup;
+    root.setup=component=>setup({
+      addEventListener:(...args)=>component.addEventListener(...args),
+      get Data(){
+        const data=component.Data;
+        if(data&&data.kind==='aerothermal-model')entries=data.uniformFieldValues;
+        return data;
+      },
+      set Data(event){if(event.kind==='rendered')refresh();component.Data=event;}
+    });
+    function refresh(){
+      const entry=entries&&entries[field.value];
+      if(!entry||!finite(entry.value)||!['full','percentile','section'].includes(scale.value)||low.textContent==='—')return;
+      const stops=swatch.style.background.match(/rgb\([^)]+\)/g);
+      if(!stops||stops.length<2)return;
+      const value=format(entry.value);
+      swatch.style.background=stops[Math.floor(stops.length/2)];
+      low.textContent=value;high.textContent='';note.textContent='有效面元均为 '+value+' '+entry.unit;
+    }
+    new root.MutationObserver(refresh).observe(note,{childList:true});
+    refresh();
+  }
+  return {headers,faceState,faceScope,faceMethod,faceMissingReason,coverage,row,csv,filename,wrap,figurePlan,drawFigure,mountSingleValueLegend};
 });

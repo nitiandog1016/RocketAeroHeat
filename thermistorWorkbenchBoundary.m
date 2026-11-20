@@ -1,9 +1,15 @@
 function [b,fs]=thermistorWorkbenchBoundary(b)
-%THERMISTORWORKBENCHBOUNDARY 给出两档周向网共同的等温试件工况，拒绝错配边界。
+%THERMISTORWORKBENCHBOUNDARY 核对固定空气来流与允许的均匀珠面温度。
 reference=struct('speed',3,'airPressurePa',101325,'airTemperatureK',293.15, ...
     'wallTemperatureK',305.15,'alphaDeg',0,'betaDeg',0);
 if nargin==0,b=reference;end
-assert(isequal(b,reference),'RAH:Bead:Boundary','此热敏珠算例仅支持登记的 3 m/s 等温边界。');
+assert(isstruct(b) && isscalar(b) && isfield(b,'wallTemperatureK') && ...
+    isequal(rmfield(b,'wallTemperatureK'),rmfield(reference,'wallTemperatureK')), ...
+    'RAH:Bead:Boundary','此算例使用登记的 3 m/s 空气条件。');
+t=b.wallTemperatureK;
+assert(isnumeric(t) && isreal(t) && isscalar(t) && isfinite(t) && double(t)>=reference.airTemperatureK && double(t)<=reference.wallTemperatureK, ...
+    'RAH:Bead:Boundary','给定壁温须为 293.15 至 305.15 K 的有限实数。');
+b.wallTemperatureK=double(t);
 fs=struct('speed',b.speed,'pressure',b.airPressurePa,'temperature',b.airTemperatureK, ...
     'alpha',0,'beta',0,'unitFlowDirection',[-1 0 0],'velocityMps',[-b.speed 0 0]);
 end
