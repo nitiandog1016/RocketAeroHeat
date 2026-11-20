@@ -474,6 +474,37 @@ if isfield(mesh,'thermistorStartup')
     data.fields(k).stateNote='首步终场的流体温度，取原面所对应的全周首层节点。';
     data.uniformFieldValues.wallInput=struct('value',c.wallTemperatureK,'unit','K');
 end
+% 时间步对照使用同一构造初场和同一物理终点，所有差值统一按两个半步减一个整步。
+if isfield(mesh,'beadStepComparison')
+    trial=mesh.beadStepComparison;s=trial.summary;w=trial.wall;
+    data.defaultField='timeHeatDifference';
+    data.caseNote=[data.caseNote ' · 主值为一个整步，对照为两个半步'];
+    data.resultCondition.caption=data.caseNote;
+    data.timeStepComparison=s;
+    scope='同一全周网格与物理时刻。比较时间步长对启动瞬态的影响，逐面实验精度待验证。';
+    fields={
+        'timeHalfPressure','绝对壁压 · 两个半步','kPa',w.pressurePa/1000,'全周层流 BDF1，终帧壁压面内积分并加环境压力','pressure';
+        'timeHalfGauge','相对环境壁压 · 两个半步','Pa',w.pressureGaugePa,'全周层流 BDF1，终帧表压按原三角面内积分平均','pressureGauge';
+        'timeHalfHeat','入壁热流 · 两个半步','kW/m²',w.heatFluxWm2/1000,'全周 BDF1 强温差标量固定端点壁反力，按原面面积保守分配','heatFlux';
+        'timeHalfNearWall','首层流体温度 · 两个半步','K',w.nearWallCellTemperatureK,'全周 BDF1 终帧首层节点标量换算为 K 后按原面平均','nearWallCellTemperature'};
+    for j=1:size(fields,1)
+        values=fields{j,4};key=fields{j,1};ref=fields{j,6};
+        add(key,fields{j,2},fields{j,3},values,ones(n,1),repmat(fields(j,5),n,1),scope);
+        data.fields(end).stateNote=scope;data.fields(end).computedStateLabel='研究数值解';
+        pair=[values;data.fields(strcmp({data.fields.key},ref)).values];
+        data.comparisonColorRanges.(key)=[min(pair) max(pair)];
+        data.comparisonColorRanges.(ref)=data.comparisonColorRanges.(key);
+    end
+    methods=repmat({'同一原面、同一物理时刻，两个 BDF1 半步减一个 BDF1 整步'},n,1);
+    delta={'timeHeatDifference','入壁热流差','W/m²',trial.heatDifferenceWm2;
+           'timePressureDifference','壁压差','Pa',trial.pressureDifferencePa};
+    for j=1:size(delta,1)
+        key=delta{j,1};values=delta{j,4};
+        add(key,delta{j,2},delta{j,3},values,ones(n,1),methods,scope);
+        data.fields(end).stateNote=['两个半步减一个整步。' scope];data.fields(end).computedStateLabel='时间步对照';
+        limit=max(abs(values));if limit>0,data.comparisonColorRanges.(key)=[-limit limit];end
+    end
+end
 if isfield(mesh,'lewisCylinder')
     data.defaultField='nusselt';data.flowDirection=[0 -1 0];
     data.coordinateNote='SI · X 为圆柱跨向 · +Y 为迎流驻点 · +Z 为正圆周角';

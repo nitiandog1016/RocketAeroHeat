@@ -39,38 +39,38 @@ def build(out):
                                compilerSHA256=base["compilerSHA256"],cachedInputsVerified=len(cached)))
 
 
-def observer_config(index,rows):
-    text=replace(config(index),f"INNER_ITER= {MAX_INNER}\n",f"INNER_ITER= {rows+1}\n")
-    if rows<MAX_INNER:
+def observer_config(index,rows,settings=config,inner_limit=MAX_INNER):
+    text=replace(settings(index),f"INNER_ITER= {inner_limit}\n",f"INNER_ITER= {rows+1}\n")
+    if rows<inner_limit:
         text=replace(text,"CONV_STARTITER= 50\n",f"CONV_STARTITER= {rows+2}\n")
     return text
 
 
-def release_config(index):
-    text=replace(config(index),f"INNER_ITER= {MAX_INNER}\n","INNER_ITER= 1\n")
+def release_config(index,settings=config,inner_limit=MAX_INNER):
+    text=replace(settings(index),f"INNER_ITER= {inner_limit}\n","INNER_ITER= 1\n")
     return replace(text,"(wall, VALUE, 1.0)","(wall, FLUX, 0.0)")
 
 
-def sample(stage,source,proof_file,out,built):
+def sample(stage,source,proof_file,out,built,settings=config,inner_limit=MAX_INNER,extra_inputs=()):
     proof=read(proof_file)
     index=proof["step"]
     assert proof["passed"] and sha(source/f"restart_{index:05}.csv")==proof["frameSHA256"]
     checked(source)
-    assert (source/"case.cfg").read_text("ascii")==config(index)
+    assert (source/"case.cfg").read_text("ascii")==settings(index)
     old_name=f"seed_{index-1:05}.csv"
     locks=[HERE/"PLAN.md",HERE/"run_half.py",Path(__file__).resolve(),proof_file,
-           source/"case.cfg",source/"debugger_process.json",ROOT/"scripts/runSU2NativeDebugger.py"]
+           source/"case.cfg",source/"debugger_process.json",ROOT/"scripts/runSU2NativeDebugger.py",*extra_inputs]
     if stage=="observe":
         exe=built/"observe_bead.exe"
         assert sha(exe)==read(built/"build.json")["observerSHA256"]
-        text=observer_config(index,proof["innerRows"])
+        text=observer_config(index,proof["innerRows"],settings,inner_limit)
         initial=source/old_name
         locks.extend([built/"build.json",built/"CIntegration.cpp"])
         limit,mb=420,350
     else:
         exe=OFFICIAL
         assert sha(exe)==ENGINE_SHA
-        text=release_config(index)
+        text=release_config(index,settings,inner_limit)
         initial=source/f"restart_{index:05}.csv"
         limit,mb=90,180
     os.link(initial,out/old_name)

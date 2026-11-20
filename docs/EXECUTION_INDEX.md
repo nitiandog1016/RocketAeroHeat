@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v292 热敏珠 6 m/s 同刻全表面时间步长对照](validation/v292/RESULTS.md) · [同面差值](validation/v292/evidence/comparison.json) · [科研界面](validation/v292/evidence/ui.json) · [下一项](validation/v292/NEXT_DECISION.md)。两个半步的固定端点热量账通过，5,216 面最大热流差 0.006122 W/m²。
+
 - [v291 热敏珠第一半步的连续残差核对](validation/v291/RESULTS.md) · [实际终场](validation/v291/evidence/first_half.json) · [下一项](validation/v291/NEXT_DECISION.md)。240 次内迭代末尾有 18 行六项全部通过，第一半步未达 20 行要求。
 
 - [v290 热敏珠 6 m/s 启动时刻的全表面压力与热流](validation/v290/RESULTS.md) · [同阶段热量账](validation/v290/evidence/surface.json) · [界面核对](validation/v290/evidence/ui.json) · [下一项](validation/v290/NEXT_DECISION.md)。5,216 个原面数值覆盖完整，适用时刻为距构造初场 7.809 µs。

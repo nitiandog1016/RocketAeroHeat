@@ -16,16 +16,16 @@ from audit_step import RMS, frame
 from check_fields import rhs_at_endpoint
 
 
-def state(index,source,out):
+def state(index,source,out,settings=config,inner_limit=MAX_INNER):
     rec=checked(source)
     assert rec["command"]==[str(OFFICIAL),"case.cfg","--threads","1"] and sha(OFFICIAL)==ENGINE_SHA
-    assert (source/"case.cfg").read_text("ascii")==config(index)
+    assert (source/"case.cfg").read_text("ascii")==settings(index)
     hist=source/f"history_{index:05}.csv"
     end=source/f"restart_{index:05}.csv"
     old=source/f"seed_{index-1:05}.csv"
     assert end.name in (source/"debugger.log").read_text(errors="replace")
     h=columns(hist,["Time_Iter","Inner_Iter"]+RMS)
-    assert 20<=len(h)<=MAX_INNER and np.all(h[:,0]==index) and np.isfinite(h).all()
+    assert 20<=len(h)<=inner_limit and np.all(h[:,0]==index) and np.isfinite(h).all()
     np.testing.assert_array_equal(h[:,1],np.arange(len(h)))
     with np.load(input_file("nodes.npz")) as grid:
         ids,xyz=grid["ids"],grid["xyz"]
@@ -53,7 +53,7 @@ def state(index,source,out):
           configSHA256=sha(source/"case.cfg"),meshSHA256=sha(source/"mesh.su2"),seconds=rec["elapsedSeconds"]))
 
 
-def energy(index,source,out,proof_path,observer,release):
+def energy(index,source,out,proof_path,observer,release,settings=config,inner_limit=MAX_INNER):
     proof=read(proof_path)
     assert proof["passed"] and proof["step"]==index
     official,obs,ctrl=[checked(folder) for folder in (source,observer,release)]
@@ -63,9 +63,9 @@ def energy(index,source,out,proof_path,observer,release):
     assert sha(OFFICIAL)==ENGINE_SHA and sha(source/end)==proof["frameSHA256"]==sha(release/old)
     assert sha(source/old)==proof["oldFrameSHA256"]==sha(observer/old)
     assert all(sha(f/"mesh.su2")==sha(input_file("mesh.su2")) for f in (source,observer,release))
-    assert (source/"case.cfg").read_text("ascii")==config(index)
-    assert (observer/"case.cfg").read_text("ascii")==observer_config(index,proof["innerRows"])
-    assert (release/"case.cfg").read_text("ascii")==release_config(index)
+    assert (source/"case.cfg").read_text("ascii")==settings(index)
+    assert (observer/"case.cfg").read_text("ascii")==observer_config(index,proof["innerRows"],settings,inner_limit)
+    assert (release/"case.cfg").read_text("ascii")==release_config(index,settings,inner_limit)
     with np.load(input_file("nodes.npz")) as grid:
         ids,xyz=grid["ids"],grid["xyz"]
     geom=read(input_file("geometry.json"))

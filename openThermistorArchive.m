@@ -11,6 +11,9 @@ switch angularCells
     case 'startup6'
         archive=fullfile(caseDir,'startup_6ms.zip');
         expected='25bdbfa8f11b6a12a6488b81b41002e7c3bc9808f8490f4b63987ee782c54b61';
+    case 'halfsteps'
+        archive=fullfile(caseDir,'startup_6ms_halfsteps.zip');
+        expected='9a1ce5800c51a19b845877b83c735cd56d082a873c04024194f1f666eb1f84f3';
     otherwise
         error('RAH:Bead:Angle','请选择已登记的 3 m/s 扇区或 6 m/s 全周启动快照。');
 end
