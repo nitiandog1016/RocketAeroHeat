@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v289 全周松弛与 6 m/s 热敏珠首次接受的物理步](validation/v289/RESULTS.md) · [200 次复核](validation/v289/evidence/first_step_200.json) · [下一项](validation/v289/NEXT_DECISION.md)。同一 7.809 µs 启动步在第 188 次内迭代形成首个连续窗，终点六项通过。
+
 - [v288 同速基流与热敏珠全周首步](validation/v288/RESULTS.md) · [同节点连续性与焓右端](validation/v288/evidence/rhs.json) · [下一项](validation/v288/NEXT_DECISION.md)。末窗五项通过、焓未达标。首次装配的主要误差位于下游轴线。
 
 - [v287 热敏珠 6 m/s 的实验点和全周首步](validation/v287/RESULTS.md) · [原生残差与完整场核对](validation/v287/evidence/first_step.json) · [下一项](validation/v287/NEXT_DECISION.md)。已排除 30° 扇区，147,456 单元的完整周向首步能在本机运行，三项残差尚未达标。
