@@ -249,8 +249,9 @@ renderEditor();sync();showGeometry(true);
                 controls.staticAir=button(grid,20,'静止空气 · 节点探针',@readStaticAirProbe);
                 controls.lewisCylinder=button(grid,21,'计算 NASA 圆柱换热对照',@showLewisCylinder);
                 controls.thermistorMode=choice(grid,22,'B 型热敏珠', ...
-                    {'查看 15° 基准网','查看 7.5° 网及差值','计算 15° 基准网','计算 7.5° 细网'}, ...
-                    {'archive','archive7p5','solve','solve7p5'},'archive');
+                    {'查看 3 m/s · 15° 基准网','查看 3 m/s · 7.5° 网及差值','查看 6 m/s · 全周启动瞬态', ...
+                     '计算 3 m/s · 15° 基准网','计算 3 m/s · 7.5° 细网'}, ...
+                    {'archive','archive7p5','startup6','solve','solve7p5'},'archive');
                 controls.thermistor=button(grid,23,'打开热敏珠全表面结果',@showThermistor);
                 controls.thermistorMode.ValueChangedFcn=@updateThermistorButton;
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
@@ -1436,7 +1437,11 @@ renderEditor();sync();showGeometry(true);
             fig.UserData.thermistorReview=view;preparing=false;renderEditor();
             controls.thermistorMode.Value=mode;updateThermistorButton([],[]);
             message(sprintf('热敏珠共 %d 面，整珠放热 %.4f mW，正热流入壁。',height(bead.hybridWall),-1000*summary.wholeSurfaceHeatPowerW));
-            title.Text='B 型热敏珠 · 三维场与实验对照';
+            if strcmp(mode,'startup6')
+                title.Text=sprintf('B 型热敏珠 · 6 m/s 启动瞬态 · %.6g µs',summary.elapsedPhysicalTimeS*1e6);
+            else
+                title.Text='B 型热敏珠 · 三维场与实验对照';
+            end
         catch ex
             preparing=false;if ~isgraphics(fig),return;end
             if exist('group','var') && isgraphics(group),delete(group);end

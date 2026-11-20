@@ -456,6 +456,24 @@ if isfield(mesh,'thermistorBead')
         end
     end
 end
+% 全周启动步使用独立的时间、算法和储热账，供云图、截面、探针与离线导出共用。
+if isfield(mesh,'thermistorStartup')
+    s=mesh.thermistorStartup;e=s.energy;c=mesh.hybridCondition;
+    data.thermistorStartup=s;
+    data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
+    data.caseNote=sprintf('%s · 距构造初场 %.8g µs · 给定壁温 %.6g K · 360° 全周', ...
+        data.caseNote,1e6*c.elapsedPhysicalTimeS,c.wallTemperatureK);
+    data.resultCondition.caption=data.caseNote;
+    data.resultCondition.elapsedPhysicalTimeS=c.elapsedPhysicalTimeS;
+    data.resultCondition.timeCaption=sprintf('距构造初场 %.8g µs',1e6*c.elapsedPhysicalTimeS);
+    k=find(strcmp({data.fields.key},'heatFlux'),1);
+    data.fields(k).stateNote=sprintf(['启动瞬态原面结果。珠面放热 %.8g mW，远场流出 %.8g mW，' ...
+        '空气储热率 %.6g nW，收支差 %.4g pW。'],1e3*e.wallReleaseW,1e3*e.farOutW,1e9*e.airStorageW,1e12*e.imbalanceW);
+    k=find(strcmp({data.fields.key},'nearWallCellTemperature'),1);
+    data.fields(k).label='首层流体节点温度';
+    data.fields(k).stateNote='首步终场的流体温度，取原面所对应的全周首层节点。';
+    data.uniformFieldValues.wallInput=struct('value',c.wallTemperatureK,'unit','K');
+end
 if isfield(mesh,'lewisCylinder')
     data.defaultField='nusselt';data.flowDirection=[0 -1 0];
     data.coordinateNote='SI · X 为圆柱跨向 · +Y 为迎流驻点 · +Z 为正圆周角';

@@ -3,6 +3,7 @@ function [current,report,page]=runThermistorBeadCase(folder,mode,windowOpen,inpu
 % [mesh,report]=runThermistorBeadCase() 只读随项目发布的原面表。
 % [mesh,report,page]=runThermistorBeadCase([], 'solve') 运行内嵌求解器并导出离线页。
 % 'archive7p5' 和 'solve7p5' 使用 7.5° 周向单元，并与 15° 归档按面配对。
+% 'startup6' 读取 6 m/s 完整周向域的首个已接受时刻，采用该时刻的固定热边界。
 % runThermistorBeadCase([], 'archive', [], [], 299.15) 使用参照场计算给定壁温的稳态结果。
 % 第五参数也可为 struct('netHeatingPowerW',0.004)，按整珠净功率反求稳态等温壁温。
 % 显式指定 outputs 下的新目录，或请求第三个输出，都会在那里导出离线页。
@@ -10,30 +11,35 @@ root=fileparts(mfilename('fullpath'));outputs=fullfile(root,'outputs');
 if nargin<1,folder='';end
 if nargin<2,mode='archive';end
 if nargin<3,windowOpen=[];end
-mode=validatestring(mode,{'archive','solve','archive7p5','solve7p5'});
+mode=validatestring(mode,{'archive','solve','archive7p5','solve7p5','startup6'});
 fresh=startsWith(mode,'solve');refined=endsWith(mode,'7p5');
 angularCells=2+2*refined;
 if nargin<4,inputMesh=[];end
-boundary=thermistorWorkbenchBoundary();
-if nargin>=5
-    if isstruct(thermalInput)
-        if isscalar(thermalInput) && isequal(fieldnames(thermalInput),{'netHeatingPowerW'})
-            boundary=rmfield(boundary,'wallTemperatureK');
-            boundary.netHeatingPowerW=thermalInput.netHeatingPowerW;
-        elseif isscalar(thermalInput) && isequal(fieldnames(thermalInput),{'wallTemperatureK'})
-            boundary.wallTemperatureK=thermalInput.wallTemperatureK;
+startup=strcmp(mode,'startup6');
+if startup
+    assert(isempty(inputMesh) && nargin<5,'RAH:Bead:Startup','6 m/s 快照使用绑定的完整体网和 303.15 K 给定壁温。');
+else
+    boundary=thermistorWorkbenchBoundary();
+    if nargin>=5
+        if isstruct(thermalInput)
+            if isscalar(thermalInput) && isequal(fieldnames(thermalInput),{'netHeatingPowerW'})
+                boundary=rmfield(boundary,'wallTemperatureK');
+                boundary.netHeatingPowerW=thermalInput.netHeatingPowerW;
+            elseif isscalar(thermalInput) && isequal(fieldnames(thermalInput),{'wallTemperatureK'})
+                boundary.wallTemperatureK=thermalInput.wallTemperatureK;
+            else
+                boundary=thermalInput;
+            end
         else
-            boundary=thermalInput;
+            boundary.wallTemperatureK=thermalInput;
         end
-    else
-        boundary.wallTemperatureK=thermalInput;
     end
-end
-boundary=thermistorWorkbenchBoundary(boundary,angularCells);
-powerMode=isfield(boundary,'netHeatingPowerW');
-if ~isempty(inputMesh)
-    % 将显式计算或归档绑定到主侧栏已确认的米制原面与实际体网。
-    verifyThermistorWorkbenchMesh(inputMesh,angularCells);
+    boundary=thermistorWorkbenchBoundary(boundary,angularCells);
+    powerMode=isfield(boundary,'netHeatingPowerW');
+    if ~isempty(inputMesh)
+        % 将显式计算或归档绑定到主侧栏已确认的米制原面与实际体网。
+        verifyThermistorWorkbenchMesh(inputMesh,angularCells);
+    end
 end
 writePage=fresh || ~isempty(folder) || nargout>=3;page='';
 if writePage
@@ -45,6 +51,12 @@ if writePage
         java.io.File(folder).mkdirs(),'RAH:Bead:Output','请选择项目 outputs 下尚未使用的目录。');
 end
 
+% 已接受的全周启动步按自身的边界与能量账读取，并从同一入口导出三维工作台。
+if startup
+    [current,report]=readThermistorStartup();
+    if writePage,page=exportAerothermalWeb(current,fullfile(folder,'workbench'));end
+    return;
+end
 % 模块一：新计算经过同网格三维动量、强温差和反力核对；浏览时校验归档后再解包。
 if ~fresh || refined
     [baseline,baseCleanup]=openThermistorArchive(2); %#ok<NASGU>

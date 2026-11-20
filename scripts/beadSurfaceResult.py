@@ -17,6 +17,10 @@ def projection(vertices,faces,ids,rays=RAYS):
     wall_ids=np.unique(ids)
     assert ids.shape[0]==len(rays)
     sectors=(rays[-1],rays[1]-rays[0])
+    full_ring=np.isclose(rays[-1]-rays[0],2*np.pi,atol=1e-12,rtol=0)
+    if full_ring:
+        assert rays[0]==0 and np.array_equal(ids[0],ids[-1])
+        np.testing.assert_allclose(np.diff(rays),sectors[1],atol=1e-14,rtol=0)
     rows=[];cols=[];weights=[]
     subdivisions=6
     for a in range(subdivisions):
@@ -26,8 +30,12 @@ def projection(vertices,faces,ids,rays=RAYS):
                 u,v=(a+shift)/subdivisions,(b+shift)/subdivisions
                 x,y,z=((1-u-v)*tri[:,0]+u*tri[:,1]+v*tri[:,2]).T
                 mer=np.arctan2(np.hypot(y,z)/B,-x/A)*(ids.shape[1]-1)/np.pi
-                phase=np.mod(np.arctan2(z,y),2*sectors[0])
-                ray=np.minimum(phase,2*sectors[0]-phase)/sectors[1]
+                # 全周各方位具有独立数值，自身接缝共享节点；历史扇区用镜面对称延拓。
+                if full_ring:
+                    ray=np.mod(np.arctan2(z,y),2*np.pi)/sectors[1]
+                else:
+                    phase=np.mod(np.arctan2(z,y),2*sectors[0])
+                    ray=np.minimum(phase,2*sectors[0]-phase)/sectors[1]
                 j=np.minimum(mer.astype(int),ids.shape[1]-2)
                 k=np.minimum(ray.astype(int),len(rays)-2)
                 for dj,wm in ((0,1-mer+j),(1,mer-j)):

@@ -5,6 +5,17 @@
   const fieldMeaning=typeof module==='object'&&module.exports?require('./viewer.js'):null;
   const finite=v=>typeof v==='number'&&Number.isFinite(v),states=['未求解','工程计算','给定条件'];
   const format=v=>finite(v)?(Math.abs(v)>=1e5||(Math.abs(v)>0&&Math.abs(v)<.001)?v.toExponential(3):Number(v.toPrecision(5)).toString()):'未求解';
+  // 固定瞬态由原始结果声明时间和起点，用同一个身份生成图题、探针和下载。
+  function fixedTime(condition){
+    if(!condition||!finite(condition.elapsedPhysicalTimeS)||condition.elapsedPhysicalTimeS<0)return null;
+    const timeSeconds=condition.elapsedPhysicalTimeS;
+    return {timeSeconds,timeCaption:condition.timeCaption||('t = '+timeSeconds+' s'),timeKind:'固定瞬态快照'};
+  }
+  function timeOptions(condition,field,options){
+    if(finite(options.timeSeconds)||field.history&&!Array.isArray(field.history))return options;
+    const stamp=fixedTime(condition);
+    return stamp?{...options,...stamp}:options;
+  }
   // 模块一：同一显示时刻的数据快照。状态优先于数值，未解占位数不能进入 CSV、探针或图注。
   function faceState(field,i){return [1,2].includes(field.status[i])&&finite(field.values[i])?field.status[i]:0;}
   function stateLabel(field,s){const meaning=fieldMeaning||root.RocketViewerState;return meaning&&meaning.stateLabel?meaning.stateLabel(field,s):states[s];}
@@ -34,12 +45,13 @@
     '算法编号（从0开始）','算法','逐面元适用范围','源热流状态说明（仅热流）','导出数据说明','数据时刻类型','时间 / s','时刻说明','工况',
     '坐标约定','色标下限','色标上限','色标方式','色图','导出时间（UTC）','本场量未解原因'];
   function row(model,field,i,options={}){
+    options=timeOptions(model.resultCondition,field,options);
     const f=model.faces[i],vs=f.map(j=>model.vertices[j]),center=[0,1,2].map(j=>vs.reduce((s,v)=>s+v[j],0)/3),state=faceState(field,i);
     return [i+1,...f.map(j=>j+1),...vs.flat(),...center,model.faceArea[i],model.region[i],field.key,field.label,
       state?field.values[i]:'',field.unit,state,stateLabel(field,state),field.status[i],field.methodIndex[i],faceMethod(field,i),faceScope(field,i),
       field.key==='heatFlux'&&model.missingReason?model.missingReason[i]:'',
       field.status[i]>0&&state===0?'源状态有效但没有有限数值；导出为未求解':'面元常值；不插值；给定条件不计为工程计算',
-      finite(options.timeSeconds)?'实际离散时间站':'单点工况',finite(options.timeSeconds)?options.timeSeconds:'',options.timeCaption||'单点工况',
+      options.timeKind||(finite(options.timeSeconds)?'实际离散时间站':'单点工况'),finite(options.timeSeconds)?options.timeSeconds:'',options.timeCaption||'单点工况',
       options.caseNote===undefined?model.caseNote||'':options.caseNote,model.coordinateNote||'',
       options.rangeHasData&&options.range?options.range[0]:'',options.rangeHasData&&options.range?options.range[1]:'',
       options.scaleLabel||'',options.paletteLabel||'',options.exportedAt||'',faceMissingReason(model,field,i)];
@@ -57,12 +69,15 @@
     return next;
   }
   function csv(model,field,options={}){
-    options=singleValueOptions(model,field,options);
+    options=singleValueOptions(model,field,timeOptions(model.resultCondition,field,options));
     check(model,field);const quote=v=>'"'+String(v===undefined||v===null?'':v).replace(/"/g,'""')+'"',lines=[headers.map(quote).join(',')];
     model.faces.forEach((f,i)=>lines.push(row(model,field,i,options).map(quote).join(',')));
     return '\ufeff'+lines.join('\r\n')+'\r\n';
   }
-  function filename(field,options={}){return 'RocketAeroHeat-'+String(field.key).replace(/[^a-zA-Z0-9_-]/g,'_')+(finite(options.timeSeconds)?'-t'+options.timeSeconds+'s':'-steady');}
+  function filename(field,options={}){
+    const stamp=timeOptions(options.resultCondition,field,options);
+    return 'RocketAeroHeat-'+String(field.key).replace(/[^a-zA-Z0-9_-]/g,'_')+(finite(stamp.timeSeconds)?'-t'+stamp.timeSeconds+'s':'-steady');
+  }
   // 模块三：按实际字体宽度逐字换行；不剪裁工况、单位、来源或所选面元状态。
   function wrap(text,maxWidth,measure){
     const lines=[];
@@ -72,7 +87,7 @@
   }
   function figurePlan(model,field,options,measure){
     check(model,field);
-    options=singleValueOptions(model,field,options);
+    options=singleValueOptions(model,field,timeOptions(model.resultCondition,field,options));
     const width=Math.max(720,Math.round(options.sceneWidth||720)),margin=24,fontSize=12,lineHeight=19,texts=[];
     const fit=(text,x,y,maxWidth,size=fontSize,color='#b7c9d9')=>{
       const lines=wrap(text,maxWidth,t=>measure(t,size));lines.forEach((text,i)=>texts.push({text,x,y:y+i*(size===16?24:lineHeight),size,color}));
@@ -143,5 +158,34 @@
     new root.MutationObserver(refresh).observe(note,{childList:true});
     refresh();
   }
-  return {headers,faceState,faceScope,faceMethod,faceMissingReason,coverage,row,csv,filename,wrap,figurePlan,drawFigure,mountSingleValueLegend};
+  // 旧三维页共用一个加载入口。只扩展成功载入的固定时刻，原时间历史仍由渲染器处理。
+  function mountSnapshotTime(){
+    const doc=root.document,viewer=root.RocketViewerState,sections=root.RocketSection;
+    const title=doc.getElementById('fieldTime'),probe=doc.getElementById('probe');
+    let model=root.ROCKET_CASE;
+    const initial=viewer.initialField;
+    viewer.initialField=(data,previous)=>{model=data;return initial(data,previous);};
+    const sectionCSV=sections.csv;
+    sections.csv=(geometry,field,caption,...rest)=>{
+      const stamp=!field.history&&fixedTime(model&&model.resultCondition);
+      return sectionCSV(geometry,field,stamp?stamp.timeCaption:caption,...rest);
+    };
+    function refresh(){
+      const stamp=fixedTime(model&&model.resultCondition);
+      if(!stamp)return;
+      const field=model.fields.find(f=>f.key===doc.getElementById('field').value);
+      if(field&&!field.history&&title.textContent!==stamp.timeCaption)title.textContent=stamp.timeCaption;
+      probe.querySelectorAll('.probeRow > small:first-of-type').forEach((label,index)=>{
+        if(model.fields[index].history)return;
+        const suffix=label.textContent.lastIndexOf(' · ');
+        if(suffix<0)return;
+        const caption=stamp.timeCaption+label.textContent.slice(suffix);
+        if(label.textContent!==caption)label.textContent=caption;
+      });
+    }
+    const changes=new root.MutationObserver(refresh);
+    changes.observe(title,{childList:true});changes.observe(probe,{childList:true});
+    refresh();
+  }
+  return {headers,faceState,faceScope,faceMethod,faceMissingReason,coverage,row,csv,filename,wrap,figurePlan,drawFigure,mountSingleValueLegend,mountSnapshotTime};
 });

@@ -13,6 +13,11 @@
     const samples=s.segments.map(v=>({...v,...faceInfo(f,v.face)}));
     const rows=[['section_x_m','component_id','face_id','theta_a_deg','theta_b_deg','a_y_m','a_z_m','b_y_m','b_z_m','length_m','field_key','value','unit','availability','qualification','method','scope','reason','trace_side','angle_state']];
     samples.forEach(v=>rows.push([x,v.component+1,v.face+1,v.thetaA===null?'':v.thetaA,v.thetaB===null?'':v.thetaB,v.a[1],v.a[2],v.b[1],v.b[2],v.length,key,v.value===null?'':v.value,f.unit,v.availabilityText,v.qualificationText,v.method,v.scope,v.reason,s.traceSide,v.angleValid?'有效周向角':v.angleReason]));
+    const condition=data.resultCondition;
+    if(condition&&finite(condition.elapsedPhysicalTimeS)){
+      rows[0].push('elapsed_physical_time_s','condition');
+      rows.slice(1).forEach(row=>row.push(condition.elapsedPhysicalTimeS,condition.caption));
+    }
     return {...s,fieldKey:key,samples,csv:'\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n')};
   }
   function mount(){
