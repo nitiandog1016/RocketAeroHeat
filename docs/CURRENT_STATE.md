@@ -1,20 +1,20 @@
 # 当前交接
 
-2026-11-20。第一阶段的优先级是单工况完整外表面气动热和统一科研工作台。用户已指定有公开实验数据的民用试件可作为独立交付对象。v282 的 B 型热敏珠在 3.0 m/s、空气 293.15 K、给定壁温 305.15 K 下，**5,216 / 5,216 个原面**均有数值壁压和热流，计算面积为 **3.08983026 × 10⁻⁶ m²**。相对 v281 新增全部珠面。自绘模型新增 **0 面、0 m²**。[本轮报告](validation/v282/RESULTS.md) · [工作台逐面复验](validation/v282/evidence/view.json)
+2026-11-20。当前首要交付是单工况完整外表面气动热与统一科研工作台。作为独立交付对象的民用 B 型热敏珠，在 3.0 m/s、空气 293.15 K、给定壁温 305.15 K 下，**5,216 / 5,216 个原面**均有数值壁压和热流，计算面积为 **3.08983026 × 10⁻⁶ m²**。v283 在同一原面完成 7.5° 周向细网求解，整珠放热 9.50885 mW。相对 v282，热敏珠和自绘模型分别新增 **0 面、0 m²**。[本轮报告](validation/v283/RESULTS.md) · [工作台逐面复验](validation/v283/evidence/view.json)
 
-<!-- records:last_completed=v282 -->
+<!-- records:last_completed=v283 -->
 <!-- records:active=none -->
-<!-- records:base_commit=7037c427ed8cb51df479565b9731add71816fcd5 -->
+<!-- records:base_commit=32f5e648aa314a18324247ffcd4431eb4b9329a6 -->
 
 ## 热敏珠当前结果
 
-整珠放热 9.38210 mW。按论文的珠体面积计算，平均换热系数为 252.7 W/(m²·K)，图 7 约为 218.4 W/(m²·K)，高 15.7%。实验只支持整珠平均换热的对照，逐面压力与热流联合独立验证面积为 0 m²。实际试件含引线，名义模型采用光滑旋转长椭球、长轴沿气流和理想等温边界。强约束温差标量的壁节点温度取给定值，首层流体温度来自终场，固体壁温未求。[图读与网格差值](validation/v282/evidence/comparison.json) · [独立壁面与远场热量账](validation/v282/evidence/energy.json)
+15° 和 7.5° 周向网分别给出整珠放热 9.38210 和 9.50885 mW。按论文珠体面积计算的平均 h 从 252.70 增至 256.11 W/(m²·K)，相对图 7 读数 218.36 W/(m²·K) 的偏差由 +15.73% 增至 +17.29%。局部放热峰值增加 6.18%。实验只支持整珠平均换热对照，逐面压力与热流联合独立验证面积为 0 m²。实际试件含引线，名义模型采用光滑旋转长椭球、长轴沿气流和理想等温边界。强约束标量的壁节点温度取给定值，首层流体温度来自终场，固体壁温未求。[网格差值](validation/v283/evidence/comparison.json) · [图 7 读点](validation/v282/evidence/comparison.json) · [细网独立热量账](validation/v283/evidence/energy.json)
 
-原生计算均有终态。三套强温差终场按原面重读已完成。早期弱等温焓超温和二维远场重建差额保留。MATLAB 的「输入模型 → B 型热敏珠」可读小归档或显式重新计算，在同一中央区查看云图、探针与原面导出。界面实际渲染、逐面导出和六阶段输入重放已核对。[本机离线页面](../outputs/v282_validation/ui02/export/workbench/index.html) · [本机完整原面导出](../outputs/v282_validation/ui02/wall_pair.csv) · [本地场及校验值](validation/v282/evidence/local_assets.json)
+原生计算均有终态。早期弱等温焓超温和二维远场重建差额保留。MATLAB 的「输入模型 → B 型热敏珠」可选 15° 或 7.5° 归档及相应的新计算。细网页额外显示带符号的同面热流差和壁压差。5,216 行主场、逐面差值及一个截面的 121 行导出已与原面表核对。[本机细网离线页面](../outputs/v283_validation/ui02/export/workbench/index.html) · [完整原面导出](../outputs/v283_validation/ui02/wall_pair.csv) · [本地场及校验值](validation/v283/evidence/local_assets.json)
 
 ## 下一项
 
-[当前下一决定](validation/v282/NEXT_DECISION.md) 核对热敏珠的角向离散误差。已比较过的三套网格都采用相同角向分辨率。拟在 20D 扩域工况上只细分角向，比较同一试件的热流分布和平均换热系数。尚未启动这一计算。v282 的计算基线为 v281，执行合同保存在 [v282 计划](validation/v282/PLAN.md)。总目标仍在进行。
+[当前下一决定](validation/v283/NEXT_DECISION.md) 将民用珠体接入主侧栏五步流程，处理网格选择、边界确认与旧结果失效。已完成的周向单次对照退出排期。v283 计算现场为 `outputs/v283_validation`，源输入、预算及门槛见 [v283 计划](validation/v283/PLAN.md)。总目标仍在进行。
 
 ## 自绘模型保留的状态
 

@@ -2,12 +2,14 @@ function [current,report,page]=runThermistorBeadCase(folder,mode,windowOpen)
 %RUNTHERMISTORBEADCASE 读取 B 型热敏珠的冻结结果，或从冷初场计算同一工况。
 % [mesh,report]=runThermistorBeadCase() 只读随项目发布的原面表。
 % [mesh,report,page]=runThermistorBeadCase([], 'solve') 运行内嵌求解器并导出离线页。
+% 'archive7p5' 和 'solve7p5' 使用 7.5° 周向单元，并与 15° 归档按面配对。
 % 显式指定 outputs 下的新目录，或请求第三个输出，都会在那里导出离线页。
 root=fileparts(mfilename('fullpath'));outputs=fullfile(root,'outputs');
 if nargin<1,folder='';end
 if nargin<2,mode='archive';end
 if nargin<3,windowOpen=[];end
-mode=validatestring(mode,{'archive','solve'});fresh=strcmp(mode,'solve');
+mode=validatestring(mode,{'archive','solve','archive7p5','solve7p5'});
+fresh=startsWith(mode,'solve');refined=endsWith(mode,'7p5');
 writePage=fresh || ~isempty(folder) || nargout>=3;page='';
 if writePage
     if isempty(folder),folder=fullfile(outputs,['thermistor_' char(java.util.UUID.randomUUID())]);end
@@ -20,18 +22,24 @@ end
 
 % 模块一：新计算经过同网格三维动量、强温差和反力核对；浏览时校验归档后再解包。
 caseDir=fullfile(root,'cases','thermistor_b');
+if ~fresh || refined
+    [baseline,baseCleanup]=extractChecked(fullfile(caseDir,'surface.zip'), ...
+        '11ba9c504f8df41a1be7c317d1047e77ab76800d3eae7b569d0b34333ffbb563'); %#ok<NASGU>
+end
 if fresh
     native=fullfile(folder,'native');
     pulse=[];
     if ~isempty(windowOpen),pulse=@checkWindow;end
-    runCM011Python({fullfile(root,'scripts','runThermistorCase.py'),native},fullfile(folder,'solve.log'),pulse);
+    args={fullfile(root,'scripts','runThermistorCase.py'),native};
+    if refined,args=[args,{'--angular-cells','4'}];end
+    runCM011Python(args,fullfile(folder,'solve.log'),pulse);
     geo=fullfile(native,'strong');result=fullfile(native,'result');
 else
-    zip=fullfile(caseDir,'surface.zip');
-    assert(strcmp(cm011FileSHA256(zip),'11ba9c504f8df41a1be7c317d1047e77ab76800d3eae7b569d0b34333ffbb563'), ...
-        'RAH:Bead:Archive','B 型珠体的归档指纹不符。');
-    geo=tempname;mkdir(geo);clean=onCleanup(@()removeExtracted(geo)); %#ok<NASGU>
-    unzip(zip,geo);result=geo;
+    geo=baseline;result=baseline;
+    if refined
+        [result,refinedCleanup]=extractChecked(fullfile(caseDir,'surface_7p5.zip'), ...
+            'd02c8ac7fb41a7072e416e251efd2ccf8d19101ec388c98a46b3ed0a6e72449b'); %#ok<NASGU>
+    end
 end
 spec=jsondecode(fileread(fullfile(geo,'case.json')));
 stats=jsondecode(fileread(fullfile(result,'summary.json')));
@@ -74,6 +82,23 @@ meanH=-report.wholeSurfaceHeatPowerW/((spec.wallK-spec.ambientK)*spec.areaSource
 assert(abs(meanH/stats.nominalExperimentAreaCoefficientWm2K-1)<1e-11,'RAH:Bead:Mean','名义面积换热积分不符。');
 current.thermistorBead=struct('experiment',comparison.experiment,'meanH',meanH, ...
     'relativeDifference',meanH/comparison.experiment.hWm2K-1,'verifiedJointAreaM2',0);
+current.thermistorBead.cellAngleDeg=15;
+if refined
+    % 模块四：根据两份各自绑定的场计算同面差值，主热流和主压力保留细网原值。
+    old=jsondecode(fileread(fullfile(baseline,'summary.json')));
+    oldWall=readtable(fullfile(baseline,'wall.csv'));
+    assert(stats.angularCells==4 && stats.cellAngleDeg==7.5 && ...
+        strcmp(stats.meshSHA256,'f59482ab24bcdc3d886fac3e442ff474a13c2d34c0596c822ebfa2e7cb81e723') && ...
+        strcmp(stats.bodySHA256,old.bodySHA256) && strcmp(stats.configSHA256,old.configSHA256) && ...
+        isequal(oldWall.faceID,rows.faceID) && isequal(oldWall.areaM2,rows.areaM2), ...
+        'RAH:Bead:Angle','周向网格、配置或原面身份与对照不符。');
+    current.beadAngularDelta=struct('pressurePa',rows.pressureGaugePa-oldWall.pressureGaugePa, ...
+        'heatFluxWm2',rows.heatFluxWm2-oldWall.heatFluxWm2);
+    current.thermistorBead.cellAngleDeg=stats.cellAngleDeg;
+    current.thermistorBead.baselineH=old.nominalExperimentAreaCoefficientWm2K;
+    current.thermistorBead.baselineFrameSHA256=old.sourceFrameSHA256;
+    current.evidenceIdentity.sourceFrame.comparisonFrameSHA256=old.sourceFrameSHA256;
+end
 report.native=stats;report.reusedArchive=~fresh;report.comparison=current.thermistorBead;
 if writePage,page=exportAerothermalWeb(current,fullfile(folder,'workbench'));end
 
@@ -100,6 +125,13 @@ if writePage,page=exportAerothermalWeb(current,fullfile(folder,'workbench'));end
         solution=struct('accepted',true,'reason','六个分量的末窗残差、温界与边界热量账通过', ...
             'wall',wall,'diagnostics',struct('sourceFrameSHA256',stats.sourceFrameSHA256));
     end
+end
+
+function [folder,cleanup]=extractChecked(archive,expected)
+% 只展开已绑定的小归档。每个工作台实例单独拥有临时目录及其清理句柄。
+assert(strcmp(cm011FileSHA256(archive),expected),'RAH:Bead:Archive','B 型珠体的归档指纹不符。');
+folder=tempname;mkdir(folder);cleanup=onCleanup(@()removeExtracted(folder));
+unzip(archive,folder);
 end
 
 function removeExtracted(folder)

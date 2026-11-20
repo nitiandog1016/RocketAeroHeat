@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v283 B 型热敏珠的周向细化与同面差值](validation/v283/RESULTS.md) · [定量对照](validation/v283/evidence/comparison.json) · [下一项](validation/v283/NEXT_DECISION.md)。从 15° 到 7.5°，平均换热系数增加 1.35%，迎流端放热峰值增加 6.18%。
+
 - [v282 公开 B 型热敏珠全表面壁压与热流](validation/v282/RESULTS.md) · [论文图 7 与三网对照](validation/v282/evidence/comparison.json) · [下一项](validation/v282/NEXT_DECISION.md)。新增 5,216 个珠体原面，整珠放热 9.38210 mW，平均换热系数比实验读数高 15.7%。
 
 - [v281 缺热原面的三份存档与同面导出](validation/v281/RESULTS.md) · [逐量核对](validation/v281/evidence/comparison.json) · [下一项](validation/v281/NEXT_DECISION.md)。目标 936 面上两份工程热流存档均缺项，研究热流有值 936 面，新增工程面积 0 m²。

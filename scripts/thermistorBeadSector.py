@@ -11,7 +11,14 @@ RAYS = np.deg2rad([0.,15.,30.])
 COPIES = 12
 
 
-def prepare(parent, out):
+def sector_rays(angular_cells):
+    """同一 30° 扇区的两种已登记离散，端点始终为对称面。"""
+    if angular_cells not in (2, 4):
+        raise ValueError("热敏珠扇区支持 2 或 4 个周向单元")
+    return np.deg2rad(np.linspace(0., 30., angular_cells+1))
+
+
+def prepare(parent, out, angular_cells=2):
     spec = read(parent/"case.json")
     rec = read(parent/"engine_process.json")
     assert rec["status"]=="terminal" and rec["exitCode"]==0 and all(rec["inputsStable"].values())
@@ -20,7 +27,10 @@ def prepare(parent, out):
         assert sha(parent/name)==rec["inputSHA256"][str(parent/name)]
     assert sha(parent/"restart.csv")==rec["outputSHA256"]["restart.csv"] and read(parent/"body.json")==body()
     m,n,extent,level = GRIDS[spec["grid"]]
-    xy,xyz,source,phi,ids,cells,markers,geom = mesh(RAYS,level,n,wall(m),extent,D)
+    rays = sector_rays(angular_cells)
+    if angular_cells == 4 and spec["grid"] != "outer":
+        raise ValueError("7.5° 对照使用 20D 外域")
+    xy,xyz,source,phi,ids,cells,markers,geom = mesh(rays,level,n,wall(m),extent,D)
     native = np.loadtxt(parent/"restart.csv",delimiter=",",skiprows=1)
     assert np.array_equal(native[:,0],np.arange(len(xy)))
     np.testing.assert_allclose(native[:,1:3],xy,rtol=0,atol=1e-13)
@@ -43,7 +53,7 @@ def prepare(parent, out):
     write_json(out/"body.json",body())
     write_json(out/"case.json",spec)
     geom.update(parentFrameSHA256=sha(parent/"restart.csv"),parentBodySHA256=sha(parent/"body.json"),
-                raysRadians=RAYS.tolist(),rotationCopies=COPIES)
+                raysRadians=rays.tolist(),rotationCopies=COPIES)
     write_json(out/"geometry.json",geom)
     inputs=[Path(__file__).resolve(),ROOT/"scripts/thermistorBead.py",ROOT/"scripts/cm011Tunnel.py",
             ROOT/"scripts/cm011TunnelSector.py",parent/"restart.csv",out/"body.json",out/"case.json",
@@ -57,8 +67,9 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("parent",type=Path)
     parser.add_argument("new_folder",type=Path)
+    parser.add_argument("--angular-cells",type=int,choices=(2,4),default=2)
     args=parser.parse_args()
     out=args.new_folder.resolve()
     out.relative_to(ROOT/"outputs")
-    prepare(args.parent.resolve(),out)
+    prepare(args.parent.resolve(),out,args.angular_cells)
     solve(out)

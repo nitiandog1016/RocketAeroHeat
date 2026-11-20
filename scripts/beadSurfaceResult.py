@@ -7,15 +7,16 @@ import numpy as np
 from scipy.sparse import coo_matrix
 
 from thermistorBead import A,B,CP,D,DT,K,P0,PE,RHO,ROOT,T0,U,body,read,sha,write_json
-from thermistorBeadSector import COPIES,RAYS
+from thermistorBeadSector import COPIES,RAYS,sector_rays
 from thermistorReaction import terminal
 
 
-def projection(vertices,faces,ids):
+def projection(vertices,faces,ids,rays=RAYS):
     """在原三角面内做等面积子三角积分，得到到各原生壁节点的非负插值权重。"""
     tri=vertices[faces]
     wall_ids=np.unique(ids)
-    sectors=(RAYS[-1],RAYS[1]-RAYS[0])
+    assert ids.shape[0]==len(rays)
+    sectors=(rays[-1],rays[1]-rays[0])
     rows=[];cols=[];weights=[]
     subdivisions=6
     for a in range(subdivisions):
@@ -28,7 +29,7 @@ def projection(vertices,faces,ids):
                 phase=np.mod(np.arctan2(z,y),2*sectors[0])
                 ray=np.minimum(phase,2*sectors[0]-phase)/sectors[1]
                 j=np.minimum(mer.astype(int),ids.shape[1]-2)
-                k=np.minimum(ray.astype(int),len(RAYS)-2)
+                k=np.minimum(ray.astype(int),len(rays)-2)
                 for dj,wm in ((0,1-mer+j),(1,mer-j)):
                     for dk,wa in ((0,1-ray+k),(1,ray-k)):
                         rows.append(np.arange(len(tri)))
@@ -88,7 +89,9 @@ def collect(parent,probes,out):
         assert sha(parent/name)==rec["inputSHA256"][str(parent/name)]
     # 固定三套名义试件体网、量纲、物性和标记。旧的弱壁解不能用于这里的结果。
     contract=read(ROOT/"cases/thermistor_b/grids.json")
-    fixed=contract["grids"][spec["grid"]]
+    angular_cells=len(geometry["raysRadians"])-1
+    rays=sector_rays(angular_cells)
+    fixed=contract["grids"][spec["grid"] if angular_cells==2 else "outerAngular4"]
     assert all(sha(parent/name)==digest for name,digest in fixed.items())
     assert sha(parent/"case.cfg")==contract["strongConfigSHA256"]
     continuation=probes/"plus20"
@@ -102,16 +105,18 @@ def collect(parent,probes,out):
         expected=[line.split("=",1)[0]+"= "+changes[line.split("=",1)[0]]
                   if line.split("=",1)[0] in changes else line for line in config]
         assert (probe/"case.cfg").read_text("ascii").splitlines()==expected+["WRT_RESTART_COMPACT= NO"]
-    assert shape==body() and geometry["raysRadians"]==RAYS.tolist() and geometry["rotationCopies"]==COPIES
+    assert shape==body() and geometry["raysRadians"]==rays.tolist() and geometry["rotationCopies"]==COPIES
     with np.load(parent/"nodes.npz") as grid:
         ids,xyz=grid["ids"],grid["xyz"]
     m=spec["meridianIntervals"]+1
     vertices,faces=np.array(shape["V"]),np.array(shape["F"])-1
-    transfer,wall_ids=projection(vertices,faces,ids[:,:m])
+    transfer,wall_ids=projection(vertices,faces,ids[:,:m],rays)
     tri=vertices[faces];cross=np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0])
     area=np.linalg.norm(cross,axis=1)/2
     assert np.all(np.sum(cross*tri.mean(axis=1),axis=1)>0)
     s,r,res,rec=state_and_reaction(parent,probes/"reaction0",wall_ids,xyz)
+    normal_speed=max(np.max(np.abs(s[ids[k],7]*np.cos(rays[k])-s[ids[k],6]*np.sin(rays[k]))) for k in (0,-1))
+    assert normal_speed<1e-8
     _,r20,res20,_=state_and_reaction(probes/"plus20",probes/"reaction20",wall_ids,xyz)
     assert sha(probes/"plus20/initial_flow.csv")==sha(parent/"restart.csv")
     # 面积集总的保守传递：每个原生边界节点的反力，分给在该点有权重的显示面。
@@ -141,6 +146,9 @@ def collect(parent,probes,out):
                 firstNodeRangeK=[near.min(),near.max()],wallTableSHA256=sha(path),bodySHA256=sha(parent/"body.json"),
                 sourceFrameSHA256=sha(parent/"restart.csv"),sourceReactionSHA256=sha(probes/"reaction0/restart.csv"),
                 configSHA256=sha(parent/"case.cfg"),elapsedSeconds=rec["elapsedSeconds"])
+    if angular_cells==4:
+        report.update(angularCells=angular_cells,cellAngleDeg=30./angular_cells,
+                      meshSHA256=fixed["mesh.su2"],maxSymmetryNormalSpeedOverU=normal_speed)
     write_json(out/"summary.json",report)
     return report
 

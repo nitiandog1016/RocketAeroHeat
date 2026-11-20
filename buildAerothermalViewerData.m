@@ -118,6 +118,16 @@ if isfield(mesh,'hybridWall')
         end
     end
 end
+% 热敏珠的差值场与主场共用原面，探针、截面与导出均能追溯到两种周向网格。
+if isfield(mesh,'beadAngularDelta')
+    angularDelta=mesh.beadAngularDelta;
+    method=repmat({'同一冻结工况逐面相减，7.5° 网减 15° 网'},n,1);
+    scope='周向离散敏感性，正值表示细网计算值较大。';
+    add('angularHeatDifference','入壁热流差 · 7.5° − 15°','W/m²',angularDelta.heatFluxWm2,ones(n,1),method,scope);
+    data.fields(end).stateNote=scope;data.fields(end).computedStateLabel='网格对照';
+    add('angularPressureDifference','壁压差 · 7.5° − 15°','Pa',angularDelta.pressurePa,ones(n,1),method,scope);
+    data.fields(end).stateNote=scope;data.fields(end).computedStateLabel='网格对照';
+end
 % 同一低速试件的三维体网格对照。研究帧沿用自己的残差、资格和功率，单列对照面积。
 if isfield(mesh,'cm011Sector')
     sector=mesh.cm011Sector.summary; w=mesh.cm011Sector.wall;
@@ -388,11 +398,16 @@ if isfield(mesh,'thermistorBead')
     data.thermistorBead=bead;
     data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
     data.caseNote=sprintf('%s · 给定壁温 %.2f K · 无引线名义珠体',data.caseNote,mesh.hybridCondition.wallTemperatureK);
+    if isfield(bead,'cellAngleDeg'),data.caseNote=sprintf('%s · 周向单元 %g°',data.caseNote,bead.cellAngleDeg);end
     data.resultCondition.caption=data.caseNote;
     k=find(strcmp({data.fields.key},'heatFlux'),1);
     data.fields(k).stateNote=sprintf(['名义面积上的整珠平均换热系数 %.1f W/(m²·K)，论文图 7 约 %.1f，' ...
         '相差 %+.1f%%。图读范围 %.1f–%.1f W/(m²·K)。局部热流缺少逐面实验数据。'], ...
         bead.meanH,observation.hWm2K,100*bead.relativeDifference,observation.graphReadRangeWm2K);
+    if isfield(bead,'baselineH')
+        data.fields(k).stateNote=[data.fields(k).stateNote sprintf(' 15° 基准网为 %.2f W/(m²·K)，周向细化后变化 %+.2f%%。', ...
+            bead.baselineH,100*(bead.meanH/bead.baselineH-1))];
+    end
     k=find(strcmp({data.fields.key},'nearWallCellTemperature'),1);
     data.fields(k).label='首层流体节点温度';
     data.fields(k).stateNote='首层流体节点温度由三维温差标量求得，壁面温度由边界条件给定。';

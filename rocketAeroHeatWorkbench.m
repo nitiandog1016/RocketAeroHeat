@@ -227,9 +227,11 @@ renderEditor();sync();showGeometry(true);
                 controls.readIdealAirReview=button(grid,19,'变比热热流接口记录',@readIdealAirDialog);
                 controls.staticAir=button(grid,20,'静止空气 · 节点探针',@readStaticAirProbe);
                 controls.lewisCylinder=button(grid,21,'计算 NASA 圆柱换热对照',@showLewisCylinder);
-                controls.thermistorMode=choice(grid,22,'B 型热敏珠',{'查看已算原面','从冷初场计算'}, ...
-                    {'archive','solve'},'archive');
+                controls.thermistorMode=choice(grid,22,'B 型热敏珠', ...
+                    {'查看 15° 基准网','查看 7.5° 网及差值','计算 15° 基准网','计算 7.5° 细网'}, ...
+                    {'archive','archive7p5','solve','solve7p5'},'archive');
                 controls.thermistor=button(grid,23,'打开热敏珠全表面结果',@showThermistor);
+                controls.thermistorMode.ValueChangedFcn=@updateThermistorButton;
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
@@ -1270,12 +1272,20 @@ renderEditor();sync();showGeometry(true);
         if isequal(name,0),return;end
         try,readBenchmarkReview(fullfile(folder,name));catch ex,showError(ex);end
     end
+    function updateThermistorButton(~,~)
+        % 切换选择时只更新操作文字。只有按下按钮才可能启动本次计算。
+        if startsWith(controls.thermistorMode.Value,'solve')
+            controls.thermistor.Text='从冷初场计算热敏珠';
+        else
+            controls.thermistor.Text='打开热敏珠全表面结果';
+        end
+    end
     function showThermistor(~,~)
         % 独立民用试件在现有中央区显示，页内探针与导出共用同一份原面表。
         if state.busy || preparing,return;end
         mode=controls.thermistorMode.Value;preparing=true;
         try
-            if strcmp(mode,'solve'),message('正在计算 B 型热敏珠的三维壁压和热流…');
+            if startsWith(mode,'solve'),message('正在计算 B 型热敏珠的三维壁压和热流…');
             else,message('正在读取 B 型热敏珠原面结果…');end
             [bead,summary]=runThermistorBeadCase([],mode,@()isgraphics(fig));
             if ~isgraphics(fig),return;end
@@ -1286,12 +1296,13 @@ renderEditor();sync();showGeometry(true);
             delete(prior);webUI=[];researchUI=[];
             geometryHost.Visible='off';resultHost.Visible='on';group.Visible='on';
             fig.UserData.thermistorReview=view;preparing=false;renderEditor();
+            controls.thermistorMode.Value=mode;updateThermistorButton([],[]);
             message(sprintf('热敏珠共 %d 面，整珠放热 %.4f mW，正热流入壁。',height(bead.hybridWall),-1000*summary.wholeSurfaceHeatPowerW));
             title.Text='B 型热敏珠 · 三维场与实验对照';
         catch ex
             preparing=false;if ~isgraphics(fig),return;end
             if exist('group','var') && isgraphics(group),delete(group);end
-            renderEditor();showError(ex);
+            renderEditor();controls.thermistorMode.Value=mode;updateThermistorButton([],[]);showError(ex);
         end
     end
     function showLewisCylinder(~,~)

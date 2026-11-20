@@ -6,7 +6,7 @@ import numpy as np
 
 from readCM011TunnelSector import frame_window, wall_fields
 from thermistorBead import AREA, CP, D, DT, ENGINE_SHA, GRIDS, K, P0, RHO, T0, U, body, read, sha, write_json
-from thermistorBeadSector import COPIES, RAYS
+from thermistorBeadSector import COPIES, sector_rays
 
 
 def frame(folder):
@@ -29,16 +29,17 @@ def evaluate(folder):
     grid=spec["grid"]
     m=GRIDS[grid][0]+1
     geom=read(folder/"geometry.json")
-    assert geom["rotationCopies"]==COPIES and geom["raysRadians"]==RAYS.tolist()
-    gauge,q,t,t1,sym,wall_speed,chord_area,chord_power,volume=wall_fields(folder,f["savedIndex"],m,RAYS,
+    rays=sector_rays(len(geom["raysRadians"])-1)
+    assert geom["rotationCopies"]==COPIES and geom["raysRadians"]==rays.tolist()
+    gauge,q,t,t1,sym,wall_speed,chord_area,chord_power,volume=wall_fields(folder,f["savedIndex"],m,rays,
                 pressure_scale=RHO*U**2,heat_scale=RHO*CP*U*DT,diameter=D,ambient_pressure=P0)
     assert abs(chord_area-geom["chordWallAreaM2"])<1e-16
-    # 先按原模型的子午位置插值，再按相邻对称扇区中的真实三条射线取周向值。
+    # 先按原模型的子午位置插值，再按当前扇区的实际射线取周向值。
     vertices=np.asarray(shape["V"])
     faces=np.asarray(shape["F"])-1
-    angles=np.mod(np.arctan2(vertices[:,2],vertices[:,1]),2*RAYS[-1])
-    h=np.minimum(angles,2*RAYS[-1]-angles)/RAYS[1]
-    lower=np.minimum(np.floor(h).astype(int),1)
+    angles=np.mod(np.arctan2(vertices[:,2],vertices[:,1]),2*rays[-1])
+    h=np.minimum(angles,2*rays[-1]-angles)/rays[1]
+    lower=np.minimum(np.floor(h).astype(int),len(rays)-2)
     idx=np.asarray(shape["nodeRow"])*(m-1)/64
     def original(field):
         by_ray=np.array([np.interp(idx,np.arange(m),ray) for ray in field])
