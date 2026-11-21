@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v310 带线热敏珠珠部平均强迫对流预测](validation/v310/RESULTS.md) · [独立复算](validation/v310/evidence/verification.json) · [下一项](validation/v310/NEXT_DECISION.md)。3 m/s、299.15 K 工况已可在侧栏比较式（28）和三维珠部功率，并保留表 1 极限 Nu 的差异。
+
 - [v309 B 型热敏珠 6 K 实验测点核对](validation/v309/RESULTS.md) · [工作台与逐面核对](validation/v309/evidence/verification.json) · [下一项](validation/v309/NEXT_DECISION.md)。两幅原图的相邻测点均与 6 K 分开，计算系数与未知实验偏差已接回同一工况。
 
 - [v308 带线热敏珠可输入均匀壁温](validation/v308/RESULTS.md) · [逐面数值核对](validation/v308/evidence/verification.json) · [下一项](validation/v308/NEXT_DECISION.md)。两档网在同一 299.15 K 工况下导出全表面结果，第二档逐面比较独立冷态。

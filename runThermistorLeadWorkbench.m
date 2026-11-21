@@ -103,6 +103,16 @@ if converted
         end
     end
 end
+% 给定壁温时，以实物珠部名义面积比较工程关联式和本次三维珠部积分。
+if ~midbody && ~powerMode
+    meanHeat=thermistorBeadMeanConvection(c,wallK);
+    meanHeat.surfaceOutwardW=summary.beadAndJointsW;
+    meanHeat.surfaceMeanHWm2K=NaN;
+    if wallK>c.airK
+        meanHeat.surfaceMeanHWm2K=meanHeat.surfaceOutwardW/(c.sourceAreaM2*(wallK-c.airK));
+    end
+    summary.meanConvection=meanHeat;
+end
 labels=string(body.regionNames);
 condition=struct('caseLabel',caseLabel,'velocityMps',[-3 0 0],'ambientPressurePa',c.airPa, ...
     'ambientTemperatureK',c.airK,'wallTemperatureK',wallK,'alphaDeg',0,'betaDeg',0, ...
@@ -120,6 +130,7 @@ if powerMode
     assert(abs(report.wholeSurfaceHeatPowerW+b.netHeatingPowerW)<=1e-11*b.netHeatingPowerW);
 end
 if converted,report.thermal=thermal;end
+if isfield(summary,'meanConvection'),report.meanConvection=summary.meanConvection;end
 if isfield(summary,'beadMeanComparison'),report.beadMeanComparison=summary.beadMeanComparison;end
 current.hybridWall.pressureGaugePa=rows.pressureGaugePa;
 if midbody,current.thermistorMidbody=s;else,current.thermistorLead=summary;end

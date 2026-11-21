@@ -660,7 +660,18 @@ renderEditor();sync();showGeometry(true);
                     if isfield(state.result,'thermistorMidbody'),controls.pairedHeat.Text='查看加密前后热流差';end
                     controls.pairedHeat.Layout.Column=1;
                 end
-                tip(grid,8,'任意X截面曲线和导出使用同一快照。完成计算不等于全面积已解；修改上游使结果失效，浏览与导出不重算。');
+                % 在同一结果侧栏并列两种珠部平均量，热流云图和截面继续显示逐面解。
+                if isfield(state.result,'thermistorLead') && isfield(state.result.thermistorLead,'meanConvection') ...
+                        && state.result.thermistorLead.meanConvection.available
+                    m=state.result.thermistorLead.meanConvection;
+                    controls.beadMeanMethods=uitable(grid,'RowName',{}, ...
+                        'ColumnName',{'珠部方法','h / W/(m²·K)','放热 / mW'}, ...
+                        'Data',{'坪内–佐藤（28）',sprintf('%.2f',m.meanHWm2K),sprintf('%.4f',1000*m.outwardW); ...
+                                '三维层流积分',sprintf('%.2f',m.surfaceMeanHWm2K),sprintf('%.4f',1000*m.surfaceOutwardW)});
+                    controls.beadMeanMethods.Layout.Row=[8 10];controls.beadMeanMethods.Layout.Column=[1 2];
+                else
+                    tip(grid,8,'任意X截面曲线和导出使用同一快照。完成计算不等于全面积已解；修改上游使结果失效，浏览与导出不重算。');
+                end
                 controls.staticAir=button(grid,11,'静止空气 · 节点探针',@readStaticAirProbe);
                 if isfield(state.result,'thermistorLeadGrid')
                     if isfield(controls,'pairedHeat'),controls.pairedHeat.Text='查看引线影响';end

@@ -448,6 +448,18 @@ if isfield(mesh,'thermistorLead') || isfield(mesh,'thermistorMidbody')
             data.fields(k).stateNote=sprintf('珠体含接头 %.4f mW，引线含端面 %.4f mW。珠部平均换热 %.2f W/(m²·K)，实验图读 %.2f W/(m²·K)。', ...
                 1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),s.beadMeanHWm2K,s.experimentMeanHWm2K);
         end
+        % 珠部平均量随热流页展示，面元云图仍读取本域的逐面壁热。
+        if isfield(s,'meanConvection')
+            m=s.meanConvection;
+            if m.available
+                note=sprintf(['珠部平均换热系数 / 向空气放热：式（28）%.2f W/(m²·K) / %.4f mW，' ...
+                    '三维积分 %.2f W/(m²·K) / %.4f mW。用表 1 极限 Nu 替换形状项，工程放热变化 %+.2f µW。'], ...
+                    m.meanHWm2K,1000*m.outwardW,m.surfaceMeanHWm2K,1000*m.surfaceOutwardW,1e6*m.tableMinusFormulaW);
+            else
+                note=['珠部式（28）对照不可用。' m.reason];
+            end
+            data.fields(k).stateNote=[data.fields(k).stateNote ' ' note];
+        end
         scope='带线试件对称稳态，母线正向取沿流向。端面及连接处按各自面元的切向计算。';
     end
     if isfield(mesh,'thermistorLeadFlow')

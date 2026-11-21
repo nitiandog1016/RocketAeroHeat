@@ -140,6 +140,10 @@ update(data,varargin{:});
         if strcmp(key,'heatFlux') && isfield(d,'thermistorLead') && isfield(d.thermistorLead,'beadMeanComparison')
             summary.beadMeanComparison=d.thermistorLead.beadMeanComparison;
         end
+        % 逐面热流来自三维解，配套的珠部平均预测另列方法、物性、参考面积和功率。
+        if strcmp(key,'heatFlux') && isfield(d,'thermistorLead') && isfield(d.thermistorLead,'meanConvection')
+            summary.meanConvection=d.thermistorLead.meanConvection;
+        end
         if startsWith(key,'outer') && isfield(d,'outerDomainComparison') && d.outerDomainComparison.available
             summary.outerDomainComparison=d.outerDomainComparison;
         end
