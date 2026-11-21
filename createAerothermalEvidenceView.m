@@ -140,6 +140,10 @@ update(data,varargin{:});
         if isfield(d,'midbodyGridComparison')
             summary.midbodyGridComparison=d.midbodyGridComparison;
         end
+        % 交付分带平均值时附上未归一化的功率和原生装配的来源。
+        if startsWith(key,'band') && isfield(d,'layerBudget')
+            summary.layerBudget=d.layerBudget;
+        end
         fid=fopen(summaryPath,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(summary));clear guard;
         receipt=struct('csvPath',path,'summaryPath',summaryPath,'rows',size(d.faces,1),'fieldKey',key,'csvSHA256',summary.csvSHA256);
     end

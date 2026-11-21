@@ -50,4 +50,5 @@ end
 assert(strcmp(info.grids(3).frameSHA256,mesh.evidenceIdentity.sourceFrame.sha256));
 mesh.evidenceIdentity.sourceFrame.midbodyGrids=info.grids;
 mesh.thermistorThreeGrids=struct('summary',info,'heat',heat);
+mesh=attachThermistorLayerBudget(mesh,area);
 end

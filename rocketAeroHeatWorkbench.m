@@ -620,7 +620,7 @@ renderEditor();sync();showGeometry(true);
                     controls.staticAir=button(grid,12,'静止空气 · 节点探针',@readStaticAirProbe);
                     sync();return;
                 end
-                grid=form(11+isfield(state.result,'thermistorOuterDomain'));d=buildAerothermalViewerData(state.result);
+                grid=form(11+double(isfield(state.result,'thermistorOuterDomain') || isfield(state.result,'thermistorLayerBudget')));d=buildAerothermalViewerData(state.result);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
                     state.resultSourceRevision,100*h.computedAreaFraction,100*p.computedAreaFraction,100*p.prescribedAreaFraction));
@@ -670,6 +670,9 @@ renderEditor();sync();showGeometry(true);
                     controls.compareGrids=button(grid,11,'对照三档网距',@showThirdGrid);
                     controls.compareGrids.Layout.Column=1;
                 end
+                if isfield(state.result,'thermistorLayerBudget')
+                    controls.layerBudget=button(grid,12,'查看分带热量账',@showLayerBudget);
+                end
         end
         sync();
     end
@@ -691,6 +694,13 @@ renderEditor();sync();showGeometry(true);
         % 定位第三档相对第二档的最大热流变化，可在变量菜单切换到上一次细化。
         pair=state.result.thermistorThreeGrids;
         inspectHeatDifference(pair.heat(:,3)-pair.heat(:,2),'gridHeat32','第三档减第二档');
+    end
+    function showLayerBudget(~,~)
+        % 打开分带结果并定位原面放热变化最大的带；每条带的实际功率可在探针中查看。
+        b=state.result.thermistorLayerBudget;d=[b.bands.delta];[~,k]=max(abs([d.faceOutW]));
+        face=find(b.faceBand==k,1);tab=webUI.evidenceTab;tab.Parent.SelectedTab=tab;
+        webUI.evidenceView.selectField('bandRelease');webUI.evidenceView.inspectFace(face,[]);
+        message(sprintf('%s，第三档相对第二档的全带放热变化 %+.3f µW。',b.bands(k).name,1e6*d(k).faceOutW));
     end
     function inspectHeatDifference(delta,key,order)
         ids=find(isfinite(delta));[~,k]=max(abs(delta(ids)));

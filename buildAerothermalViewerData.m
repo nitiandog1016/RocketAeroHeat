@@ -617,6 +617,32 @@ if isfield(mesh,'thermistorThreeGrids')
         data.fields(k).stateNote=[data.fields(k).stateNote ' 当前功率超过部分参照网的支持范围。'];
     end
 end
+% 分带收支的云图取功率差除以带原面面积，积分可以恢复该带功率。正号表示向外。
+if isfield(mesh,'thermistorLayerBudget')
+    b=mesh.thermistorLayerBudget;data.layerBudget=rmfield(b,'faceBand');
+    bandIndex=b.faceBand;bands=b.bands;deltas=[bands.delta];areas=[bands.areaM2];
+    scopes=cell(numel(bands),1);
+    for k=1:numel(bands)
+        d=deltas(k);
+        scopes{k}=sprintf(['%s · 第三档减第二档，305.15 K。全带放热变化 %+.3f µW，' ...
+            '外侧对流 %+.3f、扩散 %+.3f、带间净流出 %+.3f、映射修正 %+.3f、残差 %+.5f µW。'], ...
+            bands(k).name,1e6*d.faceOutW,1e6*d.outerConvW,1e6*d.outerDiffW,1e6*(d.sideConvW+d.sideDiffW), ...
+            1e6*d.mapCorrectionW,1e6*d.residualW);
+    end
+    scope='3 m/s 带线热敏珠；同一带内显示面积平均，正值表示向外传热增加。';
+    rows={'bandRelease','分带平均 · 壁面放热变化',[deltas.faceOutW],'原面放热按带积分'; ...
+          'bandConvection','分带平均 · 外侧对流变化',[deltas.outerConvW],'共同近壁控制体外侧的原生对流通量'; ...
+          'bandDiffusion','分带平均 · 外侧扩散变化',[deltas.outerDiffW],'共同近壁控制体外侧的原生扩散通量'; ...
+          'bandSide','分带平均 · 带间净流出变化',[deltas.sideConvW]+[deltas.sideDiffW],'共同近壁控制体沿相邻带界的净通量'};
+    bound=0;
+    for j=1:size(rows,1)
+        density=rows{j,3}./areas;bound=max(bound,max(abs(density)));
+        method=[rows{j,4} '，第三档减第二档后除以本带原面面积'];
+        add(rows{j,1},rows{j,2},'W/m²',density(bandIndex),ones(n,1),repmat({method},n,1),scope,scopes(bandIndex));
+        data.fields(end).stateNote=scope;
+    end
+    for j=1:size(rows,1),data.comparisonColorRanges.(rows{j,1})=[-bound bound];end
+end
 % 全周启动步使用独立的时间、算法和储热账，供云图、截面、探针与离线导出共用。
 if isfield(mesh,'thermistorStartup')
     s=mesh.thermistorStartup;e=s.energy;c=mesh.hybridCondition;

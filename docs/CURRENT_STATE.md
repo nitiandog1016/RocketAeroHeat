@@ -1,12 +1,12 @@
 # 当前交接
 
-2026-11-21。3 m/s 带引线 B 型热敏珠在 20D 主域完成第三档中段网距计算。给定 305.15 K，珠部放热比第二档低 3.10%，整件放热 10.56292 mW。给定 4 mW，集总壁温升至 297.694199 K，热峰仍在迎风引线 207 号面。壁压与热流覆盖 10,272 / 10,272 面、3.19665061 mm²，新增 0 面、0 m²。珠部平均换热比实验图读高 22.80%，逐面联合实验验证面积为 0 m²。[v304 报告](validation/v304/RESULTS.md) · [同面数据](validation/v304/evidence/face_comparison.zip) · [给定壁温三维页](../outputs/v304_validation/three_ui01/givenWall/workbench/index.html) · [4 mW 三维页](../outputs/v304_validation/three_ui01/givenPower/workbench/index.html)
+2026-11-21。3 m/s 带引线 B 型热敏珠、给定壁温 305.15 K，第三档比第二档的珠部放热少 318.303 µW，前中段贡献 187.118 µW。珠部近壁层外侧的扩散流出减少 270.908 µW，对流流出减少 47.371 µW。十个带的收支及七区原面功率均已核对。第三档壁压与热流覆盖 10,272 / 10,272 面、3.19665061 mm²，本轮新增 0 面、0 m²。珠部平均换热比实验图读高 22.80%，逐面联合实验验证面积为 0 m²。[v305 报告](validation/v305/RESULTS.md) · [两档热量账](validation/v305/evidence/budget.json) · [分带三维页](../outputs/v305_validation/ui03/workbench/index.html)
 
-<!-- records:last_completed=v304 -->
+<!-- records:last_completed=v305 -->
 <!-- records:active=none -->
-<!-- records:base_commit=e7c695d7a84d01947c1dec176887cf2f7eba47b6 -->
+<!-- records:base_commit=bf3796c2eb27e5e15ae2676a781222eeb09a13b4 -->
 
-带线模型的网格页选“第三档中段细化”，结果页可对照三档网距。两种热边界各导出 10,272 面和 96 行截面，已逐行核对。第二档的 20D 至 30D 外域对照使热导改变 −0.00427%。v301 高阶配置因温度下越界关闭。[工作台验收](validation/v304/evidence/workbench.json) · [外域对照](validation/v303/RESULTS.md) · [功率反演](validation/v302/RESULTS.md) · [温界证据](validation/v301/evidence/frames.json)
+带线模型选“第三档中段细化”，在 305.15 K 结果页点“查看分带热量账”。4 mW 集总壁温为 297.694199 K，热峰在迎风引线 207 号面。第二档 20D 至 30D 的热导差为 −0.00427%，v301 高阶配置因温度下越界关闭。[工作台验收](validation/v305/evidence/workbench.json) · [三档网距](validation/v304/RESULTS.md) · [外域对照](validation/v303/RESULTS.md) · [功率反演](validation/v302/RESULTS.md)
 
 ## 带线试件
 
@@ -36,7 +36,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-下一项使用已保存的第二、第三档终场，在两网共同的近壁层核对珠部不同位置的对流、扩散及壁面热量，定位此次珠部 0.31830 mW 的差异。[当前下一决定](validation/v304/NEXT_DECISION.md)
+下一项在珠面前中段检验沿壁法向排列的过渡网，先核实实际角度、间距和受影响的范围，再决定是否用一次冷态比较该带、邻带与整件放热。[当前下一决定](validation/v305/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 
