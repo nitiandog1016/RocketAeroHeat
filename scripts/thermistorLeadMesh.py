@@ -13,7 +13,10 @@ SECTORS = 48
 WEDGE = 4
 
 
-def meridian():
+SMOOTH_LABELS = ["后极冠", "共同珠面", "前极冠"]
+
+
+def meridian(smooth=False):
     """椭圆与直线之间构造双切圆弧。各段只保留暴露外壁，切点由两侧共享。"""
     a, b = A / D, B / D
     wire = fillet = 0.027e-3 / D
@@ -38,6 +41,15 @@ def meridian():
         np.testing.assert_allclose(left[-1], right[0], rtol=0, atol=1e-13)
     wall = np.vstack([part[:-1] for part in parts] + [parts[-1][-1:]])
     region = np.repeat(np.arange(7), [len(part)-1 for part in parts])
+    if smooth:
+        # 原封保留切点间的每个顶点，包括从接头端取得的最后一排坐标。
+        indices = np.flatnonzero(region == 3)
+        common = wall[indices[0]:indices[-1]+2]
+        count = int(np.ceil(t / (polar[0]-polar[1])))
+        angles = np.linspace(0, t, count+1)[:-1]
+        end = np.column_stack((a*np.cos(angles), b*np.sin(angles)))
+        wall = np.vstack((end*mirror, common, end[::-1]))
+        region = np.repeat(np.arange(3), [count, len(indices), count])
     return wall, region
 
 
@@ -62,8 +74,8 @@ def rotate(xy, rays, closed=False):
     return np.vstack(xyz), np.array(ids)
 
 
-def original():
-    wall, region = meridian()
+def original(smooth=False):
+    wall, region = meridian(smooth)
     xyz, rings = rotate(wall, np.linspace(0, 2*np.pi, SECTORS+1), True)
     faces, groups, native = [], [], []
     for k in range(SECTORS):
@@ -88,7 +100,7 @@ def original():
     assert len(np.unique(edges,axis=0))==len(edges)
     assert np.all(area>0) and np.all(np.einsum("ij,ij->i",cross,tri.mean(axis=1))>0)
     return dict(V=(xyz*D).tolist(),F=(f+1).tolist(),regionID=(np.array(groups)+1).tolist(),
-                regionNames=LABELS), np.asarray(native), area
+                regionNames=SMOOTH_LABELS if smooth else LABELS), np.asarray(native), area
 
 
 def outer_mesh(front, extent):
@@ -132,8 +144,7 @@ def outer_mesh(front, extent):
         gmsh.finalize()
 
 
-def section(first,extent=20):
-    wall,_=meridian()
+def wall_layers(wall, first):
     d=np.diff(wall,axis=0)
     n=np.column_stack((-d[:,1],d[:,0]))/np.linalg.norm(d,axis=1)[:,None]
     bisector=n[:-1]+n[1:]
@@ -144,16 +155,28 @@ def section(first,extent=20):
     assert first==levels[1]
     layers=np.array([wall+offset*normals for offset in levels])
     layers[:,[0,-1],1]=0
+    return layers
+
+
+def section(first,extent=20,smooth=False):
+    wall,_=meridian(smooth)
+    layers=wall_layers(wall,first)
     width=len(wall)
-    xy,tri,far,interface,active=outer_mesh(layers[-1],extent)
+    if smooth:
+        from thermistorCapMesh import replace_caps
+        wired,_=meridian()
+        front=wall_layers(wired,first)[-1]
+        xy,tri,far,interface,active=replace_caps(front,layers[-1],outer_mesh(front,extent))
+    else:
+        xy,tri,far,interface,active=outer_mesh(layers[-1],extent)
     extra=np.setdiff1d(active,interface)
     translate=np.full(len(xy),-1,int)
-    translate[interface]=np.arange(width)+(len(levels)-1)*width
+    translate[interface]=np.arange(width)+(len(layers)-1)*width
     translate[extra]=np.arange(len(extra))+layers.shape[0]*width
     np.testing.assert_allclose(xy[interface],layers[-1],rtol=0,atol=1e-13)
     points=np.vstack((layers.reshape(-1,2),xy[extra]))
     quads=[]
-    for k in range(len(levels)-1):
+    for k in range(len(layers)-1):
         for j in range(width-1):
             a=k*width+j
             quads.append([a,a+1,a+width+1,a+width])
@@ -192,10 +215,10 @@ def sweep(c, low, high):
     return [bottom[a],bottom[d],top[d],bottom[b],bottom[c],top[c]]
 
 
-def prepare_mesh(out,first):
+def prepare_mesh(out,first,smooth=False):
     from collections import defaultdict
-    wall,_=meridian()
-    xy,section_cells,far_edges,moment=section(first)
+    wall,_=meridian(smooth)
+    xy,section_cells,far_edges,moment=section(first,smooth=smooth)
     angles=np.arange(WEDGE+1)*2*np.pi/SECTORS
     xyz,ids=rotate(xy,angles)
     cells=[sweep(c,lo,hi) for lo,hi in zip(ids,ids[1:]) for c in section_cells]
@@ -242,7 +265,7 @@ def prepare_mesh(out,first):
         for name,faces in sorted(boundaries.items()):
             f.write(f"MARKER_TAG= {name}\nMARKER_ELEMS= {len(faces)}\n")
             for face in faces:f.write(" ".join(map(str,[5 if len(face)==3 else 9,*face]))+"\n")
-    body,mapping,areas=original()
+    body,mapping,areas=original(smooth)
     write_json(out/"body.json",body)
     np.savez_compressed(out/"nodes.npz",xyz=xyz,ids=ids,wallMap=ids[mapping[:,:,0],mapping[:,:,1]],
                         firstMap=ids[mapping[:,:,0],mapping[:,:,1]+len(wall)],area=areas)

@@ -46,9 +46,9 @@ SPECIES_CLIPPING= NO
 """
 
 
-def build(out,first):
+def build(out,first,smooth=False):
     assert sha(ENGINE)==ENGINE_SHA
-    stats=prepare_mesh(out,first)
+    stats=prepare_mesh(out,first,smooth)
     with np.load(out/"nodes.npz") as data:
         xyz=data["xyz"]
         walls=np.unique(data["wallMap"])
@@ -59,22 +59,27 @@ def build(out,first):
     np.savetxt(out/"initial_flow.csv",state,fmt=["%d"]+["%.17g"]*9,delimiter=",",comments="",
                header='"PointID","x","y","z","Pressure","Velocity_x","Velocity_y","Velocity_z","Enthalpy","Species_0"')
     (out/"case.cfg").write_text(configuration(),encoding="ascii")
-    write_json(out/"case.json",dict(caseKind="thermistor-B-axial-two-leads",meridianIntervals=stats["meridianIntervals"],
-               sourceAreaM2=AREA,diameterM=D,wireDiameterM=.054e-3,exposedStraightLengthM=.300e-3,
-               jointRadiusM=.027e-3,speedMps=U,airPa=P0,airK=T0,wallK=T0+DT,rho=RHO,mu=MU,cp=CP,k=K,
+    write_json(out/"case.json",dict(caseKind="thermistor-B-paired-smooth" if smooth else "thermistor-B-axial-two-leads",
+               meridianIntervals=stats["meridianIntervals"],sourceAreaM2=AREA,diameterM=D,
+               wireDiameterM=0. if smooth else .054e-3,exposedStraightLengthM=0. if smooth else .300e-3,
+               jointRadiusM=0. if smooth else .027e-3,speedMps=U,airPa=P0,airK=T0,wallK=T0+DT,rho=RHO,mu=MU,cp=CP,k=K,
                sectorDeg=30,angularCells=4,firstLayerM=first*D,outerRadiusOverD=20))
     sources=[PLAN,Path(__file__).resolve(),ROOT/"scripts/thermistorLeadMesh.py",ROOT/"scripts/thermistorBead.py",
              ROOT/"scripts/cm011Tunnel.py",out/"geometry.json",out/"nodes.npz",out/"body.json",out/"case.json"]
+    if smooth:
+        sources.extend((ROOT/"docs/validation/v298/PLAN.md",ROOT/"scripts/thermistorCapMesh.py"))
     write_json(out/"engine_request.json",dict(workDirectory=str(out),configFile="case.cfg",meshFile="mesh.su2",
                threads=1,maximumSeconds=720,jobToken=str(uuid.uuid4()),
                sourceFiles=[p.relative_to(ROOT).as_posix() for p in sources]))
 
 
-def prepare(out,first):
+def prepare(out,first,smooth=False):
     out.mkdir(parents=True,exist_ok=False)
     script=Path(__file__).resolve()
     files=[script,ROOT/"scripts/thermistorLeadMesh.py",PLAN,ROOT/"third_party/gmsh/source_lock.json"]
-    rec=observe([sys.executable,str(script),"mesh-worker",str(out),"--first",str(first)],out,
+    options=["--smooth-control"] if smooth else []
+    if smooth:files.extend([ROOT/"scripts/thermistorCapMesh.py",ROOT/"docs/validation/v298/PLAN.md"])
+    rec=observe([sys.executable,str(script),"mesh-worker",str(out),"--first",str(first),*options],out,
                 {str(f):sha(f) for f in files},180,200*1024**2)
     assert rec["debuggerExitCode"]==0 and not rec["stopReason"] and not rec["supervisorError"],out/"debugger.log"
 
@@ -95,10 +100,13 @@ if __name__=="__main__":
     cli.add_argument("action",choices=("prepare","mesh-worker","solve","probes"))
     cli.add_argument("folder",type=Path)
     cli.add_argument("--first",type=float,choices=(.002,.001),default=.002)
+    cli.add_argument("--smooth-control",action="store_true",help="以相同椭球替换两端引线，保留远区体网")
     args=cli.parse_args()
     out=args.folder.resolve();out.relative_to(ROOT/"outputs")
-    if args.action=="prepare":prepare(out,args.first)
-    elif args.action=="mesh-worker":build(out,args.first)
+    if args.smooth_control and args.action not in ("prepare","mesh-worker"):
+        cli.error("几何选择仅用于准备输入，推进与审核读取已保存的工况")
+    if args.action=="prepare":prepare(out,args.first,args.smooth_control)
+    elif args.action=="mesh-worker":build(out,args.first,args.smooth_control)
     elif args.action=="probes":probes(out)
     else:
         g=read(out/"geometry.json")

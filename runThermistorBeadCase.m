@@ -211,6 +211,9 @@ if refined
     current.evidenceIdentity.sourceFrame.comparisonFrameSHA256=old.sourceFrameSHA256;
 end
 if scale==1 && ~powerMode,report.native=stats;else,report.referenceNative=stats;end
+if refined && scale==1 && ~powerMode
+    current=attachThermistorPairedControl(current,'historical');
+end
 report.thermal=thermal;report.reusedArchive=~fresh;report.comparison=current.thermistorBead;
 if ~isempty(inputMesh)
     p=inputMesh.thermistorPrepared;

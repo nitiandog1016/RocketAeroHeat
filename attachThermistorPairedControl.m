@@ -1,0 +1,48 @@
+function mesh=attachThermistorPairedControl(mesh,kind)
+% 模块一：按已验收的模型、冻结工况和源帧配对。其他已算结果仍可独立使用。
+kind=validatestring(kind,{'wired','historical'});
+[folder,guard]=openThermistorArchive('paired3'); %#ok<NASGU>
+c=jsondecode(fileread(fullfile(folder,'comparison.json')));
+id=mesh.evidenceIdentity.sourceFrame;condition=mesh.hybridCondition;
+if ~strcmp(id.sha256,c.sourceFrames.(kind)) || ~strcmp(id.bodySHA256,c.bodies.(kind)) || ...
+        ~strcmp(id.wallSHA256,c.primaryTables.(kind)) || ~isequal(condition.velocityMps,[-3 0 0]) || ...
+        condition.ambientTemperatureK~=293.15 || condition.ambientPressurePa~=101325 || ...
+        ~isfield(condition,'wallTemperatureK') || condition.wallTemperatureK~=305.15
+    return;
+end
+n=size(mesh.F,1);w=mesh.hybridWall;v=mesh.V;f=mesh.F;
+area=vecnorm(cross(v(f(:,2),:)-v(f(:,1),:),v(f(:,3),:)-v(f(:,1),:),2),2,2)/2;
+q=nan(n,1);pressure=q;reverse=q;reverseChange=q;
+if strcmp(kind,'wired')
+    % 模块二：两种几何按共同三角面比较。引线、接头和线端的光滑对照保持未知。
+    mapFile=fullfile(folder,'shared.csv');bodyFile=fullfile(folder,'body.json');wallFile=fullfile(folder,'wall.csv');
+    assert(strcmp(cm011FileSHA256(mapFile),c.sharedMapSHA256) && strcmp(cm011FileSHA256(bodyFile),c.bodies.smooth) && ...
+        strcmp(cm011FileSHA256(wallFile),c.primaryTables.smooth),'RAH:Bead:Pair','公共面来源不符。');
+    pair=readtable(mapFile);b=jsondecode(fileread(bodyFile));table=readtable(wallFile);
+    flowFile=fullfile(folder,'flow.csv');assert(strcmp(cm011FileSHA256(flowFile),c.flow.smoothNative.tableSHA256));
+    flow=readtable(flowFile);i=pair.wiredID;j=pair.smoothID;
+    assert(numel(i)==c.commonFaces && numel(unique(i))==numel(i) && numel(unique(j))==numel(j) && ...
+        isequal(flow.face_id,table.faceID+1) && all(table.regionID(j)==2));
+    for k=1:3
+        assert(isequal(v(f(i,k),:),b.V(b.F(j,k),:)),'RAH:Bead:Pair','公共三角面的顶点或绕序不符。');
+    end
+    assert(max(abs(area(i)-table.areaM2(j)))<1e-18 && abs(sum(area(i))-c.commonAreaM2)<1e-16);
+    q(i)=table.heatFluxWm2(j);pressure(i)=table.pressurePa(j);reverse(i)=flow.reverse_both(j);
+    dq=w.heatFluxWm2-q;dp=w.pressurePa-pressure;
+    reverseChange(i)=mesh.thermistorLeadFlow.reverse(i)-reverse(i);
+    order='带线减光滑';scope='仅限两个原面三个顶点、面积与几何位置相同的珠面。';
+else
+    % 模块三：光滑旧网格上的两解都按原 5,216 面投影。用面积分复核两套壁面功率。
+    assert(strcmp(kind,'historical'));
+    path=fullfile(folder,'historical.csv');assert(strcmp(cm011FileSHA256(path),c.historicalTransferSHA256));
+    t=readtable(path);
+    assert(isequal(t.faceID,(1:n)') && max(abs(t.areaM2-area))<1e-18 && ...
+        abs(area'*t.pairedHeatFluxWm2+c.powerW.pairedSmooth)<1e-12 && ...
+        abs(area'*w.heatFluxWm2+c.powerW.oldSmooth)<1e-12,'RAH:Bead:Pair','光滑原面功率或顺序不符。');
+    q=t.pairedHeatFluxWm2;pressure=t.pairedPressurePa;reverse=t.pairedReverse;
+    dq=q-w.heatFluxWm2;dp=pressure-w.pressurePa;reverseChange=reverse-t.originalReverse;
+    order='混合网减原结构网';scope='同一光滑椭球的两次计算按原 5,216 面比较；壁热按面积守恒投影。';
+end
+mesh.thermistorPaired=struct('kind',kind,'summary',c,'heatFluxWm2',q,'deltaHeatWm2',dq, ...
+    'deltaPressurePa',dp,'reverse',reverse,'reverseChange',reverseChange,'order',order,'scope',scope);
+end

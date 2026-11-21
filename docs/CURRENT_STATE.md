@@ -1,12 +1,14 @@
 # 当前交接
 
-2026-11-21。公开民用 B 型热敏珠带两条轴向引线，3 m/s、293.15 K 空气、给定整件壁温 305.15 K 的对称稳态已求得 **10,272 / 10,272 面、3.19665061 mm²** 的壁压和对流热流。珠体和接头放热 11.94750 mW，两根引线含端面 0.59246 mW，整件 12.53996 mW。细网的珠部平均换热比原实验读数高 47.37%，逐面壁压和热流联合实验验证面积为 0 m²。各算例独立记账。[v297 报告](validation/v297/RESULTS.md) · [两网原面对照](validation/v297/evidence/comparison.json)
+2026-11-21。公开民用 B 型热敏珠的 3 m/s、给定壁温 305.15 K 对称稳态已完成配对计算。**原结构网光滑珠体放热 9.50885 mW，混合网光滑珠体 12.30870 mW，混合网带线珠体含接头 11.94750 mW。** 同几何两种离散相差 +2.79986 mW；同方法加入引线时珠部改变 −0.36120 mW。配对光滑工作网覆盖 6,624 / 6,624 面，原带线试件覆盖 10,272 / 10,272 面；既有试件新增覆盖为 0 面、0 m²。三种方法相对实验平均 h 分别高 17.29%、51.83%、47.37%，逐面联合实验验证面积为 0 m²。[v298 报告](validation/v298/RESULTS.md) · [配对与功率](validation/v298/evidence/comparison.json)
 
-<!-- records:last_completed=v297 -->
+<!-- records:last_completed=v298 -->
 <!-- records:active=none -->
-<!-- records:base_commit=c870db1a7ef3b4560a935a1c872077268a2a3334 -->
+<!-- records:base_commit=c1eb8eebcf41d43b88052b14fa6b9e95f188fdae -->
 
 ## 带线试件
+
+上述两种 3 m/s 主结果的侧栏均有“查看配对热流差”。6,144 个共同珠面可直接同面比较。两种光滑方法另按原 5,216 面守恒对照，几何和离散差值各自标明方向。新光滑场、20 次延续、独立反力和远场收支均已正常结束。[带线三维页](../outputs/v298_validation/wired_ui03/workbench/index.html) · [光滑三维页](../outputs/v298_validation/smooth_ui03/workbench/index.html) · [导出验收](validation/v298/evidence/workbench.json)
 
 从“选用带引线 B 型热敏珠”进入五步侧栏。工作台已通过网格、边界、冷态新算、归档、三维云图与七区探针验收。最大放热在迎风侧引线面元 207。后引线、后接头和珠体背流侧共有 1,536 面出现壁剪切与首层流速同时反向，两套近壁网辨认出同一批原面。新算任务 `thermistor_leads_run_d5d2003c-4d02-45b2-8fd1-0dd2641a07e0` 已有正常终态和逐面核对。引线长度、接头圆角、全体等温均为名义假设。[本机三维页](../outputs/v297_validation/ui03/workbench/index.html) · [科研出口](validation/v297/evidence/workbench.json) · [近壁数据](validation/v297/evidence/nearwall.json)
 
@@ -20,9 +22,7 @@ v295 曾在一次独立壁反力读取中断，原读数终态未知，现场留
 
 v292 在 6 m/s、293.15 K 空气、给定壁温 303.15 K 下，以一个整步及两个半步到达相同时刻。48 层网的局部最大步长差分别为 0.002772 Pa、0.006122 W/m²，放热峰均为工作台面元 5211。发展后尾迹和空间收敛阶待验证。[同刻差异](validation/v292/evidence/comparison.json)
 
-两个半步各在第 260 次内迭代保存终点，末尾分别有 38、72 次六项残差连续达标。初次回放把不同更新阶段的压力与标量读到一起。改用固定端点装配后，两步全域压力与接受场的无量纲最大差均低于 1.35 × 10⁻¹⁵。第二步放热 10.726572344 mW，收支差 −2.498 pW。主侧栏“查看 6 m/s · 同刻时间步对照”支持同原面差场、统一色标、探针和截面导出。[首步热量账](validation/v292/evidence/first_energy.json) · [第二步热量账](validation/v292/evidence/second_energy.json) · [本机对照三维页](../outputs/v292_validation/view02/export/workbench/index.html)
-
-6 m/s 全周快照以原生强温差壁反力保守映回原面。绝对壁压 101309.77–101351.96 Pa，入壁热流 −6606.75 至 −1152.12 W/m²，首层流体温度 302.665–303.068 K。工作台热峰面元为 5211。整珠放热 10.726572556 mW，远场流出 10.726560354 mW，空气储热率 12.192505 nW，收支差 9.764 pW。在主侧栏的 B 型热敏珠菜单选择“查看 6 m/s · 全周启动瞬态”。MATLAB 工作台、离线三维页、探针和下载保留相同物理时刻与原面值。[同阶段热量账](validation/v290/evidence/surface.json) · [界面核对](validation/v290/evidence/ui.json) · [本机三维页](../outputs/v290_validation/ui03/export/workbench/index.html)
+v292 初次回放混合了不同阶段的压力和标量。改用固定端点装配后，48 层网第二半步放热 10.726572344 mW，收支差 −2.498 pW。主侧栏可分别查看全周启动瞬态和同刻时间步对照。[v290 原步热量账](validation/v290/evidence/surface.json) · [v292 半步热量账](validation/v292/evidence/second_energy.json) · [本机对照三维页](../outputs/v292_validation/view02/export/workbench/index.html)
 
 3 m/s、293.15 K 空气和 4 mW 净功率下，15° 与 7.5° 网分别求得 298.26613 K 与 298.19793 K 的均匀集总壁温。全部 5,216 面均有压力、热流、首层流体温度与壁温，放热积分为 4 mW。[3 m/s 结果](validation/v286/RESULTS.md) · [本机细网三维页](../outputs/v286_validation/fine01/workbench/index.html)
 
@@ -32,7 +32,7 @@ v292 在 6 m/s、293.15 K 空气、给定壁温 303.15 K 下，以一个整步�
 
 ## 下一项
 
-[当前下一决定](validation/v297/NEXT_DECISION.md) 是在 v297 相同网格方法、物性与边界下求解配对光滑试件，区分引线引起的功率变化与原方法的离散差异。先比较两种方法的光滑珠体功率，再比较新方法下的有线与无线结果。v297 已完成正式运行和独立导出，当前没有待接续的带线求解进程。
+[当前下一决定](validation/v298/NEXT_DECISION.md) 是在光滑控制上定向加密中段近壁层外侧。−0.5 < X/a < 0.5 贡献了同几何两套方法功率差的 74.86%，距壁 0.015D 至 0.1D 的若干实际法向间距在混合网上更大。固定首层、母线原面与物理边界，实测改变的网距、分带功率与反向区。差异的具体成因仍待这一独立试验。[空间分布与网距](validation/v298/evidence/spatial.json)
 
 ## 自绘模型保留的状态
 

@@ -622,10 +622,23 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,4,'点选面元核对场量、算法和范围。灰色未解；未知外缘热力状态与有效状态的Kn超限分开，两者均可阻断下游热流。输入壁温与求解壁温分开。');
                 end
                 controls.export=button(grid,7,'导出完整离线工作台',@exportCase);
+                if isfield(state.result,'thermistorPaired')
+                    controls.export.Layout.Column=2;
+                    controls.pairedHeat=button(grid,7,'查看配对热流差',@showPairedHeat);
+                    controls.pairedHeat.Layout.Column=1;
+                end
                 tip(grid,8,'任意X截面曲线和导出使用同一快照。完成计算不等于全面积已解；修改上游使结果失效，浏览与导出不重算。');
                 controls.staticAir=button(grid,11,'静止空气 · 节点探针',@readStaticAirProbe);
         end
         sync();
+    end
+    function showPairedHeat(~,~)
+        % 打开当前冻结结果的配对证据页，初次定位绝对热流差最大的可比面。
+        pair=state.result.thermistorPaired;
+        ids=find(isfinite(pair.deltaHeatWm2));[~,k]=max(abs(pair.deltaHeatWm2(ids)));
+        tab=webUI.evidenceTab;tab.Parent.SelectedTab=tab;
+        webUI.evidenceView.selectField('pairedDeltaHeat');webUI.evidenceView.inspectFace(ids(k),[]);
+        message(sprintf('%s，最大绝对差位于面元 %d，入壁热流差 %+.3f W/m²。',pair.order,ids(k),pair.deltaHeatWm2(ids(k))));
     end
     function grid=form(rows)
         grid=uigridlayout(editor,[rows 2]);grid.ColumnWidth={138,'1x'};

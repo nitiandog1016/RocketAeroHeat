@@ -26,8 +26,10 @@ def assess(folder):
     cf=field["Skin_Friction_Coefficient"][vtk_ids]
     flow=np.loadtxt(saved,delimiter=",",skiprows=1)
     assert np.allclose(flow[:,1:4],xyz,rtol=0,atol=1e-13)
-    profile,_=meridian()
-    body,links,area=original()
+    smooth=read(folder/"case.json")["caseKind"]=="thermistor-B-paired-smooth"
+    profile,_=meridian(smooth)
+    body,links,area=original(smooth)
+    assert body==read(folder/"body.json")
     strip=links[:,:,1].min(axis=1);phi=links[:,:,0]*2*np.pi/SECTORS
     direction=-np.diff(profile,axis=0)
     direction/=np.linalg.norm(direction,axis=1)[:,None]

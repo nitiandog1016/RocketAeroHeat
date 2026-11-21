@@ -11,11 +11,14 @@ from thermistorBeadSector import COPIES,RAYS,sector_rays
 from thermistorReaction import terminal
 
 
-def projection(vertices,faces,ids,rays=RAYS):
+def projection(vertices,faces,ids,rays=RAYS,meridian_angles=None):
     """在原三角面内做等面积子三角积分，得到到各原生壁节点的非负插值权重。"""
     tri=vertices[faces]
     wall_ids=np.unique(ids)
     assert ids.shape[0]==len(rays)
+    if meridian_angles is not None:
+        assert len(meridian_angles)==ids.shape[1] and np.all(np.diff(meridian_angles)>0)
+        assert meridian_angles[0]==0 and meridian_angles[-1]==np.pi
     sectors=(rays[-1],rays[1]-rays[0])
     full_ring=np.isclose(rays[-1]-rays[0],2*np.pi,atol=1e-12,rtol=0)
     if full_ring:
@@ -29,7 +32,12 @@ def projection(vertices,faces,ids,rays=RAYS):
             for shift in offsets:
                 u,v=(a+shift)/subdivisions,(b+shift)/subdivisions
                 x,y,z=((1-u-v)*tri[:,0]+u*tri[:,1]+v*tri[:,2]).T
-                mer=np.arctan2(np.hypot(y,z)/B,-x/A)*(ids.shape[1]-1)/np.pi
+                angle=np.arctan2(np.hypot(y,z)/B,-x/A)
+                if meridian_angles is None:
+                    mer=angle*(ids.shape[1]-1)/np.pi
+                else:
+                    # 光滑配对网在引线切点处保留共同环，极冠使用自己的非均匀母线角。
+                    mer=np.interp(angle,meridian_angles,np.arange(ids.shape[1]))
                 # 全周各方位具有独立数值，自身接缝共享节点；历史扇区用镜面对称延拓。
                 if full_ring:
                     ray=np.mod(np.arctan2(z,y),2*np.pi)/sectors[1]

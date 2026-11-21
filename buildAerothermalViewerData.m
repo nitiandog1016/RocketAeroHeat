@@ -474,6 +474,36 @@ if isfield(mesh,'thermistorBead')
         end
     end
 end
+% 热敏珠的配对控制随原面云图、探针和 CSV 共用同一组已核对字段。
+if isfield(mesh,'thermistorPaired')
+    pair=mesh.thermistorPaired;pc=pair.summary;data.thermistorPair=pc;
+    note=sprintf('3 m/s 珠部放热：原结构网光滑 %.5f mW，配对混合网光滑 %.5f mW，带线含接头 %.5f mW。', ...
+        1000*pc.powerW.oldSmooth,1000*pc.powerW.pairedSmooth,1000*pc.powerW.wiredBeadAndJoints);
+    tab={'pairedSmoothHeat','配对光滑入壁热流','kW/m²',pair.heatFluxWm2/1000,'光滑混合网强等温标量的壁面离散反力';
+         'pairedDeltaHeat',['入壁热流差 · ' pair.order],'W/m²',pair.deltaHeatWm2,'同位置两解的入壁热流相减';
+         'pairedDeltaPressure',['壁压差 · ' pair.order],'Pa',pair.deltaPressurePa,'同位置两解的绝对壁压相减';
+         'pairedSmoothReverse','配对光滑近壁反向','0 / 1',pair.reverse,'光滑壁面剪切与首层速度沿流向的分量均为负时取 1';
+         'pairedReverseChange',['反向区变化 · ' pair.order],'1',pair.reverseChange,'两解的近壁反向标记相减，取 −1、0 或 1'};
+    status=double(isfinite(pair.heatFluxWm2));
+    primary=data.fields(strcmp({data.fields.key},'heatFlux'));
+    valid=[primary.values(isfinite(primary.values));pair.heatFluxWm2(status>0)/1000];
+    if isfield(data,'comparisonColorRanges') && isfield(data.comparisonColorRanges,'heatFlux')
+        valid=[valid(:);data.comparisonColorRanges.heatFlux(:)];
+    end
+    limits=[min(valid) max(valid)];data.comparisonColorRanges.heatFlux=limits;
+    data.comparisonColorRanges.pairedSmoothHeat=limits;
+    if isfield(data.comparisonColorRanges,'baselineHeatFlux'),data.comparisonColorRanges.baselineHeatFlux=limits;end
+    data.comparisonColorRanges.pairedSmoothReverse=[0 1];data.comparisonColorRanges.pairedReverseChange=[-1 1];
+    reasons=repmat({'光滑控制没有与这个接头、引线或端面重合的原三角面'},n,1);
+    for j=1:size(tab,1)
+        add(tab{j,1},tab{j,2},tab{j,3},tab{j,4},status,repmat(tab(j,5),n,1),pair.scope,{},reasons);
+        data.fields(end).stateNote=[note ' ' pair.scope];
+        if ismember(j,[2 3])
+            bound=max(abs(tab{j,4}(status>0)));
+            if bound>0,data.comparisonColorRanges.(tab{j,1})=[-bound bound];end
+        end
+    end
+end
 % 全周启动步使用独立的时间、算法和储热账，供云图、截面、探针与离线导出共用。
 if isfield(mesh,'thermistorStartup')
     s=mesh.thermistorStartup;e=s.energy;c=mesh.hybridCondition;

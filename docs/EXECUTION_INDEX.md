@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v298 光滑与带线热敏珠的配对控制](validation/v298/RESULTS.md) · [三项功率](validation/v298/evidence/comparison.json) · [网距与额外放热](validation/v298/evidence/spatial.json) · [下一项](validation/v298/NEXT_DECISION.md)。同一光滑几何换用混合网的放热差为 +2.79986 mW，匹配方法下加入引线的珠部差为 −0.36120 mW。
+
 - [v297 带两根引线的 B 型热敏珠全表面换热](validation/v297/RESULTS.md) · [七区壁压与热流](validation/v297/evidence/fine_surface.json) · [反向流动](validation/v297/evidence/nearwall.json) · [工作台](validation/v297/evidence/workbench.json) · [下一项](validation/v297/NEXT_DECISION.md)。3 m/s 对称稳态覆盖 10,272 个原面，整件放热 12.53996 mW，珠部平均换热比实验图读高 47.37%。
 
 - [v296 民用热敏珠独立安装与全表面复算](validation/v296/RESULTS.md) · [安装方法](validation/v296/INSTALL.md) · [5,216 面同刻结果与整珠实验](validation/v296/evidence/installation_result.json) · [下一项](validation/v296/NEXT_DECISION.md)。程序冷态重建初场，独立工作台新算复现原面表，整珠放热 10.69725502 mW。

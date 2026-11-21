@@ -64,6 +64,7 @@ current.evidenceIdentity.runDirectory=runFolder;current.evidenceIdentity.reusedA
 current.evidenceIdentity.sourceTraceable=true;current.evidenceIdentity.productionQualified=false;
 current.evidenceIdentity.scope='轴向来流下两端带线等温试件的对称稳态分支，实验对照为珠体平均换热。';
 current=attachThermistorLeadNearWall(current,runFolder);
+current=attachThermistorPairedControl(current,'wired');
 report.outputDirectory=runFolder;report.regions=s.regions;
 
     function pulse()

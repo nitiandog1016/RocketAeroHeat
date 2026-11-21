@@ -10,7 +10,7 @@ import numpy as np
 
 from beadSurfaceResult import state_and_reaction
 from thermistorBead import AREA,D,DT,P0,RHO,ROOT,T0,U,read,sha,write_json
-from thermistorLeadMesh import LABELS,original
+from thermistorLeadMesh import original
 from runThermistorLeadCase import configuration
 from thermistorReaction import terminal
 
@@ -19,10 +19,12 @@ def collect(parent,out):
     record=terminal(parent)
     g=read(parent/"geometry.json")
     c=read(parent/"case.json")
-    assert c["caseKind"]=="thermistor-B-axial-two-leads" and c["wireDiameterM"]==.054e-3
+    smooth=c["caseKind"]=="thermistor-B-paired-smooth"
+    assert smooth or c["caseKind"]=="thermistor-B-axial-two-leads"
+    assert c["wireDiameterM"]==(0. if smooth else .054e-3)
     assert c["wallK"]==T0+DT and c["speedMps"]==U and c["sectorDeg"]==30
     assert (parent/"case.cfg").read_text("ascii")==configuration()
-    body,links,area=original()
+    body,links,area=original(smooth)
     assert body==read(parent/"body.json") and sha(parent/"body.json")==g["bodySHA256"]
     for name in ("case.json","geometry.json","body.json","nodes.npz"):
         assert sha(parent/name)==record["inputSHA256"][str(parent/name)]
@@ -67,15 +69,19 @@ def collect(parent,out):
     assert abs(watts.sum()/release-1)<1e-12 and np.isfinite(q).all()
     groups=np.array(body["regionID"])
     rows=[]
-    for i,name in enumerate(LABELS,1):
+    for i,name in enumerate(body["regionNames"],1):
         f=np.flatnonzero(groups==i)
         peak=int(f[np.argmax(-q[f])])
         rows.append(dict(regionID=i,name=name,faces=len(f),areaM2=float(area[f].sum()),outwardW=float(watts[f].sum()),
                          pressurePa=[float(P0+gauge[f].min()),float(P0+gauge[f].max())],
                          intoWallWm2=[float(q[f].min()),float(q[f].max())],peakFaceID=peak+1))
-    bead=watts[(groups>=3)&(groups<=5)].sum()
-    tip=watts[(groups==1)|(groups==7)].sum()
-    wires=watts[(groups==2)|(groups==6)].sum()
+    if smooth:
+        bead=watts.sum()
+        tip=wires=0.
+    else:
+        bead=watts[(groups>=3)&(groups<=5)].sum()
+        tip=watts[(groups==1)|(groups==7)].sum()
+        wires=watts[(groups==2)|(groups==6)].sum()
     assert abs(bead+wires+tip-release)<1e-12
     exp=read(ROOT/"docs/validation/v282/evidence/comparison.json")["experiment"]
     out.mkdir(exist_ok=False)

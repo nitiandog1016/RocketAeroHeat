@@ -8,6 +8,9 @@ switch angularCells
     case 4
         archive=fullfile(caseDir,'surface_7p5.zip');
         expected='d02c8ac7fb41a7072e416e251efd2ccf8d19101ec388c98a46b3ed0a6e72449b';
+    case 'paired3'
+        archive=fullfile(caseDir,'paired3.zip');
+        manifest=jsondecode(fileread(fullfile(caseDir,'paired3.json')));expected=manifest.archiveSHA256;
     case 'leads3'
         contract=jsondecode(fileread(fullfile(caseDir,'leads3.json')));
         archive=fullfile(caseDir,'leads3.zip');expected=contract.archiveSHA256;
@@ -30,7 +33,7 @@ end
 
 function removeExtracted(folder)
 % 模块四：释放本次从已校验数据包展开的临时文件。
-for name={'case.json','body.json','wall.csv','summary.json','matched_temperature.csv'}
+for name={'case.json','body.json','wall.csv','summary.json','matched_temperature.csv','comparison.json','historical.csv','shared.csv','flow.csv'}
     path=fullfile(folder,name{1});if isfile(path),delete(path);end
 end
 rmdir(folder);
