@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v302 带线热敏珠整件功率边界](validation/v302/RESULTS.md) · [半温差独立核验](validation/v302/evidence/half.json) · [下一项](validation/v302/NEXT_DECISION.md)。4 mW 时 10,272 面共用 297.562541 K 求解壁温，七区放热总和复现输入。
+
 - [v301 带线热敏珠温差输运对照](validation/v301/RESULTS.md) · [全域温界与同迭代流场](validation/v301/evidence/frames.json) · [下一项](validation/v301/NEXT_DECISION.md)。一次有限斜率 MUSCL 试验收敛，412 个节点持续越过温度下限，关闭这一配置。
 
 - [v300 带引线热敏珠的中段网距和引线效应](validation/v300/RESULTS.md) · [七区与四场](validation/v300/evidence/comparison.json) · [下一项](validation/v300/NEXT_DECISION.md)。带线珠部放热从 11.94750 降至 10.27423 mW，整件放热 10.87809 mW。

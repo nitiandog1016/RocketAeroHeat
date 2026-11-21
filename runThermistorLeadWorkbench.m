@@ -13,8 +13,8 @@ else
     end
 end
 contract=jsondecode(fileread(fullfile(root,'cases','thermistor_b',[archive '.json'])));
-assert(isequal(cfg.thermistorBoundary,thermistorWorkbenchBoundary()) && cfg.thermistorAngularCells==4, ...
-    'RAH:Lead:Boundary','此工况使用 3 m/s 空气和 305.15 K 给定壁温。');
+b=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
+powerMode=isfield(b,'netHeatingPowerW');
 saved=jsondecode(fileread(p.manifest));
 assert(isequal(saved,rmfield(p,{'manifest','manifestSHA256'})) && strcmp(cm011FileSHA256(p.manifest),p.manifestSHA256) && ...
     strcmp(p.meshSHA256,contract.meshSHA256) && strcmp(p.bodySHA256,contract.bodySHA256) && ...
@@ -59,16 +59,48 @@ for j=1:numel(s.regions)
     ix=rows.regionID==j;
     assert(nnz(ix)==s.regions(j).faces && abs(sum(area(ix).*rows.heatFluxWm2(ix))+s.regions(j).outwardW)<1e-12);
 end
+% 模块三：净功率由整件七区共同承担，逐面换算后独立积分各区与总功率。
+wallK=c.wallK;summary=s;
+if powerMode
+    [rows,scale,deltaT,wallK]=scaleThermistorWallField(rows,b,c.airK,c.wallK,s.totalOutwardW);
+    regions=s.regions;
+    for j=1:numel(regions)
+        ix=rows.regionID==j;
+        regions(j).outwardW=-sum(area(ix).*rows.heatFluxWm2(ix));
+        regions(j).intoWallWm2=[min(rows.heatFluxWm2(ix));max(rows.heatFluxWm2(ix))];
+        if scale==0,regions(j).peakFaceID=[];end
+    end
+    release=[regions.outwardW];
+    thermal=struct('netHeatingPowerW',b.netHeatingPowerW,'referenceReleaseW',s.totalOutwardW, ...
+        'conductanceWK',s.totalOutwardW/(c.wallK-c.airK),'ambientTemperatureK',c.airK,'referenceWallTemperatureK',c.wallK, ...
+        'deltaTemperatureK',deltaT,'wallTemperatureK',wallK,'scale',scale,'surfaceReleaseW',sum(release), ...
+        'balanceErrorW',sum(release)-b.netHeatingPowerW,'nativeFrameSHA256',s.sourceFrameSHA256,'nativeReactionSHA256',s.sourceReactionSHA256, ...
+        'wallMethod','整件稳态等温集总热平衡，环境温度加净对流功率除以七区总热导', ...
+        'scope','名义珠体和两根引线共用一个壁温。输入为全部暴露面传给空气的净对流功率。');
+    assert(abs(thermal.balanceErrorW)<=1e-11*b.netHeatingPowerW,'RAH:Lead:Power','七区对流放热与整件输入功率不符。');
+    summary=struct('thermal',thermal,'referenceNative',s,'regions',regions,'faces',n,'areaM2',sum(area), ...
+        'totalOutwardW',sum(release),'beadAndJointsW',sum(release(3:5)), ...
+        'wireSidesW',sum(release([2 6])),'wireEndsW',sum(release([1 7])),'jointExperimentVerifiedM2',0);
+end
 labels=string(body.regionNames);
 condition=struct('caseLabel',caseLabel,'velocityMps',[-3 0 0],'ambientPressurePa',c.airPa, ...
     'ambientTemperatureK',c.airK,'wallTemperatureK',c.wallK,'alphaDeg',0,'betaDeg',0, ...
     'geometryScope',scope);
-setup=struct('condition',condition,'region',labels(rows.regionID),'wallTemperatureK',repmat(c.wallK,n,1), ...
+if powerMode
+    condition=rmfield(condition,'wallTemperatureK');condition.netHeatingPowerW=b.netHeatingPowerW;
+end
+setup=struct('condition',condition,'region',labels(rows.regionID),'wallTemperatureK',repmat(wallK,n,1), ...
     'engineeringSolver',@emptyWall,'localSolver',@wallData);
 [current,~,report]=runAeroHeatSingleCase(struct('F',f,'V',v),struct('analysisMode','hybridSurface','hybridSurface',setup));
-assert(report.fullSurfaceComputed && abs(report.wholeSurfaceHeatPowerW+s.totalOutwardW)<1e-12);
+assert(report.fullSurfaceComputed && abs(report.wholeSurfaceHeatPowerW+summary.totalOutwardW)<1e-12);
+if powerMode
+    current.hybridSolvedWallTemperatureK=current.hybridWallTemperatureK;
+    current=rmfield(current,'hybridWallTemperatureK');
+    assert(abs(report.wholeSurfaceHeatPowerW+b.netHeatingPowerW)<=1e-11*b.netHeatingPowerW);
+    report.thermal=thermal;
+end
 current.hybridWall.pressureGaugePa=rows.pressureGaugePa;
-if midbody,current.thermistorMidbody=s;else,current.thermistorLead=s;end
+if midbody,current.thermistorMidbody=s;else,current.thermistorLead=summary;end
 current.evidenceIdentity.sourceFrame=struct('kind',['SU2-8.6.0-thermistor-B-' cfg.thermistorVariant '-3ms'],'sha256',s.sourceFrameSHA256, ...
     'reactionSHA256',s.sourceReactionSHA256,'bodySHA256',s.bodySHA256,'wallSHA256',s.wallSHA256);
 current.evidenceIdentity.meshSHA256=p.meshSHA256;current.evidenceIdentity.preparedSHA256=p.manifestSHA256;
@@ -76,12 +108,16 @@ current.evidenceIdentity.runDirectory=runFolder;current.evidenceIdentity.reusedA
 current.evidenceIdentity.sourceTraceable=true;current.evidenceIdentity.productionQualified=false;
 current.evidenceIdentity.scope=[scope '。实验对照为珠体平均换热。'];
 current=attachThermistorLeadNearWall(current,runFolder,folder);
-if midbody,current=attachThermistorPairedControl(current,'midbody');
+if powerMode
+    current.evidenceIdentity.sourceFrame.thermalConversion=thermal;
+    rev=logical(current.thermistorLeadFlow.reverse);
+    current.thermistorLeadFlow.summary.reverseReleaseW=-sum(area(rev).*rows.heatFluxWm2(rev));
+elseif midbody,current=attachThermistorPairedControl(current,'midbody');
 elseif refineLeads
     current=attachThermistorPairedControl(current,'wiredRefined');
     current=attachThermistorLeadGridComparison(current);
 else,current=attachThermistorPairedControl(current,'wired');end
-report.outputDirectory=runFolder;report.regions=s.regions;
+report.outputDirectory=runFolder;report.regions=summary.regions;
 
     function pulse()
         if ~isempty(progress),progress(struct('phase','thermistorLead','status','running','fraction',NaN, ...
@@ -96,6 +132,10 @@ report.outputDirectory=runFolder;report.regions=s.regions;
         w.pressureMethod=repmat("壁节点表压按三角形平均，加来流静压",m,1);
         w.heatFluxMethod=repmat("强温差标量的壁节点反力按邻接面积守恒分配，正热流入壁",m,1);
         w.nearWallTemperatureMethod=repmat("对应三个壁节点的首层流体温差标量换算为 K 后平均",m,1);
+        if powerMode
+            w.heatFluxMethod(:)="整件集总热平衡求壁温，以温差比缩放同网格强等温壁反力，按原面积分";
+            w.nearWallTemperatureMethod(:)="同网格首层流体超温按整件热平衡温差比换算，再加环境温度";
+        end
         result=struct('accepted',true,'reason','六项残差、温界、独立壁反力、热稳定性与远场收支通过', ...
             'wall',w,'diagnostics',struct('sourceFrameSHA256',s.sourceFrameSHA256));
     end

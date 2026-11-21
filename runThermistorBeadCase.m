@@ -110,24 +110,7 @@ assert(all(abs(rows.areaM2-area)<1e-10*area),'RAH:Bead:Area','逐面面积与原
 referenceDelta=spec.wallK-spec.ambientK;
 referenceRelease=-stats.powerW;
 conductance=referenceRelease/referenceDelta;
-if powerMode
-    % 只把扣除引线与辐射等损失后的净功率交给空气侧；采用本次所选场的实际热导。
-    assert(boundary.netHeatingPowerW<=referenceRelease,'RAH:Bead:Power','净功率超过本次参照场的范围。');
-    scale=boundary.netHeatingPowerW/referenceRelease;
-    deltaT=referenceDelta*scale;
-    wallTemperatureK=spec.ambientK+deltaT;
-else
-    wallTemperatureK=boundary.wallTemperatureK;
-    deltaT=wallTemperatureK-spec.ambientK;
-    scale=deltaT/referenceDelta;
-end
-if scale==0
-    rows.heatFluxWm2(:)=0;
-    rows.nearWallCellTemperatureK(:)=spec.ambientK;
-elseif scale~=1
-    rows.heatFluxWm2=scale*rows.heatFluxWm2;
-    rows.nearWallCellTemperatureK=spec.ambientK+scale*(rows.nearWallCellTemperatureK-spec.ambientK);
-end
+[rows,scale,deltaT,wallTemperatureK]=scaleThermistorWallField(rows,boundary,spec.ambientK,spec.wallK,referenceRelease);
 
 % 模块二：同一名义等温珠体的全部原面交给区域求解入口，保留每个变量的算法来源。
 condition=struct('caseLabel','B 型热敏珠 · 名义长椭球 · 沿长轴来流','velocityMps',[-spec.freestreamMps 0 0], ...

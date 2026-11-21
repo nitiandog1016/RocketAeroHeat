@@ -162,7 +162,7 @@ switch action
         validateFlight(state.cfg);
         fs=optional(payload,'freestream',state.freestream);
         if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB')
-            [~,reference]=thermistorWorkbenchBoundary(state.cfg.thermistorBoundary,state.cfg.thermistorAngularCells);
+            [~,reference]=thermistorWorkbenchBoundary(state.cfg.thermistorBoundary,state.cfg.thermistorAngularCells,state.cfg);
             if isempty(fs),fs=reference;end
             assert(isequal(fs,reference),'RAH:Bead:Boundary','来流记录与确认的珠体边界不符。');
         end
@@ -434,11 +434,7 @@ end
 %% 模块十：边界输入基础检查；完整物理适用性仍由后端各模型审核。
 function validateFlight(cfg)
 if strcmp(optional(cfg,'computationBackend',''),'thermistorB')
-    thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells);
-    if any(strcmp(optional(cfg,'thermistorVariant','smooth'),{'leads','midbody'}))
-        assert(cfg.thermistorAngularCells==4 && isequal(cfg.thermistorBoundary,thermistorWorkbenchBoundary()), ...
-            'RAH:Lead:Boundary','此混合网工况使用 3 m/s 轴向来流与给定壁温 305.15 K。');
-    end
+    thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
     return;
 end
 if strcmp(optional(cfg,'computationBackend',''),'cm011Imported')
@@ -462,7 +458,7 @@ end
 end
 function validateThermistorResult(result,frozen)
 % 核对低速试件的冻结边界，分别检查给定壁温和由净功率求解的稳态壁温。
-cfg=frozen.cfg;[b,fs]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells);
+cfg=frozen.cfg;[b,fs]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
 p=frozen.mesh.thermistorPrepared;w=result.hybridWall;n=size(frozen.mesh.F,1);c=result.hybridCondition;
 id=result.evidenceIdentity;
 if p.angularCells==48
@@ -477,8 +473,9 @@ elseif any(strcmp(optional(cfg,'thermistorVariant','smooth'),{'leads','midbody'}
     % 按试件分别核对带线七区或光滑三区，冻结快照必须属于本次体网。
     if strcmp(cfg.thermistorVariant,'leads'),s=result.thermistorLead;groups=7;
     else,s=result.thermistorMidbody;groups=3;end
-    assert(strcmp(s.meshSHA256,p.meshSHA256) && strcmp(id.sourceFrame.sha256,s.sourceFrameSHA256) && ...
-        strcmp(id.sourceFrame.wallSHA256,s.wallSHA256) && numel(s.regions)==groups && sum([s.regions.faces])==n && ...
+    native=s;if isfield(s,'referenceNative'),native=s.referenceNative;end
+    assert(strcmp(native.meshSHA256,p.meshSHA256) && strcmp(id.sourceFrame.sha256,native.sourceFrameSHA256) && ...
+        strcmp(id.sourceFrame.wallSHA256,native.wallSHA256) && numel(s.regions)==groups && sum([s.regions.faces])==n && ...
         strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && id.reusedArchive==strcmp(cfg.thermistorResultSource,'archive'), ...
         'RAH:Lead:Snapshot','带线原面、区域或终场不符。');
 else
@@ -492,7 +489,8 @@ assert(isequal(c.velocityMps,fs.velocityMps) && c.ambientPressurePa==b.airPressu
     c.ambientTemperatureK==b.airTemperatureK && isequal(c,id.physicalCondition), ...
     'RAH:Bead:Snapshot','结果边界与当前确认的试件工况不符。');
 if isfield(b,'netHeatingPowerW')
-    t=result.thermistorBead.thermal;
+    if isfield(result,'thermistorLead'),t=result.thermistorLead.thermal;
+    else,t=result.thermistorBead.thermal;end
     assert(isfield(c,'netHeatingPowerW') && c.netHeatingPowerW==b.netHeatingPowerW && ...
         ~isfield(c,'wallTemperatureK') && ~isfield(result,'hybridWallTemperatureK') && ...
         t.netHeatingPowerW==b.netHeatingPowerW && t.conductanceWK>0 && ...

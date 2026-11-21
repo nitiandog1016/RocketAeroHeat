@@ -399,7 +399,8 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isBead()
-                    if isMixedBead()
+                    wiredPower=hasBeadLeads() && getOption(state.cfg,'thermistorRefineLeads',false);
+                    if isMixedBead() && ~wiredPower
                         grid=form(6);tip(grid,1,'空气 3 m/s · 沿 −X · 293.15 K · 101325 Pa');
                         tip(grid,2,[mixedBeadLabel() ' · 全部暴露面给定 305.15 K。']);
                         controls.confirm=button(grid,5,'确认试件热边界',@confirmBoundary);sync();return;
@@ -410,23 +411,32 @@ renderEditor();sync();showGeometry(true);
                         controls.confirm=button(grid,5,'确认此工况与给定壁温',@confirmBoundary);sync();return;
                     end
                     grid=form(9);selected='none';temp=305.15;watts=0.004;
+                    if wiredPower,selected='published';end
                     boundary=state.cfg.thermistorBoundary;
                     if isstruct(boundary)
                         if isfield(boundary,'netHeatingPowerW'),selected='power';watts=boundary.netHeatingPowerW;
                         else,selected='published';temp=boundary.wallTemperatureK;end
                     end
-                    controls.beadCondition=choice(grid,1,'热边界',{'请选择热边界','给定均匀壁温','给定净加热功率'}, ...
-                        {'none','published','power'},selected);
+                    if wiredPower
+                        items={'给定壁温 305.15 K','整件净对流功率'};values={'published','power'};powerLabel='整件净对流功率 / W';
+                    else
+                        items={'请选择热边界','给定均匀壁温','给定净加热功率'};values={'none','published','power'};powerLabel='整珠净功率 / W';
+                    end
+                    controls.beadCondition=choice(grid,1,'热边界',items,values,selected);
                     controls.beadCondition.ValueChangedFcn=@boundaryEdited;
                     controls.beadWall=numberField(grid,2,'给定壁温 / K',temp,[293.15 305.15]);
-                    controls.beadWall.ValueChangedFcn=@boundaryEdited;controls.beadWall.Enable=onoff(strcmp(selected,'published'));
-                    limit=thermistorNetPowerLimit(state.cfg.thermistorAngularCells);
-                    controls.beadPower=numberField(grid,3,'整珠净功率 / W',watts,[0 limit]);
+                    controls.beadWall.ValueChangedFcn=@boundaryEdited;controls.beadWall.Enable=onoff(~wiredPower && strcmp(selected,'published'));
+                    limit=thermistorNetPowerLimit(state.cfg.thermistorAngularCells,state.cfg);
+                    controls.beadPower=numberField(grid,3,powerLabel,watts,[0 limit]);
                     controls.beadPower.ValueDisplayFormat='%.10g';
                     controls.beadPower.ValueChangedFcn=@boundaryEdited;controls.beadPower.Enable=onoff(strcmp(selected,'power'));
-                    tip(grid,4,sprintf('3 m/s 空气，293.15 K，101325 Pa。净功率已扣除引线、辐射等损失。本网上限约 %.6g mW。',1000*limit));
+                    if wiredPower
+                        tip(grid,4,sprintf('3 m/s 空气，293.15 K。功率包括珠面、接头、引线和线端传给空气的热量。上限 %.8g mW。',1000*limit));
+                    else
+                        tip(grid,4,sprintf('3 m/s 空气，293.15 K，101325 Pa。净功率已扣除引线、辐射等损失。本网上限约 %.6g mW。',1000*limit));
+                    end
                     controls.confirm=button(grid,7,'确认热敏珠边界',@confirmBoundary);
-                    controls.confirm.Enable=onoff(~isempty(state.cfg.thermistorBoundary));sync();return;
+                    controls.confirm.Enable=onoff(wiredPower || ~isempty(state.cfg.thermistorBoundary));sync();return;
                 end
                 if isCM011()
                     grid=form(8);selected='none';
@@ -544,7 +554,10 @@ renderEditor();sync();showGeometry(true);
                     if isMixedBead()
                         controls.readBead=button(grid,1,'读取同网格已算结果',@(~,~)solveCase([],[],'archive'));
                         controls.run=button(grid,2,'从冷态计算当前试件',@solveCase);
-                        tip(grid,3,[mixedBeadLabel() ' · 3 m/s 轴向稳态']);
+                        if isfield(state.cfg.thermistorBoundary,'netHeatingPowerW')
+                            controls.readBead.Text='用已算参照场求壁温';controls.run.Text='冷态重算参照场并求壁温';
+                        end
+                        tip(grid,3,[mixedBeadLabel() ' · 3 m/s 轴向稳态 · ' beadBoundaryText(state.cfg.thermistorBoundary)]);
                         sync();return;
                     end
                     if isFullBead()
@@ -620,8 +633,10 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,4,sprintf('光滑珠中段加密 · 整珠放热 %.5f mW · 平均换热 %.2f W/(m²·K)',1000*s.totalOutwardW,s.beadMeanHWm2K));
                 elseif hasBeadLeads()
                     s=state.result.thermistorLead;
-                    tip(grid,4,sprintf('珠体和接头 %.4f mW · 两条引线含端面 %.4f mW · 总放热 %.4f mW', ...
-                        1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),1000*s.totalOutwardW));
+                    msg=sprintf('珠体和接头 %.4f mW · 两条引线含端面 %.4f mW · 总放热 %.4f mW', ...
+                        1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),1000*s.totalOutwardW);
+                    if isfield(s,'thermal'),msg=sprintf('求解壁温 %.6f K · %s',s.thermal.wallTemperatureK,msg);end
+                    tip(grid,4,msg);
                 elseif isBead()
                     origin='本次冷启动计算';
                     if state.result.evidenceIdentity.reusedArchive,origin='使用归档温差场';end
@@ -850,7 +865,7 @@ renderEditor();sync();showGeometry(true);
         next=state.cfg;
         if isBead()
             next.thermistorBoundary=[];
-            if isMixedBead(),next.thermistorBoundary=thermistorWorkbenchBoundary();return;end
+            if isMixedBead() && ~isfield(controls,'beadCondition'),next.thermistorBoundary=thermistorWorkbenchBoundary();return;end
             if isFullBead()
                 b=thermistorWorkbenchBoundary();b.speed=6;b.wallTemperatureK=303.15;
                 next.thermistorBoundary=thermistorWorkbenchBoundary(b,48);return;
@@ -862,7 +877,7 @@ renderEditor();sync();showGeometry(true);
                 else
                     b.wallTemperatureK=controls.beadWall.Value;
                 end
-                next.thermistorBoundary=thermistorWorkbenchBoundary(b,next.thermistorAngularCells);
+                next.thermistorBoundary=thermistorWorkbenchBoundary(b,next.thermistorAngularCells,next);
             end
             return;
         end
@@ -999,7 +1014,7 @@ renderEditor();sync();showGeometry(true);
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
             if isBead()
-                controls.beadWall.Enable=onoff(strcmp(controls.beadCondition.Value,'published'));
+                    controls.beadWall.Enable=onoff(~hasBeadLeads() && strcmp(controls.beadCondition.Value,'published'));
                 controls.beadPower.Enable=onoff(strcmp(controls.beadCondition.Value,'power'));
                 controls.confirm.Enable=onoff(~isempty(state.cfg.thermistorBoundary));
                 message('热敏珠边界选择已更新，请确认工况。');showGeometry(false);return;
@@ -1042,7 +1057,7 @@ renderEditor();sync();showGeometry(true);
         try
             next=boundaryConfiguration();
             if isBead()
-                [~,fs]=thermistorWorkbenchBoundary(next.thermistorBoundary,next.thermistorAngularCells);
+                [~,fs]=thermistorWorkbenchBoundary(next.thermistorBoundary,next.thermistorAngularCells,next);
                 state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
                 state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',fs));
                 message(sprintf('已确认 %g m/s、293.15 K 空气，%s。',fs.speed,beadBoundaryText(next.thermistorBoundary)));go(4);return;
@@ -1154,7 +1169,8 @@ renderEditor();sync();showGeometry(true);
     end
     function label=beadBoundaryText(b)
         % 计算页和确认回执显示实际冻结的热边界与单位。
-        if isfield(b,'netHeatingPowerW'),label=sprintf('整珠净功率 %.12g mW',1000*b.netHeatingPowerW);
+        if isfield(b,'netHeatingPowerW') && hasBeadLeads(),label=sprintf('整件净对流功率 %.12g mW',1000*b.netHeatingPowerW);
+        elseif isfield(b,'netHeatingPowerW'),label=sprintf('整珠净功率 %.12g mW',1000*b.netHeatingPowerW);
         else,label=sprintf('给定壁温 %.12g K',b.wallTemperatureK);end
     end
     function yes=isBead()
