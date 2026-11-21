@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-21。民用带线 B 型热敏珠两档加密网已支持给定均匀壁温 293.15–305.15 K。3 m/s 空气、壁温 299.15 K 下，两档均覆盖 10,272 / 10,272 面、3.19665061 mm²，向空气放热分别为 5.439043 与 5.281459 mW。第二档对独立冷态的最大逐面热流差为 0.09817 W/m²。新增几何覆盖 0 面、0 m²，逐面联合实验验证面积为 0 m²。[v308 报告](validation/v308/RESULTS.md) · [逐面核对](validation/v308/evidence/verification.json) · [第三档三维页](../outputs/v308_validation/fine01/workbench/index.html)
+2026-11-21。民用带线 B 型热敏珠在 3 m/s 空气、给定壁温 299.15 K 下，两档珠部平均换热系数为 276.72 和 268.15 W/(m²·K)。原论文图 7、8 在 6 K 温差处没有测点，工作台已区分计算值和未知实验偏差。两档各覆盖 10,272 / 10,272 面、3.19665061 mm²，整件放热分别为 5.439043 和 5.281459 mW。新增 0 面、0 m²，逐面联合实验验证面积为 0 m²。[v309 测点核对](validation/v309/RESULTS.md) · [第三档三维页](../outputs/v309_validation/fine01/workbench/index.html) · [可输入壁温及独立冷态](validation/v308/RESULTS.md)
 
-<!-- records:last_completed=v308 -->
+<!-- records:last_completed=v309 -->
 <!-- records:active=none -->
-<!-- records:base_commit=66c1e1ee9e38656b65d010fcc32a7f18cbba4d54 -->
+<!-- records:base_commit=547ae6de07435d74b90bb838ee28e70e31ae2e86 -->
 
 前中段两轮网格排列候选已关闭。约 12 K 温差下，第三档珠部平均换热比原论文图读高 22.80%。[网格试验结论](validation/v307/RESULTS.md)
 
@@ -38,7 +38,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-核对 3 m/s、约 6 K 温差下 B 型热敏珠的公开珠部换热测点与本次工况的对应范围。[当前下一决定](validation/v308/NEXT_DECISION.md)
+将原论文强迫对流工程关系接入带线热敏珠 3 m/s 同工况工作台，比较珠部平均换热与功率。[当前下一决定](validation/v309/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

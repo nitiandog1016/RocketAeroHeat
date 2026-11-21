@@ -90,6 +90,18 @@ if converted
         'wireSidesW',sum(release([2 6])),'wireEndsW',sum(release([1 7])),'jointExperimentVerifiedM2',0, ...
         'peakFaceID',s.peakFaceID,'beadMeanHWm2K',s.beadMeanHWm2K);
     if scale==0,summary.peakFaceID=[];summary.beadMeanHWm2K=NaN;end
+    % 按论文的珠部名义面积比较平均换热，记录两实测点之间的温差范围。
+    if ~powerMode && ~midbody && leadLevel>0
+        source=jsondecode(fileread(fullfile(root,'cases','thermistor_b','beadExperimentGap.json')));
+        if c.speedMps==source.speedMps && deltaT>source.openGapK(1) && deltaT<source.openGapK(2)
+            summary.beadMeanComparison=struct('status','noMatchingPoint','deltaTK',deltaT, ...
+                'predictedHWm2K',summary.beadAndJointsW/(source.nominalBeadAreaM2*deltaT), ...
+                'beadAndJointsW',summary.beadAndJointsW,'nominalBeadAreaM2',source.nominalBeadAreaM2, ...
+                'measuredHWm2K',NaN,'relativeDifference',NaN,'reportedPointUncertaintyWm2K',NaN, ...
+                'openGapK',source.openGapK,'doi',source.doi,'sourcePDFSHA256',source.pdfSHA256, ...
+                'printedPage',source.printedPage,'figures',[source.figures.figure]);
+        end
+    end
 end
 labels=string(body.regionNames);
 condition=struct('caseLabel',caseLabel,'velocityMps',[-3 0 0],'ambientPressurePa',c.airPa, ...
@@ -108,6 +120,7 @@ if powerMode
     assert(abs(report.wholeSurfaceHeatPowerW+b.netHeatingPowerW)<=1e-11*b.netHeatingPowerW);
 end
 if converted,report.thermal=thermal;end
+if isfield(summary,'beadMeanComparison'),report.beadMeanComparison=summary.beadMeanComparison;end
 current.hybridWall.pressureGaugePa=rows.pressureGaugePa;
 if midbody,current.thermistorMidbody=s;else,current.thermistorLead=summary;end
 current.evidenceIdentity.sourceFrame=struct('kind',['SU2-8.6.0-thermistor-B-' cfg.thermistorVariant '-3ms'],'sha256',s.sourceFrameSHA256, ...

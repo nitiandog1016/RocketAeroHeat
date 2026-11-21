@@ -438,6 +438,11 @@ if isfield(mesh,'thermistorLead') || isfield(mesh,'thermistorMidbody')
                 1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),1000*s.totalOutwardW,1000*s.thermal.conductanceWK);
             if s.thermal.deltaTemperatureK==0
                 data.fields(k).stateNote='壁面与环境同温，七区各面热流均为零。没有唯一热峰，按功率除以温差计算的平均换热系数未定义。';
+            elseif isfield(s,'beadMeanComparison')
+                obs=s.beadMeanComparison;
+                data.fields(k).stateNote=[data.fields(k).stateNote sprintf( ...
+                    ' 珠部计算平均换热系数 %.2f W/(m²·K)。图 7、8 在温差 %.9g K 处无匹配测点，实验偏差未知。', ...
+                    obs.predictedHWm2K,obs.deltaTK)];
             end
         else
             data.fields(k).stateNote=sprintf('珠体含接头 %.4f mW，引线含端面 %.4f mW。珠部平均换热 %.2f W/(m²·K)，实验图读 %.2f W/(m²·K)。', ...

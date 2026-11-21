@@ -136,6 +136,10 @@ update(data,varargin{:});
         if isfield(d,'thermistorLead') && isfield(d.thermistorLead,'thermal')
             summary.thermalConversion=d.thermistorLead.thermal;
         end
+        % 热流全表的配套说明保存珠部平均换热的实验口径与缺测状态。
+        if strcmp(key,'heatFlux') && isfield(d,'thermistorLead') && isfield(d.thermistorLead,'beadMeanComparison')
+            summary.beadMeanComparison=d.thermistorLead.beadMeanComparison;
+        end
         if startsWith(key,'outer') && isfield(d,'outerDomainComparison') && d.outerDomainComparison.available
             summary.outerDomainComparison=d.outerDomainComparison;
         end
