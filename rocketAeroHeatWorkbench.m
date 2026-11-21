@@ -266,7 +266,7 @@ renderEditor();sync();showGeometry(true);
                     controls.generate=button(grid,2,'生成热敏珠体网',@generate);
                     description='外域 20 倍横径 · 子午 64 × 径向 48 · 30° 对称扇区';
                     if isFullBead()
-                        controls.generate.Text='核对并使用 56 层全周体网';
+                        controls.generate.Text='准备 56 层全周体网';
                         description='外域 20 倍横径 · 48 个方位 · 56 个径向区间 · 全周启动瞬态';
                     end
                     if ~isempty(state.mesh)
@@ -517,7 +517,7 @@ renderEditor();sync();showGeometry(true);
                     grid=form(11);p=state.mesh.thermistorPrepared;
                     if isFullBead()
                         controls.run=button(grid,1,'从构造初场计算两个半步',@solveCase);
-                        tip(grid,2,'6 m/s · 给定壁温 303.15 K · 56 层 · 目标 7.809360865 µs。上次用时约 49 分钟。');
+                        tip(grid,2,'6 m/s · 给定壁温 303.15 K · 目标 7.809360865 µs。已有初场约 49 分钟，首次计算另需准备初场。');
                         controls.beadDirectory=textField(grid,4,'已有计算目录',fullfile(state.cfg.projectRoot,'outputs','v294_validation'));
                         controls.browseRun=button(grid,5,'选择计算目录',@chooseBeadDirectory);
                         controls.readBead=button(grid,6,'读取已完成计算',@(~,~)solveCase([],[],'read'));
@@ -738,7 +738,7 @@ renderEditor();sync();showGeometry(true);
         if isBead()
             try
                 preparing=true;message('正在准备并核对所选热敏珠体网…');
-                candidate=prepareThermistorWorkbenchMesh(state.orientedMesh,state.cfg.thermistorAngularCells);
+                candidate=prepareThermistorWorkbenchMesh(state.orientedMesh,state.cfg.thermistorAngularCells,@()isgraphics(fig));
                 state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));report=[];
                 preparing=false;renderEditor();showGeometry(true);message('体网已就绪，可以设置边界条件。');
             catch ex,preparing=false;if isgraphics(fig),renderEditor();showError(ex);end,end

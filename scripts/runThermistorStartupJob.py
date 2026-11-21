@@ -17,8 +17,9 @@ import psutil
 ROOT = Path(__file__).resolve().parents[1]
 RECIPE = ROOT / "docs/validation/v294"
 sys.path.insert(0, str(RECIPE))
-from advance import BUILD, ENGINE_SHA, GRID, OFFICIAL, OLD, PREVIOUS, RUN, grid_info, read, settings, sha
-from prepare import bound_source
+from advance import ENGINE_SHA, GRID, OFFICIAL, PREVIOUS, RUN, read, settings, sha
+from thermistorStartupCache import bound_source, ensure_grid, ensure_mesh
+from thermistorStartupObserver import ensure_observer
 from compare import BASE, BASE_SHA
 from runEmbeddedSU2 import atomic_write_json
 
@@ -37,7 +38,7 @@ def require(condition, message):
 
 def prepare(out):
     """从实际全周体网取壁面预览并绑定米制几何、初场和节点编号。"""
-    info = grid_info()
+    info = ensure_mesh()
     geometry = read(bound_source("geometry.json"))
     with np.load(GRID / "nodes.npz") as data:
         wall = data["ids"][:, :65]
@@ -54,19 +55,15 @@ def prepare(out):
 
 
 def preflight():
-    """在创建新计算目录前核对该具名配方真正读取的本机资产。"""
-    grid_info()
-    build = read(PREVIOUS / "evidence/readout_build.json")
-    require(sha(OFFICIAL) == ENGINE_SHA and sha(BUILD / "observe_bead.exe") == build["observerSHA256"]
-            and read(BUILD / "build.json") == build and sha(BUILD / "CIntegration.cpp") == build["sourceSHA256"],
-            "SU2 或固定端点观察器指纹有变化")
+    """从安装位置恢复当前工况所需的准确输入，求解前核对运行库和存储预算。"""
+    require(OFFICIAL.is_file(), "请先运行 python scripts/installSU2Runtime.py 安装本工况的官方 SU2 8.6.0。")
+    require(sha(OFFICIAL) == ENGINE_SHA, "官方 SU2 指纹有变化")
     require(sha(BASE) == BASE_SHA, "48 层参照场指纹有变化")
+    require(shutil.disk_usage(ROOT/"outputs").free >= 3 * 1024**3, "需要至少 3 GiB 可用磁盘空间")
+    ensure_observer()
+    ensure_grid()
     for name in ("body.json", "nodes.npz", "geometry.json"):
         bound_source(name)
-    assets = read(PREVIOUS / "evidence/local_assets.json")
-    for name in ("case.cfg", "history_00001.csv"):
-        path = OLD / "first01" / name
-        require(sha(path) == assets[path.relative_to(ROOT).as_posix()]["sha256"], "v293 首步参照输入已变化")
     settings(1)
     settings(2)
     require(shutil.disk_usage(RUN).free >= 3 * 1024**3, "需要至少 3 GiB 可用磁盘空间")
@@ -197,7 +194,6 @@ def preserve_interrupted_release(area, stage):
 
 def run(area, resume):
     require(area.parent == JOBS, "新任务须位于本工况专用输出目录")
-    preflight()
     request = dict(directory=str(area), condition=CONDITION, meshSHA256=GRID_SPEC["gridSHA256"],
                    seedSHA256=GRID_SPEC["seedSHA256"])
     if resume:
@@ -207,12 +203,16 @@ def run(area, resume):
         atomic_write_json(area / "request.json", request)
     with exclusive(area):
         progress = area / "progress.json"
-        stage = "preflight"
+        stage = "prepare_inputs"
         try:
             if resume:
                 existing_names = [name for name, _ in stages() if (area / name).exists()]
                 existing = [name in existing_names for name, _ in stages()]
                 require(existing == sorted(existing, reverse=True), "保存阶段中间有缺项。已保留目录供核查")
+                if all(existing):
+                    return inspect(area)
+            atomic_write_json(progress, dict(status="running", stage=stage, pid=os.getpid()))
+            preflight()
             for stage, args in stages():
                 directory = area / stage
                 if resume and directory.exists():

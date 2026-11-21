@@ -1,6 +1,7 @@
 """在已验收的热敏珠 56 层体网上按 v294 限额推进，逐项绑定源帧、网格与原生历史。"""
 import argparse
 import gzip
+import hashlib
 import os
 from pathlib import Path
 import sys
@@ -8,41 +9,34 @@ import sys
 HERE=Path(__file__).resolve().parent
 PREVIOUS=HERE.parent/"v293"
 sys.path.insert(0,str(PREVIOUS))
-from run_step import (ROOT, RUN as OLD, LIMIT as OLD_LIMIT, OFFICIAL, ENGINE_SHA, BIN, inputs,
-                      configuration, observe, read, replace, sha)
+from run_step import ROOT, OFFICIAL, ENGINE_SHA, BIN, observe, read, replace, sha
+from thermistorStartupCache import BUILD, CASE, GRID, ensure_grid, grid_info
+from thermistorSeedRecovery import identical
 
 RUN=ROOT/"outputs/v294_validation"
-GRID=OLD/"grid01"
-BUILD=OLD/"build01"
 LIMIT=800
 
 
 def settings(index):
-    return replace(configuration(index),f"INNER_ITER= {OLD_LIMIT}\n",f"INNER_ITER= {LIMIT}\n")
+    cfg=identical(CASE/"halfstep.cfg","72c487e7378c25db6a9b57ebf51fdc0b5b8658df920a01dcce667a84224658be").read_text("ascii")
+    if index==1:return cfg
+    assert index==2
+    return replace(replace(cfg,"RESTART_ITER= 1\n","RESTART_ITER= 2\n"),"TIME_ITER= 2\n","TIME_ITER= 3\n")
 
 
 def prefix(history):
-    original=OLD/"first01/history_00001.csv"
     record=read(PREVIOUS/"evidence/first_state.json")
     saved=gzip.decompress((PREVIOUS/"evidence/first_history.csv.gz").read_bytes())
-    assert not record["passed"] and sha(original)==record["historySHA256"]
-    assert original.read_bytes()==saved and len(saved.splitlines())==561
+    assert not record["passed"] and hashlib.sha256(saved).hexdigest()==record["historySHA256"]
+    assert len(saved.splitlines())==561
     assert history.read_bytes().startswith(saved),"首半步前 560 行发生变化"
 
 
-def grid_info():
-    g=inputs(GRID)
-    assert g==read(PREVIOUS/"evidence/grid.json") and g["nodes"]==172482
-    return g
-
-
 def run(index,area):
-    g=grid_info()
+    g=ensure_grid()
     assert sha(OFFICIAL)==ENGINE_SHA
-    old_cfg=OLD/"first01/case.cfg"
-    assert sha(old_cfg)==read(PREVIOUS/"evidence/local_assets.json")[old_cfg.relative_to(ROOT).as_posix()]["sha256"]
-    assert old_cfg.read_text("ascii")==configuration(1)
-    files=[HERE/"PLAN.md",Path(__file__).resolve(),PREVIOUS/"run_step.py",GRID/"grid.json",old_cfg,
+    files=[HERE/"PLAN.md",Path(__file__).resolve(),PREVIOUS/"run_step.py",GRID/"grid.json",CASE/"halfstep.cfg",
+           ROOT/"scripts/thermistorStartupCache.py",ROOT/"scripts/thermistorSeedRecovery.py",
            PREVIOUS/"evidence/grid.json",PREVIOUS/"evidence/first_history.csv.gz",OFFICIAL,ROOT/"scripts/runSU2NativeDebugger.py"]
     if index==1:
         old=GRID/"seed_00000.csv"

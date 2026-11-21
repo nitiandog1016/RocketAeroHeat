@@ -52,8 +52,8 @@ def diag_config(index,n,stage,settings=configuration,inner_cap=LIMIT):
     return cfg
 
 
-def sample(index,stage,area,out,grid,src,proof,settings=configuration,inner_cap=LIMIT,built=None,replay_seconds=900,extra_inputs=()):
-    info=inputs(grid);s=read(proof);checked(src)
+def sample(index,stage,area,out,grid,src,proof,settings=configuration,inner_cap=LIMIT,built=None,replay_seconds=900,extra_inputs=(),grid_reader=inputs):
+    info=grid_reader(grid);s=read(proof);checked(src)
     assert s["step"]==index and s["passed"] and s["gridSHA256"]==info["gridSHA256"]
     name=f"seed_{index-1:05}.csv";end=src/f"restart_{index:05}.csv"
     assert sha(end)==s["frameSHA256"] and sha(src/name)==s["oldFrameSHA256"]
@@ -75,8 +75,8 @@ def sample(index,stage,area,out,grid,src,proof,settings=configuration,inner_cap=
     checked(out)
 
 
-def energy(index,grid,src,obs,ctrl,proof,out,settings=configuration,inner_cap=LIMIT,built=None):
-    info=inputs(grid);s=read(proof)
+def energy(index,grid,src,obs,ctrl,proof,out,settings=configuration,inner_cap=LIMIT,built=None,grid_reader=inputs,source=bound_source):
+    info=grid_reader(grid);s=read(proof)
     assert s["passed"] and s["step"]==index
     official,witness,release=[checked(f) for f in (src,obs,ctrl)]
     assert official["command"]==release["command"]==[str(OFFICIAL),"case.cfg","--threads","1"] and sha(OFFICIAL)==ENGINE_SHA
@@ -99,7 +99,7 @@ def energy(index,grid,src,obs,ctrl,proof,out,settings=configuration,inner_cap=LI
     scratch_error=np.max(abs(raw[:,1:6]-scratch[:,1:]),axis=0)
     dual_error=float(np.max(abs(raw[:,6]/dual-1)))
     assert scratch_error.max()<2e-12 and dual_error<2e-10
-    geom=read(bound_source("geometry.json"));geom["dtSeconds"]=s["dtSeconds"]
+    geom=read(source("geometry.json"));geom["dtSeconds"]=s["dtSeconds"]
     state,reaction,balance=step_energy(src,obs,ctrl,geom,ids,xyz,witness,index,n,.025)
     result=dict(accepted=True,step=index,gridSHA256=info["gridSHA256"],acceptedFrame=str(src/end),energy=balance,
                 elapsedPhysicalTimeS=s["elapsedPhysicalTimeS"],nativeDualMaxRelativeDifference=dual_error,
@@ -107,10 +107,10 @@ def energy(index,grid,src,obs,ctrl,proof,out,settings=configuration,inner_cap=LI
     if "verifiedPrefixRows" in s:result["verifiedPrefixRows"]=s["verifiedPrefixRows"]
     if index==2:
         # 第一列温度属于加密网首层；另取原第一层的同一 XYZ，再作原面内积分。
-        os.link(bound_source("body.json"),out/"body.json");os.link(grid/"mesh.su2",out/"mesh.su2")
+        os.link(source("body.json"),out/"body.json");os.link(grid/"mesh.su2",out/"mesh.su2")
         result["surface"]=map_surface(out,geom,ids,xyz,state,reaction,balance,out/"wall.csv")
         body=read(out/"body.json");w,wall=projection(np.array(body["V"]),np.array(body["F"])-1,ids[:,:65],np.linspace(0,2*np.pi,49))
-        with np.load(bound_source("nodes.npz")) as base:
+        with np.load(source("nodes.npz")) as base:
             assert np.array_equal(ids[:,130:195],base["ids"][:,65:130])
             original=base["xyz"][base["ids"][:,65:130]]
             assert np.array_equal(xyz[ids[:,130:195]],original)

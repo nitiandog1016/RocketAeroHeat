@@ -1,5 +1,6 @@
-function mesh=prepareThermistorWorkbenchMesh(oriented,angularCells)
-%PREPARETHERMISTORWORKBENCHMESH 生成独立扇区体网，保留全珠原面和原生壁面预览。
+function mesh=prepareThermistorWorkbenchMesh(oriented,angularCells,windowOpen)
+%PREPARETHERMISTORWORKBENCHMESH 准备所选扇区或全周体网，保留原面及真实壁节点预览。
+if nargin<3,windowOpen=[];end
 assert(isscalar(angularCells) && ismember(angularCells,[2 4 48]),'RAH:Bead:Angle','请选择已支持的周向网格。');
 [canonical,source]=thermistorWorkbenchModel();
 assert(isequal(canonical.V,oriented.V) && isequal(canonical.F,oriented.F), ...
@@ -7,9 +8,11 @@ assert(isequal(canonical.V,oriented.V) && isequal(canonical.F,oriented.F), ...
 root=fileparts(mfilename('fullpath'));
 work=fullfile(root,'outputs',['thermistor_grid_' char(java.util.UUID.randomUUID())]);mkdir(work);
 if angularCells==48
-    % 全周计算复用已验收的 56 层体网；预览直接取实际壁面节点。
+    % 全周网可从几何重建；耗时的首次准备期间继续处理工作台事件。
     manifest=fullfile(work,'prepared.json');
-    runCM011Python({fullfile(root,'scripts','runThermistorStartupJob.py'),'prepare',manifest},fullfile(work,'prepare.log'));
+    pulse=[];
+    if ~isempty(windowOpen),pulse=@refreshWindow;end
+    runCM011Python({fullfile(root,'scripts','runThermistorStartupJob.py'),'prepare',manifest},fullfile(work,'prepare.log'),pulse,true);
     mesh=canonical;p=jsondecode(fileread(manifest));
     p.manifest=manifest;p.manifestSHA256=cm011FileSHA256(manifest);mesh.thermistorPrepared=p;
     verifyThermistorWorkbenchMesh(mesh,angularCells);return;
@@ -23,4 +26,8 @@ mesh.thermistorPrepared=struct('directory',folder,'manifestSHA256',cm011FileSHA2
     'meshSHA256',g.meshSHA256,'bodySHA256',source.bodySHA256,'angularCells',g.angularCells, ...
     'nodes',g.nodes,'cells',g.hexahedra+g.prisms,'wallFaces',g.boundaryFaces.wall,'preview',g.preview);
 verifyThermistorWorkbenchMesh(mesh,angularCells);
+    function refreshWindow()
+        drawnow limitrate;
+        if ~windowOpen(),error('RAH:Bead:Closed','工作台已关闭，本次网格准备仍在独立目录完成。');end
+    end
 end

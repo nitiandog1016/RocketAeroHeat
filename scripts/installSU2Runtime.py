@@ -4,6 +4,7 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import tempfile
 import urllib.request
 import zipfile
 
@@ -23,6 +24,8 @@ def sha(path):
 
 
 def main():
+    if not __debug__:
+        raise RuntimeError("安装或核对运行库需要启用 Python 断言")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--proxy', default=None)
     args = parser.parse_args()
@@ -31,9 +34,26 @@ def main():
     manifest = target / 'runtime.json'
     if manifest.exists():
         info = json.loads(manifest.read_text(encoding='utf-8'))
-        assert info['archiveSHA256'] == ARCHIVE_SHA
+        assert info['version'] == VERSION and info['archiveSHA256'] == ARCHIVE_SHA
         for item in info['files']:
-            assert sha(target / item['path']) == item['sha256']
+            file = (target / item['path']).resolve()
+            file.relative_to(target.resolve())
+            assert sha(file) == item['sha256']
+        # 迁移或还原安装后只重写本地清单路径；共享硬链接的原清单继续保留。
+        exe = (target / 'bin/SU2_CFD.exe').resolve()
+        digest = '01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7'
+        assert any(item['path']=='bin/SU2_CFD.exe' and item['sha256']==digest for item in info['files'])
+        if Path(info['executable']) != exe:
+            info['executable'] = str(exe)
+            with tempfile.NamedTemporaryFile(dir=target, delete=False, mode='w', encoding='utf8') as f:
+                json.dump(info, f, ensure_ascii=False, indent=2)
+                f.write('\n')
+            temporary = Path(f.name)
+            try:
+                temporary.replace(manifest)
+            finally:
+                if temporary.exists():
+                    temporary.unlink()
         print(json.dumps(dict(status='existing-runtime-verified', executable=info['executable'])))
         return
     archive = target / 'official-download.zip'

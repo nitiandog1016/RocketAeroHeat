@@ -13,8 +13,8 @@ sys.path[:0]=[str(HERE.parent/v) for v in ("v287","v288","v289")]
 from audit_step import RMS, frame
 
 
-def audit(index,grid,folder,out,settings=configuration,inner_cap=LIMIT):
-    info=inputs(grid);rec=checked(folder);end=folder/f"restart_{index:05}.csv"
+def audit(index,grid,folder,out,settings=configuration,inner_cap=LIMIT,grid_reader=inputs,source=bound_source):
+    info=grid_reader(grid);rec=checked(folder);end=folder/f"restart_{index:05}.csv"
     hist=folder/f"history_{index:05}.csv";seed=folder/f"seed_{index-1:05}.csv"
     assert (folder/"case.cfg").read_text("ascii")==settings(index)
     assert rec["command"]==[str(OFFICIAL),"case.cfg","--threads","1"] and sha(OFFICIAL)==ENGINE_SHA
@@ -54,7 +54,7 @@ def audit(index,grid,folder,out,settings=configuration,inner_cap=LIMIT):
     modes[0]+=residual[np.unique(ids[0,:,[0,-1]])].sum()
     assert abs(modes.sum()/residual.sum()-1)<1e-10
     worst_layers=np.bincount(layer,weights=residual)/residual.sum()
-    g=read(bound_source("geometry.json"));p=g["airPa"]+g["rho"]*g["speedMps"]**2*new[:,4]
+    g=read(source("geometry.json"));p=g["airPa"]+g["rho"]*g["speedMps"]**2*new[:,4]
     t=new[:,9];w=np.unique(ids[:,0]);slip=float(np.max(abs(new[w,5:8])));wall_error=float(np.max(abs(t[w]-1)))
     window=h[-20:,2:].max(axis=0);valid=(h[:,2:]<-8).all(axis=1)
     where=np.flatnonzero(np.convolve(valid.astype(int),np.ones(20,int),"valid")==20)

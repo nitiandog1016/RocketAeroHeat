@@ -10,13 +10,15 @@ from advance import BUILD,GRID,HERE,LIMIT,PREVIOUS,ROOT,RUN,grid_info,observe,pr
 from check_state import audit
 from read_wall import energy,sample
 from thermistorStartupSurface import write
+from thermistorStartupCache import bound_source
+from thermistorStartupObserver import ensure_observer
 
 
 def check(index,stage,area,out):
     label="first" if index==1 else "second"
     folder=area/(label+"01")
     if stage=="state":
-        audit(index,GRID,folder,out,settings,LIMIT)
+        audit(index,GRID,folder,out,settings,LIMIT,grid_info,bound_source)
         report=read(out/"state.json")
         if index==1:prefix(folder/"history_00001.csv")
         report["verifiedPrefixRows"]=560 if index==1 else 0
@@ -24,7 +26,7 @@ def check(index,stage,area,out):
     else:
         proof=area/(label+"_state")/"verified.json"
         if index==1:assert read(proof)["verifiedPrefixRows"]==560
-        energy(index,GRID,folder,area/(label+"_observe"),area/(label+"_release"),proof,out,settings,LIMIT,BUILD)
+        energy(index,GRID,folder,area/(label+"_observe"),area/(label+"_release"),proof,out,settings,LIMIT,BUILD,grid_info,bound_source)
 
 
 def execute(stage,index,area,worker):
@@ -33,19 +35,20 @@ def execute(stage,index,area,worker):
     if worker:
         assert stage in ("state","energy");check(index,stage,area,out);return
     grid_info()
-    expected=read(PREVIOUS/"evidence/readout_build.json")
-    assert read(BUILD/"build.json")==expected and sha(BUILD/"observe_bead.exe")==expected["observerSHA256"]
+    ensure_observer()
     out.mkdir(exist_ok=False)
     locks=[HERE/"PLAN.md",HERE/"advance.py",Path(__file__).resolve(),PREVIOUS/"run_step.py",PREVIOUS/"check_state.py",
            PREVIOUS/"read_wall.py",PREVIOUS/"evidence/first_history.csv.gz",PREVIOUS/"evidence/readout_build.json",
-           GRID/"grid.json",GRID/"nodes.npz",ROOT/"scripts/thermistorStartupSurface.py",ROOT/"scripts/beadSurfaceResult.py"]
+           GRID/"grid.json",GRID/"nodes.npz",ROOT/"scripts/thermistorStartupSurface.py",ROOT/"scripts/beadSurfaceResult.py",
+           ROOT/"scripts/thermistorStartupCache.py",ROOT/"scripts/thermistorStartupObserver.py",bound_source("geometry.json")]
     if stage in ("observe","release"):
-        sample(index,stage,area,out,GRID,src,proof,settings,LIMIT,BUILD,1100,locks)
+        sample(index,stage,area,out,GRID,src,proof,settings,LIMIT,BUILD,1100,locks,grid_info)
         return
     locks.extend(src/n for n in ("debugger_process.json","case.cfg",f"restart_{index:05}.csv",
                                 f"seed_{index-1:05}.csv",f"history_{index:05}.csv"))
     if index==2:locks.append(area/"first_energy/accepted.json")
     if stage=="energy":
+        if index==2:locks.extend([bound_source("body.json"),bound_source("nodes.npz")])
         locks.append(proof)
         locks.extend(area/(label+"_observe")/n for n in ("before_wall.csv","after_wall.csv","stages.csv","readout_updates.csv",
                                 "debugger_process.json",f"restart_{index:05}.csv"))

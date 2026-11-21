@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v296 民用热敏珠独立安装与全表面复算](validation/v296/RESULTS.md) · [安装方法](validation/v296/INSTALL.md) · [5,216 面同刻结果与整珠实验](validation/v296/evidence/installation_result.json) · [下一项](validation/v296/NEXT_DECISION.md)。程序冷态重建初场，独立工作台新算复现原面表，整珠放热 10.69725502 mW。
+
 - [v295 热敏珠 6 m/s 五步工作台计算与中断接续](validation/v295/RESULTS.md) · [新算逐面对照](validation/v295/evidence/recovered.json) · [结果页](validation/v295/evidence/resumed_ui.json) · [下一项](validation/v295/NEXT_DECISION.md)。从侧栏接续真实中断，全部 5,216 面与参考表一致，整珠放热 10.69725502 mW。
 
 - [v294 民用热敏珠全表面近壁网格对照](validation/v294/RESULTS.md) · [两网逐面统计](validation/v294/evidence/comparison.json) · [科研界面](validation/v294/evidence/ui.json) · [下一项](validation/v294/NEXT_DECISION.md)。56 层与 48 层在同一启动时刻覆盖 5,216 面，整珠放热相差 −0.2733%，热峰均在工作台面元 5211。

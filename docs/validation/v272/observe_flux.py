@@ -115,8 +115,8 @@ def instrument(rel, original):
     return head+"void CIncEulerSolver::BC_Far_Field("+body+"void CIncEulerSolver::BC_Inlet("+rest
 
 
-def invoke(name, args, cwd, out, seconds, memory_gib, trace=False):
-    env = dict(os.environ, OMP_NUM_THREADS="1", PATH=str(BIN)+os.pathsep+os.environ["PATH"])
+def invoke(name, args, cwd, out, seconds, memory_gib, trace=False, bin_directory=BIN):
+    env = dict(os.environ, OMP_NUM_THREADS="1", PATH=str(bin_directory)+os.pathsep+os.environ["PATH"])
     env.pop("RAH_CM011_LOW_SPEED_LEDGER", None)
     if trace:
         env["RAH_CM011_LOW_SPEED_LEDGER"]="1"
