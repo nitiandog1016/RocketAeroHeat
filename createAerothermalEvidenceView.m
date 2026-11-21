@@ -132,6 +132,10 @@ update(data,varargin{:});
             'csvSHA256',sha256File(path),'rows',size(d.faces,1),'fieldKey',key, ...
             'identity',ledger.identity,'evidenceLedger',compact,'viewState',v, ...
             'exportScope','当前变量的全部原始面元；选区不筛选CSV，原值不按资格裁剪');
+        % 外域差值回执包含两份原生源帧和实际热边界，便于单独传递 CSV 后复核。
+        if startsWith(key,'outer') && isfield(d,'outerDomainComparison') && d.outerDomainComparison.available
+            summary.outerDomainComparison=d.outerDomainComparison;
+        end
         fid=fopen(summaryPath,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(summary));clear guard;
         receipt=struct('csvPath',path,'summaryPath',summaryPath,'rows',size(d.faces,1),'fieldKey',key,'csvSHA256',summary.csvSHA256);
     end

@@ -1,14 +1,12 @@
 # 当前交接
 
-2026-11-21。3 m/s 带引线 B 型热敏珠已支持输入整件净对流功率。**4 mW 时集总求解壁温为 297.562541 K**，珠部含接头放热 3.777955 mW，两根引线含端面 0.222045 mW。新功率工况覆盖 10,272 / 10,272 面、3.19665061 mm²。独立 299.15 K 冷态得到 5.439043104 mW，反推壁温误差 2.83 × 10⁻⁷ K。逐面联合实验验证面积为 0 m²。[v302 报告](validation/v302/RESULTS.md) · [完整原面结果](validation/v302/evidence/power4mW.zip) · [4 mW 三维页](../outputs/v302_validation/wired_ui01/workbench/index.html)
+2026-11-21。3 m/s 带引线 B 型热敏珠完成 20D 与 30D 外边界对照。给定 305.15 K，扩域使整件放热降低 0.00427%。给定净对流功率 4 mW，集总壁温由 297.562541 K 升至 297.562730 K。两种边界的热峰均在迎流引线 207 号面。壁压和热流覆盖 10,272 / 10,272 面、3.19665061 mm²，新增 0 面、0 m²。30D 珠部平均换热较实验图读值高 26.72%，逐面压力与热流联合实验验证面积为 0 m²。[v303 报告](validation/v303/RESULTS.md) · [同面数据](validation/v303/evidence/face_comparison.zip) · [给定壁温三维页](../outputs/v303_validation/domain_ui03/givenWall/workbench/index.html) · [4 mW 三维页](../outputs/v303_validation/domain_ui03/givenPower/workbench/index.html)
 
-<!-- records:last_completed=v302 -->
+<!-- records:last_completed=v303 -->
 <!-- records:active=none -->
-<!-- records:base_commit=8aeb277d9239b5d96c7d87b23e35664614b2b7f1 -->
+<!-- records:base_commit=856c191cd73d777b028c2cde8a8d1f63b668b9c9 -->
 
-给定 305.15 K 的 v300 参照场整件放热 10.87809 mW，珠部平均换热比图读实验高 26.73%。v301 的 MUSCL/Barth–Jespersen 配置因全域温度下越界已关闭。[七区参照场](validation/v300/evidence/comparison.json) · [温界证据](validation/v301/evidence/frames.json)
-
-在带线模型的网格页选择“中段加密”。查看结果时可分别选择“查看网距影响”和“查看引线影响”。两套云图、探针、截面及完整导出已逐面核对。[本机三维页](../outputs/v300_validation/wired_ui01/workbench/index.html) · [工作台验收](validation/v300/evidence/workbench.json)
+在带线模型的网格页选“中段加密”。结果页可查看外边界、网距和引线的影响。两种热边界各导出 10,272 面及 96 行截面，来源与原面值已核查。20D 的功率反演曾用独立 299.15 K 冷态核对。v301 的 MUSCL/Barth–Jespersen 配置因温度下越界关闭。[工作台验收](validation/v303/evidence/workbench.json) · [功率反演](validation/v302/RESULTS.md) · [温界证据](validation/v301/evidence/frames.json)
 
 ## 带线试件
 
@@ -38,7 +36,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-[当前下一决定](validation/v302/NEXT_DECISION.md) 是保留全部 20D 内区体网，外接到 30D。在同一带线试件上检验外边界距离对单工况热导、4 mW 壁温及七区放热的影响；扩域计算尚未启动。
+上一轮中段网距细化使珠部放热降低 14.01%。下一项在同一带线试件的 20D 主域上核对第三档中段网距，比较七区放热、峰值与 4 mW 壁温。待量得目标区实际网距并登记新预算后启动。[当前下一决定](validation/v303/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

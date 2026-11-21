@@ -117,6 +117,7 @@ elseif refineLeads
     current=attachThermistorPairedControl(current,'wiredRefined');
     current=attachThermistorLeadGridComparison(current);
 else,current=attachThermistorPairedControl(current,'wired');end
+if refineLeads,current=attachThermistorOuterDomain(current);end
 report.outputDirectory=runFolder;report.regions=summary.regions;
 
     function pulse()

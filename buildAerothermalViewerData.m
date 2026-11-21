@@ -553,6 +553,42 @@ if isfield(mesh,'thermistorLeadGrid')
     data.comparisonColorRanges.leadGridBaseHeat=limits;data.comparisonColorRanges.heatFlux=limits;
     data.comparisonColorRanges.pairedSmoothHeat=limits;
 end
+% 外边界敏感性取两次冷态的同面结果，值、单位和相减方向随导出保留。
+if isfield(mesh,'thermistorOuterDomain')
+    domain=mesh.thermistorOuterDomain;
+    if domain.available
+        data.outerDomainComparison=rmfield(domain,{'heat30Wm2','deltaHeatWm2','deltaPressurePa','deltaFirstK'});
+        note=sprintf('%s 20D / 30D 壁温 %.7f / %.7f K，整件放热 %.7f / %.7f mW。', ...
+            domain.scope,domain.wall20K,domain.wall30K,1000*domain.outward20W,1000*domain.outward30W);
+        tab={'outerHeat30','入壁热流 · 30D 外域','kW/m²',domain.heat30Wm2/1000,'30D 域强等温标量的原面壁反力'; ...
+            'outerDeltaHeat','入壁热流差 · 30D 减 20D','W/m²',domain.deltaHeatWm2,'两域同一原面和热边界下的入壁热流相减'; ...
+            'outerDeltaPressure','壁压差 · 30D 减 20D','Pa',domain.deltaPressurePa,'两次层流解的同面绝对壁压相减'; ...
+            'outerDeltaFirst','首层温差 · 30D 减 20D','K',domain.deltaFirstK,'两个域相同首层节点上的面平均流体温度相减'};
+        if strcmp(domain.mode,'givenPower'),tab{1,5}='由 30D 空气侧热导反求壁温，按温差比换算该域壁反力';end
+        for j=1:size(tab,1)
+            add(tab{j,1},tab{j,2},tab{j,3},tab{j,4},ones(n,1),repmat(tab(j,5),n,1),domain.scope);
+            data.fields(end).stateNote=note;
+            if all(tab{j,4}==tab{j,4}(1))
+                data.uniformFieldValues.(tab{j,1})=struct('value',tab{j,4}(1),'unit',tab{j,3});
+            elseif j>1
+                bound=max(abs(tab{j,4}));data.comparisonColorRanges.(tab{j,1})=[-bound bound];
+            end
+        end
+        limits=[mesh.hybridWall.heatFluxWm2;domain.heat30Wm2]/1000;
+        if isfield(data,'comparisonColorRanges') && isfield(data.comparisonColorRanges,'heatFlux')
+            limits=[limits;data.comparisonColorRanges.heatFlux(:)];
+        end
+        limits=[min(limits) max(limits)];
+        if limits(2)>limits(1)
+            data.comparisonColorRanges.heatFlux=limits;data.comparisonColorRanges.outerHeat30=limits;
+            if isfield(data.comparisonColorRanges,'leadGridBaseHeat'),data.comparisonColorRanges.leadGridBaseHeat=limits;end
+            if isfield(data.comparisonColorRanges,'pairedSmoothHeat'),data.comparisonColorRanges.pairedSmoothHeat=limits;end
+        end
+    else
+        data.outerDomainComparison=domain;k=find(strcmp({data.fields.key},'heatFlux'),1);
+        data.fields(k).stateNote=[data.fields(k).stateNote ' ' domain.note];
+    end
+end
 % 全周启动步使用独立的时间、算法和储热账，供云图、截面、探针与离线导出共用。
 if isfield(mesh,'thermistorStartup')
     s=mesh.thermistorStartup;e=s.energy;c=mesh.hybridCondition;

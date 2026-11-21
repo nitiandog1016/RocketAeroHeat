@@ -620,7 +620,7 @@ renderEditor();sync();showGeometry(true);
                     controls.staticAir=button(grid,12,'静止空气 · 节点探针',@readStaticAirProbe);
                     sync();return;
                 end
-                grid=form(11);d=buildAerothermalViewerData(state.result);
+                grid=form(11+isfield(state.result,'thermistorOuterDomain'));d=buildAerothermalViewerData(state.result);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
                     state.resultSourceRevision,100*h.computedAreaFraction,100*p.computedAreaFraction,100*p.prescribedAreaFraction));
@@ -662,6 +662,9 @@ renderEditor();sync();showGeometry(true);
                     controls.gridHeat=button(grid,11,'查看网距影响',@(~,~)showPairedHeat([],[],true));
                     controls.gridHeat.Layout.Column=1;
                 end
+                if isfield(state.result,'thermistorOuterDomain') && state.result.thermistorOuterDomain.available
+                    controls.outerHeat=button(grid,12,'查看外边界影响 · 30D 减 20D',@showOuterHeat);
+                end
         end
         sync();
     end
@@ -672,6 +675,14 @@ renderEditor();sync();showGeometry(true);
         else
             pair=state.result.thermistorPaired;delta=pair.deltaHeatWm2;key='pairedDeltaHeat';order=pair.order;
         end
+        inspectHeatDifference(delta,key,order);
+    end
+    function showOuterHeat(~,~)
+        % 按当前热边界定位两次外域计算的最大绝对热流差。
+        pair=state.result.thermistorOuterDomain;
+        inspectHeatDifference(pair.deltaHeatWm2,'outerDeltaHeat','30D 减 20D');
+    end
+    function inspectHeatDifference(delta,key,order)
         ids=find(isfinite(delta));[~,k]=max(abs(delta(ids)));
         tab=webUI.evidenceTab;tab.Parent.SelectedTab=tab;
         webUI.evidenceView.selectField(key);webUI.evidenceView.inspectFace(ids(k),[]);
