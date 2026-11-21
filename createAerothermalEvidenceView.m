@@ -136,6 +136,10 @@ update(data,varargin{:});
         if startsWith(key,'outer') && isfield(d,'outerDomainComparison') && d.outerDomainComparison.available
             summary.outerDomainComparison=d.outerDomainComparison;
         end
+        % 随逐面表保留三档网格的网距顺序、源帧、真实热边界和各区放热。
+        if isfield(d,'midbodyGridComparison')
+            summary.midbodyGridComparison=d.midbodyGridComparison;
+        end
         fid=fopen(summaryPath,'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s\n',jsonencode(summary));clear guard;
         receipt=struct('csvPath',path,'summaryPath',summaryPath,'rows',size(d.faces,1),'fieldKey',key,'csvSHA256',summary.csvSHA256);
     end

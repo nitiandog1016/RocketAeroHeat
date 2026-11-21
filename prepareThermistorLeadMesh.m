@@ -5,7 +5,7 @@ if nargin<3,variant='leads';end
 if nargin<4,refineLeads=false;end
 variant=validatestring(variant,{'leads','midbody'});options={};
 if strcmp(variant,'midbody'),options={'--midbody'};end
-if refineLeads,assert(strcmp(variant,'leads'));options={'--refine-leads'};end
+if refineLeads,assert(strcmp(variant,'leads'));[~,options]=thermistorLeadGridChoice(refineLeads);end
 [reference,source]=thermistorWorkbenchModel(variant);
 assert(isequal(reference.V,oriented.V) && isequal(reference.F,oriented.F),'RAH:Lead:Geometry','试件几何或面序不符。');
 root=fileparts(mfilename('fullpath'));work=fullfile(root,'outputs',['thermistor_' variant '_' char(java.util.UUID.randomUUID())]);

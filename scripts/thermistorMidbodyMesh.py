@@ -15,10 +15,11 @@ def wall_distance(points, wall):
     return distance
 
 
-def refine_midbody(background, wall):
-    """共享边只建一个中点。两次局部二分允许中段变细，邻接三角形共用同一切分。"""
+def refine_midbody(background, wall, third_grid=False):
+    """共享边共用中点。第三档复用第二档的两次切分，再细分指定距壁范围。"""
     xy, triangles, far, interface, _ = background
-    for _ in range(2):
+    thresholds = (.015, .015, .006) if third_grid else (.015, .015)
+    for level, threshold in enumerate(thresholds):
         pairs = triangles[:, [[0, 1], [1, 2], [2, 0]]].reshape(-1, 2)
         edges, inverse, counts = np.unique(np.sort(pairs, axis=1), axis=0,
                                            return_inverse=True, return_counts=True)
@@ -27,7 +28,9 @@ def refine_midbody(background, wall):
         distance = wall_distance(centers, wall)
         axial = abs(centers[:, 0]) / (A/D)
         strength = np.clip((.85-axial)/.25, 0, 1) * np.clip((.16-distance)/.06, 0, 1)
-        split = (counts == 2) & (np.linalg.norm(ends[:, 1]-ends[:, 0], axis=1)*strength > .015)
+        split = (counts == 2) & (np.linalg.norm(ends[:, 1]-ends[:, 0], axis=1)*strength > threshold)
+        if level == 2:
+            split &= (distance >= .015) & (distance <= .100)
         mid = np.full(len(edges), -1, dtype=int)
         mid[split] = len(xy) + np.arange(np.count_nonzero(split))
         xy = np.vstack((xy, centers[split]))

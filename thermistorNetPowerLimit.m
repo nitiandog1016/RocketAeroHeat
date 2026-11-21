@@ -5,7 +5,7 @@ archive=angularCells;
 if wired
     assert(angularCells==4 && isfield(cfg,'thermistorRefineLeads') && cfg.thermistorRefineLeads, ...
         'RAH:Lead:Boundary','整件净对流功率使用带线中段加密网。');
-    archive='leadsMidbody3';
+    archive=thermistorLeadGridChoice(cfg.thermistorRefineLeads);
 end
 [folder,cleanup]=openThermistorArchive(archive); %#ok<NASGU>
 stats=jsondecode(fileread(fullfile(folder,'summary.json')));

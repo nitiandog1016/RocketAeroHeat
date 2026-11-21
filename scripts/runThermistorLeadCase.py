@@ -51,9 +51,9 @@ def midbody_sources(smooth):
     return [ROOT/f"docs/validation/{plan}/PLAN.md",ROOT/"scripts/thermistorMidbodyMesh.py"]
 
 
-def build(out,first,smooth=False,midbody=False):
+def build(out,first,smooth=False,midbody=False,third_grid=False):
     assert sha(ENGINE)==ENGINE_SHA
-    stats=prepare_mesh(out,first,smooth,midbody)
+    stats=prepare_mesh(out,first,smooth,midbody,third_grid)
     with np.load(out/"nodes.npz") as data:
         xyz=data["xyz"]
         walls=np.unique(data["wallMap"])
@@ -73,22 +73,26 @@ def build(out,first,smooth=False,midbody=False):
              ROOT/"scripts/cm011Tunnel.py",out/"geometry.json",out/"nodes.npz",out/"body.json",out/"case.json"]
     if smooth:
         sources.extend((ROOT/"docs/validation/v298/PLAN.md",ROOT/"scripts/thermistorCapMesh.py"))
-    if midbody:
+    if midbody or third_grid:
         sources.extend(midbody_sources(smooth))
+    if third_grid:
+        sources.extend((ROOT/"docs/validation/v304/PLAN.md", ROOT/"cases/thermistor_b/leadsMidbody3.json"))
     write_json(out/"engine_request.json",dict(workDirectory=str(out),configFile="case.cfg",meshFile="mesh.su2",
                threads=1,maximumSeconds=720,jobToken=str(uuid.uuid4()),
                sourceFiles=[p.relative_to(ROOT).as_posix() for p in sources]))
 
 
-def prepare(out,first,smooth=False,midbody=False):
+def prepare(out,first,smooth=False,midbody=False,third_grid=False):
     out.mkdir(parents=True,exist_ok=False)
     script=Path(__file__).resolve()
     files=[script,ROOT/"scripts/thermistorLeadMesh.py",PLAN,ROOT/"third_party/gmsh/source_lock.json"]
     options=["--smooth-control"] if smooth else []
     if smooth:files.extend([ROOT/"scripts/thermistorCapMesh.py",ROOT/"docs/validation/v298/PLAN.md"])
-    if midbody:
+    if midbody or third_grid:
         files.extend(midbody_sources(smooth))
-        options.append("--refine-midbody")
+        options.append("--third-midbody" if third_grid else "--refine-midbody")
+    if third_grid:
+        files.extend((ROOT/"docs/validation/v304/PLAN.md", ROOT/"cases/thermistor_b/leadsMidbody3.json"))
     rec=observe([sys.executable,str(script),"mesh-worker",str(out),"--first",str(first),*options],out,
                 {str(f):sha(f) for f in files},180,200*1024**2)
     assert rec["debuggerExitCode"]==0 and not rec["stopReason"] and not rec["supervisorError"],out/"debugger.log"
@@ -111,15 +115,19 @@ if __name__=="__main__":
     cli.add_argument("folder",type=Path)
     cli.add_argument("--first",type=float,choices=(.002,.001),default=.002)
     cli.add_argument("--smooth-control",action="store_true",help="以相同椭球替换两端引线，保留远区体网")
-    cli.add_argument("--refine-midbody",action="store_true",help="局部加密热敏珠中段的过渡区")
+    grids=cli.add_mutually_exclusive_group()
+    grids.add_argument("--refine-midbody",action="store_true",help="局部加密热敏珠中段的过渡区")
+    grids.add_argument("--third-midbody",action="store_true",help="在带线热敏珠第二档中段网上细化 0.015D 至 0.1D 过渡区")
     args=cli.parse_args()
     out=args.folder.resolve();out.relative_to(ROOT/"outputs")
-    if (args.smooth_control or args.refine_midbody) and args.action not in ("prepare","mesh-worker"):
+    if (args.smooth_control or args.refine_midbody or args.third_midbody) and args.action not in ("prepare","mesh-worker"):
         cli.error("几何选择仅用于准备输入，推进与审核读取已保存的工况")
-    if args.refine_midbody and args.first!=.001:
+    if args.third_midbody and args.smooth_control:
+        cli.error("第三档对照用于带线热敏珠")
+    if (args.refine_midbody or args.third_midbody) and args.first!=.001:
         cli.error("中段过渡区对照需要 --first .001")
-    if args.action=="prepare":prepare(out,args.first,args.smooth_control,args.refine_midbody)
-    elif args.action=="mesh-worker":build(out,args.first,args.smooth_control,args.refine_midbody)
+    if args.action=="prepare":prepare(out,args.first,args.smooth_control,args.refine_midbody,args.third_midbody)
+    elif args.action=="mesh-worker":build(out,args.first,args.smooth_control,args.refine_midbody,args.third_midbody)
     elif args.action=="probes":probes(out)
     else:
         g=read(out/"geometry.json")

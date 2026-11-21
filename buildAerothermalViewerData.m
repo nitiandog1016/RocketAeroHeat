@@ -589,6 +589,34 @@ if isfield(mesh,'thermistorOuterDomain')
         data.fields(k).stateNote=[data.fields(k).stateNote ' ' domain.note];
     end
 end
+% 三档中段网距在同一热边界下比较，前两档取真实归档，第三档为当前原面主解。
+if isfield(mesh,'thermistorThreeGrids')
+    g=mesh.thermistorThreeGrids;info=g.summary;data.midbodyGridComparison=info;
+    if info.available
+        q=g.heat;scope=sprintf('3 m/s 带线试件，三档均采用 20D 外域，热边界 %.7g %s。',info.boundaryValue,info.boundaryUnit);
+        method='同工况强等温标量的壁反力按原面积守恒分配';
+        if strcmp(info.mode,'givenPower'),method='以每档实算热导反求等温壁温，按温差比换算该网原面壁反力';end
+        note=sprintf('%s 三档壁温 %.6f / %.6f / %.6f K。',scope,info.grids.wallK);
+        tab={'gridHeat1','入壁热流 · 第一档','kW/m²',q(:,1)/1000,method; ...
+             'gridHeat2','入壁热流 · 第二档','kW/m²',q(:,2)/1000,method; ...
+             'gridHeat21','入壁热流差 · 第二档减第一档','W/m²',q(:,2)-q(:,1),[method '，第二档减第一档']; ...
+             'gridHeat32','入壁热流差 · 第三档减第二档','W/m²',q(:,3)-q(:,2),[method '，第三档减第二档']};
+        absolute=[min(q(:)) max(q(:))]/1000;bound=max(abs(diff(q,1,2)),[],'all');
+        for j=1:size(tab,1)
+            key=tab{j,1};values=tab{j,4};
+            add(key,tab{j,2},tab{j,3},values,ones(n,1),repmat(tab(j,5),n,1),scope);
+            data.fields(end).stateNote=note;
+            if all(values==values(1))
+                data.uniformFieldValues.(key)=struct('value',values(1),'unit',tab{j,3});
+            elseif j<=2,data.comparisonColorRanges.(key)=absolute;
+            else,data.comparisonColorRanges.(key)=[-bound bound];end
+        end
+        if absolute(2)>absolute(1),data.comparisonColorRanges.heatFlux=absolute;end
+    else
+        k=find(strcmp({data.fields.key},'heatFlux'),1);
+        data.fields(k).stateNote=[data.fields(k).stateNote ' 当前功率超过部分参照网的支持范围。'];
+    end
+end
 % 全周启动步使用独立的时间、算法和储热账，供云图、截面、探针与离线导出共用。
 if isfield(mesh,'thermistorStartup')
     s=mesh.thermistorStartup;e=s.energy;c=mesh.hybridCondition;

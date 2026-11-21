@@ -269,7 +269,7 @@ renderEditor();sync();showGeometry(true);
                     grid=form(8);
                     if isMixedBead()
                         if hasBeadLeads()
-                            controls.leadGrid=choice(grid,1,'带线试件体网',{'原混合网','中段加密'},[0 1],double(getOption(state.cfg,'thermistorRefineLeads',false)));
+                            controls.leadGrid=choice(grid,1,'带线试件体网',{'原混合网','中段加密','第三档中段细化'},[0 1 2],double(getOption(state.cfg,'thermistorRefineLeads',false)));
                             controls.leadGrid.ValueChangedFcn=@changeLeadGrid;
                         else
                             tip(grid,1,[mixedBeadLabel() ' · 30° 对称扇区 · 周向单元 7.5°']);
@@ -665,6 +665,11 @@ renderEditor();sync();showGeometry(true);
                 if isfield(state.result,'thermistorOuterDomain') && state.result.thermistorOuterDomain.available
                     controls.outerHeat=button(grid,12,'查看外边界影响 · 30D 减 20D',@showOuterHeat);
                 end
+                if isfield(state.result,'thermistorThreeGrids') && state.result.thermistorThreeGrids.summary.available
+                    controls.staticAir.Layout.Column=2;
+                    controls.compareGrids=button(grid,11,'对照三档网距',@showThirdGrid);
+                    controls.compareGrids.Layout.Column=1;
+                end
         end
         sync();
     end
@@ -681,6 +686,11 @@ renderEditor();sync();showGeometry(true);
         % 按当前热边界定位两次外域计算的最大绝对热流差。
         pair=state.result.thermistorOuterDomain;
         inspectHeatDifference(pair.deltaHeatWm2,'outerDeltaHeat','30D 减 20D');
+    end
+    function showThirdGrid(~,~)
+        % 定位第三档相对第二档的最大热流变化，可在变量菜单切换到上一次细化。
+        pair=state.result.thermistorThreeGrids;
+        inspectHeatDifference(pair.heat(:,3)-pair.heat(:,2),'gridHeat32','第三档减第二档');
     end
     function inspectHeatDifference(delta,key,order)
         ids=find(isfinite(delta));[~,k]=max(abs(delta(ids)));
@@ -1199,7 +1209,8 @@ renderEditor();sync();showGeometry(true);
     function label=mixedBeadLabel()
         if hasBeadLeads()
             label='两端带引线';
-            if getOption(state.cfg,'thermistorRefineLeads',false),label='带线珠中段加密';end
+            level=getOption(state.cfg,'thermistorRefineLeads',false);
+            if level,[~,~,name]=thermistorLeadGridChoice(level);label=['带线珠' name];end
         else,label='光滑珠中段加密';end
     end
     function chooseBeadDirectory(~,~)
@@ -1240,7 +1251,7 @@ renderEditor();sync();showGeometry(true);
     end
     function changeLeadGrid(field,~)
         % 带线几何共用同一原面表。更换体网后，清除原计算和热边界确认。
-        refine=logical(field.Value);
+        refine=field.Value;
         if state.busy || preparing || refine==getOption(state.cfg,'thermistorRefineLeads',false),return;end
         next=state.cfg;next.thermistorRefineLeads=refine;next.thermistorBoundary=[];
         state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));

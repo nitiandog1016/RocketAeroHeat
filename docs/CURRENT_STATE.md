@@ -1,12 +1,12 @@
 # 当前交接
 
-2026-11-21。3 m/s 带引线 B 型热敏珠完成 20D 与 30D 外边界对照。给定 305.15 K，扩域使整件放热降低 0.00427%。给定净对流功率 4 mW，集总壁温由 297.562541 K 升至 297.562730 K。两种边界的热峰均在迎流引线 207 号面。壁压和热流覆盖 10,272 / 10,272 面、3.19665061 mm²，新增 0 面、0 m²。30D 珠部平均换热较实验图读值高 26.72%，逐面压力与热流联合实验验证面积为 0 m²。[v303 报告](validation/v303/RESULTS.md) · [同面数据](validation/v303/evidence/face_comparison.zip) · [给定壁温三维页](../outputs/v303_validation/domain_ui03/givenWall/workbench/index.html) · [4 mW 三维页](../outputs/v303_validation/domain_ui03/givenPower/workbench/index.html)
+2026-11-21。3 m/s 带引线 B 型热敏珠在 20D 主域完成第三档中段网距计算。给定 305.15 K，珠部放热比第二档低 3.10%，整件放热 10.56292 mW。给定 4 mW，集总壁温升至 297.694199 K，热峰仍在迎风引线 207 号面。壁压与热流覆盖 10,272 / 10,272 面、3.19665061 mm²，新增 0 面、0 m²。珠部平均换热比实验图读高 22.80%，逐面联合实验验证面积为 0 m²。[v304 报告](validation/v304/RESULTS.md) · [同面数据](validation/v304/evidence/face_comparison.zip) · [给定壁温三维页](../outputs/v304_validation/three_ui01/givenWall/workbench/index.html) · [4 mW 三维页](../outputs/v304_validation/three_ui01/givenPower/workbench/index.html)
 
-<!-- records:last_completed=v303 -->
+<!-- records:last_completed=v304 -->
 <!-- records:active=none -->
-<!-- records:base_commit=856c191cd73d777b028c2cde8a8d1f63b668b9c9 -->
+<!-- records:base_commit=e7c695d7a84d01947c1dec176887cf2f7eba47b6 -->
 
-在带线模型的网格页选“中段加密”。结果页可查看外边界、网距和引线的影响。两种热边界各导出 10,272 面及 96 行截面，来源与原面值已核查。20D 的功率反演曾用独立 299.15 K 冷态核对。v301 的 MUSCL/Barth–Jespersen 配置因温度下越界关闭。[工作台验收](validation/v303/evidence/workbench.json) · [功率反演](validation/v302/RESULTS.md) · [温界证据](validation/v301/evidence/frames.json)
+带线模型的网格页选“第三档中段细化”，结果页可对照三档网距。两种热边界各导出 10,272 面和 96 行截面，已逐行核对。第二档的 20D 至 30D 外域对照使热导改变 −0.00427%。v301 高阶配置因温度下越界关闭。[工作台验收](validation/v304/evidence/workbench.json) · [外域对照](validation/v303/RESULTS.md) · [功率反演](validation/v302/RESULTS.md) · [温界证据](validation/v301/evidence/frames.json)
 
 ## 带线试件
 
@@ -36,7 +36,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-上一轮中段网距细化使珠部放热降低 14.01%。下一项在同一带线试件的 20D 主域上核对第三档中段网距，比较七区放热、峰值与 4 mW 壁温。待量得目标区实际网距并登记新预算后启动。[当前下一决定](validation/v303/NEXT_DECISION.md)
+下一项使用已保存的第二、第三档终场，在两网共同的近壁层核对珠部不同位置的对流、扩散及壁面热量，定位此次珠部 0.31830 mW 的差异。[当前下一决定](validation/v304/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

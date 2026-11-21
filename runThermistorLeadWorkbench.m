@@ -2,15 +2,15 @@ function [current,report]=runThermistorLeadWorkbench(input,cfg,progress)
 % 模块一：绑定已确认的米制原面、求解体网、冻结热边界与所选数据来源。
 root=fileparts(mfilename('fullpath'));p=input.thermistorPrepared;
 midbody=strcmp(cfg.thermistorVariant,'midbody');options={};
-refineLeads=isfield(cfg,'thermistorRefineLeads') && cfg.thermistorRefineLeads;
+leadLevel=0;
+if isfield(cfg,'thermistorRefineLeads'),leadLevel=double(cfg.thermistorRefineLeads);end
 if midbody
     archive='midbody3';options={'--midbody'};caseLabel='光滑 B 型热敏珠 · 中段加密';
     scope='光滑名义珠体，30° 对称稳态，中段近壁过渡区局部加密';
 else
-    archive='leads3';caseLabel='带引线 B 型热敏珠';scope='两端带线名义试件，30° 对称稳态，完整暴露面含接头及端面';
-    if refineLeads
-        archive='leadsMidbody3';options={'--refine-leads'};caseLabel='带引线 B 型热敏珠 · 中段加密';
-    end
+    [archive,options,gridLabel]=thermistorLeadGridChoice(leadLevel);
+    caseLabel='带引线 B 型热敏珠';scope='两端带线名义试件，30° 对称稳态，完整暴露面含接头及端面';
+    if leadLevel>0,caseLabel=[caseLabel ' · ' gridLabel];end
 end
 contract=jsondecode(fileread(fullfile(root,'cases','thermistor_b',[archive '.json'])));
 b=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
@@ -113,11 +113,12 @@ if powerMode
     rev=logical(current.thermistorLeadFlow.reverse);
     current.thermistorLeadFlow.summary.reverseReleaseW=-sum(area(rev).*rows.heatFluxWm2(rev));
 elseif midbody,current=attachThermistorPairedControl(current,'midbody');
-elseif refineLeads
+elseif leadLevel==1
     current=attachThermistorPairedControl(current,'wiredRefined');
     current=attachThermistorLeadGridComparison(current);
-else,current=attachThermistorPairedControl(current,'wired');end
-if refineLeads,current=attachThermistorOuterDomain(current);end
+elseif leadLevel==0,current=attachThermistorPairedControl(current,'wired');end
+if leadLevel==1,current=attachThermistorOuterDomain(current);end
+if leadLevel==2,current=attachThermistorThreeGrids(current);end
 report.outputDirectory=runFolder;report.regions=summary.regions;
 
     function pulse()
