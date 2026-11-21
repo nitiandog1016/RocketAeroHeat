@@ -605,14 +605,18 @@ end
 if isfield(mesh,'thermistorOuterDomain')
     domain=mesh.thermistorOuterDomain;
     if domain.available
-        data.outerDomainComparison=rmfield(domain,{'heat30Wm2','deltaHeatWm2','deltaPressurePa','deltaFirstK'});
+        faceFields={'heat30Wm2','deltaHeatWm2','deltaPressurePa','deltaFirstK'};
+        if strcmp(domain.mode,'sidewindGivenWall'),faceFields=[faceFields {'gauge30Pa','first30K'}];end
+        data.outerDomainComparison=rmfield(domain,faceFields);
         note=sprintf('%s 20D / 30D 壁温 %.7f / %.7f K，整件放热 %.7f / %.7f mW。', ...
             domain.scope,domain.wall20K,domain.wall30K,1000*domain.outward20W,1000*domain.outward30W);
         tab={'outerHeat30','入壁热流 · 30D 外域','kW/m²',domain.heat30Wm2/1000,'30D 域强等温标量的原面壁反力'; ...
             'outerDeltaHeat','入壁热流差 · 30D 减 20D','W/m²',domain.deltaHeatWm2,'两域同一原面和热边界下的入壁热流相减'; ...
             'outerDeltaPressure','壁压差 · 30D 减 20D','Pa',domain.deltaPressurePa,'两次层流解的同面绝对壁压相减'; ...
             'outerDeltaFirst','首层温差 · 30D 减 20D','K',domain.deltaFirstK,'两个域相同首层节点上的面平均流体温度相减'};
-        if strcmp(domain.mode,'givenPower'),tab{1,5}='由 30D 空气侧热导反求壁温，按温差比换算该域壁反力';
+        if strcmp(domain.mode,'sidewindGivenWall')
+            tab{1,5}='30D 全周侧吹 6 K 强温差原生壁反力，按实际方位的原面面积守恒分配';
+        elseif strcmp(domain.mode,'givenPower'),tab{1,5}='由 30D 空气侧热导反求壁温，按温差比换算该域壁反力';
         elseif domain.wall30K~=305.15,tab{1,5}='30D 域 305.15 K 壁反力按实际给定温差比换算';end
         for j=1:size(tab,1)
             add(tab{j,1},tab{j,2},tab{j,3},tab{j,4},ones(n,1),repmat(tab(j,5),n,1),domain.scope);
@@ -621,6 +625,22 @@ if isfield(mesh,'thermistorOuterDomain')
                 data.uniformFieldValues.(tab{j,1})=struct('value',tab{j,4}(1),'unit',tab{j,3});
             elseif j>1
                 bound=max(abs(tab{j,4}));data.comparisonColorRanges.(tab{j,1})=[-bound bound];
+            end
+        end
+        % 侧吹对照另外提供原生表压与首层温度，同一量的两域云图使用共同色标。
+        if strcmp(domain.mode,'sidewindGivenWall')
+            views={'outerGauge30','相对环境壁压 · 30D 外域','Pa','pressureGauge', ...
+                domain.gauge30Pa,'30D 侧吹壁节点相对环境的表压按原面平均'; ...
+                'outerFirst30','首层流体温度 · 30D 外域','K','nearWallCellTemperature', ...
+                domain.first30K,'30D 对应首层节点的强温差标量按 6 K 换算并取面平均'};
+            for j=1:size(views,1)
+                baseField=data.fields(strcmp({data.fields.key},views{j,4}));
+                values=views{j,5};range=[min([baseField.values(:);values]) max([baseField.values(:);values])];
+                add(views{j,1},views{j,2},views{j,3},values,ones(n,1),repmat(views(j,6),n,1),domain.scope);
+                data.fields(end).stateNote=note;
+                if range(2)>range(1)
+                    data.comparisonColorRanges.(views{j,1})=range;data.comparisonColorRanges.(views{j,4})=range;
+                end
             end
         end
         limits=[mesh.hybridWall.heatFluxWm2;domain.heat30Wm2]/1000;

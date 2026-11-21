@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v312 带线 B 珠侧吹远场半径对照](validation/v312/RESULTS.md) · [周向差值图](validation/v312/evidence/section_domains.png) · [下一项](validation/v312/NEXT_DECISION.md)。20D 扩至 30D 后，整件放热减少 0.00473%，两域热峰均在第 10267 面。
+
 - [v311 带线 B 珠全周侧吹](validation/v311/RESULTS.md) · [实际周向分布](validation/v311/evidence/circumference.png) · [下一项](validation/v311/NEXT_DECISION.md)。3 m/s 沿 −Y 侧吹的 10,272 面均已计算，整件向空气放热 5.74320 mW。
 
 - [v310 带线热敏珠珠部平均强迫对流预测](validation/v310/RESULTS.md) · [独立复算](validation/v310/evidence/verification.json) · [下一项](validation/v310/NEXT_DECISION.md)。3 m/s、299.15 K 工况已可在侧栏比较式（28）和三维珠部功率，并保留表 1 极限 Nu 的差异。

@@ -56,7 +56,7 @@ def append_shell(cells,xyz,boundary,ids):
     columns=np.flatnonzero(np.isin(ids[0],source))
     assert np.array_equal(np.unique(ids[:,columns]),source)
     interface_columns=np.searchsorted(source,ids[:,columns])
-    symmetry={name:set(v for face in boundary[name] for v in face) for name in ("sym0","sym1")}
+    symmetry={name:set(v for face in faces for v in face) for name,faces in boundary.items() if name in ("sym0","sym1")}
     new_cells=list(cells);new_boundary={k:list(v) for k,v in boundary.items()}
     nodes=[xyz];meridians=[ids];lower=source
     for layer in range(1,6):
@@ -81,9 +81,9 @@ def ordered(face):
     return face[j:]+face[:j]
 
 
-def audit(base,expanded):
+def audit(base,expanded,expected_markers=("far","sym0","sym1","wall")):
     """从写出的文件重新读取，逐体检查有序节点、内面双侧相反和标记外向。"""
-    old,coords,marks=load_mesh(base/"mesh.su2");cells,xyz,boundary=load_mesh(expanded/"mesh.su2")
+    old,coords,marks=load_mesh(base/"mesh.su2",expected_markers);cells,xyz,boundary=load_mesh(expanded/"mesh.su2",expected_markers)
     assert cells[:len(old)]==old and boundary["wall"]==marks["wall"]
     np.testing.assert_array_equal(coords,xyz[:len(coords)])
     owners={}
