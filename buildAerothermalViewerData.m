@@ -658,6 +658,38 @@ if isfield(mesh,'thermistorOuterDomain')
         data.fields(k).stateNote=[data.fields(k).stateNote ' ' domain.note];
     end
 end
+% 热敏珠前引线端面近壁细化：分开细网首层与共同物理位置，仅在共同位置定义温差。
+if isfield(mesh,'thermistorTipSpacing')
+    t=mesh.thermistorTipSpacing;g=t.summary;data.tipSpacingComparison=g;
+    note=sprintf('原网／细网前端面放热 %.5f／%.5f µW，整件 %.6f／%.6f mW。细网最强两面 %d、%d，放热密度相差 %.3g W/m²。', ...
+        1e6*g.regions(7).baseOutW,1e6*g.regions(7).fineOutW,1e3*g.outwardBaseW,1e3*g.outwardFineW, ...
+        g.finePeakFace,g.fineSecondFace,g.finePeakGapWm2);
+    tab={'tipFineHeat','入壁热流 · 端面细网','kW/m²',t.fineHeat/1000,'细网强等温壁节点反力按原面面积守恒分配'; ...
+        'tipDeltaHeat','入壁热流差 · 端面细网减原网','W/m²',t.deltaHeat,'两套 20D 全周解在同一原面的入壁热流相减'; ...
+        'tipFineGauge','相对环境壁压 · 端面细网','Pa',t.fineGauge,'细网不可压流动的原面壁节点表压平均'; ...
+        'tipDeltaPressure','壁压差 · 端面细网减原网','Pa',t.deltaPressure,'同一原面两网绝对壁压相减'; ...
+        'tipFineFirst','实际首层流体温度 · 端面细网','K',t.fineFirstK,'细网实际第一层的三个对应节点按 6 K 温差换算并平均'; ...
+        'tipMatched','原首层位置流体温度 · 端面细网','K',t.matchedK,'由细网终场直接读取保留的原首层三个物理节点并平均'; ...
+        'tipDeltaMatched','同位置流体温差 · 细网减原网','K',t.deltaMatchedK,'在相同三个原首层物理节点读取两网温度，各自面平均后相减'; ...
+        'tipHeight','实际首层法向距离 · 端面细网','µm',1e6*t.fineDistanceM,'三个壁顶点至对应细网首层节点的位移投影到原面单位法向后取平均'};
+    for j=1:size(tab,1)
+        key=tab{j,1};vals=tab{j,4};add(key,tab{j,2},tab{j,3},vals,ones(n,1),repmat(tab(j,5),n,1),g.scope);
+        data.fields(end).stateNote=note;
+        if startsWith(key,'tipDelta')
+            limit=max(abs(vals));if limit>0,data.comparisonColorRanges.(key)=[-limit limit];end
+        end
+    end
+    % 保持同量的 20D、30D、近壁细网三套结果可以在相同色标下读数。
+    sets={{'heatFlux','outerHeat30','tipFineHeat'},{'pressureGauge','outerGauge30','tipFineGauge'}, ...
+        {'nearWallCellTemperature','outerFirst30','tipFineFirst','tipMatched'}};
+    for j=1:numel(sets)
+        keys=sets{j};found=ismember({data.fields.key},keys);
+        vals=vertcat(data.fields(found).values);bounds=[min(vals) max(vals)];
+        for k=keys
+            if ismember(k{1},{data.fields.key}),data.comparisonColorRanges.(k{1})=bounds;end
+        end
+    end
+end
 % 三档中段网距在同一热边界下比较，前两档取真实归档，第三档为当前原面主解。
 if isfield(mesh,'thermistorThreeGrids')
     g=mesh.thermistorThreeGrids;info=g.summary;data.midbodyGridComparison=info;

@@ -696,6 +696,11 @@ renderEditor();sync();showGeometry(true);
                 if isfield(state.result,'thermistorOuterDomain') && state.result.thermistorOuterDomain.available
                     controls.outerHeat=button(grid,12,'查看外边界影响 · 30D 减 20D',@showOuterHeat);
                 end
+                if isfield(state.result,'thermistorTipSpacing')
+                    controls.staticAir.Layout.Column=2;
+                    controls.tipSpacing=button(grid,11,'前引线端面网距',@showTipSpacing);
+                    controls.tipSpacing.Layout.Column=1;
+                end
                 if isfield(state.result,'thermistorThreeGrids') && state.result.thermistorThreeGrids.summary.available
                     controls.staticAir.Layout.Column=2;
                     controls.compareGrids=button(grid,11,'对照三档网距',@showThirdGrid);
@@ -720,6 +725,14 @@ renderEditor();sync();showGeometry(true);
         % 按当前热边界定位两次外域计算的最大绝对热流差。
         pair=state.result.thermistorOuterDomain;
         inspectHeatDifference(pair.deltaHeatWm2,'outerDeltaHeat','30D 减 20D');
+    end
+    function showTipSpacing(~,~)
+        % 直接定位细网放热峰；云图显示该面相对原网的热流变化。
+        t=state.result.thermistorTipSpacing;g=t.summary;id=g.finePeakFace;
+        tab=webUI.evidenceTab;tab.Parent.SelectedTab=tab;
+        webUI.evidenceView.selectField('tipDeltaHeat');webUI.evidenceView.inspectFace(id,[]);
+        message(sprintf('细网面元 %d 入壁热流 %.3f W/m²，与第二强面 %d 相差 %.3g W/m²。前端面放热 %.5f µW。', ...
+            id,t.fineHeat(id),g.fineSecondFace,g.finePeakGapWm2,1e6*g.regions(7).fineOutW));
     end
     function showThirdGrid(~,~)
         % 定位第三档相对第二档的最大热流变化，可在变量菜单切换到上一次细化。

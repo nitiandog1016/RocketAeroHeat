@@ -71,14 +71,17 @@ def prepare(base,seed,out):
                initialState="20D 侧吹终场，外壳沿半径过渡至自由流",axisAndSeamChecked=True))
 
 
-def run(prepared,out,steps,parent=None):
+def run(prepared,out,steps,parent=None,*,stage_files=None):
     """新域从已确认的初猜开始，续算只接受同域的真实终帧。"""
     info=read(prepared/"mesh_audit.json");digest=sha(prepared/"mesh_audit.json")
     assert info["baseMeshSHA256"]==read(ROOT/"cases/thermistor_b/sidewind3.json")["meshSHA256"]
     assert info["axisAndSeamChecked"] and all(sha(prepared/k)==h for k,h in info["files"].items())
     assert sha(ENGINE)==ENGINE_SHA and 1<=steps<=7000
     initial=prepared/"initial_flow.csv";prior=0
-    locks=[HERE/"PLAN.md",HERE/"NATIVE.md",Path(__file__).resolve(),ROOT/"scripts/thermistorOuterDomain.py",
+    if stage_files is None:
+        assert read(prepared/"case.json")["outerRadiusOverD"]==30 and "shell" in info
+        stage_files=[HERE/"PLAN.md",HERE/"NATIVE.md"]
+    locks=[*stage_files,Path(__file__).resolve(),ROOT/"scripts/thermistorOuterDomain.py",
            ROOT/"scripts/thermistorBead.py",HERE.parent/"v311/run_steady.py",prepared/"mesh_audit.json"]
     if parent:
         old=terminal(parent);a=read(parent/"field_audit.json");initial=parent/"restart.csv"

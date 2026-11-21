@@ -147,6 +147,10 @@ update(data,varargin{:});
         if startsWith(key,'outer') && isfield(d,'outerDomainComparison') && d.outerDomainComparison.available
             summary.outerDomainComparison=d.outerDomainComparison;
         end
+        % 前端面近壁对照附两套原生帧、七区功率和共同温度采样位置。
+        if startsWith(key,'tip') && isfield(d,'tipSpacingComparison')
+            summary.tipSpacingComparison=d.tipSpacingComparison;
+        end
         % 带线两档网距比较同时交付原网参照帧和本次比较的温差比例。
         if startsWith(key,'leadGrid') && isfield(d,'leadGridReference')
             summary.leadGridReference=d.leadGridReference;
