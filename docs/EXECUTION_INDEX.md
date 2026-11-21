@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v306 热敏珠前中段切向重排](validation/v306/RESULTS.md) · [十六条测线](validation/v306/evidence/rays.json) · [下一项](validation/v306/NEXT_DECISION.md)。最靠近壁法向的边的平均夹角降低 8.30%，62 号条带最宽间距增大 26.61%，该候选在几何阶段结束。
+
 - [v305 两档热敏珠网的分带热量收支](validation/v305/RESULTS.md) · [逐带热量与交换矩阵](validation/v305/evidence/budget.json) · [下一项](validation/v305/NEXT_DECISION.md)。珠部放热减少 318.303 µW，前中段占 58.8%，两档十个带的同阶段收支均闭合。
 
 - [v304 带线热敏珠的第三档中段网距](validation/v304/RESULTS.md) · [三档同面数据](validation/v304/evidence/face_comparison.zip) · [下一项](validation/v304/NEXT_DECISION.md)。珠部放热再降 3.10%，4 mW 壁温升至 297.694199 K，热峰位于迎风引线 207 号面。

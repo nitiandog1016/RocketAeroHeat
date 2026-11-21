@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-21。3 m/s 带引线 B 型热敏珠、给定壁温 305.15 K，第三档比第二档的珠部放热少 318.303 µW，前中段贡献 187.118 µW。珠部近壁层外侧的扩散流出减少 270.908 µW，对流流出减少 47.371 µW。十个带的收支及七区原面功率均已核对。第三档壁压与热流覆盖 10,272 / 10,272 面、3.19665061 mm²，本轮新增 0 面、0 m²。珠部平均换热比实验图读高 22.80%，逐面联合实验验证面积为 0 m²。[v305 报告](validation/v305/RESULTS.md) · [两档热量账](validation/v305/evidence/budget.json) · [分带三维页](../outputs/v305_validation/ui03/workbench/index.html)
+2026-11-21。民用带线 B 型热敏珠前中段的固定连接切向重排停在几何阶段。最靠近法向的边的平均夹角从 22.98° 降至 21.07°，改善 8.30%，低于本次 20% 目标。62 号条带最大法向穿越间距增大 26.61%，超过 25% 上限。候选网热流未知。3 m/s 工况继续使用第三档的 10,272 / 10,272 面、3.19665061 mm²。新增 0 面、0 m²。第三档珠部平均换热比实验图读高 22.80%，逐面联合实验验证面积为 0 m²。[v306 报告](validation/v306/RESULTS.md) · [十六条法线](validation/v306/evidence/rays.json) · [已算分带三维页](../outputs/v305_validation/ui03/workbench/index.html)
 
-<!-- records:last_completed=v305 -->
+<!-- records:last_completed=v306 -->
 <!-- records:active=none -->
-<!-- records:base_commit=bf3796c2eb27e5e15ae2676a781222eeb09a13b4 -->
+<!-- records:base_commit=e9b4ac801c056e4ba856f060ed663d44e3d2a0c8 -->
 
 带线模型选“第三档中段细化”，在 305.15 K 结果页点“查看分带热量账”。4 mW 集总壁温为 297.694199 K，热峰在迎风引线 207 号面。第二档 20D 至 30D 的热导差为 −0.00427%，v301 高阶配置因温度下越界关闭。[工作台验收](validation/v305/evidence/workbench.json) · [三档网距](validation/v304/RESULTS.md) · [外域对照](validation/v303/RESULTS.md) · [功率反演](validation/v302/RESULTS.md)
 
@@ -36,7 +36,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-下一项在珠面前中段检验沿壁法向排列的过渡网，先核实实际角度、间距和受影响的范围，再决定是否用一次冷态比较该带、邻带与整件放热。[当前下一决定](validation/v305/NEXT_DECISION.md)
+下一项在原第三档前中段固定节点与十六条测线，先估算局部换对角线可实现的方向改善上界，再决定是否值得建候选网。[当前下一决定](validation/v306/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 
