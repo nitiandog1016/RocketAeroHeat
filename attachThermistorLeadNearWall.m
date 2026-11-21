@@ -1,7 +1,11 @@
 function mesh=attachThermistorLeadNearWall(mesh,runFolder,outDir)
 % 模块一：已算归档由保存的同帧原面表恢复，新算从自己的速度和壁剪切输出提取。
 root=fileparts(mfilename('fullpath'));
-if isempty(runFolder)
+if isempty(runFolder) && isfield(mesh,'thermistorMidbody')
+    % 光滑加密归档携带同一终帧导出的首层速度、壁剪切和全表面流向表。
+    stats=jsondecode(fileread(fullfile(outDir,'flow.json')));
+    csv=fullfile(outDir,'flow.csv');digest=stats.tableSHA256;
+elseif isempty(runFolder)
     proof=fullfile(root,'docs','validation','v297','evidence');
     stats=jsondecode(fileread(fullfile(proof,'nearwall.json')));stats=stats.fine;
     target=tempname;mkdir(target);guard=onCleanup(@()clearTable(target)); %#ok<NASGU>

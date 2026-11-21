@@ -1,9 +1,16 @@
 function [current,report]=runThermistorLeadWorkbench(input,cfg,progress)
 % 模块一：绑定已确认的米制原面、求解体网、冻结热边界与所选数据来源。
 root=fileparts(mfilename('fullpath'));p=input.thermistorPrepared;
-contract=jsondecode(fileread(fullfile(root,'cases','thermistor_b','leads3.json')));
+midbody=strcmp(cfg.thermistorVariant,'midbody');options={};
+if midbody
+    archive='midbody3';options={'--midbody'};caseLabel='光滑 B 型热敏珠 · 中段加密';
+    scope='光滑名义珠体，30° 对称稳态，中段近壁过渡区局部加密';
+else
+    archive='leads3';caseLabel='带引线 B 型热敏珠';scope='两端带线名义试件，30° 对称稳态，完整暴露面含接头及端面';
+end
+contract=jsondecode(fileread(fullfile(root,'cases','thermistor_b',[archive '.json'])));
 assert(isequal(cfg.thermistorBoundary,thermistorWorkbenchBoundary()) && cfg.thermistorAngularCells==4, ...
-    'RAH:Lead:Boundary','带线工况使用 3 m/s 空气和 305.15 K 给定壁温。');
+    'RAH:Lead:Boundary','此工况使用 3 m/s 空气和 305.15 K 给定壁温。');
 saved=jsondecode(fileread(p.manifest));
 assert(isequal(saved,rmfield(p,{'manifest','manifestSHA256'})) && strcmp(cm011FileSHA256(p.manifest),p.manifestSHA256) && ...
     strcmp(p.meshSHA256,contract.meshSHA256) && strcmp(p.bodySHA256,contract.bodySHA256) && ...
@@ -12,18 +19,18 @@ assert(isequal(saved,rmfield(p,{'manifest','manifestSHA256'})) && strcmp(cm011Fi
     'RAH:Lead:Mesh','已确认的体网或真实节点映射发生变化。');
 mode='solve';if isfield(cfg,'thermistorResultSource'),mode=validatestring(cfg.thermistorResultSource,{'archive','solve'});end
 if strcmp(mode,'archive')
-    [folder,guard]=openThermistorArchive('leads3'); %#ok<NASGU>
+    [folder,guard]=openThermistorArchive(archive); %#ok<NASGU>
     geometry=folder;runFolder='';
 else
     if isfield(cfg,'thermistorRunDirectory'),runFolder=cfg.thermistorRunDirectory;
     else,runFolder=fullfile(root,'outputs',['thermistor_leads_run_' char(java.util.UUID.randomUUID())]);end
     logFile=[runFolder '.log'];timer=tic;
     runCM011Python({fullfile(root,'scripts','thermistorLeadWorkbench.py'),'calculate',runFolder, ...
-        '--prepared',p.directory},logFile,@pulse,true);
+        '--prepared',p.directory,options{:}},logFile,@pulse,true);
     folder=fullfile(runFolder,'surface');geometry=runFolder;
 end
 
-% 模块二：按七个暴露区域接入同一逐面台账，独立积分面元功率并核对温度身份。
+% 模块二：按实际暴露区域接入逐面台账，独立积分面元功率并核对温度身份。
 s=jsondecode(fileread(fullfile(folder,'summary.json')));bodyFile=fullfile(geometry,'body.json');
 c=jsondecode(fileread(fullfile(geometry,'case.json')));body=jsondecode(fileread(bodyFile));
 wallFile=fullfile(folder,'wall.csv');rows=readtable(wallFile);
@@ -49,22 +56,24 @@ for j=1:numel(s.regions)
     assert(nnz(ix)==s.regions(j).faces && abs(sum(area(ix).*rows.heatFluxWm2(ix))+s.regions(j).outwardW)<1e-12);
 end
 labels=string(body.regionNames);
-condition=struct('caseLabel','带引线 B 型热敏珠','velocityMps',[-3 0 0],'ambientPressurePa',c.airPa, ...
+condition=struct('caseLabel',caseLabel,'velocityMps',[-3 0 0],'ambientPressurePa',c.airPa, ...
     'ambientTemperatureK',c.airK,'wallTemperatureK',c.wallK,'alphaDeg',0,'betaDeg',0, ...
-    'geometryScope','两端带线名义试件，30° 对称稳态，完整暴露面含接头及端面');
+    'geometryScope',scope);
 setup=struct('condition',condition,'region',labels(rows.regionID),'wallTemperatureK',repmat(c.wallK,n,1), ...
     'engineeringSolver',@emptyWall,'localSolver',@wallData);
 [current,~,report]=runAeroHeatSingleCase(struct('F',f,'V',v),struct('analysisMode','hybridSurface','hybridSurface',setup));
 assert(report.fullSurfaceComputed && abs(report.wholeSurfaceHeatPowerW+s.totalOutwardW)<1e-12);
-current.hybridWall.pressureGaugePa=rows.pressureGaugePa;current.thermistorLead=s;
-current.evidenceIdentity.sourceFrame=struct('kind','SU2-8.6.0-thermistor-B-leads-3ms','sha256',s.sourceFrameSHA256, ...
+current.hybridWall.pressureGaugePa=rows.pressureGaugePa;
+if midbody,current.thermistorMidbody=s;else,current.thermistorLead=s;end
+current.evidenceIdentity.sourceFrame=struct('kind',['SU2-8.6.0-thermistor-B-' cfg.thermistorVariant '-3ms'],'sha256',s.sourceFrameSHA256, ...
     'reactionSHA256',s.sourceReactionSHA256,'bodySHA256',s.bodySHA256,'wallSHA256',s.wallSHA256);
 current.evidenceIdentity.meshSHA256=p.meshSHA256;current.evidenceIdentity.preparedSHA256=p.manifestSHA256;
 current.evidenceIdentity.runDirectory=runFolder;current.evidenceIdentity.reusedArchive=strcmp(mode,'archive');
 current.evidenceIdentity.sourceTraceable=true;current.evidenceIdentity.productionQualified=false;
-current.evidenceIdentity.scope='轴向来流下两端带线等温试件的对称稳态分支，实验对照为珠体平均换热。';
-current=attachThermistorLeadNearWall(current,runFolder);
-current=attachThermistorPairedControl(current,'wired');
+current.evidenceIdentity.scope=[scope '。实验对照为珠体平均换热。'];
+current=attachThermistorLeadNearWall(current,runFolder,folder);
+if midbody,current=attachThermistorPairedControl(current,'midbody');
+else,current=attachThermistorPairedControl(current,'wired');end
 report.outputDirectory=runFolder;report.regions=s.regions;
 
     function pulse()

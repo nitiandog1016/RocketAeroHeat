@@ -158,7 +158,7 @@ def wall_layers(wall, first):
     return layers
 
 
-def section(first,extent=20,smooth=False):
+def section(first,extent=20,smooth=False,midbody=False):
     wall,_=meridian(smooth)
     layers=wall_layers(wall,first)
     width=len(wall)
@@ -166,8 +166,14 @@ def section(first,extent=20,smooth=False):
         from thermistorCapMesh import replace_caps
         wired,_=meridian()
         front=wall_layers(wired,first)[-1]
-        xy,tri,far,interface,active=replace_caps(front,layers[-1],outer_mesh(front,extent))
+        background=replace_caps(front,layers[-1],outer_mesh(front,extent))
+        if midbody:
+            from thermistorMidbodyMesh import refine_midbody
+            background=refine_midbody(background,wall)
+        xy,tri,far,interface,active=background
     else:
+        if midbody:
+            raise ValueError("中段网距对照仅适用于光滑热敏珠")
         xy,tri,far,interface,active=outer_mesh(layers[-1],extent)
     extra=np.setdiff1d(active,interface)
     translate=np.full(len(xy),-1,int)
@@ -215,10 +221,10 @@ def sweep(c, low, high):
     return [bottom[a],bottom[d],top[d],bottom[b],bottom[c],top[c]]
 
 
-def prepare_mesh(out,first,smooth=False):
+def prepare_mesh(out,first,smooth=False,midbody=False):
     from collections import defaultdict
     wall,_=meridian(smooth)
-    xy,section_cells,far_edges,moment=section(first,smooth=smooth)
+    xy,section_cells,far_edges,moment=section(first,smooth=smooth,midbody=midbody)
     angles=np.arange(WEDGE+1)*2*np.pi/SECTORS
     xyz,ids=rotate(xy,angles)
     cells=[sweep(c,lo,hi) for lo,hi in zip(ids,ids[1:]) for c in section_cells]

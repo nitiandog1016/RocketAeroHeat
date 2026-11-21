@@ -1,11 +1,14 @@
-function mesh=prepareThermistorLeadMesh(oriented,windowOpen)
-% 模块一：用选中的带线原面生成对应三维体网，返回实际壁节点组成的扇区预览。
+function mesh=prepareThermistorLeadMesh(oriented,windowOpen,variant)
+% 模块一：为选定的带线或光滑中段加密试件生成体网，并返回真实壁节点预览。
 if nargin<2,windowOpen=[];end
-[reference,source]=thermistorWorkbenchModel('leads');
-assert(isequal(reference.V,oriented.V) && isequal(reference.F,oriented.F),'RAH:Lead:Geometry','带线试件几何或面序不符。');
-root=fileparts(mfilename('fullpath'));work=fullfile(root,'outputs',['thermistor_leads_' char(java.util.UUID.randomUUID())]);
+if nargin<3,variant='leads';end
+variant=validatestring(variant,{'leads','midbody'});options={};
+if strcmp(variant,'midbody'),options={'--midbody'};end
+[reference,source]=thermistorWorkbenchModel(variant);
+assert(isequal(reference.V,oriented.V) && isequal(reference.F,oriented.F),'RAH:Lead:Geometry','试件几何或面序不符。');
+root=fileparts(mfilename('fullpath'));work=fullfile(root,'outputs',['thermistor_' variant '_' char(java.util.UUID.randomUUID())]);
 mkdir(work);folder=fullfile(work,'prepared');
-runCM011Python({fullfile(root,'scripts','thermistorLeadWorkbench.py'),'prepare',folder}, ...
+runCM011Python({fullfile(root,'scripts','thermistorLeadWorkbench.py'),'prepare',folder,options{:}}, ...
     fullfile(work,'prepare.log'),@pulse,true);
 path=fullfile(folder,'prepared.json');p=jsondecode(fileread(path));
 assert(strcmp(source.bodySHA256,p.bodySHA256) && strcmp(p.directory,folder),'RAH:Lead:Source','准备记录与试件不符。');

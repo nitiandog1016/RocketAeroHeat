@@ -11,9 +11,9 @@ switch angularCells
     case 'paired3'
         archive=fullfile(caseDir,'paired3.zip');
         manifest=jsondecode(fileread(fullfile(caseDir,'paired3.json')));expected=manifest.archiveSHA256;
-    case 'leads3'
-        contract=jsondecode(fileread(fullfile(caseDir,'leads3.json')));
-        archive=fullfile(caseDir,'leads3.zip');expected=contract.archiveSHA256;
+    case {'leads3','midbody3'}
+        contract=jsondecode(fileread(fullfile(caseDir,[angularCells '.json'])));
+        archive=fullfile(caseDir,[angularCells '.zip']);expected=contract.archiveSHA256;
     case 'startup6'
         archive=fullfile(caseDir,'startup_6ms.zip');
         expected='25bdbfa8f11b6a12a6488b81b41002e7c3bc9808f8490f4b63987ee782c54b61';
@@ -33,7 +33,7 @@ end
 
 function removeExtracted(folder)
 % 模块四：释放本次从已校验数据包展开的临时文件。
-for name={'case.json','body.json','wall.csv','summary.json','matched_temperature.csv','comparison.json','historical.csv','shared.csv','flow.csv'}
+for name={'case.json','body.json','wall.csv','summary.json','matched_temperature.csv','comparison.json','historical.csv','shared.csv','flow.csv','flow.json'}
     path=fullfile(folder,name{1});if isfile(path),delete(path);end
 end
 rmdir(folder);

@@ -10,6 +10,8 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 两种 3 m/s 热敏珠在 305.15 K 下可选择 **查看配对热流差**。带线珠面按重合三角面比较，光滑珠体可在 7.5° 网的原面上比较两种离散。云图、探针与 CSV 共用相同来源。[光滑配对控制与引线影响](docs/validation/v298/RESULTS.md)
 
+选择 **光滑热敏珠 · 中段加密**，按侧栏生成体网、确认边界、读取已算结果或从冷态计算。在结果页点 **查看加密前后热流差**，可在同一批 6,624 个原面上查看中段网距对换热的影响。[3 m/s 定向加密对照](docs/validation/v299/RESULTS.md)
+
 ## 历史交付（截至 2026-11-16）
 
 最新[v252非相似边界层剖面](docs/PHASE_NONSIMILAR_PROFILES_V252.md)：同相态Levy–Lees/沿程后退差分＋MATLAB bvp4c，三链及独立复算/积分账通过；上游壁温历史在40°处造成2.70%热流差。**仍只原1306球帽面候选，无新增合格热面积。** 原三链父监督终态缺失如实保留，单站修复回归已通过。34字段接原面WebGL，新增沿程滑块、实际速度/温度剖面与CSV；本地`outputs/v252_validation/workbench02/index.html`，图见[原面热流](docs/validation/v252/evidence/workbench02/rocket_nonsimilar.png)和[沿程/剖面](docs/validation/v252/evidence/workbench02/profiles_and_history.png)。

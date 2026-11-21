@@ -1,14 +1,16 @@
 # 当前交接
 
-2026-11-21。公开民用 B 型热敏珠的 3 m/s、给定壁温 305.15 K 对称稳态已完成配对计算。**原结构网光滑珠体放热 9.50885 mW，混合网光滑珠体 12.30870 mW，混合网带线珠体含接头 11.94750 mW。** 同几何两种离散相差 +2.79986 mW；同方法加入引线时珠部改变 −0.36120 mW。配对光滑工作网覆盖 6,624 / 6,624 面，原带线试件覆盖 10,272 / 10,272 面；既有试件新增覆盖为 0 面、0 m²。三种方法相对实验平均 h 分别高 17.29%、51.83%、47.37%，逐面联合实验验证面积为 0 m²。[v298 报告](validation/v298/RESULTS.md) · [配对与功率](validation/v298/evidence/comparison.json)
+2026-11-21。公开民用 B 型热敏珠在 3 m/s、给定壁温 305.15 K 下完成中段加密对照。**光滑珠体放热由 12.30870 降至 10.62365 mW**，按上一版相同分带，中段与原结构网的差额缩小 71.98%。平均 h 由 331.52 降到 286.14 W/(m²·K)，仍比实验图读值高 31.04%。光滑试件 6,624 / 6,624 面共 3.089123 mm² 的壁压与热流均已算出；新增覆盖 0 面、0 m²，逐面联合实验验证 0 m²。冷态终点、延续、独立收支与导出已核对。[v299 报告](validation/v299/RESULTS.md) · [原面功率与热峰](validation/v299/evidence/comparison.json)
 
-<!-- records:last_completed=v298 -->
+<!-- records:last_completed=v299 -->
 <!-- records:active=none -->
-<!-- records:base_commit=c1eb8eebcf41d43b88052b14fa6b9e95f188fdae -->
+<!-- records:base_commit=4d4b21cdbdbaad7888b00a9452d1cc982e14dd88 -->
+
+在主侧栏选择“光滑热敏珠 · 中段加密”。结果页可按同一原面比较加密前后的入壁热流、壁压和反向区。[本机三维页](../outputs/v299_validation/midbody_ui01/workbench/index.html) · [实际网距](validation/v299/evidence/inputs.json) · [工作台与截面导出](validation/v299/evidence/workbench.json)
 
 ## 带线试件
 
-上述两种 3 m/s 主结果的侧栏均有“查看配对热流差”。6,144 个共同珠面可直接同面比较。两种光滑方法另按原 5,216 面守恒对照，几何和离散差值各自标明方向。新光滑场、20 次延续、独立反力和远场收支均已正常结束。[带线三维页](../outputs/v298_validation/wired_ui03/workbench/index.html) · [光滑三维页](../outputs/v298_validation/smooth_ui03/workbench/index.html) · [导出验收](validation/v298/evidence/workbench.json)
+v298 配对中，带线珠体含接头放热 11.94750 mW，相对同方法光滑珠体减少 0.36120 mW。原带线试件覆盖 10,272 / 10,272 面，6,144 个共同珠面可逐面比较。[带线三维页](../outputs/v298_validation/wired_ui03/workbench/index.html) · [光滑三维页](../outputs/v298_validation/smooth_ui03/workbench/index.html) · [三项配对](validation/v298/evidence/comparison.json)
 
 从“选用带引线 B 型热敏珠”进入五步侧栏。工作台已通过网格、边界、冷态新算、归档、三维云图与七区探针验收。最大放热在迎风侧引线面元 207。后引线、后接头和珠体背流侧共有 1,536 面出现壁剪切与首层流速同时反向，两套近壁网辨认出同一批原面。新算任务 `thermistor_leads_run_d5d2003c-4d02-45b2-8fd1-0dd2641a07e0` 已有正常终态和逐面核对。引线长度、接头圆角、全体等温均为名义假设。[本机三维页](../outputs/v297_validation/ui03/workbench/index.html) · [科研出口](validation/v297/evidence/workbench.json) · [近壁数据](validation/v297/evidence/nearwall.json)
 
@@ -32,7 +34,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-[当前下一决定](validation/v298/NEXT_DECISION.md) 是在光滑控制上定向加密中段近壁层外侧。−0.5 < X/a < 0.5 贡献了同几何两套方法功率差的 74.86%，距壁 0.015D 至 0.1D 的若干实际法向间距在混合网上更大。固定首层、母线原面与物理边界，实测改变的网距、分带功率与反向区。差异的具体成因仍待这一独立试验。[空间分布与网距](validation/v298/evidence/spatial.json)
+[当前下一决定](validation/v299/NEXT_DECISION.md) 是在带线 B 型试件上做一次相同的中段加密，分别核对珠体、接头、引线和端面的放热，并与 v299 的共同珠面直接比较。带线加密计算尚未启动。
 
 ## 自绘模型保留的状态
 

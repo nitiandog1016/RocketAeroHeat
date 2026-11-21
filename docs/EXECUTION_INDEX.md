@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v299 光滑热敏珠中段过渡网加密](validation/v299/RESULTS.md) · [功率与热峰](validation/v299/evidence/comparison.json) · [下一项](validation/v299/NEXT_DECISION.md)。同一光滑原面上的放热降低 1.68505 mW，整珠平均 h 与实验相差 +31.04%。
+
 - [v298 光滑与带线热敏珠的配对控制](validation/v298/RESULTS.md) · [三项功率](validation/v298/evidence/comparison.json) · [网距与额外放热](validation/v298/evidence/spatial.json) · [下一项](validation/v298/NEXT_DECISION.md)。同一光滑几何换用混合网的放热差为 +2.79986 mW，匹配方法下加入引线的珠部差为 −0.36120 mW。
 
 - [v297 带两根引线的 B 型热敏珠全表面换热](validation/v297/RESULTS.md) · [七区壁压与热流](validation/v297/evidence/fine_surface.json) · [反向流动](validation/v297/evidence/nearwall.json) · [工作台](validation/v297/evidence/workbench.json) · [下一项](validation/v297/NEXT_DECISION.md)。3 m/s 对称稳态覆盖 10,272 个原面，整件放热 12.53996 mW，珠部平均换热比实验图读高 47.37%。

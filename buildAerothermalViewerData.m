@@ -407,17 +407,25 @@ if isfield(mesh,'hybridWall')
     data.defaultField='heatFlux';
 end
 % 带线试件按原面保留珠体、引线和接头分区。实验只对照扣除引线散热后的珠部平均量。
-if isfield(mesh,'thermistorLead')
-    s=mesh.thermistorLead;data.thermistorLead=s;
+if isfield(mesh,'thermistorLead') || isfield(mesh,'thermistorMidbody')
     data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
-    data.caseNote='带引线 B 型热敏珠 · 3 m/s · 305.15 K 等温壁 · 30° 对称稳态';
+    data.caseNote=[mesh.hybridCondition.caseLabel ' · 3 m/s · 305.15 K 等温壁 · 30° 对称稳态'];
     data.resultCondition.caption=data.caseNote;
     k=find(strcmp({data.fields.key},'heatFlux'),1);
-    data.fields(k).stateNote=sprintf('珠体含接头 %.4f mW，引线含端面 %.4f mW。珠部平均换热 %.2f W/(m²·K)，实验图读 %.2f W/(m²·K)。', ...
-        1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),s.beadMeanHWm2K,s.experimentMeanHWm2K);
+    if isfield(mesh,'thermistorMidbody')
+        % 中段加密有独立终帧；原混合网只作为同一批原三角面的对照字段。
+        s=mesh.thermistorMidbody;data.thermistorMidbody=s;
+        data.fields(k).stateNote=sprintf('整珠放热 %.5f mW，名义面积平均换热 %.2f W/(m²·K)，实验图读 %.2f W/(m²·K)。', ...
+            1000*s.totalOutwardW,s.beadMeanHWm2K,s.experimentMeanHWm2K);
+        scope='光滑珠体轴向对称稳态，壁剪切和首层速度投影到沿流向的母线切向。';
+    else
+        s=mesh.thermistorLead;data.thermistorLead=s;
+        data.fields(k).stateNote=sprintf('珠体含接头 %.4f mW，引线含端面 %.4f mW。珠部平均换热 %.2f W/(m²·K)，实验图读 %.2f W/(m²·K)。', ...
+            1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),s.beadMeanHWm2K,s.experimentMeanHWm2K);
+        scope='带线试件对称稳态，母线正向取沿流向。端面及连接处按各自面元的切向计算。';
+    end
     if isfield(mesh,'thermistorLeadFlow')
         flow=mesh.thermistorLeadFlow;
-        scope='带线试件对称稳态，母线正向取沿流向。端面及连接处按各自面元的切向计算。';
         add('leadDownstreamCf','沿流向壁面摩擦系数','1',flow.downstreamCf,ones(n,1),repmat({'原生壁面摩擦向量投影到沿流向母线切向，三角面平均'},n,1),scope);
         add('leadReverse','近壁反向流动','0 / 1',flow.reverse,ones(n,1),repmat({'壁剪切和首层流速的母线切向分量均为负时取 1'},n,1),scope);
         add('leadFirstYPlus','首层 y+ 估算','1',flow.estimatedYPlus,ones(n,1),repmat({'按原生壁面摩擦系数、实际首层法向距离和运动黏度估算'},n,1),scope);
@@ -484,6 +492,10 @@ if isfield(mesh,'thermistorPaired')
          'pairedDeltaPressure',['壁压差 · ' pair.order],'Pa',pair.deltaPressurePa,'同位置两解的绝对壁压相减';
          'pairedSmoothReverse','配对光滑近壁反向','0 / 1',pair.reverse,'光滑壁面剪切与首层速度沿流向的分量均为负时取 1';
          'pairedReverseChange',['反向区变化 · ' pair.order],'1',pair.reverseChange,'两解的近壁反向标记相减，取 −1、0 或 1'};
+    if strcmp(pair.kind,'midbody')
+        note=sprintf('原混合网放热 %.5f mW，中段加密后 %.5f mW。',1000*pc.powerW.pairedSmooth,1000*mesh.thermistorMidbody.totalOutwardW);
+        tab{1,2}='入壁热流 · 加密前';tab{4,2}='近壁反向 · 加密前';
+    end
     status=double(isfinite(pair.heatFluxWm2));
     primary=data.fields(strcmp({data.fields.key},'heatFlux'));
     valid=[primary.values(isfinite(primary.values));pair.heatFluxWm2(status>0)/1000];

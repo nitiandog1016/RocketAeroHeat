@@ -208,11 +208,11 @@ switch action
             end
             state.frozenInputs.cfg.thermistorResultSource=source;
             state.frozenInputs.cfg.thermistorRunDirectory=folder;
-        elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && strcmp(optional(state.cfg,'thermistorVariant','smooth'),'leads')
+        elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && any(strcmp(optional(state.cfg,'thermistorVariant','smooth'),{'leads','midbody'}))
             % 在按下计算按钮时确定同一任务的来源，防止另一次同工况的结果串入。
             source=validatestring(optional(payload,'leadAction','solve'),{'solve','archive'});folder='';
             if strcmp(source,'solve')
-                folder=fullfile(fileparts(mfilename('fullpath')),'outputs',['thermistor_leads_run_' char(java.util.UUID.randomUUID())]);
+                folder=fullfile(fileparts(mfilename('fullpath')),'outputs',['thermistor_' state.cfg.thermistorVariant '_run_' char(java.util.UUID.randomUUID())]);
             end
             state.frozenInputs.cfg.thermistorResultSource=source;
             state.frozenInputs.cfg.thermistorRunDirectory=folder;
@@ -434,9 +434,9 @@ end
 function validateFlight(cfg)
 if strcmp(optional(cfg,'computationBackend',''),'thermistorB')
     thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells);
-    if strcmp(optional(cfg,'thermistorVariant','smooth'),'leads')
+    if any(strcmp(optional(cfg,'thermistorVariant','smooth'),{'leads','midbody'}))
         assert(cfg.thermistorAngularCells==4 && isequal(cfg.thermistorBoundary,thermistorWorkbenchBoundary()), ...
-            'RAH:Lead:Boundary','带引线工况使用 3 m/s 轴向来流与给定壁温 305.15 K。');
+            'RAH:Lead:Boundary','此混合网工况使用 3 m/s 轴向来流与给定壁温 305.15 K。');
     end
     return;
 end
@@ -472,11 +472,12 @@ if p.angularCells==48
         strcmp(s.firstHalfEnergy.acceptedFrameSHA256,s.fineSurface.energy.oldFrameSHA256) && ...
         strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && strcmp(id.startupAction,cfg.thermistorResultSource), ...
         'RAH:Bead:Snapshot','计算目录、终点或源帧不符。');
-elseif strcmp(optional(cfg,'thermistorVariant','smooth'),'leads')
-    % 带线试件的七个区域共用已确认的真实壁面和同一确定的求解体网。
-    s=result.thermistorLead;
+elseif any(strcmp(optional(cfg,'thermistorVariant','smooth'),{'leads','midbody'}))
+    % 按试件分别核对带线七区或光滑三区，冻结快照必须属于本次体网。
+    if strcmp(cfg.thermistorVariant,'leads'),s=result.thermistorLead;groups=7;
+    else,s=result.thermistorMidbody;groups=3;end
     assert(strcmp(s.meshSHA256,p.meshSHA256) && strcmp(id.sourceFrame.sha256,s.sourceFrameSHA256) && ...
-        strcmp(id.sourceFrame.wallSHA256,s.wallSHA256) && numel(s.regions)==7 && sum([s.regions.faces])==n && ...
+        strcmp(id.sourceFrame.wallSHA256,s.wallSHA256) && numel(s.regions)==groups && sum([s.regions.faces])==n && ...
         strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && id.reusedArchive==strcmp(cfg.thermistorResultSource,'archive'), ...
         'RAH:Lead:Snapshot','带线原面、区域或终场不符。');
 else
