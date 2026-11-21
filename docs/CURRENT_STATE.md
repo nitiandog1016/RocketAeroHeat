@@ -1,12 +1,16 @@
 # 当前交接
 
-2026-11-21。民用光滑 B 型热敏珠已通过独立安装的单工况全表面数值复算。在 6 m/s、距构造初场 7.809360865 µs 时，全周 56 层网覆盖 **5,216 / 5,216 面、3.08983026 mm²**，整珠放热 **10.69725502 mW**。与 v295 相比新增 **0 面、0 m²**。本版从程序内部恢复初场，在另一安装中重新推进，逐面结果与参考表逐字节一致。按论文面积换算的启动时刻平均换热系数比实验读数高 18.28%，局部壁压与热流的联合实验验证面积为 **0 m²**。[v296 报告](validation/v296/RESULTS.md) · [原面和实测量对照](validation/v296/evidence/installation_result.json)
+2026-11-21。公开民用 B 型热敏珠带两条轴向引线，3 m/s、293.15 K 空气、给定整件壁温 305.15 K 的对称稳态已求得 **10,272 / 10,272 面、3.19665061 mm²** 的壁压和对流热流。珠体和接头放热 11.94750 mW，两根引线含端面 0.59246 mW，整件 12.53996 mW。细网的珠部平均换热比原实验读数高 47.37%，逐面壁压和热流联合实验验证面积为 0 m²。各算例独立记账。[v297 报告](validation/v297/RESULTS.md) · [两网原面对照](validation/v297/evidence/comparison.json)
 
-<!-- records:last_completed=v296 -->
+<!-- records:last_completed=v297 -->
 <!-- records:active=none -->
-<!-- records:base_commit=c7f0bcd6d0ec2ab120bb7fa1dc4a6d13c70e2036 -->
+<!-- records:base_commit=c870db1a7ef3b4560a935a1c872077268a2a3334 -->
 
-## 热敏珠当前结果
+## 带线试件
+
+从“选用带引线 B 型热敏珠”进入五步侧栏。工作台已通过网格、边界、冷态新算、归档、三维云图与七区探针验收。最大放热在迎风侧引线面元 207。后引线、后接头和珠体背流侧共有 1,536 面出现壁剪切与首层流速同时反向，两套近壁网辨认出同一批原面。新算任务 `thermistor_leads_run_d5d2003c-4d02-45b2-8fd1-0dd2641a07e0` 已有正常终态和逐面核对。引线长度、接头圆角、全体等温均为名义假设。[本机三维页](../outputs/v297_validation/ui03/workbench/index.html) · [科研出口](validation/v297/evidence/workbench.json) · [近壁数据](validation/v297/evidence/nearwall.json)
+
+## 光滑热敏珠
 
 从“选用 B 型热敏珠”进入网格页，选择“6 m/s · 360° 全周 · 56 层”，准备体网、确认边界后可新算、读取已完成计算或接续。第二套安装的任务 `d457118c-1e76-4618-ab24-5bcab5bfce09` 已完成全部 11 阶段，MATLAB 耗时 45.63 min。末步收支差 −0.9432 nW，热峰位于工作台面元 5211。初场冷态恢复与新算在同机两个安装目录验收。另一台电脑复算需安装固定依赖。[本机三维页](../outputs/v296_validation/desktop_final/outputs/thermistor_view_fb14f0d9-dab2-4f6f-84e0-e505ac1861cb/workbench/index.html) · [离线逐面核对](validation/v296/evidence/offline.json) · [安装方法](validation/v296/INSTALL.md)
 
@@ -28,9 +32,7 @@ v292 在 6 m/s、293.15 K 空气、给定壁温 303.15 K 下，以一个整步�
 
 ## 下一项
 
-[当前下一决定](validation/v296/NEXT_DECISION.md) 是在 3 m/s 基准工况下加入论文给出线径的引线，分别验收珠体、引线和连接区的原面、壁压、热流及功率。引线露出长度、接入位置、端面和热边界需在开算前声明。当前结果属于光滑珠体。[冷态恢复](validation/v296/evidence/cold.json) · [空缓存网格](validation/v296/evidence/empty_mesh.json)
-
-6 m/s 名义横径雷诺数 360.20，沿轴长椭球首次对称破缺的临界图读约 241。30° 镜面扇区只提供基流初猜。原论文图 7 的 6 m/s 测点测得整珠平均 h 约 292.32 W/(m²·K)，温差读数约 10.09 K。[图读与适用范围](validation/v287/evidence/measurements.json)
+[当前下一决定](validation/v297/NEXT_DECISION.md) 是在 v297 相同网格方法、物性与边界下求解配对光滑试件，区分引线引起的功率变化与原方法的离散差异。先比较两种方法的光滑珠体功率，再比较新方法下的有线与无线结果。v297 已完成正式运行和独立导出，当前没有待接续的带线求解进程。
 
 ## 自绘模型保留的状态
 

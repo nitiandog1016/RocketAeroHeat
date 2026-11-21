@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v297 带两根引线的 B 型热敏珠全表面换热](validation/v297/RESULTS.md) · [七区壁压与热流](validation/v297/evidence/fine_surface.json) · [反向流动](validation/v297/evidence/nearwall.json) · [工作台](validation/v297/evidence/workbench.json) · [下一项](validation/v297/NEXT_DECISION.md)。3 m/s 对称稳态覆盖 10,272 个原面，整件放热 12.53996 mW，珠部平均换热比实验图读高 47.37%。
+
 - [v296 民用热敏珠独立安装与全表面复算](validation/v296/RESULTS.md) · [安装方法](validation/v296/INSTALL.md) · [5,216 面同刻结果与整珠实验](validation/v296/evidence/installation_result.json) · [下一项](validation/v296/NEXT_DECISION.md)。程序冷态重建初场，独立工作台新算复现原面表，整珠放热 10.69725502 mW。
 
 - [v295 热敏珠 6 m/s 五步工作台计算与中断接续](validation/v295/RESULTS.md) · [新算逐面对照](validation/v295/evidence/recovered.json) · [结果页](validation/v295/evidence/resumed_ui.json) · [下一项](validation/v295/NEXT_DECISION.md)。从侧栏接续真实中断，全部 5,216 面与参考表一致，整珠放热 10.69725502 mW。

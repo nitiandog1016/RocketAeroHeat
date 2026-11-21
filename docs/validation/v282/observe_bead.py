@@ -12,7 +12,7 @@ import numpy as np
 
 ROOT=Path(__file__).resolve().parents[3]
 sys.path[:0]=[str(ROOT/"scripts"),str(ROOT/"docs/validation/v272")]
-from observe_flux import BIN, BUILD, FILES, OFFICIAL, SRC, TOOL, arguments, invoke, replace
+from observe_flux import FILES, OFFICIAL, TOOL, arguments, invoke, replace
 from thermistorBead import CP,D,DT,RHO,U,read,sha,write_json
 from thermistorReaction import terminal
 
@@ -58,34 +58,42 @@ def audit(parent, probes, out):
     rec=terminal(parent)
     out.mkdir(parents=True,exist_ok=False)
     cache=json.loads(gzip.decompress((ROOT/"docs/validation/v272/evidence/build.json.gz").read_bytes()))
-    assert all(sha(Path(k))==v for k,v in cache["cachedBuildInputs"].items())
-    assert sha(TOOL/"su2.zip")==cache["sourceArchiveSHA256"]
-    source=SRC/FILES[0]
-    with zipfile.ZipFile(TOOL/"su2.zip") as z:
+    # 缓存清单保存了初次验收时的绝对路径。在当前选定的构建目录复核同一批源与对象。
+    kit=Path(os.environ.get("RAH_THERMISTOR_SU2_BUILD",TOOL)).resolve()
+    build=kit/"build-v117";bin_dir=kit/"toolchain/w64devkit/bin"
+    original_source,=[Path(p) for p in cache["cachedBuildInputs"] if Path(p).as_posix().endswith("/source/"+FILES[0])]
+    old_kit=original_source.parents[len(Path(FILES[0]).parts)]
+    inputs={kit/Path(p).relative_to(old_kit):digest for p,digest in cache["cachedBuildInputs"].items()}
+    assert all(sha(p)==v for p,v in inputs.items())
+    assert sha(bin_dir/"g++.exe")==cache["compilerSHA256"] and sha(kit/"su2.zip")==cache["sourceArchiveSHA256"]
+    source=kit/"source"/FILES[0]
+    with zipfile.ZipFile(kit/"su2.zip") as z:
         member,=[k for k in z.namelist() if k.endswith("/"+FILES[0])]
         assert source.read_bytes()==z.read(member)
     initial=np.loadtxt(parent/"restart.csv",delimiter=",",skiprows=1)
     local=out/source.name
     local.write_text(instrument(source.read_text("utf8"),len(initial)),encoding="utf8")
-    entries=read(BUILD/"compile_commands.json")
+    entries=read(build/"compile_commands.json")
     entry,=[e for e in entries if e["file"].replace("\\","/").endswith("/"+FILES[0])]
     cmd=arguments(entry["command"]);obj=out/(source.stem+".obj")
+    assert Path(cmd[0]).name=="g++.exe"
+    cmd[0]=str(bin_dir/"g++.exe")
     for k,v in (("-MQ",obj),("-MF",str(obj)+".d"),("-o",obj)):
         cmd[cmd.index(k)+1]=str(v)
     cmd[-1:]=["-iquote",str(source.parent),str(local)]
-    invoke(source.stem,cmd,BUILD,out,120,3)
+    invoke(source.stem,cmd,build,out,120,3,bin_directory=bin_dir)
     link=re.search(r"^build SU2_CFD/src/SU2_CFD\.exe: cpp_LINKER ([^ |]+)[^\n]*\n LINK_ARGS = ([^\n]+)",
-                   (BUILD/"build.ninja").read_text("utf8"),re.M)
+                   (build/"build.ninja").read_text("utf8"),re.M)
     exe=out/"thermistor_observe.exe"
-    invoke("link",[BIN/"g++.exe","-o",exe,link[1],obj,*arguments(link[2])],BUILD,out,60,3)
-    assert all(sha(Path(k))==v for k,v in cache["cachedBuildInputs"].items())
+    invoke("link",[bin_dir/"g++.exe","-o",exe,link[1],obj,*arguments(link[2])],build,out,60,3,bin_directory=bin_dir)
+    assert all(sha(p)==v for p,v in inputs.items())
     for tag,binary,trace in (("control",OFFICIAL,False),("observed",exe,True)):
         folder=out/tag;folder.mkdir()
         os.link(parent/"mesh.su2",folder/"mesh.su2");os.link(parent/"restart.csv",folder/"initial_flow.csv")
         cfg,k=re.subn(r"^ITER= \d+$","ITER= 1",(parent/"case.cfg").read_text("ascii"),flags=re.M)
         assert k==1
         (folder/"case.cfg").write_text(cfg,encoding="ascii")
-        invoke("step",[binary,"case.cfg","--threads","1"],folder,folder,60,1,trace=trace)
+        invoke("step",[binary,"case.cfg","--threads","1"],folder,folder,60,1,trace=trace,bin_directory=bin_dir)
     check(parent,probes,out)
 
 

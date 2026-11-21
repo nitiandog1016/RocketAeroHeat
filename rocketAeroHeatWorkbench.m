@@ -220,7 +220,9 @@ renderEditor();sync();showGeometry(true);
         switch state.currentStep
             case 1
                 if isBead()
-                    grid=form(6);tip(grid,1,'B 型热敏珠 · 光滑名义珠体，沿 X 轴放置。长度和三角面采用公开试件的米制重建几何。');
+                    grid=form(6);
+                    if hasBeadLeads(),tip(grid,1,'B 型热敏珠 · 两端引线直径 0.0540 mm，各含 0.300 mm 名义直段和暴露端面。');
+                    else,tip(grid,1,'B 型热敏珠 · 光滑名义珠体，沿 X 轴放置。长度和三角面采用公开试件的米制重建几何。');end
                     controls.nextMesh=button(grid,4,'选择周向网格',@(~,~)go(2));
                     controls.changeModel=button(grid,5,'更换模型',@leaveBead);sync();return;
                 end
@@ -240,6 +242,7 @@ renderEditor();sync();showGeometry(true);
                 controls.rotate=button(grid,10,'应用增量旋转预览',@manualOrientation);
                 controls.reset=button(grid,11,'恢复导入坐标',@resetOrientation);
                 controls.confirm=button(grid,12,'确认主轴 X、鼻尖 +X',@confirmOrientation);
+                controls.wiredBeadModel=button(grid,14,'选用带引线 B 型热敏珠',@(~,~)loadBeadModel([],[],true));
                 tip(grid,13,['STL不含单位。默认mm模型转换系数0.001；m模型为1。' newline ...
                     'PCA只识别轴，不能确定鼻向。实际旋转会使网格/结果失效；鼠标操作只改变观察视角。']);
                 controls.native=button(grid,15,'建立原生箭体 · 内嵌SU2研究',@loadNative);
@@ -261,6 +264,16 @@ renderEditor();sync();showGeometry(true);
             case 2
                 if isBead()
                     grid=form(8);
+                    if hasBeadLeads()
+                        tip(grid,1,'两端带线 · 30° 对称扇区 · 周向单元 7.5°');
+                        controls.generate=button(grid,2,'生成带引线试件体网',@generate);
+                        if ~isempty(state.mesh)
+                            p=state.mesh.thermistorPrepared;
+                            tip(grid,3,sprintf('%d 个体单元 · %d 个全表面原面 · 首层 0.937 µm',p.cells,size(state.mesh.F,1)));
+                            controls.nextBoundary=button(grid,6,'设置边界条件',@(~,~)go(3));
+                        end
+                        sync();return;
+                    end
                     controls.beadCells=choice(grid,1,'工况与体网',{'3 m/s · 15° 扇区单元','3 m/s · 7.5° 扇区单元','6 m/s · 360° 全周 · 56 层'},[2 4 48],state.cfg.thermistorAngularCells);
                     controls.beadCells.ValueChangedFcn=@changeBeadGrid;
                     controls.generate=button(grid,2,'生成热敏珠体网',@generate);
@@ -378,6 +391,11 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isBead()
+                    if hasBeadLeads()
+                        grid=form(6);tip(grid,1,'空气 3 m/s · 沿 −X · 293.15 K · 101325 Pa');
+                        tip(grid,2,'珠面、接头、引线和线端均给定 305.15 K。');
+                        controls.confirm=button(grid,5,'确认带引线试件热边界',@confirmBoundary);sync();return;
+                    end
                     if isFullBead()
                         grid=form(6);tip(grid,1,'6 m/s 空气 · 沿 −X · 293.15 K · 101325 Pa');
                         tip(grid,2,'珠面等温 303.15 K · 两个物理半步 · 距构造初场 7.809360865 µs');
@@ -515,6 +533,12 @@ renderEditor();sync();showGeometry(true);
             case 4
                 if isBead()
                     grid=form(11);p=state.mesh.thermistorPrepared;
+                    if hasBeadLeads()
+                        controls.readBead=button(grid,1,'读取同网格已算结果',@(~,~)solveCase([],[],'archive'));
+                        controls.run=button(grid,2,'从冷态计算带引线试件',@solveCase);
+                        tip(grid,3,'3 m/s 轴向稳态 · 分别积分珠体、引线和端面放热。');
+                        sync();return;
+                    end
                     if isFullBead()
                         controls.run=button(grid,1,'从构造初场计算两个半步',@solveCase);
                         tip(grid,2,'6 m/s · 给定壁温 303.15 K · 目标 7.809360865 µs。已有初场约 49 分钟，首次计算另需准备初场。');
@@ -583,6 +607,10 @@ renderEditor();sync();showGeometry(true);
                     origins=struct('run','本次计算','read','已保存计算','resume','接续计算');
                     tip(grid,4,sprintf('%s · 全周 56 层 · 7.809360865 µs · 珠面放热 %.6f mW', ...
                         origins.(report.startupAction),-1000*report.wholeSurfaceHeatPowerW));
+                elseif hasBeadLeads()
+                    s=state.result.thermistorLead;
+                    tip(grid,4,sprintf('珠体和接头 %.4f mW · 两条引线含端面 %.4f mW · 总放热 %.4f mW', ...
+                        1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),1000*s.totalOutwardW));
                 elseif isBead()
                     origin='本次冷启动计算';
                     if state.result.evidenceIdentity.reusedArchive,origin='使用归档温差场';end
@@ -738,7 +766,8 @@ renderEditor();sync();showGeometry(true);
         if isBead()
             try
                 preparing=true;message('正在准备并核对所选热敏珠体网…');
-                candidate=prepareThermistorWorkbenchMesh(state.orientedMesh,state.cfg.thermistorAngularCells,@()isgraphics(fig));
+                if hasBeadLeads(),candidate=prepareThermistorLeadMesh(state.orientedMesh,@()isgraphics(fig));
+                else,candidate=prepareThermistorWorkbenchMesh(state.orientedMesh,state.cfg.thermistorAngularCells,@()isgraphics(fig));end
                 state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));report=[];
                 preparing=false;renderEditor();showGeometry(true);message('体网已就绪，可以设置边界条件。');
             catch ex,preparing=false;if isgraphics(fig),renderEditor();showError(ex);end,end
@@ -786,6 +815,7 @@ renderEditor();sync();showGeometry(true);
         next=state.cfg;
         if isBead()
             next.thermistorBoundary=[];
+            if hasBeadLeads(),next.thermistorBoundary=thermistorWorkbenchBoundary();return;end
             if isFullBead()
                 b=thermistorWorkbenchBoundary();b.speed=6;b.wallTemperatureK=303.15;
                 next.thermistorBoundary=thermistorWorkbenchBoundary(b,48);return;
@@ -1037,6 +1067,8 @@ renderEditor();sync();showGeometry(true);
                 if strcmp(source,'solve'),source='run';end
                 request.startupAction=source;
                 if ~strcmp(source,'run'),request.runDirectory=strtrim(controls.beadDirectory.Value);end
+            elseif hasBeadLeads()
+                request.leadAction=source;
             end
             state=aeroHeatWorkflowState('beginSolve',state,request);token=state.solveId;revision=state.solveInputRevision;
             renderEditor();
@@ -1096,25 +1128,34 @@ renderEditor();sync();showGeometry(true);
     function yes=isFullBead()
         yes=isBead() && state.cfg.thermistorAngularCells==48;
     end
+    function yes=hasBeadLeads()
+        yes=isBead() && strcmp(getOption(state.cfg,'thermistorVariant','smooth'),'leads');
+    end
     function chooseBeadDirectory(~,~)
         % 这里只选择现有运行目录，读取、接续与新算分别由计算页按钮触发。
         folder=uigetdir(fullfile(state.cfg.projectRoot,'outputs','v294_validation'),'选择热敏珠计算根目录');
         if ~isequal(folder,0),controls.beadDirectory.Value=folder;end
     end
-    function loadBeadModel(~,~)
+    function loadBeadModel(~,~,leads)
         % 固定朝向的民用试件从模型步骤进入主流程，原面在网格步骤继续使用。
         if state.busy || preparing,return;end
         try
-            [raw,source]=thermistorWorkbenchModel();
-            next=state.cfg;next.computationBackend='thermistorB';next.thermistorAngularCells=2;next.thermistorBoundary=[];
+            leads=nargin>=3 && leads;
+            if leads,variant='leads';cells=4;else,variant='smooth';cells=2;end
+            [raw,source]=thermistorWorkbenchModel(variant);
+            next=state.cfg;next.computationBackend='thermistorB';next.thermistorAngularCells=cells;next.thermistorBoundary=[];
+            next.thermistorVariant=variant;
             state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'orientedMesh',raw,'modelSource',source,'cfg',next));
             embeddedVolume=[];qualityPreview=false;creasePreview=false;candidatePreview=[];preview=raw;report=[];
-            go(2);message('已加载 B 型热敏珠，沿长轴来流。请选择周向分辨率。');
+            go(2);
+            if leads,message('已加载两端带引线的 B 型热敏珠，可生成三维体网。');
+            else,message('已加载 B 型热敏珠，沿长轴来流。请选择周向分辨率。');end
         catch ex,showError(ex);end
     end
     function leaveBead(~,~)
         if state.busy || preparing,return;end
         next=state.cfg;next.computationBackend='engineering';next=rmfield(next,{'thermistorAngularCells','thermistorBoundary'});
+        if isfield(next,'thermistorVariant'),next=rmfield(next,'thermistorVariant');end
         state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
         report=[];preview=[];renderEditor();showGeometry(true);message('请选择新的输入模型。');
     end

@@ -8,6 +8,9 @@ switch angularCells
     case 4
         archive=fullfile(caseDir,'surface_7p5.zip');
         expected='d02c8ac7fb41a7072e416e251efd2ccf8d19101ec388c98a46b3ed0a6e72449b';
+    case 'leads3'
+        contract=jsondecode(fileread(fullfile(caseDir,'leads3.json')));
+        archive=fullfile(caseDir,'leads3.zip');expected=contract.archiveSHA256;
     case 'startup6'
         archive=fullfile(caseDir,'startup_6ms.zip');
         expected='25bdbfa8f11b6a12a6488b81b41002e7c3bc9808f8490f4b63987ee782c54b61';

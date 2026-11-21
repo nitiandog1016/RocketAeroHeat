@@ -406,6 +406,24 @@ if isfield(mesh,'hybridWall')
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
 end
+% 带线试件按原面保留珠体、引线和接头分区。实验只对照扣除引线散热后的珠部平均量。
+if isfield(mesh,'thermistorLead')
+    s=mesh.thermistorLead;data.thermistorLead=s;
+    data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
+    data.caseNote='带引线 B 型热敏珠 · 3 m/s · 305.15 K 等温壁 · 30° 对称稳态';
+    data.resultCondition.caption=data.caseNote;
+    k=find(strcmp({data.fields.key},'heatFlux'),1);
+    data.fields(k).stateNote=sprintf('珠体含接头 %.4f mW，引线含端面 %.4f mW。珠部平均换热 %.2f W/(m²·K)，实验图读 %.2f W/(m²·K)。', ...
+        1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),s.beadMeanHWm2K,s.experimentMeanHWm2K);
+    if isfield(mesh,'thermistorLeadFlow')
+        flow=mesh.thermistorLeadFlow;
+        scope='带线试件对称稳态，母线正向取沿流向。端面及连接处按各自面元的切向计算。';
+        add('leadDownstreamCf','沿流向壁面摩擦系数','1',flow.downstreamCf,ones(n,1),repmat({'原生壁面摩擦向量投影到沿流向母线切向，三角面平均'},n,1),scope);
+        add('leadReverse','近壁反向流动','0 / 1',flow.reverse,ones(n,1),repmat({'壁剪切和首层流速的母线切向分量均为负时取 1'},n,1),scope);
+        add('leadFirstYPlus','首层 y+ 估算','1',flow.estimatedYPlus,ones(n,1),repmat({'按原生壁面摩擦系数、实际首层法向距离和运动黏度估算'},n,1),scope);
+        data.fields(end-1).stateNote=sprintf('1 表示两项均反向。%d 面，%.6f mm²。',flow.summary.reverseFaces,1e6*flow.summary.reverseAreaM2);
+    end
+end
 % 热敏珠只具备整珠平均换热的实验读数；探针上的局部压力和热流均保留研究身份。
 if isfield(mesh,'thermistorBead')
     bead=mesh.thermistorBead;

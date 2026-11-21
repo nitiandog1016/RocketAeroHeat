@@ -149,6 +149,7 @@ switch action
         if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') || strcmp(optional(cfg,'computationBackend',''),'thermistorB')
             requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','试件来源');
             requireUnchangedConfigSection(cfg,state.cfg,'thermistorAngularCells','周向网格');
+            requireUnchangedConfigSection(cfg,state.cfg,'thermistorVariant','试件外形');
         end
         if ~isequaln(cfg,state.cfg)
             state=invalidate(state,'边界条件或工程算法改变');
@@ -204,6 +205,14 @@ switch action
                 folder=required(payload,'runDirectory');
                 requireCondition(isfolder(folder),'请选择存在的计算根目录。');
                 folder=char(java.io.File(folder).getCanonicalPath());
+            end
+            state.frozenInputs.cfg.thermistorResultSource=source;
+            state.frozenInputs.cfg.thermistorRunDirectory=folder;
+        elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && strcmp(optional(state.cfg,'thermistorVariant','smooth'),'leads')
+            % 在按下计算按钮时确定同一任务的来源，防止另一次同工况的结果串入。
+            source=validatestring(optional(payload,'leadAction','solve'),{'solve','archive'});folder='';
+            if strcmp(source,'solve')
+                folder=fullfile(fileparts(mfilename('fullpath')),'outputs',['thermistor_leads_run_' char(java.util.UUID.randomUUID())]);
             end
             state.frozenInputs.cfg.thermistorResultSource=source;
             state.frozenInputs.cfg.thermistorRunDirectory=folder;
@@ -424,7 +433,12 @@ end
 %% 模块十：边界输入基础检查；完整物理适用性仍由后端各模型审核。
 function validateFlight(cfg)
 if strcmp(optional(cfg,'computationBackend',''),'thermistorB')
-    thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells);return;
+    thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells);
+    if strcmp(optional(cfg,'thermistorVariant','smooth'),'leads')
+        assert(cfg.thermistorAngularCells==4 && isequal(cfg.thermistorBoundary,thermistorWorkbenchBoundary()), ...
+            'RAH:Lead:Boundary','带引线工况使用 3 m/s 轴向来流与给定壁温 305.15 K。');
+    end
+    return;
 end
 if strcmp(optional(cfg,'computationBackend',''),'cm011Imported')
     cm011WorkbenchBoundary(cfg.cm011Boundary);return;
@@ -458,6 +472,13 @@ if p.angularCells==48
         strcmp(s.firstHalfEnergy.acceptedFrameSHA256,s.fineSurface.energy.oldFrameSHA256) && ...
         strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && strcmp(id.startupAction,cfg.thermistorResultSource), ...
         'RAH:Bead:Snapshot','计算目录、终点或源帧不符。');
+elseif strcmp(optional(cfg,'thermistorVariant','smooth'),'leads')
+    % 带线试件的七个区域共用已确认的真实壁面和同一确定的求解体网。
+    s=result.thermistorLead;
+    assert(strcmp(s.meshSHA256,p.meshSHA256) && strcmp(id.sourceFrame.sha256,s.sourceFrameSHA256) && ...
+        strcmp(id.sourceFrame.wallSHA256,s.wallSHA256) && numel(s.regions)==7 && sum([s.regions.faces])==n && ...
+        strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && id.reusedArchive==strcmp(cfg.thermistorResultSource,'archive'), ...
+        'RAH:Lead:Snapshot','带线原面、区域或终场不符。');
 else
     assert(result.thermistorBead.cellAngleDeg==30/p.angularCells,'RAH:Bead:Snapshot','扇区分辨率不符。');
 end
