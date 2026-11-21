@@ -1,12 +1,14 @@
 # 当前交接
 
-2026-11-21。民用 B 型热敏珠 6 m/s 工况已完成 56 层与 48 层近壁网格的同刻全表面验收。距构造初场 7.809360865 µs，两网均覆盖 **5,216 面、3.08983026 mm²**。首层法向距离减半后，整珠放热由 10.726572 降至 10.697255 mW（−0.2733%），原面热流最大绝对差为 17.0397 W/m²，热峰均为工作台面元 5211。相对 v293，各模型首次同时有壁压和热流的面积为 **0 面、0 m²**。局部实验联合验证面积为 **0 m²**。[v294 报告](validation/v294/RESULTS.md) · [两网比较](validation/v294/evidence/comparison.json)
+2026-11-21。民用 B 型热敏珠 6 m/s 全周计算已接入工作台五步主流程，并通过新算、中断接续和结果显示验收。在距构造初场 7.809360865 µs 时，56 层网得到全部 **5,216 面、3.08983026 mm²** 的壁压和热流，整珠放热 **10.69725502 mW**。与 v294 相比，首次同时有壁压和热流的新增面积为 **0 面、0 m²**；本次逐面压力、热流和首层温度与 v294 的同刻数值逐字节一致。局部实验联合验证面积为 **0 m²**。[v295 报告](validation/v295/RESULTS.md) · [同面核对](validation/v295/evidence/recovered.json)
 
-<!-- records:last_completed=v294 -->
+<!-- records:last_completed=v295 -->
 <!-- records:active=none -->
-<!-- records:base_commit=8614e8efe150f13b3c2c3e99e9ca4b8599b25b0e -->
+<!-- records:base_commit=6b2eecee3ad031ba9aa7c3b17ff98e222a93c163 -->
 
 ## 热敏珠当前结果
+
+从“选用 B 型热敏珠”进入网格页，选择“6 m/s · 360° 全周 · 56 层”，核对体网并确认边界后可新算、读取已有计算或接续。本次任务 `f34070bc-0d20-4899-95e8-c8c5e1b30632` 首次独立壁反力读数中断，原读数终态未知，现场已经留存。从同一侧栏复用已有三项成功回执后完成两半步。最终收支差 −0.9432 nW，结果页探针选中面元 5211，导出检查覆盖全部原面。[本机三维页](../outputs/thermistor_view_2ff3ae0f-d6cb-4e72-b463-50e3bcb920fa/workbench/index.html) · [新算界面](validation/v295/evidence/resumed_ui.json) · [离线页核对](validation/v295/evidence/offline.json)
 
 在主侧栏的 B 型热敏珠菜单选择“查看 6 m/s · 近壁网格对照”。主值为 56 层，可核对两网同刻压力、热流及相同位置的温度。实际截面 X = 0.172 mm 导出 121 行，逐行对应同一批原面。6 m/s 运行、热量核对及界面验收均有终态回执。[界面回执](validation/v294/evidence/ui.json) · [本机三维页](../outputs/v294_validation/view01/export/workbench/index.html)
 
@@ -24,7 +26,7 @@ v292 在 6 m/s、293.15 K 空气、给定壁温 303.15 K 下，以一个整步�
 
 ## 下一项
 
-[当前下一决定](validation/v294/NEXT_DECISION.md) 将 6 m/s 具名工况的实际计算接入主侧栏，复用已验收的网格、初场和两半步流程，完成后打开本次计算的原面三维场。当前 6 m/s 侧栏读取冻结结果，实际复算入口为 [run_pair.py](validation/v294/run_pair.py)。
+[当前下一决定](validation/v295/NEXT_DECISION.md) 处理独立安装时的输入准备。6 m/s 新算目前需要本机已有的体网、构造初场、观察器和旧阶段的小文件。下一项将按来源核对、生成或复用这些输入，并在独立目录验证普通用户入口。公开数据包和本机已有运行目录均可查看。
 
 6 m/s 名义横径雷诺数 360.20，沿轴长椭球首次对称破缺的临界图读约 241。30° 镜面扇区只提供基流初猜。原论文图 7 的 6 m/s 测点测得整珠平均 h 约 292.32 W/(m²·K)，温差读数约 10.09 K。[图读与适用范围](validation/v287/evidence/measurements.json)
 

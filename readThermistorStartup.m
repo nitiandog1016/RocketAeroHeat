@@ -1,7 +1,8 @@
-function [current,report]=readThermistorStartup(mode)
+function [current,report]=readThermistorStartup(mode,job)
 %READTHERMISTORSTARTUP 核验 B 型热敏珠全周启动瞬态，并将选定终点设为主结果。
 % 模块一：绑定给定壁温、物理时间、实际旧新帧、原面号与原生热量收支。
 if nargin==0,mode='startup6';end
+if nargin<2,job=[];end
 refined=strcmp(validatestring(mode,{'startup6','nearWall6'}),'nearWall6');
 [folder,cleanup]=openThermistorArchive('startup6'); %#ok<NASGU>
 c=jsondecode(fileread(fullfile(folder,'case.json')));
@@ -17,11 +18,20 @@ assert(c.speedMps==6 && c.airK==293.15 && c.nominalWallK==303.15 && c.airPa==101
 initial=e.oldFrameSHA256;
 kind='SU2-8.6.0-thermistor-B-first-step';
 if refined
-    [fineDir,fineCleanup]=openThermistorArchive('nearWall6'); %#ok<NASGU>
+    if isempty(job)
+        [fineDir,fineCleanup]=openThermistorArchive('nearWall6'); %#ok<NASGU>
+        fineSummary=fullfile(fineDir,'summary.json');
+    else
+        % 显式计算和目录恢复都从该次热量审核和比较步骤读取实际文件。
+        fineDir=fullfile(job.directory,'second_energy');fineSummary=fullfile(job.directory,'compare','summary.json');
+        assert(strcmp(cm011FileSHA256(fineSummary),job.summarySHA256) && ...
+            strcmp(cm011FileSHA256(fullfile(fineDir,'wall.csv')),job.wallSHA256),'RAH:Bead:Source','本次计算文件在核对后发生变化。');
+    end
     [refDir,refCleanup]=openThermistorArchive('halfsteps'); %#ok<NASGU>
-    trial=readGridComparison(fineDir,refDir,s,c);
+    trial=readGridComparison(fineDir,fineSummary,refDir,s,c);
     s=trial.summary.fineSurface;e=s.energy;wallFile=fullfile(fineDir,'wall.csv');
     initial=trial.summary.gridTransfer.seedSHA256;
+    if ~isempty(job),assert(strcmp(e.acceptedFrameSHA256,job.frameSHA256),'RAH:Bead:Source','返回终场与计算目录不符。');end
     kind='SU2-8.6.0-thermistor-B-56-layers-two-halfsteps';
 end
 body=jsondecode(fileread(bodyFile));mesh=struct('V',body.V,'F',body.F);
@@ -80,9 +90,9 @@ end
     end
 end
 
-function trial=readGridComparison(fineDir,refDir,startup,condition)
+function trial=readGridComparison(fineDir,summaryFile,refDir,startup,condition)
 % 模块三：核验两套网格的同刻两半步、同面功率与共同空间位置的温度。
-s=jsondecode(fileread(fullfile(fineDir,'summary.json')));g=s.gridTransfer;
+s=jsondecode(fileread(summaryFile));g=s.gridTransfer;
 ref=jsondecode(fileread(fullfile(refDir,'summary.json')));fine=s.fineSurface;
 one=s.firstHalfEnergy;two=fine.energy;t=condition.dtSeconds;
 assert(g.admitted && g.originalNodesPreserved && g.oldLayers==48 && g.newLayers==56 && ...

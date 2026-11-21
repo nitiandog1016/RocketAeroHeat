@@ -2,8 +2,13 @@ function [b,fs]=thermistorWorkbenchBoundary(b,angularCells)
 %THERMISTORWORKBENCHBOUNDARY 核对空气来流、互斥热边界及所选网格的净功率上限。
 reference=struct('speed',3,'airPressurePa',101325,'airTemperatureK',293.15, ...
     'wallTemperatureK',305.15,'alphaDeg',0,'betaDeg',0);
-if nargin==0,b=reference;end
 if nargin<2,angularCells=2;end
+if angularCells==48
+    % 全周启动工况的壁温和来流与构造初场一致，限定终点由两个物理半步确定。
+    reference.speed=6;reference.wallTemperatureK=303.15;
+    assert(isequal(b,reference),'RAH:Bead:Boundary','56 层全周网使用 6 m/s、293.15 K 空气和 303.15 K 给定壁温。');
+end
+if nargin==0,b=reference;end
 assert(isstruct(b) && isscalar(b) && xor(isfield(b,'wallTemperatureK'),isfield(b,'netHeatingPowerW')), ...
     'RAH:Bead:Boundary','请选择一项热边界：均匀壁温或整珠净加热功率。');
 key='wallTemperatureK';powerMode=isfield(b,'netHeatingPowerW');

@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v295 热敏珠 6 m/s 五步工作台计算与中断接续](validation/v295/RESULTS.md) · [新算逐面对照](validation/v295/evidence/recovered.json) · [结果页](validation/v295/evidence/resumed_ui.json) · [下一项](validation/v295/NEXT_DECISION.md)。从侧栏接续真实中断，全部 5,216 面与参考表一致，整珠放热 10.69725502 mW。
+
 - [v294 民用热敏珠全表面近壁网格对照](validation/v294/RESULTS.md) · [两网逐面统计](validation/v294/evidence/comparison.json) · [科研界面](validation/v294/evidence/ui.json) · [下一项](validation/v294/NEXT_DECISION.md)。56 层与 48 层在同一启动时刻覆盖 5,216 面，整珠放热相差 −0.2733%，热峰均在工作台面元 5211。
 
 - [v293 热敏珠近壁加密与第一半步残差定位](validation/v293/RESULTS.md) · [网格与初场](validation/v293/evidence/grid.json) · [终场](validation/v293/evidence/first_state.json) · [下一项](validation/v293/NEXT_DECISION.md)。最内 8 个区间加密，首次装配差异定位到加密带；末窗焓未达标。

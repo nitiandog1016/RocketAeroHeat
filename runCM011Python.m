@@ -1,6 +1,7 @@
-function runCM011Python(args,logPath,heartbeat)
+function runCM011Python(args,logPath,heartbeat,independent)
 %RUNCM011PYTHON 使用独立参数传递路径；计算时可刷新工作台并检查关闭请求。
 root=fileparts(mfilename('fullpath'));
+if nargin<4,independent=false;end
 items=[{'python'},args];argv=javaArray('java.lang.String',numel(items));
 for k=1:numel(items),argv(k)=java.lang.String(items{k});end
 cmd=java.lang.ProcessBuilder(argv);cmd.directory(java.io.File(root));cmd.redirectErrorStream(true);
@@ -10,7 +11,9 @@ if nargin>=3 && ~isempty(heartbeat)
     try
         while proc.isAlive(),heartbeat();pause(.2);end
     catch ex
-        proc.waitFor();rethrow(ex);
+        % 有独立回执的长任务在窗口关闭后仍由自己的监督器完成，可按目录恢复。
+        if ~independent,proc.waitFor();end
+        rethrow(ex);
     end
 end
 code=proc.waitFor();

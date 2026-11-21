@@ -195,6 +195,19 @@ switch action
         state.solveInputRevision=state.revision;
         state.frozenInputs=struct('mesh',state.mesh,'cfg',state.cfg, ...
             'freestream',state.freestream,'revision',state.revision,'solveId',state.solveId);
+        if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && state.cfg.thermistorAngularCells==48
+            % 将动作与目录一起冻结，避免同一几何和同刻的其他计算被误接收。
+            source=validatestring(optional(payload,'startupAction','run'),{'run','read','resume'});
+            if strcmp(source,'run')
+                folder=fullfile(fileparts(mfilename('fullpath')),'outputs','v294_validation','workbench',char(java.util.UUID.randomUUID()));
+            else
+                folder=required(payload,'runDirectory');
+                requireCondition(isfolder(folder),'请选择存在的计算根目录。');
+                folder=char(java.io.File(folder).getCanonicalPath());
+            end
+            state.frozenInputs.cfg.thermistorResultSource=source;
+            state.frozenInputs.cfg.thermistorRunDirectory=folder;
+        end
         state.busy=true;state.status='solving';state.currentStep=4;
         state.error=struct('identifier','','message','');
     case 'completesolve'
@@ -437,7 +450,18 @@ function validateThermistorResult(result,frozen)
 cfg=frozen.cfg;[b,fs]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells);
 p=frozen.mesh.thermistorPrepared;w=result.hybridWall;n=size(frozen.mesh.F,1);c=result.hybridCondition;
 id=result.evidenceIdentity;
-assert(cfg.thermistorAngularCells==p.angularCells && result.thermistorBead.cellAngleDeg==30/p.angularCells && ...
+if p.angularCells==48
+    % 全周计算核对两个实际物理半步及给定壁温；扇区稳态沿用原有资格。
+    s=result.beadNearWallComparison.summary;
+    assert(c.elapsedPhysicalTimeS==7.80936086544745e-6 && strcmp(c.initialStateSHA256,p.seedSHA256) && ...
+        strcmp(s.fineSurface.meshSHA256,p.meshSHA256) && strcmp(s.fineSurface.energy.acceptedFrameSHA256,id.sourceFrame.sha256) && ...
+        strcmp(s.firstHalfEnergy.acceptedFrameSHA256,s.fineSurface.energy.oldFrameSHA256) && ...
+        strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && strcmp(id.startupAction,cfg.thermistorResultSource), ...
+        'RAH:Bead:Snapshot','计算目录、终点或源帧不符。');
+else
+    assert(result.thermistorBead.cellAngleDeg==30/p.angularCells,'RAH:Bead:Snapshot','扇区分辨率不符。');
+end
+assert(cfg.thermistorAngularCells==p.angularCells && ...
     strcmp(id.origin,'research') && isequal(id.productionQualified,false) && strcmp(id.meshSHA256,p.meshSHA256) && ...
     strcmp(id.preparedSHA256,p.manifestSHA256) && strcmp(id.sourceFrame.bodySHA256,p.bodySHA256), ...
     'RAH:Bead:Snapshot','热敏珠快照的网格或来源不符。');

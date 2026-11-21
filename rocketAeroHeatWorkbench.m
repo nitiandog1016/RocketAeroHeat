@@ -182,6 +182,7 @@ renderEditor();sync();showGeometry(true);
             if state.currentStep==2 && ~isempty(state.mesh)
                 p=state.mesh.thermistorPrepared;m=p.preview;
                 caption=sprintf('实际三维体网的 30° 壁面扇区 · 周向单元 %g° · %d 个原生壁面',30/p.angularCells,p.wallFaces);
+                if isFullBead(),caption=sprintf('360° 全周体网 · 56 层 · %d 个原生壁面',p.wallFaces);end
             end
         end
         updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2,'resetCamera',reset));
@@ -260,10 +261,14 @@ renderEditor();sync();showGeometry(true);
             case 2
                 if isBead()
                     grid=form(8);
-                    controls.beadCells=choice(grid,1,'扇区周向单元',{'2 个 · 15°','4 个 · 7.5°'},[2 4],state.cfg.thermistorAngularCells);
+                    controls.beadCells=choice(grid,1,'工况与体网',{'3 m/s · 15° 扇区单元','3 m/s · 7.5° 扇区单元','6 m/s · 360° 全周 · 56 层'},[2 4 48],state.cfg.thermistorAngularCells);
                     controls.beadCells.ValueChangedFcn=@changeBeadGrid;
                     controls.generate=button(grid,2,'生成热敏珠体网',@generate);
                     description='外域 20 倍横径 · 子午 64 × 径向 48 · 30° 对称扇区';
+                    if isFullBead()
+                        controls.generate.Text='核对并使用 56 层全周体网';
+                        description='外域 20 倍横径 · 48 个方位 · 56 个径向区间 · 全周启动瞬态';
+                    end
                     if ~isempty(state.mesh)
                         p=state.mesh.thermistorPrepared;
                         description=sprintf('%s\n%d 节点 · %d 体单元 · %d 个全珠原面',description,p.nodes,p.cells,size(state.mesh.F,1));
@@ -373,6 +378,11 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isBead()
+                    if isFullBead()
+                        grid=form(6);tip(grid,1,'6 m/s 空气 · 沿 −X · 293.15 K · 101325 Pa');
+                        tip(grid,2,'珠面等温 303.15 K · 两个物理半步 · 距构造初场 7.809360865 µs');
+                        controls.confirm=button(grid,5,'确认此工况与给定壁温',@confirmBoundary);sync();return;
+                    end
                     grid=form(9);selected='none';temp=305.15;watts=0.004;
                     boundary=state.cfg.thermistorBoundary;
                     if isstruct(boundary)
@@ -505,6 +515,16 @@ renderEditor();sync();showGeometry(true);
             case 4
                 if isBead()
                     grid=form(11);p=state.mesh.thermistorPrepared;
+                    if isFullBead()
+                        controls.run=button(grid,1,'从构造初场计算两个半步',@solveCase);
+                        tip(grid,2,'6 m/s · 给定壁温 303.15 K · 56 层 · 目标 7.809360865 µs。上次用时约 49 分钟。');
+                        controls.beadDirectory=textField(grid,4,'已有计算目录',fullfile(state.cfg.projectRoot,'outputs','v294_validation'));
+                        controls.browseRun=button(grid,5,'选择计算目录',@chooseBeadDirectory);
+                        controls.readBead=button(grid,6,'读取已完成计算',@(~,~)solveCase([],[],'read'));
+                        controls.resumeBead=button(grid,7,'从已审核阶段接续',@(~,~)solveCase([],[],'resume'));
+                        controls.log=uitextarea(grid,'Editable','off','Value',logLines);
+                        controls.log.Layout.Row=[8 11];controls.log.Layout.Column=[1 2];sync();return;
+                    end
                     controls.readBead=button(grid,1,'用参照场计算当前工况',@(~,~)solveCase([],[],'archive'));
                     controls.run=button(grid,2,'从冷初场计算当前试件',@solveCase);
                     tip(grid,3,sprintf('B 型热敏珠 · 周向单元 %g° · %d 体单元\n3 m/s 空气 · %s',30/p.angularCells,p.cells,beadBoundaryText(state.cfg.thermistorBoundary)));
@@ -559,7 +579,11 @@ renderEditor();sync();showGeometry(true);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
                     state.resultSourceRevision,100*h.computedAreaFraction,100*p.computedAreaFraction,100*p.prescribedAreaFraction));
-                if isBead()
+                if isFullBead()
+                    origins=struct('run','本次计算','read','已保存计算','resume','接续计算');
+                    tip(grid,4,sprintf('%s · 全周 56 层 · 7.809360865 µs · 珠面放热 %.6f mW', ...
+                        origins.(report.startupAction),-1000*report.wholeSurfaceHeatPowerW));
+                elseif isBead()
                     origin='本次冷启动计算';
                     if state.result.evidenceIdentity.reusedArchive,origin='使用归档温差场';end
                     tip(grid,4,sprintf('%s · 周向单元 %g°。点选面元可查壁压、入壁热流、首层流体温度和各量的方法。', ...
@@ -713,10 +737,10 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         if isBead()
             try
-                preparing=true;message('正在生成热敏珠扇区体网…');
+                preparing=true;message('正在准备并核对所选热敏珠体网…');
                 candidate=prepareThermistorWorkbenchMesh(state.orientedMesh,state.cfg.thermistorAngularCells);
                 state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));report=[];
-                preparing=false;renderEditor();showGeometry(true);message('扇区体网已生成，可以设置边界条件。');
+                preparing=false;renderEditor();showGeometry(true);message('体网已就绪，可以设置边界条件。');
             catch ex,preparing=false;if isgraphics(fig),renderEditor();showError(ex);end,end
             return;
         end
@@ -762,6 +786,10 @@ renderEditor();sync();showGeometry(true);
         next=state.cfg;
         if isBead()
             next.thermistorBoundary=[];
+            if isFullBead()
+                b=thermistorWorkbenchBoundary();b.speed=6;b.wallTemperatureK=303.15;
+                next.thermistorBoundary=thermistorWorkbenchBoundary(b,48);return;
+            end
             if ~strcmp(controls.beadCondition.Value,'none')
                 b=thermistorWorkbenchBoundary();
                 if strcmp(controls.beadCondition.Value,'power')
@@ -952,7 +980,7 @@ renderEditor();sync();showGeometry(true);
                 [~,fs]=thermistorWorkbenchBoundary(next.thermistorBoundary,next.thermistorAngularCells);
                 state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
                 state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',fs));
-                message(['已确认 3 m/s、293.15 K 空气，' beadBoundaryText(next.thermistorBoundary) '。']);go(4);return;
+                message(sprintf('已确认 %g m/s、293.15 K 空气，%s。',fs.speed,beadBoundaryText(next.thermistorBoundary)));go(4);return;
             end
             if isCM011()
                 [~,fs]=cm011WorkbenchBoundary(next.cm011Boundary);
@@ -1003,13 +1031,21 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         if isEmbedded(),startEngine();return;end
         try
-            state=aeroHeatWorkflowState('beginSolve',state);token=state.solveId;revision=state.solveInputRevision;
+            if nargin<3,source='solve';end
+            request=struct();
+            if isFullBead()
+                if strcmp(source,'solve'),source='run';end
+                request.startupAction=source;
+                if ~strcmp(source,'run'),request.runDirectory=strtrim(controls.beadDirectory.Value);end
+            end
+            state=aeroHeatWorkflowState('beginSolve',state,request);token=state.solveId;revision=state.solveInputRevision;
             renderEditor();
             frozen=state.frozenInputs;
             if isBead()
-                if nargin<3,source='solve';end
                 frozen.cfg.thermistorResultSource=source;
-                if strcmp(source,'archive'),message('正在核对体网，并用归档温差场计算当前壁温结果…');
+                if isFullBead()
+                    message('正在核对全周计算的网格、初场和物理时刻…');
+                elseif strcmp(source,'archive'),message('正在核对体网，并用归档温差场计算当前壁温结果…');
                 else,message('正在使用已确认的体网从冷初场计算热敏珠…');end
             else,message('正在显式计算当前工况；各阶段完成不代表全面积已求解。');end
             [solved,fs,newReport]=quietTriple(@()runAeroHeatSingleCase(frozen.mesh,frozen.cfg,@progress));
@@ -1056,6 +1092,14 @@ renderEditor();sync();showGeometry(true);
     end
     function yes=isBead()
         yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'thermistorB');
+    end
+    function yes=isFullBead()
+        yes=isBead() && state.cfg.thermistorAngularCells==48;
+    end
+    function chooseBeadDirectory(~,~)
+        % 这里只选择现有运行目录，读取、接续与新算分别由计算页按钮触发。
+        folder=uigetdir(fullfile(state.cfg.projectRoot,'outputs','v294_validation'),'选择热敏珠计算根目录');
+        if ~isequal(folder,0),controls.beadDirectory.Value=folder;end
     end
     function loadBeadModel(~,~)
         % 固定朝向的民用试件从模型步骤进入主流程，原面在网格步骤继续使用。

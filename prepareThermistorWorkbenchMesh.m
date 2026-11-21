@@ -1,11 +1,19 @@
 function mesh=prepareThermistorWorkbenchMesh(oriented,angularCells)
 %PREPARETHERMISTORWORKBENCHMESH 生成独立扇区体网，保留全珠原面和原生壁面预览。
-assert(isscalar(angularCells) && ismember(angularCells,[2 4]),'RAH:Bead:Angle','请选择已支持的周向网格。');
+assert(isscalar(angularCells) && ismember(angularCells,[2 4 48]),'RAH:Bead:Angle','请选择已支持的周向网格。');
 [canonical,source]=thermistorWorkbenchModel();
 assert(isequal(canonical.V,oriented.V) && isequal(canonical.F,oriented.F), ...
     'RAH:Bead:Geometry','当前几何与登记的 B 型珠体不符。');
 root=fileparts(mfilename('fullpath'));
 work=fullfile(root,'outputs',['thermistor_grid_' char(java.util.UUID.randomUUID())]);mkdir(work);
+if angularCells==48
+    % 全周计算复用已验收的 56 层体网；预览直接取实际壁面节点。
+    manifest=fullfile(work,'prepared.json');
+    runCM011Python({fullfile(root,'scripts','runThermistorStartupJob.py'),'prepare',manifest},fullfile(work,'prepare.log'));
+    mesh=canonical;p=jsondecode(fileread(manifest));
+    p.manifest=manifest;p.manifestSHA256=cm011FileSHA256(manifest);mesh.thermistorPrepared=p;
+    verifyThermistorWorkbenchMesh(mesh,angularCells);return;
+end
 folder=fullfile(work,'mesh');
 runCM011Python({fullfile(root,'scripts','runThermistorCase.py'),folder,'--mesh-only','--angular-cells',num2str(angularCells)}, ...
     fullfile(work,'prepare.log'));
