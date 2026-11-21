@@ -2,11 +2,15 @@ function [current,report]=runThermistorLeadWorkbench(input,cfg,progress)
 % 模块一：绑定已确认的米制原面、求解体网、冻结热边界与所选数据来源。
 root=fileparts(mfilename('fullpath'));p=input.thermistorPrepared;
 midbody=strcmp(cfg.thermistorVariant,'midbody');options={};
+refineLeads=isfield(cfg,'thermistorRefineLeads') && cfg.thermistorRefineLeads;
 if midbody
     archive='midbody3';options={'--midbody'};caseLabel='光滑 B 型热敏珠 · 中段加密';
     scope='光滑名义珠体，30° 对称稳态，中段近壁过渡区局部加密';
 else
     archive='leads3';caseLabel='带引线 B 型热敏珠';scope='两端带线名义试件，30° 对称稳态，完整暴露面含接头及端面';
+    if refineLeads
+        archive='leadsMidbody3';options={'--refine-leads'};caseLabel='带引线 B 型热敏珠 · 中段加密';
+    end
 end
 contract=jsondecode(fileread(fullfile(root,'cases','thermistor_b',[archive '.json'])));
 assert(isequal(cfg.thermistorBoundary,thermistorWorkbenchBoundary()) && cfg.thermistorAngularCells==4, ...
@@ -73,6 +77,9 @@ current.evidenceIdentity.sourceTraceable=true;current.evidenceIdentity.productio
 current.evidenceIdentity.scope=[scope '。实验对照为珠体平均换热。'];
 current=attachThermistorLeadNearWall(current,runFolder,folder);
 if midbody,current=attachThermistorPairedControl(current,'midbody');
+elseif refineLeads
+    current=attachThermistorPairedControl(current,'wiredRefined');
+    current=attachThermistorLeadGridComparison(current);
 else,current=attachThermistorPairedControl(current,'wired');end
 report.outputDirectory=runFolder;report.regions=s.regions;
 

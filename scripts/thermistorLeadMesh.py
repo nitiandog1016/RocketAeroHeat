@@ -167,14 +167,12 @@ def section(first,extent=20,smooth=False,midbody=False):
         wired,_=meridian()
         front=wall_layers(wired,first)[-1]
         background=replace_caps(front,layers[-1],outer_mesh(front,extent))
-        if midbody:
-            from thermistorMidbodyMesh import refine_midbody
-            background=refine_midbody(background,wall)
-        xy,tri,far,interface,active=background
     else:
-        if midbody:
-            raise ValueError("中段网距对照仅适用于光滑热敏珠")
-        xy,tri,far,interface,active=outer_mesh(layers[-1],extent)
+        background=outer_mesh(layers[-1],extent)
+    if midbody:
+        from thermistorMidbodyMesh import refine_midbody
+        background=refine_midbody(background,wall)
+    xy,tri,far,interface,active=background
     extra=np.setdiff1d(active,interface)
     translate=np.full(len(xy),-1,int)
     translate[interface]=np.arange(width)+(len(layers)-1)*width

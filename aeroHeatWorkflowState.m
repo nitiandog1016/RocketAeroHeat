@@ -150,6 +150,7 @@ switch action
             requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','试件来源');
             requireUnchangedConfigSection(cfg,state.cfg,'thermistorAngularCells','周向网格');
             requireUnchangedConfigSection(cfg,state.cfg,'thermistorVariant','试件外形');
+            requireUnchangedConfigSection(cfg,state.cfg,'thermistorRefineLeads','带线中段网距');
         end
         if ~isequaln(cfg,state.cfg)
             state=invalidate(state,'边界条件或工程算法改变');

@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v300 带引线热敏珠的中段网距和引线效应](validation/v300/RESULTS.md) · [七区与四场](validation/v300/evidence/comparison.json) · [下一项](validation/v300/NEXT_DECISION.md)。带线珠部放热从 11.94750 降至 10.27423 mW，整件放热 10.87809 mW。
+
 - [v299 光滑热敏珠中段过渡网加密](validation/v299/RESULTS.md) · [功率与热峰](validation/v299/evidence/comparison.json) · [下一项](validation/v299/NEXT_DECISION.md)。同一光滑原面上的放热降低 1.68505 mW，整珠平均 h 与实验相差 +31.04%。
 
 - [v298 光滑与带线热敏珠的配对控制](validation/v298/RESULTS.md) · [三项功率](validation/v298/evidence/comparison.json) · [网距与额外放热](validation/v298/evidence/spatial.json) · [下一项](validation/v298/NEXT_DECISION.md)。同一光滑几何换用混合网的放热差为 +2.79986 mW，匹配方法下加入引线的珠部差为 −0.36120 mW。

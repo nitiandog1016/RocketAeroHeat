@@ -1,10 +1,13 @@
 function mesh=attachThermistorPairedControl(mesh,kind)
 % 模块一：按已验收的模型、冻结工况和源帧配对。其他已算结果仍可独立使用。
-kind=validatestring(kind,{'wired','historical','midbody'});
+kind=validatestring(kind,{'wired','historical','midbody','wiredRefined'});
 [folder,guard]=openThermistorArchive('paired3'); %#ok<NASGU>
 c=jsondecode(fileread(fullfile(folder,'comparison.json')));
 id=mesh.evidenceIdentity.sourceFrame;condition=mesh.hybridCondition;
-if strcmp(kind,'midbody')
+if strcmp(kind,'wiredRefined')
+    s=mesh.thermistorLead;
+    sourceMatches=strcmp(id.bodySHA256,c.bodies.wired) && strcmp(id.sha256,s.sourceFrameSHA256) && strcmp(id.wallSHA256,s.wallSHA256);
+elseif strcmp(kind,'midbody')
     s=mesh.thermistorMidbody;
     sourceMatches=strcmp(id.bodySHA256,c.bodies.smooth) && strcmp(id.sha256,s.sourceFrameSHA256) && strcmp(id.wallSHA256,s.wallSHA256);
 else
@@ -18,13 +21,24 @@ end
 n=size(mesh.F,1);w=mesh.hybridWall;v=mesh.V;f=mesh.F;
 area=vecnorm(cross(v(f(:,2),:)-v(f(:,1),:),v(f(:,3),:)-v(f(:,1),:),2),2,2)/2;
 q=nan(n,1);pressure=q;reverse=q;reverseChange=q;
-if strcmp(kind,'wired')
+if any(strcmp(kind,{'wired','wiredRefined'}))
     % 模块二：两种几何按共同三角面比较。引线、接头和线端的光滑对照保持未知。
-    mapFile=fullfile(folder,'shared.csv');bodyFile=fullfile(folder,'body.json');wallFile=fullfile(folder,'wall.csv');
+    mapFile=fullfile(folder,'shared.csv');referenceFolder=folder;
+    if strcmp(kind,'wiredRefined')
+        % 两种加密网共用原面配对表，参考压力和热流取加密光滑解的真实终帧。
+        [referenceFolder,refGuard]=openThermistorArchive('midbody3'); %#ok<NASGU>
+        ref=jsondecode(fileread(fullfile(referenceFolder,'summary.json')));
+        refFlow=jsondecode(fileread(fullfile(referenceFolder,'flow.json')));
+        assert(strcmp(ref.bodySHA256,c.bodies.smooth) && strcmp(ref.sourceFrameSHA256,refFlow.sourceFrameSHA256));
+        tableHash=ref.wallSHA256;flowHash=refFlow.tableSHA256;
+    else
+        tableHash=c.primaryTables.smooth;flowHash=c.flow.smoothNative.tableSHA256;
+    end
+    bodyFile=fullfile(referenceFolder,'body.json');wallFile=fullfile(referenceFolder,'wall.csv');
     assert(strcmp(cm011FileSHA256(mapFile),c.sharedMapSHA256) && strcmp(cm011FileSHA256(bodyFile),c.bodies.smooth) && ...
-        strcmp(cm011FileSHA256(wallFile),c.primaryTables.smooth),'RAH:Bead:Pair','公共面来源不符。');
+        strcmp(cm011FileSHA256(wallFile),tableHash),'RAH:Bead:Pair','公共面来源不符。');
     pair=readtable(mapFile);b=jsondecode(fileread(bodyFile));table=readtable(wallFile);
-    flowFile=fullfile(folder,'flow.csv');assert(strcmp(cm011FileSHA256(flowFile),c.flow.smoothNative.tableSHA256));
+    flowFile=fullfile(referenceFolder,'flow.csv');assert(strcmp(cm011FileSHA256(flowFile),flowHash));
     flow=readtable(flowFile);i=pair.wiredID;j=pair.smoothID;
     assert(numel(i)==c.commonFaces && numel(unique(i))==numel(i) && numel(unique(j))==numel(j) && ...
         isequal(flow.face_id,table.faceID+1) && all(table.regionID(j)==2));
@@ -36,6 +50,12 @@ if strcmp(kind,'wired')
     dq=w.heatFluxWm2-q;dp=w.pressurePa-pressure;
     reverseChange(i)=mesh.thermistorLeadFlow.reverse(i)-reverse(i);
     order='带线减光滑';scope='仅限两个原面三个顶点、面积与几何位置相同的珠面。';
+    if strcmp(kind,'wiredRefined')
+        order='带线减光滑 · 两网均中段加密';
+        c=struct('powerW',struct('pairedSmooth',ref.totalOutwardW,'wiredBeadAndJoints',s.beadAndJointsW), ...
+            'sourceFrames',struct('wired',id.sha256,'smooth',ref.sourceFrameSHA256),'commonFaces',numel(i), ...
+            'commonAreaM2',sum(area(i)),'sharedMapSHA256',c.sharedMapSHA256,'referenceWallSHA256',tableHash);
+    end
 elseif strcmp(kind,'midbody')
     % 模块三：新旧混合网拥有相同的原面、顺序和壁温，可直接逐面比较。
     wallFile=fullfile(folder,'wall.csv');flowFile=fullfile(folder,'flow.csv');bodyFile=fullfile(folder,'body.json');

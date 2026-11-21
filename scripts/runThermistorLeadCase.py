@@ -46,8 +46,9 @@ SPECIES_CLIPPING= NO
 """
 
 
-def midbody_sources():
-    return [ROOT/"docs/validation/v299/PLAN.md",ROOT/"scripts/thermistorMidbodyMesh.py"]
+def midbody_sources(smooth):
+    plan="v299" if smooth else "v300"
+    return [ROOT/f"docs/validation/{plan}/PLAN.md",ROOT/"scripts/thermistorMidbodyMesh.py"]
 
 
 def build(out,first,smooth=False,midbody=False):
@@ -73,7 +74,7 @@ def build(out,first,smooth=False,midbody=False):
     if smooth:
         sources.extend((ROOT/"docs/validation/v298/PLAN.md",ROOT/"scripts/thermistorCapMesh.py"))
     if midbody:
-        sources.extend(midbody_sources())
+        sources.extend(midbody_sources(smooth))
     write_json(out/"engine_request.json",dict(workDirectory=str(out),configFile="case.cfg",meshFile="mesh.su2",
                threads=1,maximumSeconds=720,jobToken=str(uuid.uuid4()),
                sourceFiles=[p.relative_to(ROOT).as_posix() for p in sources]))
@@ -86,7 +87,7 @@ def prepare(out,first,smooth=False,midbody=False):
     options=["--smooth-control"] if smooth else []
     if smooth:files.extend([ROOT/"scripts/thermistorCapMesh.py",ROOT/"docs/validation/v298/PLAN.md"])
     if midbody:
-        files.extend(midbody_sources())
+        files.extend(midbody_sources(smooth))
         options.append("--refine-midbody")
     rec=observe([sys.executable,str(script),"mesh-worker",str(out),"--first",str(first),*options],out,
                 {str(f):sha(f) for f in files},180,200*1024**2)
@@ -110,13 +111,13 @@ if __name__=="__main__":
     cli.add_argument("folder",type=Path)
     cli.add_argument("--first",type=float,choices=(.002,.001),default=.002)
     cli.add_argument("--smooth-control",action="store_true",help="以相同椭球替换两端引线，保留远区体网")
-    cli.add_argument("--refine-midbody",action="store_true",help="局部加密光滑控制的中段过渡区")
+    cli.add_argument("--refine-midbody",action="store_true",help="局部加密热敏珠中段的过渡区")
     args=cli.parse_args()
     out=args.folder.resolve();out.relative_to(ROOT/"outputs")
-    if args.smooth_control and args.action not in ("prepare","mesh-worker"):
+    if (args.smooth_control or args.refine_midbody) and args.action not in ("prepare","mesh-worker"):
         cli.error("几何选择仅用于准备输入，推进与审核读取已保存的工况")
-    if args.refine_midbody and (not args.smooth_control or args.first!=.001):
-        cli.error("中段过渡区对照需要 --smooth-control --first .001")
+    if args.refine_midbody and args.first!=.001:
+        cli.error("中段过渡区对照需要 --first .001")
     if args.action=="prepare":prepare(out,args.first,args.smooth_control,args.refine_midbody)
     elif args.action=="mesh-worker":build(out,args.first,args.smooth_control,args.refine_midbody)
     elif args.action=="probes":probes(out)

@@ -268,7 +268,12 @@ renderEditor();sync();showGeometry(true);
                 if isBead()
                     grid=form(8);
                     if isMixedBead()
-                        tip(grid,1,[mixedBeadLabel() ' · 30° 对称扇区 · 周向单元 7.5°']);
+                        if hasBeadLeads()
+                            controls.leadGrid=choice(grid,1,'带线试件体网',{'原混合网','中段加密'},[0 1],double(getOption(state.cfg,'thermistorRefineLeads',false)));
+                            controls.leadGrid.ValueChangedFcn=@changeLeadGrid;
+                        else
+                            tip(grid,1,[mixedBeadLabel() ' · 30° 对称扇区 · 周向单元 7.5°']);
+                        end
                         controls.generate=button(grid,2,'生成试件混合体网',@generate);
                         if ~isempty(state.mesh)
                             p=state.mesh.thermistorPrepared;
@@ -636,16 +641,26 @@ renderEditor();sync();showGeometry(true);
                 end
                 tip(grid,8,'任意X截面曲线和导出使用同一快照。完成计算不等于全面积已解；修改上游使结果失效，浏览与导出不重算。');
                 controls.staticAir=button(grid,11,'静止空气 · 节点探针',@readStaticAirProbe);
+                if isfield(state.result,'thermistorLeadGrid')
+                    controls.pairedHeat.Text='查看引线影响';
+                    controls.staticAir.Layout.Column=2;
+                    controls.gridHeat=button(grid,11,'查看网距影响',@(~,~)showPairedHeat([],[],true));
+                    controls.gridHeat.Layout.Column=1;
+                end
         end
         sync();
     end
-    function showPairedHeat(~,~)
+    function showPairedHeat(~,~,gridEffect)
         % 打开当前冻结结果的配对证据页，初次定位绝对热流差最大的可比面。
-        pair=state.result.thermistorPaired;
-        ids=find(isfinite(pair.deltaHeatWm2));[~,k]=max(abs(pair.deltaHeatWm2(ids)));
+        if nargin==3 && gridEffect
+            delta=state.result.thermistorLeadGrid.deltaHeatWm2;key='leadGridDeltaHeat';order='带线加密减原网';
+        else
+            pair=state.result.thermistorPaired;delta=pair.deltaHeatWm2;key='pairedDeltaHeat';order=pair.order;
+        end
+        ids=find(isfinite(delta));[~,k]=max(abs(delta(ids)));
         tab=webUI.evidenceTab;tab.Parent.SelectedTab=tab;
-        webUI.evidenceView.selectField('pairedDeltaHeat');webUI.evidenceView.inspectFace(ids(k),[]);
-        message(sprintf('%s，最大绝对差位于面元 %d，入壁热流差 %+.3f W/m²。',pair.order,ids(k),pair.deltaHeatWm2(ids(k))));
+        webUI.evidenceView.selectField(key);webUI.evidenceView.inspectFace(ids(k),[]);
+        message(sprintf('%s，最大绝对差位于面元 %d，入壁热流差 %+.3f W/m²。',order,ids(k),delta(ids(k))));
     end
     function grid=form(rows)
         grid=uigridlayout(editor,[rows 2]);grid.ColumnWidth={138,'1x'};
@@ -786,7 +801,7 @@ renderEditor();sync();showGeometry(true);
         if isBead()
             try
                 preparing=true;message('正在准备并核对所选热敏珠体网…');
-                if isMixedBead(),candidate=prepareThermistorLeadMesh(state.orientedMesh,@()isgraphics(fig),state.cfg.thermistorVariant);
+                if isMixedBead(),candidate=prepareThermistorLeadMesh(state.orientedMesh,@()isgraphics(fig),state.cfg.thermistorVariant,getOption(state.cfg,'thermistorRefineLeads',false));
                 else,candidate=prepareThermistorWorkbenchMesh(state.orientedMesh,state.cfg.thermistorAngularCells,@()isgraphics(fig));end
                 state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));report=[];
                 preparing=false;renderEditor();showGeometry(true);message('体网已就绪，可以设置边界条件。');
@@ -1155,7 +1170,10 @@ renderEditor();sync();showGeometry(true);
         yes=isBead() && any(strcmp(getOption(state.cfg,'thermistorVariant','smooth'),{'leads','midbody'}));
     end
     function label=mixedBeadLabel()
-        if hasBeadLeads(),label='两端带引线';else,label='光滑珠中段加密';end
+        if hasBeadLeads()
+            label='两端带引线';
+            if getOption(state.cfg,'thermistorRefineLeads',false),label='带线珠中段加密';end
+        else,label='光滑珠中段加密';end
     end
     function chooseBeadDirectory(~,~)
         % 这里只选择现有运行目录，读取、接续与新算分别由计算页按钮触发。
@@ -1171,6 +1189,7 @@ renderEditor();sync();showGeometry(true);
             [raw,source]=thermistorWorkbenchModel(variant);
             next=state.cfg;next.computationBackend='thermistorB';next.thermistorAngularCells=cells;next.thermistorBoundary=[];
             next.thermistorVariant=variant;
+            next.thermistorRefineLeads=false;
             state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'orientedMesh',raw,'modelSource',source,'cfg',next));
             embeddedVolume=[];qualityPreview=false;creasePreview=false;candidatePreview=[];preview=raw;report=[];
             go(2);
@@ -1182,6 +1201,7 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         next=state.cfg;next.computationBackend='engineering';next=rmfield(next,{'thermistorAngularCells','thermistorBoundary'});
         if isfield(next,'thermistorVariant'),next=rmfield(next,'thermistorVariant');end
+        if isfield(next,'thermistorRefineLeads'),next=rmfield(next,'thermistorRefineLeads');end
         state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
         report=[];preview=[];renderEditor();showGeometry(true);message('请选择新的输入模型。');
     end
@@ -1190,6 +1210,14 @@ renderEditor();sync();showGeometry(true);
         next=state.cfg;next.thermistorAngularCells=field.Value;next.thermistorBoundary=[];
         state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
         report=[];renderEditor();showGeometry(true);message('周向分辨率已改变，请生成新网格并确认边界。');
+    end
+    function changeLeadGrid(field,~)
+        % 带线几何共用同一原面表。更换体网后，清除原计算和热边界确认。
+        refine=logical(field.Value);
+        if state.busy || preparing || refine==getOption(state.cfg,'thermistorRefineLeads',false),return;end
+        next=state.cfg;next.thermistorRefineLeads=refine;next.thermistorBoundary=[];
+        state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));
+        report=[];renderEditor();showGeometry(true);message('带线体网选项已改变，请生成网格并确认边界。');
     end
     function meshBackendChoice(grid,row)
         controls.meshBackend=choice(grid,row,'网格方法',{'工程表面重构','CM-011 低速半域'}, ...

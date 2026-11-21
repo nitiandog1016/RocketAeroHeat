@@ -485,8 +485,13 @@ end
 % 热敏珠的配对控制随原面云图、探针和 CSV 共用同一组已核对字段。
 if isfield(mesh,'thermistorPaired')
     pair=mesh.thermistorPaired;pc=pair.summary;data.thermistorPair=pc;
-    note=sprintf('3 m/s 珠部放热：原结构网光滑 %.5f mW，配对混合网光滑 %.5f mW，带线含接头 %.5f mW。', ...
-        1000*pc.powerW.oldSmooth,1000*pc.powerW.pairedSmooth,1000*pc.powerW.wiredBeadAndJoints);
+    if strcmp(pair.kind,'wiredRefined')
+        note=sprintf('中段加密下，光滑珠体放热 %.5f mW，带线珠体含接头 %.5f mW。', ...
+            1000*pc.powerW.pairedSmooth,1000*pc.powerW.wiredBeadAndJoints);
+    else
+        note=sprintf('3 m/s 珠部放热：原结构网光滑 %.5f mW，配对混合网光滑 %.5f mW，带线含接头 %.5f mW。', ...
+            1000*pc.powerW.oldSmooth,1000*pc.powerW.pairedSmooth,1000*pc.powerW.wiredBeadAndJoints);
+    end
     tab={'pairedSmoothHeat','配对光滑入壁热流','kW/m²',pair.heatFluxWm2/1000,'光滑混合网强等温标量的壁面离散反力';
          'pairedDeltaHeat',['入壁热流差 · ' pair.order],'W/m²',pair.deltaHeatWm2,'同位置两解的入壁热流相减';
          'pairedDeltaPressure',['壁压差 · ' pair.order],'Pa',pair.deltaPressurePa,'同位置两解的绝对壁压相减';
@@ -515,6 +520,26 @@ if isfield(mesh,'thermistorPaired')
             if bound>0,data.comparisonColorRanges.(tab{j,1})=[-bound bound];end
         end
     end
+end
+% 带线旧网与加密网在七区均可对照，和只在共同珠面定义的几何差别分开显示。
+if isfield(mesh,'thermistorLeadGrid')
+    g=mesh.thermistorLeadGrid;
+    data.leadGridReference=rmfield(g,{'baseHeatFluxWm2','deltaHeatWm2','deltaPressurePa','deltaNearWallK'});
+    scope='两次带线计算的 10,272 个原面、首层节点与热边界相同。';
+    tab={'leadGridBaseHeat','入壁热流 · 带线原网','kW/m²',g.baseHeatFluxWm2/1000,'原网强温差标量的壁节点反力按邻接面积守恒分配'; ...
+         'leadGridDeltaHeat','入壁热流差 · 带线加密减原网','W/m²',g.deltaHeatWm2,'两套带线体网的原面入壁热流相减'; ...
+         'leadGridDeltaPressure','壁压差 · 带线加密减原网','Pa',g.deltaPressurePa,'两套带线体网的同面绝对壁压相减'; ...
+         'leadGridDeltaTemperature','首层温差 · 带线加密减原网','K',g.deltaNearWallK,'同一首层节点位置的面平均流体温度相减'};
+    for j=1:size(tab,1)
+        add(tab{j,1},tab{j,2},tab{j,3},tab{j,4},ones(n,1),repmat(tab(j,5),n,1),scope);
+        if j>1
+            bound=max(abs(tab{j,4}));if bound>0,data.comparisonColorRanges.(tab{j,1})=[-bound bound];end
+        end
+    end
+    values=[data.comparisonColorRanges.heatFlux(:);g.baseHeatFluxWm2/1000];
+    limits=[min(values) max(values)];
+    data.comparisonColorRanges.leadGridBaseHeat=limits;data.comparisonColorRanges.heatFlux=limits;
+    data.comparisonColorRanges.pairedSmoothHeat=limits;
 end
 % 全周启动步使用独立的时间、算法和储热账，供云图、截面、探针与离线导出共用。
 if isfield(mesh,'thermistorStartup')

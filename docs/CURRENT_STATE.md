@@ -1,12 +1,12 @@
 # 当前交接
 
-2026-11-21。公开民用 B 型热敏珠在 3 m/s、给定壁温 305.15 K 下完成中段加密对照。**光滑珠体放热由 12.30870 降至 10.62365 mW**，按上一版相同分带，中段与原结构网的差额缩小 71.98%。平均 h 由 331.52 降到 286.14 W/(m²·K)，仍比实验图读值高 31.04%。光滑试件 6,624 / 6,624 面共 3.089123 mm² 的壁压与热流均已算出；新增覆盖 0 面、0 m²，逐面联合实验验证 0 m²。冷态终点、延续、独立收支与导出已核对。[v299 报告](validation/v299/RESULTS.md) · [原面功率与热峰](validation/v299/evidence/comparison.json)
+2026-11-21。公开民用带引线 B 型热敏珠在 3 m/s、给定壁温 305.15 K 下已完成中段加密。**珠部含接头放热 10.27423 mW，整件 10.87809 mW**。中段加密使珠部放热降低 14.01%，与同样加密的光滑体比较，加入引线使珠部少放热 0.34942 mW。平均 h 仍比图读实验高 26.73%。壁压与入壁热流覆盖 10,272 / 10,272 面、3.196651 mm²；新增覆盖 0 面、0 m²，逐面联合实验验证为 0 m²。[v300 报告](validation/v300/RESULTS.md) · [四场与七区结果](validation/v300/evidence/comparison.json)
 
-<!-- records:last_completed=v299 -->
+<!-- records:last_completed=v300 -->
 <!-- records:active=none -->
-<!-- records:base_commit=4d4b21cdbdbaad7888b00a9452d1cc982e14dd88 -->
+<!-- records:base_commit=2033ae3ed34eef1febbd51346fe35cee971dec30 -->
 
-在主侧栏选择“光滑热敏珠 · 中段加密”。结果页可按同一原面比较加密前后的入壁热流、壁压和反向区。[本机三维页](../outputs/v299_validation/midbody_ui01/workbench/index.html) · [实际网距](validation/v299/evidence/inputs.json) · [工作台与截面导出](validation/v299/evidence/workbench.json)
+在带线模型的网格页选择“中段加密”。查看结果时可分别选择“查看网距影响”和“查看引线影响”。两套云图、探针、截面及完整导出已逐面核对。[本机三维页](../outputs/v300_validation/wired_ui01/workbench/index.html) · [工作台验收](validation/v300/evidence/workbench.json)
 
 ## 带线试件
 
@@ -15,6 +15,8 @@ v298 配对中，带线珠体含接头放热 11.94750 mW，相对同方法光滑
 从“选用带引线 B 型热敏珠”进入五步侧栏。工作台已通过网格、边界、冷态新算、归档、三维云图与七区探针验收。最大放热在迎风侧引线面元 207。后引线、后接头和珠体背流侧共有 1,536 面出现壁剪切与首层流速同时反向，两套近壁网辨认出同一批原面。新算任务 `thermistor_leads_run_d5d2003c-4d02-45b2-8fd1-0dd2641a07e0` 已有正常终态和逐面核对。引线长度、接头圆角、全体等温均为名义假设。[本机三维页](../outputs/v297_validation/ui03/workbench/index.html) · [科研出口](validation/v297/evidence/workbench.json) · [近壁数据](validation/v297/evidence/nearwall.json)
 
 ## 光滑热敏珠
+
+v299 光滑控制完成了 6,624 原面的中段加密对照，放热由 12.30870 降至 10.62365 mW；中段与原结构网的额外放热缩小 71.98%。[原面分带](validation/v299/evidence/comparison.json) · [三维页](../outputs/v299_validation/midbody_ui01/workbench/index.html)
 
 从“选用 B 型热敏珠”进入网格页，选择“6 m/s · 360° 全周 · 56 层”，准备体网、确认边界后可新算、读取已完成计算或接续。第二套安装的任务 `d457118c-1e76-4618-ab24-5bcab5bfce09` 已完成全部 11 阶段，MATLAB 耗时 45.63 min。末步收支差 −0.9432 nW，热峰位于工作台面元 5211。初场冷态恢复与新算在同机两个安装目录验收。另一台电脑复算需安装固定依赖。[本机三维页](../outputs/v296_validation/desktop_final/outputs/thermistor_view_fb14f0d9-dab2-4f6f-84e0-e505ac1861cb/workbench/index.html) · [离线逐面核对](validation/v296/evidence/offline.json) · [安装方法](validation/v296/INSTALL.md)
 
@@ -34,7 +36,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-[当前下一决定](validation/v299/NEXT_DECISION.md) 是在带线 B 型试件上做一次相同的中段加密，分别核对珠体、接头、引线和端面的放热，并与 v299 的共同珠面直接比较。带线加密计算尚未启动。
+[当前下一决定](validation/v300/NEXT_DECISION.md) 是在 v300 带线体网上做一次带斜率限制的温差标量输运对照，固定原流场离散、边界和物性。以全域温界、残差、独立反力、同阶段收支和七区结果决定采用或关闭。该对照尚未启动。
 
 ## 自绘模型保留的状态
 

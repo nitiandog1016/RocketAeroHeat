@@ -12,6 +12,7 @@ from thermistorLeadSurface import collect
 
 CONTRACT=ROOT/"cases/thermistor_b/leads3.json"
 MIDBODY=CONTRACT.with_name("midbody3.json")
+REFINED_LEADS=CONTRACT.with_name("leadsMidbody3.json")
 
 
 def check_grid(folder,contract=CONTRACT):
@@ -26,8 +27,7 @@ def check_grid(folder,contract=CONTRACT):
 
 
 def geometry(folder,contract=CONTRACT):
-    refined=contract==MIDBODY
-    prepare(folder,.001,smooth=refined,midbody=refined)
+    prepare(folder,.001,smooth=contract==MIDBODY,midbody=contract in (MIDBODY,REFINED_LEADS))
     fixed=check_grid(folder,contract)
     with np.load(folder/"nodes.npz") as arr:
         wall=arr["wallMap"]
@@ -69,10 +69,13 @@ if __name__=="__main__":
     cli.add_argument("action",choices=("prepare","calculate"))
     cli.add_argument("folder",type=Path)
     cli.add_argument("--prepared",type=Path)
-    cli.add_argument("--midbody",action="store_true",help="使用光滑热敏珠中段加密网")
+    meshes=cli.add_mutually_exclusive_group()
+    meshes.add_argument("--midbody",action="store_true",help="使用光滑热敏珠中段加密网")
+    meshes.add_argument("--refine-leads",action="store_true",help="使用带线热敏珠中段加密网")
     args=cli.parse_args()
     folder=args.folder.resolve();folder.relative_to(ROOT/"outputs")
     contract=MIDBODY if args.midbody else CONTRACT
+    if args.refine_leads:contract=REFINED_LEADS
     if args.action=="prepare":geometry(folder,contract)
     else:
         if args.prepared is None:cli.error("请指定 --prepared 及已确认的体网目录")
