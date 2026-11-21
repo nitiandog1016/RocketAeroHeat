@@ -63,6 +63,7 @@ current.evidenceIdentity.sourceTraceable=true;current.evidenceIdentity.productio
 current.evidenceIdentity.scope='3 m/s、−Y 侧向来流，20D 外域的三维不可压层流稳态解，侧吹实验精度未知。';
 current=attachThermistorOuterDomain(current);
 current=attachThermistorTipSpacing(current);
+current=attachThermistorAngularSpacing(current);
 report.outputDirectory=runFolder;report.regions=s.regions;
     function pulse()
         if ~isempty(progress),progress(struct('phase','thermistorSidewind','status','running','fraction',NaN, ...

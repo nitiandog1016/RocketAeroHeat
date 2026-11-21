@@ -633,7 +633,8 @@ renderEditor();sync();showGeometry(true);
                     controls.staticAir=button(grid,12,'静止空气 · 节点探针',@readStaticAirProbe);
                     sync();return;
                 end
-                grid=form(11+double(isfield(state.result,'thermistorOuterDomain') || isfield(state.result,'thermistorLayerBudget')));d=buildAerothermalViewerData(state.result);
+                resultRows=11+double(isfield(state.result,'thermistorOuterDomain') || isfield(state.result,'thermistorLayerBudget'));
+                grid=form(resultRows+double(isfield(state.result,'thermistorAngularSpacing')));d=buildAerothermalViewerData(state.result);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
                     state.resultSourceRevision,100*h.computedAreaFraction,100*p.computedAreaFraction,100*p.prescribedAreaFraction));
@@ -701,6 +702,9 @@ renderEditor();sync();showGeometry(true);
                     controls.tipSpacing=button(grid,11,'前引线端面网距',@showTipSpacing);
                     controls.tipSpacing.Layout.Column=1;
                 end
+                if isfield(state.result,'thermistorAngularSpacing')
+                    controls.angularSpacing=button(grid,13,'周向网距 · 48 与 96 档',@showAngularSpacing);
+                end
                 if isfield(state.result,'thermistorThreeGrids') && state.result.thermistorThreeGrids.summary.available
                     controls.staticAir.Layout.Column=2;
                     controls.compareGrids=button(grid,11,'对照三档网距',@showThirdGrid);
@@ -733,6 +737,14 @@ renderEditor();sync();showGeometry(true);
         webUI.evidenceView.selectField('tipDeltaHeat');webUI.evidenceView.inspectFace(id,[]);
         message(sprintf('细网面元 %d 入壁热流 %.3f W/m²，与第二强面 %d 相差 %.3g W/m²。前端面放热 %.5f µW。', ...
             id,t.fineHeat(id),g.fineSecondFace,g.finePeakGapWm2,1e6*g.regions(7).fineOutW));
+    end
+    function showAngularSpacing(~,~)
+        % 用同一原面显示两档热流差，定位 96 档积分回原面后的最强放热区。
+        a=state.result.thermistorAngularSpacing;g=a.summary;id=g.finePeakFace;
+        tab=webUI.evidenceTab;tab.Parent.SelectedTab=tab;
+        webUI.evidenceView.selectField('angularDeltaHeat');webUI.evidenceView.inspectFace(id,[]);
+        message(sprintf('96 档最强面 %d，入壁热流 %.2f W/m²，比 48 档变化 %+.2f W/m²。整件放热 %.6f mW。', ...
+            id,a.heat96(id),a.deltaHeat(id),1e3*g.outward96W));
     end
     function showThirdGrid(~,~)
         % 定位第三档相对第二档的最大热流变化，可在变量菜单切换到上一次细化。

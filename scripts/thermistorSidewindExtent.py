@@ -74,7 +74,9 @@ def prepare(base,seed,out):
 def run(prepared,out,steps,parent=None,*,stage_files=None):
     """新域从已确认的初猜开始，续算只接受同域的真实终帧。"""
     info=read(prepared/"mesh_audit.json");digest=sha(prepared/"mesh_audit.json")
-    assert info["baseMeshSHA256"]==read(ROOT/"cases/thermistor_b/sidewind3.json")["meshSHA256"]
+    angular=read(prepared/"case.json")["angularCells"]==96
+    source="sidewindTipSpacing.json" if angular else "sidewind3.json"
+    assert info["baseMeshSHA256"]==read(ROOT/"cases/thermistor_b"/source)["meshSHA256"]
     assert info["axisAndSeamChecked"] and all(sha(prepared/k)==h for k,h in info["files"].items())
     assert sha(ENGINE)==ENGINE_SHA and 1<=steps<=7000
     initial=prepared/"initial_flow.csv";prior=0
@@ -95,7 +97,7 @@ def run(prepared,out,steps,parent=None,*,stage_files=None):
     (out/"case.cfg").write_text(cfg.replace("ITER= 7000\n",f"ITER= {steps}\n"),encoding="ascii")
     write_json(out/"engine_request.json",dict(workDirectory=str(out),configFile="case.cfg",meshFile="mesh.su2",
         threads=4,maximumSeconds=720,jobToken=str(uuid.uuid4()),sourceFiles=[p.relative_to(ROOT).as_posix() for p in locks]))
-    solve(out,memory_bytes=3*1024**3,output_bytes=1536*1024**2)
+    solve(out,memory_bytes=(4 if angular else 3)*1024**3,output_bytes=1536*1024**2)
     receipt=terminal(out)
     with (out/"history.csv").open(encoding="ascii") as f:
         header=[word.strip() for word in next(csv.reader(f,skipinitialspace=True))]

@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-21。带线 B 型热敏珠 20D、3 m/s 沿 −Y 侧吹、给定壁温 299.15 K。前端面首层距离减半后，峰值放热由 13775.439 降至 13775.125 W/m²，端面功率下降 0.01817%，整件放热 5.743196570 mW。209 与 10267 是迎风缘的两个共边镜像面，两网的排序交换，细网两者相差约 10⁻⁹ W/m²。两网均覆盖 10,272 面、3.19665061 mm²，本版新增 0 面、0 m²。侧吹逐面联合实验验证面积为 0 m²。[近壁与峰值对照](validation/v313/RESULTS.md) · [本机三维页](../outputs/v313_validation/ui02/workbench/index.html) · [20D／30D 外域对照](validation/v312/RESULTS.md)
+2026-11-21。带线 B 型热敏珠 20D、3 m/s 沿 −Y 侧吹、给定壁温 299.15 K。周向从 48 档加密至 96 档，整件放热由 5.743197 降至 5.722993 mW（−0.352%）。峰值仍在前引线端面 10267、209 两镜像面，原面最大放热密度下降 3.350%。X = 0.172 mm 背风近邻放热密度增加 12.77%。两网均覆盖 10,272 面、3.19665061 mm²，本版新增 0 面、0 m²。侧吹逐面联合实验验证面积为 0 m²。[周向对照](validation/v314/RESULTS.md) · [本机三维页](../outputs/v314_validation/ui01/workbench/index.html) · [近壁细化](validation/v313/RESULTS.md) · [外域对照](validation/v312/RESULTS.md)
 
-<!-- records:last_completed=v313 -->
+<!-- records:last_completed=v314 -->
 <!-- records:active=none -->
-<!-- records:base_commit=5b929196c565489dcbe9e319ab1e525f8f18eada -->
+<!-- records:base_commit=6c5cccbe4fdc40711cb3ee1fa70f60c449e1d930 -->
 
 前中段两轮网格排列候选已关闭。约 12 K 温差下，第三档珠部平均换热比原论文图读高 22.80%。[网格试验结论](validation/v307/RESULTS.md)
 
@@ -38,7 +38,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-固定 v313 的 20D 外域与近壁网，准备 48／96 周向间隔的同几何对照并检验原面映射。[当前下一决定](validation/v313/NEXT_DECISION.md)
+对 B 珠 3 m/s、约 12 K 温差的实际测点核对风向及珠部热量口径，按可比范围接入全表面结果与实验平均量。[当前下一决定](validation/v314/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

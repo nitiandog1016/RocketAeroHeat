@@ -52,7 +52,7 @@ def observer_binary(work):
     return exe
 
 
-def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe):
+def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe,*,angular96=False):
     """对比官方一步以及同阶段的壁面与远场收支。"""
     assert sha(ENGINE)==ENGINE_SHA
     cfg,n=re.subn(r"^ITER= \d+$","ITER= 1",(parent/"case.cfg").read_text("ascii"),flags=re.M);assert n==1
@@ -60,9 +60,10 @@ def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe):
     for name,binary in (("control",ENGINE),("observed",exe)):
         run=out/name;run.mkdir();os.link(parent/"mesh.su2",run/"mesh.su2");os.link(parent/"restart.csv",run/"initial_flow.csv")
         (run/"case.cfg").write_text(cfg,encoding="ascii")
-        invoke("step",[binary,"case.cfg","--threads","1"],run,run,90,3,trace=name=="observed")
+        invoke("step",[binary,"case.cfg","--threads","1"],run,run,150 if angular96 else 90,
+               4 if angular96 else 3,trace=name=="observed")
         rec=read(run/"step_process.json");assert rec["exitCode"]==0 and not (rec["stopReason"] or rec["livePids"])
-        assert sum(p.stat().st_size for p in run.iterdir() if p.is_file())<1024**3
+        assert sum(p.stat().st_size for p in run.iterdir() if p.is_file())<(1536 if angular96 else 1024)*1024**2
     end=[np.loadtxt(out/name/"restart.csv",delimiter=",",skiprows=1) for name in ("control","observed")]
     delta=float(np.max(abs(end[0]-end[1])));assert delta<2e-7
     stages={}
@@ -87,9 +88,15 @@ def collect(parent,exe=None):
     for name in ("case.json","nodes.npz","body.json","mesh.su2"):
         assert sha(parent/name)==rec["inputSHA256"][str(parent/name)]
     scale=c["rho"]*c["speedMps"]*c["cp"]*(c["wallK"]-c["airK"])*c["diameterM"]**2
+    angular96=c["angularCells"]==96
     with np.load(parent/"nodes.npz") as z:
         wall,near,area,xyz=(z[k] for k in ("wallMap","firstMap","area","xyz"))
-    wall_ids=np.unique(wall);budget=dict(maximum_seconds=120,memory_bytes=3*1024**3,output_bytes=450*1024**2)
+        if angular96:
+            original_area,near,pi,ci,weights=(z[k] for k in ("originalArea","originalFirstMap","overlapParent","overlapChild","shapeAreaM2"))
+            assert c["reportAngularCells"]==48 and len(original_area)==len(body["F"])
+    wall_ids=np.unique(wall)
+    budget=dict(maximum_seconds=180 if angular96 else 120,memory_bytes=(4 if angular96 else 3)*1024**3,
+                output_bytes=(850 if angular96 else 450)*1024**2)
     for name,source,release in (("reaction0",parent,True),("plus20",parent,False),("reaction20",parent/"plus20",True)):
         dest=parent/name
         if not dest.exists():observe(source,dest,release=release,**budget)
@@ -108,12 +115,20 @@ def collect(parent,exe=None):
     power=-scale*raw[wall_ids].sum();change=abs(other[wall_ids].sum()/raw[wall_ids].sum()-1)
     assert change<.002
     if exe is None:exe=observer_binary(parent/"observer_build")
-    ledger=energy(parent,parent/"ledger",state[:,9],wall_ids,raw,scale,exe)
+    ledger=energy(parent,parent/"ledger",state[:,9],wall_ids,raw,scale,exe,angular96=angular96)
     write_json(parent/"ledger/energy.json",ledger);assert abs(ledger["relativeDifference"])<.005
     # 无扇区反射，每个真实壁节点按相邻三角面面积三分之一分摊功率。
     lump=np.bincount(wall.ravel(),weights=np.repeat(area/3,3),minlength=len(xyz))
-    q=(scale*raw[wall]/lump[wall]).mean(axis=1)
-    gauge=c["rho"]*c["speedMps"]**2*state[wall,4].mean(axis=1)
+    if angular96:
+        # 先按真实细三角面积分摊节点反力，再积分细面形函数到原报告三角形。
+        from thermistorAngularSpacing import project
+        density=np.zeros(len(xyz));density[wall_ids]=scale*raw[wall_ids]/lump[wall_ids]
+        q=project(density,wall,original_area,pi,ci,weights)
+        gauge=project(c["rho"]*c["speedMps"]**2*state[:,4],wall,original_area,pi,ci,weights)
+        area=original_area
+    else:
+        q=(scale*raw[wall]/lump[wall]).mean(axis=1)
+        gauge=c["rho"]*c["speedMps"]**2*state[wall,4].mean(axis=1)
     temperature=c["airK"]+(c["wallK"]-c["airK"])*state[near,9].mean(axis=1)
     watts=-area*q;assert abs(watts.sum()-power)<1e-12
     group=np.asarray(body["regionID"]);regions=[]
@@ -128,6 +143,14 @@ def collect(parent,exe=None):
                  energy=ledger,jointExperimentVerifiedM2=0,meshSHA256=sha(parent/"mesh.su2"),bodySHA256=sha(parent/"body.json"),
                  caseSHA256=sha(parent/"case.json"),wallSHA256=sha(table),sourceFrameSHA256=info["lastFrame"],
                  sourceReactionSHA256=sha(parent/"reaction0/restart.csv"),cumulativeSteps=info["cumulativeSteps"])
+    if angular96:
+        sources=[Path(__file__).resolve(),ROOT/"scripts/thermistorAngularSpacing.py",ROOT/"scripts/thermistorReaction.py",
+                 ROOT/"scripts/beadSurfaceResult.py",ROOT/"docs/validation/v272/observe_flux.py"]
+        summary.update(nativeWallTriangles=len(wall),angularCells=96,reportAngularCells=48,
+                       wallMapping="P1-overlap-integral",temperatureSampling="v313-common-first-nodes",
+                       nodeMapSHA256=sha(parent/"nodes.npz"),plus20FrameSHA256=sha(plus/"restart.csv"),
+                       reaction20SHA256=sha(parent/"reaction20/restart.csv"),
+                       postprocessSHA256={p.relative_to(ROOT).as_posix():sha(p) for p in sources})
     write_json(out/"summary.json",summary)
 
 

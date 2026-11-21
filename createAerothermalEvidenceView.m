@@ -151,6 +151,10 @@ update(data,varargin{:});
         if startsWith(key,'tip') && isfield(d,'tipSpacingComparison')
             summary.tipSpacingComparison=d.tipSpacingComparison;
         end
+        % 周向细化回执标明 48、96 档独立终帧，以及细壁片到原面的积分映射。
+        if startsWith(key,'angular') && isfield(d,'angularSpacingComparison')
+            summary.angularSpacingComparison=d.angularSpacingComparison;
+        end
         % 带线两档网距比较同时交付原网参照帧和本次比较的温差比例。
         if startsWith(key,'leadGrid') && isfield(d,'leadGridReference')
             summary.leadGridReference=d.leadGridReference;

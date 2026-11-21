@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v314 带线热敏珠 48／96 档周向对照](validation/v314/RESULTS.md) · [迎背风曲线](validation/v314/evidence/section.png) · [下一项](validation/v314/NEXT_DECISION.md)。整件放热下降 0.352%，同截面背风近邻放热密度增加 12.77%。
+
 - [v313 带线热敏珠侧吹前端面近壁细化](validation/v313/RESULTS.md) · [端面放热图](validation/v313/evidence/cap_map.png) · [下一项](validation/v313/NEXT_DECISION.md)。端面首层距离减半，最强放热密度下降 0.00228%，两共边镜像面交换排序。
 
 - [v312 带线 B 珠侧吹远场半径对照](validation/v312/RESULTS.md) · [周向差值图](validation/v312/evidence/section_domains.png) · [下一项](validation/v312/NEXT_DECISION.md)。20D 扩至 30D 后，整件放热减少 0.00473%，两域热峰均在第 10267 面。

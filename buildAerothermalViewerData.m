@@ -679,9 +679,28 @@ if isfield(mesh,'thermistorTipSpacing')
             limit=max(abs(vals));if limit>0,data.comparisonColorRanges.(key)=[-limit limit];end
         end
     end
-    % 保持同量的 20D、30D、近壁细网三套结果可以在相同色标下读数。
-    sets={{'heatFlux','outerHeat30','tipFineHeat'},{'pressureGauge','outerGauge30','tipFineGauge'}, ...
-        {'nearWallCellTemperature','outerFirst30','tipFineFirst','tipMatched'}};
+    % 96 档返回原三角形平均值；两档温差使用前引线近壁细化后的同一组流体节点。
+    if isfield(mesh,'thermistorAngularSpacing')
+        az=mesh.thermistorAngularSpacing;ag=az.summary;data.angularSpacingComparison=ag;
+        note=sprintf('48／96 档整件放热 %.6f／%.6f mW。96 档最强两面 %d、%d，相差 %.3g W/m²。', ...
+            1e3*ag.outward48W,1e3*ag.outward96W,ag.finePeakFace,ag.fineSecondFace,ag.finePeakGapWm2);
+        tab={'angular96Heat','入壁热流 · 周向 96 档','kW/m²',az.heat96/1000,'强等温反力按细面节点面积分摊，再按细三角线性形函数积分到原面'; ...
+            'angular96Gauge','相对环境壁压 · 周向 96 档','Pa',az.gauge96,'细网原生壁节点表压在每个交叠多边形上积分，除以原面面积'; ...
+            'angular96First','同位置首层温度 · 周向 96 档','K',az.common96,'96 档终场在 48 档端面细网的三个首层节点读取温度并取面平均'; ...
+            'angularDeltaHeat','入壁热流差 · 96 减 48','W/m²',az.deltaHeat,'两档各自的壁反力守恒分配到相同原面后相减'; ...
+            'angularDeltaPressure','壁压差 · 96 减 48','Pa',az.deltaPressure,'相同环境压力下，两网在同一原面上的平均表压相减'; ...
+            'angularDeltaFirst','同位置首层温差 · 96 减 48','K',az.deltaCommon,'两网在完全相同的三个首层物理位置取温度平均后相减'};
+        for j=1:size(tab,1)
+            key=tab{j,1};vals=tab{j,4};add(key,tab{j,2},tab{j,3},vals,ones(n,1),repmat(tab(j,5),n,1),ag.scope);
+            data.fields(end).stateNote=note;
+            if startsWith(key,'angularDelta')
+                limit=max(abs(vals));if limit>0,data.comparisonColorRanges.(key)=[-limit limit];end
+            end
+        end
+    end
+    % 同量绝对场共用色标，实际存在的对照字段参与范围计算。
+    sets={{'heatFlux','outerHeat30','tipFineHeat','angular96Heat'},{'pressureGauge','outerGauge30','tipFineGauge','angular96Gauge'}, ...
+        {'nearWallCellTemperature','outerFirst30','tipFineFirst','tipMatched','angular96First'}};
     for j=1:numel(sets)
         keys=sets{j};found=ismember({data.fields.key},keys);
         vals=vertcat(data.fields(found).values);bounds=[min(vals) max(vals)];
