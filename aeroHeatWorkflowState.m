@@ -212,7 +212,7 @@ switch action
         elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && any(strcmp(optional(state.cfg,'thermistorVariant','smooth'),{'leads','midbody','sidewind'}))
             % 在按下计算按钮时确定同一任务的来源，防止另一次同工况的结果串入。
             source=validatestring(optional(payload,'leadAction','solve'),{'solve','archive'});folder='';
-            if strcmp(source,'solve')
+            if strcmp(source,'solve') && ~(strcmp(state.cfg.thermistorVariant,'sidewind') && state.cfg.thermistorAngularCells==96)
                 folder=fullfile(fileparts(mfilename('fullpath')),'outputs',['thermistor_' state.cfg.thermistorVariant '_run_' char(java.util.UUID.randomUUID())]);
             end
             state.frozenInputs.cfg.thermistorResultSource=source;
@@ -461,7 +461,15 @@ function validateThermistorResult(result,frozen)
 cfg=frozen.cfg;[b,fs]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
 p=frozen.mesh.thermistorPrepared;w=result.hybridWall;n=size(frozen.mesh.F,1);c=result.hybridCondition;
 id=result.evidenceIdentity;
-if strcmp(optional(cfg,'thermistorVariant','smooth'),'sidewind')
+if strcmp(optional(cfg,'thermistorVariant','smooth'),'sidewind') && p.angularCells==96
+    % 12 K 测点的两个入口分别读取 6 K 基底作线性求解、直接读取 12 K 原生参照。
+    m=result.thermistorMeasuredPoint;src=m.scaledFrom;
+    if strcmp(cfg.thermistorResultSource,'archive'),src=m.nativeCheck;end
+    assert(strcmp(id.sourceFrame.sha256,src.frame) && strcmp(id.sourceFrame.wallSHA256,src.wallSHA256) && ...
+        strcmp(id.meshSHA256,m.meshSHA256) && m.deltaTK==12 && m.wallK==b.wallTemperatureK && ...
+        strcmp(m.action,cfg.thermistorResultSource) && isempty(id.runDirectory) && id.reusedArchive && ...
+        abs(m.wholeW-sum([m.regions.outwardW]))<1e-12 && m.jointVerifiedM2==0,'RAH:Bead:Point','测点结果与边界或来源不符。');
+elseif strcmp(optional(cfg,'thermistorVariant','smooth'),'sidewind')
     s=result.thermistorSidewind;
     assert(p.angularCells==48 && strcmp(s.meshSHA256,p.meshSHA256) && strcmp(s.sourceFrameSHA256,id.sourceFrame.sha256) && ...
         strcmp(s.wallSHA256,id.sourceFrame.wallSHA256) && numel(s.regions)==7 && sum([s.regions.faces])==n && ...

@@ -7,7 +7,8 @@ if nargin<3,cfg=struct();end
 % 全周带线侧吹使用独立的来流向量，几何长轴固定沿 +X。
 if isfield(cfg,'thermistorVariant') && strcmp(cfg.thermistorVariant,'sidewind')
     reference.wallTemperatureK=299.15;reference.betaDeg=90;
-    assert(angularCells==48 && isequal(b,reference),'RAH:Lead:Sidewind','侧吹使用沿 −Y 的 3 m/s 来流和 299.15 K 给定壁温。');
+    if angularCells==96,reference.wallTemperatureK=305.15;end
+    assert(ismember(angularCells,[48 96]) && isequal(b,reference),'RAH:Lead:Sidewind','所选侧吹体网的来流或壁温与登记工况不符。');
     fs=struct('speed',b.speed,'pressure',b.airPressurePa,'temperature',b.airTemperatureK, ...
         'alpha',0,'beta',90,'unitFlowDirection',[0 -1 0],'velocityMps',[0 -b.speed 0]);
     return;

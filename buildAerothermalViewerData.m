@@ -424,6 +424,12 @@ if isfield(mesh,'thermistorSidewind')
     k=find(strcmp({data.fields.key},'heatFlux'),1);
     data.fields(k).stateNote=sprintf('珠部含接头 %.5f mW，引线及端面 %.5f mW，七区合计向空气放热 %.5f mW。侧吹局部实验精度未知。', ...
         1000*s.beadAndJointsW,1000*(s.totalOutwardW-s.beadAndJointsW),1000*s.totalOutwardW);
+    if isfield(mesh,'thermistorMeasuredPoint')
+        m=mesh.thermistorMeasuredPoint;data.measuredPoint=m;
+        data.caseNote='B 型热敏珠 · 图 7 · 3 m/s 名义侧吹 · 壁温 305.15 K';data.resultCondition.caption=data.caseNote;
+        data.fields(k).stateNote=sprintf('珠部平均 h %.2f W/(m²·K)，图 7 读数 %.2f（%.2f–%.2f），差 %+.2f%%。%s', ...
+            m.beadHWm2K,m.experiment.hWm2K,m.experiment.graphReadRangeWm2K,100*m.relativeDifference,m.experiment.mounting);
+    end
 end
 if isfield(mesh,'thermistorLead') || isfield(mesh,'thermistorMidbody')
     data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';

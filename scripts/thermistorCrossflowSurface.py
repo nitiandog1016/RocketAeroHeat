@@ -18,13 +18,14 @@ sys.path.insert(0,str(ROOT/"docs/validation/v272"))
 from observe_flux import invoke
 
 
-def reaction(parent,probe,wall_ids):
+def reaction(parent,probe,wall_ids,wall_value=1.0):
     """使用同一接受态的官方释放壁行读数，同时核实独立目录的精确配置。"""
     rec,_=thermal_frame(parent);terminal(probe)
     assert sha(probe/"initial_flow.csv")==rec["outputSHA256"]["restart.csv"]
     assert sha(probe/"mesh.su2")==sha(parent/"mesh.su2")
     cfg=re.sub(r"^ITER= \d+$","ITER= 1",(parent/"case.cfg").read_text("ascii"),flags=re.M)
-    cfg=cfg.replace("(wall, VALUE, 1.0)","(wall, FLUX, 0.0)").replace("SOLUTION, PRIMITIVE","SOLUTION, RESIDUAL")
+    value=f"(wall, VALUE, {float(wall_value)})";assert cfg.count(value)==1
+    cfg=cfg.replace(value,"(wall, FLUX, 0.0)").replace("SOLUTION, PRIMITIVE","SOLUTION, RESIDUAL")
     assert (probe/"case.cfg").read_text("ascii")==cfg+"WRT_RESTART_COMPACT= NO\n"
     with (probe/"restart.csv").open(encoding="ascii") as f:
         header=next(csv.reader(f))
@@ -52,7 +53,7 @@ def observer_binary(work):
     return exe
 
 
-def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe,*,angular96=False):
+def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe,*,angular96=False,temperature_scale=6):
     """对比官方一步以及同阶段的壁面与远场收支。"""
     assert sha(ENGINE)==ENGINE_SHA
     cfg,n=re.subn(r"^ITER= \d+$","ITER= 1",(parent/"case.cfg").read_text("ascii"),flags=re.M);assert n==1
@@ -77,7 +78,7 @@ def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe,*,angular96=Fals
     assert abs(wall+wall_rows[wall_ids].sum()*scale)<1e-10
     return dict(wallReleaseW=wall,farOutW=far,relativeDifference=(wall-far)/wall,stageW=stages,
                 maxWallNodeRowDifferenceW=error,maxOneUpdateDifference=delta,observerSHA256=sha(exe),
-                inputFrameSHA256=sha(parent/"restart.csv"),temperatureScaleK=6,domainCopies=1)
+                inputFrameSHA256=sha(parent/"restart.csv"),temperatureScaleK=temperature_scale,domainCopies=1)
 
 
 def collect(parent,exe=None):
@@ -87,7 +88,10 @@ def collect(parent,exe=None):
     assert c["caseKind"]=="thermistor-B-sidewind-two-leads" and c["velocityMps"]==[0,-3,0] and c["sectorDeg"]==360
     for name in ("case.json","nodes.npz","body.json","mesh.su2"):
         assert sha(parent/name)==rec["inputSHA256"][str(parent/name)]
-    scale=c["rho"]*c["speedMps"]*c["cp"]*(c["wallK"]-c["airK"])*c["diameterM"]**2
+    delta=c["wallK"]-c["airK"];temperature_scale=c.get("scalarReferenceDeltaK",delta)
+    wall_value=delta/temperature_scale
+    assert (delta,temperature_scale,wall_value) in ((6,6,1),(12,24,.5))
+    scale=c["rho"]*c["speedMps"]*c["cp"]*temperature_scale*c["diameterM"]**2
     angular96=c["angularCells"]==96
     with np.load(parent/"nodes.npz") as z:
         wall,near,area,xyz=(z[k] for k in ("wallMap","firstMap","area","xyz"))
@@ -99,23 +103,23 @@ def collect(parent,exe=None):
                 output_bytes=(850 if angular96 else 450)*1024**2)
     for name,source,release in (("reaction0",parent,True),("plus20",parent,False),("reaction20",parent/"plus20",True)):
         dest=parent/name
-        if not dest.exists():observe(source,dest,release=release,**budget)
+        if not dest.exists():observe(source,dest,release=release,wall_value=wall_value,**budget)
         terminal(dest)
     plus=parent/"plus20"
     assert (plus/"case.cfg").read_text("ascii")==re.sub(r"^ITER= \d+$","ITER= 20",(parent/"case.cfg").read_text("ascii"),flags=re.M)
     assert sha(plus/"initial_flow.csv")==info["lastFrame"]
-    raw=reaction(parent,parent/"reaction0",wall_ids);other=reaction(plus,parent/"reaction20",wall_ids)
+    raw=reaction(parent,parent/"reaction0",wall_ids,wall_value);other=reaction(plus,parent/"reaction20",wall_ids,wall_value)
     _,plus_res=thermal_frame(plus)
     for src in (plus,parent):
         state=np.loadtxt(src/"restart.csv",delimiter=",",skiprows=1)
         np.testing.assert_array_equal(state[:,0],np.arange(len(xyz)))
         np.testing.assert_allclose(state[:,1:4],xyz,rtol=0,atol=1e-13)
-        assert np.isfinite(state).all() and state[:,9].min()>=-1e-12 and state[:,9].max()<=1+1e-12
-        assert np.all(state[wall_ids,9]==1) and np.max(abs(state[wall_ids,5:8]))<1e-10 and np.min(c["airPa"]+c["rho"]*9*state[:,4])>0
+        assert np.isfinite(state).all() and state[:,9].min()>=-1e-12 and state[:,9].max()<=wall_value+1e-12
+        assert np.all(state[wall_ids,9]==wall_value) and np.max(abs(state[wall_ids,5:8]))<1e-10 and np.min(c["airPa"]+c["rho"]*9*state[:,4])>0
     power=-scale*raw[wall_ids].sum();change=abs(other[wall_ids].sum()/raw[wall_ids].sum()-1)
     assert change<.002
     if exe is None:exe=observer_binary(parent/"observer_build")
-    ledger=energy(parent,parent/"ledger",state[:,9],wall_ids,raw,scale,exe,angular96=angular96)
+    ledger=energy(parent,parent/"ledger",state[:,9],wall_ids,raw,scale,exe,angular96=angular96,temperature_scale=temperature_scale)
     write_json(parent/"ledger/energy.json",ledger);assert abs(ledger["relativeDifference"])<.005
     # 无扇区反射，每个真实壁节点按相邻三角面面积三分之一分摊功率。
     lump=np.bincount(wall.ravel(),weights=np.repeat(area/3,3),minlength=len(xyz))
@@ -129,7 +133,7 @@ def collect(parent,exe=None):
     else:
         q=(scale*raw[wall]/lump[wall]).mean(axis=1)
         gauge=c["rho"]*c["speedMps"]**2*state[wall,4].mean(axis=1)
-    temperature=c["airK"]+(c["wallK"]-c["airK"])*state[near,9].mean(axis=1)
+    temperature=c["airK"]+temperature_scale*state[near,9].mean(axis=1)
     watts=-area*q;assert abs(watts.sum()-power)<1e-12
     group=np.asarray(body["regionID"]);regions=[]
     for i,name in enumerate(body["regionNames"],1):

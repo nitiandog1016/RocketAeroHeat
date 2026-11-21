@@ -11,7 +11,7 @@ switch angularCells
     case 'paired3'
         archive=fullfile(caseDir,'paired3.zip');
         manifest=jsondecode(fileread(fullfile(caseDir,'paired3.json')));expected=manifest.archiveSHA256;
-    case {'leads3','midbody3','leadsMidbody3','leadsThird3','outer30','sidewind3','sidewindOuter30','sidewindTipSpacing','sidewindAngular96'}
+    case {'leads3','midbody3','leadsMidbody3','leadsThird3','outer30','sidewind3','sidewindOuter30','sidewindTipSpacing','sidewindAngular96','windPoint12'}
         contract=jsondecode(fileread(fullfile(caseDir,[angularCells '.json'])));
         archive=fullfile(caseDir,[angularCells '.zip']);expected=contract.archiveSHA256;
     case 'startup6'
@@ -33,7 +33,7 @@ end
 
 function removeExtracted(folder)
 % 模块四：释放本次从已校验数据包展开的临时文件。
-for name={'case.json','body.json','wall.csv','summary.json','matched_temperature.csv','comparison.json','historical.csv','shared.csv','flow.csv','flow.json'}
+for name={'case.json','body.json','wall.csv','summary.json','matched_temperature.csv','comparison.json','historical.csv','shared.csv','flow.csv','flow.json','six_case.json','six_wall.csv','six_summary.json'}
     path=fullfile(folder,name{1});if isfile(path),delete(path);end
 end
 rmdir(folder);

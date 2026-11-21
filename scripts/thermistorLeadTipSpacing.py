@@ -16,19 +16,8 @@ SOURCE_FILES = {"mesh.su2": "meshSHA256", "nodes.npz": "nodeMapSHA256", "case.js
                 "body.json": "bodySHA256", "case.cfg": "configSHA256", "initial_flow.csv": "initialSHA256"}
 
 
-def prepare(base, seed, dest):
-    """从本机已核验的同工况解构建新网和初猜，旧节点号保持可直接对照。"""
-    key = read(ROOT / "cases/thermistor_b/sidewind3.json")
-    assert all(sha(base / name) == key[field] for name, field in SOURCE_FILES.items())
-    rec = terminal(seed)
-    summary = read(seed / "surface/summary.json")
-    frame = sha(seed / "restart.csv")
-    assert frame == rec["outputSHA256"]["restart.csv"] == summary["sourceFrameSHA256"]
-    assert frame == summary["energy"]["inputFrameSHA256"] and frame == read(seed / "field_audit.json")["lastFrame"]
-    assert summary["meshSHA256"] == key["meshSHA256"] and summary["caseSHA256"] == key["caseSHA256"]
-    assert max(summary["residualWindow"].values()) < -8 and max(summary["plus20Window"].values()) < -8
-    assert summary["relativeChange20"] < .002 and abs(summary["energy"]["relativeDifference"]) < .005
-
+def build_geometry(base, dest):
+    """只生成热敏珠体网、原面和节点映射，供工作台在确认热边界前使用。"""
     old, coords, marks = load_mesh(base / "mesh.su2", ("far", "wall"))
     spec = read(base / "case.json")
     assert spec["outerRadiusOverD"] == 20 and spec["velocityMps"] == [0, -3, 0] and spec["wallK"] == 299.15
@@ -82,6 +71,23 @@ def prepare(base, seed, dest):
     spec["baseFirstLayerM"] = spec.pop("firstLayerM")
     spec.update(frontCapFirstLayerRatio=.5, transitionLeadRows=1, splitLeadRows=2)
     write_json(dest / "case.json", spec)
+    return coords, nodes, edges
+
+
+def prepare(base, seed, dest):
+    """从本机已核验的同工况解构建新网和初猜，旧节点号保持可直接对照。"""
+    key = read(ROOT / "cases/thermistor_b/sidewind3.json")
+    assert all(sha(base / name) == key[field] for name, field in SOURCE_FILES.items())
+    rec = terminal(seed)
+    summary = read(seed / "surface/summary.json")
+    frame = sha(seed / "restart.csv")
+    assert frame == rec["outputSHA256"]["restart.csv"] == summary["sourceFrameSHA256"]
+    assert frame == summary["energy"]["inputFrameSHA256"] and frame == read(seed / "field_audit.json")["lastFrame"]
+    assert summary["meshSHA256"] == key["meshSHA256"] and summary["caseSHA256"] == key["caseSHA256"]
+    assert max(summary["residualWindow"].values()) < -8 and max(summary["plus20Window"].values()) < -8
+    assert summary["relativeChange20"] < .002 and abs(summary["energy"]["relativeDifference"]) < .005
+
+    coords,nodes,edges=build_geometry(base,dest)
     orig = np.loadtxt(seed / "restart.csv", delimiter=",", skiprows=1)
     np.testing.assert_array_equal(orig[:,0], np.arange(len(coords)))
     np.testing.assert_allclose(orig[:,1:4], coords, atol=1e-13, rtol=0)

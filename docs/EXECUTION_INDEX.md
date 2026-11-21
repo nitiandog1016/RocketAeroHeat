@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v315 B 珠 3 m/s、12 K 风洞测点](validation/v315/RESULTS.md) · [平均换热对照图](validation/v315/evidence/mean_heat.png) · [下一项](validation/v315/NEXT_DECISION.md)。96 档名义侧吹珠部平均 h 比原图读数高 26.16%，换算与直接热边界逐面等步核对通过。
+
 - [v314 带线热敏珠 48／96 档周向对照](validation/v314/RESULTS.md) · [迎背风曲线](validation/v314/evidence/section.png) · [下一项](validation/v314/NEXT_DECISION.md)。整件放热下降 0.352%，同截面背风近邻放热密度增加 12.77%。
 
 - [v313 带线热敏珠侧吹前端面近壁细化](validation/v313/RESULTS.md) · [端面放热图](validation/v313/evidence/cap_map.png) · [下一项](validation/v313/NEXT_DECISION.md)。端面首层距离减半，最强放热密度下降 0.00228%，两共边镜像面交换排序。

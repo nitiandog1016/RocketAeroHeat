@@ -15,6 +15,9 @@ if nargin<3,progressFcn=[];end
 if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'thermistorB')
     [boundary,freestream]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
     if isfield(cfg,'thermistorVariant') && strcmp(cfg.thermistorVariant,'sidewind')
+        if cfg.thermistorAngularCells==96
+            [current,report]=runThermistorMeasuredPoint(mesh,cfg);return;
+        end
         [current,report]=runThermistorSidewindWorkbench(mesh,cfg,progressFcn);return;
     end
     if isfield(cfg,'thermistorVariant') && any(strcmp(cfg.thermistorVariant,{'leads','midbody'}))

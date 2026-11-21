@@ -155,6 +155,8 @@ update(data,varargin{:});
         if startsWith(key,'angular') && isfield(d,'angularSpacingComparison')
             summary.angularSpacingComparison=d.angularSpacingComparison;
         end
+        % 每个变量的测点导出均保留姿态假设、热量范围和量纲边界的来源。
+        if isfield(d,'measuredPoint'),summary.measuredPoint=d.measuredPoint;end
         % 带线两档网距比较同时交付原网参照帧和本次比较的温差比例。
         if startsWith(key,'leadGrid') && isfield(d,'leadGridReference')
             summary.leadGridReference=d.leadGridReference;

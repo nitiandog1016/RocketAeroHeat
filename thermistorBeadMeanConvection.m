@@ -8,7 +8,7 @@ result=struct('available',false,'reason','','method','坪内、佐藤（1959）�
     'lengthM',0.3430e-3,'areaM2',3.094e-6,'eccentricity',0.53,'tableNu0',0.664, ...
     'speedMps',c.speedMps,'airTemperatureK',c.airK,'wallTemperatureK',wallK, ...
     'meanHWm2K',NaN,'outwardW',NaN);
-if ~strcmp(c.caseKind,'thermistor-B-axial-two-leads') || c.sourceAreaM2~=result.areaM2
+if ~any(strcmp(c.caseKind,{'thermistor-B-axial-two-leads','thermistor-B-sidewind-two-leads'})) || c.sourceAreaM2~=result.areaM2
     result.reason='试件与表 1 的 B 型热敏珠不匹配。';return;
 end
 deltaT=wallK-c.airK;

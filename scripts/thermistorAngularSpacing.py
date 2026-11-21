@@ -81,20 +81,8 @@ def project(node_values, wall, original_area, parents, children, weights):
     return np.bincount(parents,weights=integral,minlength=len(original_area))/original_area
 
 
-def prepare(base, seed, dest):
-    key = read(ROOT/"cases/thermistor_b/sidewindTipSpacing.json")
-    base_audit = read(base/"mesh_audit.json")
-    for name,h in base_audit["files"].items():
-        assert sha(base/name)==h
-    assert base_audit["files"]["mesh.su2"]==key["meshSHA256"] and base_audit["files"]["case.json"]==key["caseSHA256"]
-    assert base_audit["files"]["body.json"]==key["bodySHA256"] and base_audit["commonPositionNodesExact"]
-    receipt=terminal(seed);s=read(seed/"surface/summary.json")
-    frame=sha(seed/"restart.csv")
-    assert frame==receipt["outputSHA256"]["restart.csv"]==s["sourceFrameSHA256"]==s["energy"]["inputFrameSHA256"]
-    assert s["meshSHA256"]==sha(seed/"mesh.su2")==key["meshSHA256"] and s["caseSHA256"]==key["caseSHA256"]
-    assert sha(seed/"nodes.npz")==base_audit["files"]["nodes.npz"]
-    assert max(s["residualWindow"].values())<-8 and max(s["plus20Window"].values())<-8
-    assert abs(s["energy"]["relativeDifference"])<.005 and s["relativeChange20"]<.002
+def build_geometry(base, dest):
+    """只生成热敏珠体网、原面和节点映射，供工作台在确认热边界前使用。"""
     cells, coords, marks=load_mesh(base/"mesh.su2",("wall","far"))
     with np.load(base/"nodes.npz") as z:
         rays,orig,first,old_area=(z[k] for k in ("ids","wallMap","firstMap","area"))
@@ -127,6 +115,24 @@ def prepare(base, seed, dest):
     for name in ("case.cfg","body.json"):shutil.copyfile(base/name,dest/name)
     spec.update(angularCells=96,reportAngularCells=48,angularConstruction="chord-midpoint")
     write_json(dest/"case.json",spec)
+    return coords, xyz, edges
+
+
+def prepare(base, seed, dest):
+    key = read(ROOT/"cases/thermistor_b/sidewindTipSpacing.json")
+    base_audit = read(base/"mesh_audit.json")
+    for name,h in base_audit["files"].items():
+        assert sha(base/name)==h
+    assert base_audit["files"]["mesh.su2"]==key["meshSHA256"] and base_audit["files"]["case.json"]==key["caseSHA256"]
+    assert base_audit["files"]["body.json"]==key["bodySHA256"] and base_audit["commonPositionNodesExact"]
+    receipt=terminal(seed);s=read(seed/"surface/summary.json")
+    frame=sha(seed/"restart.csv")
+    assert frame==receipt["outputSHA256"]["restart.csv"]==s["sourceFrameSHA256"]==s["energy"]["inputFrameSHA256"]
+    assert s["meshSHA256"]==sha(seed/"mesh.su2")==key["meshSHA256"] and s["caseSHA256"]==key["caseSHA256"]
+    assert sha(seed/"nodes.npz")==base_audit["files"]["nodes.npz"]
+    assert max(s["residualWindow"].values())<-8 and max(s["plus20Window"].values())<-8
+    assert abs(s["energy"]["relativeDifference"])<.005 and s["relativeChange20"]<.002
+    coords,xyz,edges=build_geometry(base,dest)
     state=np.loadtxt(seed/"restart.csv",skiprows=1,delimiter=",")
     np.testing.assert_array_equal(state[:,0],np.arange(len(coords)))
     np.testing.assert_allclose(state[:,1:4],coords,rtol=0,atol=1e-13)

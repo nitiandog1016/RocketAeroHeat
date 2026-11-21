@@ -8,6 +8,7 @@ if strcmp(variant,'midbody'),options={'--midbody'};end
 model=variant;
 if strcmp(variant,'sidewind')
     script='thermistorSidewindWorkbench.py';model='leads';
+    if isequal(refineLeads,4),script='thermistorMeasuredMesh.py';end
 elseif refineLeads
     assert(strcmp(variant,'leads'));[~,options]=thermistorLeadGridChoice(refineLeads);
 end
