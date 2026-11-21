@@ -30,8 +30,9 @@ if isfield(c,'netHeatingPowerW')
     wall20=mesh.hybridSolvedWallTemperatureK(1);pair.mode='givenPower';
     pair.scope=sprintf('同一整件净功率 %.9g mW，两域各用本域热导求壁温。',1000*c.netHeatingPowerW);
 else
-    assert(c.wallTemperatureK==spec.wallK);wall20=spec.wallK;wall30=spec.wallK;pair.mode='givenWall';
-    pair.scope=sprintf('两域均给定全表面壁温 %.6g K。',spec.wallK);
+    [rows,~,~,wall30]=scaleThermistorWallField(rows,c,spec.airK,spec.wallK,s.totalOutwardW);
+    wall20=c.wallTemperatureK;pair.mode='givenWall';
+    pair.scope=sprintf('两域均给定全表面壁温 %.12g K，各用本域 %.6g K 参照场。',wall20,spec.wallK);
 end
 pair.wall20K=wall20;pair.wall30K=wall30;pair.outward20W=-area'*w.heatFluxWm2;pair.outward30W=-area'*rows.heatFluxWm2;
 if strcmp(pair.mode,'givenPower')

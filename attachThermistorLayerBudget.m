@@ -1,7 +1,7 @@
 function mesh=attachThermistorLayerBudget(mesh,area)
 % 模块一：将给定壁温下的分带收支绑定到两份实际终场及本工况的原面顺序。
 g=mesh.thermistorThreeGrids;
-if ~strcmp(g.summary.mode,'givenWall'),return;end
+if ~strcmp(g.summary.mode,'givenWall') || g.summary.boundaryValue~=305.15,return;end
 path=fullfile(fileparts(mfilename('fullpath')),'cases','thermistor_b','layerBands.json');
 digest=cm011FileSHA256(path);
 assert(strcmp(digest,'764fd03400467414bde957d28b5294224c986a20d7dd8fa27731eadd91bb53df'),'热敏珠分带数据的来源指纹不符。');

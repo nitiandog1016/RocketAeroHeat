@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v308 带线热敏珠可输入均匀壁温](validation/v308/RESULTS.md) · [逐面数值核对](validation/v308/evidence/verification.json) · [下一项](validation/v308/NEXT_DECISION.md)。两档网在同一 299.15 K 工况下导出全表面结果，第二档逐面比较独立冷态。
+
 - [v307 带线热敏珠前中段固定节点换边](validation/v307/RESULTS.md) · [成品几何](validation/v307/evidence/geometry.json) · [下一项](validation/v307/NEXT_DECISION.md)。169 次换边保住了原 16 条测线，22 条交错测线的最大间距超限，4 个近退化棱柱未通过面锥检查。
 
 - [v306 热敏珠前中段切向重排](validation/v306/RESULTS.md) · [十六条测线](validation/v306/evidence/rays.json) · [下一项](validation/v306/NEXT_DECISION.md)。最靠近壁法向的边的平均夹角降低 8.30%，62 号条带最宽间距增大 26.61%，该候选在几何阶段结束。

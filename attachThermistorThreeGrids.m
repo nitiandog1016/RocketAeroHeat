@@ -6,15 +6,17 @@ v=mesh.V;f=mesh.F;n=size(f,1);
 area=vecnorm(cross(v(f(:,2),:)-v(f(:,1),:),v(f(:,3),:)-v(f(:,1),:),2),2,2)/2;
 heat=nan(n,3);heat(:,3)=w.heatFluxWm2;
 powerMode=isfield(c,'netHeatingPowerW');
-info=struct('mode','givenWall','boundaryValue',305.15,'boundaryUnit','K','available',true);
+info=struct('mode','givenWall','boundaryUnit','K','available',true);
 if powerMode
     info.mode='givenPower';info.boundaryValue=c.netHeatingPowerW;info.boundaryUnit='W';
+else
+    info.boundaryValue=c.wallTemperatureK;
 end
 regionNames={s.regions.name};
 for level=1:3
     if level==3
-        src=s;wallK=305.15;
-        if powerMode,wallK=mesh.hybridSolvedWallTemperatureK(1);end
+        src=s;
+        if powerMode,wallK=mesh.hybridSolvedWallTemperatureK(1);else,wallK=c.wallTemperatureK;end
     else
         [archive,~,~]=thermistorLeadGridChoice(level-1);
         [folder,guard]=openThermistorArchive(archive);

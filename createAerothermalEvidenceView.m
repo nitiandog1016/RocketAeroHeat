@@ -133,8 +133,15 @@ update(data,varargin{:});
             'identity',ledger.identity,'evidenceLedger',compact,'viewState',v, ...
             'exportScope','当前变量的全部原始面元；选区不筛选CSV，原值不按资格裁剪');
         % 外域差值回执包含两份原生源帧和实际热边界，便于单独传递 CSV 后复核。
+        if isfield(d,'thermistorLead') && isfield(d.thermistorLead,'thermal')
+            summary.thermalConversion=d.thermistorLead.thermal;
+        end
         if startsWith(key,'outer') && isfield(d,'outerDomainComparison') && d.outerDomainComparison.available
             summary.outerDomainComparison=d.outerDomainComparison;
+        end
+        % 带线两档网距比较同时交付原网参照帧和本次比较的温差比例。
+        if startsWith(key,'leadGrid') && isfield(d,'leadGridReference')
+            summary.leadGridReference=d.leadGridReference;
         end
         % 随逐面表保留三档网格的网距顺序、源帧、真实热边界和各区放热。
         if isfield(d,'midbodyGridComparison')

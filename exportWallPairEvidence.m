@@ -30,6 +30,13 @@ t.condition_sha256=repmat(string(ledger.identity.conditionSHA256),n,1);
 t.source_sha256=repmat(string(ledger.identity.sourceSHA256),n,1);
 t.source_traceable=repmat(ledger.identity.sourceTraceable,n,1);
 t.synthetic=repmat(ledger.identity.synthetic,n,1);
+% 热敏珠换算表给出原生参照及比例，供取出单行后复核压力与热流的来源。
+if isfield(data,'thermistorLead') && isfield(data.thermistorLead,'thermal')
+    thermal=data.thermistorLead.thermal;
+    t.reference_frame_sha256=repmat(string(thermal.nativeFrameSHA256),n,1);
+    t.reference_wall_K=repmat(thermal.referenceWallTemperatureK,n,1);
+    t.temperature_difference_ratio=repmat(thermal.scale,n,1);
+end
 
 % 模块三：先写同目录临时文件，完整写出后再替换目标文件。
 [folder,name,ext]=fileparts(char(path));if isempty(folder),folder=pwd;end

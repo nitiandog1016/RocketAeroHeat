@@ -72,6 +72,10 @@ expansionOutside=[];
 if isfield(mesh,'hybridWall')
     w=mesh.hybridWall;
     hybridScope='当前混合计算原面结果；方法见逐面来源，实验精度单独验证';
+    if isfield(mesh,'thermistorLead') && isfield(mesh.thermistorLead,'thermal')
+        t=mesh.thermistorLead.thermal;
+        hybridScope=sprintf('%s 本次壁温 %.12g K，参照终帧 %s。',t.scope,t.wallTemperatureK,t.nativeFrameSHA256);
+    end
     data.missingReason(isfinite(w.heatFluxWm2))={''};
     add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridMethod(w,'pressureMethod'),hybridScope);
     add('heatFlux','入壁热流','kW/m²',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope);
@@ -87,8 +91,10 @@ if isfield(mesh,'hybridWall')
     end
     if ismember('nearWallCellTemperatureK',w.Properties.VariableNames)
         tCell=w.nearWallCellTemperatureK;
+        firstScope='与原面对应的首层流体单元温度';
+        if isfield(mesh,'thermistorLead'),firstScope=[firstScope '。' hybridScope];end
         add('nearWallCellTemperature','临壁流体单元温度','K',tCell,double(isfinite(tCell)), ...
-            hybridMethod(w,'nearWallTemperatureMethod'),'与原面对应的首层流体单元温度');
+            hybridMethod(w,'nearWallTemperatureMethod'),firstScope);
     end
     if isfield(mesh,'hybridSolvedWallTemperatureK')
         reason='此工况输入净对流功率，壁温由稳态热平衡求出。';
@@ -409,11 +415,13 @@ end
 % 带线试件按原面保留珠体、引线和接头分区。实验只对照扣除引线散热后的珠部平均量。
 if isfield(mesh,'thermistorLead') || isfield(mesh,'thermistorMidbody')
     data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
-    data.caseNote=[mesh.hybridCondition.caseLabel ' · 3 m/s · 305.15 K 等温壁 · 30° 对称稳态'];
     if isfield(mesh,'hybridSolvedWallTemperatureK')
         t=solvedBeadThermal(mesh);
         data.caseNote=sprintf('%s · 3 m/s · 整件净对流功率 %.9g mW · 求解壁温 %.9g K', ...
             mesh.hybridCondition.caseLabel,1000*t.netHeatingPowerW,t.wallTemperatureK);
+    else
+        data.caseNote=sprintf('%s · 3 m/s · 给定壁温 %.12g K · 30° 对称稳态', ...
+            mesh.hybridCondition.caseLabel,mesh.hybridCondition.wallTemperatureK);
     end
     data.resultCondition.caption=data.caseNote;
     k=find(strcmp({data.fields.key},'heatFlux'),1);
@@ -428,6 +436,9 @@ if isfield(mesh,'thermistorLead') || isfield(mesh,'thermistorMidbody')
         if isfield(s,'thermal')
             data.fields(k).stateNote=sprintf('珠体含接头 %.6f mW，引线含端面 %.6f mW。七区合计 %.6f mW，稳态热导 %.6f mW/K。', ...
                 1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),1000*s.totalOutwardW,1000*s.thermal.conductanceWK);
+            if s.thermal.deltaTemperatureK==0
+                data.fields(k).stateNote='壁面与环境同温，七区各面热流均为零。没有唯一热峰，按功率除以温差计算的平均换热系数未定义。';
+            end
         else
             data.fields(k).stateNote=sprintf('珠体含接头 %.4f mW，引线含端面 %.4f mW。珠部平均换热 %.2f W/(m²·K)，实验图读 %.2f W/(m²·K)。', ...
                 1000*s.beadAndJointsW,1000*(s.wireSidesW+s.wireEndsW),s.beadMeanHWm2K,s.experimentMeanHWm2K);
@@ -485,7 +496,7 @@ if isfield(mesh,'thermistorBead')
     data.fields(k).stateNote='首层流体节点温度由三维温差标量求得，壁面温度由边界条件给定。';
     if powerMode,data.fields(k).stateNote='首层流体温度由参照温差标量按稳态集总壁温换算。';end
 end
-if isfield(mesh,'thermistorBead') || (isfield(mesh,'thermistorLead') && isfield(mesh,'hybridSolvedWallTemperatureK'))
+if isfield(mesh,'thermistorBead') || isfield(mesh,'thermistorLead')
     % 声明静态试件场的真实单值。空场不产生色标，固定的比较／手动色标另行保留。
     for k=1:numel(data.fields)
         f=data.fields(k);valid=f.values(f.status>0 & isfinite(f.values));
@@ -537,21 +548,29 @@ end
 if isfield(mesh,'thermistorLeadGrid')
     g=mesh.thermistorLeadGrid;
     data.leadGridReference=rmfield(g,{'baseHeatFluxWm2','deltaHeatWm2','deltaPressurePa','deltaNearWallK'});
-    scope='两次带线计算的 10,272 个原面、首层节点与热边界相同。';
+    scope=sprintf('两档带线网共用 10,272 个原面和首层位置，给定壁温 %.12g K。',mesh.hybridCondition.wallTemperatureK);
     tab={'leadGridBaseHeat','入壁热流 · 带线原网','kW/m²',g.baseHeatFluxWm2/1000,'原网强温差标量的壁节点反力按邻接面积守恒分配'; ...
          'leadGridDeltaHeat','入壁热流差 · 带线加密减原网','W/m²',g.deltaHeatWm2,'两套带线体网的原面入壁热流相减'; ...
          'leadGridDeltaPressure','壁压差 · 带线加密减原网','Pa',g.deltaPressurePa,'两套带线体网的同面绝对壁压相减'; ...
          'leadGridDeltaTemperature','首层温差 · 带线加密减原网','K',g.deltaNearWallK,'同一首层节点位置的面平均流体温度相减'};
+    if mesh.hybridCondition.wallTemperatureK~=305.15,tab{1,5}='原网 305.15 K 壁反力按实际温差比换算';end
     for j=1:size(tab,1)
         add(tab{j,1},tab{j,2},tab{j,3},tab{j,4},ones(n,1),repmat(tab(j,5),n,1),scope);
-        if j>1
+        if all(tab{j,4}==tab{j,4}(1))
+            data.uniformFieldValues.(tab{j,1})=struct('value',tab{j,4}(1),'unit',tab{j,3});
+        elseif j>1
             bound=max(abs(tab{j,4}));if bound>0,data.comparisonColorRanges.(tab{j,1})=[-bound bound];end
         end
     end
-    values=[data.comparisonColorRanges.heatFlux(:);g.baseHeatFluxWm2/1000];
+    values=[mesh.hybridWall.heatFluxWm2;g.baseHeatFluxWm2]/1000;
+    if isfield(data,'comparisonColorRanges') && isfield(data.comparisonColorRanges,'heatFlux')
+        values=[values;data.comparisonColorRanges.heatFlux(:)];
+    end
     limits=[min(values) max(values)];
-    data.comparisonColorRanges.leadGridBaseHeat=limits;data.comparisonColorRanges.heatFlux=limits;
-    data.comparisonColorRanges.pairedSmoothHeat=limits;
+    if limits(2)>limits(1)
+        data.comparisonColorRanges.leadGridBaseHeat=limits;data.comparisonColorRanges.heatFlux=limits;
+        if isfield(mesh,'thermistorPaired'),data.comparisonColorRanges.pairedSmoothHeat=limits;end
+    end
 end
 % 外边界敏感性取两次冷态的同面结果，值、单位和相减方向随导出保留。
 if isfield(mesh,'thermistorOuterDomain')
@@ -564,7 +583,8 @@ if isfield(mesh,'thermistorOuterDomain')
             'outerDeltaHeat','入壁热流差 · 30D 减 20D','W/m²',domain.deltaHeatWm2,'两域同一原面和热边界下的入壁热流相减'; ...
             'outerDeltaPressure','壁压差 · 30D 减 20D','Pa',domain.deltaPressurePa,'两次层流解的同面绝对壁压相减'; ...
             'outerDeltaFirst','首层温差 · 30D 减 20D','K',domain.deltaFirstK,'两个域相同首层节点上的面平均流体温度相减'};
-        if strcmp(domain.mode,'givenPower'),tab{1,5}='由 30D 空气侧热导反求壁温，按温差比换算该域壁反力';end
+        if strcmp(domain.mode,'givenPower'),tab{1,5}='由 30D 空气侧热导反求壁温，按温差比换算该域壁反力';
+        elseif domain.wall30K~=305.15,tab{1,5}='30D 域 305.15 K 壁反力按实际给定温差比换算';end
         for j=1:size(tab,1)
             add(tab{j,1},tab{j,2},tab{j,3},tab{j,4},ones(n,1),repmat(tab(j,5),n,1),domain.scope);
             data.fields(end).stateNote=note;
@@ -595,7 +615,8 @@ if isfield(mesh,'thermistorThreeGrids')
     if info.available
         q=g.heat;scope=sprintf('3 m/s 带线试件，三档均采用 20D 外域，热边界 %.7g %s。',info.boundaryValue,info.boundaryUnit);
         method='同工况强等温标量的壁反力按原面积守恒分配';
-        if strcmp(info.mode,'givenPower'),method='以每档实算热导反求等温壁温，按温差比换算该网原面壁反力';end
+        if strcmp(info.mode,'givenPower'),method='以每档实算热导反求等温壁温，按温差比换算该网原面壁反力';
+        elseif info.boundaryValue~=305.15,method='各档 305.15 K 参照场的原面壁反力按实际给定温差比换算';end
         note=sprintf('%s 三档壁温 %.6f / %.6f / %.6f K。',scope,info.grids.wallK);
         tab={'gridHeat1','入壁热流 · 第一档','kW/m²',q(:,1)/1000,method; ...
              'gridHeat2','入壁热流 · 第二档','kW/m²',q(:,2)/1000,method; ...

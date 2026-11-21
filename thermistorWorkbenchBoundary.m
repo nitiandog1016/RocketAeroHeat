@@ -15,9 +15,10 @@ assert(isstruct(b) && isscalar(b) && xor(isfield(b,'wallTemperatureK'),isfield(b
 key='wallTemperatureK';powerMode=isfield(b,'netHeatingPowerW');
 if powerMode,key='netHeatingPowerW';end
 if isfield(cfg,'thermistorVariant') && any(strcmp(cfg.thermistorVariant,{'leads','midbody'}))
-    % 混合网的给定工况固定为 305.15 K，整件净功率使用独立核验过的带线加密网。
-    allowPower=strcmp(cfg.thermistorVariant,'leads') && isfield(cfg,'thermistorRefineLeads') && cfg.thermistorRefineLeads;
-    assert(angularCells==4 && ((powerMode && allowPower) || isequal(b,reference)), ...
+    % 第二、第三档带线网支持两种热边界；其余混合网须使用原生给定壁温。
+    adjustable=strcmp(cfg.thermistorVariant,'leads') && isfield(cfg,'thermistorRefineLeads') && ...
+        ismember(cfg.thermistorRefineLeads,[1 2]);
+    assert(angularCells==4 && (adjustable || isequal(b,reference)), ...
         'RAH:Lead:Boundary','请选择与当前试件体网匹配的热边界。');
 end
 assert(isequal(rmfield(b,key),rmfield(reference,'wallTemperatureK')), ...
