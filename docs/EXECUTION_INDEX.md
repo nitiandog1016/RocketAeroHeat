@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v307 带线热敏珠前中段固定节点换边](validation/v307/RESULTS.md) · [成品几何](validation/v307/evidence/geometry.json) · [下一项](validation/v307/NEXT_DECISION.md)。169 次换边保住了原 16 条测线，22 条交错测线的最大间距超限，4 个近退化棱柱未通过面锥检查。
+
 - [v306 热敏珠前中段切向重排](validation/v306/RESULTS.md) · [十六条测线](validation/v306/evidence/rays.json) · [下一项](validation/v306/NEXT_DECISION.md)。最靠近壁法向的边的平均夹角降低 8.30%，62 号条带最宽间距增大 26.61%，该候选在几何阶段结束。
 
 - [v305 两档热敏珠网的分带热量收支](validation/v305/RESULTS.md) · [逐带热量与交换矩阵](validation/v305/evidence/budget.json) · [下一项](validation/v305/NEXT_DECISION.md)。珠部放热减少 318.303 µW，前中段占 58.8%，两档十个带的同阶段收支均闭合。
