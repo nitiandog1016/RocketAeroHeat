@@ -72,6 +72,7 @@ expansionOutside=[];
 if isfield(mesh,'hybridWall')
     w=mesh.hybridWall;
     hybridScope='当前混合计算原面结果；方法见逐面来源，实验精度单独验证';
+    if isfield(mesh,'thermistorSidewind'),hybridScope=mesh.evidenceIdentity.scope;end
     if isfield(mesh,'thermistorLead') && isfield(mesh.thermistorLead,'thermal')
         t=mesh.thermistorLead.thermal;
         hybridScope=sprintf('%s 本次壁温 %.12g K，参照终帧 %s。',t.scope,t.wallTemperatureK,t.nativeFrameSHA256);
@@ -81,7 +82,9 @@ if isfield(mesh,'hybridWall')
     add('heatFlux','入壁热流','kW/m²',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope);
     if ismember('pressureGaugePa',w.Properties.VariableNames)
         delta=w.pressureGaugePa;
-        add('pressureGauge','相对环境壁压','Pa',delta,double(isfinite(delta)),hybridMethod(w,'pressureMethod'), ...
+        sourceKey='pressureMethod';
+        if ismember('pressureGaugeMethod',w.Properties.VariableNames),sourceKey='pressureGaugeMethod';end
+        add('pressureGauge','相对环境壁压','Pa',delta,double(isfinite(delta)),hybridMethod(w,sourceKey), ...
             '同工况壁面绝对压力与环境参考压力之差');
     end
     if ismember('wallFluidTemperatureK',w.Properties.VariableNames)
@@ -413,6 +416,15 @@ if isfield(mesh,'hybridWall')
     data.defaultField='heatFlux';
 end
 % 带线试件按原面保留珠体、引线和接头分区。实验只对照扣除引线散热后的珠部平均量。
+if isfield(mesh,'thermistorSidewind')
+    s=mesh.thermistorSidewind;data.thermistorSidewind=s;
+    data.coordinateNote='SI · 长轴 X · 来流 −Y · 正热流入壁';
+    data.caseNote=sprintf('带线 B 型热敏珠 · 全周侧吹 3 m/s · 给定壁温 %.6g K · 稳态',mesh.hybridCondition.wallTemperatureK);
+    data.resultCondition.caption=data.caseNote;
+    k=find(strcmp({data.fields.key},'heatFlux'),1);
+    data.fields(k).stateNote=sprintf('珠部含接头 %.5f mW，引线及端面 %.5f mW，七区合计向空气放热 %.5f mW。侧吹局部实验精度未知。', ...
+        1000*s.beadAndJointsW,1000*(s.totalOutwardW-s.beadAndJointsW),1000*s.totalOutwardW);
+end
 if isfield(mesh,'thermistorLead') || isfield(mesh,'thermistorMidbody')
     data.coordinateNote='SI · 长轴 X · 来流 −X · 正热流入壁';
     if isfield(mesh,'hybridSolvedWallTemperatureK')

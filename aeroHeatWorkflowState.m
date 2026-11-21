@@ -197,7 +197,7 @@ switch action
         state.solveInputRevision=state.revision;
         state.frozenInputs=struct('mesh',state.mesh,'cfg',state.cfg, ...
             'freestream',state.freestream,'revision',state.revision,'solveId',state.solveId);
-        if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && state.cfg.thermistorAngularCells==48
+        if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && state.cfg.thermistorAngularCells==48 && ~strcmp(optional(state.cfg,'thermistorVariant','smooth'),'sidewind')
             % 将动作与目录一起冻结，避免同一几何和同刻的其他计算被误接收。
             source=validatestring(optional(payload,'startupAction','run'),{'run','read','resume'});
             if strcmp(source,'run')
@@ -209,7 +209,7 @@ switch action
             end
             state.frozenInputs.cfg.thermistorResultSource=source;
             state.frozenInputs.cfg.thermistorRunDirectory=folder;
-        elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && any(strcmp(optional(state.cfg,'thermistorVariant','smooth'),{'leads','midbody'}))
+        elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && any(strcmp(optional(state.cfg,'thermistorVariant','smooth'),{'leads','midbody','sidewind'}))
             % 在按下计算按钮时确定同一任务的来源，防止另一次同工况的结果串入。
             source=validatestring(optional(payload,'leadAction','solve'),{'solve','archive'});folder='';
             if strcmp(source,'solve')
@@ -461,7 +461,13 @@ function validateThermistorResult(result,frozen)
 cfg=frozen.cfg;[b,fs]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
 p=frozen.mesh.thermistorPrepared;w=result.hybridWall;n=size(frozen.mesh.F,1);c=result.hybridCondition;
 id=result.evidenceIdentity;
-if p.angularCells==48
+if strcmp(optional(cfg,'thermistorVariant','smooth'),'sidewind')
+    s=result.thermistorSidewind;
+    assert(p.angularCells==48 && strcmp(s.meshSHA256,p.meshSHA256) && strcmp(s.sourceFrameSHA256,id.sourceFrame.sha256) && ...
+        strcmp(s.wallSHA256,id.sourceFrame.wallSHA256) && numel(s.regions)==7 && sum([s.regions.faces])==n && ...
+        strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && id.reusedArchive==strcmp(cfg.thermistorResultSource,'archive'), ...
+        'RAH:Lead:Snapshot','侧吹源帧、全周体网或区域与冻结工况不符。');
+elseif p.angularCells==48
     % 全周计算核对两个实际物理半步及给定壁温；扇区稳态沿用原有资格。
     s=result.beadNearWallComparison.summary;
     assert(c.elapsedPhysicalTimeS==7.80936086544745e-6 && strcmp(c.initialStateSHA256,p.seedSHA256) && ...

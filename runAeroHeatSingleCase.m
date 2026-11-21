@@ -14,6 +14,9 @@ if nargin<3,progressFcn=[];end
 % 珠体只使用已生成的扇区、已确认的等温边界和用户在计算页选择的来源。
 if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'thermistorB')
     [boundary,freestream]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
+    if isfield(cfg,'thermistorVariant') && strcmp(cfg.thermistorVariant,'sidewind')
+        [current,report]=runThermistorSidewindWorkbench(mesh,cfg,progressFcn);return;
+    end
     if isfield(cfg,'thermistorVariant') && any(strcmp(cfg.thermistorVariant,{'leads','midbody'}))
         [current,report]=runThermistorLeadWorkbench(mesh,cfg,progressFcn);return;
     end

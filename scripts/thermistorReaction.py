@@ -21,7 +21,8 @@ def terminal(folder):
     return record
 
 
-def observe(parent, out, *, release, wall_value=1.0):
+def observe(parent, out, *, release, wall_value=1.0, maximum_seconds=60,
+            memory_bytes=2*1024**3, output_bytes=180*1024**2):
     terminal(parent)
     cfg=(parent/"case.cfg").read_text("ascii")
     strong_wall=f"MARKER_WALL_SPECIES= (wall, VALUE, {float(wall_value)})"
@@ -40,8 +41,8 @@ def observe(parent, out, *, release, wall_value=1.0):
     (out/"case.cfg").write_text(cfg,encoding="ascii")
     sources=[out/"initial_flow.csv",Path(__file__).resolve(),parent/"engine_process.json",ROOT/"scripts/thermistorBead.py"]
     write_json(out/"engine_request.json",dict(workDirectory=str(out),configFile="case.cfg",meshFile="mesh.su2",
-              maximumSeconds=60,threads=1,jobToken=str(uuid.uuid4()),sourceFiles=[p.relative_to(ROOT).as_posix() for p in sources]))
-    solve(out)
+              maximumSeconds=maximum_seconds,threads=1,jobToken=str(uuid.uuid4()),sourceFiles=[p.relative_to(ROOT).as_posix() for p in sources]))
+    solve(out,memory_bytes=memory_bytes,output_bytes=output_bytes)
     terminal(out)
 
 

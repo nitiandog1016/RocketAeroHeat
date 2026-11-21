@@ -77,7 +77,7 @@ def prepare(folder, grid):
                sourceFiles=[p.relative_to(ROOT).as_posix() for p in inputs]))
 
 
-def solve(folder):
+def solve(folder, *, memory_bytes=2*1024**3, output_bytes=180*1024**2):
     request = folder/"engine_request.json"
     # 工作台关闭时停止其专属运行。单独启动阶段脚本时仍沿用原有监督方式。
     flag = os.environ.get("RAH_THERMISTOR_CANCEL_FILE")
@@ -97,7 +97,7 @@ def solve(folder):
                 except psutil.NoSuchProcess:
                     pass
                 size = max(size,sum(p.stat().st_size for p in folder.iterdir() if p.is_file()))
-                if not exceed and (peak > 2*1024**3 or size > 180*1024**2):
+                if not exceed and (peak > memory_bytes or size > output_bytes):
                     exceed = True
                     write_json(folder/"engine_cancel.json",dict(jobToken=read(request)["jobToken"]))
                 if flag and Path(flag).exists() and not (folder/"engine_cancel.json").exists():
@@ -109,8 +109,8 @@ def solve(folder):
             proc.wait()
     size = max(size,sum(p.stat().st_size for p in folder.iterdir() if p.is_file()))
     write_json(folder/"resources.json",dict(peakSampledFamilyRSSBytes=peak,directoryBytes=size,
-                                            resourceExceeded=bool(exceed or size>180*1024**2)))
-    if proc.returncode or exceed or size>180*1024**2 or read(folder/"engine_process.json")["cancelled"]:
+                                            resourceExceeded=bool(exceed or size>output_bytes)))
+    if proc.returncode or exceed or size>output_bytes or read(folder/"engine_process.json")["cancelled"]:
         raise RuntimeError("热敏珠原生计算结束，请核对原生回执")
 
 

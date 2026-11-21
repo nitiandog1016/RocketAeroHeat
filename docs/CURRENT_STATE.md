@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-21。带线 B 型热敏珠在 3 m/s 空气、299.15 K 给定壁温下，式（28）预测珠部放热 4.27991 mW，第二、三档三维珠部积分分别为 5.13711、4.97796 mW。使用表列极限 Nu 会使工程放热增加 2.769 µW。6 K 温差的实验偏差未知。两档各覆盖 10,272 / 10,272 面、3.19665061 mm²。新增 0 面、0 m²，逐面联合实验验证面积为 0 m²。[方法与验收](validation/v310/RESULTS.md) · [第三档三维页](../outputs/v310_validation/fine01/workbench/index.html) · [实测点核对](validation/v309/RESULTS.md) · [给定壁温](validation/v308/RESULTS.md)
+2026-11-21。带线 B 型热敏珠在 3 m/s 沿 −Y 侧吹、给定壁温 299.15 K 下，首次得到该工况全部 10,272 面、3.19665061 mm² 的压力和热流。整件放热 5.74320 mW，前引线端面 10267 号放热最强。X = 0.172 mm 截面迎风与背风近邻的表压分别为 +7.16 和 −2.29 Pa。独立能量收支相对差 3.64×10⁻⁸，逐面联合实验验证面积为 0 m²。[全周侧吹验收](validation/v311/RESULTS.md) · [侧吹三维页](../outputs/v311_validation/ui02/workbench/index.html) · [轴向工程预测](validation/v310/RESULTS.md)
 
-<!-- records:last_completed=v310 -->
+<!-- records:last_completed=v311 -->
 <!-- records:active=none -->
-<!-- records:base_commit=2c9e0ad983487e69919003afc7661d10a62db45b -->
+<!-- records:base_commit=84c7502de55a8627c9382a6545e693b81a8a9f3c -->
 
 前中段两轮网格排列候选已关闭。约 12 K 温差下，第三档珠部平均换热比原论文图读高 22.80%。[网格试验结论](validation/v307/RESULTS.md)
 
@@ -38,7 +38,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-带线 B 型热敏珠的 3 m/s 侧向来流需要完整方位的体网、边界与原面映射。[当前下一决定](validation/v310/NEXT_DECISION.md)
+核对 20D 至 30D 远场半径对全周侧吹的热峰、七区功率和周向分布的影响。[当前下一决定](validation/v311/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

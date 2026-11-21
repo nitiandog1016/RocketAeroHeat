@@ -3,14 +3,19 @@ function mesh=prepareThermistorLeadMesh(oriented,windowOpen,variant,refineLeads)
 if nargin<2,windowOpen=[];end
 if nargin<3,variant='leads';end
 if nargin<4,refineLeads=false;end
-variant=validatestring(variant,{'leads','midbody'});options={};
+variant=validatestring(variant,{'leads','midbody','sidewind'});options={};script='thermistorLeadWorkbench.py';
 if strcmp(variant,'midbody'),options={'--midbody'};end
-if refineLeads,assert(strcmp(variant,'leads'));[~,options]=thermistorLeadGridChoice(refineLeads);end
-[reference,source]=thermistorWorkbenchModel(variant);
+model=variant;
+if strcmp(variant,'sidewind')
+    script='thermistorSidewindWorkbench.py';model='leads';
+elseif refineLeads
+    assert(strcmp(variant,'leads'));[~,options]=thermistorLeadGridChoice(refineLeads);
+end
+[reference,source]=thermistorWorkbenchModel(model);
 assert(isequal(reference.V,oriented.V) && isequal(reference.F,oriented.F),'RAH:Lead:Geometry','试件几何或面序不符。');
 root=fileparts(mfilename('fullpath'));work=fullfile(root,'outputs',['thermistor_' variant '_' char(java.util.UUID.randomUUID())]);
 mkdir(work);folder=fullfile(work,'prepared');
-runCM011Python({fullfile(root,'scripts','thermistorLeadWorkbench.py'),'prepare',folder,options{:}}, ...
+runCM011Python({fullfile(root,'scripts',script),'prepare',folder,options{:}}, ...
     fullfile(work,'prepare.log'),@pulse,true);
 path=fullfile(folder,'prepared.json');p=jsondecode(fileread(path));
 assert(strcmp(source.bodySHA256,p.bodySHA256) && strcmp(p.directory,folder),'RAH:Lead:Source','准备记录与试件不符。');

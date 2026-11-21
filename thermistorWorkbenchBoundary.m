@@ -4,6 +4,14 @@ reference=struct('speed',3,'airPressurePa',101325,'airTemperatureK',293.15, ...
     'wallTemperatureK',305.15,'alphaDeg',0,'betaDeg',0);
 if nargin<2,angularCells=2;end
 if nargin<3,cfg=struct();end
+% 全周带线侧吹使用独立的来流向量，几何长轴固定沿 +X。
+if isfield(cfg,'thermistorVariant') && strcmp(cfg.thermistorVariant,'sidewind')
+    reference.wallTemperatureK=299.15;reference.betaDeg=90;
+    assert(angularCells==48 && isequal(b,reference),'RAH:Lead:Sidewind','侧吹使用沿 −Y 的 3 m/s 来流和 299.15 K 给定壁温。');
+    fs=struct('speed',b.speed,'pressure',b.airPressurePa,'temperature',b.airTemperatureK, ...
+        'alpha',0,'beta',90,'unitFlowDirection',[0 -1 0],'velocityMps',[0 -b.speed 0]);
+    return;
+end
 if angularCells==48
     % 全周启动工况的壁温和来流与构造初场一致，限定终点由两个物理半步确定。
     reference.speed=6;reference.wallTemperatureK=303.15;

@@ -12,7 +12,7 @@ from thermistorLeadMesh import SIDES,VTK
 from thermistorBead import ENGINE,ENGINE_SHA,ROOT,read,sha,write_json
 
 
-def load_mesh(path):
+def load_mesh(path,expected_markers=("far","sym0","sym1","wall")):
     """读取本项目写出的 SU2 网格，保留各面和各体单元的有序连接。"""
     with path.open(encoding="ascii") as f:
         def count(key):
@@ -34,7 +34,7 @@ def load_mesh(path):
                 faces.append(tuple(ids))
             boundary[name]=faces
         assert not f.read().strip()
-    assert set(boundary)=={"far","sym0","sym1","wall"}
+    assert set(boundary)==set(expected_markers)
     return cells,xyz,boundary
 
 
