@@ -37,6 +37,7 @@ method.ValueChangedFcn=@(~,~)drawMesh();zoom.ValueChangedFcn=@(~,~)drawMesh();dr
 page=struct('tab',tab,'method',method,'zoom',zoom,'line',plotLine,'outcome',outcome,'stats',stats, ...
     'build',build,'message',message,'report',report,'flux',flux,'point',point, ...
     'edgeMark',edgeMark,'diffusion',diffusion);
+page.balance=addShortSupportBalanceTab(tabs,folder,flux);
     function kind=gridKind()
         % 两种质量通量计算共用同一套混合网，重建时按实际网格类型分派。
         kind=method.Value;
