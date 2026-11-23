@@ -28,8 +28,9 @@ def flow_source(source):
     return '#include "far_mass.hpp"\n'+head+"void CIncEulerSolver::BC_Far_Field("+body+"void CIncEulerSolver::"+tail
 
 
-def scalar_source(source):
-    head,rest=adapted(source).split("::BoundaryFluxResidual(",1)
+def scalar_source(source,node_count=101122):
+    text=once(adapted(source),"nPointDomain!=101122",f"nPointDomain!={int(node_count)}")
+    head,rest=text.split("::BoundaryFluxResidual(",1)
     body,tail=rest.split("::FluidInterfaceFluxResidual(",1)
     start=body.index("      massFlux = BoundedScalarBCFlux(")
     end=body.index("normal.data());",start)+len("normal.data());")
@@ -57,8 +58,14 @@ def scalar_source(source):
     return head+"::BoundaryFluxResidual("+body+"::FluidInterfaceFluxResidual("+tail
 
 
-def build(out):
+def build(out,prepared=None):
     out.mkdir(parents=True,exist_ok=False)
+    node_count=101122;binding={}
+    if prepared is not None:
+        spec=read(prepared/"prepared.json")
+        assert sha(prepared/"mesh.su2")==spec["files"]["mesh.su2"]
+        node_count=spec["geometry"]["nodes"]
+        binding=dict(preparedSHA256=sha(prepared/"prepared.json"),meshSHA256=spec["files"]["mesh.su2"],nodes=node_count)
     src=KIT/"source";work=KIT/"build-v117";compiler=KIT/"toolchain/w64devkit/bin/g++.exe"
     cache=json.loads(gzip.decompress((ROOT/"docs/validation/v272/evidence/build.json.gz").read_bytes()))
     old,=[Path(k) for k in cache["cachedBuildInputs"] if Path(k).as_posix().endswith("/source/SU2_CFD/src/integration/CIntegration.cpp")]
@@ -89,7 +96,7 @@ def build(out):
     (out/"silver.hpp").write_text('#include "far_mass.hpp"\n'+header,encoding="utf8")
     for path in (HERE/"far_mass.hpp",PREV/"capacity.hpp"):(out/path.name).write_bytes(path.read_bytes())
     (out/"CIncEulerSolver.cpp").write_text(flow_source((src/FLOW).read_text("utf8")),encoding="utf8")
-    (out/"CScalarSolver.inl").write_text(scalar_source((src/SCALAR).read_text("utf8")),encoding="utf8")
+    (out/"CScalarSolver.inl").write_text(scalar_source((src/SCALAR).read_text("utf8"),node_count),encoding="utf8")
     species=once((src/SPECIES).read_text("utf8"),'"../../include/solvers/CScalarSolver.inl"','"CScalarSolver.inl"')
     (out/"CSpeciesSolver.cpp").write_text('#include "silver.hpp"\n'+species,encoding="utf8")
     objs=[];entries=read(work/"compile_commands.json")
@@ -102,7 +109,7 @@ def build(out):
     link=read(DRIVER/"wire_process.json")["args"];exe=out/"shared.exe";main=DRIVER/"SU2_CFD.obj"
     assert Path(link[3])==main and sha(main)=="6f0079a7d064d790699f24cdf85cbd80ad4f4c5278039f1020b4a722d122cd74"
     invoke("shared",[compiler,"-o",exe,main,*objs,*link[4:]],work,out,180,3,bin_directory=compiler.parent)
-    write_json(out/"build.json",dict(exe=sha(exe),main=sha(main),archive=sha(KIT/"su2.zip"),recipe=sha(Path(__file__)),
+    write_json(out/"build.json",dict(exe=sha(exe),main=sha(main),archive=sha(KIT/"su2.zip"),recipe=sha(Path(__file__)),**binding,
                     files={p.name:sha(p) for p in out.iterdir() if p.suffix in (".hpp",".inl",".cpp",".obj")}))
 
 

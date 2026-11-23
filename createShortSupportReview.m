@@ -1,6 +1,7 @@
-function view=createShortSupportReview(host,g,job)
+function view=createShortSupportReview(host,g,job,compareNearWall)
 % 模块一：在科研工作台显示带支管名义外形，接头、测站及面积共用同一套面号。
 if nargin<3,job='';end
+if nargin<4,compareNearWall=false;end
 tabs=uitabgroup(host,'Tag','short-sphere-review','Visible','off','Units','normalized','Position',[0 0 1 1]);
 try
     tab=uitab(tabs,'Title','双支管银球');layout=uigridlayout(tab,[4 1]);
@@ -31,7 +32,13 @@ try
         'ledger',ledger,'geometry',g,'exportTo',@(path)exportShortSupportedSphere(g,path));
     if g.summary.extensionD==1
         view.fluidGrid=addShortSupportGridTab(tabs,g);
-        [m,stations,r]=loadShortSupportSurface(g,job);
+        if compareNearWall
+            [m,stations,r]=loadShortSupportSurface(g,job,'fine');
+            [m,pair]=attachShortSupportGridPair(m,r,g);
+            view.comparison=addShortSupportResolutionTab(tabs,pair);
+        else
+            [m,stations,r]=loadShortSupportSurface(g,job);
+        end
         view.web=createAerothermalWebTab(tabs,m);view.mesh=m;view.report=r;
         view.surface=addShortSupportSurfaceTab(tabs,stations,r);tabs.SelectedTab=view.web.tab;
     end

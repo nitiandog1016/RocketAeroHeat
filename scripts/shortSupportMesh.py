@@ -29,7 +29,7 @@ def reference():
     return data,info
 
 
-def section(radius, end, structured):
+def section(radius, end, structured, split_near=False):
     angle=np.arcsin(2*radius)
     t=np.linspace(np.pi-angle,angle,COUNTS[2]+1)
     sphere=.5*np.c_[np.cos(t),np.sin(t)]
@@ -39,6 +39,12 @@ def section(radius, end, structured):
     mirror=np.array([-1,1])
     wall=np.vstack([cap[:0:-1]*mirror,pipe[:0:-1]*mirror,sphere[:-1],pipe[:-1],cap])
     layers=wall_layers(wall,.002)
+    if split_near:
+        # 对每个既有间隔插入中面，原五层及混合外区接口的位置由原数组直接保留。
+        nested=np.empty((2*len(layers)-1,*layers.shape[1:]))
+        nested[::2]=layers
+        nested[1::2]=(layers[:-1]+layers[1:])/2
+        layers=nested
     if structured:
         # 球身中段沿近径向伸展，端盖和直管各留连续的外圈角度，避免极区挤在同一方向。
         alpha=np.linspace(np.pi,0,len(wall))
@@ -104,10 +110,10 @@ def audit_volume(folder):
                 minCellVolumeD3=lowest,minConeVolumeD3=cone,volumeD3=volume)
 
 
-def prepare(out,structured=False):
+def prepare(out,structured=False,split_near=False):
     data,info=reference();case=read(CASE);s=condition(case);D=s["diameterM"]
     out.mkdir(parents=True,exist_ok=False)
-    wall,xy,cells2,far=section(info["tubeDiameterM"]/(2*D),info["endYM"]/D,structured)
+    wall,xy,cells2,far=section(info["tubeDiameterM"]/(2*D),info["endYM"]/D,structured,split_near)
     rays=PHASE+np.arange(SECTORS+1)*2*np.pi/SECTORS
     rotated,ids=rotate(xy,rays,True)
     xyz=rotated[:,[1,0,2]].copy();xyz[:,2]*=-1
@@ -136,7 +142,8 @@ def prepare(out,structured=False):
     p=xyz[corners];vec=np.cross(p[:,2]-p[:,0],p[:,3]-p[:,1])/2
     area=np.linalg.norm(vec,axis=1);normals=vec/area[:,None]
     heights=np.einsum("ijk,ik->ij",xyz[lookup[corners]]-p,normals)
-    assert heights.min()>.00195 and heights.max()<.00205
+    divisor=2 if split_near else 1
+    assert heights.min()>.00195/divisor and heights.max()<.00205/divisor
     group=np.tile(np.repeat(REGIONS,COUNTS),SECTORS)
     # 接头共享球面温界，管壁其余排与端盖给定相同赤道温度。
     tags=ids[:,:width];sphere_nodes=np.unique(tags[:,23:72])
@@ -152,10 +159,10 @@ def prepare(out,structured=False):
     np.savetxt(out/"initial.csv",np.c_[np.arange(len(xyz)),xyz,state],delimiter=",",comments="",header=HEADER,fmt=["%d"]+["%.17g"]*9)
     np.savez_compressed(out/"mapping.npz",xyz=xyz,wet=wet,theta=theta,first=first,corners=corners,
                         nativeArea=area*D**2,group=group)
-    seal_prepared(out)
+    seal_prepared(out,split_near)
 
 
-def seal_prepared(out):
+def seal_prepared(out,split_near=False):
     data,info=reference();case=read(CASE);s=condition(case);D=s["diameterM"]
     stats=audit_volume(out)
     with np.load(out/"mapping.npz") as z:
@@ -163,9 +170,11 @@ def seal_prepared(out):
         p=xyz[c];q=xyz[z["first"][np.searchsorted(wet,c)]]
     normal=np.cross(p[:,2]-p[:,0],p[:,3]-p[:,1])
     height=np.einsum("ijk,ik->ij",q-p,normal/np.linalg.norm(normal,axis=1)[:,None])
-    assert height.min()>.00195 and height.max()<.00205
+    divisor=2 if split_near else 1
+    assert height.min()>.00195/divisor and height.max()<.00205/divisor
     stats.update(minFirstM=height.min()*D,maxFirstM=height.max()*D,outerRadiusD=14,
                  nativeAreasM2=np.bincount(group,area)[1:].tolist())
+    if split_near:stats["nearWallIntervals"]=10
     from shortSupportTransfer import transfer
     stats["transfer"]=transfer(out,data,s,stats)
     files=["mesh.su2","initial.csv","profile.dat","release.dat","mapping.npz","transfer.npz"]
@@ -178,5 +187,6 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output",type=Path)
     parser.add_argument("--outer",choices=("hybrid","structured"),default="hybrid")
+    parser.add_argument("--split-near",action="store_true",help="将原五个近壁间隔全部对半")
     args=parser.parse_args()
-    out=args.output.resolve();out.relative_to(ROOT/"outputs");prepare(out,args.outer=="structured")
+    out=args.output.resolve();out.relative_to(ROOT/"outputs");prepare(out,args.outer=="structured",args.split_near)

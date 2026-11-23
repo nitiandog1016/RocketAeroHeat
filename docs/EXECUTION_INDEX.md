@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v330 双支管试件近壁间隔对半](validation/v330/RESULTS.md) · [同色标云图与分区差异](validation/v330/evidence/nearwall.png) · [下一项](validation/v330/NEXT_DECISION.md)。在相同 32,480 原面上整件放热变化 −0.0834%，近峰区域交并面积比 99.08%，量热偏差仍约 +38.6%。
+
 - [v329 双支管银球单工况全表面结果](validation/v329/RESULTS.md) · [热流云图与七站](validation/v329/evidence/surface.png) · [下一项](validation/v329/NEXT_DECISION.md)。统一远场通量后 32,480 面 p/q 全覆盖；两次独立冷算面表一致，外露银球折合量热高 38.43%。
 
 - [v328 双支管银球的有界稳态及远场热量差](validation/v328/RESULTS.md) · [逐次历史、边界与原始回执](validation/v328/evidence/receipts.zip) · [下一项](validation/v328/NEXT_DECISION.md)。600 次更新有界且残差收敛，远场与壁面差 0.640012%。

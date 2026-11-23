@@ -19,9 +19,9 @@ from thermistorWireSurface import residual
 from shortSphere65 import conductivity, CASE
 
 
-def check(work,ui):
+def check(work,ui,*,near_refined=False):
     data=ROOT/"cases/short_sphere"
-    with ZipFile(data/"supportedSurface65.zip") as z:
+    with ZipFile(data/("supportedFine65.zip" if near_refined else "supportedSurface65.zip")) as z:
         surface=np.genfromtxt(io.BytesIO(z.read("wall.csv")),names=True,delimiter=",")
         s=json.loads(z.read("summary.json"));stations=np.genfromtxt(io.BytesIO(z.read("stations.csv")),names=True,delimiter=",")
     with ZipFile(data/"supported65.zip") as z:g=json.loads(z.read("geometry.json"))
@@ -54,6 +54,8 @@ def check(work,ui):
         required=("target","source","targetFraction","sourceFraction","targetArea","region","nativeRegion","nativeCorners",
                   "nativeArea","nativeWallXYZD","firstXYZD")
         target,source,wt,ws,area,group,srcGroup,corners,srcArea,wallXYZ,firstXYZ=[transfer[k] for k in required]
+    # 细网首层位于旧壁节点与旧首层的几何中点，独立于新网映射表。
+    if near_refined:firstXYZ=(wallXYZ+firstXYZ)/2
     tree=cKDTree(saved[:,1:4]);dw,wall=tree.query(wallXYZ);df,first=tree.query(firstXYZ)
     assert max(dw.max(),df.max())<1e-12 and len(np.unique(wall))==len(wall)==5954 and not np.intersect1d(wall,first).size
     load=scale*(release[wall]-correction[wall])

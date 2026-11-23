@@ -49,25 +49,31 @@ def measure_stations(xyz,wet,sphere,q,tw,physical,case):
     return np.array(rows)
 
 
-def mapped(work,out):
+def mapped(work,out,*,prepared=PREP,expected_mesh=None):
     thermal=read(work/"thermal.json")
     assert thermal["passed"] and thermal["thermalChange"]<.002 and thermal["controlError"]<2e-12
-    config=read(PREP/"prepared.json");s=config["condition"];case=read(CASE)
+    config=read(prepared/"prepared.json");s=config["condition"];case=read(CASE)
     grid=read(DATA/"supportedGrid65.json")
     assert sha(DATA/"supported65.zip")==grid["bodySHA256"] and sha(DATA/"supportedTransfer65.npz")==grid["publicTransferSHA256"]
-    assert grid["hybrid"]["meshSHA256"]==thermal["meshSHA256"] and grid["caseSHA256"]==thermal["caseSHA256"]
+    mesh_key=grid["hybrid"]["meshSHA256"] if expected_mesh is None else expected_mesh
+    assert sha(prepared/"mesh.su2")==mesh_key==thermal["meshSHA256"] and grid["caseSHA256"]==thermal["caseSHA256"]
     with ZipFile(DATA/"supported65.zip") as z:
         body=json.loads(z.read("geometry.json"))
         reference=list(csv.DictReader(io.StringIO(z.read("stations.csv").decode("ascii"))))
-    with np.load(PREP/"mapping.npz") as mesh:
+    with np.load(prepared/"mapping.npz") as mesh:
         xyz,wet,first,corners,sourceArea,group,theta=(mesh[k] for k in ("xyz","wet","first","corners","nativeArea","group","theta"))
     for name,release in (("early","releaseEarly"),("late","releaseLate")):
         actual=budget(work/name,work/release,wet,thermal["scale"])
         assert actual==thermal[name] and abs(actual["physicalGapFraction"])<.005
     out.mkdir(parents=True,exist_ok=False)
-    with np.load(PREP/"transfer.npz") as m:
+    with np.load(prepared/"transfer.npz") as m:
         target,source,wTarget,wSource,area,regions=(m[k] for k in ("target","source","targetFraction","sourceFraction","targetArea","region"))
-    assert sha(PREP/"mapping.npz")==config["files"]["mapping.npz"] and sha(PREP/"transfer.npz")==config["files"]["transfer.npz"]
+    assert sha(prepared/"mapping.npz")==config["files"]["mapping.npz"] and sha(prepared/"transfer.npz")==config["files"]["transfer.npz"]
+    with np.load(DATA/"supportedTransfer65.npz") as public:
+        np.testing.assert_array_equal(public["nativeWallXYZD"],xyz[wet])
+        np.testing.assert_array_equal(public["nativeCorners"],np.searchsorted(wet,corners))
+        for name,values in (("target",target),("source",source),("targetFraction",wTarget),("sourceFraction",wSource)):
+            np.testing.assert_array_equal(public[name],values)
     np.testing.assert_array_equal(area,body["areaM2"]);np.testing.assert_array_equal(regions,body["regionID"])
     np.testing.assert_array_equal(regions[target],group[source])
     v=np.asarray(body["V"]);f=np.array(body["F"])-1;tri=v[f]

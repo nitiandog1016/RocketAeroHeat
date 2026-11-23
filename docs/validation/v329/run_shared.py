@@ -10,15 +10,15 @@ from run import CASE, PREP, configuration, observe
 from verify import budget, table
 
 
-def advance(folder,start,exe,steps,release=False,capture=False):
+def advance(folder,start,exe,steps,release=False,capture=False,*,prepared=PREP,plan=HERE/"PLAN.md"):
     folder.mkdir()
-    s=read(PREP/"prepared.json")
-    names={"mesh.su2":PREP/"mesh.su2","wire_boundary.dat":PREP/("release.dat" if release else "profile.dat"),"initial_flow.csv":start}
+    s=read(prepared/"prepared.json")
+    names={"mesh.su2":prepared/"mesh.su2","wire_boundary.dat":prepared/("release.dat" if release else "profile.dat"),"initial_flow.csv":start}
     for name,path in names.items():os.link(path,folder/name)
     assert all(sha(folder/n)==s["files"][names[n].name] for n in ("mesh.su2","wire_boundary.dat"))
     cfg=folder/"case.cfg";cfg.write_text(configuration(s["condition"],steps,release,"BOUNDED_SCALAR"),encoding="ascii")
     if steps==200:assert sha(cfg)=="f1e0a615abb10c46560e1c446d5d8b61db9eac8d968aab748534fc1ca41a01cf"
-    locks=[exe,cfg,*[folder/k for k in names],PREP/"prepared.json",CASE,HERE/"PLAN.md",Path(__file__).resolve()]
+    locks=[exe,cfg,*[folder/k for k in names],prepared/"prepared.json",CASE,plan,Path(__file__).resolve()]
     if capture:
         flag=folder/"capture.flag";flag.write_bytes(b"Short 65 endpoint\n");locks.append(flag)
     os.environ["PATH"]=str(KIT/"toolchain/w64devkit/bin")+os.pathsep+os.environ["PATH"]
@@ -41,11 +41,11 @@ def advance(folder,start,exe,steps,release=False,capture=False):
         assert len(trace)==steps*2 and np.all(trace["stage"][::2]=="low") and np.all(trace["stage"][1::2]=="actual")
         assert np.all(trace["below"]==0) and np.all(trace["above"]==0) and np.max(trace["wallDrift"])<2e-14
         record.update(rawMax20=float(max(trace["rawRMS"][1::2][-20:])),pairs=sha(folder/"far_pairs.csv"),trace=sha(folder/"stages.csv"))
-        with np.load(PREP/"mapping.npz") as m:wet,wall=m["wet"],m["theta"]
+        with np.load(prepared/"mapping.npz") as m:wet,wall=m["wet"],m["theta"]
         frames={}
         for index in sorted({steps-1,*range(100,steps,100)}):
             name=f"restart_{index:06d}.csv";state=table(folder,name);fields=s["condition"]
-            np.testing.assert_array_equal(state[:,0],np.arange(101122));assert np.isfinite(state).all()
+            np.testing.assert_array_equal(state[:,0],np.arange(s["geometry"]["nodes"]));assert np.isfinite(state).all()
             np.testing.assert_allclose(state[wet,9],wall,atol=2e-14,rtol=0)
             assert (fields["airPa"]+fields["rho"]*fields["speedMps"]**2*state[:,4]).min()>0
             assert state[:,9].min()>=-1e-12 and state[:,9].max()<=wall.max()+1e-12
@@ -56,16 +56,17 @@ def advance(folder,start,exe,steps,release=False,capture=False):
     return record
 
 
-def solve(work,driver):
+def solve(work,driver,*,prepared=PREP,plan=HERE/"PLAN.md"):
     work.mkdir(parents=True,exist_ok=False)
     record=read(driver/"build.json");exe=driver/"shared.exe"
     assert sha(exe)==record["exe"] and all(sha(driver/p)==v for p,v in record["files"].items())
-    assert sha(PREP/"prepared.json")=="ca9c622e056924cb0482e06e5f3561b402d7c40df079da93dd62cd61a98587b0"
-    seed=PREP/"initial.csv"
-    assert sha(seed)==read(PREP/"prepared.json")["files"]["initial.csv"]
+    spec=read(prepared/"prepared.json")
+    assert sha(prepared/"prepared.json")==record.get("preparedSHA256","ca9c622e056924cb0482e06e5f3561b402d7c40df079da93dd62cd61a98587b0")
+    seed=prepared/"initial.csv"
+    assert sha(seed)==spec["files"]["initial.csv"] and spec["caseSHA256"]==sha(CASE)
     trend=[]
     for i in range(1,13):
-        stage=work/f"steady{i:02d}";r=advance(stage,seed,exe,200)
+        stage=work/f"steady{i:02d}";r=advance(stage,seed,exe,200,prepared=prepared,plan=plan)
         worst=max(max(r["window"]),np.log10(r["rawMax20"]));trend.append(worst)
         print(stage.name,worst,flush=True);seed=stage/"restart.csv"
         if worst < -8:break
@@ -76,11 +77,11 @@ def solve(work,driver):
     for name,start,steps,let,snap in (("plus20",seed,20,False,False),("control",seed,1,False,False),
             ("early",seed,1,False,True),("releaseEarly",seed,1,True,False),
             ("late",work/"plus20/restart.csv",1,False,True),("releaseLate",work/"plus20/restart.csv",1,True,False)):
-        advance(work/name,start,release if let else exe,steps,let,snap)
-    check(work)
+        advance(work/name,start,release if let else exe,steps,let,snap,prepared=prepared,plan=plan)
+    check(work,prepared)
 
 
-def check(work):
+def check(work,prepared=PREP):
     conv=read(work/"converged.json");seed=conv["frame"]
     for name in ("early","late","control","plus20","releaseEarly","releaseLate"):
         d=work/name;r=read(d/"record.json")
@@ -88,8 +89,8 @@ def check(work):
         assert r["end"]==sha(d/"restart.csv") and r["history"]==sha(d/"history.csv")
     controlError=float(np.max(abs(table(work/"control","restart.csv")-table(work/"early","restart.csv"))))
     assert controlError<2e-12 and max(read(work/"plus20/record.json")["window"])<-8
-    s=read(PREP/"prepared.json")["condition"];scale=s["rho"]*s["cp"]*s["speedMps"]*s["diameterM"]**2*s["scalarUnitK"]
-    with np.load(PREP/"mapping.npz") as m:wet=m["wet"]
+    s=read(prepared/"prepared.json")["condition"];scale=s["rho"]*s["cp"]*s["speedMps"]*s["diameterM"]**2*s["scalarUnitK"]
+    with np.load(prepared/"mapping.npz") as m:wet=m["wet"]
     ends={}
     for name,rel in (("early","releaseEarly"),("late","releaseLate")):
         obs=work/name;ends[name]=budget(obs,work/rel,wet,scale)
@@ -97,7 +98,7 @@ def check(work):
         n=n[n[:,0].argsort()];np.testing.assert_array_equal(n[flow[:,0].astype(int),11],flow[:,1])
     change=abs(ends["late"]["wallW"]/ends["early"]["wallW"]-1)
     passed=change<.002 and all(abs(e["physicalGapFraction"])<.005 for e in ends.values())
-    result=dict(caseSHA256=sha(CASE),meshSHA256=sha(PREP/"mesh.su2"),**ends,scale=scale,thermalChange=change,controlError=controlError,
+    result=dict(caseSHA256=sha(CASE),meshSHA256=sha(prepared/"mesh.su2"),**ends,scale=scale,thermalChange=change,controlError=controlError,
                 passed=bool(passed),updates=len(conv["trend"])*200)
     write_json(work/"thermal.json",result)
     if not passed:raise ValueError("端点热量门槛未通过")

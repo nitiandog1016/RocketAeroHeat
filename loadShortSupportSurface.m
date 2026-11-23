@@ -1,9 +1,15 @@
-function [mesh,stations,s]=loadShortSupportSurface(g,job)
+function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution)
 % 模块一：核对同一几何、温界、收敛端点和五区交叠文件，从存档或新算目录取数。
+if nargin<3,resolution='coarse';end
 root=fileparts(mfilename('fullpath'));cases=fullfile(root,'cases','short_sphere');
 if nargin<2 || isempty(job)
-    archive=fullfile(cases,'supportedSurface65.zip');
-    assert(strcmp(cm011FileSHA256(archive),'2e5b065e3b7bd7f15dc46a22bdc6f5a041bf57ebb9a158c31cb46426953c772b'));
+    if strcmp(resolution,'fine')
+        pair=readShortSupportGridPair(cases);archive=fullfile(cases,'supportedFine65.zip');
+        assert(strcmp(cm011FileSHA256(archive),pair.fineArchiveSHA256));
+    else
+        archive=fullfile(cases,'supportedSurface65.zip');
+        assert(strcmp(cm011FileSHA256(archive),'2e5b065e3b7bd7f15dc46a22bdc6f5a041bf57ebb9a158c31cb46426953c772b'));
+    end
 else
     ack=jsondecode(fileread(fullfile(job,'completed.json')));archive=fullfile(job,'surface','surface.zip');
     assert(strcmp(cm011FileSHA256(archive),ack.archiveSHA256) && ...

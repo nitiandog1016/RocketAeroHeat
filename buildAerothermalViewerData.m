@@ -607,6 +607,24 @@ if isfield(mesh,'thermistorPaired')
         end
     end
 end
+% 双支管的两套近壁网共用原面；两网同一物理量的色标相同，差值以零为中心。
+if isfield(mesh,'shortSupportGridPair')
+    pair=mesh.shortSupportGridPair;
+    data.shortSupportGridPair=rmfield(pair,{'coarseHeat','coarseGauge'});
+    scope=sprintf('同一名义双支管与给定温界。五层终帧 %s；十层终帧 %s。',pair.coarseFrame,pair.fineFrame);
+    dq=mesh.hybridWall.heatFluxWm2-pair.coarseHeat;dp=mesh.hybridWall.pressureGaugePa-pair.coarseGauge;
+    entries={'supportCoarseHeat','五层网 · 入壁热流','kW/m²',pair.coarseHeat/1000,'五层网独立释放壁反力和有界修正，五区守恒交叠'; ...
+        'supportCoarseGauge','五层网 · 相对环境壁压','Pa',pair.coarseGauge,'五层网壁节点表压按壁片面积和原面交叠加权'; ...
+        'supportHeatChange','入壁热流差 · 十层减五层','W/m²',dq,'两端点的同一原面入壁热流相减'; ...
+        'supportGaugeChange','相对壁压差 · 十层减五层','Pa',dp,'两端点的同一原面表压相减'};
+    for j=1:size(entries,1)
+        add(entries{j,1},entries{j,2},entries{j,3},entries{j,4},ones(n,1),repmat(entries(j,5),n,1),scope);
+        data.fields(end).computedStateLabel='研究数值解';data.fields(end).stateNote=scope;
+    end
+    data.comparisonColorRanges.heatFlux=pair.fluxRange;data.comparisonColorRanges.supportCoarseHeat=pair.fluxRange;
+    data.comparisonColorRanges.pressureGauge=pair.gaugeRange;data.comparisonColorRanges.supportCoarseGauge=pair.gaugeRange;
+    data.comparisonColorRanges.supportHeatChange=[-1 1]*max(abs(dq));data.comparisonColorRanges.supportGaugeChange=[-1 1]*max(abs(dp));
+end
 % 带线旧网与加密网在七区均可对照，和只在共同珠面定义的几何差别分开显示。
 if isfield(mesh,'thermistorLeadGrid')
     g=mesh.thermistorLeadGrid;
