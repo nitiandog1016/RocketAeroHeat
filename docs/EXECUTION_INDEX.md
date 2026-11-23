@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v324 双支管银球几何与逐原面外露面积](validation/v324/RESULTS.md) · [接头图](validation/v324/evidence/geometry.png) · [下一项](validation/v324/NEXT_DECISION.md)。88 个原球面受支管影响，两处接缝连续，七站均位于外露球面。
+
 - [v323 银球球后回流与六截面空间分辨率](validation/v323/RESULTS.md) · [原节点速度剖面](validation/v323/evidence/profiles.png) · [下一项](validation/v323/NEXT_DECISION.md)。轴线回流长 1.474 mm，两处背风测站的首层流向相反。
 
 - [v322 Short 银球 82.10 ms 全表面瞬时解](validation/v322/RESULTS.md) · [尾迹与背风换热](validation/v322/evidence/wake.png) · [下一项](validation/v322/NEXT_DECISION.md)。两种步长、六个同刻、4,464 面的结果通过数值核对，背风两站与实验的趋势差异仍在。
