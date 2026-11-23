@@ -11,16 +11,23 @@ assert(strcmp(cm011FileSHA256(fluxFile),'1c4fb8cff2b83f23ac4343b602b9b28a1c9d0f3
 flux=jsondecode(fileread(fluxFile));
 assert(strcmp(flux.caseSHA256,report.caseSHA256) && strcmp(flux.meshSHA256,report.hybrid.meshSHA256) && ...
     isequal({flux.frames.baselineSHA256},{report.hybrid.stages(end).frames.sha256}));
+diffFile=fullfile(folder,'supportedDiffusion65.json');
+assert(strcmp(cm011FileSHA256(diffFile),'adb09a0bbafea46d9547cc65cf47c7eed8412d0a99e33c03137e4013e7d22b3d'));
+diffusion=jsondecode(fileread(diffFile));
+assert(strcmp(diffusion.referenceSHA256,cm011FileSHA256(fluxFile)) && strcmp(diffusion.meshSHA256,flux.meshSHA256) && ...
+    strcmp(diffusion.caseSHA256,flux.caseSHA256) && diffusion.star.pointID==flux.first.worstID);
 tab=uitab(tabs,'Title','流体体网与计算状态');
 box=uigridlayout(tab,[6 2]);box.RowHeight={34,30,'1x',50,55,32};box.ColumnWidth={'1x','1x'};
 box.Padding=[14 8 14 8];heading=uilabel(box,'Text','Short Test 65 · 封闭有限支管 · Re = 882','FontWeight','bold');
 heading.Layout.Column=[1 2];
-method=uidropdown(box,'Items',{'混合外区','结构外区对照','混合外区 · 质量通量对照'}, ...
-    'ItemsData',{'hybrid','structured','flux'},'Value','hybrid');
+method=uidropdown(box,'Items',{'混合外区','结构外区对照','混合外区 · 质量通量对照','混合外区 · 扩散精度检验'}, ...
+    'ItemsData',{'hybrid','structured','flux','diffusion'},'Value','hybrid');
 zoom=uidropdown(box,'Items',{'球体与两侧接头','+Y 管根近壁层','全外域'},'ItemsData',{'body','joint','outer'},'Value','body');
 ax=uiaxes(box);ax.Layout.Column=[1 2];hold(ax,'on');plotLine=plot(ax,nan,nan,'Color',[.28 .40 .49],'LineWidth',.5);
 point=plot(ax,nan,nan,'o','MarkerFaceColor',[.74 .30 .12],'MarkerEdgeColor','white', ...
     'MarkerSize',9,'Visible','off','DisplayName','首次越界的最低值节点（径向投影）');
+edgeMark=plot(ax,nan,nan,'-o','Color',[.69 .27 .08],'MarkerFaceColor','white', ...
+    'LineWidth',2,'MarkerSize',4,'Visible','off','DisplayName','解析场检验中误差最大的边（径向投影）');
 xlabel(ax,'沿支管轴 Y/D');ylabel(ax,'子午径向距离 r/D');axis(ax,'equal');
 stats=uilabel(box,'WordWrap','on');stats.Layout.Column=[1 2];
 outcome=uilabel(box,'WordWrap','on');outcome.Layout.Column=[1 2];
@@ -28,11 +35,12 @@ build=uibutton(box,'Text','从几何生成所选体网','ButtonPushedFcn',@build
 message=uilabel(box,'Text','','WordWrap','on');
 method.ValueChangedFcn=@(~,~)drawMesh();zoom.ValueChangedFcn=@(~,~)drawMesh();drawMesh();
 page=struct('tab',tab,'method',method,'zoom',zoom,'line',plotLine,'outcome',outcome,'stats',stats, ...
-    'build',build,'message',message,'report',report,'flux',flux,'point',point);
+    'build',build,'message',message,'report',report,'flux',flux,'point',point, ...
+    'edgeMark',edgeMark,'diffusion',diffusion);
     function kind=gridKind()
         % 两种质量通量计算共用同一套混合网，重建时按实际网格类型分派。
         kind=method.Value;
-        if strcmp(kind,'flux'),kind='hybrid';end
+        if any(strcmp(kind,{'flux','diffusion'})),kind='hybrid';end
     end
     function drawMesh()
         % 模块二：绘制实际体网母平面，诊断页另标首次越界节点绕支管轴的投影。
@@ -47,7 +55,7 @@ page=struct('tab',tab,'method',method,'zoom',zoom,'line',plotLine,'outcome',outc
         geo=d.geometry;last=d.stages(end);frame=last.frames(end);
         stats.Text=sprintf('%d 个体单元，%d 个节点。%d 个求解壁片对应 %d 个原面，法向首层 %.2f–%.2f µm。', ...
             geo.cells,geo.nodes,geo.wallFaces,geo.transfer.targetFaces,1e6*geo.minFirstM,1e6*geo.maxFirstM);
-        point.Visible='off';outcome.Tooltip='';
+        point.Visible='off';edgeMark.Visible='off';outcome.Tooltip='';
         outcome.Text=sprintf(['本次稳态推进 %d 次，正常保存终帧。主温差标量下限为 −1e−12，' ...
             '末帧最小 %.4g，%d 个节点低于下限。已接受壁压与热流面积 0 m²。'], ...
             sum([d.stages.iterations]),frame.minScalar,frame.below);
@@ -61,10 +69,20 @@ page=struct('tab',tab,'method',method,'zoom',zoom,'line',plotLine,'outcome',outc
                 flux.method,f.index,f.minScalar,f.below,flux.lowerBound,flux.acceptedAreaM2);
             outcome.Tooltip=sprintf('温差标量 = (T − T∞) / %.0f K。终帧最低温差 %.3g K；原迎风格式同帧最低标量 %.4g，越界 %d 个。', ...
                 flux.scalarUnitK,flux.scalarUnitK*f.minScalar,f.baselineMinimum,f.baselineBelow);
+        elseif strcmp(method.Value,'diffusion')
+            % 模块三：仅显示解析场在真实边上的误差；区分制造场与试件壁面场。
+            s=diffusion.star;w=s.worst;ends=squeeze(s.segmentEndsD(s.edgeIDs==w.edge,:,:));
+            edgeMark.XData=ends(:,2);edgeMark.YData=hypot(ends(:,1),ends(:,3));edgeMark.Visible='on';
+            stats.Text=sprintf('橙线为节点 %d 附近的边 %d 的投影。线性 Y 温差场中，该边通量误差占扩散系数 × 梯度模 × 面积的 %.2f%%。', ...
+                s.pointID,w.edge,100*w.normalizedError);
+            outcome.Text=sprintf('逐面限幅 %.1f · 解析检验未通过。斜网三档加密均丢失整个非零截面通量，未启动新流场计算。合格壁压与热流面积 %g m²。', ...
+                diffusion.limitCoefficient,flux.acceptedAreaM2);
+            outcome.Tooltip=sprintf('原生无量纲量：该边有向解析通量 %.6g，限幅后 %.6g。方向为体节点 %d → %d。', ...
+                w.exact,w.limited,w.i,w.j);
         end
     end
     function buildGrid(~,~)
-        % 模块三：由同一源码重新生成体网，计算任务和浏览存档各有独立身份。
+        % 模块四：由同一源码重新生成体网，计算任务和浏览存档各有独立身份。
         kind=gridKind();job=fullfile(root,'outputs',['short65_grid_' char(java.util.UUID.randomUUID())]);
         build.Enable='off';method.Enable='off';zoom.Enable='off';
         unlock=onCleanup(@enableControls); %#ok<NASGU>

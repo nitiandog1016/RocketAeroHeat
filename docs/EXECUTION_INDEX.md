@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v327 双支管银球扩散精度检验](validation/v327/RESULTS.md) · [三档网格结果](validation/v327/evidence/cuts.csv) · [下一项](validation/v327/NEXT_DECISION.md)。沿边幅值限制在斜网解析场上完全丢失横向截面通量，该候选已关闭。
+
 - [v326 双支管银球的标量通量对照](validation/v326/RESULTS.md) · [首次越界诊断图](validation/v326/evidence/flux.png) · [下一项](validation/v326/NEXT_DECISION.md)。质量通量对照仍越界，首次最低值节点已核实八条边和隐式更新。
 
 - [v325 双支管流体体网与原生启动](validation/v325/RESULTS.md) · [网格与越界位置](validation/v325/evidence/mesh.png) · [下一项](validation/v325/NEXT_DECISION.md)。6,016 个壁片完成五区守恒映射；两套外区的首段均因主标量越界未获接受。
