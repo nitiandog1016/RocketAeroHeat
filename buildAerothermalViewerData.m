@@ -106,6 +106,7 @@ if isfield(mesh,'hybridWall')
     else
         wallMethod='输入壁温';
         if isfield(mesh,'thermistorWire'),wallMethod='珠部和接头等温，直引线按一维长线导热解逐节点给定，交叠积分至原面';end
+        if isfield(mesh,'thermometryFluxChange'),wallMethod='由电阻等效内部温度反推珠表面温度，长引线超温按同一比例作为空气侧边界';end
         add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({wallMethod},n,1),hybridScope);
     end
     % 混合结果使用适配器实际返回的算法，不沿用默认工程压力、热流的解释文字。
@@ -426,6 +427,12 @@ if isfield(mesh,'thermistorSidewind')
         data.caseNote=sprintf('B 珠 · 3 m/s 侧吹 · 线根 %.2f K · 名义线端 %.3f K · 长引线温度边界',mesh.hybridCondition.beadWallK,w.profile.endK);
         add('wireHeatFluxChange','引线边界热流差','kW/m²',mesh.thermistorWireFluxChange/1000,ones(n,1), ...
             repmat({'长引线三维入壁热流减同面均温控制解'},n,1),'同一原面和来流，均温参照与长引线终态分别记录');
+        if isfield(w,'thermometry')
+            m=w.thermometry;
+            data.caseNote=sprintf('B 珠 · 3 m/s · 电阻等效温度 %.2f K · 推算珠表面 %.4f K · %s',m.internalK,m.surfaceK,m.fieldMethod);
+            add('thermometryHeatFluxChange','测温修正热流差','kW/m²',mesh.thermometryFluxChange/1000,ones(n,1), ...
+                repmat({'修正场减 v317 同面长引线热流'},n,1),'原长引线参照为 12 K 珠表面超温。原生核对另外推进了 20 步，同步比较见测温记录');
+        end
     else
         data.caseNote=sprintf('带线 B 型热敏珠 · 全周侧吹 3 m/s · 给定壁温 %.6g K · 稳态',mesh.hybridCondition.wallTemperatureK);
     end

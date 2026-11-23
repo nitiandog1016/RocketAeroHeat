@@ -44,6 +44,12 @@ elseif isfield(data,'thermistorWire')
     t.uniform_reference_frame_sha256=repmat(string(w.baseFrame),n,1);
     t.wall_boundary_sha256=repmat(string(w.boundarySHA256),n,1);
     t.wall_input_K=tw.values(:);t.change_from_uniform_kW_m2=dq.values(:);
+    if isfield(w,'thermometry')
+        m=w.thermometry;t.resistance_temperature_K=repmat(m.internalK,n,1);t.inferred_bead_surface_K=repmat(m.surfaceK,n,1);
+        t.uniform_reference_temperature_ratio=repmat(m.scale,n,1);t.source_field_temperature_ratio=repmat(m.fieldFactor,n,1);
+        t.thermometry_reference_frame_sha256=repmat(string(m.referenceFrame),n,1);
+        change=data.fields(strcmp({data.fields.key},'thermometryHeatFluxChange'));t.thermometry_change_kW_m2=change.values(:);
+    end
     t.experiment_doi=repmat(string(w.experiment.doi),n,1);
 elseif isfield(data,'measuredPoint')
     % 截取单行时仍可辨认当前 12 K 场量路径，以及论文实际测量的空间范围。

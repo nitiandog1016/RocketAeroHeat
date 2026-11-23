@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v318 电阻等效温度与 B 珠表面温度](validation/v318/RESULTS.md) · [测温与功率对照](validation/v318/evidence/thermometry.png) · [下一项](validation/v318/NEXT_DECISION.md)。主测点内外温差 0.11058 K，珠部功率减少 0.09442 mW，剩余偏差 +25.22%。
+
 - [v317 B 珠长引线热边界与同步均温解](validation/v317/RESULTS.md) · [沿线温度与分段放热](validation/v317/evidence/wire.png) · [下一项](validation/v317/NEXT_DECISION.md)。引线降温使整件放热减少，珠部放热增加 0.01800 mW。
 
 - [v316 带线 B 珠独立冷启动](validation/v316/RESULTS.md) · [超差原面](validation/v316/evidence/outside_tolerance.csv) · [下一项](validation/v316/NEXT_DECISION.md)。全表面 10,272 面均已求解。与 v315 的局部差异集中在两根引线和端面。

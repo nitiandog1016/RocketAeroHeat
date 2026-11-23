@@ -11,7 +11,7 @@ switch angularCells
     case 'paired3'
         archive=fullfile(caseDir,'paired3.zip');
         manifest=jsondecode(fileread(fullfile(caseDir,'paired3.json')));expected=manifest.archiveSHA256;
-    case {'leads3','midbody3','leadsMidbody3','leadsThird3','outer30','sidewind3','sidewindOuter30','sidewindTipSpacing','sidewindAngular96','windPoint12','longWire12'}
+    case {'leads3','midbody3','leadsMidbody3','leadsThird3','outer30','sidewind3','sidewindOuter30','sidewindTipSpacing','sidewindAngular96','windPoint12','longWire12','resistance12'}
         contract=jsondecode(fileread(fullfile(caseDir,[angularCells '.json'])));
         archive=fullfile(caseDir,[angularCells '.zip']);expected=contract.archiveSHA256;
     case 'startup6'

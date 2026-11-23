@@ -213,10 +213,11 @@ switch action
             % 在按下计算按钮时确定同一任务的来源，防止另一次同工况的结果串入。
             measured=strcmp(state.cfg.thermistorVariant,'sidewind') && state.cfg.thermistorAngularCells==96;
             wire=measured && isfield(state.cfg.thermistorBoundary,'leadThermalModel');
+            reading=wire && isfield(state.cfg.thermistorBoundary,'resistanceTemperatureK');
             choices={'solve','archive'};
-            if wire,choices=[choices {'resumeWire'}];elseif measured,choices=[choices {'cold','resume'}];end
+            if wire && ~reading,choices=[choices {'resumeWire'}];elseif measured && ~wire,choices=[choices {'cold','resume'}];end
             source=validatestring(optional(payload,'leadAction','solve'),choices);folder='';
-            if wire && ~strcmp(source,'archive')
+            if wire && ~reading && ~strcmp(source,'archive')
                 state.frozenInputs.cfg.thermistorInvocation=char(java.util.UUID.randomUUID());
                 if strcmp(source,'resumeWire')
                     folder=required(payload,'runDirectory');
@@ -500,7 +501,7 @@ if wire
     % 逐面给定的长引线热边界与本次动作、壁温分布指纹和全表面气动热源同时绑定。
     m=result.thermistorWire;
     assert(strcmp(m.action,cfg.thermistorResultSource) && strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && ...
-        id.reusedArchive==strcmp(m.action,'archive') && strcmp(m.sourceFrameSHA256,id.sourceFrame.sha256) && ...
+        id.reusedArchive==(isfield(b,'resistanceTemperatureK') || strcmp(m.action,'archive')) && strcmp(m.sourceFrameSHA256,id.sourceFrame.sha256) && ...
         strcmp(m.wallSHA256,id.sourceFrame.wallSHA256) && strcmp(c.boundarySHA256,m.boundarySHA256) && ...
         strcmp(c.leadThermalModel,b.leadThermalModel) && m.faces==n && m.jointExperimentVerifiedM2==0);
 elseif strcmp(optional(cfg,'thermistorVariant','smooth'),'sidewind') && p.angularCells==96
@@ -550,8 +551,13 @@ assert(isequal(c.velocityMps,fs.velocityMps) && c.ambientPressurePa==b.airPressu
     c.ambientTemperatureK==b.airTemperatureK && isequal(c,id.physicalCondition), ...
     'RAH:Bead:Snapshot','结果边界与当前确认的试件工况不符。');
 if wire
+    if isfield(b,'resistanceTemperatureK')
+        t=m.thermometry;beadK=t.surfaceK;
+        assert(c.resistanceTemperatureK==b.resistanceTemperatureK && t.internalK==c.resistanceTemperatureK && ...
+            abs((beadK-c.ambientTemperatureK)*(1+t.ratio)-(t.internalK-c.ambientTemperatureK))<1e-10);
+    else,beadK=b.wallTemperatureK;end
     tw=result.hybridWallTemperatureK;assert(~isfield(result,'hybridSolvedWallTemperatureK') && numel(tw)==n && ...
-        c.beadWallK==b.wallTemperatureK && abs(min(tw)-m.profile.endK)<1e-9 && abs(max(tw)-c.beadWallK)<1e-9);
+        c.beadWallK==beadK && abs(min(tw)-m.profile.endK)<1e-9 && abs(max(tw)-c.beadWallK)<1e-9);
 elseif isfield(b,'netHeatingPowerW')
     if isfield(result,'thermistorLead'),t=result.thermistorLead.thermal;
     else,t=result.thermistorBead.thermal;end
