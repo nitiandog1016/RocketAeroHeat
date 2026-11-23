@@ -636,8 +636,15 @@ if isfield(mesh,'shortSupportDirection')
         data.defaultField='heatFlux';
         data.comparisonColorRanges.heatFlux=mesh.shortSupportAngular.sharedFluxRangeKWm2;
         data.comparisonColorRanges.pressureGauge=mesh.shortSupportAngular.sharedGaugeRangePa;
+    elseif isfield(mesh,'shortSupportTime')
+        % 同一物理时刻的两个独立 BDF1 分支，截面与导出按本分支实际步长标识。
+        tp=mesh.shortSupportTime;label='整步';if strcmp(g,'timehalf'),label='两半步';end
+        data.defaultField='heatFlux';data.comparisonColorRanges.heatFlux=tp.heatRangeKWm2;
+        data.comparisonColorRanges.pressureGauge=tp.gaugeRangePa;
+        data.resultCondition.elapsedPhysicalTimeS=tp.elapsedS;
+        data.resultCondition.timeCaption=sprintf('扰动后 %.6f ms · %s',1000*tp.elapsedS,label);
     end
-    scope=sprintf('%s网。先按壁片对偶面积平均，再按同区交叠传到原面。顺流取 −X 在当地切平面的投影。',label);
+    scope=sprintf('%s。先按壁片对偶面积平均，再按同区交叠传到原面。顺流取 −X 在当地切平面的投影。',label);
     spec={'ShearPa','壁剪切沿流分量','Pa','SU2 表面摩擦系数向量乘来流动压，投影到当地顺流方向'; ...
         'SpeedMps','首层速度沿流分量','m/s','原生首层速度乘来流速度尺度，投影到当地顺流方向'; ...
         'ShearMagnitudePa','壁剪切切向模','Pa','对传到原面切平面的壁剪切向量取模'; ...
@@ -647,6 +654,8 @@ if isfield(mesh,'shortSupportDirection')
         col=spec{j,1};
         if strcmp(g,'angular')
             lim=mesh.shortSupportAngular.flowRangeMax.(col);
+        elseif isfield(mesh,'shortSupportTime')
+            lim=tp.flowRangeMax.(col);
         else
             both=[w.(['coarse' col]);w.(['fine' col])];lim=max(abs(both),[],'omitnan');
         end

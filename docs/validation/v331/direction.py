@@ -112,6 +112,12 @@ def native_vectors(prep,stage,grid,condition,wall_key):
     assert max(record["window"])<-8 and sha(stage/"history.csv")==record["history"]
     frame = stage/"restart_000199.csv"; vtk = stage/"surface_000199.vtk"
     assert record["end"]==sha(frame)==wall_key["frame"] and sha(vtk)==wall_key["vtkSHA256"]
+    return frame_vectors(prep,frame,vtk,grid,condition,wall_key)
+
+
+def frame_vectors(prep,frame,vtk,grid,condition,wall_key):
+    """从已确认身份的同一保存帧读取摩擦系数和首层节点速度，保持原场坐标对应。"""
+    assert sha(frame)==wall_key["frame"] and sha(vtk)==wall_key["vtkSHA256"]
     with np.load(prep/"mapping.npz") as m:
         wet, first, xyz = m["wet"], m["first"], m["xyz"]
         np.testing.assert_array_equal(wet[grid["nativeCorners"]], m["corners"])
@@ -123,7 +129,7 @@ def native_vectors(prep,stage,grid,condition,wall_key):
     np.testing.assert_array_equal(state[:,0], np.arange(len(xyz)))
     np.testing.assert_allclose(state[:,1:4],xyz,atol=2e-13,rtol=2e-14)
     np.testing.assert_allclose(fields["Pressure"][idx,0],state[wet,4],atol=1e-7,rtol=7e-7)
-    cfg = spec["condition"]; speed = cfg["speedMps"]; dyn = .5*cfg["rho"]*speed**2
+    speed = condition["speedMps"]; dyn = .5*condition["rho"]*speed**2
     vectors = [fields["Skin_Friction_Coefficient"][idx]*dyn, state[first,5:8]*speed]
     assert all(np.isfinite(x).all() for x in vectors)
     return vectors, wet, [dyn,speed], wall_key

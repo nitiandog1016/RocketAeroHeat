@@ -1,12 +1,12 @@
 # 当前交接
 
-2026-11-23。Short Test 65 名义双支管银球（Re = 882）在十层、128 扇区网从冷态完成 1,000 次更新，**32,480 / 32,480 面、0.000700423853595 m²** 有稳态壁压和热流。相对 v331 新增 0 面、0 m²，逐面联合实验验证面积 0 m²。周向间隔二分使整件放热从 2.009415 降至 2.005433 W；+Z 测线变号区间由 143.44°–149.06° 移至 137.81°–140.63°，反向面积由 45.110 增至 58.932 mm²。热峰仍是 25,055 号面。新网外露银球折合量热偏高 38.08%，七站 RMSE 为 4.888 Nu。[周向对照](validation/v332/RESULTS.md) · [本机三维页](../outputs/v332_validation/ui01/workbench/index.html)
+2026-11-23。Short Test 65 名义双支管银球（Re = 882）首次在扰动后 **2.565681 ms** 以一整步、两半步取得 **32,480 / 32,480 面、0.000700423853595 m²** 同刻壁压与热流。相对 v332 新增几何覆盖 0 面、0 m²，逐面联合实验验证面积 0 m²。两半步整件放热 2.005432463 W、流体储热率 +0.883592 µW；最大步长热流差 0.03819 W/m²。两支热峰均为 25,055 号面，反向面积均为 59.0146 mm²。外露银球折合量热高 38.08%，七站 RMSE 为 4.888 Nu。[同刻对照](validation/v333/RESULTS.md) · [本机两半步三维页](../outputs/v333_validation/ui01/half/workbench/index.html)
 
-<!-- records:last_completed=v332 -->
+<!-- records:last_completed=v333 -->
 <!-- records:active=none -->
-<!-- records:base_commit=ae95222f3b16653275b14941d83bb5da981220b0 -->
+<!-- records:base_commit=d460bfa1b4e1df32594078ea8a34b8efe316f938 -->
 
-64 扇区的五层与十层法向对照已完成，119.8° 测站顺向、166.7° 反向，128 扇区也给出相同的测站判断。[近壁诊断](validation/v331/RESULTS.md) · [法向网格对照](validation/v330/RESULTS.md) · [粗网冷算](validation/v329/RESULTS.md)
+双支管 128 扇区的稳态场是本次扰动基线。法向和周向加密对照均已完成。119.8° 测站顺向、166.7° 反向。[稳态与周向对照](validation/v332/RESULTS.md) · [近壁诊断](validation/v331/RESULTS.md) · [法向对照](validation/v330/RESULTS.md)
 
 独立光滑球对照在扰动后 82.10 ms 已有 4,464 / 4,464 面同时刻壁压与热流，细步总放热 0.977093924 W，比实验折算高 16.68%。该段尚无周期统计，联合实验验证面积 0 m²。[瞬时结果](validation/v322/RESULTS.md) · [本机三维页](../outputs/v322_validation/read01/wakeFine/workbench/index.html) · [测量定义](validation/v321/SOURCE.md)
 
@@ -40,7 +40,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-以双支管 128 扇区收敛场为基线，用一整步与两个半步核对首个物理时刻的全表面结果和流体储热。[下一决定](validation/v332/NEXT_DECISION.md)
+把 v333 双支管银球单时刻结果接入普通 STL 的五步入口，核对导入面号、网格、温界、选算与导出。[下一决定](validation/v333/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

@@ -60,10 +60,10 @@ def verify_ledger(section,ids,area,q,status):
               [sum(area[local]),sum(power),sum(np.maximum(power,0)),sum(np.maximum(-power,0))])
 
 
-def raw_check(k,report,m,n,tau_dir,defined,rows,folder=None,sectors=64):
+def raw_check(k,report,m,n,tau_dir,defined,rows,folder=None,sectors=64,frame_suffix="000199"):
     if folder is None:
         folder=ROOT/"outputs"/("v329_validation" if k=="coarse" else "v330_validation")/"run01/steady03"
-    frame=folder/"restart_000199.csv";surface=folder/"surface_000199.vtk"
+    frame=folder/("restart_"+frame_suffix+".csv");surface=folder/("surface_"+frame_suffix+".vtk")
     assert digest(frame)==report["frame"] and digest(surface)==report["vtk"]
     state=np.loadtxt(frame,skiprows=1,delimiter=",",usecols=range(8))
     lines=surface.read_text("ascii").splitlines()

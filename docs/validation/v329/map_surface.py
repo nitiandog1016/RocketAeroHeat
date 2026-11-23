@@ -4,7 +4,7 @@ import csv
 import io
 import json
 from pathlib import Path
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
 import numpy as np
 
@@ -60,14 +60,33 @@ def mapped(work,out,*,prepared=PREP,expected_mesh=None,transfer_file=None,transf
     assert sha(transfer_file)==transfer_sha
     mesh_key=grid["hybrid"]["meshSHA256"] if expected_mesh is None else expected_mesh
     assert sha(prepared/"mesh.su2")==mesh_key==thermal["meshSHA256"] and grid["caseSHA256"]==thermal["caseSHA256"]
+    with np.load(prepared/"mapping.npz") as mesh:wet=mesh["wet"]
+    for name,release in (("early","releaseEarly"),("late","releaseLate")):
+        actual=budget(work/name,work/release,wet,thermal["scale"],config["geometry"].get("farNodes",1346))
+        assert actual==thermal[name] and abs(actual["physicalGapFraction"])<.005
+    state=table(work/"early","initial_flow.csv");frame=sha(work/"early/initial_flow.csv")
+    assert frame==thermal["early"]["sourceFrame"]
+    n=np.fromfile(work/"early/nodes.bin",dtype="<f8").reshape(-1,16);n=n[n[:,0].argsort()]
+    np.testing.assert_array_equal(n[:,1],state[:,9])
+    raw=residual(work/"releaseEarly/restart.csv")
+    # 正号入壁；端点原生空间行的正壁反力对应热壁向空气放热。
+    nodeW=(raw[wet]+n[wet,9]-n[wet,10])*thermal["scale"]
+    assert abs(nodeW.sum()+thermal["early"]["wallW"])<1e-10
+    stats=project_surface(out,prepared,transfer_file,transfer_sha,state,nodeW,thermal["early"]["wallW"])
+    summary=dict(thermal=thermal,condition=s,caseSHA256=sha(CASE),bodySHA256=grid["bodySHA256"],transferSHA256=transfer_sha,
+                 frameSHA256=frame,releaseSHA256=sha(work/"releaseEarly/restart.csv"),**stats)
+    return write_surface(out,summary)
+
+
+def project_surface(out,prepared,transfer_file,transfer_sha,state,nodeW,wall_power):
+    """把一个已核对的同态节点场和入壁功率映射到五区原面，稳态和物理时刻共用。"""
+    config=read(prepared/"prepared.json");s=config["condition"];case=read(CASE)
+    assert sha(transfer_file)==transfer_sha and sha(DATA/"supported65.zip")==config["supportedSHA256"]
     with ZipFile(DATA/"supported65.zip") as z:
         body=json.loads(z.read("geometry.json"))
         reference=list(csv.DictReader(io.StringIO(z.read("stations.csv").decode("ascii"))))
     with np.load(prepared/"mapping.npz") as mesh:
         xyz,wet,first,corners,sourceArea,group,theta=(mesh[k] for k in ("xyz","wet","first","corners","nativeArea","group","theta"))
-    for name,release in (("early","releaseEarly"),("late","releaseLate")):
-        actual=budget(work/name,work/release,wet,thermal["scale"],config["geometry"].get("farNodes",1346))
-        assert actual==thermal[name] and abs(actual["physicalGapFraction"])<.005
     out.mkdir(parents=True,exist_ok=False)
     with np.load(prepared/"transfer.npz") as m:
         target,source,wTarget,wSource,area,regions=(m[k] for k in ("target","source","targetFraction","sourceFraction","targetArea","region"))
@@ -81,14 +100,6 @@ def mapped(work,out,*,prepared=PREP,expected_mesh=None,transfer_file=None,transf
     np.testing.assert_array_equal(regions[target],group[source])
     v=np.asarray(body["V"]);f=np.array(body["F"])-1;tri=v[f]
     np.testing.assert_allclose(np.linalg.norm(np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0]),axis=1)/2,area,rtol=1e-12,atol=1e-19)
-    state=table(work/"early","initial_flow.csv");frame=sha(work/"early/initial_flow.csv")
-    assert frame==thermal["early"]["sourceFrame"]
-    n=np.fromfile(work/"early/nodes.bin",dtype="<f8").reshape(-1,16);n=n[n[:,0].argsort()]
-    np.testing.assert_array_equal(n[:,1],state[:,9])
-    raw=residual(work/"releaseEarly/restart.csv")
-    # 正号入壁；端点原生空间行的正壁反力对应热壁向空气放热。
-    nodeW=(raw[wet]+n[wet,9]-n[wet,10])*thermal["scale"]
-    assert abs(nodeW.sum()+thermal["early"]["wallW"])<1e-10
     ix=np.searchsorted(wet,corners);np.testing.assert_array_equal(wet[ix],corners)
     weights=corner_weights(corners,xyz);shares=weights*sourceArea[:,None]
     lump=np.bincount(ix.ravel(),weights=shares.ravel(),minlength=len(wet));assert np.min(lump)>0
@@ -110,7 +121,7 @@ def mapped(work,out,*,prepared=PREP,expected_mesh=None,transfer_file=None,transf
         regions_out.append(dict(id=region,faces=int(mask.sum()),areaM2=float(area[mask].sum()),outW=power,nativeOutW=src,
                 minFluxIn=float(q[mask].min()),maxFluxIn=float(q[mask].max()),peakOutFace=int(ids[np.argmin(q[mask])]+1),
                 minPa=float(p[mask].min()),maxPa=float(p[mask].max())))
-    assert abs(sum(r["outW"] for r in regions_out)-thermal["early"]["wallW"])<1e-10
+    assert abs(sum(r["outW"] for r in regions_out)-wall_power)<1e-10
     stations=measure_stations(xyz,wet,np.unique(corners[group==1]),nodeQ,tw,s,case,config["geometry"].get("angularSectors",64))
     np.testing.assert_array_equal(stations[:,0],[float(r["angleDeg"]) for r in reference])
     station_faces=np.array([int(r["faceID"]) for r in reference])
@@ -123,15 +134,20 @@ def mapped(work,out,*,prepared=PREP,expected_mesh=None,transfer_file=None,transf
                comments="",fmt=["%d","%d"]+["%.17g"]*6)
     silver=regions_out[0];equiv=silver["outW"]*np.pi*s["diameterM"]**2/silver["areaM2"]
     observed=case["observedBtuS"]*1055.05585262
-    summary=dict(thermal=thermal,condition=s,caseSHA256=sha(CASE),bodySHA256=grid["bodySHA256"],transferSHA256=transfer_sha,
-                 frameSHA256=frame,releaseSHA256=sha(work/"releaseEarly/restart.csv"),faces=len(area),areaM2=area.sum(),regions=regions_out,
+    return dict(faces=len(area),areaM2=area.sum(),regions=regions_out,
                  minGaugePa=float(gauge.min()),maxGaugePa=float(gauge.max()),peakOutFace=int(q.argmin()+1),peakOutWm2=float(-q.min()),
                  solvedAreaM2=area.sum(),jointExperimentalAreaM2=0.,silverEquivalentFullSphereW=equiv,observedFullSphereW=observed,
                  equivalentRelativeError=equiv/observed-1,stationRMSE=float(np.sqrt(np.mean(stations[:,3]**2))),
                  stationMaxAbs=float(np.max(abs(stations[:,3]))),files={name:sha(out/name) for name in ("wall.csv","stations.csv")})
+
+
+def write_surface(out,summary,extra=()):
+    """保存与当前源身份相符的压缩表，物理量名和原面顺序随包交付。"""
     (out/"summary.json").write_text(json.dumps(summary,indent=2,allow_nan=False),encoding="utf8")
     with ZipFile(out/"surface.zip","x",compression=ZIP_DEFLATED,compresslevel=9) as z:
-        for name in ("summary.json","wall.csv","stations.csv"):z.write(out/name,name)
+        for name in ("summary.json","wall.csv","stations.csv",*extra):
+            if extra:z.writestr(ZipInfo(name),(out/name).read_bytes(),compress_type=ZIP_DEFLATED,compresslevel=9)
+            else:z.write(out/name,name)
     return summary
 
 

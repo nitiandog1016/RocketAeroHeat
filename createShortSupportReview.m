@@ -37,6 +37,9 @@ try
             [m,stations,r]=loadShortSupportSurface(g,job,'fine');
             [m,pair]=attachShortSupportGridPair(m,r,g);
             view.comparison=addShortSupportResolutionTab(tabs,pair);
+        elseif startsWith(directionGrid,'time')
+            [m,stations,r]=loadShortSupportSurface(g,job,directionGrid);
+            view.timePair=addShortSupportTimeTab(tabs,m.shortSupportTime);
         elseif ~isempty(directionGrid)
             % 模块三：一次载入所选端点的五个近壁场，探针同时读到同一网格的压力和热流。
             [m,stations,r]=loadShortSupportSurface(g,job,directionGrid);
