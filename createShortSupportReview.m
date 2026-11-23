@@ -1,5 +1,6 @@
-function view=createShortSupportReview(host,g)
+function view=createShortSupportReview(host,g,job)
 % 模块一：在科研工作台显示带支管名义外形，接头、测站及面积共用同一套面号。
+if nargin<3,job='';end
 tabs=uitabgroup(host,'Tag','short-sphere-review','Visible','off','Units','normalized','Position',[0 0 1 1]);
 try
     tab=uitab(tabs,'Title','双支管银球');layout=uigridlayout(tab,[4 1]);
@@ -30,6 +31,9 @@ try
         'ledger',ledger,'geometry',g,'exportTo',@(path)exportShortSupportedSphere(g,path));
     if g.summary.extensionD==1
         view.fluidGrid=addShortSupportGridTab(tabs,g);
+        [m,stations,r]=loadShortSupportSurface(g,job);
+        view.web=createAerothermalWebTab(tabs,m);view.mesh=m;view.report=r;
+        view.surface=addShortSupportSurfaceTab(tabs,stations,r);tabs.SelectedTab=view.web.tab;
     end
 catch ex
     delete(tabs);rethrow(ex);
@@ -45,7 +49,7 @@ end
         payload.sectionSegments=reshape(g.V(edges(:),:),size(edges,1),2,3);
         k=choice.Value;payload.inspectedFace=-1;
         if k==0
-            info.Text='轮廓线标出球面与管外壁的两处接缝。支管外伸为名义值；双支管工况的壁压与热流待求。';
+            info.Text='轮廓线标出球面与管外壁的两处接缝。支管外伸长度为名义值。';
         else
             row=g.stations(k,:);payload.inspectedFace=row.faceID-1;
             info.Text=sprintf('测站 %g°   |   面号 %d   |   原球面号 %d   |   位置 [%.4f, %.4f, %.4f] mm', ...

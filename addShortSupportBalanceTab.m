@@ -5,7 +5,7 @@ assert(strcmp(cm011FileSHA256(file),'9560d6951503cbe91fb06902bbbe9692239694832d4
 d=jsondecode(fileread(file));
 assert(strcmp(d.caseSHA256,reference.caseSHA256) && strcmp(d.meshSHA256,reference.meshSHA256) && ...
     strcmp(d.coldSHA256,reference.coldSHA256) && strcmp(d.stages(end).frame,d.early.sourceFrame));
-tab=uitab(tabs,'Title','收敛与热量账');
+tab=uitab(tabs,'Title','原远场方案对照');
 layout=uigridlayout(tab,[5 1]);layout.RowHeight={30,32,'1x',82,57};layout.Padding=[14 8 14 8];
 uilabel(layout,'Text',sprintf('Short Test 65 · 节点余量通量修正 · %d 次更新 · %d 个节点越界', ...
     d.updates,d.boundViolations),'FontWeight','bold');
