@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v325 双支管流体体网与原生启动](validation/v325/RESULTS.md) · [网格与越界位置](validation/v325/evidence/mesh.png) · [下一项](validation/v325/NEXT_DECISION.md)。6,016 个壁片完成五区守恒映射；两套外区的首段均因主标量越界未获接受。
+
 - [v324 双支管银球几何与逐原面外露面积](validation/v324/RESULTS.md) · [接头图](validation/v324/evidence/geometry.png) · [下一项](validation/v324/NEXT_DECISION.md)。88 个原球面受支管影响，两处接缝连续，七站均位于外露球面。
 
 - [v323 银球球后回流与六截面空间分辨率](validation/v323/RESULTS.md) · [原节点速度剖面](validation/v323/evidence/profiles.png) · [下一项](validation/v323/NEXT_DECISION.md)。轴线回流长 1.474 mm，两处背风测站的首层流向相反。

@@ -2,11 +2,11 @@
 
 2026-11-23。Short Test 65 的光滑球对照在 Re = 882 下完成初始扰动后 82.10 ms 的全表面瞬时计算。粗、细步分别完成 32、64 个物理步，六个同刻均通过步长核对。4,464 / 4,464 面、0.000503553014 m² 有同时刻壁压和热流，相对稳态基流新增几何覆盖 0 面、0 m²。细步整球放热 0.977093924 W，按完整球面积折合比试验量热高 16.68%。背风 119.8°、166.7° 的 Nu 分别为 13.163、6.910，实验为 5.5、8.8。本段未得到周期统计，联合实验验证面积 0 m²。[瞬时结果](validation/v322/RESULTS.md) · [本机细步三维页](../outputs/v322_validation/read01/wakeFine/workbench/index.html) · [测量定义](validation/v321/SOURCE.md)
 
-<!-- records:last_completed=v324 -->
+<!-- records:last_completed=v325 -->
 <!-- records:active=none -->
-<!-- records:base_commit=463517d339416a85ed8389413deefd67757c5693 -->
+<!-- records:base_commit=387a8efd7302da006b06649f50ddd040d9530c2d -->
 
-v324 双支管名义几何已接工作台。72 个原球面部分遮盖、16 个完全遮盖，外露银球 494.10352 mm²，七站均已定位。两侧各名义外伸 1D，支管热边界未知。新增 p/q 为 0 面、0 m²；接头有 112 个小于 5° 的三角面。[面积账与验证](validation/v324/RESULTS.md) · [光滑球回流](validation/v323/RESULTS.md)
+v325 双支管 32,480 原面与 6,016 个求解壁片的五区映射通过。名义端盖受热，完整湿壁 700.423854 mm²。混合和结构外区各完成 200 次稳态迭代，终帧分别有 128、228 个主标量低于下限。两次均未获接受，新增 p/q 为 0 面、0 m²。侧栏可重建体网。[求解与映射](validation/v325/RESULTS.md) · [装置尺寸](validation/v324/RESULTS.md)
 
 B 珠已有 10,276 面、3.196650633 mm² 全表面结果。第三档珠部换热比图读高 22.80%，两轮网格排列候选已关闭。带线模型 4 mW 集总壁温为 297.694199 K，热峰在迎风引线 207 号面。[重剖子面验收](validation/v320/RESULTS.md) · [网格试验](validation/v307/RESULTS.md) · [分带热量账](validation/v305/evidence/workbench.json)
 
@@ -38,7 +38,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-下一项为名义双支管工况建立流体体网、近壁层及各分区原面映射，核对端部边界后启动求解。[当前下一决定](validation/v324/NEXT_DECISION.md)
+下一项在已验收的混合网和原冷态上单独检验原生标量对流质量通量方案。[当前下一决定](validation/v325/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

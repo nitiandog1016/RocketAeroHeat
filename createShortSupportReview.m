@@ -28,6 +28,9 @@ try
     tabs.SelectedTab=tab;
     view=struct('tabs',tabs,'geometryTab',tab,'areaTab',audit,'scene',scene,'choice',choice,'info',info, ...
         'ledger',ledger,'geometry',g,'exportTo',@(path)exportShortSupportedSphere(g,path));
+    if g.summary.extensionD==1
+        view.fluidGrid=addShortSupportGridTab(tabs,g);
+    end
 catch ex
     delete(tabs);rethrow(ex);
 end
