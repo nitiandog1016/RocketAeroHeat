@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v326 双支管银球的标量通量对照](validation/v326/RESULTS.md) · [首次越界诊断图](validation/v326/evidence/flux.png) · [下一项](validation/v326/NEXT_DECISION.md)。质量通量对照仍越界，首次最低值节点已核实八条边和隐式更新。
+
 - [v325 双支管流体体网与原生启动](validation/v325/RESULTS.md) · [网格与越界位置](validation/v325/evidence/mesh.png) · [下一项](validation/v325/NEXT_DECISION.md)。6,016 个壁片完成五区守恒映射；两套外区的首段均因主标量越界未获接受。
 
 - [v324 双支管银球几何与逐原面外露面积](validation/v324/RESULTS.md) · [接头图](validation/v324/evidence/geometry.png) · [下一项](validation/v324/NEXT_DECISION.md)。88 个原球面受支管影响，两处接缝连续，七站均位于外露球面。

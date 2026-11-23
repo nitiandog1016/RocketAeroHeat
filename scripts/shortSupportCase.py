@@ -62,10 +62,10 @@ def qualify(prep):
                 physicalAreaM2=old.sum(),firstNodeDistanceD=[distance.min(),distance.max()],caseSHA256=sha(CASE))
 
 
-def checked_stage(prep,dest,start,build,steps,mode):
+def checked_stage(prep,dest,start,build,steps,mode,species_convection="SCALAR_UPWIND"):
     if not dest.exists():
         try:
-            return advance(prep,dest,build,start,steps,mode)
+            return advance(prep,dest,build,start,steps,mode,species_convection)
         except AssertionError as error:
             if mode=="solve" and (dest/"debugger_process.json").is_file():
                 with np.load(prep/"mapping.npz") as grid:
@@ -86,17 +86,28 @@ def checked_stage(prep,dest,start,build,steps,mode):
     assert proc["command"]==[str(exe),"case.cfg","--threads",str(4 if steps>20 else 1)]
     assert sha(exe)==DRIVER[exe.stem] and sha(dest/"mesh.su2")==spec["files"]["mesh.su2"]
     assert sha(dest/"wire_boundary.dat")==spec["files"]["release.dat" if mode=="release" else "profile.dat"]
-    assert (dest/"case.cfg").read_text("ascii")==configuration(spec["condition"],steps,mode=="release")
+    assert (dest/"case.cfg").read_text("ascii")==configuration(spec["condition"],steps,mode=="release",species_convection)
     assert record["input"]==sha(start)==sha(dest/"initial_flow.csv") and record["frame"]==sha(dest/"restart.csv")
     assert record["history"]==sha(dest/"history.csv") and all(sha(dest/n)==h for n,h in record["frames"].items())
     assert record["steps"]==steps or record["passed"]
     return record
 
 
-def run(work,prep,build,resume=False):
+def run(work,prep,build,resume=False,species_convection=None):
     if not resume:work.mkdir(parents=True,exist_ok=False)
     assert work.is_dir()
     with exclusive(work):
+        # 接续沿用原任务登记的离散方式、体网和驱动。旧回执使用原迎风格式。
+        receipt=work/"qualified.json"
+        if resume and receipt.is_file():
+            previous=read(receipt)
+            recorded=previous.get("speciesConvection","SCALAR_UPWIND")
+            if species_convection is not None and species_convection!=recorded:
+                raise ValueError(f"该任务登记为 {recorded}，更换标量对流方式需新建任务。")
+            species_convection=recorded
+            if prep is None:prep=Path(previous["preparedPath"])
+            if build is None:build=Path(previous["driverPath"])
+        if species_convection is None:species_convection="SCALAR_UPWIND"
         if prep is None:
             prep=work/"prepared"
             if not prep.exists():prepare(prep)
@@ -109,7 +120,7 @@ def run(work,prep,build,resume=False):
                 if not build.exists():compile_driver(build)
         assert all(sha(build/(k+".exe"))==h for k,h in DRIVER.items())
         audit.update(preparedPath=str(prep),driverPath=str(build))
-        receipt=work/"qualified.json"
+        if species_convection!="SCALAR_UPWIND":audit["speciesConvection"]=species_convection
         if receipt.exists():assert read(receipt)==audit
         else:atomic_write_json(receipt,audit)
         kit=Path(os.environ.get("RAH_THERMISTOR_SU2_BUILD",ROOT/"tools/runtime/su2-thermal-build"))
@@ -118,7 +129,7 @@ def run(work,prep,build,resume=False):
         try:
             for i in range(1,13):
                 dest=work/f"steady{i:02d}"
-                rec=checked_stage(prep,dest,start,build,200,"solve")
+                rec=checked_stage(prep,dest,start,build,200,"solve",species_convection)
                 worst=max(rec["window"].values());trend.append(worst)
                 print(dest.name,rec["steps"],worst,flush=True)
                 start=dest/"restart.csv"
@@ -128,7 +139,7 @@ def run(work,prep,build,resume=False):
             else:raise RuntimeError("已用完登记的稳态步数")
             for name,seed,n,mode in [("reaction",start,1,"release"),("plus20",start,20,"solve"),
                     ("reaction20",dest/"plus20/restart.csv",1,"release"),("control",start,1,"solve"),("observer",start,1,"observer")]:
-                rec=checked_stage(prep,dest/name,seed,build,n,mode)
+                rec=checked_stage(prep,dest/name,seed,build,n,mode,species_convection)
                 if name=="plus20":assert rec["passed"]
             atomic_write_json(work/"endpoints.json",dict(stage=dest.name,frame=sha(start),case=sha(CASE),residuals=trend))
         except Exception as error:
@@ -140,6 +151,9 @@ def run(work,prep,build,resume=False):
 if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("work",type=Path);parser.add_argument("--prepared",type=Path);parser.add_argument("--driver",type=Path)
-    parser.add_argument("--resume",action="store_true");args=parser.parse_args()
+    parser.add_argument("--resume",action="store_true")
+    parser.add_argument("--species-convection",choices=("SCALAR_UPWIND","BOUNDED_SCALAR"),
+                        help="新算默认 SCALAR_UPWIND；接续沿用原任务的选择。")
+    args=parser.parse_args()
     work=args.work.resolve();work.relative_to(ROOT/"outputs")
-    run(work,args.prepared.resolve() if args.prepared else None,args.driver.resolve() if args.driver else None,args.resume)
+    run(work,args.prepared.resolve() if args.prepared else None,args.driver.resolve() if args.driver else None,args.resume,args.species_convection)

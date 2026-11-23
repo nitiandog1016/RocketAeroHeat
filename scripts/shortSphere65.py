@@ -73,9 +73,11 @@ def prepare(out):
                                         caseSHA256=sha(CASE),faces=len(f),cells=len(cells)))
 
 
-def configuration(s,steps,release):
+def configuration(s,steps,release,species_convection="SCALAR_UPWIND"):
     # 模块二：固定求解器与原标量方程，采用本试件的 Re、Pe、轴向来流和逐节点热界。
-    changes={"INC_VELOCITY_INIT":"(-1, 0, 0)","MU_CONSTANT":1/s["re"],"THERMAL_CONDUCTIVITY_CONSTANT":1/s["pe"],
+    if species_convection not in ("SCALAR_UPWIND","BOUNDED_SCALAR"):
+        raise ValueError("未知标量对流配置")
+    changes={"INC_VELOCITY_INIT":"(-1, 0, 0)","CONV_NUM_METHOD_SPECIES":species_convection,"MU_CONSTANT":1/s["re"],"THERMAL_CONDUCTIVITY_CONSTANT":1/s["pe"],
              "DIFFUSIVITY_CONSTANT":1/s["pe"]}
     if release:changes.update(MARKER_WALL_SPECIES="(wall, FLUX, 0.0)",VOLUME_OUTPUT="(COORDINATES, SOLUTION, RESIDUAL)")
     lines=[]
@@ -86,14 +88,14 @@ def configuration(s,steps,release):
     return "\n".join(lines)+"\nMARKER_PYTHON_CUSTOM= (wall)\n"+("WRT_RESTART_COMPACT= NO\n" if release else "")
 
 
-def advance(prep,dest,build,start,steps,mode):
+def advance(prep,dest,build,start,steps,mode,species_convection="SCALAR_UPWIND"):
     p=read(prep/"prepared.json");s=p["condition"]
     dest.mkdir();release=mode=="release";trace=mode=="observer"
     exe=build/("wire_observer.exe" if trace else "wire.exe")
     assert sha(exe)==DRIVER[exe.stem] and p["caseSHA256"]==sha(CASE)
     for src,name in [(prep/"mesh.su2","mesh.su2"),(prep/("release.dat" if release else "profile.dat"),"wire_boundary.dat"),(start,"initial_flow.csv")]:
         os.link(src,dest/name)
-    (dest/"case.cfg").write_text(configuration(s,steps,release),encoding="ascii")
+    (dest/"case.cfg").write_text(configuration(s,steps,release,species_convection),encoding="ascii")
     locks={str(q):sha(q) for q in [exe,Path(__file__).resolve(),CASE,prep/"prepared.json",*(dest/n for n in ("case.cfg","mesh.su2","wire_boundary.dat","initial_flow.csv"))]}
     if trace:os.environ["RAH_CM011_LOW_SPEED_LEDGER"]="1"
     else:os.environ.pop("RAH_CM011_LOW_SPEED_LEDGER",None)

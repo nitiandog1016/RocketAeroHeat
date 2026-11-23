@@ -2,11 +2,11 @@
 
 2026-11-23。Short Test 65 的光滑球对照在 Re = 882 下完成初始扰动后 82.10 ms 的全表面瞬时计算。粗、细步分别完成 32、64 个物理步，六个同刻均通过步长核对。4,464 / 4,464 面、0.000503553014 m² 有同时刻壁压和热流，相对稳态基流新增几何覆盖 0 面、0 m²。细步整球放热 0.977093924 W，按完整球面积折合比试验量热高 16.68%。背风 119.8°、166.7° 的 Nu 分别为 13.163、6.910，实验为 5.5、8.8。本段未得到周期统计，联合实验验证面积 0 m²。[瞬时结果](validation/v322/RESULTS.md) · [本机细步三维页](../outputs/v322_validation/read01/wakeFine/workbench/index.html) · [测量定义](validation/v321/SOURCE.md)
 
-<!-- records:last_completed=v325 -->
+<!-- records:last_completed=v326 -->
 <!-- records:active=none -->
-<!-- records:base_commit=387a8efd7302da006b06649f50ddd040d9530c2d -->
+<!-- records:base_commit=54e777db026d04fe4a2095eff29f8d79e9362635 -->
 
-v325 双支管 32,480 原面与 6,016 个求解壁片的五区映射通过。名义端盖受热，完整湿壁 700.423854 mm²。混合和结构外区各完成 200 次稳态迭代，终帧分别有 128、228 个主标量低于下限。两次均未获接受，新增 p/q 为 0 面、0 m²。侧栏可重建体网。[求解与映射](validation/v325/RESULTS.md) · [装置尺寸](validation/v324/RESULTS.md)
+双支管试件含两名义端盖，共 32,480 原面、700.423854 mm²，已与 6,016 个求解壁片逐区对应。v325 的混合与结构外区终帧分别有 128、228 个节点越界。v326 只更换混合网的标量对流通量，正常完成 200 次稳态更新，终帧仍有 126 个节点越界，六分量残差均未达标。两次回放定位到第 8 次更新的 6 个越界节点。最差体节点 78423 的空间行由非正交扩散修正主导。侧栏可查看其径向投影。双支管五区新增合格 p/q **0 面、0 m²**。[通量与更新复核](validation/v326/RESULTS.md) · [五区映射](validation/v325/RESULTS.md)
 
 B 珠已有 10,276 面、3.196650633 mm² 全表面结果。第三档珠部换热比图读高 22.80%，两轮网格排列候选已关闭。带线模型 4 mW 集总壁温为 297.694199 K，热峰在迎风引线 207 号面。[重剖子面验收](validation/v320/RESULTS.md) · [网格试验](validation/v307/RESULTS.md) · [分带热量账](validation/v305/evidence/workbench.json)
 
@@ -24,11 +24,11 @@ v299 光滑控制完成了 6,624 原面的中段加密对照，放热由 12.3087
 
 v295 曾在一次独立壁反力读取中断，原读数终态未知，现场留存。同一工作台已验证从成功阶段接续这一任务，再读完整两半步。[中断与接续](validation/v295/RESULTS.md)
 
-在主侧栏的 B 型热敏珠菜单选择“查看 6 m/s · 近壁网格对照”。主值为 56 层，可核对两网同刻压力、热流及相同位置的温度。实际截面 X = 0.172 mm 导出 121 行，逐行对应同一批原面。6 m/s 运行、热量核对及界面验收均有终态回执。[界面回执](validation/v294/evidence/ui.json) · [本机三维页](../outputs/v294_validation/view01/export/workbench/index.html)
+侧栏“查看 6 m/s · 近壁网格对照”用 56 层为主值，X = 0.172 mm 截面已核对全部 121 行。[界面回执](validation/v294/evidence/ui.json) · [本机三维页](../outputs/v294_validation/view01/export/workbench/index.html)
 
 v292 在 6 m/s、293.15 K 空气、给定壁温 303.15 K 下，以一个整步及两个半步到达相同时刻。48 层网的局部最大步长差分别为 0.002772 Pa、0.006122 W/m²，放热峰均为工作台面元 5211。发展后尾迹和空间收敛阶待验证。[同刻差异](validation/v292/evidence/comparison.json)
 
-v292 初次回放混合了不同阶段的压力和标量。改用固定端点装配后，48 层网第二半步放热 10.726572344 mW，收支差 −2.498 pW。主侧栏可分别查看全周启动瞬态和同刻时间步对照。[v290 原步热量账](validation/v290/evidence/surface.json) · [v292 半步热量账](validation/v292/evidence/second_energy.json) · [本机对照三维页](../outputs/v292_validation/view02/export/workbench/index.html)
+v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，收支差 −2.498 pW。[原步热量账](validation/v290/evidence/surface.json) · [半步热量账](validation/v292/evidence/second_energy.json)
 
 3 m/s、293.15 K 空气和 4 mW 净功率下，15° 与 7.5° 网分别求得 298.26613 K 与 298.19793 K 的均匀集总壁温。全部 5,216 面均有压力、热流、首层流体温度与壁温，放热积分为 4 mW。[3 m/s 结果](validation/v286/RESULTS.md) · [本机细网三维页](../outputs/v286_validation/fine01/workbench/index.html)
 
@@ -38,7 +38,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-下一项在已验收的混合网和原冷态上单独检验原生标量对流质量通量方案。[当前下一决定](validation/v325/NEXT_DECISION.md)
+固定双支管试件、混合网及原冷态，检验逐面守恒的非正交扩散限制。先核对正交与斜网一致性和内部通量守恒，通过后才进行一次真实推进。本轮已终止，无在运行的试件求解。[下一决策](validation/v326/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 
