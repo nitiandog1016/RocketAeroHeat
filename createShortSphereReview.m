@@ -35,9 +35,13 @@ try
             g.wallOutW,g.farOutW,g.airStorageW,pair.heatMaxWm2));
         view.wakeTab=wt;view.wakeVelocity=vel;view.wakeHeat=thermal;
     end
+    if isfield(report,'resolution')
+        view.resolution=createResolutionTab(tabs,report.resolution,report.condition.diameterM);
+    end
 catch ex
     delete(tabs);rethrow(ex);
 end
+
     function saveStations(~,~)
         [name,folder]=uiputfile('*.csv','导出风洞测站','Short65-stations.csv');if isequal(name,0),return;end
         writeStations(fullfile(folder,name));
@@ -53,5 +57,41 @@ end
             data.baselineNu=report.baselineNu(:);
         end
         writetable(data,path,'Encoding','UTF-8');
+    end
+end
+
+function page=createResolutionTab(tabs,data,diameter)
+% 模块三：按真实射线显示六个速度剖面，区分插值零点、原网夹区与壁面测站。
+tab=uitab(tabs,'Title','尾迹空间分辨率');
+grid=uigridlayout(tab,[6 1]);grid.RowHeight={44,32,'1x',58,80,36};
+grid.Padding=[16 10 16 10];grid.RowSpacing=6;
+axisData=data.axis;
+uilabel(grid,'WordWrap','on','Text',sprintf( ...
+    't = %.2f ms   |   从球尾量起的轴线回流长度 %.3f mm   |   零速点的相邻原节点位于 %.3f、%.3f mm', ...
+    1000*data.timeS,1000*diameter*axisData.lengthD,1000*diameter*axisData.bracketD));
+sections=data.sections;locations=[sections.xD];
+choice=uidropdown(grid,'Items',cellstr(compose('子午截面   x/D = %g',locations(:))), ...
+    'ItemsData',1:numel(sections),'Value',1,'ValueChangedFcn',@(~,~)showSection());
+ax=uiaxes(grid);hold(ax,'on');ax.YGrid='on';
+curve=plot(ax,nan,nan,'-o','Color',[.15 .32 .49],'MarkerSize',4,'DisplayName','原网格线交点');
+marks=plot(ax,nan,nan,'s','Color',[.66 .32 .12],'MarkerFaceColor',[.66 .32 .12],'DisplayName','10% 与 90% 恢复位置');
+xlabel(ax,'距轴线 r/D');ylabel(ax,'下游速度 −u_x / U');legend(ax,'Location','southeast');
+note=uilabel(grid,'WordWrap','on');
+stations=data.stations;
+tableData=[[stations.angleDeg]' [stations.firstTangentialSpeedOverU]' [stations.computedNu]' [stations.measuredNu]'];
+uitable(grid,'Data',round(tableData,5),'ColumnName',{'测站极角 / °','首层切向速度 / U','瞬时 Nu','实验 Nu'},'RowName',[]);
+uilabel(grid,'WordWrap','on','Text','速度取自 +Z 测线相邻原节点的线性插值。首层切向以迎风点沿壁朝向尾极为正。测站热流可从七站页导出。');
+showSection();
+page=struct('tab',tab,'choice',choice,'curve',curve,'marks',marks,'note',note);
+    function showSection()
+        % 模块四：切换截面时同步更新网距和恢复带；图中保留原始剖面取样点。
+        profile=sections(choice.Value);band=profile.band;
+        curve.XData=profile.radiusD;curve.YData=profile.downstreamSpeedOverU;
+        marks.XData=[band.r10D band.r90D];
+        marks.YData=band.minSpeedOverU+[.1 .9]*(1-band.minSpeedOverU);
+        xlim(ax,[0 1.4*band.r90D]);ylim(ax,[-.1 1.2]);
+        note.Text=sprintf(['速度恢复带宽 %.4f D，带内 %d 条独立射线。射线横距 %.4f–%.4f D，' ...
+            '供值边轴向跨度 %.4f–%.4f D。恢复幅度取速度谷底至自由流之差。'], ...
+            band.widthD,band.innerRays,band.minRadialGapD,band.maxRadialGapD,band.minAxialSpanD,band.maxAxialSpanD);
     end
 end

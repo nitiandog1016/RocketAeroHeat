@@ -83,6 +83,18 @@ if wake
     id.scope='给定小幅尾迹扰动后的瞬时解；七站比较使用实验参考值，支管与实测入口湍动未建模。';
 end
 result.evidenceIdentity=id;report=s;report.coverage=coverage;report.action=mode;report.jobDirectory=job;
+% 模块三：已发布的尾迹剖面只在原网格、工况和同一物理终帧上显示。
+if wake && s.timeDU==8
+    path=fullfile(cases,'wakeResolution.json');
+    assert(strcmp(cm011FileSHA256(path),'af201413a60e6388d05d3ed255820d1b89152502d80c5e2dd9633d3c60c26485'), ...
+        'RAH:Short:Resolution','银球尾迹空间诊断文件校验失败。');
+    diagnostic=jsondecode(fileread(path));
+    selected=diagnostic.(branch);
+    if strcmp(selected.frameSHA256,s.frameSHA256) && strcmp(diagnostic.meshSHA256,s.meshSHA256) && ...
+            strcmp(diagnostic.caseSHA256,s.caseSHA256) && selected.timeS==s.elapsedPhysicalTimeS
+        report.resolution=selected;
+    end
+end
     function t=empty(~,~,~)
         t=table(zeros(0,1),zeros(0,1),zeros(0,1),strings(0,1),'VariableNames',{'faceID','pressurePa','heatFluxWm2','method'});
     end

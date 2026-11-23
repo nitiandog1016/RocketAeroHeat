@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v323 银球球后回流与六截面空间分辨率](validation/v323/RESULTS.md) · [原节点速度剖面](validation/v323/evidence/profiles.png) · [下一项](validation/v323/NEXT_DECISION.md)。轴线回流长 1.474 mm，两处背风测站的首层流向相反。
+
 - [v322 Short 银球 82.10 ms 全表面瞬时解](validation/v322/RESULTS.md) · [尾迹与背风换热](validation/v322/evidence/wake.png) · [下一项](validation/v322/NEXT_DECISION.md)。两种步长、六个同刻、4,464 面的结果通过数值核对，背风两站与实验的趋势差异仍在。
 
 - [v321 Short 银球全周基流与七站对照](validation/v321/RESULTS.md) · [局部 Nu 曲线](validation/v321/evidence/stations.png) · [下一项](validation/v321/NEXT_DECISION.md)。4,464 面均有基流压力和热流，119.8° 处高估 139.3%。

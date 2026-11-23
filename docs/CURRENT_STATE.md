@@ -2,11 +2,11 @@
 
 2026-11-23。公开民用 Short 银球 Test 65 在 Re = 882 下完成初始扰动后 82.10 ms 的全表面瞬时计算。粗、细步分别完成 32、64 个物理步，六个同刻均通过步长核对。4,464 / 4,464 面、0.000503553014 m² 有同时刻壁压和热流，相对稳态基流新增几何覆盖 0 面、0 m²。细步整球放热 0.977093924 W，按完整球面积折合比试验量热高 16.68%。背风 119.8°、166.7° 的 Nu 分别为 13.163、6.910，实验为 5.5、8.8。本段未得到周期统计，联合实验验证面积 0 m²。[瞬时结果](validation/v322/RESULTS.md) · [本机细步三维页](../outputs/v322_validation/read01/wakeFine/workbench/index.html) · [测量定义](validation/v321/SOURCE.md)
 
-<!-- records:last_completed=v322 -->
+<!-- records:last_completed=v323 -->
 <!-- records:active=none -->
-<!-- records:base_commit=c926bbb5048bd3b688798644db7f53f7c8796739 -->
+<!-- records:base_commit=b254c3a5b2c7cbf38ab8095874d558d27b064cbe -->
 
-最后细步原单线程回放超出历史容差，同四线程回放的 51 行记录与终态一致。两份终点档案、首个同刻新算、面元和截线导出已经核对，原始失败和全部物理时间层保存在 E 盘。[独立复核](validation/v322/evidence/terminal.json) · [资源与回执](validation/v322/evidence/resources.json)
+v323 由同刻原网读出球后轴线回流长 1.474 mm，原节点夹区 1.166–1.499 mm。六截面速度恢复带各有 7–9 条独立射线。粗细步分类一致；一阶迎风的空间误差仍未知。工作台已核对两档共 12 个剖面。[空间核对与界面](validation/v323/RESULTS.md)
 
 B 珠已有 10,276 面、3.196650633 mm² 全表面结果。第三档珠部换热比图读高 22.80%，两轮网格排列候选已关闭。带线模型 4 mW 集总壁温为 297.694199 K，热峰在迎风引线 207 号面。[重剖子面验收](validation/v320/RESULTS.md) · [网格试验](validation/v307/RESULTS.md) · [分带热量账](validation/v305/evidence/workbench.json)
 
@@ -38,7 +38,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-下一项用已存球体网格和两份终帧量化回流和剪切层的实际空间分辨率，再决定是否需要有针对性的尾迹网格对照。[当前下一决定](validation/v322/NEXT_DECISION.md)
+下一项按 Short 原装置核对两根赤道支管，建立带支管银球的几何和外露原面账。[当前下一决定](validation/v323/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 
