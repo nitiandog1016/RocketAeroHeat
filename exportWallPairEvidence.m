@@ -16,6 +16,14 @@ t=table((1:n)',string(data.region(:)),compose("%.17g",data.faceArea(:)), ...
     'VariableNames',{'face_id','region','area_m2'});
 t=addField(t,p,'pressure',ledger);
 t=addField(t,q,'heat_flux',ledger);
+if isfield(data,'shortSphere')
+    % 银球实验按离散极角测量，原面 CSV 保留工况身份与温界，实验值留在独立测站表内。
+    t.polar_angle_deg=data.shortSphere.angleDeg(:);
+    tw=data.fields(strcmp({data.fields.key},'wallInput'));first=data.fields(strcmp({data.fields.key},'nearWallCellTemperature'));
+    t.wall_input_K=tw.values(:);t.first_fluid_K=first.values(:);
+    t.test_number=repmat(data.shortSphere.test,n,1);t.experimental_doi=repmat(string(data.shortSphere.doi),n,1);
+    t.steady_frame_sha256=repmat(string(data.evidenceIdentity.sourceFrame.sha256),n,1);
+end
 if isfield(data,'thermistorImport')
     % 原 STL 面号和标准面积成对保留，可独立复核任一行的热功率。
     m=data.thermistorImport;t.reference_face_id=m.referenceFaceID(:);

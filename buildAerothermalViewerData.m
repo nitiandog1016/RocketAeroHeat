@@ -72,7 +72,7 @@ expansionOutside=[];
 if isfield(mesh,'hybridWall')
     w=mesh.hybridWall;
     hybridScope='当前混合计算原面结果；方法见逐面来源，实验精度单独验证';
-    if isfield(mesh,'thermistorSidewind'),hybridScope=mesh.evidenceIdentity.scope;end
+    if isfield(mesh,'thermistorSidewind') || isfield(mesh,'shortSphere'),hybridScope=mesh.evidenceIdentity.scope;end
     if isfield(mesh,'thermistorLead') && isfield(mesh.thermistorLead,'thermal')
         t=mesh.thermistorLead.thermal;
         hybridScope=sprintf('%s 本次壁温 %.12g K，参照终帧 %s。',t.scope,t.wallTemperatureK,t.nativeFrameSHA256);
@@ -105,6 +105,7 @@ if isfield(mesh,'hybridWall')
         data.fields(end).stateNote=reason;
     else
         wallMethod='输入壁温';
+        if isfield(mesh,'shortSphere'),wallMethod='Short 表 III 实测表温按极角线性连接，末测站至尾极沿用末站温度';end
         if isfield(mesh,'thermistorWire'),wallMethod='珠部和接头等温，直引线按一维长线导热解逐节点给定，交叠积分至原面';end
         if isfield(mesh,'thermometryFluxChange'),wallMethod='由电阻等效内部温度反推珠表面温度，长引线超温按同一比例作为空气侧边界';end
         add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({wallMethod},n,1),hybridScope);
@@ -417,6 +418,7 @@ if isfield(mesh,'hybridWall')
     end
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
+    if isfield(mesh,'shortSphere'),data.shortSphere=mesh.shortSphere;end
 end
 % 带线试件按原面保留珠体、引线和接头分区。实验只对照扣除引线散热后的珠部平均量。
 if isfield(mesh,'thermistorSidewind')

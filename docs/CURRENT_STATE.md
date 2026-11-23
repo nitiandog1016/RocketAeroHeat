@@ -1,10 +1,12 @@
 # 当前交接
 
-2026-11-23。普通 STL 带线 B 珠局部重剖通过五步流程。3 m/s 侧吹，10,276 / 10,276 面、3.196650633 mm² 均有壁压和热流。前接头和前引线的六个子面直接积分已接受的细壁场；五条路径的最大父面功率差 2.12 × 10⁻²¹ W。长引线工况整件放热 11.14834 mW。相比 v319 新增几何 0 面、0 m²，逐面联合实验面积仍为 0 m²。电阻测温工况珠部放热比图 7 折算高 25.22%。[本轮验收](validation/v320/RESULTS.md) · [本机三维页](../outputs/v320_validation/ui02/longWire_archive/workbench/index.html) · [上次原生求解](validation/v319/RESULTS.md)
+2026-11-23。Short 银球风洞 Test 65 已接工作台。12.7 mm 光滑球、Re = 882 的研究基流新增 4,464 面、0.000503553014 m² 壁压及热流，网格放热 0.97709 W，按完整球面积对照实验高 16.68%。七站局部 Nu 的 RMSE 为 5.27，119.8° 高估 139.3%，166.7° 低估 21.5%。支管与发展尾迹尚未解析，联合实验验证面积 0 m²。[七站对照](validation/v321/RESULTS.md) · [本机三维页](../outputs/v321_validation/ui02/solve/workbench/index.html) · [原始测量定义](validation/v321/SOURCE.md)
 
-<!-- records:last_completed=v320 -->
+<!-- records:last_completed=v321 -->
 <!-- records:active=none -->
-<!-- records:base_commit=d0b38337af4cfee3257d86139d0ee2bbc9757867 -->
+<!-- records:base_commit=9b902df72092d434a6cb7c8b7f57c80a0b5c2a79 -->
+
+B 珠原有 10,276 面、3.196650633 mm² 全表面结果保留。重剖子面和长引线放热已验收。[B 珠回归](validation/v320/RESULTS.md)
 
 前中段两轮网格排列候选已关闭。约 12 K 温差下，第三档珠部平均换热比原论文图读高 22.80%。[网格试验结论](validation/v307/RESULTS.md)
 
@@ -38,7 +40,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-下一项为局部换热精度选定一个有角向测量的公开低速加热球工况；B 珠保留为全表面回归试件。[当前下一决定](validation/v320/NEXT_DECISION.md)
+下一项从 Test 65 已收敛的全周场出发，检验非定常尾迹对背风两个测站的影响。[当前下一决定](validation/v321/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

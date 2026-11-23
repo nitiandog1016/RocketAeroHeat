@@ -147,6 +147,7 @@ renderEditor();sync();showGeometry(true);
         if ~isgraphics(fig),return;end
         delete(findall(resultHost,'Tag','thermistor-bead-review'));fig.UserData.thermistorReview=[];
         delete(findall(resultHost,'Tag','lewis-cylinder-review'));fig.UserData.lewisCylinderReview=[];
+        delete(findall(resultHost,'Tag','short-sphere-review'));fig.UserData.shortSphereReview=[];
         resultHost.Visible='off';geometryHost.Visible='on';
         fig.UserData.benchmarkReview=[];
         fig.UserData.idealAirReview=[];
@@ -197,6 +198,7 @@ renderEditor();sync();showGeometry(true);
         updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2,'resetCamera',reset));
     end
     function showResults()
+        delete(findall(resultHost,'Tag','short-sphere-review'));fig.UserData.shortSphereReview=[];
         delete(findall(resultHost,'Tag','thermistor-bead-review'));fig.UserData.thermistorReview=[];
         delete(findall(resultHost,'Tag','lewis-cylinder-review'));fig.UserData.lewisCylinderReview=[];
         if ~isempty(state.researchResult)
@@ -235,7 +237,7 @@ renderEditor();sync();showGeometry(true);
                     controls.nextMesh=button(grid,4,'选择周向网格',@(~,~)go(2));
                     controls.changeModel=button(grid,5,'更换模型',@leaveBead);sync();return;
                 end
-                grid=form(23);
+                grid=form(25);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
@@ -269,6 +271,8 @@ renderEditor();sync();showGeometry(true);
                      '查看 6 m/s · 同刻时间步对照','查看 6 m/s · 近壁网格对照','计算 3 m/s · 15° 基准网','计算 3 m/s · 7.5° 细网'}, ...
                     {'archive','archive7p5','startup6','timeSteps6','nearWall6','solve','solve7p5'},'archive');
                 controls.thermistor=button(grid,23,'打开热敏珠全表面结果',@showThermistor);
+                controls.shortSphereMode=choice(grid,24,'Short 银球 · Test 65',{'查看已算稳态基流','从冷态复算稳态基流'},{'archive','solve'},'archive');
+                controls.shortSphere=button(grid,25,'打开银球全表面与七站对照',@showShortSphere);
                 controls.thermistorMode.ValueChangedFcn=@updateThermistorButton;
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
                     'Enable',onoff(~isempty(state.rawMesh)));
@@ -1867,6 +1871,22 @@ renderEditor();sync();showGeometry(true);
             preparing=false;if ~isgraphics(fig),return;end
             if exist('group','var') && isgraphics(group),delete(group);end
             renderEditor();controls.thermistorMode.Value=mode;updateThermistorButton([],[]);showError(ex);
+        end
+    end
+    function showShortSphere(~,~)
+        % 独立民用风洞测点与当前模型共用中央工作区，显式区分原生新算和归档。
+        if state.busy || preparing,return;end
+        mode=controls.shortSphereMode.Value;preparing=true;sync();
+        try
+            if strcmp(mode,'solve'),message('正在从冷态计算银球基流，并核对两次壁反力及同态能量账…');end
+            [m,stations,s]=runShortSphereWorkbench(mode,@()drawnow('limitrate'));
+            if ~isgraphics(fig),return;end
+            prior=resultHost.Children;view=createShortSphereReview(resultHost,m,stations,s);
+            delete(prior);webUI=[];researchUI=[];preparing=false;
+            geometryHost.Visible='off';resultHost.Visible='on';view.tabs.Visible='on';fig.UserData.shortSphereReview=view;
+            sync();title.Text='Short 银球 · 全表面与七站对照';message(sprintf('银球稳态基流放热 %.4f W，七站 Nu 的 RMSE 为 %.2f。',s.wholeOutW,s.stationRMSE));
+        catch ex
+            preparing=false;if isgraphics(fig),sync();showError(ex);end
         end
     end
     function showLewisCylinder(~,~)
