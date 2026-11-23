@@ -272,8 +272,8 @@ renderEditor();sync();showGeometry(true);
                     {'archive','archive7p5','startup6','timeSteps6','nearWall6','solve','solve7p5'},'archive');
                 controls.thermistor=button(grid,23,'打开热敏珠全表面结果',@showThermistor);
                 controls.shortSphereMode=choice(grid,24,'Short 银球 · Test 65', ...
-                    {'查看已算稳态基流','从冷态复算稳态基流','查看尾迹终点 · 细步长','查看尾迹终点 · 粗步长','计算首个同刻 · tU/D = 0.25','计算尾迹两步长 · tU/D = 8','查看双支管全表面与七站','从冷态复算双支管全表面','双支管 · 近壁网格对照','双支管 · 近壁流向（十层）','双支管 · 近壁流向（五层）'}, ...
-                    {'archive','solve','wakeFine','wakeCoarse','wakeStart','wakeSolve','supports','supportSolve','supportResolution','supportDirectionFine','supportDirectionCoarse'},'archive');
+                    {'查看已算稳态基流','从冷态复算稳态基流','查看尾迹终点 · 细步长','查看尾迹终点 · 粗步长','计算首个同刻 · tU/D = 0.25','计算尾迹两步长 · tU/D = 8','查看双支管全表面与七站','从冷态复算双支管全表面','双支管 · 近壁网格对照','双支管 · 近壁流向（十层）','双支管 · 近壁流向（五层）','双支管 · 周向加密（128 扇区）'}, ...
+                    {'archive','solve','wakeFine','wakeCoarse','wakeStart','wakeSolve','supports','supportSolve','supportResolution','supportDirectionFine','supportDirectionCoarse','supportDirectionAngular'},'archive');
                 controls.shortSphere=button(grid,25,'打开银球全表面与七站对照',@showShortSphere);
                 controls.thermistorMode.ValueChangedFcn=@updateThermistorButton;
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
@@ -1882,7 +1882,7 @@ renderEditor();sync();showGeometry(true);
         try
             if strcmp(mode,'solve'),message('正在从冷态计算银球基流，并核对两次壁反力及同态能量账…');end
             if any(strcmp(mode,{'wakeStart','wakeSolve'})),message('正在推进两套物理时间步，核对同刻壁面结果与储能…');end
-            if any(strcmp(mode,{'supports','supportSolve','supportResolution','supportDirectionFine','supportDirectionCoarse'}))
+            if any(strcmp(mode,{'supports','supportSolve','supportResolution'})) || startsWith(mode,'supportDirection')
                 % 名义装置的几何、同态热量账和五区原面共享同一结果页。
                 g=buildShortSupportedSphere();
                 job='';

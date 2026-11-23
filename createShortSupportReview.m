@@ -41,12 +41,24 @@ try
             % 模块三：一次载入所选端点的五个近壁场，探针同时读到同一网格的压力和热流。
             [m,stations,r]=loadShortSupportSurface(g,job,directionGrid);
             folder=fullfile(fileparts(mfilename('fullpath')),'cases','short_sphere');
-            pair=readShortSupportGridPair(folder);
-            [m.shortSupportDirection,d]=readShortSupportDirection(folder,pair,g);
-            assert(strcmp(r.frameSHA256,d.(directionGrid).frame));
+            if strcmp(directionGrid,'angular')
+                pair=readShortSupportAngularPair(folder);
+                assert(strcmp(r.frameSHA256,pair.fineFrame) && strcmp(r.thermal.meshSHA256,pair.fineMesh) && ...
+                    strcmp(r.transferSHA256,pair.transferSHA256) && strcmp(r.bodySHA256,pair.bodySHA256));
+                m.shortSupportDirection=readShortSupportDirection(folder,pair,g,true);
+                m.shortSupportAngular=pair;
+                m.evidenceIdentity.sourceFrame.shearVTKSHA256=pair.sourceVTKSHA256;
+                m.hybridCondition.caseLabel='Short Test 65 · 双支管 · 十层近壁网 · 128 个周向扇区';
+                m.evidenceIdentity.physicalCondition=m.hybridCondition;
+                view.comparison=addShortSupportAngularTab(tabs,pair);
+            else
+                pair=readShortSupportGridPair(folder);
+                [m.shortSupportDirection,d]=readShortSupportDirection(folder,pair,g);
+                assert(strcmp(r.frameSHA256,d.(directionGrid).frame));
+                m.evidenceIdentity.sourceFrame.shearVTKSHA256=d.(directionGrid).vtk;
+                view.direction=addShortSupportDirectionTab(tabs,d);
+            end
             m.shortSupportDirectionGrid=directionGrid;
-            m.evidenceIdentity.sourceFrame.shearVTKSHA256=d.(directionGrid).vtk;
-            view.direction=addShortSupportDirectionTab(tabs,d);
         else
             [m,stations,r]=loadShortSupportSurface(g,job);
         end

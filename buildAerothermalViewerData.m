@@ -629,8 +629,14 @@ end
 if isfield(mesh,'shortSupportDirection')
     w=mesh.shortSupportDirection;g=mesh.shortSupportDirectionGrid;
     label='五层';if strcmp(g,'fine'),label='十层';end
+    if strcmp(g,'angular'),label='128 扇区';end
     prefix=['support' upper(g(1)) g(2:end)];reason=w.([g 'Reason']);
     data.defaultField=[prefix 'Status'];
+    if strcmp(g,'angular')
+        data.defaultField='heatFlux';
+        data.comparisonColorRanges.heatFlux=mesh.shortSupportAngular.sharedFluxRangeKWm2;
+        data.comparisonColorRanges.pressureGauge=mesh.shortSupportAngular.sharedGaugeRangePa;
+    end
     scope=sprintf('%s网。先按壁片对偶面积平均，再按同区交叠传到原面。顺流取 −X 在当地切平面的投影。',label);
     spec={'ShearPa','壁剪切沿流分量','Pa','SU2 表面摩擦系数向量乘来流动压，投影到当地顺流方向'; ...
         'SpeedMps','首层速度沿流分量','m/s','原生首层速度乘来流速度尺度，投影到当地顺流方向'; ...
@@ -638,8 +644,13 @@ if isfield(mesh,'shortSupportDirection')
         'SpeedMagnitudeMps','首层速度切向模','m/s','对传到原面切平面的首层速度向量取模'; ...
         'Status','近壁流向','±1','壁剪切与首层速度的沿流分量同时为正取 +1，同时为负取 −1'};
     for j=1:size(spec,1)
-        col=spec{j,1};both=[w.(['coarse' col]);w.(['fine' col])];
-        lim=max(abs(both),[],'omitnan');range=[-lim lim];
+        col=spec{j,1};
+        if strcmp(g,'angular')
+            lim=mesh.shortSupportAngular.flowRangeMax.(col);
+        else
+            both=[w.(['coarse' col]);w.(['fine' col])];lim=max(abs(both),[],'omitnan');
+        end
+        range=[-lim lim];
         if contains(col,'Magnitude'),range(1)=0;end
         key=[prefix col];values=w.([g col]);
         if strcmp(col,'Status'),values(values==0)=NaN;end

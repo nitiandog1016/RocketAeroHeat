@@ -30,10 +30,10 @@ def corner_weights(corners,xyz):
     return weights
 
 
-def measure_stations(xyz,wet,sphere,q,tw,physical,case):
-    # 测线在 Y=0 的真实 64 点环上。各测站的射线与环的直弦相交，插值节点量。
+def measure_stations(xyz,wet,sphere,q,tw,physical,case,sectors=64):
+    # 测线在 Y=0 的真实节点环上。各测站的射线与环的直弦相交，插值节点量。
     ring=sphere[np.abs(xyz[sphere,1])<1e-10]
-    assert len(ring)==64
+    assert len(ring)==sectors
     phi=np.mod(np.arctan2(xyz[ring,2],xyz[ring,0]),2*np.pi);order=np.argsort(phi)
     ring=ring[order];phi=phi[order];rows=[]
     for deg,reference in zip(case["angleDeg"],case["localNuSurface"]):
@@ -49,12 +49,15 @@ def measure_stations(xyz,wet,sphere,q,tw,physical,case):
     return np.array(rows)
 
 
-def mapped(work,out,*,prepared=PREP,expected_mesh=None):
+def mapped(work,out,*,prepared=PREP,expected_mesh=None,transfer_file=None,transfer_sha=None):
     thermal=read(work/"thermal.json")
     assert thermal["passed"] and thermal["thermalChange"]<.002 and thermal["controlError"]<2e-12
     config=read(prepared/"prepared.json");s=config["condition"];case=read(CASE)
     grid=read(DATA/"supportedGrid65.json")
-    assert sha(DATA/"supported65.zip")==grid["bodySHA256"] and sha(DATA/"supportedTransfer65.npz")==grid["publicTransferSHA256"]
+    assert sha(DATA/"supported65.zip")==grid["bodySHA256"]
+    if transfer_file is None:
+        transfer_file=DATA/"supportedTransfer65.npz";transfer_sha=grid["publicTransferSHA256"]
+    assert sha(transfer_file)==transfer_sha
     mesh_key=grid["hybrid"]["meshSHA256"] if expected_mesh is None else expected_mesh
     assert sha(prepared/"mesh.su2")==mesh_key==thermal["meshSHA256"] and grid["caseSHA256"]==thermal["caseSHA256"]
     with ZipFile(DATA/"supported65.zip") as z:
@@ -63,13 +66,13 @@ def mapped(work,out,*,prepared=PREP,expected_mesh=None):
     with np.load(prepared/"mapping.npz") as mesh:
         xyz,wet,first,corners,sourceArea,group,theta=(mesh[k] for k in ("xyz","wet","first","corners","nativeArea","group","theta"))
     for name,release in (("early","releaseEarly"),("late","releaseLate")):
-        actual=budget(work/name,work/release,wet,thermal["scale"])
+        actual=budget(work/name,work/release,wet,thermal["scale"],config["geometry"].get("farNodes",1346))
         assert actual==thermal[name] and abs(actual["physicalGapFraction"])<.005
     out.mkdir(parents=True,exist_ok=False)
     with np.load(prepared/"transfer.npz") as m:
         target,source,wTarget,wSource,area,regions=(m[k] for k in ("target","source","targetFraction","sourceFraction","targetArea","region"))
     assert sha(prepared/"mapping.npz")==config["files"]["mapping.npz"] and sha(prepared/"transfer.npz")==config["files"]["transfer.npz"]
-    with np.load(DATA/"supportedTransfer65.npz") as public:
+    with np.load(transfer_file) as public:
         np.testing.assert_array_equal(public["nativeWallXYZD"],xyz[wet])
         np.testing.assert_array_equal(public["nativeCorners"],np.searchsorted(wet,corners))
         for name,values in (("target",target),("source",source),("targetFraction",wTarget),("sourceFraction",wSource)):
@@ -108,7 +111,7 @@ def mapped(work,out,*,prepared=PREP,expected_mesh=None):
                 minFluxIn=float(q[mask].min()),maxFluxIn=float(q[mask].max()),peakOutFace=int(ids[np.argmin(q[mask])]+1),
                 minPa=float(p[mask].min()),maxPa=float(p[mask].max())))
     assert abs(sum(r["outW"] for r in regions_out)-thermal["early"]["wallW"])<1e-10
-    stations=measure_stations(xyz,wet,np.unique(corners[group==1]),nodeQ,tw,s,case)
+    stations=measure_stations(xyz,wet,np.unique(corners[group==1]),nodeQ,tw,s,case,config["geometry"].get("angularSectors",64))
     np.testing.assert_array_equal(stations[:,0],[float(r["angleDeg"]) for r in reference])
     station_faces=np.array([int(r["faceID"]) for r in reference])
     assert np.all(regions[station_faces-1]==1)
@@ -120,7 +123,7 @@ def mapped(work,out,*,prepared=PREP,expected_mesh=None):
                comments="",fmt=["%d","%d"]+["%.17g"]*6)
     silver=regions_out[0];equiv=silver["outW"]*np.pi*s["diameterM"]**2/silver["areaM2"]
     observed=case["observedBtuS"]*1055.05585262
-    summary=dict(thermal=thermal,condition=s,caseSHA256=sha(CASE),bodySHA256=grid["bodySHA256"],transferSHA256=grid["publicTransferSHA256"],
+    summary=dict(thermal=thermal,condition=s,caseSHA256=sha(CASE),bodySHA256=grid["bodySHA256"],transferSHA256=transfer_sha,
                  frameSHA256=frame,releaseSHA256=sha(work/"releaseEarly/restart.csv"),faces=len(area),areaM2=area.sum(),regions=regions_out,
                  minGaugePa=float(gauge.min()),maxGaugePa=float(gauge.max()),peakOutFace=int(q.argmin()+1),peakOutWm2=float(-q.min()),
                  solvedAreaM2=area.sum(),jointExperimentalAreaM2=0.,silverEquivalentFullSphereW=equiv,observedFullSphereW=observed,

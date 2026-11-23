@@ -34,12 +34,21 @@ def differences(values,areas):
 def compare(fine,grid):
     coarse=DATA/"supportedSurface65.zip"
     assert sha(coarse)=="2e5b065e3b7bd7f15dc46a22bdc6f5a041bf57ebb9a158c31cb46426953c772b"
+    return compare_surfaces(coarse,fine,grid)
+
+
+def compare_surfaces(coarse,fine,grid,angular=False):
     c,w,cs=load_surface(coarse);f,v,fs=load_surface(fine)
-    for key in ("condition","bodySHA256","caseSHA256","transferSHA256","areaM2"):
+    for key in ("condition","bodySHA256","caseSHA256","areaM2"):
         assert c[key]==f[key]
+    if angular:
+        assert c["transferSHA256"]!=f["transferSHA256"]==grid["publicTransferSHA256"]
+    else:
+        assert c["transferSHA256"]==f["transferSHA256"]
     assert f["thermal"]["meshSHA256"]==grid["meshSHA256"]!=c["thermal"]["meshSHA256"]
     assert f["frameSHA256"]!=c["frameSHA256"]
-    for name in ("faceID","areaM2","regionID","wallInputK"):np.testing.assert_array_equal(w[name],v[name])
+    for name in ("faceID","areaM2","regionID"):np.testing.assert_array_equal(w[name],v[name])
+    if not angular:np.testing.assert_array_equal(w["wallInputK"],v["wallInputK"])
     np.testing.assert_array_equal(cs["angleDeg"],fs["angleDeg"]);np.testing.assert_array_equal(cs["reportedNu"],fs["reportedNu"])
     a=w["areaM2"];q=-w["fluxInWm2"];fq=-v["fluxInWm2"];base=q>=.99*q.max();changed=fq>=.99*fq.max()
     regions=[]

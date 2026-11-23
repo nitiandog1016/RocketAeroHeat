@@ -36,7 +36,7 @@ def advance(folder,start,exe,steps,release=False,capture=False,*,prepared=PREP,p
     if not release:
         pairs=np.loadtxt(folder/"far_pairs.csv",delimiter=",",ndmin=2)
         np.testing.assert_array_equal(pairs[:,0],np.arange(steps))
-        assert np.all(pairs[:,1]==1346) and np.all(pairs[:,2:4]>0) and np.all(pairs[:,4]<=1e-15)
+        assert np.all(pairs[:,1]==s["geometry"].get("farNodes",1346)) and np.all(pairs[:,2:4]>0) and np.all(pairs[:,4]<=1e-15)
         trace=np.genfromtxt(folder/"stages.csv",names=True,delimiter=",",dtype=None,encoding="ascii")
         assert len(trace)==steps*2 and np.all(trace["stage"][::2]=="low") and np.all(trace["stage"][1::2]=="actual")
         assert np.all(trace["below"]==0) and np.all(trace["above"]==0) and np.max(trace["wallDrift"])<2e-14
@@ -89,11 +89,11 @@ def check(work,prepared=PREP):
         assert r["end"]==sha(d/"restart.csv") and r["history"]==sha(d/"history.csv")
     controlError=float(np.max(abs(table(work/"control","restart.csv")-table(work/"early","restart.csv"))))
     assert controlError<2e-12 and max(read(work/"plus20/record.json")["window"])<-8
-    s=read(prepared/"prepared.json")["condition"];scale=s["rho"]*s["cp"]*s["speedMps"]*s["diameterM"]**2*s["scalarUnitK"]
+    spec=read(prepared/"prepared.json");s=spec["condition"];scale=s["rho"]*s["cp"]*s["speedMps"]*s["diameterM"]**2*s["scalarUnitK"]
     with np.load(prepared/"mapping.npz") as m:wet=m["wet"]
     ends={}
     for name,rel in (("early","releaseEarly"),("late","releaseLate")):
-        obs=work/name;ends[name]=budget(obs,work/rel,wet,scale)
+        obs=work/name;ends[name]=budget(obs,work/rel,wet,scale,spec["geometry"].get("farNodes",1346))
         flow=np.loadtxt(obs/"flow_far.csv",delimiter=",");n=np.fromfile(obs/"nodes.bin","<f8").reshape(-1,16)
         n=n[n[:,0].argsort()];np.testing.assert_array_equal(n[flow[:,0].astype(int),11],flow[:,1])
     change=abs(ends["late"]["wallW"]/ends["early"]["wallW"]-1)

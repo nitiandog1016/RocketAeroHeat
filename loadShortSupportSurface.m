@@ -2,8 +2,13 @@ function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution)
 % 模块一：核对同一几何、温界、收敛端点和五区交叠文件，从存档或新算目录取数。
 if nargin<3,resolution='coarse';end
 root=fileparts(mfilename('fullpath'));cases=fullfile(root,'cases','short_sphere');
+transferName='supportedTransfer65.npz';
+if strcmp(resolution,'angular'),transferName='supportedAngularTransfer65.npz';end
 if nargin<2 || isempty(job)
-    if strcmp(resolution,'fine')
+    if strcmp(resolution,'angular')
+        pair=readShortSupportAngularPair(cases);archive=fullfile(cases,'supportedAngularSurface65.zip');
+        assert(strcmp(cm011FileSHA256(archive),pair.fineArchiveSHA256));
+    elseif strcmp(resolution,'fine')
         pair=readShortSupportGridPair(cases);archive=fullfile(cases,'supportedFine65.zip');
         assert(strcmp(cm011FileSHA256(archive),pair.fineArchiveSHA256));
     else
@@ -20,7 +25,7 @@ temp=tempname;mkdir(temp);clean=onCleanup(@()discard(temp)); %#ok<NASGU>
 unzip(archive,temp);s=jsondecode(fileread(fullfile(temp,'summary.json')));
 assert(strcmp(cm011FileSHA256(fullfile(cases,'test65.json')),s.caseSHA256) && ...
     strcmp(cm011FileSHA256(fullfile(cases,'supported65.zip')),s.bodySHA256) && ...
-    strcmp(cm011FileSHA256(fullfile(cases,'supportedTransfer65.npz')),s.transferSHA256));
+    strcmp(cm011FileSHA256(fullfile(cases,transferName)),s.transferSHA256));
 assert(s.thermal.passed && abs(s.thermal.early.physicalGapFraction)<.005 && ...
     abs(s.thermal.late.physicalGapFraction)<.005 && s.thermal.thermalChange<.002 && ...
     strcmp(s.thermal.early.sourceFrame,s.frameSHA256));

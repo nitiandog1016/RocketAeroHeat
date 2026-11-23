@@ -110,12 +110,22 @@ def audit_volume(folder):
                 minCellVolumeD3=lowest,minConeVolumeD3=cone,volumeD3=volume)
 
 
-def prepare(out,structured=False,split_near=False):
+def prepare(out,structured=False,split_near=False,split_sectors=False):
     data,info=reference();case=read(CASE);s=condition(case);D=s["diameterM"]
     out.mkdir(parents=True,exist_ok=False)
     wall,xy,cells2,far=section(info["tubeDiameterM"]/(2*D),info["endYM"]/D,structured,split_near)
-    rays=PHASE+np.arange(SECTORS+1)*2*np.pi/SECTORS
+    if split_sectors and (structured or not split_near):
+        raise ValueError("这项周向对照以十层混合网为基线")
+    sectors=SECTORS*(2 if split_sectors else 1)
+    rays=PHASE+np.arange(sectors+1)*2*np.pi/sectors
     rotated,ids=rotate(xy,rays,True)
+    if split_sectors:
+        # 湿壁与全部近壁层使用旧弦的几何中点。14D 远场新增射线仍落在原半径上。
+        radial=np.linalg.norm(xy,axis=1)
+        blend=np.clip((radial-2.)/12.,0.,1.)[:,None]
+        for k in range(1,sectors,2):
+            mid=(rotated[ids[k-1]]+rotated[ids[k+1]])/2
+            rotated[ids[k]]=mid+blend*(rotated[ids[k]]-mid)
     xyz=rotated[:,[1,0,2]].copy();xyz[:,2]*=-1
     cells=[sweep(c,lo,hi) for lo,hi in zip(ids,ids[1:]) for c in cells2]
     width=len(wall)
@@ -144,7 +154,7 @@ def prepare(out,structured=False,split_near=False):
     heights=np.einsum("ijk,ik->ij",xyz[lookup[corners]]-p,normals)
     divisor=2 if split_near else 1
     assert heights.min()>.00195/divisor and heights.max()<.00205/divisor
-    group=np.tile(np.repeat(REGIONS,COUNTS),SECTORS)
+    group=np.tile(np.repeat(REGIONS,COUNTS),sectors)
     # 接头共享球面温界，管壁其余排与端盖给定相同赤道温度。
     tags=ids[:,:width];sphere_nodes=np.unique(tags[:,23:72])
     eq=np.interp(90,case["angleDeg"],kelvin(case["surfaceF"]))
@@ -159,10 +169,10 @@ def prepare(out,structured=False,split_near=False):
     np.savetxt(out/"initial.csv",np.c_[np.arange(len(xyz)),xyz,state],delimiter=",",comments="",header=HEADER,fmt=["%d"]+["%.17g"]*9)
     np.savez_compressed(out/"mapping.npz",xyz=xyz,wet=wet,theta=theta,first=first,corners=corners,
                         nativeArea=area*D**2,group=group)
-    seal_prepared(out,split_near)
+    seal_prepared(out,split_near,split_sectors)
 
 
-def seal_prepared(out,split_near=False):
+def seal_prepared(out,split_near=False,split_sectors=False):
     data,info=reference();case=read(CASE);s=condition(case);D=s["diameterM"]
     stats=audit_volume(out)
     with np.load(out/"mapping.npz") as z:
@@ -175,6 +185,11 @@ def seal_prepared(out,split_near=False):
     stats.update(minFirstM=height.min()*D,maxFirstM=height.max()*D,outerRadiusD=14,
                  nativeAreasM2=np.bincount(group,area)[1:].tolist())
     if split_near:stats["nearWallIntervals"]=10
+    if split_sectors:
+        stats["angularSectors"]=2*SECTORS
+        # 球形远场两个轴端共用节点，其余节点均来自真实远场标记。
+        _,_,marks=load_mesh(out/"mesh.su2",("far","wall"))
+        stats["farNodes"]=len({i for face in marks["far"] for i in face})
     from shortSupportTransfer import transfer
     stats["transfer"]=transfer(out,data,s,stats)
     files=["mesh.su2","initial.csv","profile.dat","release.dat","mapping.npz","transfer.npz"]
@@ -188,5 +203,6 @@ if __name__=="__main__":
     parser.add_argument("output",type=Path)
     parser.add_argument("--outer",choices=("hybrid","structured"),default="hybrid")
     parser.add_argument("--split-near",action="store_true",help="将原五个近壁间隔全部对半")
+    parser.add_argument("--split-sectors",action="store_true",help="在十层近壁网的每个旧扇区内增加中间射线")
     args=parser.parse_args()
-    out=args.output.resolve();out.relative_to(ROOT/"outputs");prepare(out,args.outer=="structured",args.split_near)
+    out=args.output.resolve();out.relative_to(ROOT/"outputs");prepare(out,args.outer=="structured",args.split_near,args.split_sectors)

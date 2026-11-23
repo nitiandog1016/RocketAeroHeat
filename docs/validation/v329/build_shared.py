@@ -95,6 +95,10 @@ def build(out,prepared=None):
 """+anchor)
     (out/"silver.hpp").write_text('#include "far_mass.hpp"\n'+header,encoding="utf8")
     for path in (HERE/"far_mass.hpp",PREV/"capacity.hpp"):(out/path.name).write_bytes(path.read_bytes())
+    if prepared is not None and "farNodes" in spec["geometry"]:
+        # 银球旧网与周向二分网分别绑定实际远场节点数，仍逐点校验生产与消费。
+        far=out/"far_mass.hpp"
+        far.write_text(once(far.read_text("utf8"),"count!=1346","count!="+str(int(spec["geometry"]["farNodes"]))),encoding="utf8")
     (out/"CIncEulerSolver.cpp").write_text(flow_source((src/FLOW).read_text("utf8")),encoding="utf8")
     (out/"CScalarSolver.inl").write_text(scalar_source((src/SCALAR).read_text("utf8"),node_count),encoding="utf8")
     species=once((src/SPECIES).read_text("utf8"),'"../../include/solvers/CScalarSolver.inl"','"CScalarSolver.inl"')

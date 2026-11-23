@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v332 双支管银球的周向间隔二分](validation/v332/RESULTS.md) · [同色标热流、七站与反向区](validation/v332/evidence/sector.png) · [下一项](validation/v332/NEXT_DECISION.md)。64 与 128 扇区的总放热相差 −0.198%，背风测线变号区间前移，7 站 RMSE 从 4.659 增至 4.888 Nu。
+
 - [v331 双支管银球的局部反向区与热峰](validation/v331/RESULTS.md) · [七站对照图](validation/v331/evidence/stations.png) · [下一项](validation/v331/NEXT_DECISION.md)。两网在 119.8° 顺向、166.7° 反向，五层、十层的反向面积分别为 42.118、45.110 mm²。
 
 - [v330 双支管试件近壁间隔对半](validation/v330/RESULTS.md) · [同色标云图与分区差异](validation/v330/evidence/nearwall.png) · [下一项](validation/v330/NEXT_DECISION.md)。在相同 32,480 原面上整件放热变化 −0.0834%，近峰区域交并面积比 99.08%，量热偏差仍约 +38.6%。

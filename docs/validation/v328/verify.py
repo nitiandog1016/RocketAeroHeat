@@ -45,7 +45,7 @@ def history(stage):
     return h,raw,rows
 
 
-def budget(folder,release,wet,scale):
+def budget(folder,release,wet,scale,far_nodes=1346):
     terminal(folder);terminal(release)
     n=np.fromfile(folder/"nodes.bin",dtype="<f8").reshape(-1,16)
     n=n[np.argsort(n[:,0])]
@@ -89,7 +89,7 @@ def budget(folder,release,wet,scale):
     wallW=float(np.sum(-unlimited_release[wet]-net(corr)[wet]+applied[wet])*scale)
     np.testing.assert_allclose(wallW,corrected[wet].sum()*scale,rtol=0,atol=1e-10)
     far=np.loadtxt(folder/"flow_far.csv",delimiter=",");ids=far[:,0].astype(int);fm=far[:,1]
-    assert len(ids)==len(np.unique(ids))==1346
+    assert len(ids)==len(np.unique(ids))==far_nodes
     assert not wall[ids].any()
     # 给定远场标量为零。独立上风读数分别使用两种实际质量通量。
     np.testing.assert_allclose(n[ids,12],np.maximum(n[ids,11],0)*old[ids],rtol=1e-13,atol=1e-20)

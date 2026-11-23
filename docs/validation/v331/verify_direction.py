@@ -60,8 +60,9 @@ def verify_ledger(section,ids,area,q,status):
               [sum(area[local]),sum(power),sum(np.maximum(power,0)),sum(np.maximum(-power,0))])
 
 
-def raw_check(k,report,m,n,tau_dir,defined,rows):
-    folder=ROOT/"outputs"/("v329_validation" if k=="coarse" else "v330_validation")/"run01/steady03"
+def raw_check(k,report,m,n,tau_dir,defined,rows,folder=None,sectors=64):
+    if folder is None:
+        folder=ROOT/"outputs"/("v329_validation" if k=="coarse" else "v330_validation")/"run01/steady03"
     frame=folder/"restart_000199.csv";surface=folder/"surface_000199.vtk"
     assert digest(frame)==report["frame"] and digest(surface)==report["vtk"]
     state=np.loadtxt(frame,skiprows=1,delimiter=",",usecols=range(8))
@@ -111,7 +112,7 @@ def raw_check(k,report,m,n,tau_dir,defined,rows):
     # 球面测线用解析的增角切向和射线/弦的二维行列式，重新定位原节点及插值权重。
     ring=np.flatnonzero(abs(wall[:,1])<1e-12)
     phi=np.arctan2(wall[ring,2],wall[ring,0]);ring=ring[np.argsort(phi)];phi=np.sort(phi)
-    assert len(ring)==64
+    assert len(ring)==sectors
     for r in report["stations"]:
         a=np.deg2rad(r["angleDeg"]);j=np.searchsorted(phi,a)
         ids=ring[[j-1,j]]
@@ -123,7 +124,8 @@ def raw_check(k,report,m,n,tau_dir,defined,rows):
         expected=[np.array([1-weight,weight])@(field[ids]@tangent) for field in fields]
         close(expected,[r["shearPa"],r["speedMps"]])
         assert np.sign(expected[0])==np.sign(expected[1])==r["status"]
-    half=ring[phi>0];phi=phi[phi>0];t=np.column_stack((-np.sin(phi),np.zeros_like(phi),np.cos(phi)))
+    positive=wall[ring,2]>1e-12
+    half=ring[positive];phi=phi[positive];t=np.column_stack((-np.sin(phi),np.zeros_like(phi),np.cos(phi)))
     signs=np.sign(np.stack([np.einsum("ij,ij->i",field[half],t) for field in fields]))
     code=np.where(signs[0]==signs[1],signs[0],0)
     i=np.flatnonzero(np.diff(code));trans=report["transitions"]

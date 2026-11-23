@@ -67,12 +67,12 @@ def surface_graph(f):
     return graph
 
 
-def geometry(pair):
+def geometry(pair,transfer_file=DATA/"supportedTransfer65.npz"):
     assert sha(DATA/"supported65.zip")==pair["bodySHA256"]
     with ZipFile(DATA/"supported65.zip") as archive:
         body = json.loads(archive.read("geometry.json"))
-    assert sha(DATA/"supportedTransfer65.npz")==pair["transferSHA256"]
-    with np.load(DATA/"supportedTransfer65.npz") as handle:
+    assert sha(transfer_file)==pair["transferSHA256"]
+    with np.load(transfer_file) as handle:
         m = dict(handle)
     f = np.array(body["F"])-1; v = np.array(body["V"]); p = v[f]
     normal = np.cross(p[:,1]-p[:,0], p[:,2]-p[:,0])
@@ -98,15 +98,20 @@ def native(name, pair, grid):
     stage = ROOT/("outputs/v329_validation" if coarse else "outputs/v330_validation")/"run01/steady03"
     wall_key = read(HERE.parent/"v330/evidence/wall_units.json")[name]
     assert sha(prep/"prepared.json")==(COARSE_KEY if coarse else FINE_KEY)
+    assert wall_key["frame"]==pair[name+"Frame"]
+    return native_vectors(prep,stage,grid,pair["condition"],wall_key)
+
+
+def native_vectors(prep,stage,grid,condition,wall_key):
     spec = read(prep/"prepared.json")
-    assert sha(prep/"mapping.npz")==spec["files"]["mapping.npz"] and spec["condition"]==pair["condition"]
+    assert sha(prep/"mapping.npz")==spec["files"]["mapping.npz"] and spec["condition"]==condition
     record = read(stage/"record.json"); proc = read(stage/"debugger_process.json")
     assert proc["status"]=="terminal" and proc["debuggerExitCode"]==0 and all(proc["inputsStable"].values())
     assert not (proc["stopReason"] or proc["supervisorError"] or proc["survivingProcessIDs"])
     assert "Exit Success (SU2_CFD)" in (stage/"debugger.log").read_text(errors="replace")
     assert max(record["window"])<-8 and sha(stage/"history.csv")==record["history"]
     frame = stage/"restart_000199.csv"; vtk = stage/"surface_000199.vtk"
-    assert record["end"]==sha(frame)==pair[name+"Frame"]==wall_key["frame"] and sha(vtk)==wall_key["vtkSHA256"]
+    assert record["end"]==sha(frame)==wall_key["frame"] and sha(vtk)==wall_key["vtkSHA256"]
     with np.load(prep/"mapping.npz") as m:
         wet, first, xyz = m["wet"], m["first"], m["xyz"]
         np.testing.assert_array_equal(wet[grid["nativeCorners"]], m["corners"])
@@ -182,7 +187,7 @@ def by_status(mask,status,area,flux):
     return {label:subtotal(mask & (status==k),area,flux) for label,k in (("forward",1),("reverse",-1),("unknown",0))}
 
 
-def report_grid(name, geom, values, wet, vectors, scales, wall, stations, pair):
+def report_grid(name, geom, values, wet, vectors, scales, wall, stations, pair,sectors=64):
     m = geom["m"]; area, region = m["targetArea"],m["region"]; flux = wall["fluxInWm2"]
     status = values[:,4]; bits = values[:,5].astype(int); graph = geom["graph"]
     info = dict(regions={}, flags={}, stations=[], transitions=[], components=[])
@@ -221,9 +226,12 @@ def report_grid(name, geom, values, wet, vectors, scales, wall, stations, pair):
                      **ring_stats([face]))
         info["stations"].append(point)
     sphere = np.unique(m["nativeCorners"][m["nativeRegion"]==1])
-    line = sphere[(abs(xyz[sphere,1])<1e-10) & (xyz[sphere,2]>0)]
+    ring = sphere[abs(xyz[sphere,1])<1e-10]
+    # 带有迎、背流轴点的测线仅在方向有定义的开半环上寻找符号变化。
+    axial = abs(xyz[ring,2])<=1e-12
+    line = ring[xyz[ring,2]>1e-12]
     phi = np.rad2deg(np.arctan2(xyz[line,2],xyz[line,0])); order=np.argsort(phi)
-    assert len(line)==32
+    assert len(ring)==sectors and 2*len(line)+axial.sum()==len(ring)
     trace = [station_point([j],np.ones(1),p,vectors,scales) for j,p in zip(line[order],phi[order])]
     for left,right in zip(trace,trace[1:]):
         if left["status"]!=right["status"]:
