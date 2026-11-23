@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v331 双支管银球的局部反向区与热峰](validation/v331/RESULTS.md) · [七站对照图](validation/v331/evidence/stations.png) · [下一项](validation/v331/NEXT_DECISION.md)。两网在 119.8° 顺向、166.7° 反向，五层、十层的反向面积分别为 42.118、45.110 mm²。
+
 - [v330 双支管试件近壁间隔对半](validation/v330/RESULTS.md) · [同色标云图与分区差异](validation/v330/evidence/nearwall.png) · [下一项](validation/v330/NEXT_DECISION.md)。在相同 32,480 原面上整件放热变化 −0.0834%，近峰区域交并面积比 99.08%，量热偏差仍约 +38.6%。
 
 - [v329 双支管银球单工况全表面结果](validation/v329/RESULTS.md) · [热流云图与七站](validation/v329/evidence/surface.png) · [下一项](validation/v329/NEXT_DECISION.md)。统一远场通量后 32,480 面 p/q 全覆盖；两次独立冷算面表一致，外露银球折合量热高 38.43%。

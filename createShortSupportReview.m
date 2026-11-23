@@ -1,7 +1,8 @@
-function view=createShortSupportReview(host,g,job,compareNearWall)
+function view=createShortSupportReview(host,g,job,compareNearWall,directionGrid)
 % 模块一：在科研工作台显示带支管名义外形，接头、测站及面积共用同一套面号。
 if nargin<3,job='';end
 if nargin<4,compareNearWall=false;end
+if nargin<5,directionGrid='';end
 tabs=uitabgroup(host,'Tag','short-sphere-review','Visible','off','Units','normalized','Position',[0 0 1 1]);
 try
     tab=uitab(tabs,'Title','双支管银球');layout=uigridlayout(tab,[4 1]);
@@ -36,6 +37,16 @@ try
             [m,stations,r]=loadShortSupportSurface(g,job,'fine');
             [m,pair]=attachShortSupportGridPair(m,r,g);
             view.comparison=addShortSupportResolutionTab(tabs,pair);
+        elseif ~isempty(directionGrid)
+            % 模块三：一次载入所选端点的五个近壁场，探针同时读到同一网格的压力和热流。
+            [m,stations,r]=loadShortSupportSurface(g,job,directionGrid);
+            folder=fullfile(fileparts(mfilename('fullpath')),'cases','short_sphere');
+            pair=readShortSupportGridPair(folder);
+            [m.shortSupportDirection,d]=readShortSupportDirection(folder,pair,g);
+            assert(strcmp(r.frameSHA256,d.(directionGrid).frame));
+            m.shortSupportDirectionGrid=directionGrid;
+            m.evidenceIdentity.sourceFrame.shearVTKSHA256=d.(directionGrid).vtk;
+            view.direction=addShortSupportDirectionTab(tabs,d);
         else
             [m,stations,r]=loadShortSupportSurface(g,job);
         end

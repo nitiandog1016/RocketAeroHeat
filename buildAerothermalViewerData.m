@@ -625,6 +625,30 @@ if isfield(mesh,'shortSupportGridPair')
     data.comparisonColorRanges.pressureGauge=pair.gaugeRange;data.comparisonColorRanges.supportCoarseGauge=pair.gaugeRange;
     data.comparisonColorRanges.supportHeatChange=[-1 1]*max(abs(dq));data.comparisonColorRanges.supportGaugeChange=[-1 1]*max(abs(dp));
 end
+% 双支管银球的同面近壁向量。流向无法判定的位置保留原因，切向模仍可查看。
+if isfield(mesh,'shortSupportDirection')
+    w=mesh.shortSupportDirection;g=mesh.shortSupportDirectionGrid;
+    label='五层';if strcmp(g,'fine'),label='十层';end
+    prefix=['support' upper(g(1)) g(2:end)];reason=w.([g 'Reason']);
+    data.defaultField=[prefix 'Status'];
+    scope=sprintf('%s网。先按壁片对偶面积平均，再按同区交叠传到原面。顺流取 −X 在当地切平面的投影。',label);
+    spec={'ShearPa','壁剪切沿流分量','Pa','SU2 表面摩擦系数向量乘来流动压，投影到当地顺流方向'; ...
+        'SpeedMps','首层速度沿流分量','m/s','原生首层速度乘来流速度尺度，投影到当地顺流方向'; ...
+        'ShearMagnitudePa','壁剪切切向模','Pa','对传到原面切平面的壁剪切向量取模'; ...
+        'SpeedMagnitudeMps','首层速度切向模','m/s','对传到原面切平面的首层速度向量取模'; ...
+        'Status','近壁流向','±1','壁剪切与首层速度的沿流分量同时为正取 +1，同时为负取 −1'};
+    for j=1:size(spec,1)
+        col=spec{j,1};both=[w.(['coarse' col]);w.(['fine' col])];
+        lim=max(abs(both),[],'omitnan');range=[-lim lim];
+        if contains(col,'Magnitude'),range(1)=0;end
+        key=[prefix col];values=w.([g col]);
+        if strcmp(col,'Status'),values(values==0)=NaN;end
+        add(key,[label ' · ' spec{j,2}],spec{j,3},values,double(isfinite(values)), ...
+            repmat(spec(j,4),n,1),scope,{},reason);
+        data.fields(end).stateNote=scope;data.fields(end).computedStateLabel='近壁流动诊断';
+        data.comparisonColorRanges.(key)=range;
+    end
+end
 % 带线旧网与加密网在七区均可对照，和只在共同珠面定义的几何差别分开显示。
 if isfield(mesh,'thermistorLeadGrid')
     g=mesh.thermistorLeadGrid;

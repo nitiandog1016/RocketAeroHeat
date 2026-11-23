@@ -1,0 +1,160 @@
+{
+  "read02/receipt.json": {
+    "mode": "read",
+    "command": [
+      "D:\\anacondapython\\python.exe",
+      "E:\\RocketAeroHeat\\docs\\validation\\v331\\direction.py",
+      "E:\\RocketAeroHeat\\outputs\\v331_validation\\read02\\data"
+    ],
+    "exitCode": 0,
+    "stopReason": null,
+    "survivors": [],
+    "seconds": 3.813000000001921,
+    "peakRSS": 123088896,
+    "peakOutputBytes": 1192303,
+    "budgetSeconds": 120,
+    "budgetRSS": 2147483648,
+    "product": "supportedDirection65.json",
+    "productPresent": true
+  },
+  "verify01/receipt.json": {
+    "mode": "verify",
+    "command": [
+      "D:\\anacondapython\\python.exe",
+      "E:\\RocketAeroHeat\\docs\\validation\\v331\\verify_direction.py",
+      "E:\\RocketAeroHeat\\cases\\short_sphere",
+      "E:\\RocketAeroHeat\\outputs\\v331_validation\\verify01\\verified.json"
+    ],
+    "exitCode": 0,
+    "stopReason": null,
+    "survivors": [],
+    "seconds": 3.9680000000007567,
+    "peakRSS": 140873728,
+    "peakOutputBytes": 23361878,
+    "budgetSeconds": 120,
+    "budgetRSS": 2147483648,
+    "product": "verified.json",
+    "productPresent": true
+  },
+  "verify01/verified.json": {
+    "faces": 32480,
+    "publicOnly": false,
+    "archiveSHA256": "1939a64e4f33ff220fc4905af37de451b923123a5318c264535cf6c988f229c8",
+    "coarseMaxAbsError": {
+      "ShearPa": 2.220446049250313e-16,
+      "ShearMagnitudePa": 2.7755575615628914e-16,
+      "SpeedMps": 2.7755575615628914e-16,
+      "SpeedMagnitudeMps": 2.7755575615628914e-16
+    },
+    "fineMaxAbsError": {
+      "ShearPa": 2.220446049250313e-16,
+      "ShearMagnitudePa": 2.7755575615628914e-16,
+      "SpeedMps": 1.6653345369377348e-16,
+      "SpeedMagnitudeMps": 1.6653345369377348e-16
+    }
+  },
+  "ui01/receipt.json": {
+    "mode": "ui",
+    "command": [
+      "D:\\matlab\\bin\\matlab.EXE",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat/outputs/v331_validation/ui01');addpath('E:/RocketAeroHeat','E:/RocketAeroHeat/docs/validation/v331');addpath('E:/RocketAeroHeat/outputs/v331_validation/ui01/frontend','-begin');check_direction_ui('E:/RocketAeroHeat/outputs/v331_validation/ui01')"
+    ],
+    "exitCode": 1,
+    "stopReason": "memory",
+    "survivors": [],
+    "seconds": 41.875,
+    "peakRSS": 4448505856,
+    "peakOutputBytes": 2807494,
+    "budgetSeconds": 180,
+    "budgetRSS": 4294967296,
+    "product": "ui.json",
+    "productPresent": false
+  },
+  "ui02/receipt.json": {
+    "mode": "ui",
+    "command": [
+      "D:\\matlab\\bin\\matlab.EXE",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat/outputs/v331_validation/ui02');addpath('E:/RocketAeroHeat','E:/RocketAeroHeat/docs/validation/v331');addpath('E:/RocketAeroHeat/outputs/v331_validation/ui02/frontend','-begin');check_direction_ui('E:/RocketAeroHeat/outputs/v331_validation/ui02','fine')"
+    ],
+    "exitCode": 0,
+    "stopReason": null,
+    "survivors": [],
+    "seconds": 62.96899999999732,
+    "peakRSS": 3872968704,
+    "peakOutputBytes": 23361204,
+    "budgetSeconds": 180,
+    "budgetRSS": 4294967296,
+    "product": "ui.json",
+    "productPresent": true
+  },
+  "ui02/ui.json": {
+    "faces": 32480,
+    "pixels": 3309,
+    "directionFields": 5,
+    "stations": 7,
+    "sectionX": 0.00137,
+    "faceIDs": [
+      164,
+      918,
+      970,
+      25055
+    ],
+    "page": "E:\\RocketAeroHeat\\outputs\\v331_validation\\ui02\\workbench\\index.html",
+    "grid": "fine",
+    "frame": "250c3b641f2551345b19a8143482f19743e198ea7930fb6c9056de7d851dbfa9"
+  },
+  "ui02/export_verified.json": {
+    "grid": "fine",
+    "sectionRows": 72,
+    "faces": 32480,
+    "fieldsChecked": 5
+  },
+  "ui03/receipt.json": {
+    "mode": "ui",
+    "command": [
+      "D:\\matlab\\bin\\matlab.EXE",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "cd('E:/RocketAeroHeat/outputs/v331_validation/ui03');addpath('E:/RocketAeroHeat','E:/RocketAeroHeat/docs/validation/v331');addpath('E:/RocketAeroHeat/outputs/v331_validation/ui03/frontend','-begin');check_direction_ui('E:/RocketAeroHeat/outputs/v331_validation/ui03','coarse')"
+    ],
+    "exitCode": 0,
+    "stopReason": null,
+    "survivors": [],
+    "seconds": 57.38999999999942,
+    "peakRSS": 3932008448,
+    "peakOutputBytes": 43900353,
+    "budgetSeconds": 180,
+    "budgetRSS": 4294967296,
+    "product": "ui.json",
+    "productPresent": true
+  },
+  "ui03/ui.json": {
+    "faces": 32480,
+    "pixels": 3309,
+    "directionFields": 5,
+    "stations": 7,
+    "sectionX": 0.00137,
+    "faceIDs": [
+      164,
+      918,
+      970,
+      25055
+    ],
+    "page": "E:\\RocketAeroHeat\\outputs\\v331_validation\\ui03\\workbench\\index.html",
+    "grid": "coarse",
+    "frame": "909f3fee3db8a16437e5b268bd823ae5707d17b9723503d717d0445f0c732490"
+  },
+  "ui03/export_verified.json": {
+    "grid": "coarse",
+    "sectionRows": 72,
+    "faces": 32480,
+    "fieldsChecked": 5
+  }
+}
