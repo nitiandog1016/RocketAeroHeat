@@ -426,9 +426,12 @@ if isfield(mesh,'thermistorSidewind')
         1000*s.beadAndJointsW,1000*(s.totalOutwardW-s.beadAndJointsW),1000*s.totalOutwardW);
     if isfield(mesh,'thermistorMeasuredPoint')
         m=mesh.thermistorMeasuredPoint;data.measuredPoint=m;
-        data.caseNote='B 型热敏珠 · 图 7 · 3 m/s 名义侧吹 · 壁温 305.15 K';data.resultCondition.caption=data.caseNote;
+        data.caseNote='B 型热敏珠 · 图 7 · 3 m/s 名义侧吹 · 壁温 305.15 K';
+        if isfield(m,'coldSource'),data.caseNote=sprintf('%s · 独立冷启动 %d 步',data.caseNote,m.coldSource.iterations);end
+        data.resultCondition.caption=data.caseNote;
         data.fields(k).stateNote=sprintf('珠部平均 h %.2f W/(m²·K)，图 7 读数 %.2f（%.2f–%.2f），差 %+.2f%%。%s', ...
             m.beadHWm2K,m.experiment.hWm2K,m.experiment.graphReadRangeWm2K,100*m.relativeDifference,m.experiment.mounting);
+        if isfield(m,'coldComparisonNote'),data.fields(k).stateNote=[data.fields(k).stateNote ' ' m.coldComparisonNote];end
     end
 end
 if isfield(mesh,'thermistorLead') || isfield(mesh,'thermistorMidbody')

@@ -13,6 +13,7 @@ state=aeroHeatWorkflowState('init',[],struct('cfg',cfg));
 preview=[];rotation=eye(3);rotationCenter=[0 0 0];controls=struct;
 webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDetailsOpen=false;
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
+measuredDirectory='';measuredPauseFile='';
 creasePreview=false;qualityPreview=false;candidatePreview=[];
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
@@ -84,6 +85,7 @@ renderEditor();sync();showGeometry(true);
             if state.steps(j).completed,tag='已完成';end
             if strcmp(state.steps(j).status,'busy'),tag='计算中';end
             if strcmp(state.steps(j).status,'failed'),tag='失败';end
+            if strcmp(state.steps(j).status,'paused'),tag='已保存';end
             if strcmp(state.steps(j).status,'research'),tag='研究快照';end
             buttons(j).Text=sprintf('%d  %s  · %s',j,state.steps(j).label,tag);
             buttons(j).Enable=onoff(state.steps(j).available && ~state.busy && ~preparing);
@@ -127,6 +129,9 @@ renderEditor();sync();showGeometry(true);
         % 异步计算期间保留取消按钮；父面板禁用会一并禁用子控件。
         if state.busy && ~isempty(engineJob) && isfield(controls,'cancel')
             editor.Enable='on';controls.cancel.Enable=onoff(~engineJob.cancelRequested);
+        end
+        if state.busy && ~isempty(measuredPauseFile) && isfield(controls,'pauseMeasured')
+            editor.Enable='on';controls.pauseMeasured.Enable=onoff(~isfile(measuredPauseFile));
         end
         drawnow limitrate;
     end
@@ -567,8 +572,17 @@ renderEditor();sync();showGeometry(true);
                         controls.run=button(grid,2,'从冷态计算当前试件',@solveCase);
                         if isSidewind()
                             if p.angularCells==96
-                                controls.run.Text='计算 12 K 测点';controls.readBead.Text='读取独立 12 K 原生结果';
-                                tip(grid,3,'96 档全周侧吹 · 以恒物性线性温差场计算压力、热流与首层温度。');
+                                controls.run.Text='用 6 K 参照场换算 12 K 测点';controls.readBead.Text='读取已算 12 K 原生结果';
+                                controls.coldMeasured=button(grid,3,'从冷态新算 12 K 测点',@(~,~)solveCase([],[],'cold'));
+                                controls.beadDirectory=textField(grid,4,'冷启动任务目录',measuredDirectory);
+                                controls.browseRun=button(grid,5,'选择任务目录',@chooseBeadDirectory);
+                                controls.resumeBead=button(grid,6,'接续或查看该次冷启动',@(~,~)solveCase([],[],'resume'));
+                                controls.pauseMeasured=button(grid,7,'保存当前阶段后暂停',@pauseMeasured);
+                                controls.pauseMeasured.Enable='off';
+                                note=tip(grid,8,'冷启动从均匀来流计算。暂停在当前阶段保存并核验后生效，目录可用于接续。');
+                                note.Layout.Row=[8 9];
+                                controls.log=uitextarea(grid,'Editable','off','Value',logLines);
+                                controls.log.Layout.Row=[10 11];controls.log.Layout.Column=[1 2];
                             else,tip(grid,3,'完整 360° · 沿 −Y 稳态侧吹 · 给定壁温 299.15 K');end
                             sync();return;
                         end
@@ -654,7 +668,17 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,4,sprintf('光滑珠中段加密 · 整珠放热 %.5f mW · 平均换热 %.2f W/(m²·K)',1000*s.totalOutwardW,s.beadMeanHWm2K));
                 elseif isSidewind()
                     s=state.result.thermistorSidewind;
-                    tip(grid,4,sprintf('侧吹 −Y · 七区放热 %.5f mW · 最强放热面 %d。沿 X 选择截面查看周向差异。',1000*s.totalOutwardW,s.peakFaceID));
+                    origin='侧吹 −Y';
+                    if isfield(state.result,'thermistorMeasuredPoint')
+                        m=state.result.thermistorMeasuredPoint;
+                        if isfield(m,'coldSource'),origin=sprintf('独立冷启动 · %d 步',m.coldSource.iterations);
+                        elseif strcmp(m.action,'solve'),origin='6 K 参照场换算';else,origin='12 K 原生归档';end
+                    end
+                    detail='沿 X 选择截面查看周向差异。';
+                    if isfield(state.result,'thermistorMeasuredPoint') && isfield(state.result.thermistorMeasuredPoint,'coldComparisonNote')
+                        detail=state.result.thermistorMeasuredPoint.coldComparisonNote;
+                    end
+                    tip(grid,4,sprintf('%s · 七区放热 %.5f mW · 最强放热面 %d。%s',origin,1000*s.totalOutwardW,s.peakFaceID,detail));
                 elseif hasBeadLeads()
                     s=state.result.thermistorLead;
                     msg=sprintf('珠体和接头 %.4f mW · 两条引线含端面 %.4f mW · 总放热 %.4f mW', ...
@@ -1225,20 +1249,27 @@ renderEditor();sync();showGeometry(true);
                 if ~strcmp(source,'run'),request.runDirectory=strtrim(controls.beadDirectory.Value);end
             elseif isMixedBead()
                 request.leadAction=source;
+                if strcmp(source,'resume'),request.runDirectory=strtrim(controls.beadDirectory.Value);end
             end
             state=aeroHeatWorkflowState('beginSolve',state,request);token=state.solveId;revision=state.solveInputRevision;
+            if isfield(state.frozenInputs.cfg,'thermistorInvocation')
+                c=state.frozenInputs.cfg;measuredDirectory=c.thermistorRunDirectory;
+                measuredPauseFile=[measuredDirectory '.' c.thermistorInvocation '.pause'];
+            end
             renderEditor();
             frozen=state.frozenInputs;
             if isBead()
                 frozen.cfg.thermistorResultSource=source;
                 if isFullBead()
                     message('正在核对全周计算的网格、初场和物理时刻…');
+                elseif ~isempty(measuredPauseFile),message(['当前冷启动目录 ' measuredDirectory]);
                 elseif isSidewind() && state.cfg.thermistorAngularCells==96,message('正在核对 96 档全表面测点和珠部平均换热…');
                 elseif isSidewind() && strcmp(source,'archive'),message('正在核对全周侧吹归档与七区原面结果…');
                 elseif strcmp(source,'archive'),message('正在核对体网，并用归档温差场计算当前壁温结果…');
                 else,message('正在使用已确认的体网从冷初场计算热敏珠…');end
             else,message('正在显式计算当前工况；各阶段完成不代表全面积已求解。');end
             [solved,fs,newReport]=quietTriple(@()runAeroHeatSingleCase(frozen.mesh,frozen.cfg,@progress));
+            measuredPauseFile='';
             state=aeroHeatWorkflowState('completeSolve',state,struct('result',solved, ...
                 'freestream',fs,'solveId',token,'sourceRevision',revision));report=newReport;
             if isfield(newReport,'coverageMessage')
@@ -1248,10 +1279,16 @@ renderEditor();sync();showGeometry(true);
             end
             go(5);
         catch ex
+            measuredPauseFile='';
             if exist('token','var') && state.busy
-                state=aeroHeatWorkflowState('failSolve',state,struct('error',ex,'solveId',token,'sourceRevision',revision));
+                operation='failSolve';if strcmp(ex.identifier,'RAH:Bead:Paused'),operation='pauseSolve';end
+                state=aeroHeatWorkflowState(operation,state,struct('error',ex,'solveId',token,'sourceRevision',revision));
             end
-            if isgraphics(fig),renderEditor();showError(ex);showGeometry(false);end
+            if isgraphics(fig)
+                renderEditor();
+                if strcmp(ex.identifier,'RAH:Bead:Paused'),message(ex.message);else,showError(ex);end
+                showGeometry(false);
+            end
         end
     end
     function progress(event)
@@ -1306,8 +1343,16 @@ renderEditor();sync();showGeometry(true);
     end
     function chooseBeadDirectory(~,~)
         % 这里只选择现有运行目录，读取、接续与新算分别由计算页按钮触发。
-        folder=uigetdir(fullfile(state.cfg.projectRoot,'outputs','v294_validation'),'选择热敏珠计算根目录');
+        base=fullfile(state.cfg.projectRoot,'outputs');
+        if isFullBead(),base=fullfile(base,'v294_validation');end
+        folder=uigetdir(base,'选择热敏珠计算根目录');
         if ~isequal(folder,0),controls.beadDirectory.Value=folder;end
+    end
+    function pauseMeasured(~,~)
+        % 暂停请求只属于本次侧栏操作。求解器先保存、核验正在运行的阶段。
+        if isempty(measuredPauseFile),return;end
+        flag=java.io.File(measuredPauseFile);flag.createNewFile();
+        message(['等待当前阶段保存。任务目录 ' measuredDirectory]);
     end
     function loadBeadModel(~,~,variant)
         % 固定朝向的民用试件从模型步骤进入主流程，原面在网格步骤继续使用。
@@ -1867,6 +1912,7 @@ renderEditor();sync();showGeometry(true);
         engineTimer=[];
     end
     function closeWorkbench(~,~)
+        if ~isempty(measuredPauseFile),pauseMeasured([],[]);end
         if ~isempty(engineJob) && ~engineJob.process.HasExited
             closing=true;cancelEngine([],[]);return;
         end

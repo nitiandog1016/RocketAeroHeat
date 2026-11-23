@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import sys
+from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
 import numpy as np
@@ -53,18 +54,32 @@ def observer_binary(work):
     return exe
 
 
-def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe,*,angular96=False,temperature_scale=6):
+def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe,*,angular96=False,temperature_scale=6,checkpoint=None):
     """对比官方一步以及同阶段的壁面与远场收支。"""
     assert sha(ENGINE)==ENGINE_SHA
     cfg,n=re.subn(r"^ITER= \d+$","ITER= 1",(parent/"case.cfg").read_text("ascii"),flags=re.M);assert n==1
-    out.mkdir(exist_ok=False)
+    out.mkdir(exist_ok=checkpoint is not None)
     for name,binary in (("control",ENGINE),("observed",exe)):
-        run=out/name;run.mkdir();os.link(parent/"mesh.su2",run/"mesh.su2");os.link(parent/"restart.csv",run/"initial_flow.csv")
-        (run/"case.cfg").write_text(cfg,encoding="ascii")
-        invoke("step",[binary,"case.cfg","--threads","1"],run,run,150 if angular96 else 90,
-               4 if angular96 else 3,trace=name=="observed")
+        run=out/name
+        if checkpoint:checkpoint(name)
+        new=not run.exists()
+        if new or checkpoint is None:
+            run.mkdir();os.link(parent/"mesh.su2",run/"mesh.su2");os.link(parent/"restart.csv",run/"initial_flow.csv")
+            (run/"case.cfg").write_text(cfg,encoding="ascii")
+            invoke("step",[binary,"case.cfg","--threads","1"],run,run,150 if angular96 else 90,
+                   4 if angular96 else 3,trace=name=="observed")
         rec=read(run/"step_process.json");assert rec["exitCode"]==0 and not (rec["stopReason"] or rec["livePids"])
         assert sum(p.stat().st_size for p in run.iterdir() if p.is_file())<(1536 if angular96 else 1024)*1024**2
+        if checkpoint:
+            # 每次回放分别封存源帧、可执行文件及实际输出，接续时仍须通过下方的数值收支核对。
+            assert rec["args"]==[str(binary),"case.cfg","--threads","1"] and rec["cwd"]==str(run)
+            assert (run/"case.cfg").read_text("ascii")==cfg and sha(run/"initial_flow.csv")==sha(parent/"restart.csv")
+            assert sha(run/"mesh.su2")==sha(parent/"mesh.su2")
+            names=["case.cfg","initial_flow.csv","mesh.su2","restart.csv","step_process.json"]
+            if name=="observed":names.extend(s+".csv" for s in ("start","beforeFar","afterFar","beforeWall","afterWall","end"))
+            seal=dict(binarySHA256=sha(binary),files={n:sha(run/n) for n in names})
+            if new:write_json(run/"checked.json",seal)
+            else:assert read(run/"checked.json")==seal
     end=[np.loadtxt(out/name/"restart.csv",delimiter=",",skiprows=1) for name in ("control","observed")]
     delta=float(np.max(abs(end[0]-end[1])));assert delta<2e-7
     stages={}
@@ -81,7 +96,7 @@ def energy(parent,out,source_theta,wall_ids,wall_rows,scale,exe,*,angular96=Fals
                 inputFrameSHA256=sha(parent/"restart.csv"),temperatureScaleK=temperature_scale,domainCopies=1)
 
 
-def collect(parent,exe=None):
+def collect(parent,exe=None,checkpoint=None):
     rec,residual=thermal_frame(parent)
     info=read(parent/"field_audit.json");assert info["allResidualsBelowMinus8"] and info["lastFrame"]==sha(parent/"restart.csv")
     c=read(parent/"case.json");body=read(parent/"body.json")
@@ -103,6 +118,7 @@ def collect(parent,exe=None):
                 output_bytes=(850 if angular96 else 450)*1024**2)
     for name,source,release in (("reaction0",parent,True),("plus20",parent,False),("reaction20",parent/"plus20",True)):
         dest=parent/name
+        if checkpoint:checkpoint(name)
         if not dest.exists():observe(source,dest,release=release,wall_value=wall_value,**budget)
         terminal(dest)
     plus=parent/"plus20"
@@ -119,8 +135,13 @@ def collect(parent,exe=None):
     power=-scale*raw[wall_ids].sum();change=abs(other[wall_ids].sum()/raw[wall_ids].sum()-1)
     assert change<.002
     if exe is None:exe=observer_binary(parent/"observer_build")
-    ledger=energy(parent,parent/"ledger",state[:,9],wall_ids,raw,scale,exe,angular96=angular96,temperature_scale=temperature_scale)
-    write_json(parent/"ledger/energy.json",ledger);assert abs(ledger["relativeDifference"])<.005
+    ledger=energy(parent,parent/"ledger",state[:,9],wall_ids,raw,scale,exe,angular96=angular96,
+                  temperature_scale=temperature_scale,checkpoint=checkpoint)
+    ledger_file=parent/"ledger/energy.json"
+    if checkpoint and ledger_file.exists():assert read(ledger_file)==ledger
+    else:write_json(ledger_file,ledger)
+    assert abs(ledger["relativeDifference"])<.005
+    if checkpoint:checkpoint("surface")
     # 无扇区反射，每个真实壁节点按相邻三角面面积三分之一分摊功率。
     lump=np.bincount(wall.ravel(),weights=np.repeat(area/3,3),minlength=len(xyz))
     if angular96:
@@ -138,7 +159,9 @@ def collect(parent,exe=None):
     group=np.asarray(body["regionID"]);regions=[]
     for i,name in enumerate(body["regionNames"],1):
         use=group==i;regions.append(dict(name=name,faces=int(use.sum()),areaM2=float(area[use].sum()),outwardW=float(watts[use].sum())))
-    out=parent/"surface";out.mkdir(exist_ok=False)
+    # 可接续任务先在临时目录写整表和摘要，两者齐备后才公开。
+    temp=TemporaryDirectory(dir=parent) if checkpoint else None
+    out=(Path(temp.name) if temp else parent)/"surface";out.mkdir(exist_ok=False)
     table=out/"wall.csv"
     np.savetxt(table,np.column_stack((np.arange(len(q)),group,area,c["airPa"]+gauge,gauge,q,temperature)),delimiter=",",comments="",
                fmt=["%d","%d"]+["%.17g"]*5,header="faceID,regionID,areaM2,pressurePa,pressureGaugePa,heatFluxWm2,nearWallCellTemperatureK")
@@ -156,6 +179,12 @@ def collect(parent,exe=None):
                        reaction20SHA256=sha(parent/"reaction20/restart.csv"),
                        postprocessSHA256={p.relative_to(ROOT).as_posix():sha(p) for p in sources})
     write_json(out/"summary.json",summary)
+    if temp:
+        target=parent/"surface"
+        if target.exists():
+            assert read(target/"summary.json")==summary and sha(target/"wall.csv")==summary["wallSHA256"]
+        else:out.rename(target)
+        temp.cleanup()
 
 
 if __name__=="__main__":

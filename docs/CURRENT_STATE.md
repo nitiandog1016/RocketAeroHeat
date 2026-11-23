@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-21。B 型热敏珠在 3 m/s、12 K 温差、96 档名义侧吹下，珠部平均 h 为 275.48 W/(m²·K)，比图 7 的 218.36 高 26.16%。整件放热 11.44598 mW，珠部 10.22786 mW。12 K 工况首次覆盖全部 10,272 面、3.19665061 mm²；新增几何 0 面、0 m²。两组原生热边界等步核对已通过，首次错开 40 步的压力超差保留。实测仅为珠部平均量，逐面联合实验验证为 0 m²。[测点与方法](validation/v315/RESULTS.md) · [本机三维页](../outputs/v315_validation/ui01/solve/workbench/index.html) · [6 K 周向网距对照](validation/v314/RESULTS.md)
+2026-11-23。B 型热敏珠 3 m/s、12 K、96 档名义侧吹已从冷态算出全表面 10,272 面、3.19665061 mm²。整件放热 11.44618 mW，珠部 10.22787 mW；珠部平均 h 比图 7 高 26.16%。相对 v315 新增 0 面、0 m²。1,280 步、双次壁反力与同态能量账通过；与 v315 逐面对照，648 个引线及端面超差，占面积 0.19563%。逐面联合实验验证为 0 m²。侧栏新算、暂停、接续、点选与导出已实测。[结果与限制](validation/v316/RESULTS.md) · [本机三维页](../outputs/v316_validation/result03/workbench/index.html) · [超差原面](validation/v316/evidence/outside_tolerance.csv)
 
-<!-- records:last_completed=v315 -->
+<!-- records:last_completed=v316 -->
 <!-- records:active=none -->
-<!-- records:base_commit=c0bfe294a8bbd3e66d4eab0c6b914c5c98dfd13c -->
+<!-- records:base_commit=abcd2e50926f372b6d8fd15794dba0ec12d762e3 -->
 
 前中段两轮网格排列候选已关闭。约 12 K 温差下，第三档珠部平均换热比原论文图读高 22.80%。[网格试验结论](validation/v307/RESULTS.md)
 
@@ -38,7 +38,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-在 96 档 12 K 测点侧栏接入直接原生冷启动和接续，验证无旧体场时的完整计算。[当前下一决定](validation/v315/NEXT_DECISION.md)
+在同一 B 珠测点核对试验支线导热的实测输入，建立引线热边界对照，量化对珠部 2.12071 mW 偏差的影响。[当前下一决定](validation/v316/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v316 带线 B 珠独立冷启动](validation/v316/RESULTS.md) · [超差原面](validation/v316/evidence/outside_tolerance.csv) · [下一项](validation/v316/NEXT_DECISION.md)。全表面 10,272 面均已求解。与 v315 的局部差异集中在两根引线和端面。
+
 - [v315 B 珠 3 m/s、12 K 风洞测点](validation/v315/RESULTS.md) · [平均换热对照图](validation/v315/evidence/mean_heat.png) · [下一项](validation/v315/NEXT_DECISION.md)。96 档名义侧吹珠部平均 h 比原图读数高 26.16%，换算与直接热边界逐面等步核对通过。
 
 - [v314 带线热敏珠 48／96 档周向对照](validation/v314/RESULTS.md) · [迎背风曲线](validation/v314/evidence/section.png) · [下一项](validation/v314/NEXT_DECISION.md)。整件放热下降 0.352%，同截面背风近邻放热密度增加 12.77%。

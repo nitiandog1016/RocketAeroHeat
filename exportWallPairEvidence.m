@@ -40,6 +40,7 @@ elseif isfield(data,'measuredPoint')
     % 截取单行时仍可辨认当前 12 K 场量路径，以及论文实际测量的空间范围。
     m=data.measuredPoint;ref=m.scaledFrom;ratio=m.scaledFrom.temperatureRatio;
     if strcmp(m.action,'archive'),ref=m.nativeCheck;ratio=1;end
+    if isfield(m,'coldSource'),ref=m.coldSource;ratio=1;end
     t.reference_frame_sha256=repmat(string(ref.frame),n,1);
     t.reference_wall_K=repmat(ref.wallK,n,1);t.temperature_difference_ratio=repmat(ratio,n,1);
     t.experiment_doi=repmat(string(m.experiment.doi),n,1);
