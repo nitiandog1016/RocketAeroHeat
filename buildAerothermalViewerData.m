@@ -418,7 +418,13 @@ if isfield(mesh,'hybridWall')
     end
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
-    if isfield(mesh,'shortSphere'),data.shortSphere=mesh.shortSphere;end
+    if isfield(mesh,'shortSphere')
+        data.shortSphere=mesh.shortSphere;
+        if isfield(hc,'elapsedPhysicalTimeS')
+            data.resultCondition.elapsedPhysicalTimeS=hc.elapsedPhysicalTimeS;
+            data.resultCondition.timeCaption=sprintf('距尾迹扰动初场 %.8g ms',1000*hc.elapsedPhysicalTimeS);
+        end
+    end
 end
 % 带线试件按原面保留珠体、引线和接头分区。实验只对照扣除引线散热后的珠部平均量。
 if isfield(mesh,'thermistorSidewind')

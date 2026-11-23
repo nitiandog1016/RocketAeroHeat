@@ -1,16 +1,14 @@
 # 当前交接
 
-2026-11-23。Short 银球风洞 Test 65 已接工作台。12.7 mm 光滑球、Re = 882 的研究基流新增 4,464 面、0.000503553014 m² 壁压及热流，网格放热 0.97709 W，按完整球面积对照实验高 16.68%。七站局部 Nu 的 RMSE 为 5.27，119.8° 高估 139.3%，166.7° 低估 21.5%。支管与发展尾迹尚未解析，联合实验验证面积 0 m²。[七站对照](validation/v321/RESULTS.md) · [本机三维页](../outputs/v321_validation/ui02/solve/workbench/index.html) · [原始测量定义](validation/v321/SOURCE.md)
+2026-11-23。公开民用 Short 银球 Test 65 在 Re = 882 下完成初始扰动后 82.10 ms 的全表面瞬时计算。粗、细步分别完成 32、64 个物理步，六个同刻均通过步长核对。4,464 / 4,464 面、0.000503553014 m² 有同时刻壁压和热流，相对稳态基流新增几何覆盖 0 面、0 m²。细步整球放热 0.977093924 W，按完整球面积折合比试验量热高 16.68%。背风 119.8°、166.7° 的 Nu 分别为 13.163、6.910，实验为 5.5、8.8。本段未得到周期统计，联合实验验证面积 0 m²。[瞬时结果](validation/v322/RESULTS.md) · [本机细步三维页](../outputs/v322_validation/read01/wakeFine/workbench/index.html) · [测量定义](validation/v321/SOURCE.md)
 
-<!-- records:last_completed=v321 -->
+<!-- records:last_completed=v322 -->
 <!-- records:active=none -->
-<!-- records:base_commit=9b902df72092d434a6cb7c8b7f57c80a0b5c2a79 -->
+<!-- records:base_commit=c926bbb5048bd3b688798644db7f53f7c8796739 -->
 
-B 珠原有 10,276 面、3.196650633 mm² 全表面结果保留。重剖子面和长引线放热已验收。[B 珠回归](validation/v320/RESULTS.md)
+最后细步原单线程回放超出历史容差，同四线程回放的 51 行记录与终态一致。两份终点档案、首个同刻新算、面元和截线导出已经核对，原始失败和全部物理时间层保存在 E 盘。[独立复核](validation/v322/evidence/terminal.json) · [资源与回执](validation/v322/evidence/resources.json)
 
-前中段两轮网格排列候选已关闭。约 12 K 温差下，第三档珠部平均换热比原论文图读高 22.80%。[网格试验结论](validation/v307/RESULTS.md)
-
-带线模型选“第三档中段细化”，在 305.15 K 结果页点“查看分带热量账”。4 mW 集总壁温为 297.694199 K，热峰在迎风引线 207 号面。第二档 20D 至 30D 的热导差为 −0.00427%，v301 高阶配置因温度下越界关闭。[工作台验收](validation/v305/evidence/workbench.json) · [三档网距](validation/v304/RESULTS.md) · [外域对照](validation/v303/RESULTS.md) · [功率反演](validation/v302/RESULTS.md)
+B 珠已有 10,276 面、3.196650633 mm² 全表面结果。第三档珠部换热比图读高 22.80%，两轮网格排列候选已关闭。带线模型 4 mW 集总壁温为 297.694199 K，热峰在迎风引线 207 号面。[重剖子面验收](validation/v320/RESULTS.md) · [网格试验](validation/v307/RESULTS.md) · [分带热量账](validation/v305/evidence/workbench.json)
 
 ## 带线试件
 
@@ -40,7 +38,7 @@ v292 初次回放混合了不同阶段的压力和标量。改用固定端点装
 
 ## 下一项
 
-下一项从 Test 65 已收敛的全周场出发，检验非定常尾迹对背风两个测站的影响。[当前下一决定](validation/v321/NEXT_DECISION.md)
+下一项用已存球体网格和两份终帧量化回流和剪切层的实际空间分辨率，再决定是否需要有针对性的尾迹网格对照。[当前下一决定](validation/v322/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

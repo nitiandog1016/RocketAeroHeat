@@ -22,7 +22,11 @@ if isfield(data,'shortSphere')
     tw=data.fields(strcmp({data.fields.key},'wallInput'));first=data.fields(strcmp({data.fields.key},'nearWallCellTemperature'));
     t.wall_input_K=tw.values(:);t.first_fluid_K=first.values(:);
     t.test_number=repmat(data.shortSphere.test,n,1);t.experimental_doi=repmat(string(data.shortSphere.doi),n,1);
-    t.steady_frame_sha256=repmat(string(data.evidenceIdentity.sourceFrame.sha256),n,1);
+    frame=repmat(string(data.evidenceIdentity.sourceFrame.sha256),n,1);
+    if isfield(data.shortSphere,'timeDU')
+        t.transient_frame_sha256=frame;t.physical_time_s=repmat(data.resultCondition.elapsedPhysicalTimeS,n,1);
+        t.time_U_over_D=repmat(data.shortSphere.timeDU,n,1);t.step_U_over_D=repmat(data.shortSphere.dtDU,n,1);
+    else,t.steady_frame_sha256=frame;end
 end
 if isfield(data,'thermistorImport')
     % 原 STL 面号和标准面积成对保留，可独立复核任一行的热功率。

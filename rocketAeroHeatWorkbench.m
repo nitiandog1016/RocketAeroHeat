@@ -271,7 +271,9 @@ renderEditor();sync();showGeometry(true);
                      '查看 6 m/s · 同刻时间步对照','查看 6 m/s · 近壁网格对照','计算 3 m/s · 15° 基准网','计算 3 m/s · 7.5° 细网'}, ...
                     {'archive','archive7p5','startup6','timeSteps6','nearWall6','solve','solve7p5'},'archive');
                 controls.thermistor=button(grid,23,'打开热敏珠全表面结果',@showThermistor);
-                controls.shortSphereMode=choice(grid,24,'Short 银球 · Test 65',{'查看已算稳态基流','从冷态复算稳态基流'},{'archive','solve'},'archive');
+                controls.shortSphereMode=choice(grid,24,'Short 银球 · Test 65', ...
+                    {'查看已算稳态基流','从冷态复算稳态基流','查看尾迹终点 · 细步长','查看尾迹终点 · 粗步长','计算首个同刻 · tU/D = 0.25','计算尾迹两步长 · tU/D = 8'}, ...
+                    {'archive','solve','wakeFine','wakeCoarse','wakeStart','wakeSolve'},'archive');
                 controls.shortSphere=button(grid,25,'打开银球全表面与七站对照',@showShortSphere);
                 controls.thermistorMode.ValueChangedFcn=@updateThermistorButton;
                 set([controls.pca controls.flip controls.rotate controls.reset controls.confirm], ...
@@ -1879,12 +1881,13 @@ renderEditor();sync();showGeometry(true);
         mode=controls.shortSphereMode.Value;preparing=true;sync();
         try
             if strcmp(mode,'solve'),message('正在从冷态计算银球基流，并核对两次壁反力及同态能量账…');end
+            if any(strcmp(mode,{'wakeStart','wakeSolve'})),message('正在推进两套物理时间步，核对同刻壁面结果与储能…');end
             [m,stations,s]=runShortSphereWorkbench(mode,@()drawnow('limitrate'));
             if ~isgraphics(fig),return;end
             prior=resultHost.Children;view=createShortSphereReview(resultHost,m,stations,s);
             delete(prior);webUI=[];researchUI=[];preparing=false;
             geometryHost.Visible='off';resultHost.Visible='on';view.tabs.Visible='on';fig.UserData.shortSphereReview=view;
-            sync();title.Text='Short 银球 · 全表面与七站对照';message(sprintf('银球稳态基流放热 %.4f W，七站 Nu 的 RMSE 为 %.2f。',s.wholeOutW,s.stationRMSE));
+            sync();title.Text='Short 银球 · 全表面与七站对照';message(sprintf('%s，放热 %.6f W，七站 Nu 的 RMSE 为 %.2f。',m.hybridCondition.caseLabel,s.wholeOutW,s.stationRMSE));
         catch ex
             preparing=false;if isgraphics(fig),sync();showError(ex);end
         end

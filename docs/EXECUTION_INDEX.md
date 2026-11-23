@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v322 Short 银球 82.10 ms 全表面瞬时解](validation/v322/RESULTS.md) · [尾迹与背风换热](validation/v322/evidence/wake.png) · [下一项](validation/v322/NEXT_DECISION.md)。两种步长、六个同刻、4,464 面的结果通过数值核对，背风两站与实验的趋势差异仍在。
+
 - [v321 Short 银球全周基流与七站对照](validation/v321/RESULTS.md) · [局部 Nu 曲线](validation/v321/evidence/stations.png) · [下一项](validation/v321/NEXT_DECISION.md)。4,464 面均有基流压力和热流，119.8° 处高估 139.3%。
 
 - [v320 带线 B 珠的局部重剖与细壁积分](validation/v320/RESULTS.md) · [逐子面数值](validation/v320/evidence/verification.json) · [下一项](validation/v320/NEXT_DECISION.md)。两个邻区共六个子面，五条路径核对完整的 10,276 个导入面。
