@@ -5,7 +5,7 @@ assert(strcmp(source.unit,'m') && source.scale==geometry.scale && strcmp(cm011Fi
 r=geometry.rotationMatrix;c=reshape(geometry.rotationCenter,1,3);
 assert(all(isfinite(c)) && norm(r*r'-eye(3),'fro')<1e-10 && abs(det(r)-1)<1e-10, ...
     'RAH:Bead:Pose','朝向必须是已确认的刚体旋转。');
-xyz=facetCorners(source.file,size(reference.F,1))*source.scale;
+xyz=facetCorners(source.file,size(mesh.F,1))*source.scale;
 xyz=(xyz-c)*r'+c;
 if size(xyz,1)~=numel(mesh.F)
     % 个别导入器会略掉退化三角形。按文件本身的记录定位缺失、重复或损坏的面。
@@ -31,7 +31,7 @@ function xyz=facetCorners(path,expected)
 file=dir(path);fid=fopen(path,'rb','ieee-le');assert(fid>=0);guard=onCleanup(@()fclose(fid)); %#ok<NASGU>
 fseek(fid,80,'bof');n=fread(fid,1,'uint32');
 if ~isempty(n) && file.bytes==84+50*n
-    assert(n>0 && n<=2*expected,'RAH:Bead:FileCount','STL 有 %d 面，此试件需要 %d 面。',n,expected);
+    assert(n>0 && n<=2*expected,'RAH:Bead:FileCount','STL 有 %d 条面记录，工作台导入了 %d 面。',n,expected);
     fseek(fid,96,'bof');raw=fread(fid,[9 n],'9*single=>double',14);
     xyz=reshape(raw,3,[])';return;
 end

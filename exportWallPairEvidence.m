@@ -24,6 +24,13 @@ if isfield(data,'thermistorImport')
     t.volume_mesh_sha256=repmat(string(m.meshSHA256),n,1);
     temp=data.fields(strcmp({data.fields.key},'wallInput'));t.wall_input_K=temp.values(:);
     near=data.fields(strcmp({data.fields.key},'nearWallCellTemperature'));t.first_fluid_K=near.values(:);
+    if isfield(data,'thermistorSubfaces')
+        % 标准父面的面积与子面实际覆盖的面积分别保存，首层采样位置采用用户坐标。
+        s=data.thermistorSubfaces;t.parent_area_m2=compose("%.17g",m.parentAreaM2(:));
+        t.is_subface=false(n,1);t.is_subface(s.ids)=true;
+        xyz=nan(n,3);xyz(s.ids,:)=s.firstXYZ;
+        t.subface_first_x_m=xyz(:,1);t.subface_first_y_m=xyz(:,2);t.subface_first_z_m=xyz(:,3);
+    end
 end
 t.joint_engineering=(p.availability(:)==1 & q.availability(:)==1);
 t.joint_verified=(ismember(p.availability(:),[1 2]) & ismember(q.availability(:),[1 2]) & ...

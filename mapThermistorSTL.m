@@ -3,6 +3,9 @@ function map=mapThermistorSTL(mesh,body)
 % 不调整滚转或尺度。用户模型的顶点、面序及跨圆角的区域边界均保留。
 tol=2e-10;
 v=mesh.V;f=mesh.F;r=body.V;rf=body.F;
+if size(f,1)>size(rf,1)
+    map=mapThermistorPartition(mesh,body,tol);return;
+end
 offset=(max(v)+min(v)-max(r)-min(r))/2;
 aligned=v-offset;
 [found,indices]=ismembertol(aligned,r,tol,'ByRows',true,'DataScale',1,'OutputAllIndices',true);

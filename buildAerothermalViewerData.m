@@ -911,6 +911,10 @@ if isfield(mesh,'evidenceIdentity')
         data.thermistorImport=struct('referenceFaceID',b.referenceFaceID,'referenceAreaM2',b.referenceAreaM2, ...
             'stlSHA256',b.source.sha256,'scaleToM',b.source.scale,'meshSHA256',mesh.evidenceIdentity.meshSHA256, ...
             'rotationMatrix',b.rotationMatrix,'rotationCenterM',b.rotationCenterM,'translationM',b.translationM);
+        if isfield(mesh,'thermistorSubfaces')
+            data.thermistorSubfaces=mesh.thermistorSubfaces;
+            data.thermistorImport.parentAreaM2=b.parentAreaM2;
+        end
     end
     data.evidenceIdentity=mesh.evidenceIdentity;
     % 对已明确标注研究资格的快照，曲线和 CSV 共用同一来源。

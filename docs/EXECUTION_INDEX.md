@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v320 带线 B 珠的局部重剖与细壁积分](validation/v320/RESULTS.md) · [逐子面数值](validation/v320/evidence/verification.json) · [下一项](validation/v320/NEXT_DECISION.md)。两个邻区共六个子面，五条路径核对完整的 10,276 个导入面。
+
 - [v319 普通 STL 的 B 珠全表面新算与导出](validation/v319/RESULTS.md) · [示例 STL](../cases/thermistor_b/probe-mm.stl) · [下一项](validation/v319/NEXT_DECISION.md)。3 m/s 下按导入面号交付全部 10,272 面，长引线新算放热 11.14834 mW。
 
 - [v318 电阻等效温度与 B 珠表面温度](validation/v318/RESULTS.md) · [测温与功率对照](validation/v318/evidence/thermometry.png) · [下一项](validation/v318/NEXT_DECISION.md)。主测点内外温差 0.11058 K，珠部功率减少 0.09442 mW，剩余偏差 +25.22%。
