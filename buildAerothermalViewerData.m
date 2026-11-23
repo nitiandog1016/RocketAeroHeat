@@ -104,7 +104,9 @@ if isfield(mesh,'hybridWall')
         add('wallInput','给定壁温','K',nan(n,1),zeros(n,1),repmat({'未给定壁温'},n,1),reason,{},repmat({reason},n,1));
         data.fields(end).stateNote=reason;
     else
-        add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({'输入壁温'},n,1),hybridScope);
+        wallMethod='输入壁温';
+        if isfield(mesh,'thermistorWire'),wallMethod='珠部和接头等温，直引线按一维长线导热解逐节点给定，交叠积分至原面';end
+        add('wallInput','给定壁温','K',mesh.hybridWallTemperatureK,2*ones(n,1),repmat({wallMethod},n,1),hybridScope);
     end
     % 混合结果使用适配器实际返回的算法，不沿用默认工程压力、热流的解释文字。
     physical={'pressure','pressureGauge','heatFlux','wallFluidTemperature','nearWallCellTemperature'};
@@ -419,7 +421,14 @@ end
 if isfield(mesh,'thermistorSidewind')
     s=mesh.thermistorSidewind;data.thermistorSidewind=s;
     data.coordinateNote='SI · 长轴 X · 来流 −Y · 正热流入壁';
-    data.caseNote=sprintf('带线 B 型热敏珠 · 全周侧吹 3 m/s · 给定壁温 %.6g K · 稳态',mesh.hybridCondition.wallTemperatureK);
+    if isfield(mesh,'thermistorWire')
+        w=mesh.thermistorWire;data.thermistorWire=w;
+        data.caseNote=sprintf('B 珠 · 3 m/s 侧吹 · 线根 %.2f K · 名义线端 %.3f K · 长引线温度边界',mesh.hybridCondition.beadWallK,w.profile.endK);
+        add('wireHeatFluxChange','引线边界热流差','kW/m²',mesh.thermistorWireFluxChange/1000,ones(n,1), ...
+            repmat({'长引线三维入壁热流减同面均温控制解'},n,1),'同一原面和来流，均温参照与长引线终态分别记录');
+    else
+        data.caseNote=sprintf('带线 B 型热敏珠 · 全周侧吹 3 m/s · 给定壁温 %.6g K · 稳态',mesh.hybridCondition.wallTemperatureK);
+    end
     data.resultCondition.caption=data.caseNote;
     k=find(strcmp({data.fields.key},'heatFlux'),1);
     data.fields(k).stateNote=sprintf('珠部含接头 %.5f mW，引线及端面 %.5f mW，七区合计向空气放热 %.5f mW。侧吹局部实验精度未知。', ...

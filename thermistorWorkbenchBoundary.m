@@ -8,6 +8,8 @@ if nargin<3,cfg=struct();end
 if isfield(cfg,'thermistorVariant') && strcmp(cfg.thermistorVariant,'sidewind')
     reference.wallTemperatureK=299.15;reference.betaDeg=90;
     if angularCells==96,reference.wallTemperatureK=305.15;end
+    % 长引线模式的 305.15 K 是珠部和线根的给定温度。线段壁温取一维导热解。
+    if angularCells==96 && isfield(b,'leadThermalModel'),reference.leadThermalModel='longWire';end
     assert(ismember(angularCells,[48 96]) && isequal(b,reference),'RAH:Lead:Sidewind','所选侧吹体网的来流或壁温与登记工况不符。');
     fs=struct('speed',b.speed,'pressure',b.airPressurePa,'temperature',b.airTemperatureK, ...
         'alpha',0,'beta',90,'unitFlowDirection',[0 -1 0],'velocityMps',[0 -b.speed 0]);

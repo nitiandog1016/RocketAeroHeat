@@ -16,6 +16,9 @@ if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'thermisto
     [boundary,freestream]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
     if isfield(cfg,'thermistorVariant') && strcmp(cfg.thermistorVariant,'sidewind')
         if cfg.thermistorAngularCells==96
+            if isfield(boundary,'leadThermalModel')
+                [current,report]=runThermistorWireWorkbench(mesh,cfg,progressFcn);return;
+            end
             [current,report]=runThermistorMeasuredPoint(mesh,cfg,progressFcn);return;
         end
         [current,report]=runThermistorSidewindWorkbench(mesh,cfg,progressFcn);return;

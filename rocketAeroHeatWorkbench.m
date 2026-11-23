@@ -13,7 +13,7 @@ state=aeroHeatWorkflowState('init',[],struct('cfg',cfg));
 preview=[];rotation=eye(3);rotationCenter=[0 0 0];controls=struct;
 webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDetailsOpen=false;
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
-measuredDirectory='';measuredPauseFile='';
+measuredDirectory='';measuredPauseFile='';lastWireDirectory='';
 creasePreview=false;qualityPreview=false;candidatePreview=[];
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
@@ -409,11 +409,20 @@ renderEditor();sync();showGeometry(true);
             case 3
                 if isBead()
                     if isSidewind()
-                        grid=form(6);tip(grid,1,'侧吹空气 3 m/s · 沿 −Y · 293.15 K · 101325 Pa');
                         if state.cfg.thermistorAngularCells==96
-                            tip(grid,3,'B 珠图 7 测点 · 全壁给定 305.15 K · 珠部平均换热与实验比较。');
-                        else,tip(grid,3,'珠体、接头、引线及端面统一给定 299.15 K。');end
-                        controls.confirm=button(grid,5,'确认侧吹边界',@confirmBoundary);sync();return;
+                            grid=form(7);note=tip(grid,1,'侧吹空气 3 m/s · 沿 −Y · 293.15 K · 101325 Pa');note.Layout.Row=[1 2];
+                            mode='uniform';if isfield(state.cfg.thermistorBoundary,'leadThermalModel'),mode='longWire';end
+                            controls.wireBoundary=choice(grid,3,'引线热边界',{'整件等温','长引线导热分布'},{'uniform','longWire'},mode);
+                            controls.wireBoundary.ValueChangedFcn=@boundaryEdited;
+                            if strcmp(mode,'uniform'),tip(grid,4,'珠面、接头与引线均给定 305.15 K。');
+                            else,tip(grid,4,'珠面和线根给定 305.15 K。引线按论文长线近似降温，截面温度由模型给出。');end
+                            controls.confirm=button(grid,7,'确认侧吹边界',@confirmBoundary);
+                        else
+                            grid=form(6);tip(grid,1,'侧吹空气 3 m/s · 沿 −Y · 293.15 K · 101325 Pa');
+                            tip(grid,3,'珠体、接头、引线及端面统一给定 299.15 K。');
+                            controls.confirm=button(grid,5,'确认侧吹边界',@confirmBoundary);
+                        end
+                        sync();return;
                     end
                     wiredPower=hasBeadLeads() && getOption(state.cfg,'thermistorRefineLeads',false);
                     if isMixedBead() && ~wiredPower
@@ -571,7 +580,17 @@ renderEditor();sync();showGeometry(true);
                         controls.readBead=button(grid,1,'读取同网格已算结果',@(~,~)solveCase([],[],'archive'));
                         controls.run=button(grid,2,'从冷态计算当前试件',@solveCase);
                         if isSidewind()
-                            if p.angularCells==96
+                            if isfield(state.cfg.thermistorBoundary,'leadThermalModel')
+                                controls.readBead.Text='读取长引线已算全场';controls.run.Text='计算长引线全表面响应';
+                                controls.wireSeed=textField(grid,3,'均温初猜目录（可空）','');
+                                controls.beadDirectory=textField(grid,4,'引线任务目录',lastWireDirectory);
+                                controls.browseRun=button(grid,5,'选择引线任务目录',@chooseBeadDirectory);
+                                controls.resumeWire=button(grid,6,'接续引线任务',@(~,~)solveCase([],[],'resumeWire'));
+                                controls.pauseMeasured=button(grid,7,'保存当前阶段后暂停',@pauseMeasured);controls.pauseMeasured.Enable='off';
+                                note=tip(grid,8,'新算可复用本程序的 96 档均温冷启动。初猜目录留空时由程序生成。');note.Layout.Row=[8 9];
+                                controls.log=uitextarea(grid,'Editable','off','Value',logLines);
+                                controls.log.Layout.Row=[10 11];controls.log.Layout.Column=[1 2];
+                            elseif p.angularCells==96
                                 controls.run.Text='用 6 K 参照场换算 12 K 测点';controls.readBead.Text='读取已算 12 K 原生结果';
                                 controls.coldMeasured=button(grid,3,'从冷态新算 12 K 测点',@(~,~)solveCase([],[],'cold'));
                                 controls.beadDirectory=textField(grid,4,'冷启动任务目录',measuredDirectory);
@@ -655,6 +674,7 @@ renderEditor();sync();showGeometry(true);
                     sync();return;
                 end
                 resultRows=11+double(isfield(state.result,'thermistorOuterDomain') || isfield(state.result,'thermistorLayerBudget'));
+                if isfield(state.result,'thermistorWire'),resultRows=18;end
                 grid=form(resultRows+double(isfield(state.result,'thermistorAngularSpacing')));d=buildAerothermalViewerData(state.result);
                 h=d.fields(strcmp({d.fields.key},'heatFlux'));p=d.fields(strcmp({d.fields.key},'pressure'));
                 tip(grid,1,sprintf('当前版本 %d 的计算快照\n热流计算面积 %.4g%%\n压力计算面积 %.4g%% / 给定 %.4g%%', ...
@@ -669,6 +689,7 @@ renderEditor();sync();showGeometry(true);
                 elseif isSidewind()
                     s=state.result.thermistorSidewind;
                     origin='侧吹 −Y';
+                    if isfield(state.result,'thermistorWire'),origin='长引线温度边界';end
                     if isfield(state.result,'thermistorMeasuredPoint')
                         m=state.result.thermistorMeasuredPoint;
                         if isfield(m,'coldSource'),origin=sprintf('独立冷启动 · %d 步',m.coldSource.iterations);
@@ -707,7 +728,18 @@ renderEditor();sync();showGeometry(true);
                     controls.pairedHeat.Layout.Column=1;
                 end
                 % 在同一结果侧栏并列两种珠部平均量，热流云图和截面继续显示逐面解。
-                if isfield(state.result,'thermistorMeasuredPoint')
+                if isfield(state.result,'thermistorWire')
+                    w=state.result.thermistorWire;
+                    controls.wireComparison=uitable(grid,'RowName',{},'ColumnName',{'珠部对照','h / W/(m²·K)','放热 / mW'}, ...
+                        'Data',{'图 7 测点',sprintf('%.2f',w.experiment.hWm2K),sprintf('%.4f',1000*w.experimentEquivalentW); ...
+                                '整件等温',sprintf('%.2f',w.controlHWm2K),sprintf('%.4f',1000*w.controlBeadW); ...
+                                '长引线',sprintf('%.2f',w.beadHWm2K),sprintf('%.4f',1000*w.beadAndJointsW)});
+                    controls.wireComparison.Layout.Row=[8 11];controls.wireComparison.Layout.Column=[1 2];
+                    controls.wireBudgetMode=choice(grid,12,'引线热量账',{'整段','沿线分段'},{'whole','bands'},'whole');
+                    controls.wireBudgetMode.ValueChangedFcn=@updateWireBudget;
+                    controls.wireBudget=uitable(grid,'RowName',{});controls.wireBudget.Layout.Row=[13 18];controls.wireBudget.Layout.Column=[1 2];
+                    updateWireBudget([],[]);sync();return;
+                elseif isfield(state.result,'thermistorMeasuredPoint')
                     m=state.result.thermistorMeasuredPoint;
                     controls.measuredPoint=uitable(grid,'RowName',{},'ColumnName',{'珠部平均量','h / W/(m²·K)','比图读 / %'}, ...
                         'Data',{'图 7 测点',sprintf('%.2f',m.experiment.hWm2K),'—';'侧吹 96 档',sprintf('%.2f',m.beadHWm2K),sprintf('%+.2f',100*m.relativeDifference); ...
@@ -806,6 +838,21 @@ renderEditor();sync();showGeometry(true);
         grid=uigridlayout(editor,[rows 2]);grid.ColumnWidth={138,'1x'};
         grid.RowHeight=repmat({31},1,rows);grid.Padding=[0 2 0 2];grid.RowSpacing=5;
         if isprop(grid,'Scrollable'),grid.Scrollable='on';end
+    end
+    function updateWireBudget(~,~)
+        % 模块用途：分别展示解析轴向导热和三维空气侧对流，右、左线各自按原面求和。
+        w=state.result.thermistorWire;t=controls.wireBudget;
+        if strcmp(controls.wireBudgetMode.Value,'whole')
+            t.ColumnName={'热量 / mW','后引线','前引线'};
+            p=w.profile;values=1000*[p.oneLeadRootW p.oneLeadRootW;p.oneLeadThroughCutW p.oneLeadThroughCutW; ...
+                p.oneLeadSideW p.oneLeadSideW;w.regions(2).outwardW w.regions(6).outwardW;w.regions(1).outwardW w.regions(7).outwardW];
+            labels={'根部轴向导热';'截点轴向导热';'一维段内放热';'三维线侧放热';'三维端面放热'};
+            t.Data=[labels cellstr(compose('%.5f',values(:,1))) cellstr(compose('%.5f',values(:,2)))];
+        else
+            t.ColumnName={'线段 / µm','一维 / µW','后侧 / µW','前侧 / µW'};s=w.bands;
+            t.Data=[cellstr(compose('%.0f–%.0f',1e6*[s.fromM]',1e6*[s.toM]')) cellstr(compose('%.3f',1e6*[s.theorySideW]')) ...
+                cellstr(compose('%.3f',1e6*[s.backSideW]')) cellstr(compose('%.3f',1e6*[s.frontSideW]'))];
+        end
     end
     function x=numberField(grid,row,label,value,limits)
         lab=uilabel(grid,'Text',label);lab.Layout.Row=row;lab.Layout.Column=1;
@@ -993,6 +1040,7 @@ renderEditor();sync();showGeometry(true);
             if isSidewind()
                 b=thermistorWorkbenchBoundary();b.wallTemperatureK=299.15;b.betaDeg=90;
                 if next.thermistorAngularCells==96,b.wallTemperatureK=305.15;end
+                if isfield(controls,'wireBoundary') && strcmp(controls.wireBoundary.Value,'longWire'),b.leadThermalModel='longWire';end
                 next.thermistorBoundary=thermistorWorkbenchBoundary(b,next.thermistorAngularCells,next);return;
             end
             if isMixedBead() && ~isfield(controls,'beadCondition'),next.thermistorBoundary=thermistorWorkbenchBoundary();return;end
@@ -1143,7 +1191,9 @@ renderEditor();sync();showGeometry(true);
         if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
-            if isBead()
+            if isBead() && isfield(controls,'wireBoundary')
+                renderEditor();message('引线热边界已更新，请确认当前工况。');
+            elseif isBead()
                 controls.beadWall.Enable=onoff(strcmp(controls.beadCondition.Value,'published'));
                 controls.beadPower.Enable=onoff(strcmp(controls.beadCondition.Value,'power'));
                 controls.confirm.Enable=onoff(~isempty(state.cfg.thermistorBoundary));
@@ -1249,12 +1299,17 @@ renderEditor();sync();showGeometry(true);
                 if ~strcmp(source,'run'),request.runDirectory=strtrim(controls.beadDirectory.Value);end
             elseif isMixedBead()
                 request.leadAction=source;
-                if strcmp(source,'resume'),request.runDirectory=strtrim(controls.beadDirectory.Value);end
+                if any(strcmp(source,{'resume','resumeWire'})),request.runDirectory=strtrim(controls.beadDirectory.Value);end
+                if strcmp(source,'solve') && isfield(controls,'wireSeed'),request.wireSeedDirectory=strtrim(controls.wireSeed.Value);end
             end
             state=aeroHeatWorkflowState('beginSolve',state,request);token=state.solveId;revision=state.solveInputRevision;
             if isfield(state.frozenInputs.cfg,'thermistorInvocation')
-                c=state.frozenInputs.cfg;measuredDirectory=c.thermistorRunDirectory;
-                measuredPauseFile=[measuredDirectory '.' c.thermistorInvocation '.pause'];
+                c=state.frozenInputs.cfg;
+                if ~isfield(c.thermistorBoundary,'leadThermalModel'),measuredDirectory=c.thermistorRunDirectory;end
+                measuredPauseFile=[c.thermistorRunDirectory '.' c.thermistorInvocation '.pause'];
+            end
+            if isBead() && isfield(state.cfg.thermistorBoundary,'leadThermalModel') && ~strcmp(source,'archive')
+                lastWireDirectory=state.frozenInputs.cfg.thermistorRunDirectory;
             end
             renderEditor();
             frozen=state.frozenInputs;
@@ -1262,6 +1317,7 @@ renderEditor();sync();showGeometry(true);
                 frozen.cfg.thermistorResultSource=source;
                 if isFullBead()
                     message('正在核对全周计算的网格、初场和物理时刻…');
+                elseif isfield(state.cfg.thermistorBoundary,'leadThermalModel') && ~strcmp(source,'archive'),message(['长引线计算目录 ' lastWireDirectory]);
                 elseif ~isempty(measuredPauseFile),message(['当前冷启动目录 ' measuredDirectory]);
                 elseif isSidewind() && state.cfg.thermistorAngularCells==96,message('正在核对 96 档全表面测点和珠部平均换热…');
                 elseif isSidewind() && strcmp(source,'archive'),message('正在核对全周侧吹归档与七区原面结果…');
@@ -1316,6 +1372,7 @@ renderEditor();sync();showGeometry(true);
         % 计算页和确认回执显示实际冻结的热边界与单位。
         if isfield(b,'netHeatingPowerW') && hasBeadLeads(),label=sprintf('整件净对流功率 %.12g mW',1000*b.netHeatingPowerW);
         elseif isfield(b,'netHeatingPowerW'),label=sprintf('整珠净功率 %.12g mW',1000*b.netHeatingPowerW);
+        elseif isfield(b,'leadThermalModel'),label=sprintf('线根 %.6g K、长引线温度分布',b.wallTemperatureK);
         else,label=sprintf('给定壁温 %.12g K',b.wallTemperatureK);end
     end
     function yes=isBead()
@@ -1352,7 +1409,7 @@ renderEditor();sync();showGeometry(true);
         % 暂停请求只属于本次侧栏操作。求解器先保存、核验正在运行的阶段。
         if isempty(measuredPauseFile),return;end
         flag=java.io.File(measuredPauseFile);flag.createNewFile();
-        message(['等待当前阶段保存。任务目录 ' measuredDirectory]);
+        message(['等待当前阶段保存。任务目录 ' state.frozenInputs.cfg.thermistorRunDirectory]);
     end
     function loadBeadModel(~,~,variant)
         % 固定朝向的民用试件从模型步骤进入主流程，原面在网格步骤继续使用。

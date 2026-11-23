@@ -36,6 +36,15 @@ if isfield(data,'thermistorLead') && isfield(data.thermistorLead,'thermal')
     t.reference_frame_sha256=repmat(string(thermal.nativeFrameSHA256),n,1);
     t.reference_wall_K=repmat(thermal.referenceWallTemperatureK,n,1);
     t.temperature_difference_ratio=repmat(thermal.scale,n,1);
+elseif isfield(data,'thermistorWire')
+    % 非均温对照逐行记录源帧、边界输入、原面温度和两种边界的热流差。
+    w=data.thermistorWire;tw=data.fields(strcmp({data.fields.key},'wallInput'));
+    dq=data.fields(strcmp({data.fields.key},'wireHeatFluxChange'));
+    t.source_frame_sha256=repmat(string(w.sourceFrameSHA256),n,1);
+    t.uniform_reference_frame_sha256=repmat(string(w.baseFrame),n,1);
+    t.wall_boundary_sha256=repmat(string(w.boundarySHA256),n,1);
+    t.wall_input_K=tw.values(:);t.change_from_uniform_kW_m2=dq.values(:);
+    t.experiment_doi=repmat(string(w.experiment.doi),n,1);
 elseif isfield(data,'measuredPoint')
     % 截取单行时仍可辨认当前 12 K 场量路径，以及论文实际测量的空间范围。
     m=data.measuredPoint;ref=m.scaledFrom;ratio=m.scaledFrom.temperatureRatio;

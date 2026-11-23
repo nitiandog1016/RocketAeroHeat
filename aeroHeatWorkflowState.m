@@ -212,10 +212,24 @@ switch action
         elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && any(strcmp(optional(state.cfg,'thermistorVariant','smooth'),{'leads','midbody','sidewind'}))
             % 在按下计算按钮时确定同一任务的来源，防止另一次同工况的结果串入。
             measured=strcmp(state.cfg.thermistorVariant,'sidewind') && state.cfg.thermistorAngularCells==96;
+            wire=measured && isfield(state.cfg.thermistorBoundary,'leadThermalModel');
             choices={'solve','archive'};
-            if measured,choices=[choices {'cold','resume'}];end
+            if wire,choices=[choices {'resumeWire'}];elseif measured,choices=[choices {'cold','resume'}];end
             source=validatestring(optional(payload,'leadAction','solve'),choices);folder='';
-            if measured && any(strcmp(source,{'cold','resume'}))
+            if wire && ~strcmp(source,'archive')
+                state.frozenInputs.cfg.thermistorInvocation=char(java.util.UUID.randomUUID());
+                if strcmp(source,'resumeWire')
+                    folder=required(payload,'runDirectory');
+                    requireCondition(isfile(fullfile(folder,'wire_job.json')) || isfile(fullfile(folder,'prepared','profile.json')) && ...
+                        isfile(fullfile(folder,'completed.json')),'请选择长引线任务目录或已完成的原生计算目录。');
+                    folder=char(java.io.File(folder).getCanonicalPath());
+                else
+                    folder=fullfile(fileparts(mfilename('fullpath')),'outputs',['thermistor_wire_' char(java.util.UUID.randomUUID())]);
+                    seed=optional(payload,'wireSeedDirectory','');
+                    requireCondition(isempty(seed) || isfile(fullfile(seed,'completed.json')),'均温初猜请选择已完成的 96 档冷启动任务。');
+                    state.frozenInputs.cfg.wireSeedDirectory=seed;
+                end
+            elseif measured && any(strcmp(source,{'cold','resume'}))
                 token=char(java.util.UUID.randomUUID());
                 state.frozenInputs.cfg.thermistorInvocation=token;
                 if strcmp(source,'resume')
@@ -481,7 +495,15 @@ function validateThermistorResult(result,frozen)
 cfg=frozen.cfg;[b,fs]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
 p=frozen.mesh.thermistorPrepared;w=result.hybridWall;n=size(frozen.mesh.F,1);c=result.hybridCondition;
 id=result.evidenceIdentity;
-if strcmp(optional(cfg,'thermistorVariant','smooth'),'sidewind') && p.angularCells==96
+wire=isfield(b,'leadThermalModel');
+if wire
+    % 逐面给定的长引线热边界与本次动作、壁温分布指纹和全表面气动热源同时绑定。
+    m=result.thermistorWire;
+    assert(strcmp(m.action,cfg.thermistorResultSource) && strcmpi(id.runDirectory,cfg.thermistorRunDirectory) && ...
+        id.reusedArchive==strcmp(m.action,'archive') && strcmp(m.sourceFrameSHA256,id.sourceFrame.sha256) && ...
+        strcmp(m.wallSHA256,id.sourceFrame.wallSHA256) && strcmp(c.boundarySHA256,m.boundarySHA256) && ...
+        strcmp(c.leadThermalModel,b.leadThermalModel) && m.faces==n && m.jointExperimentVerifiedM2==0);
+elseif strcmp(optional(cfg,'thermistorVariant','smooth'),'sidewind') && p.angularCells==96
     % 12 K 测点绑定当前动作、原面与源帧；冷启动还须绑定冻结目录及本次操作的回执。
     m=result.thermistorMeasuredPoint;src=m.scaledFrom;
     if strcmp(cfg.thermistorResultSource,'archive'),src=m.nativeCheck;end
@@ -527,7 +549,10 @@ assert(cfg.thermistorAngularCells==p.angularCells && ...
 assert(isequal(c.velocityMps,fs.velocityMps) && c.ambientPressurePa==b.airPressurePa && ...
     c.ambientTemperatureK==b.airTemperatureK && isequal(c,id.physicalCondition), ...
     'RAH:Bead:Snapshot','结果边界与当前确认的试件工况不符。');
-if isfield(b,'netHeatingPowerW')
+if wire
+    tw=result.hybridWallTemperatureK;assert(~isfield(result,'hybridSolvedWallTemperatureK') && numel(tw)==n && ...
+        c.beadWallK==b.wallTemperatureK && abs(min(tw)-m.profile.endK)<1e-9 && abs(max(tw)-c.beadWallK)<1e-9);
+elseif isfield(b,'netHeatingPowerW')
     if isfield(result,'thermistorLead'),t=result.thermistorLead.thermal;
     else,t=result.thermistorBead.thermal;end
     assert(isfield(c,'netHeatingPowerW') && c.netHeatingPowerW==b.netHeatingPowerW && ...

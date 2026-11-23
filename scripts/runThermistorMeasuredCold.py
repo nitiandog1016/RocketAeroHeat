@@ -45,7 +45,7 @@ class SavedPause(Exception):
     """当前操作已保存，可以从同一任务目录继续。"""
 
 
-def execute(action, run, prepared, stage_limit=None, invocation=None):
+def execute(action, run, prepared, stage_limit=None, invocation=None, parent_pause=None):
     spec = grid(prepared)
     if action == "cold":
         run.mkdir(parents=True, exist_ok=False)
@@ -70,7 +70,7 @@ def execute(action, run, prepared, stage_limit=None, invocation=None):
             if status in ("complete", "paused"):
                 write_json(run / ("receipt-" + token + ".json"), progress)
         def checkpoint(stage):
-            if pause.exists():
+            if pause.exists() or (parent_pause is not None and parent_pause.exists()):
                 report(stage, "paused")
                 raise SavedPause
             report(stage, "running")
