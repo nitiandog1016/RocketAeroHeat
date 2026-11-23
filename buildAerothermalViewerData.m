@@ -905,6 +905,13 @@ if isempty(histories)
 end
 % 仅传递明确保存的来源/证据；旧快照不凭方法名自动获得物理资格。
 if isfield(mesh,'evidenceIdentity')
+    if isfield(mesh,'thermistorImport')
+        % 逐面导出保留文件身份和对应标准面，避免把本机文件路径写入离线页。
+        b=mesh.thermistorImport;
+        data.thermistorImport=struct('referenceFaceID',b.referenceFaceID,'referenceAreaM2',b.referenceAreaM2, ...
+            'stlSHA256',b.source.sha256,'scaleToM',b.source.scale,'meshSHA256',mesh.evidenceIdentity.meshSHA256, ...
+            'rotationMatrix',b.rotationMatrix,'rotationCenterM',b.rotationCenterM,'translationM',b.translationM);
+    end
     data.evidenceIdentity=mesh.evidenceIdentity;
     % 对已明确标注研究资格的快照，曲线和 CSV 共用同一来源。
     if isfield(mesh.evidenceIdentity,'productionQualified') && isequal(mesh.evidenceIdentity.productionQualified,false)

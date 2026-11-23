@@ -1,4 +1,4 @@
-function mesh = loadSTLMesh(cfg)
+function mesh = loadSTLMesh(cfg,preserveTextCoordinates)
 %% =========================================================
 %  loadSTLMesh.m
 %
@@ -73,7 +73,13 @@ end
 % ConnectivityList：
 % 三角面元节点编号
 
-TR = stlread(filename);
+if nargin<2,preserveTextCoordinates=false;end
+format='';
+if preserveTextCoordinates && nargout('stlread')>=2
+    [TR,format]=stlread(filename);
+else
+    TR=stlread(filename);
+end
 
 
 %% ===================== 4. 提取节点和面元 =====================
@@ -116,6 +122,19 @@ end
 
 V = double(V);
 F = double(F);
+
+% 普通文件工作台需要核对原始面。文本 STL 在部分 MATLAB 版本中被读成
+% 单精度：按导入器的顶点键恢复原文小数，同时保留面序、绕序及共享关系。
+if strcmp(format,'text') && isa(TR,'triangulation')
+    corners=unique(readSTLTextCorners(filename),'rows');
+    if ~isempty(corners) && all(isfinite(corners),'all')
+        rounded=double(single(corners));
+        [found,location]=ismember(V,rounded,'rows');
+        if all(found) && size(unique(rounded,'rows'),1)==size(rounded,1)
+            V=corners(location,:);
+        end
+    end
+end
 
 
 %% ===================== 6. STL 单位转换 =====================

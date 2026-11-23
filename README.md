@@ -4,6 +4,8 @@ MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
 当前阶段、工程覆盖和验证面积见[当前交接](docs/CURRENT_STATE.md)。每个代码小版本以 `v数字` 标记，可在 [GitHub 版本标签](https://github.com/nitiandog1016/RocketAeroHeat/tags) 查看对应源码。[项目目标与验收](docs/PROJECT_GOALS.md)
 
+**从普通 STL 计算民用测温探头。** 在 MATLAB 运行 `rocketAeroHeatWorkbench`。第一步选择下方毫米制 B 珠示例，把“原坐标 → m”设为 `0.001`，加载并确认朝向。第二步选择 **带线 B 珠 · 96 档侧吹**，点击 **生成试件混合体网**。第三步选择整件等温、长引线导热或电阻测温边界。第四步的按钮分别说明从冷态新算、按参照场换算或读取归档。第五步点选任一面可读数，壁压和热流联合 CSV 中的 `face_id` 对应 STL 从 1 开始的原始记录，`reference_face_id` 对应登记试件的标准三角面。此入口要求同一名义外形及三角面连通关系，支持重排面序、换算单位和调整姿态。[示例 STL](cases/thermistor_b/probe-mm.stl)
+
 在 MATLAB 运行 `rocketAeroHeatWorkbench` 可打开科研工作台。选择 **B 型热敏珠**，可在同一侧栏准备体网、确认热边界、计算并查看全表面结果。6 m/s 全周工况可在本机重建体网和启动初场，并按指纹复用输入。计算使用官方 SU2 8.6.0 及其专用热流观察器，直接查看冻结结果只需随源码发布的小型数据包。[独立安装](docs/validation/v296/INSTALL.md) · [热敏珠工作台操作](docs/validation/v295/RESULTS.md)
 
 带线试件在同一工作台选择 **选用带引线 B 型热敏珠**。可生成体网、确认 3 m/s 等温工况、从冷态计算或读取归档，在全表面查看珠体、接头、引线及端面的压力、热流、首层温度与近壁反向区。[操作与实验对照](docs/validation/v297/RESULTS.md)

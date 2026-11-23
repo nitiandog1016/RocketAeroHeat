@@ -121,6 +121,10 @@ switch action
         mesh=clearComputedFields(mesh);
         cfg=optional(payload,'cfg',state.cfg);assertScalarStruct(cfg,'cfg');
         requireUnchangedConfigSection(cfg,state.cfg,'geometry','模型输入或朝向');
+        if strcmp(optional(cfg,'computationBackend',''),'thermistorB') && isfield(state.modelSource,'file')
+            assert(isfield(mesh,'thermistorImport') && isequal(mesh.thermistorImport.source,state.modelSource) && ...
+                sameGeometry(mesh,state.orientedMesh),'RAH:Bead:ImportMesh','请用当前 STL 文件和确认朝向生成试件体网。');
+        end
         quality=optional(payload,'quality',[]);
         changed=~isequaln(mesh,state.mesh) || ~isequaln(cfg,state.cfg);
         if changed
@@ -496,6 +500,11 @@ function validateThermistorResult(result,frozen)
 cfg=frozen.cfg;[b,fs]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
 p=frozen.mesh.thermistorPrepared;w=result.hybridWall;n=size(frozen.mesh.F,1);c=result.hybridCondition;
 id=result.evidenceIdentity;
+if isfield(frozen.mesh,'thermistorImport')
+    map=frozen.mesh.thermistorImport;
+    assert(isequal(map,result.thermistorImport) && strcmp(id.sourceFrame.stlSHA256,map.source.sha256) && ...
+        strcmp(cm011FileSHA256(map.source.file),map.source.sha256),'RAH:Bead:Snapshot','STL 来源或逐面对应与当前工况不同。');
+end
 wire=isfield(b,'leadThermalModel');
 if wire
     % 逐面给定的长引线热边界与本次动作、壁温分布指纹和全表面气动热源同时绑定。

@@ -16,6 +16,15 @@ t=table((1:n)',string(data.region(:)),compose("%.17g",data.faceArea(:)), ...
     'VariableNames',{'face_id','region','area_m2'});
 t=addField(t,p,'pressure',ledger);
 t=addField(t,q,'heat_flux',ledger);
+if isfield(data,'thermistorImport')
+    % 原 STL 面号和标准面积成对保留，可独立复核任一行的热功率。
+    m=data.thermistorImport;t.reference_face_id=m.referenceFaceID(:);
+    t.reference_area_m2=compose("%.17g",m.referenceAreaM2(:));
+    t.stl_sha256=repmat(string(m.stlSHA256),n,1);t.stl_scale_to_m=repmat(m.scaleToM,n,1);
+    t.volume_mesh_sha256=repmat(string(m.meshSHA256),n,1);
+    temp=data.fields(strcmp({data.fields.key},'wallInput'));t.wall_input_K=temp.values(:);
+    near=data.fields(strcmp({data.fields.key},'nearWallCellTemperature'));t.first_fluid_K=near.values(:);
+end
 t.joint_engineering=(p.availability(:)==1 & q.availability(:)==1);
 t.joint_verified=(ismember(p.availability(:),[1 2]) & ismember(q.availability(:),[1 2]) & ...
     p.qualification(:)==2 & q.qualification(:)==2);

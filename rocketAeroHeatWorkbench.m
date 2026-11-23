@@ -188,6 +188,7 @@ renderEditor();sync();showGeometry(true);
             if isSidewind(),caption='带线 B 型热敏珠 · 米制原面 · 侧向来流 −Y';end
             if state.currentStep==2 && ~isempty(state.mesh)
                 p=state.mesh.thermistorPrepared;m=p.preview;
+                if isfield(state.mesh,'thermistorImport'),m.V=m.V+state.mesh.thermistorImport.translationM;end
                 caption=sprintf('实际三维体网的 30° 壁面扇区 · 周向单元 %g° · %d 个原生壁面',30/p.angularCells,p.wallFaces);
                 if isFullBead(),caption=sprintf('360° 全周体网 · 56 层 · %d 个原生壁面',p.wallFaces);end
                 if isSidewind(),caption=sprintf('侧吹全周体网 · %d 个周向间隔 · %d 个原生壁面',p.angularCells,p.wallFaces);end
@@ -227,7 +228,7 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
-                if isBead()
+                if isBead() && ~isfield(state.modelSource,'file')
                     grid=form(6);
                     if hasBeadLeads(),tip(grid,1,'B 型热敏珠 · 两端引线直径 0.0540 mm，各含 0.300 mm 名义直段和暴露端面。');
                     else,tip(grid,1,'B 型热敏珠 · 光滑名义珠体，沿 X 轴放置。长度和三角面采用公开试件的米制重建几何。');end
@@ -276,7 +277,9 @@ renderEditor();sync();showGeometry(true);
                 if isBead()
                     grid=form(8);
                     if isMixedBead()
-                        if hasBeadLeads()
+                        if isfield(state.modelSource,'file')
+                            meshBackendChoice(grid,1);
+                        elseif hasBeadLeads()
                             controls.leadGrid=choice(grid,1,'带线试件体网',{'原混合网','中段加密','第三档中段细化','360° 全周 · 3 m/s 侧吹','96 档侧吹 · 图 7 风洞测点'},[0 1 2 3 4],double(getOption(state.cfg,'thermistorRefineLeads',false)));
                             controls.leadGrid.ValueChangedFcn=@changeLeadGrid;
                         else
@@ -944,7 +947,7 @@ renderEditor();sync();showGeometry(true);
             state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
             preview=[];report=[];preparing=true;message('正在加载模型并核对SI尺度…');
             hash=cm011FileSHA256(next.geometry.stlFile);
-            raw=quietCall(@()loadSTLMesh(next));raw=quietCall(@()calcFaceGeometry(raw));
+            raw=quietCall(@()loadSTLMesh(next,true));raw=quietCall(@()calcFaceGeometry(raw));
             assert(strcmp(hash,cm011FileSHA256(next.geometry.stlFile)),'RAH:STL:Changed','STL 读取期间发生改变，请重新加载。');
             [ok,stlFile]=fileattrib(next.geometry.stlFile);assert(ok,'无法定位导入文件。');
             state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'cfg',next, ...
@@ -1013,7 +1016,9 @@ renderEditor();sync();showGeometry(true);
         if isBead()
             try
                 preparing=true;message('正在准备并核对所选热敏珠体网…');
-                if isMixedBead(),candidate=prepareThermistorLeadMesh(state.orientedMesh,@()isgraphics(fig),state.cfg.thermistorVariant,getOption(state.cfg,'thermistorRefineLeads',false));
+                if isfield(state.modelSource,'file')
+                    candidate=prepareThermistorLeadMesh(state.orientedMesh,@()isgraphics(fig),'sidewind',4,state.modelSource,state.cfg.geometry);
+                elseif isMixedBead(),candidate=prepareThermistorLeadMesh(state.orientedMesh,@()isgraphics(fig),state.cfg.thermistorVariant,getOption(state.cfg,'thermistorRefineLeads',false));
                 else,candidate=prepareThermistorWorkbenchMesh(state.orientedMesh,state.cfg.thermistorAngularCells,@()isgraphics(fig));end
                 state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));report=[];
                 preparing=false;renderEditor();showGeometry(true);message('体网已就绪，可以设置边界条件。');
@@ -1486,13 +1491,20 @@ renderEditor();sync();showGeometry(true);
         report=[];renderEditor();showGeometry(true);message('带线体网选项已改变，请生成网格并确认边界。');
     end
     function meshBackendChoice(grid,row)
-        controls.meshBackend=choice(grid,row,'网格方法',{'工程表面重构','CM-011 低速半域'}, ...
-            {'engineering','cm011Imported'},getOption(state.cfg,'computationBackend','engineering'));
+        labels={'工程表面重构','CM-011 低速半域'};values={'engineering','cm011Imported'};
+        if isfield(state.modelSource,'file')
+            labels{end+1}='带线 B 珠 · 96 档侧吹';values{end+1}='thermistorB';
+        end
+        controls.meshBackend=choice(grid,row,'网格方法',labels,values,getOption(state.cfg,'computationBackend','engineering'));
         controls.meshBackend.ValueChangedFcn=@changeMeshBackend;
     end
     function changeMeshBackend(field,~)
         if state.busy || preparing,return;end
         next=state.cfg;next.computationBackend=field.Value;next.cm011Boundary=[];
+        if strcmp(field.Value,'thermistorB')
+            next.thermistorAngularCells=96;next.thermistorVariant='sidewind';
+            next.thermistorRefineLeads=4;next.thermistorBoundary=[];
+        end
         state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));report=[];
         renderEditor();showGeometry(true);message('网格方法已选择，请生成当前网格。');
     end
