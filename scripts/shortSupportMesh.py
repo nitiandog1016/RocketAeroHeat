@@ -75,7 +75,7 @@ def section(radius, end, structured, split_near=False):
     return wall,xy,[*quads.tolist(),*idx[tri].tolist()],idx[far]
 
 
-def audit_volume(folder):
+def audit_volume(folder, outer_radius=14):
     """独立重读 SU2 文件；无须依赖生成器的单元序号判定内外邻接。"""
     sys.path.insert(0,str(ROOT/"docs/validation/v311"))
     from audit_mesh import face_keys, normals
@@ -100,7 +100,7 @@ def audit_volume(folder):
             if not len(group):continue
             k,s=face_keys(group);keys.append(k);signs.append(~s);wall_and_far.append(k)
             if name=="far":
-                np.testing.assert_allclose(np.linalg.norm(xyz[group],axis=2),14,rtol=0,atol=1e-10)
+                np.testing.assert_allclose(np.linalg.norm(xyz[group],axis=2),outer_radius,rtol=0,atol=1e-10)
                 assert np.min(np.einsum("ij,ij->i",normals(xyz[group]),xyz[group].mean(1)))>0
     exterior=np.vstack(wall_and_far)
     assert len(np.unique(exterior,axis=0))==len(exterior)

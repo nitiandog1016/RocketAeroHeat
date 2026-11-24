@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-24。Short Test 65 双支管银球（Re = 882）的普通 STL 五步入口已通过米制原文件与转向、重排的毫米副本验收。扰动后 **2.565681 ms** 两种步长各覆盖 **32,480 / 32,480 面**；参考网面积 **0.000700423853595 m²**。相对 v333 新增 0 面、0 m²，联合实验验证 0 m²。两半步向外放热 2.005432463 W；五区功率守恒，5,328 个反向面均找到。侧栏分别定位导入网峰值与参考网峰值（参考面 25,055）。外露银球量热偏高 38.08%，七站 RMSE 4.888 Nu。[STL 验收](validation/v334/RESULTS.md) · [原生三步](validation/v333/RESULTS.md) · [本机三维页](../outputs/v334_validation/half01/workbench/index.html)
+2026-11-24。Short Test 65（Re = 882）双支管银球在 14D 与 20D 远场分别完成扰动后 **2.565681 ms** 的 32,480 / 32,480 面、0.000700423853595 m² 压力与热流。相对 v334 新增 0 面、0 m²，联合实验验证 0 m²。两半步整件放热由 2.005432463 W 降至 2.005187691 W（−0.01221%），外露银球折合量热偏差由 +38.0827% 变为 +38.0639%。工作台可选半径，显示同面差值并导出；两次最终窗口峰值均不超过 3.05 GiB。[同刻结果](validation/v335/RESULTS.md) · [本机三维页](../outputs/v335_validation/ui03/half/workbench/index.html) · [普通 STL 入口](validation/v334/RESULTS.md)
 
-<!-- records:last_completed=v334 -->
+<!-- records:last_completed=v335 -->
 <!-- records:active=none -->
-<!-- records:base_commit=990843b031a3dcef116a3a7c20e7313271d15e10 -->
+<!-- records:base_commit=ec457a3df93914b1dccbf753f4cbe2774ca0eac5 -->
 
 双支管 128 扇区的稳态场是本次扰动基线。法向和周向加密对照均已完成。119.8° 测站顺向、166.7° 反向。[稳态与周向对照](validation/v332/RESULTS.md) · [近壁诊断](validation/v331/RESULTS.md) · [法向对照](validation/v330/RESULTS.md)
 
@@ -40,7 +40,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-对照双支管银球远场距离对同一时刻五区热功率和七站 Nu 的影响。[下一决定](validation/v334/NEXT_DECISION.md)
+在没有历史输出的新安装中，从银球 STL 生成 14D 的稳态基流和已验收的物理终点。[下一决定](validation/v335/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

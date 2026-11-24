@@ -45,12 +45,12 @@ def pack(base,work,out):
         for k,v in small.items():z.writestr(k,v)
 
 
-def check(path):
+def check(path,*,prefix="run01",nodes=261708):
     with ZipFile(path) as z:
         manifest=json.loads(z.read("manifest.json"))
         for k,h in manifest["files"].items():assert hashlib.sha256(z.read(k)).hexdigest()==h
         for branch,step in (("full",1),("half",1),("half",2)):
-            root=f"run01/{branch}/step{step}/";e=json.loads(z.read(root+"energy.json"))
+            root=f"{prefix}/{branch}/step{step}/";e=json.loads(z.read(root+"energy.json"))
             for sub in ("","release/"):
                 rec=json.loads(z.read(root+sub+"debugger_process.json"))
                 assert rec["status"]=="terminal" and rec["debuggerExitCode"]==0 and all(rec["inputsStable"].values())
@@ -60,7 +60,7 @@ def check(path):
                 heat=(-v["nodeInW"]).sum();far=(np.maximum(v["farMass"],0)@v["farTheta"])*e["scale"]
                 np.testing.assert_allclose(v["nodeInW"],-(v["released"]+v["edgeCorrection"])*e["scale"],rtol=1e-9,atol=1e-10)
             s=np.genfromtxt(z.open(f"storage/{branch}{step}.csv"),names=True,delimiter=",")
-            np.testing.assert_array_equal(s["firstID"][1:],s["endExclusive"][:-1]);assert s["firstID"][0]==0 and s["endExclusive"][-1]==261708
+            np.testing.assert_array_equal(s["firstID"][1:],s["endExclusive"][:-1]);assert s["firstID"][0]==0 and s["endExclusive"][-1]==nodes
             assert abs(s["storageFromFramesW"].sum()-e["storageW"])<1e-9 and abs(s["storageFromNativeW"].sum()-e["storageW"])<1e-9
             assert abs(heat-e["wallW"])<1e-10 and abs(far-e["farW"])<1e-10
             assert abs((heat-far-s["storageFromFramesW"].sum())/heat)<.005

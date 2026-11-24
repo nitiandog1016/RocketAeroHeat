@@ -1,4 +1,4 @@
-function [binding,g]=bindShortSupportSTL(mesh,source,geometry)
+function [binding,g]=bindShortSupportSTL(mesh,source,geometry,radiusD)
 % 模块一：核对读取的文件、米制比例、刚体姿态与连续面记录，保留文件原号。
 [ok,file]=fileattrib(geometry.stlFile);
 assert(ok && strcmpi(file.Name,source.file) && strcmp(source.unit,'m') && source.scale>0 && ...
@@ -8,7 +8,8 @@ r=geometry.rotationMatrix;c=reshape(geometry.rotationCenter,1,3);
 assert(geometry.isAligned && all(isfinite(c)) && norm(r*r'-eye(3),'fro')<1e-10 && abs(det(r)-1)<1e-10, ...
     'RAH:Short:Pose','请先确认实际模型朝向。');
 folder=fullfile(fileparts(mfilename('fullpath')),'cases','short_sphere');
-pair=readShortSupportTimePair(folder);archive=fullfile(folder,'supported65.zip');
+if nargin<4,radiusD=14;end
+pair=readShortSupportTimePair(folder,radiusD);archive=fullfile(folder,'supported65.zip');
 assert(strcmp(cm011FileSHA256(archive),pair.bodySHA256) && ...
     strcmp(cm011FileSHA256(fullfile(folder,'supportedAngularTransfer65.npz')),pair.transferSHA256));
 temp=tempname;mkdir(temp);cleanup=onCleanup(@()removeExtracted(temp)); %#ok<NASGU>

@@ -670,6 +670,17 @@ if isfield(mesh,'shortSupportDirection')
     end
 end
 % 带线旧网与加密网在七区均可对照，和只在共同珠面定义的几何差别分开显示。
+if isfield(mesh,'shortSupportOuter')
+    % 单位保留 W/m² 和 Pa，让远场距离造成的小差异在同一物理面上可见。
+    c=mesh.shortSupportOuter;scope='Short 65 两套独立基流，在同一物理时间和同一步长比较。正差表示 20D 的量更大。';
+    for item={{'outerFluxChange','20D 减 14D · 入壁热流','W/m²',c.fluxChangeWm2}, ...
+              {'outerGaugeChange','20D 减 14D · 相对环境壁压','Pa',c.gaugeChangePa}}
+        f=item{1};v=f{4};add(f{1},f{2},f{3},v,double(isfinite(v)), ...
+            repmat({'SU2 不可压 BDF1，两域端点映射至同一 STL 面后相减'},n,1),scope);
+        limit=max(abs(v));if limit>0,data.comparisonColorRanges.(f{1})=[-limit limit];end
+    end
+    data.shortSupportOuter=rmfield(c,{'fluxChangeWm2','gaugeChangePa'});
+end
 if isfield(mesh,'thermistorLeadGrid')
     g=mesh.thermistorLeadGrid;
     data.leadGridReference=rmfield(g,{'baseHeatFluxWm2','deltaHeatWm2','deltaPressurePa','deltaNearWallK'});

@@ -5,7 +5,7 @@ from build_time import PREP, read, sha, write_json
 from thermistorWireSurface import residual
 
 
-def endpoint(work,branch,step):
+def endpoint(work,branch,step,*,prepared=PREP,expected_edges=921290):
     folder=work/branch/f"step{step}";release=folder/"release";job=read(work/"job.json")
     cfg=job["condition"];meta=read(folder/"native.json");dt=meta["dt"]
     frame=folder/f"restart_{step:05d}.csv";seed=folder/f"seed_{step-1:05d}.csv"
@@ -20,7 +20,7 @@ def endpoint(work,branch,step):
     raw_nodes=np.fromfile(folder/"nodes.bin","<f8").reshape(-1,18);order=np.argsort(raw_nodes[:,0])
     n=raw_nodes[order];N=len(n);np.testing.assert_array_equal(n[:,0],state[:,0])
     assert N==job["nodes"] and np.isfinite(n).all() and (n[:,5:7]>0).all()
-    with np.load(PREP/"mapping.npz") as m:wet=m["wet"];theta=m["theta"]
+    with np.load(prepared/"mapping.npz") as m:wet=m["wet"];theta=m["theta"]
     wall=n[:,4].astype(bool);np.testing.assert_array_equal(np.flatnonzero(wall),wet)
     np.testing.assert_allclose(state[wet,9],theta,atol=2e-14,rtol=0)
     def native_row(name):return np.fromfile(folder/(name+".bin"),"<f8")[order]
@@ -44,7 +44,7 @@ def endpoint(work,branch,step):
     independent=-residual(release/f"restart_{step:05d}.csv")[wet]
     release_error=max(abs(independent-pre))/max(abs(pre));assert release_error<1e-5,release_error
     e=np.fromfile(folder/"edges.bin","<f8").reshape(-1,6)
-    assert len(e)==921290 and np.isfinite(e).all()
+    assert len(e)==expected_edges and np.isfinite(e).all()
     i,j=e[:,:2].astype(int).T;mass,high,corr,alpha=e[:,2:].T
     def acc(a,b):return np.bincount(i,a,minlength=N)+np.bincount(j,b,minlength=N)
     def net(a):return acc(a,-a)

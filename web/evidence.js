@@ -7,7 +7,12 @@
   const fmt=v=>finite(v)?Number(v).toPrecision(6):'未知';
   function fieldByKey(data,key){const f=list(data.evidenceLedger.fields).find(f=>f.key===key);if(!f)throw Error('账本缺少字段 '+key);return f;}
   function fieldRange(field){const vs=list(field.values).filter(finite);if(!vs.length)return [0,1];let lo=Infinity,hi=-Infinity;vs.forEach(v=>{lo=Math.min(lo,v);hi=Math.max(hi,v);});if(lo===hi){const gap=Math.max(Math.abs(lo)*.01,1e-6);lo-=gap;hi+=gap;}return [lo,hi];}
-  function faceInfo(field,i){const a=at(field.availability,i),q=at(field.qualification,i);return {value:finite(at(field.values,i))?at(field.values,i):null,availability:a,availabilityText:availabilityNames[a]||'未知',qualification:q,qualificationText:qualificationNames[q]||'未验证',method:at(field.methodNames,at(field.methodIndex,i))||'来源未记录',scope:list(field.scopeNames).length?at(field.scopeNames,at(field.scopeIndex,i)):field.scope,reason:at(field.reason,i)||at(field.missingReason,i)||'',evidenceIDs:at(field.evidenceIDs,i)||[]};}
+  function faceText(field,key,i){
+    const words=list(field[key+'Words']);
+    if(!words.length)return at(field[key],i);
+    return words[words.length===1?0:at(field[key+'Codes'],i)];
+  }
+  function faceInfo(field,i){const a=at(field.availability,i),q=at(field.qualification,i);return {value:finite(at(field.values,i))?at(field.values,i):null,availability:a,availabilityText:availabilityNames[a]||'未知',qualification:q,qualificationText:qualificationNames[q]||'未验证',method:at(field.methodNames,at(field.methodIndex,i))||'来源未记录',scope:list(field.scopeNames).length?at(field.scopeNames,at(field.scopeIndex,i)):field.scope,reason:faceText(field,'reason',i)||faceText(field,'missingReason',i)||'',evidenceIDs:at(field.evidenceIDs,i)||[]};}
   function section(data,key,x){
     const f=fieldByKey(data,key),s=core.geometry(data.vertices,data.faces,x);
     const samples=s.segments.map(v=>({...v,...faceInfo(f,v.face)}));
@@ -88,17 +93,23 @@
     function selectField(key){if(!data)return;const f=fieldByKey(data,key);fieldKey=key;if(!ranges[key])ranges[key]=fieldRange(f);$('fieldChoice').value=key;$('rangeLow').value=String(ranges[key][0]);$('rangeHigh').value=String(ranges[key][1]);$('fieldIdentity').textContent=f.stateNote||'数值身份与验证资格分别统计';loadGeometry();renderTable();updateSection(currentSection?currentSection.x:(Number($('sectionX').min)+Number($('sectionX').max))/2);notify();}
     function selectRegion(name){if(!data)return;if(name!==''&&!list(data.evidenceLedger.regions).some(r=>r.name===name))throw Error('未知区域');regionName=name;const ids=regionFaces();if(ids.length&&!ids.includes(face)){face=ids[0];position=data.faces[face].reduce((v,i)=>v.map((q,j)=>q+data.vertices[i][j]/3),[0,0,0]);updateSection(position[0]);}window.RocketGeometry.selectFaces(ids,face);renderTable();renderProbe();drawSection();notify();}
     function inspect(i,p){if(!data||!Number.isInteger(i)||i<0||i>=data.faces.length)throw Error('原面元编号无效');face=i;position=Array.isArray(p)&&p.length===3&&p.every(finite)?p:data.faces[i].reduce((v,k)=>v.map((q,j)=>q+data.vertices[k][j]/3),[0,0,0]);regionName=text(at(data.region,i));window.RocketGeometry.selectFaces(regionFaces(),face);renderTable();renderProbe();updateSection(position[0]);notify();}
+    let snapshotRevision=0;
+    function applyView(next){
+      ranges={...(next.ranges||{})};fieldKey=next.fieldKey||list(data.fields)[0].key;regionName=next.regionName||'';
+      face=Number.isInteger(next.selectedFace)?next.selectedFace:-1;position=list(next.position);
+      currentSection=null;selectField(fieldKey);if(finite(next.sectionX))updateSection(next.sectionX);
+      renderProbe();renderEvidence();notify();
+    }
     function load(payload){try{
       $('exportWallPair').hidden=true;
-      data=payload.data;revision=payload.revision;
+      data=payload.data;revision=payload.revision;snapshotRevision=payload.snapshotRevision??revision;
       if(!data||!data.evidenceLedger||data.evidenceLedger.kind!=='aerothermal-evidence-ledger')throw Error('区域账本负载缺失');
       $('faceNumber').max=String(data.faces.length);$('faceNumber').disabled=false;$('findFace').disabled=false;
       $('caseCondition').textContent=(data.resultCondition&&data.resultCondition.caption)||data.caseNote||'工况与来源见验证证据；未记录量不推断';
       const nextIdentity=JSON.stringify(data.evidenceLedger.identity.geometrySHA256);pendingFit=geometryIdentity!==nextIdentity;geometryIdentity=nextIdentity;
-      const next=payload.viewState||{};ranges={...(next.ranges||{})};fieldKey=next.fieldKey||list(data.fields)[0].key;regionName=next.regionName||'';face=Number.isInteger(next.selectedFace)?next.selectedFace:-1;position=list(next.position);
       const choice=$('fieldChoice');choice.replaceChildren();list(data.fields).forEach(f=>{const o=node('option',f.label+' / '+f.unit);o.value=f.key;choice.append(o);});
       let lo=Infinity,hi=-Infinity;data.vertices.forEach(v=>{lo=Math.min(lo,v[0]);hi=Math.max(hi,v[0]);});$('sectionX').min=$('sectionSlider').min=String(lo);$('sectionX').max=$('sectionSlider').max=String(hi);$('sectionSlider').step=String((hi-lo)/2000||1);
-      currentSection=null;selectField(fieldKey);if(finite(next.sectionX))updateSection(next.sectionX);renderProbe();renderEvidence();notify();
+      applyView(payload.viewState||{});
       const pair=['pressure','heatFlux'].map(key=>list(data.evidenceLedger.fields).find(f=>f.key===key));
       $('exportWallPair').hidden=!pair.every(f=>f && !list(f.history).length);
     }catch(e){$('error').hidden=false;$('error').textContent=e.message;send({kind:'evidence-error',message:e.message});}}
@@ -114,7 +125,18 @@
       }
       inspect(id-1);
     };
-    window.setup=function(real){component=real;geometrySetup(geometryBridge);real.addEventListener('DataChanged',()=>{const p=real.Data;if(p&&p.kind==='aerothermal-evidence-view')load(p);});send({kind:'ready'});};
+    window.setup=function(real){
+      component=real;geometrySetup(geometryBridge);
+      real.addEventListener('DataChanged',()=>{
+        const p=real.Data;if(!p)return;
+        if(p.kind==='aerothermal-evidence-view'){if(p.revision>=revision)load(p);return;}
+        if(p.kind!=='aerothermal-evidence-state'||p.revision<revision)return;
+        revision=p.revision;
+        if(!data||p.snapshotRevision!==snapshotRevision){send({kind:'evidence-needs-snapshot'});return;}
+        try{applyView(p.viewState);}catch(e){send({kind:'evidence-error',message:e.message});}
+      });
+      send({kind:'ready'});
+    };
     $('exportWallPair').onclick=()=>{if(data && !$('exportWallPair').hidden)send({kind:'evidence-wall-pair-export'});};
     $('fieldChoice').onchange=()=>selectField($('fieldChoice').value);$('applyRange').onclick=()=>{const a=Number($('rangeLow').value),b=Number($('rangeHigh').value);if(!finite(a)||!finite(b)||a>=b){$('error').hidden=false;$('error').textContent='色标须为有限且递增的范围。';return;}ranges[fieldKey]=[a,b];loadGeometry();drawSection();notify();};$('resetRange').onclick=()=>{ranges[fieldKey]=fieldRange(fieldByKey(data,fieldKey));selectField(fieldKey);};$('sectionX').onchange=()=>{updateSection(Number($('sectionX').value));notify();};$('sectionSlider').oninput=()=>{updateSection(Number($('sectionSlider').value));notify();};$('exportLedger').onclick=()=>send({kind:'evidence-export',...state()});$('exportSection').onclick=()=>send({kind:'evidence-section-export',...state()});new ResizeObserver(drawSection).observe($('sectionCanvas'));
     return {selectField,selectRegion,inspectFace:inspect,getState:state,setSectionX:x=>{updateSection(x);notify();}};

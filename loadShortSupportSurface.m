@@ -1,6 +1,7 @@
-function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution)
+function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution,radiusD)
 % 模块一：核对同一几何、温界、收敛端点和五区交叠文件，从存档或新算目录取数。
 if nargin<3,resolution='coarse';end
+if nargin<4,radiusD=14;end
 root=fileparts(mfilename('fullpath'));cases=fullfile(root,'cases','short_sphere');
 timed=ismember(resolution,{'timefull','timehalf'});
 transferName='supportedTransfer65.npz';
@@ -8,7 +9,9 @@ if timed || strcmp(resolution,'angular'),transferName='supportedAngularTransfer6
 if timed
     branch=resolution(5:end);
     if isempty(job)
-        pair=readShortSupportTimePair(cases);archive=fullfile(cases,['supportedTime65' upper(branch(1)) branch(2:end) '.zip']);
+        pair=readShortSupportTimePair(cases,radiusD);
+        folder=cases;if radiusD==20,folder=fullfile(cases,'outer20');end
+        archive=fullfile(folder,['supportedTime65' upper(branch(1)) branch(2:end) '.zip']);
     else
         pair=jsondecode(fileread(fullfile(job,'export','pair.json')));archive=fullfile(job,'export',branch,'surface.zip');
         ack=jsondecode(fileread(fullfile(job,'completed.json')));
@@ -70,6 +73,9 @@ condition=struct('caseLabel','Short Test 65 · 双支管银球 · 稳态','veloc
     'ambientPressurePa',c.airPa,'ambientTemperatureK',c.airK,'reynolds',c.re,'alphaDeg',0,'betaDeg',0);
 if timed
     condition.caseLabel=sprintf('Short Test 65 · 双支管银球 · 扰动后 %.6f ms · 步长 %.6f ms',1000*s.elapsedSeconds,1000*s.dtSeconds);
+    if radiusD==20
+        condition.caseLabel=[condition.caseLabel ' · 20D 远场'];condition.outerRadiusD=radiusD;
+    end
     condition.elapsedPhysicalTimeS=s.elapsedSeconds;condition.physicalStepSizeS=s.dtSeconds;
 end
 setup=struct('condition',condition,'region',names(g.regionID),'wallTemperatureK',w.wallInputK, ...

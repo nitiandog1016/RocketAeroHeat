@@ -122,8 +122,10 @@ switch action
         cfg=optional(payload,'cfg',state.cfg);assertScalarStruct(cfg,'cfg');
         requireUnchangedConfigSection(cfg,state.cfg,'geometry','模型输入或朝向');
         if strcmp(optional(cfg,'computationBackend',''),'shortSupport65')
+            [~,grid]=shortSupportImportBoundary(cfg.shortSupportBoundary.branch,optional(cfg,'shortSupportRadiusD',14));
             assert(isfield(mesh,'shortSupportImport') && isequal(mesh.shortSupportImport.source,state.modelSource) && ...
-                sameGeometry(mesh,state.orientedMesh),'RAH:Short:ImportMesh','请先核对当前 STL 原面。');
+                strcmp(mesh.shortSupportImport.meshSHA256,grid.meshSHA256) && sameGeometry(mesh,state.orientedMesh), ...
+                'RAH:Short:ImportMesh','请先核对当前 STL 原面和远场网格。');
         end
         if strcmp(optional(cfg,'computationBackend',''),'thermistorB') && isfield(state.modelSource,'file')
             assert(isfield(mesh,'thermistorImport') && isequal(mesh.thermistorImport.source,state.modelSource) && ...
@@ -156,6 +158,7 @@ switch action
         requireUnchangedConfigSection(cfg,state.cfg,'mesh','网格参数');
         if any(strcmp({optional(state.cfg,'computationBackend',''),optional(cfg,'computationBackend','')},'shortSupport65'))
             requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','银球体网');
+            requireUnchangedConfigSection(cfg,state.cfg,'shortSupportRadiusD','银球远场半径');
         end
         if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') || strcmp(optional(cfg,'computationBackend',''),'thermistorB')
             requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','试件来源');
@@ -293,7 +296,7 @@ switch action
                 numel(result.hybridWallTemperatureK)==n && all(isfinite(result.hybridWallTemperatureK)), ...
                 'RAH:Short:Snapshot','返回的银球快照与本次冻结输入或原面场不符。');
             if strcmp(cfg.shortSupportAction,'archive')
-                [~,pair]=shortSupportImportBoundary(b.branch);
+                [~,pair]=shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14));
                 assert(strcmp(id.sourceFrame.sha256,pair.([b.branch 'Frame'])),'RAH:Short:Snapshot','归档帧与所选步长不符。');
             end
         elseif strcmp(optional(state.cfg,'computationBackend',''),'cm011Imported')
@@ -509,7 +512,7 @@ end
 function validateFlight(cfg)
 if strcmp(optional(cfg,'computationBackend',''),'shortSupport65')
     b=cfg.shortSupportBoundary;
-    assert(isequal(b,shortSupportImportBoundary(b.branch)),'RAH:Short:Boundary','请使用当前双支管试件登记的工况和物理时间。');return;
+    assert(isequal(b,shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14))),'RAH:Short:Boundary','请使用当前双支管试件登记的工况和物理时间。');return;
 end
 if strcmp(optional(cfg,'computationBackend',''),'thermistorB')
     thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);

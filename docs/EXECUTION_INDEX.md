@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v335 双支管银球 14D 与 20D 同刻外域对照](validation/v335/RESULTS.md) · [七站与五区](validation/v335/evidence/domain.png) · [同面数据](validation/v335/evidence/comparison.json) · [下一项](validation/v335/NEXT_DECISION.md)。
+
 - [v334 从普通 STL 运行双支管银球单时刻工况](validation/v334/RESULTS.md) · [米制验收](validation/v334/evidence/full.json) · [毫米、转向与面序验收](validation/v334/evidence/half.json) · [下一项](validation/v334/NEXT_DECISION.md)。
 
 - [v333 双支管银球在 2.565681 ms 的全表面结果](validation/v333/RESULTS.md) · [同刻云图、步长差和储热](validation/v333/evidence/time.png) · [下一项](validation/v333/NEXT_DECISION.md)。32,480 面均有两种 BDF1 步长的壁压和热流，最大同面热流差 0.03819 W/m²。

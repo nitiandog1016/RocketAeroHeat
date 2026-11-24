@@ -119,4 +119,18 @@ if(process.argv[2]){
   console.log(JSON.stringify({actualFaces:reference.originalFaces,queriedFaces:reference.probeExamples.map(x=>x.faceID),
     checkedFieldsPerFace:actual.evidenceLedger.fields.length,actualWebGL:false}));
 }
-console.log(JSON.stringify({checks:section.samples.length*6+56,components:2,originalValuesUnchanged:true,unknownNotZero:true,negativeAndZeroPreserved:true,qualificationIndependent:true,domStateDispatch:true,regionDoesNotCropOrRescale:true,compactProbeDetailsCollapsed:true,oneBasedFaceLookup:true,separateJointEngineeringArea:true,signedPartialAndWholePower:true,actualWebGL:false}));
+// 新选择只传显示状态。同一几何的另一份物理快照也必须重新加载；迟到的旧选择忽略。
+const savedView={fieldKey:'heatFlux',ranges:{heatFlux:[-9,9]},sectionX:1,selectedFace:1,regionName:'first',position:[1,0,0]};
+const encoded={...field,reason:[],missingReason:[],reasonWords:['','已核对'],reasonCodes:F.map((_,i)=>i%2),missingReasonWords:['原热流未知']};
+assert.strictEqual(view.faceInfo(encoded,0).reason,'原热流未知');
+assert.strictEqual(view.faceInfo(encoded,1).reason,'已核对');
+bridgeValue={kind:'aerothermal-evidence-view',revision:20,snapshotRevision:20,data:uiData,viewState:savedView};listener();
+bridgeValue={kind:'aerothermal-evidence-state',revision:22,snapshotRevision:20,viewState:{...savedView,selectedFace:3}};listener();
+assert.strictEqual(element('probeID').textContent,'#4');
+bridgeValue={kind:'aerothermal-evidence-state',revision:21,snapshotRevision:20,viewState:savedView};listener();
+assert.strictEqual(element('probeID').textContent,'#4');
+bridgeValue={kind:'aerothermal-evidence-state',revision:24,snapshotRevision:23,viewState:savedView};listener();
+assert.strictEqual(bridgeValue.kind,'evidence-needs-snapshot');assert.strictEqual(bridgeValue.revision,24);
+bridgeValue={kind:'aerothermal-evidence-view',revision:24,snapshotRevision:23,data:uiData,viewState:savedView};listener();
+assert.strictEqual(element('probeID').textContent,'#2');
+console.log(JSON.stringify({checks:section.samples.length*6+61,components:2,originalValuesUnchanged:true,unknownNotZero:true,negativeAndZeroPreserved:true,qualificationIndependent:true,domStateDispatch:true,regionDoesNotCropOrRescale:true,compactProbeDetailsCollapsed:true,oneBasedFaceLookup:true,separateJointEngineeringArea:true,signedPartialAndWholePower:true,incrementalSelection:true,actualWebGL:false}));

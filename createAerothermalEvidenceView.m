@@ -32,13 +32,14 @@ update(data,varargin{:});
         % 每次数据更新清空原面元选择，避免旧索引被误用到新的结果快照。
         v.regionName='';v.selectedFace=-1;v.position=[];s.viewState=v;s.sectionInfo=[];
         s.revision=s.revision+1;s.rendered=[];s.error=[];
-        s.payload=struct('kind','aerothermal-evidence-view','schemaVersion',1,'revision',s.revision,'data',next,'viewState',v);
-        html.UserData=s;html.Data=s.payload;
+        s.payload=struct('kind','aerothermal-evidence-view','schemaVersion',1,'revision',s.revision,'snapshotRevision',s.revision,'data',next,'viewState',v);
+        html.UserData=s;html.Data=webSnapshot(s.payload);
     end
     function receive(src,~)
         message=src.Data;s=src.UserData;if ~isstruct(message)||~isfield(message,'kind'),return;end
-        if strcmp(message.kind,'ready'),s.ready=true;src.UserData=s;src.Data=s.payload;return;end
+        if strcmp(message.kind,'ready'),s.ready=true;src.UserData=s;src.Data=webSnapshot(s.payload);return;end
         if ~isfield(message,'revision')||message.revision~=s.revision,return;end
+        if strcmp(message.kind,'evidence-needs-snapshot'),src.Data=webSnapshot(s.payload);return;end
         if strcmp(message.kind,'evidence-wall-pair-export')
             % 只使用当前 MATLAB 账本，网页传递版本号，不传递物理量。
             [name,folder]=uiputfile('*.csv','导出全部原面的壁压与热流','wall_pressure_heat_flux.csv');
@@ -67,7 +68,10 @@ update(data,varargin{:});
     end
     function publish(v)
         s=html.UserData;s.revision=s.revision+1;s.viewState=v;s.sectionInfo=[];s.rendered=[];s.error=[];
-        s.payload.revision=s.revision;s.payload.viewState=v;html.UserData=s;html.Data=s.payload;
+        % 选择、色标、切面只改变显示。完整网格仅在几何/结果更新或网页重新加载时发送。
+        s.payload.revision=s.revision;s.payload.viewState=v;html.UserData=s;
+        html.Data=struct('kind','aerothermal-evidence-state','snapshotRevision',s.payload.snapshotRevision, ...
+            'revision',s.revision,'viewState',v);
     end
     function selectField(key)
         s=html.UserData;key=char(key);idx=find(strcmp({s.payload.data.evidenceLedger.fields.key},key),1);
@@ -179,6 +183,24 @@ update(data,varargin{:});
             strcmp(s.sectionInfo.fieldKey,s.viewState.fieldKey),'当前截面尚未完成绘制，请稍后导出。');
         fid=fopen(char(path),'w','n','UTF-8');assert(fid>=0);guard=onCleanup(@()fclose(fid));fprintf(fid,'%s',s.sectionInfo.csv);
     end
+end
+
+function packet=webSnapshot(packet)
+% 网页字段菜单只用名称和单位，逐面值在证据账本内传一次。重复说明用词表无损编码。
+% MATLAB 端的查询、导出、历史和原始拒绝原因仍使用完整账本。
+if isempty(packet),return;end
+d=packet.data;d.fields=rmfield(d.fields,setdiff(fieldnames(d.fields),{'key','label','unit'}));
+f=d.evidenceLedger.fields;
+for j=1:numel(f)
+    for item={'reason','missingReason'}
+        k=item{1};if ~isfield(f,k) || isempty(f(j).(k)),continue;end
+        [words,~,index]=unique(string(f(j).(k)(:)));
+        f(j).([k 'Words'])=cellstr(words);f(j).(k)=[];
+        if numel(words)>1,f(j).([k 'Codes'])=uint32(index-1);end
+    end
+    if iscell(f(j).evidenceIDs) && all(cellfun(@isempty,f(j).evidenceIDs)),f(j).evidenceIDs=[];end
+end
+d.evidenceLedger.fields=f;packet.data=d;
 end
 
 function range=initialRange(field)

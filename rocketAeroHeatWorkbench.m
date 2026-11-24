@@ -284,13 +284,16 @@ renderEditor();sync();showGeometry(true);
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
             case 2
                 if isShortSupport()
-                    grid=form(7);meshBackendChoice(grid,1);
-                    controls.generate=button(grid,2,'核对 STL 原面并绑定试件体网',@generate);
+                    grid=form(8);meshBackendChoice(grid,1);radius=getOption(state.cfg,'shortSupportRadiusD',14);
+                    controls.shortRadius=choice(grid,2,'远场半径',{'14D · 基线','20D · 外域对照'},[14 20],radius);
+                    controls.shortRadius.ValueChangedFcn=@changeShortRadius;
+                    controls.generate=button(grid,3,'核对 STL 原面并绑定试件体网',@generate);
                     if isempty(state.mesh)
-                        tip(grid,3,'使用已登记的 128 扇区、十层近壁体网。支管沿 ±Y，沿 −X 来流。');
+                        tip(grid,4,'使用已登记的 128 扇区、十层近壁体网。支管沿 ±Y，沿 −X 来流。');
                     else
-                        tip(grid,3,sprintf('已对应 %d 面 · 397,824 个体单元\n最大角点偏差 %.3g m',size(state.mesh.F,1),state.mesh.shortSupportImport.maxVertexErrorM));
-                        controls.nextBoundary=button(grid,6,'设置边界条件',@(~,~)go(3));
+                        count=397824;if radius==20,count=406272;end
+                        tip(grid,4,sprintf('已对应 %d 面 · %d 个体单元 · %dD\n最大角点偏差 %.3g m',size(state.mesh.F,1),count,radius,state.mesh.shortSupportImport.maxVertexErrorM));
+                        controls.nextBoundary=button(grid,7,'设置边界条件',@(~,~)go(3));
                     end
                     sync();return;
                 end
@@ -713,7 +716,7 @@ renderEditor();sync();showGeometry(true);
                 controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[12+offset 19+offset];controls.log.Layout.Column=[1 2];
             case 5
                 if isShortSupport()
-                    grid=form(15);b=state.cfg.shortSupportBoundary;
+                    grid=form(15+2*isfield(state.result,'shortSupportOuter'));b=state.cfg.shortSupportBoundary;
                     origin='本次原生计算';if state.result.evidenceIdentity.reusedArchive,origin='读取发布归档';end
                     tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
                     tip(grid,4,sprintf('导入网热峰 #%d · 参考网热峰 #%d 对应 STL #%d\n反向区 %.4f mm² · 逐面联合实验验证 0 m²',report.peakOutFace,report.nativePeakReferenceFaceID,report.nativePeakFileFaceID,1e6*report.reverseAreaM2));
@@ -723,6 +726,12 @@ renderEditor();sync();showGeometry(true);
                     controls.export=button(grid,13,'导出完整离线工作台',@exportCase);
                     controls.filePeak=button(grid,14,'定位导入网热峰',@(~,~)inspectShortPeak(report.peakOutFace));
                     controls.nativePeak=button(grid,15,'定位参考网热峰',@(~,~)inspectShortPeak(report.nativePeakFileFaceID));
+                    if isfield(state.result,'shortSupportOuter')
+                        controls.stations.ColumnName={'极角 / °','STL 面','实验 Nu','14D Nu','20D Nu'};
+                        controls.stations.Data=report.stations{:,{'angleDeg','fileFaceID','reportedNu','baseNu','computedNu'}};
+                        note=tip(grid,16,sprintf('20D 减 14D · 整件向外放热 %+.6g W\n七站 RMSE %.4f → %.4f Nu', ...
+                            state.result.shortSupportOuter.powerChangeW,report.baseStationRMSE,report.stationRMSE));note.Layout.Row=[16 17];
+                    end
                     sync();return;
                 end
                 if ~isempty(state.researchResult)
@@ -1066,7 +1075,7 @@ renderEditor();sync();showGeometry(true);
         if isShortSupport()
             try
                 preparing=true;message('正在核对银球 STL 面号、实际面积和体网来源…');
-                candidate=state.orientedMesh;candidate.shortSupportImport=bindShortSupportSTL(candidate,state.modelSource,state.cfg.geometry);
+                candidate=state.orientedMesh;candidate.shortSupportImport=bindShortSupportSTL(candidate,state.modelSource,state.cfg.geometry,getOption(state.cfg,'shortSupportRadiusD',14));
                 state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));report=[];
                 preparing=false;renderEditor();showGeometry(true);message('五个区域的原面已对应，可以确认工况。');
             catch ex,preparing=false;renderEditor();showError(ex);end
@@ -1124,7 +1133,7 @@ renderEditor();sync();showGeometry(true);
 %% 模块九：边界输入与热物性/方法选择均入集中状态，不立即求物理场。
     function next=boundaryConfiguration()
         next=state.cfg;
-        if isShortSupport(),next.shortSupportBoundary=shortSupportImportBoundary(controls.shortBranch.Value);return;end
+        if isShortSupport(),next.shortSupportBoundary=shortSupportImportBoundary(controls.shortBranch.Value,getOption(next,'shortSupportRadiusD',14));return;end
         if isBead()
             next.thermistorBoundary=[];
             if isSidewind()
@@ -1475,6 +1484,14 @@ renderEditor();sync();showGeometry(true);
     function yes=isShortSupport()
         yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'shortSupport65');
     end
+    function changeShortRadius(field,~)
+        % 数值外域改变后重新绑定试件体网和基流，撤销上次边界审核与结果。
+        if state.busy || preparing,return;end
+        next=state.cfg;next.shortSupportRadiusD=field.Value;
+        next.shortSupportBoundary=shortSupportImportBoundary(next.shortSupportBoundary.branch,field.Value);
+        state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));report=[];
+        renderEditor();showGeometry(true);message('已更改远场半径，请重新绑定体网。');
+    end
     function inspectShortPeak(face)
         % 在同一窗口定位相应测度上的峰值，探针给出实际文件号与标准面号。
         webUI.evidenceTab.Parent.SelectedTab=webUI.evidenceTab;
@@ -1578,7 +1595,7 @@ renderEditor();sync();showGeometry(true);
     function changeMeshBackend(field,~)
         if state.busy || preparing,return;end
         next=state.cfg;next.computationBackend=field.Value;next.cm011Boundary=[];
-        if strcmp(field.Value,'shortSupport65'),next.shortSupportBoundary=shortSupportImportBoundary('half');end
+        if strcmp(field.Value,'shortSupport65'),next.shortSupportRadiusD=14;next.shortSupportBoundary=shortSupportImportBoundary('half');end
         if strcmp(field.Value,'thermistorB')
             next.thermistorAngularCells=96;next.thermistorVariant='sidewind';
             next.thermistorRefineLeads=4;next.thermistorBoundary=[];

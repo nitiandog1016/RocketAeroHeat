@@ -23,9 +23,9 @@ DATA=ROOT/"cases/short_sphere"
 def table(z,name):return np.genfromtxt(io.BytesIO(z.read(name)),names=True,delimiter=",")
 
 
-def verify(data,work=None,ui=None):
+def verify(data,work=None,ui=None,*,base_frame=BASE_FRAME,steady=BASE/"run01/steady05/restart_000199.csv"):
     pair=read(data/"supportedTime65.json");s=pair["condition"]
-    assert pair["steadyFrame"]==BASE_FRAME and sha(DATA/"supportedAngularTransfer65.npz")==pair["transferSHA256"]
+    assert pair["steadyFrame"]==base_frame and sha(DATA/"supportedAngularTransfer65.npz")==pair["transferSHA256"]
     with np.load(DATA/"supportedAngularTransfer65.npz") as m:grid=dict(m)
     area=grid["targetArea"];xyz=grid["nativeWallXYZD"];c=grid["nativeCorners"];sa=grid["nativeArea"]
     nsrc=len(sa);N=len(area);a,b=grid["target"],grid["source"]
@@ -85,7 +85,7 @@ def verify(data,work=None,ui=None):
                 close(-heat*s["diameterM"]/((st["wallK"]-s["airK"])*conductivity(st["wallK"])),st["computedNu"])
             mapped={"angular"+k[0].upper()+k[1:]:d[k] for k in d.dtype.names}
             direction=raw_check("angular",dict(r["direction"],frame=e["frame"],vtk=e["vtk"]),grid,n,basis,ok,mapped,stage,128,fname)
-            steady=BASE/"run01/steady05/restart_000199.csv";assert sha(steady)==BASE_FRAME
+            assert sha(steady)==base_frame
             base_u=np.loadtxt(steady,delimiter=",",skiprows=1,usecols=(5,6,7))
             xx,yy,zz=state[:,1:4].T
             wake=((xx+1.15)/.55)**2+(yy*yy+zz*zz)/.45**2<1

@@ -101,11 +101,11 @@ def header(source):
     return once(source,"std::sqrt(schemeRms/nodesData.size()));","std::sqrt(schemeRms/nodesData.size()),storage);")
 
 
-def build(out):
+def build(out, *, steady_build=BUILD, expected_build="0bbcde57b7bc0aa2889bf1426613a002c498da980f61e06b67b8ae2db7e94c19"):
     out.mkdir(parents=True,exist_ok=False)
-    rec=read(BUILD/"build.json");wc=KIT/"build-v117"
-    assert sha(BUILD/"build.json")=="0bbcde57b7bc0aa2889bf1426613a002c498da980f61e06b67b8ae2db7e94c19"
-    assert all(sha(BUILD/name)==h for name,h in rec["files"].items())
+    rec=read(steady_build/"build.json");wc=KIT/"build-v117"
+    assert sha(steady_build/"build.json")==expected_build
+    assert all(sha(steady_build/name)==h for name,h in rec["files"].items())
     cache=json.loads(gzip.decompress((ROOT/"docs/validation/v272/evidence/build.json.gz").read_bytes()))
     assert sha(KIT/"su2.zip")==rec["archive"]==cache["sourceArchiveSHA256"]
     key=next(Path(k) for k in cache["cachedBuildInputs"] if Path(k).name=="CIntegration.cpp")
@@ -113,23 +113,24 @@ def build(out):
     with ZipFile(KIT/"su2.zip") as z:
         name,=[k for k in z.namelist() if k.endswith("/SU2_CFD/src/integration/CIntegration.cpp")]
         original=z.read(name).decode("utf8").replace("\r\n","\n")
-    (out/"CIntegration.cpp").write_text(integration(original),encoding="utf8")
-    (out/"CScalarSolver.inl").write_text(scalar((BUILD/"CScalarSolver.inl").read_text("utf8")),encoding="utf8")
-    (out/"silver.hpp").write_text(header((BUILD/"silver.hpp").read_text("utf8")),encoding="utf8")
-    for name in ("far_mass.hpp","capacity.hpp","CSpeciesSolver.cpp"):(out/name).write_bytes((BUILD/name).read_bytes())
+    source=once(integration(original),"GetnPointDomain()!=261708",f"GetnPointDomain()!={int(rec['nodes'])}")
+    (out/"CIntegration.cpp").write_text(source,encoding="utf8")
+    (out/"CScalarSolver.inl").write_text(scalar((steady_build/"CScalarSolver.inl").read_text("utf8")),encoding="utf8")
+    (out/"silver.hpp").write_text(header((steady_build/"silver.hpp").read_text("utf8")),encoding="utf8")
+    for name in ("far_mass.hpp","capacity.hpp","CSpeciesSolver.cpp"):(out/name).write_bytes((steady_build/name).read_bytes())
     compiler=KIT/"toolchain/w64devkit/bin/g++.exe";assert sha(compiler)==cache["compilerSHA256"]
-    for stem,origin in (("CIntegration",DRIVER),("CSpeciesSolver",BUILD)):
+    for stem,origin in (("CIntegration",DRIVER),("CSpeciesSolver",steady_build)):
         receipt=read(origin/(stem+"_process.json"));args=receipt["args"]
         assert receipt["exitCode"]==0 and not receipt["livePids"] and Path(args[0])==compiler
         args=[str(out/Path(a).name) if Path(a).parent==origin else a for a in args]
         invoke(stem,args,wc,out,180,3,bin_directory=compiler.parent)
-    for stem,base,recipe in (("physical",BUILD,"shared"),("release",DRIVER,"wire")):
+    for stem,base,recipe in (("physical",steady_build,"shared"),("release",DRIVER,"wire")):
         args=read(base/(recipe+"_process.json"))["args"]
         assert sha(Path(args[3]))==rec["main"]
         if stem=="physical":args[4]=str(out/"CSpeciesSolver.obj")
         args[2]=str(out/(stem+".exe"));args.insert(4,str(out/"CIntegration.obj"))
         invoke(stem,args,wc,out,180,3,bin_directory=compiler.parent)
-    write_json(out/"build.json",dict(baseline=sha(BUILD/"build.json"),recipe=sha(Path(__file__)),
+    write_json(out/"build.json",dict(baseline=sha(steady_build/"build.json"),recipe=sha(Path(__file__)),
         files={p.name:sha(p) for p in out.iterdir() if p.suffix in (".hpp",".cpp",".inl",".exe",".obj")}))
 
 

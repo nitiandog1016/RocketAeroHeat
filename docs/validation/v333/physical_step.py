@@ -15,21 +15,21 @@ DT={"full":.25,"half":.125}
 UPDATES=360
 
 
-def setup(work,driver):
+def setup(work,driver,*,prepared=PREP,prepared_sha=PREP_KEY,steady=BASE/"run01/steady05",base_frame=BASE_FRAME,steady_build=BUILD):
     work.mkdir(parents=True,exist_ok=False)
-    p=read(PREP/"prepared.json");assert sha(PREP/"prepared.json")==PREP_KEY
-    assert all(sha(PREP/name)==h for name,h in p["files"].items()) and sha(CASE)==p["caseSHA256"]
-    steady=BASE/"run01/steady05";frame=steady/"restart_000199.csv";end=read(steady/"record.json")
+    p=read(prepared/"prepared.json");assert sha(prepared/"prepared.json")==prepared_sha
+    assert all(sha(prepared/name)==h for name,h in p["files"].items()) and sha(CASE)==p["caseSHA256"]
+    frame=steady/"restart_000199.csv";end=read(steady/"record.json")
     rec=read(steady/"debugger_process.json")
     assert rec["status"]=="terminal" and rec["debuggerExitCode"]==0 and all(rec["inputsStable"].values())
     assert not(rec["supervisorError"] or rec["stopReason"] or rec["survivingProcessIDs"])
-    assert sha(frame)==end["end"]==BASE_FRAME and max(end["window"])<-8 and end["rawMax20"]<1e-8
-    heat=read(BASE/"run01/thermal.json")
-    assert heat["passed"] and heat["early"]["sourceFrame"]==BASE_FRAME and heat["meshSHA256"]==p["files"]["mesh.su2"]
-    src=read(driver/"build.json");assert src["baseline"]==sha(BUILD/"build.json")
+    assert sha(frame)==end["end"]==base_frame and max(end["window"])<-8 and end["rawMax20"]<1e-8
+    heat=read(steady.parent/"thermal.json")
+    assert heat["passed"] and heat["early"]["sourceFrame"]==base_frame and heat["meshSHA256"]==p["files"]["mesh.su2"]
+    src=read(driver/"build.json");assert src["baseline"]==sha(steady_build/"build.json")
     assert all(sha(driver/name)==h for name,h in src["files"].items())
     state=np.loadtxt(frame,skiprows=1,delimiter=",")
-    with np.load(PREP/"mapping.npz") as m:xyz,wet=m["xyz"],m["wet"]
+    with np.load(prepared/"mapping.npz") as m:xyz,wet=m["xyz"],m["wet"]
     np.testing.assert_array_equal(xyz,state[:,1:4]);x,y,z=xyz.T
     dx=x+1.15;support=1-(dx/.55)**2-(y*y+z*z)/.45**2
     env=np.maximum(support,0.)**2
@@ -42,7 +42,7 @@ def setup(work,driver):
     np.testing.assert_array_equal(np.loadtxt(path,delimiter=",",skiprows=1),state)
     np.testing.assert_array_equal(prior[support<=0],state[support<=0])
     np.testing.assert_array_equal(prior[:,[0,1,2,3,4,8,9]],state[:,[0,1,2,3,4,8,9]])
-    j=dict(baseFrame=BASE_FRAME,seed=sha(path),preparedSHA256=PREP_KEY,driver=str(driver),buildSHA256=sha(driver/"build.json"),
+    j=dict(baseFrame=base_frame,seed=sha(path),preparedSHA256=prepared_sha,driver=str(driver),buildSHA256=sha(driver/"build.json"),
            condition=p["condition"],nodes=len(xyz),wetNodes=len(wet),changed=int(np.any(prior!=state,axis=1).sum()),
            peakDeltaOverU=float(np.linalg.norm(state[:,5:8]-prior[:,5:8],axis=1).max()))
     write_json(work/"job.json",j);return j
@@ -63,10 +63,10 @@ def config(j,dt,step,release):
     return "\n".join(lines)+"\n"
 
 
-def advance(work,branch,step,old,release=False):
+def advance(work,branch,step,old,release=False,*,prepared=PREP,plan=HERE/"PLAN.md"):
     assert (branch,step) in (("full",1),("half",1),("half",2))
-    j=read(work/"job.json");driver=Path(j["driver"]);p=read(PREP/"prepared.json")
-    assert sha(driver/"build.json")==j["buildSHA256"] and sha(PREP/"prepared.json")==j["preparedSHA256"]
+    j=read(work/"job.json");driver=Path(j["driver"]);p=read(prepared/"prepared.json")
+    assert sha(driver/"build.json")==j["buildSHA256"] and sha(prepared/"prepared.json")==j["preparedSHA256"]
     physical=work/branch/f"step{step}";dt=DT[branch]
     folder=physical/"release" if release else physical
     folder.mkdir(parents=True,exist_ok=False)
@@ -78,20 +78,20 @@ def advance(work,branch,step,old,release=False):
     exe=driver/("release.exe" if release else "physical.exe")
     assert sha(exe)==read(driver/"build.json")["files"][exe.name]
     for name,dest in (("mesh.su2","mesh.su2"),("release.dat" if release else "profile.dat","wire_boundary.dat")):
-        assert sha(PREP/name)==p["files"][name];os.link(PREP/name,folder/dest)
+        assert sha(prepared/name)==p["files"][name];os.link(prepared/name,folder/dest)
     seed=folder/f"seed_{step-1:05d}.csv";os.link(old,seed)
     cfg=folder/"case.cfg";cfg.write_text(config(j,dt,step,release),encoding="ascii")
-    locks=[exe,work/"job.json",HERE/"PLAN.md",Path(__file__).resolve(),cfg,seed,folder/"wire_boundary.dat",folder/"mesh.su2",driver/"build.json"]
+    locks=[exe,work/"job.json",plan,Path(__file__).resolve(),cfg,seed,folder/"wire_boundary.dat",folder/"mesh.su2",driver/"build.json"]
     binpath=str(KIT/"toolchain/w64devkit/bin")
     if binpath not in os.environ["PATH"].split(os.pathsep):os.environ["PATH"]=binpath+os.pathsep+os.environ["PATH"]
     r=observe([str(exe),"case.cfg","--threads","4"],folder,{str(f):sha(f) for f in locks},150 if release else 480,(350 if release else 550)*1024**2)
-    return inspect_step(work,branch,step,old,release)
+    return inspect_step(work,branch,step,old,release,prepared=prepared)
 
 
-def inspect_step(work,branch,step,old,release):
+def inspect_step(work,branch,step,old,release,*,prepared=PREP):
     physical=work/branch/f"step{step}";folder=physical/"release" if release else physical
     j=read(work/"job.json");dt=DT[branch];seed=folder/f"seed_{step-1:05d}.csv"
-    r=read(folder/"debugger_process.json");driver=Path(j["driver"]);p=read(PREP/"prepared.json")
+    r=read(folder/"debugger_process.json");driver=Path(j["driver"]);p=read(prepared/"prepared.json")
     exe=driver/("release.exe" if release else "physical.exe")
     assert r["command"]==[str(exe),"case.cfg","--threads","4"]
     locks=r["inputSHA256"];assert sha(exe)==locks[str(exe)]==read(driver/"build.json")["files"][exe.name]
@@ -116,7 +116,7 @@ def inspect_step(work,branch,step,old,release):
               old=sha(seed),frame=sha(frame),history=sha(file),nativeElapsedSeconds=r["elapsedSeconds"],peakRSS=r["peakFamilyRSSBytes"])
     if not release:
         state=np.loadtxt(frame,delimiter=",",skiprows=1,usecols=range(10))
-        with np.load(PREP/"mapping.npz") as m:
+        with np.load(prepared/"mapping.npz") as m:
             wet=m["wet"];theta=m["theta"];np.testing.assert_array_equal(state[:,1:4],m["xyz"])
         assert np.isfinite(state).all() and state[:,9].min()>=-1e-12 and state[:,9].max()<=theta.max()+1e-12
         assert np.max(abs(state[wet,5:8]))<1e-12 and min(j["condition"]["airPa"]+j["condition"]["rho"]*j["condition"]["speedMps"]**2*state[:,4])>0
@@ -143,16 +143,16 @@ def inspect_step(work,branch,step,old,release):
     return frame
 
 
-def run_steps(work):
+def run_steps(work,*,prepared=PREP,plan=HERE/"PLAN.md",expected_edges=921290):
     for branch,steps in (("full",1),("half",2)):
         old=work/"seed.csv"
         for step in range(1,steps+1):
             folder=work/branch/f"step{step}"
-            frame=inspect_step(work,branch,step,old,False) if folder.exists() else advance(work,branch,step,old)
-            if (folder/"release").exists():inspect_step(work,branch,step,frame,True)
-            else:advance(work,branch,step,frame,True)
+            frame=inspect_step(work,branch,step,old,False,prepared=prepared) if folder.exists() else advance(work,branch,step,old,prepared=prepared,plan=plan)
+            if (folder/"release").exists():inspect_step(work,branch,step,frame,True,prepared=prepared)
+            else:advance(work,branch,step,frame,True,prepared=prepared,plan=plan)
             from energy import endpoint
-            result=endpoint(work,branch,step)
+            result=endpoint(work,branch,step,prepared=prepared,expected_edges=expected_edges)
             print(branch,step,result["wallW"],result["storageW"],flush=True);old=frame
 
 

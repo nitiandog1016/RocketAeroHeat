@@ -1,20 +1,22 @@
 function [result,boundary,report]=runShortSupportImportedCase(input,cfg,progress)
 % 模块一：核对用户确认的文件、面网、温界和所选时间层，然后调用试件原生入口。
-boundary=shortSupportImportBoundary(cfg.shortSupportBoundary.branch);
+radiusD=14;if isfield(cfg,'shortSupportRadiusD'),radiusD=cfg.shortSupportRadiusD;end
+boundary=shortSupportImportBoundary(cfg.shortSupportBoundary.branch,radiusD);
 assert(isequal(cfg.shortSupportBoundary,boundary),'RAH:Short:Boundary','当前设置与 Test 65 的冻结工况不符。');
-[b,g]=bindShortSupportSTL(input,input.shortSupportImport.source,cfg.geometry);
+[b,g]=bindShortSupportSTL(input,input.shortSupportImport.source,cfg.geometry,radiusD);
 assert(isequal(b,input.shortSupportImport),'RAH:Short:Mapping','建网后试件映射已改变。');
 root=fileparts(mfilename('fullpath'));job=cfg.shortSupportJob;
 switch cfg.shortSupportAction
     case 'solve'
         assert(~isempty(job) && ~isfolder(job),'RAH:Short:Job','新算需要独立的新任务目录。');
-        runCM011Python({fullfile(root,'scripts','shortSupportTime65.py'),job},[job '.log'],@pulse,true);
+        script='shortSupportTime65.py';if radiusD==20,script='shortSupportOuter65.py';end
+        runCM011Python({fullfile(root,'scripts',script),job},[job '.log'],@pulse,true);
     case 'archive'
         assert(isempty(job),'RAH:Short:Job','读取发布归档的目录设置无效。');
     otherwise
         error('RAH:Short:Action','请在计算页选择新算或读取归档。');
 end
-grid=['time' boundary.branch];[result,stations,s]=loadShortSupportSurface(g,job,grid);
+grid=['time' boundary.branch];[result,stations,s]=loadShortSupportSurface(g,job,grid,radiusD);
 assert(strcmp(s.meshSHA256,b.meshSHA256) && strcmp(s.seedFrame,boundary.initialFrame) && ...
     strcmp(s.caseSHA256,boundary.caseSHA256) && s.elapsedSeconds==boundary.elapsedS && s.dtSeconds==boundary.dtS);
 % 模块二：面均压力、温度及方向按同一物理面取值；按导入面的实际面积折算热流密度。
@@ -57,6 +59,21 @@ report.nativePeakWm2=s.peakOutWm2;
 report.reverseAreaM2=sum(area(reverse));report.nearPeakAreaM2=sum(area(near));
 report.stationRMSE=s.stationRMSE;report.equivalentRelativeError=s.equivalentRelativeError;
 report.jointExperimentalAreaM2=s.jointExperimentalAreaM2;report.energy=s.energy;
+if radiusD==20
+    % 两个半径的面号、温界、物理时刻及步长逐一相配。差值沿用实际导入面积。
+    [wall,measurements,ref]=referenceForDifference(root,boundary.branch);
+    assert(ref.elapsedSeconds==s.elapsedSeconds && ref.dtSeconds==s.dtSeconds && ...
+        isequal(ref.condition,s.condition) && strcmp(ref.bodySHA256,s.bodySHA256) && ...
+        strcmp(ref.transferSHA256,s.transferSHA256) && isequal(wall.faceID,(1:n)') && isequal(wall.regionID(order),b.regionID) && ...
+        max(abs(wall.areaM2(order)-b.referenceAreaM2))<1e-17 && isequal(wall.wallInputK(order),result.hybridWallTemperatureK));
+    delta=w.heatFluxWm2-wall.fluxInWm2(order).*(b.referenceAreaM2./area);
+    result.shortSupportOuter=struct('fluxChangeWm2',delta,'gaugeChangePa',w.pressureGaugePa-wall.gaugePa(order), ...
+        'baseFrame',ref.frameSHA256,'baseMesh',ref.meshSHA256,'powerChangeW',s.outW-ref.energy.wallW);
+    assert(abs(area'*delta+result.shortSupportOuter.powerChangeW)<1e-10);
+    assert(isequal(stations.referenceFaceID,measurements.originalFaceID));
+    report.stations.baseNu=measurements.computedNu;
+    report.baseOutW=ref.energy.wallW;report.baseStationRMSE=ref.stationRMSE;report.baseEquivalentRelativeError=ref.equivalentRelativeError;
+end
 result.shortSupportAction=cfg.shortSupportAction;result.shortSupportJob=job;
 id=result.evidenceIdentity;id.reusedArchive=strcmp(cfg.shortSupportAction,'archive');
 id.sourceFrame.stlSHA256=b.source.sha256;id.sourceFrame.stlScaleToM=b.source.scale;
@@ -68,4 +85,23 @@ assert(strcmp(cm011FileSHA256(b.source.file),b.source.sha256),'RAH:Short:Source'
             progress(struct('status','running','message','双支管银球原生计算中'));
         end
     end
+end
+
+function [wall,stations,s]=referenceForDifference(root,branch)
+% 差分只读已绑定的基线两表，避免再次构建 32,480 面工作台快照及其方法列。
+cases=fullfile(root,'cases','short_sphere');p=readShortSupportTimePair(cases);
+file=fullfile(cases,['supportedTime65' upper(branch(1)) branch(2:end) '.zip']);
+assert(strcmp(cm011FileSHA256(file),p.([branch 'Archive'])));
+folder=tempname;mkdir(folder);cleanup=onCleanup(@()discardReference(folder)); %#ok<NASGU>
+unzip(file,folder);s=jsondecode(fileread(fullfile(folder,'summary.json')));
+assert(strcmp(s.frameSHA256,p.([branch 'Frame'])) && strcmp(s.meshSHA256,p.meshSHA256) && ...
+    strcmp(cm011FileSHA256(fullfile(folder,'wall.csv')),s.files.wall_csv) && ...
+    strcmp(cm011FileSHA256(fullfile(folder,'stations.csv')),s.files.stations_csv));
+wall=readtable(fullfile(folder,'wall.csv'));stations=readtable(fullfile(folder,'stations.csv'));
+end
+function discardReference(folder)
+for name={'summary.json','wall.csv','stations.csv','direction.csv'}
+    file=fullfile(folder,name{1});if isfile(file),delete(file);end
+end
+rmdir(folder);
 end
