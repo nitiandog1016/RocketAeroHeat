@@ -12,6 +12,7 @@ if ~isstruct(options)||~isscalar(options)
 end
 showWire=readFlag(options,'showWire',false);
 resetCamera=readFlag(options,'resetCamera',true);
+enableFaceProbe=readFlag(options,'enableFaceProbe',false);
 if ~(ischar(caption)&&isrow(caption))&&~(isstring(caption)&&isscalar(caption))
     error('RocketAeroHeat:GeometryView:Caption','几何标题必须是单行文本。');
 end
@@ -37,6 +38,8 @@ payload=struct('kind','aerothermal-geometry','schemaVersion',1, ...
     'vertices',double(V),'faces',double(F)-1,'caption',char(caption), ...
     'coordinateNote','SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例', ...
     'showWire',showWire,'resetCamera',resetCamera,'revision',revision);
+% 纯几何探针沿用现有三角形拾取；此开关只传回面号和交点。
+if enableFaceProbe,payload.enableFaceProbe=true;end
 state.payload=payload;state.revision=revision;state.rendered=[];state.error=[];
 view.html.UserData=state;view.html.Data=payload;
 end

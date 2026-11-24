@@ -96,6 +96,10 @@ renderEditor();sync();showGeometry(true);
         counts='尚无求解网格';
         if ~isempty(state.mesh),counts=sprintf('求解网格 %d 节点 / %d 面元',size(state.mesh.V,1),size(state.mesh.F,1));end
         inputSummary.Text=[counts newline 'SI · 主轴 X · 鼻尖 +X · 零攻角来流 −X'];
+        if isfield(state.rawMesh,'rfzRegions') && isempty(state.mesh)
+            inputSummary.Text=sprintf('DLR RFZ-REC · %d 个 CAD 面\n%d 个三角面 · %.4f m²', ...
+                height(state.rawMesh.rfzRegions),size(state.rawMesh.F,1),sum(state.rawMesh.area));
+        end
         if isShortSupport(),inputSummary.Text=sprintf('Short Test 65 · %d 个 STL 面\n支管沿 ±Y，来流沿 −X',size(state.rawMesh.F,1));end
         if isBead()
             counts=sprintf('B 型热敏珠 · %d 个原面',size(state.rawMesh.F,1));
@@ -198,7 +202,10 @@ renderEditor();sync();showGeometry(true);
                 if isSidewind(),caption=sprintf('侧吹全周体网 · %d 个周向间隔 · %d 个原生壁面',p.angularCells,p.wallFaces);end
             end
         end
-        updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2,'resetCamera',reset));
+        rfzProbe=isfield(m,'rfzRegions') && isempty(state.mesh);
+        if rfzProbe,caption='DLR RFZ-REC · 点击三角面查看 CAD 面号与面积';end
+        updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2, ...
+            'resetCamera',reset,'enableFaceProbe',rfzProbe));
     end
     function showResults()
         delete(findall(resultHost,'Tag','short-sphere-review'));fig.UserData.shortSphereReview=[];
@@ -248,6 +255,9 @@ renderEditor();sync();showGeometry(true);
                 controls.browse.Layout.Column=1;
                 controls.beadModel=button(grid,3,'选用 B 型热敏珠',@loadBeadModel);controls.beadModel.Layout.Column=2;
                 controls.load=button(grid,4,'加载当前模型',@loadInput);
+                controls.load.Layout.Column=1;
+                controls.rfzModel=button(grid,4,'打开 DLR RFZ-REC',@loadRFZ);
+                controls.rfzModel.Layout.Column=2;
                 controls.pca=button(grid,5,'PCA 对齐主轴',@pcaOrientation);
                 controls.flip=button(grid,6,'翻转鼻向（Y轴180°）',@flipOrientation);
                 controls.rx=numberField(grid,7,'绕 X 增量 / °',0,[-180 180]);
@@ -1087,6 +1097,24 @@ renderEditor();sync();showGeometry(true);
     end
 
 %% 模块七：真实模型输入及朝向确认，不以观察相机变化代替实际坐标变换。
+    function loadRFZ(~,~)
+        % 模块用途：首次准备作者几何，再从普通 STL 加载入口核对原面。
+        if state.busy || preparing,return;end
+        root=fileparts(mfilename('fullpath'));folder=fullfile(root,'outputs','rfz_rec_geometry');
+        stl=fullfile(folder,'RFZ-REC_m.stl');
+        try
+            if ~isfile(stl)
+                preparing=true;message('正在准备 DLR 作者的 RFZ-REC 几何…');
+                parent=fileparts(folder);if ~isfolder(parent),mkdir(parent);end
+                runCM011Python({fullfile(root,'scripts','prepareRFZGeometry.py')},[tempname(parent) '.log'],@drawnow);
+                preparing=false;
+            end
+            expected=jsondecode(fileread(fullfile(root,'cases','rfz_rec','geometry.json')));
+            assert(strcmp(cm011FileSHA256(stl),expected.stlSHA256), ...
+                'RAH:RFZ:Source','本地 RFZ-REC 文件与冻结输入不符。');
+            controls.file.Value=stl;controls.scale.Value=1;loadInput([],[]);
+        catch ex,preparing=false;if isgraphics(fig),showError(ex);end,end
+    end
     function modelEdited(~,~)
         if state.busy || preparing,return;end
         next=state.cfg;next.geometry.stlFile=controls.file.Value;next.geometry.scale=controls.scale.Value;
@@ -1106,6 +1134,8 @@ renderEditor();sync();showGeometry(true);
             preview=[];report=[];preparing=true;message('正在加载模型并核对SI尺度…');
             hash=cm011FileSHA256(next.geometry.stlFile);
             raw=quietCall(@()loadSTLMesh(next,true));raw=quietCall(@()calcFaceGeometry(raw));
+            regions=bindRFZGeometry(raw,next.geometry.stlFile,next.geometry.scale,hash);
+            if ~isempty(regions),raw.rfzRegions=regions;end
             assert(strcmp(hash,cm011FileSHA256(next.geometry.stlFile)),'RAH:STL:Changed','STL 读取期间发生改变，请重新加载。');
             [ok,stlFile]=fileattrib(next.geometry.stlFile);assert(ok,'无法定位导入文件。');
             state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'cfg',next, ...
@@ -1850,9 +1880,20 @@ renderEditor();sync();showGeometry(true);
         renderEditor();sync();showGeometry(true);message('已定位失败候选；当前计算输入保持，候选未被接收。');
     end
     function geometryMessage(src,event)
-        message=src.Data;geometryReceiver(src,event);
-        if isstruct(message) && isfield(message,'kind') && strcmp(message.kind,'geometry-face-probe')
-            probeMeshQuality(message);
+        data=src.Data;geometryReceiver(src,event);
+        if isstruct(data) && isfield(data,'kind') && strcmp(data.kind,'geometry-face-probe')
+            if isfield(state.rawMesh,'rfzRegions') && isempty(state.mesh) && ...
+                    getOption(src.UserData.payload,'enableFaceProbe',false) && ...
+                    isfield(data,'revision') && data.revision==src.UserData.revision && isfield(data,'faceIndex')
+                face=double(data.faceIndex)+1;mesh=state.rawMesh;
+                if isscalar(face) && isfinite(face) && face==fix(face) && face>=1 && face<=size(mesh.F,1)
+                    row=mesh.rfzRegions(find(face<=mesh.rfzRegions.lastFace,1),:);
+                    message(sprintf('原面 %d · CAD 面 %d · 三角面 %.7g m² · 本区 %.7g m²', ...
+                        face,row.cadFace,mesh.area(face),row.stlAreaM2));
+                end
+                return
+            end
+            probeMeshQuality(data);
         end
     end
     function probeMeshQuality(message)

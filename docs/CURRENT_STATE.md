@@ -1,10 +1,12 @@
 # 当前交接
 
-2026-11-24。Short Test 65 在球体输入 0.827123193 W 下求得壁温 **341.770414 K**，膜温 326.382429 K，k = 0.0282578503 W/(m·K)，比实验平均壁温低 11.157 K。球面放热 0.827228166 W，整件 1.460448272 W。32,480 面均有压力与热流，4,624 个球面采用量热平衡温度，管壁及端盖随球温给定。v341 新增几何覆盖 0 面、0 m²，总面积 0.000700423854 m²，联合实验验证 0 m²。[自洽膜温工况](validation/v341/RESULTS.md) · [本机三维页](../outputs/v341_validation/ui_final/workbench/index.html) · [固定膜温对照](validation/v340/RESULTS.md) · [给定壁温瞬时工况](validation/v339/RESULTS.md)
+2026-11-24。DLR RFZ-REC 完整 CAD 边界已接入输入模型页。204 个 CAD 面对应 130,044 个原三角面、740.729003 m²。几何探针和米制文件重开已核对。新增壁压与热流共同计算覆盖 0 面、0 m²，全部原面待求。EUCASS 候选有 1,407 个点距离散表面超过 50 mm，参考封盖与物理壁面的对应待查。[本版结果](validation/v342/RESULTS.md) · [原面分区](../cases/rfz_rec/cad_faces.csv)
 
-<!-- records:last_completed=v341 -->
+<!-- records:last_completed=v342 -->
 <!-- records:active=none -->
-<!-- records:base_commit=1723c29c161c983886ed12bd11f2b49a57a34f0d -->
+<!-- records:base_commit=ae3c1fc9131fb6b89f6d8cabcaac2624562a931e -->
+
+Short Test 65 保留 32,480 面的独立回归。球面量热输入 0.827123193 W，求得球温 341.770414 K，比实验均值低 11.157 K。[回归及工作台](validation/v341/RESULTS.md)
 
 20D 的两半步放热为 2.005187691 W，较 14D 减少 0.01221%。[远场对照](validation/v335/RESULTS.md)
 
@@ -24,7 +26,7 @@ v298 配对中，带线珠体含接头放热 11.94750 mW，相对同方法光滑
 
 v299 光滑控制完成了 6,624 原面的中段加密对照，放热由 12.30870 降至 10.62365 mW；中段与原结构网的额外放热缩小 71.98%。[原面分带](validation/v299/evidence/comparison.json) · [三维页](../outputs/v299_validation/midbody_ui01/workbench/index.html)
 
-从“选用 B 型热敏珠”进入网格页，选择“6 m/s · 360° 全周 · 56 层”，准备体网、确认边界后可新算、读取已完成计算或接续。第二套安装的任务 `d457118c-1e76-4618-ab24-5bcab5bfce09` 已完成全部 11 阶段，MATLAB 耗时 45.63 min。末步收支差 −0.9432 nW，热峰位于工作台面元 5211。初场冷态恢复与新算在同机两个安装目录验收。另一台电脑复算需安装固定依赖。[本机三维页](../outputs/v296_validation/desktop_final/outputs/thermistor_view_fb14f0d9-dab2-4f6f-84e0-e505ac1861cb/workbench/index.html) · [离线逐面核对](validation/v296/evidence/offline.json) · [安装方法](validation/v296/INSTALL.md)
+两套安装已验收光滑珠体的读档和新算；另一台电脑复算需要固定依赖。[离线逐面核对](validation/v296/evidence/offline.json) · [安装方法](validation/v296/INSTALL.md)
 
 v295 曾在一次独立壁反力读取中断，原读数终态未知，现场留存。同一工作台已验证从成功阶段接续这一任务，再读完整两半步。[中断与接续](validation/v295/RESULTS.md)
 
@@ -42,7 +44,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-接入同试件的 Short Test 63，使用其独立来流、球面功率和七站位置，验收第二个可选择的完整工况。[下一决定](validation/v341/NEXT_DECISION.md)
+核定 RFZ-REC 物理壁面与作者参考封盖的对应和工况边界，分别统计 CAD 分母与参考覆盖。[下一决定](validation/v342/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

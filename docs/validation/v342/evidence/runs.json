@@ -1,0 +1,177 @@
+{
+  "processes": {
+    "geometry01": {
+      "args": [
+        "D:\\anacondapython\\python.exe",
+        "E:\\RocketAeroHeat\\scripts\\prepareRFZGeometry.py",
+        "--out",
+        "E:\\RocketAeroHeat\\outputs\\rfz_rec_geometry"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 11.96900000000096,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 129064960,
+      "stopReason": null,
+      "livePids": []
+    },
+    "geometry02": {
+      "args": [
+        "D:\\anacondapython\\python.exe",
+        "E:\\RocketAeroHeat\\scripts\\prepareRFZGeometry.py",
+        "--out",
+        "E:\\RocketAeroHeat\\outputs\\v342_validation\\rebuild"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 11.671999999998661,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 128544768,
+      "stopReason": null,
+      "livePids": []
+    },
+    "reference01": {
+      "args": [
+        "D:\\anacondapython\\python.exe",
+        "E:\\RocketAeroHeat\\docs\\validation\\v342\\check_reference.py",
+        "E:\\RocketAeroHeat\\outputs\\rfz_rec_geometry\\RFZ-REC_m.stl",
+        "E:\\RocketAeroHeat\\outputs\\rfz_reference\\author_data_20261124\\files\\Aerodynamics\\Stage_1\\EUCASS_2023\\deg190",
+        "E:\\RocketAeroHeat\\outputs\\v342_validation\\reference.json"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 2.5930000000007567,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 84115456,
+      "stopReason": null,
+      "livePids": []
+    },
+    "ui01/window": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "addpath('docs/validation/v342');check_workbench('E:/RocketAeroHeat/outputs/v342_validation/ui01')"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 29.71900000000096,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 2206990336,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean01/window": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "restoredefaultpath;cd('E:/RocketAeroHeat/outputs/v342_validation/clean01/app');addpath('docs/validation/v342');check_workbench('E:/RocketAeroHeat/outputs/v342_validation/clean01')"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v342_validation\\clean01\\app",
+      "elapsedSeconds": 209.375,
+      "exitCode": 1,
+      "peakSampledRSSBytes": 1541718016,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean02/window": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "restoredefaultpath;cd('E:/RocketAeroHeat/outputs/v342_validation/clean02/app');addpath('docs/validation/v342');check_workbench('E:/RocketAeroHeat/outputs/v342_validation/clean02')"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v342_validation\\clean02\\app",
+      "elapsedSeconds": 106.75,
+      "exitCode": 1,
+      "peakSampledRSSBytes": 1512452096,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean03/gmsh": {
+      "args": [
+        "D:\\anacondapython\\python.exe",
+        "scripts/installGmshRuntime.py"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v342_validation\\clean03\\app",
+      "elapsedSeconds": 113.11000000000058,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 210550784,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean03/cad": {
+      "args": [
+        "D:\\anacondapython\\python.exe",
+        "-c",
+        "import sys;sys.path.insert(0,'scripts');from prepareRFZGeometry import source_file;print(source_file(None))"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v342_validation\\clean03\\app",
+      "elapsedSeconds": 83.56300000000192,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 48750592,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean03/window": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "restoredefaultpath;cd('E:/RocketAeroHeat/outputs/v342_validation/clean03/app');addpath('docs/validation/v342');check_workbench('E:/RocketAeroHeat/outputs/v342_validation/clean03')"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v342_validation\\clean03\\app",
+      "elapsedSeconds": 34.7029999999977,
+      "exitCode": 1,
+      "peakSampledRSSBytes": 2009731072,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean04/window": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "restoredefaultpath;cd('E:/RocketAeroHeat/outputs/v342_validation/clean04/app');addpath('docs/validation/v342');check_workbench('E:/RocketAeroHeat/outputs/v342_validation/clean04')"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v342_validation\\clean04\\app",
+      "elapsedSeconds": 41.21900000000096,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 2119598080,
+      "stopReason": null,
+      "livePids": []
+    }
+  },
+  "failedRuns": {
+    "clean01": {
+      "reason": "gmsh-truncated",
+      "windowLogSHA256": "c499cbb6acc554b122cfb33c78bff5243f970094fd4962c76b26bfd991c1e394",
+      "preparationLogSHA256": "8eed841a4574eb1ae5fc0870394db4dc0131cce032374101b02320fd4f343bd2"
+    },
+    "clean02": {
+      "reason": "step-read-timeout",
+      "windowLogSHA256": "811c7ed787c2e31ed590a2e1bb68d0c5620abb1e3510d3117fb850a82934db5d",
+      "preparationLogSHA256": "1000ae49a7104dca2eb332bae7919932a98948949094fdf3e6ac69c44611a1ad"
+    },
+    "clean03": {
+      "reason": "MATLAB-exportapp-error",
+      "windowLogSHA256": "b34e5b3e66beb7fa8221923d661c62aa0ceeb6351da10a1f7871cfe51cc33a9f",
+      "preparationLogSHA256": "d7c4b96698eab71cb943f5ed6127b584b0854829f9bb18fd5525637dc0a024f4"
+    }
+  },
+  "partialBytes": 22412528,
+  "partialSHA256": "b7b1d5c2ebd50199ba5eedba1776ced925d07dcd3d27ca161b8c83e1fdce8483",
+  "finalWheelBytes": 42235999,
+  "finalWheelSHA256": "7b36083bb410fa27c5d0e052929d1a9844a5b09169d66017b72b41aabd49d711",
+  "testedSourceSHA256": {
+    "bindRFZGeometry.m": "51bbd190f1f558850da3654734f43c686c2de6278d3264562b3978893eab5729",
+    "rocketAeroHeatWorkbench.m": "9fcff33f6e30ba454a015100a8cb475e1f43d7ea4a685d13418b3efae1070ee4",
+    "updateAerothermalGeometryView.m": "1ece1e70f1063a57f8e6b82bd546e7806fb4997b9a690e0073f76f6889966e85",
+    "web/geometry.js": "82aa2473cdc5c43d0c3ef037686e820d1e6f8243be626f730cd0c2f912a70075",
+    "scripts/installGmshRuntime.py": "08b2f57fcc084351afb10b6a37d4b29797b78757bd195b85dda53f75371a676a",
+    "scripts/prepareRFZGeometry.py": "abf6019c13b28a1deeedfd2263dc60d4e886f6628c47d1c833dc67fbe4e7d038",
+    "docs/validation/v342/check_workbench.m": "877901f2346beef63e93cabef8a39f20348ea82b4e0dff2fe89c6b43db3dd46e"
+  }
+}
