@@ -16,8 +16,13 @@ def advance(folder,start,exe,steps,release=False,capture=False,*,prepared=PREP,p
     names={"mesh.su2":prepared/"mesh.su2","wire_boundary.dat":prepared/("release.dat" if release else "profile.dat"),"initial_flow.csv":start}
     for name,path in names.items():os.link(path,folder/name)
     assert all(sha(folder/n)==s["files"][names[n].name] for n in ("mesh.su2","wire_boundary.dat"))
-    cfg=folder/"case.cfg";cfg.write_text(configuration(s["condition"],steps,release,"BOUNDED_SCALAR"),encoding="ascii")
-    if steps==200:assert sha(cfg)=="f1e0a615abb10c46560e1c446d5d8b61db9eac8d968aab748534fc1ca41a01cf"
+    cfg=folder/"case.cfg"
+    if "filmTransport" in s:
+        from shortSupportFilmProperties import native_text
+        cfg.write_text(native_text(s,steps,release),encoding="ascii")
+    else:
+        cfg.write_text(configuration(s["condition"],steps,release,"BOUNDED_SCALAR"),encoding="ascii")
+        if steps==200:assert sha(cfg)=="f1e0a615abb10c46560e1c446d5d8b61db9eac8d968aab748534fc1ca41a01cf"
     locks=[exe,cfg,*[folder/k for k in names],prepared/"prepared.json",CASE,plan,Path(__file__).resolve()]
     if capture:
         flag=folder/"capture.flag";flag.write_bytes(b"Short 65 endpoint\n");locks.append(flag)

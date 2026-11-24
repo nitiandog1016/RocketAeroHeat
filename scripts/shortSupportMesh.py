@@ -110,8 +110,10 @@ def audit_volume(folder, outer_radius=14):
                 minCellVolumeD3=lowest,minConeVolumeD3=cone,volumeD3=volume)
 
 
-def prepare(out,structured=False,split_near=False,split_sectors=False):
-    data,info=reference();case=read(CASE);s=condition(case);D=s["diameterM"]
+def prepare(out,structured=False,split_near=False,split_sectors=False,*,uniform_excess=None):
+    data,info=reference();case=read(CASE)
+    wall_k=None if uniform_excess is None else float(kelvin(case["airF"]))+uniform_excess
+    s=condition(case,wall_k=wall_k);D=s["diameterM"]
     out.mkdir(parents=True,exist_ok=False)
     wall,xy,cells2,far=section(info["tubeDiameterM"]/(2*D),info["endYM"]/D,structured,split_near)
     if split_sectors and (structured or not split_near):
@@ -157,10 +159,11 @@ def prepare(out,structured=False,split_near=False,split_sectors=False):
     group=np.tile(np.repeat(REGIONS,COUNTS),sectors)
     # 接头共享球面温界，管壁其余排与端盖给定相同赤道温度。
     tags=ids[:,:width];sphere_nodes=np.unique(tags[:,23:72])
-    eq=np.interp(90,case["angleDeg"],kelvin(case["surfaceF"]))
+    eq=np.interp(90,case["angleDeg"],kelvin(case["surfaceF"])) if wall_k is None else wall_k
     wall_t=np.full(len(wet),eq)
     angles=np.degrees(np.arctan2(np.linalg.norm(xyz[sphere_nodes,1:],axis=1),xyz[sphere_nodes,0]))
-    wall_t[np.searchsorted(wet,sphere_nodes)]=np.interp(angles,case["angleDeg"],kelvin(case["surfaceF"]))
+    if wall_k is None:
+        wall_t[np.searchsorted(wet,sphere_nodes)]=np.interp(angles,case["angleDeg"],kelvin(case["surfaceF"]))
     theta=(wall_t-s["airK"])/s["scalarUnitK"]
     for name,v in (("profile",theta),("release",np.zeros(len(theta)))):
         np.savetxt(out/(name+".dat"),np.c_[wet,1+theta,v],fmt=["%d","%.17g","%.17g"])
@@ -169,11 +172,11 @@ def prepare(out,structured=False,split_near=False,split_sectors=False):
     np.savetxt(out/"initial.csv",np.c_[np.arange(len(xyz)),xyz,state],delimiter=",",comments="",header=HEADER,fmt=["%d"]+["%.17g"]*9)
     np.savez_compressed(out/"mapping.npz",xyz=xyz,wet=wet,theta=theta,first=first,corners=corners,
                         nativeArea=area*D**2,group=group)
-    seal_prepared(out,split_near,split_sectors)
+    seal_prepared(out,split_near,split_sectors,wall_k=wall_k)
 
 
-def seal_prepared(out,split_near=False,split_sectors=False):
-    data,info=reference();case=read(CASE);s=condition(case);D=s["diameterM"]
+def seal_prepared(out,split_near=False,split_sectors=False,*,wall_k=None):
+    data,info=reference();case=read(CASE);s=condition(case,wall_k=wall_k);D=s["diameterM"]
     stats=audit_volume(out)
     with np.load(out/"mapping.npz") as z:
         xyz=z["xyz"];c=z["corners"];wet=z["wet"];area=z["nativeArea"];group=z["group"]
@@ -194,7 +197,7 @@ def seal_prepared(out,split_near=False,split_sectors=False):
     stats["transfer"]=transfer(out,data,s,stats)
     files=["mesh.su2","initial.csv","profile.dat","release.dat","mapping.npz","transfer.npz"]
     write_json(out/"prepared.json",dict(geometry=stats,caseSHA256=sha(CASE),supportedSHA256=BODY_HASH,
-               condition=s,equatorK=float(np.interp(90,case["angleDeg"],kelvin(case["surfaceF"]))),
+               condition=s,equatorK=float(np.interp(90,case["angleDeg"],kelvin(case["surfaceF"]))) if wall_k is None else wall_k,
                files={n:sha(out/n) for n in files}))
 
 
@@ -204,5 +207,8 @@ if __name__=="__main__":
     parser.add_argument("--outer",choices=("hybrid","structured"),default="hybrid")
     parser.add_argument("--split-near",action="store_true",help="将原五个近壁间隔全部对半")
     parser.add_argument("--split-sectors",action="store_true",help="在十层近壁网的每个旧扇区内增加中间射线")
+    parser.add_argument("--uniform-excess",type=float,help="用给定均匀超温生成网格与冷初场（K）")
     args=parser.parse_args()
-    out=args.output.resolve();out.relative_to(ROOT/"outputs");prepare(out,args.outer=="structured",args.split_near,args.split_sectors)
+    if args.uniform_excess is not None and not 20<=args.uniform_excess<=40:parser.error("等温试算超温须为 20–40 K")
+    out=args.output.resolve();out.relative_to(ROOT/"outputs")
+    prepare(out,args.outer=="structured",args.split_near,args.split_sectors,uniform_excess=args.uniform_excess)

@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v341 银球量热与膜温导热系数闭合](validation/v341/RESULTS.md) · [同面热流差及七站图](validation/v341/evidence/film.png) · [原生物性与全表面核对](validation/v341/evidence/comparison.json) · [下一项](validation/v341/NEXT_DECISION.md)。
+
 - [v340 双支管银球的量热平衡壁温及全表面解](validation/v340/RESULTS.md) · [球温与七站对照图](validation/v340/evidence/calorimetry.png) · [三档原生计算复核](validation/v340/evidence/comparison.json) · [下一项](validation/v340/NEXT_DECISION.md)。
 
 - [v339 双支管银球在 10.262726 ms 的全表面瞬时解](validation/v339/RESULTS.md) · [同面早晚对照图](validation/v339/evidence/later.png) · [原场重建](validation/v339/evidence/comparison.json) · [下一项](validation/v339/NEXT_DECISION.md)。

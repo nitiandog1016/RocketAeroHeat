@@ -27,7 +27,7 @@ BASE_FRAME="c23c9ca1beb024105c600642f3fb016c9b7077599c8cecff227eb6d3ab0dbe63"
 TRANSFER=DATA/"supportedAngularTransfer65.npz"
 
 
-def sources(job):
+def sources(job,plan=PLAN,*,allow_bootstrap=True):
     """核对稳态父场及驱动。新安装从现有项目入口建立相同试件的本地依赖。"""
     prep=BASE/"prepared01";driver=BASE/"build01";steady=BASE/"run01";release=DRIVER/"wire.exe"
     legacy=all(p.is_file() for p in (prep/"prepared.json",driver/"build.json",driver/"shared_process.json",steady/"thermal.json",release))
@@ -48,6 +48,7 @@ def sources(job):
             for file in ("build.json","CSpeciesSolver_process.json","CIncEulerSolver_process.json","shared_process.json"):
                 assert records.read("build01/"+file)==(driver/file).read_bytes()
     else:
+        if not allow_bootstrap:return None
         from shortSupportFirstRun import inputs
         prep,native,steady,_=inputs(job);driver=native/"steady";release=driver/"wire.exe"
         assert sha(release)==read(driver/"build.json")["files"]["wire.exe"]
@@ -65,15 +66,19 @@ def sources(job):
     assert sha(TRANSFER)==read(DATA/"supportedAngular65.json")["transferSHA256"]
     write_json(job/"source.json",dict(prepared=str(prep),preparedSHA256=PREP_HASH,frame=str(state),frameSHA256=sha(state),
         buildSHA256=sha(driver/"build.json"),engineSHA256=sha(engine),releaseSHA256=sha(release),caseSHA256=sha(CASE),
-        transferSHA256=sha(TRANSFER),thermalSHA256=sha(steady/"thermal.json"),planSHA256=sha(PLAN),
+        transferSHA256=sha(TRANSFER),thermalSHA256=sha(steady/"thermal.json"),planSHA256=sha(plan),
         uniformContractSHA256=sha(PLAN.with_name("NATIVE.md"))))
     return prep,state,engine,release
 
 
-def prepare(directory,base,frame,excess):
+def prepare(directory,base,frame,excess,*,film=False,seed_excess=None):
     """为本次试算写独立温界、面映射中的壁温和全体初值；原网和几何权重只读复用。"""
     directory.mkdir()
     spec=read(base/"prepared.json");condition=spec["condition"]
+    if film:
+        from shortSupportFilmProperties import film_state
+        condition,spec["filmTransport"]=film_state(read(CASE),excess)
+        spec["condition"]=condition
     theta=excess/condition["scalarUnitK"];wall=condition["airK"]+excess
     for name in ("mesh.su2","transfer.npz"):os.link(base/name,directory/name)
     with np.load(base/"mapping.npz") as grid:data=dict(grid)
@@ -82,15 +87,28 @@ def prepare(directory,base,frame,excess):
     for name,scalar in (("profile.dat",theta),("release.dat",0.)):
         np.savetxt(directory/name,np.column_stack((wet,np.full(len(wet),1+theta),np.full(len(wet),scalar))),fmt=["%d","%.17g","%.17g"])
     values=np.loadtxt(frame,skiprows=1,delimiter=",",usecols=range(10))
-    np.testing.assert_array_equal(values[:,1:4],data["xyz"]);np.testing.assert_allclose(values[wet,9],previous,rtol=0,atol=2e-14)
-    values[:,9]*=theta/max(previous)
+    np.testing.assert_array_equal(values[:,1:4],data["xyz"])
+    if film and seed_excess is None:
+        # 历史场只提供压力和速度，热初值完全由环境和本次温界生成。
+        values[:,8]=1-298.15
+        values[:,9]=0.
+        values[wet,8]+=theta
+    elif film:
+        np.testing.assert_allclose(values[wet,9],seed_excess/condition["scalarUnitK"],rtol=0,atol=2e-14)
+        ratio=excess/seed_excess
+        values[:,8]=(1-298.15)+(values[:,8]-(1-298.15))*ratio
+        values[:,9]*=ratio
+    else:
+        np.testing.assert_allclose(values[wet,9],previous,rtol=0,atol=2e-14)
+        values[:,9]*=theta/max(previous)
+        values[wet,8]+=theta-previous
     values[wet,9]=theta
-    values[wet,8]+=theta-previous
     assert np.isfinite(values).all() and values[:,9].min()>=-1e-12 and values[:,9].max()<=theta+1e-12
     with frame.open("r",encoding="ascii") as f:header=f.readline().strip()
     np.savetxt(directory/"initial.csv",values,fmt=["%d"]+["%.17g"]*9,delimiter=",",header=header,comments="")
-    spec.update(equatorK=wall,temperatureBoundary="uniform-calorimetry-trial",basePreparedSHA256=PREP_HASH,
+    spec.update(equatorK=wall,temperatureBoundary="uniform-calorimetry-trial",basePreparedSHA256=sha(base/"prepared.json"),
                 parentFrame=sha(frame),uniformExcessK=excess)
+    if film:spec["initialSourceExcessK"]=seed_excess
     spec["files"]={name:sha(directory/name) for name in spec["files"]}
     write_json(directory/"prepared.json",spec)
 
@@ -107,13 +125,14 @@ def second_surface(work,prep,dest,thermal):
     return project_surface(dest,prep,TRANSFER,sha(TRANSFER),state,nodeW,thermal["late"]["wallW"])
 
 
-def trial(job,name,excess,inputs):
+def trial(job,name,excess,inputs,*,film=False,seed_excess=None,plan=PLAN):
     base,frame,engine,release=inputs
-    directory=job/name;directory.mkdir();prep=directory/"prepared";prepare(prep,base,frame,excess)
+    directory=job/name;directory.mkdir();prep=directory/"prepared"
+    prepare(prep,base,frame,excess,film=film,seed_excess=seed_excess)
     engine=build_uniform(directory/"driver",engine.parent,excess/read(prep/"prepared.json")["condition"]["scalarUnitK"])
     work=directory/"run";work.mkdir();seed=prep/"initial.csv";trend=[]
-    options=dict(prepared=prep,plan=PLAN)
-    for index in range(1,6):
+    options=dict(prepared=prep,plan=plan)
+    for index in range(1,9 if film else 6):
         stage=work/f"steady{index:02d}"
         atomic_write_json(job/"progress.json",dict(stage=name,message=f"{name}，均匀超温 {excess:.6f} K，第 {index} 段"))
         print(name,stage.name,excess,flush=True)
@@ -135,6 +154,9 @@ def trial(job,name,excess,inputs):
                 earlyRegionW=[r["outW"] for r in early["regions"]],lateRegionW=[r["outW"] for r in late["regions"]],
                 earlyPeak=early["peakOutFace"],latePeak=late["peakOutFace"],earlyPeakWm2=early["peakOutWm2"],latePeakWm2=late["peakOutWm2"],
                 thermalSHA256=sha(work/"thermal.json"),surfaceSHA256=sha(directory/"surface/surface.zip"))
+    if film:
+        result["filmTransport"]=read(prep/"prepared.json")["filmTransport"]
+        result["parentFrame"]=sha(frame)
     write_json(directory/"trial.json",result)
     print(name,"sphere W",result["earlyRegionW"][0],flush=True)
     return result

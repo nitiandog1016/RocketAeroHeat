@@ -1,12 +1,15 @@
-function check_power_ui(out,mode,job)
+function check_power_ui(out,mode,job,heatMode)
 % 模块一：从实际 STL 完成同一侧栏的网格、热边界和计算结果读取。
+if nargin<4,heatMode='power';end
+film=strcmp(heatMode,'film');
 fig=rocketAeroHeatWorkbench();closeFig=onCleanup(@()delete(fig)); %#ok<NASGU>
 c=fig.UserData.controls;c.file.Value=fullfile(out,'input.stl');c.scale.Value=1;press(c.load);
 press(fig.UserData.controls.confirm);choose(fig.UserData.controls.meshBackend,'shortSupport65');press(fig.UserData.controls.generate);
-press(fig.UserData.controls.nextBoundary);choose(fig.UserData.controls.shortHeatBoundary,'power');press(fig.UserData.controls.confirm);
+press(fig.UserData.controls.nextBoundary);choose(fig.UserData.controls.shortHeatBoundary,heatMode);press(fig.UserData.controls.confirm);
 c=fig.UserData.controls;ready=fig.UserData.workflowState;
 frozen=aeroHeatWorkflowState('beginSolve',ready,struct('shortSupportAction','solve'));
 assert(strcmp(frozen.frozenInputs.cfg.shortSupportBoundary.branch,'power') && ~isempty(frozen.frozenInputs.cfg.shortSupportJob));
+if film,assert(strcmp(frozen.frozenInputs.cfg.shortSupportBoundary.propertyModel,'candidateFilm'));end
 if strcmp(mode,'archive'),press(c.readShort);else,c.shortDirectory.Value=job;press(c.reopenShort);end
 s=fig.UserData.workflowState;assert(strcmp(s.status,'solved'),'%s',fig.UserData.status.Text);
 m=s.result;r=fig.UserData.caseReport;ui=fig.UserData.webUI;
@@ -28,24 +31,36 @@ for id=1:5
     if id==1,ev.selectField('wallSolved');else,ev.selectField('wallInput');end
     ev.inspectFace(face,[]);probe=ev.getState();assert(probe.selectedFaceID==face);
 end
-ev.selectField('heatFlux');x=m.shortSupportImport.translationM(1)+.00137;ev.setSectionX(x);timer=tic;
+field='heatFlux';
+if film
+    field='filmHeatChange';
+    assert(isequal(fig.UserData.controls.stations.Data,r.stations{:,{'angleDeg','reportedNu','fixedFilmNu','computedNu'}}));
+    values=get(field);[~,id]=max(abs(values.values));ev.selectField(field);ev.inspectFace(id,[]);probe=ev.getState();assert(probe.selectedFaceID==id);
+end
+ev.selectField(field);x=m.shortSupportImport.translationM(1)+.00137;ev.setSectionX(x);timer=tic;
 while toc(timer)<45
     drawnow;cut=ev.getSection();
-    if isstruct(cut) && isfield(cut,'csv') && strcmp(cut.fieldKey,'heatFlux') && abs(cut.x-x)<1e-13,break;end
+    if isstruct(cut) && isfield(cut,'csv') && strcmp(cut.fieldKey,field) && abs(cut.x-x)<1e-13,break;end
     pause(.12);
 end
-assert(isstruct(cut) && isfield(cut,'csv') && strcmp(cut.fieldKey,'heatFlux') && abs(cut.x-x)<1e-13);
+assert(isstruct(cut) && isfield(cut,'csv') && strcmp(cut.fieldKey,field) && abs(cut.x-x)<1e-13);
 ev.exportSectionTo(fullfile(out,'section.csv'));rec=ev.exportWallPairTo(fullfile(out,'wall.csv'));assert(rec.rows==32480);
 exportAerothermalWeb(m,fullfile(out,'workbench'));
 proof=struct('mode',mode,'frame',m.evidenceIdentity.sourceFrame.sha256,'targetW',s.freestream.targetSphereW, ...
     'temperatureK',m.shortSupportPower.temperatureK,'outW',-r.wholeSurfaceHeatPowerW,'regionsW',[r.regions.outW], ...
     'faces',gl.faces,'pixels',gl.visiblePixelSamples,'peakFile',r.peakOutFace,'peakReference',r.peakReferenceFaceID);
-press(fig.UserData.workflowButtons(3));choose(fig.UserData.controls.shortHeatBoundary,'temperature');press(fig.UserData.controls.confirm);
+other='temperature';if film,other='power';proof.filmTransport=m.shortSupportPower.filmTransport;end
+press(fig.UserData.workflowButtons(3));choose(fig.UserData.controls.shortHeatBoundary,other);press(fig.UserData.controls.confirm);
 assert(isempty(fig.UserData.workflowState.result));ready=fig.UserData.workflowState;
 rejected=false;try,aeroHeatWorkflowState('beginSolve',ready,struct('shortSupportAction','reopen','runDirectory',job));
 catch ex,rejected=strcmp(ex.identifier,'RAH:Short:Incomplete') || strcmp(ex.identifier,'RAH:Short:Job');end
 assert(rejected);press(fig.UserData.controls.readShort);assert(strcmp(fig.UserData.workflowState.status,'solved'));
-assert(~isfield(fig.UserData.workflowState.result,'shortSupportPower'));proof.oldBoundaryRestored=true;
+if film
+    assert(~isfield(fig.UserData.workflowState.result.shortSupportPower,'filmTransport'));
+else
+    assert(~isfield(fig.UserData.workflowState.result,'shortSupportPower'));
+end
+proof.oldBoundaryRestored=true;
 f=fopen(fullfile(out,'ui.json'),'w','n','UTF-8');assert(f>=0);close=onCleanup(@()fclose(f)); %#ok<NASGU>
 fprintf(f,'%s\n',jsonencode(proof,'PrettyPrint',true));
 end

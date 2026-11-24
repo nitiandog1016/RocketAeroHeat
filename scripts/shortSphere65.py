@@ -24,8 +24,9 @@ def conductivity(t):
     return .0241*(t/273.15)**1.5*(273.15+194)/(t+194)
 
 
-def condition(c):
-    d=c["diameterIn"]*.0254;u=c["speedFtS"]*.3048;t=kelvin(c["airF"]);tw=kelvin(c["meanSurfaceF"])
+def condition(c,*,wall_k=None):
+    d=c["diameterIn"]*.0254;u=c["speedFtS"]*.3048;t=kelvin(c["airF"])
+    tw=kelvin(c["meanSurfaceF"]) if wall_k is None else wall_k
     p=c["pressureLbfFt2"]*4.4482216152605/.3048**2;y=c["waterMassFraction"]
     rho=p/(t*((1-y)*287.05+y*461.52));cp=(1-y)*1006+y*1860
     k=conductivity((t+tw)/2);re=c["reynoldsFree"]

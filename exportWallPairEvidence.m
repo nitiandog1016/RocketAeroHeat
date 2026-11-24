@@ -38,6 +38,13 @@ if isfield(data,'thermistorImport') || isfield(data,'shortSupportImport')
             t.wall_temperature_role=repmat("支管或端盖随球温给定",n,1);t.wall_temperature_role(isfinite(f.values))="球体量热平衡温度";
             t.wall_temperature_method=repmat("补偿支管及端盖与银球等温的边界假设",n,1);
             t.wall_temperature_method(isfinite(f.values))="两档原生球面功率作割线插值，第三个稳态解按球面功率独立复核";
+            if isfield(c,'filmTransport')
+                t.wall_temperature_method(isfinite(f.values))="每次更新候选膜温、导热系数及 Pe，以两端点的实际球面功率闭合";
+                t.film_temperature_K=repmat(c.filmTransport.filmK,n,1);t.transport_k_W_mK=repmat(c.filmTransport.kWmK,n,1);
+                t.peclet=repmat(c.filmTransport.pe,n,1);d=data.fields(strcmp({data.fields.key},'filmHeatChange'));
+                t.delta_fixed_film_flux_W_m2=compose("%.17g",d.values(:));
+                t.fixed_film_frame_sha256=repmat(string(data.shortSupportFilmDifference.baseFrame),n,1);
+            end
         else
             t.physical_time_s=repmat(data.resultCondition.elapsedPhysicalTimeS,n,1);
             t.physical_step_s=repmat(data.resultCondition.physicalStepSizeS,n,1);

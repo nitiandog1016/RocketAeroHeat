@@ -1,7 +1,8 @@
 function frame=shortSupportJobFrame(folder,binding,boundary)
 if strcmp(boundary.branch,'power')
-    % 量热工况由三个稳态任务绑定，实际候选初场和收敛端点来自第三个任务。
-    [p,~,seal]=readShortSupportPowerCase(folder);
+    % 量热工况取最终满足球面功率容差的候选，记录该候选的初场和收敛端点。
+    model='fixedFilm';if isfield(boundary,'propertyModel'),model=boundary.propertyModel;end
+    [p,~,seal]=readShortSupportPowerCase(folder,model);
     assert(strcmp(p.source.transferSHA256,binding.transferSHA256) && p.targetSphereW==boundary.targetSphereW);
     frame=struct('initial',p.balance.initialSHA256,'terminal',p.balance.earlyFrame,'receipt',seal);return;
 end

@@ -1,16 +1,17 @@
-function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution,radiusD,target)
+function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution,radiusD,target,propertyModel)
 % 模块一：核对同一几何、温界、收敛端点和五区交叠文件，从存档或新算目录取数。
 if nargin<2,job='';end
 if nargin<3,resolution='coarse';end
 if nargin<4,radiusD=14;end
 if nargin<5,target=.25;end
+if nargin<6,propertyModel='fixedFilm';end
 root=fileparts(mfilename('fullpath'));cases=fullfile(root,'cases','short_sphere');
 timed=ismember(resolution,{'timefull','timehalf'});
 transferName='supportedTransfer65.npz';
 powerMode=strcmp(resolution,'power');
 if timed || powerMode || strcmp(resolution,'angular'),transferName='supportedAngularTransfer65.npz';end
 if powerMode
-    [cal,archive]=readShortSupportPowerCase(job);
+    [cal,archive]=readShortSupportPowerCase(job,propertyModel);
 elseif timed
     branch=resolution(5:end);
     if isempty(job)
@@ -119,6 +120,13 @@ if powerMode
         'supportW',sum([s.regions(2:end).outW]),'temperatureK',cal.temperatureK,'measuredMeanK',(experiment.meanSurfaceF-32)*5/9+273.15);
     mesh.evidenceIdentity.scope=sprintf('Short 65 名义等温银球，球面量热功率反求壁温。两管和端盖同温并独立供热。准稳态层流，沿用实验平均表温所定膜温导热系数 %.8f W/(m·K)。',c.kFilm);
     mesh.hybridCondition.caseLabel='Short Test 65 · 球体量热功率 · 准稳态';
+    if strcmp(propertyModel,'candidateFilm')
+        f=cal.balance.filmTransport;
+        assert(abs(c.rho*c.cp*c.speedMps*c.diameterM/f.kWmK/f.pe-1)<1e-12 && c.pe==f.pe && c.kFilm==f.kWmK);
+        mesh.shortSupportPower.filmTransport=f;
+        mesh.evidenceIdentity.scope=sprintf('Short 65 名义等温银球与同温补偿支管。按候选壁温更新膜温，最终 %.6f K，k %.9f W/(m·K)，Pe %.6f。准稳态层流。',f.filmK,f.kWmK,f.pe);
+        mesh.hybridCondition.caseLabel='Short Test 65 · 量热功率与膜温自洽 · 准稳态';
+    end
 end
 if ~isempty(later),mesh.shortSupportTemporal=readShortSupportTimeDifference(job,cases,branch,pair,s);end
 if radiusD==14 && timed && (target==1 || strcmp(resolution,'timehalf'))

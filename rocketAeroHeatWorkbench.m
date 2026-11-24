@@ -438,11 +438,14 @@ renderEditor();sync();showGeometry(true);
                     choices={'两个半步','一个整步'};offset=0;
                     if getOption(state.cfg,'shortSupportRadiusD',14)==14
                         mode='temperature';if strcmp(b.branch,'power'),mode='power';end
-                        controls.shortHeatBoundary=choice(grid,1,'热边界',{'给定壁温 · 瞬时','球体量热功率 · 准稳态'},{'temperature','power'},mode);
+                        if isfield(b,'propertyModel') && strcmp(b.propertyModel,'candidateFilm'),mode='film';end
+                        controls.shortHeatBoundary=choice(grid,1,'热边界',{'给定壁温 · 瞬时','球体量热 · 随壁温更新物性','球体量热 · 固定膜温对照'},{'temperature','film','power'},mode);
                         controls.shortHeatBoundary.ValueChangedFcn=@boundaryEdited;
-                        if strcmp(mode,'power')
+                        if any(strcmp(mode,{'power','film'}))
                             tip(grid,3,sprintf('外露银球放热 %.9f W · Re %g\n来流 %.6f m/s · %.5f K',b.targetSphereW,b.reynolds,-b.velocityMps(1),b.airK));
-                            tip(grid,6,'球面功率决定均匀壁温。支管及端盖假定与球同温，由独立热源供热。');
+                            note='沿用实验平均表温所定膜温。';
+                            if strcmp(mode,'film'),note='用每个候选壁温和来流温度计算膜温，更新导热系数与 Pe。';end
+                            msg=tip(grid,6,[note '支管及端盖取球温并独立供热。']);msg.Layout.Row=[6 8];
                             controls.confirm=button(grid,10,'确认量热功率和来流',@confirmBoundary);
                             sync();return;
                         end
@@ -645,7 +648,7 @@ renderEditor();sync();showGeometry(true);
                     end
                     if strcmp(b.branch,'power')
                         controls.readShort.Text='读取量热稳态归档';controls.run.Text='按球体功率计算壁温和全表面场';
-                        tip(grid,3,sprintf('外露银球放热 %.9f W。独立计算两个括区温度及反求温度处的原生场。',b.targetSphereW));
+                        note=tip(grid,3,sprintf('外露银球放热 %.9f W。以实际稳态解核对括区与候选。',b.targetSphereW));note.Layout.Row=[3 4];
                     else
                         tip(grid,3,sprintf('同刻 %.6f ms · 当前步长 %.6f ms。%s',1e3*b.elapsedS,1e3*b.dtS,info));
                     end
@@ -758,6 +761,13 @@ renderEditor();sync();showGeometry(true);
                         cal=state.result.shortSupportPower;
                         a=tip(grid,1,sprintf('%s · 准稳态 · %d / %d 面\n银球反求壁温 %.5f K · 实验平均 %.5f K',origin,report.jointComputedFaceCount,report.faceCount,cal.temperatureK,cal.measuredMeanK));a.Layout.Row=[1 2];
                         peakNote=tip(grid,4,sprintf('球面放热 %.9f W · 支管和端盖 %.9f W\n热峰 STL #%d · 联合实验验证 0 m²',cal.sphereW,cal.supportW,report.peakOutFace));peakNote.Layout.Row=[4 5];
+                        if isfield(cal,'filmTransport')
+                            f=cal.filmTransport;
+                            filmNote=tip(grid,3,sprintf('膜温 %.4f K · Pe %.4f\n导热系数 %.8f W/(m·K)',f.filmK,f.pe,f.kWmK));
+                            filmNote.Layout.Row=[3 4];peakNote.Layout.Row=[5 6];
+                            peakNote.Text=sprintf('球面 %.9f W · 支管及端盖 %.9f W\n文件网热峰 %d 面 · 代表 STL #%d（参考 #%d）',cal.sphereW,cal.supportW, ...
+                                numel(report.peakFileTies),report.peakOutFace,report.peakReferenceFaceID);
+                        end
                     else
                         tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
                         peakNote=tip(grid,4,sprintf('导入网热峰 #%d · 参考网热峰 #%d 对应 STL #%d\n反向区 %.4f mm² · 逐面联合实验验证 0 m²',report.peakOutFace,report.nativePeakReferenceFaceID,report.nativePeakFileFaceID,1e6*report.reverseAreaM2));
@@ -765,6 +775,10 @@ renderEditor();sync();showGeometry(true);
                     controls.stations=uitable(grid,'RowName',{},'ColumnName',{'极角 / °','STL 面','实验 Nu','计算 Nu'}, ...
                         'Data',report.stations{:,{'angleDeg','fileFaceID','reportedNu','computedNu'}});
                     controls.stations.Layout.Row=[7 12];controls.stations.Layout.Column=[1 2];
+                    if ismember('fixedFilmNu',report.stations.Properties.VariableNames)
+                        controls.stations.ColumnName={'极角 / °','实验 Nu','固定膜温','更新膜温'};
+                        controls.stations.Data=report.stations{:,{'angleDeg','reportedNu','fixedFilmNu','computedNu'}};
+                    end
                     controls.export=button(grid,13,'导出完整离线工作台',@exportCase);
                     controls.filePeak=button(grid,14,'定位导入网热峰',@(~,~)inspectShortPeak(report.peakOutFace));
                     controls.nativePeak=button(grid,15,'定位参考网热峰',@(~,~)inspectShortPeak(report.nativePeakFileFaceID));
@@ -1219,8 +1233,9 @@ renderEditor();sync();showGeometry(true);
     function next=boundaryConfiguration()
         next=state.cfg;
         if isShortSupport()
-            if isfield(controls,'shortHeatBoundary') && strcmp(controls.shortHeatBoundary.Value,'power')
-                next.shortSupportBoundary=shortSupportImportBoundary('power',14);return;
+            if isfield(controls,'shortHeatBoundary') && any(strcmp(controls.shortHeatBoundary.Value,{'power','film'}))
+                model='fixedFilm';if strcmp(controls.shortHeatBoundary.Value,'film'),model='candidateFilm';end
+                next.shortSupportBoundary=shortSupportImportBoundary('power',14,.25,model);return;
             end
             target=.25;if isfield(controls,'shortTarget'),target=controls.shortTarget.Value;end
             branch='half';if isfield(controls,'shortBranch'),branch=controls.shortBranch.Value;end

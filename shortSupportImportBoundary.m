@@ -1,9 +1,11 @@
-function [b,pair]=shortSupportImportBoundary(branch,radiusD,target)
+function [b,pair]=shortSupportImportBoundary(branch,radiusD,target,propertyModel)
 % 模块用途：从已验收的时间层和试验原表生成唯一的银球边界与物理时刻。
 assert(any(strcmp(branch,{'full','half','power'})),'RAH:Short:Branch','请选择已登记的试件热边界。');
 folder=fullfile(fileparts(mfilename('fullpath')),'cases','short_sphere');
 if nargin<2,radiusD=14;end
 if nargin<3,target=.25;end
+if nargin<4,propertyModel='fixedFilm';end
+assert(strcmp(propertyModel,'fixedFilm') || (strcmp(branch,'power') && strcmp(propertyModel,'candidateFilm')),'RAH:Short:Boundary','物性模式与热边界不符。');
 pair=readShortSupportTimePair(folder,radiusD,target);file=fullfile(folder,'test65.json');
 assert(strcmp(cm011FileSHA256(file),pair.caseSHA256));
 s=jsondecode(fileread(file));c=pair.condition;
@@ -12,6 +14,7 @@ if strcmp(branch,'power')
     assert(radiusD==14 && target==.25,'RAH:Short:Boundary','量热稳态采用 14D 体网。');
     b=struct('branch',branch,'velocityMps',[-c.speedMps 0 0],'airK',c.airK,'airPa',c.airPa, ...
         'reynolds',c.re,'targetSphereW',s.observedBtuS*1055.05585262/s.supportAreaFactor,'caseSHA256',pair.caseSHA256);
+    if strcmp(propertyModel,'candidateFilm'),b.propertyModel=propertyModel;end
     return;
 end
 e=pair.([branch 'Energy']);

@@ -2,7 +2,8 @@ function [result,boundary,report]=runShortSupportImportedCase(input,cfg,progress
 % 模块一：核对用户确认的文件、面网、温界和所选时间层，然后调用试件原生入口。
 radiusD=14;if isfield(cfg,'shortSupportRadiusD'),radiusD=cfg.shortSupportRadiusD;end
 target=.25;if isfield(cfg.shortSupportBoundary,'targetDU'),target=cfg.shortSupportBoundary.targetDU;end
-boundary=shortSupportImportBoundary(cfg.shortSupportBoundary.branch,radiusD,target);
+model='fixedFilm';if isfield(cfg.shortSupportBoundary,'propertyModel'),model=cfg.shortSupportBoundary.propertyModel;end
+boundary=shortSupportImportBoundary(cfg.shortSupportBoundary.branch,radiusD,target,model);
 powerMode=strcmp(boundary.branch,'power');
 assert(isequal(cfg.shortSupportBoundary,boundary),'RAH:Short:Boundary','当前设置与 Test 65 的冻结工况不符。');
 [b,g]=bindShortSupportSTL(input,input.shortSupportImport.source,cfg.geometry,radiusD);
@@ -16,6 +17,7 @@ switch cfg.shortSupportAction
         script='shortSupportTime65.py';if radiusD==20,script='shortSupportOuter65.py';end
         if target==1,script='shortSupportLater65.py';end
         if powerMode,script='shortSupportPower65.py';end
+        if strcmp(model,'candidateFilm'),script='shortSupportFilm65.py';end
         args={fullfile(root,'scripts',script),job};
         if target==1 && isfield(cfg,'shortSupportSourceJob') && ~isempty(cfg.shortSupportSourceJob)
             args=[args,{'--from-job',cfg.shortSupportSourceJob}];
@@ -30,9 +32,9 @@ switch cfg.shortSupportAction
         error('RAH:Short:Action','请在计算页选择新算或读取归档。');
 end
 grid=['time' boundary.branch];if powerMode,grid='power';end
-[result,stations,s]=loadShortSupportSurface(g,job,grid,radiusD,target);
+[result,stations,s]=loadShortSupportSurface(g,job,grid,radiusD,target,model);
 if powerMode
-    cal=readShortSupportPowerCase(job);seed=cal.balance.initialSHA256;
+    cal=readShortSupportPowerCase(job,model);seed=cal.balance.initialSHA256;
 else
     seed=boundary.initialFrame;
 end
@@ -90,6 +92,12 @@ for j=1:numel(regions)
     regions(j).minFluxIn=low;regions(j).maxFluxIn=max(q);regions(j).outW=outward;regions(j).areaM2=sum(area(faces));
 end
 [peak,face]=max(-w.heatFluxWm2);near=find(-w.heatFluxWm2>=.99*peak);
+if strcmp(model,'candidateFilm')
+    % 相同的文件网峰值保留全部对应面，按参考面号选代表面，避免反序导入改变定位。
+    ties=find(-w.heatFluxWm2==peak);
+    [report.peakReferenceTies,orderOfTies]=sort(order(ties));
+    report.peakFileTies=ties(orderOfTies);face=report.peakFileTies(1);
+end
 stations.referenceFaceID=stations.originalFaceID;stations.fileFaceID=inverse(stations.originalFaceID);
 stations=removevars(stations,'originalFaceID');stations.faceMeanFluxInWm2=w.heatFluxWm2(stations.fileFaceID);
 if ismember('gradientNu',stations.Properties.VariableNames),result.shortSupportStationTable=stations;end
@@ -108,6 +116,25 @@ if powerMode
     report.energy=s.thermal;
     report.stations.powerFrameSHA256=repmat(string(s.frameSHA256),height(stations),1);
     report.stations.method=repmat("同态释放壁反力和逐边修正；用反求球温计算当地导热系数与 Nu",height(stations),1);
+    if strcmp(model,'candidateFilm')
+        % 固定物性参考只在主解完成后取数；按文件面序和实际面面积比较两种膜温处理。
+        [reference,archive]=readShortSupportPowerCase('');
+        temp=tempname;mkdir(temp);clean=onCleanup(@()discardReference(temp)); %#ok<NASGU>
+        unzip(archive,temp);baseWall=readtable(fullfile(temp,'wall.csv'));baseStations=readtable(fullfile(temp,'stations.csv'));
+        baseSummary=jsondecode(fileread(fullfile(temp,'summary.json')));
+        assert(strcmp(baseSummary.frameSHA256,reference.balance.earlyFrame) && strcmp(baseSummary.thermal.meshSHA256,s.thermal.meshSHA256) && ...
+            strcmp(baseSummary.transferSHA256,s.transferSHA256) && reference.targetSphereW==boundary.targetSphereW && ...
+            isequal(rmfield(baseSummary.condition,{'kFilm','pe'}),rmfield(s.condition,{'kFilm','pe'})) && ...
+            isequal(baseWall.faceID,(1:n)') && isequal(baseWall.regionID(order),b.regionID) && max(abs(baseWall.areaM2(order)-b.referenceAreaM2))<1e-17);
+        assert(isequal(baseStations.originalFaceID,stations.referenceFaceID));
+        dq=w.heatFluxWm2-baseWall.fluxInWm2(order).*(b.referenceAreaM2./area);
+        change=s.outW-baseSummary.thermal.early.wallW;assert(abs(area'*dq+change)<1e-10);
+        result.shortSupportFilmDifference=struct('fluxChangeWm2',dq,'baseFrame',reference.balance.earlyFrame,'powerChangeW',change, ...
+            'wallChangeK',cal.temperatureK-reference.temperatureK,'fixedKWmK',baseSummary.condition.kFilm, ...
+            'stlPeakReferenceFaces',report.peakReferenceTies,'stlPeakFileFaces',report.peakFileTies);
+        report.stations.fixedFilmNu=baseStations.computedNu;
+        report.stations.transportKWmK=repmat(s.condition.kFilm,height(stations),1);
+    end
     result.shortSupportStationTable=report.stations;
 else
     report.energy=s.energy;

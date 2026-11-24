@@ -308,7 +308,13 @@ switch action
                 numel(result.hybridWallTemperatureK)==n, ...
                 'RAH:Short:Snapshot','返回的银球快照与本次冻结输入或原面场不符。');
             if strcmp(b.branch,'power')
-                [cal,~,seal]=readShortSupportPowerCase(cfg.shortSupportJob);sphere=binding.regionID==1;
+                [cal,~,seal]=readShortSupportPowerCase(cfg.shortSupportJob,optional(b,'propertyModel','fixedFilm'));sphere=binding.regionID==1;
+                if strcmp(optional(b,'propertyModel','fixedFilm'),'candidateFilm')
+                    assert(isfield(result.shortSupportPower,'filmTransport') && isequal(result.shortSupportPower.filmTransport,cal.balance.filmTransport), ...
+                        'RAH:Short:Snapshot','返回的膜温物性与本次候选端点不符。');
+                else
+                    assert(~isfield(result.shortSupportPower,'filmTransport'),'RAH:Short:Snapshot','固定膜温工况收到其他物性模式的端点。');
+                end
                 assert(result.shortSupportPower.targetSphereW==b.targetSphereW && strcmp(id.sourceFrame.sha256,cal.balance.earlyFrame) && ...
                     strcmp(id.sourceFrame.initialSHA256,cal.balance.initialSHA256) && isequal(isfinite(result.hybridSolvedWallTemperatureK),sphere) && ...
                     isequal(isfinite(result.hybridWallTemperatureK),~sphere) && all(result.hybridSolvedWallTemperatureK(sphere)==cal.temperatureK) && ...
@@ -545,7 +551,7 @@ end
 function validateFlight(cfg)
 if strcmp(optional(cfg,'computationBackend',''),'shortSupport65')
     b=cfg.shortSupportBoundary;
-    assert(isequal(b,shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14),optional(b,'targetDU',.25))), ...
+    assert(isequal(b,shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14),optional(b,'targetDU',.25),optional(b,'propertyModel','fixedFilm'))), ...
         'RAH:Short:Boundary','请使用当前双支管试件登记的工况和物理时间。');return;
 end
 if strcmp(optional(cfg,'computationBackend',''),'thermistorB')

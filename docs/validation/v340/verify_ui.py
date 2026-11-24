@@ -10,9 +10,10 @@ import numpy as np
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2];CASE=ROOT/"cases/short_sphere"
 
 
-def check(folder):
-    ui=json.loads((folder/"ui.json").read_bytes());p=json.loads((CASE/"calorimetry65.json").read_bytes())
-    with ZipFile(CASE/"calorimetry65.zip") as z:
+def check(folder,*,film=False):
+    stem="calorimetryFilm65" if film else "calorimetry65"
+    ui=json.loads((folder/"ui.json").read_bytes());p=json.loads((CASE/(stem+".json")).read_bytes())
+    with ZipFile(CASE/(stem+".zip")) as z:
         w=np.genfromtxt(z.open("wall.csv"),delimiter=",",names=True);stations=np.genfromtxt(z.open("stations.csv"),delimiter=",",names=True)
     rec=json.loads((folder/"window_process.json").read_bytes())
     assert rec["exitCode"]==0 and not(rec["livePids"] or rec["stopReason"])
@@ -21,7 +22,9 @@ def check(folder):
     dtype=[("n","<f4",(3,)),("vertex","<f4",(3,3)),("tag","<u2")];tri=np.fromfile(folder/"input.stl",dtype=dtype,offset=84)["vertex"].astype(float)
     area=np.linalg.norm(np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0]),axis=1)/2
     w=w[order];sphere=w["regionID"]==1;q=w["fluxInWm2"]*(w["areaM2"]/area)
-    assert ui["peakFile"]==np.argmin(q)+1 and ui["peakReference"]==w["faceID"][np.argmin(q)]
+    candidates=np.flatnonzero(q==q.min())
+    peak=candidates[np.argmin(w["faceID"][candidates])] if film else np.argmin(q)
+    assert ui["peakFile"]==peak+1 and ui["peakReference"]==w["faceID"][peak]
     with (folder/"wall.csv").open(encoding="utf-8-sig",newline="") as f:rows=list(csv.DictReader(f))
     assert len(rows)==len(w)
     for i,r in enumerate(rows):
@@ -47,13 +50,35 @@ def check(folder):
     np.testing.assert_allclose([float(r["computedNu"]) for r in seven],stations["computedNu"],atol=1e-10,rtol=0)
     with (folder/"section.csv").open(encoding="utf-8-sig",newline="") as f:cut=list(csv.DictReader(f))
     assert len(cut)==72
+    key="heatFlux";expected=q/1000;unit="kW/m²"
+    if film:
+        with ZipFile(CASE/"calorimetry65.zip") as z:
+            old=np.genfromtxt(z.open("wall.csv"),names=True,delimiter=",")[order]
+            old_st=np.genfromtxt(z.open("stations.csv"),names=True,delimiter=",")
+        fixed=json.loads((CASE/"calorimetry65.json").read_bytes())
+        ties=page["shortSupportFilmDifference"]
+        np.testing.assert_array_equal(np.sort(np.atleast_1d(ties["stlPeakReferenceFaces"])),np.sort(w["faceID"][candidates]))
+        np.testing.assert_array_equal(np.sort(np.atleast_1d(ties["stlPeakFileFaces"])),np.sort(candidates+1))
+        expected=(w["fluxInWm2"]-old["fluxInWm2"])*(w["areaM2"]/area);key="filmHeatChange";unit="W/m²"
+        actual=p["balance"]["filmTransport"]
+        assert all(r["fixed_film_frame_sha256"]==fixed["balance"]["earlyFrame"] for r in rows)
+        for column,k in (("film_temperature_K","filmK"),("transport_k_W_mK","kWmK"),("peclet","pe")):
+            np.testing.assert_allclose(col(column),actual[k],rtol=1e-12,atol=0)
+            assert abs(ui["filmTransport"][k]/actual[k]-1)<1e-12
+        np.testing.assert_allclose(col("delta_fixed_film_flux_W_m2"),expected,rtol=0,atol=1e-8)
+        np.testing.assert_allclose(fields[key]["values"],expected,rtol=0,atol=1e-8)
+        np.testing.assert_allclose(page["comparisonColorRanges"][key],[-max(abs(expected)),max(abs(expected))],rtol=1e-10,atol=1e-8)
+        assert "<th>更新膜温</th><th>固定膜温</th>" in (folder/"workbench/index.html").read_text("utf8")
+        np.testing.assert_allclose([float(r["fixedFilmNu"]) for r in seven],old_st["computedNu"],rtol=1e-12)
     for row in cut:
-        assert row["field_key"]=="heatFlux" and abs(float(row["value"])-q[int(row["face_id"])-1]/1000)<1e-10
+        tolerance=1e-8 if film else 1e-10
+        assert row["field_key"]==key and row["unit"]==unit and abs(float(row["value"])-expected[int(row["face_id"])-1])<tolerance
     return dict(window=ui,rows=len(w),solvedWallFaces=int(sum(sphere)),prescribedSupportFaces=int(sum(~sphere)),
                 sectionRows=len(cut),sphereIntegralW=-q[sphere]@area[sphere],seconds=rec["elapsedSeconds"],peakBytes=rec["peakSampledRSSBytes"])
 
 
 if __name__=="__main__":
-    p=argparse.ArgumentParser();p.add_argument("archive",type=Path);p.add_argument("local",type=Path);a=p.parse_args()
-    result=dict(archive=check(a.archive),local=check(a.local))
-    with (HERE/"evidence/workbench.json").open("x",encoding="utf8",newline="\n") as f:json.dump(result,f,ensure_ascii=False,indent=2);f.write("\n")
+    p=argparse.ArgumentParser();p.add_argument("archive",type=Path);p.add_argument("local",type=Path);p.add_argument("--film",action="store_true");a=p.parse_args()
+    result=dict(archive=check(a.archive,film=a.film),local=check(a.local,film=a.film))
+    dest=HERE.parent/"v341" if a.film else HERE
+    with (dest/"evidence/workbench.json").open("x",encoding="utf8",newline="\n") as f:json.dump(result,f,ensure_ascii=False,indent=2);f.write("\n")

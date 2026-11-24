@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-24。Short Test 65 量热准稳态工况在球体输入 0.827123193 W 下反求壁温 **341.527781 K**，比实验平均低 11.400 K。独立原生积分球面放热 0.827116501 W，整件放热 1.461090332 W。4,624 个球面使用热平衡温度，管壁与端盖采用同温假设。32,480 面均有压力和热流，总面积 0.000700423854 m²。v340 新增几何覆盖 0 面、0 m²，联合实验验证 0 m²。膜温导热系数沿用实验温度。[量热工况](validation/v340/RESULTS.md) · [本机三维页](../outputs/v340_validation/ui_archive/workbench/index.html) · [给定壁温的 10.262726 ms 瞬时工况](validation/v339/RESULTS.md) · [冷算与重开](validation/v336/RESULTS.md)
+2026-11-24。Short Test 65 在球体输入 0.827123193 W 下求得壁温 **341.770414 K**，膜温 326.382429 K，k = 0.0282578503 W/(m·K)，比实验平均壁温低 11.157 K。球面放热 0.827228166 W，整件 1.460448272 W。32,480 面均有压力与热流，4,624 个球面采用量热平衡温度，管壁及端盖随球温给定。v341 新增几何覆盖 0 面、0 m²，总面积 0.000700423854 m²，联合实验验证 0 m²。[自洽膜温工况](validation/v341/RESULTS.md) · [本机三维页](../outputs/v341_validation/ui_final/workbench/index.html) · [固定膜温对照](validation/v340/RESULTS.md) · [给定壁温瞬时工况](validation/v339/RESULTS.md)
 
-<!-- records:last_completed=v340 -->
+<!-- records:last_completed=v341 -->
 <!-- records:active=none -->
-<!-- records:base_commit=eeff6cce24c5d8e07428fbadd6190f8be728ea51 -->
+<!-- records:base_commit=1723c29c161c983886ed12bd11f2b49a57a34f0d -->
 
 20D 的两半步放热为 2.005187691 W，较 14D 减少 0.01221%。[远场对照](validation/v335/RESULTS.md)
 
@@ -42,7 +42,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-在同一球体功率下用反求壁温更新膜温和导热系数，闭合温度与输运参数，并复核五区及七站。[下一决定](validation/v340/NEXT_DECISION.md)
+接入同试件的 Short Test 63，使用其独立来流、球面功率和七站位置，验收第二个可选择的完整工况。[下一决定](validation/v341/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

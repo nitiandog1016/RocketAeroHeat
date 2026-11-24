@@ -98,8 +98,13 @@ def check_steady(steady, prepared, native):
     assert not (proc["stopReason"] or proc["supervisorError"] or proc["survivingProcessIDs"])
     assert all(proc["inputsStable"].values()) and proc["command"][0] == str(exe)
     for file in (exe, CASE, prepared / "prepared.json", last / "case.cfg", last / "wire_boundary.dat",
-                 last / "mesh.su2", last / "initial_flow.csv", Path(solve.__code__.co_filename)):
+                   last / "mesh.su2", last / "initial_flow.csv"):
         assert sha(file) == proc["inputSHA256"][str(file)]
+    helper=Path(solve.__code__.co_filename)
+    # 已发布的旧源和当前源共用原固定温界合同，识别旧源码的 LF 与 CRLF 字节形式。
+    assert proc["inputSHA256"][str(helper)] in (sha(helper),"4dd78c1f89b3fea9cedacca7747cbca33a580e99799a785fdb70b354954852e7",
+                                              "2a17e1b3c42be9233702e99c5e87cf34b8d3844892e2fcdccd81caa3430773aa")
+    assert sha(last/"case.cfg")=="f1e0a615abb10c46560e1c446d5d8b61db9eac8d968aab748534fc1ca41a01cf"
     assert record["exe"] == sha(exe) and max(record["window"]) < -8 and record["rawMax20"] < 1e-8
     assert sha(last / "restart_000199.csv") == stages["frame"] == record["end"]
     return stages

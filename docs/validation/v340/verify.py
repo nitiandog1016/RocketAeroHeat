@@ -25,12 +25,12 @@ def store(path,obj):
     with path.open("x",encoding="utf8",newline="\n") as f:json.dump(obj,f,indent=2,ensure_ascii=False,allow_nan=False);f.write("\n")
 
 
-def publish(job):
+def publish(job,stem="calorimetry65"):
     ack=read(job/"completed.json");assert sha(job/"power65.zip")==ack["archiveSHA256"]
     # 发布回执保留来源摘要；本机大场路径及原始回执保存在证据包。
     source=ack["source"]
     ack["source"]={k:v for k,v in source.items() if k not in ("prepared","frame")}
-    archive=CASE/"calorimetry65.zip";manifest=CASE/"calorimetry65.json"
+    archive=CASE/(stem+".zip");manifest=CASE/(stem+".json")
     if manifest.exists():assert read(manifest)==ack
     if archive.exists():assert sha(archive)==ack["archiveSHA256"]
     else:shutil.copyfile(job/"power65.zip",archive)
@@ -46,7 +46,7 @@ def terminal(p,exe):
     return d
 
 
-def pack(job):
+def pack(job,*,film=False,proof_dir=PROOF):
     transfer=CASE/"supportedAngularTransfer65.npz"
     with np.load(transfer) as t:xyz=t["nativeWallXYZD"];firstxyz=t["firstXYZD"]
     ack=read(job/"completed.json");included={};large={}
@@ -54,22 +54,38 @@ def pack(job):
     assert sha(parent)==source["frameSHA256"] and sha(base/"prepared.json")==source["preparedSHA256"]
     original=np.loadtxt(parent,delimiter=",",skiprows=1,usecols=range(10))
     with np.load(base/"mapping.npz") as mapping:wet_ids=mapping["wet"];old_wall=mapping["theta"]
-    with ZipFile(PROOF/"native.zip","x",compression=ZIP_DEFLATED,compresslevel=6) as z:
+    previous_excess=None
+    with ZipFile(proof_dir/"native.zip","x",compression=ZIP_DEFLATED,compresslevel=6) as z:
         def put(name,data):
             included[name]=hashlib.sha256(data).hexdigest();z.writestr(name,data)
         def add(f):put(f.relative_to(job).as_posix(),f.read_bytes())
         add(job/"source.json");add(job/"completed.json")
-        for lab in ("high","low","balance"):
-            trial=job/lab;work=trial/"run";p=ack[lab];build=read(trial/"driver/build.json");exe=build["exe"]
+        if film:
+            add(job/"acceptedTrials.json")
+            for f in (ROOT/"scripts/shortSupportFilmProperties.py",ROOT/"scripts/shortSupportFilm65.py",
+                      ROOT/"scripts/shortSupportPower65.py",HERE.parent/"v329/run_shared.py"):
+                put("source/"+f.name,f.read_bytes())
+        for lab in (ack["order"] if film else ("high","low","balance")):
+            trial=job/lab;work=trial/"run";p=ack["trials"][lab] if film else ack[lab];build=read(trial/"driver/build.json");exe=build["exe"]
             assert sha(trial/"driver/uniform.exe")==exe and abs(build["expectedTheta"]*90-p["excessK"])<1e-12
             for f in ("trial.json","prepared/prepared.json","driver/build.json","driver/CScalarSolver.inl","driver/species_process.json",
                       "driver/link_process.json","run/converged.json","run/thermal.json"):add(trial/f)
             thermal=read(work/"thermal.json");prior=sha(trial/"prepared/initial.csv")
-            assert prior==p["initialSHA256"] and read(trial/"prepared/prepared.json")["parentFrame"]==ack["source"]["frameSHA256"]
+            spec=read(trial/"prepared/prepared.json")
+            assert prior==p["initialSHA256"] and spec["parentFrame"]==sha(parent)
             seed=np.loadtxt(trial/"prepared/initial.csv",delimiter=",",skiprows=1)
             np.testing.assert_array_equal(seed[:,:8],original[:,:8])
             new_wall=p["excessK"]/90
-            theta=original[:,9]*(new_wall/max(old_wall));theta[wet_ids]=new_wall
+            if film:
+                assert spec["initialSourceExcessK"]==previous_excess and p["parentFrame"]==sha(parent)
+                if previous_excess is None:
+                    theta=np.zeros(len(seed));enthalpy=np.full(len(seed),1-298.15);enthalpy[wet_ids]+=new_wall
+                else:
+                    ratio=p["excessK"]/previous_excess
+                    theta=original[:,9]*ratio;enthalpy=(1-298.15)+(original[:,8]-(1-298.15))*ratio
+                np.testing.assert_array_equal(seed[:,8],enthalpy)
+            else:theta=original[:,9]*(new_wall/max(old_wall))
+            theta[wet_ids]=new_wall
             np.testing.assert_array_equal(seed[:,9],theta)
             for boundary,scalar in (("profile.dat",new_wall),("release.dat",0.)):
                 rows=np.loadtxt(trial/"prepared"/boundary);np.testing.assert_array_equal(rows[:,0],wet_ids)
@@ -78,7 +94,8 @@ def pack(job):
             dirs=sorted(work.glob("steady*"))
             for stage in dirs+[work/name for name in ("plus20","early","control","late","releaseEarly","releaseLate")]:
                 record=read(stage/"record.json");release=stage.name.startswith("release")
-                terminal(stage,ack["source"]["releaseSHA256"] if release else exe)
+                receipt=terminal(stage,ack["source"]["releaseSHA256"] if release else exe)
+                if film:assert receipt["inputSHA256"][str(HERE.parent/"v329/run_shared.py")]==included["source/run_shared.py"]
                 for name in ("record.json","case.cfg","debugger_process.json","history.csv","debugger.log","stages.csv","far_pairs.csv"):
                     path=stage/name
                     if path.is_file():add(path)
@@ -108,19 +125,24 @@ def pack(job):
                 np.savez_compressed(buf,wet=wet,release=freed,correction=correction[wet],p=state[wet,4],theta=state[wet,9],
                                     first=state[first,9],farMass=sides[:,1],farTheta=state[ids,9])
                 put(lab+"/"+label+".npz",buf.getvalue())
+            if film:
+                previous_excess=p["excessK"];parent=work/"early/initial_flow.csv"
+                original=np.loadtxt(parent,delimiter=",",skiprows=1,usecols=range(10))
         failed=job.parent/"power01/high/run/steady01"
-        if failed.is_dir():
+        if not film and failed.is_dir():
             for k in ("debugger_process.json","debugger.log","history.csv","case.cfg"):
                 put("first_attempt/"+k,(failed/k).read_bytes())
             put("first_attempt/attempt_driver.py",(job.parent/"power01/attempt_driver.py").read_bytes())
             assert sha(job.parent/"power01/high/prepared/initial.csv")==ack["high"]["initialSHA256"]
-        for f in (HERE/"PLAN.md",HERE/"NATIVE.md"):
+        for f in (proof_dir.parent/"PLAN.md",HERE/"NATIVE.md"):
             put("contracts/"+f.name,f.read_bytes())
         z.writestr("manifest.json",json.dumps(dict(files=included,largeLocal=large),indent=2))
 
 
-def verify():
-    p=read(CASE/"calorimetry65.json");case=read(CASE/"test65.json");archive=CASE/"calorimetry65.zip"
+def verify(*,film=False,proof_dir=PROOF,stem="calorimetry65"):
+    p=read(CASE/(stem+".json"));case=read(CASE/"test65.json");archive=CASE/(stem+".zip")
+    assert p["schema"]==("short65-sphere-power-film-v1" if film else "short65-sphere-power-v1")
+    final=p["balanceName"] if film else "balance"
     assert p["archiveSHA256"]==sha(archive) and p["source"]["caseSHA256"]==sha(CASE/"test65.json")
     target=case["observedBtuS"]*1055.05585262/case["supportAreaFactor"];assert p["targetSphereW"]==target
     with ZipFile(archive) as z:
@@ -139,12 +161,14 @@ def verify():
     np.testing.assert_array_equal(w["faceID"],np.arange(len(area))+1);np.testing.assert_array_equal(w["regionID"],region)
     np.testing.assert_array_equal(w["areaM2"],area);assert len(area)==32480 and s["jointExperimentalAreaM2"]==0
     cond=s["condition"];air=cond["airK"];proof={};per_degree={}
-    with ZipFile(PROOF/"native.zip") as z:
+    with ZipFile(proof_dir/"native.zip") as z:
         manifest=json.loads(z.read("manifest.json"))
         for f,h in manifest["files"].items():assert hashlib.sha256(z.read(f)).hexdigest()==h
-        full=json.loads(z.read("completed.json"));assert all(full[k]==p[k] for k in ("targetSphereW","temperatureK","high","low","balance","archiveSHA256"))
-        for lab in ("high","low","balance"):
-            trial=p[lab];thermal=json.loads(z.read(lab+"/run/thermal.json"));rows={}
+        full=json.loads(z.read("completed.json"))
+        assert all(full[k]==p[k] for k in p if k!="source")
+        assert all(full["source"][k]==v for k,v in p["source"].items())
+        for lab in (p["order"] if film else ("high","low","balance")):
+            trial=p["trials"][lab] if film else p[lab];thermal=json.loads(z.read(lab+"/run/thermal.json"));rows={}
             conv=json.loads(z.read(lab+"/run/converged.json"));previous=trial["initialSHA256"]
             for index in range(1,len(conv["trend"])+1):
                 stage=f"{lab}/run/steady{index:02d}/";record=json.loads(z.read(stage+"record.json"))
@@ -169,11 +193,11 @@ def verify():
                     assert abs(total-thermal[label]["wallW"])<1e-10 and abs(farW-thermal[label]["scalarFarW"])<1e-10
                     assert abs(total-farW)/total<.005 and np.argmin(q)+1==trial[label+"Peak"]
                     rows[label]=dict(regionW=zones,totalW=total,farW=farW,peakFace=int(np.argmin(q)+1),peakWm2=-min(q))
-                    if lab=="balance":
+                    if lab==final:
                         assert abs(zones[0]/target-1)<.0002
                     if label=="early":
                         per_degree[lab]=(q/trial["excessK"],mean(v["first"])*cond["scalarUnitK"]/trial["excessK"])
-                    if lab!="balance" or label!="early":continue
+                    if lab!=final or label!="early":continue
                     gauge=mean(cond["rho"]*cond["speedMps"]**2*v["p"]);wt=air+cond["scalarUnitK"]*v["theta"]
                     expected=dict(absolutePa=cond["airPa"]+gauge,gaugePa=gauge,fluxInWm2=q,wallInputK=mean(wt),
                                   firstK=mean(air+cond["scalarUnitK"]*v["first"]))
@@ -187,10 +211,14 @@ def verify():
                         assert abs(nu-st["computedNu"])<1e-9
             proof[lab]=rows
     q0=proof["low"]["early"]["regionW"][0];q1=proof["high"]["early"]["regionW"][0]
-    assert q0<target<q1 and abs(q1/(2*q0)-1)<.002
-    candidate=air+20+20*(target-q0)/(q1-q0);assert abs(candidate-p["temperatureK"])<1e-8
+    assert q0<target<q1
+    candidate=p["temperatureK"]
+    if not film:
+        assert abs(q1/(2*q0)-1)<.002
+        candidate=air+20+20*(target-q0)/(q1-q0)
+        assert abs(candidate-p["temperatureK"])<1e-8
     err=[max(abs(a-b)) for a,b in zip(per_degree["high"],per_degree["low"])]
-    assert err[0]<.002*max(abs(per_degree["high"][0])) and err[1]<.002
+    if not film:assert err[0]<.002*max(abs(per_degree["high"][0])) and err[1]<.002
     return dict(trials=proof,targetSphereW=target,temperatureK=candidate,experimentalMeanK=(case["meanSurfaceF"]-32)*5/9+273.15,
                 normalizedMaxErrors=err,faces=len(w),areaM2=sum(area),peakFace=int(np.argmin(w["fluxInWm2"])+1),
                 sphereFaces=int(sum(region==1)),nu=stations["computedNu"].tolist(),experimentalNu=case["localNuSurface"],

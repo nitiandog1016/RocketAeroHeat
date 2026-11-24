@@ -350,6 +350,7 @@ if isfield(mesh,'hybridWall')
 end
 if isfield(mesh,'shortSupportPower')
     tw=mesh.hybridSolvedWallTemperatureK;method='外露银球的原生对流功率平衡，独立温度工况括区与候选端点复算';
+    if isfield(mesh.shortSupportPower,'filmTransport'),method='按候选温度更新膜温和 Pe，在实算球面功率括区内迭代并独立复核终点';end
     add('wallSolved','银球量热平衡壁温','K',tw,double(isfinite(tw)),repmat({method},n,1),mesh.evidenceIdentity.scope,{}, ...
         repmat({'支管和端盖采用同温边界，独立固体温度未知。'},n,1));
     data.fields(end).computedStateLabel='集总热平衡';
@@ -433,6 +434,9 @@ if isfield(mesh,'hybridWall')
         cal=mesh.shortSupportPower;
         data.caseNote=sprintf('Short Test 65 · Re %.0f · 球体量热 %.9f W · 银球平衡壁温 %.5f K · 准稳态', ...
             hc.reynolds,cal.targetSphereW,cal.temperatureK);
+        if isfield(cal,'filmTransport')
+            data.caseNote=[data.caseNote sprintf(' · 膜温 %.4f K · k %.8f W/(m·K) · Pe %.4f',cal.filmTransport.filmK,cal.filmTransport.kWmK,cal.filmTransport.pe)];
+        end
         data.resultCondition.caption=data.caseNote;
     end
     if isfield(mesh,'shortSphere')
@@ -702,6 +706,14 @@ if isfield(mesh,'shortSupportTemporal')
         limit=c.sharedMax.(f{1});if limit>0,data.comparisonColorRanges.(f{1})=[-limit limit];end
     end
     data.shortSupportTemporal=rmfield(c,{'fluxChangeWm2','gaugeChangePa','firstChangeK'});
+end
+if isfield(mesh,'shortSupportFilmDifference')
+    d=mesh.shortSupportFilmDifference;
+    scope='同一球体量热目标、相同原面。按候选壁温更新物性的入壁热流减去固定膜温参考。';
+    add('filmHeatChange','更新膜温减固定膜温 · 入壁热流','W/m²',d.fluxChangeWm2,double(isfinite(d.fluxChangeWm2)), ...
+        repmat({'两份独立原生稳态解的守恒面均热流之差'},n,1),scope);
+    limit=max(abs(d.fluxChangeWm2));if limit>0,data.comparisonColorRanges.filmHeatChange=[-limit limit];end
+    data.shortSupportFilmDifference=rmfield(d,'fluxChangeWm2');
 end
 if isfield(mesh,'shortSupportOuter')
     % 单位保留 W/m² 和 Pa，让远场距离造成的小差异在同一物理面上可见。
