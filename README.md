@@ -2,6 +2,8 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
+在 14D 银球两半步结果页打开 **查看七站周向换热**，可沿七个极角读出不同方位的入壁热流、局部 Nu 和 STL 面号。背风两站支持同方位比较；赤道遮盖段保留空白。离线三维页也可展开曲线和下载 CSV。[同刻周向范围和误差来源](docs/validation/v338/RESULTS.md)
+
 14D 双支管银球结果页的 **测站对照** 可切换壁反力、流体温度梯度和实验 Nu。导出的离线三维页侧栏也可展开七站表，下载包含热流、取样距离、温度和算法的 CSV。[七站图与适用范围](docs/validation/v337/RESULTS.md)
 
 **从 STL 计算双支管银球的单时刻结果。** 从试件包解出 `supported_m.stl`，运行 `rocketAeroHeatWorkbench`。加载文件时选比例 1、确认朝向，在网格页选择“双支管银球 · Short Test 65”和 14D。确认边界和步长后按“从扰动初场重新计算”。新安装会生成体网、编译内核、从冷态求稳态，再推进至所选物理时刻。计算页也可重开已完成的本地任务或查看版本归档。结果页可按 STL 面号查询压力、热流、温度和算法，侧栏可直接定位热峰。[下载试件](cases/short_sphere/supported65.zip) · [安装与操作](docs/validation/v336/INSTALL.md) · [普通 STL 映射验收](docs/validation/v334/RESULTS.md)

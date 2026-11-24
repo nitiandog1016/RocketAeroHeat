@@ -101,6 +101,10 @@ if timed
     mesh.shortSupportDirectionGrid=resolution;mesh.shortSupportTime=pair;
 end
 mesh.evidenceIdentity=id;s.coverage=coverage;s.outW=power;
+if radiusD==14 && strcmp(resolution,'timehalf')
+    az=readShortSupportAzimuth(cases,job,s,stations,temp);
+    if ~isempty(az),mesh.shortSupportAzimuth=az;end
+end
 if ismember('gradientNu',stations.Properties.VariableNames),mesh.shortSupportStationTable=stations;end
     function t=empty(~,~,~)
         t=table(zeros(0,1),zeros(0,1),zeros(0,1),strings(0,1),'VariableNames',{'faceID','pressurePa','heatFluxWm2','method'});

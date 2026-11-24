@@ -724,7 +724,8 @@ renderEditor();sync();showGeometry(true);
             case 5
                 if isShortSupport()
                     hasGradient=ismember('gradientNu',report.stations.Properties.VariableNames);
-                    grid=form(15+2*isfield(state.result,'shortSupportOuter')+hasGradient);b=state.cfg.shortSupportBoundary;
+                    hasAzimuth=isfield(state.result,'shortSupportAzimuth');
+                    grid=form(15+2*isfield(state.result,'shortSupportOuter')+hasGradient+hasAzimuth);b=state.cfg.shortSupportBoundary;
                     origin='本次原生计算';if state.result.evidenceIdentity.reusedArchive,origin='读取发布归档';end
                     if strcmp(state.result.shortSupportAction,'reopen'),origin='重开本地计算';end
                     tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
@@ -743,6 +744,7 @@ renderEditor();sync();showGeometry(true);
                         selector.ValueChangedFcn=@selectStationMethod;controls.stationMethod=selector;
                         controls.exportStations=button(grid,16,'导出七站方法与取样 CSV',@saveShortStations);
                     end
+                    if hasAzimuth,controls.openAzimuth=button(grid,17,'查看七站周向换热',@openShortAzimuth);end
                     if isfield(state.result,'shortSupportOuter')
                         controls.stations.ColumnName={'极角 / °','STL 面','实验 Nu','14D Nu','20D Nu'};
                         controls.stations.Data=report.stations{:,{'angleDeg','fileFaceID','reportedNu','baseNu','computedNu'}};
@@ -986,6 +988,14 @@ renderEditor();sync();showGeometry(true);
                 keys={'angleDeg','fileFaceID','reportedNu','computedNu'};labels={'极角 / °','STL 面','实验 Nu','计算 Nu'};
         end
         controls.stations.ColumnName=labels;controls.stations.Data=report.stations{:,keys};
+    end
+    function openShortAzimuth(~,~)
+        % 模块用途：在当前窗口打开同一终帧的曲线。选中测站时直接转到该极角。
+        tabs=webUI.tab.Parent;tab=findobj(tabs,'Type','uitab','Tag','Short65Azimuth');tabs.SelectedTab=tab;
+        selection=controls.stations.Selection;
+        if ~isempty(selection)
+            row=selection(1);tab.UserData.html.Data=struct('kind','azimuth-view','angle',report.stations.angleDeg(row));
+        end
     end
     function saveShortStations(~,~)
         % 模块用途：导出当前导入面的测站号、两种热流、法向模板与本次体场指纹。

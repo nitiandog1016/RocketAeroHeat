@@ -32,6 +32,12 @@ assert(strcmp(s.meshSHA256,b.meshSHA256) && strcmp(s.seedFrame,seed) && ...
     strcmp(s.caseSHA256,boundary.caseSHA256) && s.elapsedSeconds==boundary.elapsedS && s.dtSeconds==boundary.dtS);
 % 模块二：面均压力、温度及方向按同一物理面取值；按导入面的实际面积折算热流密度。
 order=b.referenceFaceID;area=b.areaM2;n=numel(order);inverse=zeros(n,1);inverse(order)=(1:n)';
+if isfield(result,'shortSupportAzimuth')
+    % 曲线坐标属于标准试件。每个命中位置的面号按本次导入映射，遮盖状态单独保留。
+    ids=result.shortSupportAzimuth.points.referenceFaceID;found=ids>0;
+    result.shortSupportAzimuth.points.fileFaceID(found)=inverse(ids(found));
+    result.shortSupportAzimuth.stlSHA256=b.source.sha256;
+end
 w=result.hybridWall(order,:);facePower=w.heatFluxWm2.*b.referenceAreaM2;
 w.faceID=(0:n-1)';w.heatFluxWm2=facePower./area;
 w.heatFluxMethod=w.heatFluxMethod+"；按对应 STL 原面功率守恒换算";

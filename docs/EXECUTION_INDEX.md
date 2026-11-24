@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v338 双支管银球七站的周向换热与背风排序](validation/v338/RESULTS.md) · [周向对照图](validation/v338/evidence/azimuth.png) · [独立整圈核对](validation/v338/evidence/comparison.json) · [下一项](validation/v338/NEXT_DECISION.md)。
+
 - [v337 双支管银球七站的壁反力和温度梯度](validation/v337/RESULTS.md) · [同刻对照图](validation/v337/evidence/stations.png) · [来源及逐层数据](../cases/short_sphere/stationGradients65.json) · [下一项](validation/v337/NEXT_DECISION.md)。
 
 - [v336 在新安装从 STL 冷算双支管银球并重开全表面结果](validation/v336/RESULTS.md) · [逐面复核](validation/v336/evidence/surface.json) · [下一项](validation/v336/NEXT_DECISION.md)。

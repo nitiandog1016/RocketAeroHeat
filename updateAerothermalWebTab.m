@@ -6,4 +6,5 @@ state=ui.html.UserData; state.payload=payload;
 ui.html.UserData=state; ui.html.Data=payload;
 % 新结果同时替换区域证据页，避免云图已更新而证据仍指向旧工况。
 if isfield(ui,'evidenceView'),ui.evidenceView.update(payload);end
+if isfield(ui,'evidenceTab'),syncShortAzimuthTab(ui.tab.Parent,mesh,ui.evidenceTab,ui.evidenceView);end
 end

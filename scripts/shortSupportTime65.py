@@ -42,8 +42,10 @@ def main(out,completed=None):
             endpoint(work,branch,step)
     result=export(work,out/"export")
     from shortSupportStationGradient import save_pair
+    from shortSupportAzimuth import compute as azimuth
     gradients=save_pair(PREP,work,out/"export")
-    write_json(out/"completed.json",dict(stationGradientsSHA256=gradients,pairSHA256=sha(out/"export/pair.json"),fullFrame=result["fullFrame"],halfFrame=result["halfFrame"],
+    azimuth_hash=azimuth(PREP,work,out/"export")
+    write_json(out/"completed.json",dict(stationAzimuthSHA256=azimuth_hash,stationGradientsSHA256=gradients,pairSHA256=sha(out/"export/pair.json"),fullFrame=result["fullFrame"],halfFrame=result["halfFrame"],
         source=str(work),faces=result["faces"],areaM2=result["areaM2"],elapsedS=result["elapsedS"]))
 
 

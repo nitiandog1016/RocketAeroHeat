@@ -11,6 +11,7 @@ html.Data=payload;
 % 模块三：区域证据页与原云图共用冻结原面数据；不改变旧0/1/2和导出。
 evidenceTab=uitab(tabs,'Title','区域结果与验证');
 evidenceView=createAerothermalEvidenceView(evidenceTab,payload);
+syncShortAzimuthTab(tabs,mesh,evidenceTab,evidenceView);
 tabs.SelectedTab=tab;
 ui=struct('tab',tab,'html',html,'evidenceTab',evidenceTab,'evidenceView',evidenceView);
     function receive(src,~)

@@ -15,6 +15,29 @@ path=fullfile(folder,'index.html');
 if isfield(mesh,'shortSupportStationTable')
     writeShortStations(path,folder,mesh.shortSupportStationTable,mesh.evidenceIdentity.sourceFrame.sha256);
 end
+if isfield(mesh,'shortSupportAzimuth')
+    writeAzimuth(path,folder,root,mesh.shortSupportAzimuth);
+end
+end
+
+function writeAzimuth(path,folder,root,az)
+% 模块用途：离线页与桌面共用同一个可交互图，完整 CSV 带实际和参考面号以及源帧。
+base=['Short65-azimuth-' az.summary.frameSHA256];page=[base '.html'];sheet=[base '.csv'];
+t=az.points;t.frameSHA256=repmat(string(az.summary.frameSHA256),height(t),1);
+t.stlSHA256=repmat(string(az.stlSHA256),height(t),1);writetable(t,fullfile(folder,sheet),'Encoding','UTF-8');
+template=fileread(fullfile(root,'web','short65-azimuth.html'));marker='/*SHORT65_OFFLINE_DATA*/';
+assert(count(template,marker)==1);data=jsonencode(shortAzimuthPayload(az),'ConvertInfAndNaN',true);
+writeHtml(fullfile(folder,page),strrep(template,marker,['window.SHORT65_DATA=' data ';']));
+html=fileread(path);assert(count(html,'</aside>')==1);
+block=['<details id="short65-azimuth"><summary>七站周向换热曲线</summary>' ...
+    '<iframe loading="lazy" title="七站周向换热" style="width:100%;height:580px;border:0" src="' page '"></iframe>' ...
+    '<p><a href="' page '">展开曲线</a> · <a download href="' sheet '">下载全周读数与取样状态 CSV</a></p></details>'];
+writeHtml(path,strrep(html,'</aside>',[block '</aside>']));
+end
+function writeHtml(path,html)
+fid=fopen(path,'w','n','UTF-8');assert(fid>=0,'无法写入周向换热页。');
+close=onCleanup(@()fclose(fid)); %#ok<NASGU>
+fprintf(fid,'%s',html);
 end
 
 function writeShortStations(path,folder,stations,frame)

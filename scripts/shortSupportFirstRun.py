@@ -141,8 +141,10 @@ def run(job,completed=None):
                   steady_surface=steady.parent/"surface/surface.zip")
     assert result["faces"]==32480 and result["meshSHA256"]==MESH and result["steadyFrame"]==base and result["seed"]==origin["seed"]
     from shortSupportStationGradient import save_pair
+    from shortSupportAzimuth import compute as azimuth
     gradients=save_pair(prep,work,job/"export")
-    write_json(job/"completed.json",dict(stationGradientsSHA256=gradients,pairSHA256=sha(job/"export/pair.json"),constructionSHA256=sha(job/"construction.json"),
+    azimuth_hash=azimuth(prep,work,job/"export")
+    write_json(job/"completed.json",dict(stationAzimuthSHA256=azimuth_hash,stationGradientsSHA256=gradients,pairSHA256=sha(job/"export/pair.json"),constructionSHA256=sha(job/"construction.json"),
                fullFrame=result["fullFrame"],halfFrame=result["halfFrame"],source=str(work),faces=result["faces"],
                areaM2=result["areaM2"],elapsedS=result["elapsedS"]))
     phase(job,"complete","原生三步、能量收支与五区逐面结果已保存")
