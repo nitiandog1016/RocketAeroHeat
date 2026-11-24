@@ -1,5 +1,6 @@
 function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution,radiusD)
 % 模块一：核对同一几何、温界、收敛端点和五区交叠文件，从存档或新算目录取数。
+if nargin<2,job='';end
 if nargin<3,resolution='coarse';end
 if nargin<4,radiusD=14;end
 root=fileparts(mfilename('fullpath'));cases=fullfile(root,'cases','short_sphere');
@@ -67,6 +68,7 @@ n=size(g.F,1);c=s.condition;
 assert(isequal(w.faceID,(1:n)') && isequal(w.regionID,g.regionID) && max(abs(w.areaM2-g.areaM2))<1e-17);
 assert(max(abs(w.absolutePa-w.gaugePa-c.airPa))<1e-8 && abs(w.areaM2'*w.fluxInWm2+power)<1e-10);
 assert(isequal(stations.originalFaceID,g.stations.faceID) && s.jointExperimentalAreaM2==0);
+if radiusD==14,stations=attachShortStationGradients(stations,s,cases,job);end
 % 模块二：用统一的原面适配器交付压力、热流、给定壁温及对应首层流体温度。
 names=["外露银球";"+Y 支管外壁";"−Y 支管外壁";"+Y 湿端盖";"−Y 湿端盖"];
 condition=struct('caseLabel','Short Test 65 · 双支管银球 · 稳态','velocityMps',[-c.speedMps 0 0], ...
@@ -99,6 +101,7 @@ if timed
     mesh.shortSupportDirectionGrid=resolution;mesh.shortSupportTime=pair;
 end
 mesh.evidenceIdentity=id;s.coverage=coverage;s.outW=power;
+if ismember('gradientNu',stations.Properties.VariableNames),mesh.shortSupportStationTable=stations;end
     function t=empty(~,~,~)
         t=table(zeros(0,1),zeros(0,1),zeros(0,1),strings(0,1),'VariableNames',{'faceID','pressurePa','heatFluxWm2','method'});
     end

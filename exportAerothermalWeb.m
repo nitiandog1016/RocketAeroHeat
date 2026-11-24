@@ -12,4 +12,29 @@ assert(fid>=0,'RocketAeroHeat:Viewer:Export','不能写入导出目录。');
 cleanup=onCleanup(@()fclose(fid)); %#ok<NASGU>
 fprintf(fid,'window.ROCKET_CASE=%s;\n',jsonencode(payload,'ConvertInfAndNaN',true));
 path=fullfile(folder,'index.html');
+if isfield(mesh,'shortSupportStationTable')
+    writeShortStations(path,folder,mesh.shortSupportStationTable,mesh.evidenceIdentity.sourceFrame.sha256);
+end
+end
+
+function writeShortStations(path,folder,stations,frame)
+% 模块三：把七站对照放入本次离线三维页的侧栏，下载表保留原面号、算法、间距和源帧。
+assert(height(stations)==7 && all(stations.gradientFrameSHA256==string(frame)));
+name=['Short65-stations-' frame '.csv'];writetable(stations,fullfile(folder,name),'Encoding','UTF-8');
+rows=strings(height(stations),1);
+for j=1:height(stations)
+    value='缺少法向取样';
+    if isfinite(stations.gradientNu(j)),value=sprintf('%.4f',stations.gradientNu(j));end
+    rows(j)=sprintf('<tr><td>%g</td><td>%g</td><td>%.4f</td><td>%s</td></tr>', ...
+        stations.angleDeg(j),stations.reportedNu(j),stations.computedNu(j),value);
+end
+block=['<details id="short65-stations"><summary>七站换热对照</summary>' ...
+    '<table><caption>局部 Nu · 以当地壁温取导热系数</caption><thead><tr>' ...
+    '<th>极角 (°)</th><th>实验</th><th>壁反力</th><th>温度梯度</th></tr></thead><tbody>' ...
+    char(join(rows,'')) '</tbody></table><p>梯度取自壁点与前两层流体温度。' ...
+    '表 III 的实验 Nu 经整体量热标定。</p><a download href="' name '">下载七站热流、温度取样信息与算法 CSV</a></details>'];
+html=fileread(path);assert(count(html,'</aside>')==1);
+fid=fopen(path,'w','n','UTF-8');assert(fid>=0,'无法写入七站离线页。');
+close=onCleanup(@()fclose(fid)); %#ok<NASGU>
+fprintf(fid,'%s',strrep(html,'</aside>',[block '</aside>']));
 end

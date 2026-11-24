@@ -723,17 +723,26 @@ renderEditor();sync();showGeometry(true);
                 controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[12+offset 19+offset];controls.log.Layout.Column=[1 2];
             case 5
                 if isShortSupport()
-                    grid=form(15+2*isfield(state.result,'shortSupportOuter'));b=state.cfg.shortSupportBoundary;
+                    hasGradient=ismember('gradientNu',report.stations.Properties.VariableNames);
+                    grid=form(15+2*isfield(state.result,'shortSupportOuter')+hasGradient);b=state.cfg.shortSupportBoundary;
                     origin='本次原生计算';if state.result.evidenceIdentity.reusedArchive,origin='读取发布归档';end
                     if strcmp(state.result.shortSupportAction,'reopen'),origin='重开本地计算';end
                     tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
-                    tip(grid,4,sprintf('导入网热峰 #%d · 参考网热峰 #%d 对应 STL #%d\n反向区 %.4f mm² · 逐面联合实验验证 0 m²',report.peakOutFace,report.nativePeakReferenceFaceID,report.nativePeakFileFaceID,1e6*report.reverseAreaM2));
+                    peakNote=tip(grid,4,sprintf('导入网热峰 #%d · 参考网热峰 #%d 对应 STL #%d\n反向区 %.4f mm² · 逐面联合实验验证 0 m²',report.peakOutFace,report.nativePeakReferenceFaceID,report.nativePeakFileFaceID,1e6*report.reverseAreaM2));
                     controls.stations=uitable(grid,'RowName',{},'ColumnName',{'极角 / °','STL 面','实验 Nu','计算 Nu'}, ...
                         'Data',report.stations{:,{'angleDeg','fileFaceID','reportedNu','computedNu'}});
                     controls.stations.Layout.Row=[7 12];controls.stations.Layout.Column=[1 2];
                     controls.export=button(grid,13,'导出完整离线工作台',@exportCase);
                     controls.filePeak=button(grid,14,'定位导入网热峰',@(~,~)inspectShortPeak(report.peakOutFace));
                     controls.nativePeak=button(grid,15,'定位参考网热峰',@(~,~)inspectShortPeak(report.nativePeakFileFaceID));
+                    if hasGradient
+                        peakNote.Layout.Row=[4 5];
+                        selector=choice(grid,6,'测站对照',{'实验与主解','壁反力与梯度 · Nu','入壁热流 · W/m²','法向取样'}, ...
+                            {'main','nu','flux','profile'},'main');
+                        % 第二段说明占第 4、5 行，选择器和七站表在视野中相邻。
+                        selector.ValueChangedFcn=@selectStationMethod;controls.stationMethod=selector;
+                        controls.exportStations=button(grid,16,'导出七站方法与取样 CSV',@saveShortStations);
+                    end
                     if isfield(state.result,'shortSupportOuter')
                         controls.stations.ColumnName={'极角 / °','STL 面','实验 Nu','14D Nu','20D Nu'};
                         controls.stations.Data=report.stations{:,{'angleDeg','fileFaceID','reportedNu','baseNu','computedNu'}};
@@ -963,6 +972,25 @@ renderEditor();sync();showGeometry(true);
     end
     function x=button(grid,row,text,callback)
         x=uibutton(grid,'Text',text,'ButtonPushedFcn',callback);x.Layout.Row=row;x.Layout.Column=[1 2];
+    end
+    function selectStationMethod(field,~)
+        % 模块用途：同一时刻与同一测站的四种显示共享一份原始表，切换仅更新列。
+        switch field.Value
+            case 'nu'
+                keys={'angleDeg','reportedNu','computedNu','gradientNu'};labels={'极角 / °','实验 Nu','壁反力 Nu','梯度 Nu'};
+            case 'flux'
+                keys={'angleDeg','fluxInWm2','gradientInWm2'};labels={'极角 / °','壁反力 / W·m⁻²','梯度 / W·m⁻²'};
+            case 'profile'
+                keys={'angleDeg','layerCount','firstDistanceM','linearNu','wideNu'};labels={'极角 / °','层数','首层 / m','单层 Nu','宽模板 Nu'};
+            otherwise
+                keys={'angleDeg','fileFaceID','reportedNu','computedNu'};labels={'极角 / °','STL 面','实验 Nu','计算 Nu'};
+        end
+        controls.stations.ColumnName=labels;controls.stations.Data=report.stations{:,keys};
+    end
+    function saveShortStations(~,~)
+        % 模块用途：导出当前导入面的测站号、两种热流、法向模板与本次体场指纹。
+        [name,folder]=uiputfile('*.csv','导出七站对照','Short65-station-gradients.csv');
+        if ~isequal(name,0),writetable(report.stations,fullfile(folder,name),'Encoding','UTF-8');end
     end
     function x=tip(grid,row,text)
         x=uilabel(grid,'Text',text,'WordWrap','on','VerticalAlignment','top');

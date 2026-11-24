@@ -15,7 +15,10 @@ data=table(names,[r.faces]',1e6*[r.areaM2]',[r.outW]',-[r.minFluxIn]',[r.peakOut
 regions=uitable(box,'Data',data,'RowName',[], ...
     'ColumnName',{'分区','原面数','面积 (mm²)','放热 (W)','最大向外热流 (W/m²)','原面号'});
 ax=uiaxes(box);hold(ax,'on');
-line=plot(ax,stations.angleDeg,stations.computedNu,'-o','Color',[.15 .32 .49],'DisplayName',curveLabel);
+line=plot(ax,stations.angleDeg,stations.computedNu,'-o','Color',[.15 .32 .49],'DisplayName',['壁反力 · ' curveLabel]);
+if ismember('gradientNu',stations.Properties.VariableNames)
+    plot(ax,stations.angleDeg,stations.gradientNu,'--s','Color',[.20 .44 .35],'DisplayName','法向温度梯度 · 二次');
+end
 plot(ax,stations.angleDeg,stations.reportedNu,'d','Color',[.66 .32 .12],'DisplayName','Short 表 III');
 xlabel(ax,'从迎风点沿 +Z 测线的极角 (°)');ylabel(ax,'当地表温物性的 Nu');
 ax.YGrid='on';xlim(ax,[-4 180]);legend(ax,'Location','best');

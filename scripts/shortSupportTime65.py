@@ -7,7 +7,7 @@ import sys
 for name in ("OPENBLAS_NUM_THREADS","MKL_NUM_THREADS","OMP_NUM_THREADS"):os.environ[name]="1"
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"docs/validation/v333"))
-from build_time import BASE_FRAME, build, sha, read, write_json
+from build_time import BASE_FRAME, PREP, build, sha, read, write_json
 from physical_step import setup, run_steps
 from time_surface import export
 
@@ -41,7 +41,9 @@ def main(out,completed=None):
             frame=inspect_step(work,branch,step,old,False);inspect_step(work,branch,step,frame,True)
             endpoint(work,branch,step)
     result=export(work,out/"export")
-    write_json(out/"completed.json",dict(pairSHA256=sha(out/"export/pair.json"),fullFrame=result["fullFrame"],halfFrame=result["halfFrame"],
+    from shortSupportStationGradient import save_pair
+    gradients=save_pair(PREP,work,out/"export")
+    write_json(out/"completed.json",dict(stationGradientsSHA256=gradients,pairSHA256=sha(out/"export/pair.json"),fullFrame=result["fullFrame"],halfFrame=result["halfFrame"],
         source=str(work),faces=result["faces"],areaM2=result["areaM2"],elapsedS=result["elapsedS"]))
 
 

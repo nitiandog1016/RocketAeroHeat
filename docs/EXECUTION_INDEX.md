@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v337 双支管银球七站的壁反力和温度梯度](validation/v337/RESULTS.md) · [同刻对照图](validation/v337/evidence/stations.png) · [来源及逐层数据](../cases/short_sphere/stationGradients65.json) · [下一项](validation/v337/NEXT_DECISION.md)。
+
 - [v336 在新安装从 STL 冷算双支管银球并重开全表面结果](validation/v336/RESULTS.md) · [逐面复核](validation/v336/evidence/surface.json) · [下一项](validation/v336/NEXT_DECISION.md)。
 
 - [v335 双支管银球 14D 与 20D 同刻外域对照](validation/v335/RESULTS.md) · [七站与五区](validation/v335/evidence/domain.png) · [同面数据](validation/v335/evidence/comparison.json) · [下一项](validation/v335/NEXT_DECISION.md)。

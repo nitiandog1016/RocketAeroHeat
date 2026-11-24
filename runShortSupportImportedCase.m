@@ -62,6 +62,7 @@ end
 [peak,face]=max(-w.heatFluxWm2);near=find(-w.heatFluxWm2>=.99*peak);
 stations.referenceFaceID=stations.originalFaceID;stations.fileFaceID=inverse(stations.originalFaceID);
 stations=removevars(stations,'originalFaceID');stations.faceMeanFluxInWm2=w.heatFluxWm2(stations.fileFaceID);
+if ismember('gradientNu',stations.Properties.VariableNames),result.shortSupportStationTable=stations;end
 reverse=find(direction.([grid 'Status'])==-1);
 report.regions=regions;report.stations=stations;report.peakOutFace=face;report.peakOutWm2=peak;
 report.peakReferenceFaceID=order(face);report.nearPeakFaces=near;report.reverseFaces=reverse;
