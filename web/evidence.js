@@ -67,6 +67,9 @@
       $('faceNumber').value=face<0?'':String(face+1);$('lookupNote').textContent='';
       $('probePosition').textContent=face<0?'可输入原面编号或点击模型。':'原面元 '+(face+1)+' · '+text(at(data.region,face))+' · 面积 '+fmt(at(data.faceArea,face))+' m² · XYZ '+position.map(fmt).join(', ')+' m';
       if(face<0)return;
+      if(data.shortSupportImport){
+        $('probePosition').textContent+=' · 试件参考面 '+at(data.shortSupportImport.referenceFaceID,face);
+      }
       // 查询默认只展开数值与两层状态；完整算法、范围和拒绝理由仍逐变量保留。
       list(data.evidenceLedger.fields).forEach(f=>{
         const p=faceInfo(f,face),block=node('div','','probeField'),head=node('div','','probeHeading');

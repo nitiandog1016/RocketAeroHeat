@@ -976,10 +976,15 @@ if isempty(histories)
 end
 % 仅传递明确保存的来源/证据；旧快照不凭方法名自动获得物理资格。
 if isfield(mesh,'evidenceIdentity')
-    if isfield(mesh,'thermistorImport')
+    if isfield(mesh,'thermistorImport') || isfield(mesh,'shortSupportImport')
         % 逐面导出保留文件身份和对应标准面，避免把本机文件路径写入离线页。
-        b=mesh.thermistorImport;
-        data.thermistorImport=struct('referenceFaceID',b.referenceFaceID,'referenceAreaM2',b.referenceAreaM2, ...
+        key='thermistorImport';
+        if isfield(mesh,'shortSupportImport')
+            key='shortSupportImport';data.coordinateNote='SI · 支管沿 ±Y · 来流 −X · 正热流入壁';
+            data.resultCondition.physicalStepSizeS=mesh.hybridCondition.physicalStepSizeS;
+        end
+        b=mesh.(key);
+        data.(key)=struct('referenceFaceID',b.referenceFaceID,'referenceAreaM2',b.referenceAreaM2, ...
             'stlSHA256',b.source.sha256,'scaleToM',b.source.scale,'meshSHA256',mesh.evidenceIdentity.meshSHA256, ...
             'rotationMatrix',b.rotationMatrix,'rotationCenterM',b.rotationCenterM,'translationM',b.translationM);
         if isfield(mesh,'thermistorSubfaces')

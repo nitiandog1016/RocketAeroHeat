@@ -121,6 +121,10 @@ switch action
         mesh=clearComputedFields(mesh);
         cfg=optional(payload,'cfg',state.cfg);assertScalarStruct(cfg,'cfg');
         requireUnchangedConfigSection(cfg,state.cfg,'geometry','模型输入或朝向');
+        if strcmp(optional(cfg,'computationBackend',''),'shortSupport65')
+            assert(isfield(mesh,'shortSupportImport') && isequal(mesh.shortSupportImport.source,state.modelSource) && ...
+                sameGeometry(mesh,state.orientedMesh),'RAH:Short:ImportMesh','请先核对当前 STL 原面。');
+        end
         if strcmp(optional(cfg,'computationBackend',''),'thermistorB') && isfield(state.modelSource,'file')
             assert(isfield(mesh,'thermistorImport') && isequal(mesh.thermistorImport.source,state.modelSource) && ...
                 sameGeometry(mesh,state.orientedMesh),'RAH:Bead:ImportMesh','请用当前 STL 文件和确认朝向生成试件体网。');
@@ -150,6 +154,9 @@ switch action
         requireUnchangedConfigSection(cfg,state.cfg,'geometry','模型输入或朝向');
         requireUnchangedConfigSection(cfg,state.cfg,'remesh','网格参数');
         requireUnchangedConfigSection(cfg,state.cfg,'mesh','网格参数');
+        if any(strcmp({optional(state.cfg,'computationBackend',''),optional(cfg,'computationBackend','')},'shortSupport65'))
+            requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','银球体网');
+        end
         if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') || strcmp(optional(cfg,'computationBackend',''),'thermistorB')
             requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','试件来源');
             requireUnchangedConfigSection(cfg,state.cfg,'thermistorAngularCells','周向网格');
@@ -165,6 +172,10 @@ switch action
         requireCondition(~isempty(state.mesh),'请先生成网格。');
         validateFlight(state.cfg);
         fs=optional(payload,'freestream',state.freestream);
+        if strcmp(optional(state.cfg,'computationBackend',''),'shortSupport65')
+            fs=optional(payload,'freestream',state.cfg.shortSupportBoundary);
+            assert(isequal(fs,state.cfg.shortSupportBoundary),'RAH:Short:Boundary','来流须对应所确认的温界和步长。');
+        end
         if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB')
             [~,reference]=thermistorWorkbenchBoundary(state.cfg.thermistorBoundary,state.cfg.thermistorAngularCells,state.cfg);
             if isempty(fs),fs=reference;end
@@ -201,7 +212,15 @@ switch action
         state.solveInputRevision=state.revision;
         state.frozenInputs=struct('mesh',state.mesh,'cfg',state.cfg, ...
             'freestream',state.freestream,'revision',state.revision,'solveId',state.solveId);
-        if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && state.cfg.thermistorAngularCells==48 && ~strcmp(optional(state.cfg,'thermistorVariant','smooth'),'sidewind')
+        if strcmp(optional(state.cfg,'computationBackend',''),'shortSupport65')
+            % 动作与目录在按下按钮时冻结。仅新算生成独立任务号，读档无需本机体场。
+            source=validatestring(required(payload,'shortSupportAction'),{'archive','solve'});
+            folder='';
+            if strcmp(source,'solve')
+                folder=fullfile(fileparts(mfilename('fullpath')),'outputs',['short65_time_' char(java.util.UUID.randomUUID())]);
+            end
+            state.frozenInputs.cfg.shortSupportAction=source;state.frozenInputs.cfg.shortSupportJob=folder;
+        elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && state.cfg.thermistorAngularCells==48 && ~strcmp(optional(state.cfg,'thermistorVariant','smooth'),'sidewind')
             % 将动作与目录一起冻结，避免同一几何和同刻的其他计算被误接收。
             source=validatestring(optional(payload,'startupAction','run'),{'run','read','resume'});
             if strcmp(source,'run')
@@ -261,6 +280,22 @@ switch action
         end
         if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB')
             validateThermistorResult(result,state.frozenInputs);
+        elseif strcmp(optional(state.cfg,'computationBackend',''),'shortSupport65')
+            cfg=state.frozenInputs.cfg;b=cfg.shortSupportBoundary;binding=state.mesh.shortSupportImport;
+            w=result.hybridWall;id=result.evidenceIdentity;n=size(result.F,1);
+            assert(isequal(result.shortSupportImport,binding) && strcmp(id.sourceFrame.stlSHA256,binding.source.sha256) && ...
+                strcmp(id.meshSHA256,binding.meshSHA256) && strcmp(id.sourceFrame.caseSHA256,b.caseSHA256) && ...
+                strcmp(id.sourceFrame.initialSHA256,b.initialFrame) && strcmp(result.shortSupportAction,cfg.shortSupportAction) && ...
+                strcmp(result.shortSupportJob,cfg.shortSupportJob) && strcmp(result.shortSupportDirectionGrid,['time' b.branch]) && ...
+                result.hybridCondition.elapsedPhysicalTimeS==b.elapsedS && result.hybridCondition.physicalStepSizeS==b.dtS && ...
+                isequal(required(payload,'freestream'),b) && isequal(w.faceID,(0:n-1)') && ...
+                all(isfinite(w.pressurePa) & isfinite(w.heatFluxWm2) & isfinite(w.nearWallCellTemperatureK)) && ...
+                numel(result.hybridWallTemperatureK)==n && all(isfinite(result.hybridWallTemperatureK)), ...
+                'RAH:Short:Snapshot','返回的银球快照与本次冻结输入或原面场不符。');
+            if strcmp(cfg.shortSupportAction,'archive')
+                [~,pair]=shortSupportImportBoundary(b.branch);
+                assert(strcmp(id.sourceFrame.sha256,pair.([b.branch 'Frame'])),'RAH:Short:Snapshot','归档帧与所选步长不符。');
+            end
         elseif strcmp(optional(state.cfg,'computationBackend',''),'cm011Imported')
             validateCM011Result(result,state.mesh);
         else
@@ -472,6 +507,10 @@ end
 
 %% 模块十：边界输入基础检查；完整物理适用性仍由后端各模型审核。
 function validateFlight(cfg)
+if strcmp(optional(cfg,'computationBackend',''),'shortSupport65')
+    b=cfg.shortSupportBoundary;
+    assert(isequal(b,shortSupportImportBoundary(b.branch)),'RAH:Short:Boundary','请使用当前双支管试件登记的工况和物理时间。');return;
+end
 if strcmp(optional(cfg,'computationBackend',''),'thermistorB')
     thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);
     return;

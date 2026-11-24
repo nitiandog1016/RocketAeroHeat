@@ -1,0 +1,8 @@
+function runCM011Python(args,logPath,heartbeat,independent)
+% 仅供验收临时调用：核对新算按钮传给原生入口的参数，在启动进程之前停下。
+root=fileparts(which('rocketAeroHeatWorkbench'));
+assert(numel(args)==2 && strcmp(args{1},fullfile(root,'scripts','shortSupportTime65.py')) && ...
+    startsWith(args{2},fullfile(root,'outputs','short65_time_')) && ~isfolder(args{2}) && ...
+    strcmp(logPath,[args{2} '.log']) && independent && isa(heartbeat,'function_handle'));
+error('RAH:ShortTest:DispatchObserved','已核对新算派发。验收在启动原生进程前结束。');
+end

@@ -96,6 +96,7 @@ renderEditor();sync();showGeometry(true);
         counts='尚无求解网格';
         if ~isempty(state.mesh),counts=sprintf('求解网格 %d 节点 / %d 面元',size(state.mesh.V,1),size(state.mesh.F,1));end
         inputSummary.Text=[counts newline 'SI · 主轴 X · 鼻尖 +X · 零攻角来流 −X'];
+        if isShortSupport(),inputSummary.Text=sprintf('Short Test 65 · %d 个 STL 面\n支管沿 ±Y，来流沿 −X',size(state.rawMesh.F,1));end
         if isBead()
             counts=sprintf('B 型热敏珠 · %d 个原面',size(state.rawMesh.F,1));
             if ~isempty(state.mesh),counts=sprintf('%s · %d 体单元',counts,state.mesh.thermistorPrepared.cells);end
@@ -118,6 +119,8 @@ renderEditor();sync();showGeometry(true);
         assignin('base','mesh',current);assignin('base','freestream',state.freestream);
         if isBead()
             assignin('base','flight',state.cfg.thermistorBoundary);
+        elseif isShortSupport()
+            assignin('base','flight',getOption(state.cfg,'shortSupportBoundary',[]));
         elseif isCM011()
             % 工程链的飞行设置留在 cfg.flight；独立工作区变量显示当前试件边界。
             assignin('base','flight',getOption(state.cfg,'cm011Boundary',[]));
@@ -280,6 +283,17 @@ renderEditor();sync();showGeometry(true);
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
             case 2
+                if isShortSupport()
+                    grid=form(7);meshBackendChoice(grid,1);
+                    controls.generate=button(grid,2,'核对 STL 原面并绑定试件体网',@generate);
+                    if isempty(state.mesh)
+                        tip(grid,3,'使用已登记的 128 扇区、十层近壁体网。支管沿 ±Y，沿 −X 来流。');
+                    else
+                        tip(grid,3,sprintf('已对应 %d 面 · 397,824 个体单元\n最大角点偏差 %.3g m',size(state.mesh.F,1),state.mesh.shortSupportImport.maxVertexErrorM));
+                        controls.nextBoundary=button(grid,6,'设置边界条件',@(~,~)go(3));
+                    end
+                    sync();return;
+                end
                 if isBead()
                     grid=form(8);
                     if isMixedBead()
@@ -416,6 +430,15 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2=button(grid,13,'当前表面 → 内嵌SU2混合网格',@(~,~)useSurfaceForSU2());
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
+                if isShortSupport()
+                    grid=form(9);b=state.cfg.shortSupportBoundary;
+                    controls.shortBranch=choice(grid,1,'时间步长',{'两个半步','一个整步'},{'half','full'},b.branch);
+                    controls.shortBranch.ValueChangedFcn=@boundaryEdited;
+                    tip(grid,2,sprintf('Re %g · 来流 −X，%.6g m/s\n环境 %.5f K、%.5f Pa',b.reynolds,-b.velocityMps(1),b.airK,b.airPa));
+                    tip(grid,5,sprintf('球面按试验七站极角给定温度，支管和端盖 %.5f K。\n扰动后 %.6f ms · 每步 %.6f ms',b.supportWallK,1e3*b.elapsedS,1e3*b.dtS));
+                    controls.confirm=button(grid,8,'确认试件温界、来流与时间',@confirmBoundary);
+                    sync();return;
+                end
                 if isBead()
                     if isSidewind()
                         if state.cfg.thermistorAngularCells==96
@@ -586,6 +609,14 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,23+12*methodDetailsOpen,sprintf('当前保留 %d 个面元壁温输入；修改统一壁温将切换为统一边界。',numel(c.heating.wallTemperatureByFace)));
                 end
             case 4
+                if isShortSupport()
+                    grid=form(9);controls.readShort=button(grid,1,'读取所选步长的归档',@(~,~)solveCase([],[],'archive'));
+                    controls.run=button(grid,2,'从扰动初场重新计算',@solveCase);
+                    b=state.cfg.shortSupportBoundary;
+                    tip(grid,3,sprintf('同刻 %.6f ms · 当前步长 %.6f ms。新算使用本机稳态基流，分别推进两种步长。',1e3*b.elapsedS,1e3*b.dtS));
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[6 9];controls.log.Layout.Column=[1 2];
+                    sync();return;
+                end
                 if isBead()
                     grid=form(11);p=state.mesh.thermistorPrepared;
                     if isMixedBead()
@@ -681,6 +712,19 @@ renderEditor();sync();showGeometry(true);
                 tip(grid,9+offset,'仅按按钮启动计算。进度为已完成的程序阶段比例，不是面积覆盖率或剩余耗时。');
                 controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[12+offset 19+offset];controls.log.Layout.Column=[1 2];
             case 5
+                if isShortSupport()
+                    grid=form(15);b=state.cfg.shortSupportBoundary;
+                    origin='本次原生计算';if state.result.evidenceIdentity.reusedArchive,origin='读取发布归档';end
+                    tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
+                    tip(grid,4,sprintf('导入网热峰 #%d · 参考网热峰 #%d 对应 STL #%d\n反向区 %.4f mm² · 逐面联合实验验证 0 m²',report.peakOutFace,report.nativePeakReferenceFaceID,report.nativePeakFileFaceID,1e6*report.reverseAreaM2));
+                    controls.stations=uitable(grid,'RowName',{},'ColumnName',{'极角 / °','STL 面','实验 Nu','计算 Nu'}, ...
+                        'Data',report.stations{:,{'angleDeg','fileFaceID','reportedNu','computedNu'}});
+                    controls.stations.Layout.Row=[7 12];controls.stations.Layout.Column=[1 2];
+                    controls.export=button(grid,13,'导出完整离线工作台',@exportCase);
+                    controls.filePeak=button(grid,14,'定位导入网热峰',@(~,~)inspectShortPeak(report.peakOutFace));
+                    controls.nativePeak=button(grid,15,'定位参考网热峰',@(~,~)inspectShortPeak(report.nativePeakFileFaceID));
+                    sync();return;
+                end
                 if ~isempty(state.researchResult)
                     grid=form(12);r=state.researchResult;
                     tip(grid,1,sprintf('输入版本%d · 内嵌NS研究快照\n%d个原面元 · 新增合格面积0',state.resultSourceRevision,size(r.F,1)));
@@ -1019,6 +1063,15 @@ renderEditor();sync();showGeometry(true);
     end
     function generate(~,~)
         if state.busy || preparing,return;end
+        if isShortSupport()
+            try
+                preparing=true;message('正在核对银球 STL 面号、实际面积和体网来源…');
+                candidate=state.orientedMesh;candidate.shortSupportImport=bindShortSupportSTL(candidate,state.modelSource,state.cfg.geometry);
+                state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));report=[];
+                preparing=false;renderEditor();showGeometry(true);message('五个区域的原面已对应，可以确认工况。');
+            catch ex,preparing=false;renderEditor();showError(ex);end
+            return;
+        end
         if isBead()
             try
                 preparing=true;message('正在准备并核对所选热敏珠体网…');
@@ -1071,6 +1124,7 @@ renderEditor();sync();showGeometry(true);
 %% 模块九：边界输入与热物性/方法选择均入集中状态，不立即求物理场。
     function next=boundaryConfiguration()
         next=state.cfg;
+        if isShortSupport(),next.shortSupportBoundary=shortSupportImportBoundary(controls.shortBranch.Value);return;end
         if isBead()
             next.thermistorBoundary=[];
             if isSidewind()
@@ -1232,6 +1286,7 @@ renderEditor();sync();showGeometry(true);
         if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
+            if isShortSupport(),renderEditor();message('时间步长已更新，请重新确认。');showGeometry(false);return;end
             if isBead() && isfield(controls,'wireBoundary')
                 renderEditor();message('引线热边界已更新，请确认当前工况。');
             elseif isBead()
@@ -1277,6 +1332,11 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         try
             next=boundaryConfiguration();
+            if isShortSupport()
+                state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
+                state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',next.shortSupportBoundary));
+                go(4);return;
+            end
             if isBead()
                 [~,fs]=thermistorWorkbenchBoundary(next.thermistorBoundary,next.thermistorAngularCells,next);
                 state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
@@ -1334,6 +1394,7 @@ renderEditor();sync();showGeometry(true);
         try
             if nargin<3,source='solve';end
             request=struct();
+            if isShortSupport(),request.shortSupportAction=source;end
             if isFullBead()
                 if strcmp(source,'solve'),source='run';end
                 request.startupAction=source;
@@ -1354,6 +1415,7 @@ renderEditor();sync();showGeometry(true);
             end
             renderEditor();
             frozen=state.frozenInputs;
+            if isShortSupport() && strcmp(source,'solve'),message(['银球新算目录 ' frozen.cfg.shortSupportJob]);end
             if isBead()
                 frozen.cfg.thermistorResultSource=source;
                 if isFullBead()
@@ -1409,6 +1471,14 @@ renderEditor();sync();showGeometry(true);
     end
     function yes=isCM011()
         yes=strcmp(getOption(state.cfg,'computationBackend','engineering'),'cm011Imported');
+    end
+    function yes=isShortSupport()
+        yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'shortSupport65');
+    end
+    function inspectShortPeak(face)
+        % 在同一窗口定位相应测度上的峰值，探针给出实际文件号与标准面号。
+        webUI.evidenceTab.Parent.SelectedTab=webUI.evidenceTab;
+        webUI.evidenceView.selectField('heatFlux');webUI.evidenceView.inspectFace(face,[]);
     end
     function label=beadBoundaryText(b)
         % 计算页和确认回执显示实际冻结的热边界与单位。
@@ -1500,6 +1570,7 @@ renderEditor();sync();showGeometry(true);
         labels={'工程表面重构','CM-011 低速半域'};values={'engineering','cm011Imported'};
         if isfield(state.modelSource,'file')
             labels{end+1}='带线 B 珠 · 96 档侧吹';values{end+1}='thermistorB';
+            labels{end+1}='双支管银球 · Short Test 65';values{end+1}='shortSupport65';
         end
         controls.meshBackend=choice(grid,row,'网格方法',labels,values,getOption(state.cfg,'computationBackend','engineering'));
         controls.meshBackend.ValueChangedFcn=@changeMeshBackend;
@@ -1507,6 +1578,7 @@ renderEditor();sync();showGeometry(true);
     function changeMeshBackend(field,~)
         if state.busy || preparing,return;end
         next=state.cfg;next.computationBackend=field.Value;next.cm011Boundary=[];
+        if strcmp(field.Value,'shortSupport65'),next.shortSupportBoundary=shortSupportImportBoundary('half');end
         if strcmp(field.Value,'thermistorB')
             next.thermistorAngularCells=96;next.thermistorVariant='sidewind';
             next.thermistorRefineLeads=4;next.thermistorBoundary=[];

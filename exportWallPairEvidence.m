@@ -28,9 +28,17 @@ if isfield(data,'shortSphere')
         t.time_U_over_D=repmat(data.shortSphere.timeDU,n,1);t.step_U_over_D=repmat(data.shortSphere.dtDU,n,1);
     else,t.steady_frame_sha256=frame;end
 end
-if isfield(data,'thermistorImport')
+if isfield(data,'thermistorImport') || isfield(data,'shortSupportImport')
     % 原 STL 面号和标准面积成对保留，可独立复核任一行的热功率。
-    m=data.thermistorImport;t.reference_face_id=m.referenceFaceID(:);
+    if isfield(data,'shortSupportImport')
+        m=data.shortSupportImport;
+        t.physical_time_s=repmat(data.resultCondition.elapsedPhysicalTimeS,n,1);
+        t.physical_step_s=repmat(data.resultCondition.physicalStepSizeS,n,1);
+        t.source_frame_sha256=repmat(string(data.evidenceIdentity.sourceFrame.sha256),n,1);
+    else
+        m=data.thermistorImport;
+    end
+    t.reference_face_id=m.referenceFaceID(:);
     t.reference_area_m2=compose("%.17g",m.referenceAreaM2(:));
     t.stl_sha256=repmat(string(m.stlSHA256),n,1);t.stl_scale_to_m=repmat(m.scaleToM,n,1);
     t.volume_mesh_sha256=repmat(string(m.meshSHA256),n,1);

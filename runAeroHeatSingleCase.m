@@ -11,6 +11,10 @@ function [current,freestream,report] = runAeroHeatSingleCase(mesh,cfg,progressFc
 % 模块四：report 保存接受的设置与面积审计；执行完成不等于全面积求解完成。
 % 未解值、给定值和场量方法均由既有后端保留，不作补零或模型回退。
 if nargin<3,progressFcn=[];end
+% 已绑定的低速双支管银球按用户确认的物理时刻和来源运行。
+if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'shortSupport65')
+    [current,freestream,report]=runShortSupportImportedCase(mesh,cfg,progressFcn);return;
+end
 % 珠体只使用已生成的扇区、已确认的等温边界和用户在计算页选择的来源。
 if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'thermistorB')
     [boundary,freestream]=thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);

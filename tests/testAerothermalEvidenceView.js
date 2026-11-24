@@ -74,6 +74,11 @@ for(const value of ['', '0','1.5','17','NaN']){
   assert(element('lookupNote').textContent.includes('1 至 16'));
 }
 submitFace('1');assert.strictEqual(element('lookupNote').textContent,'');
+// 银球导入后，查询仍用文件面号，探针另显对应参考面号。
+uiData.shortSupportImport={referenceFaceID:F.map((_,i)=>F.length-i)};
+submitFace('2');assert.strictEqual(element('probeID').textContent,'#2');
+assert(element('probePosition').textContent.includes('试件参考面 15'));
+delete uiData.shortSupportImport;
 delete joint.pressureHeatFluxEngineeringArea;
 controller.selectRegion('');assert(element('jointSummary').textContent.includes('工程解 未记录'));
 // 可选存档重放：通过同一个窗口的数据消息和编号表单读取实际原面，不启动浏览器。

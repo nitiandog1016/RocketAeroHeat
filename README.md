@@ -2,6 +2,8 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
+**从 STL 查看双支管银球的单时刻结果**。从[试件包](cases/short_sphere/supported65.zip)解出 `supported_m.stl`，运行 `rocketAeroHeatWorkbench`。加载文件时选比例 1，保持原朝向；在网格页选择“双支管银球 · Short Test 65”，核对原面后确认边界和步长。在计算页选择“读取所选步长的归档”即可查看热流云图。区域结果页支持按导入文件面号点选或查询，侧栏可定位导入网和参考网各自的热峰。重新计算需要本机的 v332 稳态基流、体网和原生运行环境。[试件验收及复现步骤](docs/validation/v334/RESULTS.md)
+
 当前阶段、工程覆盖和验证面积见[当前交接](docs/CURRENT_STATE.md)。每个代码小版本以 `v数字` 标记，可在 [GitHub 版本标签](https://github.com/nitiandog1016/RocketAeroHeat/tags) 查看对应源码。[项目目标与验收](docs/PROJECT_GOALS.md)
 
 在 MATLAB 运行 `rocketAeroHeatWorkbench`，在第一步侧栏选择 **Short 银球 · Test 65**，可查看归档或从冷态复算。打开 **七个风洞测站** 页可查看迎风到背风的局部 Nu、计算误差并导出 CSV。三维页与面元探针显示 12.7 mm 光滑球稳态基流的压力、热流、给定壁温和首层温度。归档随源码提供；新算使用项目的 SU2 8.6.0 逐节点温界驱动，程序内部建网。[对照结果与模型限制](docs/validation/v321/RESULTS.md) · [来源与边界](docs/validation/v321/SOURCE.md)
