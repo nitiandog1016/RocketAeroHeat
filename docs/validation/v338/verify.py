@@ -85,43 +85,45 @@ def continuous_order(wall,body,q,tw,c):
                 lower119=float(bands[119.8][0].min()),upper166=float(bands[166.7][1].max()))
 
 
-def raw_sources():
+def raw_sources(stage=None,prep=None,pair=None):
     app=ROOT/"outputs/v336_validation/clean01"
     job=app/"outputs/short65_time_6dea1a68-073d-4129-867d-3772b804b131"
-    stage=job/"run/half/step2";e=json.loads((stage/"energy.json").read_bytes())
-    assert e["frame"]==sha(stage/"restart_00002.csv") and sha(stage/"edges.bin")==e["files"]["edges.bin"]
-    assert sha(stage/"release/restart_00002.csv")==json.loads((stage/"release/native.json").read_bytes())["frame"]
+    if stage is None:stage=job/"run/half/step2"
+    e=json.loads((stage/"energy.json").read_bytes());filename=f"restart_{e['step']:05d}.csv"
+    assert e["frame"]==sha(stage/filename) and sha(stage/"edges.bin")==e["files"]["edges.bin"]
+    assert sha(stage/"release"/filename)==json.loads((stage/"release/native.json").read_bytes())["frame"]
     with np.load(DATA/"supportedAngularTransfer65.npz") as g:
         xyz,corners,area=(g[k] for k in ("nativeWallXYZD","nativeCorners","nativeArea"))
-    prep=app/json.loads((job/"construction.json").read_bytes())["prepared"]
+    if prep is None:prep=app/json.loads((job/"construction.json").read_bytes())["prepared"]
     with np.load(prep/"mapping.npz") as m:r=m["group"]
-    state=np.loadtxt(stage/"restart_00002.csv",delimiter=",",skiprows=1,usecols=(1,2,3,9))
+    state=np.loadtxt(stage/filename,delimiter=",",skiprows=1,usecols=(1,2,3,9))
     dist,wet=cKDTree(state[:,:3]).query(xyz);assert max(dist)<1e-12
     edges=np.fromfile(stage/"edges.bin","<f8").reshape(-1,6);i,j=edges[:,:2].astype(int).T
     delta=edges[:,4]*(1-edges[:,5])
-    power=(residual(stage/"release/restart_00002.csv")+np.bincount(i,delta,minlength=len(state))-np.bincount(j,delta,minlength=len(state)))[wet]*e["scale"]
+    power=(residual(stage/"release"/filename)+np.bincount(i,delta,minlength=len(state))-np.bincount(j,delta,minlength=len(state)))[wet]*e["scale"]
     _,weights=normals_and_weights(xyz,corners)
     dual=np.bincount(corners.ravel(),(area[:,None]*weights).ravel(),minlength=len(wet))
     assert abs(power.sum()+e["wallW"])<1e-10
     tri=np.concatenate([corners[:,[0,1,2]],corners[:,[2,3,0]]]);keep=np.any(np.cross(xyz[tri[:,1]]-xyz[tri[:,0]],xyz[tri[:,2]]-xyz[tri[:,0]])!=0,axis=1)
     wall=Triangles(xyz,tri[keep],np.tile(r,2)[keep],np.tile(np.arange(len(r))+1,2)[keep])
-    pair=json.loads((DATA/"supportedTime65.json").read_bytes());c=pair["condition"]
+    if pair is None:pair=json.loads((DATA/"supportedTime65.json").read_bytes())
+    c=pair["condition"]
     with ZipFile(DATA/"supported65.zip") as z:g=json.loads(z.read("geometry.json"))
     f=np.array(g["F"])-1
     body=Triangles(np.array(g["V"])/c["diameterM"],f,np.array(g["regionID"]),np.arange(len(f))+1)
     return wall,body,power/dual,c["airK"]+c["scalarUnitK"]*state[wet,3],c
 
 
-def verify(file,volumes):
+def verify(file,volumes,*,pair=None,stage=None,prepared=None,branch="half"):
     with ZipFile(file) as z:
         summary=json.loads(z.read("summary.json"));rows=list(csv.DictReader(io.StringIO(z.read("points.csv").decode())))
-    pair=json.loads((DATA/"supportedTime65.json").read_bytes())
-    assert summary["frameSHA256"]==pair["halfFrame"] and summary["meshSHA256"]==pair["meshSHA256"]
+    if pair is None:pair=json.loads((DATA/"supportedTime65.json").read_bytes())
+    assert summary["frameSHA256"]==pair[branch+"Frame"] and summary["meshSHA256"]==pair["meshSHA256"]
     assert summary["caseSHA256"]==sha(DATA/"test65.json") and summary["bodySHA256"]==sha(DATA/"supported65.zip")
     assert summary["elapsedS"]==pair["elapsedS"] and len(summary["stations"])==7
-    if volumes:wall,body,q,tw,c=raw_sources()
+    if volumes:wall,body,q,tw,c=raw_sources(stage,prepared,pair)
     gaps=[];max_error=0.;tested=0;rear={}
-    for station,expected in zip(summary["stations"],pair["halfNu"]):
+    for station,expected in zip(summary["stations"],pair[branch+"Nu"]):
         angle=station["angleDeg"];band=[r for r in rows if float(r["angleDeg"])==angle]
         assert abs(float(band[0]["nu"])-expected)<1e-8
         intervals=[r for r in band if r["kind"]=="interval"]
@@ -166,11 +168,16 @@ def verify(file,volumes):
     front,back=rear.values();assert len(front)==len(back)
     assert all(a["phiDeg"]==b["phiDeg"] and a["status"]==b["status"]=="sphere" for a,b in zip(front,back))
     min_bound=min(float(a["nuLower"])-float(b["nuUpper"]) for a,b in zip(front,back))
-    assert min_bound==summary["rear"]["lowerBound"] and min_bound>0 and summary["rear"]["status"]=="positive-throughout"
+    minimum=min(float(a["nu"])-float(b["nu"]) for a,b in zip(front,back))
+    status="observed-reversal" if minimum<0 else ("positive-throughout" if min_bound>0 else "unresolved")
+    assert min_bound==summary["rear"]["lowerBound"] and status==summary["rear"]["status"]
+    if pair["elapsedDU"]==.25:assert min_bound>0
     proof=dict(rows=len(rows),equatorGapDegrees=gaps,productionDifferenceLower=min_bound)
     if volumes:
         independent=continuous_order(wall,body,q,tw,c)
-        assert independent["minCommonDifferenceBound"]>0 and max_error<1e-6
+        assert max_error<1e-6
+        if pair["elapsedDU"]==.25:assert independent["minCommonDifferenceBound"]>0
+        assert independent["minCommonDifferenceBound"]<=minimum+1e-8
         proof.update(maxRawHeatDifferenceWm2=max_error,interiorChecks=tested,independentCoverage=independent)
     return proof
 

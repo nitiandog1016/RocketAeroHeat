@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-24。Short Test 65 双支管银球在扰动后 **2.565681 ms** 的 32,480 面均有壁压和热流，总面积 0.000700423853595 m²，向空气放热 2.005432463 W。v338 新增 0 面、0 m²，联合实验验证 0 m²。119.8° 与 166.7° 两站在任一共同方位的 Nu 差均至少为 **+4.839**，实验差为 −3.3。90° 赤道有两段球面遮盖，合计 44.520°。七站周向曲线已接入工作台和离线页。[整圈范围及证明](validation/v338/RESULTS.md) · [本机三维页](../outputs/v338_validation/ui02/workbench/index.html) · [温度梯度](validation/v337/RESULTS.md) · [冷算与重开](validation/v336/RESULTS.md)
+2026-11-24。Short Test 65 名义双支管银球在扰动后 **10.262726 ms** 的 32,480 面均有壁压和热流，面积 0.000700423853595 m²。细步解向空气放热 2.005432412 W，比 2.565681 ms 少 50.78 nW。背风两站在全周的 Nu 差至少为 +4.83875，实验差为 −3.3。银球部分折合量热偏差 +38.08%。v339 新增 0 面、0 m²，联合实验验证 0 m²。工作台可选早晚时刻、查看同面差及七站周向曲线。[单时刻验收](validation/v339/RESULTS.md) · [本机三维页](../outputs/v339_validation/ui_half/workbench/index.html) · [早期周向对照](validation/v338/RESULTS.md) · [冷算与重开](validation/v336/RESULTS.md)
 
-<!-- records:last_completed=v338 -->
+<!-- records:last_completed=v339 -->
 <!-- records:active=none -->
-<!-- records:base_commit=66ba1dcabf0d8081f6a7e403be0666514f24d372 -->
+<!-- records:base_commit=3935850822bf743f197350e70b5a7d2c27603311 -->
 
 20D 的两半步放热为 2.005187691 W，较 14D 减少 0.01221%。[远场对照](validation/v335/RESULTS.md)
 
@@ -42,7 +42,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-接续到 tU/D = 1 的全表面瞬时场，用两种步长核对尾迹发展后背风两站和五区功率的变化。[下一决定](validation/v338/NEXT_DECISION.md)
+用球体量热功率 0.8271231935 W 反求名义等温银球的热平衡壁温，单列支管与端盖放热，以试验平均壁温和七站换热进行对照。[下一决定](validation/v339/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

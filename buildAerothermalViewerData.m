@@ -639,6 +639,11 @@ if isfield(mesh,'shortSupportDirection')
     elseif isfield(mesh,'shortSupportTime')
         % 同一物理时刻的两个独立 BDF1 分支，截面与导出按本分支实际步长标识。
         tp=mesh.shortSupportTime;label='整步';if strcmp(g,'timehalf'),label='两半步';end
+        if isfield(mesh,'shortSupportTemporal')
+            count=round(tp.elapsedS/mesh.shortSupportTemporal.dtS);
+            stepName='整步';if strcmp(g,'timehalf'),stepName='半步';end
+            label=sprintf('%d 个%s',count,stepName);
+        end
         data.defaultField='heatFlux';data.comparisonColorRanges.heatFlux=tp.heatRangeKWm2;
         data.comparisonColorRanges.pressureGauge=tp.gaugeRangePa;
         data.resultCondition.elapsedPhysicalTimeS=tp.elapsedS;
@@ -670,6 +675,18 @@ if isfield(mesh,'shortSupportDirection')
     end
 end
 % 带线旧网与加密网在七区均可对照，和只在共同珠面定义的几何差别分开显示。
+if isfield(mesh,'shortSupportTemporal')
+    % 同一网格与同一步长的两个真实物理时刻；差值以晚时刻减早时刻为正。
+    c=mesh.shortSupportTemporal;scope=sprintf('Short 65 · 同一步长 %.6f ms · %.6f ms 减 %.6f ms',1e3*c.dtS,1e3*c.laterTimeS,1e3*c.earlyTimeS);
+    for item={{'timeFluxChange','两时刻之差 · 入壁热流','W/m²',c.fluxChangeWm2}, ...
+              {'timeGaugeChange','两时刻之差 · 表压','Pa',c.gaugeChangePa}, ...
+              {'timeFirstChange','两时刻之差 · 首层流体温度','K',c.firstChangeK}}
+        f=item{1};v=f{4};add(f{1},f{2},f{3},v,double(isfinite(v)), ...
+            repmat({'SU2 BDF1 同一分支保存帧的同面差'},n,1),scope);
+        limit=c.sharedMax.(f{1});if limit>0,data.comparisonColorRanges.(f{1})=[-limit limit];end
+    end
+    data.shortSupportTemporal=rmfield(c,{'fluxChangeWm2','gaugeChangePa','firstChangeK'});
+end
 if isfield(mesh,'shortSupportOuter')
     % 单位保留 W/m² 和 Pa，让远场距离造成的小差异在同一物理面上可见。
     c=mesh.shortSupportOuter;scope='Short 65 两套独立基流，在同一物理时间和同一步长比较。正差表示 20D 的量更大。';

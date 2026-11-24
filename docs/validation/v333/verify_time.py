@@ -43,7 +43,9 @@ def verify(data,work=None,ui=None,*,base_frame=BASE_FRAME,steady=BASE/"run01/ste
     def close(x,y):np.testing.assert_allclose(x,y,atol=1e-10,rtol=1e-12)
     def rms(v):return np.sqrt(np.average(v*v,weights=area))
     proof=dict(faces=N,areaM2=area.sum(),elapsedS=pair["elapsedS"]);all_rows={}
-    for branch,step in (("full",1),("half",2)):
+    later=pair["schema"]=="short65-supported-time-continuation-v1"
+    steps=(("full",4),("half",8)) if later else (("full",1),("half",2))
+    for branch,step in steps:
         archive=data/("supportedTime65"+branch.title()+".zip")
         assert sha(archive)==pair[branch+"Archive"]
         with ZipFile(archive) as z:
@@ -51,7 +53,8 @@ def verify(data,work=None,ui=None,*,base_frame=BASE_FRAME,steady=BASE/"run01/ste
             assert all(hashlib.sha256(z.read(k)).hexdigest()==v for k,v in r["files"].items())
         all_rows[branch]=w;e=r["energy"]
         assert r["frameSHA256"]==pair[branch+"Frame"]==e["frame"] and r["seedFrame"]==pair["seed"]
-        assert e["old"]==(pair["seed"] if step==1 else pair["firstHalfFrame"]) and e["elapsedDU"]==.25
+        prior=pair["history"][branch][-2]["frame"] if later else (pair["seed"] if step==1 else pair["firstHalfFrame"])
+        assert e["old"]==prior and e["elapsedDU"]==(1 if later else .25)
         close(e["elapsedS"],e["dt"]*step*s["diameterM"]/s["speedMps"]);close(e["elapsedS"],pair["elapsedS"])
         assert r["jointExperimentalAreaM2"]==0 and r["faces"]==32480
         np.testing.assert_array_equal(w["faceID"],np.arange(N)+1);np.testing.assert_array_equal(w["regionID"],grid["region"])

@@ -150,11 +150,13 @@ def compare_rear(front,back):
                 lowerBound=min(lower),upperBound=max(upper))
 
 
-def compute(prepared,work,out):
-    stage=work/"half/step2";frame=stage/"restart_00002.csv"
-    endpoint=read(stage/"energy.json");s=read(out/"half/summary.json");p=read(prepared/"prepared.json")
+def compute(prepared,work,out,*,branch="half"):
+    assert branch in ("full","half")
+    s=read(out/branch/"summary.json");step=s["energy"]["step"]
+    stage=work/branch/f"step{step}";frame=stage/f"restart_{step:05d}.csv"
+    endpoint=read(stage/"energy.json");p=read(prepared/"prepared.json")
     c=s["condition"];angles=read(CASE)["angleDeg"];D=c["diameterM"]
-    assert s["branch"]=="half" and p["condition"]==c and p["geometry"]["outerRadiusD"]==14
+    assert s["branch"]==branch and p["condition"]==c and p["geometry"]["outerRadiusD"]==14
     assert s["energy"]==endpoint and sha(frame)==s["frameSHA256"]==endpoint["frame"]
     assert s["caseSHA256"]==sha(CASE) and s["bodySHA256"]==sha(BODY)
     assert s["meshSHA256"]==p["files"]["mesh.su2"] and sha(prepared/"mapping.npz")==p["files"]["mapping.npz"]
@@ -176,8 +178,8 @@ def compute(prepared,work,out):
     grids={a:cut_angles(np.r_[np.arange(360),native.crossings(a),body.crossings(a)]) for a in angles if a}
     a,b=119.8,166.7
     grids[a]=grids[b]=cut_angles(np.r_[grids[a],grids[b]])
-    stations=np.genfromtxt(out/"half/stations.csv",names=True,delimiter=",")
-    assert sha(out/"half/stations.csv")==s["files"]["stations.csv"]
+    stations=np.genfromtxt(out/branch/"stations.csv",names=True,delimiter=",")
+    assert sha(out/branch/"stations.csv")==s["files"]["stations.csv"]
     curves={};stats=[]
     for angle,st in zip(angles,stations):
         assert angle==st["angleDeg"];rows=[]
@@ -211,7 +213,7 @@ def compute(prepared,work,out):
     text=io.StringIO();writer=csv.DictWriter(text,fieldnames=FIELDS,lineterminator="\n")
     writer.writeheader()
     for rows in curves.values():writer.writerows(rows)
-    path=out/"stationAzimuth.zip"
+    path=out/("stationAzimuth.zip" if branch=="half" else "stationAzimuthFull.zip")
     with ZipFile(path,"x") as z:
         for name,content in (("summary.json",json.dumps(summary,allow_nan=False)),("points.csv",text.getvalue())):
             z.writestr(ZipInfo(name),content.encode("utf8"),compress_type=ZIP_DEFLATED,compresslevel=9)

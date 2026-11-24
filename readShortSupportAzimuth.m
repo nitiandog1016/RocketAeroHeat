@@ -1,12 +1,17 @@
-function az=readShortSupportAzimuth(cases,job,s,stations,folder)
-% 模块一：只给匹配源帧、面网和条件的 14D 两半步结果加载曲线，新任务使用自己的反力包。
-az=[];local=false;
+function az=readShortSupportAzimuth(cases,job,s,stations,folder,later)
+% 模块一：按 14D 的物理时刻、步长和终帧加载本分支的周向换热曲线。
+if nargin<6,later=[];end
+az=[];local=false;field='stationAzimuthSHA256';name='stationAzimuth.zip';
+if ~isempty(later) && strcmp(s.branch,'full'),field='stationAzimuthFullSHA256';name='stationAzimuthFull.zip';end
 if ~isempty(job)
     receipt=jsondecode(fileread(fullfile(job,'completed.json')));
-    local=isfield(receipt,'stationAzimuthSHA256');
+    local=isfield(receipt,field);
 end
 if local
-    file=fullfile(job,'export','stationAzimuth.zip');key=receipt.stationAzimuthSHA256;
+    file=fullfile(job,'export',name);key=receipt.(field);
+elseif ~isempty(later)
+    assert(isempty(job),'RAH:Short:Azimuth','接续任务缺少周向读数来源。');
+    file=fullfile(cases,'later1',name);key=later.(field);
 else
     if ~strcmp(s.frameSHA256,'0132e9b266ef344fcbf13fd9a7d3dd994fa56ef3192caa3fbf7c8fc1da5f002e'),return;end
     file=fullfile(cases,'stationAzimuth65.zip');key='1c4167c5f2d314419b2db464fe13e449e9ba27bc58305bb9617caa82b47c5cc3';

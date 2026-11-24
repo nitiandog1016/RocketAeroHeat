@@ -47,18 +47,27 @@ def mapped_step(job,folder,step,branch,transfer,geom,out,*,prepared=PREP):
 
 
 def export(work,out,*,prepared=PREP,prepared_sha=PREP_KEY,base_frame=BASE_FRAME,
-           steady_surface=DATA/"supportedAngularSurface65.zip"):
+           steady_surface=DATA/"supportedAngularSurface65.zip",continuation=None):
     job=read(work/"job.json");assert job["baseFrame"]==base_frame and sha(work/"seed.csv")==job["seed"]
     assert job["preparedSHA256"]==sha(prepared/"prepared.json")==prepared_sha
     manifest=read(DATA/"supportedAngular65.json");transfer=DATA/"supportedAngularTransfer65.npz"
     assert sha(transfer)==manifest["transferSHA256"]
     geom=geometry(manifest,transfer);geom["transferSHA256"]=sha(transfer)
-    first=read(work/"half/step1/energy.json")
+    if continuation is None:
+        full_step,half_step=1,2
+        first=read(work/"half/step1/energy.json")
+        previous_full=job["seed"];previous_half=first["frame"]
+    else:
+        # 接续记录包含从同一扰动种子出发的全部时间层，两条链各自独立。
+        full_step,half_step=4,8
+        assert len(continuation["full"])==full_step and len(continuation["half"])==half_step
+        first=read(Path(read(work/"continuation.json")["sourceRun"])/"half/step1/energy.json")
+        previous_full=continuation["full"][-2]["frame"];previous_half=continuation["half"][-2]["frame"]
     assert abs(first["relativeBalance"])<.005 and first["old"]==job["seed"]
     out.mkdir(parents=True,exist_ok=False)
-    full,w,v,st=mapped_step(job,work/"full/step1",1,"full",transfer,geom,out/"full",prepared=prepared)
-    half,z,vh,sth=mapped_step(job,work/"half/step2",2,"half",transfer,geom,out/"half",prepared=prepared)
-    assert full["energy"]["old"]==job["seed"] and half["energy"]["old"]==first["frame"]
+    full,w,v,st=mapped_step(job,work/"full"/f"step{full_step}",full_step,"full",transfer,geom,out/"full",prepared=prepared)
+    half,z,vh,sth=mapped_step(job,work/"half"/f"step{half_step}",half_step,"half",transfer,geom,out/"half",prepared=prepared)
+    assert full["energy"]["old"]==previous_full and half["energy"]["old"]==previous_half
     assert full["elapsedSeconds"]==half["elapsedSeconds"]
     for k in ("faceID","regionID","areaM2","wallInputK"):np.testing.assert_array_equal(w[k],z[k])
     s=job["condition"];area=w["areaM2"];dyn=s["rho"]*s["speedMps"]**2/2
@@ -90,6 +99,9 @@ def export(work,out,*,prepared=PREP,prepared_sha=PREP_KEY,base_frame=BASE_FRAME,
             ("ShearPa","ShearMagnitudePa","SpeedMps","SpeedMagnitudeMps","Status"))},
         heatRangeKWm2=[min(w["fluxInWm2"].min(),z["fluxInWm2"].min())/1000,max(w["fluxInWm2"].max(),z["fluxInWm2"].max())/1000],
         gaugeRangePa=[min(w["gaugePa"].min(),z["gaugePa"].min()),max(w["gaugePa"].max(),z["gaugePa"].max())])
+    if continuation is not None:
+        assert full["energy"]["elapsedDU"]==half["energy"]["elapsedDU"]==1
+        comparison.update(schema="short65-supported-time-continuation-v1",elapsedDU=1,history=continuation)
     store(out/"pair.json",comparison);return comparison
 
 

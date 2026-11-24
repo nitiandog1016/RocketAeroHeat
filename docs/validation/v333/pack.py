@@ -45,11 +45,11 @@ def pack(base,work,out):
         for k,v in small.items():z.writestr(k,v)
 
 
-def check(path,*,prefix="run01",nodes=261708):
+def check(path,*,prefix="run01",nodes=261708,steps=(("full",1),("half",1),("half",2))):
     with ZipFile(path) as z:
         manifest=json.loads(z.read("manifest.json"))
         for k,h in manifest["files"].items():assert hashlib.sha256(z.read(k)).hexdigest()==h
-        for branch,step in (("full",1),("half",1),("half",2)):
+        for branch,step in steps:
             root=f"{prefix}/{branch}/step{step}/";e=json.loads(z.read(root+"energy.json"))
             for sub in ("","release/"):
                 rec=json.loads(z.read(root+sub+"debugger_process.json"))

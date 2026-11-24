@@ -221,6 +221,14 @@ switch action
             folder='';
             if strcmp(source,'solve')
                 folder=fullfile(fileparts(mfilename('fullpath')),'outputs',['short65_time_' char(java.util.UUID.randomUUID())]);
+                if optional(state.cfg.shortSupportBoundary,'targetDU',.25)==1
+                    origin=char(optional(payload,'shortStartDirectory',''));
+                    if ~isempty(origin)
+                        origin=char(java.io.File(origin).getCanonicalPath());
+                        assert(isfile(fullfile(origin,'completed.json')),'RAH:Short:Job','起点目录缺少已完成计算的回执。');
+                    end
+                    state.frozenInputs.cfg.shortSupportSourceJob=origin;
+                end
             elseif strcmp(source,'reopen')
                 assert(optional(state.cfg,'shortSupportRadiusD',14)==14,'RAH:Short:Job','请选择 14D 主工况。');
                 folder=char(java.io.File(required(payload,'runDirectory')).getCanonicalPath());
@@ -301,7 +309,7 @@ switch action
                 numel(result.hybridWallTemperatureK)==n && all(isfinite(result.hybridWallTemperatureK)), ...
                 'RAH:Short:Snapshot','返回的银球快照与本次冻结输入或原面场不符。');
             if strcmp(cfg.shortSupportAction,'archive')
-                [~,pair]=shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14));
+                [~,pair]=shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14),optional(b,'targetDU',.25));
                 assert(strcmp(id.sourceFrame.sha256,pair.([b.branch 'Frame'])) && strcmp(id.sourceFrame.initialSHA256,b.initialFrame), ...
                     'RAH:Short:Snapshot','归档帧与所选步长不符。');
             else
@@ -526,7 +534,8 @@ end
 function validateFlight(cfg)
 if strcmp(optional(cfg,'computationBackend',''),'shortSupport65')
     b=cfg.shortSupportBoundary;
-    assert(isequal(b,shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14))),'RAH:Short:Boundary','请使用当前双支管试件登记的工况和物理时间。');return;
+    assert(isequal(b,shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14),optional(b,'targetDU',.25))), ...
+        'RAH:Short:Boundary','请使用当前双支管试件登记的工况和物理时间。');return;
 end
 if strcmp(optional(cfg,'computationBackend',''),'thermistorB')
     thermistorWorkbenchBoundary(cfg.thermistorBoundary,cfg.thermistorAngularCells,cfg);

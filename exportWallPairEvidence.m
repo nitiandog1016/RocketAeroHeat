@@ -35,6 +35,13 @@ if isfield(data,'thermistorImport') || isfield(data,'shortSupportImport')
         t.physical_time_s=repmat(data.resultCondition.elapsedPhysicalTimeS,n,1);
         t.physical_step_s=repmat(data.resultCondition.physicalStepSizeS,n,1);
         t.source_frame_sha256=repmat(string(data.evidenceIdentity.sourceFrame.sha256),n,1);
+        if isfield(data,'shortSupportTemporal')
+            c=data.shortSupportTemporal;t.reference_time_s=repmat(c.earlyTimeS,n,1);
+            t.reference_time_frame_sha256=repmat(string(c.baseFrame),n,1);
+            for pair={{'timeFluxChange','delta_time_heat_flux_W_m2'},{'timeGaugeChange','delta_time_gauge_Pa'},{'timeFirstChange','delta_time_first_K'}}
+                item=pair{1};f=data.fields(strcmp({data.fields.key},item{1}));t.(item{2})=compose("%.17g",f.values(:));
+            end
+        end
         if isfield(data,'shortSupportOuter')
             % 20D 的主值和相对 14D 的差分各列保存；每行可独立定位对照帧。
             c=data.shortSupportOuter;

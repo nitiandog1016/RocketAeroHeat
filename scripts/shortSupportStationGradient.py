@@ -138,10 +138,11 @@ def reconstruct(grid, frame, archive):
 
 
 def save_pair(prepared,work,out):
-    """在 14D 生产入口从本次真实终帧附加诊断，独立于守恒主面表。"""
+    """从两分支本次面表登记的物理终帧附加诊断，独立于守恒主面表。"""
     grid=measurement_grid(prepared)
     sets=[]
-    for branch,step in (("full",1),("half",2)):
+    for branch in ("full","half"):
+        step=read(out/branch/"summary.json")["energy"]["step"]
         frame=work/branch/f"step{step}"/f"restart_{step:05d}.csv"
         sets.append(reconstruct(grid,frame,out/branch/"surface.zip"))
     file=out/"stationGradients.json"

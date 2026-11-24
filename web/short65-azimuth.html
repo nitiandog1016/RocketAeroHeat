@@ -37,7 +37,7 @@ function notify(kind,extra){
 function load(payload){
   data=payload;const options=$('angle');options.length=1;
   for(const a of data.angles)options.add(new Option(a+'°',String(a)));
-  $('condition').textContent='Short Test 65 · Re = 882 · 14D · 扰动后 '+val(data.timeMs,6)+' ms';
+  $('condition').textContent='Short Test 65 · Re = 882 · 14D · 扰动后 '+val(data.timeMs,6)+' ms · 步长 '+val(data.stepMs,6)+' ms';
   show();
 }
 function show(){

@@ -1,8 +1,9 @@
-function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution,radiusD)
+function [mesh,stations,s]=loadShortSupportSurface(g,job,resolution,radiusD,target)
 % 模块一：核对同一几何、温界、收敛端点和五区交叠文件，从存档或新算目录取数。
 if nargin<2,job='';end
 if nargin<3,resolution='coarse';end
 if nargin<4,radiusD=14;end
+if nargin<5,target=.25;end
 root=fileparts(mfilename('fullpath'));cases=fullfile(root,'cases','short_sphere');
 timed=ismember(resolution,{'timefull','timehalf'});
 transferName='supportedTransfer65.npz';
@@ -10,13 +11,15 @@ if timed || strcmp(resolution,'angular'),transferName='supportedAngularTransfer6
 if timed
     branch=resolution(5:end);
     if isempty(job)
-        pair=readShortSupportTimePair(cases,radiusD);
+        pair=readShortSupportTimePair(cases,radiusD,target);
         folder=cases;if radiusD==20,folder=fullfile(cases,'outer20');end
+        if target==1,folder=fullfile(cases,'later1');end
         archive=fullfile(folder,['supportedTime65' upper(branch(1)) branch(2:end) '.zip']);
     else
         pair=jsondecode(fileread(fullfile(job,'export','pair.json')));archive=fullfile(job,'export',branch,'surface.zip');
         ack=jsondecode(fileread(fullfile(job,'completed.json')));
         assert(strcmp(cm011FileSHA256(fullfile(job,'export','pair.json')),ack.pairSHA256));
+        validateShortTimeChain(pair,target);
     end
     assert(strcmp(cm011FileSHA256(archive),pair.([branch 'Archive'])));
 elseif nargin<2 || isempty(job)
@@ -68,7 +71,8 @@ n=size(g.F,1);c=s.condition;
 assert(isequal(w.faceID,(1:n)') && isequal(w.regionID,g.regionID) && max(abs(w.areaM2-g.areaM2))<1e-17);
 assert(max(abs(w.absolutePa-w.gaugePa-c.airPa))<1e-8 && abs(w.areaM2'*w.fluxInWm2+power)<1e-10);
 assert(isequal(stations.originalFaceID,g.stations.faceID) && s.jointExperimentalAreaM2==0);
-if radiusD==14,stations=attachShortStationGradients(stations,s,cases,job);end
+later=[];if timed && target==1,later=pair;end
+if radiusD==14,stations=attachShortStationGradients(stations,s,cases,job,later);end
 % 模块二：用统一的原面适配器交付压力、热流、给定壁温及对应首层流体温度。
 names=["外露银球";"+Y 支管外壁";"−Y 支管外壁";"+Y 湿端盖";"−Y 湿端盖"];
 condition=struct('caseLabel','Short Test 65 · 双支管银球 · 稳态','velocityMps',[-c.speedMps 0 0], ...
@@ -101,8 +105,9 @@ if timed
     mesh.shortSupportDirectionGrid=resolution;mesh.shortSupportTime=pair;
 end
 mesh.evidenceIdentity=id;s.coverage=coverage;s.outW=power;
-if radiusD==14 && strcmp(resolution,'timehalf')
-    az=readShortSupportAzimuth(cases,job,s,stations,temp);
+if ~isempty(later),mesh.shortSupportTemporal=readShortSupportTimeDifference(job,cases,branch,pair,s);end
+if radiusD==14 && timed && (target==1 || strcmp(resolution,'timehalf'))
+    az=readShortSupportAzimuth(cases,job,s,stations,temp,later);
     if ~isempty(az),mesh.shortSupportAzimuth=az;end
 end
 if ismember('gradientNu',stations.Properties.VariableNames),mesh.shortSupportStationTable=stations;end

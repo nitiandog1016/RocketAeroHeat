@@ -1,5 +1,6 @@
-function stations=attachShortStationGradients(stations,s,cases,job)
+function stations=attachShortStationGradients(stations,s,cases,job,later)
 % 模块一：本地新任务优先使用随任务封存的七站剖面；旧任务和发布归档按实际终帧匹配。
+if nargin<5,later=[];end
 local=false;
 if ~isempty(job)
     receipt=jsondecode(fileread(fullfile(job,'completed.json')));
@@ -7,6 +8,9 @@ if ~isempty(job)
 end
 if local
     file=fullfile(job,'export','stationGradients.json');expected=receipt.stationGradientsSHA256;
+elseif ~isempty(later)
+    assert(isempty(job),'RAH:Short:Gradient','接续任务缺少七站来源。');
+    file=fullfile(cases,'later1','stationGradients65.json');expected=later.stationGradientsSHA256;
 else
     file=fullfile(cases,'stationGradients65.json');
     expected='8245b78b562d770419cbc1d5efaeacde94e9b612883a0ec9ab04e54eb953bd9d';
@@ -16,7 +20,7 @@ data=jsondecode(fileread(file));
 assert(strcmp(data.schema,'short65-station-gradient-v1'),'RAH:Short:Gradient','七站梯度文件格式有误。');
 if isfield(s,'meshSHA256'),mesh=s.meshSHA256;else,mesh=s.thermal.meshSHA256;end
 matches=strcmp({data.sets.frameSHA256},s.frameSHA256) & strcmp({data.sets.meshSHA256},mesh);
-if ~local && ~any(matches),return;end
+if ~local && isempty(later) && ~any(matches),return;end
 assert(nnz(matches)==1,'RAH:Short:Gradient','本任务没有唯一匹配的七站体场。');g=data.sets(matches);
 assert(strcmp(g.caseSHA256,s.caseSHA256) && strcmp(g.stationsSHA256,s.files.stations_csv), ...
     'RAH:Short:Gradient','七站位置或工况与主面表不符。');

@@ -1,7 +1,8 @@
 function [result,boundary,report]=runShortSupportImportedCase(input,cfg,progress)
 % 模块一：核对用户确认的文件、面网、温界和所选时间层，然后调用试件原生入口。
 radiusD=14;if isfield(cfg,'shortSupportRadiusD'),radiusD=cfg.shortSupportRadiusD;end
-boundary=shortSupportImportBoundary(cfg.shortSupportBoundary.branch,radiusD);
+target=.25;if isfield(cfg.shortSupportBoundary,'targetDU'),target=cfg.shortSupportBoundary.targetDU;end
+boundary=shortSupportImportBoundary(cfg.shortSupportBoundary.branch,radiusD,target);
 assert(isequal(cfg.shortSupportBoundary,boundary),'RAH:Short:Boundary','当前设置与 Test 65 的冻结工况不符。');
 [b,g]=bindShortSupportSTL(input,input.shortSupportImport.source,cfg.geometry,radiusD);
 assert(isequal(b,input.shortSupportImport),'RAH:Short:Mapping','建网后试件映射已改变。');
@@ -12,7 +13,12 @@ switch cfg.shortSupportAction
         % 全新检出可能还没有 outputs；启动 Python 前需先建立日志的父目录。
         parent=fileparts(job);if ~isfolder(parent),mkdir(parent);end
         script='shortSupportTime65.py';if radiusD==20,script='shortSupportOuter65.py';end
-        runCM011Python({fullfile(root,'scripts',script),job},[job '.log'],@pulse,true);
+        if target==1,script='shortSupportLater65.py';end
+        args={fullfile(root,'scripts',script),job};
+        if target==1 && isfield(cfg,'shortSupportSourceJob') && ~isempty(cfg.shortSupportSourceJob)
+            args=[args,{'--from-job',cfg.shortSupportSourceJob}];
+        end
+        runCM011Python(args,[job '.log'],@pulse,true);
     case 'archive'
         assert(isempty(job),'RAH:Short:Job','读取发布归档的目录设置无效。');
     case 'reopen'
@@ -21,7 +27,7 @@ switch cfg.shortSupportAction
     otherwise
         error('RAH:Short:Action','请在计算页选择新算或读取归档。');
 end
-grid=['time' boundary.branch];[result,stations,s]=loadShortSupportSurface(g,job,grid,radiusD);
+grid=['time' boundary.branch];[result,stations,s]=loadShortSupportSurface(g,job,grid,radiusD,target);
 seed=boundary.initialFrame;
 if ~isempty(job)
     frame=shortSupportJobFrame(job,b,boundary);seed=frame.initial;
@@ -91,6 +97,18 @@ if radiusD==20
     assert(isequal(stations.referenceFaceID,measurements.originalFaceID));
     report.stations.baseNu=measurements.computedNu;
     report.baseOutW=ref.energy.wallW;report.baseStationRMSE=ref.stationRMSE;report.baseEquivalentRelativeError=ref.equivalentRelativeError;
+end
+if target==1
+    % 同面压力与温度按源面号取值，热流时间差按导入面的实际面积保持各面瓦数。
+    d=result.shortSupportTemporal;d.gaugeChangePa=d.gaugeChangePa(order);d.firstChangeK=d.firstChangeK(order);
+    areaRatio=b.referenceAreaM2./area;
+    d.fluxChangeWm2=d.fluxChangeWm2(order).*areaRatio;
+    d.sharedMax.timeFluxChange=d.sharedMax.timeFluxChange*max(areaRatio);
+    assert(abs(area'*d.fluxChangeWm2+d.powerChangeW)<1e-10);result.shortSupportTemporal=d;
+    old=pair.timeComparison.(boundary.branch);
+    report.stations.earlyNu=old.earlyNu(:);report.earlySourceFrame=old.earlyFrame;
+    report.temporalPowerChangeW=old.wallChangeW;report.earlyStationRMSE=old.earlyStationRMSE;
+    if isfield(result,'shortSupportStationTable'),result.shortSupportStationTable=report.stations;end
 end
 result.shortSupportAction=cfg.shortSupportAction;result.shortSupportJob=job;
 id=result.evidenceIdentity;id.reusedArchive=strcmp(cfg.shortSupportAction,'archive');

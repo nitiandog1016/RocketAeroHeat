@@ -13,7 +13,7 @@ state=aeroHeatWorkflowState('init',[],struct('cfg',cfg));
 preview=[];rotation=eye(3);rotationCenter=[0 0 0];controls=struct;
 webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDetailsOpen=false;
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
-measuredDirectory='';measuredPauseFile='';lastWireDirectory='';lastShortDirectory='';
+measuredDirectory='';measuredPauseFile='';lastWireDirectory='';lastShortDirectory='';lastEarlyShortDirectory='';
 creasePreview=false;qualityPreview=false;candidatePreview=[];
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
@@ -434,12 +434,18 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isShortSupport()
-                    grid=form(9);b=state.cfg.shortSupportBoundary;
-                    controls.shortBranch=choice(grid,1,'时间步长',{'两个半步','一个整步'},{'half','full'},b.branch);
+                    grid=form(10);b=state.cfg.shortSupportBoundary;target=getOption(b,'targetDU',.25);
+                    choices={'两个半步','一个整步'};offset=0;
+                    if getOption(state.cfg,'shortSupportRadiusD',14)==14
+                        controls.shortTarget=choice(grid,1,'扰动后时刻',{'2.565681 ms · 0.25 D/U','10.262726 ms · 1 D/U'},{.25,1},target);
+                        controls.shortTarget.ValueChangedFcn=@boundaryEdited;offset=1;
+                        if target==1,choices={'八个半步','四个整步'};end
+                    end
+                    controls.shortBranch=choice(grid,1+offset,'时间步长',choices,{'half','full'},b.branch);
                     controls.shortBranch.ValueChangedFcn=@boundaryEdited;
-                    tip(grid,2,sprintf('Re %g · 来流 −X，%.6g m/s\n环境 %.5f K、%.5f Pa',b.reynolds,-b.velocityMps(1),b.airK,b.airPa));
-                    tip(grid,5,sprintf('球面按试验七站极角给定温度，支管和端盖 %.5f K。\n扰动后 %.6f ms · 每步 %.6f ms',b.supportWallK,1e3*b.elapsedS,1e3*b.dtS));
-                    controls.confirm=button(grid,8,'确认试件温界、来流与时间',@confirmBoundary);
+                    tip(grid,2+offset,sprintf('Re %g · 来流 −X，%.6g m/s\n环境 %.5f K、%.5f Pa',b.reynolds,-b.velocityMps(1),b.airK,b.airPa));
+                    tip(grid,5+offset,sprintf('球面按试验七站极角给定温度，支管和端盖 %.5f K。\n扰动后 %.6f ms · 每步 %.6f ms',b.supportWallK,1e3*b.elapsedS,1e3*b.dtS));
+                    controls.confirm=button(grid,8+offset,'确认试件温界、来流与时间',@confirmBoundary);
                     sync();return;
                 end
                 if isBead()
@@ -622,6 +628,11 @@ renderEditor();sync();showGeometry(true);
                         info='首次从冷初场建立并核对稳态基流，之后从该基流生成扰动。';
                         controls.shortDirectory=textField(grid,10,'计算目录',lastShortDirectory);
                         controls.reopenShort=button(grid,11,'重开已完成的本地计算',@(~,~)solveCase([],[],'reopen'));
+                        if getOption(b,'targetDU',.25)==1
+                            controls.run.Text='从早期终帧接续计算';
+                            controls.shortStartDirectory=textField(grid,12,'早期起点目录',lastEarlyShortDirectory);
+                            info='接续计算使用下方早期起点目录。留空时程序先生成早期场，再接续至所选时刻。';
+                        end
                     end
                     tip(grid,3,sprintf('同刻 %.6f ms · 当前步长 %.6f ms。%s',1e3*b.elapsedS,1e3*b.dtS,info));
                     controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[6 9];controls.log.Layout.Column=[1 2];
@@ -725,7 +736,8 @@ renderEditor();sync();showGeometry(true);
                 if isShortSupport()
                     hasGradient=ismember('gradientNu',report.stations.Properties.VariableNames);
                     hasAzimuth=isfield(state.result,'shortSupportAzimuth');
-                    grid=form(15+2*isfield(state.result,'shortSupportOuter')+hasGradient+hasAzimuth);b=state.cfg.shortSupportBoundary;
+                    temporal=isfield(state.result,'shortSupportTemporal');
+                    grid=form(15+2*isfield(state.result,'shortSupportOuter')+hasGradient+hasAzimuth+2*temporal);b=state.cfg.shortSupportBoundary;
                     origin='本次原生计算';if state.result.evidenceIdentity.reusedArchive,origin='读取发布归档';end
                     if strcmp(state.result.shortSupportAction,'reopen'),origin='重开本地计算';end
                     tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
@@ -738,13 +750,18 @@ renderEditor();sync();showGeometry(true);
                     controls.nativePeak=button(grid,15,'定位参考网热峰',@(~,~)inspectShortPeak(report.nativePeakFileFaceID));
                     if hasGradient
                         peakNote.Layout.Row=[4 5];
-                        selector=choice(grid,6,'测站对照',{'实验与主解','壁反力与梯度 · Nu','入壁热流 · W/m²','法向取样'}, ...
-                            {'main','nu','flux','profile'},'main');
+                        labels={'实验与主解','壁反力与梯度 · Nu','入壁热流 · W/m²','法向取样'};modes={'main','nu','flux','profile'};
+                        if isfield(state.result,'shortSupportTemporal'),labels{end+1}='两时刻 · 同一步长 Nu';modes{end+1}='time';end
+                        selector=choice(grid,6,'测站对照',labels,modes,'main');
                         % 第二段说明占第 4、5 行，选择器和七站表在视野中相邻。
                         selector.ValueChangedFcn=@selectStationMethod;controls.stationMethod=selector;
                         controls.exportStations=button(grid,16,'导出七站方法与取样 CSV',@saveShortStations);
                     end
                     if hasAzimuth,controls.openAzimuth=button(grid,17,'查看七站周向换热',@openShortAzimuth);end
+                    if temporal
+                        note=tip(grid,18,sprintf('同一步长 · 10.263 ms 减 2.566 ms\n整件放热变化 %+.5g µW · 七站 RMSE %.5f → %.5f Nu', ...
+                            report.temporalPowerChangeW*1e6,report.earlyStationRMSE,report.stationRMSE));note.Layout.Row=[18 19];
+                    end
                     if isfield(state.result,'shortSupportOuter')
                         controls.stations.ColumnName={'极角 / °','STL 面','实验 Nu','14D Nu','20D Nu'};
                         controls.stations.Data=report.stations{:,{'angleDeg','fileFaceID','reportedNu','baseNu','computedNu'}};
@@ -978,6 +995,8 @@ renderEditor();sync();showGeometry(true);
     function selectStationMethod(field,~)
         % 模块用途：同一时刻与同一测站的四种显示共享一份原始表，切换仅更新列。
         switch field.Value
+            case 'time'
+                keys={'angleDeg','reportedNu','earlyNu','computedNu'};labels={'极角 / °','实验 Nu','2.566 ms · Nu','10.263 ms · Nu'};
             case 'nu'
                 keys={'angleDeg','reportedNu','computedNu','gradientNu'};labels={'极角 / °','实验 Nu','壁反力 Nu','梯度 Nu'};
             case 'flux'
@@ -1179,7 +1198,10 @@ renderEditor();sync();showGeometry(true);
 %% 模块九：边界输入与热物性/方法选择均入集中状态，不立即求物理场。
     function next=boundaryConfiguration()
         next=state.cfg;
-        if isShortSupport(),next.shortSupportBoundary=shortSupportImportBoundary(controls.shortBranch.Value,getOption(next,'shortSupportRadiusD',14));return;end
+        if isShortSupport()
+            target=.25;if isfield(controls,'shortTarget'),target=controls.shortTarget.Value;end
+            next.shortSupportBoundary=shortSupportImportBoundary(controls.shortBranch.Value,getOption(next,'shortSupportRadiusD',14),target);return;
+        end
         if isBead()
             next.thermistorBoundary=[];
             if isSidewind()
@@ -1341,7 +1363,7 @@ renderEditor();sync();showGeometry(true);
         if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
-            if isShortSupport(),renderEditor();message('时间步长已更新，请重新确认。');showGeometry(false);return;end
+            if isShortSupport(),renderEditor();message('物理时刻或步长已更新，请重新确认。');showGeometry(false);return;end
             if isBead() && isfield(controls,'wireBoundary')
                 renderEditor();message('引线热边界已更新，请确认当前工况。');
             elseif isBead()
@@ -1450,6 +1472,9 @@ renderEditor();sync();showGeometry(true);
             if nargin<3,source='solve';end
             request=struct();
             if isShortSupport(),request.shortSupportAction=source;end
+            if isShortSupport() && strcmp(source,'solve') && isfield(controls,'shortStartDirectory')
+                request.shortStartDirectory=strtrim(controls.shortStartDirectory.Value);
+            end
             if isShortSupport() && strcmp(source,'reopen')
                 folder=strtrim(controls.shortDirectory.Value);
                 if isempty(folder),folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择银球计算目录');if isequal(folder,0),return;end,end
@@ -1492,7 +1517,12 @@ renderEditor();sync();showGeometry(true);
             measuredPauseFile='';
             state=aeroHeatWorkflowState('completeSolve',state,struct('result',solved, ...
                 'freestream',fs,'solveId',token,'sourceRevision',revision));report=newReport;
-            if isShortSupport() && ~isempty(solved.shortSupportJob),lastShortDirectory=solved.shortSupportJob;end
+            if isShortSupport() && ~isempty(solved.shortSupportJob)
+                lastShortDirectory=solved.shortSupportJob;
+                if getOption(state.cfg.shortSupportBoundary,'targetDU',.25)==.25 && getOption(state.cfg,'shortSupportRadiusD',14)==14
+                    lastEarlyShortDirectory=solved.shortSupportJob;
+                end
+            end
             if isfield(newReport,'coverageMessage')
                 message(newReport.coverageMessage);
             else

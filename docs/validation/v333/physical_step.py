@@ -64,7 +64,12 @@ def config(j,dt,step,release):
 
 
 def advance(work,branch,step,old,release=False,*,prepared=PREP,plan=HERE/"PLAN.md"):
-    assert (branch,step) in (("full",1),("half",1),("half",2))
+    if (work/"continuation.json").is_file():
+        contract=read(work/"continuation.json")
+        assert contract["schema"]=="short65-time-continuation-v1" and contract["targetDU"]==1
+        assert branch in DT and int(.25/DT[branch]) < step <= int(contract["targetDU"]/DT[branch])
+    else:
+        assert (branch,step) in (("full",1),("half",1),("half",2))
     j=read(work/"job.json");driver=Path(j["driver"]);p=read(prepared/"prepared.json")
     assert sha(driver/"build.json")==j["buildSHA256"] and sha(prepared/"prepared.json")==j["preparedSHA256"]
     physical=work/branch/f"step{step}";dt=DT[branch]
@@ -82,6 +87,7 @@ def advance(work,branch,step,old,release=False,*,prepared=PREP,plan=HERE/"PLAN.m
     seed=folder/f"seed_{step-1:05d}.csv";os.link(old,seed)
     cfg=folder/"case.cfg";cfg.write_text(config(j,dt,step,release),encoding="ascii")
     locks=[exe,work/"job.json",plan,Path(__file__).resolve(),cfg,seed,folder/"wire_boundary.dat",folder/"mesh.su2",driver/"build.json"]
+    if (work/"continuation.json").is_file():locks.append(work/"continuation.json")
     binpath=str(KIT/"toolchain/w64devkit/bin")
     if binpath not in os.environ["PATH"].split(os.pathsep):os.environ["PATH"]=binpath+os.pathsep+os.environ["PATH"]
     r=observe([str(exe),"case.cfg","--threads","4"],folder,{str(f):sha(f) for f in locks},150 if release else 480,(350 if release else 550)*1024**2)
