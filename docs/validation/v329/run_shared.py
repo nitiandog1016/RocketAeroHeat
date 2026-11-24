@@ -56,7 +56,7 @@ def advance(folder,start,exe,steps,release=False,capture=False,*,prepared=PREP,p
     return record
 
 
-def solve(work,driver,*,prepared=PREP,plan=HERE/"PLAN.md"):
+def solve(work,driver,*,prepared=PREP,plan=HERE/"PLAN.md",release_driver=None):
     work.mkdir(parents=True,exist_ok=False)
     record=read(driver/"build.json");exe=driver/"shared.exe"
     assert sha(exe)==record["exe"] and all(sha(driver/p)==v for p,v in record["files"].items())
@@ -73,7 +73,11 @@ def solve(work,driver,*,prepared=PREP,plan=HERE/"PLAN.md"):
         if len(trend)>=3 and trend[-1]>=trend[-2]>=trend[-3]:raise RuntimeError("连续两段不改善")
     else:raise RuntimeError("达到登记阶段上限")
     write_json(work/"converged.json",dict(stage=stage.name,frame=sha(seed),trend=trend))
-    release=DRIVER/"wire.exe";assert sha(release)=="9721e25124a866652e8d004b531854ec88d2f856e99ca7b80c0ab34d2bbebb55"
+    if release_driver is None:
+        release=DRIVER/"wire.exe";assert sha(release)=="9721e25124a866652e8d004b531854ec88d2f856e99ca7b80c0ab34d2bbebb55"
+    else:
+        release=release_driver
+        assert release==driver/"wire.exe" and sha(release)==record["files"]["wire.exe"]
     for name,start,steps,let,snap in (("plus20",seed,20,False,False),("control",seed,1,False,False),
             ("early",seed,1,False,True),("releaseEarly",seed,1,True,False),
             ("late",work/"plus20/restart.csv",1,False,True),("releaseLate",work/"plus20/restart.csv",1,True,False)):

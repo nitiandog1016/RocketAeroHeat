@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v336 在新安装从 STL 冷算双支管银球并重开全表面结果](validation/v336/RESULTS.md) · [逐面复核](validation/v336/evidence/surface.json) · [下一项](validation/v336/NEXT_DECISION.md)。
+
 - [v335 双支管银球 14D 与 20D 同刻外域对照](validation/v335/RESULTS.md) · [七站与五区](validation/v335/evidence/domain.png) · [同面数据](validation/v335/evidence/comparison.json) · [下一项](validation/v335/NEXT_DECISION.md)。
 
 - [v334 从普通 STL 运行双支管银球单时刻工况](validation/v334/RESULTS.md) · [米制验收](validation/v334/evidence/full.json) · [毫米、转向与面序验收](validation/v334/evidence/half.json) · [下一项](validation/v334/NEXT_DECISION.md)。

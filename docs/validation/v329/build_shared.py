@@ -58,23 +58,7 @@ def scalar_source(source,node_count=101122):
     return head+"::BoundaryFluxResidual("+body+"::FluidInterfaceFluxResidual("+tail
 
 
-def build(out,prepared=None):
-    out.mkdir(parents=True,exist_ok=False)
-    node_count=101122;binding={}
-    if prepared is not None:
-        spec=read(prepared/"prepared.json")
-        assert sha(prepared/"mesh.su2")==spec["files"]["mesh.su2"]
-        node_count=spec["geometry"]["nodes"]
-        binding=dict(preparedSHA256=sha(prepared/"prepared.json"),meshSHA256=spec["files"]["mesh.su2"],nodes=node_count)
-    src=KIT/"source";work=KIT/"build-v117";compiler=KIT/"toolchain/w64devkit/bin/g++.exe"
-    cache=json.loads(gzip.decompress((ROOT/"docs/validation/v272/evidence/build.json.gz").read_bytes()))
-    old,=[Path(k) for k in cache["cachedBuildInputs"] if Path(k).as_posix().endswith("/source/SU2_CFD/src/integration/CIntegration.cpp")]
-    assert all(sha(KIT/Path(k).relative_to(old.parents[4]))==v for k,v in cache["cachedBuildInputs"].items())
-    assert sha(compiler)==cache["compilerSHA256"] and sha(KIT/"su2.zip")==cache["sourceArchiveSHA256"]
-    with ZipFile(KIT/"su2.zip") as z:
-        for rel in (FLOW,SPECIES,SCALAR):
-            key,=[k for k in z.namelist() if k.endswith("/"+rel)]
-            assert z.read(key)==(src/rel).read_bytes()
+def write_sources(out,src,node_count,far_nodes):
     # 端点记录与 v328 相同的原生列顺序；受限、低阶和原空间行各自保留。
     anchor="  double lo=1e30,"
     header=once((PREV/"silver.hpp").read_text("utf8"),anchor,r"""
@@ -95,14 +79,34 @@ def build(out,prepared=None):
 """+anchor)
     (out/"silver.hpp").write_text('#include "far_mass.hpp"\n'+header,encoding="utf8")
     for path in (HERE/"far_mass.hpp",PREV/"capacity.hpp"):(out/path.name).write_bytes(path.read_bytes())
-    if prepared is not None and "farNodes" in spec["geometry"]:
+    if far_nodes is not None:
         # 银球旧网与周向二分网分别绑定实际远场节点数，仍逐点校验生产与消费。
         far=out/"far_mass.hpp"
-        far.write_text(once(far.read_text("utf8"),"count!=1346","count!="+str(int(spec["geometry"]["farNodes"]))),encoding="utf8")
+        far.write_text(once(far.read_text("utf8"),"count!=1346","count!="+str(int(far_nodes))),encoding="utf8")
     (out/"CIncEulerSolver.cpp").write_text(flow_source((src/FLOW).read_text("utf8")),encoding="utf8")
     (out/"CScalarSolver.inl").write_text(scalar_source((src/SCALAR).read_text("utf8"),node_count),encoding="utf8")
     species=once((src/SPECIES).read_text("utf8"),'"../../include/solvers/CScalarSolver.inl"','"CScalarSolver.inl"')
     (out/"CSpeciesSolver.cpp").write_text('#include "silver.hpp"\n'+species,encoding="utf8")
+
+
+def build(out,prepared=None):
+    out.mkdir(parents=True,exist_ok=False)
+    node_count=101122;binding={}
+    if prepared is not None:
+        spec=read(prepared/"prepared.json")
+        assert sha(prepared/"mesh.su2")==spec["files"]["mesh.su2"]
+        node_count=spec["geometry"]["nodes"]
+        binding=dict(preparedSHA256=sha(prepared/"prepared.json"),meshSHA256=spec["files"]["mesh.su2"],nodes=node_count)
+    src=KIT/"source";work=KIT/"build-v117";compiler=KIT/"toolchain/w64devkit/bin/g++.exe"
+    cache=json.loads(gzip.decompress((ROOT/"docs/validation/v272/evidence/build.json.gz").read_bytes()))
+    old,=[Path(k) for k in cache["cachedBuildInputs"] if Path(k).as_posix().endswith("/source/SU2_CFD/src/integration/CIntegration.cpp")]
+    assert all(sha(KIT/Path(k).relative_to(old.parents[4]))==v for k,v in cache["cachedBuildInputs"].items())
+    assert sha(compiler)==cache["compilerSHA256"] and sha(KIT/"su2.zip")==cache["sourceArchiveSHA256"]
+    with ZipFile(KIT/"su2.zip") as z:
+        for rel in (FLOW,SPECIES,SCALAR):
+            key,=[k for k in z.namelist() if k.endswith("/"+rel)]
+            assert z.read(key)==(src/rel).read_bytes()
+    write_sources(out,src,node_count,spec["geometry"].get("farNodes") if prepared is not None else None)
     objs=[];entries=read(work/"compile_commands.json")
     for rel in (SPECIES,FLOW):
         entry,=[e for e in entries if e["file"].replace("\\","/").endswith("/"+rel)]

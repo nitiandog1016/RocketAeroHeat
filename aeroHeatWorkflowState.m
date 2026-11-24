@@ -217,10 +217,15 @@ switch action
             'freestream',state.freestream,'revision',state.revision,'solveId',state.solveId);
         if strcmp(optional(state.cfg,'computationBackend',''),'shortSupport65')
             % 动作与目录在按下按钮时冻结。仅新算生成独立任务号，读档无需本机体场。
-            source=validatestring(required(payload,'shortSupportAction'),{'archive','solve'});
+            source=validatestring(required(payload,'shortSupportAction'),{'archive','solve','reopen'});
             folder='';
             if strcmp(source,'solve')
                 folder=fullfile(fileparts(mfilename('fullpath')),'outputs',['short65_time_' char(java.util.UUID.randomUUID())]);
+            elseif strcmp(source,'reopen')
+                assert(optional(state.cfg,'shortSupportRadiusD',14)==14,'RAH:Short:Job','请选择 14D 主工况。');
+                folder=char(java.io.File(required(payload,'runDirectory')).getCanonicalPath());
+                f=shortSupportJobFrame(folder,state.mesh.shortSupportImport,state.cfg.shortSupportBoundary);
+                state.frozenInputs.cfg.shortSupportSeal=f.receipt;
             end
             state.frozenInputs.cfg.shortSupportAction=source;state.frozenInputs.cfg.shortSupportJob=folder;
         elseif strcmp(optional(state.cfg,'computationBackend',''),'thermistorB') && state.cfg.thermistorAngularCells==48 && ~strcmp(optional(state.cfg,'thermistorVariant','smooth'),'sidewind')
@@ -288,17 +293,26 @@ switch action
             w=result.hybridWall;id=result.evidenceIdentity;n=size(result.F,1);
             assert(isequal(result.shortSupportImport,binding) && strcmp(id.sourceFrame.stlSHA256,binding.source.sha256) && ...
                 strcmp(id.meshSHA256,binding.meshSHA256) && strcmp(id.sourceFrame.caseSHA256,b.caseSHA256) && ...
-                strcmp(id.sourceFrame.initialSHA256,b.initialFrame) && strcmp(result.shortSupportAction,cfg.shortSupportAction) && ...
+                strcmp(result.shortSupportAction,cfg.shortSupportAction) && ...
                 strcmp(result.shortSupportJob,cfg.shortSupportJob) && strcmp(result.shortSupportDirectionGrid,['time' b.branch]) && ...
                 result.hybridCondition.elapsedPhysicalTimeS==b.elapsedS && result.hybridCondition.physicalStepSizeS==b.dtS && ...
-                isequal(required(payload,'freestream'),b) && isequal(w.faceID,(0:n-1)') && ...
+                isequal(w.faceID,(0:n-1)') && ...
                 all(isfinite(w.pressurePa) & isfinite(w.heatFluxWm2) & isfinite(w.nearWallCellTemperatureK)) && ...
                 numel(result.hybridWallTemperatureK)==n && all(isfinite(result.hybridWallTemperatureK)), ...
                 'RAH:Short:Snapshot','返回的银球快照与本次冻结输入或原面场不符。');
             if strcmp(cfg.shortSupportAction,'archive')
                 [~,pair]=shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14));
-                assert(strcmp(id.sourceFrame.sha256,pair.([b.branch 'Frame'])),'RAH:Short:Snapshot','归档帧与所选步长不符。');
+                assert(strcmp(id.sourceFrame.sha256,pair.([b.branch 'Frame'])) && strcmp(id.sourceFrame.initialSHA256,b.initialFrame), ...
+                    'RAH:Short:Snapshot','归档帧与所选步长不符。');
+            else
+                f=shortSupportJobFrame(cfg.shortSupportJob,binding,b);
+                b.initialFrame=f.initial;
+                assert(strcmp(id.sourceFrame.sha256,f.terminal) && strcmp(id.sourceFrame.initialSHA256,f.initial) && ...
+                    strcmp(id.sourceFrame.completedReceiptSHA256,f.receipt),'RAH:Short:Snapshot','返回的结果与本次计算目录不符。');
+                if strcmp(cfg.shortSupportAction,'reopen'),assert(strcmp(f.receipt,cfg.shortSupportSeal),'RAH:Short:Snapshot','冻结后回执已变。');end
             end
+            % 所有来流、温界、步长均按冻结值核对；首次冷算的实际扰动帧由本任务提供。
+            assert(isequal(required(payload,'freestream'),b),'RAH:Short:Snapshot','返回工况或实际初始帧与本次计算不符。');
         elseif strcmp(optional(state.cfg,'computationBackend',''),'cm011Imported')
             validateCM011Result(result,state.mesh);
         else

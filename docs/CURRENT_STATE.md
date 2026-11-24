@@ -1,10 +1,12 @@
 # 当前交接
 
-2026-11-24。Short Test 65（Re = 882）双支管银球在 14D 与 20D 远场分别完成扰动后 **2.565681 ms** 的 32,480 / 32,480 面、0.000700423853595 m² 压力与热流。相对 v334 新增 0 面、0 m²，联合实验验证 0 m²。两半步整件放热由 2.005432463 W 降至 2.005187691 W（−0.01221%），外露银球折合量热偏差由 +38.0827% 变为 +38.0639%。工作台可选半径，显示同面差值并导出；两次最终窗口峰值均不超过 3.05 GiB。[同刻结果](validation/v335/RESULTS.md) · [本机三维页](../outputs/v335_validation/ui03/half/workbench/index.html) · [普通 STL 入口](validation/v334/RESULTS.md)
+2026-11-24。在没有历史输出的新安装中，Short Test 65 双支管银球已从 STL、14D 体网及冷态算到扰动后 **2.565681 ms**。32,480 / 32,480 面、0.000700423853595 m² 有壁压和热流。与 v335 相比新增 0 面、0 m²。两半步放热 **2.005432463 W**，外露银球折合量热偏高 **38.08%**，联合实验验证 0 m²。新算与重开窗口的逐面 CSV 完全一致。新算窗口的 MATLAB 退出码与整体峰值未知，已核对原生终态及第二窗口正常退出。[计算及限制](validation/v336/RESULTS.md) · [安装](validation/v336/INSTALL.md) · [本机三维页](../outputs/v336_validation/windows/reopen01/workbench/index.html)
 
-<!-- records:last_completed=v335 -->
+<!-- records:last_completed=v336 -->
 <!-- records:active=none -->
-<!-- records:base_commit=ec457a3df93914b1dccbf753f4cbe2774ca0eac5 -->
+<!-- records:base_commit=59c17358d992fbba80b4d5a1a61f12e8d857da96 -->
+
+20D 的两半步放热为 2.005187691 W，较 14D 减少 0.01221%。[远场对照](validation/v335/RESULTS.md)
 
 双支管 128 扇区的稳态场是本次扰动基线。法向和周向加密对照均已完成。119.8° 测站顺向、166.7° 反向。[稳态与周向对照](validation/v332/RESULTS.md) · [近壁诊断](validation/v331/RESULTS.md) · [法向对照](validation/v330/RESULTS.md)
 
@@ -40,7 +42,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-在没有历史输出的新安装中，从银球 STL 生成 14D 的稳态基流和已验收的物理终点。[下一决定](validation/v335/NEXT_DECISION.md)
+在同一银球的七个实验测站比较壁反力热流与沿法向温度梯度重建的热流，定位现有实验偏差。[下一决定](validation/v336/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

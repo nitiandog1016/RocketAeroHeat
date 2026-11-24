@@ -14,8 +14,20 @@ from time_surface import export
 
 def main(out,completed=None):
     out.relative_to(ROOT/"outputs");out.mkdir(parents=True,exist_ok=False)
+    # 旧安装保留已验收的冻结入口；没有历史基流的新安装从本项目的几何和冷初场计算。
+    legacy=ROOT/"outputs/v332_validation"
+    fresh=not all(p.is_file() for p in (legacy/"prepared01/prepared.json",legacy/"run01/thermal.json",legacy/"build01/build.json",
+                                        legacy/"run01/steady05/restart_000199.csv"))
+    driver=ROOT/"outputs/v333_validation/build02"
+    cached_programs=all((driver/name).is_file() for name in ("build.json","physical.exe","release.exe"))
+    archived_toolchain=all((ROOT/path).is_file() for path in ("outputs/v317_validation/build01/wire_process.json",
+            "tools/runtime/su2-thermal-build/build-v117/build.ninja","tools/runtime/su2-thermal-build/su2.zip"))
+    if (completed is None and (fresh or not (cached_programs or archived_toolchain))) or (
+            completed is not None and (completed.resolve().parent/"construction.json").is_file()):
+        from shortSupportFirstRun import run
+        run(out,completed)
+        return
     if completed is None:
-        driver=ROOT/"outputs/v333_validation/build02"
         if not (driver/"build.json").is_file():
             driver=out/"driver";build(driver)
         work=out/"run";setup(work,driver);run_steps(work)

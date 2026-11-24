@@ -135,9 +135,15 @@ def invoke(name, args, cwd, out, seconds, memory_gib, trace=False, bin_directory
                 except psutil.NoSuchProcess:
                     pass
                 used = 0
-                for p in family.values():
-                    try: used += p.memory_info().rss
-                    except psutil.NoSuchProcess: pass
+                # 长任务中 Windows 会重用已退出子进程的 PID。按创建时间核对身份后再计内存。
+                for pid,p in list(family.items()):
+                    try:
+                        if p.is_running():
+                            used += p.memory_info().rss
+                        else:
+                            del family[pid]
+                    except psutil.NoSuchProcess:
+                        family.pop(pid,None)
                 peak = max(peak, used)
                 if time.monotonic()-start > seconds or peak > memory_gib*1024**3:
                     reason="resource budget"
@@ -146,10 +152,16 @@ def invoke(name, args, cwd, out, seconds, memory_gib, trace=False, bin_directory
         finally:
             if child.poll() is None:
                 for p in reversed(list(family.values())):
-                    try: p.kill()
+                    try:
+                        if p.is_running():p.kill()
                     except psutil.NoSuchProcess: pass
             child.wait(timeout=10)
-    _, alive = psutil.wait_procs(list(family.values()), timeout=3)
+    # 对旧 PID 调用系统 wait 可能打开已复用此号的系统服务。只查询已记录的进程身份。
+    deadline=time.monotonic()+3
+    alive=[p for p in family.values() if p.is_running()]
+    while alive and time.monotonic()<deadline:
+        time.sleep(.05)
+        alive=[p for p in alive if p.is_running()]
     receipt = dict(args=args, cwd=str(cwd), elapsedSeconds=time.monotonic()-start, exitCode=child.returncode,
                    peakSampledRSSBytes=peak, stopReason=reason, livePids=[p.pid for p in alive])
     save(out/(name+"_process.json"), receipt)

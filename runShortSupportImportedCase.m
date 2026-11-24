@@ -5,19 +5,30 @@ boundary=shortSupportImportBoundary(cfg.shortSupportBoundary.branch,radiusD);
 assert(isequal(cfg.shortSupportBoundary,boundary),'RAH:Short:Boundary','当前设置与 Test 65 的冻结工况不符。');
 [b,g]=bindShortSupportSTL(input,input.shortSupportImport.source,cfg.geometry,radiusD);
 assert(isequal(b,input.shortSupportImport),'RAH:Short:Mapping','建网后试件映射已改变。');
-root=fileparts(mfilename('fullpath'));job=cfg.shortSupportJob;
+root=fileparts(mfilename('fullpath'));job=cfg.shortSupportJob;phaseRead=tic;lastPhase='';
 switch cfg.shortSupportAction
     case 'solve'
         assert(~isempty(job) && ~isfolder(job),'RAH:Short:Job','新算需要独立的新任务目录。');
+        % 全新检出可能还没有 outputs；启动 Python 前需先建立日志的父目录。
+        parent=fileparts(job);if ~isfolder(parent),mkdir(parent);end
         script='shortSupportTime65.py';if radiusD==20,script='shortSupportOuter65.py';end
         runCM011Python({fullfile(root,'scripts',script),job},[job '.log'],@pulse,true);
     case 'archive'
         assert(isempty(job),'RAH:Short:Job','读取发布归档的目录设置无效。');
+    case 'reopen'
+        assert(radiusD==14 && isfolder(job) && strcmp(cm011FileSHA256(fullfile(job,'completed.json')),cfg.shortSupportSeal), ...
+            'RAH:Short:Job','重开任务的路径或回执已改变。');
     otherwise
         error('RAH:Short:Action','请在计算页选择新算或读取归档。');
 end
 grid=['time' boundary.branch];[result,stations,s]=loadShortSupportSurface(g,job,grid,radiusD);
-assert(strcmp(s.meshSHA256,b.meshSHA256) && strcmp(s.seedFrame,boundary.initialFrame) && ...
+seed=boundary.initialFrame;
+if ~isempty(job)
+    frame=shortSupportJobFrame(job,b,boundary);seed=frame.initial;
+    assert(strcmp(frame.terminal,s.frameSHA256) && strcmp(frame.steady,s.baselineFrame),'RAH:Short:Job','壁面源帧与所选任务不符。');
+    result.evidenceIdentity.sourceFrame.completedReceiptSHA256=frame.receipt;
+end
+assert(strcmp(s.meshSHA256,b.meshSHA256) && strcmp(s.seedFrame,seed) && ...
     strcmp(s.caseSHA256,boundary.caseSHA256) && s.elapsedSeconds==boundary.elapsedS && s.dtSeconds==boundary.dtS);
 % 模块二：面均压力、温度及方向按同一物理面取值；按导入面的实际面积折算热流密度。
 order=b.referenceFaceID;area=b.areaM2;n=numel(order);inverse=zeros(n,1);inverse(order)=(1:n)';
@@ -79,9 +90,17 @@ id=result.evidenceIdentity;id.reusedArchive=strcmp(cfg.shortSupportAction,'archi
 id.sourceFrame.stlSHA256=b.source.sha256;id.sourceFrame.stlScaleToM=b.source.scale;
 id.sourceFrame.initialSHA256=s.seedFrame;id.sourceFrame.transferSHA256=b.transferSHA256;
 result.evidenceIdentity=id;
+boundary.initialFrame=seed;
 assert(strcmp(cm011FileSHA256(b.source.file),b.source.sha256),'RAH:Short:Source','计算期间源 STL 已改变。');
     function pulse()
         if ~isempty(progress)
+            if toc(phaseRead)>1
+                phaseRead=tic;path=fullfile(job,'progress.json');
+                if isfile(path)
+                    entry=jsondecode(fileread(path));
+                    if ~strcmp(entry.stage,lastPhase),lastPhase=entry.stage;progress(struct('status','started','message',entry.message));end
+                end
+            end
             progress(struct('status','running','message','双支管银球原生计算中'));
         end
     end

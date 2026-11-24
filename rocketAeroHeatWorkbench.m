@@ -13,7 +13,7 @@ state=aeroHeatWorkflowState('init',[],struct('cfg',cfg));
 preview=[];rotation=eye(3);rotationCenter=[0 0 0];controls=struct;
 webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDetailsOpen=false;
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
-measuredDirectory='';measuredPauseFile='';lastWireDirectory='';
+measuredDirectory='';measuredPauseFile='';lastWireDirectory='';lastShortDirectory='';
 creasePreview=false;qualityPreview=false;candidatePreview=[];
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
@@ -613,10 +613,17 @@ renderEditor();sync();showGeometry(true);
                 end
             case 4
                 if isShortSupport()
-                    grid=form(9);controls.readShort=button(grid,1,'读取所选步长的归档',@(~,~)solveCase([],[],'archive'));
+                    mainDomain=getOption(state.cfg,'shortSupportRadiusD',14)==14;
+                    grid=form(9+3*mainDomain);controls.readShort=button(grid,1,'读取所选步长的归档',@(~,~)solveCase([],[],'archive'));
                     controls.run=button(grid,2,'从扰动初场重新计算',@solveCase);
                     b=state.cfg.shortSupportBoundary;
-                    tip(grid,3,sprintf('同刻 %.6f ms · 当前步长 %.6f ms。新算使用本机稳态基流，分别推进两种步长。',1e3*b.elapsedS,1e3*b.dtS));
+                    info='新算使用本机稳态基流，分别推进两种步长。';
+                    if mainDomain
+                        info='首次从冷初场建立并核对稳态基流，之后从该基流生成扰动。';
+                        controls.shortDirectory=textField(grid,10,'计算目录',lastShortDirectory);
+                        controls.reopenShort=button(grid,11,'重开已完成的本地计算',@(~,~)solveCase([],[],'reopen'));
+                    end
+                    tip(grid,3,sprintf('同刻 %.6f ms · 当前步长 %.6f ms。%s',1e3*b.elapsedS,1e3*b.dtS,info));
                     controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[6 9];controls.log.Layout.Column=[1 2];
                     sync();return;
                 end
@@ -718,6 +725,7 @@ renderEditor();sync();showGeometry(true);
                 if isShortSupport()
                     grid=form(15+2*isfield(state.result,'shortSupportOuter'));b=state.cfg.shortSupportBoundary;
                     origin='本次原生计算';if state.result.evidenceIdentity.reusedArchive,origin='读取发布归档';end
+                    if strcmp(state.result.shortSupportAction,'reopen'),origin='重开本地计算';end
                     tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
                     tip(grid,4,sprintf('导入网热峰 #%d · 参考网热峰 #%d 对应 STL #%d\n反向区 %.4f mm² · 逐面联合实验验证 0 m²',report.peakOutFace,report.nativePeakReferenceFaceID,report.nativePeakFileFaceID,1e6*report.reverseAreaM2));
                     controls.stations=uitable(grid,'RowName',{},'ColumnName',{'极角 / °','STL 面','实验 Nu','计算 Nu'}, ...
@@ -1404,6 +1412,11 @@ renderEditor();sync();showGeometry(true);
             if nargin<3,source='solve';end
             request=struct();
             if isShortSupport(),request.shortSupportAction=source;end
+            if isShortSupport() && strcmp(source,'reopen')
+                folder=strtrim(controls.shortDirectory.Value);
+                if isempty(folder),folder=uigetdir(fullfile(fileparts(mfilename('fullpath')),'outputs'),'选择银球计算目录');if isequal(folder,0),return;end,end
+                request.runDirectory=folder;
+            end
             if isFullBead()
                 if strcmp(source,'solve'),source='run';end
                 request.startupAction=source;
@@ -1441,6 +1454,7 @@ renderEditor();sync();showGeometry(true);
             measuredPauseFile='';
             state=aeroHeatWorkflowState('completeSolve',state,struct('result',solved, ...
                 'freestream',fs,'solveId',token,'sourceRevision',revision));report=newReport;
+            if isShortSupport() && ~isempty(solved.shortSupportJob),lastShortDirectory=solved.shortSupportJob;end
             if isfield(newReport,'coverageMessage')
                 message(newReport.coverageMessage);
             else

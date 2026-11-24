@@ -2,7 +2,7 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
-**从 STL 查看双支管银球的单时刻结果**。从[试件包](cases/short_sphere/supported65.zip)解出 `supported_m.stl`，运行 `rocketAeroHeatWorkbench`。加载文件时选比例 1，保持原朝向；在网格页选择“双支管银球 · Short Test 65”，核对原面后确认边界和步长。在计算页选择“读取所选步长的归档”即可查看热流云图。区域结果页支持按导入文件面号点选或查询，侧栏可定位导入网和参考网各自的热峰。重新计算需要本机的 v332 稳态基流、体网和原生运行环境。[试件验收及复现步骤](docs/validation/v334/RESULTS.md)
+**从 STL 计算双支管银球的单时刻结果。** 从试件包解出 `supported_m.stl`，运行 `rocketAeroHeatWorkbench`。加载文件时选比例 1、确认朝向，在网格页选择“双支管银球 · Short Test 65”和 14D。确认边界和步长后按“从扰动初场重新计算”。新安装会生成体网、编译内核、从冷态求稳态，再推进至所选物理时刻。计算页也可重开已完成的本地任务或查看版本归档。结果页可按 STL 面号查询压力、热流、温度和算法，侧栏可直接定位热峰。[下载试件](cases/short_sphere/supported65.zip) · [安装与操作](docs/validation/v336/INSTALL.md) · [普通 STL 映射验收](docs/validation/v334/RESULTS.md)
 
 网格页选择 **20D · 外域对照** 后，可在相同物理时刻查看 20D 的主结果，或选择 **20D 减 14D · 入壁热流** 查看同一 STL 面上的变化。结果页并列七个测站的实验、14D 和 20D 数值。此试件在扰动后 2.565681 ms 的两半步整件放热变化为 −0.24477 mW。[同刻五区结果、差值及运行依赖](docs/validation/v335/RESULTS.md)
 
