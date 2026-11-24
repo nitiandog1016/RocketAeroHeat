@@ -434,11 +434,20 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
                 if isShortSupport()
-                    grid=form(10);b=state.cfg.shortSupportBoundary;target=getOption(b,'targetDU',.25);
+                    grid=form(11);b=state.cfg.shortSupportBoundary;target=getOption(b,'targetDU',.25);
                     choices={'两个半步','一个整步'};offset=0;
                     if getOption(state.cfg,'shortSupportRadiusD',14)==14
-                        controls.shortTarget=choice(grid,1,'扰动后时刻',{'2.565681 ms · 0.25 D/U','10.262726 ms · 1 D/U'},{.25,1},target);
-                        controls.shortTarget.ValueChangedFcn=@boundaryEdited;offset=1;
+                        mode='temperature';if strcmp(b.branch,'power'),mode='power';end
+                        controls.shortHeatBoundary=choice(grid,1,'热边界',{'给定壁温 · 瞬时','球体量热功率 · 准稳态'},{'temperature','power'},mode);
+                        controls.shortHeatBoundary.ValueChangedFcn=@boundaryEdited;
+                        if strcmp(mode,'power')
+                            tip(grid,3,sprintf('外露银球放热 %.9f W · Re %g\n来流 %.6f m/s · %.5f K',b.targetSphereW,b.reynolds,-b.velocityMps(1),b.airK));
+                            tip(grid,6,'球面功率决定均匀壁温。支管及端盖假定与球同温，由独立热源供热。');
+                            controls.confirm=button(grid,10,'确认量热功率和来流',@confirmBoundary);
+                            sync();return;
+                        end
+                        controls.shortTarget=choice(grid,2,'扰动后时刻',{'2.565681 ms · 0.25 D/U','10.262726 ms · 1 D/U'},{.25,1},target);
+                        controls.shortTarget.ValueChangedFcn=@boundaryEdited;offset=2;
                         if target==1,choices={'八个半步','四个整步'};end
                     end
                     controls.shortBranch=choice(grid,1+offset,'时间步长',choices,{'half','full'},b.branch);
@@ -634,7 +643,12 @@ renderEditor();sync();showGeometry(true);
                             info='接续计算使用下方早期起点目录。留空时程序先生成早期场，再接续至所选时刻。';
                         end
                     end
-                    tip(grid,3,sprintf('同刻 %.6f ms · 当前步长 %.6f ms。%s',1e3*b.elapsedS,1e3*b.dtS,info));
+                    if strcmp(b.branch,'power')
+                        controls.readShort.Text='读取量热稳态归档';controls.run.Text='按球体功率计算壁温和全表面场';
+                        tip(grid,3,sprintf('外露银球放热 %.9f W。独立计算两个括区温度及反求温度处的原生场。',b.targetSphereW));
+                    else
+                        tip(grid,3,sprintf('同刻 %.6f ms · 当前步长 %.6f ms。%s',1e3*b.elapsedS,1e3*b.dtS,info));
+                    end
                     controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[6 9];controls.log.Layout.Column=[1 2];
                     sync();return;
                 end
@@ -740,8 +754,14 @@ renderEditor();sync();showGeometry(true);
                     grid=form(15+2*isfield(state.result,'shortSupportOuter')+hasGradient+hasAzimuth+2*temporal);b=state.cfg.shortSupportBoundary;
                     origin='本次原生计算';if state.result.evidenceIdentity.reusedArchive,origin='读取发布归档';end
                     if strcmp(state.result.shortSupportAction,'reopen'),origin='重开本地计算';end
-                    tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
-                    peakNote=tip(grid,4,sprintf('导入网热峰 #%d · 参考网热峰 #%d 对应 STL #%d\n反向区 %.4f mm² · 逐面联合实验验证 0 m²',report.peakOutFace,report.nativePeakReferenceFaceID,report.nativePeakFileFaceID,1e6*report.reverseAreaM2));
+                    if strcmp(b.branch,'power')
+                        cal=state.result.shortSupportPower;
+                        a=tip(grid,1,sprintf('%s · 准稳态 · %d / %d 面\n银球反求壁温 %.5f K · 实验平均 %.5f K',origin,report.jointComputedFaceCount,report.faceCount,cal.temperatureK,cal.measuredMeanK));a.Layout.Row=[1 2];
+                        peakNote=tip(grid,4,sprintf('球面放热 %.9f W · 支管和端盖 %.9f W\n热峰 STL #%d · 联合实验验证 0 m²',cal.sphereW,cal.supportW,report.peakOutFace));peakNote.Layout.Row=[4 5];
+                    else
+                        tip(grid,1,sprintf('%s · %.6f ms · 步长 %.6f ms\n%d / %d 面 · 向空气放热 %.9f W',origin,1e3*b.elapsedS,1e3*b.dtS,report.jointComputedFaceCount,report.faceCount,-report.wholeSurfaceHeatPowerW));
+                        peakNote=tip(grid,4,sprintf('导入网热峰 #%d · 参考网热峰 #%d 对应 STL #%d\n反向区 %.4f mm² · 逐面联合实验验证 0 m²',report.peakOutFace,report.nativePeakReferenceFaceID,report.nativePeakFileFaceID,1e6*report.reverseAreaM2));
+                    end
                     controls.stations=uitable(grid,'RowName',{},'ColumnName',{'极角 / °','STL 面','实验 Nu','计算 Nu'}, ...
                         'Data',report.stations{:,{'angleDeg','fileFaceID','reportedNu','computedNu'}});
                     controls.stations.Layout.Row=[7 12];controls.stations.Layout.Column=[1 2];
@@ -1199,8 +1219,12 @@ renderEditor();sync();showGeometry(true);
     function next=boundaryConfiguration()
         next=state.cfg;
         if isShortSupport()
+            if isfield(controls,'shortHeatBoundary') && strcmp(controls.shortHeatBoundary.Value,'power')
+                next.shortSupportBoundary=shortSupportImportBoundary('power',14);return;
+            end
             target=.25;if isfield(controls,'shortTarget'),target=controls.shortTarget.Value;end
-            next.shortSupportBoundary=shortSupportImportBoundary(controls.shortBranch.Value,getOption(next,'shortSupportRadiusD',14),target);return;
+            branch='half';if isfield(controls,'shortBranch'),branch=controls.shortBranch.Value;end
+            next.shortSupportBoundary=shortSupportImportBoundary(branch,getOption(next,'shortSupportRadiusD',14),target);return;
         end
         if isBead()
             next.thermistorBoundary=[];
@@ -1363,7 +1387,7 @@ renderEditor();sync();showGeometry(true);
         if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
-            if isShortSupport(),renderEditor();message('物理时刻或步长已更新，请重新确认。');showGeometry(false);return;end
+            if isShortSupport(),renderEditor();message('试件工况已更新，请重新确认热边界。');showGeometry(false);return;end
             if isBead() && isfield(controls,'wireBoundary')
                 renderEditor();message('引线热边界已更新，请确认当前工况。');
             elseif isBead()
@@ -1519,7 +1543,7 @@ renderEditor();sync();showGeometry(true);
                 'freestream',fs,'solveId',token,'sourceRevision',revision));report=newReport;
             if isShortSupport() && ~isempty(solved.shortSupportJob)
                 lastShortDirectory=solved.shortSupportJob;
-                if getOption(state.cfg.shortSupportBoundary,'targetDU',.25)==.25 && getOption(state.cfg,'shortSupportRadiusD',14)==14
+                if ~strcmp(state.cfg.shortSupportBoundary.branch,'power') && getOption(state.cfg.shortSupportBoundary,'targetDU',.25)==.25 && getOption(state.cfg,'shortSupportRadiusD',14)==14
                     lastEarlyShortDirectory=solved.shortSupportJob;
                 end
             end
@@ -1570,7 +1594,8 @@ renderEditor();sync();showGeometry(true);
         % 数值外域改变后重新绑定试件体网和基流，撤销上次边界审核与结果。
         if state.busy || preparing,return;end
         next=state.cfg;next.shortSupportRadiusD=field.Value;
-        next.shortSupportBoundary=shortSupportImportBoundary(next.shortSupportBoundary.branch,field.Value);
+        branch=next.shortSupportBoundary.branch;if strcmp(branch,'power') && field.Value~=14,branch='half';end
+        next.shortSupportBoundary=shortSupportImportBoundary(branch,field.Value);
         state=aeroHeatWorkflowState('setMeshOptions',state,struct('cfg',next));report=[];
         renderEditor();showGeometry(true);message('已更改远场半径，请重新绑定体网。');
     end

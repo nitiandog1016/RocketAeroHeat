@@ -99,7 +99,11 @@ if isfield(mesh,'hybridWall')
         add('nearWallCellTemperature','临壁流体单元温度','K',tCell,double(isfinite(tCell)), ...
             hybridMethod(w,'nearWallTemperatureMethod'),firstScope);
     end
-    if isfield(mesh,'hybridSolvedWallTemperatureK')
+    if isfield(mesh,'shortSupportPower')
+        tw=mesh.hybridWallTemperatureK;reason='球面温度由球体功率平衡求得。';
+        add('wallInput','支管及端盖给定壁温','K',tw,2*double(isfinite(tw)), ...
+            repmat({'补偿支管和端盖采用银球热平衡温度'},n,1),hybridScope,{},repmat({reason},n,1));
+    elseif isfield(mesh,'hybridSolvedWallTemperatureK')
         reason='此工况输入净对流功率，壁温由稳态热平衡求出。';
         add('wallInput','给定壁温','K',nan(n,1),zeros(n,1),repmat({'未给定壁温'},n,1),reason,{},repmat({reason},n,1));
         data.fields(end).stateNote=reason;
@@ -344,7 +348,13 @@ if isfield(mesh,'hybridWall')
         add(term{1},label,'K',nan(n,1),zeros(n,1),repmat({reason},n,1),reason,{},repmat({reason},n,1));
     end
 end
-if isfield(mesh,'hybridSolvedWallTemperatureK')
+if isfield(mesh,'shortSupportPower')
+    tw=mesh.hybridSolvedWallTemperatureK;method='外露银球的原生对流功率平衡，独立温度工况括区与候选端点复算';
+    add('wallSolved','银球量热平衡壁温','K',tw,double(isfinite(tw)),repmat({method},n,1),mesh.evidenceIdentity.scope,{}, ...
+        repmat({'支管和端盖采用同温边界，独立固体温度未知。'},n,1));
+    data.fields(end).computedStateLabel='集总热平衡';
+    data.shortSupportPower=mesh.shortSupportPower;
+elseif isfield(mesh,'hybridSolvedWallTemperatureK')
     t=solvedBeadThermal(mesh);
     add('wallSolved','稳态求解壁温','K',mesh.hybridSolvedWallTemperatureK,ones(n,1), ...
         repmat({t.wallMethod},n,1),t.scope);
@@ -419,6 +429,12 @@ if isfield(mesh,'hybridWall')
     end
     data.resultCondition.caption=data.caseNote;
     data.defaultField='heatFlux';
+    if isfield(mesh,'shortSupportPower')
+        cal=mesh.shortSupportPower;
+        data.caseNote=sprintf('Short Test 65 · Re %.0f · 球体量热 %.9f W · 银球平衡壁温 %.5f K · 准稳态', ...
+            hc.reynolds,cal.targetSphereW,cal.temperatureK);
+        data.resultCondition.caption=data.caseNote;
+    end
     if isfield(mesh,'shortSphere')
         data.shortSphere=mesh.shortSphere;
         if isfield(hc,'elapsedPhysicalTimeS')
@@ -1009,7 +1025,7 @@ if isfield(mesh,'evidenceIdentity')
         key='thermistorImport';
         if isfield(mesh,'shortSupportImport')
             key='shortSupportImport';data.coordinateNote='SI · 支管沿 ±Y · 来流 −X · 正热流入壁';
-            data.resultCondition.physicalStepSizeS=mesh.hybridCondition.physicalStepSizeS;
+            if isfield(mesh.hybridCondition,'physicalStepSizeS'),data.resultCondition.physicalStepSizeS=mesh.hybridCondition.physicalStepSizeS;end
         end
         b=mesh.(key);
         data.(key)=struct('referenceFaceID',b.referenceFaceID,'referenceAreaM2',b.referenceAreaM2, ...
@@ -1188,7 +1204,14 @@ if isfield(mesh,'pressure') && isfield(mesh.pressure,'freestream')
         end
     end
 end
-if isfield(mesh,'hybridSolvedWallTemperatureK')
+if isfield(mesh,'shortSupportPower')
+    c=mesh.shortSupportPower;result.wallInputType='spherePower';result.wallIdentity='球体热平衡温度；支管和端盖随球温';
+    result.wallKnownFaces=nnz(isfinite(mesh.hybridWallTemperatureK));result.wallUnknownFaces=size(mesh.F,1)-result.wallKnownFaces;
+    result.freestreamTemperatureK=mesh.hybridCondition.ambientTemperatureK;
+    result.freestreamPressurePa=mesh.hybridCondition.ambientPressurePa;
+    result.caption=sprintf('Short 65 · 准稳态 · 球体 %.9f W · 壁温 %.5f K',c.targetSphereW,c.temperatureK);
+    result.timeCaption='准稳态';return;
+elseif isfield(mesh,'hybridSolvedWallTemperatureK')
     % 只在功率模式登记求解温度；给定壁温的计数及范围维持无输入状态。
     t=solvedBeadThermal(mesh);
     result.wallInputType='netHeatingPower';result.wallIdentity=t.wallMethod;

@@ -1,4 +1,10 @@
 function frame=shortSupportJobFrame(folder,binding,boundary)
+if strcmp(boundary.branch,'power')
+    % 量热工况由三个稳态任务绑定，实际候选初场和收敛端点来自第三个任务。
+    [p,~,seal]=readShortSupportPowerCase(folder);
+    assert(strcmp(p.source.transferSHA256,binding.transferSHA256) && p.targetSphereW==boundary.targetSphereW);
+    frame=struct('initial',p.balance.initialSHA256,'terminal',p.balance.earlyFrame,'receipt',seal);return;
+end
 % 模块一：只读已完成任务的回执、时间层与两种步长，绑定本次几何和实际源帧。
 ackFile=fullfile(folder,'completed.json');pairFile=fullfile(folder,'export','pair.json');
 assert(isfile(ackFile) && isfile(pairFile),'RAH:Short:Incomplete','所选目录还没有完成回执和两套时间层。');

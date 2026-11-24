@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v340 双支管银球的量热平衡壁温及全表面解](validation/v340/RESULTS.md) · [球温与七站对照图](validation/v340/evidence/calorimetry.png) · [三档原生计算复核](validation/v340/evidence/comparison.json) · [下一项](validation/v340/NEXT_DECISION.md)。
+
 - [v339 双支管银球在 10.262726 ms 的全表面瞬时解](validation/v339/RESULTS.md) · [同面早晚对照图](validation/v339/evidence/later.png) · [原场重建](validation/v339/evidence/comparison.json) · [下一项](validation/v339/NEXT_DECISION.md)。
 
 - [v338 双支管银球七站的周向换热与背风排序](validation/v338/RESULTS.md) · [周向对照图](validation/v338/evidence/azimuth.png) · [独立整圈核对](validation/v338/evidence/comparison.json) · [下一项](validation/v338/NEXT_DECISION.md)。

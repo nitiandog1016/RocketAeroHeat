@@ -32,8 +32,16 @@ if isfield(data,'thermistorImport') || isfield(data,'shortSupportImport')
     % 原 STL 面号和标准面积成对保留，可独立复核任一行的热功率。
     if isfield(data,'shortSupportImport')
         m=data.shortSupportImport;
-        t.physical_time_s=repmat(data.resultCondition.elapsedPhysicalTimeS,n,1);
-        t.physical_step_s=repmat(data.resultCondition.physicalStepSizeS,n,1);
+        if isfield(data,'shortSupportPower')
+            c=data.shortSupportPower;f=data.fields(strcmp({data.fields.key},'wallSolved'));
+            t.sphere_equilibrium_wall_K=f.values(:);t.target_sphere_W=repmat(c.targetSphereW,n,1);
+            t.wall_temperature_role=repmat("支管或端盖随球温给定",n,1);t.wall_temperature_role(isfinite(f.values))="球体量热平衡温度";
+            t.wall_temperature_method=repmat("补偿支管及端盖与银球等温的边界假设",n,1);
+            t.wall_temperature_method(isfinite(f.values))="两档原生球面功率作割线插值，第三个稳态解按球面功率独立复核";
+        else
+            t.physical_time_s=repmat(data.resultCondition.elapsedPhysicalTimeS,n,1);
+            t.physical_step_s=repmat(data.resultCondition.physicalStepSizeS,n,1);
+        end
         t.source_frame_sha256=repmat(string(data.evidenceIdentity.sourceFrame.sha256),n,1);
         if isfield(data,'shortSupportTemporal')
             c=data.shortSupportTemporal;t.reference_time_s=repmat(c.earlyTimeS,n,1);

@@ -7,8 +7,11 @@ if nargin<5,target=.25;end
 root=fileparts(mfilename('fullpath'));cases=fullfile(root,'cases','short_sphere');
 timed=ismember(resolution,{'timefull','timehalf'});
 transferName='supportedTransfer65.npz';
-if timed || strcmp(resolution,'angular'),transferName='supportedAngularTransfer65.npz';end
-if timed
+powerMode=strcmp(resolution,'power');
+if timed || powerMode || strcmp(resolution,'angular'),transferName='supportedAngularTransfer65.npz';end
+if powerMode
+    [cal,archive]=readShortSupportPowerCase(job);
+elseif timed
     branch=resolution(5:end);
     if isempty(job)
         pair=readShortSupportTimePair(cases,radiusD,target);
@@ -72,7 +75,7 @@ assert(isequal(w.faceID,(1:n)') && isequal(w.regionID,g.regionID) && max(abs(w.a
 assert(max(abs(w.absolutePa-w.gaugePa-c.airPa))<1e-8 && abs(w.areaM2'*w.fluxInWm2+power)<1e-10);
 assert(isequal(stations.originalFaceID,g.stations.faceID) && s.jointExperimentalAreaM2==0);
 later=[];if timed && target==1,later=pair;end
-if radiusD==14,stations=attachShortStationGradients(stations,s,cases,job,later);end
+if radiusD==14 && ~powerMode,stations=attachShortStationGradients(stations,s,cases,job,later);end
 % 模块二：用统一的原面适配器交付压力、热流、给定壁温及对应首层流体温度。
 names=["外露银球";"+Y 支管外壁";"−Y 支管外壁";"+Y 湿端盖";"−Y 湿端盖"];
 condition=struct('caseLabel','Short Test 65 · 双支管银球 · 稳态','velocityMps',[-c.speedMps 0 0], ...
@@ -105,6 +108,18 @@ if timed
     mesh.shortSupportDirectionGrid=resolution;mesh.shortSupportTime=pair;
 end
 mesh.evidenceIdentity=id;s.coverage=coverage;s.outW=power;
+if powerMode
+    % 模块四：外层热平衡求出球温，支管和端盖温度由用户选定的同温假设给出。
+    assert(strcmp(cal.balance.earlyFrame,s.frameSHA256) && abs(s.regions(1).outW-cal.targetSphereW)<.0002*cal.targetSphereW);
+    assert(max(abs(w.wallInputK-cal.temperatureK))<1e-8 && max(abs([s.regions.outW]'-cal.balance.earlyRegionW(:)))<1e-10);
+    sphere=g.regionID==1;mesh.hybridSolvedWallTemperatureK=nan(n,1);
+    mesh.hybridSolvedWallTemperatureK(sphere)=cal.temperatureK;mesh.hybridWallTemperatureK(sphere)=NaN;
+    experiment=jsondecode(fileread(fullfile(cases,'test65.json')));
+    mesh.shortSupportPower=struct('targetSphereW',cal.targetSphereW,'sphereW',s.regions(1).outW, ...
+        'supportW',sum([s.regions(2:end).outW]),'temperatureK',cal.temperatureK,'measuredMeanK',(experiment.meanSurfaceF-32)*5/9+273.15);
+    mesh.evidenceIdentity.scope=sprintf('Short 65 名义等温银球，球面量热功率反求壁温。两管和端盖同温并独立供热。准稳态层流，沿用实验平均表温所定膜温导热系数 %.8f W/(m·K)。',c.kFilm);
+    mesh.hybridCondition.caseLabel='Short Test 65 · 球体量热功率 · 准稳态';
+end
 if ~isempty(later),mesh.shortSupportTemporal=readShortSupportTimeDifference(job,cases,branch,pair,s);end
 if radiusD==14 && timed && (target==1 || strcmp(resolution,'timehalf'))
     az=readShortSupportAzimuth(cases,job,s,stations,temp,later);

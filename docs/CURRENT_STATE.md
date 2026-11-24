@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-24。Short Test 65 名义双支管银球在扰动后 **10.262726 ms** 的 32,480 面均有壁压和热流，面积 0.000700423853595 m²。细步解向空气放热 2.005432412 W，比 2.565681 ms 少 50.78 nW。背风两站在全周的 Nu 差至少为 +4.83875，实验差为 −3.3。银球部分折合量热偏差 +38.08%。v339 新增 0 面、0 m²，联合实验验证 0 m²。工作台可选早晚时刻、查看同面差及七站周向曲线。[单时刻验收](validation/v339/RESULTS.md) · [本机三维页](../outputs/v339_validation/ui_half/workbench/index.html) · [早期周向对照](validation/v338/RESULTS.md) · [冷算与重开](validation/v336/RESULTS.md)
+2026-11-24。Short Test 65 量热准稳态工况在球体输入 0.827123193 W 下反求壁温 **341.527781 K**，比实验平均低 11.400 K。独立原生积分球面放热 0.827116501 W，整件放热 1.461090332 W。4,624 个球面使用热平衡温度，管壁与端盖采用同温假设。32,480 面均有压力和热流，总面积 0.000700423854 m²。v340 新增几何覆盖 0 面、0 m²，联合实验验证 0 m²。膜温导热系数沿用实验温度。[量热工况](validation/v340/RESULTS.md) · [本机三维页](../outputs/v340_validation/ui_archive/workbench/index.html) · [给定壁温的 10.262726 ms 瞬时工况](validation/v339/RESULTS.md) · [冷算与重开](validation/v336/RESULTS.md)
 
-<!-- records:last_completed=v339 -->
+<!-- records:last_completed=v340 -->
 <!-- records:active=none -->
-<!-- records:base_commit=3935850822bf743f197350e70b5a7d2c27603311 -->
+<!-- records:base_commit=eeff6cce24c5d8e07428fbadd6190f8be728ea51 -->
 
 20D 的两半步放热为 2.005187691 W，较 14D 减少 0.01221%。[远场对照](validation/v335/RESULTS.md)
 
@@ -42,7 +42,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-用球体量热功率 0.8271231935 W 反求名义等温银球的热平衡壁温，单列支管与端盖放热，以试验平均壁温和七站换热进行对照。[下一决定](validation/v339/NEXT_DECISION.md)
+在同一球体功率下用反求壁温更新膜温和导热系数，闭合温度与输运参数，并复核五区及七站。[下一决定](validation/v340/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 
