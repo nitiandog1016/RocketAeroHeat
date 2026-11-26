@@ -15,7 +15,7 @@ webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDeta
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
 measuredDirectory='';measuredPauseFile='';lastWireDirectory='';lastShortDirectory='';lastEarlyShortDirectory='';
 creasePreview=false;qualityPreview=false;candidatePreview=[];
-rfzListOpen=false;rfzSelectedFaces=[];rfzAir=[];
+rfzListOpen=false;rfzSelectedFaces=[];rfzAir=[];rfzNodesOpen=false;
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
 fig.CloseRequestFcn=@closeWorkbench;
@@ -64,7 +64,7 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing || ~isgraphics(fig),return;end
         try
             state=aeroHeatWorkflowState('selectStep',state,struct('step',step));
-            rfzListOpen=false;rfzSelectedFaces=[];
+            rfzListOpen=false;rfzNodesOpen=false;rfzSelectedFaces=[];
             delete(findall(resultHost,'Tag','static-air-probe-host'));
             renderEditor();sync();
             if step==5,showResults();else,showGeometry(false);end
@@ -73,7 +73,9 @@ renderEditor();sync();showGeometry(true);
     function s=getState(),s=state;end
     function sync()
         if ~isgraphics(fig),return;end
-        if ~isempty(rfzAir) && ~hasRFZAir(),rfzAir=[];end
+        if ~isempty(rfzAir) && ~hasRFZAir()
+            rfzAir=[];rfzNodesOpen=false;rfzSelectedFaces=[];
+        end
         if isempty(state.result) && ~isempty(webUI)
             % 输入失效后释放旧结果页，防止隐藏页探针继续指向上一次计算。
             if isgraphics(webUI.tab),delete(webUI.tab.Parent);end
@@ -213,7 +215,9 @@ renderEditor();sync();showGeometry(true);
         rfzProbe=isfield(m,'rfzRegions') && (isempty(state.mesh) || isRFZSurface());
         if rfzProbe,caption='DLR RFZ-REC · 点击三角面查看 CAD 面号与面积';end
         options=struct('showWire',state.currentStep==2,'resetCamera',reset,'enableFaceProbe',rfzProbe,'selectedFaces',rfzSelectedFaces);
-        if isRFZSurface() && state.currentStep>=3 && state.boundaryConfirmed
+        if rfzNodesOpen && hasRFZAir() && state.currentStep==4
+            caption='原面邻点温界 · 线框标出选中的原面';
+        elseif isRFZSurface() && state.currentStep>=3 && state.boundaryConfirmed
             options.givenWallK=state.cfg.heating.wallTemperatureByFace;
             caption='RFZ-REC · 完整 CAD 给定壁温';
         end
@@ -680,7 +684,8 @@ renderEditor();sync();showGeometry(true);
                 end
             case 4
                 if isRFZSurface()
-                    grid=form(10);b=state.cfg.rfzSurfaceInput;
+                    if rfzNodesOpen && hasRFZAir(),renderRFZNodes();sync();return;end
+                    grid=form(11);b=state.cfg.rfzSurfaceInput;
                     tip(grid,1,sprintf('%s · 完整 CAD\n%d 面已确认给定壁温，内壁 %.6g K。',b.dataset,b.faces,b.cavityWallK));
                     controls.rfzAir=button(grid,4,'准备或读取空气体网',@prepareRFZAir);
                     controls.rfzSave=button(grid,5,'保存已确认工况',@saveRFZCase);
@@ -693,6 +698,7 @@ renderEditor();sync();showGeometry(true);
                             s.source.gmshVersion,s.tetrahedra,s.wallFaces);
                     end
                     controls.rfzAirInfo=tip(grid,8,airText);
+                    if hasRFZAir(),controls.rfzNodes=button(grid,11,'查看原面邻点温界',@(~,~)openRFZNodes(true));end
                     sync();return
                 end
                 if isShortSupport()
@@ -1175,6 +1181,65 @@ renderEditor();sync();showGeometry(true);
         % 模块用途：仅向已核对、仍有效的输入版本提供邻接信息。
         yes=~isempty(rfzAir) && state.boundaryConfirmed && rfzAir.revision==state.revision && ...
             isfield(state.cfg,'rfzSurfaceInput') && isequal(rfzAir.input,state.cfg.rfzSurfaceInput);
+    end
+    function openRFZNodes(open)
+        % 模块用途：切换原面温界检查页，并清除上个视图的选区。
+        if ~hasRFZAir(),return;end
+        rfzNodesOpen=open;rfzSelectedFaces=[];renderEditor();sync();showGeometry(false);
+    end
+    function renderRFZNodes()
+        grid=form(15);
+        controls.nodesBack=button(grid,1,'返回计算输入',@(~,~)openRFZNodes(false));
+        ids=state.mesh.rfzRegions.cadFace;
+        scopes=[{'全部原面'};cellstr(compose('CAD %d',ids))];
+        controls.nodeScope=choice(grid,2,'查看区域',scopes,[0;ids],13);
+        controls.nodeScope.ValueChangedFcn=@refreshRFZNodes;
+        controls.nodeSummary=tip(grid,3,'');
+        controls.nodeTable=uitable(grid,'RowName',{},'CellSelectionCallback',@selectRFZNodes);
+        controls.nodeTable.Layout.Row=[5 9];controls.nodeTable.Layout.Column=[1 2];
+        controls.nodeSummary.Layout.Row=[3 4];
+        controls.nodeProbe=tip(grid,10,'点选模型可查看原面、对顶点位置和温度约束。');
+        controls.nodeFacesCSV=button(grid,13,'导出当前区域逐面明细',@(~,~)exportRFZNodes(false));
+        controls.wallNodesCSV=button(grid,14,'导出全体壁节点给温表',@(~,~)exportRFZNodes(true));
+        refreshRFZNodes([],[]);
+    end
+    function rows=currentNodeFaces()
+        rows=rfzAir.thermal.faces;scope=controls.nodeScope.Value;
+        if scope~=0,rows=rows(rows.cadFace==scope,:);end
+    end
+    function refreshRFZNodes(src,~)
+        rows=currentNodeFaces();names=categories(rows.nodalConstraint);
+        code=double(rows.nodalConstraint);n=numel(names);
+        counts=accumarray(code,1,[n 1]);areas=accumarray(code,rows.areaM2,[n 1]);
+        controls.nodeTable.Data=table(string(names),counts,areas,'VariableNames',{'constraint','faces','areaM2'});
+        controls.nodeTable.ColumnName={'节点温界','面数','面积 / m²'};
+        controls.nodeSummary.Text=sprintf('%d 原面 · %.6f m²\n全体壁节点中有 %d 个给温不唯一。', ...
+            height(rows),sum(rows.areaM2),nnz(isnan(rfzAir.thermal.wallNodes.uniqueGivenK)));
+        rfzSelectedFaces=[];
+        if ~isempty(src)
+            controls.nodeProbe.Text='点选模型可查看原面、对顶点位置和温度约束。';
+            showGeometry(false);
+        end
+    end
+    function selectRFZNodes(src,event)
+        if ~rfzNodesOpen || ~hasRFZAir() || isempty(event.Indices),return;end
+        row=event.Indices(1,1);rows=currentNodeFaces();
+        rfzSelectedFaces=rows.faceID(double(rows.nodalConstraint)==row);
+        showGeometry(false);message(sprintf('%s · %d 面 · %.6f m²',src.Data.constraint(row),src.Data.faces(row),src.Data.areaM2(row)));
+    end
+    function exportRFZNodes(nodes)
+        % 模块用途：逐面文件保留原面编号。全壁节点表仅在相邻给温一致时提供唯一值。
+        if ~rfzNodesOpen || ~hasRFZAir(),return;end
+        if nodes
+            rows=rfzAir.thermal.wallNodes;name='RFZ-wall-nodes.csv';
+        else
+            rows=currentNodeFaces();name=sprintf('RFZ-face-nodes-%d.csv',controls.nodeScope.Value);
+        end
+        [file,folder]=uiputfile('*.csv','导出节点温界',name);if isequal(file,0),return;end
+        try
+            writetable(rows,fullfile(folder,file),'Encoding','UTF-8');
+            message(sprintf('已导出 %d 行温界记录。',height(rows)));
+        catch ex,showError(ex);end
     end
     function prepareRFZAir(~,~)
         % 模块用途：显式生成或读取几何体网，绑定当前工况后供原面探针读取。
@@ -2123,6 +2188,11 @@ renderEditor();sync();showGeometry(true);
                         if hasRFZAir() && state.currentStep==4
                             cellID=rfzAir.owner(face);
                             note=sprintf('%s · 空气单元 %d · SICN %.5g',note,cellID,rfzAir.cellSICN(cellID));
+                            if rfzNodesOpen
+                                detail=rfzAir.thermal.faces(face,:);
+                                controls.nodeProbe.Text=sprintf('原面 %d · CAD %d · 对顶点 %d（%s）\n%s · 热流待求', ...
+                                    face,detail.cadFace,detail.oppositeNodeID,string(detail.oppositeLocation),string(detail.nodalConstraint));
+                            end
                         end
                     end
                     message(note);

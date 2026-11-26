@@ -2,6 +2,8 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
+RFZ 的 **计算 → 准备或读取空气体网 → 查看原面邻点温界** 可按 CAD 区统计和高亮相邻单元的温度约束，导出原面及壁节点给温表。标准工况下，CAD 第 13 区有 2,409 个原面的相邻四面体四点同温，直接用其节点温度插值会得到零梯度。[逐面核对与使用说明](docs/validation/v346/RESULTS.md)
+
 在 MATLAB 运行 `rocketAeroHeatWorkbench`，从 **输入模型 → 选择模型或工况** 打开 RFZ 完整 CAD 标准工况，再选 **计算 → 准备或读取空气体网**。点选任一原面可查看 CAD 分区、给定壁温及来源、相邻空气单元和形状质量。也可从 **打开 DLR RFZ-REC** 开始确认几何及边界，或导出逐面壁温。RFZ 壁压和热流待求。[标准工况](cases/rfz_rec/full_cad_input.json) · [体网使用与验收](docs/validation/v345/RESULTS.md) · [公开实验试件全表面结果](docs/validation/v345/TEST65.md)
 
 在双支管银球 14D 的边界页选择 **球体量热 · 随壁温更新物性**，可由 0.827123 W 球体功率同时求得均匀壁温与膜温导热系数。结果页可检查压力、热流、首层流体温度，点选原面查看算法，比较五区放热和七站 Nu。选择 **球体量热 · 固定膜温对照** 可读取原物性工况。[自洽膜温的启动方法和原面数据](docs/validation/v341/RESULTS.md) · [固定膜温对照](docs/validation/v340/RESULTS.md)

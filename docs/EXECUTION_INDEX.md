@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v346 RFZ 原面邻点温界与第 13 区核对](validation/v346/RESULTS.md) · [第 13 区完整面表](validation/v346/evidence/cad13.csv.gz) · [下一项](validation/v346/NEXT_DECISION.md)。
+
 - [v345 RFZ 全部原壁与空气单元连接](validation/v345/RESULTS.md) · [公开银球试件独立验收](validation/v345/TEST65.md) · [下一项](validation/v345/NEXT_DECISION.md)。
 
 - [v344 RFZ 完整原面与给定壁温输入](validation/v344/RESULTS.md) · [标准工况](../cases/rfz_rec/full_cad_input.json) · [下一项](validation/v344/NEXT_DECISION.md)。
