@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v343 RFZ-REC 原壁与参考封盖归属](validation/v343/RESULTS.md) · [全部原面分区](validation/v343/evidence/cad.csv) · [下一项](validation/v343/NEXT_DECISION.md)。
+
 - [v342 RFZ-REC 完整 CAD 边界与工作台导入](validation/v342/RESULTS.md) · [原面分区](../cases/rfz_rec/cad_faces.csv) · [与作者点云的几何核对](validation/v342/evidence/reference.json) · [下一项](validation/v342/NEXT_DECISION.md)。
 
 - [v341 银球量热与膜温导热系数闭合](validation/v341/RESULTS.md) · [同面热流差及七站图](validation/v341/evidence/film.png) · [原生物性与全表面核对](validation/v341/evidence/comparison.json) · [下一项](validation/v341/NEXT_DECISION.md)。

@@ -1,6 +1,6 @@
-function region = bindRFZGeometry(mesh,filename,scale,fileHash)
+function [region,boundary] = bindRFZGeometry(mesh,filename,scale,fileHash)
 % 模块一：识别 RFZ-REC 的冻结米制 STL，普通文件继续使用原工作流。
-region=[];
+region=[];boundary=[];
 if ~strcmp(fileHash,'f68c1b1416f58be69a94c062b8f2c8fabaccf9966bddeb6b6e8991b5d73ad083') || scale~=1
     return
 end
@@ -31,4 +31,34 @@ regionID=repelem(region.cadFace,region.lastFace-region.firstFace+1);
 areas=accumarray(regionID,mesh.area(:));
 assert(max(abs(areas-region.stlAreaM2))<1e-8 && abs(sum(areas)-info.stlAreaM2)<1e-8, ...
     'RAH:RFZ:Area','RFZ 分区面积核对失败。');
+
+% 模块四：按原 CAD 面号加入作者封盖的归属。人工多边形只存于独立清单。
+source=fullfile(folder,'deg190_boundary.json');condition=fullfile(folder,'deg190_reference.json');
+assert(strcmp(cm011FileSHA256(source),'b6647eb6dd7cb68e8b0db272240bdae0a9f4f686c660f63cf1eb62e1758de073'), ...
+    'RAH:RFZ:Boundary','RFZ 边界清单与发布版本不符。');
+b=jsondecode(fileread(source));
+assert(strcmp(b.caseSHA256,cm011FileSHA256(condition)) && strcmp(b.stlSHA256,fileHash) && ...
+    strcmp(b.cadTableSHA256,info.regionsSHA256) && strcmp(b.stepSHA256,info.stepSHA256));
+boundary=struct('condition',jsondecode(fileread(condition)));
+assert(strcmp(b.dataset,boundary.condition.dataset) && b.faces==size(mesh.F,1) && b.cadFaces==height(region));
+caps=b.caps;rim=[caps.rimCADFace]';inner=cellfun(@(v)v(:),{caps.innerCADFaces},'UniformOutput',false);
+allAssigned=[rim;vertcat(inner{:})];
+assert(numel(unique(allAssigned))==numel(allAssigned) && all(ismember(allAssigned,region.cadFace)));
+boundary.regions=region;
+boundary.regions.referenceRole=repmat("其余 CAD 壁",height(region),1);
+boundary.regions.referenceRole(rim)="实体唇环";
+boundary.regions.referenceRole(vertcat(inner{:}))="封盖内侧 CAD 壁";
+boundary.regions.rimCADFace=nan(height(region),1);
+for j=1:numel(rim)
+    boundary.regions.rimCADFace([rim(j);inner{j}])=rim(j);
+end
+keys={'other','rim','cavity'};labels=["其余 CAD 壁","实体唇环","封盖内侧 CAD 壁"];
+for j=1:numel(keys)
+    selected=boundary.regions.referenceRole==labels(j);g=b.groups.(keys{j});
+    assert(nnz(selected)==g.cadFaces && sum(region.lastFace(selected)-region.firstFace(selected)+1)==g.faces && ...
+        abs(sum(areas(selected))-g.areaM2)<1e-8);
+end
+boundary.caps=table(rim,[caps.polygonAreaM2]',[caps.referenceInteriorPoints]',[caps.farPoints]', ...
+    'VariableNames',{'rimCADFace','polygonAreaM2','referenceInteriorPoints','farPoints'});
+boundary.groups=b.groups;
 end

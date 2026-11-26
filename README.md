@@ -2,7 +2,7 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
-在 MATLAB 运行 `rocketAeroHeatWorkbench`，在 **输入模型** 页选择 **打开 DLR RFZ-REC**。首次打开从作者 STEP 准备米制几何，以后复用本机文件。点击三角面可查看原面号、所属 CAD 面和面积。当前交付为几何与原面核对，压力和热流待求。[RFZ-REC 导入、对照范围与复现方法](docs/validation/v342/RESULTS.md)
+在 MATLAB 运行 `rocketAeroHeatWorkbench`，在 **输入模型** 页选择 **打开 DLR RFZ-REC**。首次打开从作者 STEP 准备米制几何，以后复用本机文件。选择 **查看参考边界** 可定位并导出 204 个 CAD 分区、九处参考封盖及论文工况。点击三角面可查看原面号、边界身份和面积。本工况的壁压和热流待求。[原面与参考封盖](docs/validation/v343/RESULTS.md) · [米制模型导入](docs/validation/v342/RESULTS.md)
 
 在双支管银球 14D 的边界页选择 **球体量热 · 随壁温更新物性**，可由 0.827123 W 球体功率同时求得均匀壁温与膜温导热系数。结果页可检查压力、热流、首层流体温度，点选原面查看算法，比较五区放热和七站 Nu。选择 **球体量热 · 固定膜温对照** 可读取原物性工况。[自洽膜温的启动方法和原面数据](docs/validation/v341/RESULTS.md) · [固定膜温对照](docs/validation/v340/RESULTS.md)
 

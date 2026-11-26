@@ -40,6 +40,13 @@ payload=struct('kind','aerothermal-geometry','schemaVersion',1, ...
     'showWire',showWire,'resetCamera',resetCamera,'revision',revision);
 % 纯几何探针沿用现有三角形拾取；此开关只传回面号和交点。
 if enableFaceProbe,payload.enableFaceProbe=true;end
+% 选区来自当前几何的一基面号；网页接收对应的零基索引。
+if isfield(options,'selectedFaces') && ~isempty(options.selectedFaces)
+    ids=options.selectedFaces;
+    assert(isnumeric(ids) && isreal(ids) && isvector(ids) && all(isfinite(ids)) && ...
+        all(ids==fix(ids)) && all(ids>=1 & ids<=size(F,1)),'几何选区含无效面号。');
+    payload.selectedFaceIDs=num2cell(double(ids(:)')-1);
+end
 state.payload=payload;state.revision=revision;state.rendered=[];state.error=[];
 view.html.UserData=state;view.html.Data=payload;
 end

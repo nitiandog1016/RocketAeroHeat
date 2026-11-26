@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-24。DLR RFZ-REC 完整 CAD 边界已接入输入模型页。204 个 CAD 面对应 130,044 个原三角面、740.729003 m²。几何探针和米制文件重开已核对。新增壁压与热流共同计算覆盖 0 面、0 m²，全部原面待求。EUCASS 候选有 1,407 个点距离散表面超过 50 mm，参考封盖与物理壁面的对应待查。[本版结果](validation/v342/RESULTS.md) · [原面分区](../cases/rfz_rec/cad_faces.csv)
+2026-11-26。DLR RFZ-REC 全部 1,407 个距原壁超过 50 mm 的参考点均定位到作者的人工封盖。封盖内侧有 19 个 CAD 面、14,982 个原三角面、20.904108 m²。九处人工封盖按完整开口重建为 6.009213 m²，单独列账。工作台已接入三份可导出的清单。完整原壁 130,044 面、740.729003 m² 全部待求；本版新增壁压与热流共同覆盖 0 面、0 m²。作者压力零点及热流正方向仍待核实。[本版核对](validation/v343/RESULTS.md) · [原壁清单](validation/v343/evidence/cad.csv)
 
-<!-- records:last_completed=v342 -->
+<!-- records:last_completed=v343 -->
 <!-- records:active=none -->
-<!-- records:base_commit=ae3c1fc9131fb6b89f6d8cabcaac2624562a931e -->
+<!-- records:base_commit=b8511f76769d52bac2c9a38dbe388fb3bd2be571 -->
 
 Short Test 65 保留 32,480 面的独立回归。球面量热输入 0.827123193 W，求得球温 341.770414 K，比实验均值低 11.157 K。[回归及工作台](validation/v341/RESULTS.md)
 
@@ -44,7 +44,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-核定 RFZ-REC 物理壁面与作者参考封盖的对应和工况边界，分别统计 CAD 分母与参考覆盖。[下一决定](validation/v342/NEXT_DECISION.md)
+将同一 RFZ 原壁及边界选择接入网格、边界和后续独立计算输入，核对全部原面编号及内壁温度的来源。[下一决定](validation/v343/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

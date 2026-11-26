@@ -15,6 +15,7 @@ webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDeta
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
 measuredDirectory='';measuredPauseFile='';lastWireDirectory='';lastShortDirectory='';lastEarlyShortDirectory='';
 creasePreview=false;qualityPreview=false;candidatePreview=[];
+rfzListOpen=false;rfzSelectedFaces=[];
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
 fig.CloseRequestFcn=@closeWorkbench;
@@ -63,6 +64,7 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing || ~isgraphics(fig),return;end
         try
             state=aeroHeatWorkflowState('selectStep',state,struct('step',step));
+            rfzListOpen=false;rfzSelectedFaces=[];
             delete(findall(resultHost,'Tag','static-air-probe-host'));
             renderEditor();sync();
             if step==5,showResults();else,showGeometry(false);end
@@ -205,7 +207,7 @@ renderEditor();sync();showGeometry(true);
         rfzProbe=isfield(m,'rfzRegions') && isempty(state.mesh);
         if rfzProbe,caption='DLR RFZ-REC · 点击三角面查看 CAD 面号与面积';end
         updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2, ...
-            'resetCamera',reset,'enableFaceProbe',rfzProbe));
+            'resetCamera',reset,'enableFaceProbe',rfzProbe,'selectedFaces',rfzSelectedFaces));
     end
     function showResults()
         delete(findall(resultHost,'Tag','short-sphere-review'));fig.UserData.shortSphereReview=[];
@@ -240,6 +242,9 @@ renderEditor();sync();showGeometry(true);
         delete(editor.Children);controls=struct;
         switch state.currentStep
             case 1
+                if rfzListOpen && isfield(state.rawMesh,'rfzBoundary')
+                    renderRFZList();sync();return
+                end
                 if isBead() && ~isfield(state.modelSource,'file')
                     grid=form(6);
                     if hasBeadLeads(),tip(grid,1,'B 型热敏珠 · 两端引线直径 0.0540 mm，各含 0.300 mm 名义直段和暴露端面。');
@@ -259,6 +264,10 @@ renderEditor();sync();showGeometry(true);
                 controls.rfzModel=button(grid,4,'打开 DLR RFZ-REC',@loadRFZ);
                 controls.rfzModel.Layout.Column=2;
                 controls.pca=button(grid,5,'PCA 对齐主轴',@pcaOrientation);
+                if isfield(state.rawMesh,'rfzBoundary')
+                    controls.pca.Layout.Column=1;
+                    controls.rfzList=button(grid,5,'查看参考边界',@(~,~)toggleRFZList(true));controls.rfzList.Layout.Column=2;
+                end
                 controls.flip=button(grid,6,'翻转鼻向（Y轴180°）',@flipOrientation);
                 controls.rx=numberField(grid,7,'绕 X 增量 / °',0,[-180 180]);
                 controls.ry=numberField(grid,8,'绕 Y 增量 / °',0,[-180 180]);
@@ -1115,6 +1124,69 @@ renderEditor();sync();showGeometry(true);
             controls.file.Value=stl;controls.scale.Value=1;loadInput([],[]);
         catch ex,preparing=false;if isgraphics(fig),showError(ex);end,end
     end
+    function toggleRFZList(open)
+        % 模块一：清单属于当前导入模型；返回、切页或重载均清除旧选区。
+        if open && ~isfield(state.rawMesh,'rfzBoundary'),return;end
+        rfzListOpen=open;rfzSelectedFaces=[];renderEditor();sync();showGeometry(false);
+    end
+    function renderRFZList()
+        grid=form(15);
+        controls.rfzBack=button(grid,1,'返回模型输入',@(~,~)toggleRFZList(false));
+        controls.rfzTableKind=choice(grid,2,'EUCASS · deg190',{'CAD 原壁','人工封盖','论文工况与字段'},{'cad','cap','condition'},'cad');
+        controls.rfzTableKind.ValueChangedFcn=@refreshRFZList;
+        controls.rfzSummary=tip(grid,3,'');
+        controls.rfzTable=uitable(grid,'RowName',{});
+        controls.rfzTable.Layout.Row=[6 12];controls.rfzTable.Layout.Column=[1 2];
+        controls.rfzExport=button(grid,13,'导出当前清单 CSV',@exportRFZList);
+        controls.rfzSource=tip(grid,14,'');
+        refreshRFZList([],[]);
+    end
+    function refreshRFZList(src,~)
+        mesh=state.rawMesh;t=controls.rfzTable;rfzSelectedFaces=[];t.CellSelectionCallback=@selectRFZRow;
+        if strcmp(controls.rfzTableKind.Value,'cad')
+            r=mesh.rfzBoundary.regions;
+            t.Data=r(:,{'cadFace','referenceRole','stlAreaM2','firstFace','lastFace','rimCADFace'});
+            t.ColumnName={'CAD 面','参考边界身份','面积 / m²','首面号','末面号','所属唇环'};
+            controls.rfzSummary.Text=sprintf('%d 个 CAD 面 · %.6f m²\n封盖内侧 %.6f m² 计入原壁总面积。', ...
+                height(r),sum(r.stlAreaM2),mesh.rfzBoundary.groups.cavity.areaM2);
+            controls.rfzSource.Text='分区依据为作者 STEP 的共享边和本项目 STL 的闭合边环。面积由原三角面逐面求和。';
+        elseif strcmp(controls.rfzTableKind.Value,'cap')
+            t.Data=mesh.rfzBoundary.caps;t.ColumnName={'相邻唇环','重建面积 / m²','内部参考点','偏离原壁 >50 mm'};
+            controls.rfzSummary.Text=sprintf('%d 个完整开口 · 重建平面面积 %.6f m²\n选择一行可定位相邻实体唇环。', ...
+                height(t.Data),sum(t.Data.polygonAreaM2));
+            controls.rfzSource.Text='封盖面积取完整开口多边形；点数只统计作者发布的半域。';
+        else
+            b=mesh.rfzBoundary.condition;p=b.publishedCondition;
+            quantity=["来流速度";"来流静压";"来流静温";"作者攻角";"舵偏角";"尾焰";"壁温";"压力字段";"热流字段";"空间范围"];
+            plume=["关闭","开启"];
+            value=[compose('%g m/s',p.freestreamSpeedMps);compose('%g Pa',p.freestreamStaticPressurePa); ...
+                compose('%g K',p.freestreamStaticTemperatureK);compose('%g°',p.authorIncidenceDeg); ...
+                compose('%g°',p.finDeflectionDeg);plume(1+double(p.plumeOn)); ...
+                string(b.referenceScope.temperature);string(b.referenceScope.pressure); ...
+                string(b.referenceScope.heatFlux);string(b.referenceScope.surfaceCoordinates)];
+            source=[repmat("论文表 4 第 3 行",6,1);"论文第 6 页与 T 数组"; ...
+                "作者字段脚本";"作者字段脚本";"作者 XYZ 数组"];
+            t.Data=table(quantity,value,source);t.ColumnName={'项目','数值或口径','来源'};t.CellSelectionCallback=[];
+            controls.rfzSummary.Text=sprintf('%s · 论文表 %d 第 %d 行\n本工况原面压力、热流均待求。', ...
+                b.referenceScope.sourceKind,b.testMatrix.table,b.testMatrix.row);
+            controls.rfzSource.Text=['来源 DOI ' b.paperDOI];
+        end
+        if ~isempty(src),showGeometry(false);end
+    end
+    function selectRFZRow(src,event)
+        % 模块二：CAD 表选中真实分区；封盖表选中相邻实体唇环，图形只绘制原面。
+        if isempty(event.Indices) || ~rfzListOpen,return;end
+        row=event.Indices(1,1);
+        if strcmp(controls.rfzTableKind.Value,'cad'),id=src.Data.cadFace(row);else,id=src.Data.rimCADFace(row);end
+        r=state.rawMesh.rfzBoundary.regions(id,:);rfzSelectedFaces=r.firstFace:r.lastFace;
+        showGeometry(false);message(sprintf('高亮 CAD 面 %d · %s · 原面 %d–%d',id,r.referenceRole,r.firstFace,r.lastFace));
+    end
+    function exportRFZList(~,~)
+        snapshot=controls.rfzTable.Data;
+        [file,folder]=uiputfile('*.csv','导出当前边界清单',['RFZ-REC-deg190-' controls.rfzTableKind.Value '.csv']);
+        if isequal(file,0),return;end
+        writetable(snapshot,fullfile(folder,file),'Encoding','UTF-8');
+    end
     function modelEdited(~,~)
         if state.busy || preparing,return;end
         next=state.cfg;next.geometry.stlFile=controls.file.Value;next.geometry.scale=controls.scale.Value;
@@ -1128,14 +1200,15 @@ renderEditor();sync();showGeometry(true);
     function loadInput(~,~)
         if state.busy || preparing,return;end
         try
+            rfzListOpen=false;rfzSelectedFaces=[];
             next=state.cfg;next.computationBackend='engineering';embeddedVolume=[];
             next.geometry.stlFile=controls.file.Value;next.geometry.scale=controls.scale.Value;
             state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
             preview=[];report=[];preparing=true;message('正在加载模型并核对SI尺度…');
             hash=cm011FileSHA256(next.geometry.stlFile);
             raw=quietCall(@()loadSTLMesh(next,true));raw=quietCall(@()calcFaceGeometry(raw));
-            regions=bindRFZGeometry(raw,next.geometry.stlFile,next.geometry.scale,hash);
-            if ~isempty(regions),raw.rfzRegions=regions;end
+            [regions,boundaryInfo]=bindRFZGeometry(raw,next.geometry.stlFile,next.geometry.scale,hash);
+            if ~isempty(regions),raw.rfzRegions=regions;raw.rfzBoundary=boundaryInfo;end
             assert(strcmp(hash,cm011FileSHA256(next.geometry.stlFile)),'RAH:STL:Changed','STL 读取期间发生改变，请重新加载。');
             [ok,stlFile]=fileattrib(next.geometry.stlFile);assert(ok,'无法定位导入文件。');
             state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'cfg',next, ...
@@ -1887,9 +1960,9 @@ renderEditor();sync();showGeometry(true);
                     isfield(data,'revision') && data.revision==src.UserData.revision && isfield(data,'faceIndex')
                 face=double(data.faceIndex)+1;mesh=state.rawMesh;
                 if isscalar(face) && isfinite(face) && face==fix(face) && face>=1 && face<=size(mesh.F,1)
-                    row=mesh.rfzRegions(find(face<=mesh.rfzRegions.lastFace,1),:);
-                    message(sprintf('原面 %d · CAD 面 %d · 三角面 %.7g m² · 本区 %.7g m²', ...
-                        face,row.cadFace,mesh.area(face),row.stlAreaM2));
+                    row=mesh.rfzBoundary.regions(find(face<=mesh.rfzRegions.lastFace,1),:);
+                    message(sprintf('原面 %d · CAD 面 %d · %s · 三角面 %.7g m² · 本区 %.7g m²', ...
+                        face,row.cadFace,row.referenceRole,mesh.area(face),row.stlAreaM2));
                 end
                 return
             end
