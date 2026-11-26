@@ -2,6 +2,8 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
+打开 RFZ 标准工况后，选择 **计算 → 查看作者压力与热流样点**，可在原位置查询 Mach 5.35 / deg190 的 72,706 个公开 CFD 样点，切换压力和热流、固定色标，并导出带单位的参考图和完整 CSV。[操作与数据口径](docs/validation/v347/RESULTS.md) · [实际导出图](docs/validation/v347/evidence/reference.png)
+
 RFZ 的 **计算 → 准备或读取空气体网 → 查看原面邻点温界** 可按 CAD 区统计和高亮相邻单元的温度约束，导出原面及壁节点给温表。标准工况下，CAD 第 13 区有 2,409 个原面的相邻四面体四点同温，直接用其节点温度插值会得到零梯度。[逐面核对与使用说明](docs/validation/v346/RESULTS.md)
 
 在 MATLAB 运行 `rocketAeroHeatWorkbench`，从 **输入模型 → 选择模型或工况** 打开 RFZ 完整 CAD 标准工况，再选 **计算 → 准备或读取空气体网**。点选任一原面可查看 CAD 分区、给定壁温及来源、相邻空气单元和形状质量。也可从 **打开 DLR RFZ-REC** 开始确认几何及边界，或导出逐面壁温。RFZ 壁压和热流待求。[标准工况](cases/rfz_rec/full_cad_input.json) · [体网使用与验收](docs/validation/v345/RESULTS.md) · [公开实验试件全表面结果](docs/validation/v345/TEST65.md)

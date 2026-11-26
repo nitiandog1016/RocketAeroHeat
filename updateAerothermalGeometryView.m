@@ -38,6 +38,20 @@ payload=struct('kind','aerothermal-geometry','schemaVersion',1, ...
     'vertices',double(V),'faces',double(F)-1,'caption',char(caption), ...
     'coordinateNote','SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例', ...
     'showWire',showWire,'resetCamera',resetCamera,'revision',revision);
+% 作者点云使用独立的点序、坐标和逐点色标。连续面元仍由 V/F 分支处理。
+if isfield(options,'referencePoints')
+    p=options.referencePoints;
+    validateattributes(p.xyz,{'double'},{'real','finite','nonempty','ncols',3});
+    validateattributes(p.values,{'double'},{'real','finite','column','numel',size(p.xyz,1)});
+    validateattributes(p.range,{'double'},{'real','finite','numel',2});
+    assert(isempty(mesh) && p.range(2)>p.range(1) && ~isfield(options,'givenWallK'), ...
+        'RAH:Reference:Display','参考点云需要独立坐标及有效色标。');
+    payload.vertices=p.xyz;
+    payload.coordinateNote='作者机体坐标 / m · 发布半域 · 喷口人工封盖';
+    payload.pointField=rmfield(p,'xyz');payload.pointField.context='published-samples';
+    payload.pointField.productionQualified=false;
+    payload.initialCameraAzimuthRad=2.15;payload.initialCameraElevationRad=.48;
+end
 % 纯几何探针沿用现有三角形拾取；此开关只传回面号和交点。
 if enableFaceProbe,payload.enableFaceProbe=true;end
 % 给定壁温来自确认的边界。整面等温时色标只显示这一温度。

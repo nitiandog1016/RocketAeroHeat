@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v347 RFZ Mach 5.35 作者压力与热流样点](validation/v347/RESULTS.md) · [工作台导出图](validation/v347/evidence/reference.png) · [下一项](validation/v347/NEXT_DECISION.md)。
+
 - [v346 RFZ 原面邻点温界与第 13 区核对](validation/v346/RESULTS.md) · [第 13 区完整面表](validation/v346/evidence/cad13.csv.gz) · [下一项](validation/v346/NEXT_DECISION.md)。
 
 - [v345 RFZ 全部原壁与空气单元连接](validation/v345/RESULTS.md) · [公开银球试件独立验收](validation/v345/TEST65.md) · [下一项](validation/v345/NEXT_DECISION.md)。

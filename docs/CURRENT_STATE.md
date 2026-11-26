@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-26。DLR RFZ-REC 完整原壁 130,044 面、740.729003 m²。在标准 300 K 工况下，CAD 第 13 区的 2,409 面、29.686029 m² 的相邻四面体四点均为同温壁节点，一次节点插值必得零梯度。其余 20,443 面有内部对顶点，气体温度待求。工作台可按区定位并导出节点温界。全域计算壁压与热流共同覆盖仍为 0 面、0 m²。原体网的近壁分辨率、外域精度及作者参考场的压力零点、热流正方向待验。[逐面核对](validation/v346/RESULTS.md) · [体网几何](validation/v345/RESULTS.md) · [标准工况](../cases/rfz_rec/full_cad_input.json)
+2026-11-26。DLR RFZ-REC 的 Mach 5.35 / deg190 参考场已接入工作台，72,706 个作者样点可查看、点选及导出。六列数值与原文件逐位相等。作者压力零点、热流正向待核实。完整 CAD 130,044 面、740.729003 m² 的项目独立壁压与热流共同覆盖仍为 0 面、0 m²。第 13 区的 2,409 面、29.686029 m² 的壁邻四面体四点同温，另外 20,443 面的内部对顶点温度待求。近壁分辨率及外域精度待验。[参考场](validation/v347/RESULTS.md) · [节点温界](validation/v346/RESULTS.md) · [标准工况](../cases/rfz_rec/full_cad_input.json)
 
-<!-- records:last_completed=v346 -->
+<!-- records:last_completed=v347 -->
 <!-- records:active=none -->
-<!-- records:base_commit=d9d3b3155b668cbdbf8381f818f37fbec5b18b02 -->
+<!-- records:base_commit=1fb6ba7faf4432887b594858f6948b4b497d59ed -->
 
 公开实验试件 Short Test 65 单独核对了 32,480 / 32,480 面计算壁压与热流。球面量热输入 0.827123193 W，球温比实验均值低 11.157 K，七站 Nu 的均方根误差为 4.8882。[试件独立验收](validation/v345/TEST65.md)
 
@@ -44,7 +44,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-RFZ 下一项从同工况实际计算取得首批可回读的壁压与热流，首先核对 CAD 第 13 区的原面与求解来源。[下一决定](validation/v346/NEXT_DECISION.md)
+下一项为 RFZ 同工况的首批独立原面壁压和热流，首先核对第 13 区，并在相同位置和明确字段口径下与作者数据对照。[下一决定](validation/v347/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

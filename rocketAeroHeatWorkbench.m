@@ -16,6 +16,7 @@ embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
 measuredDirectory='';measuredPauseFile='';lastWireDirectory='';lastShortDirectory='';lastEarlyShortDirectory='';
 creasePreview=false;qualityPreview=false;candidatePreview=[];
 rfzListOpen=false;rfzSelectedFaces=[];rfzAir=[];rfzNodesOpen=false;
+rfzSamples=[];rfzSampleLimits=struct;rfzImageRequest='';
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
 fig.CloseRequestFcn=@closeWorkbench;
@@ -64,7 +65,7 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing || ~isgraphics(fig),return;end
         try
             state=aeroHeatWorkflowState('selectStep',state,struct('step',step));
-            rfzListOpen=false;rfzNodesOpen=false;rfzSelectedFaces=[];
+            rfzListOpen=false;rfzNodesOpen=false;rfzSelectedFaces=[];rfzSamples=[];rfzImageRequest='';
             delete(findall(resultHost,'Tag','static-air-probe-host'));
             renderEditor();sync();
             if step==5,showResults();else,showGeometry(false);end
@@ -169,6 +170,9 @@ renderEditor();sync();showGeometry(true);
         fig.UserData.benchmarkReview=[];
         fig.UserData.idealAirReview=[];
         fig.UserData.meshQuality=[];
+        if ~isempty(rfzSamples) && state.currentStep==4 && isRFZSurface()
+            drawRFZSamples(reset);return
+        end
         if qualityPreview && state.currentStep==2 && (~isempty(embeddedVolume) || ~isempty(candidatePreview))
             % 网格质量来自真实四面体；灰色原壁面只用于空间定位。
             if isempty(candidatePreview)
@@ -684,8 +688,9 @@ renderEditor();sync();showGeometry(true);
                 end
             case 4
                 if isRFZSurface()
+                    if ~isempty(rfzSamples),renderRFZSamples();sync();return;end
                     if rfzNodesOpen && hasRFZAir(),renderRFZNodes();sync();return;end
-                    grid=form(11);b=state.cfg.rfzSurfaceInput;
+                    grid=form(12);b=state.cfg.rfzSurfaceInput;
                     tip(grid,1,sprintf('%s · 完整 CAD\n%d 面已确认给定壁温，内壁 %.6g K。',b.dataset,b.faces,b.cavityWallK));
                     controls.rfzAir=button(grid,4,'准备或读取空气体网',@prepareRFZAir);
                     controls.rfzSave=button(grid,5,'保存已确认工况',@saveRFZCase);
@@ -698,7 +703,8 @@ renderEditor();sync();showGeometry(true);
                             s.source.gmshVersion,s.tetrahedra,s.wallFaces);
                     end
                     controls.rfzAirInfo=tip(grid,8,airText);
-                    if hasRFZAir(),controls.rfzNodes=button(grid,11,'查看原面邻点温界',@(~,~)openRFZNodes(true));end
+                    controls.rfzSamples=button(grid,11,'查看作者压力与热流样点',@openRFZSamples);
+                    if hasRFZAir(),controls.rfzNodes=button(grid,12,'查看原面邻点温界',@(~,~)openRFZNodes(true));end
                     sync();return
                 end
                 if isShortSupport()
@@ -1176,6 +1182,107 @@ renderEditor();sync();showGeometry(true);
         end
         expected=jsondecode(fileread(fullfile(root,'cases','rfz_rec','geometry.json')));
         assert(strcmp(cm011FileSHA256(stl),expected.stlSHA256),'RAH:RFZ:Source','本地 RFZ-REC 文件与冻结输入不符。');
+    end
+    function openRFZSamples(~,~)
+        % 模块一：点击后才读取参考发布物，保留项目工况及求解状态。
+        if preparing || state.busy || ~state.boundaryConfirmed || ~isRFZSurface(),return;end
+        try
+            preparing=true;message('正在读取并核对作者的六个原始数组…');
+            points=readRFZReferenceSamples();
+            if ~isgraphics(fig),return;end
+            rfzSamples=points;rfzSampleLimits=struct;preparing=false;
+            renderEditor();sync();showGeometry(true);message('已打开 DLR 的 Mach 5.35 数值参考样点。');
+        catch ex
+            preparing=false;rfzSamples=[];
+            if isgraphics(fig),renderEditor();showGeometry(true);showError(ex);end
+        end
+    end
+    function renderRFZSamples()
+        grid=form(15);
+        controls.samplesBack=button(grid,1,'返回计算输入',@(~,~)go(4));
+        controls.sampleField=choice(grid,2,'参考量',{'作者热流 q','作者压力 p'},{'q','p'},'q');
+        controls.sampleScale=choice(grid,3,'色标',{'全范围','2%–98% 样点范围','指定范围'},{'full','central','fixed'},'central');
+        controls.sampleLo=numberField(grid,4,'色标下限',0,[-inf inf]);
+        controls.sampleHi=numberField(grid,5,'色标上限',1,[-inf inf]);
+        controls.sampleApply=button(grid,6,'应用指定范围',@applyRFZSampleLimits);
+        controls.sampleID=numberField(grid,7,'作者样点号',1,[1 height(rfzSamples)]);
+        controls.sampleID.RoundFractionalValues='on';
+        controls.sampleID.ValueChangedFcn=@(~,~)selectRFZSample(controls.sampleID.Value,true);
+        controls.sampleProbe=tip(grid,8,'');
+        controls.sampleExport=button(grid,11,'导出作者原始样点 CSV',@exportRFZSamples);
+        controls.samplePNG=button(grid,12,'导出当前参考图 PNG',@requestRFZImage);
+        tip(grid,13,'DLR CFD · EUCASS 2023 / deg190 · 作者给定壁温 300 K。压力零点、热流正方向待核实。');
+        controls.sampleField.ValueChangedFcn=@(~,~)drawRFZSamples(false);
+        controls.sampleScale.ValueChangedFcn=@(~,~)drawRFZSamples(false);
+        selectRFZSample(1,false);
+    end
+    function applyRFZSampleLimits(~,~)
+        limits=[controls.sampleLo.Value controls.sampleHi.Value];
+        if ~all(isfinite(limits)) || limits(2)<=limits(1)
+            message('色标上限须大于下限，两端均须有限。');return
+        end
+        rfzSampleLimits.(controls.sampleField.Value)=limits;drawRFZSamples(false);
+    end
+    function drawRFZSamples(reset)
+        % 模块二：在作者原坐标绘制离散点，色限仅用于着色，探针始终读取原值。
+        key=controls.sampleField.Value;mode=controls.sampleScale.Value;
+        if strcmp(key,'q'),values=rfzSamples.authorHeatFlux_Wm2;name='作者热流 q';unit='W/m²';
+        else,values=rfzSamples.authorPressure_Pa;name='作者压力 p';unit='Pa';end
+        limits=[min(values) max(values)];
+        if strcmp(mode,'central')
+            ordered=sort(values);limits=ordered(1+round((numel(ordered)-1)*[.02 .98]))';
+            limits=reshape(limits,1,2);
+        elseif strcmp(mode,'fixed') && isfield(rfzSampleLimits,key),limits=rfzSampleLimits.(key);end
+        controls.sampleLo.Value=limits(1);controls.sampleHi.Value=limits(2);
+        enabled=onoff(strcmp(mode,'fixed'));
+        controls.sampleLo.Enable=enabled;controls.sampleHi.Enable=enabled;controls.sampleApply.Enable=enabled;
+        scaleNames=struct('full','全范围','central','2%–98% 样点','fixed','指定范围');
+        point=struct('xyz',rfzSamples{:,2:4},'values',values,'name',name,'unit',unit,'scaleLabel',scaleNames.(mode), ...
+            'range',limits,'selectedIndex',controls.sampleID.Value-1);
+        updateAerothermalGeometryView(geometryView,[],'DLR 数值参考 · Mach 5.35 · deg190', ...
+            struct('referencePoints',point,'resetCamera',reset));
+    end
+    function selectRFZSample(id,notifyPage)
+        % 模块三：编号是作者数组的一基行号，不作为 CAD 面号。
+        if isempty(rfzSamples) || ~isscalar(id) || ~isfinite(id) || id~=fix(id) || id<1 || id>height(rfzSamples),return;end
+        controls.sampleID.Value=id;row=rfzSamples{id,2:7};
+        controls.sampleProbe.Text=sprintf('样点 %d · 作者 XYZ / m\n%.8g，%.8g，%.8g\np = %.10g Pa · q = %.10g W/m²\n壁温 T = %.10g K',id,row);
+        html=geometryView.html;s=html.UserData;
+        if isstruct(s.payload) && isfield(s.payload,'pointField')
+            s.payload.pointField.selectedIndex=id-1;html.UserData=s;
+            if notifyPage,html.Data=struct('kind','geometry-point-selection','revision',s.revision,'sampleIndex',id-1);end
+        end
+    end
+    function exportRFZSamples(~,~)
+        [file,folder]=uiputfile('*.csv','导出作者原始样点','DLR-EUCASS2023-deg190-samples.csv');
+        if isequal(file,0),return;end
+        try
+            saveRFZReferenceCSV(fullfile(folder,file),rfzSamples);
+            message(sprintf('已导出 %d 个作者样点，坐标及场量保留原值。',height(rfzSamples)));
+        catch ex,showError(ex);end
+    end
+    function requestRFZImage(~,~)
+        % 模块四：请求当前 WebGL 视图，接收时核对图像、工况视图版本和本次操作。
+        html=geometryView.html;rfzImageRequest=char(java.util.UUID.randomUUID());
+        html.Data=struct('kind','geometry-point-image-request','revision',html.UserData.revision,'token',rfzImageRequest);
+    end
+    function saveRFZImage(data)
+        rfzImageRequest='';
+        [file,folder]=uiputfile('*.png','导出当前参考图',['DLR-deg190-' controls.sampleField.Value '.png']);
+        if isequal(file,0),return;end
+        try
+            bytes=matlab.net.base64decode(data.base64);
+            assert(numel(bytes)>8 && isequal(reshape(bytes(1:8),1,[]),uint8([137 80 78 71 13 10 26 10])),'参考图像格式无效。');
+            partial=[tempname(folder) '.png'];cleanup=onCleanup(@()deleteTempImage(partial)); %#ok<NASGU>
+            [fid,msg]=fopen(partial,'wb');assert(fid>=0,'%s',msg);
+            count=fwrite(fid,bytes,'uint8');code=fclose(fid);assert(code==0 && count==numel(bytes),'图像写入不完整。');
+            imfinfo(partial);
+            [ok,msg]=movefile(partial,fullfile(folder,file),'f');assert(ok,'%s',msg);
+            message('已导出当前视角、样点编号、单位和色标。');
+        catch ex,showError(ex);end
+    end
+    function deleteTempImage(file)
+        if isfile(file),delete(file);end
     end
     function yes=hasRFZAir()
         % 模块用途：仅向已核对、仍有效的输入版本提供邻接信息。
@@ -2171,6 +2278,16 @@ renderEditor();sync();showGeometry(true);
     end
     function geometryMessage(src,event)
         data=src.Data;geometryReceiver(src,event);
+        if isstruct(data) && isfield(data,'kind') && strcmp(data.kind,'geometry-point-image') && ...
+                ~isempty(rfzSamples) && ~isempty(rfzImageRequest) && isfield(data,'token') && strcmp(data.token,rfzImageRequest) && ...
+                isfield(data,'revision') && isequal(data.revision,src.UserData.revision) && isfield(data,'base64')
+            saveRFZImage(data);return
+        end
+        if isstruct(data) && isfield(data,'kind') && strcmp(data.kind,'geometry-point-probe') && ...
+                ~isempty(rfzSamples) && state.currentStep==4 && isfield(src.UserData.payload,'pointField') && ...
+                isfield(data,'revision') && isequal(data.revision,src.UserData.revision) && isfield(data,'sampleIndex')
+            selectRFZSample(double(data.sampleIndex)+1,false);return
+        end
         if isstruct(data) && isfield(data,'kind') && strcmp(data.kind,'geometry-face-probe')
             if isfield(state.rawMesh,'rfzRegions') && (isempty(state.mesh) || isRFZSurface()) && ...
                     getOption(src.UserData.payload,'enableFaceProbe',false) && ...

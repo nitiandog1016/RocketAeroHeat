@@ -3,12 +3,17 @@
 (function(){
   const $=id=>document.getElementById(id),canvas=$('scene'),finite=x=>typeof x==='number'&&Number.isFinite(x);
   const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],fmt=x=>Number(x.toPrecision(5)).toString();
-  const fieldColor=t=>{const stops=[[.94,.97,.99],[.67,.82,.90],[.28,.60,.75],[.08,.35,.56],[.025,.15,.31]],x=Math.max(0,Math.min(1,t))*4,i=Math.min(3,Math.floor(x)),f=x-i;return stops[i].map((v,j)=>v+(stops[i+1][j]-v)*f);};
+  const surfaceStops=[[.94,.97,.99],[.67,.82,.90],[.28,.60,.75],[.08,.35,.56],[.025,.15,.31]];
+  const sampleStops=[[.04,.16,.30],[.22,.33,.48],[.46,.48,.47],[.72,.64,.39],[.97,.86,.36]];
+  const ramp=(stops,t)=>{const x=Math.max(0,Math.min(1,t))*4,i=Math.min(3,Math.floor(x)),f=x-i;return stops[i].map((v,j)=>v+(stops[i+1][j]-v)*f);};
+  const fieldColor=t=>ramp(surfaceStops,t);
+  const sampleCSS=t=>'rgb('+ramp(sampleStops,t).map(v=>Math.round(255*v)).join(',')+')';
   let gl,program,positions,colorBuffer,edges,flowPositions,flowColors,sectionPositions,selectionPositions,probePositions,bridge,model=null,vertices=[],lo,hi,initializationError='';
   let selectionCount=0,probeCount=0,selectedFaceIDs=[],inspectedFace=-1;
   let modelCenter=[0,0,0],modelExtent=1,flowSegments=0,flowPoints=[],sectionSegmentCount=0;
   let az=-Math.PI/2,el=.35,zoom=1,pan=[0,0],baseScale=1,right,up,direction,sx,sy,frame=0,pendingReport=false,drag;
   let researchSection=null;
+  let surfaceCamera=null;
   const sectionView=$('su2Section')&&window.RocketSU2Section?window.RocketSU2Section.mount($('su2Section'),info=>{
     researchSection=info;if(!info||!model)return;
     model.hasSectionOverlay=true;sectionSegmentCount=info.segments.length;
@@ -21,7 +26,7 @@
     if(!gl)throw Error('当前内嵌网页环境不支持 WebGL。');
     const shader=(type,source)=>{const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;};
     program=gl.createProgram();
-    gl.attachShader(program,shader(gl.VERTEX_SHADER,'attribute vec3 p,c;uniform vec3 r,u,d;uniform vec2 scale,pan;varying vec3 color;void main(){gl_Position=vec4(dot(p,r)*scale.x+pan.x,dot(p,u)*scale.y+pan.y,-dot(p,d)*0.45,1.0);color=c;}'));
+    gl.attachShader(program,shader(gl.VERTEX_SHADER,'attribute vec3 p,c;uniform vec3 r,u,d;uniform vec2 scale,pan;uniform float pointSize;varying vec3 color;void main(){gl_Position=vec4(dot(p,r)*scale.x+pan.x,dot(p,u)*scale.y+pan.y,-dot(p,d)*0.45,1.0);gl_PointSize=pointSize;color=c;}'));
     gl.attachShader(program,shader(gl.FRAGMENT_SHADER,'precision mediump float;varying vec3 color;void main(){gl_FragColor=vec4(color,1.0);}'));
     gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
     positions=gl.createBuffer();colorBuffer=gl.createBuffer();edges=gl.createBuffer();flowPositions=gl.createBuffer();flowColors=gl.createBuffer();sectionPositions=gl.createBuffer();selectionPositions=gl.createBuffer();probePositions=gl.createBuffer();gl.enable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
@@ -54,13 +59,17 @@
       if(!data||data.kind!=='aerothermal-geometry'||data.schemaVersion!==1||!Number.isInteger(data.revision))throw Error('几何负载类型或版本无效。');
       let V=data.vertices,F=data.faces;
       if(Array.isArray(V)&&typeof V[0]==='number')V=[V];if(Array.isArray(F)&&typeof F[0]==='number')F=[F];
-      if(!Array.isArray(V)||!Array.isArray(F)||Boolean(V.length)!==Boolean(F.length)||V.some(v=>!Array.isArray(v)||v.length!==3||v.some(x=>!finite(x)))||F.some(f=>!Array.isArray(f)||f.length!==3||f.some(i=>!Number.isInteger(i)||i<0||i>=V.length)))throw Error('顶点坐标或三角形编号无效。');
-      const field=data.faceField;
+      const points=data.pointField;
+      const wasPointView=Boolean(model?.pointField);
+      if(!Array.isArray(V)||!Array.isArray(F)||(points?(!V.length||F.length):Boolean(V.length)!==Boolean(F.length))||V.some(v=>!Array.isArray(v)||v.length!==3||v.some(x=>!finite(x)))||F.some(f=>!Array.isArray(f)||f.length!==3||f.some(i=>!Number.isInteger(i)||i<0||i>=V.length)))throw Error('顶点坐标或三角形编号无效。');
+      if(points&&(points.context!=='published-samples'||data.faceField||!Array.isArray(points.values)||points.values.some(x=>!finite(x))||!Number.isInteger(points.selectedIndex)||points.selectedIndex<0||points.selectedIndex>=V.length))throw Error('参考样点身份、数值或行号无效。');
+      const field=points||data.faceField;
       const givenWall=field?.context==='given-wall';
       const uniformWall=givenWall && Array.isArray(field.range) && field.range[0]===field.range[1];
-      if(field&&(!Array.isArray(field.values)||field.values.length!==F.length||field.values.some(v=>v!==null&&!finite(v))||!Array.isArray(field.range)||field.range.length!==2||!field.range.every(finite)||(field.range[1]<=field.range[0]&&!uniformWall)||typeof field.name!=='string'||typeof field.unit!=='string'||field.productionQualified!==false))throw Error('逐面研究场量、单位、色标或资格无效。');
+      if(field&&(!Array.isArray(field.values)||field.values.length!==(points?V.length:F.length)||field.values.some(v=>v!==null&&!finite(v))||!Array.isArray(field.range)||field.range.length!==2||!field.range.every(finite)||(field.range[1]<=field.range[0]&&!uniformWall)||typeof field.name!=='string'||typeof field.unit!=='string'||field.productionQualified!==false))throw Error('研究场量、单位、色标或资格无效。');
       if(givenWall && (field.unit!=='K' || field.values.some(v=>!finite(v)||v<=0||v<field.range[0]||v>field.range[1])))throw Error('给定壁温的单位、数值或范围无效。');
-      model={vertices:V,faces:F,revision:data.revision,faceField:field||null,enableFaceProbe:data.enableFaceProbe===true,hasSectionOverlay:Array.isArray(data.sectionSegments)};
+      if(points&&!wasPointView&&model?.faces.length)surfaceCamera={az,el,zoom,pan:[...pan],baseScale};
+      model={vertices:V,faces:F,revision:data.revision,pointField:points,faceField:data.faceField||null,enableFaceProbe:data.enableFaceProbe===true,hasSectionOverlay:Array.isArray(data.sectionSegments)};
       if(initializationError)throw Error(initializationError);
       vertices=[];lo=[Infinity,Infinity,Infinity];hi=[-Infinity,-Infinity,-Infinity];
       V.forEach(v=>v.forEach((x,j)=>{lo[j]=Math.min(lo[j],x);hi[j]=Math.max(hi[j],x);}));
@@ -74,6 +83,12 @@
       if(gl)buffer(sectionPositions,sections.flatMap(s=>s.flatMap(p=>p.map((x,j)=>(x-modelCenter[j])/modelExtent))));
       if(gl){const ts=[],cs=[],es=[];F.forEach((f,faceIndex)=>{const a=vertices[f[0]],b=vertices[f[1]],c=vertices[f[2]],ab=b.map((x,j)=>x-a[j]),ac=c.map((x,j)=>x-a[j]);let n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];const norm=Math.hypot(...n);n=norm>0?n.map(x=>x/norm):[0,0,0];const light=.65+.22*Math.abs(dot(n,[.3,.4,.8660254])),color=field?(finite(field.values[faceIndex])?fieldColor(uniformWall ? .5 : (field.values[faceIndex]-field.range[0])/(field.range[1]-field.range[0])):[.66,.69,.72]):[.52,.60,.67].map(x=>x*light);f.forEach(i=>{ts.push(...vertices[i]);cs.push(...color);});[0,1,1,2,2,0].forEach(j=>es.push(...vertices[f[j]]));});buffer(positions,ts);buffer(colorBuffer,cs);buffer(edges,es);}
       const legend=$('fieldLegend');
+      if(points){
+        buffer(positions,vertices.flat());
+        buffer(colorBuffer,points.values.flatMap(v=>ramp(sampleStops,(v-points.range[0])/(points.range[1]-points.range[0]))));
+        document.querySelector('footer span:last-child').textContent='DLR 作者数值场 · 项目独立结果待求';
+      }
+      if(points||wasPointView)$('wire').parentElement.hidden=Boolean(points);
       if(legend){
         legend.hidden=!field;
         if(field){
@@ -83,6 +98,9 @@
           if(givenWall){
             label.textContent=uniformWall?'给定壁温 · 全面 '+fmt(field.range[0])+' K':'给定壁温 / K · '+fmt(field.range[0])+'—'+fmt(field.range[1]);
             if(uniformWall)bar.style.background='rgb('+fieldColor(.5).map(v=>Math.round(255*v)).join(',')+')';
+          }else if(points){
+            label.textContent=field.name+' / '+field.unit+' · '+(field.scaleLabel||'色标')+' '+fmt(field.range[0])+' — '+fmt(field.range[1])+' · 范围外取端点色';
+            bar.style.background='linear-gradient(to right,'+[0,.25,.5,.75,1].map(sampleCSS).join(',')+')';
           }else{
             label.textContent=field.name+' / '+field.unit+' · 固定范围 '+fmt(field.range[0])+'—'+fmt(field.range[1])+(field.context==='mesh-quality'?' · 灰色原壁面用于定位参考':' · 超范围使用端点色；灰色为未知');
           }
@@ -93,7 +111,12 @@
       selectFaces(data.selectedFaceIDs||[],Number.isInteger(data.inspectedFace)?data.inspectedFace:-1);
       $('caption').textContent=data.caption||'几何预览';$('coordinates').textContent=data.coordinateNote||'SI · XYZ / m · 主轴 X · 鼻尖 +X · 真实几何比例';$('wire').checked=Boolean(data.showWire);
       $('summary').textContent=F.length?V.length.toLocaleString()+' 顶点 · '+F.length.toLocaleString()+' 三角面':'等待导入模型';$('empty').hidden=Boolean(F.length);
+      if(points){$('summary').textContent=V.length.toLocaleString()+' 个作者样点';$('empty').hidden=true;}
       $('bounds').textContent=V.length?'几何尺寸 / m：X '+fmt(hi[0]-lo[0])+' · Y '+fmt(hi[1]-lo[1])+' · Z '+fmt(hi[2]-lo[2]):'几何尺寸 / m：—';
+      if(wasPointView&&!points&&surfaceCamera){
+        if(!data.resetCamera)({az,el,zoom,pan,baseScale}=surfaceCamera);
+        surfaceCamera=null;
+      }
       if(data.resetCamera){const view=finite(data.initialCameraAzimuthRad)?data:data.surfaceFlowLines;az=view&&finite(view.initialCameraAzimuthRad)?view.initialCameraAzimuthRad:-Math.PI/2;el=view&&finite(view.initialCameraElevationRad)?Math.max(-1.55,Math.min(1.55,view.initialCameraElevationRad)):.35;fit();}if(gl)$('error').hidden=true;pendingReport=true;render();
     }catch(e){problem(e.message);}
   }
@@ -102,13 +125,19 @@
   function draw(){frame=0;if(!gl||!model)return;const dpr=Math.min(window.devicePixelRatio||1,2),w=Math.max(1,Math.round(canvas.clientWidth*dpr)),h=Math.max(1,Math.round(canvas.clientHeight*dpr));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}gl.viewport(0,0,w,h);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);camera();
     [['r',right],['u',up],['d',direction]].forEach(([k,v])=>gl.uniform3fv(gl.getUniformLocation(program,k),v));gl.uniform2f(gl.getUniformLocation(program,'scale'),sx,sy);gl.uniform2fv(gl.getUniformLocation(program,'pan'),pan);
     attribute('p',positions);attribute('c',colorBuffer);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);gl.drawArrays(gl.TRIANGLES,0,model.faces.length*3);gl.disable(gl.POLYGON_OFFSET_FILL);
+    if(model.pointField){
+      const size=gl.getUniformLocation(program,'pointSize');
+      gl.uniform1f(size,3*dpr);gl.drawArrays(gl.POINTS,0,vertices.length);
+      const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3f(i,.90,.40,.06);
+      gl.disable(gl.DEPTH_TEST);gl.uniform1f(size,8*dpr);gl.drawArrays(gl.POINTS,model.pointField.selectedIndex,1);gl.enable(gl.DEPTH_TEST);
+    }
     if($('wire').checked){attribute('p',edges);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,[.17,.23,.29]);gl.drawArrays(gl.LINES,0,model.faces.length*6);}
     if(flowSegments){attribute('p',flowPositions);attribute('c',flowColors);gl.drawArrays(gl.LINES,0,flowSegments*2);}
     if(sectionSegmentCount){attribute('p',sectionPositions);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,[.74,.29,.10]);gl.drawArrays(gl.LINES,0,sectionSegmentCount*2);}
     // 模块六：选择只增加原三角面轮廓；不遮掉其他区域、不改原值或色标。
     [[selectionPositions,selectionCount,[.53,.31,.08]],[probePositions,probeCount,[.05,.06,.08]]].forEach(([b,count,color])=>{if(count){attribute('p',b);const i=gl.getAttribLocation(program,'c');gl.disableVertexAttribArray(i);gl.vertexAttrib3fv(i,color);gl.drawArrays(gl.LINES,0,count);}});
     $('axes').replaceChildren();['X','Y','Z'].forEach((t,i)=>{const s=document.createElement('span');s.textContent=t;s.style.left=(32+right[i]*27)+'px';s.style.top=(32-up[i]*27)+'px';s.style.color=['#9c5046','#427357','#466d92'][i];$('axes').append(s);});
-    if(pendingReport&&bridge){pendingReport=false;const pixels=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);let visible=0;for(let i=3;i<pixels.length;i+=64)if(pixels[i])visible++;bridge.Data={kind:'geometry-rendered',revision:model.revision,faces:model.faces.length,vertices:model.vertices.length,visiblePixelSamples:visible,webglError:gl.getError(),width:w,height:h,firstVertex:model.vertices[0]||[],bounds:model.vertices.length?[lo,hi]:[],selectedFaceCount:selectedFaceIDs.length,inspectedFace,fieldRange:model.faceField?[...model.faceField.range]:[],...(model.faceField?.context==='given-wall'?{givenWallLegend:$('fieldLegend').textContent}:{}),...(flowSegments?{surfaceFlowSegments:flowSegments,surfaceFlowPointCount:flowPoints.length}:{}),...(model.hasSectionOverlay?{sectionSegments:sectionSegmentCount}:{}),...(researchSection?{sectionInfo:researchSection}:{}),nonce:Date.now()};}
+    if(pendingReport&&bridge){pendingReport=false;const pixels=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);let visible=0;for(let i=3;i<pixels.length;i+=64)if(pixels[i])visible++;bridge.Data={kind:'geometry-rendered',revision:model.revision,faces:model.faces.length,vertices:model.vertices.length,visiblePixelSamples:visible,webglError:gl.getError(),width:w,height:h,firstVertex:model.vertices[0]||[],bounds:model.vertices.length?[lo,hi]:[],selectedFaceCount:selectedFaceIDs.length,inspectedFace,fieldRange:model.pointField?[...model.pointField.range]:model.faceField?[...model.faceField.range]:[],...(model.pointField?{sampleCount:vertices.length,selectedSampleIndex:model.pointField.selectedIndex,sampleLegend:$('fieldLegend').textContent}:{}),...(model.faceField?.context==='given-wall'?{givenWallLegend:$('fieldLegend').textContent}:{}),...(flowSegments?{surfaceFlowSegments:flowSegments,surfaceFlowPointCount:flowPoints.length}:{}),...(model.hasSectionOverlay?{sectionSegments:sectionSegmentCount}:{}),...(researchSection?{sectionInfo:researchSection}:{}),nonce:Date.now()};}
   }
   // 模块四：旋转/平移/缩放及标准视角；无持续动画或外部资源请求。
   canvas.oncontextmenu=e=>e.preventDefault();canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,pan:e.shiftKey||e.button===2||$('panMode').checked};canvas.setPointerCapture(e.pointerId);};
@@ -116,6 +145,18 @@
   canvas.onpointerup=e=>{
     const pick=drag&&!drag.pan&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<4;drag=null;
     if(!pick||!bridge)return;camera();const rect=canvas.getBoundingClientRect();let chosen=null,best=12*12,depth=-Infinity;
+    if(model?.pointField){
+      // 点标记是 3 CSS 像素的方形。重叠时取最前点，同深度沿发布顺序取首点。
+      let hit=-1;
+      vertices.forEach((v,i)=>{
+        const x=rect.left+(1+dot(v,right)*sx+pan[0])*rect.width/2;
+        const y=rect.top+(1-dot(v,up)*sy-pan[1])*rect.height/2;
+        if(Math.abs(x-e.clientX)>1.5||Math.abs(y-e.clientY)>1.5)return;
+        const z=dot(v,direction);if(z>depth){depth=z;hit=i;}
+      });
+      if(hit>=0){model.pointField.selectedIndex=hit;render();bridge.Data={kind:'geometry-point-probe',revision:model.revision,sampleIndex:hit,nonce:Date.now()};}
+      return;
+    }
     // 模块用途：按真实三角面投影重心及前后深度拾取，不要求场量有限，不让未知区消失。
     if(model&&(model.faceField||model.enableFaceProbe)&&!flowPoints.length){let hit=null;model.faces.forEach((f,faceIndex)=>{const p=f.map(i=>vertices[i]),xy=p.map(v=>[rect.left+(1+dot(v,right)*sx+pan[0])*rect.width/2,rect.top+(1-dot(v,up)*sy-pan[1])*rect.height/2]);const a=xy[0],b=xy[1],c=xy[2],den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);if(Math.abs(den)<1e-12)return;const u=((b[1]-c[1])*(e.clientX-c[0])+(c[0]-b[0])*(e.clientY-c[1]))/den,v=((c[1]-a[1])*(e.clientX-c[0])+(a[0]-c[0])*(e.clientY-c[1]))/den,w=1-u-v;if(Math.min(u,v,w)<-1e-9)return;const bary=[u,v,w],z=bary.reduce((s,t,i)=>s+t*dot(p[i],direction),0);if(z>depth){depth=z;hit={faceIndex,barycentric:bary,position:[0,1,2].map(j=>bary.reduce((s,t,i)=>s+t*model.vertices[f[i]][j],0))};}});if(hit)bridge.Data={kind:'geometry-face-probe',revision:model.revision,...hit,nonce:Date.now()};return;}
     if(!flowPoints.length)return;
@@ -138,7 +179,49 @@
     if(gl)buffer(sectionPositions,segments.flatMap(s=>s.flatMap(p=>p.map((x,j)=>(x-modelCenter[j])/modelExtent))));pendingReport=true;render();
   }
   // 独立科研页仅复用显示管线；旧 uihtml 协议和普通几何页保持兼容。
+  function exportPointImage(msg){
+    const field=model?.pointField;
+    if(!field||model.revision!==msg.revision)return;
+    // 只裁去透明留白，保留当前投影、选中标记和可见的全部样点。
+    const pixels=new Uint8Array(canvas.width*canvas.height*4);
+    gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+    let left=canvas.width,bottom=canvas.height,rightEdge=-1,top=-1;
+    for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++){
+      if(pixels[4*(y*canvas.width+x)+3]){
+        left=Math.min(left,x);rightEdge=Math.max(rightEdge,x);bottom=Math.min(bottom,y);top=Math.max(top,y);
+      }
+    }
+    if(rightEdge<left){problem('当前视角内没有可导出的样点，请先适配模型。');return;}
+    const width=rightEdge-left+1,height=top-bottom+1;
+    const out=document.createElement('canvas'),margin=24;
+    out.width=Math.max(760,width+2*margin);out.height=height+182;
+    const ctx=out.getContext('2d');ctx.fillStyle='#edf0f3';ctx.fillRect(0,0,out.width,out.height);
+    ctx.drawImage(canvas,left,canvas.height-1-top,width,height,(out.width-width)/2,69,width,height);
+    ctx.fillStyle='#243647';ctx.font='600 17px "Microsoft YaHei", sans-serif';
+    ctx.fillText($('caption').textContent+' · '+field.name+' / '+field.unit,margin,24);
+    ctx.font='13px "Microsoft YaHei", sans-serif';
+    ctx.fillText($('coordinates').textContent+' · '+vertices.length.toLocaleString()+' 个样点',margin,46);
+    const y=out.height-77,w=out.width-2*margin,bar=ctx.createLinearGradient(margin,0,margin+w,0);
+    for(const t of [0,.25,.5,.75,1])bar.addColorStop(t,sampleCSS(t));
+    ctx.fillStyle=bar;ctx.fillRect(margin,y,w,11);ctx.fillStyle='#243647';
+    for(const t of [0,.25,.5,.75,1]){
+      ctx.textAlign=t===0?'left':t===1?'right':'center';
+      ctx.fillText(fmt(field.range[0]+t*(field.range[1]-field.range[0])),margin+t*w,y+29);
+    }
+    ctx.textAlign='left';
+    const id=field.selectedIndex;
+    ctx.fillText('橙色标记 · 样点 '+(id+1)+' · '+field.name+' = '+fmt(field.values[id])+' '+field.unit,margin,y+51);
+    ctx.fillText('EUCASS 2023 · DOI 10.13009/EUCASS2023-018 · '+(field.scaleLabel||'当前色标')+' · 作者 CFD 原始字段，端点色包含超范围值',margin,y+71);
+    bridge.Data={kind:'geometry-point-image',revision:model.revision,token:msg.token,base64:out.toDataURL('image/png').split(',')[1]};
+  }
   window.RocketGeometry={load,selectFaces,setSectionSegments,getState:()=>({revision:model?model.revision:0,selectedFaceIDs:[...selectedFaceIDs],inspectedFace,range:model&&model.faceField?[...model.faceField.range]:null})};
   // 模块五：MATLAB uihtml 双向白名单桥接；收到确认事件不重复加载几何。
-  window.setup=function(component){bridge=component;component.addEventListener('DataChanged',()=>{if(component.Data&&component.Data.kind==='aerothermal-geometry')load(component.Data);});component.Data={kind:'ready',nonce:Date.now()};};
+  window.setup=function(component){bridge=component;component.addEventListener('DataChanged',()=>{
+    const msg=component.Data;
+    if(msg?.kind==='aerothermal-geometry')load(msg);
+    if(msg?.kind==='geometry-point-image-request'&&typeof msg.token==='string')requestAnimationFrame(()=>exportPointImage(msg));
+    if(msg?.kind==='geometry-point-selection'&&model?.pointField&&msg.revision===model.revision&&Number.isInteger(msg.sampleIndex)&&msg.sampleIndex>=0&&msg.sampleIndex<vertices.length){
+      model.pointField.selectedIndex=msg.sampleIndex;pendingReport=true;render();
+    }
+  });component.Data={kind:'ready',nonce:Date.now()};};
 })();
