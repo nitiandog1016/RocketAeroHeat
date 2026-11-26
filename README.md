@@ -2,6 +2,8 @@
 
 MATLAB 气动热工程计算后端与自定义 WebGL 三维科研工作台。
 
+运行 `main`，默认几何是完整的简化运载火箭。依次加载模型、确认鼻向、核对原网格和确认风洞边界，选择 **计算低速风洞全表面结果** 可从头计算。选择 **查看已算的同工况结果** 可直接核对项目已算出的 9,216 个原面。本工况为 0.05 m/s、零攻角、空气 300 K、壁面 300.001 K。[几何和算例](cases/simple_launcher/README.md) · [三维云图](cases/simple_launcher/wind-tunnel.png)
+
 打开 RFZ 标准工况后，选择 **计算 → 查看作者压力与热流样点**，可查询 deg190 的 72,706 个公开 CFD 样点、切换色标并导出 PNG 或 CSV。作者目录标称 Mach 5.35，配套工作簿列 Mach 5.38。选择 ZIP 可同时导出样点、工况编号、字段定义和来源校验值。[工况来源](docs/validation/v348/RESULTS.md) · [工作台操作](docs/validation/v347/RESULTS.md) · [实际导出图](docs/validation/v348/evidence/pressure.png)
 
 RFZ 的 **计算 → 准备或读取空气体网 → 查看原面邻点温界** 可按 CAD 区统计和高亮相邻单元的温度约束，导出原面及壁节点给温表。标准工况下，CAD 第 13 区有 2,409 个原面的相邻四面体四点同温，直接用其节点温度插值会得到零梯度。[逐面核对与使用说明](docs/validation/v346/RESULTS.md)

@@ -193,6 +193,10 @@ switch action
         requireCondition(~isempty(state.mesh),'请先生成网格。');
         validateFlight(state.cfg,state.mesh);
         fs=optional(payload,'freestream',state.freestream);
+        if strcmp(optional(state.cfg,'computationBackend',''),'simpleLauncherTunnel')
+            fs=optional(payload,'freestream',state.cfg.launcherBoundary);
+            assert(isequaln(fs,state.cfg.launcherBoundary),'RAH:Launcher:Boundary','风洞来流与当前工况不符。');
+        end
         if strcmp(optional(state.cfg,'computationBackend',''),'rfzSurface')
             reference=state.mesh.rfzBoundary.condition.publishedCondition;
             fs=optional(payload,'freestream',reference);
@@ -238,6 +242,11 @@ switch action
         state.solveInputRevision=state.revision;
         state.frozenInputs=struct('mesh',state.mesh,'cfg',state.cfg, ...
             'freestream',state.freestream,'revision',state.revision,'solveId',state.solveId);
+        if strcmp(optional(state.cfg,'computationBackend',''),'simpleLauncherTunnel')
+            assert(isequaln(state.freestream,state.cfg.launcherBoundary),'RAH:Launcher:Boundary','需要已确认的低速来流。');
+            state.frozenInputs.cfg.launcherAction=validatestring(optional(payload,'launcherAction','solve'),{'solve','archive'});
+            if isfield(state.frozenInputs.cfg,'flight'),state.frozenInputs.cfg=rmfield(state.frozenInputs.cfg,'flight');end
+        end
         if strcmp(optional(state.cfg,'computationBackend',''),'rfzSurface')
             % 本模式的来源是当前试件记录，通用工程页面的默认飞行工况不进入冻结输入。
             assert(isequaln(state.freestream,state.mesh.rfzBoundary.condition.publishedCondition), ...
@@ -367,6 +376,16 @@ switch action
             end
             % 所有来流、温界、步长均按冻结值核对；首次冷算的实际扰动帧由本任务提供。
             assert(isequal(required(payload,'freestream'),b),'RAH:Short:Snapshot','返回工况或实际初始帧与本次计算不符。');
+        elseif strcmp(optional(state.cfg,'computationBackend',''),'simpleLauncherTunnel')
+            w=result.hybridWall;n=size(state.mesh.F,1);
+            assert(strcmp(result.launcherAction,state.frozenInputs.cfg.launcherAction) && ...
+                isequal(result.hybridCondition,state.frozenInputs.freestream) && ...
+                isequal(required(payload,'freestream'),result.hybridCondition) && ...
+                isequal(w.faceID,(0:n-1)') && height(w)==n && all(isfinite(w.pressurePa) & w.pressurePa>0) && ...
+                all(isfinite(w.heatFluxWm2)) && all(strlength(w.pressureMethod)>0 & strlength(w.heatFluxMethod)>0) && ...
+                strcmp(result.launcherSummary.surfaceSHA256,state.modelSource.sha256) && ...
+                result.launcherSummary.accepted && all(result.hybridWallTemperatureK==result.hybridCondition.wallTemperatureK), ...
+                'RAH:Launcher:Snapshot','风洞结果未覆盖全部原面或与冻结输入不一致。');
         elseif strcmp(optional(state.cfg,'computationBackend',''),'cm011Imported')
             validateCM011Result(result,state.mesh);
         else
@@ -585,6 +604,9 @@ end
 
 %% 模块十：边界输入基础检查；完整物理适用性仍由后端各模型审核。
 function validateFlight(cfg,mesh)
+if strcmp(optional(cfg,'computationBackend',''),'simpleLauncherTunnel')
+    assert(isequaln(cfg.launcherBoundary,simpleLauncherBoundary()),'RAH:Launcher:Boundary','需要当前固定低速风洞工况。');return
+end
 if strcmp(optional(cfg,'computationBackend',''),'rfzSurface')
     [input,wall]=buildRFZSurfaceInput(mesh,cfg.geometry,cfg.rfzCavityMode,cfg.rfzCavityK);
     assert(isfield(cfg,'rfzSurfaceInput') && isequaln(cfg.rfzSurfaceInput,input) && ...

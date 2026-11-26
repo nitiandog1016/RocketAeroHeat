@@ -11,6 +11,10 @@ function [current,freestream,report] = runAeroHeatSingleCase(mesh,cfg,progressFc
 % 模块四：report 保存接受的设置与面积审计；执行完成不等于全面积求解完成。
 % 未解值、给定值和场量方法均由既有后端保留，不作补零或模型回退。
 if nargin<3,progressFcn=[];end
+% 固定低速风洞支路直接接受完整原面网格，单独核对不可压来流与等温壁。
+if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'simpleLauncherTunnel')
+    [current,freestream,report]=runSimpleLauncherWindTunnel(mesh,cfg,progressFcn);return
+end
 % RFZ 原面输入有独立的域与温界。通用工程分支尚未实现该构型的全部区域。
 if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'rfzSurface')
     error('RAH:RFZ:SurfaceInput','RFZ 完整 CAD 模式当前提供表面与壁面输入，独立物理求解尚未接入。');

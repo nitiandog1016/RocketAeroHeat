@@ -1,4 +1,4 @@
-function cfg = createCaseConfig()
+function cfg = createCaseConfig(model)
 %% ========================================================================
 % createCaseConfig.m
 %
@@ -20,35 +20,23 @@ cfg.projectRoot = ...
 
 
 %% ========================================================================
-% 2. STL
+% 2. 选择初始 STL 及其到米的比例。无参数调用沿用原回归模型。
 % ========================================================================
 
-cfg.geometry.stlName = ...
-    'rocket.stl';
-
-
-cfg.geometry.stlFile = ...
-    fullfile( ...
-        cfg.projectRoot, ...
-        'cases', ...
-        cfg.geometry.stlName);
-
-
-
-%% ========================================================================
-% 3. STL 单位转换
-%
-% NX / UG 常用 mm：
-%
-%       1e-3
-%
-% STL 已经为 m：
-%
-%       1
-%% ========================================================================
-
-cfg.geometry.scale = ...
-    1e-3;
+if nargin<1,model='original';end
+model=validatestring(model,{'original','simpleLauncher'});
+folder=fullfile(cfg.projectRoot,'cases');
+if strcmp(model,'simpleLauncher')
+    folder=fullfile(folder,'simple_launcher');
+    cfg.geometry.stlName='launcher-m.stl';
+    cfg.geometry.scale=1;
+    cfg.computationBackend='simpleLauncherTunnel';
+    cfg.launcherBoundary=simpleLauncherBoundary();
+else
+    cfg.geometry.stlName='rocket.stl';
+    cfg.geometry.scale=1e-3;
+end
+cfg.geometry.stlFile=fullfile(folder,cfg.geometry.stlName);
 
 
 

@@ -4,7 +4,7 @@ function fig=rocketAeroHeatWorkbench(cfg)
 % 模块二：集中状态控制输入版本和下游失效；查看页面不触发物理重算。
 % 模块三：几何与结果采用离线WebGL，未求解预览没有虚构物理字段。
 % 模块四：保留既有SI坐标、朝向和网格算法；各区域求解状态来自后端。
-if nargin<1,cfg=createCaseConfig();end
+if nargin<1,cfg=createCaseConfig('simpleLauncher');end
 % 统一可见默认值，避免只查看再确认就因补默认字段而误判输入改变。
 cfg.heating.sphericalNoseAngleStepDeg=getOption(cfg.heating,'sphericalNoseAngleStepDeg',2);
 cfg.pressure.aftBaseCp=getOption(getOption(cfg,'pressure',struct),'aftBaseCp',0);
@@ -131,7 +131,9 @@ renderEditor();sync();showGeometry(true);
         assignin('base','rawMesh',state.orientedMesh);assignin('base','quality',state.quality);
         current=state.mesh;if ~isempty(state.result),current=state.result;end
         assignin('base','mesh',current);assignin('base','freestream',state.freestream);
-        if isRFZSurface()
+        if isLauncherTunnel()
+            assignin('base','flight',state.cfg.launcherBoundary);
+        elseif isRFZSurface()
             assignin('base','flight',state.rawMesh.rfzBoundary.condition.publishedCondition);
         elseif isBead()
             assignin('base','flight',state.cfg.thermistorBoundary);
@@ -321,6 +323,12 @@ renderEditor();sync();showGeometry(true);
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
             case 2
+                if isLauncherTunnel()
+                    grid=form(6);tip(grid,1,'简化运载火箭 · 米制原表面，鼻向 +X');
+                    controls.generate=button(grid,3,'核对全表面原网格',@generate);
+                    if ~isempty(state.mesh),controls.nextBoundary=button(grid,5,'设置风洞边界',@(~,~)go(3));end
+                    sync();return
+                end
                 if isRFZSurface()
                     grid=form(7);meshBackendChoice(grid,1);
                     controls.generate=button(grid,2,'确认完整 CAD 原面网格',@generate);
@@ -478,6 +486,13 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2=button(grid,13,'当前表面 → 内嵌SU2混合网格',@(~,~)useSurfaceForSU2());
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
+                if isLauncherTunnel()
+                    grid=form(8);b=state.cfg.launcherBoundary;
+                    tip(grid,1,sprintf('轴向来流 %.3g m/s · 零攻角',-b.velocityMps(1)));
+                    tip(grid,3,sprintf('空气 %.3f K · %.0f Pa',b.ambientTemperatureK,b.ambientPressurePa));
+                    tip(grid,5,sprintf('给定等温壁 %.3f K',b.wallTemperatureK));
+                    controls.confirm=button(grid,7,'确认风洞工况',@confirmBoundary);sync();return
+                end
                 if isRFZSurface()
                     grid=form(10);b=state.mesh.rfzBoundary;outer=b.condition.publishedCondition.prescribedIsothermalWallK;
                     tip(grid,1,sprintf('完整 CAD · %s\n外壁和唇环给定 %g K。内腔共 %d 面、%.6f m²。', ...
@@ -688,6 +703,15 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,23+12*methodDetailsOpen,sprintf('当前保留 %d 个面元壁温输入；修改统一壁温将切换为统一边界。',numel(c.heating.wallTemperatureByFace)));
                 end
             case 4
+                if isLauncherTunnel()
+                    grid=form(10);controls.run=button(grid,1,'计算低速风洞全表面结果',@solveCase);
+                    if isfile(fullfile(state.cfg.projectRoot,'cases','simple_launcher','receipt.json'))
+                        controls.readLauncher=button(grid,2,'查看已算的同工况结果',@(~,~)solveCase([],[],'archive'));
+                    end
+                    tip(grid,3,'程序从当前模型和风洞边界独立计算，并核对网格误差和热量收支。');
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[5 10];
+                    controls.log.Layout.Column=[1 2];sync();return
+                end
                 if isRFZSurface()
                     if ~isempty(rfzSamples),renderRFZSamples();sync();return;end
                     if rfzNodesOpen && hasRFZAir(),renderRFZNodes();sync();return;end
@@ -1509,6 +1533,11 @@ renderEditor();sync();showGeometry(true);
             state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
             preview=[];report=[];preparing=true;message('正在加载模型并核对SI尺度…');
             [raw,source]=readModelFile(next);
+            % 固定低速试件只按 STL 指纹及米制比例识别，文件名相同不足以复用工况。
+            launcher=simpleLauncherBoundary();
+            if source.scale==1 && strcmp(source.sha256,launcher.surfaceSHA256)
+                next.computationBackend='simpleLauncherTunnel';next.launcherBoundary=launcher;
+            end
             if isfield(raw,'rfzBoundary')
                 next.computationBackend='rfzSurface';next.rfzCavityMode='matchExterior';
                 next.rfzCavityK=raw.rfzBoundary.condition.publishedCondition.prescribedIsothermalWallK;
@@ -1585,6 +1614,16 @@ renderEditor();sync();showGeometry(true);
     end
     function generate(~,~)
         if state.busy || preparing,return;end
+        if isLauncherTunnel()
+            try
+                assert(isequal(state.rawMesh.F,state.orientedMesh.F) && ...
+                    max(abs(state.rawMesh.V-state.orientedMesh.V),[],'all')<1e-10, ...
+                    '固定风洞试件要求沿原始 +X 鼻向。请返回第 1 步恢复导入坐标并确认。');
+                state=aeroHeatWorkflowState('setMesh',state,struct('mesh',state.orientedMesh));
+                report=[];renderEditor();showGeometry(true);message('已核对完整外壁，保留原三角面顺序。');
+            catch ex,showError(ex);end
+            return
+        end
         if isRFZSurface()
             try
                 candidate=state.orientedMesh;
@@ -1654,6 +1693,7 @@ renderEditor();sync();showGeometry(true);
 %% 模块九：边界输入与热物性/方法选择均入集中状态，不立即求物理场。
     function next=boundaryConfiguration()
         next=state.cfg;
+        if isLauncherTunnel(),return;end
         if isRFZSurface()
             next.rfzCavityMode=controls.rfzMode.Value;
             [input,wall]=buildRFZSurfaceInput(state.mesh,next.geometry,next.rfzCavityMode,controls.innerK.Value);
@@ -1881,6 +1921,10 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         try
             next=boundaryConfiguration();
+            if isLauncherTunnel()
+                state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
+                state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',next.launcherBoundary));go(4);return
+            end
             if isRFZSurface()
                 state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
                 state=aeroHeatWorkflowState('confirmBoundary',state);go(4);
@@ -1949,6 +1993,7 @@ renderEditor();sync();showGeometry(true);
         try
             if nargin<3,source='solve';end
             request=struct();
+            if isLauncherTunnel(),request.launcherAction=source;end
             if isShortSupport(),request.shortSupportAction=source;end
             if isShortSupport() && strcmp(source,'solve') && isfield(controls,'shortStartDirectory')
                 request.shortStartDirectory=strtrim(controls.shortStartDirectory.Value);
@@ -2042,6 +2087,9 @@ renderEditor();sync();showGeometry(true);
     end
     function yes=isCM011()
         yes=strcmp(getOption(state.cfg,'computationBackend','engineering'),'cm011Imported');
+    end
+    function yes=isLauncherTunnel()
+        yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend',''),'simpleLauncherTunnel');
     end
     function yes=isShortSupport()
         yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'shortSupport65');

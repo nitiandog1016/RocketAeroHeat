@@ -72,14 +72,16 @@ expansionOutside=[];
 if isfield(mesh,'hybridWall')
     w=mesh.hybridWall;
     hybridScope='当前混合计算原面结果；方法见逐面来源，实验精度单独验证';
-    if isfield(mesh,'thermistorSidewind') || isfield(mesh,'shortSphere') || isfield(mesh,'shortSupportSurface'),hybridScope=mesh.evidenceIdentity.scope;end
+    if isfield(mesh,'thermistorSidewind') || isfield(mesh,'shortSphere') || isfield(mesh,'shortSupportSurface') || isfield(mesh,'launcherSummary'),hybridScope=mesh.evidenceIdentity.scope;end
     if isfield(mesh,'thermistorLead') && isfield(mesh.thermistorLead,'thermal')
         t=mesh.thermistorLead.thermal;
         hybridScope=sprintf('%s 本次壁温 %.12g K，参照终帧 %s。',t.scope,t.wallTemperatureK,t.nativeFrameSHA256);
     end
     data.missingReason(isfinite(w.heatFluxWm2))={''};
     add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridMethod(w,'pressureMethod'),hybridScope);
-    add('heatFlux','入壁热流','kW/m²',w.heatFluxWm2/1000,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope);
+    if isfield(mesh,'launcherSummary'),heatUnit='W/m²';heatScale=1;
+    else,heatUnit='kW/m²';heatScale=1000;end
+    add('heatFlux','入壁热流',heatUnit,w.heatFluxWm2/heatScale,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope);
     if ismember('pressureGaugePa',w.Properties.VariableNames)
         delta=w.pressureGaugePa;
         sourceKey='pressureMethod';
@@ -1025,8 +1027,10 @@ if isempty(histories)
     pf=data.fields(strcmp({data.fields.key},'pressure'));
     qf=data.fields(strcmp({data.fields.key},'heatFlux'));
     if isscalar(pf) && isscalar(qf)
-        % 上述标准字段固定使用 kPa 和 kW/m²，功率汇总的输入单位为 W/m²。
-        data.wallCoverage=summarizeComputedWall(area,pf.status==1,qf.status==1,1000*qf.values);
+        % 按实际显示单位还原 W/m²，保证小热流风洞工况和旧存档的功率一致。
+        if strcmp(qf.unit,'W/m²'),scaleToWatts=1;
+        else,assert(strcmp(qf.unit,'kW/m²'));scaleToWatts=1000;end
+        data.wallCoverage=summarizeComputedWall(area,pf.status==1,qf.status==1,scaleToWatts*qf.values);
         data.caseNote=[data.wallCoverage.coverageMessage ' ' data.caseNote];
     end
 end

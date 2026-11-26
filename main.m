@@ -4,5 +4,5 @@
 % 原逐段脚本完整保留为 mainLegacy.m，供既有流程对照，不是默认入口。
 projectRoot=fileparts(mfilename('fullpath'));
 addpath(projectRoot);
-cfg=createCaseConfig();
+cfg=createCaseConfig('simpleLauncher');
 appFigure=rocketAeroHeatWorkbench(cfg);

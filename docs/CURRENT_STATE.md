@@ -1,12 +1,12 @@
 # 当前交接
 
-## 下一项产品交付
+## 简化运载火箭低速风洞工况
 
-2026-11-26。用户一次计算只接收最终全面积结果。工程计算和必要的局部补算在后台完成；有缺项则停留在计算页。自绘模型历史热流覆盖 66.56%，与计算壁压同面覆盖 43.10%。7.246 秒是历史工程阶段用时，完整结果的总等待时间尚未取得。[产品约定](validation/product_review_20261126/NEXT_DECISION.md) · [下一项](validation/v349/NEXT_DECISION.md)
+2026-11-26。默认主模型改为完整光滑简化箭体。0.05 m/s 轴向来流下，全部 9,216 个原面、0.935517 m² 已有独立壁压和热流，整件向外放热 0.87352 mW，联合实验验证面积 0 m²。用户一次计算后查看全面积结果。[工况与验收](validation/v350/RESULTS.md) · [下一项](validation/v350/NEXT_DECISION.md)
 
-<!-- records:last_completed=v349 -->
+<!-- records:last_completed=v350 -->
 <!-- records:active=none -->
-<!-- records:base_commit=d367d3ec2b8aa02d1677bf19a1b614bd34129ca0 -->
+<!-- records:base_commit=efbd45b0d303980b549aaf5d8adbe820f33a4521 -->
 
 ## RFZ 独立计算与公开对照
 
