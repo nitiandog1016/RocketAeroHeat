@@ -15,7 +15,7 @@ webUI=[];report=[];logLines={'等待输入模型。'};preparing=false;methodDeta
 embeddedVolume=[];engineJob=[];engineTimer=[];researchUI=[];closing=false;
 measuredDirectory='';measuredPauseFile='';lastWireDirectory='';lastShortDirectory='';lastEarlyShortDirectory='';
 creasePreview=false;qualityPreview=false;candidatePreview=[];
-rfzListOpen=false;rfzSelectedFaces=[];
+rfzListOpen=false;rfzSelectedFaces=[];rfzAir=[];
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
 fig.CloseRequestFcn=@closeWorkbench;
@@ -73,6 +73,7 @@ renderEditor();sync();showGeometry(true);
     function s=getState(),s=state;end
     function sync()
         if ~isgraphics(fig),return;end
+        if ~isempty(rfzAir) && ~hasRFZAir(),rfzAir=[];end
         if isempty(state.result) && ~isempty(webUI)
             % 输入失效后释放旧结果页，防止隐藏页探针继续指向上一次计算。
             if isgraphics(webUI.tab),delete(webUI.tab.Parent);end
@@ -679,12 +680,19 @@ renderEditor();sync();showGeometry(true);
                 end
             case 4
                 if isRFZSurface()
-                    grid=form(9);b=state.cfg.rfzSurfaceInput;
+                    grid=form(10);b=state.cfg.rfzSurfaceInput;
                     tip(grid,1,sprintf('%s · 完整 CAD\n%d 面已确认给定壁温，内壁 %.6g K。',b.dataset,b.faces,b.cavityWallK));
-                    controls.rfzSave=button(grid,4,'保存已确认工况',@saveRFZCase);
-                    controls.rfzWallCSV=button(grid,5,'导出原面壁温输入 CSV',@exportRFZWall);
-                    controls.rfzReopen=button(grid,6,'重开已保存工况',@chooseRFZInput);
-                    tip(grid,7,'已准备表面与壁面输入。体网和流场仍待计算。');
+                    controls.rfzAir=button(grid,4,'准备或读取空气体网',@prepareRFZAir);
+                    controls.rfzSave=button(grid,5,'保存已确认工况',@saveRFZCase);
+                    controls.rfzWallCSV=button(grid,6,'导出原面壁温输入 CSV',@exportRFZWall);
+                    controls.rfzReopen=button(grid,7,'重开已保存工况',@chooseRFZInput);
+                    airText='空气体网可用于核对每个原面的相邻单元。压力和热流待求。';
+                    if hasRFZAir()
+                        s=rfzAir.summary;
+                        airText=sprintf('Gmsh %s · %d 个四面体\n%d 个原面已连接。点击模型查看相邻单元与形状质量。压力、热流待求。', ...
+                            s.source.gmshVersion,s.tetrahedra,s.wallFaces);
+                    end
+                    controls.rfzAirInfo=tip(grid,8,airText);
                     sync();return
                 end
                 if isShortSupport()
@@ -1162,6 +1170,29 @@ renderEditor();sync();showGeometry(true);
         end
         expected=jsondecode(fileread(fullfile(root,'cases','rfz_rec','geometry.json')));
         assert(strcmp(cm011FileSHA256(stl),expected.stlSHA256),'RAH:RFZ:Source','本地 RFZ-REC 文件与冻结输入不符。');
+    end
+    function yes=hasRFZAir()
+        % 模块用途：仅向已核对、仍有效的输入版本提供邻接信息。
+        yes=~isempty(rfzAir) && state.boundaryConfirmed && rfzAir.revision==state.revision && ...
+            isfield(state.cfg,'rfzSurfaceInput') && isequal(rfzAir.input,state.cfg.rfzSurfaceInput);
+    end
+    function prepareRFZAir(~,~)
+        % 模块用途：显式生成或读取几何体网，绑定当前工况后供原面探针读取。
+        if state.busy || preparing || ~isRFZSurface() || ~state.boundaryConfirmed,return;end
+        try
+            preparing=true;message('正在核对空气体网与原面连接…');
+            root=fileparts(mfilename('fullpath'));parent=fullfile(root,'outputs','rfz_air_volume','requests');
+            if ~isfolder(parent),mkdir(parent);end
+            request=[tempname(parent) '.json'];log=[request '.log'];
+            runCM011Python({fullfile(root,'scripts','prepareRFZAirVolume.py'),'--receipt',request},log,@drawnow);
+            if ~isgraphics(fig),return;end
+            checked=bindRFZAirVolume(jsondecode(fileread(request)),state.rawMesh,state.mesh,state.cfg);
+            checked.revision=state.revision;rfzAir=checked;
+            preparing=false;renderEditor();message('空气体网已核对。点击原面可查看相邻单元编号与 SICN。');
+        catch ex
+            preparing=false;rfzAir=[];
+            if isgraphics(fig),renderEditor();showError(ex);end
+        end
     end
     function saveRFZCase(~,~)
         try
@@ -2089,6 +2120,10 @@ renderEditor();sync();showGeometry(true);
                             if strcmp(state.cfg.rfzCavityMode,'specified'),source='用户给定内壁';else,source='项目同温假设';end
                         end
                         note=sprintf('%s · 给定 %.6g K（%s）',note,state.cfg.heating.wallTemperatureByFace(face),source);
+                        if hasRFZAir() && state.currentStep==4
+                            cellID=rfzAir.owner(face);
+                            note=sprintf('%s · 空气单元 %d · SICN %.5g',note,cellID,rfzAir.cellSICN(cellID));
+                        end
                     end
                     message(note);
                 end

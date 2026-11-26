@@ -1,12 +1,12 @@
 # 当前交接
 
-2026-11-26。DLR RFZ-REC 已能确认并重开含 130,044 个原面、740.729003 m² 的工况。外壁给定 300 K，标准输入明确假设内腔 14,982 面随外壁同温，另支持单独给定。已验收逐面导出、给定壁温云图、探针与修改失效。新增计算壁压与热流共同覆盖 0 面、0 m²。空气体网和独立物理解待完成。九处论文参考封盖独立列账，作者压力零点及热流正方向待核实。[本版核对](validation/v344/RESULTS.md) · [标准输入](../cases/rfz_rec/full_cad_input.json) · [原壁清单](validation/v343/evidence/cad.csv)
+2026-11-26。DLR RFZ-REC 全部 130,044 个原面、740.729003 m² 已逐面连到唯一空气侧四面体，含 14,982 个内腔面。工作台第 4 步可以生成或读取体网，点选查看当前给定壁温、相邻单元号和 SICN。185,078 个四面体中有 61,769 个 SICN < 0.1，近壁分辨率及外域精度待验。RFZ 计算壁压与热流共同覆盖仍为 0 面、0 m²。九处论文参考封盖另记，作者压力零点与热流正方向待核实。[本版核对](validation/v345/RESULTS.md) · [标准工况](../cases/rfz_rec/full_cad_input.json)
 
-<!-- records:last_completed=v344 -->
+<!-- records:last_completed=v345 -->
 <!-- records:active=none -->
-<!-- records:base_commit=1ec6ace44b07b960b1a872cfe9592d2e944ee760 -->
+<!-- records:base_commit=d287e0b915d1d457170bdad648637b67d3e5a8c5 -->
 
-Short Test 65 保留 32,480 面的独立回归。球面量热输入 0.827123193 W，求得球温 341.770414 K，比实验均值低 11.157 K。[回归及工作台](validation/v341/RESULTS.md)
+公开实验试件 Short Test 65 单独核对了 32,480 / 32,480 面计算壁压与热流。球面量热输入 0.827123193 W，球温比实验均值低 11.157 K，七站 Nu 的均方根误差为 4.8882。[试件独立验收](validation/v345/TEST65.md)
 
 20D 的两半步放热为 2.005187691 W，较 14D 减少 0.01221%。[远场对照](validation/v335/RESULTS.md)
 
@@ -44,7 +44,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-从已确认的 RFZ 完整 CAD 工况核对空气域与全部物理原壁的对应，再进入独立计算。[下一决定](validation/v344/NEXT_DECISION.md)
+RFZ 的下一项针对面积最大的 CAD 第 13 区，从同一冻结工况取得首批适用的原面壁压、热流。其余原面继续计入完整分母。[下一决定](validation/v345/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 

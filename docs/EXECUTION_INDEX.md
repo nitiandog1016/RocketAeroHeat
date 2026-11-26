@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v345 RFZ 全部原壁与空气单元连接](validation/v345/RESULTS.md) · [公开银球试件独立验收](validation/v345/TEST65.md) · [下一项](validation/v345/NEXT_DECISION.md)。
+
 - [v344 RFZ 完整原面与给定壁温输入](validation/v344/RESULTS.md) · [标准工况](../cases/rfz_rec/full_cad_input.json) · [下一项](validation/v344/NEXT_DECISION.md)。
 
 - [v343 RFZ-REC 原壁与参考封盖归属](validation/v343/RESULTS.md) · [全部原面分区](validation/v343/evidence/cad.csv) · [下一项](validation/v343/NEXT_DECISION.md)。
