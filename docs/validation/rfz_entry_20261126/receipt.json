@@ -1,0 +1,64 @@
+{
+  "testedRelease": "9ee6e67f70121edcaffbece2a10221081d1ce42a",
+  "inputs": {
+    "release": "9ee6e67f70121edcaffbece2a10221081d1ce42a",
+    "entry": "runAeroHeatSingleCase.m",
+    "entrySHA256": "3bbe7b28f902ffa43435dbc0e4f44f7cec2969e927069f8d33216391e06194a4",
+    "case": "E:\\RocketAeroHeat\\cases\\rfz_rec\\full_cad_input.json",
+    "inputSHA256": "e7a4b0a46185818a050e3e4fcaaa5cb9a990343e866dd513d9b49c6924f8aa5f",
+    "mode": "rfzSurface",
+    "threads": 1,
+    "secondsLimit": 120,
+    "processMemoryLimitGiB": 2,
+    "newOutputLimitMiB": 20,
+    "stop": "entry returns or raises; time or memory limit",
+    "result": "entry_return.mat on normal return, entry_error.json on MATLAB exception, process receipt and captured output",
+    "initialStatus": "no matching native result found",
+    "correction": "The first batch string failed MATLAB parsing before calling the entry. This call uses a script with real block delimiters."
+  },
+  "entry": {
+    "entry": "E:\\RocketAeroHeat\\runAeroHeatSingleCase.m",
+    "backend": "rfzSurface",
+    "caseSHA256": "e7a4b0a46185818a050e3e4fcaaa5cb9a990343e866dd513d9b49c6924f8aa5f",
+    "meshSHA256": "4f6360b2c6198a8f5da526e4ba2701f524f08331330aa1af2dae6921047ef126",
+    "source": "EUCASS_2023/deg190",
+    "faces": 130044,
+    "areaM2": 740.7290034031088,
+    "givenWallRangeK": [
+      300,
+      300
+    ],
+    "elapsedAtEntrySeconds": 0.0187016,
+    "identifier": "RAH:RFZ:SurfaceInput",
+    "message": "RFZ 完整 CAD 模式当前提供表面与壁面输入，独立物理求解尚未接入。",
+    "stack": [
+      {
+        "file": "E:\\RocketAeroHeat\\runAeroHeatSingleCase.m",
+        "name": "runAeroHeatSingleCase",
+        "line": 16
+      },
+      {
+        "file": "E:\\RocketAeroHeat\\outputs\\rfz_v348_entry02\\attempt_entry.m",
+        "name": "attempt_entry",
+        "line": 15
+      }
+    ]
+  },
+  "process": {
+    "args": [
+      "D:\\matlab\\bin\\matlab.EXE",
+      "-wait",
+      "-singleCompThread",
+      "-batch",
+      "addpath('E:/RocketAeroHeat/outputs/rfz_v348_entry02');attempt_entry"
+    ],
+    "cwd": "E:\\RocketAeroHeat",
+    "elapsedSeconds": 14.45299999999952,
+    "exitCode": 1,
+    "peakSampledRSSBytes": 802373632,
+    "stopReason": null,
+    "livePids": []
+  },
+  "outputDirectory": "outputs/rfz_v348_entry02",
+  "resultReturned": false
+}
