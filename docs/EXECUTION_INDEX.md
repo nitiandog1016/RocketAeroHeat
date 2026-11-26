@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v348 deg190 的工况编号与字段口径](validation/v348/RESULTS.md) · [参考来源记录](../cases/rfz_rec/deg190_source_record.json) · [下一项](validation/v348/NEXT_DECISION.md)。
+
 - [v347 RFZ Mach 5.35 作者压力与热流样点](validation/v347/RESULTS.md) · [工作台导出图](validation/v347/evidence/reference.png) · [下一项](validation/v347/NEXT_DECISION.md)。
 
 - [v346 RFZ 原面邻点温界与第 13 区核对](validation/v346/RESULTS.md) · [第 13 区完整面表](validation/v346/evidence/cad13.csv.gz) · [下一项](validation/v346/NEXT_DECISION.md)。

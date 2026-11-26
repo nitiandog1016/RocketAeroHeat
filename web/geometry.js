@@ -211,7 +211,8 @@
     ctx.textAlign='left';
     const id=field.selectedIndex;
     ctx.fillText('橙色标记 · 样点 '+(id+1)+' · '+field.name+' = '+fmt(field.values[id])+' '+field.unit,margin,y+51);
-    ctx.fillText('EUCASS 2023 · DOI 10.13009/EUCASS2023-018 · '+(field.scaleLabel||'当前色标')+' · 作者 CFD 原始字段，端点色包含超范围值',margin,y+71);
+    const convention=field.convention?' · '+field.convention:'';
+    ctx.fillText('EUCASS 2023 · DOI 10.13009/EUCASS2023-018 · '+(field.scaleLabel||'当前色标')+convention+' · 端点色包含超范围值',margin,y+71,out.width-2*margin);
     bridge.Data={kind:'geometry-point-image',revision:model.revision,token:msg.token,base64:out.toDataURL('image/png').split(',')[1]};
   }
   window.RocketGeometry={load,selectFaces,setSectionSegments,getState:()=>({revision:model?model.revision:0,selectedFaceIDs:[...selectedFaceIDs],inspectedFace,range:model&&model.faceField?[...model.faceField.range]:null})};

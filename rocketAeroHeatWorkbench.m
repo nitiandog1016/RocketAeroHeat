@@ -1189,9 +1189,10 @@ renderEditor();sync();showGeometry(true);
         try
             preparing=true;message('正在读取并核对作者的六个原始数组…');
             points=readRFZReferenceSamples();
+            points.Properties.UserData=rfzReferenceSourceRecord(points);
             if ~isgraphics(fig),return;end
             rfzSamples=points;rfzSampleLimits=struct;preparing=false;
-            renderEditor();sync();showGeometry(true);message('已打开 DLR 的 Mach 5.35 数值参考样点。');
+            renderEditor();sync();showGeometry(true);message('已打开 DLR 的 EUCASS 2023 / deg190 数值参考样点。');
         catch ex
             preparing=false;rfzSamples=[];
             if isgraphics(fig),renderEditor();showGeometry(true);showError(ex);end
@@ -1209,9 +1210,11 @@ renderEditor();sync();showGeometry(true);
         controls.sampleID.RoundFractionalValues='on';
         controls.sampleID.ValueChangedFcn=@(~,~)selectRFZSample(controls.sampleID.Value,true);
         controls.sampleProbe=tip(grid,8,'');
-        controls.sampleExport=button(grid,11,'导出作者原始样点 CSV',@exportRFZSamples);
+        controls.sampleExport=button(grid,11,'导出参考样点（CSV / ZIP）',@exportRFZSamples);
         controls.samplePNG=button(grid,12,'导出当前参考图 PNG',@requestRFZImage);
-        tip(grid,13,'DLR CFD · EUCASS 2023 / deg190 · 作者给定壁温 300 K。压力零点、热流正方向待核实。');
+        record=rfzSamples.Properties.UserData;
+        controls.sampleSource=tip(grid,13,sprintf('论文表 %d 编号 %d · 工作簿 Case %d（第 %d 行）\n给定壁温 300 K。压力零点、热流正方向待核实。', ...
+            record.paper.table,record.paper.caseNumber,record.workbook.caseNumber,record.workbook.row));
         controls.sampleField.ValueChangedFcn=@(~,~)drawRFZSamples(false);
         controls.sampleScale.ValueChangedFcn=@(~,~)drawRFZSamples(false);
         selectRFZSample(1,false);
@@ -1226,8 +1229,8 @@ renderEditor();sync();showGeometry(true);
     function drawRFZSamples(reset)
         % 模块二：在作者原坐标绘制离散点，色限仅用于着色，探针始终读取原值。
         key=controls.sampleField.Value;mode=controls.sampleScale.Value;
-        if strcmp(key,'q'),values=rfzSamples.authorHeatFlux_Wm2;name='作者热流 q';unit='W/m²';
-        else,values=rfzSamples.authorPressure_Pa;name='作者压力 p';unit='Pa';end
+        if strcmp(key,'q'),values=rfzSamples.authorHeatFlux_Wm2;name='作者热流 q';unit='W/m²';convention='作者热流正方向待核实';
+        else,values=rfzSamples.authorPressure_Pa;name='作者压力 p';unit='Pa';convention='作者压力零点待核实';end
         limits=[min(values) max(values)];
         if strcmp(mode,'central')
             ordered=sort(values);limits=ordered(1+round((numel(ordered)-1)*[.02 .98]))';
@@ -1238,8 +1241,10 @@ renderEditor();sync();showGeometry(true);
         controls.sampleLo.Enable=enabled;controls.sampleHi.Enable=enabled;controls.sampleApply.Enable=enabled;
         scaleNames=struct('full','全范围','central','2%–98% 样点','fixed','指定范围');
         point=struct('xyz',rfzSamples{:,2:4},'values',values,'name',name,'unit',unit,'scaleLabel',scaleNames.(mode), ...
-            'range',limits,'selectedIndex',controls.sampleID.Value-1);
-        updateAerothermalGeometryView(geometryView,[],'DLR 数值参考 · Mach 5.35 · deg190', ...
+            'range',limits,'selectedIndex',controls.sampleID.Value-1,'convention',convention);
+        record=rfzSamples.Properties.UserData;
+        caption=sprintf('DLR · deg190 · Mach %.2f（发布说明）/ %.2f（工况表）',record.readme.nominalMach,record.workbook.mach);
+        updateAerothermalGeometryView(geometryView,[],caption, ...
             struct('referencePoints',point,'resetCamera',reset));
     end
     function selectRFZSample(id,notifyPage)
@@ -1254,11 +1259,21 @@ renderEditor();sync();showGeometry(true);
         end
     end
     function exportRFZSamples(~,~)
-        [file,folder]=uiputfile('*.csv','导出作者原始样点','DLR-EUCASS2023-deg190-samples.csv');
+        [file,folder]=uiputfile({'*.csv','作者原始样点（CSV）';'*.zip','样点和工况来源（ZIP）'}, ...
+            '导出作者原始样点','DLR-EUCASS2023-deg190-samples.csv');
         if isequal(file,0),return;end
         try
-            saveRFZReferenceCSV(fullfile(folder,file),rfzSamples);
-            message(sprintf('已导出 %d 个作者样点，坐标及场量保留原值。',height(rfzSamples)));
+            [~,~,extension]=fileparts(file);
+            switch lower(extension)
+                case '.csv'
+                    saveRFZReferenceCSV(fullfile(folder,file),rfzSamples);
+                    message(sprintf('已导出 %d 个作者原始样点。',height(rfzSamples)));
+                case '.zip'
+                    saveRFZReferenceBundle(fullfile(folder,file),rfzSamples);
+                    message('已导出样点、工况来源、字段定义和 CSV 校验值。');
+                otherwise
+                    error('请选择 CSV 或 ZIP 文件扩展名。');
+            end
         catch ex,showError(ex);end
     end
     function requestRFZImage(~,~)

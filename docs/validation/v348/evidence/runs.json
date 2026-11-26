@@ -1,0 +1,139 @@
+{
+  "baseline": "9728dd96910a2aae4211239ad3d623c4e44e0f9b",
+  "testedSHA256": {
+    "cases/rfz_rec/deg190_source_record.json": "0c5e36109a158bb04425223b1eaedeeb01b6d484a05f37ddc61c87f2d9dfeb7d",
+    "rfzReferenceSourceRecord.m": "7cc2be34499f20c4af3a01edbd8c2edf438cf78a97b4ca06c75b212c52f5f544",
+    "saveRFZReferenceBundle.m": "9b70f4fa2d2c928514e807c9916f20cf8dffde4e9190549f57a14d2c8bccbe83",
+    "saveRFZReferenceCSV.m": "dfffc370f803345eb582ef6708e0106da2b655d5914d3501785977403819cfbb",
+    "rocketAeroHeatWorkbench.m": "7ebf9ad791d2d14854a7f9f79799daf384b149da04a322311a2c67e9710441cb",
+    "web/geometry.js": "887a4f81ed337328cbcb97cf1338de58da2f3f8f1c02496579552c6cbce3728d",
+    "docs/validation/v348/verify_sources.py": "271f5f98fefbc43d280f2e344ed48f92caca1d50ac796775a8308d46718c83de",
+    "docs/validation/v348/verify_bundle.py": "aff606ecf85189d496116f024e9b5bf2ab27d030684b933b42c16a76f2e827d9",
+    "docs/validation/v348/check_source_ui.m": "b59bc78e001447d376b2d8c1349ef0df6ffe73de040c7295e086eb0e43ea18f2"
+  },
+  "processes": {
+    "bundle_process.json": {
+      "args": [
+        "D:\\anacondapython\\python.exe",
+        "docs/validation/v348/verify_bundle.py",
+        "E:\\RocketAeroHeat\\outputs\\v348_validation\\ui01\\reference.zip",
+        "--csv",
+        "E:\\RocketAeroHeat\\outputs\\v348_validation\\ui01\\direct.csv"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 0.6869999999998981,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 77717504,
+      "stopReason": null,
+      "livePids": [],
+      "logSHA256": "94cdc6c3c9a62841176da1f4a21eabcdf0e3c95b024a39fde0a6b731365080ba"
+    },
+    "local_process.json": {
+      "args": [
+        "C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1123-915-0_26.1123.915.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe",
+        "docs/validation/v348/verify_sources.py",
+        "--original-tree",
+        "E:\\RocketAeroHeat\\outputs\\v348_validation\\original_tree.json"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 0.8279999999995198,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 96698368,
+      "stopReason": null,
+      "livePids": [],
+      "logSHA256": "8de688880ac38912e56f382610c511361311c85b421a5c39e0ccd836b1cb74b0"
+    },
+    "offline_process.json": {
+      "args": [
+        "C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1123-915-0_26.1123.915.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe",
+        "docs/validation/v348/verify_sources.py",
+        "--cache",
+        "E:\\RocketAeroHeat\\outputs\\v348_validation\\restore"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 0.8439999999991414,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 123752448,
+      "stopReason": null,
+      "livePids": [],
+      "logSHA256": "8de688880ac38912e56f382610c511361311c85b421a5c39e0ccd836b1cb74b0"
+    },
+    "restore_process.json": {
+      "args": [
+        "C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1123-915-0_26.1123.915.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe",
+        "docs/validation/v348/verify_sources.py",
+        "--cache",
+        "E:\\RocketAeroHeat\\outputs\\v348_validation\\restore"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 7.593000000000757,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 132567040,
+      "stopReason": null,
+      "livePids": [],
+      "logSHA256": "8de688880ac38912e56f382610c511361311c85b421a5c39e0ccd836b1cb74b0"
+    },
+    "source_record_process.json": {
+      "args": [
+        "C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1123-915-0_26.1123.915.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe",
+        "docs/validation/v348/verify_sources.py",
+        "E:\\RocketAeroHeat\\outputs\\v348_validation\\original_tree.json"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 0.8280000000013388,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 124903424,
+      "stopReason": null,
+      "livePids": [],
+      "logSHA256": "8de688880ac38912e56f382610c511361311c85b421a5c39e0ccd836b1cb74b0"
+    },
+    "sources02_process.json": {
+      "args": [
+        "C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1123-915-0_26.1123.915.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe",
+        "docs/validation/v348/verify_sources.py",
+        "E:\\RocketAeroHeat\\outputs\\v348_validation\\original_tree.json",
+        "--write-new",
+        "E:\\RocketAeroHeat\\cases\\rfz_rec\\deg190_source_record.json"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 0.7810000000008586,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 82898944,
+      "stopReason": null,
+      "livePids": [],
+      "logSHA256": "8ee2d91f552e38cd48fe03093c17d5c59dc67040b268bc1caa7e1c7400f26b74"
+    },
+    "sources_process.json": {
+      "args": [
+        "C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1123-915-0_26.1123.915.0_x64__3k8sg7r9htsxt\\dependencies\\python\\python.exe",
+        "docs/validation/v348/verify_sources.py",
+        "E:\\RocketAeroHeat\\outputs\\v348_validation\\original_tree.json",
+        "--write-new",
+        "E:\\RocketAeroHeat\\cases\\rfz_rec\\deg190_source_record.json"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 0.8280000000013388,
+      "exitCode": 1,
+      "peakSampledRSSBytes": 93605888,
+      "stopReason": null,
+      "livePids": [],
+      "logSHA256": "9b426233ad724444c6e53cedb8586002aa0912059d08e3a647907a58dab1c3ff"
+    },
+    "ui01/window_process.json": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "addpath('docs/validation/v348');check_source_ui('E:/RocketAeroHeat/outputs/v348_validation/ui01')"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 27.67199999999866,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 2132049920,
+      "stopReason": null,
+      "livePids": [],
+      "logSHA256": "4a902e8711dfd2c1171241de2eee4e569fa51e6f3cc528013ee8c7e463530fc4"
+    }
+  }
+}

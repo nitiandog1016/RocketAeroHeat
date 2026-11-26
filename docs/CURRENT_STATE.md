@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-11-26。DLR RFZ-REC 的 Mach 5.35 / deg190 参考场已接入工作台，72,706 个作者样点可查看、点选及导出。六列数值与原文件逐位相等。作者压力零点、热流正向待核实。完整 CAD 130,044 面、740.729003 m² 的项目独立壁压与热流共同覆盖仍为 0 面、0 m²。第 13 区的 2,409 面、29.686029 m² 的壁邻四面体四点同温，另外 20,443 面的内部对顶点温度待求。近壁分辨率及外域精度待验。[参考场](validation/v347/RESULTS.md) · [节点温界](validation/v346/RESULTS.md) · [标准工况](../cases/rfz_rec/full_cad_input.json)
+2026-11-26。RFZ-REC / deg190 的目录标称 Mach 5.35，作者工作簿第 4 行列 Mach 5.38。论文表 4 编号 3 对应工作簿 Case 2。工作台的 72,706 个作者样点可连同来源记录导出。压力零点、热流正向待核实。完整 CAD 130,044 面、740.729003 m² 的项目独立壁压与热流共同覆盖仍为 0 面、0 m²。第 13 区有 2,409 面的壁邻四面体四点同温，其余 20,443 面的内部对顶点温度待求。近壁分辨率及外域精度待验。[工况对照](validation/v348/RESULTS.md) · [参考场](validation/v347/RESULTS.md) · [节点温界](validation/v346/RESULTS.md) · [标准工况](../cases/rfz_rec/full_cad_input.json)
 
-<!-- records:last_completed=v347 -->
+<!-- records:last_completed=v348 -->
 <!-- records:active=none -->
-<!-- records:base_commit=1fb6ba7faf4432887b594858f6948b4b497d59ed -->
+<!-- records:base_commit=9728dd96910a2aae4211239ad3d623c4e44e0f9b -->
 
 公开实验试件 Short Test 65 单独核对了 32,480 / 32,480 面计算壁压与热流。球面量热输入 0.827123193 W，球温比实验均值低 11.157 K，七站 Nu 的均方根误差为 4.8882。[试件独立验收](validation/v345/TEST65.md)
 
@@ -44,7 +44,7 @@ v292 更正跨阶段读取后，48 层网第二半步放热 10.726572344 mW，�
 
 ## 下一项
 
-下一项为 RFZ 同工况的首批独立原面壁压和热流，首先核对第 13 区，并在相同位置和明确字段口径下与作者数据对照。[下一决定](validation/v347/NEXT_DECISION.md)
+RFZ 同工况的项目独立壁压、热流仍待取得，优先核对第 13 区。参考端已具备样点和版本来源，有符号误差另需明确压力基准和热流正向。[下一决定](validation/v348/NEXT_DECISION.md)
 
 ## 自绘模型保留的状态
 
