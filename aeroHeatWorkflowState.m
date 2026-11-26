@@ -372,7 +372,7 @@ switch action
         else
             validateResultFields(result);
         end
-        % 不补场量或温度：后端快照中的 NaN、算法及逐面元状态完整保留。
+        % 通过该分支的逐面检查后才接收最终场，其他温度保留各自的给定或未知身份。
         fs=optional(payload,'freestream',state.frozenInputs.freestream);
         if strcmp(optional(state.cfg,'computationBackend',''),'thermistorB')
             assert(isequal(fs,state.frozenInputs.freestream),'RAH:Bead:Snapshot','返回的来流与本次冻结工况不符。');
@@ -424,7 +424,7 @@ end
 state=deriveSteps(state);
 end
 
-%% 模块七：集中派生侧边栏状态，结果完成不等于全面积物理模型已完成。
+%% 模块七：普通结果页仅对已接收的完整当前场开放，研究查看使用独立状态。
 function state=deriveSteps(state)
 modelReady=~isempty(state.orientedMesh);
 meshReady=~isempty(state.mesh);
@@ -530,7 +530,7 @@ if ~isequaln(optional(a,key,[]),optional(b,key,[]))
 end
 end
 function validateResultFields(result)
-% 仅真实计算快照可完成计算步骤；全 NaN 仍按未解状态原样保存。
+% 先核对后台快照的逐面状态与数值，再判定能否作为用户的最终结果。
 count=size(result.F,1);groups={'pressure','pressure','pressure','heating'};
 names={'staticPressure','Cp','pressureIncrement','heatFlux'};
 for i=1:numel(names)
@@ -574,6 +574,12 @@ if ~isfield(h,'eligibleFace') || ...
         ~isequal(logical(h.eligibleFace(:)),isfinite(h.heatFlux(:)))
     error('RocketAeroHeat:WorkflowResultFields', ...
         '热流 eligibleFace 与真实热流有限值/未解NaN必须逐面元一致。');
+end
+% 原面逐一核对，避免极小缺口在面积百分比四舍五入后被当成全面积。
+joint = p.fieldStatus(:)==1 & logical(h.eligibleFace(:));
+if ~all(joint)
+    error('RocketAeroHeat:WorkflowIncompleteSurface', ...
+        '全表面计算未完成，%d 个原面中仍有 %d 个缺少计算壁压或热流。',count,nnz(~joint));
 end
 end
 

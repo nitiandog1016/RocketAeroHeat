@@ -1,0 +1,8 @@
+function [mesh,fs,report]=runAeroHeatSingleCase(mesh,~,~)
+% 界面测试专用输入：全部原面有计算压力，最后一个原面缺热流。
+n=size(mesh.F,1);fs=[];report=struct();
+mesh.pressure=struct('staticPressure',ones(n,1),'Cp',zeros(n,1), ...
+    'pressureIncrement',zeros(n,1),'fieldStatus',ones(n,1));
+q=zeros(n,1);q(end)=NaN;
+mesh.heating=struct('heatFlux',q,'eligibleFace',isfinite(q));
+end

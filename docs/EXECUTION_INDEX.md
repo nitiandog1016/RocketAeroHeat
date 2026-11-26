@@ -4,7 +4,7 @@
 
 ## 当前与独立工作入口
 
-- [2026-11-26 单工况工程首算与局部补算的产品路线复核](validation/product_review_20261126/NEXT_DECISION.md)
+- [v349 工作台只发布全面积最终结果](validation/v349/RESULTS.md) · [单工况产品验收约定](validation/product_review_20261126/NEXT_DECISION.md) · [下一项](validation/v349/NEXT_DECISION.md)
 
 - [v348 deg190 的工况编号与字段口径](validation/v348/RESULTS.md) · [参考来源记录](../cases/rfz_rec/deg190_source_record.json) · [下一项](validation/v348/NEXT_DECISION.md)。
 

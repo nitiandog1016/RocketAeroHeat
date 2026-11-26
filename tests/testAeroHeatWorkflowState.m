@@ -1,4 +1,4 @@
-function testAeroHeatWorkflowState(out)
+function testAeroHeatWorkflowState(out,archive)
 %TESTAEROHEATWORKFLOWSTATE 验证五步骤集中状态、真实上游修改及过期快照保护。
 % 模块一：按输入/朝向/网格/边界/显式计算/结果执行完整路径。
 % 模块二：缩放、旋转、同面数新网格及边界编辑的下游失效；确认输入
@@ -43,6 +43,18 @@ result=raw;result.pressure=struct('staticPressure',[120;NaN;80;0], ...
 result.heating=struct('heatFlux',[10;NaN;-3;0], ...
     'eligibleFace',[true;false;true;true], ...
     'faceMethodID',uint8([1;0;2;1]),'wallTemperatureByFace',ones(4,1)*300);
+partial=result;token.result=partial;
+mustThrow(@()aeroHeatWorkflowState('completeSolve',s,token),'RocketAeroHeat:WorkflowIncompleteSurface');
+% 软件测试用完整面表，包含零热流和负热流。给定压力即使数值有限仍不可发布。
+result.pressure.staticPressure(2)=100;result.pressure.Cp(2)=0;
+result.pressure.pressureIncrement(2)=0;result.pressure.fieldStatus(2)=1;
+result.pressure.missingPressureFace(:)=false;
+result.heating.heatFlux(2)=1;result.heating.eligibleFace(2)=true;result.heating.faceMethodID(2)=1;
+token.result=result;
+mustThrow(@()aeroHeatWorkflowState('completeSolve',s,token),'RocketAeroHeat:WorkflowIncompleteSurface');
+result.pressure.fieldStatus(3)=1;result.pressure.isPrescribedBase(3)=false;
+token.result=result;token.result.heating.heatFlux(2)=NaN;token.result.heating.eligibleFace(2)=false;
+mustThrow(@()aeroHeatWorkflowState('completeSolve',s,token),'RocketAeroHeat:WorkflowIncompleteSurface');
 token.result=result;s=aeroHeatWorkflowState('completeSolve',s,token);
 assert(~s.busy && s.steps(5).available && all([s.steps.completed]));
 assert(isequaln(s.result,result) && isequal(s.resultSourceRevision,s.revision));
@@ -154,13 +166,13 @@ mustThrow(@()aeroHeatWorkflowState('completeSolve',changed,wrong), ...
 wrong.result=result;wrong.result.pressure.staticPressure(1)=Inf;
 mustThrow(@()aeroHeatWorkflowState('completeSolve',changed,wrong), ...
     'RocketAeroHeat:WorkflowResultFields');
-wrong.result=result;wrong.result.pressure.fieldStatus(2)=uint8(1);
+wrong.result=partial;wrong.result.pressure.fieldStatus(2)=uint8(1);
 mustThrow(@()aeroHeatWorkflowState('completeSolve',changed,wrong), ...
     'RocketAeroHeat:WorkflowResultFields');
-wrong.result=result;wrong.result.pressure.staticPressure(2)=0;
+wrong.result=partial;wrong.result.pressure.staticPressure(2)=0;
 mustThrow(@()aeroHeatWorkflowState('completeSolve',changed,wrong), ...
     'RocketAeroHeat:WorkflowResultFields');
-wrong.result=result;wrong.result.heating.eligibleFace(2)=true;
+wrong.result=partial;wrong.result.heating.eligibleFace(2)=true;
 mustThrow(@()aeroHeatWorkflowState('completeSolve',changed,wrong), ...
     'RocketAeroHeat:WorkflowResultFields');
 wrong.result=result;wrong.result.heating.eligibleFace(1)=false;
@@ -179,16 +191,15 @@ wrongCfg=ready.cfg;wrongCfg.remesh.workflowTestParameter=20;
 mustThrow(@()aeroHeatWorkflowState('setBoundary',ready,struct('cfg',wrongCfg)), ...
     'RocketAeroHeat:WorkflowInputHierarchy');
 
-% 完成的是后端执行，不表示全面积已解；全NaN快照不变成物理零值。
+% 全 NaN 快照不得打开结果页。
 allMissing=result;allMissing.pressure.staticPressure(:)=NaN;
 allMissing.pressure.Cp(:)=NaN;allMissing.pressure.pressureIncrement(:)=NaN;
 allMissing.pressure.fieldStatus(:)=uint8(0);allMissing.pressure.missingPressureFace(:)=true;
 allMissing.heating.heatFlux(:)=NaN;allMissing.heating.eligibleFace(:)=false;
 missingState=aeroHeatWorkflowState('beginSolve',ready);missingToken=solvePayload(missingState);
 missingToken.result=allMissing;
-missingState=aeroHeatWorkflowState('completeSolve',missingState,missingToken);
-assert(all(isnan(missingState.result.pressure.staticPressure)));
-assert(all(isnan(missingState.result.heating.heatFlux)) && missingState.steps(5).available);
+mustThrow(@()aeroHeatWorkflowState('completeSolve',missingState,missingToken),'RocketAeroHeat:WorkflowIncompleteSurface');
+assert(isempty(missingState.result) && ~missingState.steps(5).available);
 
 %% 模块八：几何输入严格保护；从旧计算网格重新导入不带旧场量。
 bad=raw;bad.F(1,1)=0;
@@ -207,7 +218,7 @@ imported=aeroHeatWorkflowState('setMesh',imported,struct('mesh',result));
 assert(~isfield(imported.mesh,'pressure') && ~isfield(imported.mesh,'heating'));
 assert(isempty(imported.result) && ~imported.boundaryConfirmed);
 
-%% 模块九：真实内部后端全快照沿同一状态路径接收，未解 NaN 不补零。
+%% 模块九：内部工程快照保留其数值和方法，存在缺项时结果页仍关闭。
 mesh=buildCanonicalBody('coneCylinder',struct('resolution',12));
 evalc('mesh=calcFaceGeometry(mesh);mesh=fixNormalDirection(mesh,cfg);mesh=buildSurfaceCoordinates(mesh,cfg);');
 mesh=analyzeLocalGeometry(mesh,cfg);
@@ -219,15 +230,18 @@ fs=calcFreestream(cfg.flight);
 realState=aeroHeatWorkflowState('confirmBoundary',realState,struct('freestream',fs));
 realState=aeroHeatWorkflowState('beginSolve',realState);
 frozen=realState.frozenInputs;
-realResult=calcFlightStationState(frozen.mesh,frozen.cfg.flight,frozen.cfg);
+if nargin<2
+    realResult=calcFlightStationState(frozen.mesh,frozen.cfg.flight,frozen.cfg);
+else
+    % 只验证结果发布行为时，可重放同一网格的已有快照。
+    saved=load(archive,'realResult');realResult=saved.realResult;
+    assert(isequal(realResult.F,frozen.mesh.F) && isequal(realResult.V,frozen.mesh.V));
+end
 token=solvePayload(realState);token.result=realResult;token.freestream=fs;
-realState=aeroHeatWorkflowState('completeSolve',realState,token);
-assert(isequaln(realState.result,realResult) && realState.steps(5).available);
-assert(any(isfinite(realState.result.heating.heatFlux)));
-assert(any(isnan(realState.result.heating.heatFlux)));
-assert(isequaln(realState.result.heating.faceMethodID,realResult.heating.faceMethodID));
-assert(~isfield(realState.result,'wallThermal'));
-if nargin>0
+mustThrow(@()aeroHeatWorkflowState('completeSolve',realState,token),'RocketAeroHeat:WorkflowIncompleteSurface');
+assert(isempty(realState.result) && ~realState.steps(5).available);
+assert(any(isfinite(realResult.heating.heatFlux)) && any(isnan(realResult.heating.heatFlux)));
+if nargin>0 && ~isempty(out)
     if ~exist(out,'dir'),mkdir(out);end
     save(fullfile(out,'workflow_state_regression.mat'),'completed','failed','changed', ...
         'realState','realResult');

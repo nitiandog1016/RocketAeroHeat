@@ -91,6 +91,7 @@ renderEditor();sync();showGeometry(true);
             if state.steps(j).completed,tag='已完成';end
             if strcmp(state.steps(j).status,'busy'),tag='计算中';end
             if strcmp(state.steps(j).status,'failed'),tag='失败';end
+            if j==4 && strcmp(state.error.identifier,'RocketAeroHeat:WorkflowIncompleteSurface'),tag='未完成';end
             if strcmp(state.steps(j).status,'paused'),tag='已保存';end
             if strcmp(state.steps(j).status,'research'),tag='研究快照';end
             buttons(j).Text=sprintf('%d  %s  · %s',j,state.steps(j).label,tag);
@@ -937,7 +938,7 @@ renderEditor();sync();showGeometry(true);
                 elseif isCM011()
                     tip(grid,4,'点选导入三角面查看压力、热流和流体温度。相对环境壁压适合比较同一圆周两侧。');
                 else
-                    tip(grid,4,'点选面元核对场量、算法和范围。灰色未解；未知外缘热力状态与有效状态的Kn超限分开，两者均可阻断下游热流。输入壁温与求解壁温分开。');
+                    tip(grid,4,'点选面元查看壁压、热流和计算方法。温度按各自的物理含义和可用状态显示。');
                 end
                 controls.export=button(grid,7,'导出完整离线工作台',@exportCase);
                 if isfield(state.result,'thermistorPaired')
@@ -1967,6 +1968,7 @@ renderEditor();sync();showGeometry(true);
                 if strcmp(source,'solve') && isfield(controls,'wireSeed'),request.wireSeedDirectory=strtrim(controls.wireSeed.Value);end
             end
             state=aeroHeatWorkflowState('beginSolve',state,request);token=state.solveId;revision=state.solveInputRevision;
+            report=[]; % 新任务只发布本次通过全面积核对的结果和报告。
             if isfield(state.frozenInputs.cfg,'thermistorInvocation')
                 c=state.frozenInputs.cfg;
                 if ~isfield(c.thermistorBoundary,'leadThermalModel'),measuredDirectory=c.thermistorRunDirectory;end
@@ -1989,7 +1991,7 @@ renderEditor();sync();showGeometry(true);
                 elseif isSidewind() && strcmp(source,'archive'),message('正在核对全周侧吹归档与七区原面结果…');
                 elseif strcmp(source,'archive'),message('正在核对体网，并用归档温差场计算当前壁温结果…');
                 else,message('正在使用已确认的体网从冷初场计算热敏珠…');end
-            else,message('正在显式计算当前工况；各阶段完成不代表全面积已求解。');end
+            else,message('正在计算当前工况。全面积结果就绪后将打开结果页。');end
             [solved,fs,newReport]=quietTriple(@()runAeroHeatSingleCase(frozen.mesh,frozen.cfg,@progress));
             measuredPauseFile='';
             state=aeroHeatWorkflowState('completeSolve',state,struct('result',solved, ...
@@ -2000,11 +2002,8 @@ renderEditor();sync();showGeometry(true);
                     lastEarlyShortDirectory=solved.shortSupportJob;
                 end
             end
-            if isfield(newReport,'coverageMessage')
-                message(newReport.coverageMessage);
-            else
-                message(sprintf('当前区域快照已接受，热流候选面积 %.4g%%。',100*newReport.heatComputedAreaFraction));
-            end
+            if isfield(newReport,'coverageMessage'),message(newReport.coverageMessage);
+            else,message('全表面壁压与热流计算完成。');end
             go(5);
         catch ex
             measuredPauseFile='';
@@ -2021,7 +2020,11 @@ renderEditor();sync();showGeometry(true);
     end
     function progress(event)
         if ~isgraphics(fig),error('RocketAeroHeat:Workbench:Closed','工作台已关闭，停止当前计算。');end
-        if strcmp(event.status,'started') || strcmp(event.status,'failed'),message(event.message);end
+        if strcmp(event.status,'started') && isfield(event,'fraction') && isfinite(event.fraction)
+            message(sprintf('计算中（%.0f%%）',100*event.fraction));
+        elseif strcmp(event.status,'started') || strcmp(event.status,'failed')
+            message(event.message);
+        end
         drawnow;
     end
     function exportCase(~,~)

@@ -2,11 +2,11 @@
 
 ## 下一项产品交付
 
-2026-11-26。普通组合外形先显示工程云图，再显示局部补算增量。自绘模型从已备网格开始的历史工程求解耗时 7.246 秒。按原面复核，热流覆盖面积 66.56%，与计算壁压同面覆盖 43.10%。现有混合调度在局部任务结束后才返回。下一项验收首图等待时间和补算前后可核对的结果。[当前决定](validation/product_review_20261126/NEXT_DECISION.md)
+2026-11-26。用户一次计算只接收最终全面积结果。工程计算和必要的局部补算在后台完成；有缺项则停留在计算页。自绘模型历史热流覆盖 66.56%，与计算壁压同面覆盖 43.10%。7.246 秒是历史工程阶段用时，完整结果的总等待时间尚未取得。[产品约定](validation/product_review_20261126/NEXT_DECISION.md) · [下一项](validation/v349/NEXT_DECISION.md)
 
-<!-- records:last_completed=v348 -->
+<!-- records:last_completed=v349 -->
 <!-- records:active=none -->
-<!-- records:base_commit=9728dd96910a2aae4211239ad3d623c4e44e0f9b -->
+<!-- records:base_commit=d367d3ec2b8aa02d1677bf19a1b614bd34129ca0 -->
 
 ## RFZ 独立计算与公开对照
 
