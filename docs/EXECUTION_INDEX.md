@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v344 RFZ 完整原面与给定壁温输入](validation/v344/RESULTS.md) · [标准工况](../cases/rfz_rec/full_cad_input.json) · [下一项](validation/v344/NEXT_DECISION.md)。
+
 - [v343 RFZ-REC 原壁与参考封盖归属](validation/v343/RESULTS.md) · [全部原面分区](validation/v343/evidence/cad.csv) · [下一项](validation/v343/NEXT_DECISION.md)。
 
 - [v342 RFZ-REC 完整 CAD 边界与工作台导入](validation/v342/RESULTS.md) · [原面分区](../cases/rfz_rec/cad_faces.csv) · [与作者点云的几何核对](validation/v342/evidence/reference.json) · [下一项](validation/v342/NEXT_DECISION.md)。

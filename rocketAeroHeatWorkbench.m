@@ -103,6 +103,9 @@ renderEditor();sync();showGeometry(true);
                 height(state.rawMesh.rfzRegions),size(state.rawMesh.F,1),sum(state.rawMesh.area));
         end
         if isShortSupport(),inputSummary.Text=sprintf('Short Test 65 · %d 个 STL 面\n支管沿 ±Y，来流沿 −X',size(state.rawMesh.F,1));end
+        if isRFZSurface() && ~isempty(state.mesh)
+            inputSummary.Text=sprintf('RFZ-REC · 完整 CAD 原壁\n%d 面 · %.6f m²',size(state.mesh.F,1),sum(state.mesh.area));
+        end
         if isBead()
             counts=sprintf('B 型热敏珠 · %d 个原面',size(state.rawMesh.F,1));
             if ~isempty(state.mesh),counts=sprintf('%s · %d 体单元',counts,state.mesh.thermistorPrepared.cells);end
@@ -123,7 +126,9 @@ renderEditor();sync();showGeometry(true);
         assignin('base','rawMesh',state.orientedMesh);assignin('base','quality',state.quality);
         current=state.mesh;if ~isempty(state.result),current=state.result;end
         assignin('base','mesh',current);assignin('base','freestream',state.freestream);
-        if isBead()
+        if isRFZSurface()
+            assignin('base','flight',state.rawMesh.rfzBoundary.condition.publishedCondition);
+        elseif isBead()
             assignin('base','flight',state.cfg.thermistorBoundary);
         elseif isShortSupport()
             assignin('base','flight',getOption(state.cfg,'shortSupportBoundary',[]));
@@ -204,10 +209,14 @@ renderEditor();sync();showGeometry(true);
                 if isSidewind(),caption=sprintf('侧吹全周体网 · %d 个周向间隔 · %d 个原生壁面',p.angularCells,p.wallFaces);end
             end
         end
-        rfzProbe=isfield(m,'rfzRegions') && isempty(state.mesh);
+        rfzProbe=isfield(m,'rfzRegions') && (isempty(state.mesh) || isRFZSurface());
         if rfzProbe,caption='DLR RFZ-REC · 点击三角面查看 CAD 面号与面积';end
-        updateAerothermalGeometryView(geometryView,m,caption,struct('showWire',state.currentStep==2, ...
-            'resetCamera',reset,'enableFaceProbe',rfzProbe,'selectedFaces',rfzSelectedFaces));
+        options=struct('showWire',state.currentStep==2,'resetCamera',reset,'enableFaceProbe',rfzProbe,'selectedFaces',rfzSelectedFaces);
+        if isRFZSurface() && state.currentStep>=3 && state.boundaryConfirmed
+            options.givenWallK=state.cfg.heating.wallTemperatureByFace;
+            caption='RFZ-REC · 完整 CAD 给定壁温';
+        end
+        updateAerothermalGeometryView(geometryView,m,caption,options);
     end
     function showResults()
         delete(findall(resultHost,'Tag','short-sphere-review'));fig.UserData.shortSphereReview=[];
@@ -256,7 +265,7 @@ renderEditor();sync();showGeometry(true);
                 controls.file=textField(grid,1,'STL 文件',state.cfg.geometry.stlFile);
                 controls.scale=numberField(grid,2,'原坐标 → m',state.cfg.geometry.scale,[eps inf]);
                 controls.file.ValueChangedFcn=@modelEdited;controls.scale.ValueChangedFcn=@modelEdited;
-                controls.browse=button(grid,3,'选择 STL 文件',@browseFile);
+                controls.browse=button(grid,3,'选择模型或工况',@browseFile);
                 controls.browse.Layout.Column=1;
                 controls.beadModel=button(grid,3,'选用 B 型热敏珠',@loadBeadModel);controls.beadModel.Layout.Column=2;
                 controls.load=button(grid,4,'加载当前模型',@loadInput);
@@ -302,6 +311,13 @@ renderEditor();sync();showGeometry(true);
                     'Enable',onoff(~isempty(state.rawMesh)));
                 if isEmbedded(),set([controls.pca controls.flip controls.rotate controls.reset controls.confirm],'Enable','off');end
             case 2
+                if isRFZSurface()
+                    grid=form(7);meshBackendChoice(grid,1);
+                    controls.generate=button(grid,2,'确认完整 CAD 原面网格',@generate);
+                    tip(grid,3,sprintf('原 STL 共 %d 个三角面。九处开口保留内壁；人工封盖只用于论文对照。',size(state.orientedMesh.F,1)));
+                    if ~isempty(state.mesh),controls.nextBoundary=button(grid,6,'设置原壁温度',@(~,~)go(3));end
+                    sync();return
+                end
                 if isShortSupport()
                     grid=form(8);meshBackendChoice(grid,1);radius=getOption(state.cfg,'shortSupportRadiusD',14);
                     controls.shortRadius=choice(grid,2,'远场半径',{'14D · 基线','20D · 外域对照'},[14 20],radius);
@@ -452,6 +468,19 @@ renderEditor();sync();showGeometry(true);
                 controls.useSurfaceForSU2=button(grid,13,'当前表面 → 内嵌SU2混合网格',@(~,~)useSurfaceForSU2());
                 controls.useSurfaceForSU2.Enable=onoff(~isempty(state.mesh));
             case 3
+                if isRFZSurface()
+                    grid=form(10);b=state.mesh.rfzBoundary;outer=b.condition.publishedCondition.prescribedIsothermalWallK;
+                    tip(grid,1,sprintf('完整 CAD · %s\n外壁和唇环给定 %g K。内腔共 %d 面、%.6f m²。', ...
+                        b.condition.dataset,outer,b.groups.cavity.faces,b.groups.cavity.areaM2));
+                    mode=getOption(state.cfg,'rfzCavityMode','matchExterior');
+                    controls.rfzMode=choice(grid,4,'内壁条件',{'随外壁同温（假设）','单独给定温度'},{'matchExterior','specified'},mode);
+                    controls.innerK=numberField(grid,5,'内壁给定 / K',getOption(state.cfg,'rfzCavityK',outer),[0 inf]);
+                    controls.innerK.Enable=onoff(strcmp(mode,'specified'));
+                    controls.rfzMode.ValueChangedFcn=@boundaryEdited;controls.innerK.ValueChangedFcn=@boundaryEdited;
+                    controls.confirm=button(grid,7,'确认来流记录和逐面壁温',@confirmBoundary);
+                    controls.rfzReopen=button(grid,8,'重开已保存工况',@chooseRFZInput);
+                    sync();return
+                end
                 if isShortSupport()
                     grid=form(11);b=state.cfg.shortSupportBoundary;target=getOption(b,'targetDU',.25);
                     choices={'两个半步','一个整步'};offset=0;
@@ -649,6 +678,15 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,23+12*methodDetailsOpen,sprintf('当前保留 %d 个面元壁温输入；修改统一壁温将切换为统一边界。',numel(c.heating.wallTemperatureByFace)));
                 end
             case 4
+                if isRFZSurface()
+                    grid=form(9);b=state.cfg.rfzSurfaceInput;
+                    tip(grid,1,sprintf('%s · 完整 CAD\n%d 面已确认给定壁温，内壁 %.6g K。',b.dataset,b.faces,b.cavityWallK));
+                    controls.rfzSave=button(grid,4,'保存已确认工况',@saveRFZCase);
+                    controls.rfzWallCSV=button(grid,5,'导出原面壁温输入 CSV',@exportRFZWall);
+                    controls.rfzReopen=button(grid,6,'重开已保存工况',@chooseRFZInput);
+                    tip(grid,7,'已准备表面与壁面输入。体网和流场仍待计算。');
+                    sync();return
+                end
                 if isShortSupport()
                     mainDomain=getOption(state.cfg,'shortSupportRadiusD',14)==14;
                     grid=form(9+3*mainDomain);controls.readShort=button(grid,1,'读取所选步长的归档',@(~,~)solveCase([],[],'archive'));
@@ -1109,19 +1147,64 @@ renderEditor();sync();showGeometry(true);
     function loadRFZ(~,~)
         % 模块用途：首次准备作者几何，再从普通 STL 加载入口核对原面。
         if state.busy || preparing,return;end
+        try
+            preparing=true;stl=rfzSTLPath();preparing=false;
+            controls.file.Value=stl;controls.scale.Value=1;loadInput([],[]);
+        catch ex,preparing=false;if isgraphics(fig),showError(ex);end,end
+    end
+    function stl=rfzSTLPath()
         root=fileparts(mfilename('fullpath'));folder=fullfile(root,'outputs','rfz_rec_geometry');
         stl=fullfile(folder,'RFZ-REC_m.stl');
+        if ~isfile(stl)
+            message('正在准备 DLR 作者的 RFZ-REC 几何…');
+            parent=fileparts(folder);if ~isfolder(parent),mkdir(parent);end
+            runCM011Python({fullfile(root,'scripts','prepareRFZGeometry.py')},[tempname(parent) '.log'],@drawnow);
+        end
+        expected=jsondecode(fileread(fullfile(root,'cases','rfz_rec','geometry.json')));
+        assert(strcmp(cm011FileSHA256(stl),expected.stlSHA256),'RAH:RFZ:Source','本地 RFZ-REC 文件与冻结输入不符。');
+    end
+    function saveRFZCase(~,~)
         try
-            if ~isfile(stl)
-                preparing=true;message('正在准备 DLR 作者的 RFZ-REC 几何…');
-                parent=fileparts(folder);if ~isfolder(parent),mkdir(parent);end
-                runCM011Python({fullfile(root,'scripts','prepareRFZGeometry.py')},[tempname(parent) '.log'],@drawnow);
-                preparing=false;
-            end
-            expected=jsondecode(fileread(fullfile(root,'cases','rfz_rec','geometry.json')));
-            assert(strcmp(cm011FileSHA256(stl),expected.stlSHA256), ...
-                'RAH:RFZ:Source','本地 RFZ-REC 文件与冻结输入不符。');
-            controls.file.Value=stl;controls.scale.Value=1;loadInput([],[]);
+            assert(isRFZSurface() && state.boundaryConfirmed,'需要已确认的完整 CAD 工况。');
+            input=state.cfg.rfzSurfaceInput;
+            [f,p]=uiputfile('*.json','保存已确认工况','RFZ-REC-input.json');if isequal(f,0),return;end
+            saveRFZSurfaceInput(fullfile(p,f),input);message('已保存工况、原面身份与壁温来源。');
+        catch ex,showError(ex);end
+    end
+    function exportRFZWall(~,~)
+        try
+            assert(isRFZSurface() && state.boundaryConfirmed,'需要已确认的完整 CAD 工况。');
+            [input,wall]=buildRFZSurfaceInput(state.mesh,state.cfg.geometry,state.cfg.rfzCavityMode,state.cfg.rfzCavityK);
+            assert(isequal(input,state.cfg.rfzSurfaceInput));
+            [f,p]=uiputfile('*.csv','导出给定壁温','RFZ-REC-wall-input.csv');if isequal(f,0),return;end
+            writetable(wall,fullfile(p,f),'Encoding','UTF-8');message(sprintf('已导出 %d 个原面的壁温输入。',height(wall)));
+        catch ex,showError(ex);end
+    end
+    function chooseRFZInput(~,~)
+        [f,p]=uigetfile('*.json','重开 RFZ 完整 CAD 工况');if ~isequal(f,0),openRFZCase(fullfile(p,f));end
+    end
+    function openRFZCase(file)
+        % 完整核验后再安装新状态，错误文件不会撤销用户已经确认的工况。
+        if state.busy || preparing,return;end
+        try
+            saved=jsondecode(fileread(file));
+            assert(isstruct(saved) && isscalar(saved) && isfield(saved,'schema') && strcmp(saved.schema,'rfz-rec-surface-input-v1'), ...
+                'RAH:RFZ:SavedInput','请选择本项目保存的 RFZ 原面工况 JSON。');
+            preparing=true;next=state.cfg;next.computationBackend='rfzSurface';next.geometry.scale=1;
+            if isfield(state.rawMesh,'rfzBoundary') && isfile(state.modelSource.file)
+                next.geometry.stlFile=state.modelSource.file;
+            else,next.geometry.stlFile=rfzSTLPath();end
+            [raw,source]=readModelFile(next);
+            [m,g,input,wall]=restoreRFZSurfaceInput(saved,raw,next.geometry);
+            next.geometry=g;next.rfzCavityMode=input.cavityMode;next.rfzCavityK=input.cavityWallK;
+            replacement=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
+            replacement=aeroHeatWorkflowState('setModel',replacement,struct('cfg',next,'rawMesh',raw,'orientedMesh',m,'modelSource',source));
+            replacement=aeroHeatWorkflowState('setMesh',replacement,struct('mesh',m));
+            next=replacement.cfg;next.rfzSurfaceInput=input;next.heating.wallTemperatureByFace=wall.givenWallK;
+            replacement=aeroHeatWorkflowState('setBoundary',replacement,struct('cfg',next));
+            replacement=aeroHeatWorkflowState('confirmBoundary',replacement);
+            state=replacement;rotation=g.rotationMatrix;rotationCenter=g.rotationCenter;preview=m;report=[];embeddedVolume=[];
+            preparing=false;go(4);message('已重开并核对完整 CAD 工况与全部原面壁温。');
         catch ex,preparing=false;if isgraphics(fig),showError(ex);end,end
     end
     function toggleRFZList(open)
@@ -1194,7 +1277,8 @@ renderEditor();sync();showGeometry(true);
         preview=[];report=[];rotation=eye(3);message('文件或尺度已编辑，旧网格/边界确认/结果失效；请重新加载。');showGeometry(true);
     end
     function browseFile(~,~)
-        [name,path]=uigetfile('*.stl','选择几何模型');if isequal(name,0),return;end
+        [name,path]=uigetfile({'*.stl;*.json','STL 模型或 RFZ 工况'},'选择模型或工况');if isequal(name,0),return;end
+        if endsWith(name,'.json','IgnoreCase',true),openRFZCase(fullfile(path,name));return;end
         controls.file.Value=fullfile(path,name);modelEdited([],[]);loadInput([],[]);
     end
     function loadInput(~,~)
@@ -1205,21 +1289,29 @@ renderEditor();sync();showGeometry(true);
             next.geometry.stlFile=controls.file.Value;next.geometry.scale=controls.scale.Value;
             state=aeroHeatWorkflowState('invalidateModel',state,struct('cfg',next));
             preview=[];report=[];preparing=true;message('正在加载模型并核对SI尺度…');
-            hash=cm011FileSHA256(next.geometry.stlFile);
-            raw=quietCall(@()loadSTLMesh(next,true));raw=quietCall(@()calcFaceGeometry(raw));
-            [regions,boundaryInfo]=bindRFZGeometry(raw,next.geometry.stlFile,next.geometry.scale,hash);
-            if ~isempty(regions),raw.rfzRegions=regions;raw.rfzBoundary=boundaryInfo;end
-            assert(strcmp(hash,cm011FileSHA256(next.geometry.stlFile)),'RAH:STL:Changed','STL 读取期间发生改变，请重新加载。');
-            [ok,stlFile]=fileattrib(next.geometry.stlFile);assert(ok,'无法定位导入文件。');
-            state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'cfg',next, ...
-                'modelSource',struct('file',stlFile.Name,'scale',next.geometry.scale,'unit','m','sha256',hash)));
+            [raw,source]=readModelFile(next);
+            if isfield(raw,'rfzBoundary')
+                next.computationBackend='rfzSurface';next.rfzCavityMode='matchExterior';
+                next.rfzCavityK=raw.rfzBoundary.condition.publishedCondition.prescribedIsothermalWallK;
+            end
+            state=aeroHeatWorkflowState('setModel',state,struct('rawMesh',raw,'cfg',next,'modelSource',source));
             preview=raw;rotation=eye(3);rotationCenter=mean(raw.V,1);report=[];
             preparing=false;renderEditor();message('模型已按所选尺度转换为m；朝向尚未确认。');showGeometry(true);
         catch ex,preparing=false;renderEditor();showError(ex);showGeometry(true);end
     end
+    function [raw,source]=readModelFile(next)
+        filename=next.geometry.stlFile;hash=cm011FileSHA256(filename);
+        raw=quietCall(@()loadSTLMesh(next,true));raw=quietCall(@()calcFaceGeometry(raw));
+        [regions,b]=bindRFZGeometry(raw,filename,next.geometry.scale,hash);
+        if ~isempty(regions),raw.rfzRegions=regions;raw.rfzBoundary=b;end
+        assert(strcmp(hash,cm011FileSHA256(filename)),'RAH:STL:Changed','STL 读取期间发生改变，请重新加载。');
+        [ok,stl]=fileattrib(filename);assert(ok,'无法定位导入文件。');
+        source=struct('file',stl.Name,'scale',next.geometry.scale,'unit','m','sha256',hash);
+    end
     function previewRotation(candidate)
         state=aeroHeatWorkflowState('invalidateOrientation',state);
-        [preview,~]=quietPair(@()alignGeometryAxis(state.rawMesh,'matrix',candidate,rotationCenter));
+        if isfield(state.rawMesh,'rfzBoundary') && isequal(candidate,eye(3)),preview=state.rawMesh;
+        else,[preview,~]=quietPair(@()alignGeometryAxis(state.rawMesh,'matrix',candidate,rotationCenter));end
         rotation=candidate;report=[];message('实际朝向预览已改变；确认后才可生成网格。');showGeometry(true);
     end
     function pcaOrientation(~,~)
@@ -1274,6 +1366,14 @@ renderEditor();sync();showGeometry(true);
     end
     function generate(~,~)
         if state.busy || preparing,return;end
+        if isRFZSurface()
+            try
+                candidate=state.orientedMesh;
+                state=aeroHeatWorkflowState('setMesh',state,struct('mesh',candidate));
+                report=[];renderEditor();showGeometry(true);message('已采用完整 CAD 原面的编号与面积。');
+            catch ex,showError(ex);end
+            return
+        end
         if isShortSupport()
             try
                 preparing=true;message('正在核对银球 STL 面号、实际面积和体网来源…');
@@ -1335,6 +1435,12 @@ renderEditor();sync();showGeometry(true);
 %% 模块九：边界输入与热物性/方法选择均入集中状态，不立即求物理场。
     function next=boundaryConfiguration()
         next=state.cfg;
+        if isRFZSurface()
+            next.rfzCavityMode=controls.rfzMode.Value;
+            [input,wall]=buildRFZSurfaceInput(state.mesh,next.geometry,next.rfzCavityMode,controls.innerK.Value);
+            next.rfzCavityK=input.cavityWallK;next.rfzSurfaceInput=input;
+            next.heating.wallTemperatureByFace=wall.givenWallK;return
+        end
         if isShortSupport()
             if isfield(controls,'shortHeatBoundary') && any(strcmp(controls.shortHeatBoundary.Value,{'power','film'}))
                 model='fixedFilm';if strcmp(controls.shortHeatBoundary.Value,'film'),model='candidateFilm';end
@@ -1502,9 +1608,14 @@ renderEditor();sync();showGeometry(true);
     end
     function boundaryEdited(~,~)
         if state.busy || preparing,return;end
+        if isRFZSurface()
+            controls.innerK.Enable=onoff(strcmp(controls.rfzMode.Value,'specified'));
+            if strcmp(controls.rfzMode.Value,'matchExterior'),controls.innerK.Value=state.mesh.rfzBoundary.condition.publishedCondition.prescribedIsothermalWallK;end
+        end
         if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
+            if isRFZSurface(),message('壁面输入已更新，请确认当前工况。');showGeometry(false);return;end
             if isShortSupport(),renderEditor();message('试件工况已更新，请重新确认热边界。');showGeometry(false);return;end
             if isBead() && isfield(controls,'wireBoundary')
                 renderEditor();message('引线热边界已更新，请确认当前工况。');
@@ -1551,6 +1662,11 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing,return;end
         try
             next=boundaryConfiguration();
+            if isRFZSurface()
+                state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
+                state=aeroHeatWorkflowState('confirmBoundary',state);go(4);
+                message('已确认完整原面工况，可保存输入并导出逐面壁温。');return
+            end
             if isShortSupport()
                 state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',next));
                 state=aeroHeatWorkflowState('confirmBoundary',state,struct('freestream',next.shortSupportBoundary));
@@ -1609,6 +1725,7 @@ renderEditor();sync();showGeometry(true);
 %% 模块十：唯一物理计算入口；输入冻结，阶段失败不接受中间快照。
     function solveCase(~,~,source)
         if state.busy || preparing,return;end
+        if isRFZSurface(),message('RFZ 表面输入已就绪，尚无已接入的全域物理求解。');return;end
         if isEmbedded(),startEngine();return;end
         try
             if nargin<3,source='solve';end
@@ -1707,6 +1824,9 @@ renderEditor();sync();showGeometry(true);
     end
     function yes=isShortSupport()
         yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'shortSupport65');
+    end
+    function yes=isRFZSurface()
+        yes=isfield(state.rawMesh,'rfzBoundary') && strcmp(getOption(state.cfg,'computationBackend',''),'rfzSurface');
     end
     function changeShortRadius(field,~)
         % 数值外域改变后重新绑定试件体网和基流，撤销上次边界审核与结果。
@@ -1814,6 +1934,7 @@ renderEditor();sync();showGeometry(true);
             labels{end+1}='带线 B 珠 · 96 档侧吹';values{end+1}='thermistorB';
             labels{end+1}='双支管银球 · Short Test 65';values{end+1}='shortSupport65';
         end
+        if isfield(state.rawMesh,'rfzBoundary'),labels{end+1}='RFZ 完整 CAD 原面';values{end+1}='rfzSurface';end
         controls.meshBackend=choice(grid,row,'网格方法',labels,values,getOption(state.cfg,'computationBackend','engineering'));
         controls.meshBackend.ValueChangedFcn=@changeMeshBackend;
     end
@@ -1955,14 +2076,21 @@ renderEditor();sync();showGeometry(true);
     function geometryMessage(src,event)
         data=src.Data;geometryReceiver(src,event);
         if isstruct(data) && isfield(data,'kind') && strcmp(data.kind,'geometry-face-probe')
-            if isfield(state.rawMesh,'rfzRegions') && isempty(state.mesh) && ...
+            if isfield(state.rawMesh,'rfzRegions') && (isempty(state.mesh) || isRFZSurface()) && ...
                     getOption(src.UserData.payload,'enableFaceProbe',false) && ...
                     isfield(data,'revision') && data.revision==src.UserData.revision && isfield(data,'faceIndex')
                 face=double(data.faceIndex)+1;mesh=state.rawMesh;
                 if isscalar(face) && isfinite(face) && face==fix(face) && face>=1 && face<=size(mesh.F,1)
                     row=mesh.rfzBoundary.regions(find(face<=mesh.rfzRegions.lastFace,1),:);
-                    message(sprintf('原面 %d · CAD 面 %d · %s · 三角面 %.7g m² · 本区 %.7g m²', ...
-                        face,row.cadFace,row.referenceRole,mesh.area(face),row.stlAreaM2));
+                    note=sprintf('原面 %d · CAD 面 %d · %s · 三角面 %.7g m² · 本区 %.7g m²', ...
+                        face,row.cadFace,row.referenceRole,mesh.area(face),row.stlAreaM2);
+                    if isRFZSurface() && state.boundaryConfirmed
+                        source='论文给定外壁';if row.referenceRole=="封盖内侧 CAD 壁"
+                            if strcmp(state.cfg.rfzCavityMode,'specified'),source='用户给定内壁';else,source='项目同温假设';end
+                        end
+                        note=sprintf('%s · 给定 %.6g K（%s）',note,state.cfg.heating.wallTemperatureByFace(face),source);
+                    end
+                    message(note);
                 end
                 return
             end

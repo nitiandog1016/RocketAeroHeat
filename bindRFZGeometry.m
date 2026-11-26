@@ -40,6 +40,9 @@ b=jsondecode(fileread(source));
 assert(strcmp(b.caseSHA256,cm011FileSHA256(condition)) && strcmp(b.stlSHA256,fileHash) && ...
     strcmp(b.cadTableSHA256,info.regionsSHA256) && strcmp(b.stepSHA256,info.stepSHA256));
 boundary=struct('condition',jsondecode(fileread(condition)));
+boundary.stlSHA256=fileHash;
+boundary.cadTableSHA256=info.regionsSHA256;
+boundary.referenceCaseSHA256=b.caseSHA256;
 assert(strcmp(b.dataset,boundary.condition.dataset) && b.faces==size(mesh.F,1) && b.cadFaces==height(region));
 caps=b.caps;rim=[caps.rimCADFace]';inner=cellfun(@(v)v(:),{caps.innerCADFaces},'UniformOutput',false);
 allAssigned=[rim;vertcat(inner{:})];

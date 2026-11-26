@@ -40,6 +40,14 @@ payload=struct('kind','aerothermal-geometry','schemaVersion',1, ...
     'showWire',showWire,'resetCamera',resetCamera,'revision',revision);
 % 纯几何探针沿用现有三角形拾取；此开关只传回面号和交点。
 if enableFaceProbe,payload.enableFaceProbe=true;end
+% 给定壁温来自确认的边界。整面等温时色标只显示这一温度。
+if isfield(options,'givenWallK')
+    t=options.givenWallK(:);
+    assert(isnumeric(t) && isreal(t) && numel(t)==size(F,1) && ~isempty(t) && all(isfinite(t) & t>0), ...
+        '逐面给定壁温必须与当前面数一致，以 K 为单位且严格为正。');
+    payload.faceField=struct('context','given-wall','name','给定壁温','unit','K','values',t, ...
+        'range',[min(t),max(t)],'productionQualified',false);
+end
 % 选区来自当前几何的一基面号；网页接收对应的零基索引。
 if isfield(options,'selectedFaces') && ~isempty(options.selectedFaces)
     ids=options.selectedFaces;

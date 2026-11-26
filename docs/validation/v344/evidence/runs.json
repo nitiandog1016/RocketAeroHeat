@@ -1,0 +1,133 @@
+{
+  "processes": {
+    "ui01/window_process.json": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "addpath('docs/validation/v344');check_surface_input('E:/RocketAeroHeat/outputs/v344_validation/ui01')"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 51.28099999999995,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 2236526592,
+      "stopReason": null,
+      "livePids": []
+    },
+    "ui02/window_process.json": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "addpath('docs/validation/v344');check_surface_input('E:/RocketAeroHeat/outputs/v344_validation/ui02')"
+      ],
+      "cwd": "E:\\RocketAeroHeat",
+      "elapsedSeconds": 54.297000000000025,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 2155405312,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean01/window_process.json": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "restoredefaultpath;cd('E:/RocketAeroHeat/outputs/v344_validation/clean01/app');addpath('docs/validation/v344','docs/validation/v343','docs/validation/v342');check_surface_input('E:/RocketAeroHeat/outputs/v344_validation/clean01');check_boundary_ui('E:/RocketAeroHeat/outputs/v344_validation/clean01/v343');check_workbench('E:/RocketAeroHeat/outputs/v344_validation/clean01/v342')"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v344_validation\\clean01\\app",
+      "elapsedSeconds": 83.92200000000003,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 2290176000,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean01/independent_process.json": {
+      "args": [
+        "D:\\anacondapython\\python.exe",
+        "E:\\RocketAeroHeat\\outputs\\v344_validation\\clean01\\app\\docs\\validation\\v344\\verify_surface_input.py",
+        "E:\\RocketAeroHeat\\outputs\\v344_validation\\clean01"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v344_validation\\clean01\\app",
+      "elapsedSeconds": 0.7029999999999745,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 49029120,
+      "stopReason": null,
+      "livePids": []
+    },
+    "clean01/standard/window_process.json": {
+      "args": [
+        "D:\\matlab\\bin\\matlab.EXE",
+        "-wait",
+        "-singleCompThread",
+        "-batch",
+        "restoredefaultpath;cd('E:/RocketAeroHeat/outputs/v344_validation/clean01/app');addpath('E:/RocketAeroHeat/outputs/v344_validation/clean01/dialog','-begin');setappdata(0,'rfzTestOut',fullfile(pwd,'cases','rfz_rec'));setappdata(0,'rfzTestFile','full_cad_input.json');fig=rocketAeroHeatWorkbench();guard=onCleanup(@()delete(fig));c=fig.UserData.controls.browse;c.ButtonPushedFcn(c,[]);drawnow;s=fig.UserData.workflowState;assert(s.currentStep==4 && s.boundaryConfirmed && isempty(s.result),'%s',fig.UserData.status.Text);src=fullfile(pwd,'cases','rfz_rec','full_cad_input.json');assert(isequal(s.cfg.rfzSurfaceInput,jsondecode(fileread(src))));assert(isequal(s.mesh.V,s.rawMesh.V) && all(s.cfg.heating.wallTemperatureByFace==300));html=fig.UserData.geometryView.html;t=tic;while isempty(html.UserData.rendered) && toc(t)<50,drawnow;pause(.1);end;gl=html.UserData.rendered;assert(gl.webglError==0 && gl.faces==130044 && gl.visiblePixelSamples>0 && isequal(gl.fieldRange(:),[300;300]));rec=struct('sourceSHA256',cm011FileSHA256(src),'faces',gl.faces,'pixels',gl.visiblePixelSamples,'legend',gl.givenWallLegend,'computedFaces',0);f=fopen('E:/RocketAeroHeat/outputs/v344_validation/clean01/standard/published.json','w','n','UTF-8');fprintf(f,'%s\\n',jsonencode(rec,'PrettyPrint',true));fclose(f);"
+      ],
+      "cwd": "E:\\RocketAeroHeat\\outputs\\v344_validation\\clean01\\app",
+      "elapsedSeconds": 29.70299999999952,
+      "exitCode": 0,
+      "peakSampledRSSBytes": 1855614976,
+      "stopReason": null,
+      "livePids": []
+    }
+  },
+  "geometryRegression": {
+    "stlSHA256": "f68c1b1416f58be69a94c062b8f2c8fabaccf9966bddeb6b6e8991b5d73ad083",
+    "faces": 130044,
+    "vertices": 65024,
+    "regions": 204,
+    "areaM2": 740.7290034031088,
+    "presetPixels": 11640,
+    "orientationPixels": 11844,
+    "fileReopenPixels": 11640,
+    "probeCallbackCADFaces": [
+      1,
+      13,
+      204
+    ],
+    "staleProbeIgnored": true,
+    "changedScaleUnbound": true,
+    "computedFaces": 0,
+    "jointExperimentalAreaM2": 0
+  },
+  "boundaryRegression": {
+    "cadRows": 204,
+    "capRows": 9,
+    "cadAreaM2": 740.7290034031093,
+    "fullReconstructedCapAreaM2": 6.009213192217581,
+    "farSamples": 1407,
+    "cadSelectionPixels": 11643,
+    "capSelectionPixels": 11642,
+    "cavityProbe": 105,
+    "rimProbe": 104,
+    "conditionRows": 10,
+    "expiredProbeIgnored": true,
+    "wrongScaleUnbound": true,
+    "computedFaces": 0
+  },
+  "testedFileSHA256": {
+    "aeroHeatWorkflowState.m": "47819a42c03463aade550aa64689c2ace456f0f1b74084d66a824654f6c029c1",
+    "bindRFZGeometry.m": "38e320c3ec000cc8e02c069cd14c0218117440d9dd2d4d559c23e9e1310e6806",
+    "buildRFZSurfaceInput.m": "341f1cce9bda53b02c3e96627aa9321f0292a1bb2c0233eb56fefe34878e29d6",
+    "restoreRFZSurfaceInput.m": "8e578ea96884d667719246ffb5828cc9667ee8a70e9641d254b39833075c9b95",
+    "saveRFZSurfaceInput.m": "526b5e2a1bf3fc3ca6affdf6a48a324f7c55248f53e98408a5a2eecded805bc6",
+    "rocketAeroHeatWorkbench.m": "6dc3bfa460e9f3e02dcff464a7990e33a69aaed87646b4b561562a680626180d",
+    "runAeroHeatSingleCase.m": "3bbe7b28f902ffa43435dbc0e4f44f7cec2969e927069f8d33216391e06194a4",
+    "updateAerothermalGeometryView.m": "e87166e05bf480306fcd85950a3ff11103b4f3c72a190d0cb56a90b5b8b81542",
+    "web/geometry.html": "60263d11043ff409c01b7c557ed215d922220bd986f1b58104b5aedf01567192",
+    "web/geometry.js": "fa26419c619798069a14baa93159d19799ba202298c8454174b9ecb41ef7248e",
+    "cases/rfz_rec/full_cad_input.json": "e7a4b0a46185818a050e3e4fcaaa5cb9a990343e866dd513d9b49c6924f8aa5f",
+    "docs/validation/v344/check_surface_input.m": "467dc5e1f5751e62ce0bee67f11fd160f734d1e0c742ed7ee1466d3f28674dea",
+    "docs/validation/v344/verify_surface_input.py": "7d7cf4ab8a3d92c7a9072fb5bc3a8394a858779ac4677250ab3291416297c9a3"
+  },
+  "publishedReopen": {
+    "sourceSHA256": "e7a4b0a46185818a050e3e4fcaaa5cb9a990343e866dd513d9b49c6924f8aa5f",
+    "faces": 130044,
+    "pixels": 4338,
+    "legend": "给定壁温 · 全面 300 K",
+    "computedFaces": 0
+  }
+}

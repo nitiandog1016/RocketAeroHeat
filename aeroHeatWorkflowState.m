@@ -121,6 +121,18 @@ switch action
         mesh=clearComputedFields(mesh);
         cfg=optional(payload,'cfg',state.cfg);assertScalarStruct(cfg,'cfg');
         requireUnchangedConfigSection(cfg,state.cfg,'geometry','模型输入或朝向');
+        if strcmp(optional(cfg,'computationBackend',''),'rfzSurface')
+            % RFZ 保留经普通 STL 入口绑定的原面顺序，坐标只接受已确认的刚体变换。
+            raw=state.rawMesh;g=cfg.geometry;R=g.rotationMatrix;c=reshape(g.rotationCenter,1,3);
+            assert(isequal(size(R),[3 3]) && norm(R'*R-eye(3),'fro')<=1e-8 && abs(det(R)-1)<=1e-8, ...
+                'RAH:RFZ:Mesh','确认的朝向必须是刚体旋转。');
+            predicted=(R*(raw.V-c)')'+c;
+            assert(isfield(raw,'rfzBoundary') && isfield(mesh,'rfzBoundary') && ...
+                strcmp(state.modelSource.sha256,raw.rfzBoundary.stlSHA256) && state.modelSource.scale==1 && ...
+                sameGeometry(mesh,state.orientedMesh) && isequal(mesh.F,raw.F) && ...
+                isequaln(raw.rfzBoundary,mesh.rfzBoundary) && isequal(raw.rfzRegions,mesh.rfzRegions) && ...
+                max(abs(mesh.V(:)-predicted(:)))<1e-10,'RAH:RFZ:Mesh','表面与当前原面编号或已确认朝向不一致。');
+        end
         if strcmp(optional(cfg,'computationBackend',''),'shortSupport65')
             [~,grid]=shortSupportImportBoundary(cfg.shortSupportBoundary.branch,optional(cfg,'shortSupportRadiusD',14));
             assert(isfield(mesh,'shortSupportImport') && isequal(mesh.shortSupportImport.source,state.modelSource) && ...
@@ -148,6 +160,9 @@ switch action
         % 界面正在编辑但验证失败时也须撤销旧确认，防止以旧边界悄悄运行。
         requireCondition(~state.busy && ~isempty(state.mesh),'只能使当前空闲网格的边界失效。');
         state=invalidate(state,'边界编辑未通过验证，须修正并重新确认');
+        if strcmp(optional(state.cfg,'computationBackend',''),'rfzSurface')
+            state.cfg=clearFaceBoundaryFields(state.cfg);
+        end
         state.revision=state.revision+1;state.boundaryRevision=state.boundaryRevision+1;
         state.currentStep=3;state.status='mesh-ready';
     case 'setboundary'
@@ -156,6 +171,9 @@ switch action
         requireUnchangedConfigSection(cfg,state.cfg,'geometry','模型输入或朝向');
         requireUnchangedConfigSection(cfg,state.cfg,'remesh','网格参数');
         requireUnchangedConfigSection(cfg,state.cfg,'mesh','网格参数');
+        if any(strcmp({optional(state.cfg,'computationBackend',''),optional(cfg,'computationBackend','')},'rfzSurface'))
+            requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','RFZ 完整 CAD 原面');
+        end
         if any(strcmp({optional(state.cfg,'computationBackend',''),optional(cfg,'computationBackend','')},'shortSupport65'))
             requireUnchangedConfigSection(cfg,state.cfg,'computationBackend','银球体网');
             requireUnchangedConfigSection(cfg,state.cfg,'shortSupportRadiusD','银球远场半径');
@@ -173,8 +191,13 @@ switch action
         end
     case 'confirmboundary'
         requireCondition(~isempty(state.mesh),'请先生成网格。');
-        validateFlight(state.cfg);
+        validateFlight(state.cfg,state.mesh);
         fs=optional(payload,'freestream',state.freestream);
+        if strcmp(optional(state.cfg,'computationBackend',''),'rfzSurface')
+            reference=state.mesh.rfzBoundary.condition.publishedCondition;
+            fs=optional(payload,'freestream',reference);
+            assert(isequaln(fs,reference),'RAH:RFZ:Boundary','来流记录须与当前选择的论文工况一致。');
+        end
         if strcmp(optional(state.cfg,'computationBackend',''),'shortSupport65')
             fs=optional(payload,'freestream',state.cfg.shortSupportBoundary);
             assert(isequal(fs,state.cfg.shortSupportBoundary),'RAH:Short:Boundary','来流须对应所确认的温界和步长。');
@@ -210,11 +233,17 @@ switch action
         requireCondition(~state.busy,'已有当前求解正在运行。');
         requireCondition(~isempty(state.mesh) && state.boundaryConfirmed, ...
             '计算需要真实网格和已确认的边界条件。');
-        validateFlight(state.cfg);
+        validateFlight(state.cfg,state.mesh);
         state=clearResult(state);state.solveId=state.solveId+1;
         state.solveInputRevision=state.revision;
         state.frozenInputs=struct('mesh',state.mesh,'cfg',state.cfg, ...
             'freestream',state.freestream,'revision',state.revision,'solveId',state.solveId);
+        if strcmp(optional(state.cfg,'computationBackend',''),'rfzSurface')
+            % 本模式的来源是当前试件记录，通用工程页面的默认飞行工况不进入冻结输入。
+            assert(isequaln(state.freestream,state.mesh.rfzBoundary.condition.publishedCondition), ...
+                'RAH:RFZ:Boundary','来流来源与当前 RFZ 工况不符。');
+            if isfield(state.frozenInputs.cfg,'flight'),state.frozenInputs.cfg=rmfield(state.frozenInputs.cfg,'flight');end
+        end
         if strcmp(optional(state.cfg,'computationBackend',''),'shortSupport65')
             % 动作与目录在按下按钮时冻结。仅新算生成独立任务号，读档无需本机体场。
             source=validatestring(required(payload,'shortSupportAction'),{'archive','solve','reopen'});
@@ -492,6 +521,7 @@ if isfield(cfg,'heating') && isstruct(cfg.heating) && ...
         isfield(cfg.heating,'wallTemperatureByFace')
     cfg.heating=rmfield(cfg.heating,'wallTemperatureByFace');
 end
+if isfield(cfg,'rfzSurfaceInput'),cfg=rmfield(cfg,'rfzSurfaceInput');end
 end
 function requireUnchangedConfigSection(a,b,key,label)
 if ~isequaln(optional(a,key,[]),optional(b,key,[]))
@@ -548,7 +578,14 @@ end
 end
 
 %% 模块十：边界输入基础检查；完整物理适用性仍由后端各模型审核。
-function validateFlight(cfg)
+function validateFlight(cfg,mesh)
+if strcmp(optional(cfg,'computationBackend',''),'rfzSurface')
+    [input,wall]=buildRFZSurfaceInput(mesh,cfg.geometry,cfg.rfzCavityMode,cfg.rfzCavityK);
+    assert(isfield(cfg,'rfzSurfaceInput') && isequaln(cfg.rfzSurfaceInput,input) && ...
+        isfield(cfg.heating,'wallTemperatureByFace') && isequal(cfg.heating.wallTemperatureByFace,wall.givenWallK), ...
+        'RAH:RFZ:Boundary','工况记录或逐面壁温已改变，请重新确认。');
+    return
+end
 if strcmp(optional(cfg,'computationBackend',''),'shortSupport65')
     b=cfg.shortSupportBoundary;
     assert(isequal(b,shortSupportImportBoundary(b.branch,optional(cfg,'shortSupportRadiusD',14),optional(b,'targetDU',.25),optional(b,'propertyModel','fixedFilm'))), ...

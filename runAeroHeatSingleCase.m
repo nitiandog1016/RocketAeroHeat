@@ -11,6 +11,10 @@ function [current,freestream,report] = runAeroHeatSingleCase(mesh,cfg,progressFc
 % 模块四：report 保存接受的设置与面积审计；执行完成不等于全面积求解完成。
 % 未解值、给定值和场量方法均由既有后端保留，不作补零或模型回退。
 if nargin<3,progressFcn=[];end
+% RFZ 原面输入有独立的域与温界。通用工程分支尚未实现该构型的全部区域。
+if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'rfzSurface')
+    error('RAH:RFZ:SurfaceInput','RFZ 完整 CAD 模式当前提供表面与壁面输入，独立物理求解尚未接入。');
+end
 % 已绑定的低速双支管银球按用户确认的物理时刻和来源运行。
 if isfield(cfg,'computationBackend') && strcmp(cfg.computationBackend,'shortSupport65')
     [current,freestream,report]=runShortSupportImportedCase(mesh,cfg,progressFcn);return;
