@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v352 低速风洞全周尾迹可行性](validation/v352/RESULTS.md) · [两次无扰动试算](validation/v352/evidence.json) · [下一项](validation/v352/NEXT_DECISION.md)
+
 - [v351 低速风洞平底压力与鼻端换热的取样范围](validation/v351/RESULTS.md) · [逐网数表](../cases/simple_launcher/wind_tunnel_stations.json) · [下一项](validation/v351/NEXT_DECISION.md)
 
 - [v350 简化运载火箭低速风洞全表面结果](validation/v350/RESULTS.md) · [模型与面表](../cases/simple_launcher/README.md) · [下一项](validation/v350/NEXT_DECISION.md)
