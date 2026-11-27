@@ -2,11 +2,11 @@
 
 ## 简化运载火箭低速风洞工况
 
-2026-11-27。0.05 m/s 尾迹弱扰动后 0.600 s 的全周壁压与热流已覆盖 9,216 面、0.935517 m²。两半步末放热 0.892959 mW，粗网时间步对照通过，空间与实验误差待验。联合实测验证面积 0 m²。[瞬态与工作台](validation/v354/RESULTS.md) · [稳态](validation/v353/RESULTS.md) · [下一项](validation/v354/NEXT_DECISION.md)
+2026-11-27。0.05 m/s，扰动后 0.600 s，壁压与热流覆盖 9,216 面、0.935517 m²。粗／细热网向外放热 0.892959／0.868870 mW，逐面热流加权 RMS 差 2.56%。底面弱信号的步长差 24.13%，超出辨识门槛。联合实测验证面积 0 m²。[近壁对照与工作台](validation/v355/RESULTS.md) · [下一项](validation/v355/NEXT_DECISION.md)
 
-<!-- records:last_completed=v354 -->
+<!-- records:last_completed=v355 -->
 <!-- records:active=none -->
-<!-- records:base_commit=ebc5f09b0add519f02fd4ff01c36d7904d291226 -->
+<!-- records:base_commit=c9f0d13ba3ec57113053818c1257c918d4e98fbf -->
 
 ## RFZ 独立计算与公开对照
 

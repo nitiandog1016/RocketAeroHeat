@@ -122,26 +122,26 @@ def near_wall(m,theta,prepared):
     return near
 
 
-def run(flow_job,momentum,prepared,heat_root,name,initial_field=None):
+def run(flow_job,momentum,prepared,heat_root,name,initial_field=None,heat_folder=None):
     step=read(momentum/name/"step.json")
     frame=momentum/name/f"restart_{step['step']:05d}.csv"
     assert step["accepted"] and sha(frame)==step["frameSHA256"]
     assert step["meshSHA256"]==read(prepared/"prepared.json")["files"]["mesh.su2"]
+    m=build_model(flow_job,prepared,heat_folder)
     initial=initial_field or ROOT/"outputs/v353_validation/coarse01/fields.npz"
     if step["step"]==1:
-        reference=read(DOC.parent/"v353/evidence.json")["coarse"]
         proof=read(initial.parent/"results.json")
         assert proof["accepted"] and all(proof["gates"].values()) and sha(initial)==proof["fieldsSHA256"]
-        assert proof["sourceFlowSHA256"]==reference["sourceFlowSHA256"] and proof["sourceHeatMeshSHA256"]==reference["sourceHeatMeshSHA256"]
+        assert proof["sourceFlowSHA256"]==m["flowSHA256"] and proof["sourceHeatMeshSHA256"]==m["heatMeshSHA256"]
         with np.load(initial) as f:old=f["theta"][0]
     else:
         parent=heat_root/f"{step['branch']}_{step['stepSize']}_{step['step']-1}"
         previous=read(parent/"heat.json");initial=parent/"thermal.npz"
         assert previous["accepted"] and sha(initial)==previous["fieldSHA256"]
         assert previous["sourceFrameSHA256"]==step["seedSHA256"]
+        if heat_folder is not None:assert previous["heatMeshSHA256"]==m["heatMeshSHA256"]
         with np.load(initial) as f:old=f["theta"]
     dst=heat_root/name
-    m=build_model(flow_job,prepared)
     native=np.loadtxt(frame,delimiter=",",skiprows=1)
     operators=project(m,native)
     theta,q,summary,ok=advance(m,operators,old,step["dtDU"])
@@ -154,6 +154,7 @@ def run(flow_job,momentum,prepared,heat_root,name,initial_field=None):
         fmt=["%d"]+4*["%.17g"],header="faceID,areaM2,pressurePa,heatFluxWm2,nearWallK",comments="")
     summary.update(accepted=ok,branch=step["branch"],step=step["step"],stepSize=step["stepSize"],
         elapsedPhysicalS=step["elapsedPhysicalS"],sourceFrameSHA256=sha(frame),initialThetaSHA256=sha(initial),
+        heatMeshSHA256=m["heatMeshSHA256"],
         fieldSHA256=sha(dst/"thermal.npz"),wallSHA256=sha(dst/"wall.csv"),baseTapGaugeMilliPa=taps.tolist())
     (dst/"heat.json").write_bytes((json.dumps(summary,indent=2,allow_nan=False)+"\n").encode())
     print(name,ok,"residual",summary["originalResidual"],"energy",summary["relativeEnergyImbalance"],
@@ -167,5 +168,6 @@ if __name__=="__main__":
     p.add_argument("name",choices=[f"{b}_{z}_{i}" for b in ("control","disturbed")
                                    for z,steps in (("full",1),("half",2)) for i in range(1,steps+1)])
     p.add_argument("--initial-field",type=Path)
+    p.add_argument("--heat-folder",type=Path,help="同一粗速度终帧上单独建立的热网与稳态初场目录")
     a=p.parse_args()
-    sys.exit(0 if run(a.flow_job.resolve(),a.momentum.resolve(),a.prepared.resolve(),a.heat_root.resolve(),a.name,a.initial_field) else 2)
+    sys.exit(0 if run(a.flow_job.resolve(),a.momentum.resolve(),a.prepared.resolve(),a.heat_root.resolve(),a.name,a.initial_field,a.heat_folder) else 2)

@@ -42,9 +42,16 @@ def boundary_sampler(points,triangles,targets):
     return sample
 
 
-def build_model(flow_job,prepared):
+def build_model(flow_job,prepared,heat_folder=None):
     ref=read(DOC.parent/"v352/baseline.json")["coarse"]
-    m=domain(flow_job,"coarse",ref)
+    if heat_folder is not None:
+        # 只改变热网。稳态温度必须来自同一个冻结的粗速度终帧和几何。
+        heat=read(heat_folder/"summary.json")
+        assert heat["grid"]=="coarse" and heat["sourceRestartSHA256"]==ref["flowSHA256"]
+        assert heat["surfaceSHA256"]==read(flow_job/"coarse/condition.json")["surfaceSHA256"]
+        ref=dict(ref,heatMeshSHA256=sha(heat_folder/"temperature.npz"))
+    m=domain(flow_job,"coarse",ref,heat_folder)
+    m["heatMeshSHA256"]=ref["heatMeshSHA256"]
     n=len(m["xy"]);xy=m["xy"];tr=m["tri"];p=xy[tr]
     area=np.cross(p[:,1]-p[:,0],p[:,2]-p[:,0])/2
     ctr=p.mean(axis=1);radius=p[:,:,1];m["cellArea"]=area;m["centroid"]=ctr

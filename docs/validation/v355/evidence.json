@@ -1,0 +1,711 @@
+{
+  "initial": {
+    "accepted": true,
+    "gates": {
+      "refined": true,
+      "bounds": true,
+      "referenceTemperature": true,
+      "residual": true,
+      "balance": true,
+      "baselineWall": true,
+      "heatStability": true
+    },
+    "sourceFlowSHA256": "720e4ce803e78c984b3015b390b1f95bc95d70dde1676216e161ec07692cb8d6",
+    "sourceHeatMeshSHA256": "624b1cec8bb094fa8ef8ebe1a96195fca871b41db378f817a8ae0b180a35d87d",
+    "fieldsSHA256": "05bb19a57c903935ba223e559e4e83284e169a32e90963e933fcc0e8ba4b99f6",
+    "resolutions": {
+      "coarse": {
+        "wallEdges": 1588,
+        "meridianNodes": 28466,
+        "triangles": 55057,
+        "medianWallEdgeMm": 0.9701877488016505,
+        "medianFirstHeightMm": 0.8491884180753034
+      },
+      "fine": {
+        "wallEdges": 3068,
+        "meridianNodes": 54318,
+        "triangles": 105264,
+        "medianWallEdgeMm": 0.5018045242672539,
+        "medianFirstHeightMm": 0.414255098447778
+      }
+    },
+    "heatStability": 2.7150259818142786e-10,
+    "thermalDOF": 2599509,
+    "referenceThetaDifference": 4.113376306236205e-14,
+    "wallFluxRMS": 8.928332793032911e-08,
+    "outwardW": 0.0008675858363502867,
+    "regionW": {
+      "afterbody": 5.737779935631686e-05,
+      "contraction": 1.7034054527171694e-05,
+      "cylinder": 0.0005028534635953467,
+      "cone": 0.0002669378792934315,
+      "sphericalNose": 1.6533647152740802e-05,
+      "base": 6.848992425279779e-06
+    },
+    "baseAnnulusW": [
+      5.317613755256049e-07,
+      1.42796293811195e-06,
+      1.792418057820016e-06,
+      3.096850053822208e-06
+    ],
+    "relativeFreeRowResidual": 1.5292764532152277e-14,
+    "maxFreeRowPerRadian": 3.122502256758253e-17,
+    "energyImbalance": 6.861452862686914e-15,
+    "wallReleasePerRadianSum": 1.9416698711072657,
+    "remoteReleasePerRadianSum": 1.9416698711072524,
+    "minTheta": 0.0,
+    "maxTheta": 1.0,
+    "maxAxisSpread": 0.0,
+    "maxFreeAngularExchangePerRadian": 0.0
+  },
+  "steps": {
+    "control_full_1": {
+      "heat": {
+        "relativeProjection": 6.324940187441662e-05,
+        "projectionRelativeToIncrement": 0.49358659112341857,
+        "initialMaxDivergence": 0.0058651339794680655,
+        "projectedMaxDivergence": 1.7433843878624823e-17,
+        "normalizedDivergence": 2.9681486141013854e-18,
+        "maxAngularMassFlux": 1.1895152350624995e-05,
+        "netFarFlux": 7.292777493006497e-15,
+        "iterations": 6,
+        "linearStatus": 0,
+        "originalResidual": 3.767256044890419e-15,
+        "minTheta": 0.0,
+        "maxTheta": 1.0,
+        "freeDOF": 2449218,
+        "storageW": 2.097547930523126e-06,
+        "farW": 0.0008667963595142686,
+        "relativeEnergyImbalance": 5.83415971056829e-16,
+        "outwardW": 0.0008688939074447922,
+        "regionW": {
+          "afterbody": 5.7574588089643716e-05,
+          "contraction": 1.708115074052333e-05,
+          "cylinder": 0.0005037708271109068,
+          "cone": 0.0002678779898956455,
+          "sphericalNose": 1.575370824528635e-05,
+          "base": 6.835643362786683e-06
+        },
+        "baseAnnulusW": [
+          5.344044338785422e-07,
+          1.4341588167781409e-06,
+          1.7881314689575592e-06,
+          3.0789486431724417e-06
+        ],
+        "accepted": true,
+        "branch": "control",
+        "step": 1,
+        "stepSize": "full",
+        "elapsedPhysicalS": 0.6000000065901767,
+        "sourceFrameSHA256": "7669acb5fd38d14df757e84fc58ff3be10f5fe96d1c6f41e77a68def1c7ddca1",
+        "initialThetaSHA256": "05bb19a57c903935ba223e559e4e83284e169a32e90963e933fcc0e8ba4b99f6",
+        "heatMeshSHA256": "624b1cec8bb094fa8ef8ebe1a96195fca871b41db378f817a8ae0b180a35d87d",
+        "fieldSHA256": "f50288beda8a6bef5b3602cf400299e35de4090b20d8826df9a7366c4dffeb6a",
+        "wallSHA256": "524985c5d2312e626775490b859fe2a71881e2e71f6a8718a974b88a2acfd002"
+      },
+      "independentStorageW": 2.0975479305231236e-06,
+      "elapsedSeconds": 20.59400000000096,
+      "peakBytes": 1637015552,
+      "coarseWallSHA256": "0cff587b1eb443dad7d0790a4c006392e7e0b6d59b8e0c087fab5442b0b787c9",
+      "coarseThermalSHA256": "0014e853127829060da1abeb851cb56149f826f54f414dc1d2e5ab95dd60b83d"
+    },
+    "control_half_1": {
+      "heat": {
+        "relativeProjection": 4.816793916108106e-05,
+        "projectionRelativeToIncrement": 0.5978828064492668,
+        "initialMaxDivergence": 0.004050931543304866,
+        "projectedMaxDivergence": 1.941907734875209e-17,
+        "normalizedDivergence": 3.306138790797331e-18,
+        "maxAngularMassFlux": 6.786167389568836e-06,
+        "netFarFlux": -5.530298441414061e-15,
+        "iterations": 5,
+        "linearStatus": 0,
+        "originalResidual": 3.1643852497427996e-15,
+        "minTheta": 0.0,
+        "maxTheta": 1.0,
+        "freeDOF": 2449218,
+        "storageW": 9.914004648307485e-07,
+        "farW": 0.000867133260402582,
+        "relativeEnergyImbalance": 7.705414747502833e-16,
+        "outwardW": 0.0008681246608674133,
+        "regionW": {
+          "afterbody": 5.745141222995303e-05,
+          "contraction": 1.7047970859723633e-05,
+          "cylinder": 0.0005031628384530068,
+          "cone": 0.0002674373441107783,
+          "sphericalNose": 1.618011801315378e-05,
+          "base": 6.844977200797602e-06
+        },
+        "baseAnnulusW": [
+          5.327542136413396e-07,
+          1.4308652955526817e-06,
+          1.7921827886036387e-06,
+          3.0891749029999434e-06
+        ],
+        "accepted": true,
+        "branch": "control",
+        "step": 1,
+        "stepSize": "half",
+        "elapsedPhysicalS": 0.30000000329508836,
+        "sourceFrameSHA256": "1687e78bd242841914d054383aa2472517e4606f3698463c79388b3d6ddb1ea3",
+        "initialThetaSHA256": "05bb19a57c903935ba223e559e4e83284e169a32e90963e933fcc0e8ba4b99f6",
+        "heatMeshSHA256": "624b1cec8bb094fa8ef8ebe1a96195fca871b41db378f817a8ae0b180a35d87d",
+        "fieldSHA256": "e538c6821cd1c2a9d2b5fa6be206ce46a093b17d0587686af7c668aa6cd87b5d",
+        "wallSHA256": "67323ae4725cf774d283f1b5a42eea688f7c38e341b2880a2f9404eb1dd095e5"
+      },
+      "independentStorageW": 9.914004648307478e-07,
+      "elapsedSeconds": 19.42200000000048,
+      "peakBytes": 1633296384,
+      "coarseWallSHA256": "ddc3acbf3d4c99cf8e3b9215e7a3b222440e7ed8fbc9290ce0cd912b3637655c",
+      "coarseThermalSHA256": "d5e98b305a4d88788eeae54c501559b29292321d30c44a7fd52a7e60a964354f"
+    },
+    "control_half_2": {
+      "heat": {
+        "relativeProjection": 6.984019952008267e-05,
+        "projectionRelativeToIncrement": 0.5105082356562405,
+        "initialMaxDivergence": 0.006382604847852024,
+        "projectedMaxDivergence": 2.7677648584481518e-17,
+        "normalizedDivergence": 4.712177925852464e-18,
+        "maxAngularMassFlux": 1.2918366447070127e-05,
+        "netFarFlux": 1.1102230246251565e-16,
+        "iterations": 6,
+        "linearStatus": 0,
+        "originalResidual": 7.299435441836885e-15,
+        "minTheta": 0.0,
+        "maxTheta": 1.0,
+        "freeDOF": 2449218,
+        "storageW": 2.128336593294216e-06,
+        "farW": 0.0008667420852915051,
+        "relativeEnergyImbalance": 4.643367294783553e-16,
+        "outwardW": 0.0008688704218847989,
+        "regionW": {
+          "afterbody": 5.7564196364763865e-05,
+          "contraction": 1.7073149679378616e-05,
+          "cylinder": 0.0005036974604422147,
+          "cone": 0.00026800197916562827,
+          "sphericalNose": 1.5695129452414836e-05,
+          "base": 6.8385067803984835e-06
+        },
+        "baseAnnulusW": [
+          5.342887132825337e-07,
+          1.4346962588357756e-06,
+          1.7902431045746622e-06,
+          3.0792787037055114e-06
+        ],
+        "accepted": true,
+        "branch": "control",
+        "step": 2,
+        "stepSize": "half",
+        "elapsedPhysicalS": 0.6000000065901767,
+        "sourceFrameSHA256": "5b319a07a57fef716ae4fbec4ab2170b615f62c0f95a88947684a3f1af63ba04",
+        "initialThetaSHA256": "e538c6821cd1c2a9d2b5fa6be206ce46a093b17d0587686af7c668aa6cd87b5d",
+        "heatMeshSHA256": "624b1cec8bb094fa8ef8ebe1a96195fca871b41db378f817a8ae0b180a35d87d",
+        "fieldSHA256": "780ec34abb57cb0eeef5df167f5c56c967b7f21f3d76a14da662d2ae2817994d",
+        "wallSHA256": "0502f40e4b621751bec9256e1c9590ec0db88a3c287d21465252f1490d08810b"
+      },
+      "independentStorageW": 2.1283365932942174e-06,
+      "elapsedSeconds": 19.90600000000086,
+      "peakBytes": 1594429440,
+      "coarseWallSHA256": "8e82894b47426f399a99880cd8f9468c1f1a09d87b6ff4ced8af586a96194e11",
+      "coarseThermalSHA256": "9fc48de030b9527837da3e06a65ce6c8a96f08ebc56b7dee225e8baa78cde0d0"
+    },
+    "disturbed_full_1": {
+      "heat": {
+        "relativeProjection": 6.324941699161212e-05,
+        "projectionRelativeToIncrement": 0.4935416056403429,
+        "initialMaxDivergence": 0.005865133978296152,
+        "projectedMaxDivergence": 2.051598501544641e-17,
+        "normalizedDivergence": 3.492889629761064e-18,
+        "maxAngularMassFlux": 6.294087690480512e-05,
+        "netFarFlux": -8.645861804268407e-15,
+        "iterations": 6,
+        "linearStatus": 0,
+        "originalResidual": 3.7672391876420105e-15,
+        "minTheta": 0.0,
+        "maxTheta": 1.0,
+        "freeDOF": 2449218,
+        "storageW": 2.097549038964009e-06,
+        "farW": 0.000866796359525133,
+        "relativeEnergyImbalance": 2.3506132748538243e-16,
+        "outwardW": 0.0008688939085640968,
+        "regionW": {
+          "afterbody": 5.7574586298283016e-05,
+          "contraction": 1.7081150740813123e-05,
+          "cylinder": 0.0005037708271158948,
+          "cone": 0.00026787798989722574,
+          "sphericalNose": 1.5753708245313908e-05,
+          "base": 6.835646266566251e-06
+        },
+        "baseAnnulusW": [
+          5.344057444845187e-07,
+          1.4341609507905684e-06,
+          1.7881313176343145e-06,
+          3.078948253656849e-06
+        ],
+        "accepted": true,
+        "branch": "disturbed",
+        "step": 1,
+        "stepSize": "full",
+        "elapsedPhysicalS": 0.6000000065901767,
+        "sourceFrameSHA256": "22b3ff1e4b924cf2edcd6d7cda80d6c7841034924a8bfd766e73813a52f9a66a",
+        "initialThetaSHA256": "05bb19a57c903935ba223e559e4e83284e169a32e90963e933fcc0e8ba4b99f6",
+        "heatMeshSHA256": "624b1cec8bb094fa8ef8ebe1a96195fca871b41db378f817a8ae0b180a35d87d",
+        "fieldSHA256": "3d67c2dd8db396882fc3455e3b3a81586928eab2ebf5a5065c45f77ecaf92a13",
+        "wallSHA256": "6cee822c9667a48ca0e3984a95b5800749e0f649ce204ee2c070e92e07dfd30a"
+      },
+      "independentStorageW": 2.097549038964008e-06,
+      "elapsedSeconds": 20.42200000000048,
+      "peakBytes": 1648132096,
+      "coarseWallSHA256": "bdc49cdb9189b4b3a06e18a2b71e46d8e2c46f2d3dad652205c1d11858a84f82",
+      "coarseThermalSHA256": "38a1fe882169f7c7c351f1cac4323c11e141c1c7b9cdc2378d757568d2a0e2c2"
+    },
+    "disturbed_half_1": {
+      "heat": {
+        "relativeProjection": 4.816796028693185e-05,
+        "projectionRelativeToIncrement": 0.5977069013178054,
+        "initialMaxDivergence": 0.004050931543543402,
+        "projectedMaxDivergence": 1.2688977066343046e-17,
+        "normalizedDivergence": 2.1603250525839404e-18,
+        "maxAngularMassFlux": 7.443489544441672e-05,
+        "netFarFlux": 2.3051005548779813e-14,
+        "iterations": 5,
+        "linearStatus": 0,
+        "originalResidual": 3.1643038685151073e-15,
+        "minTheta": 0.0,
+        "maxTheta": 1.0,
+        "freeDOF": 2449218,
+        "storageW": 9.914003943974953e-07,
+        "farW": 0.0008671332604091595,
+        "relativeEnergyImbalance": 9.267926429312e-16,
+        "outwardW": 0.0008681246608035578,
+        "regionW": {
+          "afterbody": 5.7451411429202735e-05,
+          "contraction": 1.7047970859511035e-05,
+          "cylinder": 0.000503162838453779,
+          "cone": 0.00026743734411129147,
+          "sphericalNose": 1.6180118013218766e-05,
+          "base": 6.844977936554733e-06
+        },
+        "baseAnnulusW": [
+          5.327545394140265e-07,
+          1.4308658168230537e-06,
+          1.7921828489774402e-06,
+          3.0891747313402116e-06
+        ],
+        "accepted": true,
+        "branch": "disturbed",
+        "step": 1,
+        "stepSize": "half",
+        "elapsedPhysicalS": 0.30000000329508836,
+        "sourceFrameSHA256": "9300ea3de24a248d6fe7aacce1c4f2f2c0c3db752467bb265d1efca7c54bcd87",
+        "initialThetaSHA256": "05bb19a57c903935ba223e559e4e83284e169a32e90963e933fcc0e8ba4b99f6",
+        "heatMeshSHA256": "624b1cec8bb094fa8ef8ebe1a96195fca871b41db378f817a8ae0b180a35d87d",
+        "fieldSHA256": "56b7cbb086bc56737a18de02f50b96181ceef20ac0f4f34ef589e56559985c36",
+        "wallSHA256": "918d24449c834b16f62cb03e9a9782ffd0417cae82869fc226c03439f778d731"
+      },
+      "independentStorageW": 9.914003943974938e-07,
+      "elapsedSeconds": 19.71899999999914,
+      "peakBytes": 1644261376,
+      "coarseWallSHA256": "262aed82de195aedafb5f189a52f87afa01d42a963fee574258a75cbb7c5026c",
+      "coarseThermalSHA256": "eced1299568af180b101e9b2e34a8b0618630af76487cbe8a4d7bf03890aeee1"
+    },
+    "disturbed_half_2": {
+      "heat": {
+        "relativeProjection": 6.9840214884759e-05,
+        "projectionRelativeToIncrement": 0.5104693427124692,
+        "initialMaxDivergence": 0.006382604847280921,
+        "projectedMaxDivergence": 2.841589990118307e-17,
+        "normalizedDivergence": 4.83786676635039e-18,
+        "maxAngularMassFlux": 5.9909282556947056e-05,
+        "netFarFlux": -9.985068327722502e-15,
+        "iterations": 6,
+        "linearStatus": 0,
+        "originalResidual": 7.299441089729784e-15,
+        "minTheta": 0.0,
+        "maxTheta": 1.0,
+        "freeDOF": 2449218,
+        "storageW": 2.128337046462381e-06,
+        "farW": 0.0008667420853033223,
+        "relativeEnergyImbalance": 3.885084449175873e-16,
+        "outwardW": 0.0008688704223497844,
+        "regionW": {
+          "afterbody": 5.7564194499020805e-05,
+          "contraction": 1.7073149679270874e-05,
+          "cylinder": 0.0005036974604455482,
+          "cone": 0.00026800197916705194,
+          "sphericalNose": 1.5695129452535264e-05,
+          "base": 6.838509106357288e-06
+        },
+        "baseAnnulusW": [
+          5.342897293030523e-07,
+          1.4346979392920784e-06,
+          1.7902431520521447e-06,
+          3.0792782857100133e-06
+        ],
+        "accepted": true,
+        "branch": "disturbed",
+        "step": 2,
+        "stepSize": "half",
+        "elapsedPhysicalS": 0.6000000065901767,
+        "sourceFrameSHA256": "6d1660ed540563dd71fe40361c283e397ee39c8a49da31956a697eb59ba1566e",
+        "initialThetaSHA256": "56b7cbb086bc56737a18de02f50b96181ceef20ac0f4f34ef589e56559985c36",
+        "heatMeshSHA256": "624b1cec8bb094fa8ef8ebe1a96195fca871b41db378f817a8ae0b180a35d87d",
+        "fieldSHA256": "a438995877671cd0f668431206244f762a81ccd5dcc07b786b8070f1cef7ed00",
+        "wallSHA256": "75a1621d5c52e6488c3d2ab4db086dc929dcd89a477eba142aa52d1af12f615b"
+      },
+      "independentStorageW": 2.1283370464623787e-06,
+      "elapsedSeconds": 19.64100000000144,
+      "peakBytes": 1647038464,
+      "coarseWallSHA256": "7c4469683e2e54e777c809c5faee996bcf42fcc8a5bb590c9f9360154a4284e5",
+      "coarseThermalSHA256": "a780609efa15bfb03ba5495e53598553eb642a2511272c95efe2cd836785ed60"
+    }
+  },
+  "spatial": {
+    "control_full_1": {
+      "outwardDifference": 0.027728694839747492,
+      "rms": 0.02560759823592227,
+      "regionDifferences": {
+        "afterbody": 0.03256722474809726,
+        "contraction": 0.023946171457015053,
+        "cylinder": 0.03289531552129432,
+        "cone": 0.017826227780180615,
+        "sphericalNose": 0.008663314512730613,
+        "base": 0.047660121113351606
+      },
+      "coarseAndFineNosePeakWm2": [
+        0.006323812366275721,
+        0.006262087479523761
+      ],
+      "nosePeakDifference": 0.009856918631972578,
+      "nosePeakFaceIDs": [
+        9078,
+        9078
+      ],
+      "coarseAndFineBaseAnnulusW": [
+        [
+          5.64662233288812e-07,
+          1.5087550423146427e-06,
+          1.879062786444195e-06,
+          3.2089508912971285e-06
+        ],
+        [
+          5.344044338785422e-07,
+          1.4341588167781409e-06,
+          1.7881314689575592e-06,
+          3.0789486431724417e-06
+        ]
+      ],
+      "baseAnnulusDifferences": [
+        0.05661966385770434,
+        0.05201392249157122,
+        0.05085270242441764,
+        0.04222293490116069
+      ],
+      "gates": {
+        "total": true,
+        "faceRMS": true,
+        "sixRegions": true,
+        "nosePeak": true,
+        "fourAnnuli": true
+      }
+    },
+    "control_half_1": {
+      "outwardDifference": 0.027642145269352936,
+      "rms": 0.025466103820627896,
+      "regionDifferences": {
+        "afterbody": 0.03253799297018878,
+        "contraction": 0.023890110153627964,
+        "cylinder": 0.032777507748381396,
+        "cone": 0.01780811446000019,
+        "sphericalNose": 0.008561675356028697,
+        "base": 0.04772679885913833
+      },
+      "coarseAndFineNosePeakWm2": [
+        0.006570918883431026,
+        0.006507475571560725
+      ],
+      "nosePeakDifference": 0.009749296969713273,
+      "nosePeakFaceIDs": [
+        9078,
+        9078
+      ],
+      "coarseAndFineBaseAnnulusW": [
+        [
+          5.629083652840432e-07,
+          1.5052630968002473e-06,
+          1.8832951717492976e-06,
+          3.2201994170218725e-06
+        ],
+        [
+          5.327542136413396e-07,
+          1.4308652955526817e-06,
+          1.7921827886036387e-06,
+          3.0891749029999434e-06
+        ]
+      ],
+      "baseAnnulusDifferences": [
+        0.05660049394373057,
+        0.051994972188370125,
+        0.050838778122988426,
+        0.04241408082614195
+      ],
+      "gates": {
+        "total": true,
+        "faceRMS": true,
+        "sixRegions": true,
+        "nosePeak": true,
+        "fourAnnuli": true
+      }
+    },
+    "control_half_2": {
+      "outwardDifference": 0.027724519509959578,
+      "rms": 0.025612282671738647,
+      "regionDifferences": {
+        "afterbody": 0.032566995598809045,
+        "contraction": 0.023959551521494538,
+        "cylinder": 0.03287501397931769,
+        "cone": 0.017854714593543042,
+        "sphericalNose": 0.008610738927512962,
+        "base": 0.04766398141587813
+      },
+      "coarseAndFineNosePeakWm2": [
+        0.006253556654945015,
+        0.006193107813036622
+      ],
+      "nosePeakDifference": 0.009760663584952756,
+      "nosePeakFaceIDs": [
+        9102,
+        9102
+      ],
+      "coarseAndFineBaseAnnulusW": [
+        [
+          5.645438933088423e-07,
+          1.5093321469277836e-06,
+          1.8812762431739287e-06,
+          3.2093049570811995e-06
+        ],
+        [
+          5.342887132825337e-07,
+          1.4346962588357756e-06,
+          1.7902431045746622e-06,
+          3.0792787037055114e-06
+        ]
+      ],
+      "baseAnnulusDifferences": [
+        0.05662702444232548,
+        0.05202208316384227,
+        0.050849595994335584,
+        0.042226204863891725
+      ],
+      "gates": {
+        "total": true,
+        "faceRMS": true,
+        "sixRegions": true,
+        "nosePeak": true,
+        "fourAnnuli": true
+      }
+    },
+    "disturbed_full_1": {
+      "outwardDifference": 0.02772869495384178,
+      "rms": 0.025607598305104486,
+      "regionDifferences": {
+        "afterbody": 0.03256722450697769,
+        "contraction": 0.023946171485626833,
+        "cylinder": 0.03289531552401792,
+        "cone": 0.01782622778109455,
+        "sphericalNose": 0.00866331451346225,
+        "base": 0.047660130137126444
+      },
+      "coarseAndFineNosePeakWm2": [
+        0.006323812366228244,
+        0.006262087479736579
+      ],
+      "nosePeakDifference": 0.009856918590070762,
+      "nosePeakFaceIDs": [
+        9114,
+        9114
+      ],
+      "coarseAndFineBaseAnnulusW": [
+        [
+          5.6466361608713e-07,
+          1.5087573021008594e-06,
+          1.8790626237714268e-06,
+          3.208950515242749e-06
+        ],
+        [
+          5.344057444845187e-07,
+          1.4341609507905684e-06,
+          1.7881313176343145e-06,
+          3.078948253656849e-06
+        ]
+      ],
+      "baseAnnulusDifferences": [
+        0.056619660089540336,
+        0.05201393279406363,
+        0.05085270038076062,
+        0.042222944614771274
+      ],
+      "gates": {
+        "total": true,
+        "faceRMS": true,
+        "sixRegions": true,
+        "nosePeak": true,
+        "fourAnnuli": true
+      }
+    },
+    "disturbed_half_1": {
+      "outwardDifference": 0.027642145306851162,
+      "rms": 0.025466103839681672,
+      "regionDifferences": {
+        "afterbody": 0.032537992804012816,
+        "contraction": 0.023890110163759415,
+        "cylinder": 0.03277750774924604,
+        "cone": 0.017808114460397206,
+        "sphericalNose": 0.008561675356413723,
+        "base": 0.047726803319093625
+      },
+      "coarseAndFineNosePeakWm2": [
+        0.006570918883491129,
+        0.006507475571732416
+      ],
+      "nosePeakDifference": 0.009749296952308528,
+      "nosePeakFaceIDs": [
+        9078,
+        9114
+      ],
+      "coarseAndFineBaseAnnulusW": [
+        [
+          5.629087123960732e-07,
+          1.5052636520337194e-06,
+          1.8832952322204974e-06,
+          3.220199255605926e-06
+        ],
+        [
+          5.327545394140265e-07,
+          1.4308658168230537e-06,
+          1.7921828489774402e-06,
+          3.0891747313402116e-06
+        ]
+      ],
+      "baseAnnulusDifferences": [
+        0.056600499387979175,
+        0.051994976982433716,
+        0.05083877646471335,
+        0.04241408649904055
+      ],
+      "gates": {
+        "total": true,
+        "faceRMS": true,
+        "sixRegions": true,
+        "nosePeak": true,
+        "fourAnnuli": true
+      }
+    },
+    "disturbed_half_2": {
+      "outwardDifference": 0.0277245196169158,
+      "rms": 0.025612282732266668,
+      "regionDifferences": {
+        "afterbody": 0.03256699535868468,
+        "contraction": 0.023959551548297098,
+        "cylinder": 0.0328750139816425,
+        "cone": 0.017854714594497167,
+        "sphericalNose": 0.008610738928280126,
+        "base": 0.047663991288467544
+      },
+      "coarseAndFineNosePeakWm2": [
+        0.006253556654979852,
+        0.006193107813329244
+      ],
+      "nosePeakDifference": 0.009760663542867087,
+      "nosePeakFaceIDs": [
+        9102,
+        9102
+      ],
+      "coarseAndFineBaseAnnulusW": [
+        [
+          5.645449706094758e-07,
+          1.5093339320043658e-06,
+          1.8812762861680867e-06,
+          3.209304556046882e-06
+        ],
+        [
+          5.342897293030523e-07,
+          1.4346979392920784e-06,
+          1.7902431520521447e-06,
+          3.0792782857100133e-06
+        ]
+      ],
+      "baseAnnulusDifferences": [
+        0.05662703145330816,
+        0.05202209515203937,
+        0.05084959214148732,
+        0.04222621610403987
+      ],
+      "gates": {
+        "total": true,
+        "faceRMS": true,
+        "sixRegions": true,
+        "nosePeak": true,
+        "fourAnnuli": true
+      }
+    }
+  },
+  "time": {
+    "control": {
+      "pressureRMSOverDynamic": 0.013591530954873348,
+      "heatFluxRelativeRMS": 0.0030785535208491485,
+      "outwardDifference": 2.7029991356286587e-05,
+      "regionPowerDifferences": {
+        "afterbody": 0.00018052410241264916,
+        "contraction": 0.00046863415918951823,
+        "cylinder": 0.0001456562211523682,
+        "cone": 0.0004626431131917741,
+        "sphericalNose": 0.003732291157528378,
+        "base": 0.0004187197152465405
+      }
+    },
+    "disturbed": {
+      "pressureRMSOverDynamic": 0.013591527577315236,
+      "heatFluxRelativeRMS": 0.003078553595977968,
+      "outwardDifference": 2.7030744410572183e-05,
+      "regionPowerDifferences": {
+        "afterbody": 0.00018052540042723386,
+        "contraction": 0.00046863418247689026,
+        "cylinder": 0.00014565622443618587,
+        "cone": 0.00046264311260524327,
+        "sphericalNose": 0.0037322911515826895,
+        "base": 0.00041863507769202
+      }
+    }
+  },
+  "baseHarmonic": {
+    "coarse_full_1": {
+      "realWm2": 1.5661422404479805e-18,
+      "imagWm2": -4.2228746920836456e-08,
+      "magnitudeWm2": 4.2228746920836456e-08,
+      "phaseDeg": -89.99999999787507
+    },
+    "coarse_half_2": {
+      "realWm2": 1.8695050432350922e-19,
+      "imagWm2": -3.419420896005483e-08,
+      "magnitudeWm2": 3.419420896005483e-08,
+      "phaseDeg": -89.99999999968675
+    },
+    "fine_full_1": {
+      "realWm2": 1.561790960233222e-18,
+      "imagWm2": -3.964686673512145e-08,
+      "magnitudeWm2": 3.964686673512145e-08,
+      "phaseDeg": -89.99999999774298
+    },
+    "fine_half_2": {
+      "realWm2": 1.134244686689796e-18,
+      "imagWm2": -3.193997447764338e-08,
+      "magnitudeWm2": 3.193997447764338e-08,
+      "phaseDeg": -89.99999999796533
+    },
+    "relativeSpace": 0.07057721614615942,
+    "relativeTime": 0.2412929998698829,
+    "identifiable": false
+  },
+  "comparisonSHA256": "c30fa3ae7eb3551a9071c95f3c43abc909e901cc06511001a718c4041e956ed4"
+}

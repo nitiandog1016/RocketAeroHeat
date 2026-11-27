@@ -92,6 +92,29 @@ if isfield(mesh,'hybridWall')
     if isfield(mesh,'launcherSummary'),heatUnit='W/m²';heatScale=1;
     else,heatUnit='kW/m²';heatScale=1000;end
     add('heatFlux','入壁热流',heatUnit,w.heatFluxWm2/heatScale,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope,heatScopes);
+    % 低速瞬态原面热流：粗细网使用相同范围，细网减粗网使用以零为中心的色标。
+    if isfield(mesh,'launcherWakeHeatGrid')
+        grid=mesh.launcherWakeHeatGrid;
+        data.fields(end).label='入壁热流 · 粗热网';
+        dq=grid.heatFluxWm2-w.heatFluxWm2;
+        scope=sprintf('同一 0.600 s 速度终帧，48 方位，给定壁温。已归档细热网向外放热 %.6f mW。',1000*grid.outwardW);
+        if ~grid.baseHarmonic.identifiable
+            scope=[scope ' 底面弱扰动的一阶周向热信号未通过辨识门槛。'];
+        end
+        sampleScopes=cellstr(string(scope)+" "+w.sampleScope);
+        add('wakeFineHeat','入壁热流 · 近壁细网','W/m²',grid.heatFluxWm2,ones(n,1), ...
+            repmat({'归档对照：三维守恒显热输运，BDF1 两半步末等温壁反力'},n,1),scope,sampleScopes);
+        data.fields(end).computedStateLabel='同工况归档复核';
+        add('wakeHeatDifference','入壁热流差 · 细网减粗网','W/m²',dq,ones(n,1), ...
+            repmat({'同一原面有符号入壁热流相减，细热网减粗热网'},n,1),scope,sampleScopes);
+        data.fields(end).computedStateLabel='同面网格差值';
+        both=[grid.heatFluxWm2;w.heatFluxWm2];
+        data.comparisonColorRanges.heatFlux=[min(both) max(both)];
+        data.comparisonColorRanges.wakeFineHeat=data.comparisonColorRanges.heatFlux;
+        bound=max(abs(dq));
+        if bound>0,data.comparisonColorRanges.wakeHeatDifference=[-bound bound];end
+        data.wakeGridSources=rmfield(grid,'heatFluxWm2');
+    end
     % 同工况的 48 方位热网复核单独成场。两种方法共用原面编号，可选同一色标。
     if isfield(mesh,'launcherAngularHeat')
         angular=mesh.launcherAngularHeat;
@@ -1066,7 +1089,13 @@ if isempty(histories)
         if strcmp(qf.unit,'W/m²'),scaleToWatts=1;
         else,assert(strcmp(qf.unit,'kW/m²'));scaleToWatts=1000;end
         data.wallCoverage=summarizeComputedWall(area,pf.status==1,qf.status==1,scaleToWatts*qf.values);
-        data.caseNote=[data.wallCoverage.coverageMessage ' ' data.caseNote];
+        if isfield(mesh,'launcherWakeHeatGrid')
+            data.caseNote=sprintf('%s · 同面已算 %d/%d · 向外放热：粗热网 %.6f mW，细热网 %.6f mW', ...
+                data.caseNote,data.wallCoverage.jointComputedFaceCount,n, ...
+                -1e3*data.wallCoverage.wholeSurfaceHeatPowerW,1e3*mesh.launcherWakeHeatGrid.outwardW);
+        else
+            data.caseNote=[data.wallCoverage.coverageMessage ' ' data.caseNote];
+        end
     end
 end
 % 仅传递明确保存的来源/证据；旧快照不凭方法名自动获得物理资格。

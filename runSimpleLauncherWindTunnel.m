@@ -119,6 +119,30 @@ if isfield(comparisonSeal,'angularHeatSHA256')
     a.heatFluxWm2=tab.heatFluxWm2;
     result.launcherAngularHeat=a;
 end
+% 模块六：将已归档的近壁热网试验与当前粗热网终帧配对。新算时仍标为归档对照。
+if wake && isfield(seal,'wakeHeatGridSHA256')
+    pack=fullfile(caseFolder,'wake_heat_grid.zip');
+    assert(strcmp(cm011FileSHA256(pack),seal.wakeHeatGridSHA256),'RAH:Launcher:GridArchive','近壁热网复核包指纹不符。');
+    sub=fullfile(job,'wake_heat_grid');unzip(pack,sub);
+    grid=jsondecode(fileread(fullfile(sub,'comparison.json')));
+    grid.condition.velocityMps=reshape(grid.condition.velocityMps,1,3);
+    matches=isequaln(grid.condition,c) && strcmp(grid.surfaceSHA256,def.fileSHA256) && ...
+        strcmp(grid.flowSHA256,s.sourceFrameSHA256) && strcmp(grid.coarseThermalSHA256,s.thermalFrameSHA256) && ...
+        strcmp(grid.coarseWallSHA256,s.wallSHA256);
+    if matches
+        path=fullfile(sub,'fine_wall.csv');
+        assert(strcmp(cm011FileSHA256(path),grid.fineWallSHA256),'RAH:Launcher:GridSource','细热网面表指纹不符。');
+        tab=readtable(path);
+        assert(isequal(tab.faceID,(1:n)') && grid.faces==n && max(abs(tab.areaM2-area))<1e-10 && ...
+            abs(sum(area)-grid.areaM2)<1e-10 && isequal(tab.pressurePa,w.pressurePa) && ...
+            all(isfinite(tab.heatFluxWm2)) && abs(area'*tab.heatFluxWm2+grid.outwardW)<1e-12, ...
+            'RAH:Launcher:GridFaces','热网对照的原面、面积、同帧壁压或放热积分不符。');
+        grid.heatFluxWm2=tab.heatFluxWm2;
+        result.launcherWakeHeatGrid=grid;
+    elseif strcmp(action,'archive')
+        error('RAH:Launcher:GridPair','归档的粗细网工况或终帧不匹配。');
+    end
+end
 report.status='completed';report.runDirectory=job;
     function heartbeat()
         if ~isempty(progressFcn),progressFcn(struct('status','running','message','低速风洞计算中'));end

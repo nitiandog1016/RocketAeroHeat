@@ -19,10 +19,10 @@ ANGLE = 2*np.pi/SECTORS
 PHI = (np.arange(SECTORS)+0.5)*ANGLE
 
 
-def domain(job, grid, reference):
+def domain(job, grid, reference, heat_folder=None):
     """在已登记的热网重建边界及速度投影，原温度只供独立对照。"""
     flow = job/grid
-    heat = job/("heat_"+grid)
+    heat = job/("heat_"+grid) if heat_folder is None else heat_folder
     file = flow/"restart.csv"
     receipt = json.loads((flow/"engine_process.json").read_bytes())
     assert receipt["status"]=="terminal" and receipt["exitCode"]==0 and all(receipt["inputsStable"].values())

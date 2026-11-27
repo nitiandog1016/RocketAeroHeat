@@ -18,10 +18,10 @@ def read(path):
     return json.loads(path.read_bytes())
 
 
-def finalize(flow,heat,dest):
-    definition,tri,d,_=geometry()
+def audit_steps(flow,heat):
+    definition,tri,_,_=geometry()
     area=np.linalg.norm(np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0]),axis=1)/2
-    tables={};records={};comparisons={};files={}
+    tables={};records={};comparisons={}
     for branch in ("control","disturbed"):
         for size,step in (("full",1),("half",1),("half",2)):
             name=f"{branch}_{size}_{step}";f=flow/name;t=heat/name
@@ -52,7 +52,7 @@ def finalize(flow,heat,dest):
             for group in definition["regions"]:
                 s=slice(group["firstFace"]-1,group["lastFace"])
                 assert abs(-area[s]@table[s,3]-b["regionW"][group["name"]])<1e-13
-            files[name]=t/"wall.csv";tables[name]=table
+            tables[name]=table
             records[name]=dict(flow=a,heat={k:v for k,v in b.items() if k!="baseTapGaugeMilliPa"},
                 heatSeconds=rec["elapsedSeconds"],heatPeakRSSBytes=rec["peakFamilyRSSBytes"])
         full=tables[f"{branch}_full_1"];half=tables[f"{branch}_half_2"]
@@ -66,6 +66,13 @@ def finalize(flow,heat,dest):
         comparisons[branch]=comparison
         assert comparison["pressureRMSOverDynamic"]<.02 and comparison["heatFluxRelativeRMS"]<.05,comparison
         assert comparison["outwardDifference"]<.02 and max(comparison["regionPowerDifferences"].values())<.05,comparison
+    return tables,records,comparisons
+
+
+def finalize(flow,heat,dest):
+    tables,records,comparisons=audit_steps(flow,heat)
+    definition,_,d,_=geometry()
+    area=tables["disturbed_half_2"][:,1]
     condition=read(CASE/"tunnel.json")
     condition.update(caseLabel="简化箭体 · 低速风洞尾迹扰动",
         elapsedPhysicalTimeS=.125*d/.05,physicalStepSizeS=.0625*d/.05,
@@ -86,7 +93,7 @@ def finalize(flow,heat,dest):
     zpath=dest/"wind_tunnel.zip"
     with ZipFile(zpath,"x",ZIP_DEFLATED) as z:
         z.writestr("summary.json",json.dumps(summary,ensure_ascii=False,allow_nan=False,indent=2))
-        z.write(files["disturbed_half_2"],"wall.csv")
+        z.write(heat/"disturbed_half_2/wall.csv","wall.csv")
     (dest/"receipt.json").write_bytes((json.dumps(dict(sha256=sha(zpath),faces=len(area),outwardW=b["outwardW"]),indent=2)+"\n").encode())
     (dest/"study.json").write_bytes((json.dumps(dict(records=records,comparisons=comparisons),indent=2,allow_nan=False)+"\n").encode())
     return summary
