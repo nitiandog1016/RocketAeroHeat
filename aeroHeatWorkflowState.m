@@ -605,7 +605,8 @@ end
 %% 模块十：边界输入基础检查；完整物理适用性仍由后端各模型审核。
 function validateFlight(cfg,mesh)
 if strcmp(optional(cfg,'computationBackend',''),'simpleLauncherTunnel')
-    assert(isequaln(cfg.launcherBoundary,simpleLauncherBoundary()),'RAH:Launcher:Boundary','需要当前固定低速风洞工况。');return
+    mode='steady';if isfield(cfg.launcherBoundary,'elapsedPhysicalTimeS'),mode='wake';end
+    assert(isequaln(cfg.launcherBoundary,simpleLauncherBoundary(mode)),'RAH:Launcher:Boundary','需要当前固定低速风洞工况。');return
 end
 if strcmp(optional(cfg,'computationBackend',''),'rfzSurface')
     [input,wall]=buildRFZSurfaceInput(mesh,cfg.geometry,cfg.rfzCavityMode,cfg.rfzCavityK);

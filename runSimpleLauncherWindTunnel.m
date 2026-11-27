@@ -2,7 +2,9 @@ function [result,c,report]=runSimpleLauncherWindTunnel(mesh,cfg,progressFcn)
 % 模块一：将当前三角形及来流与固定风洞试件逐面绑定，保留实际原面顺序。
 if nargin<3,progressFcn=[];end
 root=fileparts(mfilename('fullpath'));folder=fullfile(root,'cases','simple_launcher');
-c=simpleLauncherBoundary();assert(isequaln(cfg.launcherBoundary,c),'RAH:Launcher:Boundary','风洞工况不一致。');
+wake=isfield(cfg.launcherBoundary,'elapsedPhysicalTimeS');
+mode='steady';if wake,mode='wake';end
+c=simpleLauncherBoundary(mode);assert(isequaln(cfg.launcherBoundary,c),'RAH:Launcher:Boundary','风洞工况不一致。');
 def=jsondecode(fileread(fullfile(folder,'geometry.json')));
 input=struct('geometry',struct('stlFile',fullfile(folder,def.file),'scale',1));
 assert(strcmp(cm011FileSHA256(input.geometry.stlFile),def.fileSHA256) && strcmp(def.fileSHA256,c.surfaceSHA256));
@@ -16,15 +18,17 @@ end
 job=fullfile(root,'outputs',['launcher_' char(java.util.UUID.randomUUID())]);
 action='solve';if isfield(cfg,'launcherAction'),action=validatestring(cfg.launcherAction,{'solve','archive'});end
 seal=struct;
-receiptFile=fullfile(folder,'receipt.json');
+caseFolder=folder;script='runSimpleLauncherCase.py';
+if wake,caseFolder=fullfile(folder,'wake');script='runSimpleLauncherWakeCase.py';end
+receiptFile=fullfile(caseFolder,'receipt.json');
 if isfile(receiptFile),seal=jsondecode(fileread(receiptFile));end
 if strcmp(action,'archive')
-    zip=fullfile(folder,'wind_tunnel.zip');
+    zip=fullfile(caseFolder,'wind_tunnel.zip');
     assert(isfield(seal,'sha256') && strcmp(cm011FileSHA256(zip),seal.sha256),'RAH:Launcher:Archive','归档指纹不符。');
     mkdir(job);
 else
     logPath=[job '.log'];
-    runCM011Python({fullfile(root,'scripts','runSimpleLauncherCase.py'),job},logPath,@heartbeat);
+    runCM011Python({fullfile(root,'scripts',script),job},logPath,@heartbeat);
     zip=fullfile(job,'result','wind_tunnel.zip');
 end
 data=fullfile(job,'wall');unzip(zip,data);
@@ -71,12 +75,27 @@ w.pressureMethod=repmat("SU2 8.6.0 不可压恒密度层流壁压",n,1);
 w.heatFluxMethod=repmat("轴对称稳态显热有限元、守恒上风通量及等温壁反力",n,1);
 w.nearWallCellTemperatureK=w.nearWallK;
 w.nearWallTemperatureMethod=repmat("显热场插值至第一层流体节点后按原面面积平均",n,1);
+% 瞬态快照的流动、热场、时间步及储热量有独立身份；两半步末值作为本次主值。
+kind='fixed-low-speed-wind-tunnel';
+if wake
+    flowFrame=s.sourceFrameSHA256;kind='fixed-low-speed-wake-bdf1';
+    w.pressureMethod(:)="SU2 8.6.0 三维恒密度无滑移动量，BDF1 两半步末壁压";
+    w.heatFluxMethod(:)="三维守恒质量通量、周期周向输运、BDF1 流体储热和强等温壁反力";
+    w.nearWallTemperatureMethod(:)="同一末时刻的三维显热场插值至首层流体节点后映射到原面";
+else
+    flowFrame=s.runs.outer.restartSHA256;
+end
 result=struct('V',v,'F',f,'localGeometry',struct('region',{cellstr(regions)}), ...
     'hybridWall',w,'hybridCondition',c,'hybridWallTemperatureK',repmat(c.wallTemperatureK,n,1), ...
     'launcherSummary',s,'launcherAction',action,'evidenceIdentity',struct('origin','research','physicalCondition',c, ...
-    'sourceTraceable',true,'sourceFrame',struct('kind','fixed-low-speed-wind-tunnel', ...
-    'wallSHA256',s.wallSHA256,'flowSHA256',s.runs.outer.restartSHA256,'stlSHA256',def.fileSHA256), ...
+    'sourceTraceable',true,'sourceFrame',struct('kind',kind, ...
+    'wallSHA256',s.wallSHA256,'flowSHA256',flowFrame,'stlSHA256',def.fileSHA256), ...
     'scope',c.scope,'productionQualified',false));
+if wake
+    result.evidenceIdentity.sourceFrame.thermalSHA256=s.thermalFrameSHA256;
+    result.evidenceIdentity.sourceFrame.initialFlowSHA256=s.initialFlowSHA256;
+    result.evidenceIdentity.sourceFrame.initialThermalSHA256=s.initialThermalSHA256;
+end
 % 模块五：按本次速度终帧和面表绑定全周热网复核。旧归档仍然可读。
 comparisonFolder=fileparts(zip);
 comparisonSeal=jsondecode(fileread(fullfile(comparisonFolder,'receipt.json')));

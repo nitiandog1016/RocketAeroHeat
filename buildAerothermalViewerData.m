@@ -74,7 +74,7 @@ if isfield(mesh,'hybridWall')
     hybridScope='当前混合计算原面结果；方法见逐面来源，实验精度单独验证';
     if isfield(mesh,'thermistorSidewind') || isfield(mesh,'shortSphere') || isfield(mesh,'shortSupportSurface') || isfield(mesh,'launcherSummary'),hybridScope=mesh.evidenceIdentity.scope;end
     % 此风洞分支将子午面解映射到三维表面，探针和导出保留该对称假设。
-    if isfield(mesh,'launcherSummary')
+    if isfield(mesh,'launcherSummary') && ~isfield(mesh.hybridCondition,'elapsedPhysicalTimeS')
         hybridScope=[hybridScope ' 稳态轴对称解沿周向展开，实际尾迹的周向差异与脉动幅度待验证。'];
     end
     if isfield(mesh,'thermistorLead') && isfield(mesh.thermistorLead,'thermal')
@@ -450,8 +450,15 @@ if isfield(mesh,'hybridWall')
         data.caseNote=[hc.caseLabel ' · ' data.caseNote];
     end
     if isfield(mesh,'launcherSummary')
-        data.caseNote=sprintf('%s · 稳态轴对称 · 来流 %.6g m/s · 环境 %.8g Pa、%.6g K · 给定壁温 %.6f K · 正热流入壁', ...
-            hc.caseLabel,norm(hc.velocityMps),hc.ambientPressurePa,hc.ambientTemperatureK,hc.wallTemperatureK);
+        stateLabel='稳态轴对称';
+        if isfield(hc,'elapsedPhysicalTimeS')
+            stateLabel=hc.timeCaption;
+            data.resultCondition.elapsedPhysicalTimeS=hc.elapsedPhysicalTimeS;
+            data.resultCondition.physicalStepSizeS=hc.physicalStepSizeS;
+            data.resultCondition.timeCaption=hc.timeCaption;
+        end
+        data.caseNote=sprintf('%s · %s · 来流 %.6g m/s · 环境 %.8g Pa、%.6g K · 给定壁温 %.6f K · 正热流入壁', ...
+            hc.caseLabel,stateLabel,norm(hc.velocityMps),hc.ambientPressurePa,hc.ambientTemperatureK,hc.wallTemperatureK);
     end
     if all(isfield(hc,{'alphaDeg','betaDeg','ambientPressurePa','ambientTemperatureK'}))
         data.resultCondition.alphaDeg=hc.alphaDeg;data.resultCondition.betaDeg=hc.betaDeg;

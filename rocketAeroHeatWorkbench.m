@@ -491,6 +491,9 @@ renderEditor();sync();showGeometry(true);
                     tip(grid,1,sprintf('轴向来流 %.3g m/s · 零攻角',-b.velocityMps(1)));
                     tip(grid,3,sprintf('空气 %.3f K · %.0f Pa',b.ambientTemperatureK,b.ambientPressurePa));
                     tip(grid,5,sprintf('给定等温壁 %.3f K',b.wallTemperatureK));
+                    mode='steady';if isfield(b,'elapsedPhysicalTimeS'),mode='wake';end
+                    controls.launcherState=choice(grid,6,'计算状态',{'稳态轴对称','尾迹弱扰动后 0.600 s'},{'steady','wake'},mode);
+                    controls.launcherState.ValueChangedFcn=@boundaryEdited;
                     controls.confirm=button(grid,7,'确认风洞工况',@confirmBoundary);sync();return
                 end
                 if isRFZSurface()
@@ -705,10 +708,17 @@ renderEditor();sync();showGeometry(true);
             case 4
                 if isLauncherTunnel()
                     grid=form(10);controls.run=button(grid,1,'计算低速风洞全表面结果',@solveCase);
-                    if isfile(fullfile(state.cfg.projectRoot,'cases','simple_launcher','receipt.json'))
+                    folder=fullfile(state.cfg.projectRoot,'cases','simple_launcher');
+                    transient=isfield(state.cfg.launcherBoundary,'elapsedPhysicalTimeS');
+                    if transient,folder=fullfile(folder,'wake');end
+                    if isfile(fullfile(folder,'receipt.json'))
                         controls.readLauncher=button(grid,2,'查看已算的同工况结果',@(~,~)solveCase([],[],'archive'));
                     end
-                    tip(grid,3,'程序从当前模型和风洞边界独立计算，并核对网格误差和热量收支。');
+                    if transient
+                        tip(grid,3,'推进至 0.600 s，核对整步与两半步。已验收的同源动量帧可复用，显热和储热重新计算。');
+                    else
+                        tip(grid,3,'程序从当前模型和风洞边界独立计算，并核对网格误差和热量收支。');
+                    end
                     controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[5 10];
                     controls.log.Layout.Column=[1 2];sync();return
                 end
@@ -1693,7 +1703,10 @@ renderEditor();sync();showGeometry(true);
 %% 模块九：边界输入与热物性/方法选择均入集中状态，不立即求物理场。
     function next=boundaryConfiguration()
         next=state.cfg;
-        if isLauncherTunnel(),return;end
+        if isLauncherTunnel()
+            if isfield(controls,'launcherState'),next.launcherBoundary=simpleLauncherBoundary(controls.launcherState.Value);end
+            return
+        end
         if isRFZSurface()
             next.rfzCavityMode=controls.rfzMode.Value;
             [input,wall]=buildRFZSurfaceInput(state.mesh,next.geometry,next.rfzCavityMode,controls.innerK.Value);
@@ -1874,6 +1887,7 @@ renderEditor();sync();showGeometry(true);
         if isEmbedded() && isfield(controls,'boundaryLayout'),layoutEmbeddedBoundary();end
         try
             state=aeroHeatWorkflowState('setBoundary',state,struct('cfg',boundaryConfiguration()));report=[];
+            if isLauncherTunnel(),message('风洞状态已更新，请确认当前工况。');showGeometry(false);return;end
             if isRFZSurface(),message('壁面输入已更新，请确认当前工况。');showGeometry(false);return;end
             if isShortSupport(),renderEditor();message('试件工况已更新，请重新确认热边界。');showGeometry(false);return;end
             if isBead() && isfield(controls,'wireBoundary')

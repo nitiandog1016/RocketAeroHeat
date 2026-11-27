@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v354 低速尾迹扰动 0.600 s 的全面积壁压与热流](validation/v354/RESULTS.md) · [逐步能量账与步长对照](validation/v354/evidence.json) · [下一项](validation/v354/NEXT_DECISION.md)
+
 - [v353 低速风洞全周稳态热输运](validation/v353/RESULTS.md) · [周向热流曲线](validation/v353/circumference.png) · [下一项](validation/v353/NEXT_DECISION.md)
 
 - [v352 低速风洞全周尾迹可行性](validation/v352/RESULTS.md) · [两次无扰动试算](validation/v352/evidence.json) · [下一项](validation/v352/NEXT_DECISION.md)
