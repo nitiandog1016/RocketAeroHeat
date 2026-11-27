@@ -77,6 +77,29 @@ result=struct('V',v,'F',f,'localGeometry',struct('region',{cellstr(regions)}), .
     'sourceTraceable',true,'sourceFrame',struct('kind','fixed-low-speed-wind-tunnel', ...
     'wallSHA256',s.wallSHA256,'flowSHA256',s.runs.outer.restartSHA256,'stlSHA256',def.fileSHA256), ...
     'scope',c.scope,'productionQualified',false));
+% 模块五：按本次速度终帧和面表绑定全周热网复核。旧归档仍然可读。
+comparisonFolder=fileparts(zip);
+comparisonSeal=jsondecode(fileread(fullfile(comparisonFolder,'receipt.json')));
+if isfield(comparisonSeal,'angularHeatSHA256')
+    pack=fullfile(comparisonFolder,'angular_heat.zip');
+    assert(isfile(pack) && strcmp(cm011FileSHA256(pack),comparisonSeal.angularHeatSHA256), ...
+        'RAH:Launcher:AngularArchive','全周复核包与本次工况回执不匹配。');
+    sub=fullfile(job,'angular_wall');unzip(pack,sub);
+    a=jsondecode(fileread(fullfile(sub,'comparison.json')));
+    a.condition.velocityMps=reshape(a.condition.velocityMps,1,3);
+    path=fullfile(sub,'angular_wall.csv');
+    assert(a.accepted && a.sectors==48 && a.faces==n && isequaln(a.condition,c) && ...
+        strcmp(a.surfaceSHA256,def.fileSHA256) && strcmp(a.flowSHA256,s.runs.outer.restartSHA256) && ...
+        strcmp(a.primaryWallSHA256,s.wallSHA256) && strcmp(a.csvSHA256,cm011FileSHA256(path)) && ...
+        a.energyImbalance<0.005 && a.relativeFreeRowResidual<1e-8,'RAH:Launcher:AngularSource', ...
+        '全周复核的几何、工况、流场或热量收支不一致。');
+    tab=readtable(path);
+    assert(isequal(tab.faceID,(1:n)') && max(abs(tab.areaM2-area))<1e-10 && ...
+        all(isfinite(tab.heatFluxWm2)) && abs(area'*tab.heatFluxWm2+a.outwardW)<1e-12, ...
+        'RAH:Launcher:AngularFaces','全周复核面表或积分功率不一致。');
+    a.heatFluxWm2=tab.heatFluxWm2;
+    result.launcherAngularHeat=a;
+end
 report.status='completed';report.runDirectory=job;
     function heartbeat()
         if ~isempty(progressFcn),progressFcn(struct('status','running','message','低速风洞计算中'));end

@@ -92,6 +92,20 @@ if isfield(mesh,'hybridWall')
     if isfield(mesh,'launcherSummary'),heatUnit='W/m²';heatScale=1;
     else,heatUnit='kW/m²';heatScale=1000;end
     add('heatFlux','入壁热流',heatUnit,w.heatFluxWm2/heatScale,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope,heatScopes);
+    % 同工况的 48 方位热网复核单独成场。两种方法共用原面编号，可选同一色标。
+    if isfield(mesh,'launcherAngularHeat')
+        angular=mesh.launcherAngularHeat;
+        method='子午面守恒显热有限元、48 方位周期导热和傅里叶分块求解';
+        scope=sprintf('固定低速等温壁，速度场稳态轴对称。全周热网 %.0f 个温度自由度，向外放热 %.6f mW。热场 SHA-256 %s。', ...
+            angular.freeAndBoundaryDOF,1000*angular.outwardW,angular.fieldSHA256);
+        add('launcherAngularHeat','入壁热流 · 全周热网复核','W/m²',angular.heatFluxWm2,ones(n,1), ...
+            repmat({method},n,1),scope,cellstr(string(scope)+" "+w.sampleScope));
+        data.fields(end).computedStateLabel='同工况数值复核';
+        data.fields(end).stateNote=scope;
+        both=[w.heatFluxWm2;angular.heatFluxWm2];
+        data.comparisonColorRanges.heatFlux=[min(both) max(both)];
+        data.comparisonColorRanges.launcherAngularHeat=data.comparisonColorRanges.heatFlux;
+    end
     if ismember('pressureGaugePa',w.Properties.VariableNames)
         delta=w.pressureGaugePa;
         sourceKey='pressureMethod';

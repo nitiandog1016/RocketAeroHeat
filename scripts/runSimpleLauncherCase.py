@@ -28,7 +28,7 @@ def compare(a,b):
                                         for k,v in left['regions'].items()})
 
 
-def seal(flow_dirs,heat_dirs,cross_heat,out):
+def seal(flow_dirs,heat_dirs,cross_heat,out,include_angular=False):
     """只接收同一原几何及固定工况下经过独立回读、守恒和空间对照的面表。"""
     condition=read(CASE/'tunnel.json')
     assert condition['velocityMps']==[-SPEED,0,0] and condition['ambientPressurePa']==P_REF
@@ -73,11 +73,17 @@ def seal(flow_dirs,heat_dirs,cross_heat,out):
            maxOutwardFluxFaceID=int(wall[np.argmin(wall[:,3]),0]),runs=runs,verifiedByExperimentM2=0,
            method='SU2 8.6.0 不可压恒密度层流动量；散度自由流函数投影、Gmsh 轴对称热网、守恒低阶上风有限元及强等温壁反力')
     out.mkdir(parents=True,exist_ok=False)
+    # 同一冻结的扩域速度终帧，独立求 48 方位的全周稳态显热，另存数值复核包。
+    if include_angular:
+        from simpleLauncherAngularHeat import write_uniform_comparison
+        write_uniform_comparison(flow_dirs[-1].parent,out/'angular_heat.zip',s,flow_dirs[-1],heat_dirs[-1])
     with ZipFile(out/'wind_tunnel.zip','x',ZIP_DEFLATED) as z:
         z.writestr('summary.json',json.dumps(s,ensure_ascii=False,allow_nan=False,indent=2))
         z.write(heat_dirs[-1]/'wall.csv','wall.csv')
-    (out/'receipt.json').write_text(json.dumps(dict(sha256=sha(out/'wind_tunnel.zip'),faces=len(wall),
-              outwardW=main['outwardW']),indent=2)+'\n',encoding='utf8')
+    receipt=dict(sha256=sha(out/'wind_tunnel.zip'),faces=len(wall),outwardW=main['outwardW'])
+    if include_angular:
+        receipt['angularHeatSHA256']=sha(out/'angular_heat.zip')
+    (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8')
     print(json.dumps(dict(faces=len(wall),outwardW=main['outwardW'],meshError=grids['powerDifference'],farError=far['powerDifference'])))
 
 
@@ -92,7 +98,7 @@ def fresh(job):
         solve(flow,memory_bytes=4*1024**3,output_bytes=2*1024**3)
         evaluate(flow,heat,spacing);flows.append(flow);heats.append(heat)
         if grid=='fine':evaluate(flow,job/'cross_heat',.004)
-    seal(flows,heats,job/'cross_heat',job/'result')
+    seal(flows,heats,job/'cross_heat',job/'result',include_angular=True)
 
 
 if __name__=='__main__':

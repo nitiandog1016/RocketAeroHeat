@@ -62,8 +62,8 @@ def dirichlet(matrix, rhs, fixed, values):
     return u,float(np.max(abs(residual))/scale)
 
 
-def transport(xy,tr,wet,axis,far,target,pe):
-    """轴对称 r 权重；外域入流强给温，出流自然扩散，绝热轴不加通量。"""
+def meridian_operator(xy,tr,wet,axis,far,target,pe):
+    """装配每弧度的显热算子与远场质量通量，供子午面和全周求解共用。"""
     v=xy[tr]
     edge=np.roll(v,-1,axis=1)-np.roll(v,1,axis=1)
     twice=np.cross(v[:,1]-v[:,0],v[:,2]-v[:,0])
@@ -93,6 +93,12 @@ def transport(xy,tr,wet,axis,far,target,pe):
     # 外域半圆从左到右为顺时针，外向质量流量为 -dψ。
     outward=-outward
     inlet=np.unique(np.column_stack((far[:-1],far[1:]))[outward<0])
+    return system,outward,inlet,psi_res,float(projection)
+
+
+def transport(xy,tr,wet,axis,far,target,pe):
+    """轴对称 r 权重；外域入流强给温，出流自然扩散，绝热轴不加通量。"""
+    system,outward,inlet,psi_res,projection=meridian_operator(xy,tr,wet,axis,far,target,pe)
     bound=np.r_[wet,inlet]
     theta,res=dirichlet(system,np.zeros(len(xy)),bound,np.r_[np.ones(len(wet)),np.zeros(len(inlet))])
     row=system@theta

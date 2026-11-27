@@ -2,11 +2,11 @@
 
 ## 简化运载火箭低速风洞工况
 
-2026-11-27。0.05 m/s 稳态轴对称风洞解覆盖 9,216 面、0.935517 m²，向外放热 0.87352 mW。全周粗网已跑通启动，两次无扰动步均未通过联合门槛，可信非定常观测 0 s。联合实测验证面积 0 m²。[全面积](validation/v350/RESULTS.md) · [探针](validation/v351/RESULTS.md) · [全周试算](validation/v352/RESULTS.md) · [下一项](validation/v352/NEXT_DECISION.md)
+2026-11-27。0.05 m/s 等温风洞解覆盖 9,216 面、0.935517 m²，放热 0.87352 mW。48 方位显热已复核全壁，峰值 452.5 MiB。速度仍为稳态轴对称，已验收非定常时长 0 s，联合实测验证面积 0 m²。[热网与工作台](validation/v353/RESULTS.md) · [尾迹试算](validation/v352/RESULTS.md) · [下一项](validation/v353/NEXT_DECISION.md)
 
-<!-- records:last_completed=v352 -->
+<!-- records:last_completed=v353 -->
 <!-- records:active=none -->
-<!-- records:base_commit=fe728cbfe9d645dffeb9e43915d5288a7473c8cd -->
+<!-- records:base_commit=7353f8bce7051afd2e53d02c30f09838a9095ba5 -->
 
 ## RFZ 独立计算与公开对照
 

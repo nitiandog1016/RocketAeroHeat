@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v353 低速风洞全周稳态热输运](validation/v353/RESULTS.md) · [周向热流曲线](validation/v353/circumference.png) · [下一项](validation/v353/NEXT_DECISION.md)
+
 - [v352 低速风洞全周尾迹可行性](validation/v352/RESULTS.md) · [两次无扰动试算](validation/v352/evidence.json) · [下一项](validation/v352/NEXT_DECISION.md)
 
 - [v351 低速风洞平底压力与鼻端换热的取样范围](validation/v351/RESULTS.md) · [逐网数表](../cases/simple_launcher/wind_tunnel_stations.json) · [下一项](validation/v351/NEXT_DECISION.md)
