@@ -15,9 +15,12 @@ end
 % 模块二：默认从当前模型独立新算。明确读取归档时，核对发布包、工况和壁面表指纹。
 job=fullfile(root,'outputs',['launcher_' char(java.util.UUID.randomUUID())]);
 action='solve';if isfield(cfg,'launcherAction'),action=validatestring(cfg.launcherAction,{'solve','archive'});end
+seal=struct;
+receiptFile=fullfile(folder,'receipt.json');
+if isfile(receiptFile),seal=jsondecode(fileread(receiptFile));end
 if strcmp(action,'archive')
-    zip=fullfile(folder,'wind_tunnel.zip');seal=jsondecode(fileread(fullfile(folder,'receipt.json')));
-    assert(strcmp(cm011FileSHA256(zip),seal.sha256),'RAH:Launcher:Archive','归档指纹不符。');
+    zip=fullfile(folder,'wind_tunnel.zip');
+    assert(isfield(seal,'sha256') && strcmp(cm011FileSHA256(zip),seal.sha256),'RAH:Launcher:Archive','归档指纹不符。');
     mkdir(job);
 else
     logPath=[job '.log'];
@@ -40,6 +43,28 @@ names=struct('sphericalNose','球形鼻端','cone','锥形头罩','cylinder','�
     'contraction','收缩肩','afterbody','尾段','base','平底');
 for g=def.regions',regions(g.firstFace:g.lastFace)=names.(g.name);end
 assert(all(strlength(regions)>0));
+% 模块四：按每个原面实际覆盖的范围标注读数，另列同一终帧的平底径向静压。
+% 壁面表始终保存面积平均值。原生流场中的测点值只用于探针说明。
+w.sampleScope=repmat("原三角面面积平均。",n,1);
+nose=regions==names.sphericalNose;
+axialDistanceMm=(max(v(:,1))-reshape(v(f(nose,:),1),[],3))*1000;
+w.sampleScope(nose)=compose("鼻端面平均；距鼻尖的轴向距离 %.3f 至 %.3f mm。", ...
+    min(axialDistanceMm,[],2),max(axialDistanceMm,[],2));
+base=regions==names.base;
+baseVertices=v(unique(f(base,:)),:);
+radiusMm=1000*max(hypot(baseVertices(:,2),baseVertices(:,3)));
+w.sampleScope(base)=sprintf('平底扇片面平均；径向范围为底心至外缘（0 至 %.1f mm）。',radiusMm);
+w.pressureSampleScope=w.sampleScope;
+studyFile=fullfile(folder,'wind_tunnel_stations.json');
+if isfile(studyFile) && isfield(seal,'stationsSHA256') && strcmp(cm011FileSHA256(studyFile),seal.stationsSHA256)
+    study=jsondecode(fileread(studyFile));grid=study.grids.outer;
+    if strcmp(study.surfaceSHA256,s.surfaceSHA256) && strcmp(grid.wallSHA256,s.wallSHA256) && ...
+            strcmp(grid.restartSHA256,s.runs.outer.restartSHA256)
+        stations=compose('%.3f R 处 %+.5f',study.tapRadiusOverBaseRadius(:),grid.tapGaugeMilliPa(:));
+        w.pressureSampleScope(base)=w.sampleScope(base)+" 同一流场的径向点值（相对环境，mPa）为 "+ ...
+            strjoin(stations,'，')+"。R 为底面半径。";
+    end
+end
 w.faceID=w.faceID-1;w.pressureGaugePa=w.pressurePa-c.ambientPressurePa;
 w.method=repmat("固定低速风洞数值解",n,1);
 w.pressureMethod=repmat("SU2 8.6.0 不可压恒密度层流壁压",n,1);

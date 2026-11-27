@@ -78,16 +78,22 @@ if isfield(mesh,'hybridWall')
         hybridScope=sprintf('%s 本次壁温 %.12g K，参照终帧 %s。',t.scope,t.wallTemperatureK,t.nativeFrameSHA256);
     end
     data.missingReason(isfinite(w.heatFluxWm2))={''};
-    add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridMethod(w,'pressureMethod'),hybridScope);
+    % 低速风洞按原三角面显示取样范围；旧快照沿用已有的工况说明。
+    pressureScopes={};heatScopes={};
+    if isfield(mesh,'launcherSummary') && all(ismember({'sampleScope','pressureSampleScope'},w.Properties.VariableNames))
+        heatScopes=cellstr(string(hybridScope)+" "+w.sampleScope);
+        pressureScopes=cellstr(string(hybridScope)+" "+w.pressureSampleScope);
+    end
+    add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridMethod(w,'pressureMethod'),hybridScope,pressureScopes);
     if isfield(mesh,'launcherSummary'),heatUnit='W/m²';heatScale=1;
     else,heatUnit='kW/m²';heatScale=1000;end
-    add('heatFlux','入壁热流',heatUnit,w.heatFluxWm2/heatScale,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope);
+    add('heatFlux','入壁热流',heatUnit,w.heatFluxWm2/heatScale,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope,heatScopes);
     if ismember('pressureGaugePa',w.Properties.VariableNames)
         delta=w.pressureGaugePa;
         sourceKey='pressureMethod';
         if ismember('pressureGaugeMethod',w.Properties.VariableNames),sourceKey='pressureGaugeMethod';end
         add('pressureGauge','相对环境壁压','Pa',delta,double(isfinite(delta)),hybridMethod(w,sourceKey), ...
-            '同工况壁面绝对压力与环境参考压力之差');
+            '同工况壁面绝对压力与环境参考压力之差',pressureScopes);
     end
     if ismember('wallFluidTemperatureK',w.Properties.VariableNames)
         fluidT=w.wallFluidTemperatureK;

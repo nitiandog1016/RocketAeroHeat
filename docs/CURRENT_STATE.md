@@ -2,11 +2,11 @@
 
 ## 简化运载火箭低速风洞工况
 
-2026-11-26。默认主模型改为完整光滑简化箭体。0.05 m/s 轴向来流下，全部 9,216 个原面、0.935517 m² 已有独立壁压和热流，整件向外放热 0.87352 mW，联合实验验证面积 0 m²。用户一次计算后查看全面积结果。[工况与验收](validation/v350/RESULTS.md) · [下一项](validation/v350/NEXT_DECISION.md)
+2026-11-27。0.05 m/s 轴向风洞工况已算出 9,216 面、0.935517 m² 的壁压与热流，向外放热 0.87352 mW。底心表压 +0.01124 mPa，底面平均 −0.02020 mPa。联合实测验证面积 0 m²。[全表面计算](validation/v350/RESULTS.md) · [探针与测量](validation/v351/RESULTS.md) · [下一项](validation/v351/NEXT_DECISION.md)
 
-<!-- records:last_completed=v350 -->
+<!-- records:last_completed=v351 -->
 <!-- records:active=none -->
-<!-- records:base_commit=efbd45b0d303980b549aaf5d8adbe820f33a4521 -->
+<!-- records:base_commit=3f499116370dd0162f7d2aeb66ff4a04610d48b9 -->
 
 ## RFZ 独立计算与公开对照
 
