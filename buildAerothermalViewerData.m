@@ -88,21 +88,38 @@ if isfield(mesh,'hybridWall')
         heatScopes=cellstr(string(hybridScope)+" "+w.sampleScope);
         pressureScopes=cellstr(string(hybridScope)+" "+w.pressureSampleScope);
     end
+    finePrimary=isfield(mesh,'launcherSummary') && isfield(mesh.launcherSummary,'primaryHeatGrid') && strcmp(mesh.launcherSummary.primaryHeatGrid,'fine');
+    if finePrimary
+        % 面元探针与逐面导出同时显示该面的取样范围和所在区的细网放热积分。
+        for name=unique(data.region(:))'
+            members=strcmp(data.region,name{1});
+            power=-1e6*sum(area(members).*w.heatFluxWm2(members));
+            heatScopes(members)=cellstr(string(heatScopes(members))+sprintf(' %s区域向外放热 %.6f µW。',name{1},power));
+        end
+    end
     add('pressure','壁面压力','kPa',w.pressurePa/1000,double(isfinite(w.pressurePa)),hybridMethod(w,'pressureMethod'),hybridScope,pressureScopes);
     if isfield(mesh,'launcherSummary'),heatUnit='W/m²';heatScale=1;
     else,heatUnit='kW/m²';heatScale=1000;end
     add('heatFlux','入壁热流',heatUnit,w.heatFluxWm2/heatScale,double(isfinite(w.heatFluxWm2)),hybridMethod(w,'heatFluxMethod'),hybridScope,heatScopes);
     % 低速瞬态原面热流：粗细网使用相同范围，细网减粗网使用以零为中心的色标。
-    if isfield(mesh,'launcherWakeHeatGrid')
-        grid=mesh.launcherWakeHeatGrid;
-        data.fields(end).label='入壁热流 · 粗热网';
-        dq=grid.heatFluxWm2-w.heatFluxWm2;
-        scope=sprintf('同一 0.600 s 速度终帧，48 方位，给定壁温。已归档细热网向外放热 %.6f mW。',1000*grid.outwardW);
-        if ~grid.baseHarmonic.identifiable
-            scope=[scope ' 底面弱扰动的一阶周向热信号未通过辨识门槛。'];
+    if finePrimary
+        data.fields(end).label='入壁热流 · 近壁细网';
+        if strcmp(mesh.launcherAction,'solve'),data.fields(end).computedStateLabel='本次细热网计算';
+        else,data.fields(end).computedStateLabel='已归档细热网计算';end
+    end
+    if isfield(mesh,'launcherWakeHeatGrid') || isfield(mesh,'launcherWakeCoarse')
+        if isfield(mesh,'launcherWakeCoarse')
+            grid=mesh.launcherWakeCoarse;key='wakeCoarseHeat';label='入壁热流 · 粗热网对照';
+            dq=w.heatFluxWm2-grid.heatFluxWm2;
+        else
+            grid=mesh.launcherWakeHeatGrid;key='wakeFineHeat';label='入壁热流 · 近壁细网';
+            data.fields(end).label='入壁热流 · 粗热网';
+            dq=grid.heatFluxWm2-w.heatFluxWm2;
         end
+        scope=sprintf('同一 0.600 s 速度终帧，48 方位，给定壁温。对照网格归档放热 %.6f mW。',1000*grid.outwardW);
+        scope=[scope ' 底面弱扰动的一阶周向热信号未通过步长辨识门槛。'];
         sampleScopes=cellstr(string(scope)+" "+w.sampleScope);
-        add('wakeFineHeat','入壁热流 · 近壁细网','W/m²',grid.heatFluxWm2,ones(n,1), ...
+        add(key,label,'W/m²',grid.heatFluxWm2,ones(n,1), ...
             repmat({'归档对照：三维守恒显热输运，BDF1 两半步末等温壁反力'},n,1),scope,sampleScopes);
         data.fields(end).computedStateLabel='同工况归档复核';
         add('wakeHeatDifference','入壁热流差 · 细网减粗网','W/m²',dq,ones(n,1), ...
@@ -110,7 +127,7 @@ if isfield(mesh,'hybridWall')
         data.fields(end).computedStateLabel='同面网格差值';
         both=[grid.heatFluxWm2;w.heatFluxWm2];
         data.comparisonColorRanges.heatFlux=[min(both) max(both)];
-        data.comparisonColorRanges.wakeFineHeat=data.comparisonColorRanges.heatFlux;
+        data.comparisonColorRanges.(key)=data.comparisonColorRanges.heatFlux;
         bound=max(abs(dq));
         if bound>0,data.comparisonColorRanges.wakeHeatDifference=[-bound bound];end
         data.wakeGridSources=rmfield(grid,'heatFluxWm2');
@@ -1089,7 +1106,11 @@ if isempty(histories)
         if strcmp(qf.unit,'W/m²'),scaleToWatts=1;
         else,assert(strcmp(qf.unit,'kW/m²'));scaleToWatts=1000;end
         data.wallCoverage=summarizeComputedWall(area,pf.status==1,qf.status==1,scaleToWatts*qf.values);
-        if isfield(mesh,'launcherWakeHeatGrid')
+        if isfield(mesh,'launcherWakeCoarse')
+            data.caseNote=sprintf('%s · 同面已算 %d/%d · 近壁细网放热 %.6f mW，粗网对照 %.6f mW', ...
+                data.caseNote,data.wallCoverage.jointComputedFaceCount,n, ...
+                -1e3*data.wallCoverage.wholeSurfaceHeatPowerW,1e3*mesh.launcherWakeCoarse.outwardW);
+        elseif isfield(mesh,'launcherWakeHeatGrid')
             data.caseNote=sprintf('%s · 同面已算 %d/%d · 向外放热：粗热网 %.6f mW，细热网 %.6f mW', ...
                 data.caseNote,data.wallCoverage.jointComputedFaceCount,n, ...
                 -1e3*data.wallCoverage.wholeSurfaceHeatPowerW,1e3*mesh.launcherWakeHeatGrid.outwardW);

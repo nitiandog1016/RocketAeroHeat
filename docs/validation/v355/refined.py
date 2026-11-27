@@ -78,20 +78,24 @@ def prepare(upstream,work):
     return result
 
 
-def launch_step(upstream,momentum,prepared,work,name):
+def launch_step(upstream,momentum,prepared,work,name,seed_directory=None,registered_frame=True,cached_modes=None):
     heat=work/"heat";dest=heat/name
     step=read(momentum/name/"step.json");frame=momentum/name/f"restart_{step['step']:05d}.csv"
     assert step["accepted"] and sha(frame)==step["frameSHA256"]
     index=ROOT/"cases/simple_launcher/wake/flow_index.json"
-    assert all(step[k]==v for k,v in read(index)[name].items())
+    if registered_frame:
+        assert all(step[k]==v for k,v in read(index)[name].items())
     dest.mkdir(parents=True,exist_ok=False)
-    initial=work/"initial/fields.npz";fine=work/"steady"
+    seed=work if seed_directory is None else seed_directory
+    initial=seed/"initial/fields.npz";fine=seed/"steady"
     paths=[DOC/"PLAN.md",PREVIOUS/"heat_step.py",PREVIOUS/"flux_transfer.py",ROOT/"scripts/simpleLauncherAngularHeat.py",
            index,frame,momentum/name/"step.json",prepared/"prepared.json",prepared/"control.csv",prepared/"stations.npz",
            initial,initial.parent/"results.json",fine/"temperature.npz",fine/"summary.json",upstream/"coarse/restart.csv"]
     if step["step"]==2:paths.append(heat/f"{step['branch']}_half_1/thermal.npz")
     cmd=[sys.executable,str(PREVIOUS/"heat_step.py"),str(upstream),str(momentum),str(prepared),str(heat),name,
          "--initial-field",str(initial),"--heat-folder",str(fine)]
+    if cached_modes is not None:
+        cmd.extend(["--cached-modes",str(cached_modes)])
     rec=observe(cmd,dest,{str(p):sha(p) for p in paths},240,300*1024**2)
     if rec["debuggerExitCode"] or rec["stopReason"] or rec["survivingProcessIDs"]:
         raise RuntimeError(f"{name} 未通过，详见 {dest/'debugger.log'}")

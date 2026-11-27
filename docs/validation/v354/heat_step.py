@@ -20,7 +20,7 @@ from simpleLauncherHeatMesh import sampler
 from simpleLauncherTemperature import transfer
 
 
-def advance(m,operators,old,dt):
+def advance(m,operators,old,dt,cached_modes=None):
     matrices,right,left,boundary,projection=operators
     n=len(m["xy"]);axis=m["axis"];wet=m["wet"];far=m["far"]
     off=np.ones(n,bool);off[axis]=False
@@ -52,17 +52,24 @@ def advance(m,operators,old,dt):
     size=int(free.sum());op=LinearOperator((size,size),matvec=matvec,dtype=float)
     rhs=pack(storage*(old-prescribed)-spatial(prescribed))[free]
     # 轴对称分块仅作线性预条件。完整残差含随方位变化的速度和周向平流项。
-    factors=[]
-    for k in range(SECTORS//2+1):
+    def factor_mode(k):
         mask=common_free.copy()
         if k:mask[axis]=False
         a=m["matrix"]+diags(storage+4*np.sin(k*ANGLE/2)**2*m["conductance"])
-        factors.append((mask,splu(a[mask][:,mask].tocsc())))
+        return mask,splu(a[mask][:,mask].tocsc())
+    modes=SECTORS//2+1
+    keep=modes if cached_modes is None else cached_modes
+    if not 0<=keep<=modes:
+        raise ValueError("常驻分块数量超出周向网格范围")
+    # 内存受限的工作台仅常驻低阶模态。其余使用相同矩阵、顺序及直接分解。
+    factors=[factor_mode(k) for k in range(keep)]
     def inverse(v):
         f=np.fft.rfft(lift(v),axis=0);sol=np.zeros_like(f)
-        for k,(mask,factor) in enumerate(factors):
+        for k in range(modes):
+            mask,factor=factors[k] if k<keep else factor_mode(k)
             b=f[k,mask];part=factor.solve(np.column_stack((b.real,b.imag)))
             sol[k,mask]=part[:,0]+1j*part[:,1]
+            del factor
         return pack(np.fft.irfft(sol,n=SECTORS,axis=0))[free]
     prec=LinearOperator((size,size),matvec=inverse,dtype=float)
     iterations=[]
@@ -122,7 +129,7 @@ def near_wall(m,theta,prepared):
     return near
 
 
-def run(flow_job,momentum,prepared,heat_root,name,initial_field=None,heat_folder=None):
+def run(flow_job,momentum,prepared,heat_root,name,initial_field=None,heat_folder=None,cached_modes=None):
     step=read(momentum/name/"step.json")
     frame=momentum/name/f"restart_{step['step']:05d}.csv"
     assert step["accepted"] and sha(frame)==step["frameSHA256"]
@@ -144,7 +151,7 @@ def run(flow_job,momentum,prepared,heat_root,name,initial_field=None,heat_folder
     dst=heat_root/name
     native=np.loadtxt(frame,delimiter=",",skiprows=1)
     operators=project(m,native)
-    theta,q,summary,ok=advance(m,operators,old,step["dtDU"])
+    theta,q,summary,ok=advance(m,operators,old,step["dtDU"],cached_modes)
     p,taps=surface_pressure(m,native)
     tri=m["corners"]
     area=np.linalg.norm(np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0]),axis=1)/2
@@ -169,5 +176,6 @@ if __name__=="__main__":
                                    for z,steps in (("full",1),("half",2)) for i in range(1,steps+1)])
     p.add_argument("--initial-field",type=Path)
     p.add_argument("--heat-folder",type=Path,help="同一粗速度终帧上单独建立的热网与稳态初场目录")
+    p.add_argument("--cached-modes",type=int,help="常驻内存的预条件分块数量，其余分块按需精确分解")
     a=p.parse_args()
-    sys.exit(0 if run(a.flow_job.resolve(),a.momentum.resolve(),a.prepared.resolve(),a.heat_root.resolve(),a.name,a.initial_field,a.heat_folder) else 2)
+    sys.exit(0 if run(a.flow_job.resolve(),a.momentum.resolve(),a.prepared.resolve(),a.heat_root.resolve(),a.name,a.initial_field,a.heat_folder,a.cached_modes) else 2)

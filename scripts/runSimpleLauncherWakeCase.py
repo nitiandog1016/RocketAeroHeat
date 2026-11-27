@@ -40,11 +40,11 @@ def saved_record(path):
         return {}
 
 
-def sources(job,allow_cached=True):
+def flow_sources(job,allow_cached=True):
     """只复用指纹已知的本机基流与初场。缺少时由冻结 STL 和风洞边界重新生成。"""
     ref=read(DOC.parent/"v352/baseline.json")["coarse"]
     old=read(DOC.parent/"v350/evidence.json")["fresh"]["runDirectory"]
-    upstream=ROOT/"outputs"/Path(old.replace("\\","/")).name
+    upstream=(ROOT/"outputs"/Path(old.replace("\\","/")).name).resolve()
     receipt=saved_record(upstream/"coarse/engine_process.json")
     condition_file=upstream/"coarse/condition.json"
     expected_wall=read(DOC.parent/"v353/evidence.json")["coarse"]["sourceFaceSHA256"]
@@ -62,12 +62,18 @@ def sources(job,allow_cached=True):
         evaluate(flow,upstream/"heat_coarse",.004)
     assert matches(upstream/"coarse/restart.csv",ref["flowSHA256"])
     assert matches(upstream/"heat_coarse/temperature.npz",ref["heatMeshSHA256"])
-    prepared=ROOT/"outputs/v352_validation/prepared01"
+    prepared=(ROOT/"outputs/v352_validation/prepared01").resolve()
     expected=read(DOC.parent/"v352/evidence.json")["geometry"]["files"]
     if not (allow_cached and saved_record(prepared/"prepared.json").get("files")==expected and
             all(matches(prepared/name,digest) for name,digest in expected.items())):
         prepared=job/"prepared"
         prepare_full(prepared,upstream)
+    return upstream,prepared
+
+
+def sources(job,allow_cached=True):
+    upstream,prepared=flow_sources(job,allow_cached)
+    ref=read(DOC.parent/"v352/baseline.json")["coarse"]
     initial=ROOT/"outputs/v353_validation/coarse01/fields.npz"
     seed_record=saved_record(initial.parent/"results.json")
     if not (allow_cached and seed_record.get("accepted") and seed_record.get("sourceFlowSHA256")==ref["flowSHA256"] and
@@ -86,20 +92,22 @@ def flow_available(folder,index,prepared):
         rec=saved_record(f/"step.json");n=rec.get("step")
         run=saved_record(f/"debugger_process.json")
         if not (rec.get("accepted") and isinstance(n,int) and run.get("status")=="terminal" and
-                run.get("debuggerExitCode")==0 and not (run.get("stopReason") or run.get("survivingProcessIDs")) and
+                run.get("debuggerExitCode")==0 and not (run.get("stopReason") or run.get("survivingProcessIDs") or run.get("supervisorError")) and
+                run.get("inputsStable") and all(run["inputsStable"].values()) and
+                run.get("inputSHA256",{}).get(str(f/f"seed_{n-1:05d}.csv"))==expected["seedSHA256"] and
                 all(rec.get(k)==v for k,v in expected.items())):return False
         checks={f"restart_{n:05d}.csv":"frameSHA256",f"seed_{n-1:05d}.csv":"seedSHA256",
                 f"history_{n:05d}.csv":"historySHA256","mesh.su2":"meshSHA256"}
         if not all(matches(f/key,rec[identity]) for key,identity in checks.items()):return False
         if rec["meshSHA256"]!=read(prepared/"prepared.json")["files"]["mesh.su2"]:return False
-    return len(index)==6
+    return bool(index)
 
 
 def fresh(job,allow_cached=True):
     job.relative_to(ROOT/"outputs");job.mkdir(parents=True,exist_ok=False)
     upstream,prepared,initial=sources(job,allow_cached)
     index=read(CASE/"wake/flow_index.json")
-    flow=ROOT/"outputs/v354_validation/flow01"
+    flow=(ROOT/"outputs/v354_validation/flow01").resolve()
     reused=allow_cached and flow_available(flow,index,prepared)
     if not reused:flow=job/"flow"
     heat=job/"heat"
@@ -129,5 +137,11 @@ def fresh(job,allow_cached=True):
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument("job",type=Path)
-    parser.add_argument("--from-start",action="store_true",help="从模型与风洞边界重新生成初场并推进全部动量步")
-    args=parser.parse_args();fresh(args.job.resolve(),not args.from_start)
+    parser.add_argument("--from-start",action="store_true",help="从模型与风洞边界重建初场并推进所需动量步")
+    parser.add_argument("--coarse-study",action="store_true",help="复现 v354 粗热网的整步与半步对照")
+    args=parser.parse_args()
+    if args.coarse_study:
+        fresh(args.job.resolve(),not args.from_start)
+    else:
+        from simpleLauncherWakePrimary import solve_fine
+        solve_fine(args.job.resolve(),not args.from_start)

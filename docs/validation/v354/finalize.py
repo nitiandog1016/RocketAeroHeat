@@ -18,43 +18,50 @@ def read(path):
     return json.loads(path.read_bytes())
 
 
+def read_step(flow,heat,branch,size,step,area,definition):
+    """核对一个实际动量步与同刻热步的源帧、终态、原面覆盖及分区积分。"""
+    name=f"{branch}_{size}_{step}";f=flow/name;t=heat/name
+    a=read(f/"step.json");b=read(t/"heat.json")
+    for path in (f,t):
+        rec=read(path/"debugger_process.json")
+        assert rec["status"]=="terminal" and rec["debuggerExitCode"]==0 and all(rec["inputsStable"].values())
+        assert not (rec["stopReason"] or rec["survivingProcessIDs"] or rec["supervisorError"])
+    assert a["accepted"] and max(a["last20Maximum"].values())< -8 and b["accepted"]
+    for field in ("branch","stepSize","step","elapsedPhysicalS"):assert a[field]==b[field]
+    assert (branch,size,step)==(a["branch"],a["stepSize"],a["step"])
+    assert sha(f/f"restart_{step:05d}.csv")==b["sourceFrameSHA256"]==a["frameSHA256"]
+    assert sha(f/f"history_{step:05d}.csv")==a["historySHA256"]
+    assert sha(t/"thermal.npz")==b["fieldSHA256"] and sha(t/"wall.csv")==b["wallSHA256"]
+    assert b["relativeEnergyImbalance"]<.005 and b["originalResidual"]<1e-8 and b["normalizedDivergence"]<1e-8
+    assert b["relativeProjection"]<.05 and b["minTheta"]>=-1e-12 and b["maxTheta"]<=1+1e-12
+    table=np.loadtxt(t/"wall.csv",delimiter=",",skiprows=1)
+    np.testing.assert_array_equal(table[:,0],np.arange(1,len(area)+1))
+    np.testing.assert_allclose(table[:,1],area,rtol=0,atol=1e-15)
+    assert np.isfinite(table).all() and table[:,2].min()>0
+    assert abs(-area@table[:,3]-b["outwardW"])<1e-13
+    for group in definition["regions"]:
+        s=slice(group["firstFace"]-1,group["lastFace"])
+        assert abs(-area[s]@table[s,3]-b["regionW"][group["name"]])<1e-13
+    record=dict(flow=a,heat={k:v for k,v in b.items() if k!="baseTapGaugeMilliPa"},
+                heatSeconds=rec["elapsedSeconds"],heatPeakRSSBytes=rec["peakFamilyRSSBytes"])
+    return table,record
+
+
 def audit_steps(flow,heat):
     definition,tri,_,_=geometry()
     area=np.linalg.norm(np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0]),axis=1)/2
     tables={};records={};comparisons={}
     for branch in ("control","disturbed"):
         for size,step in (("full",1),("half",1),("half",2)):
-            name=f"{branch}_{size}_{step}";f=flow/name;t=heat/name
-            a=read(f/"step.json");b=read(t/"heat.json")
-            for path in (f,t):
-                rec=read(path/"debugger_process.json")
-                assert rec["status"]=="terminal" and rec["debuggerExitCode"]==0 and all(rec["inputsStable"].values())
-                assert not (rec["stopReason"] or rec["survivingProcessIDs"] or rec["supervisorError"])
-            assert a["accepted"] and max(a["last20Maximum"].values())< -8 and b["accepted"]
-            for field in ("branch","stepSize","step","elapsedPhysicalS"):assert a[field]==b[field]
-            assert (branch,size,step)==(a["branch"],a["stepSize"],a["step"])
-            assert sha(f/f"restart_{step:05d}.csv")==b["sourceFrameSHA256"]==a["frameSHA256"]
-            assert sha(f/f"history_{step:05d}.csv")==a["historySHA256"]
-            assert sha(t/"thermal.npz")==b["fieldSHA256"] and sha(t/"wall.csv")==b["wallSHA256"]
-            assert b["relativeEnergyImbalance"]<.005 and b["originalResidual"]<1e-8 and b["normalizedDivergence"]<1e-8
-            assert b["relativeProjection"]<.05 and b["minTheta"]>=-1e-12 and b["maxTheta"]<=1+1e-12
-            table=np.loadtxt(t/"wall.csv",delimiter=",",skiprows=1)
-            np.testing.assert_array_equal(table[:,0],np.arange(1,len(area)+1))
-            np.testing.assert_allclose(table[:,1],area,rtol=0,atol=1e-15)
-            assert np.isfinite(table).all() and table[:,2].min()>0
-            assert abs(-area@table[:,3]-b["outwardW"])<1e-13
+            name=f"{branch}_{size}_{step}"
+            tables[name],records[name]=read_step(flow,heat,branch,size,step,area,definition)
+            a=records[name]["flow"];b=records[name]["heat"]
             if step==2:
                 prior=records[f"{branch}_half_1"]
                 assert prior["flow"]["frameSHA256"]==a["seedSHA256"] and prior["heat"]["fieldSHA256"]==b["initialThetaSHA256"]
             elif size=="half":
                 prior=records[f"{branch}_full_1"]
                 assert prior["flow"]["seedSHA256"]==a["seedSHA256"] and prior["heat"]["initialThetaSHA256"]==b["initialThetaSHA256"]
-            for group in definition["regions"]:
-                s=slice(group["firstFace"]-1,group["lastFace"])
-                assert abs(-area[s]@table[s,3]-b["regionW"][group["name"]])<1e-13
-            tables[name]=table
-            records[name]=dict(flow=a,heat={k:v for k,v in b.items() if k!="baseTapGaugeMilliPa"},
-                heatSeconds=rec["elapsedSeconds"],heatPeakRSSBytes=rec["peakFamilyRSSBytes"])
         full=tables[f"{branch}_full_1"];half=tables[f"{branch}_half_2"]
         r=records[f"{branch}_full_1"];s=records[f"{branch}_half_2"]
         assert r["flow"]["elapsedPhysicalS"]==s["flow"]["elapsedPhysicalS"]

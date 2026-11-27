@@ -22,21 +22,35 @@ caseFolder=folder;script='runSimpleLauncherCase.py';
 if wake,caseFolder=fullfile(folder,'wake');script='runSimpleLauncherWakeCase.py';end
 receiptFile=fullfile(caseFolder,'receipt.json');
 if isfile(receiptFile),seal=jsondecode(fileread(receiptFile));end
+fineArchive=wake && strcmp(action,'archive') && isfield(seal,'fineSummarySHA256');
 if strcmp(action,'archive')
-    zip=fullfile(caseFolder,'wind_tunnel.zip');
-    assert(isfield(seal,'sha256') && strcmp(cm011FileSHA256(zip),seal.sha256),'RAH:Launcher:Archive','归档指纹不符。');
+    if fineArchive
+        zip=fullfile(caseFolder,'wake_heat_grid.zip');expected=seal.wakeHeatGridSHA256;
+    else
+        zip=fullfile(caseFolder,'wind_tunnel.zip');expected=seal.sha256;
+    end
+    assert(strcmp(cm011FileSHA256(zip),expected),'RAH:Launcher:Archive','归档指纹不符。');
     mkdir(job);
 else
     logPath=[job '.log'];
     runCM011Python({fullfile(root,'scripts',script),job},logPath,@heartbeat);
     zip=fullfile(job,'result','wind_tunnel.zip');
+    runSeal=jsondecode(fileread(fullfile(job,'result','receipt.json')));
+    assert(strcmp(cm011FileSHA256(zip),runSeal.sha256),'RAH:Launcher:Snapshot','新算结果包与任务回执不符。');
 end
 data=fullfile(job,'wall');unzip(zip,data);
-s=jsondecode(fileread(fullfile(data,'summary.json')));s.condition.velocityMps=reshape(s.condition.velocityMps,1,3);
+if fineArchive
+    meta=fullfile(caseFolder,'fine_primary.json');wallFile=fullfile(data,'fine_wall.csv');
+    assert(strcmp(cm011FileSHA256(meta),seal.fineSummarySHA256),'RAH:Launcher:Archive','细热网摘要指纹不符。');
+else
+    meta=fullfile(data,'summary.json');wallFile=fullfile(data,'wall.csv');
+end
+s=jsondecode(fileread(meta));s.condition.velocityMps=reshape(s.condition.velocityMps,1,3);
+fine=wake && isfield(s,'primaryHeatGrid') && strcmp(s.primaryHeatGrid,'fine');
 assert(s.accepted && isequaln(s.condition,c) && strcmp(s.surfaceSHA256,def.fileSHA256) && ...
-    strcmp(cm011FileSHA256(fullfile(data,'wall.csv')),s.wallSHA256),'RAH:Launcher:Snapshot','工况或面表指纹不符。');
+    strcmp(cm011FileSHA256(wallFile),s.wallSHA256),'RAH:Launcher:Snapshot','工况或面表指纹不符。');
 % 模块三：从原面面积独立复算整件功率，科研工作台按变量显示各自的来源。
-w=readtable(fullfile(data,'wall.csv'));assert(isequal(w.faceID,(1:n)') && height(w)==n);
+w=readtable(wallFile);assert(isequal(w.faceID,(1:n)') && height(w)==n);
 f=mesh.F;v=mesh.V;area=vecnorm(cross(v(f(:,2),:)-v(f(:,1),:),v(f(:,3),:)-v(f(:,1),:),2),2,2)/2;
 assert(max(abs(area-w.areaM2))<1e-10 && all(w.pressurePa>0) && all(isfinite(w.nearWallK)));
 report=summarizeComputedWall(area,isfinite(w.pressurePa),isfinite(w.heatFluxWm2),w.heatFluxWm2);
@@ -45,7 +59,12 @@ assert(report.fullSurfaceComputed && abs(report.wholeSurfaceHeatPowerW+s.outward
 regions=strings(n,1);
 names=struct('sphericalNose','球形鼻端','cone','锥形头罩','cylinder','圆柱箭身', ...
     'contraction','收缩肩','afterbody','尾段','base','平底');
-for g=def.regions',regions(g.firstFace:g.lastFace)=names.(g.name);end
+for g=def.regions'
+    ids=g.firstFace:g.lastFace;regions(ids)=names.(g.name);
+    if fine
+        assert(abs(area(ids)'*w.heatFluxWm2(ids)+s.regionW.(g.name))<1e-12,'RAH:Launcher:Region','原面分区积分不符。');
+    end
+end
 assert(all(strlength(regions)>0));
 % 模块四：按每个原面实际覆盖的范围标注读数，另列同一终帧的平底径向静压。
 % 壁面表始终保存面积平均值。原生流场中的测点值只用于探针说明。
@@ -82,6 +101,10 @@ if wake
     w.pressureMethod(:)="SU2 8.6.0 三维恒密度无滑移动量，BDF1 两半步末壁压";
     w.heatFluxMethod(:)="三维守恒质量通量、周期周向输运、BDF1 流体储热和强等温壁反力";
     w.nearWallTemperatureMethod(:)="同一末时刻的三维显热场插值至首层流体节点后映射到原面";
+    if fine
+        w.heatFluxMethod(:)="近壁细热网，三维守恒显热输运、BDF1 两半步末等温壁反力";
+        w.nearWallTemperatureMethod(:)="本时刻细热网温度插值至首层流体节点后按原面面积平均";
+    end
 else
     flowFrame=s.runs.outer.restartSHA256;
 end
@@ -95,6 +118,10 @@ if wake
     result.evidenceIdentity.sourceFrame.thermalSHA256=s.thermalFrameSHA256;
     result.evidenceIdentity.sourceFrame.initialFlowSHA256=s.initialFlowSHA256;
     result.evidenceIdentity.sourceFrame.initialThermalSHA256=s.initialThermalSHA256;
+    if fine
+        result.evidenceIdentity.sourceFrame.heatMeshSHA256=s.heatMeshSHA256;
+        result.evidenceIdentity.scope=[c.scope ' 近壁细热网。底面弱扰动的一阶周向热信号未通过步长辨识门槛。'];
+    end
 end
 % 模块五：按本次速度终帧和面表绑定全周热网复核。旧归档仍然可读。
 comparisonFolder=fileparts(zip);
@@ -120,7 +147,26 @@ if isfield(comparisonSeal,'angularHeatSHA256')
     result.launcherAngularHeat=a;
 end
 % 模块六：将已归档的近壁热网试验与当前粗热网终帧配对。新算时仍标为归档对照。
-if wake && isfield(seal,'wakeHeatGridSHA256')
+if fine && isfield(seal,'sha256') && isfile(fullfile(caseFolder,'wind_tunnel.zip'))
+    % 对照来自旧粗热网归档。读档与新算都只按相同原面、边界和速度终帧配对。
+    coarsePack=fullfile(caseFolder,'wind_tunnel.zip');
+    if strcmp(cm011FileSHA256(coarsePack),seal.sha256)
+        sub=fullfile(job,'wake_coarse');unzip(coarsePack,sub);
+        coarse=jsondecode(fileread(fullfile(sub,'summary.json')));
+        coarse.condition.velocityMps=reshape(coarse.condition.velocityMps,1,3);
+        path=fullfile(sub,'wall.csv');
+        if coarse.accepted && isequaln(coarse.condition,c) && strcmp(coarse.surfaceSHA256,s.surfaceSHA256) && ...
+                strcmp(coarse.sourceFrameSHA256,s.sourceFrameSHA256) && strcmp(coarse.initialFlowSHA256,s.initialFlowSHA256) && ...
+                strcmp(coarse.flowMeshSHA256,s.flowMeshSHA256) && strcmp(cm011FileSHA256(path),coarse.wallSHA256)
+            tab=readtable(path);
+            assert(isequal(tab.faceID,(1:n)') && isequal(w.pressurePa,tab.pressurePa) && ...
+                max(abs(area-tab.areaM2))<1e-10 && all(isfinite(tab.heatFluxWm2)) && ...
+                abs(area'*tab.heatFluxWm2+coarse.outwardW)<1e-12,'RAH:Launcher:GridFaces','粗热网对照面表不符。');
+            result.launcherWakeCoarse=struct('heatFluxWm2',tab.heatFluxWm2,'outwardW',coarse.outwardW, ...
+                'flowSHA256',coarse.sourceFrameSHA256,'wallSHA256',coarse.wallSHA256,'thermalSHA256',coarse.thermalFrameSHA256);
+        end
+    end
+elseif ~fine && wake && isfield(seal,'wakeHeatGridSHA256')
     pack=fullfile(caseFolder,'wake_heat_grid.zip');
     assert(strcmp(cm011FileSHA256(pack),seal.wakeHeatGridSHA256),'RAH:Launcher:GridArchive','近壁热网复核包指纹不符。');
     sub=fullfile(job,'wake_heat_grid');unzip(pack,sub);

@@ -715,7 +715,7 @@ renderEditor();sync();showGeometry(true);
                         controls.readLauncher=button(grid,2,'查看已算的同工况结果',@(~,~)solveCase([],[],'archive'));
                     end
                     if transient
-                        tip(grid,3,'推进至 0.600 s，核对整步与两半步。已验收的同源动量帧可复用，显热和储热重新计算。');
+                        tip(grid,3,'用两个 0.300 s 时间步计算近壁细网热流。结果包含 0.600 s 的全表面壁压、热流和首层流体温度。');
                     else
                         tip(grid,3,'程序从当前模型和风洞边界独立计算，并核对网格误差和热量收支。');
                     end

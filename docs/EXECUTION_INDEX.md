@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v356 低速风洞侧栏直接计算近壁细网主结果](validation/v356/RESULTS.md) · [缺档、有缓存及读档的实际回执](validation/v356/evidence.json) · [下一项](validation/v356/NEXT_DECISION.md)
+
 - [v355 低速风洞 0.600 s 全表面热流的近壁网格对照](validation/v355/RESULTS.md) · [工作台回执](validation/v355/workflow.json) · [下一项](validation/v355/NEXT_DECISION.md)
 
 - [v354 低速尾迹扰动 0.600 s 的全面积壁压与热流](validation/v354/RESULTS.md) · [逐步能量账与步长对照](validation/v354/evidence.json) · [下一项](validation/v354/NEXT_DECISION.md)
