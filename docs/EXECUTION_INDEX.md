@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v363 六区同工况证据与飞行档案原面拾取](validation/v363/RESULTS.md) · [分区及原面状态](validation/v363/regions.json) · [下一项](validation/v363/NEXT_DECISION.md)
+
 - [v362 球体速度势与两种壁压的独立对照](validation/v362/RESULTS.md) · [M0.30 理论差额](validation/v362/mach030.json) · [下一项](validation/v362/NEXT_DECISION.md)
 
 - [v361 低亚声速无黏球体动量与飞行记录侧栏](validation/v361/RESULTS.md) · [加密网误差](validation/v361/sphere_fine.json) · [下一项](validation/v361/NEXT_DECISION.md)

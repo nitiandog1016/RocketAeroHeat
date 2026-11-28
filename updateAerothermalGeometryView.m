@@ -69,6 +69,12 @@ if isfield(options,'selectedFaces') && ~isempty(options.selectedFaces)
         all(ids==fix(ids)) && all(ids>=1 & ids<=size(F,1)),'几何选区含无效面号。');
     payload.selectedFaceIDs=num2cell(double(ids(:)')-1);
 end
+% 单独描出被点选的三角面，网页探针使用零基索引，区域线框仍可同时显示。
+if isfield(options,'inspectedFace') && ~isempty(options.inspectedFace)
+    id=options.inspectedFace;
+    validateattributes(id,{'numeric'},{'real','finite','scalar','integer','>=',1,'<=',size(F,1)});
+    payload.inspectedFace=double(id)-1;
+end
 state.payload=payload;state.revision=revision;state.rendered=[];state.error=[];
 view.html.UserData=state;view.html.Data=payload;
 end

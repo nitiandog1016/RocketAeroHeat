@@ -224,6 +224,11 @@ renderEditor();sync();showGeometry(true);
         rfzProbe=isfield(m,'rfzRegions') && (isempty(state.mesh) || isRFZSurface());
         if rfzProbe,caption='DLR RFZ-REC · 点击三角面查看 CAD 面号与面积';end
         options=struct('showWire',state.currentStep==2,'resetCamera',reset,'enableFaceProbe',rfzProbe,'selectedFaces',rfzSelectedFaces);
+        if state.currentStep==4 && ~isempty(launcherFlightReview) && ~isempty(launcherFlightReview.regionAudit)
+            options.enableFaceProbe=true;options.selectedFaces=launcherFlightReview.selectedFaces;
+            options.inspectedFace=launcherFlightReview.inspectedFace;
+            caption=launcherFlightReview.caption;
+        end
         if rfzNodesOpen && hasRFZAir() && state.currentStep==4
             caption='原面邻点温界 · 线框标出选中的原面';
         elseif isRFZSurface() && state.currentStep>=3 && state.boundaryConfirmed
@@ -710,17 +715,23 @@ renderEditor();sync();showGeometry(true);
             case 4
                 if isLauncherTunnel()
                     if ~isempty(launcherFlightReview)
-                        grid=form(14);
+                        grid=form(15);
                         controls.backToTunnel=button(grid,1,'返回当前风洞工况',@(~,~)go(4));
                         mach=cellfun(@(entry)entry.mach,launcherFlightReview.cases)';
                         controls.flightRecord=choice(grid,2,'飞行记录 · v358',cellstr(compose('M %.2f',mach)),mach,mach(1));
-                        controls.flightRecord.ValueChangedFcn=@updateFlightRecord;
-                        controls.flightCondition=tip(grid,3,'');
+                        controls.flightRecord.ValueChangedFcn=@(~,~)updateFlightRecord();
+                        if ~isempty(launcherFlightReview.regionAudit)
+                            regions=launcherFlightReview.regionAudit.regions;
+                            controls.flightRegion=choice(grid,3,'查看范围',[{'全表面'} {regions.label}], ...
+                                [{'all'} {regions.key}],'all');
+                            controls.flightRegion.ValueChangedFcn=@(~,~)updateFlightRecord();
+                        end
+                        controls.flightCondition=tip(grid,4,'');
                         controls.flightCoverage=uitable(grid,'ColumnName',{'场量与状态','面数','面积占比'}, ...
                             'RowName',{},'ColumnWidth',{'auto','auto','auto'});
-                        controls.flightCoverage.Layout.Row=[6 9];controls.flightCoverage.Layout.Column=[1 2];
+                        controls.flightCoverage.Layout.Row=[7 10];controls.flightCoverage.Layout.Column=[1 2];
                         controls.flightNote=uitextarea(grid,'Editable','off');
-                        controls.flightNote.Layout.Row=[10 14];controls.flightNote.Layout.Column=[1 2];
+                        controls.flightNote.Layout.Row=[11 15];controls.flightNote.Layout.Column=[1 2];
                         updateFlightRecord();sync();return
                     end
                     grid=form(12);controls.run=button(grid,1,'计算低速风洞全表面结果',@solveCase);
@@ -2139,6 +2150,15 @@ renderEditor();sync();showGeometry(true);
                 'a210e58a3233596764be347ca2eb2bc89a3f51b9f96d97f1212ebb68bca74970');
             archive.compressibility=readFlightCheck('v362','mach030.json', ...
                 '8ea9cd2188722ccff53271f5fccfaaa99cc2486ab52fd2dc861dbaa63990b736');
+            archive.regionAudit=readFlightCheck('v363','regions.json', ...
+                '1b9ab112cd58d48aaa5010672b2f7248d3df3e4d7e5b53e86c9500d452a14794');
+            % 逐面高亮需要当前网格与导入的原面保持相同顶点、顺序和坐标。
+            if ~isempty(archive.regionAudit) && ~(strcmp(archive.regionAudit.surfaceSHA256,archive.surfaceSHA256) && ...
+                    isequal(state.mesh.F,state.rawMesh.F) && isequal(size(state.mesh.V),size(state.rawMesh.V)) && ...
+                    max(abs(state.mesh.V-state.rawMesh.V),[],'all')<1e-10)
+                archive.regionAudit=[];
+            end
+            archive.selectedFaces=[];archive.inspectedFace=[];archive.caption='';
             launcherFlightReview=archive;
             renderEditor();sync();
         catch ex
@@ -2153,46 +2173,82 @@ renderEditor();sync();showGeometry(true);
             data=jsondecode(fileread(path));
         end
     end
-    function updateFlightRecord(~,~)
-        % 模块用途：从同一条运行回执取来流和面积，来流阶段退出显示为未返回面场。
+    function updateFlightRecord(face)
+        % 模块用途：全表面和分区共用同一工况回执，面号只用于定位原 STL。
+        if nargin==0,face=[];end
         cases=launcherFlightReview.cases;
         entry=cases{cellfun(@(entry)entry.mach,cases)==controls.flightRecord.Value};
-        c=entry.coverage;
+        c=entry.coverage;region=[];
+        scope=sprintf('%d 个原面 · %.6f m²',c.faces,c.areaM2);
+        launcherFlightReview.selectedFaces=[];launcherFlightReview.inspectedFace=face;
+        launcherFlightReview.caption='飞行记录 · 点击模型可查看该原面的区域和档案覆盖';
+        controls.flightCoverage.ColumnName={'场量与状态','面数','全表面占比'};
+        if isfield(controls,'flightRegion') && ~strcmp(controls.flightRegion.Value,'all')
+            key=controls.flightRegion.Value;regions=launcherFlightReview.regionAudit.regions;
+            region=regions(strcmp({regions.key},key));c=entry.regions.(key);
+            scope=sprintf('%s · %d 面 · %.6f m²（全表面 %.2f%%）',region.label,c.faces,c.areaM2,region.percentOfBody);
+            launcherFlightReview.selectedFaces=region.firstFace:region.lastFace;
+            launcherFlightReview.caption=sprintf('%s · 原面 %d–%d · 区域定位',region.label,region.firstFace,region.lastFace);
+            controls.flightCoverage.ColumnName={'场量与状态','面数','区内面积比'};
+        end
         controls.flightCondition.Text=sprintf(['高度 %.0f m · 给定壁温 %.0f K\n' ...
-            '来流 %.2f m/s · %.2f K · %.0f Pa\n%d 个原面 · %.6f m²'], ...
+            '来流 %.2f m/s · %.2f K · %.0f Pa\n%s'], ...
             entry.altitudeM,entry.wallGivenK,entry.speedMps,entry.freeTemperatureK, ...
-            entry.freePressurePa,c.faces,c.areaM2);
+            entry.freePressurePa,scope);
         labels={'计算壁压';'工程热流';'两者同面';'给定壁压'};
         if entry.solverReturned
             faces=[c.computedPressureFaces;c.heatFaces;c.jointFaces;c.prescribedPressureFaces];
             area=[c.computedPressureAreaM2;c.heatAreaM2;c.jointAreaM2;c.prescribedPressureAreaM2];
             controls.flightCoverage.Data=[labels,cellstr(compose('%d',faces)),cellstr(compose('%.2f%%',100*area/c.areaM2))];
-            note={'整件热功率未知。已有局部工程值，预测精度待验证。'; ...
+            note={'整件热功率未知。该工况返回了局部工程值，预测精度待验证。'; ...
                 ['压力方法 · ' entry.pressureMethod];['热流方法 · ' entry.heatMethod]; ...
                 ['压力适用范围 · ' char(strjoin(string(entry.pressureScope),newline))]; ...
                 ['热流适用范围 · ' char(strjoin(string(entry.heatScope),newline))]};
         else
             controls.flightCoverage.Data=[labels,repmat({'—'},numel(labels),2)];
             note={'工程程序在来流阶段退出，未返回面场。整件热功率未知。'};
-            if entry.mach==0.30 && ~isempty(launcherFlightReview.potential)
+            if isempty(region) && entry.mach==0.30 && ~isempty(launcherFlightReview.potential)
                 s=launcherFlightReview.potential.commonNodes;
                 note{end+1}=sprintf(['v362 · 理想球体对照，129 个共同极角。势流壁速 RMS 误差 %.3f%%，' ...
                     '伯努利压力最大 Cp 误差 %.4f，通过。原生泊松压力最大 Cp 误差 %.3f，未通过。'], ...
                     100*s.tangentialRMS,s.bernoulli.maxAbsCp,s.nativePoisson.maxAbsCp);
             end
-            if entry.mach==0.30 && ~isempty(launcherFlightReview.compressibility)
+            if isempty(region) && entry.mach==0.30 && ~isempty(launcherFlightReview.compressibility)
                 d=launcherFlightReview.compressibility.computedIncompressibleVsMach030;
                 note{end+1}=sprintf(['同一球体与 M0.30 可压缩理论比较，最大 Cp 差 %.4f。' ...
                     '飞行模型的附着区与壁面热流仍待核对。'],d.cp.maxAbs);
             end
-            if entry.mach==0.30 && ~isempty(launcherFlightReview.sphere)
+            if isempty(region) && entry.mach==0.30 && ~isempty(launcherFlightReview.sphere)
                 s=launcherFlightReview.sphere;
                 note{end+1}=sprintf(['v361 · 加密网无黏球体对照：最大压力系数误差 %.3f（门槛 0.10），' ...
                     '切向速度 RMS 误差 %.3f 倍来流速度（门槛 0.03）。'], ...
                     s.pressureCoefficientMax,s.tangentialVelocityRMS);
             end
         end
+        if ~isempty(region)
+            note=[{sprintf('原面 %d–%d · X = %.4f 至 %.4f m',region.firstFace,region.lastFace,region.xMinM,region.xMaxM)};note(:)];
+            if entry.mach==launcherFlightReview.regionAudit.mach
+                note=[{['本区流动状态' region.flowState '。' region.note]};note];
+                domain=region.windDomain;
+                note{end+1}=sprintf(['同形稳态风洞（0.05 m/s），远界从 14D 扩至 22D。' ...
+                    '本区壁压 RMS 差为风洞动压的 %.4f%%，放热功率差 %.4f%%。M0.30 的外域误差未知。'], ...
+                    domain.pressureRmsPercentDynamic,domain.powerDifferencePercent);
+            end
+            if ~isempty(face)
+                faceText=sprintf('选中原面 %d · 面积 %.7g m²',face,state.mesh.area(face));
+                if entry.solverReturned
+                    states=launcherFlightReview.regionAudit.faceStates;
+                    field=states([states.mach]==entry.mach);
+                    slot=find(face<=field.lastFace,1);
+                    pStatus={'缺项','工程计算','给定'};qStatus={'缺项','工程计算'};
+                    faceText=sprintf('%s\n该面壁压 · %s，热流 · %s',faceText, ...
+                        pStatus{1+field.pressureState(slot)},qStatus{1+double(field.heatComputed(slot))});
+                end
+                note=[{faceText};note];
+            end
+        end
         controls.flightNote.Value=note;
+        if ~isempty(launcherFlightReview.regionAudit),showGeometry(false);end
     end
     function yes=isShortSupport()
         yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'shortSupport65');
@@ -2458,6 +2514,18 @@ renderEditor();sync();showGeometry(true);
             selectRFZSample(double(data.sampleIndex)+1,false);return
         end
         if isstruct(data) && isfield(data,'kind') && strcmp(data.kind,'geometry-face-probe')
+            if state.currentStep==4 && ~isempty(launcherFlightReview) && isfield(controls,'flightRegion')
+                % 延迟到达的旧帧拾取不能修改新工况或新网格的选区。
+                if ~getOption(src.UserData.payload,'enableFaceProbe',false) || ...
+                        ~isequal(getOption(data,'revision',[]),src.UserData.revision),return;end
+                index=getOption(data,'faceIndex',[]);
+                if ~isnumeric(index) || ~isscalar(index) || ~isreal(index) || ~isfinite(index) || ...
+                        index~=fix(index) || index<0 || index>=size(state.mesh.F,1),return;end
+                face=double(index)+1;regions=launcherFlightReview.regionAudit.regions;
+                r=regions(face>=[regions.firstFace] & face<=[regions.lastFace]);
+                if isscalar(r),controls.flightRegion.Value=r.key;updateFlightRecord(face);end
+                return
+            end
             if isfield(state.rawMesh,'rfzRegions') && (isempty(state.mesh) || isRFZSurface()) && ...
                     getOption(src.UserData.payload,'enableFaceProbe',false) && ...
                     isfield(data,'revision') && data.revision==src.UserData.revision && isfield(data,'faceIndex')
