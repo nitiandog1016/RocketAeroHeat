@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v370 M0.30 首个收敛步的原生质量与能量收支](validation/v370/RESULTS.md) · [六区热壁项与空间归档](validation/v370/evidence/balance.json) · [下一项](validation/v370/NEXT_DECISION.md)
+
 - [v369 M0.30 的 6.25 µs 单步收敛与全表面研究场](validation/v369/RESULTS.md) · [原面、收支及两份原生历史核对](validation/v369/verify_archive.py) · [下一项](validation/v369/NEXT_DECISION.md)
 
 - [v368 五个飞行工况的能力与 M0.30 面值重建对照](validation/v368/RESULTS.md) · [原始面值与节点复核](validation/v368/check_reconstruction.py) · [下一项](validation/v368/NEXT_DECISION.md)

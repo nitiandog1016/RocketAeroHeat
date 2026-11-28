@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞 9,216 面已算。M0.30 在数值起点后 6.25 µs 首次通过步内门槛，9,216 面研究场入壁功率 −1,045.057 W。12.5 µs 整步未过，同刻误差未知；保存场能量账差 −16.81 kW。五点最终功率待验。[单步结果](validation/v369/RESULTS.md) · [下一项原生守恒账](validation/v369/NEXT_DECISION.md)
+风洞 9,216 面已算。M0.30 的 6.25 µs 研究场入壁功率 −1,045.057 W。原生边界与储能之和 −13.53 kW；扣除参考焓的质量输运后为 +140.18 W。下一项在同刻检验最外两层加密。五点最终功率待验。[原生守恒账](validation/v370/RESULTS.md) · [下一项](validation/v370/NEXT_DECISION.md)
 
-<!-- records:last_completed=v369 -->
+<!-- records:last_completed=v370 -->
 <!-- records:active=none -->
-<!-- records:base_commit=1058f4a89c0207ee0e02bfc3f0e59e348126eea9 -->
+<!-- records:base_commit=31fd2d9d7cfb89be223923c39178333d6d717c18 -->
 
 ## RFZ 独立计算与公开对照
 
