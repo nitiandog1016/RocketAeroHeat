@@ -2133,16 +2133,24 @@ renderEditor();sync();showGeometry(true);
                 'RAH:Launcher:FlightRecord','工况记录与当前网格的模型、面数或面积不符。');
             if isstruct(archive.cases),archive.cases=num2cell(archive.cases);end
             archive.cases=archive.cases(:);
-            archive.sphere=[];
-            spherePath=fullfile(state.cfg.projectRoot,'docs','validation','v361','sphere_fine.json');
-            if isfile(spherePath) && strcmp(cm011FileSHA256(spherePath), ...
-                    '809a5c5e992893715d9f3be0d5c7dfbb640437579cec7dd7356706620fbdd1c6')
-                archive.sphere=jsondecode(fileread(spherePath));
-            end
+            archive.sphere=readFlightCheck('v361','sphere_fine.json', ...
+                '809a5c5e992893715d9f3be0d5c7dfbb640437579cec7dd7356706620fbdd1c6');
+            archive.potential=readFlightCheck('v362','sphere.json', ...
+                'a210e58a3233596764be347ca2eb2bc89a3f51b9f96d97f1212ebb68bca74970');
+            archive.compressibility=readFlightCheck('v362','mach030.json', ...
+                '8ea9cd2188722ccff53271f5fccfaaa99cc2486ab52fd2dc861dbaa63990b736');
             launcherFlightReview=archive;
             renderEditor();sync();
         catch ex
             launcherFlightReview=[];showError(ex);
+        end
+    end
+    function data=readFlightCheck(version,name,expected)
+        % 模块用途：只读取对应版本的已核对附加记录；缺档时仍可查看五个飞行点。
+        path=fullfile(state.cfg.projectRoot,'docs','validation',version,name);
+        data=[];
+        if isfile(path) && strcmp(cm011FileSHA256(path),expected)
+            data=jsondecode(fileread(path));
         end
     end
     function updateFlightRecord(~,~)
@@ -2166,6 +2174,17 @@ renderEditor();sync();showGeometry(true);
         else
             controls.flightCoverage.Data=[labels,repmat({'—'},numel(labels),2)];
             note={'工程程序在来流阶段退出，未返回面场。整件热功率未知。'};
+            if entry.mach==0.30 && ~isempty(launcherFlightReview.potential)
+                s=launcherFlightReview.potential.commonNodes;
+                note{end+1}=sprintf(['v362 · 理想球体对照，129 个共同极角。势流壁速 RMS 误差 %.3f%%，' ...
+                    '伯努利压力最大 Cp 误差 %.4f，通过。原生泊松压力最大 Cp 误差 %.3f，未通过。'], ...
+                    100*s.tangentialRMS,s.bernoulli.maxAbsCp,s.nativePoisson.maxAbsCp);
+            end
+            if entry.mach==0.30 && ~isempty(launcherFlightReview.compressibility)
+                d=launcherFlightReview.compressibility.computedIncompressibleVsMach030;
+                note{end+1}=sprintf(['同一球体与 M0.30 可压缩理论比较，最大 Cp 差 %.4f。' ...
+                    '飞行模型的附着区与壁面热流仍待核对。'],d.cp.maxAbs);
+            end
             if entry.mach==0.30 && ~isempty(launcherFlightReview.sphere)
                 s=launcherFlightReview.sphere;
                 note{end+1}=sprintf(['v361 · 加密网无黏球体对照：最大压力系数误差 %.3f（门槛 0.10），' ...

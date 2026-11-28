@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞已算全 9,216 面；同一侧栏可查五个飞行点，整件热功率均未知。M0.30 候选的加密球网最大 Cp 误差 0.150，切向速度 RMS 误差 4.42%，新增 0 面、0 m²。[两网与界面](validation/v361/RESULTS.md) · [下一项](validation/v361/NEXT_DECISION.md)
+风洞全 9,216 面已算，五个飞行点整件功率未知。理想球体势流壁速与伯努利压力通过，泊松压力未过；与 M0.30 球体理论最大 Cp 差 0.06124。飞行原面新增 0 面、0 m²。[核对与侧栏](validation/v362/RESULTS.md) · [下一项](validation/v362/NEXT_DECISION.md)
 
-<!-- records:last_completed=v361 -->
+<!-- records:last_completed=v362 -->
 <!-- records:active=none -->
-<!-- records:base_commit=e7b60c460a51786039b302008095c3b88ade887a -->
+<!-- records:base_commit=6c09339e25390bee4489830d35fc17b18d79a802 -->
 
 ## RFZ 独立计算与公开对照
 

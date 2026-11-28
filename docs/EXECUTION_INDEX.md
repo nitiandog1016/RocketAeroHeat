@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v362 球体速度势与两种壁压的独立对照](validation/v362/RESULTS.md) · [M0.30 理论差额](validation/v362/mach030.json) · [下一项](validation/v362/NEXT_DECISION.md)
+
 - [v361 低亚声速无黏球体动量与飞行记录侧栏](validation/v361/RESULTS.md) · [加密网误差](validation/v361/sphere_fine.json) · [下一项](validation/v361/NEXT_DECISION.md)
 
 - [v360 亚声速加热平板的 22 站非零热流对照](validation/v360/RESULTS.md) · [实测与计算热流](validation/v360/plate_heat.csv) · [下一项](validation/v360/NEXT_DECISION.md)

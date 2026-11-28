@@ -1,0 +1,156 @@
+{
+  "cells": 9216,
+  "wallBands": 128,
+  "stages": {
+    "blockMesh": {
+      "elapsedSeconds": 0.774027808999989,
+      "nativeExitCode": 0,
+      "stopReason": null,
+      "peakObservedGroupRSSBytes": 52592640,
+      "caseBytes": 2361009
+    },
+    "checkMesh": {
+      "elapsedSeconds": 0.773122949999987,
+      "nativeExitCode": 0,
+      "stopReason": null,
+      "peakObservedGroupRSSBytes": 62529536,
+      "caseBytes": 2361009
+    },
+    "potentialFoam": {
+      "elapsedSeconds": 0.7740809979999881,
+      "nativeExitCode": 0,
+      "stopReason": null,
+      "peakObservedGroupRSSBytes": 62668800,
+      "caseBytes": 3720217
+    },
+    "foamToVTK": {
+      "elapsedSeconds": 0.7864417099999912,
+      "nativeExitCode": 0,
+      "stopReason": null,
+      "peakObservedGroupRSSBytes": 62488576,
+      "caseBytes": 5496421
+    }
+  },
+  "faceCenters": {
+    "tangentialRMS": 0.0018426411232401838,
+    "bernoulli": {
+      "rmsCp": 0.004953521368957835,
+      "maxAbsCp": 0.006936344190655586,
+      "worstAngleDeg": 89.29680321224741,
+      "passesWallGates": true
+    },
+    "nativePoisson": {
+      "rmsCp": 0.5706903171204348,
+      "maxAbsCp": 0.8455758004378152,
+      "worstAngleDeg": 89.29680321224741,
+      "passesWallGates": false
+    }
+  },
+  "commonNodes": {
+    "tangentialRMS": 0.001945439924462601,
+    "bernoulli": {
+      "rmsCp": 0.005144818813900068,
+      "maxAbsCp": 0.007275242344575439,
+      "worstAngleDeg": 90.0,
+      "passesWallGates": true
+    },
+    "nativePoisson": {
+      "rmsCp": 0.5708019174234893,
+      "maxAbsCp": 0.8459146985914482,
+      "worstAngleDeg": 90.0,
+      "passesWallGates": false
+    }
+  },
+  "poleCp": {
+    "bernoulli": [
+      0.9992294923422956,
+      0.9992294925556885
+    ],
+    "nativePoisson": [
+      0.534582298663242,
+      0.5345822984397823
+    ]
+  },
+  "fluxM3s": {
+    "body": 0.0,
+    "far": 7.632783294297951e-17,
+    "minus": 0.0,
+    "plus": 0.0
+  },
+  "incomingFarM3s": 3.420150676845096,
+  "maxCellImbalanceM3s": 2.711719737646945e-14,
+  "maxCellImbalanceOverIncident": 1.919251544476414e-07,
+  "farNetOverInflow": 2.231709657113347e-17,
+  "nativeContinuity": 1.83914727350809e-13,
+  "normalWallSpeedMax": 2.220446049250313e-16,
+  "linearSolves": {
+    "p": [
+      {
+        "initial": 1.0,
+        "final": 9.320174917941537e-13,
+        "iterations": 170
+      },
+      {
+        "initial": 7.707494058919453e-06,
+        "final": 8.868820030396152e-13,
+        "iterations": 127
+      },
+      {
+        "initial": 1.70480771962895e-09,
+        "final": 7.20379977936014e-13,
+        "iterations": 82
+      },
+      {
+        "initial": 1.50256285978803e-12,
+        "final": 8.304318100725807e-13,
+        "iterations": 1
+      },
+      {
+        "initial": 8.305456394674316e-13,
+        "final": 8.305456394674316e-13,
+        "iterations": 0
+      }
+    ],
+    "Phi": [
+      {
+        "initial": 1.0,
+        "final": 9.943366107771894e-13,
+        "iterations": 206
+      },
+      {
+        "initial": 0.0001917454179978159,
+        "final": 9.077826507352843e-13,
+        "iterations": 177
+      },
+      {
+        "initial": 3.111207726139305e-08,
+        "final": 7.585790488722254e-13,
+        "iterations": 147
+      },
+      {
+        "initial": 1.789703606948034e-11,
+        "final": 8.215364277681086e-13,
+        "iterations": 16
+      },
+      {
+        "initial": 8.537522868504047e-13,
+        "final": 8.537522868504047e-13,
+        "iterations": 0
+      }
+    ]
+  },
+  "linearGatePassed": true,
+  "outputSHA256": {
+    "U": "9407862bb2695de1d28481c0bda804ea03b0525fb4ed00618dac694d46e51703",
+    "p": "e1982988e149a3fc45cd26d9e66d30170afec126c50d57f5d4a46e83a30584ab",
+    "phi": "df31daf11c1a31efd1f3df02147819cbe42df466382d2184160908b6ffe8cc69",
+    "Phi": "e8478462bcfeb1a0a5d54bb1fcddf64fd9d19e052afb3a4596de862f9ce99c10"
+  },
+  "meshSHA256": {
+    "faces": "a49b527eb53672d9506b171feb1b50ab4f86fdb276c194ebfc19cb0e96a0ff71",
+    "neighbour": "451f5f30b7acfda7a82c60978902a2845f7e358c81a9f58b50904f3fb21deda0",
+    "boundary": "17e731581ea3a28df506932bae83aadc4d4b7dab404c8a14f392d4297549b2f3",
+    "points": "17ce3c6e27769b7801af36ecfceaa762fe0e46ebca91662755a993135b334a55",
+    "owner": "19f9f18110510238fa51dbee6f54974c1816a2b9199dfccb902dea34e1aaf9cc"
+  }
+}
