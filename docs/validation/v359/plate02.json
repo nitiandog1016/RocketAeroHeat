@@ -1,0 +1,95 @@
+{
+  "accepted": false,
+  "gates": {
+    "finite": true,
+    "physicalState": true,
+    "nativeFrictionAvailable": true,
+    "sixResiduals": false,
+    "friction": false,
+    "nativeSuccess": true
+  },
+  "requestedMach": 0.2,
+  "gridCells": 816,
+  "wallNodes": 29,
+  "stationX": 0.970084071,
+  "stationNodes": [
+    0.970084048409,
+    0.827391957677
+  ],
+  "skinFriction": 0.0026863249743243685,
+  "stationGradientEstimate": 0.002686325385983798,
+  "references": {
+    "CFL3D": 0.00255183387,
+    "FUN3D": 0.00251561562813413
+  },
+  "relativeErrors": {
+    "CFL3D": 0.05270370689310133,
+    "FUN3D": 0.06785986868624128
+  },
+  "last20Maximum": {
+    "rms[Rho]": -13.8762851,
+    "rms[RhoU]": -11.38592931,
+    "rms[RhoV]": -11.6283361,
+    "rms[RhoE]": -8.34843448,
+    "rms[k]": -13.32696359,
+    "rms[w]": -7.135701041
+  },
+  "lastIteration": 9999,
+  "minimumWallYPlus": 0.0,
+  "maximumWallYPlus": 1.941935,
+  "nativeWallRead": true,
+  "thermalBoundary": "adiabatic",
+  "heatTransferValidation": false,
+  "seconds": 62.84400000000005,
+  "peakRSSBytes": 24457216,
+  "sourceSHA256": "bfbcb0a950148a3c0492ba18d50be375f40f6b35ffa0f9258854e821a55a2a60",
+  "meshSHA256": "78265e5e41ee5091b156607d2a5661b3f73b4068f8a7af04d085ac3a6ae315a4",
+  "historySHA256": "f242b726b80ca7cd6b84781328be23a12869901bfd859939e7b2b2e3724d3320",
+  "frameSHA256": "0876101c529b958ec226e90a3db2afa4974f8d376f731e5f8b72b9e008bfc403",
+  "wallSHA256": "0335f644c33964cd2ba3e201f3b09188edf7202cc97483e4aa9ad95bbdab3333",
+  "process": {
+    "status": "terminal",
+    "command": [
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe",
+      "case.cfg",
+      "--threads",
+      "1"
+    ],
+    "debuggerExitCode": 0,
+    "inputsStable": {
+      "E:\\RocketAeroHeat\\outputs\\v359_validation\\plate02\\case.cfg": true,
+      "E:\\RocketAeroHeat\\outputs\\v359_validation\\plate02\\mesh.su2": true,
+      "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v359\\PLAN.md": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v359\\sources.json": true,
+      "E:\\RocketAeroHeat\\outputs\\v359_validation\\plate02\\seed.csv": true,
+      "E:\\RocketAeroHeat\\outputs\\v359_validation\\plate01\\checked.json": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v359\\RECOVERY.md": true,
+      "E:\\RocketAeroHeat\\docs\\validation\\v359\\plate_check.py": true
+    },
+    "stopReason": null,
+    "supervisorError": null,
+    "survivingProcessIDs": [],
+    "peakOutputBytes": 8002571,
+    "maximumSeconds": 180,
+    "maximumRSSBytes": 4294967296,
+    "maximumOutputBytes": 62914560,
+    "nativeSuccessMessageInLog": true
+  },
+  "rawHashes": {
+    "checked.json": "7dd2c8742d6ecea522caad28cd5137e0f00a7a7d6c813edc68cb2a47f26b398f",
+    "debugger_process.json": "d7cca3cf8eed25bce332a5786c1cbd25af5e0419abeeb186a68d5bdb2fe265b5",
+    "debugger.log": "e043f8c3763397da70df72e87e233d1fa9f5ade1742e4b57329218ae79e43546"
+  },
+  "inputSHA256": {
+    "E:\\RocketAeroHeat\\outputs\\v359_validation\\plate02\\case.cfg": "bfbcb0a950148a3c0492ba18d50be375f40f6b35ffa0f9258854e821a55a2a60",
+    "E:\\RocketAeroHeat\\outputs\\v359_validation\\plate02\\mesh.su2": "78265e5e41ee5091b156607d2a5661b3f73b4068f8a7af04d085ac3a6ae315a4",
+    "E:\\RocketAeroHeat\\tools\\runtime\\su2\\8.6.0\\bin\\SU2_CFD.exe": "01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7",
+    "E:\\RocketAeroHeat\\docs\\validation\\v359\\PLAN.md": "7904d8a70dd026fc7b4a0a9c084dddb6867f6946e2b89c69f8ee7b7f87c3b6f0",
+    "E:\\RocketAeroHeat\\docs\\validation\\v359\\sources.json": "2be5197a91d318a212b5bd1660ebf8aca7657168cf780abed1b5b9733b03ea1e",
+    "E:\\RocketAeroHeat\\outputs\\v359_validation\\plate02\\seed.csv": "bae3a966c41d47896abfecbcb958740c3e3bfe0bc5ebbdc2dcacf07f9753d1cb",
+    "E:\\RocketAeroHeat\\outputs\\v359_validation\\plate01\\checked.json": "79cefaa60071e520dbd9aa7326d3094fb8c69b605af6788b3d2b0744de66b772",
+    "E:\\RocketAeroHeat\\docs\\validation\\v359\\RECOVERY.md": "617c64f4c962658c544b6bd4a3eec6028f5dea5f2875346d9743afc7a38fbc4c",
+    "E:\\RocketAeroHeat\\docs\\validation\\v359\\plate_check.py": "6a425e92c732d2c09dd480beab56d81d874eb871e645016bc35da1a1178a7e88"
+  }
+}

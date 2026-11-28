@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v359 M0.30 入口对照与五工况结论](validation/v359/RESULTS.md) · [平板原生续算读回](validation/v359/plate02.json) · [下一项](validation/v359/NEXT_DECISION.md)
+
 - [v358 五个飞行工况的现有代码能力检查](validation/v358/RESULTS.md) · [全表面和六区覆盖](validation/v358/evidence/cases.json) · [下一项](validation/v358/NEXT_DECISION.md)
 
 - [v357 同一风洞瞬态的动量网格加密对照](validation/v357/RESULTS.md) · [同面误差与热量收支](validation/v357/fields.json) · [下一项](validation/v357/NEXT_DECISION.md)

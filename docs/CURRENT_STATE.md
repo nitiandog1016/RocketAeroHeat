@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-5 km、零攻角，M0.30/0.85/1.00 通用工程链退出，M1.20/2.00 的计算壁压与热流联合面积为 14.60%/14.75%，五例整件功率未知。低速风洞 0.05 m/s、0.600 s 已覆盖 9,216 面。联合实测面积 0 m²。[五工况](validation/v358/RESULTS.md) · [风洞](validation/v357/RESULTS.md) · [下一项](validation/v358/NEXT_DECISION.md)
+风洞已算全 9,216 面。5 km 五点均缺整件热功率，M1.20/2.00 联合面积 14.60%/14.75%。M0.30 候选平板摩擦偏差 +5.27%/+6.79%，ω 残差未通过，整件未试算，新增 0 面、0 m²。[五点与平板](validation/v359/RESULTS.md) · [下一项](validation/v359/NEXT_DECISION.md)
 
-<!-- records:last_completed=v358 -->
+<!-- records:last_completed=v359 -->
 <!-- records:active=none -->
-<!-- records:base_commit=307a5f7469727acf0ed51e04828a7e82142fe7fd -->
+<!-- records:base_commit=69c35883ee8dc53d9a85189a2074695f3c63c1a4 -->
 
 ## RFZ 独立计算与公开对照
 
