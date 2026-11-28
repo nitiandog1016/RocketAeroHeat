@@ -2174,6 +2174,13 @@ renderEditor();sync();showGeometry(true);
                     archive.wallStudy.faces~=archive.faces || numel(archive.wallStudy.faceGroup)~=archive.faces))
                 archive.wallStudy=[];
             end
+            % 绑定本模型的物理步审核摘要，研究档案可显示时间精度是否已取得。
+            archive.timeStudy=readFlightCheck('v366',fullfile('research','status.json'), ...
+                'abec1d26201a2c232bc74515f4baa8385f9faa1740e9e41ce910007315016f13');
+            if ~isempty(archive.timeStudy) && ~(strcmp(archive.timeStudy.surfaceSHA256,archive.surfaceSHA256) ...
+                    && archive.timeStudy.faces==archive.faces)
+                archive.timeStudy=[];
+            end
             archive.selectedFaces=[];archive.inspectedFace=[];archive.caption='';
             launcherFlightReview=archive;
             renderEditor();sync();
@@ -2306,6 +2313,17 @@ renderEditor();sync();showGeometry(true);
                     fine(3),fine(4),wall.wallGivenK,fine(5),fine(6));
             end
             note=[lines;note(:)];
+        end
+        timeStudy=launcherFlightReview.timeStudy;
+        if ~isempty(timeStudy) && entry.mach==timeStudy.mach && entry.altitudeM==timeStudy.altitudeM && ...
+                entry.wallGivenK==timeStudy.wallGivenK && ~timeStudy.sameTimePairAvailable
+            msg=sprintf('时间步对照 · %.0f µs 整步及首个 %.0f µs 半步均未收敛，同刻热流差未知。', ...
+                timeStudy.requestedEndpointUs,timeStudy.requestedHalfStepUs);
+            if isempty(region) || ismember(string(region.key),["base","afterbody"])
+                msg=sprintf('%s 底缘和相邻尾段两列节点分别占 Newton–Krylov 两次末轮能量残差平方和的 %.1f%%、%.1f%%。', ...
+                    msg,100*timeStudy.fullEnergyRimShare,100*timeStudy.halfEnergyRimShare);
+            end
+            if isempty(face),note=[{msg};note(:)];else,note=[note(:);{msg}];end
         end
         controls.flightNote.Value=note;
         if ~isempty(launcherFlightReview.regionAudit),showGeometry(false);end

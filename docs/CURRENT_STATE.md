@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞 9,216 面已算。M0.30 全层流试算的圆柱段放热 452.38 / 448.25 W，两档局部热流 RMS 差 6.06%，稳态未过。共同反向 480 面。五个飞行点整件功率仍未知，合格同面新增 0 m²。[壁面证据与侧栏](validation/v365/RESULTS.md) · [下一项](validation/v365/NEXT_DECISION.md)
+风洞 9,216 面已算。M0.30 的 50 / 25 µs 第一步均未过门，同刻热流差未知。底缘及相邻尾段两列占 Newton–Krylov 末轮能量残差平方和 88.81% / 93.04%。合格同面新增 0 m²，五点整件功率未知。[时间与收支](validation/v366/RESULTS.md) · [下一项](validation/v366/NEXT_DECISION.md)
 
-<!-- records:last_completed=v365 -->
+<!-- records:last_completed=v366 -->
 <!-- records:active=none -->
-<!-- records:base_commit=3d5bac9a0afa946fc3dc7c5bb540cc064be774ba -->
+<!-- records:base_commit=d3b4acf0d9e34565ab5204dc3be4df251f00972c -->
 
 ## RFZ 独立计算与公开对照
 

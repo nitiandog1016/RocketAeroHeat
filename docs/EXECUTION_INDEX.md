@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v366 M0.30 物理步、能量收支与尾部残差定位](validation/v366/RESULTS.md) · [六份原生回执核对](validation/v366/research/runs.json) · [下一项](validation/v366/NEXT_DECISION.md)
+
 - [v365 M0.30 两档等温壁热流、近壁流向与原面拾取](validation/v365/RESULTS.md) · [原生场核对](validation/v365/research/runs.json) · [下一项](validation/v365/NEXT_DECISION.md)
 
 - [v364 M0.30 同形滑移壁研究压力、两档外域和原面拾取](validation/v364/RESULTS.md) · [六区数值](validation/v364/research/surface.json) · [下一项](validation/v364/NEXT_DECISION.md)
