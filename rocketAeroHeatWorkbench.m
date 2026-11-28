@@ -17,6 +17,7 @@ measuredDirectory='';measuredPauseFile='';lastWireDirectory='';lastShortDirector
 creasePreview=false;qualityPreview=false;candidatePreview=[];
 rfzListOpen=false;rfzSelectedFaces=[];rfzAir=[];rfzNodesOpen=false;
 rfzSamples=[];rfzSampleLimits=struct;rfzImageRequest='';
+launcherFlightReview=[];
 fig=uifigure('Name','RocketAeroHeat · 科研工作台', ...
     'Position',[30 30 1580 940],'Color',[.96 .97 .98]);
 fig.CloseRequestFcn=@closeWorkbench;
@@ -65,6 +66,7 @@ renderEditor();sync();showGeometry(true);
         if state.busy || preparing || ~isgraphics(fig),return;end
         try
             state=aeroHeatWorkflowState('selectStep',state,struct('step',step));
+            launcherFlightReview=[];
             rfzListOpen=false;rfzNodesOpen=false;rfzSelectedFaces=[];rfzSamples=[];rfzImageRequest='';
             delete(findall(resultHost,'Tag','static-air-probe-host'));
             renderEditor();sync();
@@ -707,7 +709,21 @@ renderEditor();sync();showGeometry(true);
                 end
             case 4
                 if isLauncherTunnel()
-                    grid=form(10);controls.run=button(grid,1,'计算低速风洞全表面结果',@solveCase);
+                    if ~isempty(launcherFlightReview)
+                        grid=form(14);
+                        controls.backToTunnel=button(grid,1,'返回当前风洞工况',@(~,~)go(4));
+                        mach=cellfun(@(entry)entry.mach,launcherFlightReview.cases)';
+                        controls.flightRecord=choice(grid,2,'飞行记录 · v358',cellstr(compose('M %.2f',mach)),mach,mach(1));
+                        controls.flightRecord.ValueChangedFcn=@updateFlightRecord;
+                        controls.flightCondition=tip(grid,3,'');
+                        controls.flightCoverage=uitable(grid,'ColumnName',{'场量与状态','面数','面积占比'}, ...
+                            'RowName',{},'ColumnWidth',{'auto','auto','auto'});
+                        controls.flightCoverage.Layout.Row=[6 9];controls.flightCoverage.Layout.Column=[1 2];
+                        controls.flightNote=uitextarea(grid,'Editable','off');
+                        controls.flightNote.Layout.Row=[10 14];controls.flightNote.Layout.Column=[1 2];
+                        updateFlightRecord();sync();return
+                    end
+                    grid=form(12);controls.run=button(grid,1,'计算低速风洞全表面结果',@solveCase);
                     folder=fullfile(state.cfg.projectRoot,'cases','simple_launcher');
                     transient=isfield(state.cfg.launcherBoundary,'elapsedPhysicalTimeS');
                     if transient,folder=fullfile(folder,'wake');end
@@ -719,7 +735,8 @@ renderEditor();sync();showGeometry(true);
                     else
                         tip(grid,3,'程序从当前模型和风洞边界独立计算，并核对网格误差和热量收支。');
                     end
-                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[5 10];
+                    controls.openFlightRecords=button(grid,6,'查看该模型的飞行工况记录',@openFlightRecords);
+                    controls.log=uitextarea(grid,'Editable','off','Value',logLines);controls.log.Layout.Row=[7 12];
                     controls.log.Layout.Column=[1 2];sync();return
                 end
                 if isRFZSurface()
@@ -2104,6 +2121,59 @@ renderEditor();sync();showGeometry(true);
     end
     function yes=isLauncherTunnel()
         yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend',''),'simpleLauncherTunnel');
+    end
+    function openFlightRecords(~,~)
+        % 模块用途：读取与当前原模型匹配的五工况档案，浏览操作不改变实际计算边界。
+        if state.busy || preparing,return;end
+        try
+            path=fullfile(state.cfg.projectRoot,'docs','validation','v358','evidence','cases.json');
+            archive=jsondecode(fileread(path));
+            assert(strcmp(archive.surfaceSHA256,state.modelSource.sha256) && ...
+                archive.faces==size(state.mesh.F,1) && abs(archive.areaM2-sum(state.mesh.area))<1e-8, ...
+                'RAH:Launcher:FlightRecord','工况记录与当前网格的模型、面数或面积不符。');
+            if isstruct(archive.cases),archive.cases=num2cell(archive.cases);end
+            archive.cases=archive.cases(:);
+            archive.sphere=[];
+            spherePath=fullfile(state.cfg.projectRoot,'docs','validation','v361','sphere_fine.json');
+            if isfile(spherePath) && strcmp(cm011FileSHA256(spherePath), ...
+                    '809a5c5e992893715d9f3be0d5c7dfbb640437579cec7dd7356706620fbdd1c6')
+                archive.sphere=jsondecode(fileread(spherePath));
+            end
+            launcherFlightReview=archive;
+            renderEditor();sync();
+        catch ex
+            launcherFlightReview=[];showError(ex);
+        end
+    end
+    function updateFlightRecord(~,~)
+        % 模块用途：从同一条运行回执取来流和面积，来流阶段退出显示为未返回面场。
+        cases=launcherFlightReview.cases;
+        entry=cases{cellfun(@(entry)entry.mach,cases)==controls.flightRecord.Value};
+        c=entry.coverage;
+        controls.flightCondition.Text=sprintf(['高度 %.0f m · 给定壁温 %.0f K\n' ...
+            '来流 %.2f m/s · %.2f K · %.0f Pa\n%d 个原面 · %.6f m²'], ...
+            entry.altitudeM,entry.wallGivenK,entry.speedMps,entry.freeTemperatureK, ...
+            entry.freePressurePa,c.faces,c.areaM2);
+        labels={'计算壁压';'工程热流';'两者同面';'给定壁压'};
+        if entry.solverReturned
+            faces=[c.computedPressureFaces;c.heatFaces;c.jointFaces;c.prescribedPressureFaces];
+            area=[c.computedPressureAreaM2;c.heatAreaM2;c.jointAreaM2;c.prescribedPressureAreaM2];
+            controls.flightCoverage.Data=[labels,cellstr(compose('%d',faces)),cellstr(compose('%.2f%%',100*area/c.areaM2))];
+            note={'整件热功率未知。已有局部工程值，预测精度待验证。'; ...
+                ['压力方法 · ' entry.pressureMethod];['热流方法 · ' entry.heatMethod]; ...
+                ['压力适用范围 · ' char(strjoin(string(entry.pressureScope),newline))]; ...
+                ['热流适用范围 · ' char(strjoin(string(entry.heatScope),newline))]};
+        else
+            controls.flightCoverage.Data=[labels,repmat({'—'},numel(labels),2)];
+            note={'工程程序在来流阶段退出，未返回面场。整件热功率未知。'};
+            if entry.mach==0.30 && ~isempty(launcherFlightReview.sphere)
+                s=launcherFlightReview.sphere;
+                note{end+1}=sprintf(['v361 · 加密网无黏球体对照：最大压力系数误差 %.3f（门槛 0.10），' ...
+                    '切向速度 RMS 误差 %.3f 倍来流速度（门槛 0.03）。'], ...
+                    s.pressureCoefficientMax,s.tangentialVelocityRMS);
+            end
+        end
+        controls.flightNote.Value=note;
     end
     function yes=isShortSupport()
         yes=~isempty(state.rawMesh) && strcmp(getOption(state.cfg,'computationBackend','engineering'),'shortSupport65');
