@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞 9,216 面已算。M0.30 尾部节点 3828 的官方基态已对齐，峰值净残差以子午边对流不平衡为主。局部二分后 50/25 µs 第一步均未过门。合格同面新增 0 m²，五点整件功率未知。[原生项与加密](validation/v367/RESULTS.md) · [下一项](validation/v367/NEXT_DECISION.md)
+风洞 9,216 面已算。五个飞行点的工程覆盖已按原 STL 复核，整件功率均未知。M0.30 同一状态改用 Green–Gauss 后，原峰值点好转，四列能量残差范数升至 2.65 倍，全域残差变大。该重建候选结束，合格同面新增 0 m²。下一项用原方法比较一组短物理步的同刻热流。[五点能力与原生读数](validation/v368/RESULTS.md) · [下一项](validation/v368/NEXT_DECISION.md)
 
-<!-- records:last_completed=v367 -->
+<!-- records:last_completed=v368 -->
 <!-- records:active=none -->
-<!-- records:base_commit=97932001fe1a069bc7abdf869af117fbf8e58858 -->
+<!-- records:base_commit=57ad61a5e636b50a05bab4ca962dadb541164215 -->
 
 ## RFZ 独立计算与公开对照
 

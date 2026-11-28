@@ -2190,6 +2190,14 @@ renderEditor();sync();showGeometry(true);
                         a.wallGivenK==archive.timeStudy.wallGivenK
                     archive.timeStudy.assembly=a;
                 end
+                % 同一冻结流场的两种梯度对照，只绑定到对应的模型、来流及壁温。
+                g=readFlightCheck('v368',fullfile('evidence','status.json'), ...
+                    '0de4322047113fb79de31d540a900aab988b0103830ee167a450e389143b540d');
+                if ~isempty(g) && strcmp(g.surfaceSHA256,archive.surfaceSHA256) && g.faces==archive.faces && ...
+                        g.mach==archive.timeStudy.mach && g.altitudeM==archive.timeStudy.altitudeM && ...
+                        g.wallGivenK==archive.timeStudy.wallGivenK
+                    archive.timeStudy.gradientComparison=g;
+                end
             end
             archive.selectedFaces=[];archive.inspectedFace=[];archive.caption='';
             launcherFlightReview=archive;
@@ -2339,6 +2347,14 @@ renderEditor();sync();showGeometry(true);
                         msg,a.peakPoint,1000*a.modelXM,a.peakCentral,a.peakPhysicalResidual);
                     if ~a.refinedFullPassed && ~a.refinedHalfPassed
                         msg=[msg ' 二分尾部三个网格间隔后，两种步长仍未收敛。'];
+                    end
+                end
+                % 尾部探针解释该工况的试算选择，不向原面的物理量写入残差。
+                if ~isempty(region) && isfield(timeStudy,'gradientComparison')
+                    g=timeStudy.gradientComparison;
+                    if ~g.admitStepTrial
+                        ratio=g.methods.gg.fourColumnRhsNorm/g.methods.weighted.fourColumnRhsNorm;
+                        msg=sprintf('%s Green–Gauss 重建下，邻近四列的能量残差范数为原方法的 %.2f 倍，保留原方法。',msg,ratio);
                     end
                 end
             end
