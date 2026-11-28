@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞已算全 9,216 面。5 km 五点均缺整件热功率，M1.20/2.00 联合面积 14.60%/14.75%。M0.30 候选平板摩擦偏差 +5.27%/+6.79%，ω 残差未通过，整件未试算，新增 0 面、0 m²。[五点与平板](validation/v359/RESULTS.md) · [下一项](validation/v359/NEXT_DECISION.md)
+风洞已算全 9,216 面，5 km 五点均缺整件热功率。加热平板 22 站放热平均高估 8.48%。M0.30 缺可信外流，v359 动量未过，新增 0 面、0 m²。[五点](validation/v358/RESULTS.md) · [平板](validation/v360/RESULTS.md) · [下一项](validation/v360/NEXT_DECISION.md)
 
-<!-- records:last_completed=v359 -->
+<!-- records:last_completed=v360 -->
 <!-- records:active=none -->
-<!-- records:base_commit=69c35883ee8dc53d9a85189a2074695f3c63c1a4 -->
+<!-- records:base_commit=46a5dd031be611b748f1cf57a366c6c98c2769f0 -->
 
 ## RFZ 独立计算与公开对照
 

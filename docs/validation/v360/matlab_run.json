@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "status": "terminal",
+  "budgetKind": "parent",
+  "argv": [
+    "D:\\matlab\\bin\\matlab.EXE",
+    "-batch",
+    "maxNumCompThreads(1);addpath('docs/validation/v360');t=tic;rows=check_plate_heat();fprintf('plateRows=%d readSeconds=%.5f\\n',height(rows),toc(t));writetable(rows,'outputs/v360_validation/process_plate01/stations.csv');"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 20.610000000000582,
+  "limitSeconds": 120,
+  "stopReason": null,
+  "peakObservedGroupRSSBytes": 559329280,
+  "peakObservedGroupVirtualBytes": 497909760,
+  "inputSHA256": {
+    "docs/validation/v360/PLAN.md": "7cf738508a38ce1da12eb552734a80bc3d224fb8c9782da04afb25504cf6cf6e",
+    "docs/validation/v360/check_plate_heat.m": "75d8d251d80c01e081dc06b25ec5cc764dc7f83811b87b32f9b5f02edb0a09d8",
+    "docs/validation/v360/table_ia_127.json": "ffa98f69686b4c4949be3582cc5e96f724bfb6199d575d2bc1d4326e7449808d",
+    "airThermalProperties.m": "b944e4b2def4786deac2121651a6675339a21eecbe999814499824ad1627c885",
+    "airRecoveryTemperature.m": "e1fc8bdca9a03a01f859868787a4c7572ea8d77f040b91316cab95515ab2e71b",
+    "airEnthalpySecantCp.m": "c3421c2b8083be3befa8492aa889a944a9c2ffbbdfbad2da0397d91b74c0b2a7",
+    "airReferenceTemperature.m": "2157097fb2c04297289a7c5af2783baef595e1f72d37861fe332efa3da26ecb1",
+    "selectAirThermalModel.m": "5805b0deda083cae9dc6de0ac540a4bbf9cbc1a83af1b65bc09401976dde1eb5",
+    "calcSurfaceHeating.m": "2520252095d438fda56323b854ade02641aae3c58336893731a2f4b5e12a2f3d",
+    "scripts/runSU2RocketPhaseV222.py": "ecc34e75135e77708f8413535aa5f21ab135d1a7eafe25e3f52f894c9efd623f"
+  },
+  "inputsStable": true,
+  "liveGroupAfterCleanup": [],
+  "cpuLimit": 1,
+  "outputMiB": 8,
+  "hardAddressSpaceLimit": false,
+  "observedOutput": "plateRows=22 readSeconds=0.90522",
+  "nativeCSVSHA256": "a4606c4f82722a5073c556b2f22a762c2af98d0d1507a1a4fdaac26b5f5f7f32",
+  "publishedCSVSHA256": "bb747dc3a4f2473c667209ba7b9d3891a0556c25febf851b20fd290e7bf71693",
+  "originalReceiptSHA256": "ded44716586997e5a46844e7a80cbc28f522b8ee3a5d17a22b63a027d4dcd073"
+}

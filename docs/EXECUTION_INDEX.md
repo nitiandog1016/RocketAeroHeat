@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v360 亚声速加热平板的 22 站非零热流对照](validation/v360/RESULTS.md) · [实测与计算热流](validation/v360/plate_heat.csv) · [下一项](validation/v360/NEXT_DECISION.md)
+
 - [v359 M0.30 入口对照与五工况结论](validation/v359/RESULTS.md) · [平板原生续算读回](validation/v359/plate02.json) · [下一项](validation/v359/NEXT_DECISION.md)
 
 - [v358 五个飞行工况的现有代码能力检查](validation/v358/RESULTS.md) · [全表面和六区覆盖](validation/v358/evidence/cases.json) · [下一项](validation/v358/NEXT_DECISION.md)
