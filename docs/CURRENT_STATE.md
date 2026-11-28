@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞 9,216 面已算。M0.30 两档外域已取得同形研究压力，圆柱段 RMS 压差 35.3 Pa；首轮非正压力已排除。五点整件热功率仍未知，M0.30 合格同面新增 0 m²。[实算与侧栏](validation/v364/RESULTS.md) · [下一项](validation/v364/NEXT_DECISION.md)
+风洞 9,216 面已算。M0.30 全层流试算的圆柱段放热 452.38 / 448.25 W，两档局部热流 RMS 差 6.06%，稳态未过。共同反向 480 面。五个飞行点整件功率仍未知，合格同面新增 0 m²。[壁面证据与侧栏](validation/v365/RESULTS.md) · [下一项](validation/v365/NEXT_DECISION.md)
 
-<!-- records:last_completed=v364 -->
+<!-- records:last_completed=v365 -->
 <!-- records:active=none -->
-<!-- records:base_commit=f533ef310b95708728ea77f622f02f5f39ff8c64 -->
+<!-- records:base_commit=3d5bac9a0afa946fc3dc7c5bb540cc064be774ba -->
 
 ## RFZ 独立计算与公开对照
 

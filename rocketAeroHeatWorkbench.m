@@ -2166,6 +2166,14 @@ renderEditor();sync();showGeometry(true);
                     numel(archive.outerStudy.faceGroup)~=archive.faces))
                 archive.outerStudy=[];
             end
+            % 等温层流对照只向相同原面序的飞行档案提供研究读数。
+            archive.wallStudy=readFlightCheck('v365',fullfile('research','surface.json'), ...
+                '4b80d867cd7b6f570310fc3b8b9bab6ffc8c22e2f108cd13c02c2f0710867fd8');
+            if isempty(archive.regionAudit) || (~isempty(archive.wallStudy) && ...
+                    (~strcmp(archive.wallStudy.surfaceSHA256,archive.surfaceSHA256) || ...
+                    archive.wallStudy.faces~=archive.faces || numel(archive.wallStudy.faceGroup)~=archive.faces))
+                archive.wallStudy=[];
+            end
             archive.selectedFaces=[];archive.inspectedFace=[];archive.caption='';
             launcherFlightReview=archive;
             renderEditor();sync();
@@ -2275,6 +2283,27 @@ renderEditor();sync();showGeometry(true);
                 p14=study.freePressurePa+study.dynamicPressurePa*study.groupCp14D(slot);
                 p22=study.freePressurePa+study.dynamicPressurePa*study.groupCp22D(slot);
                 lines=[{sprintf('原面 %d · 研究静压（绝对）14D %.1f Pa，22D %.1f Pa。',face,p14,p22)};lines];
+            end
+            note=[lines;note(:)];
+        end
+        % 用户可在同一原面上对照两档热壁解；工程覆盖表仍按其原有回执读取。
+        wall=launcherFlightReview.wallStudy;
+        if ~isempty(wall) && entry.mach==wall.mach && entry.altitudeM==wall.altitudeM && entry.wallGivenK==wall.wallGivenK
+            lines={'SU2 等温壁层流试算 · 全壁层流假设，实际转捩待核实。热流正值表示入壁。'};
+            if ~wall.residualPassedBoth
+                lines{end+1,1}='两档网格的稳态残差未同时过门，以下数值仅供诊断。';
+            end
+            if isempty(region) || strcmp(region.key,'cylinder')
+                lines{end+1,1}=sprintf('圆柱段 · 4 / 2 µm 网格热流 RMS 相对差 %.2f%%，两档末帧均出现近壁反向的完整原面 %d 个。', ...
+                    100*wall.gridDifference.heatRelativeRms,wall.commonReverseCylinderFaces);
+            end
+            if ~isempty(face)
+                slot=wall.faceGroup(face);coarse=wall.normal4(slot,:);fine=wall.normal2(slot,:);
+                lines{end+1,1}=sprintf(['原面 %d · 4 / 2 µm 末帧热流 %.1f / %.1f W/m²，' ...
+                    '绝对壁压 %.1f / %.1f Pa。'],face,coarse(2),fine(2),coarse(1),fine(1));
+                lines{end+1,1}=sprintf(['2 µm 试算 · 沿来流壁剪切 %.4g Pa，首层沿来流速度 %.4g m/s。' ...
+                    '给定壁温 %.2f K，壁节点流体 %.3f K，首层流体 %.3f K。'], ...
+                    fine(3),fine(4),wall.wallGivenK,fine(5),fine(6));
             end
             note=[lines;note(:)];
         end
