@@ -3,7 +3,6 @@ import argparse
 import gzip
 import json
 from pathlib import Path
-import shutil
 import sys
 from zipfile import ZipFile
 
@@ -78,6 +77,11 @@ def instrument(rel,source):
 def build(out):
     out=out.resolve()
     out.relative_to(BASE)
+    compile_observer(out,(DOC/"ledger.hpp").read_bytes())
+
+
+def compile_observer(out,header):
+    """用指定的节点数检查头文件重新编译所有取样单元；原网与细网共用同一套取样。"""
     old=DOC.parent/"v272/evidence/build.json.gz"
     cache=json.loads(gzip.decompress(old.read_bytes()))
     locks={Path(k):h for k,h in cache["cachedBuildInputs"].items()}
@@ -87,7 +91,7 @@ def build(out):
     assert all(sha(p)==h for p,h in locks.items())
     entries=json.loads((BUILD/"compile_commands.json").read_bytes())
     out.mkdir(parents=True,exist_ok=False)
-    shutil.copyfile(DOC/"ledger.hpp",out/"ledger.hpp")
+    (out/"ledger.hpp").write_bytes(header)
     objects=[]
     with ZipFile(archive) as z:
         for rel in (UP,SIMD,INT,ROE,DIFFUSION):
@@ -112,7 +116,7 @@ def build(out):
     exe=out/"ledger.exe"
     invoke("link",[compiler,"-o",exe,link[3],*objects,*link[6:]],BUILD,out,240,3)
     assert sum(p.stat().st_size for p in out.iterdir())<350*1024**2 and all(sha(p)==h for p,h in locks.items())
-    save(out/"build.json",dict(executableSHA256=sha(exe),headerSHA256=sha(DOC/"ledger.hpp"),recipeSHA256=sha(Path(__file__)),
+    save(out/"build.json",dict(executableSHA256=sha(exe),headerSHA256=sha(out/"ledger.hpp"),recipeSHA256=sha(Path(__file__)),
          archiveSHA256=sha(archive),cacheManifestSHA256=sha(old),compilerSHA256=sha(compiler)))
 
 

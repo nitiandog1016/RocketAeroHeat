@@ -10,19 +10,8 @@ FIELDS = ["pressurePa","qIntoWallWm2","wallFluidK","firstFluidK","shearDownstrea
 GROUP_SOURCE = DOC.parent/"v365/research/surface.json"
 
 
-def archive(pair, out):
-    """此归档绑定本次实得的一步收敛及整步拒绝；其他终态须按其自己的证据处理。"""
-    pair = pair.resolve()
-    pair.relative_to(BASE)
-    records = {key:inspect(pair/key,key) for key in ("full","half1")}
-    for key,r in records.items():
-        assert r == read(pair/key/"step.json")
-    assert not records["full"]["passed"] and records["half1"]["passed"]
-    assert not (pair/"half2").exists()
-    model, _, area, matrix, meridian = mapping()
-    c = read(OLD/"condition.json")
-    a = numbers(pair/"half1/restart_00001.csv")
-    h = numbers(pair/"half1/history_00001.csv")
+def wall_field(a,h,c,meridian):
+    """读取当前帧的壁节点并独立核对温度梯度和原生热流线积分。"""
     n = len(meridian)
     xy = np.column_stack((c["lengthM"]-a["x"], a["y"]))
     np.testing.assert_allclose(xy[:n],meridian,rtol=0,atol=5e-15)
@@ -43,6 +32,23 @@ def archive(pair, out):
     dynamic = .5*c["densityKgM3"]*c["speedMps"]**2
     nodes = np.column_stack((a["Pressure"][:n]*c["freePressurePa"],q,tw,near,
                              dynamic*a["Skin_Friction_Coefficient_x"][:n]))
+    return nodes,gap,float(max(abs(q-qcheck)))
+
+
+def archive(pair, out):
+    """此归档绑定本次实得的一步收敛及整步拒绝；其他终态须按其自己的证据处理。"""
+    pair = pair.resolve()
+    pair.relative_to(BASE)
+    records = {key:inspect(pair/key,key) for key in ("full","half1")}
+    for key,r in records.items():
+        assert r == read(pair/key/"step.json")
+    assert not records["full"]["passed"] and records["half1"]["passed"]
+    assert not (pair/"half2").exists()
+    model, _, area, matrix, meridian = mapping()
+    c = read(OLD/"condition.json")
+    a = numbers(pair/"half1/restart_00001.csv")
+    h = numbers(pair/"half1/history_00001.csv")
+    nodes,gap,heat_readback_error=wall_field(a,h,c,meridian)
     weights, groups = np.unique(matrix.toarray(),axis=0,return_inverse=True)
     np.testing.assert_array_equal(groups+1,read(GROUP_SOURCE)["faceGroup"])
     grouped = weights@nodes
@@ -65,7 +71,7 @@ def archive(pair, out):
              columns=FIELDS,groupValues=grouped.tolist(),regions=regions,fullStepUs=records["full"]["deltaUs"],
              halfStepWorst=max(records["half1"]["last20Max"].values()),fullStepWorst=max(records["full"]["last20Max"].values()),
              firstHalfStepConverged=True,sameTimePairAvailable=False,sameTimeHeatError=None,
-             maxHeatReadbackDifferenceWm2=float(max(abs(q-qcheck))),nativeFluxClosureProven=False,
+             maxHeatReadbackDifferenceWm2=heat_readback_error,nativeFluxClosureProven=False,
              wholeBodyPowerW=None,physicalQualification=False)
     out.mkdir(parents=True,exist_ok=False)
     save(out/"surface.json",s)

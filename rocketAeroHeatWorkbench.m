@@ -228,6 +228,11 @@ renderEditor();sync();showGeometry(true);
             options.enableFaceProbe=true;options.selectedFaces=launcherFlightReview.selectedFaces;
             options.inspectedFace=launcherFlightReview.inspectedFace;
             caption=launcherFlightReview.caption;
+            if isfield(launcherFlightReview,'plotField') && ~isempty(launcherFlightReview.plotField)
+                options.stepField=launcherFlightReview.plotField;
+                record=launcherFlightReview.shortStep;
+                caption=sprintf('M%.2f · %g km · %.2f µs · %s',record.mach,record.altitudeM/1000,record.elapsedFromNumericalSeedUs,options.stepField.name);
+            end
         end
         if rfzNodesOpen && hasRFZAir() && state.currentStep==4
             caption='原面邻点温界 · 线框标出选中的原面';
@@ -715,7 +720,7 @@ renderEditor();sync();showGeometry(true);
             case 4
                 if isLauncherTunnel()
                     if ~isempty(launcherFlightReview)
-                        grid=form(15);
+                        grid=form(16);
                         controls.backToTunnel=button(grid,1,'返回当前风洞工况',@(~,~)go(4));
                         mach=cellfun(@(entry)entry.mach,launcherFlightReview.cases)';
                         controls.flightRecord=choice(grid,2,'飞行工况记录',cellstr(compose('M %.2f',mach)),mach,mach(1));
@@ -726,12 +731,16 @@ renderEditor();sync();showGeometry(true);
                                 [{'all'} {regions.key}],'all');
                             controls.flightRegion.ValueChangedFcn=@(~,~)updateFlightRecord();
                         end
-                        controls.flightCondition=tip(grid,4,'');
+                        controls.flightField=choice(grid,4,'三维显示', ...
+                            {'几何与原面','外层加密网 · 入壁热流','原网 · 入壁热流','外层加密网 · 绝对壁压','原网 · 绝对壁压'}, ...
+                            {'geometry','fineHeat','coarseHeat','finePressure','coarsePressure'},'geometry');
+                        controls.flightField.ValueChangedFcn=@(~,~)updateFlightRecord(launcherFlightReview.inspectedFace);
+                        controls.flightCondition=tip(grid,5,'');
                         controls.flightCoverage=uitable(grid,'ColumnName',{'场量与状态','面数','面积占比'}, ...
                             'RowName',{},'ColumnWidth',{'auto','auto','auto'});
-                        controls.flightCoverage.Layout.Row=[7 10];controls.flightCoverage.Layout.Column=[1 2];
+                        controls.flightCoverage.Layout.Row=[8 11];controls.flightCoverage.Layout.Column=[1 2];
                         controls.flightNote=uitextarea(grid,'Editable','off');
-                        controls.flightNote.Layout.Row=[11 15];controls.flightNote.Layout.Column=[1 2];
+                        controls.flightNote.Layout.Row=[12 16];controls.flightNote.Layout.Column=[1 2];
                         updateFlightRecord();sync();return
                     end
                     grid=form(12);controls.run=button(grid,1,'计算低速风洞全表面结果',@solveCase);
@@ -2215,6 +2224,14 @@ renderEditor();sync();showGeometry(true);
                             b.wallGivenK==t.wallGivenK && b.elapsedUs==t.elapsedFromNumericalSeedUs
                         t.balance=b;
                     end
+                    d=readFlightCheck('v371',fullfile('evidence','comparison.json'), ...
+                        '50d26422263af820add584da9ee965509f95d8aec19f6e1fcdb3724cf0b2e992');
+                    if ~isempty(d) && strcmp(d.coarseFrameSHA256,t.frameSHA256) && strcmp(d.surfaceSHA256,t.surfaceSHA256) && ...
+                            strcmp(d.groupSourceSHA256,t.groupSourceSHA256) && d.faces==t.faces && d.mach==t.mach && ...
+                            d.altitudeM==t.altitudeM && d.wallGivenK==t.wallGivenK && d.elapsedFromNumericalSeedUs==t.elapsedFromNumericalSeedUs && ...
+                            isequal(d.columns,t.columns) && isequal(size(d.fineGroupValues),size(t.groupValues))
+                        t.outerGrid=d;
+                    end
                     archive.shortStep=t;
                 end
             end
@@ -2381,6 +2398,7 @@ renderEditor();sync();showGeometry(true);
         end
         % 用同一份研究终帧展示积分与探针。壁面流体温度和给定壁温分别标注。
         t=launcherFlightReview.shortStep;
+        launcherFlightReview.plotField=[];controls.flightField.Enable='off';
         if ~isempty(t) && entry.mach==t.mach && entry.altitudeM==t.altitudeM && entry.wallGivenK==t.wallGivenK
             scopeKey='all';scopeLabel='全表面';
             if ~isempty(region),scopeKey=region.key;scopeLabel=region.label;end
@@ -2404,8 +2422,35 @@ renderEditor();sync();showGeometry(true);
                 lines=[lines(1);{sprintf('原面 %d · 绝对壁压 %.1f Pa，入壁热流 %.1f W/m²。',face,value(1),value(2)); ...
                     sprintf('给定壁温 %.2f K，壁节点流体 %.2f K，首层流体 %.2f K。',t.wallGivenK,value(3),value(4))};lines(2:end)];
             end
+            % 仅在两份步末场均与原面绑定时提供对照，切换网格时保持相同色标和视角。
+            if isfield(t,'outerGrid')
+                d=t.outerGrid;mode=controls.flightField.Value;controls.flightField.Enable='on';
+                regionGrid=d.regions.(scopeKey);
+                compareLine=sprintf('外层加密对照 · %s热流 RMS 差 %.4g%%，参考焓换算后的整域差 %+.2f W → %+.2f W。', ...
+                    scopeLabel,100*regionGrid.heatRmsFraction,d.nativeBalance.coarse.excessW,d.nativeBalance.fine.excessW);
+                if ~strcmp(mode,'geometry')
+                    col=1;quantity='绝对壁压';unit='Pa';
+                    if endsWith(mode,'Heat'),col=2;quantity='入壁热流';unit='W/m²';end
+                    values=t.groupValues;gridLabel='原网';
+                    if startsWith(mode,'fine'),values=d.fineGroupValues;gridLabel='外层加密网';end
+                    limits=[min([t.groupValues(:,col);d.fineGroupValues(:,col)]) max([t.groupValues(:,col);d.fineGroupValues(:,col)])];
+                    launcherFlightReview.plotField=struct('name',[gridLabel ' · ' quantity],'unit',unit, ...
+                        'values',values(launcherFlightReview.wallStudy.faceGroup,col),'range',limits);
+                    power=r.researchIntoWallW;
+                    if startsWith(mode,'fine'),power=regionGrid.researchIntoWallW;end
+                    lines={sprintf('SU2 层流研究场 · %s · %.2f µs · 给定壁温 %.2f K。',gridLabel,t.elapsedFromNumericalSeedUs,t.wallGivenK); ...
+                        sprintf('%s %d 面 · 入壁功率 %.6f W。',scopeLabel,r.faces,power)};
+                    if ~isempty(face)
+                        v=values(launcherFlightReview.wallStudy.faceGroup(face),:);
+                        lines{end+1}=sprintf('原面 %d · 绝对壁压 %.5f Pa，入壁热流 %.5f W/m²。',face,v(1),v(2));
+                        lines{end+1}=sprintf('壁节点流体 %.5f K，首层流体 %.5f K。',v(3),v(4));
+                    end
+                end
+                lines{end+1}=compareLine;
+            end
             note=[lines;note(:)];
         end
+        if strcmp(controls.flightField.Enable,'off'),controls.flightField.Value='geometry';end
         controls.flightNote.Value=note;
         if ~isempty(launcherFlightReview.regionAudit),showGeometry(false);end
     end

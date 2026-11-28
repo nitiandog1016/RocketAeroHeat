@@ -1,6 +1,6 @@
 function updateAerothermalGeometryView(view,mesh,caption,options)
-%UPDATEAEROTHERMALGEOMETRYVIEW 将实际 V/F 同步到无物理场的几何网页。
-% 模块一：核验输入和选项；仅传送几何，不制造压力、热流或温度字段。
+%UPDATEAEROTHERMALGEOMETRYVIEW 将真实几何及用户选中的已有面场传给离线三维视图。
+% 模块一：核验输入、面序和选项。
 % options.showWire：是否显示实际三角形边，默认 false。
 % options.resetCamera：更新时适配模型，默认 true；false 保留用户视角。
 if ~isstruct(view)||~isfield(view,'html')||~isvalid(view.html),return;end
@@ -61,6 +61,16 @@ if isfield(options,'givenWallK')
         '逐面给定壁温必须与当前面数一致，以 K 为单位且严格为正。');
     payload.faceField=struct('context','given-wall','name','给定壁温','unit','K','values',t, ...
         'range',[min(t),max(t)],'productionQualified',false);
+end
+% 收敛单步研究场使用原面顺序及两网共用色标；计算资格由工作台独立管理。
+if isfield(options,'stepField')
+    f=options.stepField;
+    validateattributes(f.values,{'double'},{'real','finite','column','nonempty','numel',size(F,1)});
+    validateattributes(f.range,{'double'},{'real','finite','numel',2});
+    assert(~isfield(payload,'pointField') && ~isfield(payload,'faceField') && f.range(1)<f.range(2) && ...
+        all(f.values>=f.range(1) & f.values<=f.range(2)),'RAH:Launcher:Field','研究面场与当前色标或原面不符。');
+    payload.faceField=struct('context','single-step-research','name',f.name,'unit',f.unit, ...
+        'values',f.values,'range',f.range,'productionQualified',false);
 end
 % 选区来自当前几何的一基面号；网页接收对应的零基索引。
 if isfield(options,'selectedFaces') && ~isempty(options.selectedFaces)

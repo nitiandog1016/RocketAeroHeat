@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v371 M0.30 同刻外层加密与两网全表面云图](validation/v371/RESULTS.md) · [原面与收支对照](validation/v371/evidence/comparison.json) · [下一项](validation/v371/NEXT_DECISION.md)
+
 - [v370 M0.30 首个收敛步的原生质量与能量收支](validation/v370/RESULTS.md) · [六区热壁项与空间归档](validation/v370/evidence/balance.json) · [下一项](validation/v370/NEXT_DECISION.md)
 
 - [v369 M0.30 的 6.25 µs 单步收敛与全表面研究场](validation/v369/RESULTS.md) · [原面、收支及两份原生历史核对](validation/v369/verify_archive.py) · [下一项](validation/v369/NEXT_DECISION.md)
