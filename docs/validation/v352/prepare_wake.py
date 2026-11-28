@@ -35,9 +35,15 @@ def prepare(out, flow_run=None):
     out.relative_to(ROOT/"outputs")
     out.mkdir(parents=True,exist_ok=False)
     sectors = 48
-    xy, sector_xyz, _, _, rows, cells, markers, single = mesh(
-        np.array([0.,2*np.pi/sectors]), 1,36,wall,14,diameter)
+    sector=mesh(np.array([0.,2*np.pi/sectors]), 1,36,wall,14,diameter)
     state = np.loadtxt(frame,delimiter=",",skiprows=1)
+    return write_full_grid(out,definition,tri,diameter,wall,sector,state,frame)
+
+
+def write_full_grid(out,definition,tri,diameter,wall,sector,state,frame,perturbation=None,source_files=()):
+    """旋转一个已核对的子午扇区；在同一实际闭合网格上写入两支初场。"""
+    sectors=48
+    xy, sector_xyz, _, _, rows, cells, markers, single=sector
     np.testing.assert_allclose(xy,state[:,1:3],rtol=0,atol=1e-13)
     np.testing.assert_array_equal(state[:,0],np.arange(len(xy)))
     axis = rows[0] == rows[1]
@@ -78,11 +84,17 @@ def prepare(out, flow_run=None):
         np.testing.assert_array_equal(unique[counts==1],np.unique(np.sort(expected,axis=1),axis=0))
         assert (counts==1).sum() == len(expected)
     # 按同一轴向带和周向扇片对照原 STL。底面径向细分的面积先加回对应扇片。
+    reference_x=np.unique(tri[:,:,0])
     def bands(polys):
         x = polys[:,:,0]
         mid = polys.mean(axis=1)
         sector = np.floor(np.mod(np.arctan2(mid[:,2],mid[:,1]),2*np.pi)*sectors/(2*np.pi))
-        return np.column_stack((np.rint(x.min(axis=1)*1e7),np.rint(x.max(axis=1)*1e7),sector)).astype(int)
+        low=x.min(axis=1);high=x.max(axis=1)
+        if perturbation is not None:
+            # 细壁面母线保留全部旧折点。每个子面归回其母轴向带，底盘独立成带。
+            base=(high==0)&(low==0);index=np.searchsorted(reference_x,.5*(low+high),side="right")-1
+            low=reference_x[index];high=np.where(base,0.,reference_x[np.minimum(index+1,len(reference_x)-1)])
+        return np.column_stack((np.rint(low*1e7),np.rint(high*1e7),sector)).astype(int)
     ref,ri = np.unique(bands(tri),axis=0,return_inverse=True)
     parts = [xyz[idx]*diameter for idx in bounds["wall"].values()]
     obs,oi = np.unique(np.vstack([bands(b) for b in parts]),axis=0,return_inverse=True)
@@ -102,10 +114,13 @@ def prepare(out, flow_run=None):
             stream.write(f"MARKER_TAG= {name}\nMARKER_ELEMS= {sum(map(len,group.values()))}\n")
             for kind,block in group.items(): put(kind,block)
     # 局部矢势 A_y 的旋度。扰动在壁面、远界及其邻域严格为零。
-    x,y,z = xyz.T; dx=x+.45; a=.35; b=.25
-    weight = np.maximum(1-(dx/a)**2-(y*y+z*z)/b**2,0.)**2
-    change = np.column_stack((6*z/b**2*weight,np.zeros(count),-6*dx/a**2*weight))
-    change *= .01/np.linalg.norm(change,axis=1).max()
+    if perturbation is None:
+        x,y,z = xyz.T; dx=x+.45; a=.35; b=.25
+        weight = np.maximum(1-(dx/a)**2-(y*y+z*z)/b**2,0.)**2
+        change = np.column_stack((6*z/b**2*weight,np.zeros(count),-6*dx/a**2*weight))
+        change *= .01/np.linalg.norm(change,axis=1).max()
+    else:
+        change=perturbation(ids)
     assert all(not change[idx].any() for group in bounds.values() for idx in group.values())
     header='"PointID","x","y","z","Pressure","Velocity_x","Velocity_y","Velocity_z","Enthalpy"'
     for name,v in [("control",vel),("disturbed",vel+change)]:
@@ -122,10 +137,11 @@ def prepare(out, flow_run=None):
                 perturbedNodes=int(np.count_nonzero(np.linalg.norm(change,axis=1))),
                 peakPerturbationOverU=float(np.linalg.norm(change,axis=1).max()),parentFrameSHA256=sha(frame),
                 sources={str(q.relative_to(ROOT)):sha(q) for q in [CASE/"tunnel.json",CASE/definition["file"],
-                    Path(__file__).resolve(),ROOT/"scripts/cm011Tunnel.py",ROOT/"scripts/cm011TunnelSector.py"]},
+                    Path(__file__).resolve(),ROOT/"scripts/cm011Tunnel.py",ROOT/"scripts/cm011TunnelSector.py",*source_files]},
                 files={q.name:sha(q) for q in paths})
     (out/"prepared.json").write_text(json.dumps(result,indent=2,allow_nan=False),encoding="utf8")
     print(count,"nodes;",len(ar),"original surface patches checked",flush=True)
+    return result
 
 
 if __name__=="__main__":

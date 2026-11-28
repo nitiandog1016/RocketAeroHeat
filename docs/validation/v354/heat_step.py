@@ -130,11 +130,17 @@ def near_wall(m,theta,prepared):
 
 
 def run(flow_job,momentum,prepared,heat_root,name,initial_field=None,heat_folder=None,cached_modes=None):
+    m=build_model(flow_job,prepared,heat_folder)
+    return run_on_mesh(m,momentum,prepared,heat_root,name,initial_field,cached_modes,surface_pressure,near_wall,
+                       check_heat_mesh=heat_folder is not None)
+
+
+def run_on_mesh(m,momentum,prepared,heat_root,name,initial_field,cached_modes,pressure_reader,temperature_reader,check_heat_mesh):
+    """对已绑定的输入网格执行同一显热步，按该网格的实际壁面算子取样。"""
     step=read(momentum/name/"step.json")
     frame=momentum/name/f"restart_{step['step']:05d}.csv"
     assert step["accepted"] and sha(frame)==step["frameSHA256"]
     assert step["meshSHA256"]==read(prepared/"prepared.json")["files"]["mesh.su2"]
-    m=build_model(flow_job,prepared,heat_folder)
     initial=initial_field or ROOT/"outputs/v353_validation/coarse01/fields.npz"
     if step["step"]==1:
         proof=read(initial.parent/"results.json")
@@ -146,16 +152,16 @@ def run(flow_job,momentum,prepared,heat_root,name,initial_field=None,heat_folder
         previous=read(parent/"heat.json");initial=parent/"thermal.npz"
         assert previous["accepted"] and sha(initial)==previous["fieldSHA256"]
         assert previous["sourceFrameSHA256"]==step["seedSHA256"]
-        if heat_folder is not None:assert previous["heatMeshSHA256"]==m["heatMeshSHA256"]
+        if check_heat_mesh:assert previous["heatMeshSHA256"]==m["heatMeshSHA256"]
         with np.load(initial) as f:old=f["theta"]
     dst=heat_root/name
     native=np.loadtxt(frame,delimiter=",",skiprows=1)
     operators=project(m,native)
     theta,q,summary,ok=advance(m,operators,old,step["dtDU"],cached_modes)
-    p,taps=surface_pressure(m,native)
+    p,taps=pressure_reader(m,native)
     tri=m["corners"]
     area=np.linalg.norm(np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0]),axis=1)/2
-    near=near_wall(m,theta,prepared)
+    near=temperature_reader(m,theta,prepared)
     np.savez_compressed(dst/"thermal.npz",theta=theta)
     np.savetxt(dst/"wall.csv",np.column_stack((np.arange(1,len(q)+1),area,p,q,near)),delimiter=",",
         fmt=["%d"]+4*["%.17g"],header="faceID,areaM2,pressurePa,heatFluxWm2,nearWallK",comments="")

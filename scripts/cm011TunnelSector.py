@@ -19,11 +19,18 @@ HEX_FACES = ((3,2,1,0),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7))
 PRISM_FACES = ((2,1,0),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5))
 
 
-def mesh(rays=RAYS, level=2, layers=42, wall=None, extent=12., diameter=D):
+def mesh(rays=RAYS, level=2, layers=42, wall=None, extent=12., diameter=D, meridian_nodes=None):
     """合并轴线节点，沿母线法向和周向生成体单元，并独立核对面邻接。"""
     if wall is None:
         wall, _ = meridian(level)
-    xy, quads, _ = volume(wall, layers, extent, level)
+    if meridian_nodes is None:
+        xy, quads, _ = volume(wall, layers, extent, level)
+    else:
+        assert meridian_nodes.shape==(layers+1,len(wall),2)
+        np.testing.assert_array_equal(meridian_nodes[0],wall)
+        xy=meridian_nodes.reshape(-1,2)
+        grid=np.arange(len(xy)).reshape(layers+1,len(wall))
+        quads=np.stack((grid[:-1,:-1],grid[:-1,1:],grid[1:,1:],grid[1:,:-1]),axis=-1).reshape(-1,4)
     steps = len(rays)-1
     angle = rays[-1]-rays[0]
     delta = angle/steps

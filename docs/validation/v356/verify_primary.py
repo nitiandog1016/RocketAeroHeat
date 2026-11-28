@@ -40,6 +40,19 @@ def verify(ui,web):
             "wallInput":(np.full(len(native),300.001),"K"),"nearWallCellTemperature":(native[:,4],"K"),
             "wakeCoarseHeat":(coarse[:,3],"W/m²"),"wakeHeatDifference":(native[:,3]-coarse[:,3],"W/m²")}
     counts={}
+    if "momentumWallSHA256" in r:
+        bundle=case/"momentum_grid.zip"
+        assert hashlib.sha256(bundle.read_bytes()).hexdigest()==read(case/"receipt.json")["momentumGridSHA256"]
+        with ZipFile(bundle) as z:
+            info=json.loads(z.read("comparison.json"))
+            assert hashlib.sha256(z.read("wall.csv")).hexdigest()==r["momentumWallSHA256"]==info["refinedWallSHA256"]
+            fine=np.loadtxt(z.open("wall.csv"),delimiter=",",skiprows=1)
+        assert info["refinedThermalSHA256"]==r["momentumThermalSHA256"] and info["refinedFlowSHA256"]==r["momentumFlowSHA256"]
+        np.testing.assert_array_equal(fine[:,:2],native[:,:2])
+        pref=info["condition"]["ambientPressurePa"]
+        values.update(pressureGauge=(native[:,2]-pref,"Pa"),momentumGridGauge=(fine[:,2]-pref,"Pa"),
+                      momentumGridHeat=(fine[:,3],"W/m²"),momentumGaugeChange=(fine[:,2]-native[:,2],"Pa"),
+                      momentumHeatChange=(fine[:,3]-native[:,3],"W/m²"),momentumFirstCell=(fine[:,4],"K"))
     for key in r["fields"]:
         field,unit=values[key]
         process=subprocess.run(["node","-e",EXPORT,str((ui/"workbench").resolve()),str(web.resolve()),key],

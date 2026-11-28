@@ -153,6 +153,39 @@ if isfield(mesh,'hybridWall')
         add('pressureGauge','相对环境壁压','Pa',delta,double(isfinite(delta)),hybridMethod(w,sourceKey), ...
             '同工况壁面绝对压力与环境参考压力之差',pressureScopes);
     end
+    if isfield(mesh,'launcherMomentumGrid')
+        % 同刻动量网对照：共享色标显示两张主量图，差值统一按“加密减原网”。
+        g=mesh.launcherMomentumGrid;p=g.pressurePa-mesh.hybridCondition.ambientPressurePa;q=g.heatFluxWm2;
+        dp=g.pressurePa-w.pressurePa;dq=q-w.heatFluxWm2;
+        scope=sprintf(['同一 0.600 s 风洞工况、相同热网及初温。加密动量网 %.0f 节点；' ...
+            '壁压加权 RMS 差为来流动压的 %.2f%%，热流加权相对 RMS 差 %.2f%%。'], ...
+            g.refinedNodes,100*g.errors.pressureRMSOverDynamic,100*g.errors.fluxRelativeRMS);
+        if ~g.allSpatialGatesPassed,scope=[scope ' 部分动量网格敏感性指标超限，详见本工况报告。'];end
+        rows={'momentumGridGauge','相对环境壁压 · 加密动量网','Pa',p,'SU2 恒密度层流 BDF1，两半步末壁压在加密壁节点上分片线性积分'; ...
+            'momentumGridHeat','入壁热流 · 加密动量网','W/m²',q,'加密动量终帧向相同热网传递速度，三维守恒显热与等温壁反力'; ...
+            'momentumGaugeChange','壁压差 · 动量网加密减原网','Pa',dp,'同一原面上两套动量离散的末时刻壁压相减'; ...
+            'momentumHeatChange','入壁热流差 · 动量网加密减原网','W/m²',dq,'相同热网、不同动量网的末时刻有符号入壁热流相减'};
+        for j=1:size(rows,1)
+            add(rows{j,1},rows{j,2},rows{j,3},rows{j,4},ones(n,1),repmat(rows(j,5),n,1), ...
+                scope,cellstr(string(scope)+" "+w.sampleScope));
+            data.fields(end).computedStateLabel='同工况归档网格对照';
+        end
+        combined=[p;w.pressureGaugePa];data.comparisonColorRanges.pressureGauge=[min(combined) max(combined)];
+        data.comparisonColorRanges.momentumGridGauge=data.comparisonColorRanges.pressureGauge;
+        combined=[q;w.heatFluxWm2];
+        if isfield(mesh,'launcherWakeCoarse'),combined=[combined;mesh.launcherWakeCoarse.heatFluxWm2];end
+        data.comparisonColorRanges.heatFlux=[min(combined) max(combined)];
+        data.comparisonColorRanges.momentumGridHeat=data.comparisonColorRanges.heatFlux;
+        if isfield(mesh,'launcherWakeCoarse'),data.comparisonColorRanges.wakeCoarseHeat=data.comparisonColorRanges.heatFlux;end
+        data.comparisonColorRanges.momentumGaugeChange=[-1 1]*max(abs(dp));
+        data.comparisonColorRanges.momentumHeatChange=[-1 1]*max(abs(dq));
+        sample=sprintf('在加密动量网的首层流体节点取样，首层法向高度中位数 %.3f mm；原动量网为 %.3f mm。', ...
+            g.refinedFirstNormalMedianMm,g.originalFirstNormalMedianMm);
+        add('momentumFirstCell','首层流体温度 · 加密动量网','K',g.nearWallK,ones(n,1), ...
+            repmat({'同刻细热网温度插值至加密动量网首层流体节点，再按原面面积平均'},n,1),sample,cellstr(string(sample)+" "+w.sampleScope));
+        data.fields(end).computedStateLabel='同工况归档网格对照';
+        data.momentumGridSources=rmfield(g,{'pressurePa','heatFluxWm2','nearWallK'});
+    end
     if ismember('wallFluidTemperatureK',w.Properties.VariableNames)
         fluidT=w.wallFluidTemperatureK;
         add('wallFluidTemperature','壁节点流体温度','K',fluidT,double(isfinite(fluidT)), ...

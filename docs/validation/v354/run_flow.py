@@ -89,7 +89,7 @@ def inspect(folder, p, seed, branch, size, step, prepared):
     return rec
 
 
-def run(out,branch,size,step,prepared=BASE):
+def run(out,branch,size,step,prepared=BASE,seconds=420,output_mib=400,plan=None):
     p=read(prepared/"prepared.json");c=read(CONDITION)
     assert c["velocityMps"]==[-.05,0,0] and c["wallTemperatureK"]==300.001 and p["sectors"]==48
     assert sha(EXE)=="01f22d0c9de2e9a5feea666f67adf3957f503d2e14ca6fd998a9a28a11417bf7"
@@ -113,7 +113,8 @@ def run(out,branch,size,step,prepared=BASE):
             os.link(old,seed)
         cfg=folder/"case.cfg";cfg.write_text(config(p,c,STEPS[size],step),encoding="ascii")
         paths=[EXE,cfg,seed,folder/"mesh.su2",prepared/"prepared.json",CONDITION,DOC/"PLAN.md",Path(__file__).resolve()]
-        observe([str(EXE),"case.cfg","--threads","4"],folder,{str(f):sha(f) for f in paths},420,400*1024**2)
+        if plan is not None:paths.append(plan)
+        observe([str(EXE),"case.cfg","--threads","4"],folder,{str(f):sha(f) for f in paths},seconds,output_mib*1024**2)
     rec=inspect(folder,p,seed,branch,size,step,prepared)
     if not (folder/"step.json").exists():save(folder/"step.json",rec)
     else:assert read(folder/"step.json")==rec

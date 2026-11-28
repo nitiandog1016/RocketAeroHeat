@@ -2,11 +2,11 @@
 
 ## 简化运载火箭低速风洞工况
 
-0.05 m/s、0.600 s，9,216 面均有同刻壁压和侧栏新算的细网热流，整件放热 0.868870 mW。缺少归档与细网初场时复用动量，125.62 s 出图。面热流粗细网加权 RMS 差 2.56%，底面弱信号步长差 24.13%，联合实测面积 0 m²。[工作台与验证](validation/v356/RESULTS.md) · [下一项](validation/v356/NEXT_DECISION.md)
+0.05 m/s、0.600 s，9,216 面全覆盖。动量网加密后放热 0.868243 mW，整件差 0.0723%，热流面积加权 RMS 差 0.741%，联合实测面积 0 m²。[网格与工作台](validation/v357/RESULTS.md) · [下一项：飞行工况检查](validation/v357/NEXT_DECISION.md)
 
-<!-- records:last_completed=v356 -->
+<!-- records:last_completed=v357 -->
 <!-- records:active=none -->
-<!-- records:base_commit=2f98057b66baeb60a5af05bd12df019adbefeb01 -->
+<!-- records:base_commit=4b06dbc09795fc33a99e74fc9f303ac5feeee20f -->
 
 ## RFZ 独立计算与公开对照
 

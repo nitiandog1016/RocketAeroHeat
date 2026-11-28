@@ -189,6 +189,31 @@ elseif ~fine && wake && isfield(seal,'wakeHeatGridSHA256')
         error('RAH:Launcher:GridPair','归档的粗细网工况或终帧不匹配。');
     end
 end
+% 模块七：同一热网及初温上的动量网格对照，绑定两套流动、热场和原面表的身份。
+if fine && isfield(seal,'momentumGridSHA256')
+    pack=fullfile(caseFolder,'momentum_grid.zip');
+    if isfile(pack) && strcmp(cm011FileSHA256(pack),seal.momentumGridSHA256)
+        sub=fullfile(job,'momentum_grid');unzip(pack,sub);g=jsondecode(fileread(fullfile(sub,'comparison.json')));
+        g.condition.velocityMps=reshape(g.condition.velocityMps,1,3);
+        if isequaln(g.condition,c) && strcmp(g.surfaceSHA256,s.surfaceSHA256) && ...
+                strcmp(g.originalFlowMeshSHA256,s.flowMeshSHA256) && strcmp(g.originalFlowSHA256,s.sourceFrameSHA256) && ...
+                strcmp(g.originalThermalSHA256,s.thermalFrameSHA256) && strcmp(g.originalWallSHA256,s.wallSHA256) && ...
+                strcmp(g.initialThermalSHA256,s.initialThermalSHA256) && strcmp(g.heatMeshSHA256,s.heatMeshSHA256)
+            path=fullfile(sub,'wall.csv');
+            assert(strcmp(cm011FileSHA256(path),g.refinedWallSHA256),'RAH:Launcher:MomentumGrid','动量网对照面表指纹不符。');
+            tab=readtable(path);
+            assert(g.faces==n && isequal(tab.faceID,(1:n)') && max(abs(tab.areaM2-area))<1e-10 && abs(g.areaM2-sum(area))<1e-10 && ...
+                all(isfinite(tab.pressurePa) & tab.pressurePa>0 & isfinite(tab.heatFluxWm2) & isfinite(tab.nearWallK)) && ...
+                abs(area'*tab.heatFluxWm2+g.outwardW)<1e-12,'RAH:Launcher:MomentumGrid','动量网对照的面积、物理量或积分不符。');
+            for group=def.regions'
+                ids=group.firstFace:group.lastFace;
+                assert(abs(area(ids)'*tab.heatFluxWm2(ids)+g.errors.region.(group.name).refinedW)<1e-12);
+            end
+            g.pressurePa=tab.pressurePa;g.heatFluxWm2=tab.heatFluxWm2;g.nearWallK=tab.nearWallK;
+            result.launcherMomentumGrid=g;
+        end
+    end
+end
 report.status='completed';report.runDirectory=job;
     function heartbeat()
         if ~isempty(progressFcn),progressFcn(struct('status','running','message','低速风洞计算中'));end

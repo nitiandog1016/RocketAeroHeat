@@ -1,4 +1,4 @@
-function check_primary(out,action,expectCoarse)
+function check_primary(out,action,expectCoarse,expectMomentum)
 % 模块一：通过普通侧栏载入简化箭体并执行指定的计算或归档操作。
 evalin('base','main');app=evalin('base','appFigure');guard=onCleanup(@()delete(app)); %#ok<NASGU>
 app.Visible='off';press(app.UserData.controls.load);press(app.UserData.controls.confirm);
@@ -14,6 +14,7 @@ gl=ui.html.UserData.rendered;assert(gl.webglError==0 && gl.visiblePixelSamples>0
 seconds=toc(timer);r=state.result;s=r.launcherSummary;
 assert(strcmp(r.launcherAction,action) && strcmp(s.primaryHeatGrid,'fine'));
 assert(isfield(r,'launcherWakeCoarse')==expectCoarse);
+if nargin>=4,assert(isfield(r,'launcherMomentumGrid')==expectMomentum);end
 job=app.UserData.caseReport.runDirectory;
 % 模块二：工作台主热流、首层温度及来源身份必须逐面匹配本次终帧。
 if strcmp(action,'solve')
@@ -34,8 +35,21 @@ if expectCoarse
     coarse=r.launcherWakeCoarse.heatFluxWm2;
     keys=[keys {'wakeCoarseHeat','wakeHeatDifference'}];values=[values {coarse,w.heatFluxWm2-coarse}];
     c=d.comparisonColorRanges;both=[w.heatFluxWm2;coarse];
+    if isfield(r,'launcherMomentumGrid'),both=[both;r.launcherMomentumGrid.heatFluxWm2];end
     assert(isequal(c.heatFlux,[min(both) max(both)]) && isequal(c.wakeCoarseHeat,c.heatFlux));
     assert(isequal(c.wakeHeatDifference,[-1 1]*max(abs(w.heatFluxWm2-coarse))));
+end
+% 若存在同热网的动量复核，四个新增场必须来自归档对照及其与本次主结果的差。
+if isfield(r,'launcherMomentumGrid')
+    g=r.launcherMomentumGrid;gauge=w.pressurePa-s.condition.ambientPressurePa;
+    p=g.pressurePa-s.condition.ambientPressurePa;dp=g.pressurePa-w.pressurePa;dq=g.heatFluxWm2-w.heatFluxWm2;
+    keys=[keys {'pressureGauge','momentumGridGauge','momentumGridHeat','momentumGaugeChange','momentumHeatChange','momentumFirstCell'}];
+    values=[values {gauge,p,g.heatFluxWm2,dp,dq,g.nearWallK}];
+    c=d.comparisonColorRanges;both=[p;gauge];
+    assert(isequal(c.pressureGauge,[min(both) max(both)]) && isequal(c.pressureGauge,c.momentumGridGauge));
+    assert(isequal(c.heatFlux,c.momentumGridHeat));
+    assert(isequal(c.momentumGaugeChange,[-1 1]*max(abs(dp))) && isequal(c.momentumHeatChange,[-1 1]*max(abs(dq))));
+    assert(strcmp(d.momentumGridSources.refinedThermalSHA256,g.refinedThermalSHA256));
 end
 probes=[1 1537 2017 6913 9102 9169];rows=zeros(size(keys));
 for k=1:numel(keys)
@@ -62,6 +76,10 @@ receipt=struct('action',action,'resultWaitSeconds',seconds,'visiblePixelSamples'
     'faces',gl.faces,'probedFaceIDs',probes,'fields',{keys},'sectionX',.7,'sectionRows',rows, ...
     'wallSHA256',s.wallSHA256,'thermalFrameSHA256',s.thermalFrameSHA256,'sourceFrameSHA256',s.sourceFrameSHA256, ...
     'heatMeshSHA256',s.heatMeshSHA256,'outwardW',s.outwardW,'regionW',s.regionW,'runDirectory',job);
+if isfield(r,'launcherMomentumGrid')
+    receipt.momentumWallSHA256=g.refinedWallSHA256;
+    receipt.momentumThermalSHA256=g.refinedThermalSHA256;receipt.momentumFlowSHA256=g.refinedFlowSHA256;
+end
 writelines(string(jsonencode(receipt,'PrettyPrint',true)),fullfile(out,'ui.json'),'Encoding','UTF-8');
 end
 
