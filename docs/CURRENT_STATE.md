@@ -1,12 +1,12 @@
 # 当前交接
 
-## 简化运载火箭低速风洞工况
+## 简化运载火箭飞行工况与低速风洞
 
-0.05 m/s、0.600 s，9,216 面全覆盖。动量网加密后放热 0.868243 mW，整件差 0.0723%，热流面积加权 RMS 差 0.741%，联合实测面积 0 m²。[网格与工作台](validation/v357/RESULTS.md) · [下一项：飞行工况检查](validation/v357/NEXT_DECISION.md)
+5 km、零攻角，M0.30/0.85/1.00 通用工程链退出，M1.20/2.00 的计算壁压与热流联合面积为 14.60%/14.75%，五例整件功率未知。低速风洞 0.05 m/s、0.600 s 已覆盖 9,216 面。联合实测面积 0 m²。[五工况](validation/v358/RESULTS.md) · [风洞](validation/v357/RESULTS.md) · [下一项](validation/v358/NEXT_DECISION.md)
 
-<!-- records:last_completed=v357 -->
+<!-- records:last_completed=v358 -->
 <!-- records:active=none -->
-<!-- records:base_commit=4b06dbc09795fc33a99e74fc9f303ac5feeee20f -->
+<!-- records:base_commit=307a5f7469727acf0ed51e04828a7e82142fe7fd -->
 
 ## RFZ 独立计算与公开对照
 
