@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v369 M0.30 的 6.25 µs 单步收敛与全表面研究场](validation/v369/RESULTS.md) · [原面、收支及两份原生历史核对](validation/v369/verify_archive.py) · [下一项](validation/v369/NEXT_DECISION.md)
+
 - [v368 五个飞行工况的能力与 M0.30 面值重建对照](validation/v368/RESULTS.md) · [原始面值与节点复核](validation/v368/check_reconstruction.py) · [下一项](validation/v368/NEXT_DECISION.md)
 
 - [v367 M0.30 尾部官方基态的逐项能量残差与局部加密](validation/v367/RESULTS.md) · [原生阶段值](validation/v367/evidence/matched_stages.csv) · [下一项](validation/v367/NEXT_DECISION.md)

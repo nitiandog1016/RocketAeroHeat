@@ -2199,6 +2199,17 @@ renderEditor();sync();showGeometry(true);
                     archive.timeStudy.gradientComparison=g;
                 end
             end
+            % 单步研究场复用已核对的原面分组；只在同一来流与壁温下读取。
+            archive.shortStep=[];
+            if ~isempty(archive.wallStudy)
+                t=readFlightCheck('v369',fullfile('evidence','surface.json'), ...
+                    '9f399f7c678b4f5b9ad842f395ef6cb0dc5173d4b3a0af5d21da9566c05a4528');
+                if ~isempty(t) && strcmp(t.surfaceSHA256,archive.surfaceSHA256) && t.faces==archive.faces && ...
+                        strcmp(t.groupSourceSHA256,'4b80d867cd7b6f570310fc3b8b9bab6ffc8c22e2f108cd13c02c2f0710867fd8') && ...
+                        size(t.groupValues,1)==max(archive.wallStudy.faceGroup) && t.firstHalfStepConverged
+                    archive.shortStep=t;
+                end
+            end
             archive.selectedFaces=[];archive.inspectedFace=[];archive.caption='';
             launcherFlightReview=archive;
             renderEditor();sync();
@@ -2359,6 +2370,22 @@ renderEditor();sync();showGeometry(true);
                 end
             end
             if isempty(face),note=[{msg};note(:)];else,note=[note(:);{msg}];end
+        end
+        % 用同一份研究终帧展示积分与探针。壁面流体温度和给定壁温分别标注。
+        t=launcherFlightReview.shortStep;
+        if ~isempty(t) && entry.mach==t.mach && entry.altitudeM==t.altitudeM && entry.wallGivenK==t.wallGivenK
+            scopeKey='all';scopeLabel='全表面';
+            if ~isempty(region),scopeKey=region.key;scopeLabel=region.label;end
+            r=t.regions.(scopeKey);
+            lines={sprintf('SU2 层流研究场 · 自数值初场起 %.2f µs，步内收敛。',t.elapsedFromNumericalSeedUs); ...
+                sprintf('%s %d 面 · 入壁功率 %.3f W。',scopeLabel,r.faces,r.researchIntoWallW); ...
+                sprintf('%.1f µs 整步未收敛，同刻步长误差与原生边界收支待核实。',t.fullStepUs)};
+            if ~isempty(face)
+                value=t.groupValues(launcherFlightReview.wallStudy.faceGroup(face),:);
+                lines=[lines(1);{sprintf('原面 %d · 绝对壁压 %.1f Pa，入壁热流 %.1f W/m²。',face,value(1),value(2)); ...
+                    sprintf('给定壁温 %.2f K，壁节点流体 %.2f K，首层流体 %.2f K。',t.wallGivenK,value(3),value(4))};lines(2:end)];
+            end
+            note=[lines;note(:)];
         end
         controls.flightNote.Value=note;
         if ~isempty(launcherFlightReview.regionAudit),showGeometry(false);end

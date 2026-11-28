@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞 9,216 面已算。五个飞行点的工程覆盖已按原 STL 复核，整件功率均未知。M0.30 同一状态改用 Green–Gauss 后，原峰值点好转，四列能量残差范数升至 2.65 倍，全域残差变大。该重建候选结束，合格同面新增 0 m²。下一项用原方法比较一组短物理步的同刻热流。[五点能力与原生读数](validation/v368/RESULTS.md) · [下一项](validation/v368/NEXT_DECISION.md)
+风洞 9,216 面已算。M0.30 在数值起点后 6.25 µs 首次通过步内门槛，9,216 面研究场入壁功率 −1,045.057 W。12.5 µs 整步未过，同刻误差未知；保存场能量账差 −16.81 kW。五点最终功率待验。[单步结果](validation/v369/RESULTS.md) · [下一项原生守恒账](validation/v369/NEXT_DECISION.md)
 
-<!-- records:last_completed=v368 -->
+<!-- records:last_completed=v369 -->
 <!-- records:active=none -->
-<!-- records:base_commit=57ad61a5e636b50a05bab4ca962dadb541164215 -->
+<!-- records:base_commit=1058f4a89c0207ee0e02bfc3f0e59e348126eea9 -->
 
 ## RFZ 独立计算与公开对照
 
