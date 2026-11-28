@@ -718,7 +718,7 @@ renderEditor();sync();showGeometry(true);
                         grid=form(15);
                         controls.backToTunnel=button(grid,1,'返回当前风洞工况',@(~,~)go(4));
                         mach=cellfun(@(entry)entry.mach,launcherFlightReview.cases)';
-                        controls.flightRecord=choice(grid,2,'飞行记录 · v358',cellstr(compose('M %.2f',mach)),mach,mach(1));
+                        controls.flightRecord=choice(grid,2,'飞行工况记录',cellstr(compose('M %.2f',mach)),mach,mach(1));
                         controls.flightRecord.ValueChangedFcn=@(~,~)updateFlightRecord();
                         if ~isempty(launcherFlightReview.regionAudit)
                             regions=launcherFlightReview.regionAudit.regions;
@@ -2158,6 +2158,14 @@ renderEditor();sync();showGeometry(true);
                     max(abs(state.mesh.V-state.rawMesh.V),[],'all')<1e-10)
                 archive.regionAudit=[];
             end
+            % 将同形滑移壁研究场绑定到已核对的原面序，完整结果仍由工况求解入口管理。
+            archive.outerStudy=readFlightCheck('v364',fullfile('research','surface.json'), ...
+                'e8247a35b3ddc240fc5eba5567ff3ac914f64b7801ce1af881dc80cfa7c636d4');
+            if isempty(archive.regionAudit) || (~isempty(archive.outerStudy) && ...
+                    (~strcmp(archive.outerStudy.surfaceSHA256,archive.surfaceSHA256) || ...
+                    numel(archive.outerStudy.faceGroup)~=archive.faces))
+                archive.outerStudy=[];
+            end
             archive.selectedFaces=[];archive.inspectedFace=[];archive.caption='';
             launcherFlightReview=archive;
             renderEditor();sync();
@@ -2228,10 +2236,14 @@ renderEditor();sync();showGeometry(true);
         if ~isempty(region)
             note=[{sprintf('原面 %d–%d · X = %.4f 至 %.4f m',region.firstFace,region.lastFace,region.xMinM,region.xMaxM)};note(:)];
             if entry.mach==launcherFlightReview.regionAudit.mach
-                note=[{['本区流动状态' region.flowState '。' region.note]};note];
+                status=['本区流动状态' region.flowState '。'];
+                if isempty(launcherFlightReview.outerStudy)
+                    status=[status region.note];
+                end
+                note=[{status};note];
                 domain=region.windDomain;
                 note{end+1}=sprintf(['同形稳态风洞（0.05 m/s），远界从 14D 扩至 22D。' ...
-                    '本区壁压 RMS 差为风洞动压的 %.4f%%，放热功率差 %.4f%%。M0.30 的外域误差未知。'], ...
+                    '本区壁压 RMS 差为风洞动压的 %.4f%%，放热功率差 %.4f%%。'], ...
                     domain.pressureRmsPercentDynamic,domain.powerDifferencePercent);
             end
             if ~isempty(face)
@@ -2246,6 +2258,25 @@ renderEditor();sync();showGeometry(true);
                 end
                 note=[{faceText};note];
             end
+        end
+        % 全表面、分区、单面各自显示相同压力来源，量纲和两档外域均显式给出。
+        study=launcherFlightReview.outerStudy;
+        if ~isempty(study) && entry.mach==study.mach && entry.altitudeM==study.altitudeM && entry.wallGivenK==study.wallGivenK
+            scopeKey='all';
+            if ~isempty(region),scopeKey=region.key;end
+            r=study.regions.(scopeKey);
+            lines={sprintf(['M%.2f 同形研究外流 · 不可压滑移壁速度，伯努利绝对静压。' ...
+                '22D 范围 %.3f–%.3f kPa。14D 与 22D 的面积加权 RMS 压差 %.1f Pa。'], ...
+                study.mach,(study.freePressurePa+study.dynamicPressurePa*r.cpMin)/1000, ...
+                (study.freePressurePa+study.dynamicPressurePa*r.cpMax)/1000,study.dynamicPressurePa*r.rmsDeltaCp); ...
+                '本模型附着与分离待核实。该方法没有壁面换热方程。'};
+            if ~isempty(face)
+                slot=study.faceGroup(face);
+                p14=study.freePressurePa+study.dynamicPressurePa*study.groupCp14D(slot);
+                p22=study.freePressurePa+study.dynamicPressurePa*study.groupCp22D(slot);
+                lines=[{sprintf('原面 %d · 研究静压（绝对）14D %.1f Pa，22D %.1f Pa。',face,p14,p22)};lines];
+            end
+            note=[lines;note(:)];
         end
         controls.flightNote.Value=note;
         if ~isempty(launcherFlightReview.regionAudit),showGeometry(false);end

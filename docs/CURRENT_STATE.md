@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞全 9,216 面已算，五个飞行点整件功率未知。M0.30 六区均无同工况附着证据，新增 0 面、0 m²。侧栏现可按区域及原面核对五点档案。[六区、拾取与外域差额](validation/v363/RESULTS.md) · [下一项](validation/v363/NEXT_DECISION.md)
+风洞 9,216 面已算。M0.30 两档外域已取得同形研究压力，圆柱段 RMS 压差 35.3 Pa；首轮非正压力已排除。五点整件热功率仍未知，M0.30 合格同面新增 0 m²。[实算与侧栏](validation/v364/RESULTS.md) · [下一项](validation/v364/NEXT_DECISION.md)
 
-<!-- records:last_completed=v363 -->
+<!-- records:last_completed=v364 -->
 <!-- records:active=none -->
-<!-- records:base_commit=125796e55e6d0357ffb0c639688f93370803b379 -->
+<!-- records:base_commit=f533ef310b95708728ea77f622f02f5f39ff8c64 -->
 
 ## RFZ 独立计算与公开对照
 
