@@ -4,6 +4,8 @@
 
 ## 当前与独立工作入口
 
+- [v367 M0.30 尾部官方基态的逐项能量残差与局部加密](validation/v367/RESULTS.md) · [原生阶段值](validation/v367/evidence/matched_stages.csv) · [下一项](validation/v367/NEXT_DECISION.md)
+
 - [v366 M0.30 物理步、能量收支与尾部残差定位](validation/v366/RESULTS.md) · [六份原生回执核对](validation/v366/research/runs.json) · [下一项](validation/v366/NEXT_DECISION.md)
 
 - [v365 M0.30 两档等温壁热流、近壁流向与原面拾取](validation/v365/RESULTS.md) · [原生场核对](validation/v365/research/runs.json) · [下一项](validation/v365/NEXT_DECISION.md)

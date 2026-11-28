@@ -2181,6 +2181,16 @@ renderEditor();sync();showGeometry(true);
                     && archive.timeStudy.faces==archive.faces)
                 archive.timeStudy=[];
             end
+            if ~isempty(archive.timeStudy)
+                % 尾部局部方程账只随对应几何和工况的时间步记录显示。
+                a=readFlightCheck('v367',fullfile('evidence','status.json'), ...
+                    '34cca64461f4c95ee7a557fdc9187e9559017aab2172c22d08d8add61bf659d5');
+                if ~isempty(a) && strcmp(a.surfaceSHA256,archive.surfaceSHA256) && a.faces==archive.faces && ...
+                        a.mach==archive.timeStudy.mach && a.altitudeM==archive.timeStudy.altitudeM && ...
+                        a.wallGivenK==archive.timeStudy.wallGivenK
+                    archive.timeStudy.assembly=a;
+                end
+            end
             archive.selectedFaces=[];archive.inspectedFace=[];archive.caption='';
             launcherFlightReview=archive;
             renderEditor();sync();
@@ -2322,6 +2332,15 @@ renderEditor();sync();showGeometry(true);
             if isempty(region) || ismember(string(region.key),["base","afterbody"])
                 msg=sprintf('%s 底缘和相邻尾段两列节点分别占 Newton–Krylov 两次末轮能量残差平方和的 %.1f%%、%.1f%%。', ...
                     msg,100*timeStudy.fullEnergyRimShare,100*timeStudy.halfEnergyRimShare);
+                if isfield(timeStudy,'assembly') && ~isempty(region)
+                    a=timeStudy.assembly;
+                    msg=sprintf(['%s 50 µs 局部组装 · 流体节点 %d（X=%.2f mm）的中心对流项 %.3g，' ...
+                        '净能量残差 %.3g，均为原生无量纲量。'], ...
+                        msg,a.peakPoint,1000*a.modelXM,a.peakCentral,a.peakPhysicalResidual);
+                    if ~a.refinedFullPassed && ~a.refinedHalfPassed
+                        msg=[msg ' 二分尾部三个网格间隔后，两种步长仍未收敛。'];
+                    end
+                end
             end
             if isempty(face),note=[{msg};note(:)];else,note=[note(:);{msg}];end
         end

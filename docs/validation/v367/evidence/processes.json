@@ -1,0 +1,112 @@
+{
+  "build01": {
+    "executableSHA256": "5d7490aab6f7ff8fca4cd9fa3310a47d47688caf700f2685ba6e65eb21ef8488",
+    "cacheManifestSHA256": "4aba31bf40733a76bfab664b047f03b4adc68d14a59efda2c591bb3591a988ea",
+    "cacheInputs": 302,
+    "compilerSHA256": "315c23bc298aba9eaf2aece174fa7fcb0e404247176663e6a4c7707a60f8e444",
+    "upstreamArchiveSHA256": "c45f77e16af4ce326e0fca3adf21009d61e4ecc0d6cac40e8dae22654e1c83dc",
+    "upstreamFiles": {
+      "SU2_CFD/include/numerics_simd/flow/convection/upwind.hpp": "50ee1ffa2d3bb97cac79a4e00b98aa5bfb5b9a08b2ff070ff963461a2d35c8f4",
+      "SU2_CFD/include/numerics_simd/CNumericsSIMD.cpp": "df4e67d5cd6f375085d3df07cca89888ea52c41978b7fc1501fe49544e735f96",
+      "SU2_CFD/src/integration/CIntegration.cpp": "b00c94749cc04fbefcf4f780316a94e76b619f600f0fd07c161132bc67b1e755",
+      "SU2_CFD/src/integration/CNewtonIntegration.cpp": "77aa24c092bc48184eac3f3bd10a1e4dc987e1876bb107b7c9cf1a21b87f5d58"
+    },
+    "observerSHA256": "9bfd716e28046d3aaf35cd8e5306fa148a42b9b99fb3f2afba3a62c0f85a965e",
+    "recipeSHA256": "280b3641f0cca4bd38f70be56c0b70c257266c35ec6c04d9bce338bbf0d9a703",
+    "buildBytes": 20929508,
+    "stages": {
+      "CIntegration_process.json": {
+        "elapsedSeconds": 3.9529999999999745,
+        "exitCode": 0,
+        "peakSampledRSSBytes": 533225472
+      },
+      "CNewtonIntegration_process.json": {
+        "elapsedSeconds": 2.8910000000000764,
+        "exitCode": 0,
+        "peakSampledRSSBytes": 550924288
+      },
+      "CNumericsSIMD_process.json": {
+        "elapsedSeconds": 28.64099999999985,
+        "exitCode": 0,
+        "peakSampledRSSBytes": 646713344
+      },
+      "link_process.json": {
+        "elapsedSeconds": 1.7180000000000746,
+        "exitCode": 0,
+        "peakSampledRSSBytes": 335740928
+      }
+    }
+  },
+  "build_match01": {
+    "executableSHA256": "4522a72fc40dc39dc2940067a7562da19f11979bca3eb4289fa0a58bcebbd4fb",
+    "baseBuildSHA256": "576bc8961b9a8ca7fa4beda422c44cf401f03b8fdaa3adfe60a9a6b7ed051acf",
+    "inputHookSHA256": "ed79bc383dddf560e65c8d7aee6fd07765f7ae813784c8edeaca7556b586093c",
+    "sourceSHA256": "20f012ec3b211c1cb763be223330156188209b47546f0aaa7a02defe7c392e97",
+    "newtonSourceSHA256": "ff340bd9be3462da76822c0310fb6b69e84c6a0ecf3460868a85787befdcbeda",
+    "newtonObjectSHA256": "e195a5cf420ccf781d6532bbcf76184ee19b7325ce65a153442c351e6a4d02cb",
+    "reusedObjects": {
+      "CIntegration.obj": "5e73098d8f9d8951f838da78196d4b9ecadeec05b884e586dc3e3c667118a65e",
+      "CNumericsSIMD.obj": "b3a747ac526a621f7a2dd1fe70c535a5e3575a4f9e0c6df1e96f29e27ff9e184"
+    },
+    "stages": {
+      "CNewtonIntegration_process.json": {
+        "elapsedSeconds": 3.234000000000151,
+        "exitCode": 0,
+        "peakSampledRSSBytes": 553517056
+      },
+      "link_process.json": {
+        "elapsedSeconds": 1.390999999999849,
+        "exitCode": 0,
+        "peakSampledRSSBytes": 325832704
+      }
+    }
+  },
+  "pair01/off": {
+    "elapsedSeconds": 21.57899999999995,
+    "debuggerExitCode": 0,
+    "peakFamilyRSSBytes": 76513280,
+    "peakOutputBytes": 5124821,
+    "stopReason": null,
+    "survivingProcessIDs": []
+  },
+  "pair01/on": {
+    "elapsedSeconds": 20.5150000000001,
+    "debuggerExitCode": 0,
+    "peakFamilyRSSBytes": 66781184,
+    "peakOutputBytes": 6391341,
+    "stopReason": null,
+    "survivingProcessIDs": []
+  },
+  "official_prefix01": {
+    "elapsedSeconds": 21.812000000000126,
+    "debuggerExitCode": 0,
+    "peakFamilyRSSBytes": 81108992,
+    "peakOutputBytes": 4921582,
+    "stopReason": null,
+    "survivingProcessIDs": []
+  },
+  "matched01": {
+    "elapsedSeconds": 1.125,
+    "debuggerExitCode": 0,
+    "peakFamilyRSSBytes": 75980800,
+    "peakOutputBytes": 6066783,
+    "stopReason": null,
+    "survivingProcessIDs": []
+  },
+  "refined01/full": {
+    "elapsedSeconds": 22.172000000000025,
+    "debuggerExitCode": 0,
+    "peakFamilyRSSBytes": 69050368,
+    "peakOutputBytes": 116256,
+    "stopReason": null,
+    "survivingProcessIDs": []
+  },
+  "refined01/half1": {
+    "elapsedSeconds": 19.78099999999995,
+    "debuggerExitCode": 0,
+    "peakFamilyRSSBytes": 68669440,
+    "peakOutputBytes": 5054905,
+    "stopReason": null,
+    "survivingProcessIDs": []
+  }
+}

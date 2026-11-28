@@ -2,11 +2,11 @@
 
 ## 简化运载火箭飞行工况与低速风洞
 
-风洞 9,216 面已算。M0.30 的 50 / 25 µs 第一步均未过门，同刻热流差未知。底缘及相邻尾段两列占 Newton–Krylov 末轮能量残差平方和 88.81% / 93.04%。合格同面新增 0 m²，五点整件功率未知。[时间与收支](validation/v366/RESULTS.md) · [下一项](validation/v366/NEXT_DECISION.md)
+风洞 9,216 面已算。M0.30 尾部节点 3828 的官方基态已对齐，峰值净残差以子午边对流不平衡为主。局部二分后 50/25 µs 第一步均未过门。合格同面新增 0 m²，五点整件功率未知。[原生项与加密](validation/v367/RESULTS.md) · [下一项](validation/v367/NEXT_DECISION.md)
 
-<!-- records:last_completed=v366 -->
+<!-- records:last_completed=v367 -->
 <!-- records:active=none -->
-<!-- records:base_commit=d3b4acf0d9e34565ab5204dc3be4df251f00972c -->
+<!-- records:base_commit=97932001fe1a069bc7abdf869af117fbf8e58858 -->
 
 ## RFZ 独立计算与公开对照
 
